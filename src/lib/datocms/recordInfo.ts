@@ -31,7 +31,7 @@ export async function recordToWebsiteRoute(
 export async function recordToSlug(
   item: SchemaTypes.Item,
   itemTypeApiKey: string,
-  locale: string,
+  _locale: string,
 ): Promise<string | null> {
   switch (itemTypeApiKey) {
     case 'article': {

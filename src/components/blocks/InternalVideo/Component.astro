@@ -1,0 +1,19 @@
+---
+import { type FragmentOf, readFragment } from '~/lib/datocms/graphql';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { InternalVideoFragment } from './graphql';
+
+interface Props {
+  block: FragmentOf<typeof InternalVideoFragment>;
+}
+
+const { block } = Astro.props;
+
+// Read unmasked block from fragment
+const unmaskedBlock = readFragment(InternalVideoFragment, block);
+---
+
+<VideoPlayer
+  data={unmaskedBlock.video}
+  thumbnailTime={unmaskedBlock.thumbTimeSeconds ?? undefined}
+/>

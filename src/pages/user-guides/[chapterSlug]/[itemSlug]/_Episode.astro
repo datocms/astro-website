@@ -1,0 +1,44 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import s from './_style.module.css';
+import { EpisodeFragment } from './_graphql';
+import { readFragment } from 'gql.tada';
+import { Image } from 'astro:assets';
+import { formatVideoDuration } from '~/lib/formatVideoDuration';
+
+interface Props {
+  episode: FragmentOf<typeof EpisodeFragment>;
+  isActive?: boolean;
+}
+
+const { isActive } = Astro.props;
+
+const episode = readFragment(EpisodeFragment, Astro.props.episode);
+---
+
+<li class:list={[s.asideListItem, isActive && s.activeListItem]}>
+  <a href={`/user-guides/${episode.chapters[0]!.slug}/${episode.slug}`} class={s.asideListItem}>
+    <figure>
+      <Image
+        src={`${episode.asset.video.thumbnailUrl}${
+          episode.thumbTimeSeconds ? `?time=${episode.thumbTimeSeconds}` : null
+        }`}
+        inferSize
+        widths={[80, 160]}
+        sizes="80px"
+        alt={episode.title}
+        style={{
+          background: `url(${episode.asset.video.blurUpThumb})`,
+          backgroundSize: 'cover',
+          color: 'transparent',
+        }}
+      />
+    </figure>
+    <div>
+      <h4>{episode.title}</h4>
+      <div class={s.asideVideoDuration}>
+        {formatVideoDuration(episode.asset.video.duration)}
+      </div>
+    </div>
+  </a>
+</li>

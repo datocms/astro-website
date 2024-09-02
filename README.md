@@ -8,63 +8,7 @@
 
 <!--datocms-autoinclude-header end-->
 
-# Astro Starter Kit
-
-This project aims to be a great starting point for your Astro projects that need to interact with DatoCMS.
-
-- 🔍 **Fully commented code** — Every file is commented and explained in detail, it will be impossible to get lost!
-- 💯 **100% TypeScript** — Thanks to [gql.tada](https://gql-tada.0no.co/) every GraphQL query is fully typed, and your IDE will help you complete the GraphQL queries.
-- 🛠️ **Minimal boilerplate** — The project is minimal and exposes only what is necessary to get started, without complicated models that need to be removed.
-- 🚫 **Zero CSS** — There is only one CSS import, which you can remove to use your preferred CSS tool.
-- 📝 **Full support for Draft Mode** — Your editors can always view the latest draft version of the content.
-- 🧩 **Plugin ready** — Support for the fantastic plugins [Web Previews](https://www.datocms.com/marketplace/plugins/i/datocms-plugin-web-previews) and [SEO/Readability Analysis](https://www.datocms.com/marketplace/plugins/i/datocms-plugin-seo-readability-analysis).
-- 🔄 **DatoCMS's Real-time Updates API** — Your editors can see updated content instantly as soon as you save a new version on DatoCMS.
-- 🌐 **SEO Metadata** — Full integration between Astro and the SEO settings coming from DatoCMS.
-
-## How to use
-
-### Quick start
-
-1. [Create an account on DatoCMS](https://datocms.com).
-
-2. Make sure that you have set up the [Github integration on Vercel](https://vercel.com/docs/git/vercel-for-github).
-
-3. Let DatoCMS set everything up for you clicking this button below:
-
-[![Deploy with DatoCMS](https://dashboard.datocms.com/deploy/button.svg)](https://dashboard.datocms.com/deploy?repo=datocms%2Fastro-starter-kit%3Amain)
-
-### Local setup
-
-Once the setup of the project and repo is done, clone the repo locally.
-
-#### Set up environment variables
-
-Copy the sample .env file:
-
-```bash
-cp .env.local.example .env
-```
-
-In your DatoCMS' project, go to the **Settings** menu at the top and click **API tokens**.
-
-Copy the values of the following tokens into the specified environment variable:
-
-- `DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN`: CDA Only (Published)
-- `DATOCMS_DRAFT_CONTENT_CDA_TOKEN`: CDA Only (Draft)
-- `DATOCMS_CMA_TOKEN`: CMA Only (Admin)
-
-#### Run your project locally
-
-```bash
-npm install
-npm run dev
-```
-
-Your website should be up and running on [http://localhost:4321](http://localhost:4321)!
-
-## VS Code
-
-It is highly recommended to follow [these instructions](https://gql-tada.0no.co/get-started/installation#vscode-setup) for an optimal experience with Visual Studio Code, including features like diagnostics, auto-completions, and type hovers for GraphQL.
+# DatoCMS Website
 
 ## <!--datocms-autoinclude-footer start-->
 

@@ -1,6 +1,6 @@
 ---
 import { QueryListener } from '@datocms/astro';
-import { DATOCMS_DRAFT_CONTENT_CDA_TOKEN } from 'astro:env/server';
+import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import type { ComponentProps } from 'react';
 import { isDraftModeEnabled } from '~/lib/draftMode';
 
@@ -20,11 +20,6 @@ const draftModeEnabled = isDraftModeEnabled(Astro);
 
 {
   draftModeEnabled && (
-    <QueryListener
-      {...Astro.props}
-      token={DATOCMS_DRAFT_CONTENT_CDA_TOKEN}
-      excludeInvalid
-      includeDrafts
-    />
+    <QueryListener {...Astro.props} token={DATOCMS_API_TOKEN} excludeInvalid includeDrafts />
   )
 }

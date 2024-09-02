@@ -1,0 +1,147 @@
+---
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { InternalVideo } from '~/components/blocks/InternalVideo';
+import s from './_style.module.css';
+import { StructuredText } from '@datocms/astro';
+import { query } from './_graphql';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { formatVideoDuration } from '~/lib/formatVideoDuration';
+import { Icon } from 'astro-icon/components';
+import NextEpisode from './_NextEpisode.astro';
+import Episode from './_Episode.astro';
+
+const { chapterSlug, itemSlug } = Astro.params;
+
+const { episode, chapters } = await executeQuery(Astro, query, {
+  // biome-ignore lint/style/noNonNullAssertion: never null!
+  variables: { itemSlug: itemSlug! },
+});
+
+const currentChapter = chapters.find((c) => c.slug === chapterSlug);
+
+if (!episode || !currentChapter) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not found',
+  });
+}
+
+const otherChapters = chapters.filter((c) => c !== currentChapter && c.episodes.length);
+const nextChapter = chapters[chapters.indexOf(currentChapter) + 1];
+const nextEpisode =
+  currentChapter.episodes[
+    currentChapter.episodes.findIndex((video) => video.slug === episode.slug) + 1
+  ] || nextChapter?.episodes[0];
+---
+
+<Layout additionalSeo={episode._seoMetaTags}>
+  <Space top={1}>
+    <Wrapper>
+      <div class={s.video}>
+        <VideoPlayer data={episode.asset} thumbnailTime={0} />
+      </div>
+      <div class={s.container}>
+        <div class={s.headingWrapper}>
+          <a href="/user-guides" class={s.back}>
+            <Icon name="regular/chevron-left" />
+            <span>Back to All Videos</span>
+          </a>
+
+          <div class={s.heading}>
+            <h1>{episode.title}</h1>
+            <div class={`${s.pill} ${s.isDark}`}>
+              {formatVideoDuration(episode.asset.video.duration)}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <StructuredText
+            data={episode.content}
+            blockComponents={{
+              InternalVideoRecord: InternalVideo,
+            }}
+          />
+          {nextEpisode && <NextEpisode episode={nextEpisode} />}
+        </div>
+
+        <div class={s.asideWrapper}>
+          <aside class={s.aside}>
+            <div class={s.asideCurrentChapter}>
+              <div class={s.asideHeadingWrapper}>
+                <div class={s.asideHeadingIntro}>
+                  <p class={s.asideChapterLabel}>
+                    Chapter #{chapters.indexOf(currentChapter) + 1}
+                  </p>
+                  <div class={`${s.pill} ${s.isLight}`}>
+                    {currentChapter.episodes.length} episodes
+                  </div>
+                </div>
+                <h2 class={s.asideListTitle}>
+                  {currentChapter.title}
+                </h2>
+              </div>
+              <div class:list={s.asideList}>
+                <ul>
+                  {
+                    currentChapter.episodes.map((nthEpisode) => (
+                      <Episode episode={nthEpisode} isActive={nthEpisode.slug === episode.slug} />
+                    ))
+                  }
+                </ul>
+              </div>
+              <button type="button" class={s.mobileAccordionCta}>
+                <div class={s.mobileAccordionCtaIcon}>
+                  <Icon name="regular/chevron-down" />
+                </div>
+              </button>
+            </div>
+            <div class={s.otherChaptersWrapper}>
+              <h3 class={s.otherChaptersTitle}>Other chapters</h3>
+              <div class={s.otherChapters}>
+                {
+                  otherChapters.map((chapter, i) => (
+                    <a
+                      class={s.otherChaptersItem}
+                      href={`/user-guides/${chapter.slug}/${chapter.episodes[0]!.slug}`}
+                    >
+                      <div class={s.otherChaptersIntro}>
+                        <p class={s.otherChaptersLabel}>Chapter #{i + 1}</p>
+                        <div class={s.pill}>{chapter.episodes.length} episodes</div>
+                      </div>
+                      <h2 class={s.otherChaptersHeading}>{chapter.title}</h2>
+                    </a>
+                  ))
+                }
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </Wrapper>
+  </Space>
+
+  <DraftModeQueryListener query={query} />
+
+  <script>
+    import s from './_style.module.css';
+
+    const toggler = document.querySelector(`.${s.mobileAccordionCta}`);
+    const target = document.querySelector(`.${s.asideList}`);
+
+    if (!toggler || !target) {
+      throw new Error('This should not happen!');
+    }
+
+    toggler.addEventListener('click', () => {
+      const isOpen = target.classList.contains(s.isOpen!);
+
+      target.classList.toggle(s.isOpen!, !isOpen);
+      toggler.classList.toggle(s.isRotated!, !isOpen);
+    });
+  </script>
+</Layout>

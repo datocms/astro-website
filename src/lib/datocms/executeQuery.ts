@@ -1,9 +1,6 @@
 import { rawExecuteQuery } from '@datocms/cda-client';
 import type { AstroGlobal } from 'astro';
-import {
-  DATOCMS_DRAFT_CONTENT_CDA_TOKEN,
-  DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN,
-} from 'astro:env/server';
+import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import type { TadaDocumentNode } from 'gql.tada';
 import { uniq } from 'lodash-es';
 import { isDraftModeEnabled } from '~/lib/draftMode';
@@ -26,9 +23,7 @@ export async function executeQuery<Result, Variables>(
       returnCacheTags: true,
       excludeInvalid: true,
       includeDrafts: draftModeEnabled,
-      token: draftModeEnabled
-        ? DATOCMS_DRAFT_CONTENT_CDA_TOKEN
-        : DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN,
+      token: DATOCMS_API_TOKEN,
     });
 
     if (draftModeEnabled) {
