@@ -1,9 +1,12 @@
-import { executeQuery as libExecuteQuery } from '@datocms/cda-client';
+import { rawExecuteQuery } from '@datocms/cda-client';
+import type { AstroGlobal } from 'astro';
 import {
   DATOCMS_DRAFT_CONTENT_CDA_TOKEN,
   DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN,
 } from 'astro:env/server';
 import type { TadaDocumentNode } from 'gql.tada';
+import { uniq } from 'lodash-es';
+import { isDraftModeEnabled } from '~/lib/draftMode';
 
 /**
  * Executes a GraphQL query using the DatoCMS Content Delivery API, using a
@@ -11,22 +14,49 @@ import type { TadaDocumentNode } from 'gql.tada';
  * published.
  */
 export async function executeQuery<Result, Variables>(
+  Astro: AstroGlobal,
   query: TadaDocumentNode<Result, Variables>,
   options?: ExecuteQueryOptions<Variables>,
 ) {
-  const result = await libExecuteQuery(query, {
-    variables: options?.variables,
-    excludeInvalid: true,
-    includeDrafts: options?.includeDrafts,
-    token: options?.includeDrafts
-      ? DATOCMS_DRAFT_CONTENT_CDA_TOKEN
-      : DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN,
-  });
+  try {
+    const draftModeEnabled = isDraftModeEnabled(Astro.cookies);
 
-  return result;
+    const [result, response] = await rawExecuteQuery(query, {
+      variables: options?.variables,
+      returnCacheTags: true,
+      excludeInvalid: true,
+      includeDrafts: draftModeEnabled,
+      token: draftModeEnabled
+        ? DATOCMS_DRAFT_CONTENT_CDA_TOKEN
+        : DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN,
+    });
+
+    if (draftModeEnabled) {
+      Astro.response.headers.set('cache-control', 'private');
+    } else {
+      // biome-ignore lint/style/noNonNullAssertion: We know this is not null
+      const newCacheTags = response.headers.get('x-cache-tags')!.split(' ');
+
+      const existingCacheTags = Astro.response.headers.get('surrogate-key')?.split(' ') ?? [];
+
+      // We want Fastly to cache our resources forever but send headers to
+      // browsers so that they don't cache it at all https://goo.gl/TQ3vqF
+
+      Astro.response.headers.set(
+        'surrogate-key',
+        uniq([...existingCacheTags, ...newCacheTags]).join(' '),
+      );
+
+      Astro.response.headers.set('surrogate-control', 'max-age=31536000');
+    }
+
+    return result;
+  } catch (e) {
+    Astro.response.headers.set('cache-control', 'private');
+    throw e;
+  }
 }
 
 type ExecuteQueryOptions<Variables> = {
   variables?: Variables;
-  includeDrafts?: boolean;
 };

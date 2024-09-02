@@ -1,7 +1,7 @@
-import { defineConfig, envField } from 'astro/config';
 import react from '@astrojs/react';
+import { defineConfig, envField } from 'astro/config';
 
-import node from "@astrojs/node";
+import node from '@astrojs/node';
 
 // https://astro.build/config
 export default defineConfig({
@@ -11,34 +11,34 @@ export default defineConfig({
       schema: {
         DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN: envField.string({
           context: 'server',
-          access: 'secret'
+          access: 'secret',
         }),
         DATOCMS_DRAFT_CONTENT_CDA_TOKEN: envField.string({
           context: 'server',
-          access: 'secret'
+          access: 'secret',
         }),
         DATOCMS_CMA_TOKEN: envField.string({
           context: 'server',
-          access: 'secret'
+          access: 'secret',
         }),
         SECRET_API_TOKEN: envField.string({
           context: 'server',
-          access: 'secret'
+          access: 'secret',
         }),
         SIGNED_COOKIE_JWT_SECRET: envField.string({
           context: 'server',
-          access: 'secret'
+          access: 'secret',
         }),
         DRAFT_MODE_COOKIE_NAME: envField.string({
           context: 'client',
-          access: 'public'
-        })
+          access: 'public',
+        }),
       },
-      validateSecrets: true
-    }
+      validateSecrets: true,
+    },
   },
   integrations: [react()],
   adapter: node({
-    mode: "standalone"
-  })
+    mode: 'standalone',
+  }),
 });

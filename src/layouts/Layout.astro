@@ -4,7 +4,6 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { graphql } from '~/lib/datocms/graphql';
 import { DraftModeToggler } from '~/components/DraftModeToggler';
 import { Seo, type TitleMetaLinkTag } from '@datocms/astro';
-import { isDraftModeEnabled } from '~/lib/draftMode';
 
 type Props = {
   additionalSeo?: TitleMetaLinkTag[];
@@ -25,8 +24,7 @@ const query = graphql(
   [TagFragment],
 );
 
-const draftModeEnabled = isDraftModeEnabled(Astro.cookies);
-const result = await executeQuery(query, { includeDrafts: draftModeEnabled });
+const result = await executeQuery(Astro, query);
 ---
 
 <!doctype html>

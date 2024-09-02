@@ -7,7 +7,6 @@ import { StructuredText } from '@datocms/astro';
 
 import { HeadingWithAnchorLink } from '~/components/HeadingWithAnchorLink';
 
-import { isDraftModeEnabled } from '~/lib/draftMode';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 import { PageInline } from '~/components/inlineRecord/PageInline';
@@ -79,8 +78,7 @@ const query = graphql(
   ],
 );
 
-const draftModeEnabled = isDraftModeEnabled(Astro.cookies);
-const { page } = await executeQuery(query, { includeDrafts: draftModeEnabled });
+const { page } = await executeQuery(Astro, query);
 
 if (!page) {
   return new Response(null, {
