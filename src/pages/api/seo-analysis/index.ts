@@ -3,10 +3,10 @@ import type { APIRoute } from 'astro';
 import { DATOCMS_CMA_TOKEN, SECRET_API_TOKEN } from 'astro:env/server';
 import { JSDOM } from 'jsdom';
 import { recordToSlug, recordToWebsiteRoute } from '~/lib/datocms/recordInfo';
-import { draftModeHeaders } from '~/lib/draftMode';
+import { draftModeHostname } from '~/lib/draftMode';
 import { handleUnexpectedError, invalidRequestResponse, json, withCORS } from '../utils';
 
-export const OPTIONS: APIRoute = ({ request }) => {
+export const OPTIONS: APIRoute = () => {
   return new Response('OK', withCORS());
 };
 
@@ -74,9 +74,9 @@ export const GET: APIRoute = async ({ url }) => {
      * do this, we set the cookies that are obtained by temporarily enabling
      * Draft Mode.
      */
-    const pageRequest = await fetch(new URL(websitePath, url).toString(), {
-      headers: draftModeHeaders(),
-    });
+    const pageRequest = await fetch(
+      new URL(websitePath, `https://${draftModeHostname}/`).toString(),
+    );
 
     if (!pageRequest.ok) {
       return invalidRequestResponse(`Invalid status for ${websitePath}: ${pageRequest.status}`);

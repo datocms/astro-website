@@ -25,14 +25,6 @@ export default defineConfig({
           context: 'server',
           access: 'secret',
         }),
-        SIGNED_COOKIE_JWT_SECRET: envField.string({
-          context: 'server',
-          access: 'secret',
-        }),
-        DRAFT_MODE_COOKIE_NAME: envField.string({
-          context: 'client',
-          access: 'public',
-        }),
       },
       validateSecrets: true,
     },

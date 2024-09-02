@@ -19,7 +19,7 @@ export async function executeQuery<Result, Variables>(
   options?: ExecuteQueryOptions<Variables>,
 ) {
   try {
-    const draftModeEnabled = isDraftModeEnabled(Astro.cookies);
+    const draftModeEnabled = isDraftModeEnabled(Astro);
 
     const [result, response] = await rawExecuteQuery(query, {
       variables: options?.variables,
@@ -32,6 +32,7 @@ export async function executeQuery<Result, Variables>(
     });
 
     if (draftModeEnabled) {
+      // No cache!
       Astro.response.headers.set('cache-control', 'private');
     } else {
       // biome-ignore lint/style/noNonNullAssertion: We know this is not null

@@ -1,9 +1,10 @@
 import type { APIRoute } from 'astro';
 import { SECRET_API_TOKEN } from 'astro:env/server';
 import { recordToWebsiteRoute } from '~/lib/datocms/recordInfo';
+import { draftModeHostname, productionHostname } from '~/lib/draftMode';
 import { handleUnexpectedError, invalidRequestResponse, json, withCORS } from '../utils';
 
-export const OPTIONS: APIRoute = ({ request }) => {
+export const OPTIONS: APIRoute = () => {
   return new Response('OK', withCORS());
 };
 
@@ -52,39 +53,17 @@ export const POST: APIRoute = async ({ url, request }) => {
        * different from the published one, so it has a draft version!
        */
       if (item.meta.status !== 'published') {
-        /**
-         * Generate a URL that initially enters Draft Mode, and then
-         * redirects to the desired URL
-         */
         response.previewLinks.push({
           label: 'Draft version',
-          url: new URL(
-            /*
-             * We generate the URL in a way that it first passes through the
-             * endpoint that enables the Draft Mode.
-             */
-            `/api/draft-mode/enable?url=${recordUrl}&token=${token}`,
-            request.url,
-          ).toString(),
+          url: new URL(recordUrl, `https://${draftModeHostname}/`).toString(),
         });
       }
 
       /** If status is not draft, it means that it has a published version! */
       if (item.meta.status !== 'draft') {
-        /**
-         * Generate a URL that first exits from Draft Mode, and then
-         * redirects to the desired URL.
-         */
         response.previewLinks.push({
           label: 'Published version',
-          url: new URL(
-            /*
-             * We generate the URL in a way that it first passes through the
-             * endpoint that disables the Draft Mode.
-             */
-            `/api/draft-mode/disable?url=${recordUrl}`,
-            request.url,
-          ).toString(),
+          url: new URL(recordUrl, `https://${productionHostname}/`).toString(),
         });
       }
     }

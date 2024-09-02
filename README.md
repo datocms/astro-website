@@ -53,11 +53,6 @@ Copy the values of the following tokens into the specified environment variable:
 - `DATOCMS_DRAFT_CONTENT_CDA_TOKEN`: CDA Only (Draft)
 - `DATOCMS_CMA_TOKEN`: CMA Only (Admin)
 
-Then set both `SECRET_API_TOKEN` and `SIGNED_COOKIE_JWT_SECRET` as a sicure strings:
-
-- The `SECRET_API_TOKEN` will be used to safeguard all API routes from incoming requests from untrusted sources;
-- The `SIGNED_COOKIE_JWT_SECRET` will be used to sign the Draft Mode cookies.
-
 #### Run your project locally
 
 ```bash
