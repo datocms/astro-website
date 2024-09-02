@@ -1,0 +1,26 @@
+---
+import { type FragmentOf, readFragment } from '~/lib/datocms/graphql';
+import { Image } from '@datocms/astro';
+import { ResponsiveImageFragment } from './fragments';
+import type { ComponentProps } from 'astro/types';
+
+interface Props extends Omit<ComponentProps<typeof Image>, 'data'> {
+  data: FragmentOf<typeof ResponsiveImageFragment>;
+}
+
+const { data, ...rest } = Astro.props;
+
+// Read unmasked data from fragment
+const unmaskedData = readFragment(ResponsiveImageFragment, data);
+---
+
+{
+  /*
+    This component is a wrapper for the `<Image />` component provided by
+    @datocms/astro, optimized for use with graphql.tada. We define the necessary
+    GraphQL fragment for this component to function only once, then reuse it
+    wherever needed.
+  */
+}
+
+<Image {...rest} data={unmaskedData} />

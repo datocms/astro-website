@@ -1,0 +1,56 @@
+---
+import { TagFragment } from '~/lib/datocms/commonFragments';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { graphql } from '~/lib/datocms/graphql';
+import { DraftModeToggler } from '~/components/DraftModeToggler';
+import { Seo, type TitleMetaLinkTag } from '@datocms/astro';
+import { isDraftModeEnabled } from '~/lib/draftMode';
+
+type Props = {
+  additionalSeo?: TitleMetaLinkTag[];
+};
+
+const { additionalSeo = [] } = Astro.props;
+
+const query = graphql(
+  /* GraphQL */ `
+    query RootQuery {
+      _site {
+        faviconMetaTags {
+          ...TagFragment
+        }
+      }
+    }
+  `,
+  [TagFragment],
+);
+
+const draftModeEnabled = isDraftModeEnabled(Astro.cookies);
+const result = await executeQuery(query, { includeDrafts: draftModeEnabled });
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="generator" content={Astro.generator} />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/datocms/nextjs-starter-kit/src/app/global.css"
+    />
+    <Seo data={[...result._site.faviconMetaTags, ...additionalSeo]} />
+  </head>
+  <body>
+    <header>
+      <h1>DatoCMS + Astro Starter Kit</h1>
+      <nav>
+        <a class="navlink" href="https://www.datocms.com/docs/astro"> 📚 Full Integration Guide </a>
+        <DraftModeToggler />
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

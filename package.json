@@ -1,0 +1,50 @@
+{
+  "name": "astro-starter-kit",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "prepare": "npx simple-git-hooks && npm run generate-schema",
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "generate-schema": "dotenv -c -- bash -c 'gql.tada generate schema https://graphql.datocms.com --header \"X-Exclude-Invalid: true\" --header \"Authorization: $DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN\"'",
+    "lint": "prettier --check .",
+    "format": "npx prettier . --write"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.2",
+    "@astrojs/node": "^8.3.3",
+    "@astrojs/react": "^3.6.2",
+    "@datocms/astro": "^0.3.4",
+    "@datocms/cda-client": "^0.2.2",
+    "@datocms/cma-client": "^3.3.5",
+    "@mux/mux-player": "^2.9.1",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "astro": "^4.13.3",
+    "datocms-structured-text-generic-html-renderer": "^4.0.1",
+    "datocms-structured-text-to-plain-text": "^4.0.1",
+    "gql.tada": "^1.8.5",
+    "jsdom": "^24.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "react": "^18.3.1",
+    "react-datocms": "^7.0.1",
+    "react-dom": "^18.3.1",
+    "serialize-error": "^11.0.3",
+    "typescript": "^5.5.4"
+  },
+  "devDependencies": {
+    "@astrojs/ts-plugin": "^1.9.2",
+    "@types/jsdom": "^21.1.7",
+    "@types/jsonwebtoken": "^9.0.6",
+    "dotenv-cli": "^7.4.2",
+    "prettier": "^3.3.3",
+    "prettier-plugin-astro": "^0.14.1",
+    "simple-git-hooks": "^2.11.1"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run format"
+  }
+}

@@ -1,0 +1,30 @@
+---
+import { QueryListener } from '@datocms/astro';
+import { DATOCMS_DRAFT_CONTENT_CDA_TOKEN } from 'astro:env/server';
+import type { ComponentProps } from 'react';
+import { isDraftModeEnabled } from '~/lib/draftMode';
+
+/*
+ * This component utilizes the QueryListener component of @datocms/astro to enable automatic
+ * page refresh whenever the result of the specified query changes. The described effect only
+ * occurs when the draft mode is ON.
+ */
+
+type Props<QueryResult, QueryVariables> = Omit<
+  ComponentProps<typeof QueryListener<QueryResult, QueryVariables>>,
+  'includeDrafts' | 'token' | 'excludeInvalid'
+>;
+
+const draftModeEnabled = isDraftModeEnabled(Astro.cookies);
+---
+
+{
+  draftModeEnabled && (
+    <QueryListener
+      {...Astro.props}
+      token={DATOCMS_DRAFT_CONTENT_CDA_TOKEN}
+      excludeInvalid
+      includeDrafts
+    />
+  )
+}

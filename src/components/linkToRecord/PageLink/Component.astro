@@ -1,0 +1,19 @@
+---
+import type { ItemLink } from 'datocms-structured-text-utils';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { TransformedMeta } from 'datocms-structured-text-generic-html-renderer';
+import { PageLinkFragment } from './fragments';
+
+interface Props {
+  node: ItemLink;
+  record: FragmentOf<typeof PageLinkFragment>;
+  attrs: TransformedMeta;
+}
+
+const { node, record, attrs } = Astro.props;
+
+// Read unmasked record from fragment
+const unmaskedRecord = readFragment(PageLinkFragment, record);
+---
+
+<a {...attrs} href="/" title={unmaskedRecord.title}><slot /></a>

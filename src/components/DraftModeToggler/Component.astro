@@ -1,0 +1,53 @@
+---
+import { isDraftModeEnabled } from '~/lib/draftMode';
+
+const draftModeEnabled = isDraftModeEnabled(Astro.cookies);
+---
+
+<draft-mode-toggler data-enabled={draftModeEnabled ? 'true' : 'false'}></draft-mode-toggler>
+
+<script>
+  class DraftModeToggler extends HTMLElement {
+    constructor() {
+      super();
+
+      const button = document.createElement('button');
+      button.setAttribute('type', 'button');
+      button.addEventListener('click', () => this.handleClick());
+      button.innerText = this.isDraftModeEnabled ? 'Disable Draft Mode' : 'Enable Draft Mode';
+
+      this.appendChild(button);
+    }
+
+    get isDraftModeEnabled() {
+      return this.dataset.enabled === 'true';
+    }
+
+    async handleClick() {
+      let response: Response;
+
+      if (this.isDraftModeEnabled) {
+        response = await fetch('/api/draft-mode/disable');
+      } else {
+        const token = prompt(
+          'To enter Draft Mode, you need to insert the PRIVATE_SECRET_API_TOKEN:',
+          'secretTokenProtectingWebhookEndpointsFromBeingCalledByAnyone',
+        );
+        if (!token) {
+          return;
+        }
+
+        response = await fetch(`/api/draft-mode/enable?token=${token}`);
+      }
+
+      if (!response.ok) {
+        alert('Could not complete the operation!');
+        return;
+      }
+
+      document.location.reload();
+    }
+  }
+
+  customElements.define('draft-mode-toggler', DraftModeToggler);
+</script>
