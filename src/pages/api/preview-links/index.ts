@@ -1,5 +1,6 @@
+import { buildClient } from '@datocms/cma-client';
 import type { APIRoute } from 'astro';
-import { SECRET_API_TOKEN } from 'astro:env/server';
+import { DATOCMS_API_TOKEN, SECRET_API_TOKEN } from 'astro:env/server';
 import { recordToWebsiteRoute } from '~/lib/datocms/recordInfo';
 import { draftModeHostname, productionHostname } from '~/lib/draftMode';
 import { handleUnexpectedError, invalidRequestResponse, json, withCORS } from '../utils';
@@ -40,10 +41,19 @@ export const POST: APIRoute = async ({ url, request }) => {
      * along with information about which locale they are currently viewing in
      * the interface
      */
-    const { item, itemType, locale } = await request.json();
+    const { item, itemType, environmentId } = await request.json();
+
+    const client = buildClient({
+      apiToken: DATOCMS_API_TOKEN,
+      environment: environmentId,
+    });
 
     // We can use this info to generate the frontend URL associated
-    const recordUrl = await recordToWebsiteRoute(item, itemType.attributes.api_key, locale);
+    const recordUrl = await recordToWebsiteRoute({
+      item,
+      itemTypeApiKey: itemType.attributes.api_key,
+      client,
+    });
 
     const response: WebPreviewsResponse = { previewLinks: [] };
 

@@ -44,7 +44,6 @@ export const GET: APIRoute = async ({ url }) => {
     const itemId = url.searchParams.get('itemId');
     const itemTypeId = url.searchParams.get('itemTypeId');
     const itemTypeApiKey = url.searchParams.get('itemTypeApiKey');
-    const locale = url.searchParams.get('locale');
     const sandboxEnvironmentId = url.searchParams.get('sandboxEnvironmentId');
 
     if (!itemId || !itemTypeApiKey || !itemTypeId || !locale || !sandboxEnvironmentId) {
@@ -59,7 +58,11 @@ export const GET: APIRoute = async ({ url }) => {
     const { data: item } = await client.items.rawFind(itemId);
 
     // We can use this info to generate the frontend URL, and the page slug
-    const websitePath = await recordToWebsiteRoute(item, itemTypeApiKey, locale);
+    const websitePath = await recordToWebsiteRoute({
+      item,
+      itemTypeApiKey,
+      client,
+    });
 
     const slug = await recordToSlug(item, itemTypeApiKey, locale);
 
