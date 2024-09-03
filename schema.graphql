@@ -12047,7 +12047,7 @@ input TableModelFilter {
   AND: [TableModelFilter]
 }
 
-"""Block of type Table (table)"""
+"""Block of type 📊 Table (table)"""
 type TableRecord implements RecordInterface {
   _createdAt: DateTime!
 
@@ -13828,10 +13828,8 @@ type UserGuidesHomeRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
-union UserGuidesVideoModelContentBlocksField = ImageRecord | InternalVideoRecord | TableRecord
-
 type UserGuidesVideoModelContentField {
-  blocks: [UserGuidesVideoModelContentBlocksField!]!
+  blocks: [InternalVideoRecord!]!
   links: [String!]!
   value: JsonField!
 }
@@ -13848,11 +13846,11 @@ input UserGuidesVideoModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
+  thumbTimeSeconds: IntegerFilter
+  content: StructuredTextFilter
   video: FileFilter
   seo: SeoFilter
-  content: StructuredTextFilter
   title: StringFilter
-  thumbTimeSeconds: IntegerFilter
   slug: SlugFilter
   OR: [UserGuidesVideoModelFilter]
   AND: [UserGuidesVideoModelFilter]
@@ -13881,10 +13879,10 @@ enum UserGuidesVideoModelOrderBy {
   updatedAt_DESC
   _isValid_ASC
   _isValid_DESC
-  title_ASC
-  title_DESC
   thumbTimeSeconds_ASC
   thumbTimeSeconds_DESC
+  title_ASC
+  title_DESC
 }
 
 """Record of type 📝 User Guides Video (user_guides_video)"""
@@ -14057,12 +14055,12 @@ type UserGuidesVideoRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  content: UserGuidesVideoModelContentField
+  content: UserGuidesVideoModelContentField!
   createdAt: DateTime!
   id: ItemId!
   seo: SeoField
   slug: String!
-  thumbTimeSeconds: IntType
+  thumbTimeSeconds: IntType!
   title: String!
   updatedAt: DateTime!
   video: VideoFileField!
