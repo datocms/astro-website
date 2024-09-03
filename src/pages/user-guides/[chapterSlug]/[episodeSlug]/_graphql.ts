@@ -25,8 +25,8 @@ export const EpisodeFragment = graphql(/* GraphQL */ `
 
 export const query = graphql(
   /* GraphQL */ `
-    query UserGuidesItemQuery($itemSlug: String!) {
-      episode: userGuidesVideo(filter: { slug: { eq: $itemSlug } }) {
+    query UserGuidesItemQuery($episodeSlug: String!) {
+      episode: userGuidesVideo(filter: { slug: { eq: $episodeSlug } }) {
         slug
         _seoMetaTags {
           ...TagFragment

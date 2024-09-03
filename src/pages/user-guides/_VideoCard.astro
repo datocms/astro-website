@@ -1,0 +1,40 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import { formatVideoDuration } from '~/lib/formatVideoDuration';
+import { EpisodeFragment } from './[chapterSlug]/[episodeSlug]/_graphql';
+import { readFragment } from 'gql.tada';
+import s from './_style.module.css';
+import { Image } from 'astro:assets';
+
+type Props = {
+  episode: FragmentOf<typeof EpisodeFragment>;
+};
+
+const episode = readFragment(EpisodeFragment, Astro.props.episode);
+const chapter = episode.chapters[0]!;
+---
+
+<div class={s.chapterItem}>
+  <div class={s.itemVideo}>
+    <a href={`/user-guides/${chapter.slug}/${episode.slug}`}>
+      <Image
+        src={`${episode.asset.video.thumbnailUrl}?time=${episode.thumbTimeSeconds}`}
+        inferSize
+        widths={[300, 600]}
+        sizes="300px"
+        alt={episode.title}
+        style={{
+          background: `url(${episode.asset.video.blurUpThumb})`,
+          backgroundSize: 'cover',
+          color: 'transparent',
+        }}
+      />
+    </a>
+  </div>
+  <a href={`/user-guides/${chapter.slug}/${episode.slug}`}>
+    <h4>{episode.title}</h4>
+    <div class={s.videoDuration}>
+      {formatVideoDuration(episode.asset.video.duration)}
+    </div>
+  </a>
+</div>

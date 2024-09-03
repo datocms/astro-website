@@ -1,0 +1,53 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import s from './_style.module.css';
+import { ChapterFragment } from './_graphql';
+import { readFragment } from 'gql.tada';
+import { Icon } from 'astro-icon/components';
+import { StructuredText } from '@datocms/astro';
+import { formatVideoDuration } from '~/lib/formatVideoDuration';
+import { sum } from 'lodash-es';
+import VideoCard from './_VideoCard.astro';
+import VideoCarousel from './_VideoCarousel.astro';
+
+type Props = {
+  chapter: FragmentOf<typeof ChapterFragment>;
+  number: number;
+};
+
+const chapter = readFragment(ChapterFragment, Astro.props.chapter);
+
+const { number } = Astro.props;
+
+const allVideosDurations = sum(
+  chapter.episodes.map((episode) => episode.asset.video.duration || 0),
+);
+---
+
+<div class={s.chapter}>
+  <div class={s.chapterIntroWrapper}>
+    <div class={s.chapterIntro}>
+      <span class={s.chapterNumber}>Chapter #{number}</span>
+      <div class={s.chapterIntroPills}>
+        <div class={s.pill}>
+          {chapter.episodes.length > 1 ? `${chapter.episodes.length} episodes` : '1 episode'}
+        </div>
+        <div class={s.pill}>
+          <Icon name="regular/clock" />
+          <span>{formatVideoDuration(allVideosDurations)}</span>
+        </div>
+      </div>
+    </div>
+    <h2 class={s.chapterIntroHeading}>{chapter.title}</h2>
+    <div class={s.chapterIntroDescription}>
+      <StructuredText data={chapter.introduction} />
+    </div>
+  </div>
+  <section class={s.chapterVideosWrapper}>
+    <div class={s.chapterVideosList}>
+      {chapter.episodes.map((episode) => <VideoCard episode={episode} />)}
+    </div>
+
+    <VideoCarousel chapter={Astro.props.chapter} />
+  </section>
+</div>

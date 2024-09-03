@@ -1,0 +1,85 @@
+---
+type Props = {
+  targetId: string;
+  startVisible?: boolean;
+};
+
+const { targetId, startVisible } = Astro.props;
+---
+
+<target-toggler target-id={targetId} target-start-visible={startVisible ? 'true' : undefined}>
+  <slot />
+</target-toggler>
+
+<style>
+  target-toggler:not(:defined) {
+    display: none;
+  }
+
+  target-toggler:defined {
+    display: contents;
+  }
+</style>
+
+<script>
+  class TargetToggler extends HTMLElement {
+    toggle: HTMLButtonElement | undefined;
+    controller: AbortController | undefined;
+
+    connectedCallback() {
+      this.toggle = this.querySelector('button') ?? undefined;
+
+      if (!this.toggle) {
+        throw new Error(`${this.localName} must contain a <button> element.`);
+      }
+
+      if (!this.startVisible) this.target.setAttribute('hidden', '');
+
+      this.controller = new AbortController();
+      const { signal } = this.controller;
+
+      this.toggle.setAttribute('aria-expanded', this.startVisible ? 'false' : 'true');
+      this.toggle.setAttribute('aria-controls', this.targetId);
+      this.toggle.addEventListener('click', () => this.handleClick(), { signal });
+    }
+
+    disconnectedCallback() {
+      this.controller?.abort();
+    }
+
+    handleClick() {
+      const expanded = this.toggle?.getAttribute('aria-expanded') === 'true' || false;
+      const newExpanded = !expanded;
+
+      this.toggle?.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
+      this.target?.toggleAttribute('hidden', newExpanded);
+    }
+
+    get target() {
+      const el = document.getElementById(this.targetId);
+
+      if (!el) {
+        throw new Error(`${this.localName} cannot find element with id "${this.targetId}".`);
+      }
+
+      return el;
+    }
+
+    get targetId() {
+      const attr = this.getAttribute('target-id');
+
+      if (!attr) {
+        throw new Error(`${this.localName} requires a "target-id" attribute set to an element id`);
+      }
+
+      return attr;
+    }
+
+    get startVisible() {
+      const attr = 'target-start-visible';
+      return (this.hasAttribute(attr) && this.getAttribute(attr) !== 'false') || false;
+    }
+  }
+
+  window.customElements.define('target-toggler', TargetToggler);
+</script>

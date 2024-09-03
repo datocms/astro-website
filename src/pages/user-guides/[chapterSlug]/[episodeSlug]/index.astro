@@ -13,20 +13,19 @@ import { formatVideoDuration } from '~/lib/formatVideoDuration';
 import { Icon } from 'astro-icon/components';
 import NextEpisode from './_NextEpisode.astro';
 import Episode from './_Episode.astro';
+import { TargetToggler } from '~/components/TargetToggler';
+import { notFoundResponse } from '~/lib/notFoundResponse';
 
-const { chapterSlug, itemSlug } = Astro.params;
+const { chapterSlug, episodeSlug } = Astro.params;
 
-const variables = { itemSlug: itemSlug! };
+const variables = { episodeSlug: episodeSlug! };
 
 const { episode, chapters } = await executeQuery(Astro, query, { variables });
 
 const currentChapter = chapters.find((c) => c.slug === chapterSlug);
 
 if (!episode || !currentChapter) {
-  return new Response(null, {
-    status: 404,
-    statusText: 'Not found',
-  });
+  return notFoundResponse();
 }
 
 const otherChapters = chapters.filter((c) => c !== currentChapter && c.episodes.length);
@@ -84,7 +83,7 @@ const nextEpisode =
                   {currentChapter.title}
                 </h2>
               </div>
-              <div class:list={s.asideList}>
+              <div class={s.asideList} id="list">
                 <ul>
                   {
                     currentChapter.episodes.map((nthEpisode) => (
@@ -93,11 +92,13 @@ const nextEpisode =
                   }
                 </ul>
               </div>
-              <button type="button" class={s.mobileAccordionCta}>
-                <div class={s.mobileAccordionCtaIcon}>
-                  <Icon name="regular/chevron-down" />
-                </div>
-              </button>
+              <TargetToggler targetId="list">
+                <button type="button" class={s.mobileAccordionCta}>
+                  <div class={s.mobileAccordionCtaIcon}>
+                    <Icon name="regular/chevron-down" />
+                  </div>
+                </button>
+              </TargetToggler>
             </div>
             <div class={s.otherChaptersWrapper}>
               <h3 class={s.otherChaptersTitle}>Other chapters</h3>
@@ -125,22 +126,4 @@ const nextEpisode =
   </Space>
 
   <DraftModeQueryListener query={query} variables={variables} />
-
-  <script>
-    import s from './_style.module.css';
-
-    const toggler = document.querySelector(`.${s.mobileAccordionCta}`);
-    const target = document.querySelector(`.${s.asideList}`);
-
-    if (!toggler || !target) {
-      throw new Error('This should not happen!');
-    }
-
-    toggler.addEventListener('click', () => {
-      const isOpen = target.classList.contains(s.isOpen!);
-
-      target.classList.toggle(s.isOpen!, !isOpen);
-      toggler.classList.toggle(s.isRotated!, !isOpen);
-    });
-  </script>
 </Layout>

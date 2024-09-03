@@ -29,6 +29,12 @@ export async function recordToWebsiteRoute({
     case 'article': {
       return `/blog/${await recordToSlug(item, itemTypeApiKey)}`;
     }
+    case 'user_guides_chapter': {
+      return '/user-guides';
+    }
+    case 'user_guides_home': {
+      return '/user-guides';
+    }
     case 'user_guides_video': {
       const chapters = await client.items.list({
         version: 'current',

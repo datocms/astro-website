@@ -1,0 +1,82 @@
+---
+import { readFragment } from 'gql.tada';
+import { ChapterFragment } from './_graphql';
+import s from './_style.module.css';
+import VideoCard from './_VideoCard.astro';
+import { Icon } from 'astro-icon/components';
+import type { FragmentOf } from 'gql.tada';
+
+type Props = {
+  chapter: FragmentOf<typeof ChapterFragment>;
+};
+
+const chapter = readFragment(ChapterFragment, Astro.props.chapter);
+---
+
+<episodes-carousel>
+  <div class={s.embla} data-carousel>
+    <div class={s.emblaContainer}>
+      {chapter.episodes.map((episode) => <VideoCard episode={episode} />)}
+    </div>
+    <button class={s.prevSlide} data-prev>
+      <Icon name="regular/angle-left" />
+    </button>
+    <button class={s.nextSlide} data-next>
+      <Icon name="regular/angle-right" />
+    </button>
+  </div>
+</episodes-carousel>
+
+<script>
+  import EmblaCarousel, { type EmblaCarouselType } from 'embla-carousel';
+
+  class EpisodesCarousel extends HTMLElement {
+    private api: EmblaCarouselType | null = null;
+
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      const node = this.querySelector<HTMLElement>('[data-carousel]');
+      if (!node) {
+        throw new Error('No carousel node found!');
+      }
+
+      const prevButton = node.querySelector<HTMLButtonElement>('[data-prev]');
+      const nextButton = node.querySelector<HTMLButtonElement>('[data-next]');
+
+      if (!prevButton || !nextButton) {
+        throw new Error('Missing required elements for the carousel!');
+      }
+
+      this.api = EmblaCarousel(node, { loop: false, align: 'start' });
+
+      prevButton.addEventListener('click', () => this.api?.scrollPrev());
+      nextButton.addEventListener('click', () => this.api?.scrollNext());
+
+      const update = () => {
+        if (!this.api) {
+          return;
+        }
+
+        prevButton.toggleAttribute('disabled', !this.api.canScrollPrev());
+        nextButton.toggleAttribute('disabled', !this.api.canScrollNext());
+      };
+
+      update();
+      this.api.on('init', update);
+      this.api.on('select', update);
+    }
+
+    disconnectedCallback() {
+      if (this.api) {
+        this.api.destroy();
+        this.api = null;
+      }
+    }
+  }
+
+  // Define the custom element
+  customElements.define('episodes-carousel', EpisodesCarousel);
+</script>

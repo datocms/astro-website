@@ -1,0 +1,40 @@
+---
+import { containsKeywords } from '~/lib/containsKeyword';
+import { Wrapper } from '../Wrapper';
+import s from './style.module.css';
+
+interface Props {
+  image?: string;
+  kicker?: string;
+  title?: string;
+  subtitle?: string;
+  seoAnalysis?: string[];
+}
+
+const { image, kicker, title, subtitle, seoAnalysis } = Astro.props;
+
+let Title: 'h1' | 'h2';
+let Subtitle: 'h3' | 'div';
+let Kicker: 'h1' | 'h2';
+
+if (seoAnalysis) {
+  const kickerContainsKeywords = kicker ? containsKeywords(kicker, seoAnalysis) : false;
+  Kicker = kickerContainsKeywords ? 'h1' : 'h2';
+  Title = kickerContainsKeywords ? 'h2' : 'h1';
+  Subtitle = 'h3';
+} else {
+  Kicker = 'h2';
+  Title = 'h1';
+  Subtitle = 'div';
+}
+---
+
+<Wrapper>
+  <div class={s.root}>
+    {kicker && <Kicker class={s.kicker}>{kicker}</Kicker>}
+    {image && <div class={s.kicker}>{image}</div>}
+    {title && <Title class={s.title}>{title}</Title>}
+    {subtitle && <Subtitle class={s.subtitle}>{subtitle}</Subtitle>}
+    <slot />
+  </div>
+</Wrapper>
