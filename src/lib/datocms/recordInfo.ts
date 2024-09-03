@@ -27,14 +27,14 @@ export async function recordToWebsiteRoute({
       return '/';
     }
     case 'article': {
-      return `/blog/${await recordToSlug(item, itemTypeApiKey, locale)}`;
+      return `/blog/${await recordToSlug(item, itemTypeApiKey)}`;
     }
     case 'user_guides_video': {
       const chapters = await client.items.list({
         version: 'current',
         filter: { type: 'user_guides_chapter', fields: { videos: { all_in: [item.id] } } },
       });
-      return `/user-guides/${chapters[0]!.slug}/${await recordToSlug(item, itemTypeApiKey, locale)}`;
+      return `/user-guides/${chapters[0]!.slug}/${await recordToSlug(item, itemTypeApiKey)}`;
     }
     default:
       return null;
@@ -44,13 +44,9 @@ export async function recordToWebsiteRoute({
 export async function recordToSlug(
   item: SchemaTypes.Item,
   itemTypeApiKey: string,
-  _locale: string,
 ): Promise<string | null> {
   switch (itemTypeApiKey) {
-    case 'article': {
-      return item.attributes.slug as string;
-    }
     default:
-      return null;
+      return item.attributes.slug as string;
   }
 }

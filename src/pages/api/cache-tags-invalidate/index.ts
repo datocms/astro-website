@@ -16,14 +16,16 @@ type CdaCacheTagsInvalidateWebhook = {
 };
 
 async function invalidateFastlySurrogateKeys(serviceId: string, fastlyKey: string, keys: string[]) {
-  return fetch(`https://api.fastly.com/service/${serviceId}/purge`, {
-    method: "POST",
+  const response = await fetch(`https://api.fastly.com/service/${serviceId}/purge`, {
+    method: 'POST',
     headers: {
-      "fastly-key": fastlyKey,
-      "content-type": "application/json",
+      'fastly-key': fastlyKey,
+      'content-type': 'application/json',
     },
     body: JSON.stringify({ surrogate_keys: keys }),
   });
+
+  return await response.json();
 }
 
 export const POST: APIRoute = async ({ url, request }) => {
@@ -36,16 +38,12 @@ export const POST: APIRoute = async ({ url, request }) => {
       return invalidRequestResponse('Invalid token', 401);
     }
 
-    const data = await request.json() as CdaCacheTagsInvalidateWebhook;
+    const data = (await request.json()) as CdaCacheTagsInvalidateWebhook;
     const cacheTags = data.entity.attributes.tags;
 
-    const response = await invalidateFastlySurrogateKeys(
-      FASTLY_SERVICE_ID,
-      FASTLY_KEY,
-      cacheTags
-    );
+    const response = await invalidateFastlySurrogateKeys(FASTLY_SERVICE_ID, FASTLY_KEY, cacheTags);
 
-    return json(response);
+    return json({ cacheTags, response });
   } catch (error) {
     return handleUnexpectedError(error);
   }

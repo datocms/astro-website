@@ -16,10 +16,9 @@ import Episode from './_Episode.astro';
 
 const { chapterSlug, itemSlug } = Astro.params;
 
-const { episode, chapters } = await executeQuery(Astro, query, {
-  // biome-ignore lint/style/noNonNullAssertion: never null!
-  variables: { itemSlug: itemSlug! },
-});
+const variables = { itemSlug: itemSlug! };
+
+const { episode, chapters } = await executeQuery(Astro, query, { variables });
 
 const currentChapter = chapters.find((c) => c.slug === chapterSlug);
 
@@ -125,7 +124,7 @@ const nextEpisode =
     </Wrapper>
   </Space>
 
-  <DraftModeQueryListener query={query} />
+  <DraftModeQueryListener query={query} variables={variables} />
 
   <script>
     import s from './_style.module.css';

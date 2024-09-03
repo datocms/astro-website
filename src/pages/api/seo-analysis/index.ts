@@ -46,7 +46,7 @@ export const GET: APIRoute = async ({ url }) => {
     const itemTypeApiKey = url.searchParams.get('itemTypeApiKey');
     const sandboxEnvironmentId = url.searchParams.get('sandboxEnvironmentId');
 
-    if (!itemId || !itemTypeApiKey || !itemTypeId || !locale || !sandboxEnvironmentId) {
+    if (!itemId || !itemTypeApiKey || !itemTypeId || !sandboxEnvironmentId) {
       return invalidRequestResponse('Missing required parameters');
     }
 
@@ -64,7 +64,7 @@ export const GET: APIRoute = async ({ url }) => {
       client,
     });
 
-    const slug = await recordToSlug(item, itemTypeApiKey, locale);
+    const slug = await recordToSlug(item, itemTypeApiKey);
 
     if (!websitePath) {
       return invalidRequestResponse(
