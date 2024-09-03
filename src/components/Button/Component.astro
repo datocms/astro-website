@@ -1,0 +1,46 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import style from './style.module.css';
+
+const fsClassNames = {
+  big: style.fsBig,
+  small: style.fsSmall,
+};
+
+const pClassNames = {
+  big: style.pBig,
+  small: style.pSmall,
+  tiny: style.pTiny,
+};
+
+const sClassNames = {
+  invert: style.sInvert,
+  purple: style.sPurple,
+};
+
+type Props<T extends HTMLTag = 'button'> = Polymorphic<{
+  as: T;
+  fs?: keyof typeof fsClassNames;
+  p?: keyof typeof pClassNames;
+  s?: keyof typeof sClassNames;
+  block?: boolean;
+  disabled?: boolean;
+}>;
+
+const { as: Tag = 'button' as any, fs, p, s, block, disabled, ...props } = Astro.props;
+---
+
+<Tag
+  {...props}
+  class:list={[
+    style.root,
+    props.class,
+    disabled && style.disabled,
+    block && style.block,
+    s && sClassNames[s],
+    fs && fsClassNames[fs],
+    p && pClassNames[p],
+  ]}
+>
+  <slot />
+</Tag>

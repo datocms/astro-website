@@ -1,0 +1,25 @@
+---
+import { Icon } from 'astro-icon/components';
+import { Wrapper } from '../Wrapper';
+import s from './style.module.css';
+
+type Props = {
+  title: string;
+  clients: string[];
+};
+
+const { title, clients } = Astro.props;
+---
+
+<Wrapper>
+  {title && <div class={s.title}>{title}</div>}
+  <div class={s.root}>
+    {
+      clients.map((client) => (
+        <div class={s.logo}>
+          <Icon name={client} width={undefined} height={undefined} />
+        </div>
+      ))
+    }
+  </div>
+</Wrapper>

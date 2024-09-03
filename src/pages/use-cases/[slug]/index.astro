@@ -1,0 +1,239 @@
+---
+import Layout from '~/layouts/Layout.astro';
+import s from './_style.module.css';
+import { Wrapper } from '~/components/Wrapper';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import { notFoundResponse } from '~/lib/notFoundResponse';
+import { Button } from '~/components/Button';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { HighlightStructuredText } from '~/components/HighlightStructuredText';
+import { LogosBar } from '~/components/LogosBar';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Space } from '~/components/Space';
+import { QuotesCarousel } from '~/components/QuotesCarousel';
+import { StructuredText } from '@datocms/astro';
+import { Highlight } from '~/components/Highlight';
+import { Icon } from 'astro-icon/components';
+import { Checks } from '~/components/Checks';
+
+const { page } = await executeQuery(Astro, query, { variables: { slug: Astro.params.slug! } });
+
+if (!page) {
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Wrapper>
+    <div class={s.hero}>
+      <div class={s.heroBody}>
+        <h1 class={s.heroTitle}>
+          <HighlightStructuredText data={page.title} />
+        </h1>
+        <div class={s.heroSubtitle}>
+          <HighlightStructuredText data={page.subtitle} />
+        </div>
+        <div class={s.buttonContainer}>
+          <Button as="a" href="https://dashboard.datocms.com/signup"> Try it for free </Button>
+          <Button as="a" s="invert" href="/contact"> Contact sales </Button>
+        </div>
+      </div>
+      <div class={s.heroImageWrapper}>
+        <div class={s.heroImage}>
+          <ResponsiveImage data={page.heroCustomer.responsiveImage} />
+        </div>
+        <div class={s.heroImage}>
+          <ResponsiveImage data={page.heroProduct.responsiveImage} />
+        </div>
+      </div>
+    </div>
+  </Wrapper>
+
+  <LogosBar
+    title="We power experiences for over half a billion users"
+    clients={[
+      'logos/polestar',
+      'logos/hashicorp',
+      'logos/verizon',
+      'logos/little-caesars',
+      'logos/vercel',
+    ]}
+  />
+
+  <div class={s.testimonials}>
+    <Space top={2} bottom={3}>
+      <InterstitialTitle style="three">
+        <HighlightStructuredText data={page.quotesHeader} />
+      </InterstitialTitle>
+      <QuotesCarousel quotes={page.quotes} animated={false} />
+    </Space>
+  </div>
+
+  <div class={s.starterBoxWrapper}>
+    <Wrapper>
+      <div class={s.starterBox}>
+        <div class={s.starterBoxText}>
+          <h2><HighlightStructuredText data={page.starterTitle} /></h2>
+          <StructuredText data={page.starterDescription} />
+          <Space top={1}>
+            <Button as="a" p="small" s="purple" href={page.starterLink}>Check it out</Button>
+          </Space>
+        </div>
+
+        {
+          page.starterImage?.responsiveImage && (
+            <div class={s.starterBoxImage}>
+              <div class={s.imageWrapper}>
+                <div class={s.image}>
+                  <ResponsiveImage
+                    data={page.starterImage.responsiveImage}
+                    pictureStyle={{
+                      objectFit: 'contain',
+                      objectPosition: 'left',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </Wrapper>
+  </div>
+
+  <div class={s.features}>
+    <Wrapper>
+      <div class={s.baloons}>
+        <div class={s.dev}>
+          <p>
+            <strong>
+              If you’re a <Highlight style="good">dev</Highlight>
+            </strong>{' '}
+            looking to hook up DatoCMS to your repos, head on over to{' '}
+            <a href="docs">our docs</a>
+          </p>
+        </div>
+
+        <div class={s.editor}>
+          <p>
+            <strong>
+              If you’re an{' '}
+              <Highlight style="good">editor, marketer, or content creator</Highlight>
+            </strong>{' '}
+            on the fence about whether or not DatoCMS is for you, you’re probably…
+          </p>
+          <Icon name="other/arrow" width={undefined} height={undefined} />
+        </div>
+      </div>
+    </Wrapper>
+
+    <Wrapper>
+      <div class={s.niceBlock}>
+        <div class={s.blockIllustration}>
+          <Icon name="illustrations/zen" width={undefined} height={undefined} />
+        </div>
+        <div class={s.blockText}>
+          <h2>{page.featuresHeader}</h2>
+          <StructuredText data={page.featuresDescription} />
+        </div>
+      </div>
+    </Wrapper>
+
+    {
+      page.callout.map((callout, index) => (
+        <section class:list={[s.featuresGroup, index === 1 && s.alternative]}>
+          <div class={s.featuresIntro}>
+            <div class={s.visual}>
+              {callout.image?.responsiveImage && (
+                <ResponsiveImage data={callout.image.responsiveImage} />
+              )}
+            </div>
+            <article>
+              <h3>{callout.title}</h3>
+              <StructuredText data={callout.description} />
+            </article>
+          </div>
+          <div class={s.featuresGrid}>
+            {callout.features.map((feature) => (
+              <div class={s.feature}>
+                <article class={s.featureContent}>
+                  {feature.icon?.url && (
+                    <div class={s.featureIcon}>
+                      <img src={feature.icon.url} loading="lazy" height={30} width={30} />
+                    </div>
+                  )}
+                  <div class={s.featureText}>
+                    <h4 class={s.featureTitle}>{feature.title}</h4>
+                    <StructuredText data={feature.description} />
+                  </div>
+                </article>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <div class={s.successStoryWrapper}>
+    <Wrapper>
+      <div class={s.successStory}>
+        <div class={s.successStoryText}>
+          <h2><HighlightStructuredText data={page.successStoryHeader} /></h2>
+          <StructuredText data={page.successStorySummary} />
+          <Space top={1}>
+            <Button
+              as="a"
+              p="small"
+              s="purple"
+              href={page.caseStudy.__typename === 'SuccessStoryRecord'
+                ? `/customers/${page.caseStudy.slug}`
+                : page.caseStudy.__typename === 'ShowcaseProjectRecord'
+                  ? `/partners/${page.caseStudy.partner.slug}/showcase/${page.caseStudy.slug}`
+                  : page.caseStudy.__typename === 'CustomerStoryRecord'
+                    ? `/customer-stories/${page.caseStudy.slug}`
+                    : undefined}
+            >
+              Check it out
+            </Button>
+          </Space>
+        </div>
+
+        {
+          page.successStoryImage?.responsiveImage && (
+            <div class={s.successStoryImage}>
+              <div class={s.imageWrapper}>
+                <div class={s.image}>
+                  <ResponsiveImage
+                    data={page.successStoryImage.responsiveImage}
+                    pictureStyle={{
+                      objectFit: 'contain',
+                      objectPosition: 'left',
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </Wrapper>
+  </div>
+
+  <Space top={2}>
+    <div class={s.outro}>
+      <InterstitialTitle style="one" kicker="Seen enough?">
+        Get started with DatoCMS
+      </InterstitialTitle>
+      <Checks checks={['No credit card', 'Easy setup']}>
+        <div class={s.buttonGroup}>
+          <Button as="a" href="https://dashboard.datocms.com/signup"> Sign up for free </Button>
+          <Button as="a" s="invert" href="https://try.datocms.com" target="_blank">
+            Try our interactive demo ⤑
+          </Button>
+        </div>
+      </Checks>
+    </div>
+  </Space>
+</Layout>

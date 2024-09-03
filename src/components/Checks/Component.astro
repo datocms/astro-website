@@ -1,0 +1,25 @@
+---
+import style from './style.module.css';
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { Icon } from 'astro-icon/components';
+
+type Props<T extends HTMLTag = 'div'> = Polymorphic<{
+  as: T;
+  checks: string[];
+}>;
+
+const { as: Tag = 'div' as any, checks } = Astro.props;
+---
+
+<Tag class={style.root}>
+  <slot />
+  <ul class={style.list}>
+    {
+      checks.map((check) => (
+        <li class={style.check}>
+          <Icon name="regular/check" /> {check}
+        </li>
+      ))
+    }
+  </ul>
+</Tag>

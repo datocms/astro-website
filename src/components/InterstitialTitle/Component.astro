@@ -1,0 +1,66 @@
+---
+import { Wrapper } from '../Wrapper';
+import { Heading } from '../Heading';
+import { containsKeywords } from '~/lib/containsKeyword';
+import s from './style.module.css';
+import type { HTMLTag } from 'astro/types';
+import { slugify } from '~/lib/slugify';
+
+type Props = {
+  style?: 'one' | 'two' | 'three';
+  kicker?: string;
+  subtitle?: string;
+  bigSubtitle?: string;
+  seoAnalysis?: unknown;
+  mainTitleOfPage?: string;
+  below?: string;
+};
+
+const {
+  style = 'one',
+  kicker,
+  subtitle,
+  bigSubtitle,
+  seoAnalysis,
+  mainTitleOfPage,
+  below,
+} = Astro.props;
+
+let Title: HTMLTag;
+let Subtitle: HTMLTag;
+let Kicker: HTMLTag;
+
+const ifMainTitle = <T extends string | undefined>(a: T, b: T) => (mainTitleOfPage ? a : b);
+
+if (seoAnalysis) {
+  const kickerContainsKeywords = containsKeywords(kicker || '', seoAnalysis);
+  Kicker = kickerContainsKeywords ? ifMainTitle('h1', 'h2') : ifMainTitle('h2', 'h3');
+  Title = kicker && kickerContainsKeywords ? ifMainTitle('h2', 'h3') : ifMainTitle('h1', 'h2');
+  Subtitle = subtitle && containsKeywords(subtitle, seoAnalysis) ? 'h4' : 'h6';
+} else {
+  Kicker = 'h2';
+  Title = ifMainTitle('h1', 'h3');
+  Subtitle = 'div';
+}
+---
+
+<Wrapper>
+  <div class={s.root}>
+    {
+      kicker && (
+        <Heading
+          as={Kicker}
+          class={s.kicker}
+          anchor={mainTitleOfPage ? undefined : slugify(kicker)}
+        >
+          {kicker}
+        </Heading>
+      )
+    }
+    <div class={s[style]}>
+      <Title class={s.title}><slot /></Title>
+    </div>
+    {subtitle && <Subtitle class={bigSubtitle ? s.bigSubtitle : s.subtitle}>{subtitle}</Subtitle>}
+    {below}
+  </div>
+</Wrapper>

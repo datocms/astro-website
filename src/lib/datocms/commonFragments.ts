@@ -5,7 +5,7 @@ import { graphql } from '~/lib/datocms/graphql';
  * component, but necessary in various parts of the code.
  */
 
-export const TagFragment = graphql(`
+export const TagFragment = graphql(/* GraphQL */ `
   fragment TagFragment on Tag @_unmask {
     tag
     attributes

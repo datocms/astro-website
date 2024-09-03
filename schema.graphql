@@ -7017,11 +7017,11 @@ input PartnerTestimonialModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   _stage: AgencyProgramWorkflowStageFilter
-  image: FileFilter
   quote: StructuredTextFilter
   partner: LinkFilter
   role: StringFilter
   name: StringFilter
+  image: FileFilter
   OR: [PartnerTestimonialModelFilter]
   AND: [PartnerTestimonialModelFilter]
 }
@@ -7084,7 +7084,7 @@ type PartnerTestimonialRecord implements RecordInterface {
   _updatedAt: DateTime!
   createdAt: DateTime!
   id: ItemId!
-  image: FileField!
+  image: ImageFileField!
   name: String!
   partner: PartnerRecord!
   quote: PartnerTestimonialModelQuoteField!
@@ -13450,11 +13450,11 @@ type UseCaseCalloutRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   createdAt: DateTime!
-  description: UseCaseCalloutModelDescriptionField
+  description: UseCaseCalloutModelDescriptionField!
   features: [UseCaseFeatureRecord!]!
   id: ItemId!
   image: FileField
-  title: String
+  title: String!
   updatedAt: DateTime!
 }
 
@@ -13485,14 +13485,14 @@ type UseCaseFeatureRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   createdAt: DateTime!
-  description: UseCaseFeatureModelDescriptionField
+  description: UseCaseFeatureModelDescriptionField!
   icon: FileField
   id: ItemId!
-  title: String
+  title: String!
   updatedAt: DateTime!
 }
 
-union UseCasePageModelCaseStudyField = CustomerStoryRecord | ShowcaseProjectRecord | SuccessStoryRecord | UseCasesPageRecord
+union UseCasePageModelCaseStudyField = CustomerStoryRecord | ShowcaseProjectRecord | SuccessStoryRecord
 
 type UseCasePageModelDescriptionField {
   blocks: [String!]!
@@ -13517,30 +13517,30 @@ input UseCasePageModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  heroProduct: FileFilter
-  heroCustomer: FileFilter
   featuresHeader: StringFilter
   heading: StringFilter
-  link: StringFilter
   successStoryHeader: StructuredTextFilter
-  quotesHeader: StructuredTextFilter
-  header: StructuredTextFilter
-  image: FileFilter
-  subtitle: StructuredTextFilter
-  quotes: LinksFilter
-  starterTitle: StructuredTextFilter
-  starterImage: FileFilter
-  description: StructuredTextFilter
-  summary: StructuredTextFilter
-  headline: StructuredTextFilter
-  starterDescription: StructuredTextFilter
-  seo: SeoFilter
-  caseStudy: LinkFilter
-  heroImage: FileFilter
   title: StructuredTextFilter
+  starterImage: FileFilter
+  heroCustomer: FileFilter
+  heroProduct: FileFilter
+  heroImage: FileFilter
+  subtitle: StructuredTextFilter
+  description: StructuredTextFilter
+  headline: StructuredTextFilter
+  seo: SeoFilter
   readability: JsonFilter
   identifierInternal: StringFilter
   slug: SlugFilter
+  quotesHeader: StructuredTextFilter
+  header: StructuredTextFilter
+  quotes: LinksFilter
+  caseStudy: LinkFilter
+  summary: StructuredTextFilter
+  image: FileFilter
+  starterTitle: StructuredTextFilter
+  starterDescription: StructuredTextFilter
+  link: StringFilter
   OR: [UseCasePageModelFilter]
   AND: [UseCasePageModelFilter]
 }
@@ -13584,13 +13584,11 @@ enum UseCasePageModelOrderBy {
   featuresHeader_DESC
   heading_ASC
   heading_DESC
-  link_ASC
-  link_DESC
   identifierInternal_ASC
   identifierInternal_DESC
+  link_ASC
+  link_DESC
 }
-
-union UseCasePageModelQuotesField = CustomerRecord | PartnerTestimonialRecord
 
 type UseCasePageModelQuotesHeaderField {
   blocks: [String!]!
@@ -13655,32 +13653,32 @@ type UseCasePageRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   callout: [UseCaseCalloutRecord!]!
-  caseStudy: UseCasePageModelCaseStudyField
+  caseStudy: UseCasePageModelCaseStudyField!
   createdAt: DateTime!
   description: UseCasePageModelDescriptionField
   featuresHeader: String
-  header: UseCasePageModelHeaderField
+  header: UseCasePageModelHeaderField!
   heading: String
   headline: UseCasePageModelHeadlineField
-  heroCustomer: FileField
-  heroImage: FileField
-  heroProduct: FileField
+  heroCustomer: ImageFileField!
+  heroImage: ImageFileField!
+  heroProduct: ImageFileField!
   id: ItemId!
   identifierInternal: String
-  image: FileField
-  link: String
-  quotes: [UseCasePageModelQuotesField!]!
-  quotesHeader: UseCasePageModelQuotesHeaderField
+  image: ImageFileField!
+  link: String!
+  quotes: [PartnerTestimonialRecord!]!
+  quotesHeader: UseCasePageModelQuotesHeaderField!
   readability: JsonField
   seo: SeoField
   slug: String
-  starterDescription: UseCasePageModelStarterDescriptionField
-  starterImage: FileField
-  starterTitle: UseCasePageModelStarterTitleField
+  starterDescription: UseCasePageModelStarterDescriptionField!
+  starterImage: ImageFileField!
+  starterTitle: UseCasePageModelStarterTitleField!
   subtitle: UseCasePageModelSubtitleField
-  successStoryHeader: UseCasePageModelSuccessStoryHeaderField
-  summary: UseCasePageModelSummaryField
-  title: UseCasePageModelTitleField
+  successStoryHeader: UseCasePageModelSuccessStoryHeaderField!
+  summary: UseCasePageModelSummaryField!
+  title: UseCasePageModelTitleField!
   updatedAt: DateTime!
 }
 

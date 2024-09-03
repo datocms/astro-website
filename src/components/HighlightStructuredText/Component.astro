@@ -1,0 +1,19 @@
+---
+import { StructuredText } from '@datocms/astro';
+import NoParagraph from './NoParagraph.astro';
+import { Highlight } from '~/components/Highlight';
+
+type Props = {
+  data: any;
+  noWrappers?: boolean;
+  highlighter?: (props: any) => any;
+};
+
+const { data, noWrappers = true, highlighter = Highlight } = Astro.props;
+---
+
+<StructuredText
+  data={data}
+  nodeOverrides={noWrappers ? { paragraph: NoParagraph } : undefined}
+  markOverrides={{ highlight: highlighter }}
+/>

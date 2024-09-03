@@ -1,13 +1,14 @@
 ---
+import type { HTMLTag, Polymorphic } from 'astro/types';
 import style from './style.module.css';
 
-type Props = {
-  as: string;
-};
+type Props<T extends HTMLTag = 'div'> = Polymorphic<{
+  as: T;
+}>;
 
-const { as: WrapperElement = 'div' } = Astro.props;
+const { as: Tag = 'div' as any, ...props } = Astro.props;
 ---
 
-<WrapperElement className={style.wrapper}>
+<Tag {...props} class:list={[style.wrapper, props.class]}>
   <slot />
-</WrapperElement>
+</Tag>

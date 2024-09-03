@@ -1,6 +1,7 @@
 ---
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import type { Heading } from 'datocms-structured-text-utils';
+import { slugify } from '~/lib/slugify';
 
 interface Props {
   // https://www.datocms.com/docs/structured-text/dast#heading
@@ -8,19 +9,6 @@ interface Props {
 }
 
 const { node } = Astro.props;
-
-/**
- * Returns a slugified version of the string by converting the input to
- * lowercase, eliminating non-alphanumeric characters, and removing any hyphens
- * at the beginning or end of the string.
- */
-const slugify = (str: string | null) =>
-  str
-    ? str
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '')
-    : undefined;
 
 const Element = `h${node.level}` as const;
 
