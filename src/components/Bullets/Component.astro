@@ -1,0 +1,27 @@
+---
+import { Icon } from 'astro-icon/components';
+import { StructuredText } from '@datocms/astro';
+import s from './style.module.css';
+
+interface Props {
+  bullets: (typeof StructuredText)[];
+  icon: string;
+  largeBullet?: boolean;
+  style: 'bad' | 'good';
+}
+
+const { bullets, icon, largeBullet, style } = Astro.props;
+---
+
+<ul class:list={[s.root, largeBullet && s.isLarge]}>
+  {
+    bullets.map((bullet) => (
+      <li class:list={[s.bullet]}>
+        <div data-style={style} class={s.iconWrapper}>
+          <Icon name={icon} />
+        </div>
+        <StructuredText data={bullet} />
+      </li>
+    ))
+  }
+</ul>

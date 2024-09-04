@@ -4,6 +4,7 @@ import Layout from '~/layouts/Layout.astro';
 import s from './_style.module.css';
 import { Hero } from '~/components/Hero';
 import { Button } from '~/components/Button';
+import { Bullets } from '~/components/Bullets';
 import { Flag } from '~/components/Flag';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { notFoundResponse } from '~/lib/notFoundResponse';
@@ -44,7 +45,14 @@ if (!page) {
             <div slot="title">
               <HighlightStructuredText data={pillar.title} />
             </div>
-            <p>{pillar.pillarCallout}</p>
+            <article>
+              {pillar.pillarCallout}
+              <Bullets
+                bullets={[pillar.capability1, pillar.capability2, pillar.capability3]}
+                icon={'regular/check'}
+                style="bad"
+              />
+            </article>
           </Flag>
         </div>
       );
