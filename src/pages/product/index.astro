@@ -1,0 +1,52 @@
+---
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import Layout from '~/layouts/Layout.astro';
+import s from './_style.module.css';
+import { Hero } from '~/components/Hero';
+import { Button } from '~/components/Button';
+import { Flag } from '~/components/Flag';
+import { notFoundResponse } from '~/lib/notFoundResponse';
+// import { HighlightStructuredText } from '../HighlightStructuredText';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Wrapper } from '~/components/Wrapper';
+import { query } from './_graphql';
+
+const { page } = await executeQuery(Astro, query);
+
+if (!page) {
+  return notFoundResponse();
+}
+---
+
+<Layout>
+  <Wrapper>
+    <Hero
+      title="The Headless CMS that gets out of the way"
+      subtitle="DatoCMS is about giving you the tools to do what you need, without the fuss. It's straightforward, it's reliable, and it lets you deliver digital projects fast, with confidence."
+    >
+      <div class={s.buttonContainer}>
+        <Button fs="big" as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
+        <Button fs="big" as="a" s="invert" href="/contact">Contact sales</Button>
+      </div>
+    </Hero>
+  </Wrapper>
+
+  {
+    page.pillars.map((pillar, index) => {
+      return (
+        <div class={s.flagContainer}>
+          <Flag
+            flip={index % 2 === 0}
+            image={pillar.image?.responsiveImage}
+            style="bad"
+            title={pillar.title}
+          >
+            <p>{pillar.pillarCallout}</p>
+          </Flag>
+        </div>
+      );
+    })
+  }
+
+  <DraftModeQueryListener query={query} />
+</Layout>

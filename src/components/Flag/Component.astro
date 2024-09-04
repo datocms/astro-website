@@ -1,0 +1,68 @@
+---
+import { slugify } from '~/lib/slugify';
+import { containsKeywords } from '~/lib/containsKeyword';
+import { Wrapper } from '~/components/Wrapper';
+import { ResponsiveImageFragment } from '../ResponsiveImage/graphql';
+import { ResponsiveImage } from '../ResponsiveImage';
+import { HighlightStructuredText } from '../HighlightStructuredText';
+import { Heading } from '~/components/Heading';
+import s from './style.module.css';
+
+interface Props {
+  flip?: boolean;
+  hideDot?: boolean;
+  image: any; //typeof ResponsiveImageFragment?
+  imageProps?: Record<string, any>;
+  kicker?: string;
+  seoAnalysis?: string[];
+  style?: 'neutral' | 'bad' | 'good';
+  subtitle?: string;
+  title: any;
+}
+
+const { style, title, subtitle, kicker, hideDot, image, imageProps, seoAnalysis, flip } =
+  Astro.props;
+
+let Title: 'h1' | 'h2';
+let Subtitle: 'h3' | 'div';
+let Kicker: 'h1' | 'h2';
+
+if (seoAnalysis) {
+  const kickerContainsKeywords = kicker ? containsKeywords(kicker, seoAnalysis) : false;
+  Kicker = kickerContainsKeywords ? 'h1' : 'h2';
+  Title = kickerContainsKeywords ? 'h2' : 'h1';
+  Subtitle = 'h3';
+} else {
+  Kicker = 'h2';
+  Title = 'h1';
+  Subtitle = 'div';
+}
+---
+
+<Wrapper>
+  <div class:list={[s.root, flip && s.isFlipped]}>
+    <div class={s.imageContainer}>
+      {!hideDot && <div data-style={style} class={s.dot} />}
+      <div class={s.image}>
+        <ResponsiveImage data={image} {...imageProps} />
+      </div>
+    </div>
+
+    <div class={s.content}>
+      {
+        kicker && (
+          <Heading as={Kicker} class={s.kicker} anchor={slugify(kicker)}>
+            {kicker}
+          </Heading>
+        )
+      }
+      <div class={s.flagTitle}>
+        <HighlightStructuredText data={title} />
+      </div>
+      {subtitle && <Subtitle class={s.subtitle}>{subtitle}</Subtitle>}
+      <div class={s.body}>
+        <slot />
+      </div>
+    </div>
+  </div>
+</Wrapper>
