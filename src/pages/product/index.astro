@@ -5,11 +5,12 @@ import s from './_style.module.css';
 import { Hero } from '~/components/Hero';
 import { Button } from '~/components/Button';
 import { Flag } from '~/components/Flag';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { notFoundResponse } from '~/lib/notFoundResponse';
-// import { HighlightStructuredText } from '../HighlightStructuredText';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Wrapper } from '~/components/Wrapper';
 import { query } from './_graphql';
+import { HighlightStructuredText } from '~/components/HighlightStructuredText';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -35,12 +36,14 @@ if (!page) {
     page.pillars.map((pillar, index) => {
       return (
         <div class={s.flagContainer}>
-          <Flag
-            flip={index % 2 === 0}
-            image={pillar.image?.responsiveImage}
-            style="bad"
-            title={pillar.title}
-          >
+          <Flag kicker={pillar.theme} flip={index % 2 === 0} style="bad" hideDot>
+            <div slot="visual">
+              {/* @ts-ignore */}
+              <ResponsiveImage data={pillar.image.responsiveImage} />
+            </div>
+            <div slot="title">
+              <HighlightStructuredText data={pillar.title} />
+            </div>
             <p>{pillar.pillarCallout}</p>
           </Flag>
         </div>

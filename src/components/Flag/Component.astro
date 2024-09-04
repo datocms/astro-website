@@ -2,26 +2,19 @@
 import { slugify } from '~/lib/slugify';
 import { containsKeywords } from '~/lib/containsKeyword';
 import { Wrapper } from '~/components/Wrapper';
-import { ResponsiveImageFragment } from '../ResponsiveImage/graphql';
-import { ResponsiveImage } from '../ResponsiveImage';
-import { HighlightStructuredText } from '../HighlightStructuredText';
 import { Heading } from '~/components/Heading';
 import s from './style.module.css';
 
 interface Props {
   flip?: boolean;
   hideDot?: boolean;
-  image: any; //typeof ResponsiveImageFragment?
-  imageProps?: Record<string, any>;
   kicker?: string;
   seoAnalysis?: string[];
   style?: 'neutral' | 'bad' | 'good';
   subtitle?: string;
-  title: any;
 }
 
-const { style, title, subtitle, kicker, hideDot, image, imageProps, seoAnalysis, flip } =
-  Astro.props;
+const { flip, hideDot, kicker, seoAnalysis, style, subtitle } = Astro.props;
 
 let Title: 'h1' | 'h2';
 let Subtitle: 'h3' | 'div';
@@ -42,10 +35,8 @@ if (seoAnalysis) {
 <Wrapper>
   <div class:list={[s.root, flip && s.isFlipped]}>
     <div class={s.imageContainer}>
-      {!hideDot && <div data-style={style} class={s.dot} />}
-      <div class={s.image}>
-        <ResponsiveImage data={image} {...imageProps} />
-      </div>
+      <slot name="visual" />
+      {!hideDot && style !== 'neutral' && <div data-style={style} class={s.dot} />}
     </div>
 
     <div class={s.content}>
@@ -56,8 +47,8 @@ if (seoAnalysis) {
           </Heading>
         )
       }
-      <div class={s.flagTitle}>
-        <HighlightStructuredText data={title} />
+      <div class={s.title}>
+        <slot name="title" />
       </div>
       {subtitle && <Subtitle class={s.subtitle}>{subtitle}</Subtitle>}
       <div class={s.body}>
