@@ -11,9 +11,10 @@ import { notFoundResponse } from '~/lib/notFoundResponse';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Wrapper } from '~/components/Wrapper';
 import { query } from './_graphql';
+import { IntegrationsBanner } from '~/components/IntegrationsBanner';
 import { HighlightStructuredText } from '~/components/HighlightStructuredText';
 
-const { page } = await executeQuery(Astro, query);
+const { integrations, page } = await executeQuery(Astro, query);
 
 if (!page) {
   return notFoundResponse();
@@ -48,7 +49,7 @@ if (!page) {
             <article>
               {pillar.pillarCallout}
               <Bullets
-                bullets={[pillar.capability1, pillar.capability2, pillar.capability3]}
+                items={[pillar.capability1, pillar.capability2, pillar.capability3]}
                 icon={'regular/check'}
                 style="bad"
               />
@@ -58,6 +59,34 @@ if (!page) {
       );
     })
   }
+
+  <IntegrationsBanner
+    title="Extensible and integrable by design"
+    bubbles={integrations
+      .filter((i) =>
+        ['ci', 'static-generator', 'language', 'cdn', 'framework'].includes(
+          i.integrationType.slug as string,
+        ),
+      )
+      .slice(0, 30)
+      .map((integration) =>
+        integration.squareLogo ? integration.squareLogo.url : integration.logo.url,
+      )}
+  >
+    <p>
+      Being a API-first <a href="/">headless CMS</a>, <strong>
+        DatoCMS easily integrates with any third-party platform or service
+      </strong>. DatoCMS is considered to be the best CMS for developers because it offers some of
+      the best tools in the market: plugins, webhooks, templates and SDKs to get you started in no
+      time. Check them out on our <a
+        href="https://github.com/datocms/"
+        target="_blank"
+        rel="noreferrer"
+      >
+        official Github page
+      </a>
+    </p>
+  </IntegrationsBanner>
 
   <DraftModeQueryListener query={query} />
 </Layout>

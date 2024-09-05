@@ -1,0 +1,139 @@
+.root {
+  position: relative;
+  padding: rfs(170px) 0;
+}
+
+.background {
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  white-space: nowrap;
+  z-index: -1;
+}
+
+.backgroundInner {
+  align-items: center;
+  animation-direction: alternate;
+  animation: slide 40s infinite linear;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 60px 140px;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  width: 200vw;
+  height: 100%;
+
+  @media (width > 1400px) {
+    width: 2800px;
+  }
+}
+
+@keyframes slide {
+  from {
+    transform: translateX(0px);
+  }
+  to {
+    transform: translateX(-700px);
+  }
+}
+
+@keyframes swing {
+  from {
+    transform: translateY(-15px);
+  }
+  to {
+    transform: translateY(20px);
+  }
+}
+
+@keyframes swing2 {
+  from {
+    transform: translateY(15px);
+  }
+  to {
+    transform: translateY(-5px);
+  }
+}
+
+.backgroundImage {
+  position: relative;
+
+  &:nth-child(3n) {
+    animation: swing 4s infinite alternate;
+
+    .backgroundImageInner {
+      aspect-ratio: 1/1;
+      min-width: 120px;
+      width: rfs(180px);
+    }
+  }
+
+  &:nth-child(5n) {
+    animation: swing2 5s infinite alternate;
+  }
+
+  &:nth-child(11) {
+    margin-left: 100px;
+  }
+
+  .backgroundImageInner {
+    align-items: center;
+    aspect-ratio: 1/1;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+    display: grid;
+    flex: 1;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: 1fr 1fr 1fr;
+    justify-content: center;
+    min-width: 80px;
+    padding: rfs(20px);
+    width: rfs(120px);
+  }
+
+  img {
+    width: 90%;
+  }
+}
+
+.foreground {
+  background: white;
+  border-radius: 5px;
+  box-shadow: var(--box-shadow);
+  margin: 0 auto;
+  padding: rfs(70px);
+  text-align: center;
+
+  @media (width > 600px) {
+    max-width: 900px;
+  }
+}
+
+.title {
+  font-family: var(--font-headline);
+  font-size: rfs(50px);
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.content {
+  font-size: 0.9em;
+  line-height: 1.3;
+  margin: 0 auto;
+  max-width: 700px;
+
+  @media (width > 900px) {
+    font-size: 1em;
+  }
+
+  a {
+    color: var(--azure-color);
+  }
+}

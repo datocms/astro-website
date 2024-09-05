@@ -4,23 +4,23 @@ import { StructuredText } from '@datocms/astro';
 import s from './style.module.css';
 
 interface Props {
-  bullets: (typeof StructuredText)[];
+  items: any[]; // (typeof StructuredText)[] | string[];
   icon: string;
   largeBullet?: boolean;
   style: 'bad' | 'good';
 }
 
-const { bullets, icon, largeBullet, style } = Astro.props;
+const { items, icon, largeBullet, style } = Astro.props;
 ---
 
 <ul class:list={[s.root, largeBullet && s.isLarge]}>
   {
-    bullets.map((bullet) => (
-      <li class:list={[s.bullet]}>
+    items.map((item) => (
+      <li class={s.bullet}>
         <div data-style={style} class={s.iconWrapper}>
           <Icon name={icon} />
         </div>
-        <StructuredText data={bullet} />
+        {typeof item === 'string' ? <p>bullet</p> : <StructuredText data={item} />}
       </li>
     ))
   }
