@@ -1,5 +1,6 @@
 import { QuotesCarouselFragment } from '~/components/QuotesCarousel/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { FeatureCardFragment } from '~/components/FeatureCard/graphql';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -53,38 +54,11 @@ export const query = graphql(
           ...QuotesCarouselFragment
         }
         features {
-          id
-          title
-          icon {
-            url
-          }
-          description {
-            value
-          }
-          highlight
-          image {
-            responsiveImage {
-              ...ResponsiveImageFragment
-            }
-          }
-          link {
-            __typename
-            ... on DocPageRecord {
-              id
-              slug
-              parent: _allReferencingDocGroups {
-                slug
-              }
-            }
-            ... on FeatureRecord {
-              id
-              slug
-            }
-          }
           featureGroup
+          ...FeatureCardFragment
         }
       }
     }
   `,
-  [ResponsiveImageFragment, QuotesCarouselFragment],
+  [ResponsiveImageFragment, QuotesCarouselFragment, FeatureCardFragment],
 );
