@@ -1,21 +1,10 @@
+import { QuotesCarouselFragment } from '~/components/QuotesCarousel/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
-import {
-  PartnerTestimonialFieldsFragment,
-  ReviewFieldsFragment,
-} from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
   /* GraphQL */ `
     query Product {
-      allReviews(first: 100) {
-        ...ReviewFieldsFragment
-        _updatedAt
-      }
-      allPartnerTestimonials(first: 100) {
-        ...PartnerTestimonialFieldsFragment
-        _updatedAt
-      }
       integrations: allIntegrations(first: 100) {
         id
         logo {
@@ -60,10 +49,8 @@ export const query = graphql(
             }
           }
         }
-        testimonials {
-          ... on PartnerTestimonialRecord {
-            ...PartnerTestimonialFieldsFragment
-          }
+        quotes: testimonials {
+          ...QuotesCarouselFragment
         }
         features {
           id
@@ -99,5 +86,5 @@ export const query = graphql(
       }
     }
   `,
-  [PartnerTestimonialFieldsFragment, ResponsiveImageFragment, ReviewFieldsFragment],
+  [ResponsiveImageFragment, QuotesCarouselFragment],
 );

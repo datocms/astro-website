@@ -14,28 +14,6 @@ export const TagFragment = graphql(/* GraphQL */ `
   }
 `);
 
-export const PartnerTestimonialFieldsFragment = graphql(
-  /* GraphQL */ `
-    fragment PartnerTestimonialFieldsFragment on PartnerTestimonialRecord {
-      quote {
-        value
-      }
-      role
-      name
-      image {
-        responsiveImage(imgixParams: { w: 300, h: 300, fit: crop, crop: faces, auto: format }) {
-          ...ResponsiveImageFragment
-        }
-      }
-      partner {
-        name
-        slug
-      }
-    }
-  `,
-  [ResponsiveImageFragment],
-);
-
 export const ReviewFieldsFragment = graphql(
   /* GraphQL */ `
     fragment ReviewFieldsFragment on ReviewRecord {

@@ -1,0 +1,53 @@
+---
+import { MaybeLink } from '../MaybeLink';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { StructuredText } from '@datocms/astro';
+import s from './style.module.css';
+
+interface Props {
+  feature: {
+    link?: {
+      __typename: 'FeatureRecord' | 'DocRecord';
+      slug: string;
+      parent: { slug: string }[];
+    } | null;
+    highlight: boolean;
+    icon: {
+      url: string;
+    };
+    image: { responsiveImage: any } | null;
+    title: string;
+    description: any;
+  };
+}
+
+const { feature } = Astro.props;
+
+const link =
+  feature.link &&
+  (feature.link.__typename === 'FeatureRecord'
+    ? `/features/${feature.link.slug}`
+    : feature.link!.parent[0]?.slug &&
+      `/docs/${feature.link!.parent[0].slug}/${feature.link.slug}`);
+---
+
+<MaybeLink href={link} class:list={[s.feature, feature.highlight && s.isHighlighted]}>
+  {
+    feature.highlight && (
+      <figure class={s.featureImage}>
+        {feature.image && <ResponsiveImage data={feature.image.responsiveImage} />}
+      </figure>
+    )
+  }
+
+  <article class={s.featureContent}>
+    <div class={s.featureIcon}>
+      <img src={feature.icon.url} height={30} width={30} />
+    </div>
+    <div class={s.featureText}>
+      <h4 class={s.featureTitle}>{feature.title}</h4>
+      <StructuredText data={feature.description} />
+    </div>
+    {feature.link && <p class={s.featureLink}>Learn more</p>}
+  </article>
+</MaybeLink>
