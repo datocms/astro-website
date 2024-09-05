@@ -3,9 +3,11 @@ import Layout from '~/layouts/Layout.astro';
 import { Bullets } from '~/components/Bullets';
 import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { FeatureCard } from '~/components/FeatureCard';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
 import { HighlightStructuredText } from '~/components/HighlightStructuredText';
+import { Icon } from 'astro-icon/components';
 import { IntegrationsBanner } from '~/components/IntegrationsBanner';
 import { QuotesCarousel } from '~/components/QuotesCarousel';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
@@ -14,8 +16,6 @@ import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
-import { Icon } from 'astro-icon/components';
-import { FeatureCard } from '~/components/FeatureCard';
 import s from './_style.module.css';
 
 const { integrations, page } = await executeQuery(Astro, query);
@@ -97,7 +97,7 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
 
   <div class={s.testimonials}>
     <h2 class={s.title}>What our customers say...</h2>
-    <Space top={2} bottom={3}>
+    <Space top={2} bottom={2}>
       {/* @ts-ignore */}
       <QuotesCarousel quotes={page.quotes} animated={true} />
     </Space>

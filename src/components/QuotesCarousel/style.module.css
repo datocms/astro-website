@@ -1,8 +1,36 @@
-.quotes {
-  overflow: hidden;
+@keyframes cambio {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(min(450px, 90vw) * -1 * var(--items-count)));
+  }
 }
 
-.quotes:not(.quotesAnimated) {
+.quotes {
+  overflow: hidden;
+
+  &.isAnimated {
+    justify-content: start;
+
+    .quotesInner {
+      animation: cambio calc(10s * var(--items-count)) linear infinite reverse;
+
+      @media screen and (width > 900px) {
+        animation: cambio calc(10s * var(--items-count)) linear infinite reverse;
+      }
+
+      &:hover {
+        animation-play-state: paused;
+      }
+    }
+  }
+}
+
+.quotes:not(.isAnimated) {
+  display: flex;
+  justify-content: center;
+
   .root:nth-child(n + 2) {
     display: none;
   }
@@ -22,22 +50,6 @@
   @media screen and (width > 1800px) {
     .root:nth-child(4) {
       display: block;
-    }
-  }
-}
-
-.quotesAnimated {
-  justify-content: start;
-
-  .quotesInner {
-    animation: cambio calc(10s * var(--items-count)) infinite linear;
-
-    @media screen and (width > 900px) {
-      animation-duration: calc(8s * var(--items-count));
-    }
-
-    &:hover {
-      animation-play-state: paused;
     }
   }
 }
@@ -121,22 +133,6 @@ a.authorRole:hover .name {
 }
 
 .role {
-  font-size: 0.9em;
+  font-size: 0.875em;
   color: var(--light-body-color);
-}
-
-.company {
-  color: var(--light-body-color);
-  font-size: 12px;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-@keyframes cambio {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(calc(min(450px, 90vw) * -1 * var(--items-count)));
-  }
 }

@@ -34,10 +34,7 @@ const unmaskedQuotes = quotes.map((q) => readCorrectFragment(q)).filter(Boolean)
 const repeatCount = animated ? (quotes.length / 4 > 1 ? 2 : 3) : 1;
 ---
 
-<div
-  class:list={[s.quotes, animated && s.quotesAnimated]}
-  style={`--items-count: ${quotes.length}`}
->
+<div class:list={[s.quotes, animated && s.isAnimated]} style={`--items-count: ${quotes.length}`}>
   <div class={s.quotesInner}>
     {
       times(repeatCount).map(() =>
@@ -55,8 +52,9 @@ const repeatCount = animated ? (quotes.length / 4 > 1 ? 2 : 3) : 1;
                 <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
                 <div class={s.authorRole}>
                   <div class={s.name}>{quote.name}</div>
-                  <div class={s.role}>{quote.role}</div>
-                  {quote.partner && <div class={s.company}>{quote.partner.name}</div>}
+                  <div class={s.role}>
+                    {quote.role} @ {quote.partner.name}
+                  </div>
                 </div>
               </div>
             </MaybeLink>
