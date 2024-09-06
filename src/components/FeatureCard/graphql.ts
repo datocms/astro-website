@@ -1,10 +1,10 @@
-import { graphql } from '~/lib/datocms/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { DocPageUrlFragment, FeatureUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
+import { graphql } from '~/lib/datocms/graphql';
 
 export const FeatureCardFragment = graphql(
   /* GraphQL */ `
     fragment FeatureCardFragment on OverviewFeatureRecord {
-      id
       title
       icon {
         url
@@ -20,20 +20,11 @@ export const FeatureCardFragment = graphql(
       }
       link {
         __typename
-        ... on DocPageRecord {
-          id
-          slug
-          parent: _allReferencingDocGroups {
-            slug
-          }
-        }
-        ... on FeatureRecord {
-          id
-          slug
-        }
+        ...DocPageUrlFragment
+        ...FeatureUrlFragment
       }
       featureGroup
     }
   `,
-  [ResponsiveImageFragment],
+  [ResponsiveImageFragment, DocPageUrlFragment, FeatureUrlFragment],
 );
