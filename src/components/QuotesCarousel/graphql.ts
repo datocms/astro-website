@@ -1,9 +1,9 @@
 import { graphql } from '~/lib/datocms/graphql';
 import { ResponsiveImageFragment } from '../ResponsiveImage/graphql';
 
-export const QuotesCarouselFragment = graphql(
+export const PartnerTestimonialQuotesCarouselFragment = graphql(
   /* GraphQL */ `
-    fragment QuotesCarouselFragment on PartnerTestimonialRecord {
+    fragment PartnerTestimonialQuotesCarouselFragment on PartnerTestimonialRecord {
       __typename
       quote {
         value
@@ -24,9 +24,9 @@ export const QuotesCarouselFragment = graphql(
   [ResponsiveImageFragment],
 );
 
-export const ReviewCarouselFragment = graphql(
+export const ReviewQuotesCarouselFragment = graphql(
   /* GraphQL */ `
-    fragment ReviewCarouselFragment on ReviewRecord {
+    fragment ReviewQuotesCarouselFragment on ReviewRecord {
       __typename
       quote {
         value

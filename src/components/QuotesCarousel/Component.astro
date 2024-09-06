@@ -2,14 +2,19 @@
 import s from './style.module.css';
 import { HighlightStructuredText } from '../HighlightStructuredText';
 import type { FragmentOf } from 'gql.tada';
-import { QuotesCarouselFragment, ReviewCarouselFragment } from './graphql';
+import { PartnerTestimonialQuotesCarouselFragment, ReviewQuotesCarouselFragment } from './graphql';
 import { readFragment } from 'gql.tada';
 import { ResponsiveImage } from '../ResponsiveImage';
 import { MaybeLink } from '../MaybeLink';
 
 interface Props {
   quotes: Array<
-    FragmentOf<typeof QuotesCarouselFragment> | FragmentOf<typeof ReviewCarouselFragment>
+    | (FragmentOf<typeof PartnerTestimonialQuotesCarouselFragment> & {
+        __typename: 'PartnerTestimonialRecord';
+      })
+    | (FragmentOf<typeof ReviewQuotesCarouselFragment> & {
+        __typename: 'ReviewRecord';
+      })
   >;
   animated?: boolean;
 }
@@ -20,17 +25,11 @@ function times(n: number): number[] {
   return Array.from({ length: n }, (_, i) => i);
 }
 
-function readCorrectFragment(quote: any) {
-  switch (quote.__typename) {
-    case 'PartnerTestimonialRecord':
-      return readFragment(QuotesCarouselFragment, quote);
-    case 'ReviewRecord':
-      return readFragment(ReviewCarouselFragment, quote);
-  }
-}
-
-// const unmaskedQuotes = Astro.props.quotes.map((q) => readFragment(QuotesCarouselFragment, q));
-const unmaskedQuotes = quotes.map((q) => readCorrectFragment(q));
+const unmaskedQuotes = quotes.map((quote) =>
+  quote.__typename === 'PartnerTestimonialRecord'
+    ? readFragment(PartnerTestimonialQuotesCarouselFragment, quote)
+    : readFragment(ReviewQuotesCarouselFragment, quote),
+);
 const repeatCount = animated ? (quotes.length / 4 > 1 ? 2 : 3) : 1;
 ---
 

@@ -1,4 +1,4 @@
-import { QuotesCarouselFragment } from '~/components/QuotesCarousel/graphql';
+import { PartnerTestimonialQuotesCarouselFragment } from '~/components/QuotesCarousel/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
@@ -35,7 +35,8 @@ export const query = graphql(
           value
         }
         quotes {
-          ...QuotesCarouselFragment
+          __typename
+          ...PartnerTestimonialQuotesCarouselFragment
         }
         starterTitle {
           value
@@ -105,5 +106,5 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment, QuotesCarouselFragment],
+  [TagFragment, ResponsiveImageFragment, PartnerTestimonialQuotesCarouselFragment],
 );
