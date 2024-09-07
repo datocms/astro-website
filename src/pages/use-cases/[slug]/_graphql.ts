@@ -17,17 +17,17 @@ export const query = graphql(
           value
         }
         heroImage {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 800, h: 500 }) {
             ...ResponsiveImageFragment
           }
         }
         heroCustomer {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 800, h: 500 }) {
             ...ResponsiveImageFragment
           }
         }
         heroProduct {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 800, h: 500 }) {
             ...ResponsiveImageFragment
           }
         }
@@ -46,7 +46,7 @@ export const query = graphql(
         }
         starterLink: link
         starterImage {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 1000, h: 1000 }) {
             ...ResponsiveImageFragment
           }
         }
@@ -60,7 +60,7 @@ export const query = graphql(
             value
           }
           image {
-            responsiveImage {
+            responsiveImage(imgixParams: { auto: format, w: 960, h: 540, fit: crop, crop: top }) {
               ...ResponsiveImageFragment
             }
           }
@@ -99,7 +99,7 @@ export const query = graphql(
           }
         }
         successStoryImage: image {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 1000, h: 1000 }) {
             ...ResponsiveImageFragment
           }
         }
