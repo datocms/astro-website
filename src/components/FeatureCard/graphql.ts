@@ -14,7 +14,7 @@ export const FeatureCardFragment = graphql(
       }
       highlight
       image {
-        responsiveImage {
+        responsiveImage(imgixParams: { auto: format, fit: fill, fill: solid, w: 640, h: 360 }) {
           ...ResponsiveImageFragment
         }
       }
