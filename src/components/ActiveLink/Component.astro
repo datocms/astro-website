@@ -1,0 +1,16 @@
+---
+interface Props {
+  href: string;
+  activeClass?: string;
+  exact?: boolean;
+  class?: string;
+}
+
+const { href, exact, activeClass, class: className, ...props } = Astro.props;
+
+let active: boolean = exact ? href === Astro.url.pathname : Astro.url.pathname.includes(href);
+---
+
+<a href={href} class:list={[className, active ? `${activeClass}` : undefined]} {...props}>
+  <slot />
+</a>

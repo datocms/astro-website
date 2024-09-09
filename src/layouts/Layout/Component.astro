@@ -1,0 +1,41 @@
+---
+import { TagFragment } from '~/lib/datocms/commonFragments';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { graphql } from '~/lib/datocms/graphql';
+import { Seo, type TitleMetaLinkTag } from '@datocms/astro';
+import './global.css';
+
+type Props = {
+  additionalSeo: TitleMetaLinkTag[];
+};
+
+const { additionalSeo = [] } = Astro.props;
+
+const query = graphql(
+  /* GraphQL */ `
+    query RootQuery {
+      _site {
+        faviconMetaTags {
+          ...TagFragment
+        }
+      }
+    }
+  `,
+  [TagFragment],
+);
+
+const result = await executeQuery(Astro, query);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <Seo data={[...result._site.faviconMetaTags, ...additionalSeo]} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

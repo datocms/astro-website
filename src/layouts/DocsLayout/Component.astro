@@ -1,0 +1,85 @@
+---
+import type { TitleMetaLinkTag } from '@datocms/astro';
+import { Layout } from '../Layout';
+import s from './style.module.css';
+import { Icon } from 'astro-icon/components';
+import { Search } from './Search';
+
+import logo from '~/svg/logos/full_logo.svg?raw';
+import { Feedback } from './Feedback';
+
+type Props = {
+  additionalSeo: TitleMetaLinkTag[];
+  languageSwitch?: boolean;
+};
+
+const { additionalSeo, languageSwitch } = Astro.props;
+const LanguagePicker = 'div';
+const ContentWrapper = languageSwitch ? LanguagePicker : 'div';
+---
+
+<Layout additionalSeo={additionalSeo}>
+  <div class={s.root}>
+    <div class={s.sidebar}>
+      <div class={s.sidebarHeader}>
+        <a href="/" class={s.logo}>
+          <Fragment set:html={logo} />
+        </a>
+        <button type="button" class={s.hamburger}>
+          <Icon name="regular/bars" />
+        </button>
+      </div>
+      <div class={s.innerSidebar} data-datocms-noindex>
+        <slot name="sidebar" />
+      </div>
+    </div>
+    <div class={s.contentWrapper}>
+      <Search client:idle />
+      <div class={s.mainHeader}>
+        <ul>
+          <li>
+            <a href="/support">
+              <Icon name="regular/headset" />
+              Ask for help!
+            </a>
+          </li>
+          <li>
+            <a href="https://status.datocms.com" target="_blank" rel="noreferrer">
+              <Icon name="regular/tachometer" />
+              Status page
+            </a>
+          </li>
+        </ul>
+      </div>
+      <ContentWrapper>
+        <div class={s.container}>
+          <slot />
+          <div class={s.footer} data-datocms-noindex>
+            <div class={s.footerCol}>
+              <div class={s.footerTitle}>Did this doc help you?</div>
+              <div class={s.footerBody}>
+                <Feedback client:idle />
+              </div>
+            </div>
+            <div class={s.footerCol}>
+              <div class={s.footerTitle}>Still need help?</div>
+              <div class={s.footerBody}>
+                Explore our <a href="https://community.datocms.com">forum</a>,{' '}
+                <a href="/support">contact support</a>, or{' '}
+                <a href="/enterprise-headless-cms#form"> connect with our sales team </a>
+                . You can also chat live with other users in our{' '}
+                <a href="/slack">Slack channel</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </ContentWrapper>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // s.innerSidebarOpen
+  // onClick={() => setSidebarOpen((old) => !old)}
+  // s.hamburger
+</script>

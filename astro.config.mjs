@@ -33,7 +33,7 @@ export default defineConfig({
       validateSecrets: true,
     },
   },
-  integrations: [react(), icon({ iconDir: 'src/icons' })],
+  integrations: [react(), icon({ iconDir: 'public/icons' })],
   adapter: node({
     mode: 'standalone',
   }),
