@@ -4,6 +4,7 @@ import {
   ReviewQuotesCarouselFragment,
 } from '~/components/QuotesCarousel/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -22,6 +23,9 @@ export const query = graphql(
         }
       }
       page: productOverview {
+        _seoMetaTags {
+          ...TagFragment
+        }
         header {
           value
         }
@@ -70,5 +74,6 @@ export const query = graphql(
     PartnerTestimonialQuotesCarouselFragment,
     FeatureCardFragment,
     ReviewQuotesCarouselFragment,
+    TagFragment,
   ],
 );
