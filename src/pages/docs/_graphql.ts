@@ -1,5 +1,6 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { DocGroupUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -14,15 +15,8 @@ export const query = graphql(
         name
         children {
           name
-          slug
-          pages {
-            __typename
-            ... on DocGroupPageRecord {
-              page {
-                slug
-              }
-            }
-          }
+          __typename
+          ...DocGroupUrlFragment
         }
       }
       tutorials: allVideoTutorials(first: 3, filter: { showInDocsHomepage: { eq: true } }) {
@@ -56,5 +50,5 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment],
+  [TagFragment, ResponsiveImageFragment, DocGroupUrlFragment],
 );

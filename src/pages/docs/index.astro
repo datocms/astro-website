@@ -6,6 +6,7 @@ import { DocsLayout } from '~/layouts/DocsLayout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
 import s from './_style.module.css';
 
 import nextLogo from '~/svg/logos/next.svg?raw';
@@ -18,8 +19,6 @@ const { page, roots, tutorials, tutorialsMeta } = await executeQuery(Astro, quer
 if (!page) {
   return notFoundResponse();
 }
-
-const normalize = (slug: string) => (slug === 'index' ? '' : `/${slug}`);
 ---
 
 <DocsLayout additionalSeo={page._seoMetaTags}>
@@ -29,15 +28,13 @@ const normalize = (slug: string) => (slug === 'index' ? '' : `/${slug}`);
         <div class={s.group}>
           <div class={s.groupName}>{root.name}</div>
           <div class={s.guides}>
-            {root.children.map((sub) => (
-              <ActiveLink
-                class={s.guide}
-                activeClass={s.activePage}
-                href={`/docs/${sub.slug}${normalize(sub.pages[0].page.slug)}`}
-              >
-                {sub.name}
-              </ActiveLink>
-            ))}
+            {root.children.map((sub) => {
+              return (
+                <ActiveLink class={s.guide} activeClass={s.activePage} href={buildUrlFromGql(sub)}>
+                  {sub.name}
+                </ActiveLink>
+              );
+            })}
           </div>
         </div>
       ))
