@@ -11,34 +11,6 @@ import GroupLink from './GroupLink.astro';
 import { Svg } from '~/components/Svg';
 import { TargetToggler } from '~/components/TargetToggler';
 
-type Props = {};
-
-const {} = Astro.props;
-
-const loggedIn = false;
-
-// const [loggedIn, setLoggedIn] = useState(false);
-// const [openMobileNav, setOpenMobileNav] = useState(false);
-// const [activeNavItem, setActiveNavItem] = useState(null);
-// const router = useRouter();
-
-// useEffect(() => {
-//   setLoggedIn(!!getCookie('datoAccountEmail'));
-// }, []);
-
-// useEffect(() => {
-//   if (!openMobileNav) {
-//     setActiveNavItem(null);
-//   }
-// }, [openMobileNav]);
-
-// const handleNavItemToggle = (name, isOpen) => {
-//   if (isOpen) {
-//     setActiveNavItem(name);
-//   }
-// };
-
-// const routerUrl = router.pathname;
 const isMarketplace = Astro.url.pathname.startsWith('/marketplace');
 ---
 
@@ -484,24 +456,27 @@ const isMarketplace = Astro.url.pathname.startsWith('/marketplace');
     <div class={s.navActions}>
       <a href="/contact" class={s.navLink}>Contact sales</a>
 
-      {
-        loggedIn ? (
-          <>
-            <Button as="a" p="small" href="https://dashboard.datocms.com/">
-              Enter dashboard
-            </Button>
-          </>
-        ) : (
-          <>
-            <a href="https://dashboard.datocms.com/login" class={s.navLink} data-exclude-mobile>
-              <span>Log in</span>
-            </a>
-            <Button as="a" p="small" href="https://dashboard.datocms.com/">
-              Get started
-            </Button>
-          </>
-        )
-      }
+      <div class={s.authActions} data-signed-in="true">
+        <Button as="a" p="small" href="https://dashboard.datocms.com/"> Enter dashboard </Button>
+      </div>
+
+      <div class={s.authActions} data-signed-in="false">
+        <a href="https://dashboard.datocms.com/login" class={s.navLink} data-exclude-mobile>
+          <span>Log in</span>
+        </a>
+        <Button as="a" p="small" href="https://dashboard.datocms.com/">Get started</Button>
+      </div>
     </div>
   </nav>
 </div>
+
+<script>
+  import { getCookie } from '~/lib/cookies';
+
+  const isSignedIn = getCookie('datoAccountEmail');
+  const signedInEl = document.querySelector<HTMLElement>('[data-signed-in=true]')!;
+  const notSignedInEl = document.querySelector<HTMLElement>('[data-signed-in=false]')!;
+
+  (isSignedIn ? signedInEl : notSignedInEl).style.display = 'contents';
+  (isSignedIn ? notSignedInEl : signedInEl).remove();
+</script>
