@@ -33,12 +33,12 @@ const { targetId, startVisible } = Astro.props;
         throw new Error(`${this.localName} must contain a <button> element.`);
       }
 
-      if (!this.startVisible) this.target.setAttribute('data-hidden', '');
+      if (this.startVisible) this.target.setAttribute('data-open', '');
 
       this.controller = new AbortController();
       const { signal } = this.controller;
 
-      this.toggle.setAttribute('aria-expanded', this.startVisible ? 'false' : 'true');
+      this.toggle.setAttribute('aria-expanded', this.startVisible ? 'true' : 'false');
       this.toggle.setAttribute('aria-controls', this.targetId);
       this.toggle.addEventListener('click', () => this.handleClick(), { signal });
     }
@@ -52,7 +52,7 @@ const { targetId, startVisible } = Astro.props;
       const newExpanded = !expanded;
 
       this.toggle?.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
-      this.target?.toggleAttribute('data-hidden', newExpanded);
+      this.target?.toggleAttribute('data-open', newExpanded);
     }
 
     get target() {

@@ -1,0 +1,40 @@
+---
+import { slugify } from '~/lib/slugify';
+import s from './style.module.css';
+import { Svg } from '~/components/Svg';
+import { TargetToggler } from '~/components/TargetToggler';
+
+type Props = {
+  name: string;
+};
+
+const { name } = Astro.props;
+
+const lowercaseName = slugify(name);
+---
+
+<div class={s.navItem} id={lowercaseName} data-navbar-navitem>
+  <div class={s.navButtonWrapper}>
+    <TargetToggler targetId={lowercaseName}>
+      <button data-navbar-navbutton class={s.navButton} type="button" aria-controls={lowercaseName}>
+        {name}
+      </button>
+    </TargetToggler>
+    <div class={s.chevron}>
+      <Svg name="icons/regular/chevron-down" />
+    </div>
+  </div>
+  <div class={s.panel} role="dialog">
+    <div class={s.panelInner}><slot /></div>
+  </div>
+</div>
+
+<script>
+  for (const navItem of document.querySelectorAll('[data-navbar-navitem]')) {
+    navItem.querySelector('[data-navbar-navbutton]')!.addEventListener('click', () => {
+      if (!navItem.hasAttribute('data-open')) {
+        setTimeout(() => navItem.scrollIntoView({ behavior: 'smooth' }), 200);
+      }
+    });
+  }
+</script>
