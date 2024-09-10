@@ -1,0 +1,65 @@
+---
+import { Wrapper } from '~/components/Wrapper';
+import s from './style.module.css';
+import { Button } from '~/components/Button';
+---
+
+<subscribe-newsletter>
+  <div class={s.newsletter}>
+    <Wrapper>
+      <div class={s.newsletterInner}>
+        <div class={s.newsletterBody}>
+          <div class={s.newsletterTitle}>Subscribe to our newsletter! 📥</div>
+          <div class={s.newsletterDescription}>
+            One update per month. All the latest news and sneak peeks directly in your inbox.
+          </div>
+        </div>
+        <div class={s.formContainer}>
+          <form class={s.form}>
+            <input placeholder="Enter your email" name="email" />
+            <Button as="button" p="tiny" fs="small"> Subscribe! </Button>
+          </form>
+          <div class={s.formMessage} data-status></div>
+        </div>
+      </div>
+    </Wrapper>
+  </div>
+</subscribe-newsletter>
+
+<script>
+  import { actions } from 'astro:actions';
+  import { isInputError } from 'astro:actions';
+
+  class SubscribeNewsletter extends HTMLElement {
+    connectedCallback() {
+      this.querySelector('form')!.addEventListener('submit', this);
+    }
+
+    async handleEvent(event: SubmitEvent) {
+      event.preventDefault();
+
+      const form = this.querySelector('form')!;
+      const button = form.querySelector('button')!;
+      const status = this.querySelector('[data-status]')!;
+
+      button.innerText = 'Submitting...';
+      button.disabled = true;
+
+      const formData = new FormData(form);
+      const { error } = await actions.subscribeToNewsletter(formData);
+
+      if (isInputError(error)) {
+        if (error.fields.email) {
+          status.innerHTML = error.fields.email.join(', ');
+        }
+      } else {
+        status.innerHTML = 'Successfully subscribed. Welcome on board! 🎉';
+      }
+
+      button.innerText = 'Subscribe!';
+      button.disabled = false;
+    }
+  }
+
+  window.customElements.define('subscribe-newsletter', SubscribeNewsletter);
+</script>

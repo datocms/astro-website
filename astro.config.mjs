@@ -2,8 +2,6 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import { defineConfig, envField } from 'astro/config';
 
-import icon from 'astro-icon';
-
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
@@ -29,11 +27,15 @@ export default defineConfig({
           context: 'server',
           access: 'secret',
         }),
+        MAILERLITE_TOKEN: envField.string({
+          context: 'server',
+          access: 'secret',
+        }),
       },
       validateSecrets: true,
     },
   },
-  integrations: [react(), icon({ iconDir: 'public/icons' })],
+  integrations: [react()],
   adapter: node({
     mode: 'standalone',
   }),

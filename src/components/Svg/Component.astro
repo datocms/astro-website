@@ -1,0 +1,59 @@
+---
+import { parse } from 'node-html-parser';
+import { optimize, type PluginConfig } from 'svgo';
+import { getSvgFile } from './utils';
+
+type Props = {
+  name: string;
+} & astroHTML.JSX.DefinedIntrinsicElements['svg'];
+
+const { name, ...props } = Astro.props as Props;
+
+const isIcon = name.split('/')[0] === 'icons';
+
+const html = getSvgFile(name);
+
+const root = parse(
+  optimize(html, {
+    path: `svg/${name}.svg`,
+    multipass: false,
+    plugins: isIcon
+      ? [
+          {
+            name: 'addAttributesToSVGElement',
+            params: {
+              attributes: [{ fill: 'currentColor' }],
+            },
+          },
+          {
+            name: 'preset-default',
+            params: {
+              overrides: {
+                removeViewBox: false,
+                convertColors: {
+                  currentColor: true,
+                },
+              },
+            },
+          },
+          'prefixIds',
+        ]
+      : [
+          {
+            name: 'preset-default',
+            params: {
+              overrides: {
+                removeViewBox: false,
+              },
+            },
+          },
+          'prefixIds',
+        ],
+  }).data,
+);
+
+const svg = root.querySelector('svg')!;
+const defaultAttributes = isIcon ? { width: '1em', height: '1em' } : {};
+---
+
+<svg {...svg.attributes} {...defaultAttributes} {...props} set:html={svg.innerHTML} />

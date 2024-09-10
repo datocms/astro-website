@@ -1,0 +1,35 @@
+---
+import { Button } from '~/components/Button';
+import { Checks } from '~/components/Checks';
+import { Wrapper } from '~/components/Wrapper';
+import s from './style.module.css';
+
+interface Props {
+  href: string;
+}
+
+const { href } = Astro.props;
+---
+
+<Wrapper>
+  <a href={href} class={s.root}>
+    <div class={s.rootInner}>
+      <div class={s.body}>
+        <div class={s.title}>
+          <slot name="title" />
+        </div>
+        <div class={s.subtitle}>
+          <slot name="subtitle" />
+        </div>
+      </div>
+      <div class={s.action}>
+        <Checks>
+          <Button fs="big">
+            <slot name="buttonText" />
+          </Button>
+          <slot slot="checks" name="checks" />
+        </Checks>
+      </div>
+    </div>
+  </a>
+</Wrapper>

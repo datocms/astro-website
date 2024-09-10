@@ -7,15 +7,14 @@ import { query } from './_graphql';
 import { notFoundResponse } from '~/lib/notFoundResponse';
 import { Button } from '~/components/Button';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { HighlightStructuredText } from '~/components/HighlightStructuredText';
 import { LogosBar } from '~/components/LogosBar';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Space } from '~/components/Space';
 import { QuotesCarousel } from '~/components/QuotesCarousel';
 import { StructuredText } from '@datocms/astro';
-import { Highlight } from '~/components/Highlight';
-import { Icon } from 'astro-icon/components';
+import { Svg } from '~/components/Svg';
 import { Checks } from '~/components/Checks';
+import { SingleLineStructuredText } from '~/components/SingleLineStructuredText';
 
 const { page } = await executeQuery(Astro, query, { variables: { slug: Astro.params.slug! } });
 
@@ -24,15 +23,15 @@ if (!page) {
 }
 ---
 
-<Layout additionalSeo={page._seoMetaTags}>
+<Layout additionalSeo={page._seoMetaTags} noFinalCta>
   <Wrapper>
     <div class={s.hero}>
       <div class={s.heroBody}>
         <h1 class={s.heroTitle}>
-          <HighlightStructuredText data={page.title} />
+          <SingleLineStructuredText data={page.title} />
         </h1>
         <div class={s.heroSubtitle}>
-          <HighlightStructuredText data={page.subtitle} />
+          <SingleLineStructuredText data={page.subtitle} />
         </div>
         <div class={s.buttonContainer}>
           <Button as="a" href="https://dashboard.datocms.com/signup"> Try it for free </Button>
@@ -53,18 +52,18 @@ if (!page) {
   <LogosBar
     title="We power experiences for over half a billion users"
     clients={[
-      'logos/polestar',
-      'logos/hashicorp',
-      'logos/verizon',
-      'logos/little-caesars',
-      'logos/vercel',
+      'svg/logos/polestar',
+      'svg/logos/hashicorp',
+      'svg/logos/verizon',
+      'svg/logos/little-caesars',
+      'svg/logos/vercel',
     ]}
   />
 
   <div class={s.testimonials}>
     <Space top={2} bottom={3}>
       <InterstitialTitle style="three">
-        <HighlightStructuredText data={page.quotesHeader} />
+        <SingleLineStructuredText data={page.quotesHeader} />
       </InterstitialTitle>
       <QuotesCarousel quotes={page.quotes} animated={false} />
     </Space>
@@ -74,7 +73,7 @@ if (!page) {
     <Wrapper>
       <div class={s.starterBox}>
         <div class={s.starterBoxText}>
-          <h2><HighlightStructuredText data={page.starterTitle} /></h2>
+          <h2><SingleLineStructuredText data={page.starterTitle} /></h2>
           <StructuredText data={page.starterDescription} />
           <Space top={1}>
             <Button as="a" p="small" s="purple" href={page.starterLink}>Check it out</Button>
@@ -108,7 +107,7 @@ if (!page) {
         <div class={s.dev}>
           <p>
             <strong>
-              If you’re a <Highlight style="good">dev</Highlight>
+              If you’re a <mark class="good">dev</mark>
             </strong>{' '}
             looking to hook up DatoCMS to your repos, head on over to{' '}
             <a href="docs">our docs</a>
@@ -119,11 +118,11 @@ if (!page) {
           <p>
             <strong>
               If you’re an{' '}
-              <Highlight style="good">editor, marketer, or content creator</Highlight>
+              <mark class="good">editor, marketer, or content creator</mark>
             </strong>{' '}
             on the fence about whether or not DatoCMS is for you, you’re probably…
           </p>
-          <Icon name="other/arrow" width={undefined} height={undefined} />
+          <Svg name="icons/other/arrow" />
         </div>
       </div>
     </Wrapper>
@@ -131,7 +130,7 @@ if (!page) {
     <Wrapper>
       <div class={s.niceBlock}>
         <div class={s.blockIllustration}>
-          <Icon name="illustrations/zen" width={undefined} height={undefined} />
+          <Svg name="svg/illustrations/zen" />
         </div>
         <div class={s.blockText}>
           <h2>{page.featuresHeader}</h2>
@@ -180,7 +179,7 @@ if (!page) {
     <Wrapper>
       <div class={s.successStory}>
         <div class={s.successStoryText}>
-          <h2><HighlightStructuredText data={page.successStoryHeader} /></h2>
+          <h2><SingleLineStructuredText data={page.successStoryHeader} /></h2>
           <StructuredText data={page.successStorySummary} />
           <Space top={1}>
             <Button
@@ -226,13 +225,18 @@ if (!page) {
       <InterstitialTitle style="one" kicker="Seen enough?">
         Get started with DatoCMS
       </InterstitialTitle>
-      <Checks checks={['No credit card', 'Easy setup']}>
+      <Checks>
         <div class={s.buttonGroup}>
           <Button as="a" href="https://dashboard.datocms.com/signup"> Sign up for free </Button>
           <Button as="a" s="invert" href="https://try.datocms.com" target="_blank">
             Try our interactive demo ⤑
           </Button>
         </div>
+
+        <Fragment slot="checks">
+          <li>No credit card</li>
+          <li>Easy setup</li>
+        </Fragment>
       </Checks>
     </div>
   </Space>

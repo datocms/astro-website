@@ -1,41 +1,38 @@
 ---
-import { TagFragment } from '~/lib/datocms/commonFragments';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { graphql } from '~/lib/datocms/graphql';
-import { Seo, type TitleMetaLinkTag } from '@datocms/astro';
-import './global.css';
+import type { TitleMetaLinkTag } from 'react-datocms';
+import { BaseLayout } from '../BaseLayout';
+import Footer from './Footer/index.astro';
+import { FinalCta } from './FinalCta';
 
 type Props = {
   additionalSeo: TitleMetaLinkTag[];
+  noFinalCta?: boolean;
 };
 
-const { additionalSeo = [] } = Astro.props;
-
-const query = graphql(
-  /* GraphQL */ `
-    query RootQuery {
-      _site {
-        faviconMetaTags {
-          ...TagFragment
-        }
-      }
-    }
-  `,
-  [TagFragment],
-);
-
-const result = await executeQuery(Astro, query);
+const { additionalSeo, noFinalCta } = Astro.props;
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <Seo data={[...result._site.faviconMetaTags, ...additionalSeo]} />
-  </head>
-  <body>
-    <slot />
-  </body>
-</html>
+<BaseLayout additionalSeo={additionalSeo}>
+  <slot />
+  <Footer>
+    {
+      !noFinalCta && (
+        /* https://github.com/withastro/astro/issues/10024#issuecomment-1933483135 */
+        <Fragment slot={!noFinalCta && 'finalCta'}>
+          <FinalCta href="/pricing">
+            <Fragment slot="title">Start using DatoCMS today</Fragment>
+            <Fragment slot="subtitle">
+              According to Gartner 89% of companies plan to compete primarily on the basis of
+              customer experience this year. Don't get caught unprepared.
+            </Fragment>
+            <Fragment slot="buttonText">Try it for free!</Fragment>
+            <Fragment slot="checks">
+              <li>No credit card</li>
+              <li>Easy setup</li>
+            </Fragment>
+          </FinalCta>
+        </Fragment>
+      )
+    }
+  </Footer>
+</BaseLayout>

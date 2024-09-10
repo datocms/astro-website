@@ -6,8 +6,7 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { FeatureCard } from '~/components/FeatureCard';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
-import { HighlightStructuredText } from '~/components/HighlightStructuredText';
-import { Icon } from 'astro-icon/components';
+import { Svg } from '~/components/Svg';
 import { IntegrationsBanner } from '~/components/IntegrationsBanner';
 import { QuotesCarousel } from '~/components/QuotesCarousel';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
@@ -17,6 +16,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { SingleLineStructuredText } from '~/components/SingleLineStructuredText';
 
 const { integrations, page } = await executeQuery(Astro, query);
 
@@ -31,10 +31,13 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
 
 <Layout additionalSeo={page._seoMetaTags}>
   <Wrapper>
-    <Hero
-      title="The Headless CMS that gets out of the way"
-      subtitle="DatoCMS is about giving you the tools to do what you need, without the fuss. It's straightforward, it's reliable, and it lets you deliver digital projects fast, with confidence."
-    >
+    <Hero>
+      <Fragment slot="title">
+        <SingleLineStructuredText data={page.header} />
+      </Fragment>
+      <Fragment slot="subtitle">
+        <SingleLineStructuredText data={page.subheader} />
+      </Fragment>
       <div class={s.buttonContainer}>
         <Button fs="big" as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
         <Button fs="big" as="a" s="invert" href="/contact">Contact sales</Button>
@@ -46,20 +49,36 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
     page.pillars.map((pillar, index) => {
       return (
         <div class={s.flagContainer}>
-          <Flag kicker={pillar.theme} flip={index % 2 === 0} style="bad" hideDot>
+          <Flag flip={index % 2 === 0}>
+            <Fragment slot="kicker">{pillar.theme}</Fragment>
             <div slot="visual">
               <ResponsiveImage data={pillar.image.responsiveImage} />
             </div>
             <div slot="title">
-              <HighlightStructuredText data={pillar.title} />
+              <SingleLineStructuredText data={pillar.title} />
             </div>
             <article>
               {pillar.pillarCallout}
-              <Bullets
-                items={[pillar.capability1, pillar.capability2, pillar.capability3]}
-                icon={'regular/check'}
-                style="bad"
-              />
+              <Bullets style="bad">
+                <li>
+                  <Svg name="icons/regular/check" />
+                  <div>
+                    <SingleLineStructuredText data={pillar.capability1} />
+                  </div>
+                </li>
+                <li>
+                  <Svg name="icons/regular/check" />
+                  <div>
+                    <SingleLineStructuredText data={pillar.capability2} />
+                  </div>
+                </li>
+                <li>
+                  <Svg name="icons/regular/check" />
+                  <div>
+                    <SingleLineStructuredText data={pillar.capability3} />
+                  </div>
+                </li>
+              </Bullets>
             </article>
           </Flag>
         </div>
@@ -106,7 +125,7 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
     <h2 class={s.featureSectionTitle}>...and the features they love!</h2>
     <div class={s.featureGroupHeading}>
       <figure class={s.featureGroupIcon}>
-        <Icon name="illustrations/developers-2" />
+        <Svg name="svg/illustrations/developers-2" />
       </figure>
       <h3 class={s.featureGroupTitle}>For developers</h3>
     </div>
@@ -119,7 +138,7 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
     </div>
     <div class={s.featureGroupHeading}>
       <figure class={s.featureGroupIcon}>
-        <Icon name="illustrations/content-editors" />
+        <Svg name="svg/illustrations/content-editors" />
       </figure>
       <h3 class={s.featureGroupTitle}>For marketers</h3>
     </div>

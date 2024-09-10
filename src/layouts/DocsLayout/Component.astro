@@ -1,12 +1,11 @@
 ---
 import type { TitleMetaLinkTag } from '@datocms/astro';
-import { Layout } from '../Layout';
+import { BaseLayout } from '../BaseLayout';
 import s from './style.module.css';
-import { Icon } from 'astro-icon/components';
+import { Svg } from '~/components/Svg';
 import { Search } from './Search';
-
-import logo from '~/svg/logos/full_logo.svg?raw';
 import { Feedback } from './Feedback';
+import { TargetToggler } from '~/components/TargetToggler';
 
 type Props = {
   additionalSeo: TitleMetaLinkTag[];
@@ -18,18 +17,20 @@ const LanguagePicker = 'div';
 const ContentWrapper = languageSwitch ? LanguagePicker : 'div';
 ---
 
-<Layout additionalSeo={additionalSeo}>
+<BaseLayout additionalSeo={additionalSeo}>
   <div class={s.root}>
     <div class={s.sidebar}>
       <div class={s.sidebarHeader}>
         <a href="/" class={s.logo}>
-          <Fragment set:html={logo} />
+          <Svg name="svg/logos/full_logo" height={30} />
         </a>
-        <button type="button" class={s.hamburger}>
-          <Icon name="regular/bars" />
-        </button>
+        <TargetToggler targetId="sidebar">
+          <button type="button" class={s.hamburger}>
+            <Svg name="icons/regular/bars" />
+          </button>
+        </TargetToggler>
       </div>
-      <div class={s.innerSidebar} data-datocms-noindex>
+      <div class={s.innerSidebar} data-datocms-noindex id="sidebar">
         <slot name="sidebar" />
       </div>
     </div>
@@ -39,13 +40,13 @@ const ContentWrapper = languageSwitch ? LanguagePicker : 'div';
         <ul>
           <li>
             <a href="/support">
-              <Icon name="regular/headset" />
+              <Svg name="icons/regular/headset" />
               Ask for help!
             </a>
           </li>
           <li>
             <a href="https://status.datocms.com" target="_blank" rel="noreferrer">
-              <Icon name="regular/tachometer" />
+              <Svg name="icons/regular/tachometer" />
               Status page
             </a>
           </li>
@@ -76,10 +77,4 @@ const ContentWrapper = languageSwitch ? LanguagePicker : 'div';
       </ContentWrapper>
     </div>
   </div>
-</Layout>
-
-<script>
-  // s.innerSidebarOpen
-  // onClick={() => setSidebarOpen((old) => !old)}
-  // s.hamburger
-</script>
+</BaseLayout>

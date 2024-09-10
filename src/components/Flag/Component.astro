@@ -4,31 +4,28 @@ import { containsKeywords } from '~/lib/containsKeyword';
 import { Wrapper } from '~/components/Wrapper';
 import { Heading } from '~/components/Heading';
 import s from './style.module.css';
+import striptags from 'striptags';
 
 interface Props {
   flip?: boolean;
   hideDot?: boolean;
-  kicker?: string;
   seoAnalysis?: string[];
   style?: 'neutral' | 'bad' | 'good';
-  subtitle?: string;
 }
 
-const { flip, hideDot, kicker, seoAnalysis, style, subtitle } = Astro.props;
+const { flip, hideDot, seoAnalysis, style = 'neutral' } = Astro.props;
 
-let Title: 'h1' | 'h2';
-let Subtitle: 'h3' | 'div';
-let Kicker: 'h1' | 'h2';
+const kickerContents = striptags(await Astro.slots.render('kicker'));
+
+let Title: 'h1' | 'h2' = 'h1';
+let Subtitle: 'h3' | 'div' = 'div';
+let Kicker: 'h1' | 'h2' = 'h2';
 
 if (seoAnalysis) {
-  const kickerContainsKeywords = kicker ? containsKeywords(kicker, seoAnalysis) : false;
+  const kickerContainsKeywords = containsKeywords(kickerContents, seoAnalysis);
   Kicker = kickerContainsKeywords ? 'h1' : 'h2';
   Title = kickerContainsKeywords ? 'h2' : 'h1';
   Subtitle = 'h3';
-} else {
-  Kicker = 'h2';
-  Title = 'h1';
-  Subtitle = 'div';
 }
 ---
 
@@ -36,24 +33,41 @@ if (seoAnalysis) {
   <div class:list={[s.root, flip && s.isFlipped]}>
     <div class={s.imageContainer}>
       <slot name="visual" />
-      {!hideDot && style !== 'neutral' && <div data-style={style} class={s.dot} />}
+      {(!['bad', 'good'].includes(style) || hideDot) && <div data-style={style} class={s.dot} />}
     </div>
 
     <div class={s.content}>
       {
-        kicker && (
-          <Heading as={Kicker} class={s.kicker} anchor={slugify(kicker)}>
-            {kicker}
+        Astro.slots.has('kicker') && (
+          <Heading as={Kicker} class={s.kicker} anchor={slugify(kickerContents)}>
+            <slot name="kicker" />
           </Heading>
         )
       }
-      <div class={s.title}>
-        <slot name="title" />
-      </div>
-      {subtitle && <Subtitle class={s.subtitle}>{subtitle}</Subtitle>}
-      <div class={s.body}>
-        <slot />
-      </div>
+
+      {
+        Astro.slots.has('title') && (
+          <div class={s.title}>
+            <slot name="title" />
+          </div>
+        )
+      }
+
+      {
+        Astro.slots.has('subtitle') && (
+          <Subtitle class={s.subtitle}>
+            <slot name="subtitle" />
+          </Subtitle>
+        )
+      }
+
+      {
+        Astro.slots.has('default') && (
+          <div class={s.body}>
+            <slot />
+          </div>
+        )
+      }
     </div>
   </div>
 </Wrapper>

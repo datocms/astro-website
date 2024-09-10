@@ -1,5 +1,3 @@
-import striptags from 'striptags';
-
 type SeoAnalysis = {
   keyword: string;
   synonyms: string;
@@ -10,13 +8,9 @@ function isSeoAnalysis(value: unknown): value is SeoAnalysis {
   return Boolean(value && typeof value === 'object' && 'keyword' in value);
 }
 
-function containsKeyword(element: string, keyword: string) {
-  const converted = striptags(element);
-
+function containsKeyword(text: string | undefined, keyword: string) {
   return (
-    element &&
-    keyword &&
-    keyword.split(' ').every((w) => converted.toLowerCase().includes(w.toLowerCase()))
+    text && keyword && keyword.split(' ').every((w) => text.toLowerCase().includes(w.toLowerCase()))
   );
 }
 
@@ -40,10 +34,10 @@ function allKeywords(seoAnalysis: SeoAnalysis) {
   return allKeywords;
 }
 
-export function containsKeywords(element: string, seoAnalysis: unknown) {
+export function containsKeywords(text: string | undefined, seoAnalysis: unknown) {
   return (
     isSeoAnalysis(seoAnalysis) &&
-    element &&
-    allKeywords(seoAnalysis).some((k) => containsKeyword(element, k))
+    text &&
+    allKeywords(seoAnalysis).some((k) => containsKeyword(text, k))
   );
 }
