@@ -10,7 +10,40 @@
 
 # DatoCMS Website
 
-## <!--datocms-autoinclude-footer start-->
+This repository contains the source code of [datocms.com](https://www.datocms.com). It's built with Astro, gql.tada and the DatoCMS Astro SDK.
+
+It's a server-only app (every route is dynamic), and it's meant to be the origin for a surrogate-keys-capable CDN like Fastly, which will then apply granular caching rules thanks to [DatoCMS cache tags](https://www.datocms.com/docs/content-delivery-api/cache-tags).
+
+It can also be directly visited by the content editors to see the result of their draft changes in real time.
+
+## How to run locally?
+
+1. Clone this repository: `git clone https://github.com/datocms/website`
+2. Install dependencies with `npm install`.
+3. Copy `.env.example` to `.env` and fill in the missing values.
+4. Run `npm run dev` to start a local development server at [localhost:4321](http://localhost:4321).
+
+## SVGs
+
+SVGs are inlined, both in HTML and CSS. For the HTML part, there's a `<Svg />` Astro component:
+
+```jsx
+<Svg name="icons/regular/tachometer" />
+```
+
+There are two main directories for SVGs: `src/icons/` and `src/svg`. Depending on the directory, `<Svg />` will apply different SVGO settings:
+
+- SVGs in `src/icons/` are 1em in size and have their `fill` color inherited from the parent HTML element's color attribute by forcing the fill of every element to `currentColor`.
+- SVGs in `src/svg/` are more flexible: they don’t have a set size, and there’s no automatic fill color.
+
+For the CSS part, we use [`postcss-inline-svg`](https://www.npmjs.com/package/postcss-inline-svg) which let's you inline SVGs like this:
+
+```css
+background: svg-load('icons/regular/check.svg');
+background: svg-load('img/arrow-down.svg', fill=#000, stroke=#fff);
+```
+
+<!--datocms-autoinclude-footer start-->
 
 ---
 
