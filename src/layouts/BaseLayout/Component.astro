@@ -34,8 +34,22 @@ const result = await executeQuery(Astro, query);
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <Seo data={[...result._site.faviconMetaTags, ...additionalSeo]} />
+    <style is:inline>
+      body {
+        visibility: hidden;
+        opacity: 0;
+      }
+    </style>
   </head>
   <body>
     <slot />
   </body>
 </html>
+
+<style is:global>
+  body {
+    visibility: visible;
+    opacity: 1;
+    transition: all 0.2s linear;
+  }
+</style>

@@ -1,4 +1,4 @@
-import { DocGroupItemsFragment } from '~/components/docs/sidebar';
+import { DocGroupItemsFragment } from '~/components/docs/Sidebar';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
