@@ -4,9 +4,10 @@ import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import { z } from 'astro:schema';
 
 export default defineAction({
+  accept: 'form',
   input: z.object({
     namespace: z.literal('docs'),
-    url: z.string().url(),
+    url: z.string(),
     reaction: z.enum(['positive', 'negative']),
     notes: z.string().optional(),
     email: z.string().email().optional(),

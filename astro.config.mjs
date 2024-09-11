@@ -1,8 +1,8 @@
 import node from '@astrojs/node';
 import react from '@astrojs/react';
 import { defineConfig, envField } from 'astro/config';
+import bundlesize from 'vite-plugin-bundlesize';
 
-// https://astro.build/config
 export default defineConfig({
   output: 'server',
   image: {
@@ -35,7 +35,21 @@ export default defineConfig({
       validateSecrets: true,
     },
   },
+  devToolbar: {
+    enabled: false,
+  },
   integrations: [react()],
+  vite: {
+    plugins: [
+      bundlesize({
+        limits: [{ name: '**/*', limit: '500 kB' }],
+        stats: 'summary',
+      }),
+    ],
+    build: {
+      sourcemap: 'hidden',
+    },
+  },
   adapter: node({
     mode: 'standalone',
   }),

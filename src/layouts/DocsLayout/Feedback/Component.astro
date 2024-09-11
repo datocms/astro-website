@@ -1,0 +1,103 @@
+---
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+import { Button } from '~/components/Button';
+---
+
+<share-feedback>
+  <form class={s.form}>
+    <input type="hidden" name="url" value={Astro.url.pathname} />
+    <input type="hidden" name="namespace" value="docs" />
+
+    <div class={s.thumbsButton}>
+      <input type="radio" name="reaction" value="positive" />
+      <Svg name="icons/regular/thumbs-up" />
+      Yes
+    </div>
+
+    <div class={s.thumbsButton}>
+      <input type="radio" name="reaction" value="negative" />
+      <Svg name="icons/regular/thumbs-down" />
+      No
+    </div>
+
+    <div class={s.deets}>
+      <div class={s.field}>
+        <div class={s.label}>
+          <div class={s.labelName}>Would you like to add more information?</div>
+          <div class={s.labelInfo}>Optional</div>
+        </div>
+        <textarea placeholder="Your feedback..." name="notes"></textarea>
+      </div>
+
+      <div class={s.field}>
+        <div class={s.label}>
+          <div class={s.labelName}>
+            To receive further updates or address your feedback, kindly share your email address
+            with us.
+          </div>
+          <div class={s.labelInfo}>Optional</div>
+        </div>
+        <input placeholder="Enter your email" name="email" />
+      </div>
+
+      <p class={s.labelInfo}>If you need a reply, please contact support instead.</p>
+
+      <Button as="button" p="small" block type="submit">Submit feedback</Button>
+    </div>
+  </form>
+
+  <script>
+    import { actions } from 'astro:actions';
+    import { isInputError } from 'astro:actions';
+
+    class ShareFeedback extends HTMLElement {
+      connectedCallback() {
+        this.querySelector('form')!.addEventListener('submit', this);
+      }
+
+      async handleEvent(event: Event) {
+        (this as any)[`handle${event.type}`](event);
+      }
+
+      async handlesubmit(event: SubmitEvent) {
+        event.preventDefault();
+
+        const form = this.querySelector('form')!;
+        const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+
+        button.innerText = 'Submitting...';
+        button.disabled = true;
+
+        const formData = new FormData(form);
+        const { error } = await actions.sendFeedbackAboutDocPage(formData);
+
+        if (isInputError(error)) {
+          for (const [name, errors] of Object.entries(error.fields)) {
+            const fieldEl = form.querySelector(`[name=${name}]`);
+            const message = errors.join(', ');
+
+            if (!fieldEl) {
+              continue;
+            }
+
+            const errorEl = fieldEl.parentElement!.querySelector<HTMLElement>('[data-error]');
+
+            if (errorEl) {
+              errorEl.innerText = message;
+            } else {
+              fieldEl.insertAdjacentHTML('afterend', `<div data-error>${errors.join(', ')}</div>`);
+            }
+          }
+
+          button.innerText = 'Submit feedback';
+          button.disabled = false;
+        } else {
+          form.innerHTML = 'Thank you! We received your feedback 🙏';
+        }
+      }
+    }
+
+    window.customElements.define('share-feedback', ShareFeedback);
+  </script>
+</share-feedback>

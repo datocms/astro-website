@@ -7,6 +7,16 @@
   margin-right: 10px;
   display: inline-flex;
   align-items: center;
+  position: relative;
+
+  input {
+    margin: 0;
+    position: absolute;
+    inset: 0;
+    appearance: none;
+    outline: none;
+    z-index: 1;
+  }
 
   svg {
     margin-right: 5px;
@@ -16,14 +26,15 @@
   &:hover {
     border-color: var(--accent-color);
   }
+
+  &:has(input:checked) {
+    border-color: var(--accent-color);
+    outline: 1px solid var(--accent-color);
+  }
 }
 
-.activeThumbsButton {
-  border-color: var(--accent-color);
-  outline: 1px solid var(--accent-color);
-}
-
-.form {
+.deets {
+  display: none;
   font-size: 14px;
   margin-top: 20px;
 
@@ -44,13 +55,17 @@
   }
 }
 
-.field {
-  margin-bottom: 20px;
+.form:has(input:checked) .deets {
+  display: block;
 }
 
-.fieldError {
-  color: red;
-  margin-top: 5px;
+.field {
+  margin-bottom: 20px;
+
+  [data-error] {
+    color: red;
+    margin-top: 5px;
+  }
 }
 
 .label {
