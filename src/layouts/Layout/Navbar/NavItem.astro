@@ -32,9 +32,11 @@ const lowercaseName = slugify(name);
 <script>
   for (const navItem of document.querySelectorAll('[data-navbar-navitem]')) {
     navItem.querySelector('[data-navbar-navbutton]')!.addEventListener('click', () => {
-      if (!navItem.hasAttribute('data-open')) {
-        setTimeout(() => navItem.scrollIntoView({ behavior: 'smooth' }), 200);
-      }
+      setTimeout(() => {
+        if (navItem.hasAttribute('data-open')) {
+          navItem.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 200);
     });
   }
 </script>
