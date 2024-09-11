@@ -1,0 +1,15 @@
+---
+import type { Entry as EntryType, Group as GroupType } from './types';
+import Group from './Group.astro';
+import Entry from './Entry.astro';
+import s from './style.module.css';
+
+type Props = { title?: string; items: (GroupType | EntryType)[] };
+
+const { title, items } = Astro.props;
+---
+
+<div>
+  {title && <div class={s.sidebarTitle}>{title}</div>}
+  {items.map((item) => ('url' in item ? <Entry {...item} /> : <Group {...item} />))}
+</div>

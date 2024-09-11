@@ -26,10 +26,10 @@ function buildUrlForDocGroup(docGroup: FragmentOf<typeof DocGroupUrlFragment>) {
   const firstPageOrSection = data.pagesOrSections[0]!;
 
   if (firstPageOrSection.__typename === 'DocGroupPageRecord') {
-    return `/docs/${data.slug}${firstPageOrSection.page.slug ? `/${firstPageOrSection.page.slug}` : ''}`;
+    return `/docs/${data.slug}${firstPageOrSection.page.slug === 'index' ? '' : `/${firstPageOrSection.page.slug}`}`;
   } else {
     const firstPage = firstPageOrSection.pages[0]!;
-    return `/docs/${data.slug}${firstPage.page.slug ? `/${firstPage.page.slug}` : ''}`;
+    return `/docs/${data.slug}${firstPage.page.slug === 'index' ? '' : `/${firstPage.page.slug}`}`;
   }
 }
 
@@ -44,7 +44,7 @@ export const DocPageUrlFragment = graphql(/* GraphQL */ `
 
 function buildUrlForDocPage(docPage: FragmentOf<typeof DocPageUrlFragment>) {
   const data = readFragment(DocPageUrlFragment, docPage);
-  return `/docs/${data.parent[0]!.slug}/${data.slug}`;
+  return `/docs/${data.parent[0]!.slug}${data.slug === 'index' ? '' : `/${data.slug}`}`;
 }
 
 export const FeatureUrlFragment = graphql(/* GraphQL */ `

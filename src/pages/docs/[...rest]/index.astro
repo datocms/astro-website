@@ -1,0 +1,82 @@
+---
+import { Sidebar, buildItemsForDocGroup, buildItemsFromHeadings } from '~/components/docs/sidebar';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { DocsLayout } from '~/layouts/DocsLayout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse } from '~/lib/notFoundResponse';
+import { docGroupQuery, docPageQuery } from './_graphql';
+import s from './_style.module.css';
+
+const [groupSlug, rawPageSlug] = Astro.params.rest!.split('/') as [string] | [string, string];
+const pageSlug = rawPageSlug || 'index';
+
+const docGroupQueryVariables = { groupSlug };
+const { group } = await executeQuery(Astro, docGroupQuery, { variables: docGroupQueryVariables });
+
+if (!group) {
+  return notFoundResponse();
+}
+
+const allPagesWithinGroup = group.pagesOrSections.flatMap((pageOrSection) =>
+  pageOrSection.__typename === 'DocGroupPageRecord'
+    ? pageOrSection.page
+    : pageOrSection.pages.map((page) => page.page),
+);
+
+const ourPageHandle = allPagesWithinGroup.find((page) => page.slug === pageSlug);
+
+if (!ourPageHandle) {
+  return notFoundResponse();
+}
+
+const docPageQueryVariables = { pageId: ourPageHandle.id };
+const { page } = await executeQuery(Astro, docPageQuery, {
+  variables: docPageQueryVariables,
+});
+
+if (!page) {
+  return notFoundResponse();
+}
+---
+
+<DocsLayout additionalSeo={page._seoMetaTags}>
+  <Fragment slot="sidebar">
+    <a href="/docs" class={s.backHome}>
+      <Svg name="icons/regular/chevron-double-left" /> Home
+    </a>
+
+    <Sidebar
+      title={group.name}
+      items={group.pagesOrSections.length > 1
+        ? buildItemsForDocGroup(group)
+        : buildItemsFromHeadings(page.content.value)}
+    />
+
+    {
+      group.techStarterKit && (
+        <Space top={1}>
+          <MarketplaceCard
+            size="micro"
+            href={`/marketplace/starters/${group.techStarterKit.code}`}
+            svgLogoUrl={
+              group.techStarterKit.technology.squareLogo?.url ||
+              group.techStarterKit.technology.logo.url
+            }
+            title={group.techStarterKit.name}
+            badge={group.techStarterKit.badge ?? undefined}
+            label={group.techStarterKit.label}
+          >
+            Words are nice... but code speaks louder. Dive into a fully commented project template,
+            showcasing these techniques (and more) in action.
+          </MarketplaceCard>
+        </Space>
+      )
+    }
+  </Fragment>
+
+  <DraftModeQueryListener query={docGroupQuery} variables={docGroupQueryVariables} />
+  <DraftModeQueryListener query={docPageQuery} variables={docPageQueryVariables} />
+</DocsLayout>

@@ -1816,8 +1816,9 @@ input DocGroupModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   techStarterKit: LinkFilter
-  name: StringFilter
+  pages: DocGroupModelPagesFieldFilter
   slug: SlugFilter
+  name: StringFilter
   OR: [DocGroupModelFilter]
   AND: [DocGroupModelFilter]
 }
@@ -1852,6 +1853,39 @@ enum DocGroupModelOrderBy {
 }
 
 union DocGroupModelPagesField = DocGroupPageRecord | DocGroupSectionRecord
+
+"""Specify nested blocks fields conditions"""
+input DocGroupModelPagesFieldBlocksConditions {
+  docGroupPage: DocGroupPageModelFilter
+  docGroupSection: DocGroupSectionModelFilter
+}
+
+"""Specify nested blocks types presence"""
+input DocGroupModelPagesFieldBlocksPresence {
+  docGroupPage: BooleanType
+  docGroupSection: BooleanType
+}
+
+"""Specify how to filter this specific Modular Content field instance"""
+input DocGroupModelPagesFieldFilter {
+  """
+  Filter records containing at least one block matching the specified conditions
+  """
+  any: DocGroupModelPagesFieldBlocksConditions
+
+  """Filter records containing at least one block of any kind or not"""
+  exists: BooleanType
+
+  """Filter records containing at least one block of specified type or not"""
+  containsAny: DocGroupModelPagesFieldBlocksPresence
+}
+
+input DocGroupPageModelFilter {
+  id: ItemIdFilter
+  page: LinkFilter
+  OR: [DocGroupPageModelFilter]
+  AND: [DocGroupPageModelFilter]
+}
 
 """Block of type Doc Group Page (doc_group_page)"""
 type DocGroupPageRecord implements RecordInterface {
@@ -1902,13 +1936,20 @@ type DocGroupRecord implements RecordInterface {
   children: [DocGroupRecord!]!
   createdAt: DateTime!
   id: ItemId!
-  name: String
+  name: String!
   pages: [DocGroupModelPagesField!]!
   parent: DocGroupRecord
   position: IntType
-  slug: String
+  slug: String!
   techStarterKit: TemplateDemoRecord
   updatedAt: DateTime!
+}
+
+input DocGroupSectionModelFilter {
+  id: ItemIdFilter
+  title: StringFilter
+  OR: [DocGroupSectionModelFilter]
+  AND: [DocGroupSectionModelFilter]
 }
 
 """Block of type Doc Group Section (doc_group_section)"""
@@ -2022,8 +2063,8 @@ input DocPageModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   content: DocPageModelContentFieldFilter
-  seo: SeoFilter
   slug: SlugFilter
+  seo: SeoFilter
   title: StringFilter
   OR: [DocPageModelFilter]
   AND: [DocPageModelFilter]
@@ -2166,12 +2207,12 @@ type DocPageRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  content: DocPageModelContentField
+  content: DocPageModelContentField!
   createdAt: DateTime!
   id: ItemId!
   seo: SeoField
-  slug: String
-  title: String
+  slug: String!
+  title: String!
   updatedAt: DateTime!
 }
 

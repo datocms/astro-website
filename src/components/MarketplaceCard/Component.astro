@@ -1,0 +1,85 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import { ResponsiveImage } from '../ResponsiveImage';
+import s from './style.module.css';
+import { MarketplaceCardImageFragment } from './graphql';
+import { readFragment } from 'gql.tada';
+
+type Props = {
+  href: string;
+  image?: FragmentOf<typeof MarketplaceCardImageFragment>;
+  svgLogoUrl: string;
+  title: string;
+  highlight?: string;
+  badge?: { emoji: string; name: string };
+  label?: unknown;
+  boxed?: boolean;
+  size?: 'small' | 'micro' | 'medium' | 'large';
+  orientation?: 'horizontal' | 'vertical';
+};
+
+const {
+  href,
+  image,
+  title,
+  svgLogoUrl,
+  highlight,
+  badge,
+  label,
+  boxed = true,
+  size = 'medium',
+  orientation = 'vertical',
+} = Astro.props;
+
+const unmaskedImage = readFragment(MarketplaceCardImageFragment, image);
+---
+
+<a href={href} class={s.card} data-size={size} data-orientation={orientation} data-boxed={boxed}>
+  {
+    highlight && (
+      <div class={s.highlightBadge}>
+        <span>{highlight}</span>
+      </div>
+    )
+  }
+  <div class={s.visualWrapper}>
+    <slot name="image" />
+    {
+      unmaskedImage ? (
+        <ResponsiveImage imgClass={s.visualImage} data={unmaskedImage.responsiveImage} />
+      ) : svgLogoUrl ? (
+        <figure class={s.visualTechnology}>
+          <img loading="lazy" class={s.technology} src={svgLogoUrl} />
+        </figure>
+      ) : null
+    }
+  </div>
+  <article class={s.cardContent}>
+    <h2 class={s.cardTitle}>{title}</h2>
+    <p class={s.cardDescription}><slot /></p>
+    {
+      unmaskedImage && svgLogoUrl && (
+        <figure class={s.technologyAside}>
+          <img loading="lazy" class={s.technology} src={svgLogoUrl} />
+        </figure>
+      )
+    }
+    <footer class={s.cardFooter}>
+      {
+        badge && (
+          <div class={s.cardBadge}>
+            <span class={s.cardBadgeEmoji}>{badge.emoji}</span>
+            <span class={s.cardBadgeName}>{badge.name}</span>
+          </div>
+        )
+      }
+      {
+        label && (
+          <div class={s.cardLabel}>
+            <span class={s.cardBadgeName}>{label}</span>
+          </div>
+        )
+      }
+    </footer>
+  </article>
+</a>
