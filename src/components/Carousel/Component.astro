@@ -1,0 +1,56 @@
+---
+import s from './_style.module.css';
+import { Svg } from '~/components/Svg';
+---
+
+<embla-carousel>
+  <div class={s.embla} data-viewport>
+    <div class={s.emblaContainer}>
+      <slot />
+    </div>
+    <button class={s.prevSlide} data-prev>
+      <Svg name="icons/regular/angle-left" />
+    </button>
+    <button class={s.nextSlide} data-next>
+      <Svg name="icons/regular/angle-right" />
+    </button>
+  </div>
+</embla-carousel>
+
+<script>
+  import emblaCarousel, { type EmblaCarouselType } from 'embla-carousel';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'embla-carousel',
+    class EmblaCarousel extends WebComponent {
+      api!: EmblaCarouselType;
+
+      connectedCallback() {
+        const node = this.$('[data-viewport]');
+        const prevButton = this.$('[data-prev]');
+        const nextButton = this.$('[data-next]');
+
+        this.api = emblaCarousel(node, { loop: false, align: 'start' });
+
+        this.on(prevButton, 'click', () => this.api.scrollPrev());
+        this.on(nextButton, 'click', () => this.api.scrollNext());
+
+        const update = () => {
+          prevButton.toggleAttribute('disabled', !this.api.canScrollPrev());
+          nextButton.toggleAttribute('disabled', !this.api.canScrollNext());
+        };
+
+        update();
+
+        this.api.on('init', update);
+        this.api.on('select', update);
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.api.destroy();
+      }
+    },
+  );
+</script>

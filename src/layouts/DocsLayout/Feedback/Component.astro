@@ -50,54 +50,55 @@ import { Button } from '~/components/Button';
   <script>
     import { actions } from 'astro:actions';
     import { isInputError } from 'astro:actions';
+    import { WebComponent } from '~/lib/WebComponent';
 
-    class ShareFeedback extends HTMLElement {
-      connectedCallback() {
-        this.querySelector('form')!.addEventListener('submit', this);
-      }
+    window.customElements.define(
+      'share-feedback',
+      class ShareFeedback extends WebComponent {
+        form!: HTMLFormElement;
+        button!: HTMLButtonElement;
 
-      async handleEvent(event: Event) {
-        (this as any)[`handle${event.type}`](event);
-      }
+        connectedCallback() {
+          this.form = this.$('form');
+          this.button = this.$('button[type=submit]');
 
-      async handlesubmit(event: SubmitEvent) {
-        event.preventDefault();
-
-        const form = this.querySelector('form')!;
-        const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
-
-        button.innerText = 'Submitting...';
-        button.disabled = true;
-
-        const formData = new FormData(form);
-        const { error } = await actions.sendFeedbackAboutDocPage(formData);
-
-        if (isInputError(error)) {
-          for (const [name, errors] of Object.entries(error.fields)) {
-            const fieldEl = form.querySelector(`[name=${name}]`);
-            const message = errors.join(', ');
-
-            if (!fieldEl) {
-              continue;
-            }
-
-            const errorEl = fieldEl.parentElement!.querySelector<HTMLElement>('[data-error]');
-
-            if (errorEl) {
-              errorEl.innerText = message;
-            } else {
-              fieldEl.insertAdjacentHTML('afterend', `<div data-error>${errors.join(', ')}</div>`);
-            }
-          }
-
-          button.innerText = 'Submit feedback';
-          button.disabled = false;
-        } else {
-          form.innerHTML = 'Thank you! We received your feedback 🙏';
+          this.on(this.form, 'submit', this.handleSubmit);
         }
-      }
-    }
 
-    window.customElements.define('share-feedback', ShareFeedback);
+        async handleSubmit(event: SubmitEvent) {
+          event.preventDefault();
+
+          this.button.innerText = 'Submitting...';
+          this.button.disabled = true;
+
+          const formData = new FormData(this.form);
+          const { error } = await actions.sendFeedbackAboutDocPage(formData);
+
+          if (isInputError(error)) {
+            for (const [name, errors] of Object.entries(error.fields)) {
+              const fieldEl = this.form.querySelector(`[name=${name}]`);
+              const message = errors.join(', ');
+
+              if (!fieldEl) {
+                continue;
+              }
+
+              const errorEl = fieldEl.parentElement!.querySelector<HTMLElement>('[data-error]');
+
+              if (errorEl) {
+                errorEl.innerText = message;
+              } else {
+                fieldEl.after(`<div data-error>${errors.join(', ')}</div>`);
+              }
+            }
+
+            this.button.innerText = 'Submit feedback';
+            this.button.disabled = false;
+          } else {
+            this.form.innerHTML = 'Thank you! We received your feedback 🙏';
+          }
+        }
+      },
+    );
   </script>
 </share-feedback>

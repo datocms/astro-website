@@ -22,64 +22,51 @@ const { targetId, startVisible } = Astro.props;
 </style>
 
 <script>
-  class TargetToggler extends HTMLElement {
-    toggle: HTMLButtonElement | undefined;
-    controller: AbortController | undefined;
+  import { WebComponent } from '~/lib/WebComponent';
 
-    connectedCallback() {
-      this.toggle = this.querySelector('button') ?? undefined;
+  window.customElements.define(
+    'target-toggler',
+    class TargetToggler extends WebComponent {
+      toggle!: HTMLButtonElement;
+      controller!: AbortController;
 
-      if (!this.toggle) {
-        throw new Error(`${this.localName} must contain a <button> element.`);
+      connectedCallback() {
+        this.toggle = this.$('button');
+
+        if (this.startVisible) this.target.setAttribute('data-open', '');
+
+        this.toggle.setAttribute('aria-expanded', this.startVisible ? 'true' : 'false');
+        this.toggle.setAttribute('aria-controls', this.targetId);
+
+        this.on(this.toggle, 'click', this.handleClick);
       }
 
-      if (this.startVisible) this.target.setAttribute('data-open', '');
+      handleClick() {
+        const expanded = this.toggle.getAttribute('aria-expanded') === 'true' || false;
+        const newExpanded = !expanded;
 
-      this.controller = new AbortController();
-      const { signal } = this.controller;
-
-      this.toggle.setAttribute('aria-expanded', this.startVisible ? 'true' : 'false');
-      this.toggle.setAttribute('aria-controls', this.targetId);
-      this.toggle.addEventListener('click', () => this.handleClick(), { signal });
-    }
-
-    disconnectedCallback() {
-      this.controller?.abort();
-    }
-
-    handleClick() {
-      const expanded = this.toggle?.getAttribute('aria-expanded') === 'true' || false;
-      const newExpanded = !expanded;
-
-      this.toggle?.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
-      this.target?.toggleAttribute('data-open', newExpanded);
-    }
-
-    get target() {
-      const el = document.getElementById(this.targetId);
-
-      if (!el) {
-        throw new Error(`${this.localName} cannot find element with id "${this.targetId}".`);
+        this.toggle?.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
+        this.target?.toggleAttribute('data-open', newExpanded);
       }
 
-      return el;
-    }
+      get target() {
+        const el = document.getElementById(this.targetId);
 
-    get targetId() {
-      const attr = this.getAttribute('target-id');
+        if (!el) {
+          throw new Error(`[${this.localName}] cannot find element with id "${this.targetId}".`);
+        }
 
-      if (!attr) {
-        throw new Error(`${this.localName} requires a "target-id" attribute set to an element id`);
+        return el;
       }
 
-      return attr;
-    }
+      get targetId() {
+        return this.getAttribute('target-id')!;
+      }
 
-    get startVisible() {
-      const attr = 'target-start-visible';
-      return (this.hasAttribute(attr) && this.getAttribute(attr) !== 'false') || false;
-    }
-  }
-
-  window.customElements.define('target-toggler', TargetToggler);
+      get startVisible() {
+        const attr = 'target-start-visible';
+        return (this.hasAttribute(attr) && this.getAttribute(attr) !== 'false') || false;
+      }
+    },
+  );
 </script>

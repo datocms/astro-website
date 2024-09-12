@@ -8,7 +8,7 @@ import { StructuredText } from '@datocms/astro';
 import { formatVideoDuration } from '~/lib/formatVideoDuration';
 import { sum } from 'lodash-es';
 import VideoCard from './_VideoCard.astro';
-import VideoCarousel from './_VideoCarousel.astro';
+import { Carousel } from '~/components/Carousel';
 
 type Props = {
   chapter: FragmentOf<typeof ChapterFragment>;
@@ -48,6 +48,8 @@ const allVideosDurations = sum(
       {chapter.episodes.map((episode) => <VideoCard episode={episode} />)}
     </div>
 
-    <VideoCarousel chapter={Astro.props.chapter} />
+    <Carousel>
+      {chapter.episodes.map((episode) => <VideoCard episode={episode} />)}
+    </Carousel>
   </section>
 </div>

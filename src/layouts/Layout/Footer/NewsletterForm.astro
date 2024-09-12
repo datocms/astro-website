@@ -17,7 +17,7 @@ import { Button } from '~/components/Button';
         <div class={s.formContainer}>
           <form class={s.form}>
             <input placeholder="Enter your email" name="email" />
-            <Button as="button" p="tiny" fs="small"> Subscribe! </Button>
+            <Button as="button" p="tiny" fs="small">Subscribe! </Button>
           </form>
           <div class={s.formMessage} data-status></div>
         </div>
@@ -29,37 +29,43 @@ import { Button } from '~/components/Button';
 <script>
   import { actions } from 'astro:actions';
   import { isInputError } from 'astro:actions';
+  import { WebComponent } from '~/lib/WebComponent';
 
-  class SubscribeNewsletter extends HTMLElement {
-    connectedCallback() {
-      this.querySelector('form')!.addEventListener('submit', this);
-    }
+  window.customElements.define(
+    'subscribe-newsletter',
+    class SubscribeNewsletter extends WebComponent {
+      form!: HTMLFormElement;
+      button!: HTMLButtonElement;
 
-    async handleEvent(event: SubmitEvent) {
-      event.preventDefault();
+      connectedCallback() {
+        this.form = this.$('form');
+        this.button = this.$('button');
 
-      const form = this.querySelector('form')!;
-      const button = form.querySelector('button')!;
-      const status = this.querySelector('[data-status]')!;
-
-      button.innerText = 'Submitting...';
-      button.disabled = true;
-
-      const formData = new FormData(form);
-      const { error } = await actions.subscribeToNewsletter(formData);
-
-      if (isInputError(error)) {
-        if (error.fields.email) {
-          status.innerHTML = error.fields.email.join(', ');
-        }
-      } else {
-        status.innerHTML = 'Successfully subscribed. Welcome on board! 🎉';
+        this.on(this.form, 'submit', this.handleSubmit);
       }
 
-      button.innerText = 'Subscribe!';
-      button.disabled = false;
-    }
-  }
+      async handleSubmit(event: SubmitEvent) {
+        event.preventDefault();
 
-  window.customElements.define('subscribe-newsletter', SubscribeNewsletter);
+        const status = this.$('[data-status]');
+
+        this.button.innerText = 'Submitting...';
+        this.button.disabled = true;
+
+        const formData = new FormData(this.form);
+        const { error } = await actions.subscribeToNewsletter(formData);
+
+        if (isInputError(error)) {
+          if (error.fields.email) {
+            status.innerHTML = error.fields.email.join(', ');
+          }
+        } else {
+          status.innerHTML = 'Successfully subscribed. Welcome on board! 🎉';
+        }
+
+        this.button.innerText = 'Subscribe!';
+        this.button.disabled = false;
+      }
+    },
+  );
 </script>

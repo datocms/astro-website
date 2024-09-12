@@ -17,6 +17,7 @@ import s from './style.module.css';
 <script>
   import { isBefore, subMinutes } from 'date-fns';
   import ky from 'ky';
+  import { WebComponent } from '~/lib/WebComponent';
 
   type Component = {
     id: string;
@@ -34,43 +35,39 @@ import s from './style.module.css';
     up: 'All systems normal',
   };
 
-  class StatusBadge extends HTMLElement {
-    async connectedCallback() {
-      const statusBadgeData: StatusBadgeData | null = (() => {
+  window.customElements.define(
+    'status-badge',
+    class StatusBadge extends WebComponent {
+      async connectedCallback() {
+        const el = this.$('a');
+
+        if (!this.data || isBefore(new Date(this.data.updatedAt), subMinutes(new Date(), 5))) {
+          el.innerHTML = 'Checking...';
+          const status = await this.getStatus();
+          el.innerText = statusLabel[status];
+          this.data = { updatedAt: Date.now(), status: status };
+        } else {
+          el.innerText = statusLabel[this.data.status];
+        }
+      }
+
+      get data(): StatusBadgeData | null {
         const data = localStorage.getItem('statusBadgeData');
         return data ? JSON.parse(data) : null;
-      })();
-
-      const el = this.querySelector('a')!;
-
-      if (
-        !statusBadgeData ||
-        isBefore(new Date(statusBadgeData.updatedAt), subMinutes(new Date(), 5))
-      ) {
-        el.innerHTML = 'Checking...';
-        const status = await this.getStatus();
-        el.innerText = statusLabel[status];
-
-        const newData: StatusBadgeData = {
-          updatedAt: Date.now(),
-          status: status,
-        };
-
-        localStorage.setItem('statusBadgeData', JSON.stringify(newData));
-      } else {
-        el.innerText = statusLabel[statusBadgeData.status];
       }
-    }
 
-    async getStatus() {
-      const components = await ky
-        .get<Component[]>('https://status.datocms.com/.netlify/functions/component-status?days=1')
-        .json();
+      set data(newData: StatusBadgeData) {
+        localStorage.setItem('statusBadgeData', JSON.stringify(newData));
+      }
 
-      const firstComponentNotUp = components.find((component) => component.status !== 'up');
+      async getStatus() {
+        const components = await ky
+          .get<Component[]>('https://status.datocms.com/.netlify/functions/component-status?days=1')
+          .json();
 
-      return firstComponentNotUp ? firstComponentNotUp.status : 'up';
-    }
-  }
-  window.customElements.define('status-badge', StatusBadge);
+        const firstComponentNotUp = components.find((component) => component.status !== 'up');
+        return firstComponentNotUp ? firstComponentNotUp.status : 'up';
+      }
+    },
+  );
 </script>
