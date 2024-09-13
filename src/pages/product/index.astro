@@ -16,7 +16,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
-import { SingleLineStructuredText } from '~/components/SingleLineStructuredText';
+import { InlineText } from '~/components/structuredText/InlineText';
 
 const { integrations, page } = await executeQuery(Astro, query);
 
@@ -33,10 +33,10 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
   <Wrapper>
     <Hero>
       <Fragment slot="title">
-        <SingleLineStructuredText data={page.header} />
+        <InlineText data={page.header} />
       </Fragment>
       <Fragment slot="subtitle">
-        <SingleLineStructuredText data={page.subheader} />
+        <InlineText data={page.subheader} />
       </Fragment>
       <div class={s.buttonContainer}>
         <Button fs="big" as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
@@ -55,7 +55,7 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
               <ResponsiveImage data={pillar.image.responsiveImage} />
             </div>
             <div slot="title">
-              <SingleLineStructuredText data={pillar.title} />
+              <InlineText data={pillar.title} />
             </div>
             <article>
               {pillar.pillarCallout}
@@ -63,19 +63,19 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
                 <li>
                   <Svg name="icons/regular/check" />
                   <div>
-                    <SingleLineStructuredText data={pillar.capability1} />
+                    <InlineText data={pillar.capability1} />
                   </div>
                 </li>
                 <li>
                   <Svg name="icons/regular/check" />
                   <div>
-                    <SingleLineStructuredText data={pillar.capability2} />
+                    <InlineText data={pillar.capability2} />
                   </div>
                 </li>
                 <li>
                   <Svg name="icons/regular/check" />
                   <div>
-                    <SingleLineStructuredText data={pillar.capability3} />
+                    <InlineText data={pillar.capability3} />
                   </div>
                 </li>
               </Bullets>

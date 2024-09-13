@@ -1,7 +1,6 @@
 export type Entry = {
-  label: string;
   url: string;
-  entries?: Entry[];
+  label: string;
 };
 
 export type Group = {

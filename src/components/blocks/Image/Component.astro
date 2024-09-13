@@ -1,0 +1,56 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import { readFragment } from 'gql.tada';
+import { ImageFragment } from './graphql';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import s from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof ImageFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+
+const { frameless, asset } = readFragment(ImageFragment, maskedBlock);
+
+const imgClass = frameless ? s.framelessResponsiveImage : s.responsiveImage;
+---
+
+<figure>
+  {
+    asset.format === 'gif' && (
+      <video
+        poster={`${asset.url}?fm=jpg&fit=max&w=900`}
+        style={{ width: `${asset.width}px` }}
+        autoplay
+        loop
+        muted
+      >
+        <source src={`${asset.url}?fm=webm&w=900`} type="video/webm" />
+        <source src={`${asset.url}?fm=mp4&w=900`} type="video/mp4" />
+      </video>
+    )
+  }
+  {
+    asset.format !== 'gif' && asset.responsiveImage && (
+      <ResponsiveImage
+        imgClass={imgClass}
+        data={asset.responsiveImage}
+        imgStyle={{
+          display: 'inline-block',
+          maxWidth: `${asset.responsiveImage.width}px`,
+        }}
+      />
+    )
+  }
+  {
+    asset.format !== 'gif' && !asset.responsiveImage && (
+      <img
+        class={imgClass}
+        alt={asset.alt}
+        src={asset.format === 'svg' ? asset.url : `${asset.url}?auto=format&fit=max&w=900`}
+      />
+    )
+  }
+  {asset.title && <figcaption>{asset.title}</figcaption>}
+</figure>

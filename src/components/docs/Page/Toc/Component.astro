@@ -1,0 +1,29 @@
+---
+import type { Group } from '../types';
+import s from './style.module.css';
+
+interface Props {
+  groups: Group[];
+}
+
+const { groups } = Astro.props;
+---
+
+<div class={s.toc}>
+  <div class={s.tocInner}>
+    {
+      groups.map((group) => (
+        <>
+          <div class={s.tocTitle}>{group.title}</div>
+          <div class={s.tocEntries}>
+            {group.entries.map((node) => (
+              <a href={node.url} class={s.tocEntry}>
+                {node.label}
+              </a>
+            ))}
+          </div>
+        </>
+      ))
+    }
+  </div>
+</div>

@@ -11,10 +11,10 @@ import { LogosBar } from '~/components/LogosBar';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Space } from '~/components/Space';
 import { QuotesCarousel } from '~/components/QuotesCarousel';
-import { StructuredText } from '@datocms/astro';
 import { Svg } from '~/components/Svg';
 import { Checks } from '~/components/Checks';
-import { SingleLineStructuredText } from '~/components/SingleLineStructuredText';
+import { InlineText } from '~/components/structuredText/InlineText';
+import { Text } from '~/components/structuredText/Text';
 
 const { page } = await executeQuery(Astro, query, { variables: { slug: Astro.params.slug! } });
 
@@ -28,10 +28,10 @@ if (!page) {
     <div class={s.hero}>
       <div class={s.heroBody}>
         <h1 class={s.heroTitle}>
-          <SingleLineStructuredText data={page.title} />
+          <InlineText data={page.title} />
         </h1>
         <div class={s.heroSubtitle}>
-          <SingleLineStructuredText data={page.subtitle} />
+          <InlineText data={page.subtitle} />
         </div>
         <div class={s.buttonContainer}>
           <Button as="a" href="https://dashboard.datocms.com/signup"> Try it for free </Button>
@@ -63,7 +63,7 @@ if (!page) {
   <div class={s.testimonials}>
     <Space top={2} bottom={3}>
       <InterstitialTitle style="three">
-        <SingleLineStructuredText data={page.quotesHeader} />
+        <InlineText data={page.quotesHeader} />
       </InterstitialTitle>
       <QuotesCarousel quotes={page.quotes} animated={false} />
     </Space>
@@ -73,8 +73,8 @@ if (!page) {
     <Wrapper>
       <div class={s.starterBox}>
         <div class={s.starterBoxText}>
-          <h2><SingleLineStructuredText data={page.starterTitle} /></h2>
-          <StructuredText data={page.starterDescription} />
+          <h2><InlineText data={page.starterTitle} /></h2>
+          <Text data={page.starterDescription} />
           <Space top={1}>
             <Button as="a" p="small" s="purple" href={page.starterLink}>Check it out</Button>
           </Space>
@@ -134,7 +134,7 @@ if (!page) {
         </div>
         <div class={s.blockText}>
           <h2>{page.featuresHeader}</h2>
-          <StructuredText data={page.featuresDescription} />
+          <Text data={page.featuresDescription} />
         </div>
       </div>
     </Wrapper>
@@ -150,7 +150,7 @@ if (!page) {
             </div>
             <article>
               <h3>{callout.title}</h3>
-              <StructuredText data={callout.description} />
+              <Text data={callout.description} />
             </article>
           </div>
           <div class={s.featuresGrid}>
@@ -164,7 +164,7 @@ if (!page) {
                   )}
                   <div class={s.featureText}>
                     <h4 class={s.featureTitle}>{feature.title}</h4>
-                    <StructuredText data={feature.description} />
+                    <Text data={feature.description} />
                   </div>
                 </article>
               </div>
@@ -179,8 +179,8 @@ if (!page) {
     <Wrapper>
       <div class={s.successStory}>
         <div class={s.successStoryText}>
-          <h2><SingleLineStructuredText data={page.successStoryHeader} /></h2>
-          <StructuredText data={page.successStorySummary} />
+          <h2><InlineText data={page.successStoryHeader} /></h2>
+          <Text data={page.successStorySummary} />
           <Space top={1}>
             <Button
               as="a"

@@ -1,11 +1,11 @@
 ---
 import { MaybeLink } from '../MaybeLink';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { StructuredText } from '@datocms/astro';
 import s from './style.module.css';
 import { type FragmentOf, readFragment } from '~/lib/datocms/graphql';
 import { FeatureCardFragment } from './graphql';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
+import { Text } from '../structuredText/Text';
 
 interface Props {
   feature: FragmentOf<typeof FeatureCardFragment>;
@@ -35,7 +35,7 @@ const unmaskedBlock = readFragment(FeatureCardFragment, feature);
     </div>
     <div class={s.featureText}>
       <h4 class={s.featureTitle}>{unmaskedBlock.title}</h4>
-      <StructuredText data={unmaskedBlock.description} />
+      <Text data={unmaskedBlock.description} />
     </div>
     {unmaskedBlock.link && <p class={s.featureLink}>Learn more</p>}
   </article>

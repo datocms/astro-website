@@ -1,3 +1,4 @@
+import { readFragment, type FragmentOf } from 'gql.tada';
 import ky from 'ky';
 import {
   Application,
@@ -11,6 +12,9 @@ import {
   ReflectionType,
   type SomeType,
 } from 'typedoc';
+import { slugify } from '~/lib/slugify';
+import type { Entry } from '../../Page/types';
+import { PluginSdkHookGroupFragment } from './graphql';
 
 function invariant(condition: any, message?: string | (() => string)): asserts condition {
   if (condition) {
@@ -244,4 +248,19 @@ export function fetchPluginSdkHooks() {
   cachedPromise = parse();
 
   return fetchPluginSdkHooks();
+}
+
+export async function buildGroupsFromPluginSdkHookGroup(
+  block: FragmentOf<typeof PluginSdkHookGroupFragment>,
+): Promise<Entry[]> {
+  const { groupName } = readFragment(PluginSdkHookGroupFragment, block);
+
+  const hooks = (await fetchPluginSdkHooks()).filter((hook) => hook.groups.includes(groupName));
+
+  return hooks
+    .sort((a, b) => a.lineNumber - b.lineNumber)
+    .map<Entry>((hook) => ({
+      label: `${hook.name}()`,
+      url: `#${slugify(hook.name)}`,
+    }));
 }

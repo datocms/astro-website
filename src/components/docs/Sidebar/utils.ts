@@ -51,7 +51,7 @@ export function buildItemsForDocGroup(
           url: buildUrlFromGql(pageOrSection.page),
         }
       : {
-          label: pageOrSection.title,
+          title: pageOrSection.title,
           entries: pageOrSection.pages.map(({ page }) => ({
             label: page.title,
             url: buildUrlFromGql(page),

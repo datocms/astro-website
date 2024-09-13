@@ -1,0 +1,15 @@
+---
+import { StructuredText } from '@datocms/astro';
+import HeadingNode from './HeadingNode.astro';
+import CodeNode from './CodeNode.astro';
+import type { ComponentProps } from 'astro/types';
+
+type Props = ComponentProps<typeof StructuredText>;
+
+const { nodeOverrides, ...props } = Astro.props;
+---
+
+<StructuredText
+  {...props}
+  nodeOverrides={{ heading: HeadingNode, code: CodeNode, ...nodeOverrides }}
+/>

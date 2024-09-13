@@ -7,6 +7,7 @@ import ExpandableAttribute from '../ExpandableAttribute/index.astro';
 import { Markdown } from '@astropub/md';
 import { Code } from 'astro:components';
 import { Svg } from '~/components/Svg';
+import { slugify } from '~/lib/slugify';
 
 type Props = { hook: PluginSdkHook };
 
@@ -23,7 +24,7 @@ const ctxMethods = ctxAttrs
   .sort((a, b) => a.name.localeCompare(b.name));
 ---
 
-<Heading anchor={hook.name} as="h4">
+<Heading anchor={slugify(hook.name)} as="h4">
   <code>{hook.name}()</code>
 </Heading>
 

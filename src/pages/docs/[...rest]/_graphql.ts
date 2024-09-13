@@ -1,10 +1,10 @@
+import { ImageFragment } from '~/components/blocks/Image/graphql';
+import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { CloneButtonFormFragment } from '~/components/docs/blocks/CloneButtonForm/graphql';
 import { DemoFragment } from '~/components/docs/blocks/Demo/graphql';
 import { DeployButtonFormFragment } from '~/components/docs/blocks/DeployButtonForm/graphql';
 import { DocCalloutFragment } from '~/components/docs/blocks/DocCallout/graphql';
 import { GraphiqlEditorFragment } from '~/components/docs/blocks/GraphiqlEditor/graphql';
-import { ImageFragment } from '~/components/docs/blocks/Image/graphql';
-import { InternalVideoFragment } from '~/components/docs/blocks/InternalVideo/graphql';
 import { MultipleDemosBlockFragment } from '~/components/docs/blocks/MultipleDemosBlock/graphql';
 import { PluginSdkHookGroupFragment } from '~/components/docs/blocks/PluginSdkHookGroup/graphql';
 import { ReactUiLiveExampleFragment } from '~/components/docs/blocks/ReactUiLiveExample/graphql';

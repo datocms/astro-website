@@ -4,11 +4,11 @@ import s from './_style.module.css';
 import { ChapterFragment } from './_graphql';
 import { readFragment } from 'gql.tada';
 import { Svg } from '~/components/Svg';
-import { StructuredText } from '@datocms/astro';
 import { formatVideoDuration } from '~/lib/formatVideoDuration';
 import { sum } from 'lodash-es';
 import VideoCard from './_VideoCard.astro';
 import { Carousel } from '~/components/Carousel';
+import { Text } from '~/components/structuredText/Text';
 
 type Props = {
   chapter: FragmentOf<typeof ChapterFragment>;
@@ -40,7 +40,7 @@ const allVideosDurations = sum(
     </div>
     <h2 class={s.chapterIntroHeading}>{chapter.title}</h2>
     <div class={s.chapterIntroDescription}>
-      <StructuredText data={chapter.introduction} />
+      <Text data={chapter.introduction} />
     </div>
   </div>
   <section class={s.chapterVideosWrapper}>
