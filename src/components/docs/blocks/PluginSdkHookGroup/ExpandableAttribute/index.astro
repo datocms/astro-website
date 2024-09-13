@@ -1,0 +1,82 @@
+---
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+import type { Property } from '../utils';
+import { Code } from 'astro:components';
+import { Markdown } from 'astro-remote';
+import removeMarkdown from 'remove-markdown';
+
+type Props = {
+  property: Property;
+};
+
+const { property } = Astro.props;
+
+const baseUrl = 'https://github.com/datocms/plugins-sdk/blob/master/packages/sdk/src/types.ts';
+---
+
+<expandable-attribute>
+  <div class={s.hook}>
+    <div class={s.hookExpand} data-expandable-attribute-button>
+      <span><Svg name="icons/regular/plus" /></span>
+      <span><Svg name="icons/regular/times" /></span>
+    </div>
+    <div class={s.hookBody}>
+      <button type="button" class={s.hookName} data-expandable-attribute-button>
+        <span class={s.hookNameName}>
+          ctx.{property.name}{property.type === 'function' ? '()' : ''}
+        </span>
+        {
+          property.description && (
+            <span class={s.hookNameDesc}>{removeMarkdown(property.description)}</span>
+          )
+        }
+      </button>
+
+      <div class={s.hookDeets} data-expandable-attribute-content>
+        <div class={s.hookDescription}>
+          {property.description && <Markdown content={property.description} />}
+          <a
+            href={`${baseUrl}#L${property.lineNumber}`}
+            target="_blank"
+            rel="noreferrer"
+            class={s.hookGithub}
+          >
+            View on Github <Svg name="icons/brands/github" />
+          </a>
+        </div>
+        {property.example && <Code code={property.example} lang="ts" />}
+      </div>
+    </div>
+  </div>
+</expandable-attribute>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'expandable-attribute',
+    class ExpandableAttribute extends WebComponent {
+      content!: HTMLElement;
+      toggles!: HTMLButtonElement[];
+
+      connectedCallback() {
+        this.toggles = this.$$('[data-expandable-attribute-button]');
+        this.content = this.$('[data-expandable-attribute-content]');
+
+        for (const toggle of this.toggles) {
+          this.on(toggle, 'click', (_event, el) => {
+            const expanded = el.getAttribute('aria-expanded') === 'true' || false;
+            const newExpanded = !expanded;
+
+            for (const toggle of this.toggles) {
+              toggle.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
+            }
+
+            this.content.toggleAttribute('data-open', newExpanded);
+          });
+        }
+      }
+    },
+  );
+</script>

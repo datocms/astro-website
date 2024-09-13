@@ -9,6 +9,21 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse } from '~/lib/notFoundResponse';
 import { docGroupQuery, docPageQuery } from './_graphql';
 import s from './_style.module.css';
+import { StructuredText } from '@datocms/astro';
+import { withAllComponents } from '~/lib/datocms/structuredText';
+import { Image } from '~/components/docs/blocks/Image';
+import { Video } from '~/components/docs/blocks/Video';
+import { Table } from '~/components/docs/blocks/Table';
+import { Demo } from '~/components/docs/blocks/Demo';
+import { MultipleDemosBlock } from '~/components/docs/blocks/MultipleDemosBlock';
+import { InternalVideo } from '~/components/docs/blocks/InternalVideo';
+import { GraphiqlEditor } from '~/components/docs/blocks/GraphiqlEditor';
+import { CloneButtonForm } from '~/components/docs/blocks/CloneButtonForm';
+import { DeployButtonForm } from '~/components/docs/blocks/DeployButtonForm';
+import { PluginSdkHookGroup } from '~/components/docs/blocks/PluginSdkHookGroup';
+import { DocCallout } from '~/components/docs/blocks/DocCallout';
+import { ReactUiLiveExample } from '~/components/docs/blocks/ReactUiLiveExample';
+import { TutorialVideo } from '~/components/docs/blocks/TutorialVideo';
 
 const [groupSlug, rawPageSlug] = Astro.params.rest!.split('/') as [string] | [string, string];
 const pageSlug = rawPageSlug || 'index';
@@ -76,6 +91,39 @@ if (!page) {
       )
     }
   </Fragment>
+
+  <div class={s.articleContainer}>
+    <!-- {
+      group.pagesOrSections.length > 1 && (
+        <Toc content={page.content} pluginSdkHooks={additionalData?.pluginSdkHooks} />
+      )
+    } -->
+    <div class={s.article}>
+      <h1 class={s.kicker}>{group.name} > {page.title}</h1>
+      <div class={s.title}>{page.title}</div>
+
+      <div class={s.body}>
+        <StructuredText
+          data={page.content}
+          blockComponents={withAllComponents(page.content.blocks, {
+            ImageRecord: Image,
+            VideoRecord: Video,
+            TableRecord: Table,
+            DemoRecord: Demo,
+            MultipleDemosBlockRecord: MultipleDemosBlock,
+            InternalVideoRecord: InternalVideo,
+            GraphiqlEditorRecord: GraphiqlEditor,
+            CloneButtonFormRecord: CloneButtonForm,
+            DeployButtonFormRecord: DeployButtonForm,
+            PluginSdkHookGroupRecord: PluginSdkHookGroup,
+            DocCalloutRecord: DocCallout,
+            ReactUiLiveExampleRecord: ReactUiLiveExample,
+            TutorialVideoRecord: TutorialVideo,
+          })}
+        />
+      </div>
+    </div>
+  </div>
 
   <DraftModeQueryListener query={docGroupQuery} variables={docGroupQueryVariables} />
   <DraftModeQueryListener query={docPageQuery} variables={docPageQueryVariables} />

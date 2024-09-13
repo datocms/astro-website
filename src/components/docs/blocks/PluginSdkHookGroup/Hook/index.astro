@@ -1,0 +1,113 @@
+---
+import { Heading } from '~/components/Heading';
+import s from './style.module.css';
+import type { PluginSdkHook } from '../utils';
+import ExpandablePane from '../ExpandablePane/index.astro';
+import ExpandableAttribute from '../ExpandableAttribute/index.astro';
+import { Markdown } from 'astro-remote';
+import { Code } from 'astro:components';
+import { Svg } from '~/components/Svg';
+
+type Props = { hook: PluginSdkHook };
+
+const { hook } = Astro.props;
+
+const ctxAttrs = hook.ctx?.flatMap((group) => group.properties) || [];
+
+const ctxProperties = ctxAttrs
+  .filter((i) => i.type === 'property')
+  .sort((a, b) => a.name.localeCompare(b.name));
+
+const ctxMethods = ctxAttrs
+  .filter((i) => i.type === 'function')
+  .sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<Heading anchor={hook.name} as="h4">
+  <code>{hook.name}()</code>
+</Heading>
+
+{hook.description && <Markdown content={hook.description} />}
+
+<!-- {
+  false && hook.returnType && (
+    <>
+      <Heading anchor={`${hook.name}-context`} as="h5" class={s.subchapter}>
+        Return value
+      </Heading>
+      {hook.returnType.properties ? (
+        <>
+          <p>
+            The function must return {hook.returnType.isArray ? 'an array of objects' : 'an object'}{' '}
+            with the following structure:
+          </p>
+          <ExpandablePane label="structure">
+            <div class={s.propertyGroup}>
+              {hook.returnType.properties
+                .sort((a, b) => a.lineNumber - b.lineNumber)
+                .map((item) => (
+                  <div key={item.name} class={s.returnValue}>
+                    <div class={s.returnValueName}>
+                      <a href={`${baseUrl}#L${item.lineNumber}`} target="_blank" rel="noreferrer">
+                        {item.name}
+                        <Svg name="icons/brands/github" />
+                      </a>{' '}
+                      {item.isOptional ? (
+                        <span class={s.optional}>Optional</span>
+                      ) : (
+                        <span class={s.required}>Required</span>
+                      )}
+                    </div>
+                    <div class={s.returnValueDescription}>
+                      <Markdown content={item.description} />
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </ExpandablePane>
+        </>
+      ) : (
+        <>
+          <p>
+            The {hook.returnType.isMaybePromise ? '(optionally async) ' : ' '}
+            function must return{' '}
+            {hook.returnType.isArray
+              ? `an array of ${hook.returnType.type}`
+              : `a ${hook.returnType.type}`}
+            .
+          </p>
+        </>
+      )}
+    </>
+  )
+} -->
+
+{
+  ctxProperties.length > 0 && (
+    <>
+      <Heading anchor={`${hook.name}-context-properties`} as="h5" class={s.subchapter}>
+        Properties available in context
+      </Heading>
+      <p>The following information and methods are available:</p>
+      {ctxProperties.map((property) => (
+        <ExpandableAttribute property={property} />
+      ))}
+    </>
+  )
+}
+
+{
+  ctxMethods.length > 0 && (
+    <>
+      <Heading anchor={`${hook.name}-context-methods`} as="h5" class={s.subchapter}>
+        Methods available in context
+      </Heading>
+      <p>The following information and methods are available:</p>
+      {ctxMethods.map((property) => (
+        <ExpandableAttribute property={property} />
+      ))}
+    </>
+  )
+}
+
+{hook.example && <Code code={hook.example} lang="js" />}

@@ -1,3 +1,16 @@
+import { CloneButtonFormFragment } from '~/components/docs/blocks/CloneButtonForm/graphql';
+import { DemoFragment } from '~/components/docs/blocks/Demo/graphql';
+import { DeployButtonFormFragment } from '~/components/docs/blocks/DeployButtonForm/graphql';
+import { DocCalloutFragment } from '~/components/docs/blocks/DocCallout/graphql';
+import { GraphiqlEditorFragment } from '~/components/docs/blocks/GraphiqlEditor/graphql';
+import { ImageFragment } from '~/components/docs/blocks/Image/graphql';
+import { InternalVideoFragment } from '~/components/docs/blocks/InternalVideo/graphql';
+import { MultipleDemosBlockFragment } from '~/components/docs/blocks/MultipleDemosBlock/graphql';
+import { PluginSdkHookGroupFragment } from '~/components/docs/blocks/PluginSdkHookGroup/graphql';
+import { ReactUiLiveExampleFragment } from '~/components/docs/blocks/ReactUiLiveExample/graphql';
+import { TableFragment } from '~/components/docs/blocks/Table/graphql';
+import { TutorialVideoFragment } from '~/components/docs/blocks/TutorialVideo/graphql';
+import { VideoFragment } from '~/components/docs/blocks/Video/graphql';
 import { DocGroupItemsFragment } from '~/components/docs/Sidebar';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
@@ -72,191 +85,69 @@ export const docPageQuery = graphql(
         content {
           value
           blocks {
-            ... on ImageRecord {
+            ... on RecordInterface {
               id
-              _modelApiKey
-              frameless
-              image {
-                format
-                width
-                responsiveImage(imgixParams: { auto: format, w: 1000 }) {
-                  ...ResponsiveImageFragment
-                }
-                zoomableResponsiveImage: responsiveImage(
-                  imgixParams: { auto: format, w: 1500, fit: max }
-                ) {
-                  ...ResponsiveImageFragment
-                }
-                url
-              }
+              __typename
+            }
+            ... on ImageRecord {
+              ...ImageFragment
             }
             ... on VideoRecord {
-              id
-              _modelApiKey
-              video {
-                url
-                title
-                provider
-                width
-                height
-                providerUid
-              }
+              ...VideoFragment
             }
             ... on TableRecord {
-              id
-              _modelApiKey
-              table
+              ...TableFragment
             }
             ... on DemoRecord {
-              id
-              _modelApiKey
-              demo {
-                id
-                name
-                code
-                githubRepo
-                technology {
-                  name
-                  logo {
-                    url
-                  }
-                }
-                screenshot {
-                  responsiveImage(
-                    imgixParams: { auto: format, w: 450, h: 350, fit: crop, crop: top }
-                  ) {
-                    ...ResponsiveImageFragment
-                  }
-                }
-              }
+              ...DemoFragment
             }
             ... on MultipleDemosBlockRecord {
-              id
-              _modelApiKey
-              demos {
-                id
-                name
-                code
-                technology {
-                  name
-                  logo {
-                    url
-                  }
-                }
-                screenshot {
-                  responsiveImage(
-                    imgixParams: { auto: format, w: 300, h: 200, fit: crop, crop: top }
-                  ) {
-                    ...ResponsiveImageFragment
-                  }
-                }
-              }
+              ...MultipleDemosBlockFragment
             }
             ... on InternalVideoRecord {
-              id
-              _modelApiKey
-              thumbTimeSeconds
-              video {
-                title
-                width
-                height
-                blurUpThumb
-                video {
-                  playbackId: muxPlaybackId
-                }
-              }
+              ...InternalVideoFragment
             }
             ... on GraphiqlEditorRecord {
-              id
-              _modelApiKey
-              query
+              ...GraphiqlEditorFragment
             }
             ... on CloneButtonFormRecord {
-              id
-              _modelApiKey
+              ...CloneButtonFormFragment
             }
             ... on DeployButtonFormRecord {
-              id
-              _modelApiKey
+              ...DeployButtonFormFragment
             }
             ... on PluginSdkHookGroupRecord {
-              id
-              _modelApiKey
-              groupName
+              ...PluginSdkHookGroupFragment
             }
             ... on DocCalloutRecord {
-              id
-              _modelApiKey
-              calloutType
-              title
-              text {
-                value
-              }
+              ...DocCalloutFragment
             }
             ... on ReactUiLiveExampleRecord {
-              id
-              _modelApiKey
-              componentName
+              ...ReactUiLiveExampleFragment
             }
             ... on TutorialVideoRecord {
-              id
-              _modelApiKey
-              tutorials {
-                ... on RecordInterface {
-                  id
-                  _modelApiKey
-                }
-                ... on RecordInterface {
-                  id
-                  _modelApiKey
-                }
-                ... on UserGuidesVideoRecord {
-                  title
-                  slug
-                  thumbTimeSeconds
-                  video {
-                    video {
-                      thumbnailUrl
-                      blurUpThumb
-                      width
-                      height
-                    }
-                  }
-                  chapters: _allReferencingUserGuidesChapters {
-                    slug
-                  }
-                }
-                ... on VideoTutorialRecord {
-                  id
-                  title
-                  res: videoTutorialResource {
-                    ... on OtherVideoResourceRecord {
-                      _modelApiKey
-                      url
-                      coverImage {
-                        responsiveImage(
-                          imgixParams: { auto: format, w: 300, ar: "4:3", fit: crop }
-                        ) {
-                          ...ResponsiveImageFragment
-                        }
-                      }
-                    }
-                    ... on YoutubeVideoResourceRecord {
-                      _modelApiKey
-                      video {
-                        url
-                        thumbnailUrl
-                        providerUid
-                      }
-                    }
-                  }
-                }
-              }
+              ...TutorialVideoFragment
             }
           }
         }
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment],
+  [
+    TagFragment,
+    ResponsiveImageFragment,
+    ImageFragment,
+    VideoFragment,
+    TableFragment,
+    DemoFragment,
+    MultipleDemosBlockFragment,
+    InternalVideoFragment,
+    GraphiqlEditorFragment,
+    CloneButtonFormFragment,
+    DeployButtonFormFragment,
+    PluginSdkHookGroupFragment,
+    DocCalloutFragment,
+    ReactUiLiveExampleFragment,
+    TutorialVideoFragment,
+  ],
 );
