@@ -3,7 +3,7 @@ import { Svg } from '~/components/Svg';
 import s from './style.module.css';
 import type { Property } from '../utils';
 import { Code } from 'astro:components';
-import { Markdown } from 'astro-remote';
+import { Markdown } from '@astropub/md';
 import removeMarkdown from 'remove-markdown';
 
 type Props = {
@@ -35,7 +35,7 @@ const baseUrl = 'https://github.com/datocms/plugins-sdk/blob/master/packages/sdk
 
       <div class={s.hookDeets} data-expandable-attribute-content>
         <div class={s.hookDescription}>
-          {property.description && <Markdown content={property.description} />}
+          {property.description && <Markdown of={property.description} />}
           <a
             href={`${baseUrl}#L${property.lineNumber}`}
             target="_blank"

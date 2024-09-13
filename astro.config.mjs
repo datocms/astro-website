@@ -1,5 +1,6 @@
 import node from '@astrojs/node';
 import react from '@astrojs/react';
+import markdownIntegration from '@astropub/md';
 import { defineConfig, envField } from 'astro/config';
 import bundlesize from 'vite-plugin-bundlesize';
 
@@ -38,7 +39,7 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
-  integrations: [react()],
+  integrations: [react(), markdownIntegration()],
   vite: {
     plugins: [
       bundlesize({

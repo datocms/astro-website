@@ -4,7 +4,7 @@ import s from './style.module.css';
 import type { PluginSdkHook } from '../utils';
 import ExpandablePane from '../ExpandablePane/index.astro';
 import ExpandableAttribute from '../ExpandableAttribute/index.astro';
-import { Markdown } from 'astro-remote';
+import { Markdown } from '@astropub/md';
 import { Code } from 'astro:components';
 import { Svg } from '~/components/Svg';
 
@@ -27,7 +27,7 @@ const ctxMethods = ctxAttrs
   <code>{hook.name}()</code>
 </Heading>
 
-{hook.description && <Markdown content={hook.description} />}
+{hook.description && <Markdown of={hook.description} />}
 
 <!-- {
   false && hook.returnType && (
@@ -59,7 +59,7 @@ const ctxMethods = ctxAttrs
                       )}
                     </div>
                     <div class={s.returnValueDescription}>
-                      <Markdown content={item.description} />
+                      <Markdown of={item.description} />
                     </div>
                   </div>
                 ))}
