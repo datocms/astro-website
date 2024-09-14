@@ -1,3 +1,23 @@
+// function findElementClosestToTargetMatchingQueryInScope(target: HTMLElement, queryToMatch: string, scope: HTMLElement) {
+//   const possibleMatches = Array.from(scope.querySelectorAll(queryToMatch));
+
+//   for (const possibleMatch of possibleMatches) {
+//     if (target === possibleMatch) {
+//       return possibleMatch;
+//     }
+
+//     let test = target;
+
+//     while (test && test !== scope) {
+//       test = test.parentNode as HTMLElement;
+
+//       if (test === target) {
+//         return possibleMatch;
+//       }
+//     }
+//   }
+// }
+
 export class WebComponent extends HTMLElement {
   eventListenerRemovers: Array<() => void> = [];
 
@@ -25,6 +45,16 @@ export class WebComponent extends HTMLElement {
 
     for (const element of elements) {
       const callbackWrapper = (e: HTMLElementEventMap[K]) => {
+        // const hit = findElementClosestToTargetMatchingQueryInScope(
+        //   e.target as HTMLElement,
+        //   query,
+        //   element,
+        // )
+
+        // if (hit) {
+        //   callback.call(this, e, hit as T);
+        // }
+
         callback.call(this, e, element);
       };
       element.addEventListener(event, callbackWrapper);

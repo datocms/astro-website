@@ -33,6 +33,10 @@ export default defineConfig({
           context: 'server',
           access: 'secret',
         }),
+        RECAPTCHA_KEY: envField.string({
+          context: 'client',
+          access: 'public',
+        }),
       },
       validateSecrets: true,
     },

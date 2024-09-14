@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import style from './style.module.css';
 import { fsClassNames, pClassNames, sClassNames } from './common';
-import type { ReactHTML, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactHTML, ReactNode } from 'react';
 
 type Props = {
   as?: keyof ReactHTML;
@@ -11,6 +11,7 @@ type Props = {
   block?: boolean;
   disabled?: boolean;
   children: ReactNode;
+  type: ButtonHTMLAttributes<HTMLButtonElement>['type'];
 };
 
 export function ButtonReactComponent({
