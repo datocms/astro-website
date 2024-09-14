@@ -20,7 +20,7 @@ type Props<
   placeholder?: string;
   validations?: RegisterOptions<TFieldValues, TName>;
   options?: Array<{ value: string; label: ReactNode }>;
-  render: ControllerProps<TFieldValues, TName>['render'];
+  render?: ControllerProps<TFieldValues, TName>['render'];
   type?: string;
   multiple?: boolean;
   readOnly?: boolean;
@@ -115,6 +115,21 @@ export function FieldReactComponent<
 
       {errorMessage && <div className={s.error}>← {errorMessage}</div>}
       {input}
+    </div>
+  );
+}
+
+type FieldsetReactComponentProps = {
+  label: string;
+  children: ReactNode;
+};
+
+export function FieldsetReactComponent({ label, children }: FieldsetReactComponentProps) {
+  return (
+    <div className={s.field}>
+      <label>{label}</label>
+
+      {children}
     </div>
   );
 }
