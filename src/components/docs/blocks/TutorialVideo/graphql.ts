@@ -1,57 +1,58 @@
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { UserGuideEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
 import { graphql } from '~/lib/datocms/graphql';
 
-export const TutorialVideoFragment = graphql(/* GraphQL */ `
-  fragment TutorialVideoFragment on TutorialVideoRecord {
-    id
-    _modelApiKey
-    tutorials {
-      ... on RecordInterface {
-        id
-        _modelApiKey
-      }
-      ... on RecordInterface {
-        id
-        _modelApiKey
-      }
-      ... on UserGuidesVideoRecord {
-        title
-        slug
-        thumbTimeSeconds
-        video {
-          video {
-            thumbnailUrl
-            blurUpThumb
-            width
-            height
-          }
+export const TutorialVideoFragment = graphql(
+  /* GraphQL */ `
+    fragment TutorialVideoFragment on TutorialVideoRecord {
+      videoTutorialsOrUserGuideEpisodes: tutorials {
+        ... on RecordInterface {
+          id
+          __typename
         }
-        chapters: _allReferencingUserGuidesChapters {
-          slug
-        }
-      }
-      ... on VideoTutorialRecord {
-        id
-        title
-        res: videoTutorialResource {
-          ... on OtherVideoResourceRecord {
-            _modelApiKey
-            url
-            coverImage {
-              responsiveImage(imgixParams: { auto: format, w: 300, ar: "4:3", fit: crop }) {
-                ...ResponsiveImageFragment
-              }
+
+        ... on UserGuidesVideoRecord {
+          title
+          thumbTimeSeconds
+          asset: video {
+            video {
+              thumbnailUrl
+              blurUpThumb
+              width
+              height
             }
           }
-          ... on YoutubeVideoResourceRecord {
-            _modelApiKey
-            video {
+          ...UserGuideEpisodeUrlFragment
+        }
+
+        ... on VideoTutorialRecord {
+          id
+          title
+          resource: videoTutorialResource {
+            ... on RecordInterface {
+              id
+              __typename
+            }
+            ... on YoutubeVideoResourceRecord {
+              video {
+                url
+                thumbnailUrl
+                providerUid
+                title
+              }
+            }
+            ... on OtherVideoResourceRecord {
               url
-              thumbnailUrl
-              providerUid
+              coverImage {
+                responsiveImage(imgixParams: { auto: format, w: 600, ar: "3:2", fit: crop }) {
+                  ...ResponsiveImageFragment
+                }
+              }
             }
           }
         }
       }
     }
-  }
-`);
+  `,
+  [ResponsiveImageFragment, UserGuideEpisodeUrlFragment],
+);

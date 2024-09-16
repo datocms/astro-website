@@ -2,7 +2,6 @@ import { readFragment, type FragmentOf } from 'gql.tada';
 import ky from 'ky';
 import {
   Application,
-  ContainerReflection,
   DeclarationReflection,
   FileRegistry,
   IntersectionType,
@@ -16,7 +15,7 @@ import { slugify } from '~/lib/slugify';
 import type { Entry } from '../../Page/types';
 import { PluginSdkHookGroupFragment } from './graphql';
 
-function invariant(condition: any, message?: string | (() => string)): asserts condition {
+export function invariant(condition: any, message?: string | (() => string)): asserts condition {
   if (condition) {
     return;
   }
@@ -24,7 +23,7 @@ function invariant(condition: any, message?: string | (() => string)): asserts c
   throw new Error(provided);
 }
 
-function dereference(type: SomeType) {
+export function dereference(type: SomeType) {
   if (type instanceof ReferenceType) {
     if (type.reflection instanceof DeclarationReflection) {
       const innerType = type.reflection.type!;
@@ -104,7 +103,7 @@ type Ctx = {
   properties: Array<Property>;
 };
 
-function buildCtx(project: ContainerReflection, rawDefinition: SomeType): Ctx[] {
+function buildCtx(rawDefinition: SomeType): Ctx[] {
   const definition = dereference(rawDefinition);
 
   if (definition instanceof ReflectionType) {
@@ -155,7 +154,7 @@ function buildCtx(project: ContainerReflection, rawDefinition: SomeType): Ctx[] 
 
   if (definition instanceof IntersectionType) {
     return definition.types.flatMap((subType) => {
-      return buildCtx(project, subType);
+      return buildCtx(subType);
     });
   }
 
@@ -217,9 +216,7 @@ async function parse(): Promise<PluginSdkHook[]> {
     const ctxParameter = signature.parameters.find((p) => p.name === 'ctx');
 
     const ctx = ctxParameter
-      ? buildCtx(project, dereference(ctxParameter.type!)).sort((a, b) =>
-          a.name.localeCompare(b.name),
-        )
+      ? buildCtx(dereference(ctxParameter.type!)).sort((a, b) => a.name.localeCompare(b.name))
       : null;
 
     return {

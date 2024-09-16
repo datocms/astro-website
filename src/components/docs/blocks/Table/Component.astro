@@ -1,5 +1,42 @@
 ---
-import s from './style.module.css';
+import type { FragmentOf } from 'gql.tada';
+import { TableFragment } from './graphql';
+import { parseShortCodes, toCss } from './utils';
+import { readFragment } from 'gql.tada';
+
+interface Props {
+  block: FragmentOf<typeof TableFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+
+const block = readFragment(TableFragment, maskedBlock);
+
+type TableData<T extends string> = {
+  columns: T[];
+  data: Array<Record<T, string>>;
+};
+
+const table = block.table as TableData<string>;
+
+const columns = table.columns.map((rawName) => parseShortCodes(rawName, ['style']));
 ---
 
-<div class={s.root}>/* TODO: Complete! */ Hello from Table</div>
+<figure>
+  <table>
+    <thead>
+      <tr>
+        {columns.map((col) => <th style={toCss(col.meta.style)}>{col.content}</th>)}
+      </tr>
+    </thead>
+    {
+      table.data.map((row) => (
+        <tr>
+          {columns.map((col) => (
+            <td style={toCss(col.meta.style)}>{row[col.id]}</td>
+          ))}
+        </tr>
+      ))
+    }
+  </table>
+</figure>

@@ -1979,7 +1979,7 @@ type DocGroupSectionRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
-union DocPageModelContentBlocksField = CloneButtonFormRecord | DemoRecord | DeployButtonFormRecord | DocCalloutRecord | GraphiqlEditorRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | PluginSdkHookGroupRecord | ReactUiLiveExampleRecord | TableRecord | TutorialVideoRecord | VideoRecord
+union DocPageModelContentBlocksField = CloneButtonFormRecord | DemoRecord | DeployButtonFormRecord | DocCalloutRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | PluginSdkHookGroupRecord | ReactUiLiveExampleRecord | TableRecord | TutorialVideoRecord
 
 type DocPageModelContentField {
   blocks: [DocPageModelContentBlocksField!]!
@@ -1993,10 +1993,8 @@ input DocPageModelContentFieldBlocksConditions {
   deployButtonForm: DeployButtonFormModelFilter
   demo: DemoModelFilter
   image: ImageModelFilter
-  graphiqlEditor: GraphiqlEditorModelFilter
   multipleDemosBlock: MultipleDemosBlockModelFilter
   internalVideo: InternalVideoModelFilter
-  video: VideoModelFilter
   pluginSdkHookGroup: PluginSdkHookGroupModelFilter
   docCallout: DocCalloutModelFilter
   reactUiLiveExample: ReactUiLiveExampleModelFilter
@@ -2024,10 +2022,8 @@ input DocPageModelContentFieldBlocksPresence {
   deployButtonForm: BooleanType
   demo: BooleanType
   image: BooleanType
-  graphiqlEditor: BooleanType
   multipleDemosBlock: BooleanType
   internalVideo: BooleanType
-  video: BooleanType
   pluginSdkHookGroup: BooleanType
   docCallout: BooleanType
   reactUiLiveExample: BooleanType
@@ -2097,7 +2093,7 @@ enum DocPageModelOrderBy {
   title_DESC
 }
 
-"""Record of type 📝 Doc page (doc_page)"""
+"""Record of type 📝 Doc page1 (doc_page)"""
 type DocPageRecord implements RecordInterface {
   _allReferencingDocGroups(
     """Specifies how to filter linking records"""
@@ -3217,42 +3213,6 @@ type GlossaryPageRecord implements RecordInterface {
   createdAt: DateTime!
   id: ItemId!
   seo: SeoField
-  updatedAt: DateTime!
-}
-
-input GraphiqlEditorModelFilter {
-  id: ItemIdFilter
-  query: TextFilter
-  OR: [GraphiqlEditorModelFilter]
-  AND: [GraphiqlEditorModelFilter]
-}
-
-"""Block of type GraphiQL editor (graphiql_editor)"""
-type GraphiqlEditorRecord implements RecordInterface {
-  _createdAt: DateTime!
-
-  """Editing URL"""
-  _editingUrl: String
-  _firstPublishedAt: DateTime
-  _isValid: BooleanType!
-  _modelApiKey: String!
-  _publicationScheduledAt: DateTime
-  _publishedAt: DateTime
-
-  """Generates SEO and Social card meta tags to be used in your frontend"""
-  _seoMetaTags(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-  ): [Tag!]!
-  _status: ItemStatus!
-  _unpublishingScheduledAt: DateTime
-  _updatedAt: DateTime!
-  createdAt: DateTime!
-  id: ItemId!
-  query(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String
   updatedAt: DateTime!
 }
 

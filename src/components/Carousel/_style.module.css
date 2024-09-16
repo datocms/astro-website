@@ -1,14 +1,31 @@
 .embla {
-  display: none;
+  position: relative;
+  --buttonsY: 50%;
+  overflow: hidden;
+  margin: 0 calc(var(--page-margin) * -1);
+  padding: 0 var(--page-margin);
 
   @media screen and (min-width: 768px) {
-    display: block;
-    overflow: hidden;
-    padding: 0 var(--page-margin);
-  }
+    &::before,
+    &::after {
+      content: '';
+      height: 100%;
+      position: absolute;
+      pointer-events: none;
+      top: 0;
+      width: var(--page-margin);
+      z-index: 10;
+    }
 
-  @media screen and (min-width: 1200px) {
-    padding: 0 calc(var(--page-margin) * 2);
+    &::before {
+      background-image: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+      left: 0;
+    }
+
+    &::after {
+      background-image: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+      right: 0;
+    }
   }
 
   &:hover {
@@ -17,8 +34,8 @@
       opacity: 1;
       pointer-events: all;
 
-      &[disabled] svg {
-        opacity: 0.3;
+      &[disabled] {
+        opacity: 0;
       }
     }
   }
@@ -46,39 +63,38 @@
   height: 44px;
   justify-content: center;
   opacity: 0;
-  pointer-events: none;
   position: absolute;
-  top: 30%;
+  top: var(--buttonsY);
   transition:
     opacity 0.3s,
     transform 0.3s;
   width: 44px;
   z-index: 20;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
 }
 
 .prevSlide {
   left: var(--page-margin);
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
 
   @media screen and (min-width: 1200px) {
     left: calc(var(--page-margin) * 2);
 
     &:hover {
-      transform: translateX(-50%) scale(1.1);
+      transform: translate(-50%, -50%) scale(1.1);
     }
   }
 }
 
 .nextSlide {
   right: var(--page-margin);
-  transform: translateX(50%);
+  transform: translate(50%, -50%);
 
   @media screen and (min-width: 1200px) {
     right: calc(var(--page-margin) * 2);
 
     &:hover {
-      transform: translateX(50%) scale(1.1);
+      transform: translate(50%, -50%) scale(1.1);
     }
   }
 }

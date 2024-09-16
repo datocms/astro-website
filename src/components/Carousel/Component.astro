@@ -1,11 +1,19 @@
 ---
 import s from './_style.module.css';
 import { Svg } from '~/components/Svg';
+
+type Props = {
+  buttonsY?: string;
+  class?: string;
+  viewportClass?: string;
+};
+
+const { buttonsY, class: className, viewportClass } = Astro.props;
 ---
 
 <embla-carousel>
-  <div class={s.embla} data-viewport>
-    <div class={s.emblaContainer}>
+  <div class:list={[s.embla, className]} data-viewport style={{ '--buttonsY': buttonsY }}>
+    <div class:list={[s.emblaContainer, viewportClass]}>
       <slot />
     </div>
     <button class={s.prevSlide} data-prev>

@@ -21,7 +21,7 @@ export const DocGroupUrlFragment = graphql(/* GraphQL */ `
   }
 `);
 
-function buildUrlForDocGroup(docGroup: FragmentOf<typeof DocGroupUrlFragment>) {
+export function buildUrlForDocGroup(docGroup: FragmentOf<typeof DocGroupUrlFragment>) {
   const data = readFragment(DocGroupUrlFragment, docGroup);
   const firstPageOrSection = data.pagesOrSections[0]!;
 
@@ -42,7 +42,7 @@ export const DocPageUrlFragment = graphql(/* GraphQL */ `
   }
 `);
 
-function buildUrlForDocPage(docPage: FragmentOf<typeof DocPageUrlFragment>) {
+export function buildUrlForDocPage(docPage: FragmentOf<typeof DocPageUrlFragment>) {
   const data = readFragment(DocPageUrlFragment, docPage);
   return `/docs/${data.parent[0]!.slug}${data.slug === 'index' ? '' : `/${data.slug}`}`;
 }
@@ -53,9 +53,36 @@ export const FeatureUrlFragment = graphql(/* GraphQL */ `
   }
 `);
 
-function buildUrlForFeature(feature: FragmentOf<typeof FeatureUrlFragment>) {
+export function buildUrlForFeature(feature: FragmentOf<typeof FeatureUrlFragment>) {
   const data = readFragment(FeatureUrlFragment, feature);
   return `/features/${data.slug}`;
+}
+
+export const UserGuideEpisodeUrlFragment = graphql(/* GraphQL */ `
+  fragment UserGuideEpisodeUrlFragment on UserGuidesVideoRecord {
+    slug
+    chapters: _allReferencingUserGuidesChapters {
+      slug
+    }
+  }
+`);
+
+export function buildUrlForUserGuideEpisode(
+  userGuideEpisode: FragmentOf<typeof UserGuideEpisodeUrlFragment>,
+) {
+  const data = readFragment(UserGuideEpisodeUrlFragment, userGuideEpisode);
+  return `/user-guides/${data.chapters[0]!.slug}/${data.slug}`;
+}
+
+export const TemplateDemoUrlFragment = graphql(/* GraphQL */ `
+  fragment TemplateDemoUrlFragment on TemplateDemoRecord {
+    code
+  }
+`);
+
+export function buildUrlForTemplateDemo(templateDemo: FragmentOf<typeof TemplateDemoUrlFragment>) {
+  const data = readFragment(TemplateDemoUrlFragment, templateDemo);
+  return `/marketplace/starters/${data.code}`;
 }
 
 export function buildUrlFromGql(
@@ -68,6 +95,12 @@ export function buildUrlFromGql(
       })
     | (FragmentOf<typeof DocGroupUrlFragment> & {
         __typename: 'DocGroupRecord';
+      })
+    | (FragmentOf<typeof UserGuideEpisodeUrlFragment> & {
+        __typename: 'UserGuidesVideoRecord';
+      })
+    | (FragmentOf<typeof TemplateDemoUrlFragment> & {
+        __typename: 'TemplateDemoRecord';
       }),
 ) {
   switch (thing.__typename) {
@@ -77,5 +110,9 @@ export function buildUrlFromGql(
       return buildUrlForFeature(thing);
     case 'DocGroupRecord':
       return buildUrlForDocGroup(thing);
+    case 'UserGuidesVideoRecord':
+      return buildUrlForUserGuideEpisode(thing);
+    case 'TemplateDemoRecord':
+      return buildUrlForTemplateDemo(thing);
   }
 }

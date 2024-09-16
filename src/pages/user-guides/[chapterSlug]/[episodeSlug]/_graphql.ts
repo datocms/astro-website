@@ -1,27 +1,28 @@
 import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { UserGuideEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
 import { graphql } from '~/lib/datocms/graphql';
 
-export const EpisodeFragment = graphql(/* GraphQL */ `
-  fragment EpisodeFragment on UserGuidesVideoRecord {
-    title
-    slug
-    asset: video {
-      video {
-        thumbnailUrl
-        width
-        height
-        blurUpThumb
-        duration
+export const EpisodeFragment = graphql(
+  /* GraphQL */ `
+    fragment EpisodeFragment on UserGuidesVideoRecord {
+      title
+      asset: video {
+        video {
+          thumbnailUrl
+          width
+          height
+          blurUpThumb
+          duration
+        }
       }
+      thumbTimeSeconds
+      ...UserGuideEpisodeUrlFragment
     }
-    thumbTimeSeconds
-    chapters: _allReferencingUserGuidesChapters {
-      slug
-    }
-  }
-`);
+  `,
+  [UserGuideEpisodeUrlFragment],
+);
 
 export const query = graphql(
   /* GraphQL */ `

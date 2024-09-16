@@ -10,11 +10,9 @@ import { notFoundResponse } from '~/lib/notFoundResponse';
 import { docGroupQuery, docPageQuery } from './_graphql';
 import s from './_style.module.css';
 import { withAllComponents } from '~/lib/datocms/structuredText';
-import { Video } from '~/components/docs/blocks/Video';
 import { Table } from '~/components/docs/blocks/Table';
 import { Demo } from '~/components/docs/blocks/Demo';
 import { MultipleDemosBlock } from '~/components/docs/blocks/MultipleDemosBlock';
-import { GraphiqlEditor } from '~/components/docs/blocks/GraphiqlEditor';
 import { CloneButtonForm } from '~/components/docs/blocks/CloneButtonForm';
 import { DeployButtonForm } from '~/components/docs/blocks/DeployButtonForm';
 import { PluginSdkHookGroup } from '~/components/docs/blocks/PluginSdkHookGroup';
@@ -27,6 +25,7 @@ import { Page } from '~/components/docs/Page';
 import { buildGroupsFromHeadings } from '~/components/docs/Page/utils';
 import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { Image } from '~/components/blocks/Image';
+import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder';
 
 const [groupSlug, rawPageSlug] = Astro.params.rest!.split('/') as [string] | [string, string];
 const pageSlug = rawPageSlug || 'index';
@@ -85,7 +84,7 @@ const sdkHooks = (
         <Space top={1}>
           <MarketplaceCard
             size="micro"
-            href={`/marketplace/starters/${group.techStarterKit.code}`}
+            href={buildUrlForTemplateDemo(group.techStarterKit)}
             svgLogoUrl={
               group.techStarterKit.technology.squareLogo?.url ||
               group.techStarterKit.technology.logo.url
@@ -116,12 +115,10 @@ const sdkHooks = (
         data={page.content}
         blockComponents={withAllComponents(page.content.blocks, {
           ImageRecord: Image,
-          VideoRecord: Video,
           TableRecord: Table,
           DemoRecord: Demo,
           MultipleDemosBlockRecord: MultipleDemosBlock,
           InternalVideoRecord: InternalVideo,
-          GraphiqlEditorRecord: GraphiqlEditor,
           CloneButtonFormRecord: CloneButtonForm,
           DeployButtonFormRecord: DeployButtonForm,
           PluginSdkHookGroupRecord: PluginSdkHookGroup,

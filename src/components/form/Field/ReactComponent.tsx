@@ -1,4 +1,3 @@
-import useComponentSize from '@rehooks/component-size';
 import cn from 'classnames';
 import { useRef, type ReactNode } from 'react';
 import {
@@ -48,8 +47,6 @@ export function FieldReactComponent<
   } = useFormContext<TFieldValues>();
   const value = watch(name);
   const field = register(name, validations);
-  const labelRef = useRef<HTMLLabelElement>(null);
-  const { height: labelHeight } = useComponentSize(labelRef);
 
   let input = (
     <input
@@ -102,19 +99,15 @@ export function FieldReactComponent<
   const errorMessage = errors[name]?.message as string | undefined;
 
   return (
-    <div
-      className={cn(s.field, errorMessage && s.fieldError)}
-      style={{
-        '--paddingTop': `${35 + labelHeight}px`,
-      }}
-    >
-      <label htmlFor={name} ref={labelRef}>
+    <div className={cn(s.field, errorMessage && s.fieldError)}>
+      <label htmlFor={name}>
         {label}
         {validations && <span className={s.required}>&nbsp;*</span>}
       </label>
 
-      {errorMessage && <div className={s.error}>← {errorMessage}</div>}
       {input}
+
+      {errorMessage && <div className={s.error}>{errorMessage}</div>}
     </div>
   );
 }

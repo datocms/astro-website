@@ -1,36 +1,35 @@
 import cn from 'classnames';
 import style from './style.module.css';
 import { fsClassNames, pClassNames, sClassNames } from './common';
-import type { ButtonHTMLAttributes, ReactHTML, ReactNode } from 'react';
+import type { ElementType, ReactNode } from 'react';
 
-type Props = {
-  as?: keyof ReactHTML;
+type Props<T extends keyof JSX.IntrinsicElements = 'button'> = {
+  as?: T;
   fs?: keyof typeof fsClassNames;
   p?: keyof typeof pClassNames;
   s?: keyof typeof sClassNames;
   block?: boolean;
-  disabled?: boolean;
   children: ReactNode;
-  type: ButtonHTMLAttributes<HTMLButtonElement>['type'];
-};
+} & JSX.IntrinsicElements[T];
 
-export function ButtonReactComponent({
-  as: Component = 'button',
+export function ButtonReactComponent<T extends keyof JSX.IntrinsicElements>({
+  as = 'button' as T,
   children,
   fs,
   p,
   s,
   block,
-  disabled,
   ...other
-}: Props) {
+}: Props<T>) {
+  const Component = as as any;
+
   return (
     <Component
       {...other}
       className={cn(
         style.root,
         'className' in other ? (other.className as string) : null,
-        disabled && style.disabled,
+        'disabled' in other && other.disabled ? style.disabled : null,
         block && style.block,
         s && sClassNames[s],
         fs && fsClassNames[fs],

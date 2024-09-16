@@ -1,14 +1,9 @@
 ---
-import type { FragmentOf } from 'gql.tada';
-import { ResponsiveImage } from '../ResponsiveImage';
 import s from './style.module.css';
-import { MarketplaceCardImageFragment } from './graphql';
-import { readFragment } from 'gql.tada';
 
 type Props = {
   href: string;
-  image?: FragmentOf<typeof MarketplaceCardImageFragment>;
-  svgLogoUrl: string;
+  svgLogoUrl?: string;
   title: string;
   highlight?: string;
   badge?: { emoji: string; name: string };
@@ -16,11 +11,12 @@ type Props = {
   boxed?: boolean;
   size?: 'small' | 'micro' | 'medium' | 'large';
   orientation?: 'horizontal' | 'vertical';
+  class?: string;
 };
 
 const {
+  class: className,
   href,
-  image,
   title,
   svgLogoUrl,
   highlight,
@@ -30,11 +26,15 @@ const {
   size = 'medium',
   orientation = 'vertical',
 } = Astro.props;
-
-const unmaskedImage = readFragment(MarketplaceCardImageFragment, image);
 ---
 
-<a href={href} class={s.card} data-size={size} data-orientation={orientation} data-boxed={boxed}>
+<a
+  href={href}
+  class:list={[s.card, className]}
+  data-size={size}
+  data-orientation={orientation}
+  data-boxed={boxed}
+>
   {
     highlight && (
       <div class={s.highlightBadge}>
@@ -43,10 +43,9 @@ const unmaskedImage = readFragment(MarketplaceCardImageFragment, image);
     )
   }
   <div class={s.visualWrapper}>
-    <slot name="image" />
     {
-      unmaskedImage ? (
-        <ResponsiveImage imgClass={s.visualImage} data={unmaskedImage.responsiveImage} />
+      Astro.slots.has('image') ? (
+        <slot name="image" />
       ) : svgLogoUrl ? (
         <figure class={s.visualTechnology}>
           <img loading="lazy" class={s.technology} src={svgLogoUrl} />
@@ -58,28 +57,29 @@ const unmaskedImage = readFragment(MarketplaceCardImageFragment, image);
     <h2 class={s.cardTitle}>{title}</h2>
     <p class={s.cardDescription}><slot /></p>
     {
-      unmaskedImage && svgLogoUrl && (
-        <figure class={s.technologyAside}>
+      Astro.slots.has('image') && svgLogoUrl && (
+        <div class={s.technologyAside}>
           <img loading="lazy" class={s.technology} src={svgLogoUrl} />
-        </figure>
+        </div>
       )
     }
-    <footer class={s.cardFooter}>
-      {
-        badge && (
-          <div class={s.cardBadge}>
-            <span class={s.cardBadgeEmoji}>{badge.emoji}</span>
-            <span class={s.cardBadgeName}>{badge.name}</span>
-          </div>
-        )
-      }
-      {
-        label && (
-          <div class={s.cardLabel}>
-            <span class={s.cardBadgeName}>{label}</span>
-          </div>
-        )
-      }
-    </footer>
+
+    {
+      (badge || label) && (
+        <footer class={s.cardFooter}>
+          {badge && (
+            <div class={s.cardBadge}>
+              <span class={s.cardBadgeEmoji}>{badge.emoji}</span>
+              <span class={s.cardBadgeName}>{badge.name}</span>
+            </div>
+          )}
+          {label && (
+            <div class={s.cardLabel}>
+              <span class={s.cardBadgeName}>{label}</span>
+            </div>
+          )}
+        </footer>
+      )
+    }
   </article>
 </a>

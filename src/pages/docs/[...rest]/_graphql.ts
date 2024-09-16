@@ -4,16 +4,15 @@ import { CloneButtonFormFragment } from '~/components/docs/blocks/CloneButtonFor
 import { DemoFragment } from '~/components/docs/blocks/Demo/graphql';
 import { DeployButtonFormFragment } from '~/components/docs/blocks/DeployButtonForm/graphql';
 import { DocCalloutFragment } from '~/components/docs/blocks/DocCallout/graphql';
-import { GraphiqlEditorFragment } from '~/components/docs/blocks/GraphiqlEditor/graphql';
 import { MultipleDemosBlockFragment } from '~/components/docs/blocks/MultipleDemosBlock/graphql';
 import { PluginSdkHookGroupFragment } from '~/components/docs/blocks/PluginSdkHookGroup/graphql';
 import { ReactUiLiveExampleFragment } from '~/components/docs/blocks/ReactUiLiveExample/graphql';
 import { TableFragment } from '~/components/docs/blocks/Table/graphql';
 import { TutorialVideoFragment } from '~/components/docs/blocks/TutorialVideo/graphql';
-import { VideoFragment } from '~/components/docs/blocks/Video/graphql';
 import { DocGroupItemsFragment } from '~/components/docs/Sidebar';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { TemplateDemoUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const docGroupQuery = graphql(
@@ -45,7 +44,6 @@ export const docGroupQuery = graphql(
           id
           name
           cmsDescription
-          code
           starterType
           badge {
             name
@@ -67,11 +65,12 @@ export const docGroupQuery = graphql(
               ...ResponsiveImageFragment
             }
           }
+          ...TemplateDemoUrlFragment
         }
       }
     }
   `,
-  [ResponsiveImageFragment, DocGroupItemsFragment],
+  [ResponsiveImageFragment, DocGroupItemsFragment, TemplateDemoUrlFragment],
 );
 
 export const docPageQuery = graphql(
@@ -92,9 +91,6 @@ export const docPageQuery = graphql(
             ... on ImageRecord {
               ...ImageFragment
             }
-            ... on VideoRecord {
-              ...VideoFragment
-            }
             ... on TableRecord {
               ...TableFragment
             }
@@ -106,9 +102,6 @@ export const docPageQuery = graphql(
             }
             ... on InternalVideoRecord {
               ...InternalVideoFragment
-            }
-            ... on GraphiqlEditorRecord {
-              ...GraphiqlEditorFragment
             }
             ... on CloneButtonFormRecord {
               ...CloneButtonFormFragment
@@ -137,12 +130,10 @@ export const docPageQuery = graphql(
     TagFragment,
     ResponsiveImageFragment,
     ImageFragment,
-    VideoFragment,
     TableFragment,
     DemoFragment,
     MultipleDemosBlockFragment,
     InternalVideoFragment,
-    GraphiqlEditorFragment,
     CloneButtonFormFragment,
     DeployButtonFormFragment,
     PluginSdkHookGroupFragment,

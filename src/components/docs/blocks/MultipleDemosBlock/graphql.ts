@@ -1,24 +1,26 @@
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { TemplateDemoUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
 import { graphql } from '~/lib/datocms/graphql';
 
-export const MultipleDemosBlockFragment = graphql(/* GraphQL */ `
-  fragment MultipleDemosBlockFragment on MultipleDemosBlockRecord {
-    id
-    _modelApiKey
-    demos {
-      id
-      name
-      code
-      technology {
+export const MultipleDemosBlockFragment = graphql(
+  /* GraphQL */ `
+    fragment MultipleDemosBlockFragment on MultipleDemosBlockRecord {
+      demos {
         name
-        logo {
-          url
+        cmsDescription
+        badge {
+          name
+          emoji
         }
-      }
-      screenshot {
-        responsiveImage(imgixParams: { auto: format, w: 300, h: 200, fit: crop, crop: top }) {
-          ...ResponsiveImageFragment
+        label
+        screenshot {
+          responsiveImage(imgixParams: { auto: format, w: 600, ar: "3:2", fit: crop, crop: top }) {
+            ...ResponsiveImageFragment
+          }
         }
+        ...TemplateDemoUrlFragment
       }
     }
-  }
-`);
+  `,
+  [ResponsiveImageFragment, TemplateDemoUrlFragment],
+);

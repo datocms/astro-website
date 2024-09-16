@@ -5,6 +5,7 @@ import { EpisodeFragment } from './_graphql';
 import { readFragment } from 'gql.tada';
 import { Image } from 'astro:assets';
 import { formatVideoDuration } from '~/lib/formatVideoDuration';
+import { buildUrlForUserGuideEpisode } from '~/lib/datocms/gqlUrlBuilder';
 
 interface Props {
   episode: FragmentOf<typeof EpisodeFragment>;
@@ -17,7 +18,7 @@ const episode = readFragment(EpisodeFragment, Astro.props.episode);
 ---
 
 <li class:list={[s.asideListItem, isActive && s.activeListItem]}>
-  <a href={`/user-guides/${episode.chapters[0]!.slug}/${episode.slug}`} class={s.asideListItem}>
+  <a href={buildUrlForUserGuideEpisode(episode)} class={s.asideListItem}>
     <figure>
       <Image
         src={`${episode.asset.video.thumbnailUrl}?time=${episode.thumbTimeSeconds}`}

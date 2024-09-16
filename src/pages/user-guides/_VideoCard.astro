@@ -5,18 +5,18 @@ import { EpisodeFragment } from './[chapterSlug]/[episodeSlug]/_graphql';
 import { readFragment } from 'gql.tada';
 import s from './_style.module.css';
 import { Image } from 'astro:assets';
+import { buildUrlForUserGuideEpisode } from '~/lib/datocms/gqlUrlBuilder';
 
 type Props = {
   episode: FragmentOf<typeof EpisodeFragment>;
 };
 
 const episode = readFragment(EpisodeFragment, Astro.props.episode);
-const chapter = episode.chapters[0]!;
 ---
 
 <div class={s.chapterItem}>
   <div class={s.itemVideo}>
-    <a href={`/user-guides/${chapter.slug}/${episode.slug}`}>
+    <a href={buildUrlForUserGuideEpisode(episode)}>
       <Image
         src={`${episode.asset.video.thumbnailUrl}?time=${episode.thumbTimeSeconds}`}
         inferSize
@@ -31,7 +31,7 @@ const chapter = episode.chapters[0]!;
       />
     </a>
   </div>
-  <a href={`/user-guides/${chapter.slug}/${episode.slug}`}>
+  <a href={buildUrlForUserGuideEpisode(episode)}>
     <h4>{episode.title}</h4>
     <div class={s.videoDuration}>
       {formatVideoDuration(episode.asset.video.duration)}
