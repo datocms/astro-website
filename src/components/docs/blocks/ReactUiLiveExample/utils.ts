@@ -27,7 +27,7 @@ export type ReactUiLiveExample = {
   description: string;
 };
 
-export async function fetchReactUiExamples(): Promise<ReactUiLiveExample[]> {
+export async function parse(): Promise<ReactUiLiveExample[]> {
   // TODO: release new version of sdk and use it here!
   const jsonOutput = await ky<JSONOutput.ProjectReflection>(
     'https://gist.githubusercontent.com/stefanoverna/476316a1d441f9f80d5eabac8ea7976e/raw/c64a50482f5aad0762257968dbcf31eb3c2ba91a/types.json',
@@ -62,7 +62,9 @@ export async function fetchReactUiExamples(): Promise<ReactUiLiveExample[]> {
         return [];
       }
 
-      const codeWithoutMarkdown = normalizedCode.match(/```[a-z]*\n([\s\S]*?)\n```/)?.[1];
+      const codeWithoutMarkdown = normalizedCode
+        .match(/```[a-z]*\n([\s\S]*?)\n```/)?.[1]
+        ?.replace(/;$/, '');
 
       if (!codeWithoutMarkdown) {
         return [];
@@ -79,4 +81,16 @@ export async function fetchReactUiExamples(): Promise<ReactUiLiveExample[]> {
       };
     });
   });
+}
+
+let cachedPromise: ReturnType<typeof parse> | undefined;
+
+export function fetchReactUiExamples() {
+  if (cachedPromise) {
+    return cachedPromise;
+  }
+
+  cachedPromise = parse();
+
+  return fetchReactUiExamples();
 }

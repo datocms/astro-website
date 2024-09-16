@@ -8,20 +8,26 @@ import { slugify } from '~/lib/slugify';
 import type { Group } from './types';
 
 export function buildGroupsFromHeadings(structuredTextValue: unknown): Group[] {
+  const entries = filterNodes(
+    (structuredTextValue as StructuredTextDocument).document,
+    (n): n is Heading => isHeading(n as Node),
+  ).map((heading) => {
+    const innerText = toPlainText(heading)!;
+
+    return {
+      url: `#${slugify(innerText)}`,
+      label: innerText,
+    };
+  });
+
+  if (entries.length === 0) {
+    return [];
+  }
+
   return [
     {
       title: 'In this page',
-      entries: filterNodes(
-        (structuredTextValue as StructuredTextDocument).document,
-        (n): n is Heading => isHeading(n as Node),
-      ).map((heading) => {
-        const innerText = toPlainText(heading)!;
-
-        return {
-          url: `#${slugify(innerText)}`,
-          label: innerText,
-        };
-      }),
+      entries,
     },
   ];
 }

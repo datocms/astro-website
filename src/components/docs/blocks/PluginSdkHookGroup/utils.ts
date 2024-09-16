@@ -174,8 +174,6 @@ export type PluginSdkHook = {
 const baseUrl = 'https://cdn.jsdelivr.net/npm/datocms-plugin-sdk';
 
 async function parse(): Promise<PluginSdkHook[]> {
-  console.log('PARSE!');
-
   // TODO: release new version of sdk and use it here!
   const jsonOutput = await ky<JSONOutput.ProjectReflection>(
     'https://gist.githubusercontent.com/stefanoverna/cfaa38d59a68d878bf74351b6edee694/raw/1eedfe04fe835dc6fb16e8fb369d58dc74f8774a/gistfile1.txt',

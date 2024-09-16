@@ -4,6 +4,9 @@ import type { FragmentOf } from 'gql.tada';
 import { readFragment } from 'gql.tada';
 import { fetchReactUiExamples } from './utils';
 import { Code } from '~/components/Code';
+import { Markdown } from '@astropub/md';
+import { Heading } from '~/components/Heading';
+import { slugify } from '~/lib/slugify';
 
 interface Props {
   block: FragmentOf<typeof ReactUiLiveExampleFragment>;
@@ -24,8 +27,8 @@ const componentExamples = examples.filter((example) => example.componentName ===
 
     return (
       <Fragment>
-        <h2>{example.title}</h2>
-        {example.description}
+        <Heading anchor={slugify(example.title)}>{example.title}</Heading>
+        <Markdown of={example.description} />
 
         <Code language="js" code={example.code} />
       </Fragment>
