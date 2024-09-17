@@ -1,0 +1,23 @@
+---
+import { notFoundResponse } from '~/lib/notFoundResponse';
+import Page from '../../../[...rest]/index.astro';
+import { buildSidebarItems, findResource } from '../../_buildSidebarItems';
+
+const sidebarItems = await buildSidebarItems(Astro.params.resourceName);
+const resource = await findResource(Astro.params.resourceName!);
+
+if (!resource) {
+  return notFoundResponse();
+}
+
+const endpoint = resource.links!.find((endpoint) => endpoint.rel === Astro.params.endpointName);
+
+if (!endpoint) {
+  return notFoundResponse();
+}
+---
+
+<Page rest="content-management-api" noPageContent additionalSidebarItems={sidebarItems}>
+  <Fragment slot="kicker">Content Management API > {resource.title}</Fragment>
+  <Fragment slot="title">{endpoint.title}</Fragment>
+</Page>

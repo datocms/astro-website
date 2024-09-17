@@ -1,0 +1,17 @@
+---
+import Page from '../../../[...rest]/index.astro';
+import { buildSidebarItems, findResource } from '../../_buildSidebarItems';
+import { notFoundResponse } from '~/lib/notFoundResponse';
+
+const sidebarItems = await buildSidebarItems(Astro.params.resourceName);
+const resource = await findResource(Astro.params.resourceName!);
+
+if (!resource) {
+  return notFoundResponse();
+}
+---
+
+<Page rest="content-management-api" noPageContent additionalSidebarItems={sidebarItems}>
+  <Fragment slot="kicker">Content Management API > {resource.title}</Fragment>
+  <Fragment slot="title">{resource.title}</Fragment>
+</Page>

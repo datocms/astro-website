@@ -11,3 +11,15 @@ const entry = Astro.props;
 <ActiveLink class={s.entry} activeClass={s.activeEntry} href={entry.url} exact>
   {entry.label}
 </ActiveLink>
+
+{
+  entry.entries && (
+    <div class={s.subEntries}>
+      {entry.entries.map((subEntry) => (
+        <ActiveLink href={subEntry.url} class={s.entry} activeClass={s.activeEntry} exact>
+          {subEntry.label}
+        </ActiveLink>
+      ))}
+    </div>
+  )
+}

@@ -39,6 +39,7 @@ type Props = {
   rest?: string;
   additionalTocGroups?: TocGroup[];
   additionalSidebarItems?: (Entry | SidebarGroup)[];
+  noPageContent?: boolean;
 };
 
 const [groupSlug, rawPageSlug] = (Astro.props.rest || Astro.params.rest)!.split('/') as
@@ -122,35 +123,43 @@ const extraTocGroups = (
 
   <Page
     tocGroups={[
-      ...buildGroupsFromHeadings(page.content.value),
+      ...(Astro.props.noPageContent ? [] : buildGroupsFromHeadings(page.content.value)),
       ...extraTocGroups,
       ...(Astro.props.additionalTocGroups || []),
     ]}
   >
-    <Fragment slot="kicker">{group.name} > {page.title}</Fragment>
-    <Fragment slot="title">{page.title}</Fragment>
+    <slot name="kicker" slot="kicker">{group.name} > {page.title}</slot>
+    <slot name="title" slot="title">{page.title}</slot>
 
     <div class={s.body}>
-      <Text
-        data={page.content}
-        blockComponents={withAllComponents(page.content.blocks, {
-          ImageRecord: Image,
-          TableRecord: Table,
-          DemoRecord: Demo,
-          MultipleDemosBlockRecord: MultipleDemosBlock,
-          InternalVideoRecord: InternalVideo,
-          CloneButtonFormRecord: CloneButtonForm,
-          DeployButtonFormRecord: DeployButtonForm,
-          PluginSdkHookGroupRecord: PluginSdkHookGroup,
-          DocCalloutRecord: DocCallout,
-          ReactUiLiveExampleRecord: ReactUiLiveExample,
-          TutorialVideoRecord: TutorialVideo,
-        })}
-      />
+      {
+        !Astro.props.noPageContent && (
+          <Text
+            data={page.content}
+            blockComponents={withAllComponents(page.content.blocks, {
+              ImageRecord: Image,
+              TableRecord: Table,
+              DemoRecord: Demo,
+              MultipleDemosBlockRecord: MultipleDemosBlock,
+              InternalVideoRecord: InternalVideo,
+              CloneButtonFormRecord: CloneButtonForm,
+              DeployButtonFormRecord: DeployButtonForm,
+              PluginSdkHookGroupRecord: PluginSdkHookGroup,
+              DocCalloutRecord: DocCallout,
+              ReactUiLiveExampleRecord: ReactUiLiveExample,
+              TutorialVideoRecord: TutorialVideo,
+            })}
+          />
+        )
+      }
       <slot />
     </div>
   </Page>
 
   <DraftModeQueryListener query={docGroupQuery} variables={docGroupQueryVariables} />
-  <DraftModeQueryListener query={docPageQuery} variables={docPageQueryVariables} />
+  {
+    !Astro.props.noPageContent && (
+      <DraftModeQueryListener query={docPageQuery} variables={docPageQueryVariables} />
+    )
+  }
 </DocsLayout>
