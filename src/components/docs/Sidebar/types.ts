@@ -1,10 +1,10 @@
-export type Entry = {
+export type SidebarEntry = {
   label: string;
   url: string;
-  entries?: Entry[];
+  entries?: SidebarEntry[];
 };
 
-export type Group = {
+export type SidebarGroup = {
   title: string;
-  entries: Entry[];
+  entries: SidebarEntry[];
 };

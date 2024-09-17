@@ -1,5 +1,5 @@
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { graphql } from '~/lib/datocms/graphql';
-import { ResponsiveImageFragment } from '../ResponsiveImage/graphql';
 
 export const PartnerTestimonialQuotesCarouselFragment = graphql(
   /* GraphQL */ `

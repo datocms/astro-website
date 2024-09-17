@@ -14,7 +14,7 @@ import {
 import { invariant } from '~/lib/invariant';
 import { slugify } from '~/lib/slugify';
 import { temporarilyCache } from '~/lib/temporarlyCache';
-import type { Entry, Group } from '../../Page/types';
+import type { TocEntry, TocGroup } from '../../Page/types';
 import { PluginSdkHookGroupFragment } from './graphql';
 
 export type PluginSdkHook = {
@@ -32,7 +32,7 @@ type Block = { __typename: 'PluginSdkHookGroupRecord' } & FragmentOf<
 
 export async function buildGroupsFromPluginSdkHooks(content: {
   blocks: Array<{ __typename: string } | Block>;
-}): Promise<Group[]> {
+}): Promise<TocGroup[]> {
   const sdkHookGroupBlocks = content.blocks.filter(
     (block): block is Block => block.__typename === 'PluginSdkHookGroupRecord',
   );
@@ -48,7 +48,7 @@ export async function buildGroupsFromPluginSdkHooks(content: {
 
         return hooks
           .sort((a, b) => a.lineNumber - b.lineNumber)
-          .map<Entry>((hook) => ({
+          .map<TocEntry>((hook) => ({
             label: `${hook.name}()`,
             url: `#${slugify(hook.name)}`,
           }));

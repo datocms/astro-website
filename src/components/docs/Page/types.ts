@@ -1,9 +1,9 @@
-export type Entry = {
+export type TocEntry = {
   url: string;
   label: string;
 };
 
-export type Group = {
+export type TocGroup = {
   title: string;
-  entries: Entry[];
+  entries: TocEntry[];
 };

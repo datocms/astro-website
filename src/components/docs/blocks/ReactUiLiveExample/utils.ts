@@ -6,7 +6,7 @@ import { Application, FileRegistry, type JSONOutput } from 'typedoc';
 import { invariant } from '~/lib/invariant';
 import { slugify } from '~/lib/slugify';
 import { temporarilyCache } from '~/lib/temporarlyCache';
-import type { Entry, Group } from '../../Page/types';
+import type { TocEntry, TocGroup } from '../../Page/types';
 import { ReactUiLiveExampleFragment } from './graphql';
 
 type Block = { __typename: 'ReactUiLiveExampleRecord' } & FragmentOf<
@@ -15,7 +15,7 @@ type Block = { __typename: 'ReactUiLiveExampleRecord' } & FragmentOf<
 
 export async function buildGroupsFromReactUiLiveExamples(content: {
   blocks: Array<{ __typename: string } | Block>;
-}): Promise<Group[]> {
+}): Promise<TocGroup[]> {
   const sdkHookGroupBlocks = content.blocks.filter(
     (block): block is Block => block.__typename === 'ReactUiLiveExampleRecord',
   );
@@ -29,7 +29,7 @@ export async function buildGroupsFromReactUiLiveExamples(content: {
           (example) => example.componentName === componentName,
         );
 
-        return examples.map<Entry>((example) => ({
+        return examples.map<TocEntry>((example) => ({
           label: example.title,
           url: `#${slugify(example.title)}`,
         }));

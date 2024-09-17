@@ -1,10 +1,10 @@
 import $RefParser, { type JSONSchema } from '@apidevtools/json-schema-ref-parser';
 import ky from 'ky';
-import type { Group } from '~/components/docs/Sidebar';
+import type { SidebarGroup } from '~/components/docs/Sidebar';
 import { invariant } from '~/lib/invariant';
 import { temporarilyCache } from '~/lib/temporarlyCache';
 
-export async function buildSidebarItems(activeResourceName?: string): Promise<Group[]> {
+export async function buildSidebarItems(activeResourceName?: string): Promise<SidebarGroup[]> {
   const schema = await fetchSchema();
 
   invariant(schema.properties);

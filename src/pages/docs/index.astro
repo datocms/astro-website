@@ -8,7 +8,7 @@ import { query } from './_graphql';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
 import s from './_style.module.css';
 import { Svg } from '~/components/Svg';
-import { Sidebar, type Entry } from '~/components/docs/Sidebar';
+import { Sidebar, type SidebarEntry } from '~/components/docs/Sidebar';
 
 const { page, roots, tutorials, tutorialsMeta } = await executeQuery(Astro, query);
 
@@ -23,7 +23,7 @@ if (!page) {
       items={[
         ...roots.map((root) => ({
           title: root.name,
-          entries: root.children.map<Entry>((sub) => ({
+          entries: root.children.map<SidebarEntry>((sub) => ({
             label: sub.name,
             url: buildUrlFromGql(sub),
           })),

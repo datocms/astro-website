@@ -7,7 +7,7 @@ import { filterNodes } from '~/lib/datocms/filterNodes';
 import { buildUrlFromGql, DocPageUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
 import { graphql, readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { slugify } from '~/lib/slugify';
-import type { Entry, Group } from './types';
+import type { SidebarEntry, SidebarGroup } from './types';
 
 export const DocGroupItemsFragment = graphql(
   /* GraphQL */ `
@@ -43,7 +43,7 @@ export const DocGroupItemsFragment = graphql(
 
 export function buildItemsForDocGroup(
   group: FragmentOf<typeof DocGroupItemsFragment>,
-): Array<Entry | Group> {
+): Array<SidebarEntry | SidebarGroup> {
   return readFragment(DocGroupItemsFragment, group).pagesOrSections.map((pageOrSection) =>
     pageOrSection.__typename === 'DocGroupPageRecord'
       ? {
@@ -60,7 +60,9 @@ export function buildItemsForDocGroup(
   );
 }
 
-export function buildItemsFromHeadings(structuredTextValue: unknown): Array<Entry | Group> {
+export function buildItemsFromHeadings(
+  structuredTextValue: unknown,
+): Array<SidebarEntry | SidebarGroup> {
   return filterNodes((structuredTextValue as StructuredTextDocument).document, (n): n is Heading =>
     isHeading(n as Node),
   ).map((heading) => {

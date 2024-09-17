@@ -5,9 +5,9 @@ import {
 import { isHeading, type Heading, type Node } from 'datocms-structured-text-utils';
 import { filterNodes } from '~/lib/datocms/filterNodes';
 import { slugify } from '~/lib/slugify';
-import type { Group } from './types';
+import type { TocGroup } from './types';
 
-export function buildGroupsFromHeadings(structuredTextValue: unknown): Group[] {
+export function buildGroupsFromHeadings(structuredTextValue: unknown): TocGroup[] {
   const entries = filterNodes(
     (structuredTextValue as StructuredTextDocument).document,
     (n): n is Heading => isHeading(n as Node),

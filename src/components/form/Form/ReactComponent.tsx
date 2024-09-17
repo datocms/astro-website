@@ -10,7 +10,7 @@ import { useRecaptcha } from 'react-recaptcha-hook';
 import toast, { Toaster } from 'react-hot-toast';
 import s from './style.module.css';
 import { RECAPTCHA_KEY } from 'astro:env/client';
-import { ButtonReactComponent } from '../../Button/ReactComponent';
+import { ButtonReactComponent } from '~/components/Button/ReactComponent';
 
 type Props<TFieldValues extends FieldValues = FieldValues> = {
   children: ReactNode;
