@@ -1,0 +1,27 @@
+---
+import { Space } from '~/components/Space';
+import { Tab, Tabs } from '~/components/Tabs';
+import type { Filters } from './_utils';
+import { Code } from '~/components/Code';
+import { gqlExample } from './_gqlExample';
+
+type Props = {
+  fieldName: string;
+  filters: Filters;
+};
+
+const { fieldName, filters } = Astro.props;
+---
+
+<Space top={1} bottom={1}>
+  <Tabs>
+    {
+      Object.entries(filters).map(([filterName, filter]) => (
+        <Tab title={filterName} code>
+          <p>{filter.description}</p>
+          <Code code={gqlExample(fieldName, filterName, filter.input)} language={'graphql'} />
+        </Tab>
+      ))
+    }
+  </Tabs>
+</Space>

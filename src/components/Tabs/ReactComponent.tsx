@@ -18,7 +18,7 @@ export default function TabsReactComponent({ children }: { children: ReactNode }
               type="button"
               key={index}
               onClick={() => setActiveTab(index)}
-              className={cn(s.handle)}
+              className={cn(s.handle, child.props.code && s.code)}
               aria-selected={activeTab === index ? 'true' : 'false'}
             >
               <span>{child.props.title}</span>
@@ -45,11 +45,10 @@ export default function TabsReactComponent({ children }: { children: ReactNode }
   );
 }
 
-export const TabReactComponent = ({ title, children }: { title: string; children: ReactNode }) => {
-  return (
-    <div>
-      <div>{title}</div>
-      <div>{children}</div>
-    </div>
-  );
+export const TabReactComponent = (props: {
+  title: string;
+  code?: boolean;
+  children: ReactNode;
+}) => {
+  return <div />;
 };

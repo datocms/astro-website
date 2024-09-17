@@ -3,13 +3,14 @@ import s from './style.module.css';
 
 export interface Props {
   title: string;
+  code?: boolean;
   noPadding?: boolean;
 }
 
-const { title = 'title', noPadding } = Astro.props;
+const { title = 'title', code, noPadding } = Astro.props;
 ---
 
-<button slot="tab" class={s.handle}>
+<button slot="tab" class:list={[s.handle, code ? s.code : undefined]}>
   {title}
 </button>
 

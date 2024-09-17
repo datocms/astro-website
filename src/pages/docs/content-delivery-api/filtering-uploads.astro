@@ -1,0 +1,35 @@
+---
+import { fetchIntrospectionUploadFilters, fieldTypeName } from './_utils';
+import Page from '../[...rest]/index.astro';
+import { Heading } from '~/components/Heading';
+import Filters from './_Filters.astro';
+import { slugify } from '~/lib/slugify';
+import { camelize } from './_gqlExample';
+
+const response = await fetchIntrospectionUploadFilters();
+---
+
+<Page
+  rest="content-delivery-api/filtering-uploads"
+  additionalTocGroups={[
+    {
+      title: 'Filter uploads by',
+      entries: Object.keys(response.filters).map((fieldName) => ({
+        label: camelize(fieldName),
+        url: `#${slugify(fieldName)}`,
+      })),
+    },
+  ]}
+>
+  <Heading anchor="field-types" as="h2">Available filters</Heading>
+  {
+    Object.entries(response.filters).map(([fieldName, filters]) => (
+      <>
+        <Heading anchor={slugify(fieldName)} as="h4">
+          Filter by <code>{camelize(fieldName)}</code>
+        </Heading>
+        <Filters fieldName={fieldName} filters={filters} />
+      </>
+    ))
+  }
+</Page>
