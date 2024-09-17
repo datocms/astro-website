@@ -1,14 +1,52 @@
+import { readFragment, type FragmentOf } from 'gql.tada';
 import ky from 'ky';
-// import { serialize } from 'next-mdx-remote/serialize';
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
+import { serialize } from 'next-mdx-remote/serialize';
 import { Application, FileRegistry, type JSONOutput } from 'typedoc';
 import { invariant } from '~/lib/invariant';
+import { slugify } from '~/lib/slugify';
 import { temporarilyCache } from '~/lib/temporarlyCache';
+import type { Entry, Group } from '../../Page/types';
+import { ReactUiLiveExampleFragment } from './graphql';
+
+type Block = { __typename: 'ReactUiLiveExampleRecord' } & FragmentOf<
+  typeof ReactUiLiveExampleFragment
+>;
+
+export async function buildGroupsFromReactUiLiveExamples(content: {
+  blocks: Array<{ __typename: string } | Block>;
+}): Promise<Group[]> {
+  const sdkHookGroupBlocks = content.blocks.filter(
+    (block): block is Block => block.__typename === 'ReactUiLiveExampleRecord',
+  );
+
+  const entries = (
+    await Promise.all(
+      sdkHookGroupBlocks.map(async (block) => {
+        const { componentName } = readFragment(ReactUiLiveExampleFragment, block);
+
+        const examples = (await fetchReactUiExamples()).filter((example) =>
+          example.componentName === componentName
+        );
+
+        return examples
+          .map<Entry>((example) => ({
+            label: example.title,
+            url: `#${slugify(example.title)}`,
+          }));
+      }),
+    )
+  ).flat();
+
+  return entries.length > 0 ? [{ title: 'Examples', entries }] : []
+}
 
 export type ReactUiLiveExample = {
   componentName: string;
   code: string;
   title: string;
   description: string;
+  serializedMdxExample: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>;
 };
 
 // TODO: release new version of sdk and use it here!
@@ -32,42 +70,51 @@ export const fetchReactUiExamples = temporarilyCache(
       new FileRegistry(),
     );
 
-    return project.children!.flatMap((child) => {
-      const blockTags = child.signatures?.[0]?.comment?.blockTags;
-      const examples = (blockTags && blockTags.filter((b) => b.tag === '@example' && b.name)) || [];
+    const result = await Promise.all(
+      project.children!.flatMap((child) => {
+        const blockTags = child.signatures?.[0]?.comment?.blockTags || child.comment?.blockTags;
 
-      return examples.flatMap((example) => {
-        invariant(example.name);
+        const examples =
+          (blockTags && blockTags.filter((b) => b.tag === '@example' && b.name)) || [];
 
-        const codePart = example.content.find(
-          (part) => part.kind === 'code' && part.text.match(/```[a-z]*\n/),
-        );
+        return examples.map(async (example) => {
+          invariant(example.name);
 
-        const normalizedCode = codePart ? removeCommonIndentation(codePart.text) : undefined;
+          const codePart = example.content.find(
+            (part) => part.kind === 'code' && part.text.match(/```[a-z]*\n/),
+          );
 
-        if (!normalizedCode) {
-          return [];
-        }
+          const normalizedCode = codePart ? removeCommonIndentation(codePart.text) : undefined;
 
-        const codeWithoutMarkdown = normalizedCode
-          .match(/```[a-z]*\n([\s\S]*?)\n```/)?.[1]
-          ?.replace(/;$/, '');
+          if (!normalizedCode) {
+            return [];
+          }
 
-        if (!codeWithoutMarkdown) {
-          return [];
-        }
+          const codeWithoutMarkdown = normalizedCode
+            .match(/```[a-z]*\n([\s\S]*?)\n```/)?.[1]
+            ?.replace(/;$/, '');
 
-        const allOtherParts = example.content.filter((part) => part !== codePart);
-        const description = allOtherParts.map((part) => part.text).join('');
+          if (!codeWithoutMarkdown) {
+            return [];
+          }
 
-        return {
-          componentName: child.name,
-          code: codeWithoutMarkdown,
-          title: example.name,
-          description,
-        };
-      });
-    });
+          const allOtherParts = example.content.filter((part) => part !== codePart);
+          const description = allOtherParts.map((part) => part.text).join('');
+
+          return [
+            {
+              componentName: child.name,
+              code: codeWithoutMarkdown,
+              title: example.name,
+              description,
+              serializedMdxExample: await serialize(codeWithoutMarkdown),
+            },
+          ];
+        });
+      }),
+    );
+
+    return result.flat();
   },
 );
 

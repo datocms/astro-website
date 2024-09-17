@@ -7,6 +7,10 @@ import { Code } from '~/components/Code';
 import { Markdown } from '@astropub/md';
 import { Heading } from '~/components/Heading';
 import { slugify } from '~/lib/slugify';
+import { LiveExample } from './LiveExample';
+import 'datocms-react-ui/styles.css';
+import s from './style.module.css';
+import { Tabs, Tab } from '~/components/Tabs';
 
 interface Props {
   block: FragmentOf<typeof ReactUiLiveExampleFragment>;
@@ -23,14 +27,23 @@ const componentExamples = examples.filter((example) => example.componentName ===
 
 {
   componentExamples.map((example) => {
-    // TODO: Maybe we can show the actual result?
-
     return (
       <Fragment>
         <Heading anchor={slugify(example.title)}>{example.title}</Heading>
         <Markdown of={example.description} />
 
-        <Code language="js" code={example.code} />
+        <figure>
+          <Tabs>
+            <Tab title="Preview">
+              <div class={s.liveExample}>
+                <LiveExample serializedMdxExample={example.serializedMdxExample} client:idle />
+              </div>
+            </Tab>
+            <Tab title="Code" noPadding>
+              <Code language="js" code={example.code} />
+            </Tab>
+          </Tabs>
+        </figure>
       </Fragment>
     );
   })

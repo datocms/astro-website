@@ -3,15 +3,16 @@ import s from './style.module.css';
 
 export interface Props {
   title: string;
+  noPadding?: boolean;
 }
 
-const { title = 'title' } = Astro.props;
+const { title = 'title', noPadding } = Astro.props;
 ---
 
 <button slot="tab" class={s.handle}>
   {title}
 </button>
 
-<div slot="panel" class={s.content}>
+<div slot="panel" class={noPadding ? undefined : s.content}>
   <slot />
 </div>

@@ -1,5 +1,11 @@
 ---
-import { Sidebar, buildItemsForDocGroup, buildItemsFromHeadings } from '~/components/docs/Sidebar';
+import {
+  Sidebar,
+  buildItemsForDocGroup,
+  buildItemsFromHeadings,
+  type Entry,
+  type Group as SidebarGroup,
+} from '~/components/docs/Sidebar';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { MarketplaceCard } from '~/components/MarketplaceCard';
 import { Space } from '~/components/Space';
@@ -16,7 +22,8 @@ import { MultipleDemosBlock } from '~/components/docs/blocks/MultipleDemosBlock'
 import { CloneButtonForm } from '~/components/docs/blocks/CloneButtonForm';
 import { DeployButtonForm } from '~/components/docs/blocks/DeployButtonForm';
 import { PluginSdkHookGroup } from '~/components/docs/blocks/PluginSdkHookGroup';
-import { buildGroupsFromPluginSdkHookGroup } from '~/components/docs/blocks/PluginSdkHookGroup/utils';
+import { buildGroupsFromPluginSdkHooks } from '~/components/docs/blocks/PluginSdkHookGroup/utils';
+import { buildGroupsFromReactUiLiveExamples } from '~/components/docs/blocks/ReactUiLiveExample/utils';
 import { DocCallout } from '~/components/docs/blocks/DocCallout';
 import { ReactUiLiveExample } from '~/components/docs/blocks/ReactUiLiveExample';
 import { TutorialVideo } from '~/components/docs/blocks/TutorialVideo';
@@ -26,8 +33,17 @@ import { buildGroupsFromHeadings } from '~/components/docs/Page/utils';
 import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { Image } from '~/components/blocks/Image';
 import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder';
+import type { Group as TocGroup } from '~/components/docs/Page/types';
 
-const [groupSlug, rawPageSlug] = Astro.params.rest!.split('/') as [string] | [string, string];
+type Props = {
+  rest?: string;
+  additionalTocGroups?: TocGroup[];
+  additionalSidebarItems?: (Entry | SidebarGroup)[];
+};
+
+const [groupSlug, rawPageSlug] = (Astro.props.rest || Astro.params.rest)!.split('/') as
+  | [string]
+  | [string, string];
 const pageSlug = rawPageSlug || 'index';
 
 const docGroupQueryVariables = { groupSlug };
@@ -58,11 +74,11 @@ if (!page) {
   return notFoundResponse();
 }
 
-const sdkHookGroupBlocks = page.content.blocks.filter(
-  (block) => block.__typename === 'PluginSdkHookGroupRecord',
-);
-const sdkHooks = (
-  await Promise.all(sdkHookGroupBlocks.map((block) => buildGroupsFromPluginSdkHookGroup(block)))
+const extraTocGroups = (
+  await Promise.all([
+    buildGroupsFromPluginSdkHooks(page.content),
+    buildGroupsFromReactUiLiveExamples(page.content),
+  ])
 ).flat();
 ---
 
@@ -74,9 +90,12 @@ const sdkHooks = (
 
     <Sidebar
       title={group.name}
-      items={group.pagesOrSections.length > 1
-        ? buildItemsForDocGroup(group)
-        : buildItemsFromHeadings(page.content.value)}
+      items={[
+        ...(group.pagesOrSections.length > 1
+          ? buildItemsForDocGroup(group)
+          : buildItemsFromHeadings(page.content.value)),
+        ...(Astro.props.additionalSidebarItems || []),
+      ]}
     />
 
     {
@@ -104,8 +123,8 @@ const sdkHooks = (
   <Page
     tocGroups={[
       ...buildGroupsFromHeadings(page.content.value),
-      ...(sdkHooks.length > 0 ? [{ title: 'Hooks', entries: sdkHooks }] : []),
-      // TODO: missing ReactUiLiveExamples!
+      ...extraTocGroups,
+      ...(Astro.props.additionalTocGroups || []),
     ]}
   >
     <Fragment slot="kicker">{group.name} > {page.title}</Fragment>
@@ -128,6 +147,7 @@ const sdkHooks = (
           TutorialVideoRecord: TutorialVideo,
         })}
       />
+      <slot />
     </div>
   </Page>
 

@@ -14,7 +14,7 @@ import {
 import { invariant } from '~/lib/invariant';
 import { slugify } from '~/lib/slugify';
 import { temporarilyCache } from '~/lib/temporarlyCache';
-import type { Entry } from '../../Page/types';
+import type { Entry, Group } from '../../Page/types';
 import { PluginSdkHookGroupFragment } from './graphql';
 
 export type PluginSdkHook = {
@@ -26,19 +26,37 @@ export type PluginSdkHook = {
   lineNumber: number;
 };
 
-export async function buildGroupsFromPluginSdkHookGroup(
-  block: FragmentOf<typeof PluginSdkHookGroupFragment>,
-): Promise<Entry[]> {
-  const { groupName } = readFragment(PluginSdkHookGroupFragment, block);
+type Block = { __typename: 'PluginSdkHookGroupRecord' } & FragmentOf<
+  typeof PluginSdkHookGroupFragment
+>;
 
-  const hooks = (await fetchPluginSdkHooks()).filter((hook) => hook.groups.includes(groupName));
+export async function buildGroupsFromPluginSdkHooks(content: {
+  blocks: Array<{ __typename: string } | Block>;
+}): Promise<Group[]> {
+  const sdkHookGroupBlocks = content.blocks.filter(
+    (block): block is Block => block.__typename === 'PluginSdkHookGroupRecord',
+  );
 
-  return hooks
-    .sort((a, b) => a.lineNumber - b.lineNumber)
-    .map<Entry>((hook) => ({
-      label: `${hook.name}()`,
-      url: `#${slugify(hook.name)}`,
-    }));
+  const entries = (
+    await Promise.all(
+      sdkHookGroupBlocks.map(async (block) => {
+        const { groupName } = readFragment(PluginSdkHookGroupFragment, block);
+
+        const hooks = (await fetchPluginSdkHooks()).filter((hook) =>
+          hook.groups.includes(groupName),
+        );
+
+        return hooks
+          .sort((a, b) => a.lineNumber - b.lineNumber)
+          .map<Entry>((hook) => ({
+            label: `${hook.name}()`,
+            url: `#${slugify(hook.name)}`,
+          }));
+      }),
+    )
+  ).flat();
+
+  return entries.length > 0 ? [{ title: 'Hooks', entries }] : []
 }
 
 // const baseUrl = 'http://localhost:5000/types.json';
@@ -48,7 +66,7 @@ export async function buildGroupsFromPluginSdkHookGroup(
 const url =
   'https://gist.githubusercontent.com/stefanoverna/cfaa38d59a68d878bf74351b6edee694/raw/1eedfe04fe835dc6fb16e8fb369d58dc74f8774a/gistfile1.txt';
 
-const fetchPluginSdkHooks = temporarilyCache(60, async (): Promise<PluginSdkHook[]> => {
+export const fetchPluginSdkHooks = temporarilyCache(60, async (): Promise<PluginSdkHook[]> => {
   const jsonOutput = await ky<JSONOutput.ProjectReflection>(url).json();
 
   const app = await Application.bootstrap({

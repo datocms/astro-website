@@ -5,7 +5,40 @@ import { temporarilyCache } from '~/lib/temporarlyCache';
 
 const schemaUrl = 'https://site-api.datocms.com/docs/dast-schema.json';
 
-export const fetchDastSchema = temporarilyCache(60, async () => {
+type Node = {
+  name: string;
+  description: string;
+  childrenNodes: string[];
+  schema: JSONSchema;
+  example?: { code: string, language: string },
+}
+
+export async function fetchDastNodes(): Promise<Node[]> {
+  const nodes = await fetchDastSchema();
+
+  return nodes.map(node => {
+    invariant(node.properties);
+    isJsonSchema(node.properties.type);
+
+    const children = findChildren(node);
+
+    const match = node.description!.match(/```([a-z]+)\n((.*\n)+)```/);
+    const description = node.description!.replace(/```([a-z]+)\n((.*\n)+)```/g, '');
+
+    return {
+      name: nodeName(node),
+      description,
+      childrenNodes: children.map(nodeName),
+      schema: node,
+      example: match ? {
+        code: match[2]!.trim(),
+        language: match[1]!,
+      } : undefined,
+    };
+  })
+}
+
+const fetchDastSchema = temporarilyCache(60, async () => {
   const unreferencedSchema = await ky(schemaUrl).json();
 
   const schema = await $RefParser.dereference(unreferencedSchema);
@@ -16,10 +49,10 @@ export const fetchDastSchema = temporarilyCache(60, async () => {
 
   isJsonSchema(Root);
 
-  return findChildrenDefinitions(Root);
+  return recursivelyFindChildren(Root);
 });
 
-function findChildrenDefinitions(
+function recursivelyFindChildren(
   definition: JSONSchema,
   foundDefs: JSONSchema[] = [],
 ): JSONSchema[] {
@@ -28,22 +61,30 @@ function findChildrenDefinitions(
   }
 
   const result: JSONSchema[] = [...foundDefs, definition];
+  return findChildren(definition).reduce((acc, def) => recursivelyFindChildren(def, acc), result);
+}
 
-  const children = definition.properties?.children;
+function findChildren(schema: JSONSchema) {
+  const children = schema.properties?.children;
 
   if (!children) {
-    return result;
+    return [];
   }
 
   isJsonSchema(children);
   isJsonSchema(children.items);
 
-  const normalizedChildren: JSONSchema[] =
-    'anyOf' in children.items ? (children.items.anyOf as JSONSchema[]) : [children.items];
+  return 'anyOf' in children.items ? (children.items.anyOf as JSONSchema[]) : [children.items];
+}
 
-  return normalizedChildren.reduce((acc, def) => findChildrenDefinitions(def, acc), result);
+function nodeName(schema: JSONSchema) {
+  invariant(schema.properties);
+  isJsonSchema(schema.properties.type);
+
+  return schema.properties.type.const!
 }
 
 function isJsonSchema(thing: unknown): asserts thing is JSONSchema {
   invariant(thing && typeof thing !== 'boolean');
 }
+
