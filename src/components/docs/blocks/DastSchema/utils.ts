@@ -10,13 +10,13 @@ type Node = {
   description: string;
   childrenNodes: string[];
   schema: JSONSchema;
-  example?: { code: string, language: string },
-}
+  example?: { code: string; language: string };
+};
 
 export async function fetchDastNodes(): Promise<Node[]> {
   const nodes = await fetchDastSchema();
 
-  return nodes.map(node => {
+  return nodes.map((node) => {
     invariant(node.properties);
     isJsonSchema(node.properties.type);
 
@@ -30,12 +30,14 @@ export async function fetchDastNodes(): Promise<Node[]> {
       description,
       childrenNodes: children.map(nodeName),
       schema: node,
-      example: match ? {
-        code: match[2]!.trim(),
-        language: match[1]!,
-      } : undefined,
+      example: match
+        ? {
+            code: match[2]!.trim(),
+            language: match[1]!,
+          }
+        : undefined,
     };
-  })
+  });
 }
 
 const fetchDastSchema = temporarilyCache(60, async () => {
@@ -81,10 +83,9 @@ function nodeName(schema: JSONSchema) {
   invariant(schema.properties);
   isJsonSchema(schema.properties.type);
 
-  return schema.properties.type.const!
+  return schema.properties.type.const!;
 }
 
 function isJsonSchema(thing: unknown): asserts thing is JSONSchema {
   invariant(thing && typeof thing !== 'boolean');
 }
-

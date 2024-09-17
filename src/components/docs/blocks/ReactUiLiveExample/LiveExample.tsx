@@ -48,7 +48,7 @@ export function LiveExample({
         ChevronDownIcon: ChevronDownIcon,
         TrashIcon: TrashIcon,
         StateManager: StateManager,
-        ...(SDK as any)
+        ...(SDK as any),
       }}
     />
   );

@@ -1,4 +1,4 @@
-export function intersperse<T, S>(arr: T[], sep: S, endSep = sep): Array<T|S> {
+export function intersperse<T, S>(arr: T[], sep: S, endSep = sep): Array<T | S> {
   if (arr.length === 0) {
     return [];
   }

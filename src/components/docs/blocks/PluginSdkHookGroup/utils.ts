@@ -56,7 +56,7 @@ export async function buildGroupsFromPluginSdkHooks(content: {
     )
   ).flat();
 
-  return entries.length > 0 ? [{ title: 'Hooks', entries }] : []
+  return entries.length > 0 ? [{ title: 'Hooks', entries }] : [];
 }
 
 // const baseUrl = 'http://localhost:5000/types.json';

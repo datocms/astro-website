@@ -25,20 +25,19 @@ export async function buildGroupsFromReactUiLiveExamples(content: {
       sdkHookGroupBlocks.map(async (block) => {
         const { componentName } = readFragment(ReactUiLiveExampleFragment, block);
 
-        const examples = (await fetchReactUiExamples()).filter((example) =>
-          example.componentName === componentName
+        const examples = (await fetchReactUiExamples()).filter(
+          (example) => example.componentName === componentName,
         );
 
-        return examples
-          .map<Entry>((example) => ({
-            label: example.title,
-            url: `#${slugify(example.title)}`,
-          }));
+        return examples.map<Entry>((example) => ({
+          label: example.title,
+          url: `#${slugify(example.title)}`,
+        }));
       }),
     )
   ).flat();
 
-  return entries.length > 0 ? [{ title: 'Examples', entries }] : []
+  return entries.length > 0 ? [{ title: 'Examples', entries }] : [];
 }
 
 export type ReactUiLiveExample = {
