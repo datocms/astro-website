@@ -1,16 +1,13 @@
 import type { JSONSchema } from '@apidevtools/json-schema-ref-parser';
 import { invariant } from '~/lib/invariant';
 
-export default function schemaExampleFor(
-  schema: JSONSchema | undefined,
-  pagination = true,
-): unknown {
+export default function exampleValueForSchema(schema: JSONSchema | undefined): unknown {
   if (!schema) {
     return null;
   }
 
   if (Array.isArray(schema)) {
-    return schemaExampleFor(schema[0], pagination);
+    return exampleValueForSchema(schema[0]);
   }
 
   if ('deprecated' in schema || 'hideFromDocs' in schema || 'hideFromExample' in schema) {
@@ -25,7 +22,7 @@ export default function schemaExampleFor(
     const firstAnyOf = schema.anyOf[0];
     isJsonSchema(firstAnyOf);
 
-    return schemaExampleFor(firstAnyOf);
+    return exampleValueForSchema(firstAnyOf);
   }
 
   const type = Array.isArray(schema.type)
@@ -36,7 +33,7 @@ export default function schemaExampleFor(
     if (schema.oneOf) {
       const firstOneOf = schema.oneOf[0];
       isJsonSchema(firstOneOf);
-      return schemaExampleFor(firstOneOf);
+      return exampleValueForSchema(firstOneOf);
     }
 
     if (!schema.properties) {
@@ -48,10 +45,6 @@ export default function schemaExampleFor(
     return Object.fromEntries(
       propertiesToGenerate
         .map<[string, unknown] | undefined>((property) => {
-          if (!pagination && property.match(/^page/)) {
-            return undefined;
-          }
-
           const propertySchema = schema.properties![property];
 
           isJsonSchema(propertySchema);
@@ -64,7 +57,7 @@ export default function schemaExampleFor(
             return undefined;
           }
 
-          return [property, schemaExampleFor(propertySchema)];
+          return [property, exampleValueForSchema(propertySchema)];
         })
         .filter((x): x is [string, unknown] => x !== undefined),
     );
@@ -80,11 +73,11 @@ export default function schemaExampleFor(
     if (schema.items.oneOf) {
       return schema.items.oneOf.map((s) => {
         isJsonSchema(s);
-        return schemaExampleFor(s);
+        return exampleValueForSchema(s);
       });
     }
 
-    return [schemaExampleFor(schema.items)];
+    return [exampleValueForSchema(schema.items)];
   }
 
   if (type === 'string') {

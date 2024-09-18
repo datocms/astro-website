@@ -1,44 +1,43 @@
 ---
 import { EndpointExample } from '~/components/docs/cma/EndpointExample';
 import type { CmaEndpoint, CmaEndpointJsExample, CmaEntity } from '../types';
-import { buildJsExample } from './buildJsExample';
+import { buildApiCallSampleCode, buildApiCallReturnValue } from './buildJs';
 import type { RestClientEndpointInfo } from '../fetchRestClientEndpointInfo';
 
 type Props = {
   entity: CmaEntity;
   endpoint: CmaEndpoint;
   restClientEndpointInfo: RestClientEndpointInfo;
-  example: CmaEndpointJsExample;
+  example?: CmaEndpointJsExample;
 };
 
 const { example, endpoint, entity, restClientEndpointInfo } = Astro.props;
 
-const { code: guessedCode, output: guessedOutput } = buildJsExample(
-  entity,
-  endpoint,
-  restClientEndpointInfo,
-);
+const sampleCode =
+  example?.request?.code ||
+  (await buildApiCallSampleCode(entity, endpoint, restClientEndpointInfo));
 
-console.log(guessedCode);
+const output =
+  example?.response?.code || (await buildApiCallReturnValue(endpoint, restClientEndpointInfo));
 ---
 
 <EndpointExample
-  title={example.title}
-  description={example.description}
+  title={example?.title || 'Basic example'}
+  description={example?.description}
   tabs={[
     {
       title: 'Code',
-      description: example.request?.description,
+      description: example?.request?.description,
       language: 'javascript',
-      code: example.request?.code!,
+      code: sampleCode,
     },
-    ...(example.response?.code
+    ...(output
       ? [
           {
             title: 'Returned output',
-            description: example.response?.description,
+            description: example?.response?.description,
             language: 'javascript',
-            code: example.response?.code,
+            code: output,
           },
         ]
       : []),

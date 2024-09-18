@@ -9,7 +9,6 @@ import { findEntity } from '~/components/docs/cma/findEntity';
 import { EndpointDescriptionWithExamples } from '~/components/docs/cma/EndpointDescriptionWithExamples';
 import { JsExample } from '~/components/docs/cma/JsExample';
 import { fetchRestClientEndpointInfo } from '~/components/docs/cma/fetchRestClientEndpointInfo';
-import { buildJsExample } from '~/components/docs/cma/JsExample/buildJsExample';
 
 const sidebarItems = await buildSidebarItems(Astro.params.entitySlug!);
 const entity = await findEntity(Astro.params.entitySlug!);
@@ -36,16 +35,6 @@ if (!endpoint) {
 const description = endpoint.documentation?.javascript?.description || endpoint.description;
 
 const examples = endpoint?.documentation?.javascript?.examples || [];
-
-const allExampleIds = examples.map((e) => e.id);
-
-const { code: guessedCode, output: guessedOutput } = buildJsExample(
-  entity,
-  endpoint,
-  restClientEndpointInfo,
-);
-
-console.log(guessedCode);
 ---
 
 <GroupLayout group={group} additionalSeo={[]} additionalSidebarItems={sidebarItems}>
@@ -67,6 +56,12 @@ console.log(guessedCode);
         )
       }
     </Prose>
+
+    <JsExample
+      entity={entity}
+      endpoint={endpoint}
+      restClientEndpointInfo={restClientEndpointInfo}
+    />
   </ContentPlusToc>
 </GroupLayout>
 
