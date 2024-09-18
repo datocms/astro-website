@@ -1,0 +1,84 @@
+---
+import { Heading } from '~/components/Heading';
+import s from './style.module.css';
+import { slugify } from '~/lib/slugify';
+import { TargetToggler } from '~/components/TargetToggler';
+import { Markdown } from '@astropub/md';
+import { Tab, Tabs } from '~/components/Tabs';
+import { Code } from '~/components/Code';
+import { Prose } from '~/components/docs/Prose';
+
+type Props = {
+  title: string;
+  description?: string;
+  tabs: Array<{ title: string; description?: string; code: string; language: string }>;
+};
+
+const { title, description, tabs } = Astro.props;
+
+const slug = slugify(title);
+---
+
+<endpoint-example slug={slug}>
+  <figure class={s.reqRes}>
+    <TargetToggler targetId={`example-${slug}`}>
+      <Heading as="button" class={s.title} anchor={slug}>
+        <span class={s.pill}>Example</span>{' '}
+        <span class={s.titleTitle}>{title}</span>
+      </Heading>
+    </TargetToggler>
+
+    <div id={`example-${slug}`} class={s.details}>
+      {
+        description && (
+          <Prose class={s.description}>
+            <Markdown of={description} />
+          </Prose>
+        )
+      }
+
+      <div class={s.tabs}>
+        <Tabs>
+          {
+            tabs.map((tab) => (
+              <Tab title={tab.title} noPadding>
+                {tab.description && (
+                  <div class={s.description}>
+                    <Markdown of={tab.description} />
+                  </div>
+                )}
+
+                <Code code={tab.code} language={tab.language} />
+              </Tab>
+            ))
+          }
+        </Tabs>
+      </div>
+    </div>
+  </figure>
+</endpoint-example>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'endpoint-example',
+    class EndpointExample extends WebComponent {
+      toggler!: HTMLButtonElement;
+
+      connectedCallback() {
+        this.toggler = this.$('target-toggler');
+
+        if (document.location.hash.replace(/^#/, '') === this.getAttribute('slug')) {
+          (this.toggler as any).toggle(true);
+        }
+      }
+    },
+  );
+</script>
+
+<style>
+  endpoint-example {
+    display: contents;
+  }
+</style>

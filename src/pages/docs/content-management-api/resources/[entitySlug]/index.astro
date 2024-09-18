@@ -3,12 +3,13 @@ import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { findGroup, GroupLayout } from '~/layouts/docs/GroupLayout';
 import { notFoundResponse } from '~/lib/notFoundResponse';
-import { buildSidebarItems, findResource } from '../../_buildSidebarItems';
 import { Markdown } from '@astropub/md';
 import { Prose } from '~/components/docs/Prose';
+import { buildSidebarItems } from '~/components/docs/cma/buildSidebarItems';
+import { findEntity } from '~/components/docs/cma/findEntity';
 
-const sidebarItems = await buildSidebarItems(Astro.params.resourceName);
-const resource = await findResource(Astro.params.resourceName!);
+const sidebarItems = await buildSidebarItems(Astro.params.entitySlug!);
+const resource = await findEntity(Astro.params.entitySlug!);
 
 const result = await findGroup(Astro, 'content-management-api');
 

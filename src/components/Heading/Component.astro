@@ -1,6 +1,5 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
-import s from './style.module.css';
 
 type Props<T extends HTMLTag = 'h1'> = Polymorphic<{
   as: T;
@@ -10,7 +9,7 @@ type Props<T extends HTMLTag = 'h1'> = Polymorphic<{
 const { as: Tag = 'h1' as any, anchor, children, ...props } = Astro.props;
 ---
 
-<Tag {...props} class:list={[s.root, props.class]} data-with-anchor={!!anchor}>
+<Tag {...props} class={props.class}>
   <slot />
   {anchor && <a data-anchor={anchor} id={anchor} />}
   {anchor && <a data-permalink href={`#${anchor}`} />}

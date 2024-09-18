@@ -1,23 +1,19 @@
 ---
 import { Code } from 'astro-expressive-code/components';
-import s from './style.module.css';
 
 type Props = {
-  class?: string;
   code: string;
   language?: string;
   highlightLines?: number[];
   showLineNumbers?: boolean;
 };
 
-const { class: className, code, language, highlightLines, showLineNumbers } = Astro.props;
+const { code, language, highlightLines, showLineNumbers } = Astro.props;
 ---
 
-<figure class:list={[s.wrapper, className]}>
-  <Code
-    code={code}
-    lang={language}
-    mark={highlightLines?.map((line) => line + 1)}
-    showLineNumbers={showLineNumbers}
-  />
-</figure>
+<Code
+  code={code}
+  lang={language}
+  mark={highlightLines?.map((line) => line + 1)}
+  showLineNumbers={showLineNumbers}
+/>

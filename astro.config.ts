@@ -3,7 +3,9 @@ import react from '@astrojs/react';
 import markdownIntegration from '@astropub/md';
 import expressiveCode from 'astro-expressive-code';
 import { defineConfig, envField } from 'astro/config';
+
 import bundlesize from 'vite-plugin-bundlesize';
+import { autolinkHeadings, figureAroundCodeBlocks } from './src/lib/plugins/foo';
 
 export default defineConfig({
   output: 'server',
@@ -49,6 +51,8 @@ export default defineConfig({
     shikiConfig: {
       theme: 'dracula',
     },
+    gfm: true,
+    rehypePlugins: [figureAroundCodeBlocks, autolinkHeadings],
   },
   vite: {
     plugins: [

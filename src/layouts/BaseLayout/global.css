@@ -21,7 +21,8 @@ body {
   overflow-y: auto;
 }
 
-figure {
+figure,
+iframe {
   margin: 0;
 }
 
@@ -60,4 +61,38 @@ mark.bad {
 
 mark.warning {
   background-image: linear-gradient(120deg, #fdf4c2 0%, #fdf4c2 100%);
+}
+
+*:has([id][data-anchor]):has([data-permalink]) {
+  position: relative;
+
+  &:hover {
+    > [data-permalink] {
+      opacity: 0.5;
+    }
+  }
+
+  > [data-anchor] {
+    position: absolute;
+    top: -120px;
+  }
+
+  > [data-permalink] {
+    transition: all 100ms ease-in-out;
+    opacity: 0;
+    background: svg-load('icons/regular/link.svg');
+    background-size: contain;
+    height: 0.7em;
+    width: 0.7em;
+    display: inline-block;
+    margin-left: 0.3em;
+
+    svg {
+      color: var(--accent-color);
+    }
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 }

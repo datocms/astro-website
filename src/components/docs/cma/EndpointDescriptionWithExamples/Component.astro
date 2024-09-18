@@ -1,0 +1,44 @@
+---
+import { markdown } from '@astropub/md';
+import { experimental_AstroContainer } from 'astro/container';
+import replaceAsync from 'string-replace-async';
+import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
+import type { CmaEndpoint, CmaEntity } from '../types';
+import type { RestClientEndpointInfo } from '../fetchRestClientEndpointInfo';
+
+type Props = {
+  entity: CmaEntity;
+  endpoint: CmaEndpoint;
+  restClientEndpointInfo: RestClientEndpointInfo;
+  description: string;
+  examples: Array<{ id: string }>;
+  exampleComponent: AstroComponentFactory;
+};
+
+const { entity, endpoint, restClientEndpointInfo, exampleComponent, description, examples } =
+  Astro.props;
+
+const content = await markdown(description, {
+  fileURL: new URL(import.meta.url),
+  contentDir: new URL('./', import.meta.url),
+});
+
+const container = await experimental_AstroContainer.create();
+
+const contentWithSubstitutions = replaceAsync(
+  content,
+  /(<p>\n*)?::example\[([^\]]+)\](\n*<\/p>)?/g,
+  async (_match, _a, exampleId) => {
+    return await container.renderToString(exampleComponent, {
+      props: {
+        entity,
+        endpoint,
+        restClientEndpointInfo,
+        example: examples.find((example) => example.id === exampleId),
+      },
+    });
+  },
+);
+---
+
+<Fragment set:html={contentWithSubstitutions} />

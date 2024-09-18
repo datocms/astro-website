@@ -1,0 +1,46 @@
+---
+import { EndpointExample } from '~/components/docs/cma/EndpointExample';
+import type { CmaEndpoint, CmaEndpointJsExample, CmaEntity } from '../types';
+import { buildJsExample } from './buildJsExample';
+import type { RestClientEndpointInfo } from '../fetchRestClientEndpointInfo';
+
+type Props = {
+  entity: CmaEntity;
+  endpoint: CmaEndpoint;
+  restClientEndpointInfo: RestClientEndpointInfo;
+  example: CmaEndpointJsExample;
+};
+
+const { example, endpoint, entity, restClientEndpointInfo } = Astro.props;
+
+const { code: guessedCode, output: guessedOutput } = buildJsExample(
+  entity,
+  endpoint,
+  restClientEndpointInfo,
+);
+
+console.log(guessedCode);
+---
+
+<EndpointExample
+  title={example.title}
+  description={example.description}
+  tabs={[
+    {
+      title: 'Code',
+      description: example.request?.description,
+      language: 'javascript',
+      code: example.request?.code!,
+    },
+    ...(example.response?.code
+      ? [
+          {
+            title: 'Returned output',
+            description: example.response?.description,
+            language: 'javascript',
+            code: example.response?.code,
+          },
+        ]
+      : []),
+  ]}
+/>

@@ -22,21 +22,19 @@ const table = block.table as TableData<string>;
 const columns = table.columns.map((rawName) => parseShortCodes(rawName, ['style']));
 ---
 
-<figure>
-  <table>
-    <thead>
+<table>
+  <thead>
+    <tr>
+      {columns.map((col) => <th style={toCss(col.meta.style)}>{col.content}</th>)}
+    </tr>
+  </thead>
+  {
+    table.data.map((row) => (
       <tr>
-        {columns.map((col) => <th style={toCss(col.meta.style)}>{col.content}</th>)}
+        {columns.map((col) => (
+          <td style={toCss(col.meta.style)}>{row[col.id]}</td>
+        ))}
       </tr>
-    </thead>
-    {
-      table.data.map((row) => (
-        <tr>
-          {columns.map((col) => (
-            <td style={toCss(col.meta.style)}>{row[col.id]}</td>
-          ))}
-        </tr>
-      ))
-    }
-  </table>
-</figure>
+    ))
+  }
+</table>

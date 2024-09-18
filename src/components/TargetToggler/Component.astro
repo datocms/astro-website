@@ -11,42 +11,28 @@ const { targetId, startVisible } = Astro.props;
   <slot />
 </target-toggler>
 
-<style>
-  target-toggler:not(:defined) {
-    display: none;
-  }
-
-  target-toggler:defined {
-    display: contents;
-  }
-</style>
-
 <script>
   import { WebComponent } from '~/lib/WebComponent';
 
   window.customElements.define(
     'target-toggler',
     class TargetToggler extends WebComponent {
-      toggle!: HTMLButtonElement;
+      toggler!: HTMLButtonElement;
       controller!: AbortController;
 
       connectedCallback() {
-        this.toggle = this.$('button');
+        this.toggler = this.$('button');
 
         if (this.startVisible) this.target.setAttribute('data-open', '');
 
-        this.toggle.setAttribute('aria-expanded', this.startVisible ? 'true' : 'false');
-        this.toggle.setAttribute('aria-controls', this.targetId);
+        this.toggler.setAttribute('aria-expanded', this.startVisible ? 'true' : 'false');
+        this.toggler.setAttribute('aria-controls', this.targetId);
 
-        this.on(this.toggle, 'click', this.handleClick);
+        this.on(this.toggler, 'click', this.handleClick);
       }
 
       handleClick() {
-        const expanded = this.toggle.getAttribute('aria-expanded') === 'true' || false;
-        const newExpanded = !expanded;
-
-        this.toggle?.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
-        this.target?.toggleAttribute('data-open', newExpanded);
+        this.toggle();
       }
 
       get target() {
@@ -66,6 +52,15 @@ const { targetId, startVisible } = Astro.props;
       get startVisible() {
         const attr = 'target-start-visible';
         return (this.hasAttribute(attr) && this.getAttribute(attr) !== 'false') || false;
+      }
+
+      get isExpanded() {
+        return this.toggler.getAttribute('aria-expanded') === 'true' || false;
+      }
+
+      toggle(newExpanded: boolean = !this.isExpanded) {
+        this.toggler?.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
+        this.target?.toggleAttribute('data-open', newExpanded);
       }
     },
   );
