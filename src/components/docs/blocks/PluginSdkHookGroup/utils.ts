@@ -14,7 +14,7 @@ import {
 import { invariant } from '~/lib/invariant';
 import { slugify } from '~/lib/slugify';
 import { temporarilyCache } from '~/lib/temporarlyCache';
-import type { TocEntry, TocGroup } from '../../Page/types';
+import type { TocEntry, TocGroup } from '../../ContentPlusToc/types';
 import { PluginSdkHookGroupFragment } from './graphql';
 
 export type PluginSdkHook = {

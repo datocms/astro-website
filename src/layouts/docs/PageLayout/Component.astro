@@ -1,0 +1,90 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import { readFragment } from 'gql.tada';
+import { Image } from '~/components/blocks/Image';
+import { InternalVideo } from '~/components/blocks/InternalVideo';
+import { CloneButtonForm } from '~/components/docs/blocks/CloneButtonForm';
+import { Demo } from '~/components/docs/blocks/Demo';
+import { DeployButtonForm } from '~/components/docs/blocks/DeployButtonForm';
+import { DocCallout } from '~/components/docs/blocks/DocCallout';
+import { MultipleDemosBlock } from '~/components/docs/blocks/MultipleDemosBlock';
+import { PluginSdkHookGroup } from '~/components/docs/blocks/PluginSdkHookGroup';
+import { buildGroupsFromPluginSdkHooks } from '~/components/docs/blocks/PluginSdkHookGroup/utils';
+import { ReactUiLiveExample } from '~/components/docs/blocks/ReactUiLiveExample';
+import { buildGroupsFromReactUiLiveExamples } from '~/components/docs/blocks/ReactUiLiveExample/utils';
+import { Table } from '~/components/docs/blocks/Table';
+import { TutorialVideo } from '~/components/docs/blocks/TutorialVideo';
+import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
+import type { TocGroup } from '~/components/docs/ContentPlusToc/types';
+import { buildGroupsFromHeadings } from '~/components/docs/ContentPlusToc/utils';
+import {
+  buildItemsFromHeadings,
+  type SidebarEntry,
+  type SidebarGroup,
+} from '~/components/docs/Sidebar';
+import { Text } from '~/components/structuredText/Text';
+import { GroupLayout } from '~/layouts/docs/GroupLayout';
+import { withAllComponents } from '~/lib/datocms/structuredText';
+import { GroupLayoutFragment } from '../GroupLayout/_graphql';
+import { PageLayoutFragment } from './_graphql';
+import { Prose } from '~/components/docs/Prose';
+
+type Props = {
+  group: FragmentOf<typeof GroupLayoutFragment>;
+  page: FragmentOf<typeof PageLayoutFragment>;
+  additionalSidebarItems?: (SidebarEntry | SidebarGroup)[];
+  additionalTocGroups?: TocGroup[];
+};
+
+const { page: maskedPage, group, additionalSidebarItems, additionalTocGroups = [] } = Astro.props;
+
+const page = readFragment(PageLayoutFragment, maskedPage);
+
+const tocGroupsFromPageContent = (
+  await Promise.all([
+    buildGroupsFromPluginSdkHooks(page.content),
+    buildGroupsFromReactUiLiveExamples(page.content),
+  ])
+).flat();
+---
+
+<GroupLayout
+  group={group}
+  additionalSeo={page._seoMetaTags}
+  sidebarItemsIfNoPagesOrSectionsInGroup={buildItemsFromHeadings(page.content.value)}
+  additionalSidebarItems={additionalSidebarItems}
+>
+  <ContentPlusToc
+    tocGroups={[
+      ...buildGroupsFromHeadings(page.content.value),
+      ...tocGroupsFromPageContent,
+      ...additionalTocGroups,
+    ]}
+  >
+    <Fragment slot="kicker">{page.parents[0]!.name} > {page.title}</Fragment>
+    <Fragment slot="title">{page.title}</Fragment>
+
+    <Prose>
+      <slot>
+        <Text
+          data={page.content}
+          blockComponents={withAllComponents(page.content.blocks, {
+            ImageRecord: Image,
+            TableRecord: Table,
+            DemoRecord: Demo,
+            MultipleDemosBlockRecord: MultipleDemosBlock,
+            InternalVideoRecord: InternalVideo,
+            CloneButtonFormRecord: CloneButtonForm,
+            DeployButtonFormRecord: DeployButtonForm,
+            PluginSdkHookGroupRecord: PluginSdkHookGroup,
+            DocCalloutRecord: DocCallout,
+            ReactUiLiveExampleRecord: ReactUiLiveExample,
+            TutorialVideoRecord: TutorialVideo,
+          })}
+        />
+      </slot>
+
+      <slot name="afterPageContent" />
+    </Prose>
+  </ContentPlusToc>
+</GroupLayout>

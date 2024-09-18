@@ -45,7 +45,7 @@ export default function TabsReactComponent({ children }: { children: ReactNode }
   );
 }
 
-export const TabReactComponent = (props: {
+export const TabReactComponent = (_props: {
   title: string;
   code?: boolean;
   children: ReactNode;

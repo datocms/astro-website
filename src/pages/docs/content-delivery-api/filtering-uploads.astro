@@ -1,16 +1,27 @@
 ---
-import { fetchIntrospectionUploadFilters, fieldTypeName } from './_utils';
-import Page from '../[...rest]/index.astro';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Heading } from '~/components/Heading';
-import Filters from './_Filters.astro';
+import { PageLayout, findGroupAndPage } from '~/layouts/docs/PageLayout';
+import { notFoundResponse } from '~/lib/notFoundResponse';
 import { slugify } from '~/lib/slugify';
+import Filters from './_Filters.astro';
 import { camelize } from './_gqlExample';
+import { fetchIntrospectionUploadFilters } from './_utils';
+
+const result = await findGroupAndPage(Astro, 'content-delivery-api/filtering-uploads');
+
+if (!result) {
+  return notFoundResponse();
+}
+
+const [group, page, queryListenerProps] = result;
 
 const response = await fetchIntrospectionUploadFilters();
 ---
 
-<Page
-  rest="content-delivery-api/filtering-uploads"
+<PageLayout
+  page={page}
+  group={group}
   additionalTocGroups={[
     {
       title: 'Filter uploads by',
@@ -21,15 +32,19 @@ const response = await fetchIntrospectionUploadFilters();
     },
   ]}
 >
-  <Heading anchor="field-types" as="h2">Available filters</Heading>
-  {
-    Object.entries(response.filters).map(([fieldName, filters]) => (
-      <>
-        <Heading anchor={slugify(fieldName)} as="h4">
-          Filter by <code>{camelize(fieldName)}</code>
-        </Heading>
-        <Filters fieldName={fieldName} filters={filters} />
-      </>
-    ))
-  }
-</Page>
+  <Fragment slot="afterPageContent">
+    <Heading anchor="field-types" as="h2">Available filters</Heading>
+    {
+      Object.entries(response.filters).map(([fieldName, filters]) => (
+        <>
+          <Heading anchor={slugify(fieldName)} as="h4">
+            Filter by <code>{camelize(fieldName)}</code>
+          </Heading>
+          <Filters fieldName={fieldName} filters={filters} />
+        </>
+      ))
+    }
+  </Fragment>
+</PageLayout>
+
+{queryListenerProps.map((props) => <DraftModeQueryListener {...props} />)}

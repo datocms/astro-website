@@ -1,0 +1,74 @@
+---
+import type { TitleMetaLinkTag } from '@datocms/astro';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import {
+  Sidebar,
+  buildItemsForDocGroup,
+  type SidebarEntry,
+  type SidebarGroup,
+} from '~/components/docs/Sidebar';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { BaseLayout } from '~/layouts/docs/BaseLayout';
+import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder';
+import { GroupLayoutFragment } from './_graphql';
+import s from './_style.module.css';
+
+type Props = {
+  group: FragmentOf<typeof GroupLayoutFragment>;
+  additionalSeo: TitleMetaLinkTag[];
+  sidebarItemsIfNoPagesOrSectionsInGroup?: (SidebarEntry | SidebarGroup)[];
+  additionalSidebarItems?: (SidebarEntry | SidebarGroup)[];
+};
+
+const {
+  group: maskedGroup,
+  additionalSeo,
+  sidebarItemsIfNoPagesOrSectionsInGroup = [],
+  additionalSidebarItems = [],
+} = Astro.props;
+
+const group = readFragment(GroupLayoutFragment, maskedGroup);
+---
+
+<BaseLayout additionalSeo={additionalSeo}>
+  <Fragment slot="sidebar">
+    <a href="/docs" class={s.backHome}>
+      <Svg name="icons/regular/chevron-double-left" /> Home
+    </a>
+
+    <Sidebar
+      title={group.name}
+      items={[
+        ...(group.pagesOrSections.length > 1
+          ? buildItemsForDocGroup(group)
+          : sidebarItemsIfNoPagesOrSectionsInGroup),
+        ...additionalSidebarItems,
+      ]}
+    />
+
+    {
+      group.techStarterKit && (
+        <Space top={1}>
+          <MarketplaceCard
+            size="micro"
+            href={buildUrlForTemplateDemo(group.techStarterKit)}
+            svgLogoUrl={
+              group.techStarterKit.technology.squareLogo?.url ||
+              group.techStarterKit.technology.logo.url
+            }
+            title={group.techStarterKit.name}
+            badge={group.techStarterKit.badge ?? undefined}
+            label={group.techStarterKit.label}
+          >
+            Words are nice... but code speaks louder. Dive into a fully commented project template,
+            showcasing these techniques (and more) in action.
+          </MarketplaceCard>
+        </Space>
+      )
+    }
+  </Fragment>
+
+  <slot />
+</BaseLayout>

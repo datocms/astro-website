@@ -51,6 +51,11 @@ type Link = {
   private?: boolean;
   rel: string;
   title: string;
+  href: string;
+  method?: string;
+  schema?: JSONSchema;
+  targetSchema?: JSONSchema;
+  jobSchema?: JSONSchema;
 };
 
 type Resource = JSONSchema & {

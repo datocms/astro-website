@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import style from './style.module.css';
 import { fsClassNames, pClassNames, sClassNames } from './common';
-import type { ElementType, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 type Props<T extends keyof JSX.IntrinsicElements = 'button'> = {
   as?: T;

@@ -6,7 +6,7 @@ import { Application, FileRegistry, type JSONOutput } from 'typedoc';
 import { invariant } from '~/lib/invariant';
 import { slugify } from '~/lib/slugify';
 import { temporarilyCache } from '~/lib/temporarlyCache';
-import type { TocEntry, TocGroup } from '../../Page/types';
+import type { TocEntry, TocGroup } from '../../ContentPlusToc/types';
 import { ReactUiLiveExampleFragment } from './graphql';
 
 type Block = { __typename: 'ReactUiLiveExampleRecord' } & FragmentOf<

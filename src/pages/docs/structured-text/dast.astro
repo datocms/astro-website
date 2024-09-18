@@ -1,16 +1,27 @@
 ---
-import { fetchDastNodes } from './_utils';
-import Page from '../[...rest]/index.astro';
-import { Heading } from '~/components/Heading';
 import { Markdown } from '@astropub/md';
 import { Code } from '~/components/Code';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Heading } from '~/components/Heading';
+import { PageLayout, findGroupAndPage } from '~/layouts/docs/PageLayout';
 import { intersperse } from '~/lib/intersperse';
+import { notFoundResponse } from '~/lib/notFoundResponse';
+import { fetchDastNodes } from './_utils';
+
+const result = await findGroupAndPage(Astro, 'structured-text/dast');
+
+if (!result) {
+  return notFoundResponse();
+}
+
+const [group, page, queryListenerProps] = result;
 
 const nodes = await fetchDastNodes();
 ---
 
-<Page
-  rest="structured-text/dast"
+<PageLayout
+  page={page}
+  group={group}
   additionalTocGroups={[
     {
       title: 'Nodes',
@@ -18,32 +29,37 @@ const nodes = await fetchDastNodes();
     },
   ]}
 >
-  {
-    nodes.map((node) => {
-      const childrenNodes = node.childrenNodes.map((subNode) =>
-        // prettier-ignore
-        <a href={`#${subNode}`}><code>{subNode}</code></a>,
-      );
+  <Fragment slot="afterPageContent">
+    {
+      nodes.map((node) => {
+        const childrenNodes = node.childrenNodes.map((subNode) =>
+          // prettier-ignore
+          <a href={`#${subNode}`}><code>{subNode}</code></a>,
+        );
 
-      return (
-        <>
-          <Heading anchor={node.name} as="h3">
-            <code>{node.name}</code>
-          </Heading>
-          <Markdown of={node.description} />
-          <p>
-            {node.childrenNodes.length > 0 ? (
-              <>
-                It allows the following children nodes: {intersperse(childrenNodes, ', ', ' and ')}.
-              </>
-            ) : (
-              <>It does not allow children nodes.</>
-            )}
-          </p>
-          {/* <JsonSchemaObject key={name} name={name} schema={definition} level={1} /> */}
-          {node.example && <Code code={node.example.code} language={node.example.language} />}
-        </>
-      );
-    })
-  }
-</Page>
+        return (
+          <>
+            <Heading anchor={node.name} as="h3">
+              <code>{node.name}</code>
+            </Heading>
+            <Markdown of={node.description} />
+            <p>
+              {node.childrenNodes.length > 0 ? (
+                <>
+                  It allows the following children nodes:{' '}
+                  {intersperse(childrenNodes, ', ', ' and ')}.
+                </>
+              ) : (
+                <>It does not allow children nodes.</>
+              )}
+            </p>
+            {/* <JsonSchemaObject key={name} name={name} schema={definition} level={1} /> */}
+            {node.example && <Code code={node.example.code} language={node.example.language} />}
+          </>
+        );
+      })
+    }
+  </Fragment>
+</PageLayout>
+
+{queryListenerProps.map((props) => <DraftModeQueryListener {...props} />)}

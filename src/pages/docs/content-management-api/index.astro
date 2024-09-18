@@ -1,8 +1,20 @@
 ---
-import Page from '../[...rest]/index.astro';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { PageLayout, findGroupAndPage } from '~/layouts/docs/PageLayout';
+import { notFoundResponse } from '~/lib/notFoundResponse';
 import { buildSidebarItems } from './_buildSidebarItems';
+
+const result = await findGroupAndPage(Astro, 'content-management-api');
+
+if (!result) {
+  return notFoundResponse();
+}
+
+const [group, page, queryListenerProps] = result;
 
 const sidebarItems = await buildSidebarItems();
 ---
 
-<Page rest="content-management-api" additionalSidebarItems={sidebarItems} />
+<PageLayout page={page} group={group} additionalSidebarItems={sidebarItems} />
+
+{queryListenerProps.map((props) => <DraftModeQueryListener {...props} />)}
