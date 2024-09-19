@@ -9,54 +9,68 @@ import { Code } from '~/components/Code';
 import { Prose } from '~/components/docs/Prose';
 
 type Props = {
+  id: string;
   title: string;
   description?: string;
   tabs: Array<{ title: string; description?: string; code: string; language: string }>;
+  startVisible?: boolean;
 };
 
-const { title, description, tabs } = Astro.props;
-
-const slug = slugify(title);
+const { id, title, description, tabs, startVisible } = Astro.props;
 ---
 
-<endpoint-example slug={slug}>
-  <figure class={s.reqRes}>
-    <TargetToggler targetId={`example-${slug}`}>
-      <Heading as="button" class={s.title} anchor={slug}>
-        <span class={s.pill}>Example</span>{' '}
-        <span class={s.titleTitle}>{title}</span>
-      </Heading>
-    </TargetToggler>
+<prose-island>
+  <endpoint-example slug={id}>
+    <div class={s.reqRes}>
+      <TargetToggler targetId={`example-${id}`} startVisible={startVisible}>
+        <Heading as="button" class={s.title} anchor={id}>
+          <span class={s.pill}>Example</span>{' '}
+          <span class={s.titleTitle}>{title}</span>
+        </Heading>
+      </TargetToggler>
 
-    <div id={`example-${slug}`} class={s.details}>
-      {
-        description && (
-          <Prose class={s.description}>
-            <Markdown of={description} />
-          </Prose>
-        )
-      }
+      <div id={`example-${id}`} class={s.details}>
+        {
+          description && (
+            <Prose class={s.description}>
+              <Markdown of={description} />
+            </Prose>
+          )
+        }
 
-      <div class={s.tabs}>
-        <Tabs>
-          {
-            tabs.map((tab) => (
-              <Tab title={tab.title} noPadding>
-                {tab.description && (
-                  <div class={s.description}>
-                    <Markdown of={tab.description} />
-                  </div>
-                )}
+        {
+          tabs.length > 1 ? (
+            <div class={s.tabs}>
+              <Tabs>
+                {tabs.map((tab) => (
+                  <Tab title={tab.title} noPadding>
+                    {tab.description && (
+                      <div class={s.description}>
+                        <Markdown of={tab.description} />
+                      </div>
+                    )}
 
-                <Code code={tab.code} language={tab.language} />
-              </Tab>
-            ))
-          }
-        </Tabs>
+                    <Code code={tab.code} language={tab.language} />
+                  </Tab>
+                ))}
+              </Tabs>
+            </div>
+          ) : (
+            <>
+              {tabs[0]!.description && (
+                <div class={s.description}>
+                  <Markdown of={tabs[0]!.description} />
+                </div>
+              )}
+
+              <Code code={tabs[0]!.code} language={tabs[0]!.language} />
+            </>
+          )
+        }
       </div>
     </div>
-  </figure>
-</endpoint-example>
+  </endpoint-example>
+</prose-island>
 
 <script>
   import { WebComponent } from '~/lib/WebComponent';
@@ -69,7 +83,18 @@ const slug = slugify(title);
       connectedCallback() {
         this.toggler = this.$('target-toggler');
 
-        if (document.location.hash.replace(/^#/, '') === this.getAttribute('slug')) {
+        if (document.location.hash.slice(1) === this.getAttribute('slug')) {
+          (this.toggler as any).toggle(true);
+        }
+
+        window.addEventListener('hashchange', () => this.handleHashChange());
+      }
+
+      handleHashChange() {
+        const currentHash = window.location.hash.slice(1);
+        const slug = this.getAttribute('slug');
+
+        if (currentHash === slug) {
           (this.toggler as any).toggle(true);
         }
       }

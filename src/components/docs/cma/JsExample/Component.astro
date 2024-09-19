@@ -5,13 +5,15 @@ import { buildApiCallSampleCode, buildApiCallReturnValue } from './buildJs';
 import type { RestClientEndpointInfo } from '../fetchRestClientEndpointInfo';
 
 type Props = {
+  id: string;
   entity: CmaEntity;
   endpoint: CmaEndpoint;
   restClientEndpointInfo: RestClientEndpointInfo;
   example?: CmaEndpointJsExample;
+  startVisible?: boolean;
 };
 
-const { example, endpoint, entity, restClientEndpointInfo } = Astro.props;
+const { id, example, endpoint, entity, restClientEndpointInfo, startVisible } = Astro.props;
 
 const sampleCode =
   example?.request?.code ||
@@ -22,6 +24,8 @@ const output =
 ---
 
 <EndpointExample
+  id={id}
+  startVisible={startVisible}
   title={example?.title || 'Basic example'}
   description={example?.description}
   tabs={[

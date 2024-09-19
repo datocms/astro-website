@@ -5,6 +5,8 @@ import replaceAsync from 'string-replace-async';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
 import type { CmaEndpoint, CmaEntity } from '../types';
 import type { RestClientEndpointInfo } from '../fetchRestClientEndpointInfo';
+import { examplePlaceholderRegexp } from '.';
+import { invariant } from '~/lib/invariant';
 
 type Props = {
   entity: CmaEntity;
@@ -27,14 +29,22 @@ const container = await experimental_AstroContainer.create();
 
 const contentWithSubstitutions = replaceAsync(
   content,
-  /(<p>\n*)?::example\[([^\]]+)\](\n*<\/p>)?/g,
-  async (_match, _a, exampleId) => {
+  examplePlaceholderRegexp,
+  async (...args) => {
+    const { exampleId } = args[args.length - 1] as { exampleId: string };
+    const example = examples.find((example) => example.id === exampleId);
+
+    if (!example) {
+      return '';
+    }
+
     return await container.renderToString(exampleComponent, {
       props: {
+        id: example.id,
         entity,
         endpoint,
         restClientEndpointInfo,
-        example: examples.find((example) => example.id === exampleId),
+        example,
       },
     });
   },

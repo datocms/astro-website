@@ -6,9 +6,14 @@ import { notFoundResponse } from '~/lib/notFoundResponse';
 import { Prose } from '~/components/docs/Prose';
 import { buildSidebarItems } from '~/components/docs/cma/buildSidebarItems';
 import { findEntity } from '~/components/docs/cma/findEntity';
-import { EndpointDescriptionWithExamples } from '~/components/docs/cma/EndpointDescriptionWithExamples';
+import {
+  buildTocGroupsFromMarkdown,
+  EndpointDescriptionWithExamples,
+  examplesNotInMarkdown,
+} from '~/components/docs/cma/EndpointDescriptionWithExamples';
 import { JsExample } from '~/components/docs/cma/JsExample';
 import { fetchRestClientEndpointInfo } from '~/components/docs/cma/fetchRestClientEndpointInfo';
+import { difference } from 'lodash-es';
 
 const sidebarItems = await buildSidebarItems(Astro.params.entitySlug!);
 const entity = await findEntity(Astro.params.entitySlug!);
@@ -35,10 +40,12 @@ if (!endpoint) {
 const description = endpoint.documentation?.javascript?.description || endpoint.description;
 
 const examples = endpoint?.documentation?.javascript?.examples || [];
+
+const examplesNotInDescription = examplesNotInMarkdown(examples, description);
 ---
 
 <GroupLayout group={group} additionalSeo={[]} additionalSidebarItems={sidebarItems}>
-  <ContentPlusToc tocGroups={[]}>
+  <ContentPlusToc tocGroups={buildTocGroupsFromMarkdown(description, examples)}>
     <Fragment slot="kicker">Content Management API > {entity.title}</Fragment>
     <Fragment slot="title">{endpoint.title}</Fragment>
 
@@ -55,13 +62,29 @@ const examples = endpoint?.documentation?.javascript?.examples || [];
           />
         )
       }
-    </Prose>
 
-    <JsExample
-      entity={entity}
-      endpoint={endpoint}
-      restClientEndpointInfo={restClientEndpointInfo}
-    />
+      {
+        examples.length > 0 ? (
+          examplesNotInDescription.map((example) => (
+            <JsExample
+              id={example.id}
+              entity={entity}
+              endpoint={endpoint}
+              restClientEndpointInfo={restClientEndpointInfo}
+              example={example}
+            />
+          ))
+        ) : (
+          <JsExample
+            id="basic-example"
+            entity={entity}
+            endpoint={endpoint}
+            restClientEndpointInfo={restClientEndpointInfo}
+            startVisible
+          />
+        )
+      }
+    </Prose>
   </ContentPlusToc>
 </GroupLayout>
 

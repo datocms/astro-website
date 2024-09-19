@@ -7,6 +7,7 @@ import { Markdown } from '@astropub/md';
 import { Prose } from '~/components/docs/Prose';
 import { buildSidebarItems } from '~/components/docs/cma/buildSidebarItems';
 import { findEntity } from '~/components/docs/cma/findEntity';
+import { buildTocGroupsFromMarkdown } from '~/components/docs/cma/EndpointDescriptionWithExamples';
 
 const sidebarItems = await buildSidebarItems(Astro.params.entitySlug!);
 const resource = await findEntity(Astro.params.entitySlug!);
@@ -21,7 +22,7 @@ const [group, queryListenerProps] = result;
 ---
 
 <GroupLayout group={group} additionalSeo={[]} additionalSidebarItems={sidebarItems}>
-  <ContentPlusToc tocGroups={[]}>
+  <ContentPlusToc tocGroups={buildTocGroupsFromMarkdown(resource.description)}>
     <Fragment slot="kicker">Content Management API > {resource.title}</Fragment>
     <Fragment slot="title">{resource.title}</Fragment>
 

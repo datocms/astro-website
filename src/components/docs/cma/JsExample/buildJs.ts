@@ -5,21 +5,32 @@ import { invariant } from '~/lib/invariant';
 import type { RestClientEndpointInfo } from '../fetchRestClientEndpointInfo';
 import type { CmaEndpoint, CmaEntity } from '../types';
 import exampleValueForSchema from './exampleValueForSchema';
+
+function hasSimpleMethod(restClientEndpointInfo: RestClientEndpointInfo) {
+  return Boolean(restClientEndpointInfo.endpoint.name);
+}
+
 function pluralize(string: string) {
   return `${string}s`;
 }
 
-function deserializeEntity(data: Record<string, unknown>, withId = false) {
-  const id = withId ? { id: data.id } : {};
+function maybeDeserializeEntity(
+  restClientEndpointInfo: RestClientEndpointInfo,
+  data: Record<string, unknown>,
+  options: { skipId?: boolean } = {},
+) {
+  if (!hasSimpleMethod(restClientEndpointInfo)) {
+    return JSON.stringify(data);
+  }
 
-  return {
-    ...id,
+  return JSON.stringify({
+    ...(options.skipId ? {} : { id: data.id }),
     ...(data.attributes || {}),
     ...(data.meta ? { meta: data.meta } : {}),
     ...Object.fromEntries(
       Object.entries(data.relationships || {}).map(([key, value]) => [key, value.data]),
     ),
-  };
+  });
 }
 
 function buildLinesBeforeApiCall(
@@ -64,11 +75,9 @@ function buildApiCallArgs(endpoint: CmaEndpoint, restClientEndpointInfo: RestCli
 
     if (isObject(example) && 'data' in example) {
       args.push(
-        JSON.stringify(
-          deserializeEntity(example.data as Record<string, unknown>, endpoint.method === 'POST'),
-          null,
-          2,
-        ),
+        maybeDeserializeEntity(restClientEndpointInfo, example.data as Record<string, unknown>, {
+          skipId: endpoint.method === 'POST',
+        }),
       );
     }
   }
@@ -90,7 +99,8 @@ function buildApiCallInvocation(
   restClientEndpointInfo: RestClientEndpointInfo,
 ) {
   const namespace = restClientEndpointInfo.namespace;
-  const action = restClientEndpointInfo.endpoint.name;
+  const action = restClientEndpointInfo.endpoint.name || restClientEndpointInfo.endpoint.rawName;
+
   const args = buildApiCallArgs(endpoint, restClientEndpointInfo);
 
   if (restClientEndpointInfo.endpoint.paginatedResponse) {
@@ -120,6 +130,8 @@ function buildApiCallAssignment(
   if (!Array.isArray(example.data)) {
     return `
       const ${singleVariableName} = await ${apiCallInvocation};
+
+      // Check the 'Returned output' tab for the result
       console.log(${singleVariableName});
     `;
   }
@@ -127,6 +139,8 @@ function buildApiCallAssignment(
   if (example.data.length === 0) {
     return `
       const result = await ${apiCallInvocation};
+
+      // Check the 'Returned output' tab for the result
       console.log(result);
     `;
   }
@@ -135,6 +149,8 @@ function buildApiCallAssignment(
     return `
       // iterates over every page of results
       for await (const ${singleVariableName} of ${apiCallInvocation}) {
+
+        // Check the 'Returned output' tab for the result
         console.log(${singleVariableName});
       }
     `;
@@ -146,6 +162,8 @@ function buildApiCallAssignment(
     const ${pluralVariableName} = await ${apiCallInvocation};
 
     for (const ${singleVariableName} of ${pluralVariableName}) {
+
+      // Check the 'Returned output' tab for the result
       console.log(${singleVariableName});
     }
   `;
@@ -157,8 +175,14 @@ function rawBuildApiCallSampleCode(
   restClientEndpointInfo: RestClientEndpointInfo,
 ) {
   return `
-    ${buildLinesBeforeApiCall(entity, restClientEndpointInfo).join('\n')}
-    ${buildApiCallAssignment(endpoint, restClientEndpointInfo)}
+    import { buildClient } from '@datocms/cma-client-node';
+
+    async function run() {
+      ${buildLinesBeforeApiCall(entity, restClientEndpointInfo).join('\n')}
+      ${buildApiCallAssignment(endpoint, restClientEndpointInfo)}
+    }
+
+    run();
   `;
 }
 
@@ -176,7 +200,7 @@ function rawBuildApiCallReturnValue(
   endpoint: CmaEndpoint,
   restClientEndpointInfo: RestClientEndpointInfo,
 ) {
-  const responseSchema = endpoint.targetSchema || endpoint.jobSchema;
+  const responseSchema = endpoint.jobSchema || endpoint.targetSchema;
 
   if (!responseSchema) {
     return null;
@@ -187,7 +211,7 @@ function rawBuildApiCallReturnValue(
   invariant(isObject(example) && 'data' in example);
 
   if (!Array.isArray(example.data)) {
-    return JSON.stringify(deserializeEntity(example.data as Record<string, unknown>, true));
+    return maybeDeserializeEntity(restClientEndpointInfo, example.data as Record<string, unknown>);
   }
 
   if (example.data.length === 0) {
@@ -198,7 +222,7 @@ function rawBuildApiCallReturnValue(
     return null;
   }
 
-  return JSON.stringify(deserializeEntity(example.data[0], true));
+  return maybeDeserializeEntity(restClientEndpointInfo, example.data[0]);
 }
 
 export async function buildApiCallReturnValue(

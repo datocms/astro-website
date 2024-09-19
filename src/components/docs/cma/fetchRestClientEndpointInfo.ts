@@ -2,7 +2,7 @@ import ky from 'ky';
 
 type EndpointInfo = {
   rel: string;
-  name: string;
+  name?: string;
   rawName: string;
   returnsCollection: boolean;
   urlTemplate: string;
