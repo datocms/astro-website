@@ -1,4 +1,4 @@
-import type { JSONSchema } from '@apidevtools/json-schema-ref-parser';
+import type { JSONSchema4Type, JSONSchema4TypeName } from 'json-schema';
 
 export type CmaEndpointHttpExample = {
   id: string;
@@ -68,3 +68,58 @@ export type CmaHyperSchema = JSONSchema & {
     resources: string[];
   }>;
 };
+
+export interface JSONSchema {
+  id?: string;
+  $ref?: string;
+  $schema?: string;
+  title?: string;
+  description?: string;
+  default?: JSONSchema4Type;
+  multipleOf?: number;
+  maximum?: number;
+  exclusiveMaximum?: boolean;
+  minimum?: number;
+  exclusiveMinimum?: boolean;
+  maxLength?: number;
+  minLength?: number;
+  pattern?: string;
+  additionalItems?: boolean | JSONSchema;
+  items?: JSONSchema | JSONSchema[];
+  maxItems?: number;
+  minItems?: number;
+  uniqueItems?: boolean;
+  maxProperties?: number;
+  minProperties?: number;
+  required?: boolean | string[];
+  additionalProperties?: boolean | JSONSchema;
+  definitions?: {
+    [k: string]: JSONSchema;
+  };
+  properties?: {
+    [k: string]: JSONSchema;
+  };
+  patternProperties?: {
+    [k: string]: JSONSchema;
+  };
+  dependencies?: {
+    [k: string]: JSONSchema | string[];
+  };
+  enum?: JSONSchema4Type[];
+  type?: JSONSchema4TypeName | JSONSchema4TypeName[];
+  allOf?: JSONSchema[];
+  anyOf?: JSONSchema[];
+  oneOf?: JSONSchema[];
+  not?: JSONSchema;
+  extends?: string | string[];
+  format?: string;
+
+  const?: JSONSchema4Type;
+
+  hideFromDocs?: boolean;
+  deprecated?: string;
+  hideFromExample?: boolean;
+
+  example?: unknown;
+  examples?: unknown[];
+}

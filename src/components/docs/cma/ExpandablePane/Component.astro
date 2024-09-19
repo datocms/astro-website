@@ -1,0 +1,24 @@
+---
+import { TargetToggler } from '~/components/TargetToggler';
+import s from './style.module.css';
+import { nanoid } from 'nanoid';
+
+type Props = {
+  label: string;
+};
+
+const { label } = Astro.props;
+const id = nanoid();
+---
+
+<expandable-pane>
+  <TargetToggler targetId={id}>
+    <button type="button" class={s.button}>
+      <span>{label}</span>
+    </button>
+  </TargetToggler>
+
+  <div class={s.content} id={id}>
+    <slot />
+  </div>
+</expandable-pane>

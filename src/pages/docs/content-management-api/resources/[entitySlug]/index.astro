@@ -8,6 +8,8 @@ import { Prose } from '~/components/docs/Prose';
 import { buildSidebarItems } from '~/components/docs/cma/buildSidebarItems';
 import { findEntity } from '~/components/docs/cma/findEntity';
 import { buildTocGroupsFromMarkdown } from '~/components/docs/cma/EndpointDescriptionWithExamples';
+import { jsonApiEntityDoc } from '~/components/docs/cma/analyzeSchemaProperties';
+import { PropertiesDoc } from '~/components/docs/cma/PropertiesDoc';
 
 const sidebarItems = await buildSidebarItems(Astro.params.entitySlug!);
 const resource = await findEntity(Astro.params.entitySlug!);
@@ -19,6 +21,10 @@ if (!result || !resource) {
 }
 
 const [group, queryListenerProps] = result;
+
+const links = resource.links ? resource.links.filter((l) => !l.private) : [];
+
+const objectPayload = jsonApiEntityDoc(resource, 'entity');
 ---
 
 <GroupLayout group={group} additionalSeo={[]} additionalSidebarItems={sidebarItems}>
@@ -28,6 +34,34 @@ const [group, queryListenerProps] = result;
 
     <Prose>
       {resource.description && <Markdown of={resource.description} />}
+
+      {
+        objectPayload && (
+          <>
+            <h2>Object payload</h2>
+            <PropertiesDoc propertiesDoc={objectPayload} showRequiredOptional={false} />
+          </>
+        )
+      }
+
+      {
+        links.length > 0 && (
+          <>
+            <h4>Available endpoints</h4>
+            <ul>
+              {links.map((link) => (
+                <li>
+                  <a
+                    href={`/docs/content-management-api/resources/${Astro.params.entitySlug!}/${link.rel}`}
+                  >
+                    {link.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
     </Prose>
   </ContentPlusToc>
 </GroupLayout>

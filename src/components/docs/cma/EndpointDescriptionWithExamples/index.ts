@@ -26,13 +26,10 @@ export function examplesNotInMarkdown(
 }
 
 export function buildTocGroupsFromMarkdown(
-  content: string | undefined,
+  rawContent: string | undefined,
   examples?: CmaEndpointJsExample[],
 ): TocGroup[] {
-  if (!content) {
-    return [];
-  }
-
+  const content = rawContent || '';
   const processor = unified().use(remarkParse);
   const tree = processor.parse(content);
 

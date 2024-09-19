@@ -1,4 +1,3 @@
-import type { JSONSchema } from '@apidevtools/json-schema-ref-parser';
 import { camelCase } from 'lodash-es';
 import * as prettier from 'prettier';
 import { invariant } from '~/lib/invariant';
@@ -48,8 +47,7 @@ function buildLinesBeforeApiCall(
     } else if (placeholder.variableName === 'fieldId') {
       lines.push(`const fieldIdOrApiKey = 'blog_post::title';`);
     } else {
-      isJsonSchema(entity.definitions?.identity);
-      const resourceId = (entity.definitions.identity as any).example || '3209482753';
+      const resourceId = entity.definitions!.identity!.example || '3209482753';
       lines.push(`const ${placeholder.variableName} = '${resourceId}';`);
     }
   }
@@ -231,10 +229,6 @@ export async function buildApiCallReturnValue(
 ) {
   const result = rawBuildApiCallReturnValue(endpoint, restClientEndpointInfo);
   return result ? prettier.format(result, { parser: 'json5' }) : undefined;
-}
-
-function isJsonSchema(thing: unknown): asserts thing is JSONSchema {
-  invariant(thing && typeof thing !== 'boolean');
 }
 
 function isObject(thing: unknown): thing is Record<string, unknown> {

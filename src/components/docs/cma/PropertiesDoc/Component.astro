@@ -1,0 +1,27 @@
+---
+import type { PropertiesDoc } from '../analyzeSchemaProperties';
+import { ExpandablePane } from '../ExpandablePane';
+import { PropertyDoc } from '../PropertyDoc';
+
+type Props = {
+  propertiesDoc: PropertiesDoc;
+  showRequiredOptional?: boolean;
+};
+
+const { propertiesDoc, showRequiredOptional = true } = Astro.props;
+---
+
+{
+  propertiesDoc.regular.map((propertyDoc) => (
+    <PropertyDoc propertyDoc={propertyDoc} showRequiredOptional={showRequiredOptional} />
+  ))
+}
+{
+  propertiesDoc.deprecated.length > 0 && (
+    <ExpandablePane label="Show deprecated">
+      {propertiesDoc.deprecated.map((propertyDoc) => (
+        <PropertyDoc propertyDoc={propertyDoc} showRequiredOptional={showRequiredOptional} />
+      ))}
+    </ExpandablePane>
+  )
+}

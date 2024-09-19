@@ -1,5 +1,4 @@
-import type { JSONSchema } from '@apidevtools/json-schema-ref-parser';
-import { invariant } from '~/lib/invariant';
+import type { JSONSchema } from '../types';
 
 export default function exampleValueForSchema(schema: JSONSchema | undefined): unknown {
   if (!schema) {
@@ -19,10 +18,7 @@ export default function exampleValueForSchema(schema: JSONSchema | undefined): u
   }
 
   if (schema.anyOf) {
-    const firstAnyOf = schema.anyOf[0];
-    isJsonSchema(firstAnyOf);
-
-    return exampleValueForSchema(firstAnyOf);
+    return exampleValueForSchema(schema.anyOf[0]);
   }
 
   const type = Array.isArray(schema.type)
@@ -31,9 +27,7 @@ export default function exampleValueForSchema(schema: JSONSchema | undefined): u
 
   if (type === 'object') {
     if (schema.oneOf) {
-      const firstOneOf = schema.oneOf[0];
-      isJsonSchema(firstOneOf);
-      return exampleValueForSchema(firstOneOf);
+      return exampleValueForSchema(schema.oneOf[0]);
     }
 
     if (!schema.properties) {
@@ -45,9 +39,7 @@ export default function exampleValueForSchema(schema: JSONSchema | undefined): u
     return Object.fromEntries(
       propertiesToGenerate
         .map<[string, unknown] | undefined>((property) => {
-          const propertySchema = schema.properties![property];
-
-          isJsonSchema(propertySchema);
+          const propertySchema = schema.properties![property]!;
 
           if (
             'deprecated' in propertySchema ||
@@ -68,16 +60,13 @@ export default function exampleValueForSchema(schema: JSONSchema | undefined): u
       return [];
     }
 
-    isJsonSchema(schema.items);
+    const items = Array.isArray(schema.items) ? schema.items[0]! : schema.items!;
 
-    if (schema.items.oneOf) {
-      return schema.items.oneOf.map((s) => {
-        isJsonSchema(s);
-        return exampleValueForSchema(s);
-      });
+    if (items.oneOf) {
+      return items.oneOf.map(exampleValueForSchema);
     }
 
-    return [exampleValueForSchema(schema.items)];
+    return [exampleValueForSchema(items)];
   }
 
   if (type === 'string') {
@@ -107,8 +96,4 @@ export default function exampleValueForSchema(schema: JSONSchema | undefined): u
   }
 
   throw new Error(`Don't know how to manage ${type} type!`);
-}
-
-function isJsonSchema(thing: unknown): asserts thing is JSONSchema {
-  invariant(thing && typeof thing !== 'boolean');
 }
