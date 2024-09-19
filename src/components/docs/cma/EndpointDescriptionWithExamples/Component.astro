@@ -1,11 +1,15 @@
 ---
-import { markdown } from '@astropub/md';
+import { Markdown } from '@astropub/md';
 import { experimental_AstroContainer } from 'astro/container';
 import replaceAsync from 'string-replace-async';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
 import type { CmaEndpoint, CmaEntity } from '../types';
 import type { RestClientEndpointInfo } from '../fetchRestClientEndpointInfo';
 import { examplePlaceholderRegexp } from '.';
+import { createMarkdownProcessor } from '@astrojs/markdown-remark';
+import { autolinkHeadings, figureAroundCodeBlocks } from '~/lib/plugins/foo';
+import rehypeExpressiveCode from 'rehype-expressive-code';
+import config from '../../../../../ec.config.mjs';
 
 type Props = {
   entity: CmaEntity;
@@ -19,10 +23,23 @@ type Props = {
 const { entity, endpoint, restClientEndpointInfo, exampleComponent, description, examples } =
   Astro.props;
 
-const content = await markdown(description, {
-  fileURL: new URL(import.meta.url),
-  contentDir: new URL('./', import.meta.url),
+const processor = await createMarkdownProcessor({
+  syntaxHighlight: false,
+  shikiConfig: {
+    langs: [],
+    theme: 'dracula',
+    themes: {},
+    wrap: false,
+    transformers: [],
+  },
+  remarkPlugins: [],
+  rehypePlugins: [figureAroundCodeBlocks, autolinkHeadings, [rehypeExpressiveCode, config]],
+  remarkRehype: {},
+  gfm: true,
+  smartypants: true,
 });
+
+const content = (await processor.render(description)).code;
 
 const container = await experimental_AstroContainer.create();
 
