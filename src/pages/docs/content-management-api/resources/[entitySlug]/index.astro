@@ -11,7 +11,11 @@ import { buildTocGroupsFromMarkdown } from '~/components/docs/restApi/EndpointDe
 import { analyzePropertiesOfJsonApiEntity } from '~/components/docs/restApi/analyzeSchemaProperties';
 import { JsonSchemaObjectAnalysis } from '~/components/docs/restApi/JsonSchemaObjectAnalysis';
 import { findEntity } from '~/components/docs/restApi/fetchSchema';
-import { currentLanguage, isValidLanguage } from '~/components/docs/restApi/LanguagePicker/utils';
+import {
+  addLanguageToUrl,
+  currentLanguage,
+  isValidLanguage,
+} from '~/components/docs/restApi/LanguagePicker/utils';
 import { Heading } from '~/components/Heading';
 
 const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
@@ -79,7 +83,11 @@ const objectPayload = analyzePropertiesOfJsonApiEntity(resource, 'entity', langu
               {links.map((link) => (
                 <li>
                   <a
-                    href={`/docs/content-management-api/resources/${Astro.params.entitySlug!}/${link.rel}`}
+                    href={addLanguageToUrl(
+                      Astro,
+                      `/docs/content-management-api/resources/${Astro.params.entitySlug!}/${link.rel}`,
+                      language,
+                    )}
                   >
                     {link.title}
                   </a>
