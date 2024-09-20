@@ -5,13 +5,15 @@ import { findGroup, GroupLayout } from '~/layouts/docs/GroupLayout';
 import { notFoundResponse } from '~/lib/notFoundResponse';
 import { Markdown } from '~/components/Markdown';
 import { Prose } from '~/components/docs/Prose';
-import { buildSidebarItems } from '~/components/docs/cma/buildSidebarItems';
-import { findEntity } from '~/components/docs/cma/findEntity';
-import { buildTocGroupsFromMarkdown } from '~/components/docs/cma/EndpointDescriptionWithExamples';
-import { jsonApiEntityDoc } from '~/components/docs/cma/analyzeSchemaProperties';
-import { PropertiesDoc } from '~/components/docs/cma/PropertiesDoc';
+import { buildSidebarItems } from '~/components/docs/restApi/buildSidebarItems';
+import { LanguagePicker } from '~/components/docs/restApi/LanguagePicker';
+import { buildTocGroupsFromMarkdown } from '~/components/docs/restApi/EndpointDescriptionWithExamples';
+import { analyzePropertiesOfJsonApiEntity } from '~/components/docs/restApi/analyzeSchemaProperties';
+import { JsonSchemaObjectAnalysis } from '~/components/docs/restApi/JsonSchemaObjectAnalysis';
+import { findEntity } from '~/components/docs/restApi/fetchSchema';
+import { isValidLanguage } from '~/components/docs/restApi/LanguagePicker/utils';
 
-const sidebarItems = await buildSidebarItems(Astro.params.entitySlug!);
+const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
 const resource = await findEntity(Astro.params.entitySlug!);
 
 const result = await findGroup(Astro, 'content-management-api');
@@ -20,14 +22,25 @@ if (!result || !resource) {
   return notFoundResponse();
 }
 
+const language = Astro.url.searchParams.get('language') || 'javascript';
+
+if (!isValidLanguage(language)) {
+  return notFoundResponse();
+}
+
 const [group, queryListenerProps] = result;
 
 const links = resource.links ? resource.links.filter((l) => !l.private) : [];
 
-const objectPayload = jsonApiEntityDoc(resource, 'entity');
+const objectPayload = analyzePropertiesOfJsonApiEntity(resource, 'entity', 'http');
 ---
 
-<GroupLayout group={group} additionalSeo={[]} additionalSidebarItems={sidebarItems}>
+<GroupLayout
+  group={group}
+  additionalSeo={[]}
+  additionalSidebarItems={sidebarItems}
+  contentWrapperComponent={LanguagePicker}
+>
   <ContentPlusToc tocGroups={buildTocGroupsFromMarkdown(resource.description)}>
     <Fragment slot="kicker">Content Management API > {resource.title}</Fragment>
     <Fragment slot="title">{resource.title}</Fragment>
@@ -39,7 +52,7 @@ const objectPayload = jsonApiEntityDoc(resource, 'entity');
         objectPayload && (
           <>
             <h2>Object payload</h2>
-            <PropertiesDoc propertiesDoc={objectPayload} showRequiredOptional={false} />
+            <JsonSchemaObjectAnalysis object={objectPayload} showRequiredOptional={false} />
           </>
         )
       }

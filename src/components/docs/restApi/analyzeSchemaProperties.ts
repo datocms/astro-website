@@ -1,11 +1,12 @@
+import type { Language } from './LanguagePicker/utils';
 import type { JSONSchema } from './types';
 
 export type MoreInfo = {
   title: string;
-  properties: PropertiesDoc;
+  properties: JsonSchemaObjectAnalysis;
 };
 
-export type PropertyDoc = {
+export type JsonSchemaPropertyAnalysis = {
   prefix?: string;
   property: string;
   deprecated?: string;
@@ -16,9 +17,9 @@ export type PropertyDoc = {
   moreInfo?: MoreInfo;
 };
 
-export type PropertiesDoc = {
-  regular: PropertyDoc[];
-  deprecated: PropertyDoc[];
+export type JsonSchemaObjectAnalysis = {
+  regular: JsonSchemaPropertyAnalysis[];
+  deprecated: JsonSchemaPropertyAnalysis[];
 };
 
 function splitPropertiesByType(
@@ -104,12 +105,15 @@ function buildTypes(schema: JSONSchema) {
 
 function buildPropertyMoreInfo(
   schema: JSONSchema,
+  language: Language,
   considerDeprecatedAndRequiredAsRequired: boolean,
 ): MoreInfo | undefined {
   const types = toArray(schema.type);
 
   if (types.includes('object') && schema.properties) {
-    return buildMoreInfo('object format', schema, { considerDeprecatedAndRequiredAsRequired });
+    return buildMoreInfo('object format', schema, language, {
+      considerDeprecatedAndRequiredAsRequired,
+    });
   }
 
   if (types.includes('array') && schema.items) {
@@ -117,16 +121,17 @@ function buildPropertyMoreInfo(
     const objectType = items.find((items) => toArray(items.type).includes('object'));
 
     if (objectType && objectType.properties) {
-      return buildMoreInfo('objects format inside array', objectType, {
+      return buildMoreInfo('objects format inside array', objectType, language, {
         considerDeprecatedAndRequiredAsRequired,
       });
     }
   }
 }
 
-function buildPropertyDoc(
+function buildJsonSchemaPropertyAnalysis(
   property: string,
   schema: JSONSchema,
+  language: Language,
   options: {
     prefix?: string;
     parentSchema?: JSONSchema;
@@ -134,7 +139,7 @@ function buildPropertyDoc(
     forceOptional?: boolean;
     inMoreInfoConsiderDeprecatedAndRequiredAsRequired?: boolean;
   },
-): PropertyDoc {
+): JsonSchemaPropertyAnalysis {
   const isRequired = options?.forceOptional
     ? false
     : ((options?.parentSchema?.required || []) as string[]).includes(property);
@@ -149,6 +154,7 @@ function buildPropertyDoc(
     description: [options?.additionalDescription, schema.description].filter(Boolean).join('\n'),
     moreInfo: buildPropertyMoreInfo(
       schema,
+      language,
       Boolean(options?.inMoreInfoConsiderDeprecatedAndRequiredAsRequired),
     ),
   };
@@ -157,6 +163,7 @@ function buildPropertyDoc(
 function buildMoreInfo(
   title: string,
   schema: JSONSchema,
+  language: Language,
   options: {
     prefix?: string;
     propertiesToShow?: Array<'required' | 'optional' | 'deprecated'>;
@@ -165,18 +172,19 @@ function buildMoreInfo(
 ): MoreInfo {
   return {
     title,
-    properties: buildObjectPropertiesDoc(schema, options),
+    properties: analyzePropertiesOfGenericObject(schema, language, options),
   };
 }
 
-export function buildObjectPropertiesDoc(
+export function analyzePropertiesOfGenericObject(
   schema: JSONSchema,
+  language: Language,
   options: {
     prefix?: string;
     forceAllOptional?: boolean;
     considerDeprecatedAndRequiredAsRequired?: boolean;
   } = {},
-): PropertiesDoc {
+): JsonSchemaObjectAnalysis {
   const { requiredProperties, optionalProperties, deprecatedProperties } = splitPropertiesByType(
     schema,
     Boolean(options?.forceAllOptional),
@@ -186,7 +194,7 @@ export function buildObjectPropertiesDoc(
   const regularProperties = [...requiredProperties, ...optionalProperties];
 
   const build = (property: string) =>
-    buildPropertyDoc(property, schema.properties![property]!, {
+    buildJsonSchemaPropertyAnalysis(property, schema.properties![property]!, language, {
       prefix: options?.prefix,
       forceOptional: Boolean(options?.forceAllOptional),
       parentSchema: schema,
@@ -200,35 +208,37 @@ export function buildObjectPropertiesDoc(
   };
 }
 
-export function jsonApiEntityDoc(
+export function analyzePropertiesOfJsonApiEntity(
   jsonApiEntitySchema: JSONSchema,
   type: 'entity' | 'endpointPayload',
-): PropertiesDoc | undefined {
+  language: Language,
+  options: { skipEntityId?: boolean } = {},
+): JsonSchemaObjectAnalysis | undefined {
   if (!jsonApiEntitySchema.properties) {
     return undefined;
   }
 
   const required = (jsonApiEntitySchema.required || []) as string[];
 
-  let regular: PropertyDoc[] = [];
-  let deprecated: PropertyDoc[] = [];
+  let regular: JsonSchemaPropertyAnalysis[] = [];
+  let deprecated: JsonSchemaPropertyAnalysis[] = [];
 
-  const merge = (properties: PropertiesDoc) => {
+  const merge = (properties: JsonSchemaObjectAnalysis) => {
     regular = [...regular, ...properties.regular];
     deprecated = [...deprecated, ...properties.deprecated];
   };
 
-  if (jsonApiEntitySchema.properties.id) {
+  if (jsonApiEntitySchema.properties.id && !options?.skipEntityId) {
     regular.push(
-      buildPropertyDoc('id', jsonApiEntitySchema.properties.id, {
+      buildJsonSchemaPropertyAnalysis('id', jsonApiEntitySchema.properties.id, language, {
         parentSchema: jsonApiEntitySchema,
       }),
     );
   }
 
-  if (jsonApiEntitySchema.properties.type) {
+  if (jsonApiEntitySchema.properties.type && (type === 'entity' || language === 'http')) {
     regular.push(
-      buildPropertyDoc('type', jsonApiEntitySchema.properties.type, {
+      buildJsonSchemaPropertyAnalysis('type', jsonApiEntitySchema.properties.type, language, {
         parentSchema: jsonApiEntitySchema,
         additionalDescription: `Must be exactly \`"${jsonApiEntitySchema.properties.type.example}"\`.`,
       }),
@@ -237,8 +247,8 @@ export function jsonApiEntityDoc(
 
   if (jsonApiEntitySchema.properties.attributes) {
     merge(
-      buildObjectPropertiesDoc(jsonApiEntitySchema.properties.attributes, {
-        prefix: 'attributes.',
+      analyzePropertiesOfGenericObject(jsonApiEntitySchema.properties.attributes, language, {
+        prefix: language === 'http' ? 'attributes.' : undefined,
         considerDeprecatedAndRequiredAsRequired: type === 'endpointPayload',
         forceAllOptional: !required.includes('attributes'),
       }),
@@ -247,7 +257,7 @@ export function jsonApiEntityDoc(
 
   if (jsonApiEntitySchema.properties.meta) {
     merge(
-      buildObjectPropertiesDoc(jsonApiEntitySchema.properties.meta, {
+      analyzePropertiesOfGenericObject(jsonApiEntitySchema.properties.meta, language, {
         prefix: 'meta.',
         forceAllOptional: !required.includes('attributes'),
       }),

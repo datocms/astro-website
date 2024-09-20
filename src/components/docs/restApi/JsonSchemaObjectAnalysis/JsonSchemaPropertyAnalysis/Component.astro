@@ -1,0 +1,77 @@
+---
+import { Markdown } from '~/components/Markdown';
+import { intersperse } from '~/lib/intersperse';
+import type { JsonSchemaPropertyAnalysis } from '../../analyzeSchemaProperties';
+import { ExpandablePane } from '../../ExpandablePane';
+import { JsonSchemaObjectAnalysis } from '..';
+import s from './style.module.css';
+
+type Props = {
+  property: JsonSchemaPropertyAnalysis;
+  showRequiredOptional?: boolean;
+};
+
+const { property, showRequiredOptional = true } = Astro.props;
+---
+
+<div class={s.schema}>
+  <div class={s.header}>
+    <span>
+      {property.prefix && <span class={s.prefix}>{property.prefix}</span>}<span class={s.name}
+        >{property.property}</span
+      >
+    </span>
+
+    <span>
+      {
+        intersperse(
+          property.types.map((type) => <code>{type}</code>),
+          ', ',
+        )
+      }
+    </span>
+
+    {
+      property.deprecated ? (
+        <span class={s.required}>Deprecated</span>
+      ) : (
+        showRequiredOptional &&
+        (property.required ? (
+          <span class={s.required}>Required</span>
+        ) : (
+          <span class={s.optional}>Optional</span>
+        ))
+      )
+    }
+  </div>
+  {
+    property.description && (
+      <div class={s.description}>
+        <Markdown of={property.description} />
+      </div>
+    )
+  }
+  {
+    property.examples.length > 0 && (
+      <div>
+        {property.examples.length > 1 ? <>Examples:</> : <>Example:</>}
+        {intersperse(
+          property.examples.map((type) => <code>{JSON.stringify(type)}</code>),
+          ', ',
+        )}
+      </div>
+    )
+  }
+  {
+    property.moreInfo && (
+      <ExpandablePane label={`Show ${property.moreInfo.title}`}>
+        <div class={s.properties}>
+          <JsonSchemaObjectAnalysis
+            object={property.moreInfo.properties}
+            showRequiredOptional={showRequiredOptional}
+          />
+        </div>
+      </ExpandablePane>
+    )
+  }
+</div>

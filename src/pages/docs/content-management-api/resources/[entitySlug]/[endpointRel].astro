@@ -1,31 +1,42 @@
 ---
 import {
-  buildObjectPropertiesDoc,
-  jsonApiEntityDoc,
-} from '~/components/docs/cma/analyzeSchemaProperties';
-import { buildSidebarItems } from '~/components/docs/cma/buildSidebarItems';
+  analyzePropertiesOfGenericObject,
+  analyzePropertiesOfJsonApiEntity,
+} from '~/components/docs/restApi/analyzeSchemaProperties';
+import { buildSidebarItems } from '~/components/docs/restApi/buildSidebarItems';
 import {
   buildTocGroupsFromMarkdown,
   EndpointDescriptionWithExamples,
   examplesNotInMarkdown,
-} from '~/components/docs/cma/EndpointDescriptionWithExamples';
-import { fetchRestApiEndpointJsClient } from '~/components/docs/cma/fetchRestApiEndpointJsClient';
-import { findEntity } from '~/components/docs/cma/findEntity';
-import { JsExample } from '~/components/docs/cma/JsExample';
-import { PropertiesDoc } from '~/components/docs/cma/PropertiesDoc';
+} from '~/components/docs/restApi/EndpointDescriptionWithExamples';
+import { fetchRestApiEndpointJsClient } from '~/components/docs/restApi/fetchRestApiEndpointJsClient';
+import { JsExample } from '~/components/docs/restApi/JsExample';
+import { JsonSchemaObjectAnalysis } from '~/components/docs/restApi/JsonSchemaObjectAnalysis';
 import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
 import { Prose } from '~/components/docs/Prose';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Svg } from '~/components/Svg';
 import { findGroup, GroupLayout } from '~/layouts/docs/GroupLayout';
 import { notFoundResponse } from '~/lib/notFoundResponse';
+import s from './style.module.css';
+import { findEntity } from '~/components/docs/restApi/fetchSchema';
+import { EndpointResponse } from '~/components/docs/restApi/EndpointResponse';
+import { LanguagePicker } from '~/components/docs/restApi/LanguagePicker';
+import { isValidLanguage } from '~/components/docs/restApi/LanguagePicker/utils';
 
-const sidebarItems = await buildSidebarItems(Astro.params.entitySlug!);
+const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
 const entity = await findEntity(Astro.params.entitySlug!);
 
 const jsClient = await fetchRestApiEndpointJsClient(
   Astro.params.entitySlug!,
   Astro.params.endpointRel!,
 );
+
+const language = Astro.url.searchParams.get('language') || 'javascript';
+
+if (!isValidLanguage(language)) {
+  return notFoundResponse();
+}
 
 const result = await findGroup(Astro, 'content-management-api');
 
@@ -41,22 +52,33 @@ if (!endpoint) {
   return notFoundResponse();
 }
 
-const description = endpoint.documentation?.javascript?.description || endpoint.description;
+const description = endpoint.documentation?.[language]?.description || endpoint.description;
 
-const examples = endpoint?.documentation?.javascript?.examples || [];
+const examples = endpoint?.documentation?.[language]?.examples || [];
 
 const examplesNotInDescription = examplesNotInMarkdown(examples, description);
 
 const bodyParameters = endpoint.schema?.properties?.data
-  ? jsonApiEntityDoc(endpoint.schema.properties.data, 'endpointPayload')
+  ? analyzePropertiesOfJsonApiEntity(endpoint.schema.properties.data, 'endpointPayload', language, {
+      skipEntityId: endpoint.method !== 'PUT',
+    })
   : undefined;
 
 const queryParameters = endpoint.hrefSchema
-  ? buildObjectPropertiesDoc(endpoint.hrefSchema, { considerDeprecatedAndRequiredAsRequired: true })
+  ? analyzePropertiesOfGenericObject(endpoint.hrefSchema, language, {
+      considerDeprecatedAndRequiredAsRequired: true,
+    })
   : undefined;
+
+const propsForExamples = { entity, endpoint, jsClient };
 ---
 
-<GroupLayout group={group} additionalSeo={[]} additionalSidebarItems={sidebarItems}>
+<GroupLayout
+  group={group}
+  additionalSeo={[]}
+  additionalSidebarItems={sidebarItems}
+  contentWrapperComponent={LanguagePicker}
+>
   <ContentPlusToc tocGroups={buildTocGroupsFromMarkdown(description, examples)}>
     <Fragment slot="kicker">Content Management API > {entity.title}</Fragment>
     <Fragment slot="title">{endpoint.title}</Fragment>
@@ -68,7 +90,7 @@ const queryParameters = endpoint.hrefSchema
             description={description}
             examples={examples}
             exampleComponent={JsExample}
-            additionalProps={{ entity, endpoint, jsClient }}
+            additionalProps={propsForExamples}
           />
         )
       }
@@ -77,39 +99,47 @@ const queryParameters = endpoint.hrefSchema
         queryParameters && (
           <>
             <h2>Query parameters</h2>
-            <PropertiesDoc propertiesDoc={queryParameters} />
+            <JsonSchemaObjectAnalysis object={queryParameters} />
           </>
         )
       }
 
       {
-        bodyParameters && (
+        bodyParameters && endpoint.schema && (
           <>
             <h2>Body parameters</h2>
-            <PropertiesDoc propertiesDoc={bodyParameters} />
+            {Array.isArray(endpoint.schema.type) && endpoint.schema.type.includes('null') && (
+              <div class={s.optionalSchema}>
+                <Svg name="icons/regular/info-circle" /> For this endpoint, the body is not required
+                and can be entirely omitted.
+              </div>
+            )}
+            <JsonSchemaObjectAnalysis object={bodyParameters} />
           </>
         )
       }
+
+      <EndpointResponse
+        targetSchema={endpoint.targetSchema}
+        jobSchema={endpoint.jobSchema}
+        language={language}
+      />
 
       {
         examples.length > 0 ? (
-          examplesNotInDescription.map((example) => (
-            <JsExample
-              id={example.id}
-              entity={entity}
-              endpoint={endpoint}
-              jsClient={jsClient}
-              example={example}
-            />
-          ))
+          examplesNotInDescription.length > 0 && (
+            <>
+              <h2>Other examples</h2>
+              {examplesNotInDescription.map((example) => (
+                <JsExample {...propsForExamples} id={example.id} example={example} />
+              ))}
+            </>
+          )
         ) : (
-          <JsExample
-            id="basic-example"
-            entity={entity}
-            endpoint={endpoint}
-            jsClient={jsClient}
-            startVisible
-          />
+          <>
+            <h2>Examples</h2>
+            <JsExample {...propsForExamples} id="basic-example" startVisible />
+          </>
         )
       }
     </Prose>

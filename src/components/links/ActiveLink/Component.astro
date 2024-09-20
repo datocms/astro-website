@@ -8,7 +8,27 @@ interface Props {
 
 const { href, exact, activeClass, class: className, ...props } = Astro.props;
 
-let active: boolean = exact ? href === Astro.url.pathname : Astro.url.pathname.includes(href);
+function clean(input: URL | string): string {
+  let url: URL;
+
+  if (typeof input === 'string') {
+    url = new URL(input, Astro.url);
+  } else if (input instanceof URL) {
+    url = new URL(input.href, Astro.url);
+  } else {
+    throw new Error('Invalid input: must be a URL object or a string');
+  }
+
+  url.search = '';
+  url.hash = '';
+
+  return url.toString();
+}
+
+const currentUrl = clean(Astro.url);
+const hrefUrl = clean(href);
+
+let active: boolean = exact ? hrefUrl === currentUrl : currentUrl.includes(hrefUrl);
 ---
 
 <a href={href} class:list={[className, active ? `${activeClass}` : undefined]} {...props}>

@@ -1,0 +1,24 @@
+---
+import { slugify } from '~/lib/slugify';
+import type { Analysis } from './utils';
+
+type Props = {
+  analysis: Analysis;
+};
+
+const { analysis } = Astro.props;
+
+const resourceUrl = `/docs/content-management-api/resources/${slugify(analysis.resourceJsonApiType)}`;
+---
+
+{
+  analysis.returnsAnArray ? (
+    <>
+      an array of resource objects of type <a href={resourceUrl}>{analysis.resourceJsonApiType}</a>
+    </>
+  ) : (
+    <>
+      a resource object of type <a href={resourceUrl}>{analysis.resourceJsonApiType}</a>
+    </>
+  )
+}
