@@ -1,26 +1,24 @@
 ---
 import { EndpointExample } from '~/components/docs/cma/EndpointExample';
-import type { CmaEndpoint, CmaEndpointJsExample, CmaEntity } from '../types';
+import type { RestApiEndpoint, RestApiEndpointJsExample, RestApiEntity } from '../types';
 import { buildApiCallSampleCode, buildApiCallReturnValue } from './buildJs';
-import type { RestClientEndpointInfo } from '../fetchRestClientEndpointInfo';
+import type { RestApiEndpointJsClient } from '../fetchRestApiEndpointJsClient';
 
 type Props = {
   id: string;
-  entity: CmaEntity;
-  endpoint: CmaEndpoint;
-  restClientEndpointInfo: RestClientEndpointInfo;
-  example?: CmaEndpointJsExample;
+  entity: RestApiEntity;
+  endpoint: RestApiEndpoint;
+  jsClient: RestApiEndpointJsClient;
+  example?: RestApiEndpointJsExample;
   startVisible?: boolean;
 };
 
-const { id, example, endpoint, entity, restClientEndpointInfo, startVisible } = Astro.props;
+const { id, example, endpoint, entity, jsClient, startVisible } = Astro.props;
 
 const sampleCode =
-  example?.request?.code ||
-  (await buildApiCallSampleCode(entity, endpoint, restClientEndpointInfo));
+  example?.request?.code || (await buildApiCallSampleCode(entity, endpoint, jsClient));
 
-const output =
-  example?.response?.code || (await buildApiCallReturnValue(endpoint, restClientEndpointInfo));
+const output = example?.response?.code || (await buildApiCallReturnValue(endpoint, jsClient));
 ---
 
 <EndpointExample

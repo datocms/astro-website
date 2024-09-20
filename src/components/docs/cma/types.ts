@@ -1,6 +1,6 @@
 import type { JSONSchema4Type, JSONSchema4TypeName } from 'json-schema';
 
-export type CmaEndpointHttpExample = {
+export type RestApiEndpointHttpExample = {
   id: string;
   title: string;
   description: string;
@@ -19,7 +19,7 @@ export type CmaEndpointHttpExample = {
   };
 };
 
-export type CmaEndpointJsExample = {
+export type RestApiEndpointJsExample = {
   id: string;
   title: string;
   description: string;
@@ -33,7 +33,7 @@ export type CmaEndpointJsExample = {
   };
 };
 
-export type CmaEndpoint = {
+export type RestApiEndpoint = {
   private?: boolean;
   rel: string;
   title: string;
@@ -42,11 +42,11 @@ export type CmaEndpoint = {
   documentation?: {
     javascript?: {
       description?: string;
-      examples: CmaEndpointJsExample[];
+      examples: RestApiEndpointJsExample[];
     };
     http?: {
       description?: string;
-      examples: CmaEndpointHttpExample[];
+      examples: RestApiEndpointHttpExample[];
     };
   };
 
@@ -58,8 +58,8 @@ export type CmaEndpoint = {
   jobSchema?: JSONSchema;
 };
 
-export type CmaEntity = JSONSchema & {
-  links?: CmaEndpoint[];
+export type RestApiEntity = JSONSchema & {
+  links?: RestApiEndpoint[];
 };
 
 export type CmaHyperSchema = JSONSchema & {

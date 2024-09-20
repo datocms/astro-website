@@ -2,7 +2,7 @@ import type { Root } from 'hast';
 import { matches, select, selectAll } from 'hast-util-select';
 import { toString } from 'hast-util-to-string';
 import { visit } from 'unist-util-visit';
-import { slugify } from '../slugify';
+import { slugify } from '~/lib/slugify';
 
 export function figureAroundCodeBlocks() {
   return function transformer(tree: Root) {

@@ -4,7 +4,7 @@ import { unified } from 'unified';
 import { visit } from 'unist-util-visit';
 import { slugify } from '~/lib/slugify';
 import type { TocEntry, TocGroup } from '../../ContentPlusToc/types';
-import type { CmaEndpointJsExample } from '../types';
+import type { RestApiEndpointJsExample } from '../types';
 
 export { default as EndpointDescriptionWithExamples } from './Component.astro';
 
@@ -17,9 +17,9 @@ export function exampleIdsInMarkdown(content: string | undefined) {
 }
 
 export function examplesNotInMarkdown(
-  examples: CmaEndpointJsExample[],
+  examples: RestApiEndpointJsExample[],
   content: string | undefined,
-): CmaEndpointJsExample[] {
+): RestApiEndpointJsExample[] {
   const exampleIdsInside = exampleIdsInMarkdown(content);
 
   return examples.filter((example) => !exampleIdsInside.includes(example.id));
@@ -27,7 +27,7 @@ export function examplesNotInMarkdown(
 
 export function buildTocGroupsFromMarkdown(
   rawContent: string | undefined,
-  examples?: CmaEndpointJsExample[],
+  examples?: RestApiEndpointJsExample[],
 ): TocGroup[] {
   const content = rawContent || '';
   const processor = unified().use(remarkParse);

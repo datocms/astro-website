@@ -1,70 +1,34 @@
 ---
-import { Markdown } from '@astropub/md';
 import { experimental_AstroContainer } from 'astro/container';
-import replaceAsync from 'string-replace-async';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
-import type { CmaEndpoint, CmaEntity } from '../types';
-import type { RestClientEndpointInfo } from '../fetchRestClientEndpointInfo';
-import { examplePlaceholderRegexp } from '.';
-import { createMarkdownProcessor } from '@astrojs/markdown-remark';
-import { autolinkHeadings, figureAroundCodeBlocks } from '~/lib/plugins/foo';
-import rehypeExpressiveCode from 'rehype-expressive-code';
-import config from '../../../../../ec.config.mjs';
+import { markdownWithExamples } from './utils';
 
 type Props = {
-  entity: CmaEntity;
-  endpoint: CmaEndpoint;
-  restClientEndpointInfo: RestClientEndpointInfo;
   description: string;
   examples: Array<{ id: string }>;
   exampleComponent: AstroComponentFactory;
+  additionalProps: Record<string, unknown>;
 };
 
-const { entity, endpoint, restClientEndpointInfo, exampleComponent, description, examples } =
-  Astro.props;
-
-const processor = await createMarkdownProcessor({
-  syntaxHighlight: false,
-  shikiConfig: {
-    langs: [],
-    theme: 'dracula',
-    themes: {},
-    wrap: false,
-    transformers: [],
-  },
-  remarkPlugins: [],
-  rehypePlugins: [figureAroundCodeBlocks, autolinkHeadings, [rehypeExpressiveCode, config]],
-  remarkRehype: {},
-  gfm: true,
-  smartypants: true,
-});
-
-const content = (await processor.render(description)).code;
-
+const { additionalProps, exampleComponent, description, examples } = Astro.props;
 const container = await experimental_AstroContainer.create();
 
-const contentWithSubstitutions = replaceAsync(
-  content,
-  examplePlaceholderRegexp,
-  async (...args) => {
-    const { exampleId } = args[args.length - 1] as { exampleId: string };
-    const example = examples.find((example) => example.id === exampleId);
+const content = await markdownWithExamples(description, async (exampleId, isAlone) => {
+  const example = examples.find((example) => example.id === exampleId);
 
-    if (!example) {
-      return '';
-    }
+  if (!example) {
+    return '';
+  }
 
-    return await container.renderToString(exampleComponent, {
-      props: {
-        id: example.id,
-        entity,
-        endpoint,
-        restClientEndpointInfo,
-        example,
-      },
-    });
-  },
-);
+  return await container.renderToString(exampleComponent, {
+    props: {
+      ...additionalProps,
+      id: example.id,
+      example,
+      startVisible: isAlone,
+    },
+  });
+});
 ---
 
-<Fragment set:html={contentWithSubstitutions} />
+<Fragment set:html={content} />

@@ -38,22 +38,21 @@ type EndpointInfo = {
   };
 };
 
-type ResourceInfo = {
+export type RestApiEndpointJsClient = {
+  jsonApiType: string;
+  namespace: string;
+  resourceClassName: string;
+} & EndpointInfo;
+
+type Response = Array<{
   jsonApiType: string;
   namespace: string;
   resourceClassName: string;
   endpoints: EndpointInfo[];
-};
+}>;
 
-export type RestClientEndpointInfo = {
-  endpoint: EndpointInfo;
-  jsonApiType: string;
-  namespace: string;
-  resourceClassName: string;
-};
-
-export async function fetchRestClientEndpointInfo(entitySlug: string, endpointRel: string) {
-  const resources = await ky<ResourceInfo[]>(
+export async function fetchRestApiEndpointJsClient(entitySlug: string, endpointRel: string) {
+  const resources = await ky<Response>(
     'https://cdn.jsdelivr.net/npm/@datocms/cma-client@latest/resources.json',
   ).json();
 
@@ -73,6 +72,6 @@ export async function fetchRestClientEndpointInfo(entitySlug: string, endpointRe
 
   return {
     ...resourceRest,
-    endpoint: foundEndpoint,
-  } as RestClientEndpointInfo;
+    ...foundEndpoint,
+  } as RestApiEndpointJsClient;
 }

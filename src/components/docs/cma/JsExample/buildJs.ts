@@ -1,12 +1,12 @@
 import { camelCase } from 'lodash-es';
 import * as prettier from 'prettier';
 import { invariant } from '~/lib/invariant';
-import type { RestClientEndpointInfo } from '../fetchRestClientEndpointInfo';
-import type { CmaEndpoint, CmaEntity } from '../types';
+import type { RestApiEndpointJsClient } from '../fetchRestApiEndpointJsClient';
+import type { RestApiEndpoint, RestApiEntity } from '../types';
 import exampleValueForSchema from './exampleValueForSchema';
 
-function hasSimpleMethod(restClientEndpointInfo: RestClientEndpointInfo) {
-  return Boolean(restClientEndpointInfo.endpoint.name);
+function hasSimpleMethod(jsClient: RestApiEndpointJsClient) {
+  return Boolean(jsClient.name);
 }
 
 function pluralize(string: string) {
@@ -14,11 +14,11 @@ function pluralize(string: string) {
 }
 
 function maybeDeserializeEntity(
-  restClientEndpointInfo: RestClientEndpointInfo,
+  jsClient: RestApiEndpointJsClient,
   data: Record<string, unknown>,
   options: { skipId?: boolean } = {},
 ) {
-  if (!hasSimpleMethod(restClientEndpointInfo)) {
+  if (!hasSimpleMethod(jsClient)) {
     return JSON.stringify(data);
   }
 
@@ -32,16 +32,13 @@ function maybeDeserializeEntity(
   });
 }
 
-function buildLinesBeforeApiCall(
-  entity: CmaEntity,
-  restClientEndpointInfo: RestClientEndpointInfo,
-) {
+function buildLinesBeforeApiCall(entity: RestApiEntity, jsClient: RestApiEndpointJsClient) {
   const lines: string[] = [
     'const client = buildClient({ apiToken: process.env.DATOCMS_API_TOKEN });',
     '',
   ];
 
-  for (const placeholder of restClientEndpointInfo.endpoint.urlPlaceholders) {
+  for (const placeholder of jsClient.urlPlaceholders) {
     if (placeholder.variableName === 'itemTypeId') {
       lines.push(`const modelIdOrApiKey = 'blog_post';`);
     } else if (placeholder.variableName === 'fieldId') {
@@ -55,10 +52,10 @@ function buildLinesBeforeApiCall(
   return lines;
 }
 
-function buildApiCallArgs(endpoint: CmaEndpoint, restClientEndpointInfo: RestClientEndpointInfo) {
+function buildApiCallArgs(endpoint: RestApiEndpoint, jsClient: RestApiEndpointJsClient) {
   const args: string[] = [];
 
-  for (const placeholder of restClientEndpointInfo.endpoint.urlPlaceholders) {
+  for (const placeholder of jsClient.urlPlaceholders) {
     if (placeholder.variableName === 'itemTypeId') {
       args.push('modelIdOrApiKey');
     } else if (placeholder.variableName === 'fieldId') {
@@ -73,7 +70,7 @@ function buildApiCallArgs(endpoint: CmaEndpoint, restClientEndpointInfo: RestCli
 
     if (isObject(example) && 'data' in example) {
       args.push(
-        maybeDeserializeEntity(restClientEndpointInfo, example.data as Record<string, unknown>, {
+        maybeDeserializeEntity(jsClient, example.data as Record<string, unknown>, {
           skipId: endpoint.method === 'POST',
         }),
       );
@@ -92,35 +89,29 @@ function buildApiCallArgs(endpoint: CmaEndpoint, restClientEndpointInfo: RestCli
   return args;
 }
 
-function buildApiCallInvocation(
-  endpoint: CmaEndpoint,
-  restClientEndpointInfo: RestClientEndpointInfo,
-) {
-  const namespace = restClientEndpointInfo.namespace;
-  const action = restClientEndpointInfo.endpoint.name || restClientEndpointInfo.endpoint.rawName;
+function buildApiCallInvocation(endpoint: RestApiEndpoint, jsClient: RestApiEndpointJsClient) {
+  const namespace = jsClient.namespace;
+  const action = jsClient.name || jsClient.rawName;
 
-  const args = buildApiCallArgs(endpoint, restClientEndpointInfo);
+  const args = buildApiCallArgs(endpoint, jsClient);
 
-  if (restClientEndpointInfo.endpoint.paginatedResponse) {
+  if (jsClient.paginatedResponse) {
     return `client.${namespace}.${action}PagedIterator(${args.join(',')})`;
   }
 
   return `client.${namespace}.${action}(${args.join(',')})`;
 }
 
-function buildApiCallAssignment(
-  endpoint: CmaEndpoint,
-  restClientEndpointInfo: RestClientEndpointInfo,
-) {
+function buildApiCallAssignment(endpoint: RestApiEndpoint, jsClient: RestApiEndpointJsClient) {
   const responseSchema = endpoint.targetSchema || endpoint.jobSchema;
-  const apiCallInvocation = buildApiCallInvocation(endpoint, restClientEndpointInfo);
+  const apiCallInvocation = buildApiCallInvocation(endpoint, jsClient);
 
   if (!responseSchema) {
     return `await ${apiCallInvocation};`;
   }
 
   const example = exampleValueForSchema(responseSchema);
-  const singleVariableName = camelCase(restClientEndpointInfo.jsonApiType);
+  const singleVariableName = camelCase(jsClient.jsonApiType);
 
   invariant(isObject(example) && 'data' in example);
   ``;
@@ -143,7 +134,7 @@ function buildApiCallAssignment(
     `;
   }
 
-  if (restClientEndpointInfo.endpoint.paginatedResponse) {
+  if (jsClient.paginatedResponse) {
     return `
       // iterates over every page of results
       for await (const ${singleVariableName} of ${apiCallInvocation}) {
@@ -168,16 +159,16 @@ function buildApiCallAssignment(
 }
 
 function rawBuildApiCallSampleCode(
-  entity: CmaEntity,
-  endpoint: CmaEndpoint,
-  restClientEndpointInfo: RestClientEndpointInfo,
+  entity: RestApiEntity,
+  endpoint: RestApiEndpoint,
+  jsClient: RestApiEndpointJsClient,
 ) {
   return `
     import { buildClient } from '@datocms/cma-client-node';
 
     async function run() {
-      ${buildLinesBeforeApiCall(entity, restClientEndpointInfo).join('\n')}
-      ${buildApiCallAssignment(endpoint, restClientEndpointInfo)}
+      ${buildLinesBeforeApiCall(entity, jsClient).join('\n')}
+      ${buildApiCallAssignment(endpoint, jsClient)}
     }
 
     run();
@@ -185,19 +176,16 @@ function rawBuildApiCallSampleCode(
 }
 
 export async function buildApiCallSampleCode(
-  entity: CmaEntity,
-  endpoint: CmaEndpoint,
-  restClientEndpointInfo: RestClientEndpointInfo,
+  entity: RestApiEntity,
+  endpoint: RestApiEndpoint,
+  jsClient: RestApiEndpointJsClient,
 ) {
-  return prettier.format(rawBuildApiCallSampleCode(entity, endpoint, restClientEndpointInfo), {
+  return prettier.format(rawBuildApiCallSampleCode(entity, endpoint, jsClient), {
     parser: 'babel',
   });
 }
 
-function rawBuildApiCallReturnValue(
-  endpoint: CmaEndpoint,
-  restClientEndpointInfo: RestClientEndpointInfo,
-) {
+function rawBuildApiCallReturnValue(endpoint: RestApiEndpoint, jsClient: RestApiEndpointJsClient) {
   const responseSchema = endpoint.jobSchema || endpoint.targetSchema;
 
   if (!responseSchema) {
@@ -209,25 +197,25 @@ function rawBuildApiCallReturnValue(
   invariant(isObject(example) && 'data' in example);
 
   if (!Array.isArray(example.data)) {
-    return maybeDeserializeEntity(restClientEndpointInfo, example.data as Record<string, unknown>);
+    return maybeDeserializeEntity(jsClient, example.data as Record<string, unknown>);
   }
 
   if (example.data.length === 0) {
     return '[]';
   }
 
-  if (restClientEndpointInfo.endpoint.paginatedResponse) {
+  if (jsClient.paginatedResponse) {
     return null;
   }
 
-  return maybeDeserializeEntity(restClientEndpointInfo, example.data[0]);
+  return maybeDeserializeEntity(jsClient, example.data[0]);
 }
 
 export async function buildApiCallReturnValue(
-  endpoint: CmaEndpoint,
-  restClientEndpointInfo: RestClientEndpointInfo,
+  endpoint: RestApiEndpoint,
+  jsClient: RestApiEndpointJsClient,
 ) {
-  const result = rawBuildApiCallReturnValue(endpoint, restClientEndpointInfo);
+  const result = rawBuildApiCallReturnValue(endpoint, jsClient);
   return result ? prettier.format(result, { parser: 'json5' }) : undefined;
 }
 

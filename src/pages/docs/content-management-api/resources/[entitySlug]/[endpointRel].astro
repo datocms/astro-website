@@ -9,7 +9,7 @@ import {
   EndpointDescriptionWithExamples,
   examplesNotInMarkdown,
 } from '~/components/docs/cma/EndpointDescriptionWithExamples';
-import { fetchRestClientEndpointInfo } from '~/components/docs/cma/fetchRestClientEndpointInfo';
+import { fetchRestApiEndpointJsClient } from '~/components/docs/cma/fetchRestApiEndpointJsClient';
 import { findEntity } from '~/components/docs/cma/findEntity';
 import { JsExample } from '~/components/docs/cma/JsExample';
 import { PropertiesDoc } from '~/components/docs/cma/PropertiesDoc';
@@ -22,14 +22,14 @@ import { notFoundResponse } from '~/lib/notFoundResponse';
 const sidebarItems = await buildSidebarItems(Astro.params.entitySlug!);
 const entity = await findEntity(Astro.params.entitySlug!);
 
-const restClientEndpointInfo = await fetchRestClientEndpointInfo(
+const jsClient = await fetchRestApiEndpointJsClient(
   Astro.params.entitySlug!,
   Astro.params.endpointRel!,
 );
 
 const result = await findGroup(Astro, 'content-management-api');
 
-if (!result || !entity || !restClientEndpointInfo) {
+if (!result || !entity || !jsClient) {
   return notFoundResponse();
 }
 
@@ -65,12 +65,10 @@ const queryParameters = endpoint.hrefSchema
       {
         description && (
           <EndpointDescriptionWithExamples
-            entity={entity}
-            endpoint={endpoint}
-            restClientEndpointInfo={restClientEndpointInfo}
             description={description}
             examples={examples}
             exampleComponent={JsExample}
+            additionalProps={{ entity, endpoint, jsClient }}
           />
         )
       }
@@ -100,7 +98,7 @@ const queryParameters = endpoint.hrefSchema
               id={example.id}
               entity={entity}
               endpoint={endpoint}
-              restClientEndpointInfo={restClientEndpointInfo}
+              jsClient={jsClient}
               example={example}
             />
           ))
@@ -109,7 +107,7 @@ const queryParameters = endpoint.hrefSchema
             id="basic-example"
             entity={entity}
             endpoint={endpoint}
-            restClientEndpointInfo={restClientEndpointInfo}
+            jsClient={jsClient}
             startVisible
           />
         )

@@ -1,6 +1,6 @@
 import { invariant } from '~/lib/invariant';
 import { fetchSchema } from './fetchSchema';
-import type { CmaEntity } from './types';
+import type { RestApiEntity } from './types';
 
 export async function findEntity(entitySlug: string) {
   const entityName = entitySlug.replace(/-/g, '_');
@@ -9,5 +9,5 @@ export async function findEntity(entitySlug: string) {
 
   invariant(schema.properties);
 
-  return schema.properties[entityName] as CmaEntity | undefined;
+  return schema.properties[entityName] as RestApiEntity | undefined;
 }
