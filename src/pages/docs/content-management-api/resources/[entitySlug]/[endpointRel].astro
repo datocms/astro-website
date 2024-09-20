@@ -5,6 +5,7 @@ import {
 } from '~/components/docs/restApi/analyzeSchemaProperties';
 import { buildSidebarItems } from '~/components/docs/restApi/buildSidebarItems';
 import {
+  buildTocGroupsFromExamples,
   buildTocGroupsFromMarkdown,
   EndpointDescriptionWithExamples,
   examplesNotInMarkdown,
@@ -22,7 +23,9 @@ import s from './style.module.css';
 import { findEntity } from '~/components/docs/restApi/fetchSchema';
 import { EndpointResponse } from '~/components/docs/restApi/EndpointResponse';
 import { LanguagePicker } from '~/components/docs/restApi/LanguagePicker';
-import { isValidLanguage } from '~/components/docs/restApi/LanguagePicker/utils';
+import { currentLanguage, isValidLanguage } from '~/components/docs/restApi/LanguagePicker/utils';
+import { Heading } from '~/components/Heading';
+import { analyzeResponse } from '~/components/docs/restApi/EndpointResponse/utils';
 
 const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
 const entity = await findEntity(Astro.params.entitySlug!);
@@ -32,7 +35,7 @@ const jsClient = await fetchRestApiEndpointJsClient(
   Astro.params.endpointRel!,
 );
 
-const language = Astro.url.searchParams.get('language') || 'javascript';
+const language = currentLanguage(Astro);
 
 if (!isValidLanguage(language)) {
   return notFoundResponse();
@@ -60,7 +63,7 @@ const examplesNotInDescription = examplesNotInMarkdown(examples, description);
 
 const bodyParameters = endpoint.schema?.properties?.data
   ? analyzePropertiesOfJsonApiEntity(endpoint.schema.properties.data, 'endpointPayload', language, {
-      skipEntityId: endpoint.method !== 'PUT',
+      skipEntityId: endpoint.method === 'PUT',
     })
   : undefined;
 
@@ -69,6 +72,8 @@ const queryParameters = endpoint.hrefSchema
       considerDeprecatedAndRequiredAsRequired: true,
     })
   : undefined;
+
+const response = analyzeResponse(endpoint.targetSchema, endpoint.jobSchema);
 
 const propsForExamples = { entity, endpoint, jsClient };
 ---
@@ -79,7 +84,20 @@ const propsForExamples = { entity, endpoint, jsClient };
   additionalSidebarItems={sidebarItems}
   contentWrapperComponent={LanguagePicker}
 >
-  <ContentPlusToc tocGroups={buildTocGroupsFromMarkdown(description, examples)}>
+  <ContentPlusToc
+    tocGroups={[
+      ...buildTocGroupsFromMarkdown(description),
+      {
+        title: 'Endpoint info',
+        entries: [
+          ...(queryParameters ? [{ label: 'Query parameters', url: '#query-parameters' }] : []),
+          ...(bodyParameters ? [{ label: 'Body parameters', url: '#body-parameters' }] : []),
+          ...(response ? [{ label: 'Returns', url: '#returns' }] : []),
+        ],
+      },
+      ...buildTocGroupsFromExamples(examples, description),
+    ]}
+  >
     <Fragment slot="kicker">Content Management API > {entity.title}</Fragment>
     <Fragment slot="title">{endpoint.title}</Fragment>
 
@@ -98,7 +116,9 @@ const propsForExamples = { entity, endpoint, jsClient };
       {
         queryParameters && (
           <>
-            <h2>Query parameters</h2>
+            <Heading as="h2" anchor="query-parameters">
+              Query parameters
+            </Heading>
             <JsonSchemaObjectAnalysis object={queryParameters} />
           </>
         )
@@ -107,7 +127,9 @@ const propsForExamples = { entity, endpoint, jsClient };
       {
         bodyParameters && endpoint.schema && (
           <>
-            <h2>Body parameters</h2>
+            <Heading as="h2" anchor="body-parameters">
+              Body parameters
+            </Heading>
             {Array.isArray(endpoint.schema.type) && endpoint.schema.type.includes('null') && (
               <div class={s.optionalSchema}>
                 <Svg name="icons/regular/info-circle" /> For this endpoint, the body is not required
@@ -119,11 +141,17 @@ const propsForExamples = { entity, endpoint, jsClient };
         )
       }
 
-      <EndpointResponse
-        targetSchema={endpoint.targetSchema}
-        jobSchema={endpoint.jobSchema}
-        language={language}
-      />
+      {
+        response && (
+          <>
+            <Heading as="h2" anchor="returns">
+              Returns
+            </Heading>
+
+            <EndpointResponse response={response} language={language} />
+          </>
+        )
+      }
 
       {
         examples.length > 0 ? (

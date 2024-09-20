@@ -12,7 +12,7 @@ export const config: AstroMarkdownOptions = {
   ],
   remarkRehype: {},
   gfm: true,
-  smartypants: true,
+  smartypants: false,
 };
 
 const processorPromise = createMarkdownProcessor(config);
@@ -20,5 +20,21 @@ const processorPromise = createMarkdownProcessor(config);
 export async function markdown(content: string) {
   const processor = await processorPromise;
   const result = await processor.render(content);
-  return result.code;
+  return new HTMLString(result.code);
+}
+
+export async function singleLineMarkdown(content: string) {
+  const processor = await processorPromise;
+  const result = await processor.render(content);
+  return new HTMLString(
+    result.code.indexOf('<p>') === 0 && result.code.indexOf('</p>') === result.code.length - 4
+      ? result.code.slice(3, -4)
+      : result.code,
+  );
+}
+
+export class HTMLString extends String {
+  get [Symbol.toStringTag]() {
+    return 'HTMLString';
+  }
 }

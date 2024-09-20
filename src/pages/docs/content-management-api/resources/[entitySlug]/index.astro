@@ -11,7 +11,8 @@ import { buildTocGroupsFromMarkdown } from '~/components/docs/restApi/EndpointDe
 import { analyzePropertiesOfJsonApiEntity } from '~/components/docs/restApi/analyzeSchemaProperties';
 import { JsonSchemaObjectAnalysis } from '~/components/docs/restApi/JsonSchemaObjectAnalysis';
 import { findEntity } from '~/components/docs/restApi/fetchSchema';
-import { isValidLanguage } from '~/components/docs/restApi/LanguagePicker/utils';
+import { currentLanguage, isValidLanguage } from '~/components/docs/restApi/LanguagePicker/utils';
+import { Heading } from '~/components/Heading';
 
 const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
 const resource = await findEntity(Astro.params.entitySlug!);
@@ -22,7 +23,7 @@ if (!result || !resource) {
   return notFoundResponse();
 }
 
-const language = Astro.url.searchParams.get('language') || 'javascript';
+const language = currentLanguage(Astro);
 
 if (!isValidLanguage(language)) {
   return notFoundResponse();
@@ -32,7 +33,7 @@ const [group, queryListenerProps] = result;
 
 const links = resource.links ? resource.links.filter((l) => !l.private) : [];
 
-const objectPayload = analyzePropertiesOfJsonApiEntity(resource, 'entity', 'http');
+const objectPayload = analyzePropertiesOfJsonApiEntity(resource, 'entity', language);
 ---
 
 <GroupLayout
@@ -41,7 +42,18 @@ const objectPayload = analyzePropertiesOfJsonApiEntity(resource, 'entity', 'http
   additionalSidebarItems={sidebarItems}
   contentWrapperComponent={LanguagePicker}
 >
-  <ContentPlusToc tocGroups={buildTocGroupsFromMarkdown(resource.description)}>
+  <ContentPlusToc
+    tocGroups={[
+      ...buildTocGroupsFromMarkdown(resource.description),
+      {
+        title: 'Resource info',
+        entries: [
+          ...(objectPayload ? [{ label: 'Object payload', url: '#object-payload' }] : []),
+          ...(links.length > 0 ? [{ label: 'Available endpoints', url: '#endpoints' }] : []),
+        ],
+      },
+    ]}
+  >
     <Fragment slot="kicker">Content Management API > {resource.title}</Fragment>
     <Fragment slot="title">{resource.title}</Fragment>
 
@@ -51,7 +63,7 @@ const objectPayload = analyzePropertiesOfJsonApiEntity(resource, 'entity', 'http
       {
         objectPayload && (
           <>
-            <h2>Object payload</h2>
+            <Heading anchor="object-payload">Object payload</Heading>
             <JsonSchemaObjectAnalysis object={objectPayload} showRequiredOptional={false} />
           </>
         )
@@ -60,7 +72,9 @@ const objectPayload = analyzePropertiesOfJsonApiEntity(resource, 'entity', 'http
       {
         links.length > 0 && (
           <>
-            <h4>Available endpoints</h4>
+            <Heading as="h2" anchor="endpoints">
+              Available endpoints
+            </Heading>
             <ul>
               {links.map((link) => (
                 <li>

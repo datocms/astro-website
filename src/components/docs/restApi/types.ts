@@ -106,6 +106,8 @@ export interface JSONSchema {
     [k: string]: JSONSchema | string[];
   };
   enum?: JSONSchema4Type[];
+  enumDescription?: Record<string, string>;
+
   type?: JSONSchema4TypeName | JSONSchema4TypeName[];
   allOf?: JSONSchema[];
   anyOf?: JSONSchema[];

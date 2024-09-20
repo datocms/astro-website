@@ -16,6 +16,15 @@ export function exampleIdsInMarkdown(content: string | undefined) {
     : [];
 }
 
+export function examplesInMarkdown(
+  examples: RestApiEndpointJsExample[],
+  content: string | undefined,
+): RestApiEndpointJsExample[] {
+  const exampleIdsInside = exampleIdsInMarkdown(content);
+
+  return examples.filter((example) => exampleIdsInside.includes(example.id));
+}
+
 export function examplesNotInMarkdown(
   examples: RestApiEndpointJsExample[],
   content: string | undefined,
@@ -25,17 +34,14 @@ export function examplesNotInMarkdown(
   return examples.filter((example) => !exampleIdsInside.includes(example.id));
 }
 
-export function buildTocGroupsFromMarkdown(
-  rawContent: string | undefined,
-  examples?: RestApiEndpointJsExample[],
-): TocGroup[] {
+export function buildTocGroupsFromMarkdown(rawContent: string | undefined): TocGroup[] {
   const content = rawContent || '';
   const processor = unified().use(remarkParse);
   const tree = processor.parse(content);
 
   const headings: TocEntry[] = [];
 
-  visit(tree, ['heading', 'paragraph'], (node) => {
+  visit(tree, ['heading'], (node) => {
     if (node.type === 'heading') {
       const content = toString(node);
 
@@ -44,46 +50,45 @@ export function buildTocGroupsFromMarkdown(
         url: `#${slugify(content)}`,
       });
     }
-
-    if (examples) {
-      if (node.type === 'paragraph') {
-        const content = toString(node);
-
-        const exampleIds = [...content.matchAll(examplePlaceholderRegexp)].map(
-          (match) => match.groups!.exampleId!,
-        );
-
-        for (const exampleId of exampleIds) {
-          const example = examples.find((e) => e.id === exampleId);
-
-          if (example) {
-            headings.push({
-              label: example.title,
-              url: `#${exampleId}`,
-              badge: 'Example',
-            });
-          }
-        }
-      }
-    }
   });
 
-  if (examples) {
-    for (const example of examplesNotInMarkdown(examples, content)) {
-      headings.push({
-        label: example.title,
-        url: `#${example.id}`,
-        badge: 'Example',
-      });
-    }
+  if (headings.length === 0) {
+    return [];
+  }
 
-    if (examples.length === 0) {
-      headings.push({
-        label: 'Basic example',
-        url: `#basic-example`,
-        badge: 'Example',
-      });
-    }
+  return [
+    {
+      title: 'Sections',
+      entries: headings,
+    },
+  ];
+}
+
+export function buildTocGroupsFromExamples(
+  examples: RestApiEndpointJsExample[],
+  content: string | undefined,
+) {
+  const headings: TocEntry[] = [];
+
+  for (const example of examplesInMarkdown(examples, content)) {
+    headings.push({
+      label: example.title,
+      url: `#${example.id}`,
+    });
+  }
+
+  for (const example of examplesNotInMarkdown(examples, content)) {
+    headings.push({
+      label: example.title,
+      url: `#${example.id}`,
+    });
+  }
+
+  if (examples.length === 0) {
+    headings.push({
+      label: 'Basic example',
+      url: `#basic-example`,
+    });
   }
 
   if (headings.length === 0) {
@@ -92,7 +97,7 @@ export function buildTocGroupsFromMarkdown(
 
   return [
     {
-      title: 'In this page',
+      title: 'Available examples',
       entries: headings,
     },
   ];

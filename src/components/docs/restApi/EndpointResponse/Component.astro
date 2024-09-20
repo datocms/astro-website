@@ -1,42 +1,33 @@
 ---
-import type { JSONSchema } from '../types';
-import { analyzeResponse } from './utils';
 import EventualResponse from './EventualResponse.astro';
+import { type Analysis } from './utils';
 
 type Props = {
-  jobSchema?: JSONSchema;
-  targetSchema?: JSONSchema;
+  response: Analysis;
   language: 'http' | 'javascript';
 };
 
-const { jobSchema, targetSchema, language } = Astro.props;
-
-const analysis = analyzeResponse(targetSchema, jobSchema);
+const { response, language } = Astro.props;
 ---
 
-{
-  analysis && (
-    <>
-      <h2>Returns</h2>
-      <p>
-        Returns{' '}
-        {language === 'http' ? (
-          analysis.returnsResultInAsyncJob ? (
-            <>
-              a Job ID. You can then poll for the
-              {/* prettier-ignore */}
-              <a href="/docs/content-management-api/resources/job-result/self">completion of the job</a>
-              that will eventually return <EventualResponse analysis={analysis} />
-            </>
-          ) : (
-            <>
-              <EventualResponse analysis={analysis} />.
-            </>
-          )
-        ) : (
-          <EventualResponse analysis={analysis} />
-        )}
-      </p>
-    </>
-  )
-}
+<p>
+  Returns{' '}
+  {
+    language === 'http' ? (
+      response.returnsResultInAsyncJob ? (
+        <>
+          a Job ID. You can then poll for the
+          {/* prettier-ignore */}
+          <a href="/docs/content-management-api/resources/job-result/self">completion of the job</a>
+          that will eventually return <EventualResponse analysis={response} />
+        </>
+      ) : (
+        <>
+          <EventualResponse analysis={response} />.
+        </>
+      )
+    ) : (
+      <EventualResponse analysis={response} />
+    )
+  }
+</p>

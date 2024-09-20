@@ -16,30 +16,32 @@ const { block: maskedBlock } = Astro.props;
 const block = readFragment(DocCalloutFragment, maskedBlock);
 ---
 
-<prose-island>
-  <div
-    class:list={[s.docCallout, s[`docCallout--${block.calloutType}`]]}
-    data-type={block.calloutType}
-  >
-    {
-      block.title && (
-        <div class={s.docCalloutTitle}>
-          {block.calloutType === 'neutral' ? (
-            <Svg name="icons/regular/info-circle" />
-          ) : block.calloutType === 'warning' ? (
-            <Svg name="icons/regular/exclamation-triangle" />
-          ) : block.calloutType === 'positive' ? (
-            <Svg name="icons/regular/smile" />
-          ) : block.calloutType === 'protip' ? (
-            <Svg name="icons/regular/wand-magic" />
-          ) : null}{' '}
-          <span>
-            {block.calloutType === 'protip' && 'Pro tip: '}
-            {block.title}
-          </span>
-        </div>
-      )
-    }
-    <Prose class={s.content}><Text data={block.text} /></Prose>
-  </div>
-</prose-island>
+<figure>
+  <prose-island>
+    <div
+      class:list={[s.docCallout, s[`docCallout--${block.calloutType}`]]}
+      data-type={block.calloutType}
+    >
+      {
+        block.title && (
+          <div class={s.docCalloutTitle}>
+            {block.calloutType === 'neutral' ? (
+              <Svg name="icons/regular/info-circle" />
+            ) : block.calloutType === 'warning' ? (
+              <Svg name="icons/regular/exclamation-triangle" />
+            ) : block.calloutType === 'positive' ? (
+              <Svg name="icons/regular/smile" />
+            ) : block.calloutType === 'protip' ? (
+              <Svg name="icons/regular/wand-magic" />
+            ) : null}{' '}
+            <span>
+              {block.calloutType === 'protip' && 'Pro tip: '}
+              {block.title}
+            </span>
+          </div>
+        )
+      }
+      <Prose><div class={s.content}><Text data={block.text} /></div></Prose>
+    </div>
+  </prose-island>
+</figure>

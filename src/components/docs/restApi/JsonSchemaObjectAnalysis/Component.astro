@@ -11,20 +11,23 @@ type Props = {
 const { object, showRequiredOptional = true } = Astro.props;
 ---
 
-{
-  object.regular.map((property) => (
-    <JsonSchemaPropertyAnalysis property={property} showRequiredOptional={showRequiredOptional} />
-  ))
-}
-{
-  object.deprecated.length > 0 && (
-    <ExpandablePane label="Show deprecated">
-      {object.deprecated.map((property) => (
-        <JsonSchemaPropertyAnalysis
-          property={property}
-          showRequiredOptional={showRequiredOptional}
-        />
-      ))}
-    </ExpandablePane>
-  )
-}
+<prose-island>
+  {
+    object.regular.map((property) => (
+      <JsonSchemaPropertyAnalysis property={property} showRequiredOptional={showRequiredOptional} />
+    ))
+  }
+
+  {
+    object.deprecated.length > 0 && (
+      <ExpandablePane label="Show deprecated">
+        {object.deprecated.map((property) => (
+          <JsonSchemaPropertyAnalysis
+            property={property}
+            showRequiredOptional={showRequiredOptional}
+          />
+        ))}
+      </ExpandablePane>
+    )
+  }
+</prose-island>
