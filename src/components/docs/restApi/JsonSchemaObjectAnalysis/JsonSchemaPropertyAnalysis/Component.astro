@@ -1,5 +1,5 @@
 ---
-import { singleLineMarkdown } from '~/components/Markdown/utils';
+import { inlineMarkdown } from '~/components/Markdown/utils';
 import { Prose } from '~/components/Prose';
 import { intersperse } from '~/lib/intersperse';
 import type { JsonSchemaPropertyAnalysis } from '../../analyzeSchemaProperties';
@@ -29,7 +29,7 @@ const { property, showRequiredOptional = true } = Astro.props;
       JSON.stringify(property.types).length < 20 && (
         <span class={s.inlineTypes}>
           {intersperse(
-            property.types.map((type) => <span class={s.type}>{singleLineMarkdown(type)}</span>),
+            property.types.map((type) => <span class={s.type}>{inlineMarkdown(type)}</span>),
             ', ',
           )}
         </span>
@@ -73,7 +73,7 @@ const { property, showRequiredOptional = true } = Astro.props;
         <div>
           Type:
           {intersperse(
-            property.types.map((type) => <span class={s.type}>{singleLineMarkdown(type)}</span>),
+            property.types.map((type) => <span class={s.type}>{inlineMarkdown(type)}</span>),
             ', ',
           )}
         </div>

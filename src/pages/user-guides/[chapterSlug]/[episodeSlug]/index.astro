@@ -16,6 +16,7 @@ import { TargetToggler } from '~/components/TargetToggler';
 import { Text } from '~/components/structuredText/Text';
 import { notFoundResponse } from '~/lib/notFoundResponse';
 import { Prose } from '~/components/Prose';
+import { withAllComponents } from '~/lib/datocms/structuredText';
 
 const { chapterSlug, episodeSlug } = Astro.params;
 
@@ -63,9 +64,9 @@ const nextEpisode =
             <div class={s.content}>
               <Text
                 data={episode.content}
-                blockComponents={{
+                blockComponents={withAllComponents(episode.content.blocks, {
                   InternalVideoRecord: InternalVideo,
-                }}
+                })}
               />
             </div>
           </Prose>

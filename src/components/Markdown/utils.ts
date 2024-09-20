@@ -23,7 +23,7 @@ export async function markdown(content: string) {
   return new HTMLString(result.code);
 }
 
-export async function singleLineMarkdown(content: string) {
+export async function inlineMarkdown(content: string) {
   const processor = await processorPromise;
   const result = await processor.render(content);
   return new HTMLString(

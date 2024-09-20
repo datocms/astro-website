@@ -16,12 +16,14 @@ It's a server-only app (every route is dynamic), and it's meant to be the origin
 
 It can also be directly visited by the content editors to see the result of their draft changes in real time.
 
-## How to run locally?
+# How to run locally?
 
 1. Clone this repository: `git clone https://github.com/datocms/website`
 2. Install dependencies with `npm install`.
 3. Copy `.env.example` to `.env` and fill in the missing values.
 4. Run `npm run dev` to start a local development server at [localhost:4321](http://localhost:4321).
+
+# Conventions
 
 ## SVGs
 
@@ -42,6 +44,72 @@ For the CSS part, we use [`postcss-inline-svg`](https://www.npmjs.com/package/po
 background: svg-load('icons/regular/check.svg');
 background: svg-load('img/arrow-down.svg', fill=#000, stroke=#fff);
 ```
+
+## `<Prose />`
+
+This component is meant to add some nice, consistent formatting on text-heavy content like articles or blog posts.
+
+The `<prose-island>` element is a custom HTML element that you can wrap around
+part of HTML inside <Prose /> that you don't want to style with the rules below.
+It's basically a reset.
+
+```jsx
+<Prose>
+  <h1>This will be formatted</h1>
+
+  <prose-island>
+    <h1>This will NOT be formatted</h1>
+
+    <Prose>
+      <h1>This will be formatted again</h1>
+    </Prose>
+  </prose-island>
+</Prose>
+```
+
+## Remote markdown content
+
+To render markdown, you can use:
+
+- `<Markdown of={content} />` or `markdown(content)` (they're basically the same).
+- `inlineMarkdown` for small, single-paragraph markdown content that you want to render without the wrapping paragraph.
+
+## Structured Text
+
+Avoid directly using `<StructuredText />`. Prefer `<Text />` or `<InlineText />` which offers a few sane defaults.
+
+Also, make sure to use `withAllComponents`, inside `blockComponents`, `linkToRecordComponents` and `inlineRecordComponents` to type-check that EVERY kind of available block is handled correctly!
+
+```jsx
+<Text
+  data={episode.content}
+  blockComponents={withAllComponents(episode.content.blocks, {
+    InternalVideoRecord: InternalVideo,
+    ImageRecord: Image,
+    TableRecord: Table,
+  })}
+/>
+```
+
+# Weird issues...
+
+## Astro, Prettier and white-spaces
+
+Prettier sometimes will format the code this way (please notice the {link.text} is on a separate line). This will generate visible white-space inside the link.
+
+```jsx
+<div>
+  {navLinks.map((link) => (
+    <a href={link.href}>{link.text}</a>
+  ))}
+</div>
+```
+
+It's a [known issue](https://github.com/withastro/prettier-plugin-astro/issues/308). Sometimes you can solve adding `/* prettier-ignore */` to avoid auto-formatting...
+
+## Astro.slots.has() returns true when slot exists inside a falsy conditional block
+
+The title says it all. More info in this [Github issue](https://github.com/withastro/astro/issues/10024).
 
 <!--datocms-autoinclude-footer start-->
 
