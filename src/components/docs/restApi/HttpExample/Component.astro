@@ -7,6 +7,9 @@ import { buildHttpRequest } from './buildHttpRequest';
 import { buildFetchCodeRequest } from './buildFetchCodeRequest';
 import { buildCurlRequest } from './buildCurlRequest';
 import { buildHttpResponse } from './buildHttpResponse';
+import { findJobResultSelfEndoint } from '../fetchSchema';
+import exampleValueForSchema from '../exampleValueForSchema';
+import { set } from 'lodash-es';
 
 type Props = {
   id: string;
@@ -18,47 +21,100 @@ type Props = {
 
 const { id, example, endpoint, entity, startVisible } = Astro.props;
 
+const findJobResultEndpoint = await findJobResultSelfEndoint();
+
 const fetchRequest = buildFetchRequest(endpoint, example);
 const fetchResponse = buildFetchResponse(endpoint, example);
-const httpRequest = buildHttpRequest(fetchRequest);
-const curlRequest = buildCurlRequest(fetchRequest);
-const fetchCodeRequest = await buildFetchCodeRequest(fetchRequest);
-const httpResponse = fetchResponse && buildHttpResponse(fetchResponse);
 ---
 
-<EndpointExample
-  id={id}
-  startVisible={startVisible}
-  title={example?.title || 'Basic example'}
-  description={example?.description}
-  tabs={[
-    {
-      title: 'HTTP Request',
-      description: example?.request?.description,
-      language: 'http',
-      code: httpRequest,
-    },
-    {
-      title: 'CURL Request',
-      code: curlRequest,
-      language: 'bash',
-      description: example?.request?.description ?? '',
-    },
-    {
-      title: 'fetch() Request',
-      code: fetchCodeRequest,
-      language: 'javascript',
-      description: example?.request?.description ?? '',
-    },
-    ...(httpResponse
-      ? [
-          {
-            title: 'HTTP Response',
-            description: example?.response?.description,
-            code: httpResponse,
-            language: 'http',
+{
+  example ? (
+    <EndpointExample
+      id={id}
+      startVisible={startVisible}
+      title={example?.title || 'Basic example'}
+      description={example?.description}
+      tabs={[
+        {
+          title: 'HTTP Request',
+          description: example?.request?.description,
+          language: 'http',
+          code: buildHttpRequest(fetchRequest),
+        },
+        {
+          title: 'CURL Request',
+          code: buildCurlRequest(fetchRequest),
+          language: 'bash',
+          description: example?.request?.description ?? '',
+        },
+        {
+          title: 'fetch() Request',
+          code: await buildFetchCodeRequest(fetchRequest),
+          language: 'javascript',
+          description: example?.request?.description ?? '',
+        },
+        ...(fetchResponse
+          ? [
+              {
+                title: 'HTTP Response',
+                description: example?.response?.description,
+                code: buildHttpResponse(fetchResponse),
+                language: 'http',
+              },
+            ]
+          : []),
+      ]}
+    />
+  ) : endpoint.jobSchema ? (
+    <>
+      <Astro.self
+        id={id}
+        endpoint={endpoint}
+        startVisible={startVisible}
+        entity={entity}
+        example={{
+          id,
+          title: 'Step 1: Perform the request',
+          description: '',
+        }}
+      />
+      <Astro.self
+        id={`${id}-step2`}
+        endpoint={findJobResultEndpoint}
+        startVisible={startVisible}
+        entity={entity}
+        example={{
+          id: `${id}-step2`,
+          title: 'Step 2: Poll to get the result of the async job',
+          description: '',
+          response: {
+            body: JSON.stringify(
+              set(
+                exampleValueForSchema(findJobResultEndpoint.targetSchema) as Record<
+                  string,
+                  unknown
+                >,
+                'data.attributes.payload',
+                exampleValueForSchema(endpoint.jobSchema),
+              ),
+              null,
+              2,
+            ),
           },
-        ]
-      : []),
-  ]}
-/>
+        }}
+      />
+    </>
+  ) : (
+    <Astro.self
+      id={`${id}-step1`}
+      endpoint={endpoint}
+      startVisible={startVisible}
+      entity={entity}
+      example={{
+        id: id,
+        title: 'Step 1: Perform the request',
+        description: '',
+      }}
+    />
+  )
+}

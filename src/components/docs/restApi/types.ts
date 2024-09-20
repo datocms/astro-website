@@ -4,14 +4,14 @@ export type RestApiEndpointHttpExample = {
   id: string;
   title: string;
   description: string;
-  request: {
+  request?: {
     description?: string;
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
     url?: string;
     headers?: Record<string, string>;
     body?: string;
   };
-  response: {
+  response?: {
     description?: string;
     statusCode?: number;
     statusText?: string;

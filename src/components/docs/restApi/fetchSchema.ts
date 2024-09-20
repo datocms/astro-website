@@ -25,5 +25,5 @@ export async function findEntity(entitySlug: string) {
 
 export async function findJobResultSelfEndoint() {
   const entity = await findEntity('job-result');
-  return entity?.links?.find((link) => link.rel === 'self');
+  return entity?.links?.find((link) => link.rel === 'self')!;
 }
