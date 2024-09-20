@@ -1,3 +1,4 @@
+import * as prettier from 'prettier';
 import type { Language } from './LanguagePicker/utils';
 import type { JSONSchema } from './types';
 
@@ -13,7 +14,7 @@ export type JsonSchemaPropertyAnalysis = {
   deprecated?: string;
   required?: boolean;
   types: string[];
-  examples: unknown[];
+  examples: Promise<string>[];
   description: string;
   moreInfo?: MoreInfo;
 };
@@ -185,9 +186,9 @@ function buildJsonSchemaPropertyAnalysis(
     ? false
     : ((options?.parentSchema?.required || []) as string[]).includes(property);
 
-  const examples = (schema.examples || (schema.example ? [schema.example] : [])).filter(
-    (exampleValue) => typeof exampleValue !== 'boolean',
-  );
+  const examples = (schema.examples || (schema.example ? [schema.example] : []))
+    .filter((exampleValue) => typeof exampleValue !== 'boolean')
+    .map((value) => prettier.format(JSON.stringify(value), { parser: 'json5' }));
 
   return {
     prefix: options.prefix,
