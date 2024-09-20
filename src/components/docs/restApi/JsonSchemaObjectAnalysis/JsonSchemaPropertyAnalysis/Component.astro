@@ -19,13 +19,13 @@ const { property, showRequiredOptional = true } = Astro.props;
     <span>
       {property.prefix && <span class={s.prefix}>{property.prefix}</span>}<span class={s.name}
         >{property.property}</span
-      >
+      >{property.suffix && <span class={s.prefix}>{property.suffix}</span>}
     </span>
 
-    <span>
+    <span class={s.types}>
       {
         intersperse(
-          property.types.map((type) => <code>{type}</code>),
+          property.types.map((type) => <Markdown of={type} />),
           ', ',
         )
       }
@@ -48,6 +48,13 @@ const { property, showRequiredOptional = true } = Astro.props;
     property.description && (
       <div class={s.description}>
         <Markdown of={property.description} />
+      </div>
+    )
+  }
+  {
+    property.deprecated && (
+      <div class={s.deprecatedDescription}>
+        <Markdown of={property.deprecated} />
       </div>
     )
   }

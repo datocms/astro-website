@@ -8,6 +8,7 @@ export type MoreInfo = {
 
 export type JsonSchemaPropertyAnalysis = {
   prefix?: string;
+  suffix?: string;
   property: string;
   deprecated?: string;
   required?: boolean;
@@ -80,27 +81,51 @@ const toArray = <T>(t: T | T[]) => (Array.isArray(t) ? t : [t]);
 function buildTypes(schema: JSONSchema) {
   return toArray(schema.type).map((type) => {
     if (type === 'string' && schema.format) {
-      return schema.format;
+      return `\`string\` of type ${schema.format}`;
     }
 
     if (type === 'string' && schema.enum) {
-      return 'enum';
+      return '`enum`';
     }
 
     if (type === 'string' && schema.const) {
-      return `"${schema.const}"`;
+      return `\`"${schema.const}"\``;
     }
 
     if (type === 'array') {
       if (!schema.items || Array.isArray(schema.items)) {
-        return 'Array';
+        return '`Array`';
       }
 
-      return `Array<${toArray(schema.items.type).join('/')}>`;
+      return `\`Array<${toArray(schema.items.type).join('/')}>\``;
     }
 
-    return type!;
+    return `\`${type}\``;
   });
+}
+
+function buildRelationshipTypes(schema: JSONSchema) {
+  const dataSchema = schema.properties!.data!;
+  const returnsAnArray = toArray(dataSchema.type).includes('array') && dataSchema.items;
+  const singleReturnSchema = returnsAnArray ? toArray(dataSchema.items)[0]! : dataSchema;
+
+  const jsonApiTypes = singleReturnSchema.anyOf
+    ? singleReturnSchema.anyOf.map((s) =>
+        toArray(s.type).includes('null') ? 'null' : (s.properties!.type!.example as string),
+      )
+    : [singleReturnSchema.properties!.type!.example as string];
+
+  const formattedTypes = jsonApiTypes
+    .map((type) => {
+      if (type === 'null') {
+        return '`null`';
+      }
+
+      return `{ type: \`"${type}"\`, "id": [\`${type}.id\`](/docs/content-management-api/resources/${type}) }`;
+    })
+    .join(', ');
+
+  return returnsAnArray ? [`\`Array\` of ${formattedTypes}`] : [formattedTypes];
 }
 
 function buildPropertyMoreInfo(
@@ -208,6 +233,69 @@ export function analyzePropertiesOfGenericObject(
   };
 }
 
+function analyzeRelationshipOfJsonApiEntity(
+  property: string,
+  schema: JSONSchema,
+  language: Language,
+  options: {
+    prefix?: string;
+    suffix?: string;
+    parentSchema?: JSONSchema;
+    additionalDescription?: string;
+    forceOptional?: boolean;
+    inMoreInfoConsiderDeprecatedAndRequiredAsRequired?: boolean;
+  },
+): JsonSchemaPropertyAnalysis {
+  const isRequired = options?.forceOptional
+    ? false
+    : ((options?.parentSchema?.required || []) as string[]).includes(property);
+
+  return {
+    prefix: options.prefix,
+    suffix: options.suffix,
+    property,
+    deprecated: schema.deprecated,
+    required: isRequired,
+    types: buildRelationshipTypes(schema),
+    examples: [],
+    description: [options?.additionalDescription, schema.description].filter(Boolean).join('\n'),
+  };
+}
+
+export function analyzeRelationshipsOfJsonApiEntity(
+  schema: JSONSchema,
+  language: Language,
+  options: {
+    prefix?: string;
+    suffix?: string;
+    forceAllOptional?: boolean;
+    considerDeprecatedAndRequiredAsRequired?: boolean;
+  } = {},
+): JsonSchemaObjectAnalysis {
+  const { requiredProperties, optionalProperties, deprecatedProperties } = splitPropertiesByType(
+    schema,
+    Boolean(options?.forceAllOptional),
+    Boolean(options?.considerDeprecatedAndRequiredAsRequired),
+  );
+
+  const regularProperties = [...requiredProperties, ...optionalProperties];
+
+  const build = (property: string) =>
+    analyzeRelationshipOfJsonApiEntity(property, schema.properties![property]!, language, {
+      prefix: options?.prefix,
+      suffix: options?.suffix,
+      forceOptional: Boolean(options?.forceAllOptional),
+      parentSchema: schema,
+      inMoreInfoConsiderDeprecatedAndRequiredAsRequired:
+        options?.considerDeprecatedAndRequiredAsRequired,
+    });
+
+  return {
+    regular: regularProperties.map(build),
+    deprecated: deprecatedProperties.map(build),
+  };
+}
+
 export function analyzePropertiesOfJsonApiEntity(
   jsonApiEntitySchema: JSONSchema,
   type: 'entity' | 'endpointPayload',
@@ -260,6 +348,16 @@ export function analyzePropertiesOfJsonApiEntity(
       analyzePropertiesOfGenericObject(jsonApiEntitySchema.properties.meta, language, {
         prefix: 'meta.',
         forceAllOptional: !required.includes('attributes'),
+      }),
+    );
+  }
+
+  if (jsonApiEntitySchema.properties.relationships) {
+    merge(
+      analyzeRelationshipsOfJsonApiEntity(jsonApiEntitySchema.properties.relationships, language, {
+        prefix: language === 'http' ? 'relationships.' : undefined,
+        suffix: language === 'http' ? '.data' : undefined,
+        forceAllOptional: !required.includes('relationships'),
       }),
     );
   }
