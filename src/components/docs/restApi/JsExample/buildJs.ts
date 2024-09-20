@@ -120,7 +120,7 @@ function buildApiCallAssignment(endpoint: RestApiEndpoint, jsClient: RestApiEndp
     return `
       const ${singleVariableName} = await ${apiCallInvocation};
 
-      // Check the 'Returned output' tab for the result
+      // Check the 'Returned output' tab for the result ☝️
       console.log(${singleVariableName});
     `;
   }
@@ -129,7 +129,7 @@ function buildApiCallAssignment(endpoint: RestApiEndpoint, jsClient: RestApiEndp
     return `
       const result = await ${apiCallInvocation};
 
-      // Check the 'Returned output' tab for the result
+      // Check the 'Returned output' tab for the result ☝️
       console.log(result);
     `;
   }
@@ -139,7 +139,7 @@ function buildApiCallAssignment(endpoint: RestApiEndpoint, jsClient: RestApiEndp
       // iterates over every page of results
       for await (const ${singleVariableName} of ${apiCallInvocation}) {
 
-        // Check the 'Returned output' tab for the result
+        // Check the 'Returned output' tab for the result ☝️
         console.log(${singleVariableName});
       }
     `;
@@ -152,7 +152,7 @@ function buildApiCallAssignment(endpoint: RestApiEndpoint, jsClient: RestApiEndp
 
     for (const ${singleVariableName} of ${pluralVariableName}) {
 
-      // Check the 'Returned output' tab for the result
+      // Check the 'Returned output' tab for the result ☝️
       console.log(${singleVariableName});
     }
   `;

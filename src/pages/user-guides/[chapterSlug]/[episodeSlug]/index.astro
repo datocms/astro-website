@@ -15,6 +15,7 @@ import Episode from './_Episode.astro';
 import { TargetToggler } from '~/components/TargetToggler';
 import { Text } from '~/components/structuredText/Text';
 import { notFoundResponse } from '~/lib/notFoundResponse';
+import { Prose } from '~/components/Prose';
 
 const { chapterSlug, episodeSlug } = Astro.params;
 
@@ -58,12 +59,16 @@ const nextEpisode =
         </div>
 
         <div>
-          <Text
-            data={episode.content}
-            blockComponents={{
-              InternalVideoRecord: InternalVideo,
-            }}
-          />
+          <Prose>
+            <div class={s.content}>
+              <Text
+                data={episode.content}
+                blockComponents={{
+                  InternalVideoRecord: InternalVideo,
+                }}
+              />
+            </div>
+          </Prose>
           {nextEpisode && <NextEpisode episode={nextEpisode} />}
         </div>
 
