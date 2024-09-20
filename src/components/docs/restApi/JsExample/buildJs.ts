@@ -1,9 +1,9 @@
 import { camelCase } from 'lodash-es';
 import * as prettier from 'prettier';
 import { invariant } from '~/lib/invariant';
+import exampleValueForSchema from '../exampleValueForSchema';
 import type { RestApiEndpointJsClient } from '../fetchRestApiEndpointJsClient';
 import type { RestApiEndpoint, RestApiEntity } from '../types';
-import exampleValueForSchema from './exampleValueForSchema';
 
 function hasSimpleMethod(jsClient: RestApiEndpointJsClient) {
   return Boolean(jsClient.name);

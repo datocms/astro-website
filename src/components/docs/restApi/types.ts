@@ -15,6 +15,7 @@ export type RestApiEndpointHttpExample = {
     description?: string;
     statusCode?: number;
     statusText?: string;
+    headers?: Record<string, string>;
     body?: string;
   };
 };

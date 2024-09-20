@@ -12,6 +12,7 @@ import {
 } from '~/components/docs/restApi/EndpointDescriptionWithExamples';
 import { fetchRestApiEndpointJsClient } from '~/components/docs/restApi/fetchRestApiEndpointJsClient';
 import { JsExample } from '~/components/docs/restApi/JsExample';
+import { HttpExample } from '~/components/docs/restApi/HttpExample';
 import { JsonSchemaObjectAnalysis } from '~/components/docs/restApi/JsonSchemaObjectAnalysis';
 import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
 import { Prose } from '~/components/docs/Prose';
@@ -75,6 +76,7 @@ const queryParameters = endpoint.hrefSchema
 
 const response = analyzeResponse(endpoint.targetSchema, endpoint.jobSchema);
 
+const Example = language === 'javascript' ? JsExample : HttpExample;
 const propsForExamples = { entity, endpoint, jsClient };
 ---
 
@@ -107,7 +109,7 @@ const propsForExamples = { entity, endpoint, jsClient };
           <EndpointDescriptionWithExamples
             description={description}
             examples={examples}
-            exampleComponent={JsExample}
+            exampleComponent={Example}
             additionalProps={propsForExamples}
           />
         )
@@ -119,7 +121,7 @@ const propsForExamples = { entity, endpoint, jsClient };
             <Heading as="h2" anchor="query-parameters">
               Query parameters
             </Heading>
-            <JsonSchemaObjectAnalysis object={queryParameters} />
+            <JsonSchemaObjectAnalysis object={queryParameters} showRequiredOptional={false} />
           </>
         )
       }
@@ -159,14 +161,14 @@ const propsForExamples = { entity, endpoint, jsClient };
             <>
               <h2>Other examples</h2>
               {examplesNotInDescription.map((example) => (
-                <JsExample {...propsForExamples} id={example.id} example={example} />
+                <Example {...propsForExamples} id={example.id} example={example as any} />
               ))}
             </>
           )
         ) : (
           <>
             <h2>Examples</h2>
-            <JsExample {...propsForExamples} id="basic-example" startVisible />
+            <Example {...propsForExamples} id="basic-example" startVisible />
           </>
         )
       }

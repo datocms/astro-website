@@ -185,19 +185,17 @@ function buildJsonSchemaPropertyAnalysis(
     ? false
     : ((options?.parentSchema?.required || []) as string[]).includes(property);
 
+  const examples = (schema.examples || (schema.example ? [schema.example] : [])).filter(
+    (exampleValue) => typeof exampleValue !== 'boolean',
+  );
+
   return {
     prefix: options.prefix,
     property,
     deprecated: schema.deprecated,
     required: isRequired,
     types: buildTypes(schema),
-    examples: options?.skipExamples
-      ? []
-      : schema.examples
-        ? schema.examples
-        : schema.example
-          ? [schema.example]
-          : [],
+    examples: options?.skipExamples ? [] : examples,
     description: [options?.additionalDescription, schema.description].filter(Boolean).join('\n'),
     moreInfo: buildPropertyMoreInfo(
       schema,

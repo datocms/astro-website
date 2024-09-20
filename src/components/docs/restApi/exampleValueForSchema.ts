@@ -1,4 +1,4 @@
-import type { JSONSchema } from '../types';
+import type { JSONSchema } from './types';
 
 export default function exampleValueForSchema(schema: JSONSchema | undefined): unknown {
   if (!schema) {

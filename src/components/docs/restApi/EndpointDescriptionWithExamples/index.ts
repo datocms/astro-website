@@ -16,22 +16,22 @@ export function exampleIdsInMarkdown(content: string | undefined) {
     : [];
 }
 
-export function examplesInMarkdown(
-  examples: RestApiEndpointJsExample[],
+export function examplesInMarkdown<T extends Array<{ id: string }>>(
+  examples: T,
   content: string | undefined,
-): RestApiEndpointJsExample[] {
+): T {
   const exampleIdsInside = exampleIdsInMarkdown(content);
 
-  return examples.filter((example) => exampleIdsInside.includes(example.id));
+  return examples.filter((example) => exampleIdsInside.includes(example.id)) as T;
 }
 
-export function examplesNotInMarkdown(
-  examples: RestApiEndpointJsExample[],
+export function examplesNotInMarkdown<T extends Array<{ id: string }>>(
+  examples: T,
   content: string | undefined,
-): RestApiEndpointJsExample[] {
+): T {
   const exampleIdsInside = exampleIdsInMarkdown(content);
 
-  return examples.filter((example) => !exampleIdsInside.includes(example.id));
+  return examples.filter((example) => !exampleIdsInside.includes(example.id)) as T;
 }
 
 export function buildTocGroupsFromMarkdown(rawContent: string | undefined): TocGroup[] {

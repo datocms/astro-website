@@ -1,0 +1,64 @@
+---
+import { EndpointExample } from '~/components/docs/restApi/EndpointExample';
+import type { RestApiEndpoint, RestApiEndpointHttpExample, RestApiEntity } from '../types';
+import { buildFetchRequest } from './buildFetchRequest';
+import { buildFetchResponse } from './buildFetchResponse';
+import { buildHttpRequest } from './buildHttpRequest';
+import { buildFetchCodeRequest } from './buildFetchCodeRequest';
+import { buildCurlRequest } from './buildCurlRequest';
+import { buildHttpResponse } from './buildHttpResponse';
+
+type Props = {
+  id: string;
+  entity: RestApiEntity;
+  endpoint: RestApiEndpoint;
+  example?: RestApiEndpointHttpExample;
+  startVisible?: boolean;
+};
+
+const { id, example, endpoint, entity, startVisible } = Astro.props;
+
+const fetchRequest = buildFetchRequest(endpoint, example);
+const fetchResponse = buildFetchResponse(endpoint, example);
+const httpRequest = buildHttpRequest(fetchRequest);
+const curlRequest = buildCurlRequest(fetchRequest);
+const fetchCodeRequest = await buildFetchCodeRequest(fetchRequest);
+const httpResponse = fetchResponse && buildHttpResponse(fetchResponse);
+---
+
+<EndpointExample
+  id={id}
+  startVisible={startVisible}
+  title={example?.title || 'Basic example'}
+  description={example?.description}
+  tabs={[
+    {
+      title: 'HTTP Request',
+      description: example?.request?.description,
+      language: 'http',
+      code: httpRequest,
+    },
+    {
+      title: 'CURL Request',
+      code: curlRequest,
+      language: 'bash',
+      description: example?.request?.description ?? '',
+    },
+    {
+      title: 'fetch() Request',
+      code: fetchCodeRequest,
+      language: 'javascript',
+      description: example?.request?.description ?? '',
+    },
+    ...(httpResponse
+      ? [
+          {
+            title: 'HTTP Response',
+            description: example?.response?.description,
+            code: httpResponse,
+            language: 'http',
+          },
+        ]
+      : []),
+  ]}
+/>

@@ -22,3 +22,8 @@ export async function findEntity(entitySlug: string) {
 
   return schema.properties[entityName] as RestApiEntity | undefined;
 }
+
+export async function findJobResultSelfEndoint() {
+  const entity = await findEntity('job-result');
+  return entity?.links?.find((link) => link.rel === 'self');
+}
