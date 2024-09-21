@@ -15,9 +15,16 @@ export function figureAroundCodeBlocks() {
       ) {
         parent.children[index] = {
           type: 'element',
-          tagName: 'prose-island',
+          tagName: 'figure',
           properties: {},
-          children: [node],
+          children: [
+            {
+              type: 'element',
+              tagName: 'prose-island',
+              properties: {},
+              children: [node],
+            },
+          ],
         };
       }
     });

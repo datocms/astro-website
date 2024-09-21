@@ -79,13 +79,15 @@ const { id, title, description, tabs, startVisible } = Astro.props;
     class EndpointExample extends WebComponent {
       toggler!: HTMLButtonElement;
 
-      connectedCallback() {
+      parsedCallback() {
         this.handleHashChange();
         window.addEventListener('hashchange', this.handleHashChange);
+        window.addEventListener('popstate', this.handleHashChange);
       }
 
       disconnectedCallback(): void {
         window.removeEventListener('hashchange', this.handleHashChange);
+        window.removeEventListener('popstate', this.handleHashChange);
       }
 
       handleHashChange = (): void => {

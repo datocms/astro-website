@@ -36,9 +36,15 @@ type Props = {
   additionalTocGroups?: TocGroup[];
 };
 
-const { page: maskedPage, group, additionalSidebarItems, additionalTocGroups = [] } = Astro.props;
+const {
+  page: maskedPage,
+  group: maskedGroup,
+  additionalSidebarItems,
+  additionalTocGroups = [],
+} = Astro.props;
 
 const page = readFragment(PageLayoutFragment, maskedPage);
+const group = readFragment(GroupLayoutFragment, maskedGroup);
 
 const tocGroupsFromPageContent = (
   await Promise.all([
@@ -49,14 +55,14 @@ const tocGroupsFromPageContent = (
 ---
 
 <GroupLayout
-  group={group}
+  group={maskedGroup}
   additionalSeo={page._seoMetaTags}
   sidebarItemsIfNoPagesOrSectionsInGroup={buildItemsFromHeadings(page.content.value)}
   additionalSidebarItems={additionalSidebarItems}
 >
   <ContentPlusToc
     tocGroups={[
-      ...buildGroupsFromHeadings(page.content.value),
+      ...(group.pagesOrSections.length > 1 ? buildGroupsFromHeadings(page.content.value) : []),
       ...tocGroupsFromPageContent,
       ...additionalTocGroups,
     ]}

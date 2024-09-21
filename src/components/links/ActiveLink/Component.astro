@@ -65,7 +65,7 @@ let active = toUrl(href).hash
         super();
       }
 
-      connectedCallback() {
+      parsedCallback() {
         this.linkEl = this.$<HTMLAnchorElement>('a');
 
         if (!this.href.hash) {
@@ -75,10 +75,12 @@ let active = toUrl(href).hash
         this.updateActiveState();
 
         window.addEventListener('hashchange', this.updateActiveState);
+        window.addEventListener('popstate', this.updateActiveState);
       }
 
       disconnectedCallback(): void {
         window.removeEventListener('hashchange', this.updateActiveState);
+        window.removeEventListener('popstate', this.updateActiveState);
       }
 
       updateActiveState = (): void => {

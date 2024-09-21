@@ -15,6 +15,7 @@ html {
   line-height: 1.25;
   -webkit-text-size-adjust: 100%;
   scrollbar-gutter: both-edges;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -91,7 +92,7 @@ mark.warning {
   background-image: linear-gradient(120deg, #fdf4c2 0%, #fdf4c2 100%);
 }
 
-*:has([id][data-anchor]):has([data-permalink]) {
+:has(> [id][data-anchor]):has(> [data-permalink]) {
   position: relative;
 
   &:hover {
@@ -100,12 +101,12 @@ mark.warning {
     }
   }
 
-  > [data-anchor] {
+  & > [data-anchor] {
     position: absolute;
     top: -120px;
   }
 
-  > [data-permalink] {
+  & > [data-permalink] {
     transition: all 100ms ease-in-out;
     opacity: 0;
     background: svg-load('icons/regular/link.svg');
@@ -122,5 +123,39 @@ mark.warning {
     &:hover {
       opacity: 1;
     }
+  }
+
+  &:has(> [id][data-anchor]:target):before {
+    content: '';
+    position: absolute;
+    inset: -1em;
+    box-shadow: 0 0 0 6px rgba(244, 207, 88, 0.8);
+    border-radius: 6px;
+    animation: highlightElement 2s 0.5s ease-in-out forwards;
+    pointer-events: none;
+    z-index: 10;
+  }
+}
+
+@keyframes highlightElement {
+  0% {
+    box-shadow:
+      0 0 0 6px rgba(244, 207, 88, 0.8),
+      0 0 0 6px rgba(244, 207, 88, 0.3);
+  }
+  20% {
+    box-shadow:
+      0 0 0 6px rgba(244, 207, 88, 0.8),
+      0 0 0 80px transparent;
+  }
+  60% {
+    box-shadow:
+      0 0 0 6px rgba(244, 207, 88, 0.8),
+      0 0 0 80px transparent;
+  }
+  100% {
+    box-shadow:
+      0 0 0 6px transparent,
+      0 0 0 80px transparent;
   }
 }
