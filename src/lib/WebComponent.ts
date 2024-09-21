@@ -1,24 +1,6 @@
-// function findElementClosestToTargetMatchingQueryInScope(target: HTMLElement, queryToMatch: string, scope: HTMLElement) {
-//   const possibleMatches = Array.from(scope.querySelectorAll(queryToMatch));
+import HTMLParsedElement from 'html-parsed-element';
 
-//   for (const possibleMatch of possibleMatches) {
-//     if (target === possibleMatch) {
-//       return possibleMatch;
-//     }
-
-//     let test = target;
-
-//     while (test && test !== scope) {
-//       test = test.parentNode as HTMLElement;
-
-//       if (test === target) {
-//         return possibleMatch;
-//       }
-//     }
-//   }
-// }
-
-export class WebComponent extends HTMLElement {
+export class WebComponent extends HTMLParsedElement {
   eventListenerRemovers: Array<() => void> = [];
 
   $$<T extends HTMLElement>(selector: string): T[] {
@@ -35,43 +17,86 @@ export class WebComponent extends HTMLElement {
     return element;
   }
 
-  on<T extends HTMLElement, K extends keyof HTMLElementEventMap>(
-    elementOrElements: T | T[],
+  on<K extends keyof HTMLElementEventMap, T extends HTMLElement>(
+    element: T,
     event: K,
     callback: (event: HTMLElementEventMap[K], element: T) => void,
-  ): () => void {
-    const elements = Array.isArray(elementOrElements) ? elementOrElements : [elementOrElements];
-    const removers: Array<() => void> = [];
+  ): () => void;
 
-    for (const element of elements) {
-      const callbackWrapper = (e: HTMLElementEventMap[K]) => {
-        // const hit = findElementClosestToTargetMatchingQueryInScope(
-        //   e.target as HTMLElement,
-        //   query,
-        //   element,
-        // )
+  on<K extends keyof HTMLElementEventMap, T extends HTMLElement = HTMLElement>(
+    element: HTMLElement,
+    event: K,
+    selector: string,
+    callback: (event: HTMLElementEventMap[K], element: T) => void,
+  ): () => void;
 
-        // if (hit) {
-        //   callback.call(this, e, hit as T);
-        // }
+  on<E extends CustomEvent, T extends HTMLElement>(
+    element: T,
+    event: string,
+    callback: (event: E, element: T) => void,
+  ): () => void;
 
+  on<E extends CustomEvent, T extends HTMLElement = HTMLElement>(
+    element: HTMLElement,
+    event: string,
+    selector: string,
+    callback: (event: E, element: T) => void,
+  ): () => void;
+
+  on(element: HTMLElement, event: string, ...args: any[]): () => void {
+    const callback = args.length === 1 ? args[0] : args[1];
+    const selector = args.length === 1 ? undefined : args[0];
+
+    const callbackWrapper = (e: Event) => {
+      if (selector) {
+        const hit = this.findClosestAncestor({
+          startFrom: e.target as HTMLElement,
+          upTo: element,
+          selector,
+        });
+
+        if (hit) {
+          callback.call(this, e, hit);
+        }
+      } else {
         callback.call(this, e, element);
-      };
-      element.addEventListener(event, callbackWrapper);
-
-      const remover = () => {
-        element.removeEventListener(event, callbackWrapper);
-        this.eventListenerRemovers = this.eventListenerRemovers.filter((r) => remover !== r);
-      };
-
-      removers.push(remover);
-    }
-
-    return () => {
-      for (const remover of removers) {
-        remover();
       }
     };
+    element.addEventListener(event, callbackWrapper);
+
+    const remover = () => {
+      element.removeEventListener(event, callbackWrapper);
+      this.eventListenerRemovers = this.eventListenerRemovers.filter((r) => r !== remover);
+    };
+
+    return remover;
+  }
+
+  findClosestAncestor({
+    startFrom,
+    upTo,
+    selector,
+  }: {
+    startFrom: HTMLElement;
+    upTo: HTMLElement;
+    selector: string;
+  }): HTMLElement | null {
+    let currentElement: HTMLElement | null = startFrom;
+
+    while (currentElement && currentElement !== upTo.parentElement) {
+      if (currentElement.matches(selector)) {
+        return currentElement;
+      }
+      currentElement = currentElement.parentElement;
+    }
+
+    // Check the 'upTo' element itself
+    if (upTo.matches(selector)) {
+      return upTo;
+    }
+
+    // If no match is found
+    return null;
   }
 
   disconnectedCallback() {

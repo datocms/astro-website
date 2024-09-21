@@ -3,6 +3,8 @@ import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { graphql } from '~/lib/datocms/graphql';
 import { Seo, type TitleMetaLinkTag } from '@datocms/astro';
+import { ViewTransitions } from 'astro:transitions';
+import ProgressBar from 'astro-vtbot/components/ProgressBar.astro';
 import './global.css';
 
 type Props = {
@@ -35,6 +37,8 @@ const result = await executeQuery(Astro, query);
     <meta name="generator" content={Astro.generator} />
     <Seo data={[...result._site.faviconMetaTags, ...additionalSeo]} />
     <slot name="head" />
+    <ViewTransitions />
+    <ProgressBar />
     <style is:inline>
       body {
         visibility: hidden;
@@ -52,5 +56,9 @@ const result = await executeQuery(Astro, query);
     visibility: visible;
     opacity: 1;
     transition: all 0.2s linear;
+  }
+
+  .swup-progress-bar {
+    background-color: var(--accent-color);
   }
 </style>

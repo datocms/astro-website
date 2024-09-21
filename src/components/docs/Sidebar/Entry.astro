@@ -8,7 +8,7 @@ type Props = SidebarEntry;
 const entry = Astro.props;
 ---
 
-<ActiveLink class={s.entry} activeClass={s.activeEntry} href={entry.url} exact>
+<ActiveLink class={s.entry} activeClass={s.activeEntry} href={entry.url} match={entry.match}>
   {entry.label}
 </ActiveLink>
 
@@ -16,7 +16,12 @@ const entry = Astro.props;
   entry.entries && (
     <div class={s.subEntries}>
       {entry.entries.map((subEntry) => (
-        <ActiveLink href={subEntry.url} class={s.entry} activeClass={s.activeEntry} exact>
+        <ActiveLink
+          href={subEntry.url}
+          class={s.entry}
+          activeClass={s.activeEntry}
+          match={subEntry.match}
+        >
           {subEntry.label}
         </ActiveLink>
       ))}

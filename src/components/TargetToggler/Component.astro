@@ -17,18 +17,18 @@ const { targetId, startVisible } = Astro.props;
   window.customElements.define(
     'target-toggler',
     class TargetToggler extends WebComponent {
-      toggler!: HTMLButtonElement;
+      button!: HTMLButtonElement;
       controller!: AbortController;
 
       connectedCallback() {
-        this.toggler = this.$('button');
+        this.button = this.$('button');
 
         if (this.startVisible) this.target.setAttribute('data-open', '');
 
-        this.toggler.setAttribute('aria-expanded', this.startVisible ? 'true' : 'false');
-        this.toggler.setAttribute('aria-controls', this.targetId);
+        this.button.setAttribute('aria-expanded', this.startVisible ? 'true' : 'false');
+        this.button.setAttribute('aria-controls', this.targetId);
 
-        this.on(this.toggler, 'click', this.handleClick);
+        this.on(this.button, 'click', this.handleClick);
       }
 
       handleClick() {
@@ -55,12 +55,20 @@ const { targetId, startVisible } = Astro.props;
       }
 
       get isExpanded() {
-        return this.toggler.getAttribute('aria-expanded') === 'true' || false;
+        return this.button.getAttribute('aria-expanded') === 'true' || false;
       }
 
       toggle(newExpanded: boolean = !this.isExpanded) {
-        this.toggler?.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
+        this.button?.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
         this.target?.toggleAttribute('data-open', newExpanded);
+
+        this.dispatchEvent(
+          new CustomEvent('target-toggler:toggle', {
+            bubbles: true,
+            cancelable: true,
+            detail: { expanded: newExpanded },
+          }),
+        );
       }
     },
   );

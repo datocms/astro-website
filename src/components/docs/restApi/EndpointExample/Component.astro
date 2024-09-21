@@ -80,23 +80,24 @@ const { id, title, description, tabs, startVisible } = Astro.props;
       toggler!: HTMLButtonElement;
 
       connectedCallback() {
-        this.toggler = this.$('target-toggler');
-
-        if (document.location.hash.slice(1) === this.getAttribute('slug')) {
-          (this.toggler as any).toggle(true);
-        }
-
-        window.addEventListener('hashchange', () => this.handleHashChange());
+        this.handleHashChange();
+        window.addEventListener('hashchange', this.handleHashChange);
       }
 
-      handleHashChange() {
+      disconnectedCallback(): void {
+        window.removeEventListener('hashchange', this.handleHashChange);
+      }
+
+      handleHashChange = (): void => {
+        this.toggler = this.$('target-toggler');
+
         const currentHash = window.location.hash.slice(1);
         const slug = this.getAttribute('slug');
 
         if (currentHash === slug) {
           (this.toggler as any).toggle(true);
         }
-      }
+      };
     },
   );
 </script>

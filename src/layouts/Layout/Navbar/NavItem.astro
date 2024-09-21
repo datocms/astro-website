@@ -10,33 +10,21 @@ type Props = {
 
 const { name } = Astro.props;
 
-const lowercaseName = slugify(name);
+const slug = slugify(name);
 ---
 
-<div class={s.navItem} id={lowercaseName} data-navbar-navitem>
-  <div class={s.navButtonWrapper}>
-    <TargetToggler targetId={lowercaseName}>
-      <button data-navbar-navbutton class={s.navButton} type="button" aria-controls={lowercaseName}>
+<div class={s.navItem} id={slug} data-navbar-navitem>
+  <TargetToggler targetId={slug}>
+    <button type="button" class={s.navButtonWrapper} data-navbar-navitem-button>
+      <div class={s.navButton}>
         {name}
-      </button>
-    </TargetToggler>
-    <div class={s.chevron}>
-      <Svg name="icons/regular/chevron-down" />
-    </div>
-  </div>
+      </div>
+      <div class={s.chevron}>
+        <Svg name="icons/regular/chevron-down" />
+      </div>
+    </button>
+  </TargetToggler>
   <div class={s.panel} role="dialog">
     <div class={s.panelInner}><slot /></div>
   </div>
 </div>
-
-<script>
-  for (const navItem of document.querySelectorAll('[data-navbar-navitem]')) {
-    navItem.querySelector('[data-navbar-navbutton]')!.addEventListener('click', () => {
-      setTimeout(() => {
-        if (navItem.hasAttribute('data-open')) {
-          navItem.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 200);
-    });
-  }
-</script>

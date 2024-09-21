@@ -5,6 +5,8 @@ import { defineConfig, envField } from 'astro/config';
 
 import bundlesize from 'vite-plugin-bundlesize';
 
+import vtbot from 'astro-vtbot';
+
 export default defineConfig({
   output: 'server',
   image: {
@@ -44,7 +46,7 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
-  integrations: [react(), expressiveCode()],
+  integrations: [react(), expressiveCode(), vtbot()],
   // This project does not use static markdown, only remote. See our <Markdown /> component
   markdown: {},
   vite: {
