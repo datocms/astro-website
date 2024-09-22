@@ -1,21 +1,24 @@
-import { addMinutes, isBefore } from 'date-fns';
+import { LRUCache } from 'lru-cache';
+import { nanoid } from 'nanoid';
 
 type AnyFunction = () => any;
 
-export function temporarilyCache<T extends AnyFunction>(cacheDurationInMinutes: number, fn: T): T {
-  let cachedResult: ReturnType<T> | '__EMPTY__' = '__EMPTY__';
-  let cacheExpiration: Date | null = null;
+export const cache = new LRUCache({
+  max: 1000,
+  ttl: 1000 * 60 * 60 * 24, // 1 day
+  allowStale: false,
+});
+
+export function cachedFn<T extends AnyFunction>(fn: T): T {
+  const id = `cachefn-${nanoid()}`;
 
   return (async () => {
-    const now = new Date();
-
-    if (cachedResult !== '__EMPTY__' && cacheExpiration && isBefore(now, cacheExpiration)) {
-      return cachedResult;
+    if (cache.has(id)) {
+      return cache.get(id) as T;
     }
 
-    const result = fn();
-    cachedResult = result;
-    cacheExpiration = addMinutes(now, cacheDurationInMinutes);
+    const result = await fn();
+    cache.set(id, result);
 
     return result;
   }) as T;

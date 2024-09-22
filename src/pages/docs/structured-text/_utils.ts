@@ -1,7 +1,7 @@
 import $RefParser, { type JSONSchema } from '@apidevtools/json-schema-ref-parser';
 import ky from 'ky';
 import { invariant } from '~/lib/invariant';
-import { temporarilyCache } from '~/lib/temporarlyCache';
+import { cachedFn } from '~/lib/temporarlyCache';
 
 const schemaUrl = 'https://site-api.datocms.com/docs/dast-schema.json';
 
@@ -40,7 +40,7 @@ export async function fetchDastNodes(): Promise<Node[]> {
   });
 }
 
-const fetchDastSchema = temporarilyCache(60, async () => {
+const fetchDastSchema = cachedFn(async () => {
   const unreferencedSchema = await ky(schemaUrl).json();
 
   const schema = await $RefParser.dereference(unreferencedSchema);

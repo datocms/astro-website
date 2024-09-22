@@ -13,7 +13,7 @@ import {
 } from 'typedoc';
 import { invariant } from '~/lib/invariant';
 import { slugify } from '~/lib/slugify';
-import { temporarilyCache } from '~/lib/temporarlyCache';
+import { cachedFn } from '~/lib/temporarlyCache';
 import type { TocEntry, TocGroup } from '../../ContentPlusToc/types';
 import { PluginSdkHookGroupFragment } from './graphql';
 
@@ -66,7 +66,7 @@ export async function buildGroupsFromPluginSdkHooks(content: {
 const url =
   'https://gist.githubusercontent.com/stefanoverna/cfaa38d59a68d878bf74351b6edee694/raw/1eedfe04fe835dc6fb16e8fb369d58dc74f8774a/gistfile1.txt';
 
-export const fetchPluginSdkHooks = temporarilyCache(60, async (): Promise<PluginSdkHook[]> => {
+export const fetchPluginSdkHooks = cachedFn(async (): Promise<PluginSdkHook[]> => {
   const jsonOutput = await ky<JSONOutput.ProjectReflection>(url).json();
 
   const app = await Application.bootstrap({

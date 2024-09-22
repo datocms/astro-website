@@ -26,23 +26,25 @@ export async function executeQuery<Result, Variables>(
       token: DATOCMS_API_TOKEN,
     });
 
+    // biome-ignore lint/style/noNonNullAssertion: We know this is not null
+    const newCacheTags = response.headers.get('x-cache-tags')!.split(' ');
+
+    const surrogateKeyHeaderName = draftModeEnabled ? 'debug-surrogate-key' : 'surrogate-key';
+
+    const existingCacheTags = Astro.response.headers.get(surrogateKeyHeaderName)?.split(' ') ?? [];
+
+    // We want Fastly to cache our resources forever but send headers to
+    // browsers so that they don't cache it at all https://goo.gl/TQ3vqF
+
+    Astro.response.headers.set(
+      surrogateKeyHeaderName,
+      uniq([...existingCacheTags, ...newCacheTags]).join(' '),
+    );
+
     if (draftModeEnabled) {
       // No cache!
       Astro.response.headers.set('cache-control', 'private');
     } else {
-      // biome-ignore lint/style/noNonNullAssertion: We know this is not null
-      const newCacheTags = response.headers.get('x-cache-tags')!.split(' ');
-
-      const existingCacheTags = Astro.response.headers.get('surrogate-key')?.split(' ') ?? [];
-
-      // We want Fastly to cache our resources forever but send headers to
-      // browsers so that they don't cache it at all https://goo.gl/TQ3vqF
-
-      Astro.response.headers.set(
-        'surrogate-key',
-        uniq([...existingCacheTags, ...newCacheTags]).join(' '),
-      );
-
       Astro.response.headers.set('surrogate-control', 'max-age=31536000');
     }
 
