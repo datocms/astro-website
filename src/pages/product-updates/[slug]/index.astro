@@ -1,0 +1,68 @@
+---
+import s from './_style.module.css';
+import { Hero } from '~/components/Hero';
+import { Image } from '~/components/blocks/Image';
+import { InternalVideo } from '~/components/blocks/InternalVideo';
+import { Layout } from '~/layouts/Layout';
+import { Prose } from '~/components/Prose';
+import { Text } from '~/components/structuredText/Text';
+import { Wrapper } from '~/components/Wrapper';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { formatDate } from '~/lib/formatDate';
+import { notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { withAllComponents } from '~/lib/datocms/structuredText';
+
+const { slug } = Astro.params;
+const variables = { slug: slug! };
+const { post } = await executeQuery(Astro, query, { variables });
+
+if (!post) {
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={post._seoMetaTags}>
+  <Wrapper>
+    <Hero>
+      <Fragment slot="title"><mark>Product Updates</mark></Fragment>
+      <Fragment slot="subtitle">
+        DatoCMS changelog for new features and general improvements
+      </Fragment>
+    </Hero>
+  </Wrapper>
+
+  <Wrapper>
+    <div class={s.post}>
+      <div class={s.categories}>
+        {
+          post.categories.map((cat) => (
+            <span class={s.category} style={{ backgroundColor: cat?.color?.hex }}>
+              {cat.name}
+            </span>
+          ))
+        }
+      </div>
+
+      <h6 class={s.title}>
+        {post.title}
+      </h6>
+
+      <div class={s.info}>
+        {formatDate(post._firstPublishedAt!)}
+      </div>
+
+      <Prose>
+        <div class={s.body} id="main-content">
+          <Text
+            data={post.content}
+            blockComponents={withAllComponents(post.content.blocks, {
+              InternalVideoRecord: InternalVideo,
+              ImageRecord: Image,
+            })}
+          />
+        </div>
+      </Prose>
+    </div>
+  </Wrapper>
+</Layout>
