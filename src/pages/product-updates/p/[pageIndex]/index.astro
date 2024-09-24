@@ -1,0 +1,54 @@
+---
+import Post from './_Post.astro';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { Pagination } from '~/components/Pagination';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+
+const { pageIndex } = Astro.params;
+
+if (!pageIndex) {
+  return notFoundResponse();
+}
+
+const POSTS_PER_PAGE = 20;
+const currentPage = parseInt(pageIndex, 10) || 0;
+const offset = currentPage * POSTS_PER_PAGE - POSTS_PER_PAGE;
+
+const { page, posts, _allChangelogEntriesMeta } = await executeQuery(Astro, query, {
+  variables: {
+    limit: POSTS_PER_PAGE,
+    offset,
+  },
+});
+
+if (!posts || !page) {
+  return notFoundResponse();
+}
+
+const totalPosts = _allChangelogEntriesMeta.count;
+const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Wrapper>
+    <Hero>
+      <Fragment slot="title"><mark>Product updates</mark></Fragment>
+      <Fragment slot="subtitle">
+        DatoCMS changelog for new features and general improvements
+      </Fragment>
+    </Hero>
+  </Wrapper>
+
+  <Wrapper>
+    <Space bottom={2}>
+      {posts.map((item) => <Post content={item} />)}
+    </Space>
+
+    <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl="/product-updates" />
+  </Wrapper>
+</Layout>
