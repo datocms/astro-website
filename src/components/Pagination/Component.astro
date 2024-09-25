@@ -1,56 +1,51 @@
 ---
+import { createPaginator } from '~/lib/paginator';
 import s from './style.module.css';
 
-export interface Props {
+interface Props {
+  perPage?: number;
   currentPage: number;
-  totalPages: number;
+  totalEntries: number;
   baseUrl: string;
+  maxPagesToBeShown?: number;
 }
 
-const { currentPage, totalPages, baseUrl } = Astro.props;
+const { perPage = 10, currentPage, totalEntries, baseUrl, maxPagesToBeShown = 7 } = Astro.props;
 
-const prevUrl =
-  currentPage === 2 ? baseUrl : currentPage > 2 ? `${baseUrl}/p/${currentPage - 1}` : null;
-const nextUrl = currentPage < totalPages ? `${baseUrl}/p/${currentPage + 1}` : null;
+const paginator = createPaginator(perPage, maxPagesToBeShown);
+const {
+  pages: pageCount,
+  firstPage: firstPage,
+  hasPreviousPage: hasPreviousPage,
+  hasNextPage: hasNextPage,
+  previousPage: previousPage,
+  nextPage: nextPage,
+} = paginator(totalEntries, currentPage);
+
+const getHref = (index: number) => `${baseUrl}/${index + 1}`;
 ---
 
-<nav aria-label="Pagination">
-  <ul class={s.pagination}>
-    {
-      prevUrl && (
-        <li>
-          <a href={prevUrl} class={s.prev}>
-            Previous
-          </a>
-        </li>
-      )
-    }
-
-    <li>
-      <a href={baseUrl} class:list={[s.pageNumber, currentPage === 1 && s.isCurrent]}>1</a>
-    </li>
-
-    {
-      Array.from({ length: totalPages - 1 }, (_, i) => i + 2).map((page) => (
-        <li>
-          <a
-            href={`${baseUrl}/p/${page}`}
-            class:list={[s.pageNumber, page === currentPage && s.isCurrent]}
-          >
-            {page}
-          </a>
-        </li>
-      ))
-    }
-
-    {
-      nextUrl && (
-        <li>
-          <a href={nextUrl} class={s.next}>
-            Next
-          </a>
-        </li>
-      )
-    }
-  </ul>
-</nav>
+{
+  pageCount > 1 && (
+    <div class={s.pagination}>
+      <a href={getHref(previousPage - 1)} class:list={[s.button, !hasPreviousPage && s.disabled]}>
+        &laquo; Previous
+      </a>
+      <ul class={s.links}>
+        {Array.from({ length: pageCount }, (_, i) => (
+          <li>
+            <a
+              href={getHref(firstPage + i - 1)}
+              class:list={[s.linksItem, firstPage + i === currentPage && s.linkActive]}
+            >
+              {firstPage + i}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a href={getHref(nextPage - 1)} class:list={[s.button, !hasNextPage && s.disabled]}>
+        Next &raquo;
+      </a>
+    </div>
+  )
+}

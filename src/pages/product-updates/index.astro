@@ -9,19 +9,17 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './p/[pageIndex]/_graphql';
 
-const POSTS_PER_PAGE = 20;
-const currentPage = 1;
-const offset = 0;
+const perPage = 10;
+const currentPage = 0;
 
 const { page, posts, _allChangelogEntriesMeta } = await executeQuery(Astro, query, {
   variables: {
-    limit: POSTS_PER_PAGE,
-    offset,
+    limit: perPage,
+    offset: 0,
   },
 });
 
-const totalPosts = _allChangelogEntriesMeta.count;
-const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+const totalEntries = _allChangelogEntriesMeta.count;
 
 if (!posts || !page) {
   return notFoundResponse();
@@ -43,6 +41,11 @@ if (!posts || !page) {
       {posts.map((item) => <Post content={item} />)}
     </Space>
 
-    <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl="/product-updates" />
+    <Pagination
+      perPage={perPage}
+      currentPage={currentPage}
+      totalEntries={totalEntries}
+      baseUrl="/product-updates/p"
+    />
   </Wrapper>
 </Layout>
