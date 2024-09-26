@@ -1,16 +1,18 @@
 import { ImageFragment } from '~/components/blocks/Image/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
   /* GraphQL */ `
-    query Post($slug: String!) {
-      post: changelogEntry(filter: { slug: { eq: $slug } }) {
+    query ProductUpdates($limit: IntType!, $offset: IntType!) {
+      page: changelog {
         _seoMetaTags {
           ...TagFragment
         }
+      }
+      posts: allChangelogEntries(first: $limit, skip: $offset, orderBy: _firstPublishedAt_DESC) {
+        id
         title
         slug
         content {
@@ -36,7 +38,10 @@ export const query = graphql(
           }
         }
       }
+      _allChangelogEntriesMeta {
+        count
+      }
     }
   `,
-  [TagFragment, ResponsiveImageFragment, InternalVideoFragment, ImageFragment],
+  [TagFragment, ImageFragment, InternalVideoFragment],
 );
