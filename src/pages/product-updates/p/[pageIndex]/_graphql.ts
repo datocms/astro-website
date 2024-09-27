@@ -4,12 +4,21 @@ import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
   /* GraphQL */ `
-    query ProductUpdate($slug: String!) {
-      productUpdate: changelogEntry(filter: { slug: { eq: $slug } }) {
+    query ProductUpdates($limit: IntType!, $offset: IntType!) {
+      page: changelog {
         _seoMetaTags {
           ...TagFragment
         }
+      }
+      productUpdates: allChangelogEntries(
+        first: $limit
+        skip: $offset
+        orderBy: _firstPublishedAt_DESC
+      ) {
         ...ProductUpdateFragment
+      }
+      _allChangelogEntriesMeta {
+        count
       }
     }
   `,

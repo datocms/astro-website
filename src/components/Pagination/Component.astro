@@ -1,16 +1,23 @@
 ---
-import { createPaginator } from '~/lib/paginator';
+import { ActiveLink } from '../links/ActiveLink';
+import { createPaginator } from './paginator';
 import s from './style.module.css';
 
 interface Props {
   perPage?: number;
-  currentPage: number;
+  currentPageIndex: number;
   totalEntries: number;
   baseUrl: string;
   maxPagesToBeShown?: number;
 }
 
-const { perPage = 10, currentPage, totalEntries, baseUrl, maxPagesToBeShown = 7 } = Astro.props;
+const {
+  perPage = 10,
+  currentPageIndex,
+  totalEntries,
+  baseUrl,
+  maxPagesToBeShown = 7,
+} = Astro.props;
 
 const paginator = createPaginator(perPage, maxPagesToBeShown);
 const {
@@ -20,9 +27,9 @@ const {
   hasNextPage: hasNextPage,
   previousPage: previousPage,
   nextPage: nextPage,
-} = paginator(totalEntries, currentPage);
+} = paginator(totalEntries, currentPageIndex);
 
-const getHref = (index: number) => `${baseUrl}/${index + 1}`;
+const getHref = (index: number) => (index === 0 ? baseUrl : `${baseUrl}/p/${index + 1}`);
 ---
 
 {
@@ -34,15 +41,13 @@ const getHref = (index: number) => `${baseUrl}/${index + 1}`;
       <ul class={s.links}>
         {Array.from({ length: pageCount }, (_, i) => (
           <li>
-            <a
+            <ActiveLink
               href={getHref(firstPage + i - 1)}
-              class:list={[
-                s.linksItem,
-                (firstPage + i === currentPage || (i === 0 && currentPage === 0)) && s.linkActive,
-              ]}
+              class={s.linksItem}
+              activeClass={s.linkActive}
             >
               {firstPage + i}
-            </a>
+            </ActiveLink>
           </li>
         ))}
       </ul>

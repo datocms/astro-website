@@ -1,28 +1,22 @@
 ---
-import s from './_style.module.css';
 import { Hero } from '~/components/Hero';
-import { Image } from '~/components/blocks/Image';
-import { InternalVideo } from '~/components/blocks/InternalVideo';
-import { Layout } from '~/layouts/Layout';
-import { Prose } from '~/components/Prose';
-import { Text } from '~/components/structuredText/Text';
 import { Wrapper } from '~/components/Wrapper';
+import { ProductUpdate } from '~/components/product-updates/ProductUpdate';
+import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { formatDate } from '~/lib/formatDate';
 import { notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
-import { withAllComponents } from '~/lib/datocms/structuredText';
 
 const { slug } = Astro.params;
 const variables = { slug: slug! };
-const { post } = await executeQuery(Astro, query, { variables });
+const { productUpdate } = await executeQuery(Astro, query, { variables });
 
-if (!post) {
+if (!productUpdate) {
   return notFoundResponse();
 }
 ---
 
-<Layout additionalSeo={post._seoMetaTags}>
+<Layout additionalSeo={productUpdate._seoMetaTags}>
   <Wrapper>
     <Hero>
       <Fragment slot="title"><mark>Product Updates</mark></Fragment>
@@ -33,36 +27,6 @@ if (!post) {
   </Wrapper>
 
   <Wrapper>
-    <div class={s.post}>
-      <div class={s.categories}>
-        {
-          post.categories.map((cat) => (
-            <span class={s.category} style={{ backgroundColor: cat?.color?.hex }}>
-              {cat.name}
-            </span>
-          ))
-        }
-      </div>
-
-      <h1 class={s.title}>
-        {post.title}
-      </h1>
-
-      <div class={s.info}>
-        {formatDate(post._firstPublishedAt!)}
-      </div>
-
-      <div class={s.body}>
-        <Prose>
-          <Text
-            data={post.content}
-            blockComponents={withAllComponents(post.content!.blocks, {
-              InternalVideoRecord: InternalVideo,
-              ImageRecord: Image,
-            })}
-          />
-        </Prose>
-      </div>
-    </div>
+    <ProductUpdate productUpdate={productUpdate} />
   </Wrapper>
 </Layout>

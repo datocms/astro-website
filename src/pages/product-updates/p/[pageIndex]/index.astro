@@ -1,7 +1,57 @@
 ---
-import ProductUpdatesLayout from '~/layouts/product-updates/Component.astro';
+import { Hero } from '~/components/Hero';
+import { Pagination } from '~/components/Pagination';
+import { ProductUpdate } from '~/components/product-updates/ProductUpdate';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { Layout } from '~/layouts/Layout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
 
-const { pageIndex } = Astro.params;
+export interface Props {
+  pageIndex?: number;
+}
+
+if (Astro.params.pageIndex === '1') {
+  return notFoundResponse();
+}
+
+const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
+const perPage = 10;
+
+const { page, productUpdates, _allChangelogEntriesMeta } = await executeQuery(Astro, query, {
+  variables: {
+    limit: perPage,
+    offset: (pageIndex - 1) * perPage,
+  },
+});
+
+const totalEntries = _allChangelogEntriesMeta.count;
+
+if (!productUpdates || !page) {
+  return notFoundResponse();
+}
 ---
 
-<ProductUpdatesLayout pageIndex={pageIndex} />
+<Layout additionalSeo={page._seoMetaTags}>
+  <Wrapper>
+    <Hero>
+      <Fragment slot="title"><mark>Product Updates</mark></Fragment>
+      <Fragment slot="subtitle">
+        DatoCMS changelog for new features and general improvements
+      </Fragment>
+    </Hero>
+  </Wrapper>
+  <Wrapper>
+    <Space bottom={2}>
+      {productUpdates.map((productUpdate) => <ProductUpdate productUpdate={productUpdate} />)}
+    </Space>
+    <Pagination
+      perPage={perPage}
+      currentPageIndex={pageIndex}
+      totalEntries={totalEntries}
+      baseUrl="/product-updates"
+    />
+  </Wrapper>
+</Layout>
