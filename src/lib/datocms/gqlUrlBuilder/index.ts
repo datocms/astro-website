@@ -42,3 +42,12 @@ export function buildUrlFromGql(
       return buildUrlForProductUpdate(thing);
   }
 }
+
+export {
+  buildUrlForUserGuideEpisode,
+  buildUrlForTemplateDemo,
+  buildUrlForProductUpdate,
+  buildUrlForFeature,
+  buildUrlForDocGroup,
+  buildUrlForDocPage,
+};

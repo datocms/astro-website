@@ -1,5 +1,5 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
-import { TemplateDemoUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
+import { TemplateDemoUrlFragment } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const MultipleDemosBlockFragment = graphql(

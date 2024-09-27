@@ -1,5 +1,6 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
-import { DocPageUrlFragment, FeatureUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
+import { DocPageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/docPage';
+import { FeatureUrlFragment } from '~/lib/datocms/gqlUrlBuilder/feature';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const FeatureCardFragment = graphql(

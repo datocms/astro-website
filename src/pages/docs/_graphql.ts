@@ -1,6 +1,6 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
-import { DocGroupUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
+import { DocGroupUrlFragment } from '~/lib/datocms/gqlUrlBuilder/docGroup';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
