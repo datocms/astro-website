@@ -9,6 +9,7 @@ import { withAllComponents } from '~/lib/datocms/structuredText';
 import { formatDate } from '~/lib/formatDate';
 import { ProductUpdateFragment } from './graphql';
 import s from './style.module.css';
+import { buildUrlForProductUpdate } from '~/lib/datocms/gqlUrlBuilder/productUpdate';
 
 interface Props {
   productUpdate: FragmentOf<typeof ProductUpdateFragment>;
@@ -31,16 +32,24 @@ const productUpdate = readFragment(ProductUpdateFragment, maskedProductUpdate);
   </div>
 
   <h2 class={s.title}>
-    <a href={`/product-updates/${productUpdate.slug}`}>{productUpdate.title}</a>
+    <a href={buildUrlForProductUpdate(productUpdate)}>{productUpdate.title}</a>
   </h2>
 
-  <div class={s.info}>{formatDate(productUpdate._firstPublishedAt!)}</div>
+  <div class={s.info}>
+    {
+      productUpdate._firstPublishedAt ? (
+        formatDate(productUpdate._firstPublishedAt)
+      ) : (
+        <>Not published yet</>
+      )
+    }
+  </div>
 
   <Prose>
     <div class={s.body}>
       <Text
         data={productUpdate.content}
-        blockComponents={withAllComponents(productUpdate.content!.blocks, {
+        blockComponents={withAllComponents(productUpdate.content.blocks, {
           InternalVideoRecord: InternalVideo,
           ImageRecord: Image,
         })}

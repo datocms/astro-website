@@ -42,6 +42,12 @@ export async function recordToWebsiteRoute({
       });
       return `/user-guides/${chapters[0]!.slug}/${await recordToSlug(item, itemTypeApiKey)}`;
     }
+    case 'changelog_entry': {
+      return `/product-updates/${await recordToSlug(item, itemTypeApiKey)}`;
+    }
+    case 'changelog': {
+      return `/product-updates`;
+    }
     default:
       return null;
   }

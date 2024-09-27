@@ -1,12 +1,13 @@
 import { ImageFragment } from '~/components/blocks/Image/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
+import { ProductUpdateUrlFragment } from '~/lib/datocms/gqlUrlBuilder/productUpdate';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const ProductUpdateFragment = graphql(
   /* GraphQL */ `
     fragment ProductUpdateFragment on ChangelogEntryRecord {
+      ...ProductUpdateUrlFragment
       title
-      slug
       content {
         value
         blocks {
@@ -31,5 +32,5 @@ export const ProductUpdateFragment = graphql(
       }
     }
   `,
-  [ImageFragment, InternalVideoFragment],
+  [ImageFragment, InternalVideoFragment, ProductUpdateUrlFragment],
 );
