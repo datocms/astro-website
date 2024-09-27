@@ -1,0 +1,59 @@
+---
+import { ActiveLink } from '../links/ActiveLink';
+import { createPaginator } from './paginator';
+import s from './style.module.css';
+
+interface Props {
+  perPage?: number;
+  currentPageIndex: number;
+  totalEntries: number;
+  baseUrl: string;
+  maxPagesToBeShown?: number;
+}
+
+const {
+  perPage = 10,
+  currentPageIndex,
+  totalEntries,
+  baseUrl,
+  maxPagesToBeShown = 7,
+} = Astro.props;
+
+const paginator = createPaginator(perPage, maxPagesToBeShown);
+const {
+  pages: pageCount,
+  firstPage: firstPage,
+  hasPreviousPage: hasPreviousPage,
+  hasNextPage: hasNextPage,
+  previousPage: previousPage,
+  nextPage: nextPage,
+} = paginator(totalEntries, currentPageIndex);
+
+const getHref = (index: number) => (index === 0 ? baseUrl : `${baseUrl}/p/${index + 1}`);
+---
+
+{
+  pageCount > 1 && (
+    <div class={s.pagination}>
+      <a href={getHref(previousPage - 1)} class:list={[s.button, !hasPreviousPage && s.disabled]}>
+        &laquo; Previous
+      </a>
+      <ul class={s.links}>
+        {Array.from({ length: pageCount }, (_, i) => (
+          <li>
+            <ActiveLink
+              href={getHref(firstPage + i - 1)}
+              class={s.linksItem}
+              activeClass={s.linkActive}
+            >
+              {firstPage + i}
+            </ActiveLink>
+          </li>
+        ))}
+      </ul>
+      <a href={getHref(nextPage - 1)} class:list={[s.button, !hasNextPage && s.disabled]}>
+        Next &raquo;
+      </a>
+    </div>
+  )
+}

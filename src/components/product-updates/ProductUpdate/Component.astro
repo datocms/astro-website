@@ -1,0 +1,57 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import { readFragment } from 'gql.tada';
+import { Image } from '~/components/blocks/Image';
+import { InternalVideo } from '~/components/blocks/InternalVideo';
+import { Prose } from '~/components/Prose';
+import { Text } from '~/components/structuredText/Text';
+import { withAllComponents } from '~/lib/datocms/structuredText';
+import { formatDate } from '~/lib/formatDate';
+import { ProductUpdateFragment } from './graphql';
+import s from './style.module.css';
+import { buildUrlForProductUpdate } from '~/lib/datocms/gqlUrlBuilder/productUpdate';
+
+interface Props {
+  productUpdate: FragmentOf<typeof ProductUpdateFragment>;
+}
+
+const { productUpdate: maskedProductUpdate } = Astro.props;
+
+const productUpdate = readFragment(ProductUpdateFragment, maskedProductUpdate);
+---
+
+<article class={s.post}>
+  <div class={s.categories}>
+    {
+      productUpdate.categories.map((cat) => (
+        <span class={s.category} style={{ backgroundColor: cat.color?.hex }}>
+          {cat.name}
+        </span>
+      ))
+    }
+  </div>
+
+  <h2 class={s.title}>
+    <a href={buildUrlForProductUpdate(productUpdate)}>{productUpdate.title}</a>
+  </h2>
+
+  <div class={s.info}>
+    {
+      productUpdate._firstPublishedAt ? (
+        formatDate(productUpdate._firstPublishedAt)
+      ) : (
+        <>Not published yet</>
+      )
+    }
+  </div>
+
+  <Prose class={s.body}>
+    <Text
+      data={productUpdate.content}
+      blockComponents={withAllComponents(productUpdate.content.blocks, {
+        InternalVideoRecord: InternalVideo,
+        ImageRecord: Image,
+      })}
+    />
+  </Prose>
+</article>

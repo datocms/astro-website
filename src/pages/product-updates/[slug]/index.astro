@@ -1,0 +1,32 @@
+---
+import { Hero } from '~/components/Hero';
+import { Wrapper } from '~/components/Wrapper';
+import { ProductUpdate } from '~/components/product-updates/ProductUpdate';
+import { Layout } from '~/layouts/Layout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+
+const { slug } = Astro.params;
+const variables = { slug: slug! };
+const { productUpdate } = await executeQuery(Astro, query, { variables });
+
+if (!productUpdate) {
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={productUpdate._seoMetaTags}>
+  <Wrapper>
+    <Hero>
+      <Fragment slot="title"><mark>Product Updates</mark></Fragment>
+      <Fragment slot="subtitle">
+        DatoCMS changelog for new features and general improvements
+      </Fragment>
+    </Hero>
+  </Wrapper>
+
+  <Wrapper>
+    <ProductUpdate productUpdate={productUpdate} />
+  </Wrapper>
+</Layout>

@@ -1,7 +1,7 @@
 import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
-import { UserGuideEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
+import { UserGuideEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder/userGuideEpisode';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const EpisodeFragment = graphql(

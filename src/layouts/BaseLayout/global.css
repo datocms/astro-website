@@ -1,139 +1,141 @@
 @import './variables.css';
 @import './font-faces.css';
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-* {
-  margin: 0;
-}
-
-html {
-  line-height: 1.25;
-  -webkit-text-size-adjust: 100%;
-  scrollbar-gutter: both-edges;
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  color: var(--base-body-color);
-  font-family: var(--font-sans);
-  font-size: rfs(18px);
-  text-rendering: optimizeLegibility;
-  background: white;
-  overflow-y: auto;
-}
-
-img,
-picture,
-video,
-canvas,
-svg,
-mux-player {
-  display: block;
-  max-width: 100%;
-}
-
-input,
-button,
-textarea,
-select {
-  font: inherit;
-}
-
-prose-island {
-  display: block;
-}
-
-mux-player {
-  width: 100%;
-}
-
-a {
-  color: inherit;
-}
-
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  overflow-wrap: break-word;
-}
-
-::-moz-selection {
-  background: #f4cf58;
-}
-::selection {
-  background: #f4cf58;
-}
-
-mark {
-  background: linear-gradient(120deg, #f4cf58 0%, #f4cf58 100%) no-repeat 0 88%/100% 0.4em
-    transparent;
-  font-weight: inherit;
-}
-
-mark.good {
-  background-image: linear-gradient(120deg, #c6ffc2 0%, #c6ffc2 100%);
-}
-
-mark.bad {
-  background-image: linear-gradient(120deg, #fac2c2 0%, #fac2c2 100%);
-}
-
-mark.warning {
-  background-image: linear-gradient(120deg, #fdf4c2 0%, #fdf4c2 100%);
-}
-
-:has(> [id][data-anchor]):has(> [data-permalink]) {
-  position: relative;
-
-  &:hover {
-    > [data-permalink] {
-      opacity: 0.5;
-    }
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
   }
 
-  & > [data-anchor] {
-    position: absolute;
-    top: -120px;
+  * {
+    margin: 0;
   }
 
-  & > [data-permalink] {
-    transition: all 100ms ease-in-out;
-    opacity: 0;
-    background: svg-load('icons/regular/link.svg');
-    background-size: contain;
-    height: 0.7em;
-    width: 0.7em;
-    display: inline-block;
-    margin-left: 0.3em;
+  html {
+    line-height: 1.25;
+    -webkit-text-size-adjust: 100%;
+    scrollbar-gutter: both-edges;
+    scroll-behavior: smooth;
+  }
 
-    svg {
-      color: var(--accent-color);
-    }
+  body {
+    margin: 0;
+    color: var(--base-body-color);
+    font-family: var(--font-sans);
+    font-size: rfs(18px);
+    text-rendering: optimizeLegibility;
+    background: white;
+    overflow-y: auto;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg,
+  mux-player {
+    display: block;
+    max-width: 100%;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  prose-island {
+    display: block;
+  }
+
+  mux-player {
+    width: 100%;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: break-word;
+  }
+
+  ::-moz-selection {
+    background: #f4cf58;
+  }
+  ::selection {
+    background: #f4cf58;
+  }
+
+  mark {
+    background: linear-gradient(120deg, #f4cf58 0%, #f4cf58 100%) no-repeat 0 88%/100% 0.4em
+      transparent;
+    font-weight: inherit;
+  }
+
+  mark.good {
+    background-image: linear-gradient(120deg, #c6ffc2 0%, #c6ffc2 100%);
+  }
+
+  mark.bad {
+    background-image: linear-gradient(120deg, #fac2c2 0%, #fac2c2 100%);
+  }
+
+  mark.warning {
+    background-image: linear-gradient(120deg, #fdf4c2 0%, #fdf4c2 100%);
+  }
+
+  :has(> [id][data-anchor]):has(> [data-permalink]) {
+    position: relative;
 
     &:hover {
-      opacity: 1;
+      > [data-permalink] {
+        opacity: 0.5;
+      }
     }
-  }
 
-  &:has(> [id][data-anchor]:target):before {
-    content: '';
-    position: absolute;
-    inset: -1em;
-    box-shadow: 0 0 0 6px rgba(244, 207, 88, 0.8);
-    border-radius: 6px;
-    animation: highlightElement 2s 0.5s ease-in-out forwards;
-    pointer-events: none;
-    z-index: 10;
+    & > [data-anchor] {
+      position: absolute;
+      top: -120px;
+    }
+
+    & > [data-permalink] {
+      transition: all 100ms ease-in-out;
+      opacity: 0;
+      background: svg-load('icons/regular/link.svg');
+      background-size: contain;
+      height: 0.7em;
+      width: 0.7em;
+      display: inline-block;
+      margin-left: 0.3em;
+
+      svg {
+        color: var(--accent-color);
+      }
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    &:has(> [id][data-anchor]:target):before {
+      content: '';
+      position: absolute;
+      inset: -1em;
+      box-shadow: 0 0 0 6px rgba(244, 207, 88, 0.8);
+      border-radius: 6px;
+      animation: highlightElement 2s 0.5s ease-in-out forwards;
+      pointer-events: none;
+      z-index: 10;
+    }
   }
 }
 

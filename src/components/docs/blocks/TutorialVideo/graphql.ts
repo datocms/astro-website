@@ -1,5 +1,5 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
-import { UserGuideEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
+import { UserGuideEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder/userGuideEpisode';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const TutorialVideoFragment = graphql(

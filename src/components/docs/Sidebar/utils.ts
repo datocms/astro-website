@@ -4,7 +4,8 @@ import {
 } from 'datocms-structured-text-to-plain-text';
 import { isHeading, type Heading, type Node } from 'datocms-structured-text-utils';
 import { filterNodes } from '~/lib/datocms/filterNodes';
-import { buildUrlFromGql, DocPageUrlFragment } from '~/lib/datocms/gqlUrlBuilder';
+import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
+import { DocPageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/docPage';
 import { graphql, readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { slugify } from '~/lib/slugify';
 import type { SidebarEntry, SidebarGroup } from './types';
