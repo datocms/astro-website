@@ -5,12 +5,13 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Heading } from '~/components/Heading';
 import { PageLayout, findGroupAndPage } from '~/layouts/docs/PageLayout';
 import { intersperse } from '~/lib/intersperse';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { fetchDastNodes } from './_utils';
 
 const result = await findGroupAndPage(Astro, 'structured-text/dast');
 
 if (!result) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 

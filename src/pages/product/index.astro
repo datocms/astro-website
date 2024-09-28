@@ -13,7 +13,7 @@ import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Space } from '~/components/Space';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
 import { InlineText } from '~/components/structuredText/InlineText';
@@ -21,6 +21,7 @@ import { InlineText } from '~/components/structuredText/InlineText';
 const { integrations, page } = await executeQuery(Astro, query);
 
 if (!page || !integrations) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 

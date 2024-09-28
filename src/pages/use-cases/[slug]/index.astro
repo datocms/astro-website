@@ -4,7 +4,7 @@ import s from './_style.module.css';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { Button } from '~/components/Button';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { LogosBar } from '~/components/LogosBar';
@@ -19,6 +19,7 @@ import { Text } from '~/components/structuredText/Text';
 const { page } = await executeQuery(Astro, query, { variables: { slug: Astro.params.slug! } });
 
 if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---

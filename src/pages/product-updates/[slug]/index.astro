@@ -4,7 +4,7 @@ import { Wrapper } from '~/components/Wrapper';
 import { ProductUpdate } from '~/components/product-updates/ProductUpdate';
 import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 
 const { slug } = Astro.params;
@@ -12,6 +12,7 @@ const variables = { slug: slug! };
 const { productUpdate } = await executeQuery(Astro, query, { variables });
 
 if (!productUpdate) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---

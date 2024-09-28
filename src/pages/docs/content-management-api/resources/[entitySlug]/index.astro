@@ -2,7 +2,7 @@
 import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { findGroup, GroupLayout } from '~/layouts/docs/GroupLayout';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { Markdown } from '~/components/Markdown';
 import { Prose } from '~/components/Prose';
 import { buildSidebarItems } from '~/components/docs/restApi/buildSidebarItems';
@@ -24,12 +24,14 @@ const resource = await findEntity(Astro.params.entitySlug!);
 const result = await findGroup(Astro, 'content-management-api');
 
 if (!result || !resource) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 
 const language = currentLanguage(Astro);
 
 if (!isValidLanguage(language)) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 

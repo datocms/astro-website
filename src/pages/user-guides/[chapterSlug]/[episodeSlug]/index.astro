@@ -14,7 +14,7 @@ import NextEpisode from './_NextEpisode.astro';
 import Episode from './_Episode.astro';
 import { TargetToggler } from '~/components/TargetToggler';
 import { Text } from '~/components/structuredText/Text';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { Prose } from '~/components/Prose';
 import { withAllComponents } from '~/lib/datocms/structuredText';
 
@@ -27,6 +27,7 @@ const { episode, chapters } = await executeQuery(Astro, query, { variables });
 const currentChapter = chapters.find((c) => c.slug === chapterSlug);
 
 if (!episode || !currentChapter) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 

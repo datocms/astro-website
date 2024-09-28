@@ -2,11 +2,12 @@
 import { buildSidebarItems } from '~/components/docs/restApi/buildSidebarItems';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { PageLayout, findGroupAndPage } from '~/layouts/docs/PageLayout';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 
 const result = await findGroupAndPage(Astro, 'content-management-api');
 
 if (!result) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 
