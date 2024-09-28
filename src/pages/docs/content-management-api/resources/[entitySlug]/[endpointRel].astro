@@ -19,7 +19,7 @@ import { Prose } from '~/components/Prose';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Svg } from '~/components/Svg';
 import { findGroup, GroupLayout } from '~/layouts/docs/GroupLayout';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import s from './_style.module.css';
 import { findEntity } from '~/components/docs/restApi/fetchSchema';
 import { EndpointResponse } from '~/components/docs/restApi/EndpointResponse';
@@ -39,12 +39,14 @@ const jsClient = await fetchRestApiEndpointJsClient(
 const language = currentLanguage(Astro);
 
 if (!isValidLanguage(language)) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 
 const result = await findGroup(Astro, 'content-management-api');
 
 if (!result || !entity || !jsClient) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 
@@ -53,6 +55,7 @@ const [group, queryListenerProps] = result;
 const endpoint = entity.links!.find((endpoint) => endpoint.rel === Astro.params.endpointRel);
 
 if (!endpoint) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 

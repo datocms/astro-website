@@ -6,7 +6,7 @@ import { Space } from '~/components/Space';
 import { Wrapper } from '~/components/Wrapper';
 import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 
 export interface Props {
@@ -14,6 +14,7 @@ export interface Props {
 }
 
 if (Astro.params.pageIndex === '1') {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 
@@ -30,6 +31,7 @@ const { page, productUpdates, _allChangelogEntriesMeta } = await executeQuery(As
 const totalEntries = _allChangelogEntriesMeta.count;
 
 if (!productUpdates || !page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---

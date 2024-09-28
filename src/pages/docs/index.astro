@@ -3,7 +3,7 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { BaseLayout } from '~/layouts/docs/BaseLayout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
 import s from './_style.module.css';
@@ -13,6 +13,7 @@ import { Sidebar, type SidebarEntry } from '~/components/docs/Sidebar';
 const { page, roots, tutorials, tutorialsMeta } = await executeQuery(Astro, query);
 
 if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---

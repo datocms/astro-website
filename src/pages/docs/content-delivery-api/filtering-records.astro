@@ -2,7 +2,7 @@
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Heading } from '~/components/Heading';
 import { PageLayout, findGroupAndPage } from '~/layouts/docs/PageLayout';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { slugify } from '~/lib/slugify';
 import Filters from './_Filters.astro';
 import { camelize } from './_gqlExample';
@@ -11,6 +11,7 @@ import { fetchIntrospectionFieldFilters, fieldTypeName } from './_utils';
 const result = await findGroupAndPage(Astro, 'content-delivery-api/filtering-records');
 
 if (!result) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 

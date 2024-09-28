@@ -257,7 +257,6 @@ export function analyzePropertiesOfGenericObject(
 function analyzeRelationshipOfJsonApiEntity(
   property: string,
   schema: JSONSchema,
-  language: Language,
   options: {
     prefix?: string;
     suffix?: string;
@@ -285,7 +284,6 @@ function analyzeRelationshipOfJsonApiEntity(
 
 export function analyzeRelationshipsOfJsonApiEntity(
   schema: JSONSchema,
-  language: Language,
   options: {
     prefix?: string;
     suffix?: string;
@@ -302,7 +300,7 @@ export function analyzeRelationshipsOfJsonApiEntity(
   const regularProperties = [...requiredProperties, ...optionalProperties];
 
   const build = (property: string) =>
-    analyzeRelationshipOfJsonApiEntity(property, schema.properties![property]!, language, {
+    analyzeRelationshipOfJsonApiEntity(property, schema.properties![property]!, {
       prefix: options?.prefix,
       suffix: options?.suffix,
       forceOptional: Boolean(options?.forceAllOptional),
@@ -376,7 +374,7 @@ export function analyzePropertiesOfJsonApiEntity(
 
   if (jsonApiEntitySchema.properties.relationships) {
     merge(
-      analyzeRelationshipsOfJsonApiEntity(jsonApiEntitySchema.properties.relationships, language, {
+      analyzeRelationshipsOfJsonApiEntity(jsonApiEntitySchema.properties.relationships, {
         prefix: language === 'http' ? 'relationships.' : undefined,
         suffix: language === 'http' ? '.data' : undefined,
         forceAllOptional: !required.includes('relationships'),

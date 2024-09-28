@@ -2,7 +2,7 @@
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import { Layout } from '~/layouts/Layout';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import s from './_style.module.css';
 import { Wrapper } from '~/components/Wrapper';
@@ -13,6 +13,7 @@ import Chapter from './_Chapter.astro';
 const { page, chapters } = await executeQuery(Astro, query);
 
 if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---
