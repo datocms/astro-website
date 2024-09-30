@@ -3,7 +3,7 @@ import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
   /* GraphQL */ `
-    query DataIntegrity($slug: String!) {
+    query DynamicLayouts($slug: String!) {
       page: feature(filter: { slug: { eq: $slug } }) {
         _seoMetaTags {
           ...TagFragment
