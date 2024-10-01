@@ -1,0 +1,159 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { Wrapper } from '~/components/Wrapper';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+
+const path = Astro.url.pathname;
+const pageSlug = path.split('/').pop() || '';
+const { page } = await executeQuery(Astro, query, { variables: { slug: pageSlug } });
+
+if (!page) {
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Wrapper>
+    <Hero>
+      <Fragment slot="kicker">Video API encoding and streaming</Fragment>
+      <Fragment slot="title">Stream beautifully, <mark>everywhere</mark></Fragment>
+      <Fragment slot="subtitle">
+        Empower your content team with the ability to <strong>produce beautiful videos</strong> and
+        <strong>serve them fast</strong> to any device with our API.
+      </Fragment>
+    </Hero>
+  </Wrapper>
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker">Fastest API for any video size </Fragment>
+    <Fragment slot="title">Adaptive bitrate means fast on every device</Fragment>
+    <Fragment slot="subtitle">
+      <p>
+        Thanks to our API's HLS Adaptive Bitrate (ABR) streaming, every viewer will always
+        <strong>download the right video size for their device and connection speed</strong>
+      </p>
+    </Fragment>
+    <div>TBD</div>
+  </TitleStripWithContent>
+
+  <Wrapper>
+    <Flag style="good">
+      <Fragment slot="visual"><Svg name="svg/illustrations/go-mobile" /></Fragment>
+      <Fragment slot="kicker">API for all video formats </Fragment>
+      <Fragment slot="title">Any video format, <mark>instantly streamable</mark></Fragment>
+      <p>
+        We can ingest almost <strong>every available codec</strong> — including those for broadcast and
+        professional applications like H.264, H.265, VP9, and Apple ProRes — and
+        <strong>make videos instantly available for streaming</strong>.
+      </p>
+    </Flag>
+  </Wrapper>
+
+  <TitleStripWithContent>
+    <Fragment slot="title">Thumbnails? Included.</Fragment>
+    <Fragment slot="subtitle">
+      <p>
+        Thumbnails are entry level when it comes to video, yet implementing them is far from simple.
+        With a <strong>
+          single request through our API you can get a thumbnail or an entire storyboard
+        </strong>
+        to use in your player to scrub preview images.
+      </p>
+    </Fragment>
+    <div class={s.frames}>
+      {
+        [...Array(6)].map((_, i) => {
+          const t = 1 + i * 2;
+          return (
+            <div class={s.frame}>
+              <img
+                src={`https://image.mux.com/goGuGfWk00LaymzN28ox44TAz00xOxea8i/thumbnail.jpg?width=600&time=${t}`}
+                alt={`Thumbnail at ${t}s.`}
+              />
+              <div class={s.frameLabel}>
+                /video/thumb.jpg?
+                <span class={s.paramName}>width</span>=<span class={s.paramValue}>600</span>
+                &amp;
+                <span class={s.paramName}>time</span>=<span class={s.paramValue}>{t}</span>
+              </div>
+            </div>
+          );
+        })
+      }
+    </div>
+  </TitleStripWithContent>
+
+  <Wrapper>
+    <Flag style="good">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/video-player" />
+      </Fragment>
+      <Fragment slot="kicker">a flexible Video API</Fragment>
+      <Fragment slot="title">
+        Fast, high-quality streaming video for <mark>your framework of choice</mark>
+      </Fragment>
+      <p>
+        Our seamless integration with the <a href="https://www.mux.com/" target="_blank">Mux</a> video
+        CDN makes it easy to serve streaming video using any video player you like, open-source or professional,
+        web or native. Or, you can simply use one of our own
+        <strong>DatoCMS Video Components</strong> for
+        <a href="/docs/next-js/displaying-videos">React/Next.js </a>,
+        <a href="/docs/nuxt/displaying-videos">Vue/Nuxt</a>, or
+        <a href="/docs/svelte/displaying-videos">Svelte/SvelteKit</a>, for easy, drop-in video
+        playback in your project.
+      </p>
+    </Flag>
+
+    <Flag style="good">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/zen" />
+      </Fragment>
+      <Fragment slot="kicker">APIs + Worldwide CDN</Fragment>
+      <Fragment slot="title">
+        A complete set of <mark>smart, modern APIs</mark>
+      </Fragment>
+      <p>
+        DatoCMS does not only offer a powerful video API but a full coordinated suite of different
+        <strong>APIs and tools</strong> to work seamlessly with the three fundamental blocks of content:
+        <strong>text, images and video</strong>. Everything is built on CDN,
+        <strong>optimized for speed and scalability</strong>.
+      </p>
+      <article>
+        <Bullets style="good">
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/images-api" title="Images API">
+              <span>Images API</span>
+            </a>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/worldwide-cdn" title="Fastest headless CMS CDN">
+              <span>Worldwide CDN</span>
+            </a>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/headless-cms-graphql" title="Headless CMS GraphQL">
+              <span>Content GraphQL API</span>
+            </a>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/real-time-api" title="Real-time updates API">
+              <span>Real-time updates API</span>
+            </a>
+          </li>
+        </Bullets>
+      </article>
+    </Flag>
+  </Wrapper>
+</Layout>
