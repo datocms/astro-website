@@ -1,0 +1,59 @@
+---
+import s from './style.module.css';
+import { Heading } from '~/components/Heading';
+import { containsKeywords } from '~/lib/containsKeyword';
+import { Wrapper } from '~/components/Wrapper';
+import { slugify } from '~/lib/slugify';
+import striptags from 'striptags';
+
+const { seoAnalysis } = Astro.props;
+
+const kickerContents = striptags(await Astro.slots.render('kicker'));
+
+let Title: 'h1' | 'h2' = 'h1';
+let Subtitle: 'h3' | 'div' = 'div';
+let Kicker: 'h1' | 'h2' = 'h2';
+
+if (seoAnalysis) {
+  const kickerContainsKeywords = containsKeywords(kickerContents, seoAnalysis);
+  Kicker = kickerContainsKeywords ? 'h1' : 'h2';
+  Title = kickerContainsKeywords ? 'h2' : 'h1';
+  Subtitle = 'h3';
+}
+---
+
+<div data-component="TitleStripWithContent" class={s.root}>
+  <Wrapper>
+    {
+      Astro.slots.has('kicker') && (
+        <Heading as={Kicker} class={s.kicker} anchor={slugify(kickerContents)}>
+          <slot name="kicker" />
+        </Heading>
+      )
+    }
+
+    {
+      Astro.slots.has('title') && (
+        <Title class={s.title}>
+          <slot name="title" />
+        </Title>
+      )
+    }
+
+    {
+      Astro.slots.has('subtitle') && (
+        <Subtitle class={s.subtitle}>
+          <slot name="subtitle" />
+        </Subtitle>
+      )
+    }
+
+    {
+      Astro.slots.has('default') && (
+        <div class={s.body}>
+          <slot />
+        </div>
+      )
+    }
+  </Wrapper>
+</div>
