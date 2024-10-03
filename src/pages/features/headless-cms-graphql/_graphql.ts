@@ -1,24 +1,35 @@
 import { TagFragment } from '~/lib/datocms/commonFragments';
-// import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
+import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
+import {
+  ReviewQuoteFragment,
+  PartnerTestimonialQuoteFragment,
+} from '~/components/quote/SingleQuote/graphql';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
   /* GraphQL */ `
-    query HeadlessCmsGraphql($slug: String!, $videoId: UploadId!) {
+    query HeadlessCmsGraphql($slug: String!) {
       page: feature(filter: { slug: { eq: $slug } }) {
         _seoMetaTags {
           ...TagFragment
         }
+        quote {
+          ... on ReviewRecord {
+            __typename
+            ...ReviewQuoteFragment
+          }
+          ... on PartnerTestimonialRecord {
+            __typename
+            ...PartnerTestimonialQuoteFragment
+          }
+        }
+        video {
+          ...VideoPlayerFragment
+        }
         seoH1
         yoastAnalysis
       }
-      video: allUploads(filter: { type: { eq: video }, id: { eq: $videoId } }) {
-        # ...VideoPlayerFragment
-        video {
-          muxPlaybackId
-        }
-      }
     }
   `,
-  [TagFragment],
+  [TagFragment, VideoPlayerFragment, ReviewQuoteFragment, PartnerTestimonialQuoteFragment],
 );

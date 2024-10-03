@@ -1,26 +1,26 @@
 ---
+import GraphQlDemoA from './_GraphQlDemoA';
+import GraphQlDemoB from './_GraphQlDemoB';
 import { Bullets } from '~/components/Bullets';
-import { Button } from '~/components/Button';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
 import { Layout } from '~/layouts/Layout';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { VideoPlayer } from '~/components/VideoPlayer';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import GraphQlDemoA from './_GraphQlDemoA';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
-// import { VideoPlayer } from '~/components/VideoPlayer';
 
 const path = Astro.url.pathname;
-const pageSlug = path.split('/').pop() || '';
-const videoId = '16228806';
-const { page, video } = await executeQuery(Astro, query, {
-  variables: { slug: pageSlug, videoId: videoId },
-});
+const slug = path.split('/').pop() || '';
+const { page } = await executeQuery(Astro, query, { variables: { slug } });
 
-if (!page || !video) {
+if (!page || !page.quote || !page.video) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---
@@ -61,40 +61,44 @@ if (!page || !video) {
         </a>
       </p>
     </Fragment>
-
     <GraphQlDemoA client:visible />
   </TitleStripWithContent>
 
-  <!-- TODO quote -->
+  <Space top={3} bottom={3}>
+    <SingleQuote quote={page.quote} />
+  </Space>
 
-  <TitleStripWithContent>
-    <Fragment slot="title">Move faster with powerful developer tools</Fragment>
-    <Fragment slot="subtitle">
-      <p>
-        Know exactly what data you can request from your API
-        <strong>without leaving your editor</strong>, highlight potential issues before sending a
-        query, and take advantage of improved code intelligence. GraphQL makes it easy to build
-        <strong>powerful tools like GraphiQL</strong> by leveraging your API’s type system.
-      </p>
-    </Fragment>
-    <!-- <VideoPlayer data={video} /> -->
-  </TitleStripWithContent>
+  <Space bottom={3}>
+    <TitleStripWithContent>
+      <Fragment slot="title">Move faster with powerful developer tools</Fragment>
+      <Fragment slot="subtitle">
+        <p>
+          Know exactly what data you can request from your API
+          <strong>without leaving your editor</strong>, highlight potential issues before sending a
+          query, and take advantage of improved code intelligence. GraphQL makes it easy to build
+          <strong>powerful tools like GraphiQL</strong> by leveraging your API’s type system.
+        </p>
+      </Fragment>
+      <VideoPlayer data={page.video} />
+    </TitleStripWithContent>
+  </Space>
 
-  <!-- TODO quote -->
-
-  <TitleStripWithContent>
-    <Fragment slot="title">Get many resources in a single request</Fragment>
-    <Fragment slot="subtitle">
-      <p>
-        GraphQL queries access not just the properties of one resource but also
-        <strong>smoothly follow references between them</strong>. While typical REST APIs require
-        loading from multiple URLs, GraphQL APIs get
-        <strong>all the data your app needs in a single request</strong>. Apps using GraphQL can be
-        <strong>quick even on slow mobile network connections</strong>.
-      </p>
-    </Fragment>
-    <div>TBD</div>
-  </TitleStripWithContent>
+  <Space bottom={3}>
+    <TitleStripWithContent>
+      <Fragment slot="title">Get many resources in a single request</Fragment>
+      <Fragment slot="subtitle">
+        <p>
+          GraphQL queries access not just the properties of one resource but also
+          <strong>smoothly follow references between them</strong>. While typical REST APIs require
+          loading from multiple URLs, GraphQL APIs get
+          <strong>all the data your app needs in a single request</strong>. Apps using GraphQL can
+          be
+          <strong>quick even on slow mobile network connections</strong>.
+        </p>
+      </Fragment>
+      <GraphQlDemoB client:visible />
+    </TitleStripWithContent>
+  </Space>
 
   <Wrapper>
     <Flag style="good">

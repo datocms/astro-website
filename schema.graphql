@@ -2575,11 +2575,13 @@ input FeatureModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  seo: SeoFilter
   yoastAnalysis: JsonFilter
   seoH1: StringFilter
-  githubUrl: StringFilter
   slug: SlugFilter
+  githubUrl: StringFilter
+  seo: SeoFilter
+  quote: LinkFilter
+  video: FileFilter
   OR: [FeatureModelFilter]
   AND: [FeatureModelFilter]
 }
@@ -2613,6 +2615,8 @@ enum FeatureModelOrderBy {
   githubUrl_DESC
 }
 
+union FeatureModelQuoteField = PartnerTestimonialRecord | ReviewRecord
+
 """Record of type ⭐ ️Feature (feature)"""
 type FeatureRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -2636,10 +2640,12 @@ type FeatureRecord implements RecordInterface {
   createdAt: DateTime!
   githubUrl: String
   id: ItemId!
+  quote: FeatureModelQuoteField
   seo: SeoField
   seoH1: String
   slug: String
   updatedAt: DateTime!
+  video: VideoFileField
   yoastAnalysis: JsonField
 }
 
