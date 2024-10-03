@@ -1,4 +1,4 @@
-import GraphQlDemo from '~/components/GraphQlDemo';
+import GraphQlDemo from '~/components/featureAnimations/GraphQlDemo';
 
 export default function GraphQlDemoB() {
   return (

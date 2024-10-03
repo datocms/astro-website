@@ -1,32 +1,27 @@
 ---
+import SandboxEnvironmentsDemo from '~/components/featureAnimations/SandboxEnvironmentsDemo';
+import WorkflowPermissionA from './_WorkflowPermissionA';
 import { Bullets } from '~/components/Bullets';
 import { Button } from '~/components/Button';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
-import { LogosBar } from '~/components/LogosBar';
 
 const path = Astro.url.pathname;
-const pageSlug = path.split('/').pop() || '';
-const { page } = await executeQuery(Astro, query, { variables: { slug: pageSlug } });
-
-// const customSeo = [
-//   { tag: 'title', content: '' },
-//   {
-//     tag: 'meta',
-//     attributes: { name: 'description', content: '' },
-//   },
-// ];
+const slug = path.split('/').pop() || '';
+const { page } = await executeQuery(Astro, query, { variables: { slug } });
 
 if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---
@@ -51,7 +46,9 @@ if (!page) {
     </Space>
 
     <Flag>
-      <Fragment slot="visual">TBD</Fragment>
+      <Fragment slot="visual">
+        <!-- TODO: animation (src/components/featureAnimations/FieldValidations) -->
+      </Fragment>
       <Fragment slot="title">
         <mark>Clean content, at every stage</mark> with field validations
       </Fragment>
@@ -68,7 +65,6 @@ if (!page) {
     <Fragment slot="title">
       Test upcoming website updates, without breaking the live website
     </Fragment>
-
     <Fragment slot="subtitle">
       <p>
         Using migration scripts, you can test changes in the structure of your content{' '}
@@ -87,12 +83,14 @@ if (!page) {
         </Button>
       </Space>
     </Fragment>
-    <div>TBD</div>
+    <SandboxEnvironmentsDemo client:visible />
   </TitleStripWithContent>
 
   <Wrapper>
     <Flag>
-      <Fragment slot="visual">TBD</Fragment>
+      <Fragment slot="visual">
+        <!-- TOD0: animation (src/components/featureAnimations/WorkflowPermissions)  -->
+      </Fragment>
       <Fragment slot="title">
         Specify <mark>who can do what, and when</mark> with custom permissions
       </Fragment>
@@ -127,7 +125,7 @@ if (!page) {
         </Button>
       </Space>
     </Fragment>
-    <div>TBD</div>
+    <!-- TODO: animation (src/components/featureAnimations/Workflow) -->
   </TitleStripWithContent>
 
   <Wrapper>
