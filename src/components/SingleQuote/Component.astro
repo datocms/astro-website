@@ -1,0 +1,67 @@
+---
+import s from './style.module.css';
+import type { FragmentOf } from 'gql.tada';
+import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from './graphql';
+import { readFragment } from 'gql.tada';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { MaybeLink } from '~/components/links/MaybeLink';
+import { InlineText } from '~/components/structuredText/InlineText';
+
+interface Props {
+  quote:
+    | (FragmentOf<typeof PartnerTestimonialQuoteFragment> & {
+        __typename: 'PartnerTestimonialRecord';
+      })
+    | (FragmentOf<typeof ReviewQuoteFragment> & {
+        __typename: 'ReviewRecord';
+      });
+}
+
+const { quote } = Astro.props;
+
+const unmaskedQuotes =
+  quote.__typename === 'PartnerTestimonialRecord'
+    ? readFragment(PartnerTestimonialQuoteFragment, quote)
+    : readFragment(ReviewQuoteFragment, quote);
+---
+
+<div class={s.root}>
+  <div class={s.quoteInner}>
+    {
+      unmaskedQuotes.__typename === 'PartnerTestimonialRecord' ? (
+        <MaybeLink
+          href={unmaskedQuotes.partner ? `/partners/${unmaskedQuotes.partner.slug}` : undefined}
+          class={s.wrapper}
+        >
+          <div class={s.quote}>
+            <InlineText data={unmaskedQuotes.quote} />
+          </div>
+
+          <div class={s.content}>
+            <ResponsiveImage pictureClass={s.image} data={unmaskedQuotes.image.responsiveImage} />
+            <div class={s.authorRole}>
+              <div class={s.name}>{unmaskedQuotes.name}</div>
+              <div class={s.role}>
+                {unmaskedQuotes.role} @ {unmaskedQuotes.partner.name}
+              </div>
+            </div>
+          </div>
+        </MaybeLink>
+      ) : (
+        <article class={s.wrapper}>
+          <div class={s.quote}>
+            <InlineText data={unmaskedQuotes.quote} />
+          </div>
+
+          <div class={s.content}>
+            <ResponsiveImage pictureClass={s.image} data={unmaskedQuotes.image.responsiveImage} />
+            <div class={s.authorRole}>
+              <div class={s.name}>{unmaskedQuotes.name}</div>
+              <div class={s.role}>{unmaskedQuotes.role}</div>
+            </div>
+          </div>
+        </article>
+      )
+    }
+  </div>
+</div>
