@@ -1,6 +1,6 @@
-import GraphQlDemo from './index';
+import GraphQlDemo from '~/components/GraphQlDemo';
 
-export default function GraphQlDemoSpecializzato() {
+export default function GraphQlDemoA() {
   return (
     <GraphQlDemo height={11}>
       {async (typer, setResult) => {

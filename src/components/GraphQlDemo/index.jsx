@@ -1,9 +1,20 @@
 import cn from 'classnames';
-import React from 'react';
-import Highlight, { defaultProps } from 'custom-prism-react-renderer';
-/* eslint-disable react/jsx-key */
+import customPrismReactRenderer, {
+  defaultProps as libDefaultProps,
+} from 'custom-prism-react-renderer';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import s from './style.module.css';
+
+// TODO: 'custom-prism-react-renderer' has some serious import issues
+// what is being imported from the package depends on whether we're on server-side or client-side?!
+
+const Highlight =
+  'default' in customPrismReactRenderer
+    ? customPrismReactRenderer.default
+    : customPrismReactRenderer;
+
+const defaultProps =
+  'default' in customPrismReactRenderer ? customPrismReactRenderer.defaultProps : libDefaultProps;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
