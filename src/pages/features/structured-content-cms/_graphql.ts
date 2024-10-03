@@ -1,5 +1,5 @@
 import { TagFragment } from '~/lib/datocms/commonFragments';
-import { ReviewQuoteFragment } from '~/components/SingleQuote/graphql';
+import { ReviewQuoteFragment } from '~/components/quote/SingleQuote/graphql';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(

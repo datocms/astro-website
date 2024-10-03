@@ -2,7 +2,7 @@ import { FeatureCardFragment } from '~/components/FeatureCard/graphql';
 import {
   PartnerTestimonialQuotesCarouselFragment,
   ReviewQuotesCarouselFragment,
-} from '~/components/QuotesCarousel/graphql';
+} from '~/components/quote/QuotesCarousel/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
