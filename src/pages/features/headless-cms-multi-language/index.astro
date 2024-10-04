@@ -2,21 +2,84 @@
 import { Bullets } from '~/components/Bullets';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
+import { IntegrationsBanner } from '~/components/IntegrationsBanner';
 import { Layout } from '~/layouts/Layout';
 import { Svg } from '~/components/Svg';
 import { Wrapper } from '~/components/Wrapper';
-import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 
 const path = Astro.url.pathname;
 const slug = path.split('/').pop() || '';
 const { page } = await executeQuery(Astro, query, { variables: { slug } });
 
+// ?url doesn't work
+const flags = await Astro.glob('~/svg/flags/*.svg');
+const icons = flags.map((flag) => flag.default.src);
+
 if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+// import argentina from '~/svg/flags/argentina.svg?url';
+// import australia from '~/svg/flags/australia.svg?url';
+// import austria from '~/svg/flags/austria.svg?url';
+// import belgium from '~/svg/flags/belgium.svg?url';
+// import brazil from '~/svg/flags/brazil.svg?url';
+// import canada from '~/svg/flags/canada.svg?url';
+// import china from '~/svg/flags/china.svg?url';
+// import denmark from '~/svg/flags/denmark.svg?url';
+// import england from '~/svg/flags/england.svg?url';
+// import finland from '~/svg/flags/finland.svg?url';
+// import france from '~/svg/flags/france.svg?url';
+// import germany from '~/svg/flags/germany.svg?url';
+// import greece from '~/svg/flags/greece.svg?url';
+// import ireland from '~/svg/flags/ireland.svg?url';
+// import italy from '~/svg/flags/italy.svg?url';
+// import mexico from '~/svg/flags/mexico.svg?url';
+// import netherlands from '~/svg/flags/netherlands.svg?url';
+// import newZealand from '~/svg/flags/new-zealand.svg?url';
+// import norway from '~/svg/flags/norway.svg?url';
+// import portugal from '~/svg/flags/portugal.svg?url';
+// import russia from '~/svg/flags/russia.svg?url';
+// import singapore from '~/svg/flags/singapore.svg?url';
+// import spain from '~/svg/flags/spain.svg?url';
+// import sweden from '~/svg/flags/sweden.svg?url';
+// import switzerland from '~/svg/flags/switzerland.svg?url';
+// import unitedKingdom from '~/svg/flags/united-kingdom.svg?url';
+// import unitedStatesOfAmerica from '~/svg/flags/united-states-of-america.svg?url';
+
+// const icons = [
+//   argentina,
+//   australia,
+//   austria,
+//   belgium,
+//   brazil,
+//   canada,
+//   china,
+//   denmark,
+//   england,
+//   finland,
+//   france,
+//   germany,
+//   greece,
+//   ireland,
+//   italy,
+//   mexico,
+//   netherlands,
+//   newZealand,
+//   norway,
+//   portugal,
+//   russia,
+//   singapore,
+//   spain,
+//   sweden,
+//   switzerland,
+//   unitedKingdom,
+//   unitedStatesOfAmerica,
+// ];
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
@@ -35,7 +98,9 @@ if (!page) {
     </Hero>
 
     <Flag style="good">
-      <Fragment slot="visual">TBD</Fragment>
+      <Fragment slot="visual">
+        <!-- TODO: animation (src/components/featureAnimations/ProjectSettings) -->
+      </Fragment>
       <Fragment slot="kicker">Multi-language & multi-site headless cms</Fragment>
       <Fragment slot="title">Translate your <mark>websites and apps</mark></Fragment>
       <p>
@@ -46,10 +111,15 @@ if (!page) {
     </Flag>
   </Wrapper>
 
-  <!-- TODO flags -->
+  <IntegrationsBanner title="Localize both content and assets" bubbles={icons}>
+    <p>
+      <strong>All your content and assets can be multi-language</strong>, including rich text,
+      responsive images, geo-points, SEO metadata and especially your URLs.
+    </p>
+  </IntegrationsBanner>
 
   <Wrapper>
-    <Flag style="good">
+    <Flag>
       <Fragment slot="visual">TBD</Fragment>
       <Fragment slot="kicker">Headless CMS multi-language & flexible</Fragment>
       <Fragment slot="title">Great <mark>flexibility and granularity</mark></Fragment>
@@ -63,7 +133,7 @@ if (!page) {
       </article>
     </Flag>
 
-    <Flag style="good">
+    <Flag>
       <Fragment slot="visual">TBD</Fragment>
       <Fragment slot="kicker">Multi-language headless CMS interface</Fragment>
       <Fragment slot="title"><mark>Translated</mark> interface</Fragment>
