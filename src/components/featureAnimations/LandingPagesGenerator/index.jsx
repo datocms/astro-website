@@ -74,10 +74,7 @@ export default function LandingPagesGenerator() {
               }}
             >
               <div className={s.cell}>
-                <div
-                  className={s.details}
-                  style={{ backgroundImage: item.css }}
-                />
+                <div className={s.details} style={{ backgroundImage: item.css }} />
               </div>
             </animated.div>
           ))}

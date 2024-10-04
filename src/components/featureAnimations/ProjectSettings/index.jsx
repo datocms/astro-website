@@ -4,13 +4,7 @@ import { useEffect, useState } from 'react';
 import s from './style.module.css';
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const locales = [
-  'English (en-US)',
-  'Spanish (es)',
-  'Italian (it)',
-  'French (fr)',
-  'Chinese (ch)',
-];
+const locales = ['English (en-US)', 'Spanish (es)', 'Italian (it)', 'French (fr)', 'Chinese (ch)'];
 
 export default function ProjectSettings() {
   const [blockCount, setBlockCount] = useState(0);
