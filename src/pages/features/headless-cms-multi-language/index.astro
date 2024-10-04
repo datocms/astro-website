@@ -6,14 +6,15 @@ import { Layout } from '~/layouts/Layout';
 import { Svg } from '~/components/Svg';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 
 const path = Astro.url.pathname;
-const pageSlug = path.split('/').pop() || '';
-const { page } = await executeQuery(Astro, query, { variables: { slug: pageSlug } });
+const slug = path.split('/').pop() || '';
+const { page } = await executeQuery(Astro, query, { variables: { slug } });
 
 if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---

@@ -9,15 +9,16 @@ import { Svg } from '~/components/Svg';
 import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import { LogosBar } from '~/components/LogosBar';
 
 const path = Astro.url.pathname;
-const pageSlug = path.split('/').pop() || '';
-const { page } = await executeQuery(Astro, query, { variables: { slug: pageSlug } });
+const slug = path.split('/').pop() || '';
+const { page } = await executeQuery(Astro, query, { variables: { slug } });
 
 if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---

@@ -3,17 +3,21 @@ import { Bullets } from '~/components/Bullets';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
 import { Layout } from '~/layouts/Layout';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse } from '~/lib/notFoundResponse';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import { undefined } from 'astro:schema';
 
 const path = Astro.url.pathname;
-const pageSlug = path.split('/').pop() || '';
-const { page } = await executeQuery(Astro, query, { variables: { slug: pageSlug } });
+const slug = path.split('/').pop() || '';
+const { page } = await executeQuery(Astro, query, { variables: { slug } });
 
 if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---
@@ -40,7 +44,13 @@ if (!page) {
       </p>
     </Flag>
 
-    <!-- TODO: quote -->
+    {
+      page.quote && (
+        <Space top={3} bottom={3}>
+          <SingleQuote quote={page.quote} />
+        </Space>
+      )
+    }
 
     <Flag style="good">
       <Fragment slot="visual">TBD</Fragment>
@@ -51,7 +61,13 @@ if (!page) {
       </p>
     </Flag>
 
-    <!-- TODO: quote -->
+    {
+      page.quote2 && !!page.quote2.__typename && (
+        <Space top={3} bottom={3}>
+          <SingleQuote quote={page.quote2} />
+        </Space>
+      )
+    }
 
     <Flag style="good">
       <Fragment slot="visual">TBD</Fragment>

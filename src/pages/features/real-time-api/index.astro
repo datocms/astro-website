@@ -4,18 +4,22 @@ import { Button } from '~/components/Button';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
 import { Layout } from '~/layouts/Layout';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { VideoPlayer } from '~/components/VideoPlayer';
 import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 
 const path = Astro.url.pathname;
-const pageSlug = path.split('/').pop() || '';
-const { page } = await executeQuery(Astro, query, { variables: { slug: pageSlug } });
+const slug = path.split('/').pop() || '';
+const { page } = await executeQuery(Astro, query, { variables: { slug } });
 
-if (!page) {
+if (!page || !page.video) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---
@@ -44,10 +48,16 @@ if (!page) {
         <strong>DatoCMS&apos;s Real-time Updates, new data is instantly pushed to them</strong>.
       </p>
     </Fragment>
-    <div>TBD</div>
+    <VideoPlayer data={page.video} autoPlay={true} />
   </TitleStripWithContent>
 
-  <!-- TODO quote -->
+  {
+    page.quote && (
+      <Space top={3} bottom={3}>
+        <SingleQuote quote={page.quote} />
+      </Space>
+    )
+  }
 
   <Wrapper>
     <Flag>
@@ -83,10 +93,9 @@ if (!page) {
       </Fragment>
       <p>
         The Real-time Updates API uses <em>Server-Sent Events</em>, which is a protocol supported
-        natively from all modern browsers, to{' '}
-        <strong> transform your regular GraphQL into streaming subscriptions </strong>
-        . Using our React and Vue libraries you can{' '}
-        <strong>get started in literally seconds</strong>.
+        natively from all modern browsers, to
+        <strong>transform your regular GraphQL into streaming subscriptions</strong>. Using our
+        React and Vue libraries you can <strong>get started in literally seconds</strong>.
       </p>
     </Flag>
 

@@ -4,18 +4,20 @@ import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Layout } from '~/layouts/Layout';
+import { SingleQuote } from '~/components/quote/SingleQuote';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 
 const path = Astro.url.pathname;
-const pageSlug = path.split('/').pop() || '';
-const { page } = await executeQuery(Astro, query, { variables: { slug: pageSlug } });
+const slug = path.split('/').pop() || '';
+const { page } = await executeQuery(Astro, query, { variables: { slug } });
 
 if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---
@@ -54,7 +56,13 @@ if (!page) {
     </Flag>
   </Wrapper>
 
-  <!-- TODO quote -->
+  {
+    page.quote && (
+      <Space top={3} bottom={3}>
+        <SingleQuote quote={page.quote} />
+      </Space>
+    )
+  }
 
   <!-- TODO numbers -->
 

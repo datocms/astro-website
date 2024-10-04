@@ -1,4 +1,5 @@
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -8,8 +9,11 @@ export const query = graphql(
         _seoMetaTags {
           ...TagFragment
         }
+        video {
+          ...VideoPlayerFragment
+        }
       }
     }
   `,
-  [TagFragment],
+  [TagFragment, VideoPlayerFragment],
 );

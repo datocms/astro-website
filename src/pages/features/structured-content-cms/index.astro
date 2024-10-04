@@ -10,18 +10,18 @@ import { SingleQuote } from '~/components/quote/SingleQuote';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { VideoPlayer } from '~/components/VideoPlayer';
 import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 
 const path = Astro.url.pathname;
-const pageSlug = path.split('/').pop() || '';
-const { page, integrations, review } = await executeQuery(Astro, query, {
-  variables: { slug: pageSlug },
-});
+const slug = path.split('/').pop() || '';
+const { page, integrations } = await executeQuery(Astro, query, { variables: { slug } });
 
-if (!page || !integrations || !review) {
+if (!page || !integrations || !page.video || !page.video2 || !page.video3) {
+  avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---
@@ -49,12 +49,16 @@ if (!page || !integrations || !review) {
         Forget the mouse, and just start typing.
       </p>
     </Fragment>
-    <div>TBD</div>
+    <VideoPlayer data={page.video} autoPlay={true} />
   </TitleStripWithContent>
 
-  <Space top={3} bottom={3}>
-    <SingleQuote quote={review} />
-  </Space>
+  {
+    page.quote && (
+      <Space top={3} bottom={3}>
+        <SingleQuote quote={page.quote} />
+      </Space>
+    )
+  }
 
   <Wrapper>
     <Space top={2} bottom={1}>
@@ -64,7 +68,9 @@ if (!page || !integrations || !review) {
     </Space>
 
     <Flag>
-      <Fragment slot="visual">TBD</Fragment>
+      <Fragment slot="visual">
+        <VideoPlayer data={page.video2} autoPlay={true} />
+      </Fragment>
       <Fragment slot="kicker">Customizable structured content CMS </Fragment>
       <Fragment slot="title">Easily embed 100% <mark>custom blocks</mark></Fragment>
       <p>
@@ -77,7 +83,9 @@ if (!page || !integrations || !review) {
     </Flag>
 
     <Flag>
-      <Fragment slot="visual">TBD</Fragment>
+      <Fragment slot="visual">
+        <VideoPlayer data={page.video3} autoPlay={true} />
+      </Fragment>
       <Fragment slot="kicker">Linking structured content </Fragment>
       <Fragment slot="title">
         Hyper-link and reference <mark>entities</mark>, not just URLs

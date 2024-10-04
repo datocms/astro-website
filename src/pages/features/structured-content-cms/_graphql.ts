@@ -1,5 +1,9 @@
 import { TagFragment } from '~/lib/datocms/commonFragments';
-import { ReviewQuoteFragment } from '~/components/quote/SingleQuote/graphql';
+import {
+  PartnerTestimonialQuoteFragment,
+  ReviewQuoteFragment,
+} from '~/components/quote/SingleQuote/graphql';
+import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -9,10 +13,24 @@ export const query = graphql(
         _seoMetaTags {
           ...TagFragment
         }
-      }
-      review: review(filter: { name: { eq: "Dominic Blain" } }) {
-        __typename
-        ...ReviewQuoteFragment
+        quote {
+          __typename
+          ... on ReviewRecord {
+            ...ReviewQuoteFragment
+          }
+          ... on PartnerTestimonialRecord {
+            ...PartnerTestimonialQuoteFragment
+          }
+        }
+        video {
+          ...VideoPlayerFragment
+        }
+        video2 {
+          ...VideoPlayerFragment
+        }
+        video3 {
+          ...VideoPlayerFragment
+        }
       }
       integrations: allIntegrations(first: 100) {
         id
@@ -28,5 +46,5 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ReviewQuoteFragment],
+  [TagFragment, ReviewQuoteFragment, PartnerTestimonialQuoteFragment, VideoPlayerFragment],
 );
