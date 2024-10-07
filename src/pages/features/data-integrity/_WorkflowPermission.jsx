@@ -1,6 +1,6 @@
 import WorkflowPermissions from '~/components/featureAnimations/WorkflowPermissions';
 
-export default function WorkflowPermissionA() {
+export default function SpecializedWorkflowPermission() {
   return (
     <WorkflowPermissions>
       <>

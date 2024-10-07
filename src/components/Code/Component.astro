@@ -6,14 +6,41 @@ type Props = {
   language?: string;
   highlightLines?: number[];
   showLineNumbers?: boolean;
+  theme?: 'catppuccin-frappe' | 'catppuccin-latte';
 };
 
-const { code, language, highlightLines, showLineNumbers } = Astro.props;
+const { theme, code, language, highlightLines, showLineNumbers } = Astro.props;
 ---
 
-<Code
-  code={code}
-  lang={language}
-  mark={highlightLines?.map((line) => line + 1)}
-  showLineNumbers={showLineNumbers}
-/>
+{
+  theme ? (
+    <set-fancy-data-theme data-theme={theme}>
+      <Code
+        code={code}
+        lang={language}
+        mark={highlightLines?.map((line) => line + 1)}
+        showLineNumbers={showLineNumbers}
+      />
+    </set-fancy-data-theme>
+  ) : (
+    <Code
+      code={code}
+      lang={language}
+      mark={highlightLines?.map((line) => line + 1)}
+      showLineNumbers={showLineNumbers}
+    />
+  )
+}
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'set-fancy-data-theme',
+    class SetFancyDataTheme extends WebComponent {
+      parsedCallback() {
+        this.$('.expressive-code').setAttribute('data-theme', this.dataset?.theme!);
+      }
+    },
+  );
+</script>

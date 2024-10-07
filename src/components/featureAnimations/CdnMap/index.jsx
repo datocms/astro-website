@@ -1,12 +1,8 @@
 import cn from 'classnames';
-import Wrapper from '~/components/Wrapper';
-import World from 'public/images/world.svg';
+import Wrapper from '~/components/Wrapper/ReactComponent';
 import { useCallback, useEffect, useState } from 'react';
-import useSWR from 'swr';
-import wretch from 'wretch';
 import s from './style.module.css';
-
-const fetcher = (url) => wretch(url).get().json();
+import ky from 'ky';
 
 function convLatLongToStyle(latitude, longitude) {
   const x = (longitude + 180.0) * (100.0 / 360.0);
@@ -45,13 +41,46 @@ function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-export default function CdnMap() {
+const useData = (url) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    const signal = abortController.signal;
+
+    setLoading(true);
+    setError(null);
+
+    ky(url, { signal })
+      .json()
+      .then((json) => {
+        setData(json);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (err.name === 'AbortError') {
+          console.log('Fetch aborted');
+        } else {
+          setError(err.message);
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      abortController.abort();
+    };
+  }, [url]);
+
+  return { data, loading, error };
+};
+
+export default function CdnMap({ children, datacenters }) {
   const [currentDataCenter, setCurrentDataCenter] = useState(null);
   const [ping, setPing] = useState(null);
 
-  const { data: datacenters } = useSWR('/api/cdn/datacenters', fetcher);
-
-  const { data: location } = useSWR('https://api-geolocation.zeit.sh/', fetcher);
+  const { data: location } = useData('https://api-geolocation.zeit.sh/');
 
   const setAndScroll = useCallback(
     (code) => {
@@ -72,26 +101,26 @@ export default function CdnMap() {
   );
 
   useEffect(() => {
-    let stopped = false;
+    const abortController = new AbortController();
 
-    (async () => {
+    async function run() {
       const start = new Date();
-      const data = await fetcher('https://graphql.datocms.com/geo/ping');
 
-      if (stopped) {
-        return;
-      }
+      const signal = abortController.signal;
+      const data = await ky('https://graphql.datocms.com/geo/ping', { signal }).json();
 
       const end = new Date();
       setPing({ ...data, latency: Number.parseInt((end - start) * 0.8) });
 
       if (!currentDataCenter) {
-        setAndScroll(data.datacenter);
+        setAndScroll(data.datacenter.slice(0, 3).toUpperCase());
       }
-    })();
+    }
+
+    run();
 
     return () => {
-      stopped = true;
+      abortController.abort();
     };
   }, [setPing, setAndScroll, currentDataCenter]);
 
@@ -99,7 +128,7 @@ export default function CdnMap() {
     <div className={s.root}>
       <Wrapper>
         <div className={s.map}>
-          <World />
+          {children}
 
           {location && (
             <div className={s.viewer} style={convLatLongToStyle(location.lat, location.lon)}>
@@ -107,7 +136,7 @@ export default function CdnMap() {
               <div className={s.ripple} />
             </div>
           )}
-          {datacenters?.map((dc) => (
+          {datacenters.map((dc) => (
             <div
               key={dc.code}
               className={cn(s.datacenter, {
@@ -128,7 +157,7 @@ export default function CdnMap() {
       </Wrapper>
       <div className={s.list}>
         <div className={s.listInner}>
-          {datacenters?.map((dc) => (
+          {datacenters.map((dc) => (
             <div key={dc.code} id={`datacenter-${dc.code}`} className={s.itemWrapper}>
               <div
                 className={cn(s.item, {

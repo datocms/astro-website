@@ -1,5 +1,4 @@
 import cn from 'classnames';
-import Wrapper from '~/components/Wrapper';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import s from './style.module.css';
@@ -301,74 +300,72 @@ export default function ImgixTransformations() {
   }, [reset, setStarted]);
 
   return (
-    <Wrapper>
-      <div className={s.root} style={{ height: `calc(var(--max-width) / ${ar})` }}>
-        <div
-          className={cn(s.imageFrame, {
-            [s.withTransitions]: started,
-            [s.ellipseFrame]: ellipse,
-          })}
+    <div className={s.root} style={{ height: `calc(var(--max-width) / ${ar})` }}>
+      <div
+        className={cn(s.imageFrame, {
+          [s.withTransitions]: started,
+          [s.ellipseFrame]: ellipse,
+        })}
+        style={{
+          width: `calc(var(--max-width) * ${result.width})`,
+          height: `calc(var(--max-width) / ${ar} * ${result.height})`,
+        }}
+      >
+        <TransitionGroup>
+          <CSSTransition
+            key={image}
+            classNames={{
+              enter: s.imageAnimationEnter,
+              enterActive: s.imageAnimationEnterActive,
+              exit: s.imageAnimationLeave,
+              exitActive: s.imageAnimationLeaveActive,
+            }}
+            timeout={{ enter: 1300, exit: 1800 }}
+          >
+            <img
+              src={image}
+              className={s.image}
+              style={{
+                width: 'calc(var(--max-width))',
+                height: `calc(var(--max-width) / ${ar})`,
+                transform: result.transform,
+              }}
+            />
+          </CSSTransition>
+        </TransitionGroup>
+      </div>
+
+      <div className={s.params}>
+        <TransitionGroup
+          className={s.paramsInner}
           style={{
-            width: `calc(var(--max-width) * ${result.width})`,
-            height: `calc(var(--max-width) / ${ar} * ${result.height})`,
+            '--content-length': `${40 + params.join('.').length}ch`,
           }}
         >
-          <TransitionGroup>
+          <CSSTransition key="prefix" timeout={0}>
+            <span className={s.paramEq}>https://datocms-assets.com/image.png</span>
+          </CSSTransition>
+          {params.map((param, i) => (
             <CSSTransition
-              key={image}
+              key={param.split(/=/)[0]}
               classNames={{
-                enter: s.imageAnimationEnter,
-                enterActive: s.imageAnimationEnterActive,
-                exit: s.imageAnimationLeave,
-                exitActive: s.imageAnimationLeaveActive,
+                enter: s.paramAnimationEnter,
+                enterActive: s.paramAnimationEnterActive,
+                exit: s.paramAnimationLeave,
+                exitActive: s.paramAnimationLeaveActive,
               }}
-              timeout={{ enter: 1300, exit: 1800 }}
+              timeout={{ enter: 900, exit: 400 }}
             >
-              <img
-                src={image}
-                className={s.image}
-                style={{
-                  width: 'calc(var(--max-width))',
-                  height: `calc(var(--max-width) / ${ar})`,
-                  transform: result.transform,
-                }}
-              />
-            </CSSTransition>
-          </TransitionGroup>
-        </div>
-
-        <div className={s.params}>
-          <TransitionGroup
-            className={s.paramsInner}
-            style={{
-              '--content-length': `${40 + params.join('.').length}ch`,
-            }}
-          >
-            <CSSTransition key="prefix" timeout={0}>
-              <span className={s.paramEq}>https://datocms-assets.com/image.png</span>
-            </CSSTransition>
-            {params.map((param, i) => (
-              <CSSTransition
-                key={param.split(/=/)[0]}
-                classNames={{
-                  enter: s.paramAnimationEnter,
-                  enterActive: s.paramAnimationEnterActive,
-                  exit: s.paramAnimationLeave,
-                  exitActive: s.paramAnimationLeaveActive,
-                }}
-                timeout={{ enter: 900, exit: 400 }}
+              <div
+                className={s.paramContainer}
+                style={{ '--content-length': `${param.length + 2}ch` }}
               >
-                <div
-                  className={s.paramContainer}
-                  style={{ '--content-length': `${param.length + 2}ch` }}
-                >
-                  <Param param={param} isFirst={i === 0} />
-                </div>
-              </CSSTransition>
-            ))}
-          </TransitionGroup>
-        </div>
+                <Param param={param} isFirst={i === 0} />
+              </div>
+            </CSSTransition>
+          ))}
+        </TransitionGroup>
       </div>
-    </Wrapper>
+    </div>
   );
 }

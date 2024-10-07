@@ -26,31 +26,33 @@ if (!page || !integrations || !page.video || !page.video2 || !page.video3) {
   return notFoundResponse();
 }
 
-const JsonExample = `
-{
-  schema: 'dast',
-  document: {
-    type: 'root',
-    children: [
-      {
-        type: 'heading',
-        level: 1,
-        children: [
-          {
-            type: 'span',
-            value: 'Hello ',
-          },
-          {
-            type: 'span',
-            marks: ['strong'],
-            value: 'world!',
-          },
-        ],
-      },
-    ],
+const jsonExample = JSON.stringify(
+  {
+    schema: 'dast',
+    document: {
+      type: 'root',
+      children: [
+        {
+          type: 'heading',
+          level: 1,
+          children: [
+            {
+              type: 'span',
+              value: 'Hello ',
+            },
+            {
+              type: 'span',
+              marks: ['strong'],
+              value: 'world!',
+            },
+          ],
+        },
+      ],
+    },
   },
-}
-`;
+  null,
+  2,
+);
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
@@ -134,8 +136,14 @@ const JsonExample = `
 
     <Flag>
       <Fragment slot="visual">
-        <!-- TODO: better styling -->
-        <Code code={JsonExample} language="JSON" showLineNumbers={false} />
+        <div style={{ flex: '1' }}>
+          <Code
+            code={jsonExample}
+            language="json"
+            showLineNumbers={false}
+            theme="catppuccin-frappe"
+          />
+        </div>
       </Fragment>
       <Fragment slot="kicker">Omnichannel CMS</Fragment>
       <Fragment slot="title">Highly structured and <strong>deeply typed</strong></Fragment>

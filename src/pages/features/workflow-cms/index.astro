@@ -12,6 +12,9 @@ import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
+import Workflow from '~/components/featureAnimations/Workflow';
+import WorkflowPermission from './_WorkflowPermission';
+import { UiChrome } from '~/components/UiChrome';
 
 const path = Astro.url.pathname;
 const slug = path.split('/').pop() || '';
@@ -50,7 +53,7 @@ if (!page) {
         </Button>
       </Space>
     </Fragment>
-    <!-- TODO: animation (src/components/featureAnimations/Workflow) -->
+    <Workflow client:visible />
   </TitleStripWithContent>
 
   <Wrapper>
@@ -68,7 +71,9 @@ if (!page) {
 
     <Flag>
       <Fragment slot="visual">
-        <!-- TODO: animation (src/components/featureAnimations/WorkflowPermissions) -->
+        <UiChrome>
+          <WorkflowPermission />
+        </UiChrome>
       </Fragment>
       <Fragment slot="kicker">CMS approval workflow </Fragment>
       <Fragment slot="title">

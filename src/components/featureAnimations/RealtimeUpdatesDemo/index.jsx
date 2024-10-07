@@ -1,9 +1,9 @@
-import useInterval from '@use-it/interval';
 import cn from 'classnames';
-import { range } from 'range';
+import range from 'lodash-es/range';
 import { useCallback, useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import s from './style.module.css';
+import { useInterval } from '../ProgressiveImagesDemo/useInterval';
 
 const images = [
   {
@@ -117,7 +117,7 @@ const Copy = ({ lines }) => (
   </div>
 );
 
-export default function ProgressiveImagesDemo() {
+export default function RealtimeUpdatesDemo() {
   const [post, setPost] = useState(0);
 
   const next = useCallback(() => {

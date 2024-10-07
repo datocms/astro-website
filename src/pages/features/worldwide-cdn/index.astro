@@ -13,6 +13,8 @@ import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
+import CdnMap from '~/components/featureAnimations/CdnMap';
+import { actions } from 'astro:actions';
 
 const path = Astro.url.pathname;
 const slug = path.split('/').pop() || '';
@@ -22,6 +24,8 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const { data: datacenters } = await actions.fastlyApiDatacenters();
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
@@ -37,7 +41,9 @@ if (!page) {
       </Fragment>
     </Hero>
 
-    <!-- TODO: animation (src/components/featureAnimations/CdnMap) -->
+    <CdnMap datacenters={datacenters} client:load>
+      <Svg name="svg/world" />
+    </CdnMap>
 
     <Space top={2} bottom={1}>
       <InterstitialTitle style="two">
