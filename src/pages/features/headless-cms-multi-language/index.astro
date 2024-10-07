@@ -14,7 +14,7 @@ const path = Astro.url.pathname;
 const slug = path.split('/').pop() || '';
 const { page } = await executeQuery(Astro, query, { variables: { slug } });
 
-// ?url doesn't work
+// .svg?url doesn't seem to work with Astro.glob
 const flags = await Astro.glob('~/svg/flags/*.svg');
 const icons = flags.map((flag) => flag.default.src);
 
@@ -97,7 +97,7 @@ if (!page) {
       </Fragment>
     </Hero>
 
-    <Flag style="good">
+    <Flag>
       <Fragment slot="visual">
         <!-- TODO: animation (src/components/featureAnimations/ProjectSettings) -->
       </Fragment>
@@ -120,7 +120,9 @@ if (!page) {
 
   <Wrapper>
     <Flag>
-      <Fragment slot="visual">TBD</Fragment>
+      <Fragment slot="visual">
+        <!-- TODO: animation (src/components/featureAnimations/FieldSettings) -->
+      </Fragment>
       <Fragment slot="kicker">Headless CMS multi-language & flexible</Fragment>
       <Fragment slot="title">Great <mark>flexibility and granularity</mark></Fragment>
       <article>
@@ -134,7 +136,9 @@ if (!page) {
     </Flag>
 
     <Flag>
-      <Fragment slot="visual">TBD</Fragment>
+      <Fragment slot="visual">
+        <!-- TODO: animation (src/components/featureAnimations/TranslatedUI) -->
+      </Fragment>
       <Fragment slot="kicker">Multi-language headless CMS interface</Fragment>
       <Fragment slot="title"><mark>Translated</mark> interface</Fragment>
       <article>
