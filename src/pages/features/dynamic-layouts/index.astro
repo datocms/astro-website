@@ -10,6 +10,10 @@ import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
+import { UiChrome } from '~/components/UiChrome';
+import CreateModularBlocks from '~/components/featureAnimations/CreateModularBlocks';
+import UseModularBlocks from '~/components/featureAnimations/UseModularBlocks';
+import LandingPagesGenerator from '~/components/featureAnimations/LandingPagesGenerator';
 
 const path = Astro.url.pathname;
 const slug = path.split('/').pop() || '';
@@ -36,7 +40,9 @@ if (!page) {
 
     <Flag>
       <Fragment slot="visual">
-        <!-- TODO: animation (src/components/featureAnimations/CreateModularBlocks) -->
+        <UiChrome>
+          <CreateModularBlocks client:visible />
+        </UiChrome>
       </Fragment>
       <Fragment slot="title">Create <mark>modular blocks</mark></Fragment>
       <p>
@@ -55,7 +61,9 @@ if (!page) {
 
     <Flag>
       <Fragment slot="visual">
-        <!-- TODO: animation (src/components/featureAnimations/UseModularBlocks) -->
+        <UiChrome>
+          <UseModularBlocks client:visible />
+        </UiChrome>
       </Fragment>
       <Fragment slot="title"><mark>Organize and structure</mark> your content</Fragment>
       <p>
@@ -74,7 +82,9 @@ if (!page) {
 
     <Flag>
       <Fragment slot="visual">
-        <!-- TODO: animation (src/components/featureAnimations/LandingPagesGenerator) -->
+        <UiChrome>
+          <LandingPagesGenerator client:visible />
+        </UiChrome>
       </Fragment>
       <Fragment slot="title">
         Easily build landing pages with <mark>dynamic templates</mark>

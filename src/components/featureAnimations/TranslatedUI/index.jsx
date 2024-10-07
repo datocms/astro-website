@@ -1,30 +1,23 @@
-import UIChrome from '~/components/UiChrome';
 import { useEffect, useState } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import s from './style.module.css';
 
-import ApiTokensIcon from '~/icons/regular/barcode-alt.svg';
-import SettingsIcon from '~/icons/regular/cog.svg';
-import WebhooksIcon from '~/icons/regular/paper-plane.svg';
-import PluginsIcon from '~/icons/regular/puzzle-piece.svg';
-import LogIcon from '~/icons/regular/receipt.svg';
-import DeploymentEnvironmentsIcon from '~/icons/regular/rocket.svg';
-import ItemTypesIcon from '~/icons/regular/shapes.svg';
-import RolesIcon from '~/icons/regular/shield-alt.svg';
-import UsersIcon from '~/icons/regular/user-friends.svg';
-
-import france from '~/svg/flags/france.svg';
-import germany from '~/svg/flags/germany.svg';
-import italy from '~/svg/flags/italy.svg';
-import spain from '~/svg/flags/spain.svg';
-import usa from '~/svg/flags/united-states-of-america.svg';
+const ApiTokensIcon = '🏷️';
+const SettingsIcon = '⚙️';
+const WebhooksIcon = '✈️';
+const PluginsIcon = '🧩';
+const LogIcon = '🧾';
+const DeploymentEnvironmentsIcon = '🚀';
+const ItemTypesIcon = '🔷';
+const RolesIcon = '🛡️';
+const UsersIcon = '👥';
 
 const flags = {
-  it: italy,
-  es: spain,
-  fr: france,
-  de: germany,
-  en: usa,
+  it: '🇮🇹',
+  es: '🇪🇸',
+  fr: '🇫🇷',
+  de: '🇩🇪',
+  en: '🇺🇸',
 };
 
 const name = {
@@ -205,10 +198,9 @@ export default function TranslatedUI() {
 
   const localeString = Object.keys(labels)[locale];
   const t = { ...labels.en, ...labels[localeString] };
-  const Flag = flags[localeString];
 
   return (
-    <UIChrome>
+    <>
       <div className={s.navbar}>
         <div className={s.title}>Acme</div>
         <div className={s.navbutton}>
@@ -226,7 +218,7 @@ export default function TranslatedUI() {
           <div className={s.sidebarGroup}>
             <div className={s.sidebarGroupTitle}>Project</div>
             <div className={s.sidebarItem}>
-              <SettingsIcon />
+              <div className={s.sidebarItemIcon}>{SettingsIcon}</div>
               <Label locale={locale} label={t['adminArea.splitPane.siteSettings']} />
             </div>
           </div>
@@ -237,11 +229,11 @@ export default function TranslatedUI() {
             </div>
 
             <div className={s.sidebarItem}>
-              <ItemTypesIcon />
+              <div className={s.sidebarItemIcon}>{ItemTypesIcon}</div>
               <Label locale={locale} label={t['adminArea.splitPane.itemTypes']} />
             </div>
             <div className={s.sidebarItem}>
-              <PluginsIcon />
+              <div className={s.sidebarItemIcon}>{PluginsIcon}</div>
               <Label locale={locale} label={t['adminArea.splitPane.plugins']} />
             </div>
           </div>
@@ -252,17 +244,17 @@ export default function TranslatedUI() {
             </div>
 
             <div className={s.sidebarItem}>
-              <RolesIcon />
+              <div className={s.sidebarItemIcon}>{RolesIcon}</div>
               <Label locale={locale} label={t['adminArea.splitPane.manageRoles']} />
             </div>
 
             <div className={s.sidebarItem}>
-              <UsersIcon />
+              <div className={s.sidebarItemIcon}>{UsersIcon}</div>
               <Label locale={locale} label={t['adminArea.splitPane.manageEditors']} />
             </div>
 
             <div className={s.sidebarItem}>
-              <ApiTokensIcon />
+              <div className={s.sidebarItemIcon}>{ApiTokensIcon}</div>
               <Label locale={locale} label={t['adminArea.splitPane.apiTokens']} />
             </div>
           </div>
@@ -272,11 +264,11 @@ export default function TranslatedUI() {
               <Label locale={locale} label={t['adminArea.splitPane.webhooks']} />
             </div>
             <div className={s.sidebarItem}>
-              <WebhooksIcon />
+              <div className={s.sidebarItemIcon}>{WebhooksIcon}</div>
               <Label locale={locale} label={t['adminArea.splitPane.manageWebhooks']} />
             </div>
             <div className={s.sidebarItem}>
-              <LogIcon />
+              <div className={s.sidebarItemIcon}>{LogIcon}</div>
               <Label locale={locale} label={t['adminArea.splitPane.webhookCalls']} />
             </div>
           </div>
@@ -287,12 +279,12 @@ export default function TranslatedUI() {
             </div>
 
             <div className={s.sidebarItem}>
-              <DeploymentEnvironmentsIcon />
+              <div className={s.sidebarItemIcon}>{DeploymentEnvironmentsIcon}</div>
               <Label locale={locale} label={t['adminArea.splitPane.deploymentSettings']} />
             </div>
 
             <div className={s.sidebarItem}>
-              <LogIcon />
+              <div className={s.sidebarItemIcon}>{LogIcon}</div>
               <Label locale={locale} label={t['adminArea.splitPane.deploymentLogs']} />
             </div>
           </div>
@@ -309,14 +301,12 @@ export default function TranslatedUI() {
               }}
               timeout={{ enter: 1200, exit: 1200 }}
             >
-              <span className={s.flag}>
-                <Flag />
-              </span>
+              <span className={s.flag}>{flags[localeString]}</span>
             </CSSTransition>
           </TransitionGroup>
           <div className={s.hey}>We speak {name[localeString]}!</div>
         </div>
       </div>
-    </UIChrome>
+    </>
   );
 }

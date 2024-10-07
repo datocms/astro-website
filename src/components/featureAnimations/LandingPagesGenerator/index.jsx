@@ -1,4 +1,3 @@
-import UIChrome from 'components/UiChrome';
 import { useEffect, useState } from 'react';
 import { animated, useTransition } from 'react-spring';
 import s from './style.module.css';
@@ -49,8 +48,8 @@ export default function LandingPagesGenerator() {
       height += data.height;
       return { ...data, y: height - data.height };
     }),
-    (d) => d.name,
     {
+      key: (item) => item.name,
       from: { height: 0, opacity: 0 },
       leave: { height: 0, opacity: 0 },
       enter: ({ y, height }) => ({ y, height, opacity: 1 }),
@@ -58,28 +57,20 @@ export default function LandingPagesGenerator() {
     },
   );
 
+  console.log(transitions);
+
   return (
-    <UIChrome>
-      <div className={s.body}>
-        <div className={s.title}>Acme Inc.</div>
-        <div className={s.list} style={{ height }}>
-          {transitions.map(({ item, props: { y, ...rest }, key }, index) => (
-            <animated.div
-              key={key}
-              className={s.card}
-              style={{
-                zIndex: blocks.length - index,
-                transform: y.interpolate((y) => `translate3d(0,${y}px,0)`),
-                ...rest,
-              }}
-            >
-              <div className={s.cell}>
-                <div className={s.details} style={{ backgroundImage: item.css }} />
-              </div>
-            </animated.div>
-          ))}
-        </div>
+    <div className={s.body}>
+      <div className={s.title}>Acme Inc.</div>
+      <div className={s.list} style={{ height }}>
+        {transitions((style, item, t, index) => (
+          <animated.div className={s.card} style={{ zIndex: blocks.length - index, ...style }}>
+            <div className={s.cell}>
+              <div className={s.details} style={{ backgroundImage: item.css }} />
+            </div>
+          </animated.div>
+        ))}
       </div>
-    </UIChrome>
+    </div>
   );
 }

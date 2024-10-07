@@ -5,8 +5,7 @@ import customPrismReactRenderer, {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import s from './style.module.css';
 
-// TODO: 'custom-prism-react-renderer' has some serious import issues
-// what is being imported from the package depends on whether we're on server-side or client-side?!
+// https://github.com/vitejs/vite/issues/2139#issuecomment-1024852072
 
 const Highlight =
   'default' in customPrismReactRenderer

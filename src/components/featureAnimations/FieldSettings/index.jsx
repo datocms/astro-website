@@ -1,5 +1,4 @@
 import cn from 'classnames';
-import UIChrome from '~/components/UiChrome';
 import { useEffect, useState } from 'react';
 import s from './style.module.css';
 
@@ -12,31 +11,29 @@ export default function FieldSettings() {
   }, []);
 
   return (
-    <UIChrome>
-      <div className={s.body}>
-        <div className={s.title}>Edit field</div>
-        <div className={s.box}>
-          <div className={s.field}>
-            <div className={s.label}>Name</div>
-            <div className={s.input}>Title</div>
-          </div>
-          <div className={s.field}>
-            <div className={s.label}>API Key</div>
-            <div className={s.input}>title</div>
-          </div>
-          <div className={s.bool}>
-            <div className={cn(s.switch, { [s.switchOn]: on })} />
-            <div className={s.label}>Enable localization for this field?</div>
-          </div>
-
-          <div className={cn(s.bool, { [s.boolDisabled]: !on })}>
-            <div className={s.switch} />
-            <div className={s.label}>Require all locales?</div>
-          </div>
-
-          <div className={s.button}>Save settings</div>
+    <div className={s.body}>
+      <div className={s.title}>Edit field</div>
+      <div className={s.box}>
+        <div className={s.field}>
+          <div className={s.label}>Name</div>
+          <div className={s.input}>Title</div>
         </div>
+        <div className={s.field}>
+          <div className={s.label}>API Key</div>
+          <div className={s.input}>title</div>
+        </div>
+        <div className={s.bool}>
+          <div className={cn(s.switch, { [s.switchOn]: on })} />
+          <div className={s.label}>Enable localization for this field?</div>
+        </div>
+
+        <div className={cn(s.bool, { [s.boolDisabled]: !on })}>
+          <div className={s.switch} />
+          <div className={s.label}>Require all locales?</div>
+        </div>
+
+        <div className={s.button}>Save settings</div>
       </div>
-    </UIChrome>
+    </div>
   );
 }

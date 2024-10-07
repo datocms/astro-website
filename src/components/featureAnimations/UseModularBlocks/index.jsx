@@ -1,5 +1,4 @@
 import cn from 'classnames';
-import UIChrome from '~/components/UiChrome';
 import { useEffect, useRef, useState } from 'react';
 import s from './style.module.css';
 
@@ -88,52 +87,50 @@ export default function UseModularBlocks() {
   }, []);
 
   return (
-    <UIChrome>
-      <div className={s.body} key={iteration}>
-        <div className={s.bodyInner}>
-          <div className={s.title}>Create new Blog post</div>
-          <div className={s.box}>
-            <div className={s.field}>
-              <div className={s.label}>Title</div>
-              <div className={s.input}>The Best Video Games to Play</div>
-            </div>
-            <div className={s.field}>
-              <div className={s.label}>Author</div>
-              <div className={s.input}>Dan Poe</div>
-            </div>
-            <div className={s.field}>
-              <div className={s.label}>Content</div>
-              {blocksSequence.map((block, i) => (
+    <div className={s.body} key={iteration}>
+      <div className={s.bodyInner}>
+        <div className={s.title}>Create new Blog post</div>
+        <div className={s.box}>
+          <div className={s.field}>
+            <div className={s.label}>Title</div>
+            <div className={s.input}>The Best Video Games to Play</div>
+          </div>
+          <div className={s.field}>
+            <div className={s.label}>Author</div>
+            <div className={s.input}>Dan Poe</div>
+          </div>
+          <div className={s.field}>
+            <div className={s.label}>Content</div>
+            {blocksSequence.map((block, i) => (
+              <div
+                className={cn(s.block, {
+                  [s[`block${block}`]]: true,
+                  [s.blockHidden]: i >= blockCount,
+                })}
+                key={i}
+              >
+                <div className={s.blockInner} key={i}>
+                  {blocksContent[block]}
+                </div>
+              </div>
+            ))}
+            <div className={s.mcAdd}>
+              <div className={s.mcAddLabel}>Add a new block:</div>
+              {allBlocks.map((block) => (
                 <div
-                  className={cn(s.block, {
-                    [s[`block${block}`]]: true,
-                    [s.blockHidden]: i >= blockCount,
+                  className={cn(s.mcAddButton, {
+                    [s.mcAddButtonActive]: blocksSequence[blockCount] === block,
                   })}
-                  key={i}
+                  key={block}
                 >
-                  <div className={s.blockInner} key={i}>
-                    {blocksContent[block]}
-                  </div>
+                  {labels[block]}
                 </div>
               ))}
-              <div className={s.mcAdd}>
-                <div className={s.mcAddLabel}>Add a new block:</div>
-                {allBlocks.map((block) => (
-                  <div
-                    className={cn(s.mcAddButton, {
-                      [s.mcAddButtonActive]: blocksSequence[blockCount] === block,
-                    })}
-                    key={block}
-                  >
-                    {labels[block]}
-                  </div>
-                ))}
-              </div>
             </div>
-            <div className={s.button}>Save Blog Post</div>
           </div>
+          <div className={s.button}>Save Blog Post</div>
         </div>
       </div>
-    </UIChrome>
+    </div>
   );
 }

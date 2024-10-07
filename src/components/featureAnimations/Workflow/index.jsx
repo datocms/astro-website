@@ -1,8 +1,11 @@
 import cn from 'classnames';
 import { useEffect, useRef, useState } from 'react';
-import Confetti from 'react-dom-confetti';
+import C from 'react-dom-confetti';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import s from './style.module.css';
+
+// https://github.com/vitejs/vite/issues/2139#issuecomment-1024852072
+const Confetti = C.default ? C.default : C;
 
 function times(n) {
   return Array.from({ length: n }, (_, i) => i);

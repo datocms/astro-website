@@ -1,5 +1,4 @@
 import cn from 'classnames';
-import UIChrome from '~/components/UiChrome';
 import { useEffect, useState } from 'react';
 import s from './style.module.css';
 
@@ -34,55 +33,53 @@ export default function CreateModularBlocks() {
   }, []);
 
   return (
-    <UIChrome>
-      <div className={s.body}>
-        <div className={s.title}>Edit &quot;Blog post&quot; model</div>
+    <div className={s.body}>
+      <div className={s.title}>Edit &quot;Blog post&quot; model</div>
 
-        <div className={s.field}>
-          <div className={s.fieldInner}>
-            <div className={s.fieldDrag} />
-            <div className={s.fieldBox}>
-              <div className={s.fieldName}>Title</div>
-              <div className={s.fieldType}>string</div>
-            </div>
-          </div>
-        </div>
-
-        <div className={s.field}>
-          <div className={s.fieldInner}>
-            <div className={s.fieldDrag} />
-            <div className={s.fieldBox}>
-              <div className={s.fieldName}>Author</div>
-              <div className={s.fieldType}>1-N relationship</div>
-            </div>
-          </div>
-        </div>
-
-        <div className={s.field}>
-          <div className={s.fieldInner}>
-            <div className={s.fieldDrag} />
-            <div className={s.fieldBox}>
-              <div className={s.fieldName}>Content</div>
-              <div className={s.fieldType}>modular content</div>
-            </div>
-          </div>
-          <div className={s.blocks}>
-            {allBlocks.map((block, i) => (
-              <div
-                className={cn(s.fieldInner, {
-                  [s.fieldInnerHidden]: i > blockCount,
-                })}
-                key={block}
-              >
-                <div className={s.fieldDrag} />
-                <div className={s.fieldBox}>
-                  <div className={s.fieldName}>{block}</div>
-                </div>
-              </div>
-            ))}
+      <div className={s.field}>
+        <div className={s.fieldInner}>
+          <div className={s.fieldDrag} />
+          <div className={s.fieldBox}>
+            <div className={s.fieldName}>Title</div>
+            <div className={s.fieldType}>string</div>
           </div>
         </div>
       </div>
-    </UIChrome>
+
+      <div className={s.field}>
+        <div className={s.fieldInner}>
+          <div className={s.fieldDrag} />
+          <div className={s.fieldBox}>
+            <div className={s.fieldName}>Author</div>
+            <div className={s.fieldType}>1-N relationship</div>
+          </div>
+        </div>
+      </div>
+
+      <div className={s.field}>
+        <div className={s.fieldInner}>
+          <div className={s.fieldDrag} />
+          <div className={s.fieldBox}>
+            <div className={s.fieldName}>Content</div>
+            <div className={s.fieldType}>modular content</div>
+          </div>
+        </div>
+        <div className={s.blocks}>
+          {allBlocks.map((block, i) => (
+            <div
+              className={cn(s.fieldInner, {
+                [s.fieldInnerHidden]: i > blockCount,
+              })}
+              key={block}
+            >
+              <div className={s.fieldDrag} />
+              <div className={s.fieldBox}>
+                <div className={s.fieldName}>{block}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }

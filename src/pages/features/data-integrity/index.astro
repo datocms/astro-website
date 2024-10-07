@@ -1,6 +1,6 @@
 ---
 import SandboxEnvironmentsDemo from '~/components/featureAnimations/SandboxEnvironmentsDemo';
-// import WorkflowPermissionA from './_WorkflowPermissionA';
+import FieldValidations from '~/components/featureAnimations/FieldValidations';
 import { Bullets } from '~/components/Bullets';
 import { Button } from '~/components/Button';
 import { Flag } from '~/components/Flag';
@@ -15,6 +15,9 @@ import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
+import { UiChrome } from '~/components/UiChrome';
+import WorkflowPermissionA from './_WorkflowPermissionA';
+import Workflow from '~/components/featureAnimations/Workflow';
 
 const path = Astro.url.pathname;
 const slug = path.split('/').pop() || '';
@@ -47,7 +50,9 @@ if (!page) {
 
     <Flag>
       <Fragment slot="visual">
-        <!-- TODO: animation (src/components/featureAnimations/FieldValidations) -->
+        <UiChrome>
+          <FieldValidations client:visible />
+        </UiChrome>
       </Fragment>
       <Fragment slot="title">
         <mark>Clean content, at every stage</mark> with field validations
@@ -89,7 +94,9 @@ if (!page) {
   <Wrapper>
     <Flag>
       <Fragment slot="visual">
-        <!-- TOD0: animation (src/components/featureAnimations/WorkflowPermissions)  -->
+        <UiChrome>
+          <WorkflowPermissionA client:visible />
+        </UiChrome>
       </Fragment>
       <Fragment slot="title">
         Specify <mark>who can do what, and when</mark> with custom permissions
@@ -125,7 +132,8 @@ if (!page) {
         </Button>
       </Space>
     </Fragment>
-    <!-- TODO: animation (src/components/featureAnimations/Workflow) -->
+
+    <Workflow client:visible />
   </TitleStripWithContent>
 
   <Wrapper>
