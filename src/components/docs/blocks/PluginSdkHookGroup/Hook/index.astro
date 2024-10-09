@@ -1,113 +1,137 @@
 ---
 import { Heading } from '~/components/Heading';
 import s from './style.module.css';
-import type { PluginSdkHook } from '../utils';
-import ExpandableAttribute from '../ExpandableAttribute/index.astro';
+import PropertyOrMethod from '../PropertyOrMethod/index.astro';
 import { Markdown } from '~/components/Markdown';
-import { Code } from 'astro:components';
-import { slugify } from '~/lib/slugify';
+import type {
+  HookInfo,
+  PropertiesOrMethodsGroup,
+  PropertyOrMethod as PropertyOrMethodType,
+} from '../manifestTypes';
+import { fetchPluginSdkManifest } from '../utils';
+import ExpandablePane from '../ExpandablePane/index.astro';
+import PropertiesOrMethodsGroupPane from '../PropertiesOrMethodsGroupPane/index.astro';
+import { Space } from '~/components/Space';
 
-type Props = { hook: PluginSdkHook };
+type Props = { hook: HookInfo };
 
 const { hook } = Astro.props;
 
-const ctxAttrs = hook.ctx?.flatMap((group) => group.properties) || [];
+const sortByNameWithNullOnTop = (a: { name?: string }, b: { name?: string }): number => {
+  // If both names are null, maintain their original order
+  if (!a.name && !b.name) return 0;
 
-const ctxProperties = ctxAttrs
-  .filter((i) => i.type === 'property')
-  .sort((a, b) => a.name.localeCompare(b.name));
+  // If a's name is null, it should come first
+  if (!a.name) return -1;
 
-const ctxMethods = ctxAttrs
-  .filter((i) => i.type === 'function')
-  .sort((a, b) => a.name.localeCompare(b.name));
+  // If b's name is null, it should come first
+  if (!b.name) return 1;
+
+  // If neither name is null, use localeCompare for alphabetical sorting
+  return a.name.localeCompare(b.name);
+};
+
+function mergeUnnamedGroups(groups: PropertiesOrMethodsGroup[]): PropertiesOrMethodsGroup[] {
+  const mergedItems: Record<string, PropertyOrMethodType> = {}; // To collect merged items
+
+  const filteredGroups = groups.filter((group) => {
+    // If group has no name and no comment, merge its items
+    if (!group.name && !group.comment) {
+      Object.assign(mergedItems, group.items); // Merge the items
+      return false; // Exclude this group from the final array
+    }
+    return true; // Keep the group if it has a name or comment
+  });
+
+  // If there were any unnamed/uncommented groups, add the merged result as a new group
+  if (Object.keys(mergedItems).length > 0) {
+    filteredGroups.push({
+      items: mergedItems, // Merged items from unnamed/uncommented groups
+    });
+  }
+
+  return filteredGroups;
+}
+
+const manifest = await fetchPluginSdkManifest();
+
+const specific = mergeUnnamedGroups(
+  [
+    ...(hook.ctxArgument?.additionalProperties || []),
+    ...(hook.ctxArgument?.additionalMethods || []),
+  ].sort(sortByNameWithNullOnTop),
+);
+
+const base = mergeUnnamedGroups(
+  [
+    ...manifest.baseCtx.properties,
+    ...manifest.baseCtx.methods,
+    ...(hook.ctxArgument?.type === 'SelfResizingPluginFrameCtx'
+      ? [manifest.selfResizingPluginFrameCtxSizingUtilities]
+      : []),
+  ].sort(sortByNameWithNullOnTop),
+);
 ---
 
-<Heading anchor={slugify(hook.name)} as="h4">
-  <code>{hook.name}()</code>
-</Heading>
+<Space top={3} bottom={3}>
+  <Heading anchor={hook.name} as="h4">
+    <code
+      >{hook.name}({
+        [
+          ...hook.nonCtxArguments.map((arg) => `${arg.name}: ${arg.typeName}`),
+          ...(hook.ctxArgument ? [`ctx`] : []),
+        ].join(', ')
+      })</code
+    >
+  </Heading>
 
-{hook.description && <Markdown of={hook.description} />}
+  {hook.comment?.markdownText && <Markdown of={hook.comment?.markdownText} />}
 
-<!-- {
-  // TODO: missing return types!
-  false && hook.returnType && (
-    <>
-      <Heading anchor={`${hook.name}-context`} as="h5" class={s.subchapter}>
-        Return value
-      </Heading>
-      {hook.returnType.properties ? (
-        <>
-          <p>
-            The function must return {hook.returnType.isArray ? 'an array of objects' : 'an object'}{' '}
-            with the following structure:
-          </p>
-          <ExpandablePane label="structure">
-            <div class={s.propertyGroup}>
-              {hook.returnType.properties
-                .sort((a, b) => a.lineNumber - b.lineNumber)
-                .map((item) => (
-                  <div key={item.name} class={s.returnValue}>
-                    <div class={s.returnValueName}>
-                      <a href={`${baseUrl}#L${item.lineNumber}`} target="_blank" rel="noreferrer">
-                        {item.name}
-                        <Svg name="icons/brands/github" />
-                      </a>{' '}
-                      {item.isOptional ? (
-                        <span class={s.optional}>Optional</span>
-                      ) : (
-                        <span class={s.required}>Required</span>
-                      )}
-                    </div>
-                    <div class={s.returnValueDescription}>
-                      <Markdown of={item.description} />
-                    </div>
-                  </div>
-                ))}
-            </div>
+  {
+    hook.returnType !== 'void' && (
+      <>
+        <Heading anchor={`${hook.name}-context`} as="h5" class={s.subchapter}>
+          Return value
+        </Heading>
+        <p>
+          The function must return: <code>{hook.returnType}</code>.
+        </p>
+      </>
+    )
+  }
+
+  {
+    hook.ctxArgument && (
+      <>
+        <Heading anchor={`${hook.name}-context-object`} as="h5" class={s.subchapter}>
+          Context object
+        </Heading>
+        <p>
+          The following properties and methods are available in the <code>ctx</code> argument:
+        </p>
+
+        {specific.length > 0 && (
+          <ExpandablePane label="Hook-specific properties and methods">
+            <p>
+              This hook exposes additional information and operations specific to the context in
+              which it operates.
+            </p>
+            {specific.map((group) => (
+              <PropertiesOrMethodsGroupPane group={group} nonCollapsible={specific.length === 1} />
+            ))}
           </ExpandablePane>
-        </>
-      ) : (
-        <>
+        )}
+
+        <ExpandablePane label="Properties and methods available in every hook">
           <p>
-            The {hook.returnType.isMaybePromise ? '(optionally async) ' : ' '}
-            function must return{' '}
-            {hook.returnType.isArray
-              ? `an array of ${hook.returnType.type}`
-              : `a ${hook.returnType.type}`}
-            .
+            Every hook available in the Plugin SDK shares the same minumum set of properties and
+            methods.
           </p>
-        </>
-      )}
-    </>
-  )
-} -->
-
-{
-  ctxProperties.length > 0 && (
-    <>
-      <Heading anchor={`${hook.name}-context-properties`} as="h5" class={s.subchapter}>
-        Properties available in context
-      </Heading>
-      <p>The following information and methods are available:</p>
-      {ctxProperties.map((property) => (
-        <ExpandableAttribute property={property} />
-      ))}
-    </>
-  )
-}
-
-{
-  ctxMethods.length > 0 && (
-    <>
-      <Heading anchor={`${hook.name}-context-methods`} as="h5" class={s.subchapter}>
-        Methods available in context
-      </Heading>
-      <p>The following information and methods are available:</p>
-      {ctxMethods.map((property) => (
-        <ExpandableAttribute property={property} />
-      ))}
-    </>
-  )
-}
-
-{hook.example && <Code code={hook.example} lang="js" />}
+          {base.map((group) => (
+            <PropertiesOrMethodsGroupPane group={group} />
+          ))}
+        </ExpandablePane>
+      </>
+    )
+  }
+</Space>

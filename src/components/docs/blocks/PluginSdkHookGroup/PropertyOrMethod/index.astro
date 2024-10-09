@@ -1,18 +1,19 @@
 ---
 import { Svg } from '~/components/Svg';
 import s from './style.module.css';
-import type { Property } from '../utils';
 import { Markdown } from '~/components/Markdown';
 import removeMarkdown from 'remove-markdown';
 import { Code } from '~/components/Code';
+import type { PropertyOrMethod } from '../manifestTypes';
 
 type Props = {
-  property: Property;
+  name: string;
+  propertyOrMethod: PropertyOrMethod;
 };
 
-const { property } = Astro.props;
+const { name, propertyOrMethod } = Astro.props;
 
-const baseUrl = 'https://github.com/datocms/plugins-sdk/blob/master/packages/sdk/src/types.ts';
+const baseUrl = 'https://github.com/datocms/plugins-sdk/blob/master/packages/sdk/';
 ---
 
 <expandable-attribute>
@@ -24,20 +25,34 @@ const baseUrl = 'https://github.com/datocms/plugins-sdk/blob/master/packages/sdk
     <div class={s.hookBody}>
       <button type="button" class={s.hookName} data-expandable-attribute-button>
         <span class={s.hookNameName}>
-          ctx.{property.name}{property.type === 'function' ? '()' : ''}
+          ctx.{name}{
+            propertyOrMethod.type.length > 50
+              ? propertyOrMethod.type.startsWith('(')
+                ? '(...)'
+                : ''
+              : propertyOrMethod.type.startsWith('(')
+                ? propertyOrMethod.type
+                : `: ${propertyOrMethod.type}`
+          }
         </span>
         {
-          property.description && (
-            <span class={s.hookNameDesc}>{removeMarkdown(property.description)}</span>
+          propertyOrMethod.comment?.markdownText && (
+            <span class={s.hookNameDesc}>
+              {removeMarkdown(propertyOrMethod.comment?.markdownText)}
+            </span>
           )
         }
       </button>
 
       <div class={s.hookDeets} data-expandable-attribute-content>
         <div class={s.hookDescription}>
-          {property.description && <Markdown of={property.description} />}
+          {
+            propertyOrMethod.comment?.markdownText && (
+              <Markdown of={propertyOrMethod.comment?.markdownText} />
+            )
+          }
           <a
-            href={`${baseUrl}#L${property.lineNumber}`}
+            href={`${baseUrl}${propertyOrMethod.location.filePath}#L${propertyOrMethod.location.lineNumber}`}
             target="_blank"
             rel="noreferrer"
             class={s.hookGithub}
@@ -45,7 +60,13 @@ const baseUrl = 'https://github.com/datocms/plugins-sdk/blob/master/packages/sdk
             View on Github <Svg name="icons/brands/github" />
           </a>
         </div>
-        {property.example && <Code code={property.example} language="ts" />}
+        {
+          propertyOrMethod.comment?.example && (
+            <div class={s.hookCode}>
+              <Code code={propertyOrMethod.comment?.example} language="ts" />
+            </div>
+          )
+        }
       </div>
     </div>
   </div>

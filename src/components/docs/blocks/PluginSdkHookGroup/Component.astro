@@ -1,5 +1,5 @@
 ---
-import { fetchPluginSdkHooks } from './utils';
+import { fetchPluginSdkManifest, sortRelatedHooks } from './utils';
 import Hook from './Hook/index.astro';
 import { PluginSdkHookGroupFragment } from './graphql';
 import type { FragmentOf } from 'gql.tada';
@@ -13,7 +13,11 @@ const { block } = Astro.props;
 
 const { groupName } = readFragment(PluginSdkHookGroupFragment, block);
 
-const hooks = (await fetchPluginSdkHooks()).filter((hook) => hook.groups.includes(groupName));
+const manifest = await fetchPluginSdkManifest();
+
+const hooks = sortRelatedHooks(
+  Object.values(manifest.hooks).filter((hook) => hook.comment?.tag === groupName),
+);
 ---
 
-{hooks.sort((a, b) => a.lineNumber - b.lineNumber).map((hook) => <Hook hook={hook} />)}
+{hooks.map((hook) => <Hook hook={hook} />)}
