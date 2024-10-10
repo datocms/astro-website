@@ -1,4 +1,5 @@
 ---
+import CdnMap from '~/components/featureAnimations/CdnMap';
 import { Bullets } from '~/components/Bullets';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
@@ -10,11 +11,10 @@ import { SingleQuote } from '~/components/quote/SingleQuote';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { Wrapper } from '~/components/Wrapper';
+import { actions } from 'astro:actions';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
-import CdnMap from '~/components/featureAnimations/CdnMap';
-import { actions } from 'astro:actions';
 
 const path = Astro.url.pathname;
 const slug = path.split('/').pop() || '';
@@ -29,18 +29,16 @@ const { data: datacenters } = await actions.fastlyApiDatacenters();
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
-  <Wrapper>
-    <Hero>
-      <Fragment slot="kicker">Fastest headless CMS</Fragment>
-      <Fragment slot="title">
-        Content, images and videos, <mark>all on the edge</mark>
-      </Fragment>
-      <Fragment slot="subtitle">
-        It’s the all-encompassing CDN-backed API for content you wish your company had:
-        <strong>accessible, performant, secure, and close to every customer</strong>.
-      </Fragment>
-    </Hero>
-  </Wrapper>
+  <Hero>
+    <Fragment slot="kicker">Fastest headless CMS</Fragment>
+    <Fragment slot="title">
+      Content, images and videos, <mark>all on the edge</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      It’s the all-encompassing CDN-backed API for content you wish your company had:
+      <strong>accessible, performant, secure, and close to every customer</strong>.
+    </Fragment>
+  </Hero>
 
   <CdnMap datacenters={datacenters} client:load>
     <Svg name="svg/world" />
