@@ -1,0 +1,83 @@
+---
+type Props = {
+  observerRoot?: string;
+  observerRootMargin?: string;
+  observerThreshold?: number;
+};
+
+const { observerRoot, observerRootMargin, observerThreshold } = Astro.props;
+---
+
+<scrollspy-nav
+  observer-root={observerRoot}
+  observer-root-margin={observerRootMargin}
+  observer-threshold={observerThreshold}
+>
+  <slot />
+</scrollspy-nav>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'scrollspy-nav',
+    class ScrollspyNav extends WebComponent {
+      private activeLink: HTMLAnchorElement | undefined;
+
+      parsedCallback(): void {
+        const links = this.$$<HTMLAnchorElement>('a');
+        const sections: HTMLElement[] = [];
+
+        links.forEach((link) => {
+          if (new URL(link.href).host !== window.location.host) return;
+
+          const el = document.querySelector(link.hash);
+          const value = link.hash.substring(1);
+
+          if (!el) {
+            console.warn(
+              `[${this.localName}]: Element with id "${value}" doesn't exist on this page.`,
+            );
+            return;
+          }
+
+          sections.push(el as HTMLElement);
+        });
+
+        const onIntersect = (entries: IntersectionObserverEntry[]): void => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) return;
+
+            const link = this.querySelector(`[href="#${entry.target.id}"`) as HTMLAnchorElement;
+
+            this.setActiveLink(link);
+          }
+
+          if (!this.activeLink) {
+            this.setActiveLink(links[0]!);
+          }
+        };
+
+        const root = this.getAttribute('observer-root');
+        const rootMargin = this.getAttribute('observer-root-margin');
+        const threshold = this.getAttribute('observer-threshold');
+
+        const observer = new IntersectionObserver(onIntersect, {
+          root: root ? document.querySelector(root) : null,
+          rootMargin: rootMargin || '-25% 0% -75% 0%',
+          threshold: threshold ? Number(threshold) : undefined,
+        });
+
+        for (const section of sections) {
+          observer.observe(section);
+        }
+      }
+
+      setActiveLink(el: HTMLAnchorElement): void {
+        this.activeLink?.removeAttribute('aria-current');
+        el.setAttribute('aria-current', 'true');
+        this.activeLink = el;
+      }
+    },
+  );
+</script>
