@@ -6,9 +6,9 @@ import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 
-export const FeatureSection = graphql(
+export const FeatureSectionFragment = graphql(
   /* GraphQL */ `
-    fragment FeatureSection on FeatureRegularCardRecord {
+    fragment FeatureSectionFragment on FeatureRegularCardRecord @_unmask {
       __typename
       title
       description {
@@ -71,17 +71,17 @@ export const query = graphql(
           value
         }
         heroImageLeft {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 1000 }) {
             ...ResponsiveImageFragment
           }
         }
         heroImageRight {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 1000 }) {
             ...ResponsiveImageFragment
           }
         }
-        coreFeature {
-          ...FeatureSection
+        coreFeaturesBlocks {
+          ...FeatureSectionFragment
           ... on TestimonialCardRecord {
             __typename
             testimonial {
@@ -90,8 +90,8 @@ export const query = graphql(
             }
           }
         }
-        editorExperienceFeature {
-          ...FeatureSection
+        editorExperienceBlocks {
+          ...FeatureSectionFragment
           ... on TestimonialCardRecord {
             __typename
             testimonial {
@@ -100,8 +100,8 @@ export const query = graphql(
             }
           }
         }
-        developerExperienceFeature {
-          ...FeatureSection
+        developerExperienceBlocks {
+          ...FeatureSectionFragment
           ... on TestimonialCardRecord {
             __typename
             testimonial {
@@ -111,8 +111,8 @@ export const query = graphql(
             }
           }
         }
-        imageVideoManagementFeature {
-          ...FeatureSection
+        imageVideoManagementBlocks {
+          ...FeatureSectionFragment
           ... on TestimonialCardRecord {
             __typename
             testimonial {
@@ -121,8 +121,8 @@ export const query = graphql(
             }
           }
         }
-        localizationFeature {
-          ...FeatureSection
+        localizationBlocks {
+          ...FeatureSectionFragment
           ... on TestimonialCardRecord {
             __typename
             testimonial {
@@ -131,8 +131,8 @@ export const query = graphql(
             }
           }
         }
-        extensibilityFeature {
-          ...FeatureSection
+        extensibilityBlocks {
+          ...FeatureSectionFragment
           ... on TestimonialCardRecord {
             __typename
             testimonial {
@@ -141,8 +141,8 @@ export const query = graphql(
             }
           }
         }
-        contentIntegrityFeature {
-          ...FeatureSection
+        contentIntegrityBlocks {
+          ...FeatureSectionFragment
           ... on TestimonialCardRecord {
             __typename
             testimonial {
@@ -151,8 +151,8 @@ export const query = graphql(
             }
           }
         }
-        governanceAndComplianceFeature {
-          ...FeatureSection
+        governanceAndComplianceBlocks {
+          ...FeatureSectionFragment
           ... on TestimonialCardRecord {
             __typename
             testimonial {
@@ -161,8 +161,8 @@ export const query = graphql(
             }
           }
         }
-        securityAndInfrastructureFeature {
-          ...FeatureSection
+        securityAndInfrastructureBlocks {
+          ...FeatureSectionFragment
           ... on TestimonialCardRecord {
             __typename
             testimonial {
@@ -174,5 +174,5 @@ export const query = graphql(
       }
     }
   `,
-  [ResponsiveImageFragment, FeatureSection, TagFragment],
+  [ResponsiveImageFragment, FeatureSectionFragment, TagFragment],
 );

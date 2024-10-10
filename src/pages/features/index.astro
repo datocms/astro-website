@@ -1,7 +1,6 @@
 ---
 import { slugify } from '~/lib/slugify';
-import { readFragment } from '~/lib/datocms/graphql';
-import { query, FeatureSection } from './_graphql';
+import { query } from './_graphql';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
@@ -9,12 +8,12 @@ import { Wrapper } from '~/components/Wrapper';
 import { Text } from '~/components/structuredText/Text';
 import { Svg } from '~/components/Svg';
 import { SingleQuote } from '~/components/quote/SingleQuote';
+import { ScrollspyNav } from '~/components/ScrollspyNav';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Layout } from '~/layouts/Layout';
 import { Heading } from '~/components/Heading';
 import { Button } from '~/components/Button';
 import s from './_style.module.css';
-import { ScrollspyNav } from '~/components/ScrollspyNav';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -24,55 +23,62 @@ if (!page) {
 }
 
 const {
-  coreFeature,
-  editorExperienceFeature,
-  developerExperienceFeature,
-  imageVideoManagementFeature,
-  localizationFeature,
-  extensibilityFeature,
-  contentIntegrityFeature,
-  governanceAndComplianceFeature,
-  securityAndInfrastructureFeature,
+  coreFeaturesBlocks,
+  editorExperienceBlocks,
+  developerExperienceBlocks,
+  imageVideoManagementBlocks,
+  localizationBlocks,
+  extensibilityBlocks,
+  contentIntegrityBlocks,
+  governanceAndComplianceBlocks,
+  securityAndInfrastructureBlocks,
 } = page;
 
 const featuresGroup = [
   {
-    title: 'Core Feature',
-    features: readFragment(FeatureSection, coreFeature),
+    title: 'Core Features',
+    features: coreFeaturesBlocks,
   },
   {
     title: 'Editor Experience',
-    features: readFragment(FeatureSection, editorExperienceFeature),
+    features: editorExperienceBlocks,
   },
   {
     title: 'Developer Experience',
-    features: readFragment(FeatureSection, developerExperienceFeature),
+    features: developerExperienceBlocks,
   },
   {
     title: 'Image & Video Management',
-    features: readFragment(FeatureSection, imageVideoManagementFeature),
+    features: imageVideoManagementBlocks,
   },
   {
     title: 'Localization',
-    features: readFragment(FeatureSection, localizationFeature),
+    features: localizationBlocks,
   },
   {
     title: 'Extensibility',
-    features: readFragment(FeatureSection, extensibilityFeature),
+    features: extensibilityBlocks,
   },
   {
     title: 'Content Integrity',
-    features: readFragment(FeatureSection, contentIntegrityFeature),
+    features: contentIntegrityBlocks,
   },
   {
     title: 'Governance & Compliance',
-    features: readFragment(FeatureSection, governanceAndComplianceFeature),
+    features: governanceAndComplianceBlocks,
   },
   {
     title: 'Security & Infrastructure',
-    features: readFragment(FeatureSection, securityAndInfrastructureFeature),
+    features: securityAndInfrastructureBlocks,
   },
 ];
+
+const linkLabel: { [key: string]: string } = {
+  docs: 'Docs',
+  guide: 'Guide',
+  learn_more: 'Learn more',
+  watch_demo: 'Watch demo',
+};
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
@@ -86,13 +92,13 @@ const featuresGroup = [
           <Text data={page.subtitle} />
         </div>
         <div class={s.buttonContainer}>
-          <Button as="a" href="https://dashboard.datocms.com/signup"> Try it for free </Button>
-          <Button as="a" s="invert" href="/contact"> Contact sales </Button>
+          <Button as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
+          <Button as="a" s="invert" href="/contact">Contact sales</Button>
         </div>
       </div>
       <div class={s.heroImageWrapper}>
         {
-          page.heroImageLeft?.responsiveImage && page.heroImageRight?.responsiveImage && (
+          page.heroImageLeft && page.heroImageRight && (
             <>
               <div class={s.heroImage}>
                 <ResponsiveImage data={page.heroImageLeft.responsiveImage} />
@@ -158,12 +164,15 @@ const featuresGroup = [
 
                             {feature.links && (
                               <div class={s.featureLinks}>
-                                {feature.links.map((link) => (
-                                  // TODO: fix warning
-                                  <a href={buildUrlFromGql(link.content)} class={s.link}>
-                                    {link.linkTitle}
-                                  </a>
-                                ))}
+                                {feature.links.map((link) => {
+                                  const customTitle = linkLabel[link.linkTitle] || link.linkTitle;
+                                  return (
+                                    // TODO: fix warning
+                                    <a href={buildUrlFromGql(link.content)} class={s.link}>
+                                      {customTitle}
+                                    </a>
+                                  );
+                                })}
                               </div>
                             )}
                           </article>
