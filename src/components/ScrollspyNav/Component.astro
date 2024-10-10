@@ -23,8 +23,10 @@ const { observerRoot, observerRootMargin, observerThreshold } = Astro.props;
     'scrollspy-nav',
     class ScrollspyNav extends WebComponent {
       private activeLink: HTMLAnchorElement | undefined;
+      private currentAnchor: HTMLElement | undefined;
 
       parsedCallback(): void {
+        this.currentAnchor = this.querySelector('[data-current-anchor]');
         const links = this.$$<HTMLAnchorElement>('a');
         const sections: HTMLElement[] = [];
 
@@ -77,6 +79,10 @@ const { observerRoot, observerRootMargin, observerThreshold } = Astro.props;
         this.activeLink?.removeAttribute('aria-current');
         el.setAttribute('aria-current', 'true');
         this.activeLink = el;
+
+        if (this.currentAnchor) {
+          this.currentAnchor.textContent = el.textContent;
+        }
       }
     },
   );
