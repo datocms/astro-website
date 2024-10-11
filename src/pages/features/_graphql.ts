@@ -53,6 +53,9 @@ export const FeatureSectionFragment = graphql(
           ... on HostingAppRecord {
             slug
           }
+          ... on EnterpriseAppRecord {
+            slug
+          }
         }
       }
     }

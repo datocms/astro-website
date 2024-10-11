@@ -1,7 +1,7 @@
 import { graphql, readFragment, type FragmentOf } from '../graphql';
 
 export const HostingAppUrlFragment = graphql(/* GraphQL */ `
-  fragment HostingAppUrlFragment on BlogPostRecord {
+  fragment HostingAppUrlFragment on HostingAppRecord {
     slug
   }
 `);
