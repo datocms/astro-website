@@ -1,5 +1,4 @@
 import { graphql } from '~/lib/datocms/graphql';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 
 /*
  * This file lists a series of graphql not related to any specific Vue

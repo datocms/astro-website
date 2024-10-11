@@ -4,9 +4,18 @@ import {
 } from '~/components/quote/SingleQuote/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { BlogPostUrlFragment } from '~/lib/datocms/gqlUrlBuilder/blogPost';
+import { ChangelogEntryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
+import { DocPageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/docPage';
+import { EnterpriseAppUrlFragment } from '~/lib/datocms/gqlUrlBuilder/enterpriseApp';
+import { FeatureUrlFragment } from '~/lib/datocms/gqlUrlBuilder/feature';
+import { HostingAppUrlFragment } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
+import { PluginUrlFragment } from '~/lib/datocms/gqlUrlBuilder/plugin';
+import { TemplateDemoUrlFragment } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
+import { UserGuideEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder/userGuideEpisode';
 import { graphql } from '~/lib/datocms/graphql';
 
-export const FeatureSectionFragment = graphql(
+const FeatureSectionFragment = graphql(
   /* GraphQL */ `
     fragment FeatureSectionFragment on FeatureRegularCardRecord @_unmask {
       __typename
@@ -23,44 +32,47 @@ export const FeatureSectionFragment = graphql(
         linkTitle
         content {
           __typename
-          ... on BlogPostRecord {
-            slug
-          }
-          ... on ChangelogEntryRecord {
-            slug
-          }
-          ... on DocPageRecord {
-            parent: _allReferencingDocGroups {
-              slug
-            }
-            slug
-          }
-          ... on FeatureRecord {
-            slug
-          }
-          ... on PluginRecord {
-            packageName
-          }
-          ... on TemplateDemoRecord {
-            code
-          }
-          ... on UserGuidesVideoRecord {
-            chapters: _allReferencingUserGuidesChapters {
-              slug
-            }
-            slug
-          }
-          ... on HostingAppRecord {
-            slug
-          }
-          ... on EnterpriseAppRecord {
-            slug
-          }
+          ...BlogPostUrlFragment
+          ...ChangelogEntryUrlFragment
+          ...DocPageUrlFragment
+          ...FeatureUrlFragment
+          ...PluginUrlFragment
+          ...TemplateDemoUrlFragment
+          ...UserGuideEpisodeUrlFragment
+          ...HostingAppUrlFragment
+          ...EnterpriseAppUrlFragment
         }
       }
     }
   `,
-  [ResponsiveImageFragment, PartnerTestimonialQuoteFragment, ReviewQuoteFragment],
+  [
+    ResponsiveImageFragment,
+    PartnerTestimonialQuoteFragment,
+    ReviewQuoteFragment,
+    BlogPostUrlFragment,
+    ChangelogEntryUrlFragment,
+    DocPageUrlFragment,
+    FeatureUrlFragment,
+    PluginUrlFragment,
+    TemplateDemoUrlFragment,
+    UserGuideEpisodeUrlFragment,
+    HostingAppUrlFragment,
+    EnterpriseAppUrlFragment,
+  ],
+);
+
+const TestimonialCardFragment = graphql(
+  /* GraphQL */ `
+    fragment TestimonialCardFragment on TestimonialCardRecord @_unmask {
+      __typename
+      testimonial {
+        __typename
+        ...PartnerTestimonialQuoteFragment
+        ...ReviewQuoteFragment
+      }
+    }
+  `,
+  [PartnerTestimonialQuoteFragment, ReviewQuoteFragment],
 );
 
 export const query = graphql(
@@ -88,97 +100,42 @@ export const query = graphql(
         }
         coreFeaturesBlocks {
           ...FeatureSectionFragment
-          ... on TestimonialCardRecord {
-            __typename
-            testimonial {
-              ...PartnerTestimonialQuoteFragment
-              ...ReviewQuoteFragment
-            }
-          }
+          ...TestimonialCardFragment
         }
         editorExperienceBlocks {
           ...FeatureSectionFragment
-          ... on TestimonialCardRecord {
-            __typename
-            testimonial {
-              ...PartnerTestimonialQuoteFragment
-              ...ReviewQuoteFragment
-            }
-          }
+          ...TestimonialCardFragment
         }
         developerExperienceBlocks {
           ...FeatureSectionFragment
-          ... on TestimonialCardRecord {
-            __typename
-            testimonial {
-              __typename
-              ...PartnerTestimonialQuoteFragment
-              ...ReviewQuoteFragment
-            }
-          }
+          ...TestimonialCardFragment
         }
         imageVideoManagementBlocks {
           ...FeatureSectionFragment
-          ... on TestimonialCardRecord {
-            __typename
-            testimonial {
-              ...PartnerTestimonialQuoteFragment
-              ...ReviewQuoteFragment
-            }
-          }
+          ...TestimonialCardFragment
         }
         localizationBlocks {
           ...FeatureSectionFragment
-          ... on TestimonialCardRecord {
-            __typename
-            testimonial {
-              ...PartnerTestimonialQuoteFragment
-              ...ReviewQuoteFragment
-            }
-          }
+          ...TestimonialCardFragment
         }
         extensibilityBlocks {
           ...FeatureSectionFragment
-          ... on TestimonialCardRecord {
-            __typename
-            testimonial {
-              ...PartnerTestimonialQuoteFragment
-              ...ReviewQuoteFragment
-            }
-          }
+          ...TestimonialCardFragment
         }
         contentIntegrityBlocks {
           ...FeatureSectionFragment
-          ... on TestimonialCardRecord {
-            __typename
-            testimonial {
-              ...PartnerTestimonialQuoteFragment
-              ...ReviewQuoteFragment
-            }
-          }
+          ...TestimonialCardFragment
         }
         governanceAndComplianceBlocks {
           ...FeatureSectionFragment
-          ... on TestimonialCardRecord {
-            __typename
-            testimonial {
-              ...PartnerTestimonialQuoteFragment
-              ...ReviewQuoteFragment
-            }
-          }
+          ...TestimonialCardFragment
         }
         securityAndInfrastructureBlocks {
           ...FeatureSectionFragment
-          ... on TestimonialCardRecord {
-            __typename
-            testimonial {
-              ...PartnerTestimonialQuoteFragment
-              ...ReviewQuoteFragment
-            }
-          }
+          ...TestimonialCardFragment
         }
       }
     }
   `,
-  [ResponsiveImageFragment, FeatureSectionFragment, TagFragment],
+  [ResponsiveImageFragment, FeatureSectionFragment, TestimonialCardFragment, TagFragment],
 );

@@ -63,7 +63,7 @@ export default function LandingPagesGenerator() {
     <div className={s.body}>
       <div className={s.title}>Acme Inc.</div>
       <div className={s.list} style={{ height }}>
-        {transitions((style, item, t, index) => (
+        {transitions((style, item, _t, index) => (
           <animated.div className={s.card} style={{ zIndex: blocks.length - index, ...style }}>
             <div className={s.cell}>
               <div className={s.details} style={{ backgroundImage: item.css }} />
