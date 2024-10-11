@@ -1,0 +1,194 @@
+.grid {
+  width: 100%;
+
+  @media screen and (width > 650px) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, auto);
+    column-gap: 30px;
+    row-gap: 50px;
+
+    grid-template-areas:
+      'draft draft'
+      'review review'
+      'approved  changes'
+      'published published';
+  }
+
+  @media screen and (width > 950px) {
+    column-gap: 30px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, auto);
+    row-gap: 50px;
+
+    grid-template-areas:
+      'draft review  approved published'
+      '.     changes .        .';
+  }
+
+  @media screen and (width > 1300px) {
+    margin: rfs(120px) -60px;
+  }
+}
+
+.draft {
+  grid-area: draft;
+}
+
+.review {
+  grid-area: review;
+}
+
+.approved {
+  grid-area: approved;
+}
+
+.published {
+  grid-area: published;
+}
+
+.changes {
+  grid-area: changes;
+}
+
+.stage {
+  margin-bottom: 50px;
+  transition: all 0.2s ease-in-out;
+
+  @media screen and (width > 650px) {
+    margin: 0;
+  }
+}
+
+.stageLabel {
+  color: var(--light-body-color);
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.stageContainer {
+  background: rgba(140, 140, 140, 0.1);
+  border-radius: 10px;
+  border: 3px dashed rgba(140, 140, 140, 0.1);
+  color: #999;
+  height: rfs(80px);
+  position: relative;
+  transition: all 0.2s ease-in-out;
+
+  @media screen and (min-height: 800px) {
+    height: 140px;
+  }
+}
+
+.stageConfetti {
+  margin-left: 50%;
+}
+
+.activeStage .stageContainer {
+  border-color: #aaa;
+}
+
+.activeStage .stageLabel {
+  color: var(--base-body-color);
+}
+
+.wrapper {
+  position: relative;
+}
+
+.record {
+  background: white;
+  border-radius: 10px;
+  box-shadow: var(--box-shadow);
+  opacity: 1;
+  overflow: hidden;
+  position: absolute;
+  transition: all 0.2s 0.3s ease-in-out;
+}
+
+.recordHidden {
+  opacity: 0;
+}
+
+.recordBody {
+  border-radius: 10px;
+  font-size: 1.3em;
+  font-weight: bold;
+  padding: 20px 20px 15px;
+  text-align: center;
+
+  @media screen and (width >= 1000px) {
+    padding: 30px 30px 25px;
+  }
+}
+
+.recordBodyChanged {
+  color: var(--azure-color);
+}
+
+.personContainer {
+  background: var(--light-bg-color);
+  height: 60px;
+  position: relative;
+}
+
+.person {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  left: 0;
+  opacity: 1;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) translateX(0);
+  transition: all 0.2s ease-in-out;
+}
+
+.personEnter {
+  opacity: 0;
+  transform: translateY(-50%) translateX(-50%);
+}
+
+.personEnterActive {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.personLeave {
+  opacity: 1;
+  transform: translateY(-50%) translateX(50%);
+}
+
+.personLeaveActive {
+  opacity: 0;
+  transform: translateY(-50%) translateX(0);
+}
+
+.personIcon {
+  flex-shrink: 0;
+  height: 40px;
+  margin-right: 20px;
+  width: 40px;
+
+  img {
+    background: linear-gradient(45deg, #fdece5, #fefae4);
+    border-radius: 50px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    height: 40px;
+    width: 40px;
+  }
+}
+
+.personName {
+  font-size: 0.7em;
+}
+
+.personRole {
+  font-size: 0.9em;
+  font-weight: bold;
+  line-height: 1;
+}

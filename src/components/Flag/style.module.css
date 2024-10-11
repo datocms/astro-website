@@ -1,21 +1,42 @@
+@keyframes move {
+  0% {
+    transform: translateY(-15px);
+  }
+
+  100% {
+    transform: translateY(15px);
+  }
+}
+
+@keyframes opacity {
+  0% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
 .root {
   --flip-margin: rfs(60px);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   margin: rfs(100px) 0;
-  text-align: center;
 
   @media screen and (min-width: 800px) {
-    display: grid;
-    text-align: center;
-    grid-template-columns: 45% 1fr;
-    grid-column-gap: 10%;
-    align-items: center;
     --dotBaseUnit: 70px;
+    align-items: center;
+    display: grid;
+    grid-column-gap: 10%;
+    grid-template-columns: 45% 1fr;
   }
 }
 
 .root.isFlipped {
   @media screen and (min-width: 800px) {
-    .imageContainer {
+    .visual {
       order: 2;
     }
 
@@ -31,25 +52,18 @@
   }
 }
 
-.imageContainer {
+.visual {
+  align-items: center;
+  display: flex;
+  justify-content: center;
   position: relative;
-}
 
-.image {
-  margin-bottom: 40px;
-  text-align: left;
-
-  @media screen and (min-width: 800px) {
-    margin-bottom: 0;
-  }
-
-  > svg,
-  > img {
+  svg {
     aspect-ratio: 5/4;
     display: block;
     margin: 0 auto;
-    width: 66%;
     max-width: 460px;
+    width: 75%;
 
     @media screen and (min-width: 800px) {
       width: 100%;
@@ -65,6 +79,10 @@
   width: rfs(200px);
   z-index: -1;
 
+  @media (prefers-reduced-motion) {
+    animation: opacity 4s infinite alternate ease-in-out;
+  }
+
   &[data-style='good'] {
     background: linear-gradient(#c3f4fa, #9be0e8);
   }
@@ -74,31 +92,19 @@
   }
 }
 
-.neutralDot {
-  animation: move 2s infinite alternate ease-in-out;
-  border-radius: 1000px;
-  position: absolute;
-  z-index: -1;
-}
-
-@keyframes move {
-  0% {
-    transform: translateY(-15px);
-  }
-
-  100% {
-    transform: translateY(15px);
-  }
-}
-
 .content {
+  text-align: center;
+
   @media screen and (width > 800px) {
     text-align: left;
   }
 
   p {
-    margin: 0;
-    margin-bottom: rfs(40px);
+    margin: 0 0 1em 0;
+
+    &:last-child {
+      margin-bottom: rfs(40px);
+    }
   }
 
   a {
@@ -124,33 +130,10 @@
 
 .body {
   line-height: 1.4;
+  margin-top: rfs(40px);
 
   @media screen and (width > 1000px) {
     padding-right: 50px;
-  }
-}
-
-.goodHighlight {
-  color: var(--azure-color);
-}
-
-.badHighlight {
-  color: var(--accent-color);
-}
-
-.badRoot {
-  .content a {
-    &:hover {
-      color: var(--accent-color);
-    }
-  }
-}
-
-.goodRoot {
-  .content a {
-    &:hover {
-      color: var(--azure-color);
-    }
   }
 }
 

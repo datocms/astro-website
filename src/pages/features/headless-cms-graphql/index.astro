@@ -1,0 +1,164 @@
+---
+import GraphQlDemoA from './_GraphQlDemoA';
+import GraphQlDemoB from './_GraphQlDemoB';
+import { Bullets } from '~/components/Bullets';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { Wrapper } from '~/components/Wrapper';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+
+const path = Astro.url.pathname;
+const slug = path.split('/').pop() || '';
+const { page } = await executeQuery(Astro, query, { variables: { slug } });
+
+if (!page || !page.quote || !page.video) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker">{page.seoH1}</Fragment>
+    <Fragment slot="title">GraphQL means <mark>superior developer experience</mark></Fragment>
+    <Fragment slot="subtitle">
+      <strong>GraphQL, in combination with a powerful headless CMS</strong>, provides
+      <strong>faster responses</strong>, a complete and understandable
+      <strong>description of your API</strong>, and enables great developer tools.
+    </Fragment>
+  </Hero>
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker">The headless cms graphql revolution</Fragment>
+    <Fragment slot="title">Ask for what you need, get exactly that</Fragment>
+    <Fragment slot="subtitle">
+      <p>
+        Apps using GraphQL combined with a headless CMS are <strong>fast and stable</strong> because
+        it is not the server which controls the data they get, <em>they</em> are.
+      </p>
+      <p>
+        Contrary to the REST API dogma, a
+        <strong>GraphQL query to your API gets exactly what you ask for</strong>, nothing more and
+        nothing less, that is why
+        <strong> GraphQL queries always return predictable results </strong>. Read more about the
+        advantages of the GraphQL API on their
+        <a
+          href="https://graphql.org/faq/#why-should-i-use-graphql"
+          target="_blank"
+          rel="noreferrer"
+        >
+          official website
+        </a>
+      </p>
+    </Fragment>
+    <Wrapper>
+      <GraphQlDemoA client:visible />
+    </Wrapper>
+  </TitleStripWithContent>
+
+  <Space top={3} bottom={3}>
+    <SingleQuote quote={page.quote} />
+  </Space>
+
+  <Space bottom={3}>
+    <TitleStripWithContent>
+      <Fragment slot="title">Move faster with powerful developer tools</Fragment>
+      <Fragment slot="subtitle">
+        <p>
+          Know exactly what data you can request from your API
+          <strong>without leaving your editor</strong>, highlight potential issues before sending a
+          query, and take advantage of improved code intelligence. GraphQL makes it easy to build
+          <strong>powerful tools like GraphiQL</strong> by leveraging your API’s type system.
+        </p>
+      </Fragment>
+      <VideoPlayer data={page.video} />
+    </TitleStripWithContent>
+  </Space>
+
+  <Space bottom={3}>
+    <TitleStripWithContent>
+      <Fragment slot="title">Get many resources in a single request</Fragment>
+      <Fragment slot="subtitle">
+        <p>
+          GraphQL queries access not just the properties of one resource but also
+          <strong>smoothly follow references between them</strong>. While typical REST APIs require
+          loading from multiple URLs, GraphQL APIs get
+          <strong>all the data your app needs in a single request</strong>. Apps using GraphQL can
+          be
+          <strong>quick even on slow mobile network connections</strong>.
+        </p>
+      </Fragment>
+      <Wrapper>
+        <GraphQlDemoB client:visible />
+      </Wrapper>
+    </TitleStripWithContent>
+  </Space>
+
+  <Wrapper>
+    <Flag style="good">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/rocket" />
+      </Fragment>
+      <Fragment slot="kicker">#1 Headless CMS GraphQL</Fragment>
+      <Fragment slot="title">GraphQL + DatoCMS = 🚀</Fragment>
+      <p>
+        <strong>DatoCMS was envisioned with GraphQL in mind</strong>. We integrated a useful GraphQL
+        API explorer directly in the editor backend, to make it even more natural to use it and
+        experiment with it!
+      </p>
+    </Flag>
+
+    <Flag style="good">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/zen-garden" />
+      </Fragment>
+      <Fragment slot="kicker">Headless CMS GraphQL + Worldwide CDN</Fragment>
+      <Fragment slot="title">
+        A complete set of <mark>smart, modern APIs</mark>
+      </Fragment>
+      <p>
+        DatoCMS does not only offer a <strong>powerful GraphQL API</strong>
+        but a full, coordinated suite of different <strong>APIs and tools</strong> to work seamlessly
+        with the three fundamental blocks of content:
+        <strong>text, images and video</strong>. Everything is built on CDN,
+        <strong>optimized for speed and scalability</strong>.
+      </p>
+      <article>
+        <Bullets style="good">
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/images-api" title="Images API">
+              <span>Images API</span>
+            </a>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/video-api" title="Video API">
+              <span>Video API</span>
+            </a>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/worldwide-cdn" title="Fastest headless CMS CDN">
+              <span>Worldwide CDN</span>
+            </a>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/real-time-api" title="Real-time API">
+              <span>Real-time updates API</span>
+            </a>
+          </li>
+        </Bullets>
+      </article>
+    </Flag>
+  </Wrapper>
+</Layout>

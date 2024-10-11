@@ -1,0 +1,19 @@
+---
+import { MaybeLink } from '~/components/links/MaybeLink';
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+
+interface Props {
+  href?: string;
+  title: string;
+  logo?: string;
+}
+
+const { href, title, logo } = Astro.props;
+---
+
+<MaybeLink href={href} class={s.block}>
+  <div class={s.blockTitle}>{title}</div>
+  <slot />
+  {logo && <Svg name={logo} class={s.logo} />}
+</MaybeLink>

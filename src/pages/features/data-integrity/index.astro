@@ -1,0 +1,195 @@
+---
+import FieldValidations from '~/components/featureAnimations/FieldValidations';
+import SandboxEnvironmentsDemo from '~/components/featureAnimations/SandboxEnvironmentsDemo';
+import Workflow from '~/components/featureAnimations/Workflow';
+import WorkflowPermission from './_WorkflowPermission';
+import { Bullets } from '~/components/Bullets';
+import { Button } from '~/components/Button';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { UiChrome } from '~/components/UiChrome';
+import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+
+const path = Astro.url.pathname;
+const slug = path.split('/').pop() || '';
+const { page } = await executeQuery(Astro, query, { variables: { slug } });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker">Data integrity</Fragment>
+    <Fragment slot="title">
+      <mark>Safety &amp; content integrity</mark>, at the core of every choice
+    </Fragment>
+    <Fragment slot="subtitle">
+      Clean data is timeless data. Discover how DatoCMS enables you to achieve peace of mind by
+      taking care of everything that can jeopardize the health and longevity of your content.
+    </Fragment>
+  </Hero>
+
+  <Wrapper>
+    <Space top={2} bottom={2}>
+      <InterstitialTitle style="two">
+        Is your CMS worrying about all this stuff for you?
+      </InterstitialTitle>
+    </Space>
+
+    <Flag>
+      <Fragment slot="visual">
+        <UiChrome>
+          <FieldValidations client:visible />
+        </UiChrome>
+      </Fragment>
+      <Fragment slot="title">
+        <mark>Clean content, at every stage</mark> with field validations
+      </Fragment>
+      <p>
+        Each and every content type in modules and blocks can be restricted to allow only specific
+        types of content. Be it a picture of a certain size, a data range, a color, a unique slug or
+        a pre-built value, DatoCMS allows workflow creation
+        <strong>that ensures mistakes cannot be made</strong>.
+      </p>
+    </Flag>
+  </Wrapper>
+
+  <TitleStripWithContent>
+    <Fragment slot="title">
+      Test upcoming website updates, without breaking the live website
+    </Fragment>
+    <Fragment slot="subtitle">
+      <p>
+        Using migration scripts, you can test changes in the structure of your content{' '}
+        <strong>in a safe sandbox environment</strong>, and replay the same exact changes in
+        production once you&#39;re ready to go live.
+      </p>
+      <Space top={1}>
+        <Button
+          as="a"
+          fs="small"
+          p="small"
+          s="invert"
+          href="/docs/scripting-migrations/introduction"
+        >
+          Learn more about Sandbox Environments
+        </Button>
+      </Space>
+    </Fragment>
+    <SandboxEnvironmentsDemo client:visible />
+  </TitleStripWithContent>
+
+  <Wrapper>
+    <Flag>
+      <Fragment slot="visual">
+        <UiChrome>
+          <WorkflowPermission client:visible />
+        </UiChrome>
+      </Fragment>
+      <Fragment slot="title">
+        Specify <mark>who can do what, and when</mark> with custom permissions
+      </Fragment>
+      <p>
+        Roles can be customized to have explicit rules to perform specific actions. These can be
+        assigned to multiple users to create team permissions.
+      </p>
+      <p>
+        Specify exactly what each role can do and cannot do.
+        <strong>Build your editorial workflow role by role</strong>, across projects, languages,
+        environments, timezones and modules.
+      </p>
+    </Flag>
+  </Wrapper>
+
+  <TitleStripWithContent>
+    <Fragment slot="title">Ensure nothing gets published by mistake</Fragment>
+    <Fragment slot="subtitle">
+      <p>
+        With our Workflows feature you can set up a precise state machine to bring a draft content
+        up to the final publication through a series of intermediate, fully customizable approval
+        steps.
+      </p>
+      <p>
+        Define clear tasks for each team members, specifying exactly
+        <strong> who is in charge of performing the necessary checks </strong> and operations on the
+        content so that it can advance to the next step in the approval chain.
+      </p>
+      <Space top={1}>
+        <Button as="a" fs="small" p="small" s="invert" href="/docs/general-concepts/workflows">
+          Learn more about Workflows
+        </Button>
+      </Space>
+    </Fragment>
+    <Workflow client:visible />
+  </TitleStripWithContent>
+
+  <Wrapper>
+    <Flag style="good">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/box-things" />
+      </Fragment>
+      <Fragment slot="kicker">The most user-friendly CMS</Fragment>
+      <Fragment slot="title">
+        A complete set of <mark>smart, modern tools</mark>
+      </Fragment>
+      <p>
+        DatoCMS does not only offer a powerful editor, but a full, coordinated
+        <strong>suite of different tools</strong> to give you the best writing and development experience.
+        Find out why we are famous for being <strong>the most user-friendly CMS</strong>:
+      </p>
+      <article>
+        <Bullets style="good">
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/headless-cms-multi-language" title="Headless CMS multilanguage">
+              <span>A complete set of multilanguage features</span>
+            </a>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/workflow-cms" title="Workflow CMS">
+              <span>Organization of your workflow</span>
+            </a>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/structured-content-cms" title="Structured Content CMS">
+              <span>A flowless editing experience</span>
+            </a>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <a href="/features/dynamic-layouts" title="Dynamic Layouts">
+              <span>Dynamic & composable layouts</span>
+            </a>
+          </li>
+        </Bullets>
+      </article>
+    </Flag>
+
+    <Space top={3} bottom={2}>
+      <LogosBar
+        title="We power experiences for over half a billion users"
+        clients={[
+          'svg/logos/polestar',
+          'svg/logos/hashicorp',
+          'svg/logos/verizon',
+          'svg/logos/little-caesars',
+          'svg/logos/vercel',
+        ]}
+      />
+    </Space>
+  </Wrapper>
+</Layout>

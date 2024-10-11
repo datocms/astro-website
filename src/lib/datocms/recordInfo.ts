@@ -48,6 +48,9 @@ export async function recordToWebsiteRoute({
     case 'changelog': {
       return `/product-updates`;
     }
+    case 'feature': {
+      return `/features/${await recordToSlug(item, itemTypeApiKey)}`;
+    }
     default:
       return null;
   }

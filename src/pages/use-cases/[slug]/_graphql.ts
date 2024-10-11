@@ -1,4 +1,4 @@
-import { PartnerTestimonialQuotesCarouselFragment } from '~/components/QuotesCarousel/graphql';
+import { PartnerTestimonialQuotesCarouselFragment } from '~/components/quote/QuotesCarousel/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';

@@ -1,0 +1,153 @@
+---
+import ImgixTransformations from '~/components/featureAnimations/ImgixTransformations';
+import ProgressiveImagesDemo from '~/components/featureAnimations/ProgressiveImagesDemo';
+import { Bullets } from '~/components/Bullets';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+
+const path = Astro.url.pathname;
+const slug = path.split('/').pop() || '';
+const { page } = await executeQuery(Astro, query, { variables: { slug } });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker">Images API</Fragment>
+    <Fragment slot="title">
+      The easiest way to deliver <mark>fast, optimized&nbsp;images</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      Serve <strong>lightning-fast images</strong> for any digital product with a suite of tools and
+      APIs built to save both development time and visitor bandwidth.
+    </Fragment>
+  </Hero>
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker">Best API for images processing</Fragment>
+    <Fragment slot="title">Endless image transformations at your service</Fragment>
+    <Fragment slot="subtitle">
+      <p>
+        DatoCMS offers best-in-class API for <strong>images processing</strong> and
+        <strong>image CDN</strong> thanks to the seamless
+        <a href="https://imgix.com/" target="_blank">partnership with Imgix</a>.
+        <strong>Optimize, resize, crop, rotate</strong> and watermark images on-the-fly simply adding
+        custom parameters to the URL of your image.
+      </p>
+    </Fragment>
+    <Wrapper>
+      <ImgixTransformations client:visible />
+    </Wrapper>
+  </TitleStripWithContent>
+
+  <Wrapper>
+    <Flag style="good">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/key" />
+      </Fragment>
+      <Fragment slot="kicker">Optimized images</Fragment>
+      <Fragment slot="title">
+        Automatically serve <mark>the best output</mark>
+      </Fragment>
+      <p>
+        Our <strong>Automatic Image Optimization</strong> simplifies getting your images ready for the
+        web. It <strong>reduces the average file size by 50%</strong> and preserves high quality, all
+        with zero development effort on your side.
+      </p>
+    </Flag>
+  </Wrapper>
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker">Images preview </Fragment>
+    <Fragment slot="title">State of the art for responsive and progressive images</Fragment>
+    <Fragment slot="subtitle">
+      <p>
+        Serving optimized images is incredibly hard, but using our GraphQL Content API you can
+        implement <strong>lazy loaded, responsive images</strong> in
+        <strong>one line of code</strong>. Avoid any layout jumping, offer instant
+        <strong>previews of images while they load</strong>. It’s like magic.
+      </p>
+    </Fragment>
+    <ProgressiveImagesDemo name={null} client:visible />
+  </TitleStripWithContent>
+</Layout>
+
+<Wrapper>
+  <Flag style="good">
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/eye-gazing" />
+    </Fragment>
+    <Fragment slot="kicker">Images Metadata</Fragment>
+    <Fragment slot="title">All the <mark>metadata</mark> you need</Fragment>
+    <p>
+      Dominant colors, EXIF data, aspect ratio, filesize, copyright information, geolocation.
+      <strong>Every possible information about your images</strong> is stored in DatoCMS and ready to
+      be used in your websites.
+    </p>
+  </Flag>
+
+  {
+    page.quote && (
+      <Space top={3} bottom={3}>
+        <SingleQuote quote={page.quote} />
+      </Space>
+    )
+  }
+
+  <Flag style="good">
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/zen" />
+    </Fragment>
+    <Fragment slot="kicker">All the tools you need</Fragment>
+    <Fragment slot="title">
+      A complete set of <mark>smart, modern APIs</mark>
+    </Fragment>
+    <p>
+      DatoCMS does not only offer a powerful images API/CDN but a full, coordinated suite of
+      different <strong>APIs and tools</strong> to work seamlessly with the three fundamental blocks
+      of content: <strong>text, images and video</strong>. Everything is built on CDN,
+      <strong>optimized for speed and scalability</strong>.
+    </p>
+    <article>
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/video-api" title="Video API">
+            <span>Video API</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/worldwide-cdn" title="Fastest headless CMS CDN">
+            <span>Worldwide CDN</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/headless-cms-graphql" title="Headless CMS GraphQL">
+            <span>Content GraphQL API</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/real-time-api" title="Real-time API">
+            <span>Real-time updates AP</span>
+          </a>
+        </li>
+      </Bullets>
+    </article>
+  </Flag>
+</Wrapper>

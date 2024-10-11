@@ -1,0 +1,197 @@
+---
+import { slugify } from '~/lib/slugify';
+import { query } from './_graphql';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
+import { Wrapper } from '~/components/Wrapper';
+import { Text } from '~/components/structuredText/Text';
+import { Svg } from '~/components/Svg';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { ScrollspyNav } from '~/components/ScrollspyNav';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Layout } from '~/layouts/Layout';
+import { Heading } from '~/components/Heading';
+import { Button } from '~/components/Button';
+import s from './_style.module.css';
+
+const { page } = await executeQuery(Astro, query);
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const {
+  coreFeaturesBlocks,
+  editorExperienceBlocks,
+  developerExperienceBlocks,
+  imageVideoManagementBlocks,
+  localizationBlocks,
+  extensibilityBlocks,
+  contentIntegrityBlocks,
+  governanceAndComplianceBlocks,
+  securityAndInfrastructureBlocks,
+} = page;
+
+const featuresGroup = [
+  {
+    title: 'Core Features',
+    features: coreFeaturesBlocks,
+  },
+  {
+    title: 'Editor Experience',
+    features: editorExperienceBlocks,
+  },
+  {
+    title: 'Developer Experience',
+    features: developerExperienceBlocks,
+  },
+  {
+    title: 'Image & Video Management',
+    features: imageVideoManagementBlocks,
+  },
+  {
+    title: 'Localization',
+    features: localizationBlocks,
+  },
+  {
+    title: 'Extensibility',
+    features: extensibilityBlocks,
+  },
+  {
+    title: 'Content Integrity',
+    features: contentIntegrityBlocks,
+  },
+  {
+    title: 'Governance & Compliance',
+    features: governanceAndComplianceBlocks,
+  },
+  {
+    title: 'Security & Infrastructure',
+    features: securityAndInfrastructureBlocks,
+  },
+];
+
+const linkLabel: { [key: string]: string } = {
+  docs: 'Docs',
+  guide: 'Guide',
+  learn_more: 'Learn more',
+  watch_demo: 'Watch demo',
+};
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Wrapper>
+    <div class={s.hero}>
+      <div class={s.heroBody}>
+        <h1 class={s.heroTitle}>
+          <Text data={page.title} />
+        </h1>
+        <div class={s.heroSubtitle}>
+          <Text data={page.subtitle} />
+        </div>
+        <div class={s.buttonContainer}>
+          <Button as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
+          <Button as="a" s="invert" href="/contact">Contact sales</Button>
+        </div>
+      </div>
+      <div class={s.heroImageWrapper}>
+        {
+          page.heroImageLeft && page.heroImageRight && (
+            <>
+              <div class={s.heroImage}>
+                <ResponsiveImage data={page.heroImageLeft.responsiveImage} />
+              </div>
+              <div class={s.heroImage}>
+                <ResponsiveImage data={page.heroImageRight.responsiveImage} />
+              </div>
+            </>
+          )
+        }
+      </div>
+    </div>
+
+    <div class={s.features}>
+      <aside class={s.aside}>
+        <div class={s.asideAnchorsWrapper}>
+          <ScrollspyNav>
+            <div class={s.currentAnchor}>
+              <span data-current-anchor>Scroll to</span>
+              <div class={s.currentAnchorArrow}>
+                <Svg name="icons/regular/chevron-down" />
+              </div>
+            </div>
+
+            <div class={s.asideAnchors}>
+              <ul>
+                {
+                  featuresGroup.map(({ title }) => (
+                    <li>
+                      <a href={`#${slugify(title)}`}>{title}</a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </ScrollspyNav>
+        </div>
+      </aside>
+      <div class={s.main}>
+        {
+          featuresGroup.map(({ title, features }) => {
+            return (
+              <div id={slugify(title)} class={s.section}>
+                <h2 class={s.sectionTitle}>{title}</h2>
+                <div class={s.blocks}>
+                  {features.map((feature) => {
+                    if (feature.__typename === 'FeatureRegularCardRecord') {
+                      return (
+                        <div class={s.feature}>
+                          {feature.image?.responsiveImage && (
+                            <figure class={s.featureImage}>
+                              <ResponsiveImage data={feature.image.responsiveImage} />
+                            </figure>
+                          )}
+                          <article>
+                            <Heading as="h3" class={s.featureTitle} anchor={slugify(feature.title)}>
+                              {feature.title}
+                            </Heading>
+
+                            <div class={s.featureDescription}>
+                              <Text data={feature.description} />
+                            </div>
+
+                            {feature.links && (
+                              <div class={s.featureLinks}>
+                                {feature.links.map((link) => {
+                                  const customTitle = linkLabel[link.linkTitle] || link.linkTitle;
+                                  return (
+                                    <a href={buildUrlFromGql(link.content)} class={s.link}>
+                                      {customTitle}
+                                    </a>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </article>
+                        </div>
+                      );
+                    }
+                    if (feature.__typename === 'TestimonialCardRecord') {
+                      return (
+                        <div class={s.quote}>
+                          <SingleQuote quote={feature.testimonial} />
+                        </div>
+                      );
+                    }
+                  })}
+                </div>
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
+  </Wrapper>
+</Layout>

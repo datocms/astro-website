@@ -1,5 +1,4 @@
 import { graphql } from '~/lib/datocms/graphql';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 
 /*
  * This file lists a series of graphql not related to any specific Vue
@@ -13,22 +12,3 @@ export const TagFragment = graphql(/* GraphQL */ `
     content
   }
 `);
-
-export const ReviewFieldsFragment = graphql(
-  /* GraphQL */ `
-    fragment ReviewFieldsFragment on ReviewRecord {
-      id
-      name
-      role
-      quote {
-        value
-      }
-      image {
-        responsiveImage(imgixParams: { auto: format, w: 300, h: 300, fit: crop, crop: faces }) {
-          ...ResponsiveImageFragment
-        }
-      }
-    }
-  `,
-  [ResponsiveImageFragment],
-);
