@@ -126,7 +126,7 @@ const linkLabel: { [key: string]: string } = {
             <div class={s.asideAnchors}>
               <ul>
                 {
-                  featuresGroup.map(({ title }, i) => (
+                  featuresGroup.map(({ title }) => (
                     <li>
                       <a href={`#${slugify(title)}`}>{title}</a>
                     </li>
@@ -139,12 +139,12 @@ const linkLabel: { [key: string]: string } = {
       </aside>
       <div class={s.main}>
         {
-          featuresGroup.map(({ title, features }, i) => {
+          featuresGroup.map(({ title, features }) => {
             return (
               <div id={slugify(title)} class={s.section}>
                 <h2 class={s.sectionTitle}>{title}</h2>
                 <div class={s.blocks}>
-                  {features.map((feature, i) => {
+                  {features.map((feature) => {
                     if (feature.__typename === 'FeatureRegularCardRecord') {
                       return (
                         <div class={s.feature}>
@@ -167,7 +167,6 @@ const linkLabel: { [key: string]: string } = {
                                 {feature.links.map((link) => {
                                   const customTitle = linkLabel[link.linkTitle] || link.linkTitle;
                                   return (
-                                    // TODO: fix warning
                                     <a href={buildUrlFromGql(link.content)} class={s.link}>
                                       {customTitle}
                                     </a>

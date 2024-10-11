@@ -5,6 +5,9 @@ import { buildUrlForFeature, type FeatureUrlFragment } from './feature';
 import { buildUrlForProductUpdate, ProductUpdateUrlFragment } from './productUpdate';
 import { buildUrlForTemplateDemo, type TemplateDemoUrlFragment } from './templateDemo';
 import { buildUrlForUserGuideEpisode, type UserGuideEpisodeUrlFragment } from './userGuideEpisode';
+import { buildUrlForBlogPost, type BlogPostUrlFragment } from './blogPost';
+import { buildUrlForChangelogEntry, type ChangelogEntryUrlFragment } from './changelogEntry';
+import { buildUrlForPlugin, type PluginUrlFragment } from './plugin';
 
 export function buildUrlFromGql(
   thing:
@@ -25,6 +28,15 @@ export function buildUrlFromGql(
       })
     | (FragmentOf<typeof ProductUpdateUrlFragment> & {
         __typename: 'ProductUpdateRecord';
+      })
+    | (FragmentOf<typeof BlogPostUrlFragment> & {
+        __typename: 'BlogPostRecord';
+      })
+    | (FragmentOf<typeof ChangelogEntryUrlFragment> & {
+        __typename: 'ChangelogEntryRecord';
+      })
+    | (FragmentOf<typeof PluginUrlFragment> & {
+        __typename: 'PluginRecord';
       }),
 ) {
   switch (thing.__typename) {
@@ -40,5 +52,11 @@ export function buildUrlFromGql(
       return buildUrlForTemplateDemo(thing);
     case 'ProductUpdateRecord':
       return buildUrlForProductUpdate(thing);
+    case 'BlogPostRecord':
+      return buildUrlForBlogPost(thing);
+    case 'ChangelogEntryRecord':
+      return buildUrlForChangelogEntry(thing);
+    case 'PluginRecord':
+      return buildUrlForPlugin(thing);
   }
 }
