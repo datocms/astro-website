@@ -8,6 +8,7 @@ import { buildUrlForUserGuideEpisode, type UserGuideEpisodeUrlFragment } from '.
 import { buildUrlForBlogPost, type BlogPostUrlFragment } from './blogPost';
 import { buildUrlForChangelogEntry, type ChangelogEntryUrlFragment } from './changelogEntry';
 import { buildUrlForPlugin, type PluginUrlFragment } from './plugin';
+import { buildUrlForHostingApp, type HostingAppUrlFragment } from './hostingApp';
 
 export function buildUrlFromGql(
   thing:
@@ -37,6 +38,9 @@ export function buildUrlFromGql(
       })
     | (FragmentOf<typeof PluginUrlFragment> & {
         __typename: 'PluginRecord';
+      })
+    | (FragmentOf<typeof HostingAppUrlFragment> & {
+        __typename: 'HostingAppRecord';
       }),
 ) {
   switch (thing.__typename) {
@@ -58,5 +62,7 @@ export function buildUrlFromGql(
       return buildUrlForChangelogEntry(thing);
     case 'PluginRecord':
       return buildUrlForPlugin(thing);
+    case 'HostingAppRecord':
+      return buildUrlForHostingApp(thing);
   }
 }

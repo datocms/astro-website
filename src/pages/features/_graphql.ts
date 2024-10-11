@@ -50,6 +50,9 @@ export const FeatureSectionFragment = graphql(
             }
             slug
           }
+          ... on HostingAppRecord {
+            slug
+          }
         }
       }
     }
