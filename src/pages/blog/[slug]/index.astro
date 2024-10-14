@@ -1,0 +1,153 @@
+---
+import {
+  render as toPlainText,
+  type StructuredTextDocument,
+} from 'datocms-structured-text-to-plain-text';
+import { isHeading, type Heading, type Node } from 'datocms-structured-text-utils';
+import { Image } from '~/components/blocks/Image';
+import { InternalVideo } from '~/components/blocks/InternalVideo';
+import { CodesandboxEmbedBlock } from '~/components/blocks/CodesandboxEmbedBlock';
+import { CtaButton } from '~/components/blocks/CtaButton';
+import { Demo } from '~/components/blocks/Demo';
+import { MultipleDemosBlock } from '~/components/blocks/MultipleDemosBlock';
+import { ShowcaseProjectBlock } from '~/components/blocks/ShowcaseProjectBlock';
+import { Table } from '~/components/blocks/Table';
+import { TutorialVideo } from '~/components/blocks/TutorialVideo';
+import { Video } from '~/components/blocks/Video';
+import { QuestionAnswer } from '~/components/blocks/QuestionAnswer';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Text } from '~/components/structuredText/Text';
+import { Wrapper } from '~/components/Wrapper';
+import { Layout } from '~/layouts/Layout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { filterNodes } from '~/lib/datocms/filterNodes';
+import { withAllComponents } from '~/lib/datocms/structuredText';
+import { formatDate } from '~/lib/formatDate';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { slugify } from '~/lib/slugify';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { Prose } from '~/components/Prose';
+
+const { slug } = Astro.params;
+const variables = { slug: slug! };
+const { post } = await executeQuery(Astro, query, { variables });
+
+if (!post) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const tocItems = filterNodes(
+  (post.content.value as StructuredTextDocument).document,
+  (n): n is Heading => isHeading(n as Node),
+).map((heading) => {
+  const innerText = toPlainText(heading)!;
+
+  return {
+    url: `#${slugify(innerText)}`,
+    label: innerText,
+  };
+});
+---
+
+{
+  /*
+
+  TODO:
+
+  canonicalUrl={post.canonicalUrl}
+
+  {post._firstPublishedAt && (
+    <meta
+      property="article:published_time"
+      content={new Date(post._firstPublishedAt).toISOString()}
+    />
+  )}
+  <meta
+    key="meta-twitter:card"
+    name="twitter:card"
+    content="summary_large_image"
+  />
+
+*/
+}
+
+<Layout additionalSeo={post.seo}>
+  <InterstitialTitle
+    seoAnalysis={post.yoastAnalysis}
+    kicker={post.seoH1 || 'The DatoCMS Blog'}
+    style="two"
+    mainTitleOfPage
+  >
+    {post.title}
+  </InterstitialTitle>
+  <div class={s.postWrapper}>
+    <Wrapper>
+      <div class={s.info}>
+        <div class={s.avatarWrapper}>
+          {
+            post.author.map((author, i) => (
+              <ResponsiveImage
+                pictureClass={s.avatar}
+                data={author.avatar.responsiveImage}
+                pictureStyle={{ zIndex: 10 - i }}
+              />
+            ))
+          }
+        </div>
+        <p>
+          Posted on{' '}
+          {post._firstPublishedAt ? formatDate(post._firstPublishedAt) : '???'}{' '}
+          by{' '}
+          {
+            post.author.map((author, i) => (
+              <span>
+                {author.name}
+                {i < post.author.length - 2 ? ', ' : i === post.author.length - 2 ? ' and ' : ''}
+              </span>
+            ))
+          }
+        </p>
+      </div>
+
+      <div id="main-content">
+        <Prose class={s.body}>
+          <Text
+            data={post.content}
+            blockComponents={withAllComponents(post.content.blocks, {
+              ImageRecord: Image,
+              TableRecord: Table,
+              DemoRecord: Demo,
+              MultipleDemosBlockRecord: MultipleDemosBlock,
+              InternalVideoRecord: InternalVideo,
+              TutorialVideoRecord: TutorialVideo,
+              VideoRecord: Video,
+              ShowcaseProjectBlockRecord: ShowcaseProjectBlock,
+              CodesandboxEmbedBlockRecord: CodesandboxEmbedBlock,
+              CtaButtonRecord: CtaButton,
+              QuestionAnswerRecord: QuestionAnswer,
+            })}
+          />
+        </Prose>
+      </div>
+    </Wrapper>
+    {
+      tocItems.length > 4 && (
+        <div class={s.tocWrapper}>
+          <div class={s.toc}>
+            <div class={s.tocTitle}>In this article:</div>
+            <ul>
+              {tocItems.map((item) => (
+                <li>
+                  <a href={item.url}>{item.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</Layout>

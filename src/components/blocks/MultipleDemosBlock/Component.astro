@@ -16,22 +16,25 @@ const { block: maskedBlock } = Astro.props;
 const { demos } = readFragment(MultipleDemosBlockFragment, maskedBlock);
 ---
 
-<Carousel buttonsY="35%" viewportClass={s.carouselViewport}>
-  {
-    demos.map((item) => (
-      <MarketplaceCard
-        title={item.name}
-        href={buildUrlForTemplateDemo(item)}
-        size="small"
-        class={s.card}
-        badge={item.badge ?? undefined}
-        label={item.label}
-      >
-        <Fragment slot="image">
-          <ResponsiveImage data={item.screenshot.responsiveImage} />
-        </Fragment>
-        Try this demo »
-      </MarketplaceCard>
-    ))
-  }
-</Carousel>
+<figure>
+  <prose-island>
+    <Carousel buttonsY="35%" viewportClass={s.carouselViewport}>
+      {
+        demos.map((item) => (
+          <MarketplaceCard
+            title={item.name}
+            href={buildUrlForTemplateDemo(item)}
+            size="small"
+            badge={item.badge ?? undefined}
+            label={item.label}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={item.screenshot.responsiveImage} />
+            </Fragment>
+            Try this demo »
+          </MarketplaceCard>
+        ))
+      }
+    </Carousel>
+  </prose-island>
+</figure>

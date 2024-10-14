@@ -8,6 +8,7 @@ import { buildUrlForFeature, type FeatureUrlFragment } from './feature';
 import { buildUrlForHostingApp, type HostingAppUrlFragment } from './hostingApp';
 import { buildUrlForPlugin, type PluginUrlFragment } from './plugin';
 import { buildUrlForProductUpdate, ProductUpdateUrlFragment } from './productUpdate';
+import { buildUrlForShowcaseProject, type ShowcaseProjectUrlFragment } from './showcaseProject';
 import { buildUrlForTemplateDemo, type TemplateDemoUrlFragment } from './templateDemo';
 import { buildUrlForUserGuideEpisode, type UserGuideEpisodeUrlFragment } from './userGuideEpisode';
 
@@ -45,6 +46,9 @@ export function buildUrlFromGql(
       })
     | (FragmentOf<typeof UserGuideEpisodeUrlFragment> & {
         __typename: 'UserGuidesVideoRecord';
+      })
+    | (FragmentOf<typeof ShowcaseProjectUrlFragment> & {
+        __typename: 'ShowcaseProjectRecord';
       }),
 ) {
   switch (thing.__typename) {
@@ -70,5 +74,7 @@ export function buildUrlFromGql(
       return buildUrlForTemplateDemo(thing);
     case 'UserGuidesVideoRecord':
       return buildUrlForUserGuideEpisode(thing);
+    case 'ShowcaseProjectRecord':
+      return buildUrlForShowcaseProject(thing);
   }
 }

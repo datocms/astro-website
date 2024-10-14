@@ -1,0 +1,17 @@
+---
+import { Button } from '~/components/Button';
+import { CtaButtonFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+
+interface Props {
+  block: FragmentOf<typeof CtaButtonFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+
+const block = readFragment(CtaButtonFragment, maskedBlock);
+---
+
+<Button as="a" href={block.url} p="tiny" fs="small" s="invert">
+  {block.text}
+</Button>

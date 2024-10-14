@@ -460,7 +460,7 @@ type BadgeRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
-union BlogPostModelContentBlocksField = CodesandboxEmbedBlockRecord | CtaButtonRecord | DemoRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | QuestionAnswerRecord | ShowcaseProjectBlockRecord | TableRecord | TutorialVideoRecord | TypeformRecord | VideoRecord
+union BlogPostModelContentBlocksField = CodesandboxEmbedBlockRecord | CtaButtonRecord | DemoRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | QuestionAnswerRecord | ShowcaseProjectBlockRecord | TableRecord | TutorialVideoRecord | VideoRecord
 
 type BlogPostModelContentField {
   blocks: [BlogPostModelContentBlocksField!]!
@@ -472,7 +472,6 @@ type BlogPostModelContentField {
 input BlogPostModelContentFieldBlocksConditions {
   demo: DemoModelFilter
   image: ImageModelFilter
-  typeform: TypeformModelFilter
   questionAnswer: QuestionAnswerModelFilter
   multipleDemosBlock: MultipleDemosBlockModelFilter
   internalVideo: InternalVideoModelFilter
@@ -502,7 +501,6 @@ input BlogPostModelContentFieldBlocksFilter {
 input BlogPostModelContentFieldBlocksPresence {
   demo: BooleanType
   image: BooleanType
-  typeform: BooleanType
   questionAnswer: BooleanType
   multipleDemosBlock: BooleanType
   internalVideo: BooleanType
@@ -562,14 +560,14 @@ input BlogPostModelFilter {
   _isValid: BooleanFilter
   yoastAnalysis: JsonFilter
   excerpt: StructuredTextFilter
-  content: BlogPostModelContentFieldFilter
   seoSettings: SeoFilter
-  coverImage: FileFilter
   author: LinksFilter
   seoH1: StringFilter
   canonicalUrl: StringFilter
   title: StringFilter
   slug: SlugFilter
+  coverImage: FileFilter
+  content: BlogPostModelContentFieldFilter
   OR: [BlogPostModelFilter]
   AND: [BlogPostModelFilter]
 }
@@ -628,7 +626,7 @@ type BlogPostRecord implements RecordInterface {
   author: [AuthorRecord!]!
   canonicalUrl: String
   content: BlogPostModelContentField!
-  coverImage: FileField
+  coverImage: ImageFileField
   createdAt: DateTime!
   excerpt: BlogPostModelExcerptField!
   id: ItemId!
@@ -956,8 +954,8 @@ type CodeExcerptBlockRecord implements RecordInterface {
 
 input CodesandboxEmbedBlockModelFilter {
   id: ItemIdFilter
-  preview: FileFilter
   slug: StringFilter
+  preview: FileFilter
   OR: [CodesandboxEmbedBlockModelFilter]
   AND: [CodesandboxEmbedBlockModelFilter]
 }
@@ -984,7 +982,7 @@ type CodesandboxEmbedBlockRecord implements RecordInterface {
   _updatedAt: DateTime!
   createdAt: DateTime!
   id: ItemId!
-  preview: FileField!
+  preview: ImageFileField!
   slug: String!
   updatedAt: DateTime!
 }
@@ -1362,7 +1360,7 @@ type CustomerStoriesIndexRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
-union CustomerStoryModelContentBlocksField = CodesandboxEmbedBlockRecord | CtaButtonRecord | DemoRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | QuestionAnswerRecord | ShowcaseProjectBlockRecord | TableRecord | TutorialVideoRecord | TypeformRecord | VideoRecord
+union CustomerStoryModelContentBlocksField = CodesandboxEmbedBlockRecord | CtaButtonRecord | DemoRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | QuestionAnswerRecord | ShowcaseProjectBlockRecord | TableRecord | TutorialVideoRecord | VideoRecord
 
 type CustomerStoryModelContentField {
   blocks: [CustomerStoryModelContentBlocksField!]!
@@ -1374,7 +1372,6 @@ type CustomerStoryModelContentField {
 input CustomerStoryModelContentFieldBlocksConditions {
   demo: DemoModelFilter
   image: ImageModelFilter
-  typeform: TypeformModelFilter
   questionAnswer: QuestionAnswerModelFilter
   multipleDemosBlock: MultipleDemosBlockModelFilter
   internalVideo: InternalVideoModelFilter
@@ -1404,7 +1401,6 @@ input CustomerStoryModelContentFieldBlocksFilter {
 input CustomerStoryModelContentFieldBlocksPresence {
   demo: BooleanType
   image: BooleanType
-  typeform: BooleanType
   questionAnswer: BooleanType
   multipleDemosBlock: BooleanType
   internalVideo: BooleanType
@@ -1459,7 +1455,6 @@ input CustomerStoryModelFilter {
   _isValid: BooleanFilter
   people: LinksFilter
   coverImage: FileFilter
-  content: CustomerStoryModelContentFieldFilter
   yoastAnalysis: JsonFilter
   seoSettings: SeoFilter
   excerpt: StructuredTextFilter
@@ -1467,6 +1462,7 @@ input CustomerStoryModelFilter {
   seoH1: StringFilter
   canonicalUrl: StringFilter
   slug: SlugFilter
+  content: CustomerStoryModelContentFieldFilter
   OR: [CustomerStoryModelFilter]
   AND: [CustomerStoryModelFilter]
 }
@@ -3546,6 +3542,105 @@ type ImageRecord implements RecordInterface {
   id: ItemId!
   image: FileField!
   updatedAt: DateTime!
+}
+
+type ImageTitleFileField implements FileFieldInterface {
+  _createdAt: DateTime!
+
+  """
+  The DatoCMS URL where you can edit this entity. To use this field, you need to set a X-Base-Editing-Url header in the request
+  """
+  _editingUrl: String
+  _updatedAt: DateTime!
+  alt(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String
+  author: String
+  basename: String!
+  blurUpThumb(
+    """
+    Controls the "punch" value (~contrast) of the blurhash decoding algorithm (defaults to 1.0)
+    """
+    punch: Float! = 1
+
+    """Maximum image dimension (defaults to 24px)"""
+    size: Int! = 24
+
+    """Image quality (defaults to 70%)"""
+    quality: Int! = 70
+
+    """Imgix transformations to apply to the image"""
+    imgixParams: ImgixParams
+  ): String
+  blurhash: String
+  colors: [ColorField!]!
+  copyright: String
+  customData(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): CustomData!
+  exifInfo: CustomData!
+  filename: String!
+  focalPoint(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): focalPoint!
+  format: String!
+  height: IntType!
+  id: UploadId!
+  md5: String!
+  mimeType: String!
+  notes: String
+  responsiveImage(
+    """Imgix transformations to apply to the image"""
+    imgixParams: ImgixParams
+
+    """Specify a custom `sizes` attribute for the image"""
+    sizes: String
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): ResponsiveImage!
+  size: IntType!
+  smartTags: [String!]!
+  tags: [String!]!
+  thumbhash: String
+  title(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): String!
+  url(
+    """Imgix transformations to apply to the image"""
+    imgixParams: ImgixParams
+  ): String!
+  video: UploadVideoField
+  width: IntType!
 }
 
 type ImageTransformationsBlockModelContentField {
@@ -11447,16 +11542,16 @@ input ShowcaseProjectModelFilter {
   _stage: AgencyProgramWorkflowStageFilter
   partner: LinkFilter
   headline: StructuredTextFilter
-  mainImage: FileFilter
   video: FileFilter
   projectScreenshots: GalleryFilter
-  datocmsScreenshots: GalleryFilter
   inDepthExplanation: StructuredTextFilter
   technologies: LinksFilter
   areasOfExpertise: LinksFilter
   name: StringFilter
   projectUrl: StringFilter
   slug: SlugFilter
+  mainImage: FileFilter
+  datocmsScreenshots: GalleryFilter
   OR: [ShowcaseProjectModelFilter]
   AND: [ShowcaseProjectModelFilter]
 }
@@ -11617,15 +11712,15 @@ type ShowcaseProjectRecord implements RecordInterface {
   _updatedAt: DateTime!
   areasOfExpertise: [ExpertiseAreaRecord!]!
   createdAt: DateTime!
-  datocmsScreenshots: [TitleFileField!]!
+  datocmsScreenshots: [ImageTitleFileField!]!
   headline: ShowcaseProjectModelHeadlineField!
   id: ItemId!
   inDepthExplanation: ShowcaseProjectModelInDepthExplanationField!
-  mainImage: FileField!
+  mainImage: ImageFileField!
   name: String!
   partner: PartnerRecord!
   position: IntType
-  projectScreenshots: [TitleFileField!]!
+  projectScreenshots: [ImageTitleFileField!]!
   projectUrl: String
   slug: String!
   technologies: [IntegrationRecord!]!
@@ -12669,105 +12764,6 @@ input TextFilter {
   exists: BooleanType
 }
 
-type TitleFileField implements FileFieldInterface {
-  _createdAt: DateTime!
-
-  """
-  The DatoCMS URL where you can edit this entity. To use this field, you need to set a X-Base-Editing-Url header in the request
-  """
-  _editingUrl: String
-  _updatedAt: DateTime!
-  alt(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-
-    """
-    If you want to fallback to a default translation when a translation has not been found
-    """
-    fallbackLocales: [SiteLocale!]
-  ): String
-  author: String
-  basename: String!
-  blurUpThumb(
-    """
-    Controls the "punch" value (~contrast) of the blurhash decoding algorithm (defaults to 1.0)
-    """
-    punch: Float! = 1
-
-    """Maximum image dimension (defaults to 24px)"""
-    size: Int! = 24
-
-    """Image quality (defaults to 70%)"""
-    quality: Int! = 70
-
-    """Imgix transformations to apply to the image"""
-    imgixParams: ImgixParams
-  ): String
-  blurhash: String
-  colors: [ColorField!]!
-  copyright: String
-  customData(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-
-    """
-    If you want to fallback to a default translation when a translation has not been found
-    """
-    fallbackLocales: [SiteLocale!]
-  ): CustomData!
-  exifInfo: CustomData!
-  filename: String!
-  focalPoint(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-
-    """
-    If you want to fallback to a default translation when a translation has not been found
-    """
-    fallbackLocales: [SiteLocale!]
-  ): focalPoint
-  format: String!
-  height: IntType
-  id: UploadId!
-  md5: String!
-  mimeType: String!
-  notes: String
-  responsiveImage(
-    """Imgix transformations to apply to the image"""
-    imgixParams: ImgixParams
-
-    """Specify a custom `sizes` attribute for the image"""
-    sizes: String
-
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-
-    """
-    If you want to fallback to a default translation when a translation has not been found
-    """
-    fallbackLocales: [SiteLocale!]
-  ): ResponsiveImage
-  size: IntType!
-  smartTags: [String!]!
-  tags: [String!]!
-  thumbhash: String
-  title(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-
-    """
-    If you want to fallback to a default translation when a translation has not been found
-    """
-    fallbackLocales: [SiteLocale!]
-  ): String!
-  url(
-    """Imgix transformations to apply to the image"""
-    imgixParams: ImgixParams
-  ): String!
-  video: UploadVideoField
-  width: IntType
-}
-
 type TryDemoBlockModelContentField {
   blocks: [String!]!
   links: [String!]!
@@ -13028,39 +13024,6 @@ input TypeFilter {
 
   """Search uploads without the specified types"""
   notIn: [UploadType]
-}
-
-input TypeformModelFilter {
-  id: ItemIdFilter
-  typeform: StringFilter
-  OR: [TypeformModelFilter]
-  AND: [TypeformModelFilter]
-}
-
-"""Block of type Typeform (typeform)"""
-type TypeformRecord implements RecordInterface {
-  _createdAt: DateTime!
-
-  """Editing URL"""
-  _editingUrl: String
-  _firstPublishedAt: DateTime
-  _isValid: BooleanType!
-  _modelApiKey: String!
-  _publicationScheduledAt: DateTime
-  _publishedAt: DateTime
-
-  """Generates SEO and Social card meta tags to be used in your frontend"""
-  _seoMetaTags(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-  ): [Tag!]!
-  _status: ItemStatus!
-  _unpublishingScheduledAt: DateTime
-  _updatedAt: DateTime!
-  createdAt: DateTime!
-  id: ItemId!
-  typeform: String
-  updatedAt: DateTime!
 }
 
 """Specifies how to filter by update datetime"""

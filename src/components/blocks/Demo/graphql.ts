@@ -18,7 +18,14 @@ export const DemoFragment = graphql(
           }
         }
         screenshot {
-          responsiveImage(imgixParams: { auto: format, w: 450, h: 350, fit: crop, crop: top }) {
+          width
+          height
+          croppedImage: responsiveImage(
+            imgixParams: { auto: format, w: 450, h: 350, fit: crop, crop: top }
+          ) {
+            ...ResponsiveImageFragment
+          }
+          freeFormImage: responsiveImage(imgixParams: { auto: format, w: 450 }) {
             ...ResponsiveImageFragment
           }
         }

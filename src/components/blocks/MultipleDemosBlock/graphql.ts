@@ -14,7 +14,7 @@ export const MultipleDemosBlockFragment = graphql(
         }
         label
         screenshot {
-          responsiveImage(imgixParams: { auto: format, w: 600, ar: "3:2", fit: crop, crop: top }) {
+          responsiveImage(imgixParams: { auto: format, w: 900, ar: "3:2", fit: crop, crop: top }) {
             ...ResponsiveImageFragment
           }
         }
