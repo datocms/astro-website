@@ -1,0 +1,28 @@
+---
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import LegalProse from './_LegalProse.astro';
+import { readFile } from 'node:fs/promises';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const { content } = JSON.parse(
+  await readFile(resolve(__dirname, '../../../legal/privacy.json'), 'utf8'),
+);
+---
+
+<Layout additionalSeo={[]}>
+  <Fragment slot="head">
+    <title>Privacy Policy</title>
+  </Fragment>
+  <Hero>
+    <Fragment slot="kicker">Legal</Fragment>
+    <Fragment slot="title"><mark>Privacy Policy</mark></Fragment>
+  </Hero>
+  <LegalProse>
+    <Fragment set:html={content} />
+  </LegalProse>
+</Layout>
