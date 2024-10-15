@@ -1,0 +1,58 @@
+---
+import { Hero } from '~/components/Hero';
+import { LogosBar } from '~/components/LogosBar';
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import { Layout } from '~/layouts/Layout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { Space } from '~/components/Space';
+import { TopicsPicker, type Topic } from './_TopicsPicker';
+import { render as renderAsHtmlString } from 'datocms-structured-text-to-html-string';
+
+const { topics } = await executeQuery(Astro, query);
+
+if (topics.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout noFinalCta additionalSeo={[]}>
+  <Fragment slot="head">
+    <title>Support page</title>
+  </Fragment>
+
+  <Wrapper>
+    <Hero>
+      <Fragment slot="kicker">Support page</Fragment>
+      <Fragment slot="title"
+        >Got&nbsp;issues?
+        <br />
+        <mark>We&apos;re&nbsp;here to&nbsp;help!</mark></Fragment
+      >
+    </Hero>
+    <TopicsPicker
+      topics={topics.map<Topic>((topic) => ({
+        ...topic,
+        description: topic.description
+          ? (renderAsHtmlString(topic.description) ?? undefined)
+          : undefined,
+      }))}
+      initialLocationSearch={Astro.url.search}
+      client:load
+    />
+  </Wrapper>
+  <Space top={3}>
+    <LogosBar
+      title="We power experiences for over half a billion users"
+      clients={[
+        'svg/logos/polestar',
+        'svg/logos/hashicorp',
+        'svg/logos/verizon',
+        'svg/logos/little-caesars',
+        'svg/logos/vercel',
+      ]}
+    />
+  </Space>
+</Layout>

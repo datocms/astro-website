@@ -29,7 +29,19 @@ export default defineConfig({
           context: 'server',
           access: 'secret',
         }),
+        ROLLBAR_TOKEN: envField.string({
+          context: 'server',
+          access: 'secret',
+        }),
+        PIPEDRIVE_TOKEN: envField.string({
+          context: 'server',
+          access: 'secret',
+        }),
         MAILERLITE_TOKEN: envField.string({
+          context: 'server',
+          access: 'secret',
+        }),
+        RECAPTCHA_SECRET_KEY: envField.string({
           context: 'server',
           access: 'secret',
         }),

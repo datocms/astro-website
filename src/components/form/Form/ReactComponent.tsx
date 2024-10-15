@@ -17,7 +17,7 @@ type Props<TFieldValues extends FieldValues = FieldValues> = {
   defaultValues?: DefaultValues<TFieldValues>;
   action?: string;
   submitLabel?: ReactNode;
-  onSubmit?: (values: FieldValues) => Promise<void>;
+  onSubmit?: (values: TFieldValues) => Promise<void>;
   nativeSubmitForm?: boolean;
 };
 
@@ -43,7 +43,7 @@ export function FormReactComponent<TFieldValues extends FieldValues = FieldValue
 
   const recaptchaInput = useRef<HTMLInputElement>(null);
 
-  const defaultSubmit: SubmitHandler<FieldValues> = async (values, event) => {
+  const defaultSubmit: SubmitHandler<TFieldValues> = async (values, event) => {
     if (!recaptchaInput.current) {
       return;
     }

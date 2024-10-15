@@ -15,10 +15,10 @@ type Props<
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
   name: TName;
-  label: ReactNode;
+  label?: ReactNode;
   placeholder?: string;
   validations?: RegisterOptions<TFieldValues, TName>;
-  options?: Array<{ value: string; label: ReactNode }>;
+  options?: string[] | Array<{ value: string; label: ReactNode }>;
   render?: ControllerProps<TFieldValues, TName>['render'];
   type?: string;
   multiple?: boolean;
@@ -42,10 +42,8 @@ export function FieldReactComponent<
   const {
     register,
     control,
-    watch,
     formState: { errors },
   } = useFormContext<TFieldValues>();
-  const value = watch(name);
   const field = register(name, validations);
 
   let input = (
@@ -62,11 +60,10 @@ export function FieldReactComponent<
   if (options) {
     input = (
       <>
-        {!value && (
-          <div className={s.selectPlaceholder}>{placeholder || 'Please select one...'}</div>
-        )}
         <select id={name} {...field}>
-          <option value="" />
+          <option value="" disabled>
+            {placeholder || 'Please select one...'}
+          </option>
           {options.map((option) => {
             const value = typeof option === 'string' ? option : option.value;
             const label = typeof option === 'string' ? option : option.label;
@@ -100,10 +97,12 @@ export function FieldReactComponent<
 
   return (
     <div className={cn(s.field, errorMessage && s.fieldError)}>
-      <label htmlFor={name}>
-        {label}
-        {validations && <span className={s.required}>&nbsp;*</span>}
-      </label>
+      {label && (
+        <label htmlFor={name}>
+          {label}
+          {validations && <span className={s.required}>&nbsp;*</span>}
+        </label>
+      )}
 
       {input}
 
