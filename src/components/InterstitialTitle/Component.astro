@@ -47,7 +47,11 @@ if (seoAnalysis) {
 <Wrapper>
   <div class={s.root}>
     {
-      kicker && (
+      Astro.slots.has('kicker') ? (
+        <div class={s.kicker}>
+          <slot name="kicker" />
+        </div>
+      ) : kicker ? (
         <Heading
           as={Kicker}
           class={s.kicker}
@@ -55,12 +59,22 @@ if (seoAnalysis) {
         >
           {kicker}
         </Heading>
-      )
+      ) : undefined
     }
     <div class={s[style]}>
       <Title class={s.title}><slot /></Title>
     </div>
-    {subtitle && <Subtitle class={bigSubtitle ? s.bigSubtitle : s.subtitle}>{subtitle}</Subtitle>}
+
+    {
+      Astro.slots.has('subtitle') ? (
+        <div class={bigSubtitle ? s.bigSubtitle : s.subtitle}>
+          <slot name="subtitle" />
+        </div>
+      ) : subtitle ? (
+        <Subtitle class={bigSubtitle ? s.bigSubtitle : s.subtitle}>{subtitle}</Subtitle>
+      ) : undefined
+    }
+
     {below}
   </div>
 </Wrapper>

@@ -2,7 +2,7 @@ import {
   render as toPlainText,
   type StructuredTextDocument,
 } from 'datocms-structured-text-to-plain-text';
-import { isHeading, type Heading, type Node } from 'datocms-structured-text-utils';
+import { isHeading } from 'datocms-structured-text-utils';
 import { filterNodes } from '~/lib/datocms/filterNodes';
 import { slugify } from '~/lib/slugify';
 import type { TocGroup } from './types';
@@ -10,7 +10,7 @@ import type { TocGroup } from './types';
 export function buildGroupsFromHeadings(structuredTextValue: unknown): TocGroup[] {
   const entries = filterNodes(
     (structuredTextValue as StructuredTextDocument).document,
-    (n): n is Heading => isHeading(n as Node),
+    isHeading,
   ).map((heading) => {
     const innerText = toPlainText(heading)!;
 

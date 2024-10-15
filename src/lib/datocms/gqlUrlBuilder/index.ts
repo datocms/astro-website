@@ -1,4 +1,6 @@
 import { type FragmentOf } from '../graphql';
+import { buildUrlForAcademyChapter, type AcademyChapterUrlFragment } from './academyChapter';
+import { buildUrlForAcademyCourse, type AcademyCourseUrlFragment } from './academyCourse';
 import { buildUrlForBlogPost, type BlogPostUrlFragment } from './blogPost';
 import { buildUrlForChangelogEntry, type ChangelogEntryUrlFragment } from './changelogEntry';
 import { buildUrlForDocGroup, type DocGroupUrlFragment } from './docGroup';
@@ -49,6 +51,12 @@ export function buildUrlFromGql(
       })
     | (FragmentOf<typeof ShowcaseProjectUrlFragment> & {
         __typename: 'ShowcaseProjectRecord';
+      })
+    | (FragmentOf<typeof AcademyCourseUrlFragment> & {
+        __typename: 'AcademyCourseRecord';
+      })
+    | (FragmentOf<typeof AcademyChapterUrlFragment> & {
+        __typename: 'AcademyChapterRecord';
       }),
 ) {
   switch (thing.__typename) {
@@ -76,5 +84,9 @@ export function buildUrlFromGql(
       return buildUrlForUserGuideEpisode(thing);
     case 'ShowcaseProjectRecord':
       return buildUrlForShowcaseProject(thing);
+    case 'AcademyCourseRecord':
+      return buildUrlForAcademyCourse(thing);
+    case 'AcademyChapterRecord':
+      return buildUrlForAcademyChapter(thing);
   }
 }

@@ -21,7 +21,7 @@ const path = Astro.url.pathname;
 const slug = path.split('/').pop() || '';
 const { page, integrations } = await executeQuery(Astro, query, { variables: { slug } });
 
-if (!page || !integrations || !page.video || !page.video2 || !page.video3) {
+if (!page || integrations.length === 0 || !page.video || !page.video2 || !page.video3) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }

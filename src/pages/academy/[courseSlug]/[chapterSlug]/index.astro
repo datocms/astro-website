@@ -1,0 +1,148 @@
+---
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import findIndex from 'lodash-es/findIndex';
+import s from './_style.module.css';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { filterNodes } from '~/lib/datocms/filterNodes';
+import { isHeading, type Heading } from 'datocms-structured-text-utils';
+import { slugify } from '~/lib/slugify';
+import { type StructuredTextDocument } from 'datocms-structured-text-to-plain-text';
+import { Wrapper } from '~/components/Wrapper';
+import { Layout } from '~/layouts/Layout';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Space } from '~/components/Space';
+import { ActiveLink } from '~/components/links/ActiveLink';
+import { Text } from '~/components/structuredText/Text';
+import { Prose } from '~/components/Prose';
+import { withAllComponents } from '~/lib/datocms/structuredText';
+import { Image } from '~/components/blocks/Image';
+import { Table } from '~/components/blocks/Table';
+import { InternalVideo } from '~/components/blocks/InternalVideo';
+import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+
+const { chapter } = await executeQuery(Astro, query, {
+  variables: { courseSlug: Astro.params.courseSlug!, chapterSlug: Astro.params.chapterSlug! },
+});
+
+if (!chapter) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const course = chapter.matchingCourses[0];
+
+if (!course) {
+  return notFoundResponse();
+}
+
+const allChapters = course.chapters;
+
+const chapterIndex = findIndex(allChapters, (c) => c.slug === chapter.slug);
+
+const prevChapter = chapterIndex > 0 ? allChapters[chapterIndex - 1] : undefined;
+
+const nextChapter =
+  chapterIndex < allChapters.length - 1 ? allChapters[chapterIndex + 1] : undefined;
+
+const sections = filterNodes(
+  (chapter.content.value as StructuredTextDocument).document,
+  (node): node is Heading => isHeading(node) && node.level < 4,
+).map((heading) => ({
+  url: `#${slugify(toPlainText(heading))}`,
+  node: heading,
+}));
+---
+
+<Layout additionalSeo={chapter.seo}>
+  <Wrapper>
+    <InterstitialTitle style="one" mainTitleOfPage>
+      <Fragment slot="kicker"><a href="/academy">DatoCMS Academy</a></Fragment>
+      {chapter.title}
+      <Fragment slot="subtitle"><Text data={course.introduction} /></Fragment>
+    </InterstitialTitle>
+  </Wrapper>
+  <Space top={1}>
+    <div class={s.contentWrapper}>
+      <div class={s.tocWrapper}>
+        <div class={s.toc}>
+          <div class={s.tocTitle}>Course chapters</div>
+          <ul class={s.tocChapters}>
+            {
+              allChapters.map((nthChapter) => (
+                <li class={s.tocChapter}>
+                  <ActiveLink
+                    href={buildUrlForAcademyChapter(nthChapter)}
+                    class={s.tocChapterLink}
+                    activeClass={s.activeTocChapter}
+                  >
+                    {nthChapter.title}
+                  </ActiveLink>
+
+                  {nthChapter.slug === chapter.slug && sections.length > 0 && (
+                    <ul class={s.tocChapterSections}>
+                      {sections.map((section) => (
+                        <li class={s.tocChapterSection}>
+                          <a title={toPlainText(section.node)} href={section.url}>
+                            {toPlainText(section.node)}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              ))
+            }
+          </ul>
+          <div class={s.tocFooter}>
+            <p>
+              This <strong>{course.name}</strong> course is part of{' '}
+              <a href="/academy">DatoCMS Academy</a>, a deep dive into the concepts around headless.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div id="main-content">
+        <Prose class={s.body}>
+          <Text
+            data={chapter.content}
+            blockComponents={withAllComponents(chapter.content.blocks, {
+              ImageRecord: Image,
+              TableRecord: Table,
+              InternalVideoRecord: InternalVideo,
+            })}
+          />
+        </Prose>
+
+        <div class={s.prevNext}>
+          <div class={s.prev}>
+            {
+              prevChapter && (
+                <>
+                  <div class={s.prevNextTitle}>Previous chapter</div>
+                  <div class={s.prevNextLink}>
+                    <a href={buildUrlForAcademyChapter(prevChapter)}>&larr; {prevChapter.title}</a>
+                  </div>
+                </>
+              )
+            }
+          </div>
+
+          <div class={s.next}>
+            {
+              nextChapter && (
+                <>
+                  <div class={s.prevNextTitle}>Next chapter</div>
+                  <div class={s.prevNextLink}>
+                    <a href={buildUrlForAcademyChapter(nextChapter)}>{nextChapter.title} &rarr;</a>
+                  </div>
+                </>
+              )
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </Space>
+</Layout>
