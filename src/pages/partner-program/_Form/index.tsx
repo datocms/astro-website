@@ -38,7 +38,8 @@ export function Form() {
         submitLabel="Let's have a chat!"
         nativeSubmitForm
         onSubmit={async (formValues) => {
-          await actions.pipedrive.createPartnerProgramLead.orThrow(formValues);
+          // await actions.pipedrive.createPartnerProgramLead.orThrow(formValues);
+          throw new Error('PIPPA');
         }}
         action="https://webhook.frontapp.com/forms/f51dbf7c0379d350b50e/3Sm_zJWUNAZjGDEATKFPqvusB9OfzY8rqYlrGJ1mjrCkgevT-jE7_fNnB8SOeobAgkr4Pff6S4eAjQN6f_euzEjsDxk76hp1CkVYfevIYPSpmoXztVnRgA86Dseo"
       >

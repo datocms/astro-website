@@ -3,6 +3,7 @@ import {
   FormProvider,
   useForm,
   type DefaultValues,
+  type FieldPath,
   type FieldValues,
   type SubmitHandler,
 } from 'react-hook-form';
@@ -11,13 +12,14 @@ import toast, { Toaster } from 'react-hot-toast';
 import s from './style.module.css';
 import { RECAPTCHA_KEY } from 'astro:env/client';
 import { ButtonReactComponent } from '~/components/Button/ReactComponent';
+import { isActionError, isInputError } from 'astro:actions';
 
 type Props<TFieldValues extends FieldValues = FieldValues> = {
   children: ReactNode;
   defaultValues?: DefaultValues<TFieldValues>;
   action?: string;
   submitLabel?: ReactNode;
-  onSubmit?: (values: TFieldValues) => Promise<void>;
+  onSubmit?: (values: TFieldValues & { token: string }) => Promise<void>;
   nativeSubmitForm?: boolean;
 };
 
@@ -56,9 +58,20 @@ export function FormReactComponent<TFieldValues extends FieldValues = FieldValue
 
     if (onSubmit) {
       try {
-        await onSubmit(values);
+        await onSubmit({ ...values, token });
       } catch (e) {
-        toast.error('Ouch! There was an error submitting the form!');
+        if (isInputError(e)) {
+          for (const [name, errors] of Object.entries(e.fields)) {
+            setError(name as FieldPath<TFieldValues>, { message: (errors as string[]).join(', ') });
+          }
+        }
+
+        if (isActionError(e)) {
+          toast.error(e.message);
+        } else {
+          toast.error('Ouch! There was an error submitting the form!');
+        }
+
         setError('root.FORM_ERROR', { type: '500' });
         setTimeout(() => clearErrors('root.FORM_ERROR'), 100);
         return;
@@ -74,7 +87,7 @@ export function FormReactComponent<TFieldValues extends FieldValues = FieldValue
 
   return (
     <FormProvider {...methods}>
-      <Toaster />
+      <Toaster position="bottom-right" toastOptions={{ className: s.toastNotification }} />
       <form
         className={s.form}
         onSubmit={handleSubmit(defaultSubmit)}

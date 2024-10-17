@@ -45,6 +45,10 @@ export default defineConfig({
           context: 'server',
           access: 'secret',
         }),
+        SLACK_TOKEN: envField.string({
+          context: 'server',
+          access: 'secret',
+        }),
         RECAPTCHA_KEY: envField.string({
           context: 'client',
           access: 'public',

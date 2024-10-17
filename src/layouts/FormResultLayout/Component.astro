@@ -25,9 +25,13 @@ const { type, kicker } = Astro.props;
       <Fragment slot="title"
         >{
           type === 'success' ? (
-            <>
-              <mark>Thank you</mark> for reaching out!
-            </>
+            Astro.slots.has('successTitle') ? (
+              <slot name="successTitle" />
+            ) : (
+              <>
+                <mark>Thank you</mark> for reaching out!
+              </>
+            )
           ) : (
             <>
               <mark>Ouch!</mark> An error occurred...

@@ -1,0 +1,74 @@
+---
+import { Hero } from '~/components/Hero';
+import { Wrapper } from '~/components/Wrapper';
+import { Layout } from '~/layouts/Layout';
+import s from './_style.module.css';
+import { WebClient } from '@slack/web-api';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { SLACK_TOKEN } from 'astro:env/server';
+import { Button } from '~/components/Button';
+import { actions } from 'astro:actions';
+import { WithRecaptchaToken } from '~/components/form/WithRecaptchaToken';
+import { isInputError } from 'astro:actions';
+import { isActionError } from 'astro:actions';
+import { Form } from './_Form';
+
+const web = new WebClient(SLACK_TOKEN);
+
+const info = await web.conversations.info({
+  channel: 'C7SS10UUW',
+  include_num_members: true,
+});
+
+if (!info.channel) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const result = Astro.getActionResult(actions.inviteEmailToSlackChannel);
+const globalError = isActionError(result?.error) && result.error.message;
+const emailError =
+  isInputError(result?.error) && result.error.fields.email
+    ? result.error.fields.email.join(', ')
+    : undefined;
+---
+
+<Layout additionalSeo={[]}>
+  <Fragment slot="head">
+    <title>Join the DatoCMS Slack Channel</title>
+  </Fragment>
+  <Hero>
+    <Fragment slot="kicker">DatoCMS Community Slack Shannel</Fragment>
+    <Fragment slot="title">Join us on <mark>Slack</mark>!</Fragment>
+    <Fragment slot="subtitle">
+      Try out new product updates before they&apos;re widely released, help us test and improve the
+      product, and connect with other users!
+    </Fragment>
+  </Hero>
+  <Wrapper>
+    {
+      globalError ? (
+        <div class={s.error}>{globalError}</div>
+      ) : (
+        <p class={s.notice}>
+          Our Slack is great for informal chats and quick questions, but for official technical
+          support, we recommend the
+          <a href={'https://community.datocms.com/'}>Community forum</a>
+          or <a href={'/support'}>Support form</a> instead.
+        </p>
+      )
+    }
+
+    <div class={s.form}>
+      <Form client:load />
+    </div>
+
+    <div class={s.stats}>
+      <strong>{info.channel.num_members}</strong> people are already part of the community!
+    </div>
+    <div class={s.info}>
+      Already a member? Enter the channel from{' '}
+      <a href="https://datocms.slack.com/">datocms.slack.com</a>.
+    </div>
+  </Wrapper>
+</Layout>

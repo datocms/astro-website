@@ -1,5 +1,5 @@
 import Mailerlite from '@mailerlite/mailerlite-nodejs';
-import { ActionError, defineAction } from 'astro:actions';
+import { defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
 import { format } from 'date-fns';
 
@@ -11,23 +11,16 @@ export default defineAction({
       .email('Please, enter a valid email! 😊'),
   }),
   handler: async ({ email }) => {
-    try {
-      const mailerlite = new Mailerlite({
-        api_key: process.env.MAILERLITE_TOKEN!,
-      });
+    const mailerlite = new Mailerlite({
+      api_key: process.env.MAILERLITE_TOKEN!,
+    });
 
-      await mailerlite.subscribers.createOrUpdate({
-        email: email,
-        status: 'active',
-        opted_in_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
-      });
+    await mailerlite.subscribers.createOrUpdate({
+      email: email,
+      status: 'active',
+      opted_in_at: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+    });
 
-      return { success: true };
-    } catch (e) {
-      throw new ActionError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: 'Something went wrong...',
-      });
-    }
+    return { success: true };
   },
 });
