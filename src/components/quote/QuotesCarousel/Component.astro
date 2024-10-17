@@ -1,18 +1,15 @@
 ---
 import s from './style.module.css';
 import type { FragmentOf } from 'gql.tada';
-import { PartnerTestimonialQuotesCarouselFragment, ReviewQuotesCarouselFragment } from './graphql';
-import { readFragment } from 'gql.tada';
-import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { MaybeLink } from '~/components/links/MaybeLink';
-import { InlineText } from '~/components/structuredText/InlineText';
+import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '../graphql';
+import { SingleQuote } from '../SingleQuote';
 
 interface Props {
   quotes: Array<
-    | (FragmentOf<typeof PartnerTestimonialQuotesCarouselFragment> & {
+    | (FragmentOf<typeof PartnerTestimonialQuoteFragment> & {
         __typename: 'PartnerTestimonialRecord';
       })
-    | (FragmentOf<typeof ReviewQuotesCarouselFragment> & {
+    | (FragmentOf<typeof ReviewQuoteFragment> & {
         __typename: 'ReviewRecord';
       })
   >;
@@ -25,11 +22,6 @@ function times(n: number): number[] {
   return Array.from({ length: n }, (_, i) => i);
 }
 
-const unmaskedQuotes = quotes.map((quote) =>
-  quote.__typename === 'PartnerTestimonialRecord'
-    ? readFragment(PartnerTestimonialQuotesCarouselFragment, quote)
-    : readFragment(ReviewQuotesCarouselFragment, quote),
-);
 const repeatCount = animated ? (quotes.length / 4 > 1 ? 2 : 3) : 1;
 ---
 
@@ -37,42 +29,7 @@ const repeatCount = animated ? (quotes.length / 4 > 1 ? 2 : 3) : 1;
   <div class={s.quotesInner}>
     {
       times(repeatCount).map(() =>
-        unmaskedQuotes.map((quote) =>
-          quote.__typename === 'PartnerTestimonialRecord' ? (
-            <MaybeLink
-              href={quote.partner ? `/partners/${quote.partner.slug}` : undefined}
-              class={s.root}
-            >
-              <div class={s.quote}>
-                <InlineText data={quote.quote} />
-              </div>
-
-              <div class={s.content}>
-                <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
-                <div class={s.authorRole}>
-                  <div class={s.name}>{quote.name}</div>
-                  <div class={s.role}>
-                    {quote.role} @ {quote.partner.name}
-                  </div>
-                </div>
-              </div>
-            </MaybeLink>
-          ) : (
-            <article class={s.root}>
-              <div class={s.quote}>
-                <InlineText data={quote.quote} />
-              </div>
-
-              <div class={s.content}>
-                <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
-                <div class={s.authorRole}>
-                  <div class={s.name}>{quote.name}</div>
-                  <div class={s.role}>{quote.role}</div>
-                </div>
-              </div>
-            </article>
-          ),
-        ),
+        quotes.map((quote) => <SingleQuote size="big" quote={quote} size="small" />),
       )
     }
   </div>

@@ -1,7 +1,7 @@
 ---
 import s from './style.module.css';
 import type { FragmentOf } from 'gql.tada';
-import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from './graphql';
+import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '../graphql';
 import { readFragment } from 'gql.tada';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { MaybeLink } from '~/components/links/MaybeLink';
@@ -15,9 +15,10 @@ interface Props {
     | (FragmentOf<typeof ReviewQuoteFragment> & {
         __typename: 'ReviewRecord';
       });
+  size: 'big' | 'medium' | 'small';
 }
 
-const { quote } = Astro.props;
+const { quote, size } = Astro.props;
 
 const unmaskedQuotes =
   quote.__typename === 'PartnerTestimonialRecord'
@@ -25,7 +26,7 @@ const unmaskedQuotes =
     : readFragment(ReviewQuoteFragment, quote);
 ---
 
-<div class={s.root} data-component="SingleQuote">
+<div class={s.root} data-size={size}>
   <div class={s.quoteInner}>
     {
       unmaskedQuotes.__typename === 'PartnerTestimonialRecord' ? (
@@ -41,9 +42,8 @@ const unmaskedQuotes =
             <ResponsiveImage pictureClass={s.image} data={unmaskedQuotes.image.responsiveImage} />
             <div class={s.authorRole}>
               <div class={s.name}>{unmaskedQuotes.name}</div>
-              <div class={s.role}>
-                {unmaskedQuotes.role} @ {unmaskedQuotes.partner.name}
-              </div>
+              <div class={s.role}>{unmaskedQuotes.role}</div>
+              <div class={s.company}>{unmaskedQuotes.partner.name}</div>
             </div>
           </div>
         </MaybeLink>

@@ -1,4 +1,4 @@
-import { PartnerTestimonialQuotesCarouselFragment } from '~/components/quote/QuotesCarousel/graphql';
+import { PartnerTestimonialQuoteFragment } from '~/components/quote/graphql';
 import { PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { graphql } from '~/lib/datocms/graphql';
 
@@ -16,7 +16,7 @@ export const query = graphql(
       }
       partnerTestimonials: allPartnerTestimonials(first: 10) {
         __typename
-        ...PartnerTestimonialQuotesCarouselFragment
+        ...PartnerTestimonialQuoteFragment
         quote {
           value
         }
@@ -24,5 +24,5 @@ export const query = graphql(
       }
     }
   `,
-  [PartnerTestimonialQuotesCarouselFragment, PartnerUrlFragment],
+  [PartnerTestimonialQuoteFragment, PartnerUrlFragment],
 );

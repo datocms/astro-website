@@ -8,18 +8,38 @@
 
 .wrapper {
   position: relative;
-  padding-top: rfs(60px);
+  text-decoration: none;
+
+  .root[data-size='big'] & {
+    padding-top: rfs(60px);
+  }
+
+  .root[data-size='medium'] &,
+  .root[data-size='small'] & {
+    padding-top: rfs(40px);
+  }
 
   &:before {
     color: var(--accent-color);
     content: '\201C';
     font-family: var(--font-serif);
-    font-size: rfs(240px);
     left: 50%;
     line-height: 0.3;
     position: absolute;
     top: 0;
     transform: translateX(-50%);
+
+    .root[data-size='big'] & {
+      font-size: rfs(240px);
+    }
+
+    .root[data-size='medium'] & {
+      font-size: rfs(150px);
+    }
+
+    .root[data-size='small'] & {
+      font-size: rfs(130px);
+    }
   }
 }
 
@@ -32,12 +52,23 @@
 
 .quote {
   font-family: var(--font-serif);
-  font-size: rfs(40px);
   letter-spacing: -0.02em;
   line-height: 1.2;
   margin-bottom: 40px;
   text-align: center;
-  width: rfs(860px);
+  width: min(450px, 90vw);
+
+  .root[data-size='big'] & {
+    font-size: rfs(40px);
+  }
+
+  .root[data-size='medium'] & {
+    font-size: rfs(30px);
+  }
+
+  .root[data-size='small'] & {
+    font-size: 24px;
+  }
 
   &:before {
     content: '\201C';
@@ -59,13 +90,39 @@
   border-radius: 400px;
   margin-right: 20px;
   overflow: hidden;
-  width: rfs(130px);
+
+  .root[data-size='big'] & {
+    width: rfs(130px);
+  }
+
+  .root[data-size='medium'] & {
+    width: 100px;
+  }
+
+  .root[data-size='small'] & {
+    width: 70px;
+  }
 }
 
 .authorRole {
   color: inherit;
   max-width: 260px;
   text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  .root[data-size='big'] & {
+    font-size: rfs(1.275rem);
+  }
+
+  .root[data-size='medium'] & {
+    font-size: rfs(1.275rem);
+  }
+
+  .root[data-size='small'] & {
+    font-size: 0.875em;
+  }
 }
 
 a.authorRole:hover .name {
@@ -73,12 +130,17 @@ a.authorRole:hover .name {
 }
 
 .name {
-  font-size: rfs(1.275rem);
   font-weight: bold;
   margin-bottom: 0.125em;
 }
 
 .role {
   color: var(--light-body-color);
-  font-size: rfs(1.275rem);
+}
+
+.company {
+  text-transform: uppercase;
+  font-weight: bold;
+  color: var(--light-body-color);
+  font-size: 0.9em;
 }

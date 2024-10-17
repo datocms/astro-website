@@ -1,4 +1,4 @@
-import { ReviewQuoteFragment } from '~/components/quote/SingleQuote/graphql';
+import { ReviewQuoteFragment } from '~/components/quote/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 

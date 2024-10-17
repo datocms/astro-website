@@ -1,8 +1,5 @@
 import { FeatureCardFragment } from '~/components/FeatureCard/graphql';
-import {
-  PartnerTestimonialQuotesCarouselFragment,
-  ReviewQuotesCarouselFragment,
-} from '~/components/quote/QuotesCarousel/graphql';
+import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
@@ -59,8 +56,8 @@ export const query = graphql(
         }
         quotes: testimonials {
           __typename
-          ...PartnerTestimonialQuotesCarouselFragment
-          ...ReviewQuotesCarouselFragment
+          ...PartnerTestimonialQuoteFragment
+          ...ReviewQuoteFragment
         }
         features {
           featureGroup
@@ -71,9 +68,9 @@ export const query = graphql(
   `,
   [
     ResponsiveImageFragment,
-    PartnerTestimonialQuotesCarouselFragment,
+    PartnerTestimonialQuoteFragment,
     FeatureCardFragment,
-    ReviewQuotesCarouselFragment,
+    ReviewQuoteFragment,
     TagFragment,
   ],
 );

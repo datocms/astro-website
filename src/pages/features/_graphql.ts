@@ -1,7 +1,4 @@
-import {
-  PartnerTestimonialQuoteFragment,
-  ReviewQuoteFragment,
-} from '~/components/quote/SingleQuote/graphql';
+import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { BlogPostUrlFragment } from '~/lib/datocms/gqlUrlBuilder/blogPost';
