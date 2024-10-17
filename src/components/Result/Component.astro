@@ -1,0 +1,31 @@
+---
+import { MaybeLink } from '~/components/links/MaybeLink';
+import s from './style.module.css';
+
+type Props = {
+  number?: string;
+  href?: string;
+};
+
+const { number, href } = Astro.props;
+---
+
+<MaybeLink href={href} class={s.root}>
+  {number && <div class={s.number}>{number}</div>}
+  {
+    Astro.slots.has('label') && (
+      <div class={s.label}>
+        <slot name="label" />
+      </div>
+    )
+  }
+  {
+    Astro.slots.has('title') && (
+      <div class={s.title}>
+        <slot name="title" />
+      </div>
+    )
+  }
+  <div class={s.body}><slot /></div>
+  {href && <div class={s.goto}>Read the whole story</div>}
+</MaybeLink>

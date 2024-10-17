@@ -1,0 +1,76 @@
+---
+import { Wrapper } from '~/components/Wrapper';
+import s from './style.module.css';
+import { Svg } from '~/components/Svg';
+
+type Props = {
+  currentPersonas: 'developers' | 'digital-marketers' | 'content-creators';
+  title: string;
+};
+
+const { title, currentPersonas } = Astro.props;
+---
+
+<Wrapper>
+  <div class={s.root}>
+    <div class={s.intro}>
+      <div class={s.introTitle}>{title}</div>
+      <div class={s.introBody}>
+        DatoCMS is a concrete benefit for the whole company. See how DatoCMS can help the entire
+        digital pipeline.
+      </div>
+    </div>
+    <div class={s.picker}>
+      {
+        currentPersonas !== 'developers' && (
+          <a class={s.personas} href="/team/best-cms-for-developers">
+            <div class={s.personasImage}>
+              <Svg name="svg/illustrations/developers-2" />
+            </div>
+            <div class={s.personasTitle}>For developers</div>
+            <div class={s.personasBody}>
+              Your business needs a reliable and future-proof infrastructure
+            </div>
+            <div class={s.personasLink}>
+              Learn more <Svg name="svg/illustrations/arrow-usecase" />
+            </div>
+          </a>
+        )
+      }
+
+      {
+        currentPersonas !== 'digital-marketers' && (
+          <a class={s.personas} href="/team/cms-digital-marketing">
+            <div class={s.personasImage}>
+              <Svg name="svg/illustrations/marketers" />
+            </div>
+            <div class={s.personasTitle}>For digital marketers</div>
+            <div class={s.personasBody}>
+              Solve complex strategic goals with technology that empowers your team
+            </div>
+            <div class={s.personasLink}>
+              Learn more <Svg name="svg/illustrations/arrow-usecase" />
+            </div>
+          </a>
+        )
+      }
+
+      {
+        currentPersonas !== 'content-creators' && (
+          <a class={s.personas} href="/team/content-creators">
+            <div class={s.personasImage}>
+              <Svg name="svg/illustrations/content-editors2" />
+            </div>
+            <div class={s.personasTitle}>For content editors</div>
+            <div class={s.personasBody}>
+              Automate SEO and manage content on multiple sites without filing an IT ticket
+            </div>
+            <div class={s.personasLink}>
+              Learn more <Svg name="svg/illustrations/arrow-usecase" />
+            </div>
+          </a>
+        )
+      }
+    </div>
+  </div>
+</Wrapper>

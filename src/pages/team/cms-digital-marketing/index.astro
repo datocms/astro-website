@@ -1,0 +1,244 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { IntegrationsBanner } from '~/components/IntegrationsBanner';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { OmnichannelIllustration } from '~/components/OmnichannelIllustration';
+import { OtherPersonasPicker } from '../_OtherPersonasPicker';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Result } from '~/components/Result';
+import { Space } from '~/components/Space';
+import { TitleIllustrationStripWithContent } from '~/components/TitleIllustrationStripWithContent';
+import { Wrapper } from '~/components/Wrapper';
+import styles from './_style.module.css';
+import { query } from './_graphql';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { Svg } from '~/components/Svg';
+
+const { page, integrations, review1 } = await executeQuery(Astro, query, {
+  variables: { slug: Astro.params.slug! },
+});
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero seoAnalysis={page.yoastAnalysis}>
+    <Fragment slot="kicker">{page.seoH1}</Fragment>
+    <Fragment slot="title">Win the <mark>omnichannel</mark> marketing challenge</Fragment>
+    <Fragment slot="subtitle">
+      It is proved that creating an
+      <strong>omnichannel customer journey can boost your revenue</strong>. With DatoCMS you take
+      control of your content, everywhere it goes. Use a <strong>unified platform</strong> to send content
+      to websites, chatbots, VR/AR and IoT devices, without heavy IT involvement.
+    </Fragment>
+  </Hero>
+
+  <Space bottom={3}>
+    <Wrapper>
+      <OmnichannelIllustration />
+    </Wrapper>
+  </Space>
+
+  <div id="main-content">
+    <TitleIllustrationStripWithContent seoAnalysis={page.yoastAnalysis}>
+      <Fragment slot="visual"><Svg name="svg/illustrations/omnichannel-matters" /></Fragment>
+      <Fragment slot="kicker">Omnichannel CMS</Fragment>
+      <Fragment slot="title">Why omnichannel matters?</Fragment>
+      <Fragment slot="subtitle">
+        Many companies engaging in digital marketing are delivering great content and experiences
+        from their CMS to their website, app, FB page and in stores. But companies finding the most
+        success are the ones who ensure that <strong>every interaction is consistent</strong>
+        online and offline. Read more about our{' '}
+        <a href="/blog/omnichannel-cms">omnichannel CMS</a>.
+      </Fragment>
+
+      <div class={styles.grid}>
+        <Result>
+          <Fragment slot="title"><mark class="good">2x revenue growth</mark></Fragment>
+
+          <strong>
+            According to <a
+              href="https://sloanreview.mit.edu/article/the-right-response-to-digital-disruption/"
+              target="_blank"
+              rel="noreferrer">MIT</a
+            ></strong
+          >, when companies provide a seamless experience they generate a twice revenue rate of
+          competitors using legacy digital tech
+        </Result>
+        <Result>
+          <Fragment slot="title"><mark class="good">2x customers</mark></Fragment>
+
+          <strong>
+            <a
+              href="https://www.salesforce.com/content/dam/web/en_us/www/documents/e-books/state-of-the-connected-customer-report-second-edition2018.pdf"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Salesforce reports</a
+            ></strong
+          > that more than half of shoppers stop buying from a company because a competitor provided
+          a better experience
+        </Result>
+      </div>
+    </TitleIllustrationStripWithContent>
+
+    <Space top={4} bottom={3}>
+      <InterstitialTitle style="two">
+        DatoCMS helps you build better
+        <mark>digital&nbsp;experiences</mark>
+      </InterstitialTitle>
+    </Space>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="good">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/eye-gazing" />
+      </Fragment>
+      <Fragment slot="kicker"> A new digital experience </Fragment>
+      <Fragment slot="title">
+        Structured, unified content means <mark>future&#8209;proof</mark>
+      </Fragment>
+
+      <p>
+        Keep content separate from presentation, uncluttered by code or formatting, so it&apos;s
+        ready to flow into new digital experiences without months of effort.
+      </p>
+
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          Build channel-agnostic content, reusable across touchpoints
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          Publish changes instantly to all your channels
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          Provide personalized, contextual help by linking resources together
+        </li>
+      </Bullets>
+    </Flag>
+
+    <IntegrationsBanner
+      bubbles={integrations
+        .filter((i) => ['marketing'].includes(i.integrationType.slug))
+        .slice(0, 30)
+        .map((integration) =>
+          integration.squareLogo ? integration.squareLogo.url : integration.logo.url,
+        )}
+    >
+      <Fragment slot="title">Easily connect any MarTech&nbsp;tool</Fragment>
+
+      Easily integrate your CMS with your preferred marketing technologies, Marketo, Salesforce,
+      Google Analytics, SEMrush, Brightcove, Watson, etc. so you can get valuable insights to make
+      meaningful business decisions.
+    </IntegrationsBanner>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="good">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/go-mobile" />
+      </Fragment>
+      <Fragment slot="kicker"> The CMS for omnichannel marketing </Fragment>
+      <Fragment slot="title">
+        Launch new campaigns <mark>in&nbsp;minutes</mark>
+      </Fragment>
+
+      <p>
+        Whether you’re looking to launch a landing page, microsite, brand site, a new experience, or
+        something in between, launch campaigns faster with less IT friction.
+      </p>
+
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          Built-in landing page builder
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          Flexible, adaptable content model
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          Easily find and reuse assets with AI-assisted DAM
+        </li>
+      </Bullets>
+    </Flag>
+
+    {review1 && <SingleQuote quote={review1} />}
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="good">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/zen" />
+      </Fragment>
+      <Fragment slot="kicker"> The headless CMS for seo </Fragment>
+      <Fragment slot="title">
+        Streamline <mark>SEO</mark>
+      </Fragment>
+
+      <p>
+        Take full control over meta titles, descriptions, social shares, URL paths, and more.
+        DatoCMS automates these tasks so you never have to worry about your content editor
+        forgetting meta content, but SEO teams still retain flexibility to optimize those fields.
+      </p>
+
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          Automatic SEO generation
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          Built-in SEO editor with validations
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          Google SERP, Facebook and Twitter cards preview
+        </li>
+      </Bullets>
+    </Flag>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="good">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/rocket" />
+      </Fragment>
+      <Fragment slot="kicker"> Optimized CMS for digital marketing </Fragment>
+      <Fragment slot="title">
+        Deliver <mark>blazing-fast</mark> digital products
+      </Fragment>
+
+      <p>
+        Your customers will experience sub-second page load times without any additional
+        optimization on your end. Even large photos are
+        <strong> automatically optimized and resized without losing quality </strong>
+        , so you can serve up the best content without sacrificing speed.
+      </p>
+
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          Easily achieve 100/100 on Google's PageSpeed Insight
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          Highly optimized images and video streaming
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          A globally delivered network at your service
+        </li>
+      </Bullets>
+    </Flag>
+
+    <OtherPersonasPicker
+      title="Not just for digital marketers"
+      currentPersonas="digital-marketers"
+    />
+  </div>
+</Layout>

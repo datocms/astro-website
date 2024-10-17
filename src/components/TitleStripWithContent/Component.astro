@@ -10,15 +10,13 @@ const { seoAnalysis } = Astro.props;
 
 const kickerContents = striptags(await Astro.slots.render('kicker'));
 
-let Title: 'h1' | 'h2' = 'h1';
-let Subtitle: 'h3' | 'div' = 'div';
-let Kicker: 'h1' | 'h2' = 'h2';
+let Title: 'h2' | 'h3' = 'h2';
+let Kicker: 'h2' | 'h3' | 'div' = 'div';
 
 if (seoAnalysis) {
   const kickerContainsKeywords = containsKeywords(kickerContents, seoAnalysis);
-  Kicker = kickerContainsKeywords ? 'h1' : 'h2';
-  Title = kickerContainsKeywords ? 'h2' : 'h1';
-  Subtitle = 'h3';
+  Kicker = kickerContainsKeywords ? 'h2' : 'h3';
+  Title = kickerContainsKeywords ? 'h3' : 'h2';
 }
 ---
 
@@ -42,9 +40,9 @@ if (seoAnalysis) {
 
     {
       Astro.slots.has('subtitle') && (
-        <Subtitle class={s.subtitle}>
+        <div class={s.subtitle}>
           <slot name="subtitle" />
-        </Subtitle>
+        </div>
       )
     }
 

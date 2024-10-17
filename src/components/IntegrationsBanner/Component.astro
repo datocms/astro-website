@@ -4,10 +4,9 @@ import s from './style.module.css';
 
 interface Props {
   bubbles: string[];
-  title: string;
 }
 
-const { title, bubbles } = Astro.props;
+const { bubbles } = Astro.props;
 ---
 
 <div class={s.root}>
@@ -25,7 +24,9 @@ const { title, bubbles } = Astro.props;
   <Wrapper>
     <div class={s.foreground}>
       <div class={s.body}>
-        <div class={s.title}>{title}</div>
+        <div class={s.title}>
+          <slot name="title" />
+        </div>
         <div class={s.content}><slot /></div>
       </div>
     </div>

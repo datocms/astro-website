@@ -9,7 +9,7 @@ import striptags from 'striptags';
 interface Props {
   flip?: boolean;
   hideDot?: boolean;
-  seoAnalysis?: string[];
+  seoAnalysis?: unknown;
   style?: 'neutral' | 'bad' | 'good';
 }
 
@@ -27,13 +27,30 @@ if (seoAnalysis) {
   Title = kickerContainsKeywords ? 'h2' : 'h1';
   Subtitle = 'h3';
 }
+
+const size = Math.random() * 1.5 + 2;
+const x = Math.floor(Math.random() * 30);
+const y = Math.floor(Math.random() * 30) + 20;
 ---
 
 <Wrapper>
   <div data-style={style} class:list={[s.root, flip && s.isFlipped]}>
     <div class={s.visual}>
       <slot name="visual" />
-      {['bad', 'good'].includes(style) && !hideDot && <div data-style={style} class={s.dot} />}
+      {
+        ['bad', 'good'].includes(style) && !hideDot && (
+          <div
+            data-style={style}
+            class={s.dot}
+            style={{
+              left: `${x}%`,
+              top: `${y}%`,
+              height: `calc(var(--dotBaseUnit) * ${size})`,
+              width: `calc(var(--dotBaseUnit) * ${size})`,
+            }}
+          />
+        )
+      }
     </div>
 
     <div class={s.content}>
