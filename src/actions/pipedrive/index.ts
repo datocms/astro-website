@@ -1,5 +1,6 @@
-import createLead from './createLead';
+import createPartnerProgramLead from './createPartnerProgramLead';
+import createSalesLead from './createSalesLead';
 
-const actions = { createLead };
+const actions = { createSalesLead, createPartnerProgramLead };
 
 export default actions;

@@ -42,7 +42,7 @@ export function Form() {
         submitLabel="Get in touch"
         nativeSubmitForm
         onSubmit={async (formValues) => {
-          await actions.pipedrive.createLead.orThrow(formValues);
+          await actions.pipedrive.createSalesLead.orThrow(formValues);
         }}
         // https://app.frontapp.com/settings/tim:1275912/channels/edit/9473928/settings
         action="https://webhook.frontapp.com/forms/f51dbf7c0379d350b50e/nzap4XhKrZaOsUgc8z60aWZmDiaXqbcs69ZEcrTnEmrZ9RFy4pLak0OqBcEvkSN-Py6tbtle8KXhPe4X_QgF89gP1Qpl97WhzTQMz8wWQ3hCpUMXJqNtE9056-Av"

@@ -5,7 +5,7 @@ import s from './style.module.css';
 
 type Props = {
   title: string;
-  clients: string[];
+  clients: string[] | Array<{ imageUrl: string; href?: string }>;
 };
 
 const { title, clients } = Astro.props;
@@ -17,7 +17,11 @@ const { title, clients } = Astro.props;
     {
       clients.map((client) => (
         <div class={s.logo}>
-          <Svg name={client} />
+          {typeof client === 'string' ? (
+            <Svg name={client} />
+          ) : (
+            <img loading="lazy" src={client.imageUrl} />
+          )}
         </div>
       ))
     }

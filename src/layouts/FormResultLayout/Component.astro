@@ -1,0 +1,84 @@
+---
+import { Hero } from '~/components/Hero';
+import { Prose } from '~/components/Prose';
+import { Wrapper } from '~/components/Wrapper';
+import { Layout } from '~/layouts/Layout';
+import s from './_style.module.css';
+import { LogosBar } from '~/components/LogosBar';
+
+type Props = {
+  type: 'success' | 'failure';
+  kicker: string;
+};
+
+const { type, kicker } = Astro.props;
+---
+
+<Layout additionalSeo={[]} noFinalCta>
+  <Fragment slot="head">
+    <title>Success | {kicker}</title>
+  </Fragment>
+
+  <Wrapper>
+    <Hero>
+      <Fragment slot="kicker">{kicker}</Fragment>
+      <Fragment slot="title"
+        >{
+          type === 'success' ? (
+            <>
+              <mark>Thank you</mark> for reaching out!
+            </>
+          ) : (
+            <>
+              <mark>Ouch!</mark> An error occurred...
+            </>
+          )
+        }</Fragment
+      >
+    </Hero>
+    <Prose class={s.result}>
+      {
+        Astro.slots.has('default') ? (
+          <slot />
+        ) : type === 'success' ? (
+          <p>
+            We have successfully received your request, and{' '}
+            <strong>you will soon receive an automated confirmation via email</strong>.
+          </p>
+        ) : (
+          <>
+            <p>
+              We sincerely apologize, but it appears{' '}
+              <strong>there was an error while submitting the form</strong>. We will try to resolve
+              this issue as soon as possible.
+            </p>
+            <p>
+              As an alternative, please send a direct email to{' '}
+              <strong>
+                <a href="mailto:support@datocms.com">support@datocms.com</a>
+              </strong>{' '}
+              to reach out to us!
+            </p>
+          </>
+        )
+      }
+    </Prose>
+
+    {
+      type === 'success' && (
+        <div class={s.footer}>
+          <LogosBar
+            title="We power experiences for over half a billion users"
+            clients={[
+              'svg/logos/deutsche-telekom',
+              'svg/logos/hashicorp',
+              'svg/logos/verizon',
+              'svg/logos/polestar',
+              'svg/logos/vercel',
+            ]}
+          />
+        </div>
+      )
+    }
+  </Wrapper>
+</Layout>

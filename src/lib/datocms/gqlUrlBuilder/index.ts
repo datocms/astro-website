@@ -8,6 +8,7 @@ import { buildUrlForDocPage, type DocPageUrlFragment } from './docPage';
 import { buildUrlForEnterpriseApp, type EnterpriseAppUrlFragment } from './enterpriseApp';
 import { buildUrlForFeature, type FeatureUrlFragment } from './feature';
 import { buildUrlForHostingApp, type HostingAppUrlFragment } from './hostingApp';
+import { buildUrlForPartner, type PartnerUrlFragment } from './partner';
 import { buildUrlForPlugin, type PluginUrlFragment } from './plugin';
 import { buildUrlForProductUpdate, ProductUpdateUrlFragment } from './productUpdate';
 import { buildUrlForShowcaseProject, type ShowcaseProjectUrlFragment } from './showcaseProject';
@@ -57,6 +58,9 @@ export function buildUrlFromGql(
       })
     | (FragmentOf<typeof AcademyChapterUrlFragment> & {
         __typename: 'AcademyChapterRecord';
+      })
+    | (FragmentOf<typeof PartnerUrlFragment> & {
+        __typename: 'PartnerRecord';
       }),
 ) {
   switch (thing.__typename) {
@@ -88,5 +92,7 @@ export function buildUrlFromGql(
       return buildUrlForAcademyCourse(thing);
     case 'AcademyChapterRecord':
       return buildUrlForAcademyChapter(thing);
+    case 'PartnerRecord':
+      return buildUrlForPartner(thing);
   }
 }
