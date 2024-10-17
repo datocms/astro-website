@@ -1,0 +1,78 @@
+---
+import { Heading } from '~/components/Heading';
+import s from './style.module.css';
+import { MaybeLink } from '~/components/links/MaybeLink';
+import { Text } from '~/components/structuredText/Text';
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import { Hero } from '~/components/Hero';
+import { slugify } from '~/lib/slugify';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { groupBy } from 'lodash-es';
+import { Layout } from '~/layouts/Layout';
+
+const { entries, page } = await executeQuery(Astro, query);
+
+if (!page || entries.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const entriesByLetter = groupBy(entries, (entry) => entry.title[0]!.toUpperCase());
+---
+
+<Layout additionalSeo={page.seo}>
+  <Wrapper>
+    <Hero>
+      <Fragment slot="title">DatoCMS <mark>Glossary</mark></Fragment>
+      <Fragment slot="subtitle">
+        A comprehensive guide to terms and terminology related to DatoCMS and Headless CMS that you
+        may encounter when using our product, reading our docs, or getting started with headless
+        content management
+      </Fragment>
+    </Hero>
+    <div class={s.root}>
+      <div class={s.toc}>
+        <div class={s.tocInner}>
+          {
+            Object.keys(entriesByLetter).map((letter) => (
+              <a class={s.tocEntry} href={`#group-${letter}`}>
+                {letter}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+      <dl class={s.letterGroups}>
+        {
+          Object.entries(entriesByLetter).map(([letter, entries]) => (
+            <div class={s.letterGroup}>
+              <Heading as="div" class={s.letterGroupTitle} anchor={`group-${letter}`}>
+                {letter}
+              </Heading>
+              <div class={s.letterGroupEntries}>
+                {entries.map((entry) => (
+                  <div class={s.entry}>
+                    <Heading as="dt" class={s.entryTitle} anchor={slugify(entry.title)}>
+                      {entry.url ? (
+                        <MaybeLink class={s.goto} href={entry.url}>
+                          {entry.title}
+                        </MaybeLink>
+                      ) : (
+                        entry.title
+                      )}
+                    </Heading>
+                    <dd class={s.entryDescription}>
+                      <Text data={entry.description} />
+                    </dd>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </Wrapper>
+</Layout>
