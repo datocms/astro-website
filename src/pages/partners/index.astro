@@ -1,0 +1,46 @@
+---
+import PartnersMap from '~/components/PartnersMap';
+import { Announce } from '~/components/pluginToolkit/Announce'; // TODO change name
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+
+const { page, posts1, posts2, posts3 } = await executeQuery(Astro, query);
+
+if (!page || !posts1 || !posts2 || !posts3) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const posts = [...posts1, ...posts2, ...posts3];
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker"> Solution Partners </Fragment>
+    <Fragment slot="title">
+      Find the perfect Partner to meet <mark>your digital needs</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      Our most successful customers work with a Solution Partner to accomplish their goals and ship
+      their digital products faster.
+    </Fragment>
+  </Hero>
+
+  <Wrapper>
+    <PartnersMap partners={posts} client:visible />
+    <Space bottom={1}>
+      <Announce href="/partner-program" center>
+        <Fragment slot="text">
+          <strong>Want to become a DatoCMS Partner?</strong> Learn more about our Partner Program and
+          its benefits!
+        </Fragment>
+      </Announce>
+    </Space>
+  </Wrapper>
+</Layout>

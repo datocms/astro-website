@@ -1,0 +1,92 @@
+---
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { Space } from '~/components/Space';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import { Wrapper } from '~/components/Wrapper';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Text } from '~/components/structuredText/Text';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+
+const { partnerSlug } = Astro.params;
+const variables = { partnerSlug: partnerSlug! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <InterstitialTitle class={s.hero} mainTitleOfPage style="two" bigSubtitle>
+    <Fragment slot="kicker"><a href="/partner-program">DatoCMS Agency Partner</a></Fragment>
+    <Fragment slot="subtitle"><Text data={page.shortDescription} /></Fragment>
+    <figure class={s.logoWrapper}>
+      <img loading="lazy" class={s.logo} alt={`${page.name} logo`} src={page.logo.url} />
+    </figure>
+  </InterstitialTitle>
+
+  <Wrapper>
+    {
+      page.projects.length > 0 && (
+        <Space top={1}>
+          <div>
+            <div class={s.projectsGrid}>
+              {/* TODO url */}
+              {page.projects.map((project) => (
+                <MarketplaceCard
+                  title={project.name}
+                  size="small"
+                  svgLogoUrl={
+                    project.technologies.find((t) => t.integrationType.slug === 'framework')?.logo
+                      .url
+                  }
+                  href={`/partners/${partnerSlug}/showcase/${project.slug}`}
+                >
+                  <Fragment slot="image">
+                    <ResponsiveImage data={project.mainImage.responsiveImage} />
+                  </Fragment>
+                  {structuredTextToPlainText(project.headline)}
+                </MarketplaceCard>
+
+                // <ResponsiveImage data={project.mainImage.responsiveImage} />
+                // <PluginBox
+                //   title={project.name}
+                //   key={project.slug}
+                //   href={`/partners/${partnerSlug}/showcase/${project.slug}`}
+                //   description={
+                //     <div class={s.demoDesc}>
+                //       <div class={s.demoDescBody}>
+                //         {structuredTextToPlainText(project.headline)}
+                //       </div>
+                //       <div class={s.demoDescImage}>
+                //         <img
+                //           class={s.techLogo}
+                //           src={
+                //             (
+                //               project.technologies.find(
+                //                 (t) => t.integrationType.slug === 'framework' && t.logo?.url,
+                //               ) || project.technologies.find((t) => t.logo?.url)
+                //             ).logo.url
+                //           }
+                //         />
+                //       </div>
+                //     </div>
+                //   }
+                //   image={<img class={s.boxImageImage} data={project.mainImage.responsiveImage} />}
+                // />
+              ))}
+            </div>
+          </div>
+        </Space>
+      )
+    }
+  </Wrapper>
+</Layout>
