@@ -1,17 +1,19 @@
 ---
-import { Hero } from '~/components/Hero';
-import { Layout } from '~/layouts/Layout';
-import { Space } from '~/components/Space';
-import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
-import { Wrapper } from '~/components/Wrapper';
-import { MarketplaceCard } from '~/components/MarketplaceCard';
-
 import { InterstitialTitle } from '~/components/InterstitialTitle';
-import { Text } from '~/components/structuredText/Text';
+import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Prose } from '~/components/Prose';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { SidebarPane } from '~/components/SidebarPane';
+import { Space } from '~/components/Space';
+import { Text } from '~/components/structuredText/Text';
+import { Wrapper } from '~/components/Wrapper';
+import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
+import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
+import { query, extraQuery } from './_graphql';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 
 const { partnerSlug } = Astro.params;
@@ -22,10 +24,14 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const { plugins } = await executeQuery(Astro, extraQuery, {
+  variables: { authorId: page.npmUser?.id || '' },
+});
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
-  <InterstitialTitle class={s.hero} mainTitleOfPage style="two" bigSubtitle>
+  <InterstitialTitle style="two" bigSubtitle={true} mainTitleOfPage>
     <Fragment slot="kicker"><a href="/partner-program">DatoCMS Agency Partner</a></Fragment>
     <Fragment slot="subtitle"><Text data={page.shortDescription} /></Fragment>
     <figure class={s.logoWrapper}>
@@ -34,12 +40,49 @@ if (!page) {
   </InterstitialTitle>
 
   <Wrapper>
+    <div class={s.contentWrapper}>
+      <div class={s.content}>
+        <h3 class={s.blockTitle}>Description</h3>
+        <section>
+          <Prose>
+            <Text data={page.description} />
+          </Prose>
+        </section>
+      </div>
+
+      <aside>
+        <SidebarPane icon="map-marker" title={page.locations.length > 1 ? 'Locations' : 'Location'}>
+          <ul class={s.list}>
+            {
+              page.locations.map((area) => (
+                <li>
+                  {area.emoji} {area.name}
+                </li>
+              ))
+            }
+          </ul>
+        </SidebarPane>
+        <SidebarPane icon="marker" title="Services offered">
+          <ul class={s.list}>
+            {page.areasOfExpertise.map((area) => <li>{area.name}</li>)}
+          </ul>
+        </SidebarPane>
+        <SidebarPane icon="laptop-code" title="Covered technologies">
+          <ul class={s.list}>
+            {page.technologies.map((area) => <li>{area.name}</li>)}
+          </ul>
+        </SidebarPane>
+      </aside>
+    </div>
+  </Wrapper>
+
+  <Wrapper>
     {
       page.projects.length > 0 && (
-        <Space top={1}>
+        <Space top={2}>
           <div>
+            <h3 class={s.blockTitle}>Projects showcase</h3>
             <div class={s.projectsGrid}>
-              {/* TODO url */}
               {page.projects.map((project) => (
                 <MarketplaceCard
                   title={project.name}
@@ -48,40 +91,35 @@ if (!page) {
                     project.technologies.find((t) => t.integrationType.slug === 'framework')?.logo
                       .url
                   }
-                  href={`/partners/${partnerSlug}/showcase/${project.slug}`}
+                  href={buildUrlForShowcaseProject(project)}
                 >
                   <Fragment slot="image">
                     <ResponsiveImage data={project.mainImage.responsiveImage} />
                   </Fragment>
                   {structuredTextToPlainText(project.headline)}
                 </MarketplaceCard>
+              ))}
+            </div>
+          </div>
+        </Space>
+      )
+    }
 
-                // <ResponsiveImage data={project.mainImage.responsiveImage} />
-                // <PluginBox
-                //   title={project.name}
-                //   key={project.slug}
-                //   href={`/partners/${partnerSlug}/showcase/${project.slug}`}
-                //   description={
-                //     <div class={s.demoDesc}>
-                //       <div class={s.demoDescBody}>
-                //         {structuredTextToPlainText(project.headline)}
-                //       </div>
-                //       <div class={s.demoDescImage}>
-                //         <img
-                //           class={s.techLogo}
-                //           src={
-                //             (
-                //               project.technologies.find(
-                //                 (t) => t.integrationType.slug === 'framework' && t.logo?.url,
-                //               ) || project.technologies.find((t) => t.logo?.url)
-                //             ).logo.url
-                //           }
-                //         />
-                //       </div>
-                //     </div>
-                //   }
-                //   image={<img class={s.boxImageImage} data={project.mainImage.responsiveImage} />}
-                // />
+    {
+      plugins.length > 0 && (
+        <Space top={2}>
+          <div>
+            <h3 class={s.blockTitle}>Plugins released</h3>
+            <div class={s.pluginsGrid}>
+              {plugins.map((plugin) => (
+                <MarketplaceCard title={plugin.title} size="small" href={buildUrlForPlugin(plugin)}>
+                  <Fragment slot="image">
+                    {plugin.coverImage && (
+                      <ResponsiveImage data={plugin.coverImage.responsiveImage} />
+                    )}
+                  </Fragment>
+                  {plugin.description}
+                </MarketplaceCard>
               ))}
             </div>
           </div>

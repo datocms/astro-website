@@ -1,5 +1,7 @@
-import { TagFragment } from '~/lib/datocms/commonFragments';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
+import { PluginUrlFragment } from '~/lib/datocms/gqlUrlBuilder/plugin';
+import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -42,8 +44,8 @@ export const query = graphql(
           id
         }
         projects: _allReferencingShowcaseProjects(first: 100, orderBy: position_ASC) {
+          ...ShowcaseProjectUrlFragment
           name
-          slug
           headline {
             value
           }
@@ -65,5 +67,29 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment],
+  [TagFragment, ResponsiveImageFragment, ShowcaseProjectUrlFragment],
+);
+
+export const extraQuery = graphql(
+  /* GraphQL */ `
+    query PartnerExtraQuery($authorId: ItemId!) {
+      plugins: allPlugins(
+        filter: { author: { eq: $authorId }, manuallyDeprecated: { eq: false } }
+        orderBy: installs_DESC
+      ) {
+        ...PluginUrlFragment
+        id
+        title
+        description
+        releasedAt
+        packageName
+        coverImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+    }
+  `,
+  [ResponsiveImageFragment, PluginUrlFragment],
 );
