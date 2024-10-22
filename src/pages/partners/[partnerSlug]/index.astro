@@ -1,4 +1,5 @@
 ---
+import { Button } from '~/components/Button';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Layout } from '~/layouts/Layout';
 import { MarketplaceCard } from '~/components/MarketplaceCard';
@@ -6,6 +7,7 @@ import { Prose } from '~/components/Prose';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { SidebarPane } from '~/components/SidebarPane';
 import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
 import { Text } from '~/components/structuredText/Text';
 import { Wrapper } from '~/components/Wrapper';
 import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
@@ -49,10 +51,31 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
           <Prose>
             <Text data={page.description} />
           </Prose>
+          <div class={s.action}>
+            <div class={s.actionButton}>
+              <Button as="a" href={page.websiteUrl} target="_blank">
+                <Svg name="icons/regular/link" /> Visit website
+              </Button>
+            </div>
+            {
+              page.publicContactEmail && (
+                <div class={s.actionButton}>
+                  <Button
+                    as="a"
+                    s="invert"
+                    href={`mailto:${page.publicContactEmail}`}
+                    target="_blank"
+                  >
+                    <Svg name="icons/regular/envelope" /> Contact {page.name}
+                  </Button>
+                </div>
+              )
+            }
+          </div>
         </section>
       </div>
 
-      <aside>
+      <aside class={s.aside}>
         <SidebarPane icon="map-marker" title={page.locations.length > 1 ? 'Locations' : 'Location'}>
           <ul class={s.list}>
             {

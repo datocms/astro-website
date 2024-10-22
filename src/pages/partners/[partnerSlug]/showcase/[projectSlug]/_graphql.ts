@@ -1,5 +1,6 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
+import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 
@@ -40,24 +41,18 @@ export const query = graphql(
           name
         }
         mainImage {
-          responsiveImage(imgixParams: { auto: format, w: 1200 }) {
+          responsiveImage(imgixParams: { auto: format, w: 1600 }) {
             ...ResponsiveImageFragment
           }
         }
         video {
-          title
-          width
-          height
-          blurUpThumb
-          video {
-            playbackId: muxPlaybackId
-          }
+          ...VideoPlayerFragment
         }
         projectScreenshots {
           id
           title
           width
-          responsiveImage(imgixParams: { auto: format, w: 900 }) {
+          responsiveImage(imgixParams: { auto: format, w: 1200 }) {
             ...ResponsiveImageFragment
           }
           zoomableResponsiveImage: responsiveImage(
@@ -70,7 +65,7 @@ export const query = graphql(
           id
           title
           width
-          responsiveImage(imgixParams: { auto: format, w: 900 }) {
+          responsiveImage(imgixParams: { auto: format, w: 1200 }) {
             ...ResponsiveImageFragment
           }
           zoomableResponsiveImage: responsiveImage(
@@ -82,5 +77,5 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment, PartnerUrlFragment],
+  [TagFragment, ResponsiveImageFragment, PartnerUrlFragment, VideoPlayerFragment],
 );

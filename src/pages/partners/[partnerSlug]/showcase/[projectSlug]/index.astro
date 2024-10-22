@@ -2,10 +2,13 @@
 import { Button } from '~/components/Button';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Layout } from '~/layouts/Layout';
+import { Prose } from '~/components/Prose';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { SidebarPane } from '~/components/SidebarPane';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { Text } from '~/components/structuredText/Text';
+import { VideoPlayer } from '~/components/VideoPlayer';
 import { Wrapper } from '~/components/Wrapper';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { executeQuery } from '~/lib/datocms/executeQuery';
@@ -52,32 +55,75 @@ if (!page) {
   </InterstitialTitle>
 
   <Wrapper>
-    <div class={s.contentWrapper}>
-      <div class={s.content}>…</div>
+    <div class={s.mainVisual}>
+      {
+        page.video ? (
+          <div class={s.mainImage}>
+            <VideoPlayer data={page.video} />
+          </div>
+        ) : (
+          <ResponsiveImage data={page.mainImage.responsiveImage} />
+        )
+      }
+    </div>
+  </Wrapper>
 
-      <aside>
+  <Wrapper>
+    <div class={s.contentWrapper}>
+      <!-- TODO: sticky aside? -->
+      <div class={s.content}>
+        <h3 class={s.blockTitle}>Project shots</h3>
+        <div class={s.gallery}>
+          {
+            page.projectScreenshots.map((screen) => (
+              <figure>
+                <div class={s.shot}>
+                  <ResponsiveImage data={screen.responsiveImage} />
+                </div>
+                <div class={s.shotTitle}>{screen.title}</div>
+              </figure>
+            ))
+          }
+        </div>
+
+        <Space top={2}>
+          <h3 class={s.blockTitle}>Backend shots</h3>
+          <div class={s.gallery}>
+            {
+              page.datocmsScreenshots.map((screen) => (
+                <figure>
+                  <div class={s.shot}>
+                    <ResponsiveImage data={screen.responsiveImage} />
+                  </div>
+                  <div class={s.shotTitle}>{screen.title}</div>
+                </figure>
+              ))
+            }
+          </div>
+        </Space>
+      </div>
+
+      <aside class={s.aside}>
         <SidebarPane icon="info" title="About the project">
-          <Text data={page.inDepthExplanation} />
+          <Prose>
+            <Text data={page.inDepthExplanation} />
+          </Prose>
         </SidebarPane>
         <SidebarPane icon="users" title="Made by">
-          <div class={s.madeBy}>
-            <div class={s.madeByImage}>
-              <a href={`/partners/${page.partner.slug}`}>
-                <img
-                  loading="lazy"
-                  class={s.madeByLogo}
-                  alt={`${page.partner.name} logo`}
-                  src={page.partner.logo.url}
-                />
-              </a>
-            </div>
-            <div class={s.madeByDescription}>
+          <a href={`/partners/${page.partner.slug}`}>
+            <img
+              loading="lazy"
+              class={s.madeByLogo}
+              alt={`${page.partner.name} logo`}
+              src={page.partner.logo.url}
+            />
+          </a>
+          <Prose>
+            <article>
               {structuredTextToPlainText(page.partner.shortDescription)}
-            </div>
-            <a href={`/partners/${page.partner.slug}`}>
-              <a class={s.madeByLink}>View profile &raquo;</a>
-            </a>
-          </div>
+            </article>
+            <a href={`/partners/${page.partner.slug}`}>View profile &raquo;</a>
+          </Prose>
         </SidebarPane>
         <SidebarPane icon="tag" title="Tags">
           <div class={s.tagList}>
