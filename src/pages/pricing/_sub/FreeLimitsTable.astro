@@ -1,0 +1,73 @@
+---
+import { Svg } from '~/components/Svg';
+import s from '../_style.module.css';
+import { formatExtra, formatLimitRaw } from './planLimitsHelpers';
+import { HintFragment } from '../_graphql';
+import type { FragmentOf } from 'gql.tada';
+import { type Plan } from './perOwnerPricingPlans';
+import CheckOrNope from './CheckOrNope.astro';
+
+type Props = {
+  hints: FragmentOf<typeof HintFragment>[];
+  freePlan: Plan;
+  proPlan: Plan;
+};
+
+const { hints, freePlan, proPlan } = Astro.props;
+---
+
+<table class={s.fTable}>
+  <thead class={s.fReducedHead}>
+    <th class={s.fReducedHeadTitle}>Limit</th>
+    <th class={s.fReducedHeadPlan}>Free plan</th>
+    <th class={s.fReducedHeadPlan}>Professional plan</th>
+  </thead>
+  <tbody>
+    {
+      [
+        'users',
+        'items',
+        'uploadable_bytes',
+        'indexable_pages',
+        'history_retention_days',
+        'traffic_bytes',
+        'api_calls',
+        'mux_encoding_seconds',
+        'mux_streaming_seconds',
+      ].map((limitId, i) => {
+        const hint = hints.find((h) => h.apiId === limitId)!;
+        const freePlanLimit = freePlan.attributes.limits.find((l) => l.id === limitId)!;
+        const proPlanLimit = proPlan.attributes.limits.find((l) => l.id === limitId)!;
+        const formattedLimitValue = formatLimitRaw(proPlanLimit);
+
+        return (
+          <tr class:list={[s.fTableFeature, i % 2 === 0 && s.fTableFeatureOdd]}>
+            <th class={s.fTableFeatureName}>
+              <div class={s.fTableFeatureNameSplit}>
+                <div class={s.fTableFeatureNameName}>{hint.name} </div>
+                {hint.description && (
+                  <div class={s.fTableFeatureNameInfo}>
+                    <Svg name="icons/regular/info-circle" />
+                    <div class={s.fTableFeatureNameInfoHint}>{hint.description}</div>
+                  </div>
+                )}
+              </div>
+            </th>
+            <td class={s.fTableFeaturePlan}>{formatLimitRaw(freePlanLimit)}</td>
+
+            <td class={s.fTableFeaturePlan}>
+              {typeof formattedLimitValue === 'boolean' ? (
+                <CheckOrNope value={formattedLimitValue} />
+              ) : (
+                formattedLimitValue
+              )}
+              {'extra_packet_amount' in proPlanLimit && proPlanLimit.extra_packet_amount && (
+                <div class={s.extra}>{formatExtra(proPlanLimit)}</div>
+              )}
+            </td>
+          </tr>
+        );
+      })
+    }
+  </tbody>
+</table>

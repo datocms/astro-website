@@ -1,0 +1,59 @@
+---
+import { Svg } from '~/components/Svg';
+import s from '../_style.module.css';
+import { InlineText } from '~/components/structuredText/InlineText';
+import Check from './Check.astro';
+import Nope from './Nope.astro';
+import { type FragmentOf } from 'gql.tada';
+import { PlanFeatureGroupFragment } from '../_graphql';
+
+type Props = {
+  startOpen: boolean;
+  group: FragmentOf<typeof PlanFeatureGroupFragment>;
+};
+
+const { group, startOpen } = Astro.props;
+---
+
+<tr class={s.fTableGroup} data-header-for-group={group.id} data-open={startOpen ?? undefined}>
+  <td colspan={3}>
+    <Svg name="icons/regular/minus-circle" class={s.fTableGroupIcon} data-show-if="open" />
+    <Svg name="icons/regular/plus-circle" class={s.fTableGroupIcon} data-show-if="closed" />
+    {group.name}
+    <span class={s.fTableGroupCount} data-show-if="closed">({group.features.length})</span>
+  </td>
+</tr>
+{
+  group.features.map((feature, i) => (
+    <tr
+      class:list={[s.fTableFeature, i % 2 === 0 && s.fTableFeatureOdd]}
+      data-part-of-group={group.id}
+      data-open={startOpen ?? undefined}
+      data-closed-if-only-show-differences={feature.availableOnProfessionalPlan ?? undefined}
+    >
+      <th class={s.fTableFeatureName}>
+        <div class={s.fTableFeatureNameSplit}>
+          <div class={s.fTableFeatureNameName}>{feature.name} </div>
+          {feature.description && (
+            <div class={s.fTableFeatureNameInfo}>
+              <Svg name="icons/regular/info-circle" />
+              <div class={s.fTableFeatureNameInfoHint}>
+                <InlineText data={feature.description} />
+
+                <div style={{ display: 'none' }}>
+                  Related to: {group.name}, {(feature.tags as string[]).join(', ')}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </th>
+      <td class={s.fTableFeaturePlan}>
+        {feature.availableOnProfessionalPlan ? <Check /> : <Nope />}
+      </td>
+      <td class={s.fTableFeaturePlan}>
+        <Check />
+      </td>
+    </tr>
+  ))
+}

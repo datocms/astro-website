@@ -91,7 +91,7 @@ export class WebComponent extends HTMLParsedElement {
     }
 
     // Check the 'upTo' element itself
-    if (upTo.matches(selector)) {
+    if ('matches' in upTo && upTo.matches(selector)) {
       return upTo;
     }
 

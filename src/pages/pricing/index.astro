@@ -1,0 +1,387 @@
+---
+import { sortBy } from 'lodash-es';
+import { Button } from '~/components/Button';
+import { Hero } from '~/components/Hero';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { LogosBar } from '~/components/LogosBar';
+import { Space } from '~/components/Space';
+import { Prose } from '~/components/Prose';
+import { Svg } from '~/components/Svg';
+import { Wrapper } from '~/components/Wrapper';
+import { Text } from '~/components/structuredText/Text';
+import { Layout } from '~/layouts/Layout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import Bullet from './_sub/Bullet.astro';
+import FeatureGroup from './_sub/FeatureGroup.astro';
+import FreeLimitsTable from './_sub/FreeLimitsTable.astro';
+import LimitsGroup from './_sub/LimitsGroup.astro';
+import ReadMore from './_sub/ReadMore.astro';
+import { fetchPerOwnerPricingPlans } from './_sub/perOwnerPricingPlans';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { formatNumber } from '~/lib/formatters';
+
+const plans = sortBy(await fetchPerOwnerPricingPlans(), 'monthly_price');
+
+const [freePlan, proPlan] = plans;
+
+const { page, faqs, review1, planFeatureGroups, hints } = await executeQuery(Astro, query);
+
+if (!page || !freePlan || !proPlan) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero>
+    <Fragment slot="kicker"> Future-proof your digital experiences </Fragment>
+    <Fragment slot="title">
+      Flexible pricing,<br /><mark>ready to scale</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      Effortless maintenance, seamless operations: unlock substantial savings every year by
+      leveraging DatoCMS headless technology and content infrastructure
+    </Fragment>
+  </Hero>
+
+  <Space top={1}>
+    <div class={s.plansStrip}>
+      <Wrapper>
+        <div class={s.plansContainer}>
+          <div class={s.plan}>
+            <div class={s.planInner}>
+              <div class={s.planName}>Professional</div>
+              <div class={s.planDescription}>
+                Everything you need — and more – to build professional digital projects
+              </div>
+
+              <div class={s.planPriceContainer}>
+                <span class={s.planPricePerMonth}>Start at </span>
+                <span class={s.planPrice}>€{formatNumber(149)}</span>
+                <span class={s.planPricePerMonth}>/month</span>
+
+                <span class={s.planYearlyPrice}>
+                  if paying annually, or <strong>€{formatNumber(199)}/month</strong>
+                </span>
+              </div>
+
+              <div class={s.planAction}>
+                <Button
+                  block
+                  s="invert"
+                  as="a"
+                  href="https://dashboard.datocms.com/personal-account/plan-billing/change?plan_id=294&utm_source=datocms&utm_medium=website&utm_campaign=pricing"
+                >
+                  Purchase now
+                </Button>
+              </div>
+
+              <div class={s.planBullets}>
+                <Bullet>
+                  Generous quota included, with soft limits you can exceed and pay-as-you-go
+                </Bullet>
+                <Bullet>
+                  10 collaborators included on each project (you can purchase more if needed)
+                </Bullet>
+                <Bullet>Additional projects can be added for as low as €29/month</Bullet>
+                <Bullet>Expanded authoring roles to support most publishing workflows</Bullet>
+                <ReadMore />
+              </div>
+            </div>
+          </div>
+
+          <div class={s.plan}>
+            <div class={s.planInner}>
+              <div class={s.planName}>Enterprise</div>
+              <div class={s.planDescription}>
+                Premium features, high-touch support and advanced compliance for scaled experiences
+              </div>
+
+              <div class={s.planPriceContainer}>
+                <span class={s.planPrice}>Custom</span>
+
+                <span class={s.planYearlyPrice}> payable by credit card or wire transfer </span>
+              </div>
+
+              <div class={s.planAction}>
+                <Button block s="invert" as="a" href="/contact"> Contact us </Button>
+              </div>
+
+              <div class={s.planBullets}>
+                <Bullet>Guaranteed support and uptime SLAs</Bullet>
+                <Bullet>SSO, Audit logs and Static webhook IPs for enhanced security</Bullet>
+                <Bullet>
+                  Fully customizable roles and tasks for granular workflows, tailored to your
+                  specific needs
+                </Bullet>
+                <Bullet>
+                  Support via shared Slack channel, editorial onboarding, plus access to our
+                  solution architects
+                </Bullet>
+                <ReadMore />
+              </div>
+            </div>
+          </div>
+        </div>
+        <a href="/partner-program" class={s.agenciesCta}>
+          <Svg name="svg/illustrations/marketers" />
+          <span>
+            <strong>Building lots of sites?</strong> Discover our{' '}
+            <mark>Agency Partner Program</mark> &raquo;
+          </span>
+        </a>
+      </Wrapper>
+    </div>
+
+    <Wrapper>
+      <div class={s.freePlan}>
+        <div class={s.freePlanContent}>
+          <div class={s.freePlanTitle}>
+            Just getting started? Try DatoCMS out for free, forever (yes really)
+          </div>
+          <div class={s.freePlanDescription}>
+            Free plan comes with 2 editors and 300 records, with 10GB of traffic and 100k API calls
+            each month. No overages allowed.{' '}
+            <a href="#free-plan-details">
+              See all limits in detail <Svg name="icons/regular/info-circle" />
+            </a>
+          </div>
+        </div>
+        <div class={s.freePlanCta}>
+          <Button block s="invert" as="a" href="https://dashboard.datocms.com/signup">
+            Sign up for free
+          </Button>
+          <div class={s.freePlanCtaReassurance}>Easy setup, no credit card required</div>
+        </div>
+      </div>
+    </Wrapper>
+
+    <pricing-context-provider>
+      <div class={s.modalWrapper} id="free-plan-details">
+        <a href="#" class={s.modalOverlay}></a>
+        <div class={s.modal}>
+          <a href="#" class={s.modalClose}>
+            <Svg name="icons/regular/times-circle" />
+          </a>
+          <div class={s.modalTitle}>Free vs Professional</div>
+          <div class={s.modalWarning}>
+            ⚠️{' '}
+            <strong>In the Free plan, you can&apos;t go over the allowed monthly limits.</strong>{
+              ' '
+            }
+            If you reach these limits, the service will stop responding as expected.
+          </div>
+          <div class={s.fTableScroll}>
+            <FreeLimitsTable hints={hints} freePlan={freePlan} proPlan={proPlan} />
+          </div>
+        </div>
+      </div>
+
+      <a id="details"></a>
+
+      <Space top={2}>
+        <Wrapper>
+          <InterstitialTitle style="three">
+            Compare plans
+            <div class={s.searchFeatures}>
+              <Svg name="icons/regular/search" />
+              <input type="text" name="searchTerm" placeholder="Search features" />
+
+              <button type="button" id="clearSearchTerm">
+                <Svg name="icons/regular/times-circle" />
+              </button>
+            </div>
+          </InterstitialTitle>
+          <div class={s.fTableScroll}>
+            <a class={s.fTableAnchor} id="detailsTable"></a>
+            <table class={s.fTable} data-details-table>
+              <thead>
+                <th class={s.fTableHead}>
+                  <div class={s.fTableHeadTitle}>Features by plan</div>
+                  <div class={s.fTableHeadSub}>
+                    Explore our features and choose the best plan for you
+                  </div>
+                  <label class={s.fTableHeadDiff}>
+                    <input name="onlyShowDifferences" type="checkbox" />{' '}
+                    <span>Only show differences</span>
+                  </label>
+                </th>
+                <th class={s.fTablePlan}>
+                  <div class={s.fTablePlanName}>Professional</div>
+                  <div class={s.fTablePlanPrice}>
+                    From €{formatNumber(149)}/month (billed annually)
+                  </div>
+                  <Button
+                    block
+                    s="invert"
+                    as="a"
+                    p="tiny"
+                    href="https://dashboard.datocms.com/personal-account/plan-billing/change?plan_id=294&utm_source=datocms&utm_medium=website&utm_campaign=pricing"
+                  >
+                    Purchase now
+                  </Button>
+                </th>
+                <th class={s.fTablePlan}>
+                  <div class={s.fTablePlanName}>Enterprise</div>
+                  <div class={s.fTablePlanPrice}>Tailored on your needs</div>
+                  <Button block p="tiny" s="invert" as="a" href="/contact"> Contact us </Button>
+                </th>
+              </thead>
+              {
+                planFeatureGroups.map((group, i) => (
+                  <FeatureGroup startOpen={i === 0} group={group} />
+                ))
+              }
+              <LimitsGroup freePlan={freePlan} proPlan={proPlan} hints={hints} />
+            </table>
+          </div>
+        </Wrapper>
+      </Space>
+    </pricing-context-provider>
+
+    <Space top={3}>
+      <Wrapper>
+        <InterstitialTitle>Frequently asked questions</InterstitialTitle>
+        <div class={s.faqs}>
+          {
+            faqs.map((faq) => (
+              <div class={s.faq}>
+                <div class={s.faqQ}>{faq.question}</div>
+                <div class={s.faqA}>
+                  <Prose>
+                    <Text data={faq.answer} />
+                  </Prose>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </Wrapper>
+    </Space>
+
+    <Space top={2}>
+      <LogosBar
+        title="We power experiences for over half a billion users"
+        clients={[
+          'svg/logos/deutsche-telekom',
+          'svg/logos/hashicorp',
+          'svg/logos/verizon',
+          'svg/logos/polestar',
+          'svg/logos/vercel',
+        ]}
+      />
+    </Space>
+
+    {review1 && <SingleQuote quote={review1} size="big" />}
+  </Space>
+</Layout>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'pricing-context-provider',
+    class PricingContextProvider extends WebComponent {
+      _searchTerm: string = '';
+      _onlyShowDifferences: boolean = false;
+
+      parsedCallback() {
+        const searchTermEl = this.$<HTMLInputElement>('input[name="searchTerm"]');
+        this.on(searchTermEl, 'keydown', () => {
+          this.searchTerm = searchTermEl.value;
+          this.onlyShowDifferences = false;
+        });
+
+        const clearSearchTermEl = this.$<HTMLButtonElement>('#clearSearchTerm');
+        this.on(clearSearchTermEl, 'click', () => {
+          searchTermEl.value = '';
+          this.searchTerm = '';
+        });
+
+        const onlyShowDifferencesEl = this.$<HTMLInputElement>('input[name="onlyShowDifferences"]');
+        this.on(onlyShowDifferencesEl, 'change', () => {
+          this.onlyShowDifferences = onlyShowDifferencesEl.checked;
+          this.$('#detailsTable').scrollIntoView({ behavior: 'smooth' });
+
+          if (onlyShowDifferencesEl.checked) {
+            searchTermEl.value = '';
+            this.searchTerm = '';
+          }
+        });
+
+        this.on(
+          this.getRootNode()! as HTMLElement,
+          'click',
+          'tr[data-header-for-group]',
+          (_event, groupEl) => {
+            groupEl.toggleAttribute('data-open');
+            this.copyGroupVisibilityOnSubElements(groupEl);
+          },
+        );
+
+        this.searchTerm = searchTermEl.value;
+        this.onlyShowDifferences = onlyShowDifferencesEl.checked;
+      }
+
+      get searchTerm() {
+        return this._searchTerm;
+      }
+
+      set searchTerm(newSearchTerm: string) {
+        this._searchTerm = newSearchTerm;
+        this.filterSubElements();
+      }
+
+      get onlyShowDifferences() {
+        return this._onlyShowDifferences;
+      }
+
+      set onlyShowDifferences(newOnlyShowDifferences: boolean) {
+        this._onlyShowDifferences = newOnlyShowDifferences;
+        this.filterSubElements();
+      }
+
+      copyGroupVisibilityOnSubElements(groupEl: HTMLElement) {
+        const groupId = groupEl.getAttribute('data-header-for-group')!;
+
+        for (const subElement of this.$$(`[data-part-of-group="${groupId}"]`)) {
+          subElement.toggleAttribute('data-open', groupEl.hasAttribute('data-open'));
+        }
+      }
+
+      filterSubElements() {
+        const isFiltering = this.onlyShowDifferences || Boolean(this.searchTerm);
+
+        this.$('[data-details-table]').toggleAttribute('data-is-filtering', isFiltering);
+
+        for (const groupEl of this.$$('tr[data-header-for-group]')) {
+          const groupId = groupEl.getAttribute('data-header-for-group')!;
+          const groupIsOpen = groupEl.hasAttribute('data-open');
+
+          let someOpen = false;
+
+          for (const subElement of this.$$(`[data-part-of-group="${groupId}"]`)) {
+            const closedIfOnlyShowDifferences = subElement.hasAttribute(
+              'data-closed-if-only-show-differences',
+            );
+            const innerText = subElement.querySelector('th')!.textContent || '';
+
+            const toOpen = isFiltering
+              ? (!this.onlyShowDifferences || !closedIfOnlyShowDifferences) &&
+                (!this.searchTerm || innerText.includes(this.searchTerm))
+              : groupIsOpen;
+
+            subElement.toggleAttribute('data-open', toOpen);
+
+            someOpen ||= toOpen;
+          }
+
+          groupEl.toggleAttribute('data-hidden', isFiltering && !someOpen);
+        }
+      }
+    },
+  );
+</script>
