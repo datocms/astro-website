@@ -1,5 +1,7 @@
 ---
+import PartnersFilters from '~/components/PartnersFilters';
 import PartnersMap from '~/components/PartnersMap';
+import sortBy from 'lodash-es/sortBy';
 import { Announce } from '~/components/pluginToolkit/Announce'; // TODO change name
 import { Hero } from '~/components/Hero';
 import { Layout } from '~/layouts/Layout';
@@ -18,6 +20,26 @@ if (!page || !posts1 || !posts2 || !posts3) {
 }
 
 const posts = [...posts1, ...posts2, ...posts3];
+
+// const countBySlug = posts.reduce((acc, post) => {
+//   acc[post.slug] = post._allReferencingShowcaseProjectsMeta.count;
+//   return acc;
+// }, {});
+
+// const highlightedSlugs = page.highlightedPartners.map((p) => p.slug);
+
+// const ordered = [
+//   ...page.highlightedPartners,
+//   ...sortBy(
+//     posts.filter((p) => !highlightedSlugs.includes(p.slug)),
+//     [(x) => -(countBySlug[x.slug] || 0), 'slug'],
+//   ),
+// ];
+
+// let filteredResults = [];
+// const handleFilteredResults = (results) => {
+//   filteredResults = results;
+// };
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
@@ -42,5 +64,35 @@ const posts = [...posts1, ...posts2, ...posts3];
         </Fragment>
       </Announce>
     </Space>
+  </Wrapper>
+
+  <Wrapper>
+    <!-- TODO: react select -->
+    <!-- <PartnersFilters client:load ordered={ordered} onFilteredResults={handleFilteredResults} />
+    <div class={s.posts}>
+      {
+        filteredResults.map((post, i) => (
+          <a href={`/partners/${post.slug}`}>
+            <a class={s.post}>
+              <div class={s.postLogo}>
+                <img src={post.logo.url} />
+              </div>
+              <div class={s.postBody}>
+                <div class={s.postTitle}>
+                  {post.name}
+                  {post.locations.slice(0, 5).map((l) => (
+                    <span>{l.emoji}</span>
+                  ))}
+                  {post.locations.length > 5 && (
+                    <span class={s.moreLocations}>+ {post.locations.length - 5} more</span>
+                  )}
+                </div>
+                <div class={s.postDescription}>{post.shortDescription}</div>
+              </div>
+            </a>
+          </a>
+        ))
+      }
+    </div> -->
   </Wrapper>
 </Layout>
