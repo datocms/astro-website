@@ -1,0 +1,57 @@
+---
+import s from './style.module.css';
+
+type Props = {
+  options: Array<{ label: string; value: string }>;
+  value: string | null;
+  searchParam: string;
+  resetSearchParams?: string[];
+};
+
+const { options, value, searchParam, resetSearchParams } = Astro.props;
+---
+
+<autosubmitting-select data-reset-search-params={JSON.stringify(resetSearchParams)}>
+  <div class={s.select}>
+    <select name={searchParam}>
+      <option value="">Select...</option>
+      {
+        options.map((option) => (
+          <option value={option.value} selected={value === option.value ? true : undefined}>
+            {option.label}
+          </option>
+        ))
+      }
+    </select>
+    <span class={s.focus}></span>
+  </div>
+</autosubmitting-select>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'autosubmitting-select',
+    class AutosubmittingSelect extends WebComponent {
+      parsedCallback() {
+        const selectEl = this.$('select');
+        const formEl = selectEl.closest('form')!;
+        const resetSearchParams = this.dataset.resetSearchParams
+          ? JSON.parse(this.dataset.resetSearchParams)
+          : [];
+
+        this.on(selectEl, 'change', () => {
+          for (const name of resetSearchParams) {
+            const otherInputEl = document.querySelector<HTMLSelectElement>(
+              `select[name="${name}"]`,
+            );
+            if (otherInputEl) {
+              otherInputEl.value = '';
+            }
+          }
+          formEl.dispatchEvent(new Event('submit', { cancelable: true }));
+        });
+      }
+    },
+  );
+</script>

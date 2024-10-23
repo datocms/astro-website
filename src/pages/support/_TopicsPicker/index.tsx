@@ -28,8 +28,6 @@ export function TopicsPicker({ topics, initialLocationSearch }: Props) {
 
   const queryString = parseUrlSearchParams(useSearchParams(initialLocationSearch));
 
-  console.log(queryString);
-
   const setSelectedTopicSlugs = (slugs: string[]) => {
     let currentUrl = new URL(window.location.href);
     let searchParams = currentUrl.searchParams;

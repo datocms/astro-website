@@ -1,0 +1,26 @@
+---
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+
+type Props = {
+  icon: string;
+  separateMoreFromContent?: boolean;
+  title: string;
+};
+
+const { icon, separateMoreFromContent, title } = Astro.props;
+---
+
+<div class:list={[s.block, separateMoreFromContent && s.separateMoreFromContent]}>
+  <div class={s.heading}>
+    <Svg name={`icons/regular/${icon}`} />
+    <h3>{title}</h3>
+  </div>
+  {
+    Astro.slots.has('default') && (
+      <div class={s.content}>
+        <slot />
+      </div>
+    )
+  }
+</div>

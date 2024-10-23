@@ -1,6 +1,7 @@
 ---
-import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { BlogPostInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 
 interface Props {
   record: FragmentOf<typeof BlogPostInlineFragment>;
@@ -11,6 +12,6 @@ const { record } = Astro.props;
 const unmaskedRecord = readFragment(BlogPostInlineFragment, record);
 ---
 
-<a href="/" class="pill">
+<a href={buildUrlForBlogPost(unmaskedRecord)}>
   {unmaskedRecord.title}
 </a>

@@ -29,6 +29,10 @@ import { slugify } from '~/lib/slugify';
 import { query } from './_graphql';
 import s from './_style.module.css';
 import { Prose } from '~/components/Prose';
+import { BlogPostInline } from '~/components/inlineRecords/BlogPostInline';
+import { ChangelogEntryInline } from '~/components/inlineRecords/ChangelogEntryInline';
+import { BlogPostLink } from '~/components/linkToRecords/BlogPostLink';
+import { ChangelogEntryLink } from '~/components/linkToRecords/ChangelogEntryLink';
 
 const { slug } = Astro.params;
 const variables = { slug: slug! };
@@ -128,6 +132,16 @@ const tocItems = filterNodes(
               CodesandboxEmbedBlockRecord: CodesandboxEmbedBlock,
               CtaButtonRecord: CtaButton,
               QuestionAnswerRecord: QuestionAnswer,
+            })}
+            inlineRecordComponents={withAllComponents(post.content.links, {
+              BlogPostRecord: BlogPostInline,
+              ChangelogEntryRecord: ChangelogEntryInline,
+              WebinarRecord: null,
+            })}
+            linkToRecordComponents={withAllComponents(post.content.links, {
+              BlogPostRecord: BlogPostLink,
+              ChangelogEntryRecord: ChangelogEntryLink,
+              WebinarRecord: null,
             })}
           />
         </Prose>

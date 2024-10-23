@@ -57,8 +57,6 @@ export default function LandingPagesGenerator() {
     },
   );
 
-  console.log(transitions);
-
   return (
     <div className={s.body}>
       <div className={s.title}>Acme Inc.</div>
