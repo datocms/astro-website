@@ -1,19 +1,14 @@
-import { groupBy } from 'lodash-es';
-import { ComposableMap, Geographies, Geography, Graticule, Sphere } from 'react-simple-maps';
+import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 import worldMap from './world-110m.json';
 import Wrapper from '~/components/Wrapper/ReactComponent';
 import s from './style.module.css';
 
-export default function PartnersMap({ partners }) {
-  const countries = groupBy(
-    partners.flatMap((partner) =>
-      partner.locations.map((location) => ({
-        location: location,
-        partner: partner,
-      })),
-    ),
-    'location.code',
-  );
+export default function PartnersMap({
+  partnersCountByCountryCode,
+}: {
+  partnersCountByCountryCode: Record<string, number>;
+}) {
+  const maxCount = Math.max(...Object.values(partnersCountByCountryCode));
 
   return (
     <div className={s.root}>
@@ -28,12 +23,13 @@ export default function PartnersMap({ partners }) {
             <Geographies geography={worldMap}>
               {({ geographies }) =>
                 geographies.map((geo) => {
-                  const results = countries[geo.properties.ISO_A2];
+                  const count = partnersCountByCountryCode[geo.properties.ISO_A2] || 0;
+
                   return (
                     <Geography
                       key={geo.rsmKey}
                       geography={geo}
-                      fill={results ? 'var(--azure-color)' : '#F5F4F6'}
+                      fill={count ? `var(--azure-color)` : '#F5F4F6'}
                       tabIndex={-1}
                       style={{
                         default: { outline: 'none' },

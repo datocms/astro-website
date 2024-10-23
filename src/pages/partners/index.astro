@@ -1,6 +1,5 @@
 ---
-import PartnersFilters from '~/components/PartnersFilters';
-import PartnersMap from '~/components/PartnersMap';
+import PartnersMap from './_sub/PartnersMap';
 import sortBy from 'lodash-es/sortBy';
 import { Announce } from '~/components/pluginToolkit/Announce'; // TODO change name
 import { Hero } from '~/components/Hero';
@@ -9,42 +8,136 @@ import { Space } from '~/components/Space';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
+import { query, PartnerFragment } from './_graphql';
 import s from './_style.module.css';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { uniq } from 'lodash-es';
+import { Filter } from './_sub/Filter';
+import type { FragmentOf } from 'gql.tada';
 
-const { page, posts1, posts2, posts3 } = await executeQuery(Astro, query);
+type Partner = FragmentOf<typeof PartnerFragment>;
 
-if (!page || !posts1 || !posts2 || !posts3) {
+const { page, partners1, partners2, partners3 } = await executeQuery(Astro, query);
+
+if (!page || !partners1 || !partners2 || !partners3) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 
-const posts = [...posts1, ...posts2, ...posts3];
+const partners = [...partners1, ...partners2, ...partners3];
 
-// const countBySlug = posts.reduce((acc, post) => {
-//   acc[post.slug] = post._allReferencingShowcaseProjectsMeta.count;
-//   return acc;
-// }, {});
+const projectsCountByPartner = partners.reduce<Record<string, number>>((acc, post) => {
+  acc[post.slug] = post._allReferencingShowcaseProjectsMeta.count;
+  return acc;
+}, {});
 
-// const highlightedSlugs = page.highlightedPartners.map((p) => p.slug);
+const highlightedPartnerSlugs = page.highlightedPartners.map((p) => p.slug);
 
-// const ordered = [
-//   ...page.highlightedPartners,
-//   ...sortBy(
-//     posts.filter((p) => !highlightedSlugs.includes(p.slug)),
-//     [(x) => -(countBySlug[x.slug] || 0), 'slug'],
-//   ),
-// ];
+const orderedPartners = [
+  ...page.highlightedPartners,
+  ...sortBy(
+    partners.filter((p) => !highlightedPartnerSlugs.includes(p.slug)),
+    [(x) => -(projectsCountByPartner[x.slug] || 0), 'slug'],
+  ),
+];
 
-// let filteredResults = [];
-// const handleFilteredResults = (results) => {
-//   filteredResults = results;
-// };
+const partnersCountByCountryCode = partners
+  .flatMap((partner) => partner.locations.map((location) => location.code))
+  .reduce<Record<string, number>>((acc, code) => {
+    acc[code] = (acc[code] || 0) + 1;
+    return acc;
+  }, {});
+
+const technologyFilter = Astro.url.searchParams.get('technology');
+const areaOfExpertiseFilter = Astro.url.searchParams.get('areaOfExpertise');
+const countryFilter = Astro.url.searchParams.get('country');
+const continentFilter = Astro.url.searchParams.get('continent');
+
+const filteredPartners = orderedPartners.filter((partner) => {
+  if (technologyFilter && !partner.technologies.some((t) => t.name === technologyFilter)) {
+    return false;
+  }
+  if (
+    areaOfExpertiseFilter &&
+    !partner.areasOfExpertise.some((t) => t.name === areaOfExpertiseFilter)
+  ) {
+    return false;
+  }
+  if (countryFilter && !partner.locations.some((t) => `${t.emoji} ${t.name}` === countryFilter)) {
+    return false;
+  }
+  if (continentFilter && !partner.locations.some((t) => t.continent.name === continentFilter)) {
+    return false;
+  }
+
+  return true;
+});
+
+function calculateCounters(partners: Partner[], filterByContinent: string | null) {
+  const technologies: Record<string, number> = {};
+  const areasOfExpertise: Record<string, number> = {};
+  const countries: Record<string, number> = {};
+  const continents: Record<string, number> = {};
+
+  for (const partner of partners) {
+    for (const t of partner.technologies) {
+      technologies[t.name] = (technologies[t.name] || 0) + 1;
+    }
+    for (const t of partner.areasOfExpertise) {
+      areasOfExpertise[t.name] = (areasOfExpertise[t.name] || 0) + 1;
+    }
+    for (const t of partner.locations) {
+      if (!filterByContinent || t.continent.name === filterByContinent)
+        countries[`${t.emoji} ${t.name}`] = (countries[`${t.emoji} ${t.name}`] || 0) + 1;
+    }
+    for (const continentName of uniq(partner.locations.map((t) => t.continent.name))) {
+      continents[continentName] = (continents[continentName] || 0) + 1;
+    }
+  }
+
+  return {
+    technologies,
+    areasOfExpertise,
+    countries,
+    continents,
+  };
+}
+
+const filteredCounters = calculateCounters(filteredPartners, continentFilter);
+const noFilterCounters = calculateCounters(orderedPartners, continentFilter);
+
+const sortByCount = (entryA: [string, number], entryB: [string, number]) => {
+  if (entryA[1] !== entryB[1]) {
+    return entryB[1] - entryA[1];
+  }
+  return entryA[0].localeCompare(entryB[0]);
+};
+
+const toOptionWithCount = (entry: [string, number]) => ({
+  value: entry[0],
+  label: `${entry[0]} (${entry[1]})`,
+});
+
+const continentOptions = Object.entries(noFilterCounters.continents)
+  .sort(sortByCount)
+  .map(toOptionWithCount);
+
+const countryOptions = Object.entries(filteredCounters.countries)
+  .sort(sortByCount)
+  .map(toOptionWithCount);
+
+const technologyOptions = Object.entries(filteredCounters.technologies)
+  .sort(sortByCount)
+  .map(toOptionWithCount);
+
+const areaOfExpertiseOptions = Object.entries(filteredCounters.areasOfExpertise)
+  .sort(sortByCount)
+  .map(toOptionWithCount);
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
   <Hero>
-    <Fragment slot="kicker"> Solution Partners </Fragment>
+    <Fragment slot="kicker">Solution Partners</Fragment>
     <Fragment slot="title">
       Find the perfect Partner to meet <mark>your digital needs</mark>
     </Fragment>
@@ -55,7 +148,7 @@ const posts = [...posts1, ...posts2, ...posts3];
   </Hero>
 
   <Wrapper>
-    <PartnersMap partners={posts} client:load />
+    <PartnersMap partnersCountByCountryCode={partnersCountByCountryCode} client:load />
     <Space bottom={1}>
       <Announce href="/partner-program" center>
         <Fragment slot="text">
@@ -67,32 +160,102 @@ const posts = [...posts1, ...posts2, ...posts3];
   </Wrapper>
 
   <Wrapper>
-    <!-- TODO: react select -->
-    <!-- <PartnersFilters client:load ordered={ordered} onFilteredResults={handleFilteredResults} />
-    <div class={s.posts}>
-      {
-        filteredResults.map((post, i) => (
-          <a href={`/partners/${post.slug}`}>
-            <a class={s.post}>
+    <load-results-in-page>
+      <form class={s.filterGrid} method="GET">
+        <div>
+          <div class={s.filterLabel}>Filter by Continent</div>
+          <Filter
+            options={continentOptions}
+            value={continentFilter}
+            searchParam="continent"
+            resetSearchParams={['country']}
+          />
+        </div>
+        <div>
+          <div class={s.filterLabel}>Filter by Country</div>
+          <Filter options={countryOptions} value={countryFilter} searchParam="country" />
+        </div>
+        <div>
+          <div class={s.filterLabel}>Filter by Technology</div>
+          <Filter options={technologyOptions} value={technologyFilter} searchParam="technology" />
+        </div>
+        <div>
+          <div class={s.filterLabel}>Filter by Area of Expertise</div>
+          <Filter
+            options={areaOfExpertiseOptions}
+            value={areaOfExpertiseFilter}
+            searchParam="areaOfExpertise"
+          />
+        </div>
+      </form>
+      <div class={s.posts} id="filtered-partners">
+        {
+          filteredPartners.map((partner, i) => (
+            <a class={s.post} href={`/partners/${partner.slug}`}>
               <div class={s.postLogo}>
-                <img src={post.logo.url} />
+                <img loading="lazy" src={partner.logo.url} />
               </div>
               <div class={s.postBody}>
                 <div class={s.postTitle}>
-                  {post.name}
-                  {post.locations.slice(0, 5).map((l) => (
+                  {partner.name}
+                  {partner.locations.slice(0, 5).map((l) => (
                     <span>{l.emoji}</span>
                   ))}
-                  {post.locations.length > 5 && (
-                    <span class={s.moreLocations}>+ {post.locations.length - 5} more</span>
+                  {partner.locations.length > 5 && (
+                    <span class={s.moreLocations}>+ {partner.locations.length - 5} more</span>
                   )}
                 </div>
-                <div class={s.postDescription}>{post.shortDescription}</div>
+                <div class={s.postDescription}>{toPlainText(partner.shortDescription)}</div>
               </div>
             </a>
-          </a>
-        ))
-      }
-    </div> -->
+          ))
+        }
+      </div>
+    </load-results-in-page>
   </Wrapper>
 </Layout>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'load-results-in-page',
+    class LoadResultsInPage extends WebComponent {
+      parsedCallback() {
+        const formEl = this.$<HTMLFormElement>('form');
+
+        this.on(formEl, 'submit', async (event) => {
+          event.preventDefault();
+
+          try {
+            const formData = new FormData(formEl);
+            const queryString = new URLSearchParams(formData as any).toString();
+            const url = `?${queryString}`;
+
+            const response = await fetch(url, {
+              headers: {
+                Accept: 'text/html',
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const html = await response.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            const newComponent = tempDiv.querySelector('load-results-in-page');
+            if (newComponent) {
+              this.replaceWith(newComponent);
+              history.pushState({}, '', url);
+            }
+          } catch (error) {
+            console.error('Error loading results:', error);
+          }
+        });
+      }
+    },
+  );
+</script>

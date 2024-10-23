@@ -1,8 +1,8 @@
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 
-const PartnerRecordFragment = graphql(/* GraphQL */ `
-  fragment PartnerRecordFragment on PartnerRecord @_unmask {
+export const PartnerFragment = graphql(/* GraphQL */ `
+  fragment PartnerFragment on PartnerRecord @_unmask {
     name
     slug
     logo {
@@ -39,19 +39,19 @@ export const query = graphql(
           ...TagFragment
         }
         highlightedPartners {
-          ...PartnerRecordFragment
+          ...PartnerFragment
         }
       }
-      posts1: allPartners(first: 100) {
-        ...PartnerRecordFragment
+      partners1: allPartners(first: 100) {
+        ...PartnerFragment
       }
-      posts2: allPartners(skip: 100, first: 100) {
-        ...PartnerRecordFragment
+      partners2: allPartners(skip: 100, first: 100) {
+        ...PartnerFragment
       }
-      posts3: allPartners(skip: 200, first: 100) {
-        ...PartnerRecordFragment
+      partners3: allPartners(skip: 200, first: 100) {
+        ...PartnerFragment
       }
     }
   `,
-  [TagFragment, PartnerRecordFragment],
+  [TagFragment, PartnerFragment],
 );
