@@ -2,29 +2,31 @@
 import s from './style.module.css';
 
 type Props = {
+  badge?: { emoji: string; name: string };
+  boxed?: boolean;
+  class?: string;
+  highlight?: string;
   href: string;
+  label?: unknown;
+  lineClamp?: number;
+  orientation?: 'horizontal' | 'vertical';
+  size?: 'small' | 'micro' | 'medium' | 'large';
   svgLogoUrl?: string;
   title: string;
-  highlight?: string;
-  badge?: { emoji: string; name: string };
-  label?: unknown;
-  boxed?: boolean;
-  size?: 'small' | 'micro' | 'medium' | 'large';
-  orientation?: 'horizontal' | 'vertical';
-  class?: string;
 };
 
 const {
-  class: className,
-  href,
-  title,
-  svgLogoUrl,
-  highlight,
   badge,
-  label,
   boxed = true,
-  size = 'medium',
+  class: className,
+  highlight,
+  href,
+  label,
+  lineClamp = 10,
   orientation = 'vertical',
+  size = 'medium',
+  svgLogoUrl,
+  title,
 } = Astro.props;
 ---
 
@@ -55,7 +57,9 @@ const {
   </div>
   <article class={s.cardContent}>
     <h2 class={s.cardTitle}>{title}</h2>
-    <p class={s.cardDescription}><slot /></p>
+    <p class={s.cardDescription} style=`--lineClamp: ${lineClamp}`>
+      <slot />
+    </p>
     {
       Astro.slots.has('image') && svgLogoUrl && (
         <div class={s.subImageWrapper}>

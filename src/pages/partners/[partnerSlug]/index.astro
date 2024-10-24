@@ -112,6 +112,7 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
                 <MarketplaceCard
                   title={project.name}
                   size="small"
+                  lineClamp={3}
                   svgLogoUrl={
                     project.technologies.find((t) => t.integrationType.slug === 'framework')?.logo
                       .url
@@ -137,13 +138,17 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
             <h3 class={s.blockTitle}>Plugins released</h3>
             <div class={s.pluginsGrid}>
               {plugins.map((plugin) => (
-                <MarketplaceCard title={plugin.title} size="small" href={buildUrlForPlugin(plugin)}>
+                <MarketplaceCard
+                  title={plugin.title}
+                  size="small"
+                  href={buildUrlForPlugin(plugin)}
+                  lineClamp={3}
+                >
                   <Fragment slot="image">
                     {plugin.coverImage && (
                       <ResponsiveImage data={plugin.coverImage.responsiveImage} />
                     )}
                   </Fragment>
-                  {/* TODO: add excerpt */}
                   {plugin.description}
                 </MarketplaceCard>
               ))}
