@@ -13,6 +13,7 @@ type Props = {
   size?: 'small' | 'micro' | 'medium' | 'large';
   svgLogoUrl?: string;
   title: string;
+  multicolorBkg?: boolean;
 };
 
 const {
@@ -26,6 +27,7 @@ const {
   orientation = 'vertical',
   size = 'medium',
   svgLogoUrl,
+  multicolorBkg = false,
   title,
 } = Astro.props;
 ---
@@ -35,7 +37,7 @@ const {
   class:list={[s.card, className]}
   data-size={size}
   data-orientation={orientation}
-  data-boxed={boxed}
+  data-boxed=`${boxed}`
 >
   {
     highlight && (
@@ -49,14 +51,16 @@ const {
       Astro.slots.has('image') ? (
         <slot name="image" />
       ) : svgLogoUrl ? (
-        <figure class={s.visualTechnology}>
+        <figure class:list={[s.visualTechnology, multicolorBkg && s.multicolorBkg]}>
           <img loading="lazy" class={s.technology} src={svgLogoUrl} />
         </figure>
       ) : null
     }
   </div>
   <article class={s.cardContent}>
-    <h2 class={s.cardTitle}>{title}</h2>
+    <h2 class={s.cardTitle}>
+      {Astro.slots.has('title') ? <slot name="title" /> : <>{title}</>}
+    </h2>
     <p class={s.cardDescription} style=`--lineClamp: ${lineClamp}`>
       <slot />
     </p>

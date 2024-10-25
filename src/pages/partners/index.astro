@@ -1,19 +1,20 @@
 ---
 import PartnersMap from './_sub/PartnersMap';
+import s from './_style.module.css';
 import sortBy from 'lodash-es/sortBy';
+import type { FragmentOf } from 'gql.tada';
 import { Announce } from '~/components/pluginToolkit/Announce'; // TODO change name
+import { Filter } from './_sub/Filter';
 import { Hero } from '~/components/Hero';
 import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
 import { Space } from '~/components/Space';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query, PartnerFragment } from './_graphql';
-import s from './_style.module.css';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { uniq } from 'lodash-es';
-import { Filter } from './_sub/Filter';
-import type { FragmentOf } from 'gql.tada';
 
 type Partner = FragmentOf<typeof PartnerFragment>;
 
@@ -133,6 +134,16 @@ const technologyOptions = Object.entries(filteredCounters.technologies)
 const areaOfExpertiseOptions = Object.entries(filteredCounters.areasOfExpertise)
   .sort(sortByCount)
   .map(toOptionWithCount);
+
+const getLabel = (count: number) => {
+  if (count === 0) {
+    return false;
+  }
+  if (count === 1) {
+    return '1 showcase project';
+  }
+  return `${count} showcase projects`;
+};
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
@@ -191,23 +202,25 @@ const areaOfExpertiseOptions = Object.entries(filteredCounters.areasOfExpertise)
       <div class={s.posts} id="filtered-partners">
         {
           filteredPartners.map((partner, i) => (
-            <a class={s.post} href={`/partners/${partner.slug}`}>
-              <div class={s.postLogo}>
-                <img loading="lazy" src={partner.logo.url} />
-              </div>
-              <div class={s.postBody}>
-                <div class={s.postTitle}>
-                  {partner.name}
-                  {partner.locations.slice(0, 5).map((l) => (
-                    <span>{l.emoji}</span>
-                  ))}
-                  {partner.locations.length > 5 && (
-                    <span class={s.moreLocations}>+ {partner.locations.length - 5} more</span>
-                  )}
-                </div>
-                <div class={s.postDescription}>{toPlainText(partner.shortDescription)}</div>
-              </div>
-            </a>
+            <MarketplaceCard
+              href={`/partners/${partner.slug}`}
+              label={getLabel(partner._allReferencingShowcaseProjectsMeta.count)}
+              lineClamp={3}
+              multicolorBkg={true}
+              svgLogoUrl={partner.logo.url}
+              title={partner.name}
+            >
+              <Fragment slot="title">
+                <span class={s.cardTitle}>{partner.name}</span>
+                {partner.locations.slice(0, 5).map((l) => (
+                  <span class={s.cardFlag}>{l.emoji}</span>
+                ))}
+                {partner.locations.length > 5 && (
+                  <span class={s.cardMoreLocations}>+ {partner.locations.length - 5} more</span>
+                )}
+              </Fragment>
+              {toPlainText(partner.shortDescription)}
+            </MarketplaceCard>
           ))
         }
       </div>
