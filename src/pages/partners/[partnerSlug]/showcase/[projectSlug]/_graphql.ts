@@ -55,11 +55,7 @@ export const query = graphql(
           responsiveImage(imgixParams: { auto: format, w: 1200 }) {
             ...ResponsiveImageFragment
           }
-          zoomableResponsiveImage: responsiveImage(
-            imgixParams: { auto: format, w: 1500, fit: max }
-          ) {
-            ...ResponsiveImageFragment
-          }
+          lightboxImageUrl: url(imgixParams: { auto: format, w: 2000, fit: max })
         }
         datocmsScreenshots {
           id
@@ -68,11 +64,7 @@ export const query = graphql(
           responsiveImage(imgixParams: { auto: format, w: 1200 }) {
             ...ResponsiveImageFragment
           }
-          zoomableResponsiveImage: responsiveImage(
-            imgixParams: { auto: format, w: 1500, fit: max }
-          ) {
-            ...ResponsiveImageFragment
-          }
+          lightboxImageUrl: url(imgixParams: { auto: format, w: 2000, fit: max })
         }
       }
     }
