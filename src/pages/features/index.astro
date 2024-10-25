@@ -1,18 +1,21 @@
 ---
-import { slugify } from '~/lib/slugify';
-import { query } from './_graphql';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
-import { Wrapper } from '~/components/Wrapper';
-import { Text } from '~/components/structuredText/Text';
-import { Svg } from '~/components/Svg';
-import { SingleQuote } from '~/components/quote/SingleQuote';
-import { ScrollspyNav } from '~/components/ScrollspyNav';
-import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { Layout } from '~/layouts/Layout';
-import { Heading } from '~/components/Heading';
 import { Button } from '~/components/Button';
+import { Heading } from '~/components/Heading';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { Prose } from '~/components/Prose';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { ScrollspyNav } from '~/components/ScrollspyNav';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { Text } from '~/components/structuredText/Text';
+import { Wrapper } from '~/components/Wrapper';
+import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { slugify } from '~/lib/slugify';
 import s from './_style.module.css';
 
 const { page } = await executeQuery(Astro, query);
@@ -37,38 +40,50 @@ const {
 const featuresGroup = [
   {
     title: 'Core Features',
+    subtitle: 'The essential features that you would interact with most often in DatoCMS.',
     features: coreFeaturesBlocks,
   },
   {
     title: 'Editor Experience',
+    subtitle: 'Features specifically focused on giving content teams and creators the right tools.',
     features: editorExperienceBlocks,
   },
   {
     title: 'Developer Experience',
+    subtitle: 'From our APIs to the CLI, we put a lot of focus on delivering a solid DX.',
     features: developerExperienceBlocks,
   },
   {
     title: 'Image & Video Management',
+    subtitle:
+      'DatoCMS offers Digital Asset Management (DAM) out of the box to optimize your media.',
     features: imageVideoManagementBlocks,
   },
   {
     title: 'Localization',
+    subtitle:
+      'Granular localization options to ensure you connect with your customers wherever they are.',
     features: localizationBlocks,
   },
   {
     title: 'Extensibility',
+    subtitle: 'Plugins allow you to extend the capabilities of the CMS for specific use-cases.',
     features: extensibilityBlocks,
   },
   {
     title: 'Content Integrity',
+    subtitle:
+      'We have measures in place to ensure your content is not at risk of loss or inconsistencies.',
     features: contentIntegrityBlocks,
   },
   {
     title: 'Governance & Compliance',
+    subtitle: 'Robust features to put your mind at ease when using DatoCMS at scale.',
     features: governanceAndComplianceBlocks,
   },
   {
     title: 'Security & Infrastructure',
+    subtitle: 'Our foundations help companies of all sizes scale without obstacles.',
     features: securityAndInfrastructureBlocks,
   },
 ];
@@ -114,7 +129,7 @@ const linkLabel: { [key: string]: string } = {
 
     <div class={s.features}>
       <aside class={s.aside}>
-        <div class={s.asideAnchorsWrapper}>
+        <div data-mobile-anchors class={s.asideAnchorsWrapper} role="button" aria-expanded="false">
           <ScrollspyNav>
             <div class={s.currentAnchor}>
               <span data-current-anchor>Scroll to</span>
@@ -139,12 +154,20 @@ const linkLabel: { [key: string]: string } = {
       </aside>
       <div class={s.main}>
         {
-          featuresGroup.map(({ title, features }) => {
+          featuresGroup.map(({ title, subtitle, features }) => {
             return (
               <div id={slugify(title)} class={s.section}>
-                <h2 class={s.sectionTitle}>{title}</h2>
+                <Space bottom={1}>
+                  <InterstitialTitle style="one">
+                    {title}
+                    <Fragment slot="below">
+                      <h4 class={s.sectionSubtitle}>{subtitle}</h4>
+                    </Fragment>
+                  </InterstitialTitle>
+                </Space>
+
                 <div class={s.blocks}>
-                  {features.map((feature) => {
+                  {features.map((feature, i) => {
                     if (feature.__typename === 'FeatureRegularCardRecord') {
                       return (
                         <div class={s.feature}>
@@ -154,12 +177,28 @@ const linkLabel: { [key: string]: string } = {
                             </figure>
                           )}
                           <article>
+                            {feature.badge && (
+                              <div class={s.featureBadge}>
+                                {feature.badge}
+                                {i % 2 === 0 ? (
+                                  <div class={s.arrow}>
+                                    <Svg name="svg/illustrations/arrow-sketch-5" />
+                                  </div>
+                                ) : (
+                                  <div class={s.arrow2}>
+                                    <Svg name="svg/illustrations/arrow-sketch-1" />
+                                  </div>
+                                )}
+                              </div>
+                            )}
                             <Heading as="h3" class={s.featureTitle} anchor={slugify(feature.title)}>
                               {feature.title}
                             </Heading>
 
                             <div class={s.featureDescription}>
-                              <Text data={feature.description} />
+                              <Prose>
+                                <Text data={feature.description} />
+                              </Prose>
                             </div>
 
                             {feature.links && (
@@ -169,6 +208,7 @@ const linkLabel: { [key: string]: string } = {
                                   return (
                                     <a href={buildUrlFromGql(link.content)} class={s.link}>
                                       {customTitle}
+                                      <span class={s.linkArrow}>→</span>
                                     </a>
                                   );
                                 })}
@@ -195,3 +235,14 @@ const linkLabel: { [key: string]: string } = {
     </div>
   </Wrapper>
 </Layout>
+
+<script>
+  const mobileAnchors = document.querySelector('[data-mobile-anchors]');
+
+  mobileAnchors?.addEventListener('click', () => {
+    mobileAnchors.setAttribute(
+      'aria-expanded',
+      mobileAnchors.getAttribute('aria-expanded') === 'true' ? 'false' : 'true',
+    );
+  });
+</script>
