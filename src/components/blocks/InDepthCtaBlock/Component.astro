@@ -1,0 +1,34 @@
+---
+import { type FragmentOf, readFragment } from '~/lib/datocms/graphql';
+import { Svg } from '~/components/Svg';
+import { Text } from '~/components/structuredText/Text';
+import { InDepthCtaBlockFragment } from './graphql';
+import s from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof InDepthCtaBlockFragment>;
+}
+
+const { block } = Astro.props;
+
+const unmaskedBlock = readFragment(InDepthCtaBlockFragment, block);
+---
+
+<div class={s.unwrap}>
+  <a href={unmaskedBlock.cta.ctaUrl} class={s.inDepth}>
+    <div class={s.inDepthImage}>
+      <Svg name="svg/illustrations/live-4" />
+    </div>
+    <div class={s.inDepthBody}>
+      <div class={s.inDepthTitle}>{unmaskedBlock.cta.title}</div>
+
+      <div class={s.inDepthDescription}>
+        <Text data={unmaskedBlock.cta.description} />
+      </div>
+      <div class={s.inDepthCta}>
+        {unmaskedBlock.cta.ctaLabel}
+        <Svg name="svg/illustrations/arrow-usecase" />
+      </div>
+    </div>
+  </a>
+</div>

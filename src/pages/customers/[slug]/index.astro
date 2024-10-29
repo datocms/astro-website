@@ -1,0 +1,89 @@
+---
+import { Image } from '~/components/blocks/Image';
+import { InDepthCtaBlock } from '~/components/blocks/InDepthCtaBlock';
+import { InternalVideo } from '~/components/blocks/InternalVideo';
+import { Layout } from '~/layouts/Layout';
+import { Prose } from '~/components/Prose';
+import { Text } from '~/components/structuredText/Text';
+import { Video } from '~/components/blocks/Video';
+import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import { withAllComponents } from '~/lib/datocms/structuredText';
+import s from './_style.module.css';
+
+const { slug } = Astro.params;
+const variables = { slug: slug! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const colors =
+  page && [page.duotoneColor1.hex, page.duotoneColor2.hex].map((x) => x.replace(/#/, '')).join(',');
+const duotone = `duotone=${colors}`;
+---
+
+<Layout additionalSeo={page.seo}>
+  <div
+    style={{
+      '--gradient1': page.duotoneColor1.hex,
+      '--gradient2': page.duotoneColor2.hex,
+      '--useCaseAccent': page.accentColor.hex,
+    }}
+  >
+    <!-- <UseCaseHead
+      title={page.title}
+      logo={page.logo.url}
+      image={`${page.coverImage.url}?fp-y=${page.coverImage.focalPoint.y}&fp-x=${page.coverImage.focalPoint.x}&crop=focalpoint&fit=crop&${duotone}`}
+    />
+
+    <div id="usecase"></div>
+
+    <UseCaseRecap
+      challenge={highlightStructuredText(page.challenge)}
+      result={highlightStructuredText(page.result)}
+    >
+      <Numbers>
+        {
+          page.numbers.map((number) => (
+            <NumbersBlock key={number.label} title={number.number}>
+              {number.label}
+            </NumbersBlock>
+          ))
+        }
+      </Numbers>
+    </UseCaseRecap>
+
+    <Results
+      image={`${page.mainResultsImage.url}?${duotone}&fp-y=${page.mainResultsImage.focalPoint.y}&crop=focalpoint&fp-x=${page.mainResultsImage.focalPoint.x}`}
+    >
+      {
+        page.mainResults.map((res) => (
+          <ResultsBlock key={res.title} title={res.title}>
+            <StructuredText data={res.description} />
+          </ResultsBlock>
+        ))
+      }
+    </Results> -->
+
+    <Wrapper>
+      <div class={s.fullStory}>
+        <Prose class={s.body}>
+          <Text
+            data={page.content}
+            blockComponents={withAllComponents(page.content.blocks, {
+              ImageRecord: Image,
+              InDepthCtaBlockRecord: InDepthCtaBlock,
+              InternalVideoRecord: InternalVideo,
+              VideoRecord: Video,
+            })}
+          />
+        </Prose>
+      </div>
+    </Wrapper>
+  </div>
+</Layout>
