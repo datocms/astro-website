@@ -1,0 +1,60 @@
+---
+import { Text } from '~/components/structuredText/Text';
+import { Wrapper } from '~/components/Wrapper';
+import { Svg } from '~/components/Svg';
+
+type Props = {
+  title: any; // TODO: type correctly
+  logoUrl: string;
+  image: string;
+};
+
+const { title, logoUrl, image } = Astro.props;
+
+import s from './style.module.css';
+---
+
+<div class={s.root}>
+  <div class:list={[s.box, s.boxText]}>
+    <div class={s.boxInner}>
+      <Wrapper>
+        <div class={s.inner}>
+          <div class={s.kicker}>
+            <img src={logoUrl} />
+            <span class={s.plus}>+</span>
+            <Svg name="svg/logos/datocms" />
+          </div>
+          <div class={s.title}>
+            <Text data={title} />
+          </div>
+          <a class={s.cta} href="#usecase">
+            Read the success case <Svg name="svg/illustrations/arrow-usecase" />
+          </a>
+        </div>
+      </Wrapper>
+    </div>
+  </div>
+  <div class:list={[s.box, s.boxCut]}>
+    <div class={s.boxInner}>
+      <Wrapper>
+        <div class={s.inner}>
+          <div class={s.kicker}>
+            <img src={logoUrl} />
+            <span class={s.plus}>+</span>
+            <Svg name="svg/logos/datocms" />
+          </div>
+          <div class={s.title}>
+            <Text data={title} />
+          </div>
+          <a class={s.cta} href="#usecase">
+            Read the success case <Svg name="svg/illustrations/arrow-usecase" />
+          </a>
+        </div>
+      </Wrapper>
+    </div>
+  </div>
+  <div class:list={[s.box, s.boxImage]}>
+    <div class={s.image} style={{ backgroundImage: `url(${image})` }}></div>
+    <!-- <BackgroundImage class={s.image} src={`${image}&fit=min&q=90&crop=center&auto=format`} /> -->
+  </div>
+</div>
