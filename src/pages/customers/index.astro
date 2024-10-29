@@ -1,0 +1,70 @@
+---
+import { query } from './_graphql';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { Wrapper } from '~/components/Wrapper';
+import { Text } from '~/components/structuredText/Text';
+import { Space } from '~/components/Space';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { LogosBar } from '~/components/LogosBar';
+import { Layout } from '~/layouts/Layout';
+import { Hero } from '~/components/Hero';
+import s from './_style.module.css';
+
+const { page, posts } = await executeQuery(Astro, query);
+
+if (!page || !posts) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero>
+    <Fragment slot="kicker">Success stories</Fragment>
+    <Fragment slot="title">Powered by <mark>DatoCMS</mark></Fragment>
+    <Fragment slot="subtitle">
+      Learn how companies are building their next-generation digital products with structured,
+      flexible content at their core
+    </Fragment>
+  </Hero>
+
+  <Wrapper>
+    <Space top={1} bottom={2}>
+      <LogosBar
+        title=""
+        clients={[
+          'svg/logos/vercel',
+          'svg/logos/deutsche-telekom',
+          'svg/logos/little-caesars',
+          'svg/logos/nhs',
+          'svg/logos/verizon',
+          'svg/logos/mit',
+        ]}
+      />
+    </Space>
+  </Wrapper>
+
+  <Wrapper>
+    <div class={s.posts}>
+      {
+        posts.map((post) => (
+          <a class={s.post} href={`/customers/${post.slug}`}>
+            <div class={s.postImage}>
+              {/* TODO why? */}
+              {post.coverImage.responsiveImage && (
+                <ResponsiveImage data={post.coverImage.responsiveImage} />
+              )}
+            </div>
+            <div class={s.postBody}>
+              <div class={s.postTitle}>
+                <Text data={post.title} />
+              </div>
+              <img src={post.logo.url} class={s.postLogo} />
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </Wrapper>
+</Layout>
