@@ -3,16 +3,17 @@ import { Image } from '~/components/blocks/Image';
 import { InDepthCtaBlock } from '~/components/blocks/InDepthCtaBlock';
 import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { Layout } from '~/layouts/Layout';
+import { Numbers } from '~/components/numbers/Numbers';
+import { NumbersBlock } from '~/components/numbers/NumbersBlock';
 import { Prose } from '~/components/Prose';
+import { Space } from '~/components/Space';
 import { Text } from '~/components/structuredText/Text';
+import { UseCaseHead } from '~/components/useCase/UseCaseHead';
+import { UseCaseRecap } from '~/components/useCase/UseCaseRecap';
 import { Video } from '~/components/blocks/Video';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { UseCaseHead } from '~/components/useCase/UseCaseHead';
-import { UseCaseRecap } from '~/components/useCase/UseCaseRecap';
-import { Numbers } from '~/components/numbers/Numbers';
-import { NumbersBlock } from '~/components/numbers/NumbersBlock';
 import { query } from './_graphql';
 import { withAllComponents } from '~/lib/datocms/structuredText';
 import s from './_style.module.css';
@@ -40,31 +41,30 @@ const duotone = `duotone=${colors}`;
     }}
   >
     <UseCaseHead
-      title={page.title}
       logoUrl={page.logo.url}
       image={`${page.coverImage.url}?fp-y=${page.coverImage.focalPoint.y}&fp-x=${page.coverImage.focalPoint.x}&crop=focalpoint&fit=crop&${duotone}`}
-    />
+    >
+      <Text data={page.title} />
+    </UseCaseHead>
 
     <div id="usecase"></div>
 
     <UseCaseRecap>
       <Fragment slot="challenge">
-        <Prose>
-          <Text data={page.challenge} />
-        </Prose>
+        <Text data={page.challenge} />
       </Fragment>
       <Fragment slot="result">
-        <Prose>
-          <Text data={page.result} />
-        </Prose>
+        <Text data={page.result} />
       </Fragment>
-      <Numbers>
-        {
-          page.numbers.map((number) => (
-            <NumbersBlock title={number.number}>{number.label}</NumbersBlock>
-          ))
-        }
-      </Numbers>
+      <Space top={2}>
+        <Numbers>
+          {
+            page.numbers.map((number) => (
+              <NumbersBlock title={number.number}>{number.label}</NumbersBlock>
+            ))
+          }
+        </Numbers>
+      </Space>
     </UseCaseRecap>
 
     <div class={s.results}>
@@ -73,7 +73,6 @@ const duotone = `duotone=${colors}`;
           src={`${page.mainResultsImage.url}?${duotone}&fp-y=${page.mainResultsImage.focalPoint?.y}&crop=focalpoint&fp-x=${page.mainResultsImage.focalPoint?.x}`}
         />
       </div>
-
       <div class={s.resultsBlocks}>
         <div class={s.resultsTitle}>Biggest wins</div>
         {

@@ -1,15 +1,13 @@
 ---
-import { Text } from '~/components/structuredText/Text';
 import { Wrapper } from '~/components/Wrapper';
 import { Svg } from '~/components/Svg';
 
 type Props = {
-  title: any; // TODO: type correctly
   logoUrl: string;
   image: string;
 };
 
-const { title, logoUrl, image } = Astro.props;
+const { logoUrl, image } = Astro.props;
 
 import s from './style.module.css';
 ---
@@ -25,7 +23,7 @@ import s from './style.module.css';
             <Svg name="svg/logos/datocms" />
           </div>
           <div class={s.title}>
-            <Text data={title} />
+            <slot />
           </div>
           <a class={s.cta} href="#usecase">
             Read the success case <Svg name="icons/regular/arrow-right" />
@@ -44,7 +42,7 @@ import s from './style.module.css';
             <Svg name="svg/logos/datocms" />
           </div>
           <div class={s.title}>
-            <Text data={title} />
+            <slot />
           </div>
           <a class={s.cta} href="#usecase">
             Read the success case <Svg name="icons/regular/arrow-right" />
@@ -54,7 +52,10 @@ import s from './style.module.css';
     </div>
   </div>
   <div class:list={[s.box, s.boxImage]}>
-    <div class={s.image} style={{ backgroundImage: `url(${image})` }}></div>
-    <!-- <BackgroundImage class={s.image} src={`${image}&fit=min&q=90&crop=center&auto=format`} /> -->
+    <div
+      class={s.image}
+      style={{ backgroundImage: `url(${image}&fit=min&q=90&crop=center&auto=format})` }}
+    >
+    </div>
   </div>
 </div>

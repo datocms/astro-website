@@ -1,14 +1,10 @@
-.fullStory {
-  margin: rfs(200px) 0;
-}
-
 .body {
-  font-size: rfs(21px);
-  line-height: 1.6;
-  letter-spacing: -0.02em;
-  max-width: 850px;
-  margin: 0 auto;
   font-family: var(--font-serif);
+  font-size: rfs(21px);
+  letter-spacing: -0.02em;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 850px;
 
   prose-island {
     font-family: var(--font-sans);
@@ -33,10 +29,10 @@
 
     figcaption {
       color: var(--light-body-color);
+      font-family: var(--font-sans);
       font-size: 0.8em;
       margin-top: 10px;
       text-align: center;
-      font-family: var(--font-sans);
     }
   }
 }
@@ -44,12 +40,10 @@
 .results {
   align-items: flex-end;
   background-color: var(--gradient1);
-  /* background-repeat: no-repeat; */
-  /* background-size: 50% 100%; */
   clip-path: var(--clip-path);
   display: flex;
   flex-direction: column;
-  padding: rfs(150px) 0;
+  padding: rfs(140px) 0;
   position: relative;
 }
 
@@ -60,25 +54,29 @@
   pointer-events: none;
   position: absolute;
   top: 0;
-  width: 60%;
+  width: 100%;
   z-index: -1;
+
+  @media screen and (min-width: 900px) {
+    width: 60%;
+
+    &:after {
+      background-image: linear-gradient(to right, transparent, var(--gradient1));
+      content: '';
+      height: 100%;
+      opacity: 100%;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: rfs(200px);
+      z-index: 1;
+    }
+  }
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-  }
-
-  &:after {
-    background-image: linear-gradient(to right, transparent, var(--gradient1));
-    content: '';
-    height: 100%;
-    opacity: 100%;
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: rfs(200px);
-    z-index: 1;
   }
 }
 
@@ -121,4 +119,8 @@
   path {
     fill: var(--base-body-color);
   }
+}
+
+.fullStory {
+  margin: rfs(120px) 0;
 }
