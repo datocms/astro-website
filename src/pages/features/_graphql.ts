@@ -25,6 +25,7 @@ const FeatureSectionFragment = graphql(
           ...ResponsiveImageFragment
         }
       }
+      badge
       links {
         linkTitle
         content {
