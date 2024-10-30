@@ -10,6 +10,9 @@ import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { UseCaseHead } from '~/components/useCase/UseCaseHead';
+import { UseCaseRecap } from '~/components/useCase/UseCaseRecap';
+import { Numbers } from '~/components/numbers/Numbers';
+import { NumbersBlock } from '~/components/numbers/NumbersBlock';
 import { query } from './_graphql';
 import { withAllComponents } from '~/lib/datocms/structuredText';
 import s from './_style.module.css';
@@ -33,7 +36,7 @@ const duotone = `duotone=${colors}`;
     style={{
       '--gradient1': page.duotoneColor1.hex,
       '--gradient2': page.duotoneColor2.hex,
-      '--useCaseAccent': page.accentColor.hex,
+      '--accent': page.accentColor.hex,
     }}
   >
     <UseCaseHead
@@ -44,33 +47,45 @@ const duotone = `duotone=${colors}`;
 
     <div id="usecase"></div>
 
-    <!-- 
-    <UseCaseRecap
-      challenge={highlightStructuredText(page.challenge)}
-      result={highlightStructuredText(page.result)}
-    >
+    <UseCaseRecap>
+      <Fragment slot="challenge">
+        <Prose>
+          <Text data={page.challenge} />
+        </Prose>
+      </Fragment>
+      <Fragment slot="result">
+        <Prose>
+          <Text data={page.result} />
+        </Prose>
+      </Fragment>
       <Numbers>
         {
           page.numbers.map((number) => (
-            <NumbersBlock key={number.label} title={number.number}>
-              {number.label}
-            </NumbersBlock>
+            <NumbersBlock title={number.number}>{number.label}</NumbersBlock>
           ))
         }
       </Numbers>
     </UseCaseRecap>
 
-    <Results
-      image={`${page.mainResultsImage.url}?${duotone}&fp-y=${page.mainResultsImage.focalPoint.y}&crop=focalpoint&fp-x=${page.mainResultsImage.focalPoint.x}`}
-    >
-      {
-        page.mainResults.map((res) => (
-          <ResultsBlock key={res.title} title={res.title}>
-            <StructuredText data={res.description} />
-          </ResultsBlock>
-        ))
-      }
-    </Results> -->
+    <div class={s.results}>
+      <div class={s.resultsImage}>
+        <img
+          src={`${page.mainResultsImage.url}?${duotone}&fp-y=${page.mainResultsImage.focalPoint?.y}&crop=focalpoint&fp-x=${page.mainResultsImage.focalPoint?.x}`}
+        />
+      </div>
+
+      <div class={s.resultsBlocks}>
+        <div class={s.resultsTitle}>Biggest wins</div>
+        {
+          page.mainResults.map((res) => (
+            <div class={s.resultsItem}>
+              <h3>{res.title}</h3>
+              <Text data={res.description} />
+            </div>
+          ))
+        }
+      </div>
+    </div>
 
     <Wrapper>
       <div class={s.fullStory}>
