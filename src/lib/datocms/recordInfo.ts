@@ -29,6 +29,30 @@ export async function recordToWebsiteRoute({
     case 'article': {
       return `/blog/${await recordToSlug(item, itemTypeApiKey)}`;
     }
+    case 'changelog': {
+      return `/product-updates`;
+    }
+    case 'changelog_entry': {
+      return `/product-updates/${await recordToSlug(item, itemTypeApiKey)}`;
+    }
+    case 'features_index': {
+      return `/features`;
+    }
+    case 'feature': {
+      return `/features/${await recordToSlug(item, itemTypeApiKey)}`;
+    }
+    case 'partner_home': {
+      return `/partners`;
+    }
+    case 'partner': {
+      return `/partners/${await recordToSlug(item, itemTypeApiKey)}`;
+    }
+    case 'success_stories_index': {
+      return `/customers`;
+    }
+    case 'success_story': {
+      return `/customers/${await recordToSlug(item, itemTypeApiKey)}`;
+    }
     case 'user_guides_chapter': {
       return '/user-guides';
     }
@@ -41,15 +65,6 @@ export async function recordToWebsiteRoute({
         filter: { type: 'user_guides_chapter', fields: { videos: { all_in: [item.id] } } },
       });
       return `/user-guides/${chapters[0]!.slug}/${await recordToSlug(item, itemTypeApiKey)}`;
-    }
-    case 'changelog_entry': {
-      return `/product-updates/${await recordToSlug(item, itemTypeApiKey)}`;
-    }
-    case 'changelog': {
-      return `/product-updates`;
-    }
-    case 'feature': {
-      return `/features/${await recordToSlug(item, itemTypeApiKey)}`;
     }
     default:
       return null;
