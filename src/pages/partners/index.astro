@@ -144,6 +144,14 @@ const getLabel = (count: number) => {
   }
   return `${count} showcase projects`;
 };
+
+const bkgColors: Array<'azure' | 'pink' | 'blue' | 'green' | 'yellow'> = [
+  'azure',
+  'pink',
+  'blue',
+  'green',
+  'yellow',
+];
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
@@ -204,9 +212,9 @@ const getLabel = (count: number) => {
           filteredPartners.map((partner, i) => (
             <MarketplaceCard
               href={`/partners/${partner.slug}`}
+              bkg={bkgColors[i % bkgColors.length]}
               label={getLabel(partner._allReferencingShowcaseProjectsMeta.count)}
               lineClamp={3}
-              multicolorBkg={true}
               svgLogoUrl={partner.logo.url}
               title={partner.name}
             >

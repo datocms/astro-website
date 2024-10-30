@@ -3,6 +3,7 @@ import s from './style.module.css';
 
 type Props = {
   badge?: { emoji: string; name: string };
+  bkg?: 'azure' | 'pink' | 'blue' | 'green' | 'yellow' | 'gray';
   boxed?: boolean;
   class?: string;
   highlight?: string;
@@ -13,11 +14,11 @@ type Props = {
   size?: 'small' | 'micro' | 'medium' | 'large';
   svgLogoUrl?: string;
   title: string;
-  multicolorBkg?: boolean;
 };
 
 const {
   badge,
+  bkg,
   boxed = true,
   class: className,
   highlight,
@@ -27,7 +28,6 @@ const {
   orientation = 'vertical',
   size = 'medium',
   svgLogoUrl,
-  multicolorBkg = false,
   title,
 } = Astro.props;
 ---
@@ -51,7 +51,7 @@ const {
       Astro.slots.has('image') ? (
         <slot name="image" />
       ) : svgLogoUrl ? (
-        <figure class:list={[s.visualTechnology, multicolorBkg && s.multicolorBkg]}>
+        <figure class={s.visualTechnology} data-bkg={bkg ?? null}>
           <img loading="lazy" class={s.technology} src={svgLogoUrl} />
         </figure>
       ) : null
