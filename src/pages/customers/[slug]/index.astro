@@ -8,8 +8,8 @@ import { NumbersBlock } from '~/components/numbers/NumbersBlock';
 import { Prose } from '~/components/Prose';
 import { Space } from '~/components/Space';
 import { Text } from '~/components/structuredText/Text';
-import { UseCaseHead } from '~/components/useCase/UseCaseHead';
-import { UseCaseRecap } from '~/components/useCase/UseCaseRecap';
+import Head from './_sub/Head.astro';
+import Recap from './_sub/Recap.astro';
 import { Video } from '~/components/blocks/Video';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
@@ -40,16 +40,16 @@ const duotone = `duotone=${colors}`;
       '--accent': page.accentColor.hex,
     }}
   >
-    <UseCaseHead
+    <Head
       logoUrl={page.logo.url}
       image={`${page.coverImage.url}?fp-y=${page.coverImage.focalPoint.y}&fp-x=${page.coverImage.focalPoint.x}&crop=focalpoint&fit=crop&${duotone}`}
     >
       <Text data={page.title} />
-    </UseCaseHead>
+    </Head>
 
     <div id="usecase"></div>
 
-    <UseCaseRecap>
+    <Recap>
       <Fragment slot="challenge">
         <Text data={page.challenge} />
       </Fragment>
@@ -65,7 +65,7 @@ const duotone = `duotone=${colors}`;
           }
         </Numbers>
       </Space>
-    </UseCaseRecap>
+    </Recap>
 
     <div class={s.results}>
       <div class={s.resultsImage}>
