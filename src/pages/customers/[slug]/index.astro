@@ -3,8 +3,6 @@ import { Image } from '~/components/blocks/Image';
 import { InDepthCtaBlock } from '~/components/blocks/InDepthCtaBlock';
 import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { Layout } from '~/layouts/Layout';
-import { Numbers } from '~/components/numbers/Numbers';
-import { NumbersBlock } from '~/components/numbers/NumbersBlock';
 import { Prose } from '~/components/Prose';
 import { Space } from '~/components/Space';
 import { Text } from '~/components/structuredText/Text';
@@ -56,15 +54,16 @@ const duotone = `duotone=${colors}`;
       <Fragment slot="result">
         <Text data={page.result} />
       </Fragment>
-      <Space top={2}>
-        <Numbers>
-          {
-            page.numbers.map((number) => (
-              <NumbersBlock title={number.number}>{number.label}</NumbersBlock>
-            ))
-          }
-        </Numbers>
-      </Space>
+      <div class={s.numbers}>
+        {
+          page.numbers.map((item) => (
+            <div class={s.numberBlock}>
+              <h3 class={s.numberTitle}>{item.number}</h3>
+              <p class={s.numberLabel}>{item.label}</p>
+            </div>
+          ))
+        }
+      </div>
     </Recap>
 
     <div class={s.results}>
