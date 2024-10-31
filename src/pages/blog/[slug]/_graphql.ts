@@ -9,10 +9,12 @@ import { ShowcaseProjectBlockFragment } from '~/components/blocks/ShowcaseProjec
 import { TableFragment } from '~/components/blocks/Table/graphql';
 import { TutorialVideoFragment } from '~/components/blocks/TutorialVideo/graphql';
 import { VideoFragment } from '~/components/blocks/Video/graphql';
+import { BlogPostInlineFragment } from '~/components/inlineRecords/BlogPostInline/graphql';
+import { ChangelogEntryInlineFragment } from '~/components/inlineRecords/ChangelogEntryInline/graphql';
+import { BlogPostLinkFragment } from '~/components/linkToRecords/BlogPostLink/graphql';
+import { ChangelogEntryLinkFragment } from '~/components/linkToRecords/ChangelogEntryLink/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
-import { BlogPostUrlFragment } from '~/lib/datocms/gqlUrlBuilder/blogPost';
-import { ChangelogEntryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -34,8 +36,10 @@ export const query = graphql(
               id
               __typename
             }
-            ...BlogPostUrlFragment
-            ...ChangelogEntryUrlFragment
+            ...BlogPostInlineFragment
+            ...ChangelogEntryInlineFragment
+            ...BlogPostLinkFragment
+            ...ChangelogEntryLinkFragment
           }
           blocks {
             ... on RecordInterface {
@@ -93,18 +97,20 @@ export const query = graphql(
   [
     TagFragment,
     ResponsiveImageFragment,
-    BlogPostUrlFragment,
     TableFragment,
     InternalVideoFragment,
     DemoFragment,
     MultipleDemosBlockFragment,
     VideoFragment,
     ImageFragment,
-    ChangelogEntryUrlFragment,
     TutorialVideoFragment,
     CodesandboxEmbedBlockFragment,
     CtaButtonFragment,
     ShowcaseProjectBlockFragment,
     QuestionAnswerFragment,
+    BlogPostInlineFragment,
+    ChangelogEntryInlineFragment,
+    BlogPostLinkFragment,
+    ChangelogEntryLinkFragment,
   ],
 );
