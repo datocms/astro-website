@@ -1,0 +1,41 @@
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
+// import { TagFragment } from '~/lib/datocms/commonFragments';
+import { graphql } from '~/lib/datocms/graphql';
+
+export const query = graphql(
+  /* GraphQL */ `
+    query ProjectsShowcase($limit: IntType!, $offset: IntType!) {
+      projects: allShowcaseProjects(
+        first: $limit
+        skip: $offset
+        orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
+      ) {
+        ...ShowcaseProjectUrlFragment
+        slug
+        name
+        headline {
+          value
+        }
+        technologies {
+          name
+          integrationType {
+            slug
+          }
+          logo {
+            url
+          }
+        }
+        mainImage {
+          responsiveImage(imgixParams: { auto: format, w: 750, h: 500, fit: crop, crop: top }) {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+      _allShowcaseProjectsMeta {
+        count
+      }
+    }
+  `,
+  [ResponsiveImageFragment, ShowcaseProjectUrlFragment],
+);
