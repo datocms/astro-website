@@ -343,7 +343,11 @@ export function analyzePropertiesOfJsonApiEntity(
     );
   }
 
-  if (jsonApiEntitySchema.properties.type && (type === 'entity' || language === 'http')) {
+  if (
+    jsonApiEntitySchema.properties.type &&
+    ((type === 'entity' && !jsonApiEntitySchema.properties.attributes?.properties?.type) ||
+      language === 'http')
+  ) {
     regular.push(
       buildJsonSchemaPropertyAnalysis('type', jsonApiEntitySchema.properties.type, language, {
         parentSchema: jsonApiEntitySchema,

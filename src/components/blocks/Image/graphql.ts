@@ -15,6 +15,7 @@ export const ImageFragment = graphql(
           ...ResponsiveImageFragment
           width
         }
+        lightboxImageUrl: url(imgixParams: { auto: format, w: 2000, fit: max })
       }
     }
   `,
