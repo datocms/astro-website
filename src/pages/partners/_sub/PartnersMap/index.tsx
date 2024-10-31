@@ -8,8 +8,6 @@ export default function PartnersMap({
 }: {
   partnersCountByCountryCode: Record<string, number>;
 }) {
-  const maxCount = Math.max(...Object.values(partnersCountByCountryCode));
-
   return (
     <div className={s.root}>
       <Wrapper>
