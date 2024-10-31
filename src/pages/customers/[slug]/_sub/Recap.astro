@@ -1,0 +1,31 @@
+---
+import { Wrapper } from '~/components/Wrapper';
+
+import s from './../_style.module.css';
+---
+
+<Wrapper>
+  <div class={s.recapRoot} data-component="UseCaseRecap">
+    {
+      Astro.slots.has('challenge') && (
+        <>
+          <div class={s.recapKicker}>The challenge</div>
+          <div class={s.recapText}>
+            <slot name="challenge" />
+          </div>
+        </>
+      )
+    }
+    {
+      Astro.slots.has('result') && (
+        <>
+          <div class={s.recapKicker}>The result</div>
+          <div class={s.recapText}>
+            <slot name="result" />
+          </div>
+        </>
+      )
+    }
+    <slot />
+  </div>
+</Wrapper>

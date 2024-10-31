@@ -1,0 +1,61 @@
+---
+import { Wrapper } from '~/components/Wrapper';
+import { Svg } from '~/components/Svg';
+
+type Props = {
+  logoUrl: string;
+  image: string;
+};
+
+const { logoUrl, image } = Astro.props;
+
+import s from './../_style.module.css';
+---
+
+<div class={s.headRoot} data-component="UseCaseHead">
+  <div class:list={[s.box, s.boxText]}>
+    <div class={s.boxInner}>
+      <Wrapper>
+        <div class={s.inner}>
+          <div class={s.headKicker}>
+            <img src={logoUrl} />
+            <span class={s.plus}>+</span>
+            <Svg name="svg/logos/datocms" />
+          </div>
+          <div class={s.headTitle}>
+            <slot />
+          </div>
+          <a class={s.headCta} href="#usecase">
+            Read the success case <Svg name="icons/regular/arrow-right" />
+          </a>
+        </div>
+      </Wrapper>
+    </div>
+  </div>
+  <div class:list={[s.box, s.boxCut]}>
+    <div class={s.boxInner}>
+      <Wrapper>
+        <div class={s.inner}>
+          <div class={s.headKicker}>
+            <img src={logoUrl} />
+            <span class={s.plus}>+</span>
+            <Svg name="svg/logos/datocms" />
+          </div>
+          <div class={s.headTitle}>
+            <slot />
+          </div>
+          <a class={s.headCta} href="#usecase">
+            Read the success case <Svg name="icons/regular/arrow-right" />
+          </a>
+        </div>
+      </Wrapper>
+    </div>
+  </div>
+  <div class:list={[s.box, s.boxImage]}>
+    <div
+      class={s.image}
+      style={{ backgroundImage: `url(${image}&fit=min&q=90&crop=center&auto=format})` }}
+    >
+    </div>
+  </div>
+</div>
