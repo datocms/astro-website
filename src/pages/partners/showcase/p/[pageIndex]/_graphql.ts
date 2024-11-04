@@ -12,19 +12,8 @@ export const query = graphql(
         orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
       ) {
         ...ShowcaseProjectUrlFragment
-        slug
-        name
         headline {
           value
-        }
-        technologies {
-          name
-          integrationType {
-            slug
-          }
-          logo {
-            url
-          }
         }
         mainImage {
           responsiveImage(imgixParams: { auto: format, w: 750, h: 500, fit: crop, crop: top }) {
