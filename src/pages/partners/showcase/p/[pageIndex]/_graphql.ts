@@ -31,6 +31,13 @@ export const query = graphql(
             ...ResponsiveImageFragment
           }
         }
+        partner {
+          name
+          slug
+          logo {
+            url
+          }
+        }
       }
       _allShowcaseProjectsMeta {
         count
