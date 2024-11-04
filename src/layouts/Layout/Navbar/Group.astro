@@ -3,13 +3,26 @@ import s from './style.module.css';
 
 type Props = {
   columns?: number;
+  link?: string;
   title?: string;
 };
 
-const { columns = 1, title } = Astro.props;
+const { columns = 1, link, title } = Astro.props;
 ---
 
 <div data-col={columns} class={s.group}>
-  {title && <h3 class={s.groupTitle}>{title}</h3>}
+  {
+    title && (
+      <h3 class={s.groupTitle}>
+        {link ? (
+          <a href={link}>
+            <span>{title}</span> <span>→</span>
+          </a>
+        ) : (
+          <span>{title}</span>
+        )}
+      </h3>
+    )
+  }
   <slot />
 </div>
