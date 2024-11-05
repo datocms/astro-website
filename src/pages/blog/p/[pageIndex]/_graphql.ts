@@ -1,6 +1,10 @@
+import { range } from 'lodash-es';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { graphql } from '~/lib/datocms/graphql';
+
+export const perPage = 15;
 
 export const query = graphql(
   /* GraphQL */ `
@@ -55,3 +59,19 @@ export const query = graphql(
   `,
   [TagFragment, ResponsiveImageFragment],
 );
+
+export const buildSitemapUrls = async () => {
+  const {
+    meta: { count },
+  } = await executeQueryOutsideAstro(
+    graphql(/* GraphQL */ `
+      query BuildSitemapUrls {
+        meta: _allBlogPostsMeta {
+          count
+        }
+      }
+    `),
+  );
+
+  return range(2, 2 + Math.ceil(count / perPage)).map((i) => `/blog/p/${i}`);
+};

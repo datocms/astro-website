@@ -9,7 +9,7 @@ import { Wrapper } from '~/components/Wrapper';
 import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
+import { perPage, query } from './_graphql';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 
@@ -23,7 +23,6 @@ if (Astro.params.pageIndex === '1') {
 }
 
 const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
-const perPage = 36;
 
 const { projects, _allShowcaseProjectsMeta } = await executeQuery(Astro, query, {
   variables: {

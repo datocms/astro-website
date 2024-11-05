@@ -7,7 +7,7 @@ import { Wrapper } from '~/components/Wrapper';
 import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
+import { perPage, query } from './_graphql';
 
 export interface Props {
   pageIndex?: number;
@@ -19,7 +19,6 @@ if (Astro.params.pageIndex === '1') {
 }
 
 const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
-const perPage = 10;
 
 const { page, productUpdates, _allChangelogEntriesMeta } = await executeQuery(Astro, query, {
   variables: {

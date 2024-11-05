@@ -36,7 +36,7 @@ export const query = graphql(
               ar: "16:9"
               w: 960
               fit: crop
-              monochrome: "45000000"
+              monochrome: "450000"
               nr: 20
               nrs: 20
             }

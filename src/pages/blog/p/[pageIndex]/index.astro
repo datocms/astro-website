@@ -6,7 +6,7 @@ import { Wrapper } from '~/components/Wrapper';
 import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
+import { perPage, query } from './_graphql';
 import { formatDate } from '~/lib/formatters';
 import s from './_style.module.css';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
@@ -22,7 +22,6 @@ if (Astro.params.pageIndex === '1') {
 }
 
 const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
-const perPage = 15;
 
 const { page, posts, latestChangelogEntry, _allBlogPostsMeta } = await executeQuery(Astro, query, {
   variables: {

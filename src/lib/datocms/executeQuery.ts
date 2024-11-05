@@ -1,9 +1,10 @@
-import { rawExecuteQuery } from '@datocms/cda-client';
+import { type ExecuteQueryOptions as CdaExecuteQueryOptions } from '@datocms/cda-client';
 import type { AstroGlobal } from 'astro';
 import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import type { TadaDocumentNode } from 'gql.tada';
 import { uniq } from 'lodash-es';
 import { isDraftModeEnabled } from '~/lib/draftMode';
+import { rawExecuteQueryWithAutoPagination } from './rawExecuteQueryWithAutoPagination';
 
 /**
  * Executes a GraphQL query using the DatoCMS Content Delivery API, using a
@@ -13,12 +14,12 @@ import { isDraftModeEnabled } from '~/lib/draftMode';
 export async function executeQuery<Result, Variables>(
   Astro: AstroGlobal,
   query: TadaDocumentNode<Result, Variables>,
-  options?: ExecuteQueryOptions<Variables>,
+  options?: Pick<CdaExecuteQueryOptions<Variables>, 'variables'>,
 ) {
   try {
     const draftModeEnabled = isDraftModeEnabled(Astro);
 
-    const [result, response] = await rawExecuteQuery(query, {
+    const [result, response] = await rawExecuteQueryWithAutoPagination(query, {
       variables: options?.variables,
       returnCacheTags: true,
       excludeInvalid: true,
@@ -55,6 +56,15 @@ export async function executeQuery<Result, Variables>(
   }
 }
 
-type ExecuteQueryOptions<Variables> = {
-  variables?: Variables;
-};
+export async function executeQueryOutsideAstro<Result, Variables>(
+  query: TadaDocumentNode<Result, Variables>,
+  options?: Omit<CdaExecuteQueryOptions<Variables>, 'token' | 'excludeInvalid'>,
+) {
+  const [result] = await rawExecuteQueryWithAutoPagination(query, {
+    ...options,
+    excludeInvalid: true,
+    token: DATOCMS_API_TOKEN,
+  });
+
+  return result;
+}

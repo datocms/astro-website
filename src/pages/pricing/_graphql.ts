@@ -45,7 +45,7 @@ export const query = graphql(
       planFeatureGroups: allPlanFeatureGroups(orderBy: position_ASC, first: 100) {
         ...PlanFeatureGroupFragment
       }
-      hints: allPricingHints(first: 100) {
+      hints: allPricingHints(first: 500) {
         ...HintFragment
       }
       review1: review(filter: { name: { eq: "Tore Heimann" } }) {

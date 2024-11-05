@@ -1,7 +1,12 @@
-import { VideoFragment } from '~/components/blocks/Video/graphql';
 import { ImageFragment } from '~/components/blocks/Image/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
+import { VideoFragment } from '~/components/blocks/Video/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import {
+  buildUrlForSuccessStory,
+  SuccessStoryUrlFragment,
+} from '~/lib/datocms/gqlUrlBuilder/successStory';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -91,3 +96,20 @@ export const query = graphql(
   `,
   [TagFragment, VideoFragment, ImageFragment, InternalVideoFragment],
 );
+
+export const buildSitemapUrls = async () => {
+  const { entries } = await executeQueryOutsideAstro(
+    graphql(
+      /* GraphQL */ `
+        query BuildSitemapUrls {
+          entries: allSuccessStories(first: 500) {
+            ...SuccessStoryUrlFragment
+          }
+        }
+      `,
+      [SuccessStoryUrlFragment],
+    ),
+  );
+
+  return entries.map(buildUrlForSuccessStory);
+};

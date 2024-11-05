@@ -1,7 +1,9 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
-import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
-import { PluginUrlFragment } from '~/lib/datocms/gqlUrlBuilder/plugin';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import { buildUrlForPartner, PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
+import { PluginUrlFragment } from '~/lib/datocms/gqlUrlBuilder/plugin';
+import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -93,3 +95,20 @@ export const extraQuery = graphql(
   `,
   [ResponsiveImageFragment, PluginUrlFragment],
 );
+
+export const buildSitemapUrls = async () => {
+  const { entries } = await executeQueryOutsideAstro(
+    graphql(
+      /* GraphQL */ `
+        query BuildSitemapUrls {
+          entries: allPartners(first: 500) {
+            ...PartnerUrlFragment
+          }
+        }
+      `,
+      [PartnerUrlFragment],
+    ),
+  );
+
+  return entries.map(buildUrlForPartner);
+};

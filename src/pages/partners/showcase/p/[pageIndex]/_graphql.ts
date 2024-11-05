@@ -1,7 +1,11 @@
+import { range } from 'lodash-es';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 // import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
+
+export const perPage = 36;
 
 export const query = graphql(
   /* GraphQL */ `
@@ -12,6 +16,7 @@ export const query = graphql(
         orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
       ) {
         ...ShowcaseProjectUrlFragment
+        name
         headline {
           value
         }
@@ -35,3 +40,19 @@ export const query = graphql(
   `,
   [ResponsiveImageFragment, ShowcaseProjectUrlFragment],
 );
+
+export const buildSitemapUrls = async () => {
+  const {
+    meta: { count },
+  } = await executeQueryOutsideAstro(
+    graphql(/* GraphQL */ `
+      query BuildSitemapUrls {
+        meta: _allShowcaseProjectsMeta {
+          count
+        }
+      }
+    `),
+  );
+
+  return range(2, 2 + Math.ceil(count / perPage)).map((i) => `/partners/showcase/p/${i}`);
+};

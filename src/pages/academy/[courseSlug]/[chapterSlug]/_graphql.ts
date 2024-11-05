@@ -3,7 +3,11 @@ import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql
 import { TableFragment } from '~/components/blocks/Table/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
-import { AcademyChapterUrlFragment } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import {
+  AcademyChapterUrlFragment,
+  buildUrlForAcademyChapter,
+} from '~/lib/datocms/gqlUrlBuilder/academyChapter';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -57,3 +61,20 @@ export const query = graphql(
     ResponsiveImageFragment,
   ],
 );
+
+export const buildSitemapUrls = async () => {
+  const { entries } = await executeQueryOutsideAstro(
+    graphql(
+      /* GraphQL */ `
+        query BuildSitemapUrls {
+          entries: allAcademyChapters(first: 500) {
+            ...AcademyChapterUrlFragment
+          }
+        }
+      `,
+      [AcademyChapterUrlFragment],
+    ),
+  );
+
+  return entries.map(buildUrlForAcademyChapter);
+};

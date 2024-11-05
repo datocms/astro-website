@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { FASTLY_KEY, FASTLY_SERVICE_ID, SECRET_API_TOKEN } from 'astro:env/server';
-import { handleUnexpectedError, invalidRequestResponse, json } from '../utils';
+import { handleUnexpectedError, invalidRequestResponse, json } from '../_utils';
 
 type CdaCacheTagsInvalidateWebhook = {
   entity_type: 'cda_cache_tags';

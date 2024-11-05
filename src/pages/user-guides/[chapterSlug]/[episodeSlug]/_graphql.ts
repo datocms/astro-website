@@ -1,7 +1,11 @@
 import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
-import { UserGuideEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder/userGuideEpisode';
+import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import {
+  buildUrlForUserGuideEpisode,
+  UserGuideEpisodeUrlFragment,
+} from '~/lib/datocms/gqlUrlBuilder/userGuideEpisode';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const EpisodeFragment = graphql(
@@ -64,3 +68,20 @@ export const query = graphql(
   `,
   [TagFragment, VideoPlayerFragment, InternalVideoFragment, EpisodeFragment],
 );
+
+export const buildSitemapUrls = async () => {
+  const { entries } = await executeQueryOutsideAstro(
+    graphql(
+      /* GraphQL */ `
+        query BuildSitemapUrls {
+          entries: allUserGuidesVideos(first: 500) {
+            ...UserGuideEpisodeUrlFragment
+          }
+        }
+      `,
+      [UserGuideEpisodeUrlFragment],
+    ),
+  );
+
+  return entries.map(buildUrlForUserGuideEpisode);
+};

@@ -27,7 +27,7 @@ export const SupportTopicFragment = graphql(/* GraphQL */ `
 export const query = graphql(
   /* GraphQL */ `
     query SupportPage {
-      topics: allSupportTopics(first: 100) {
+      topics: allSupportTopics(first: 500) {
         ...SupportTopicFragment
       }
     }

@@ -10,5 +10,5 @@ export function buildUrlForChangelogEntry(
   changelogEntry: FragmentOf<typeof ChangelogEntryUrlFragment>,
 ) {
   const data = readFragment(ChangelogEntryUrlFragment, changelogEntry);
-  return `/marketplace/plugins/i/${data.slug}`;
+  return `/product-updates/${data.slug}`;
 }

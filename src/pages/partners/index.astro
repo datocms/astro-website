@@ -18,14 +18,12 @@ import { uniq } from 'lodash-es';
 
 type Partner = FragmentOf<typeof PartnerFragment>;
 
-const { page, partners1, partners2, partners3 } = await executeQuery(Astro, query);
+const { page, partners } = await executeQuery(Astro, query);
 
-if (!page || !partners1 || !partners2 || !partners3) {
+if (!page || partners.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
-
-const partners = [...partners1, ...partners2, ...partners3];
 
 const projectsCountByPartner = partners.reduce<Record<string, number>>((acc, post) => {
   acc[post.slug] = post._allReferencingShowcaseProjectsMeta.count;

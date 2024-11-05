@@ -1,6 +1,11 @@
 import { PartnerTestimonialQuoteFragment } from '~/components/quote/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import {
+  buildUrlForUseCasePage,
+  UseCasePageUrlFragment,
+} from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -108,3 +113,20 @@ export const query = graphql(
   `,
   [TagFragment, ResponsiveImageFragment, PartnerTestimonialQuoteFragment],
 );
+
+export const buildSitemapUrls = async () => {
+  const { entries } = await executeQueryOutsideAstro(
+    graphql(
+      /* GraphQL */ `
+        query BuildSitemapUrls {
+          entries: allUseCasePages(first: 500) {
+            ...UseCasePageUrlFragment
+          }
+        }
+      `,
+      [UseCasePageUrlFragment],
+    ),
+  );
+
+  return entries.map(buildUrlForUseCasePage);
+};

@@ -15,6 +15,8 @@ import { BlogPostLinkFragment } from '~/components/linkToRecords/BlogPostLink/gr
 import { ChangelogEntryLinkFragment } from '~/components/linkToRecords/ChangelogEntryLink/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import { BlogPostUrlFragment, buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -114,3 +116,20 @@ export const query = graphql(
     ChangelogEntryLinkFragment,
   ],
 );
+
+export const buildSitemapUrls = async () => {
+  const { entries } = await executeQueryOutsideAstro(
+    graphql(
+      /* GraphQL */ `
+        query BuildSitemapUrls {
+          entries: allBlogPosts(first: 500) {
+            ...BlogPostUrlFragment
+          }
+        }
+      `,
+      [BlogPostUrlFragment],
+    ),
+  );
+
+  return entries.map(buildUrlForBlogPost);
+};

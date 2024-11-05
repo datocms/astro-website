@@ -42,13 +42,7 @@ export const query = graphql(
           ...PartnerFragment
         }
       }
-      partners1: allPartners(first: 100) {
-        ...PartnerFragment
-      }
-      partners2: allPartners(skip: 100, first: 100) {
-        ...PartnerFragment
-      }
-      partners3: allPartners(skip: 200, first: 100) {
+      partners: allPartners(first: 1000) {
         ...PartnerFragment
       }
     }

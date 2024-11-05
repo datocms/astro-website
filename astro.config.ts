@@ -10,6 +10,7 @@ export default defineConfig({
   image: {
     domains: ['image.mux.com'],
   },
+  trailingSlash: 'never',
   experimental: {
     env: {
       schema: {

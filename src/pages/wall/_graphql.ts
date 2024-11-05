@@ -9,7 +9,7 @@ export const query = graphql(
         ...ReviewQuoteFragment
         _updatedAt
       }
-      allPartnerTestimonials(first: 100) {
+      allPartnerTestimonials(first: 500) {
         __typename
         ...PartnerTestimonialQuoteFragment
         _updatedAt

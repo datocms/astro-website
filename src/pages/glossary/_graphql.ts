@@ -9,7 +9,7 @@ export const query = graphql(/* GraphQL */ `
         content
       }
     }
-    entries: allGlossaryEntries(orderBy: title_ASC, first: 100) {
+    entries: allGlossaryEntries(orderBy: title_ASC, first: 500) {
       id
       title
       description {

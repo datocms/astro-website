@@ -12,7 +12,9 @@ import { buildUrlForPartner, type PartnerUrlFragment } from './partner';
 import { buildUrlForPlugin, type PluginUrlFragment } from './plugin';
 import { buildUrlForProductUpdate, ProductUpdateUrlFragment } from './productUpdate';
 import { buildUrlForShowcaseProject, type ShowcaseProjectUrlFragment } from './showcaseProject';
+import { buildUrlForSuccessStory, type SuccessStoryUrlFragment } from './successStory';
 import { buildUrlForTemplateDemo, type TemplateDemoUrlFragment } from './templateDemo';
+import { buildUrlForUseCasePage, type UseCasePageUrlFragment } from './useCasePage';
 import { buildUrlForUserGuideEpisode, type UserGuideEpisodeUrlFragment } from './userGuideEpisode';
 
 export function buildUrlFromGql(
@@ -61,6 +63,12 @@ export function buildUrlFromGql(
       })
     | (FragmentOf<typeof PartnerUrlFragment> & {
         __typename: 'PartnerRecord';
+      })
+    | (FragmentOf<typeof SuccessStoryUrlFragment> & {
+        __typename: 'SuccessStoryRecord';
+      })
+    | (FragmentOf<typeof UseCasePageUrlFragment> & {
+        __typename: 'UseCasePageRecord';
       }),
 ) {
   switch (thing.__typename) {
@@ -94,5 +102,9 @@ export function buildUrlFromGql(
       return buildUrlForAcademyChapter(thing);
     case 'PartnerRecord':
       return buildUrlForPartner(thing);
+    case 'SuccessStoryRecord':
+      return buildUrlForSuccessStory(thing);
+    case 'UseCasePageRecord':
+      return buildUrlForUseCasePage(thing);
   }
 }

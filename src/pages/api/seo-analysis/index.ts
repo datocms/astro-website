@@ -4,7 +4,7 @@ import { DATOCMS_API_TOKEN, SECRET_API_TOKEN } from 'astro:env/server';
 import { JSDOM } from 'jsdom';
 import { recordToSlug, recordToWebsiteRoute } from '~/lib/datocms/recordInfo';
 import { draftModeHostname } from '~/lib/draftMode';
-import { handleUnexpectedError, invalidRequestResponse, json, withCORS } from '../utils';
+import { handleUnexpectedError, invalidRequestResponse, json, withCORS } from '../_utils';
 
 export const OPTIONS: APIRoute = () => {
   return new Response('OK', withCORS());

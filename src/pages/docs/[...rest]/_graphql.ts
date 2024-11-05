@@ -1,5 +1,7 @@
 import { GroupLayoutFragment } from '~/layouts/docs/GroupLayout/_graphql';
 import { PageLayoutFragment } from '~/layouts/docs/PageLayout/_graphql';
+import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import { buildUrlForDocPage, DocPageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/docPage';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const docGroupQuery = graphql(
@@ -41,3 +43,28 @@ export const docPageQuery = graphql(
   `,
   [PageLayoutFragment],
 );
+
+export const buildSitemapUrls = async () => {
+  const { entries } = await executeQueryOutsideAstro(
+    graphql(
+      /* GraphQL */ `
+        query BuildSitemapUrls {
+          entries: allDocPages(first: 500) {
+            ...DocPageUrlFragment
+          }
+        }
+      `,
+      [DocPageUrlFragment],
+    ),
+  );
+
+  return entries
+    .map((page) => {
+      try {
+        return buildUrlForDocPage(page);
+      } catch (e) {
+        return undefined;
+      }
+    })
+    .filter(Boolean);
+};
