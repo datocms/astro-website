@@ -5,12 +5,12 @@ import { cachedFn } from '~/lib/temporarlyCache';
 const allAstroFiles = import.meta.glob<string>('../pages/**/*.astro', {
   query: '?raw',
   import: 'default',
-  eager: true,
+  eager: false,
 });
 
 const allBuildSitemapUrls = import.meta.glob<string>('../pages/**/_graphql.ts', {
   import: 'buildSitemapUrls',
-  eager: true,
+  eager: false,
 });
 
 export type BuildSitemapUrlsFn = () => Promise<string[]>;
