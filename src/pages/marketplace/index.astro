@@ -11,6 +11,7 @@ import { query } from './_graphql';
 import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
 import { buildUrlForHostingApp } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
 import { buildUrlForEnterpriseApp } from '~/lib/datocms/gqlUrlBuilder/enterpriseApp';
+import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 import s from './_style.module.css';
 
 const { page, demos, plugins, hostingApps, enterpriseApps } = await executeQuery(Astro, query);
@@ -49,7 +50,7 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
           fullFledged.map((item) => (
             <MarketplaceCard
               title={item.name}
-              href={`/marketplace/starters/${item.code}`}
+              href={buildUrlForTemplateDemo(item)}
               highlight={'Best choice to start!'}
               label={item.label}
               size="large"
@@ -72,7 +73,7 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
         {
           techStarters.map((item) => (
             <MarketplaceCard
-              href={`/marketplace/starters/${item.code}`}
+              href={buildUrlForTemplateDemo(item)}
               svgLogoUrl={
                 item.technology.squareLogo
                   ? item.technology.squareLogo.url

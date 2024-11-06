@@ -2,6 +2,7 @@ import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { PluginUrlFragment } from '~/lib/datocms/gqlUrlBuilder/plugin';
 import { HostingAppUrlFragment } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
 import { EnterpriseAppUrlFragment } from '~/lib/datocms/gqlUrlBuilder/enterpriseApp';
+import { TemplateDemoUrlFragment } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -21,6 +22,7 @@ export const query = graphql(
       }
       page: integrationsPage {
         demos {
+          ...TemplateDemoUrlFragment
           id
           code
           name
@@ -80,5 +82,11 @@ export const query = graphql(
       }
     }
   `,
-  [ResponsiveImageFragment, PluginUrlFragment, HostingAppUrlFragment, EnterpriseAppUrlFragment],
+  [
+    ResponsiveImageFragment,
+    TemplateDemoUrlFragment,
+    PluginUrlFragment,
+    HostingAppUrlFragment,
+    EnterpriseAppUrlFragment,
+  ],
 );
