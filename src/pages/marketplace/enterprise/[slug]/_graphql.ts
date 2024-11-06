@@ -26,6 +26,12 @@ export const query = graphql(
           width
           height
         }
+        gallery {
+          id
+          responsiveImage(imgixParams: { auto: format, w: 1200, h: 800, fit: crop }) {
+            ...ResponsiveImageFragment
+          }
+        }
         content {
           value
           blocks {
