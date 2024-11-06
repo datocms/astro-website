@@ -3,6 +3,7 @@ import { ProductUpdateFragment } from '~/components/product-updates/ProductUpdat
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const perPage = 10;
 
@@ -29,7 +30,7 @@ export const query = graphql(
   [TagFragment, ProductUpdateFragment],
 );
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
   const {
     meta: { count },
   } = await executeQueryOutsideAstro(
@@ -40,6 +41,7 @@ export const buildSitemapUrls = async () => {
         }
       }
     `),
+    { includeDrafts },
   );
 
   return range(2, 2 + Math.ceil(count / perPage)).map((i) => `/product-updates/p/${i}`);

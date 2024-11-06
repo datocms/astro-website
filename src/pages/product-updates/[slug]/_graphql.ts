@@ -6,6 +6,7 @@ import {
   ChangelogEntryUrlFragment,
 } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -21,7 +22,7 @@ export const query = graphql(
   [TagFragment, ProductUpdateFragment],
 );
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -33,6 +34,7 @@ export const buildSitemapUrls = async () => {
       `,
       [ChangelogEntryUrlFragment],
     ),
+    { includeDrafts },
   );
 
   return entries.map(buildUrlForChangelogEntry);

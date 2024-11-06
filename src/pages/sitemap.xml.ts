@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { SitemapStream, streamToPromise } from 'sitemap';
-import { cachedFn } from '~/lib/temporarlyCache';
+import { isDraftModeEnabled } from '~/lib/draftMode';
 
 const allAstroFiles = import.meta.glob<string>('../pages/**/*.astro', {
   query: '?raw',
@@ -8,14 +8,14 @@ const allAstroFiles = import.meta.glob<string>('../pages/**/*.astro', {
   eager: false,
 });
 
-const allBuildSitemapUrls = import.meta.glob<string>('../pages/**/_graphql.ts', {
+const allBuildSitemapUrls = import.meta.glob<BuildSitemapUrlsFn>('../pages/**/_graphql.ts', {
   import: 'buildSitemapUrls',
   eager: false,
 });
 
-export type BuildSitemapUrlsFn = () => Promise<string[]>;
+export type BuildSitemapUrlsFn = (ctx: { includeDrafts: boolean }) => Promise<string[]>;
 
-export const fetchSitemapUrls = cachedFn(async () => {
+export const fetchSitemapUrls = async (includeDrafts: boolean) => {
   let urlsPromises: Array<Promise<string[]>> = [];
 
   for (const astroFilePath of Object.keys(allAstroFiles)) {
@@ -29,15 +29,19 @@ export const fetchSitemapUrls = cachedFn(async () => {
           const graphqlPath =
             astroFilePath.replace('.astro', '').replace('/index', '') + '/_graphql.ts';
 
-          const buildSitemapUrls = allBuildSitemapUrls[graphqlPath] as
-            | BuildSitemapUrlsFn
-            | undefined;
+          const buildSitemapUrlsFnPromise = allBuildSitemapUrls[graphqlPath];
+
+          if (!buildSitemapUrlsFnPromise) {
+            throw new Error(`Missing buildSitemapUrls() in ${graphqlPath}`);
+          }
+
+          const buildSitemapUrls = await buildSitemapUrlsFnPromise();
 
           if (!buildSitemapUrls) {
             throw new Error(`Missing buildSitemapUrls() in ${graphqlPath}`);
           }
 
-          return await buildSitemapUrls();
+          return await buildSitemapUrls({ includeDrafts });
         })(),
       );
     } else {
@@ -47,13 +51,13 @@ export const fetchSitemapUrls = cachedFn(async () => {
   }
 
   return (await Promise.all(urlsPromises)).flat();
-});
+};
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async (x) => {
   const stream = new SitemapStream({ hostname: 'https://www.datocms.com/' });
   const sitemapPromise = streamToPromise(stream);
 
-  for (const url of await fetchSitemapUrls()) {
+  for (const url of await fetchSitemapUrls(isDraftModeEnabled(x.request))) {
     if (url === '/404') {
       continue;
     }

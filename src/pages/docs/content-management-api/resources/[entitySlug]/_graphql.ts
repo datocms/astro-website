@@ -1,7 +1,8 @@
 import { fetchSchema } from '~/components/docs/restApi/fetchSchema';
 import { invariant } from '~/lib/invariant';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async () => {
   const schema = await fetchSchema();
   invariant(schema.properties);
 

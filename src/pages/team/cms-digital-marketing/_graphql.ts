@@ -9,7 +9,6 @@ export const query = graphql(
         seo: _seoMetaTags {
           ...TagFragment
         }
-        slug
         seoH1
         yoastAnalysis
       }

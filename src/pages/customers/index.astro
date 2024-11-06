@@ -10,6 +10,7 @@ import { LogosBar } from '~/components/LogosBar';
 import { Layout } from '~/layouts/Layout';
 import { Hero } from '~/components/Hero';
 import s from './_style.module.css';
+import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
 
 const { page, posts } = await executeQuery(Astro, query);
 
@@ -49,7 +50,7 @@ if (!page || posts.length === 0) {
     <div class={s.posts}>
       {
         posts.map((post) => (
-          <a class={s.post} href={`/customers/${post.slug}`}>
+          <a class={s.post} href={buildUrlForSuccessStory(post)}>
             <div class={s.postImage}>
               <ResponsiveImage data={post.coverImage.responsiveImage} />
             </div>

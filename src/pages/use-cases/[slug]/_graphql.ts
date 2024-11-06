@@ -2,11 +2,15 @@ import { PartnerTestimonialQuoteFragment } from '~/components/quote/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import { CustomerStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/customerStory';
+import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
+import { SuccessStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/successStory';
 import {
   buildUrlForUseCasePage,
   UseCasePageUrlFragment,
 } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -91,16 +95,13 @@ export const query = graphql(
             __typename
           }
           ... on SuccessStoryRecord {
-            slug
+            ...SuccessStoryUrlFragment
           }
           ... on ShowcaseProjectRecord {
-            slug
-            partner {
-              slug
-            }
+            ...ShowcaseProjectUrlFragment
           }
           ... on CustomerStoryRecord {
-            slug
+            ...CustomerStoryUrlFragment
           }
         }
         successStoryImage: image {
@@ -111,10 +112,17 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment, PartnerTestimonialQuoteFragment],
+  [
+    TagFragment,
+    ResponsiveImageFragment,
+    PartnerTestimonialQuoteFragment,
+    SuccessStoryUrlFragment,
+    ShowcaseProjectUrlFragment,
+    CustomerStoryUrlFragment,
+  ],
 );
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -126,6 +134,7 @@ export const buildSitemapUrls = async () => {
       `,
       [UseCasePageUrlFragment],
     ),
+    { includeDrafts },
   );
 
   return entries.map(buildUrlForUseCasePage);

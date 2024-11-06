@@ -6,6 +6,7 @@ import { readFragment } from 'gql.tada';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { MaybeLink } from '~/components/links/MaybeLink';
 import { InlineText } from '~/components/structuredText/InlineText';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 
 interface Props {
   quote:
@@ -18,46 +19,46 @@ interface Props {
   size: 'big' | 'medium' | 'small';
 }
 
-const { quote, size } = Astro.props;
+const { quote: maskedQuote, size } = Astro.props;
 
-const unmaskedQuotes =
-  quote.__typename === 'PartnerTestimonialRecord'
-    ? readFragment(PartnerTestimonialQuoteFragment, quote)
-    : readFragment(ReviewQuoteFragment, quote);
+const quote =
+  maskedQuote.__typename === 'PartnerTestimonialRecord'
+    ? readFragment(PartnerTestimonialQuoteFragment, maskedQuote)
+    : readFragment(ReviewQuoteFragment, maskedQuote);
 ---
 
 <div class={s.root} data-size={size}>
   <div class={s.quoteInner}>
     {
-      unmaskedQuotes.__typename === 'PartnerTestimonialRecord' ? (
+      quote.__typename === 'PartnerTestimonialRecord' ? (
         <MaybeLink
-          href={unmaskedQuotes.partner ? `/partners/${unmaskedQuotes.partner.slug}` : undefined}
+          href={quote.partner ? buildUrlForPartner(quote.partner) : undefined}
           class={s.wrapper}
         >
           <div class={s.quote}>
-            <InlineText data={unmaskedQuotes.quote} />
+            <InlineText data={quote.quote} />
           </div>
 
           <div class={s.content}>
-            <ResponsiveImage pictureClass={s.image} data={unmaskedQuotes.image.responsiveImage} />
+            <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
             <div class={s.authorRole}>
-              <div class={s.name}>{unmaskedQuotes.name}</div>
-              <div class={s.role}>{unmaskedQuotes.role}</div>
-              <div class={s.company}>{unmaskedQuotes.partner.name}</div>
+              <div class={s.name}>{quote.name}</div>
+              <div class={s.role}>{quote.role}</div>
+              <div class={s.company}>{quote.partner.name}</div>
             </div>
           </div>
         </MaybeLink>
       ) : (
         <article class={s.wrapper}>
           <div class={s.quote}>
-            <InlineText data={unmaskedQuotes.quote} />
+            <InlineText data={quote.quote} />
           </div>
 
           <div class={s.content}>
-            <ResponsiveImage pictureClass={s.image} data={unmaskedQuotes.image.responsiveImage} />
+            <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
             <div class={s.authorRole}>
-              <div class={s.name}>{unmaskedQuotes.name}</div>
-              <div class={s.role}>{unmaskedQuotes.role}</div>
+              <div class={s.name}>{quote.name}</div>
+              <div class={s.role}>{quote.role}</div>
             </div>
           </div>
         </article>

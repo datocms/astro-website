@@ -8,6 +8,7 @@ import {
   ShowcaseProjectUrlFragment,
 } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -19,7 +20,6 @@ export const query = graphql(
         partner {
           ...PartnerUrlFragment
           name
-          slug
           logo {
             url
           }
@@ -28,7 +28,6 @@ export const query = graphql(
           }
         }
         name
-        slug
         projectUrl
         headline {
           value
@@ -77,7 +76,7 @@ export const query = graphql(
   [TagFragment, ResponsiveImageFragment, PartnerUrlFragment, VideoPlayerFragment],
 );
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -89,6 +88,7 @@ export const buildSitemapUrls = async () => {
       `,
       [ShowcaseProjectUrlFragment],
     ),
+    { includeDrafts },
   );
 
   return entries.map(buildUrlForShowcaseProject);

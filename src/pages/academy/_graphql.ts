@@ -1,3 +1,4 @@
+import { TagFragment } from '~/lib/datocms/commonFragments';
 import { AcademyChapterUrlFragment } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
 import { AcademyCourseUrlFragment } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
 import { graphql } from '~/lib/datocms/graphql';
@@ -7,13 +8,10 @@ export const query = graphql(
     query AcademyIndex {
       page: academyPage {
         seo: _seoMetaTags {
-          tag
-          attributes
-          content
+          ...TagFragment
         }
       }
       courses: allAcademyCourses(orderBy: position_ASC) {
-        slug
         name
         illustration
         introduction {
@@ -27,5 +25,5 @@ export const query = graphql(
       }
     }
   `,
-  [AcademyCourseUrlFragment, AcademyChapterUrlFragment],
+  [AcademyCourseUrlFragment, AcademyChapterUrlFragment, TagFragment],
 );

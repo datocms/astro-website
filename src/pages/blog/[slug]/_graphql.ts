@@ -18,6 +18,7 @@ import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { BlogPostUrlFragment, buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -26,7 +27,6 @@ export const query = graphql(
         seo: _seoMetaTags {
           ...TagFragment
         }
-        slug
         title
         seoH1
         canonicalUrl
@@ -117,7 +117,7 @@ export const query = graphql(
   ],
 );
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -129,6 +129,7 @@ export const buildSitemapUrls = async () => {
       `,
       [BlogPostUrlFragment],
     ),
+    { includeDrafts },
   );
 
   return entries.map(buildUrlForBlogPost);

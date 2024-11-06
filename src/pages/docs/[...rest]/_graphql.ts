@@ -3,6 +3,8 @@ import { PageLayoutFragment } from '~/layouts/docs/PageLayout/_graphql';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { buildUrlForDocPage, DocPageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/docPage';
 import { graphql } from '~/lib/datocms/graphql';
+import { isDefined } from '~/lib/isDefined';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const docGroupQuery = graphql(
   /* GraphQL */ `
@@ -14,7 +16,6 @@ export const docGroupQuery = graphql(
           ... on DocGroupPageRecord {
             page {
               id
-              slug
             }
           }
           ... on DocGroupSectionRecord {
@@ -22,7 +23,6 @@ export const docGroupQuery = graphql(
             pages {
               page {
                 id
-                slug
               }
             }
           }
@@ -44,7 +44,7 @@ export const docPageQuery = graphql(
   [PageLayoutFragment],
 );
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -56,6 +56,7 @@ export const buildSitemapUrls = async () => {
       `,
       [DocPageUrlFragment],
     ),
+    { includeDrafts },
   );
 
   return entries
@@ -66,5 +67,5 @@ export const buildSitemapUrls = async () => {
         return undefined;
       }
     })
-    .filter(Boolean);
+    .filter(isDefined);
 };

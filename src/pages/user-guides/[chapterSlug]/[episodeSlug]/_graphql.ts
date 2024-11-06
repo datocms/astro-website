@@ -7,6 +7,7 @@ import {
   UserGuideEpisodeUrlFragment,
 } from '~/lib/datocms/gqlUrlBuilder/userGuideEpisode';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const EpisodeFragment = graphql(
   /* GraphQL */ `
@@ -32,7 +33,7 @@ export const query = graphql(
   /* GraphQL */ `
     query UserGuidesItemQuery($episodeSlug: String!) {
       episode: userGuidesVideo(filter: { slug: { eq: $episodeSlug } }) {
-        slug
+        id
         _seoMetaTags {
           ...TagFragment
         }
@@ -57,19 +58,27 @@ export const query = graphql(
         }
       }
       chapters: allUserGuidesChapters(orderBy: position_ASC) {
-        slug
+        id
         title
+        slug
         episodes: videos {
-          slug
+          id
           ...EpisodeFragment
+          ...UserGuideEpisodeUrlFragment
         }
       }
     }
   `,
-  [TagFragment, VideoPlayerFragment, InternalVideoFragment, EpisodeFragment],
+  [
+    TagFragment,
+    VideoPlayerFragment,
+    InternalVideoFragment,
+    EpisodeFragment,
+    UserGuideEpisodeUrlFragment,
+  ],
 );
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -81,6 +90,7 @@ export const buildSitemapUrls = async () => {
       `,
       [UserGuideEpisodeUrlFragment],
     ),
+    { includeDrafts },
   );
 
   return entries.map(buildUrlForUserGuideEpisode);

@@ -19,7 +19,6 @@ export const DocGroupItemsFragment = graphql(
           page {
             id
             title
-            slug
             __typename
             ...DocPageUrlFragment
           }
@@ -30,7 +29,6 @@ export const DocGroupItemsFragment = graphql(
             page {
               id
               title
-              slug
               __typename
               ...DocPageUrlFragment
             }

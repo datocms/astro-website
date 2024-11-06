@@ -8,6 +8,7 @@ import {
   SuccessStoryUrlFragment,
 } from '~/lib/datocms/gqlUrlBuilder/successStory';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -97,7 +98,7 @@ export const query = graphql(
   [TagFragment, VideoFragment, ImageFragment, InternalVideoFragment],
 );
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -109,6 +110,7 @@ export const buildSitemapUrls = async () => {
       `,
       [SuccessStoryUrlFragment],
     ),
+    { includeDrafts },
   );
 
   return entries.map(buildUrlForSuccessStory);

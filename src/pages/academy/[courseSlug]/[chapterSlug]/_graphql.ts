@@ -9,12 +9,13 @@ import {
   buildUrlForAcademyChapter,
 } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
     query AcademyChapter($courseSlug: String!, $chapterSlug: String!) {
       chapter: academyChapter(filter: { slug: { eq: $chapterSlug } }) {
-        slug
+        id
         seo: _seoMetaTags {
           ...TagFragment
         }
@@ -38,14 +39,13 @@ export const query = graphql(
           }
         }
         matchingCourses: _allReferencingAcademyCourses(filter: { slug: { eq: $courseSlug } }) {
-          slug
           name
           introduction {
             value
           }
           chapters {
             ...AcademyChapterUrlFragment
-            slug
+            id
             title
           }
         }
@@ -62,7 +62,7 @@ export const query = graphql(
   ],
 );
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -74,6 +74,7 @@ export const buildSitemapUrls = async () => {
       `,
       [AcademyChapterUrlFragment],
     ),
+    { includeDrafts },
   );
 
   return entries.map(buildUrlForAcademyChapter);

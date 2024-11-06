@@ -1,5 +1,6 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { SuccessStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/successStory';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -23,7 +24,6 @@ export const query = graphql(
         title {
           value
         }
-        slug
         coverImage {
           url
           focalPoint {
@@ -47,8 +47,9 @@ export const query = graphql(
         logo {
           url
         }
+        ...SuccessStoryUrlFragment
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment],
+  [TagFragment, ResponsiveImageFragment, SuccessStoryUrlFragment],
 );

@@ -1,5 +1,4 @@
-// Already handled in src/pages/docs/[...rest]/_graphql.ts
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
-export const buildSitemapUrls = async () => {
-  return [];
-};
+// Already handled in src/pages/docs/[...rest]/_graphql.ts
+export const buildSitemapUrls: BuildSitemapUrlsFn = async () => [];

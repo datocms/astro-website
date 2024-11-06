@@ -8,13 +8,11 @@ export const GroupLayoutFragment = graphql(
     fragment GroupLayoutFragment on DocGroupRecord {
       ...DocGroupItemsFragment
       name
-      slug
       pagesOrSections: pages {
         __typename
         ... on DocGroupPageRecord {
           page {
             id
-            slug
           }
         }
         ... on DocGroupSectionRecord {
@@ -22,7 +20,6 @@ export const GroupLayoutFragment = graphql(
           pages {
             page {
               id
-              slug
             }
           }
         }

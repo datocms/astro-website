@@ -11,6 +11,7 @@ import { formatDate } from '~/lib/formatters';
 import s from './_style.module.css';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 
 export interface Props {
   pageIndex?: number;
@@ -48,7 +49,7 @@ if (!page || posts.length === 0) {
       latestChangelogEntry && (
         <div>
           <div class={s.changelogIntro}>Latest from our Product Updates changelog →</div>
-          <a href={'/product-updates'} class={s.changelogEntry}>
+          <a href="/product-updates" class={s.changelogEntry}>
             <div class={s.changelogEntryTitle}>{latestChangelogEntry.title}</div>
             <div class={s.changelogEntryDate}>
               {latestChangelogEntry._firstPublishedAt ? (
@@ -66,7 +67,7 @@ if (!page || posts.length === 0) {
       <div class={s.grid}>
         {
           posts.map((post) => (
-            <a href={`/blog/${post.slug}`} class={s.post}>
+            <a href={buildUrlForBlogPost(post)} class={s.post}>
               {post.coverImage?.responsiveImage && (
                 <div class={s.coverImage}>
                   <ResponsiveImage data={post.coverImage.responsiveImage} />

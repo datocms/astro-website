@@ -15,6 +15,7 @@ import { Svg } from '~/components/Svg';
 import { Checks } from '~/components/Checks';
 import { InlineText } from '~/components/structuredText/InlineText';
 import { Text } from '~/components/structuredText/Text';
+import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
 
 const { page } = await executeQuery(Astro, query, { variables: { slug: Astro.params.slug! } });
 
@@ -183,18 +184,7 @@ if (!page) {
           <h2><InlineText data={page.successStoryHeader} /></h2>
           <Text data={page.successStorySummary} />
           <Space top={1}>
-            <Button
-              as="a"
-              p="small"
-              s="purple"
-              href={page.caseStudy.__typename === 'SuccessStoryRecord'
-                ? `/customers/${page.caseStudy.slug}`
-                : page.caseStudy.__typename === 'ShowcaseProjectRecord'
-                  ? `/partners/${page.caseStudy.partner.slug}/showcase/${page.caseStudy.slug}`
-                  : page.caseStudy.__typename === 'CustomerStoryRecord'
-                    ? `/customer-stories/${page.caseStudy.slug}`
-                    : undefined}
-            >
+            <Button as="a" p="small" s="purple" href={buildUrlFromGql(page.caseStudy)}>
               Check it out
             </Button>
           </Space>

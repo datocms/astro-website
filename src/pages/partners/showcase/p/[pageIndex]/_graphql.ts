@@ -4,6 +4,7 @@ import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 // import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const perPage = 36;
 
@@ -27,7 +28,6 @@ export const query = graphql(
         }
         partner {
           name
-          slug
           logo {
             url
           }
@@ -41,7 +41,7 @@ export const query = graphql(
   [ResponsiveImageFragment, ShowcaseProjectUrlFragment],
 );
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
   const {
     meta: { count },
   } = await executeQueryOutsideAstro(
@@ -52,6 +52,7 @@ export const buildSitemapUrls = async () => {
         }
       }
     `),
+    { includeDrafts },
   );
 
   return range(2, 2 + Math.ceil(count / perPage)).map((i) => `/partners/showcase/p/${i}`);

@@ -3,6 +3,7 @@ import { buildUrlForAcademyChapter, type AcademyChapterUrlFragment } from './aca
 import { buildUrlForAcademyCourse, type AcademyCourseUrlFragment } from './academyCourse';
 import { buildUrlForBlogPost, type BlogPostUrlFragment } from './blogPost';
 import { buildUrlForChangelogEntry, type ChangelogEntryUrlFragment } from './changelogEntry';
+import { buildUrlForCustomerStory, type CustomerStoryUrlFragment } from './customerStory';
 import { buildUrlForDocGroup, type DocGroupUrlFragment } from './docGroup';
 import { buildUrlForDocPage, type DocPageUrlFragment } from './docPage';
 import { buildUrlForEnterpriseApp, type EnterpriseAppUrlFragment } from './enterpriseApp';
@@ -67,6 +68,9 @@ export function buildUrlFromGql(
     | (FragmentOf<typeof SuccessStoryUrlFragment> & {
         __typename: 'SuccessStoryRecord';
       })
+    | (FragmentOf<typeof CustomerStoryUrlFragment> & {
+        __typename: 'CustomerStoryRecord';
+      })
     | (FragmentOf<typeof UseCasePageUrlFragment> & {
         __typename: 'UseCasePageRecord';
       }),
@@ -104,6 +108,8 @@ export function buildUrlFromGql(
       return buildUrlForPartner(thing);
     case 'SuccessStoryRecord':
       return buildUrlForSuccessStory(thing);
+    case 'CustomerStoryRecord':
+      return buildUrlForCustomerStory(thing);
     case 'UseCasePageRecord':
       return buildUrlForUseCasePage(thing);
   }

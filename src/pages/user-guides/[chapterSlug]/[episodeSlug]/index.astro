@@ -17,6 +17,7 @@ import { Text } from '~/components/structuredText/Text';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { Prose } from '~/components/Prose';
 import { withAllComponents } from '~/lib/datocms/structuredText';
+import { buildUrlForUserGuideEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuideEpisode';
 
 const { chapterSlug, episodeSlug } = Astro.params;
 
@@ -34,9 +35,8 @@ if (!episode || !currentChapter) {
 const otherChapters = chapters.filter((c) => c !== currentChapter && c.episodes.length);
 const nextChapter = chapters[chapters.indexOf(currentChapter) + 1];
 const nextEpisode =
-  currentChapter.episodes[
-    currentChapter.episodes.findIndex((video) => video.slug === episode.slug) + 1
-  ] || nextChapter?.episodes[0];
+  currentChapter.episodes[currentChapter.episodes.findIndex((e) => e.id === episode.id) + 1] ||
+  nextChapter?.episodes[0];
 ---
 
 <Layout additionalSeo={episode._seoMetaTags}>
@@ -92,7 +92,7 @@ const nextEpisode =
                 <ul>
                   {
                     currentChapter.episodes.map((nthEpisode) => (
-                      <Episode episode={nthEpisode} isActive={nthEpisode.slug === episode.slug} />
+                      <Episode episode={nthEpisode} isActive={nthEpisode.id === episode.id} />
                     ))
                   }
                 </ul>
@@ -112,7 +112,7 @@ const nextEpisode =
                   otherChapters.map((chapter, i) => (
                     <a
                       class={s.otherChaptersItem}
-                      href={`/user-guides/${chapter.slug}/${chapter.episodes[0]!.slug}`}
+                      href={buildUrlForUserGuideEpisode(chapter.episodes[0]!)}
                     >
                       <div class={s.otherChaptersIntro}>
                         <p class={s.otherChaptersLabel}>Chapter #{i + 1}</p>

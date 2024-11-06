@@ -15,6 +15,7 @@ import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse
 import { query, PartnerFragment } from './_graphql';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { uniq } from 'lodash-es';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 
 type Partner = FragmentOf<typeof PartnerFragment>;
 
@@ -25,18 +26,18 @@ if (!page || partners.length === 0) {
   return notFoundResponse();
 }
 
-const projectsCountByPartner = partners.reduce<Record<string, number>>((acc, post) => {
-  acc[post.slug] = post._allReferencingShowcaseProjectsMeta.count;
+const projectsCountByPartner = partners.reduce<Record<string, number>>((acc, partner) => {
+  acc[partner.id] = partner._allReferencingShowcaseProjectsMeta.count;
   return acc;
 }, {});
 
-const highlightedPartnerSlugs = page.highlightedPartners.map((p) => p.slug);
+const highlightedPartnerIds = page.highlightedPartners.map((p) => p.id);
 
 const orderedPartners = [
   ...page.highlightedPartners,
   ...sortBy(
-    partners.filter((p) => !highlightedPartnerSlugs.includes(p.slug)),
-    [(x) => -(projectsCountByPartner[x.slug] || 0), 'slug'],
+    partners.filter((p) => !highlightedPartnerIds.includes(p.id)),
+    [(x) => -(projectsCountByPartner[x.id] || 0), 'name'],
   ),
 ];
 
@@ -203,7 +204,7 @@ const bkgColors = ['azure', 'pink', 'blue', 'green', 'yellow'] as const;
         {
           filteredPartners.map((partner, i) => (
             <MarketplaceCard
-              href={`/partners/${partner.slug}`}
+              href={buildUrlForPartner(partner)}
               background={bkgColors[i % bkgColors.length]}
               label={getLabel(partner._allReferencingShowcaseProjectsMeta.count)}
               lineClamp={3}

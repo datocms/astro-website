@@ -2,7 +2,10 @@ import { range } from 'lodash-es';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import { BlogPostUrlFragment } from '~/lib/datocms/gqlUrlBuilder/blogPost';
+import { ChangelogEntryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const perPage = 15;
 
@@ -20,7 +23,7 @@ export const query = graphql(
         skip: $offset
         orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
       ) {
-        slug
+        ...BlogPostUrlFragment
         title
         excerpt {
           value
@@ -44,8 +47,8 @@ export const query = graphql(
         orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
         filter: { showInBlog: { eq: true } }
       ) {
+        ...ChangelogEntryUrlFragment
         title
-        slug
         _firstPublishedAt
         _createdAt
         categories {
@@ -57,10 +60,10 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment],
+  [TagFragment, ResponsiveImageFragment, BlogPostUrlFragment, ChangelogEntryUrlFragment],
 );
 
-export const buildSitemapUrls = async () => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
   const {
     meta: { count },
   } = await executeQueryOutsideAstro(
@@ -71,6 +74,7 @@ export const buildSitemapUrls = async () => {
         }
       }
     `),
+    { includeDrafts },
   );
 
   return range(2, 2 + Math.ceil(count / perPage)).map((i) => `/blog/p/${i}`);

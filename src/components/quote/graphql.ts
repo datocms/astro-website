@@ -1,4 +1,5 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const PartnerTestimonialQuoteFragment = graphql(
@@ -17,11 +18,11 @@ export const PartnerTestimonialQuoteFragment = graphql(
       }
       partner {
         name
-        slug
+        ...PartnerUrlFragment
       }
     }
   `,
-  [ResponsiveImageFragment],
+  [ResponsiveImageFragment, PartnerUrlFragment],
 );
 
 export const ReviewQuoteFragment = graphql(
