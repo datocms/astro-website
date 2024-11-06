@@ -1,4 +1,5 @@
 ---
+import { MaybeLink } from '~/components/links/MaybeLink';
 import s from './style.module.css';
 
 type Props = {
@@ -7,7 +8,7 @@ type Props = {
   boxed?: boolean;
   class?: string;
   highlight?: string;
-  href: string;
+  href?: string;
   label?: unknown;
   lineClamp?: number;
   orientation?: 'horizontal' | 'vertical';
@@ -32,7 +33,7 @@ const {
 } = Astro.props;
 ---
 
-<a
+<MaybeLink
   href={href}
   class:list={[s.card, className]}
   data-size={size}
@@ -61,16 +62,25 @@ const {
     <h2 class={s.cardTitle}>
       {Astro.slots.has('title') ? <slot name="title" /> : <>{title}</>}
     </h2>
-    <p class={s.cardDescription} style=`--lineClamp: ${lineClamp}`>
-      <slot />
-    </p>
-    {
-      Astro.slots.has('image') && svgLogoUrl && (
-        <div class={s.subImageWrapper}>
-          <img loading="lazy" class={s.subImage} src={svgLogoUrl} />
-        </div>
-      )
-    }
+    <div class={s.cardBody}>
+      <p class={s.cardDescription} style=`--lineClamp: ${lineClamp}`>
+        <slot />
+      </p>
+      {
+        Astro.slots.has('below') && (
+          <div class={s.below}>
+            <slot name="below" />
+          </div>
+        )
+      }
+      {
+        Astro.slots.has('image') && svgLogoUrl && (
+          <div class={s.subImageWrapper}>
+            <img loading="lazy" class={s.subImage} src={svgLogoUrl} />
+          </div>
+        )
+      }
+    </div>
     {
       (badge || label) && (
         <footer class={s.cardFooter}>
@@ -89,4 +99,4 @@ const {
       )
     }
   </article>
-</a>
+</MaybeLink>
