@@ -1,0 +1,120 @@
+---
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { Carousel } from '~/components/Carousel';
+import { Space } from '~/components/Space';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+
+const { page, popular, latest } = await executeQuery(Astro, query);
+
+if (!page || popular.length === 0 || latest.length === 0 || page.collections.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout noFinalCta additionalSeo={page.seo}>
+  <Hero>
+    <Fragment slot="title">Community Plugins</Fragment>
+    <Fragment slot="subtitle">
+      Easily expand and customize the capabilities of DatoCMS with community plugins
+    </Fragment>
+  </Hero>
+
+  <Wrapper>
+    <h2 class={s.title}>Editors' Choice</h2>
+    <div class={s.highlighted}>
+      {
+        page.highlighted.map((item) => (
+          <MarketplaceCard href={buildUrlForPlugin(item)} title={item.title}>
+            {item.coverImage && (
+              <Fragment slot="image">
+                <ResponsiveImage data={item.coverImage.responsiveImage} />
+              </Fragment>
+            )}
+            {item.description}
+          </MarketplaceCard>
+        ))
+      }
+    </div>
+
+    <Space top={2}>
+      <h2 class={s.title}>Most popular</h2>
+      <div class={s.popular}>
+        {
+          popular.map((item) => (
+            <MarketplaceCard
+              href={buildUrlForPlugin(item)}
+              title={item.title}
+              orientation="horizontal"
+              boxed={false}
+              size="small"
+            >
+              {item.coverImage && (
+                <Fragment slot="image">
+                  <ResponsiveImage data={item.coverImage.responsiveImage} />
+                </Fragment>
+              )}
+              {item.description}
+            </MarketplaceCard>
+          ))
+        }
+      </div>
+    </Space>
+
+    {
+      page.collections.map((collection) => (
+        <Space top={2}>
+          <h2 class={s.title}>{collection.title}</h2>
+          <div class={s.carouselWrapper}>
+            <Carousel buttonsY="50%" class={s.carousel}>
+              {collection.plugins.map((item) => (
+                <div class={s.cardWrapper}>
+                  <MarketplaceCard href={buildUrlForPlugin(item)} title={item.title}>
+                    {item.coverImage && (
+                      <Fragment slot="image">
+                        <ResponsiveImage data={item.coverImage.responsiveImage} />
+                      </Fragment>
+                    )}
+                    {item.description}
+                  </MarketplaceCard>
+                </div>
+              ))}
+            </Carousel>
+          </div>
+        </Space>
+      ))
+    }
+
+    <Space top={2}>
+      <h2 class={s.title}>Just released</h2>
+      <div class={s.latest}>
+        {
+          latest.map((item) => (
+            <MarketplaceCard
+              href={buildUrlForPlugin(item)}
+              title={item.title}
+              orientation="horizontal"
+              boxed={false}
+              size="small"
+            >
+              {item.coverImage && (
+                <Fragment slot="image">
+                  <ResponsiveImage data={item.coverImage.responsiveImage} />
+                </Fragment>
+              )}
+              {item.description}
+            </MarketplaceCard>
+          ))
+        }
+      </div>
+    </Space>
+  </Wrapper>
+</Layout>
