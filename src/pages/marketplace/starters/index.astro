@@ -1,0 +1,142 @@
+---
+import { Carousel } from '~/components/Carousel';
+import { GroupPreview } from './_sub/GroupPreview';
+import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Svg } from '~/components/Svg';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { Announce } from '~/components/pluginToolkit/Announce';
+import { Hero } from '~/components/Hero';
+import { Wrapper } from '~/components/Wrapper';
+import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
+import { buildUrlForHostingApp } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
+import { buildUrlForEnterpriseApp } from '~/lib/datocms/gqlUrlBuilder/enterpriseApp';
+import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
+import s from './_style.module.css';
+
+const { starters } = await executeQuery(Astro, query);
+
+if (!starters) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const fullyFledged = starters.filter((starter) => starter.starterType === 'fully_fledged');
+const techStarters = starters.filter((starter) => starter.starterType === 'tech_starter');
+const community = starters.filter((starter) => starter.starterType === 'community');
+---
+
+<Layout noFinalCta additionalSeo={[]}>
+  <Hero>
+    <Fragment slot="title">Starters</Fragment>
+    <Fragment slot="subtitle">
+      Start with a fully configured DatoCMS project, a best-practice frontend and free hosting
+    </Fragment>
+  </Hero>
+
+  <div class={s.firstPartyStarters}>
+    <div class={s.groupWrapper}>
+      <div class={s.intro}>
+        <h2>Fully fledged demos</h2>
+        <p>
+          Use our pre-built demo projects to see all of DatoCMS&apos;s features in a <strong
+            >realistic production-ready setup</strong
+          >. Includes many example content types, and advanced features.
+        </p>
+      </div>
+      <section class={s.fullyFledged}>
+        {
+          fullyFledged.map((item) => (
+            <MarketplaceCard
+              badge={item?.badge}
+              highlight={'Best choice to start!'}
+              href={buildUrlForTemplateDemo(item)}
+              label={item.label}
+              size="large"
+              svgLogoUrl={item.technology.logo.url}
+              title={item.name}
+            >
+              <Fragment slot="image">
+                <ResponsiveImage data={item.screenshot.responsiveImage} />
+              </Fragment>
+              {item.cmsDescription}
+            </MarketplaceCard>
+          ))
+        }
+      </section>
+    </div>
+
+    {
+      techStarters.length > 0 && (
+        <div class={s.groupWrapper}>
+          <div class={s.intro}>
+            <h2>Tech starter kits</h2>
+            <p>
+              Kickstart your next project with our <strong>official scaffolds</strong>. They offer
+              all the best practices to integrate DatoCMS with your frontend framework, with minimal
+              content and styling.
+            </p>
+          </div>
+          <section class={s.techStarters}>
+            {techStarters.map((item) => (
+              <MarketplaceCard
+                badge={item?.badge}
+                href={buildUrlForTemplateDemo(item)}
+                label={item.label}
+                title={item.name}
+                svgLogoUrl={
+                  item.technology.squareLogo
+                    ? item.technology.squareLogo.url
+                    : item.technology.logo.url
+                }
+              >
+                {item.cmsDescription}
+              </MarketplaceCard>
+            ))}
+          </section>
+        </div>
+      )
+    }
+  </div>
+
+  <Wrapper>
+    <div class={s.intro}>
+      <h2>Community templates</h2>
+      <p>
+        Discover the projects created by the community. They are not officially supported by
+        DatoCMS, but they can be a great source of inspiration to kickstart your next project.
+      </p>
+    </div>
+
+    <Announce
+      href="/docs/general-concepts/project-starters-and-templates#generate-a-project-starter-button"
+      center
+    >
+      <strong>Want to create your own starter project?</strong> Learn how to do that in our documentation!
+    </Announce>
+
+    <div class={s.community}>
+      {
+        community.map((item) => (
+          <MarketplaceCard
+            badge={item.badge}
+            boxed={false}
+            href={`/marketplace/starters/${item.code}`}
+            label={item.label}
+            orientation="horizontal"
+            size="small"
+            title={item.name}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={item.screenshot.responsiveImage} />
+            </Fragment>
+            {item.cmsDescription}
+          </MarketplaceCard>
+        ))
+      }
+    </div>
+  </Wrapper>
+</Layout>
