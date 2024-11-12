@@ -16,8 +16,10 @@ import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse
 import { query } from './_graphql';
 import s from './_style.module.css';
 
-const { slug } = Astro.params;
-const variables = { slug: slug! };
+const { rest } = Astro.params;
+const variables = {
+  slug: rest || '',
+};
 const { page } = await executeQuery(Astro, query, { variables });
 
 if (!page || !page.readme) {
