@@ -2,6 +2,7 @@ import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 import { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const perPage = 36;
 
@@ -30,3 +31,6 @@ export const query = graphql(
   `,
   [TagFragment, ResponsiveImageFragment, PluginCardFragment],
 );
+
+// TODO: to implement!
+export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => [];

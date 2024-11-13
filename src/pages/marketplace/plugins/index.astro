@@ -12,6 +12,7 @@ import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse
 import { query } from './_graphql';
 import s from './_style.module.css';
 import { PluginCard } from '../_sub/PluginCard';
+import { PluginSearchBox } from '../_sub/PluginSearchBox';
 
 const { page, popular, latest } = await executeQuery(Astro, query);
 
@@ -30,6 +31,8 @@ if (!page || popular.length === 0 || latest.length === 0 || page.collections.len
   </Hero>
 
   <Wrapper>
+    <PluginSearchBox />
+
     <h2 class={s.title}>Editors' Choice</h2>
     <div class={s.highlighted}>
       {page.highlighted.map((item) => <PluginCard plugin={item} />)}

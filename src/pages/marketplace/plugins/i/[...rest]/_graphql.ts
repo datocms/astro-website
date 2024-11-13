@@ -56,7 +56,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
     graphql(
       /* GraphQL */ `
         query BuildSitemapUrls {
-          entries: allPlugins(first: 100) {
+          entries: allPlugins(first: 500) {
             ...PluginUrlFragment
           }
         }

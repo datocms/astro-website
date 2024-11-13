@@ -8,6 +8,7 @@ interface Props {
   currentPageIndex: number;
   totalEntries: number;
   baseUrl: string;
+  searchParams?: URLSearchParams;
   maxPagesToBeShown?: number;
 }
 
@@ -17,6 +18,7 @@ const {
   totalEntries,
   baseUrl,
   maxPagesToBeShown = 7,
+  searchParams,
 } = Astro.props;
 
 const paginator = createPaginator(perPage, maxPagesToBeShown);
@@ -29,7 +31,17 @@ const {
   nextPage: nextPage,
 } = paginator(totalEntries, currentPageIndex);
 
-const getHref = (index: number) => (index === 0 ? baseUrl : `${baseUrl}/p/${index + 1}`);
+const getHref = (index: number) => {
+  const url = new URL(index === 0 ? baseUrl : `${baseUrl}/p/${index + 1}`, 'http://bogus.com');
+
+  if (searchParams) {
+    searchParams.forEach((value, key) => {
+      url.searchParams.append(key, value);
+    });
+  }
+
+  return url.pathname + url.search;
+};
 ---
 
 {
