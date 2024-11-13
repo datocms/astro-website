@@ -40,7 +40,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
   } = await executeQueryOutsideAstro(
     graphql(/* GraphQL */ `
       query BuildSitemapUrls {
-        meta: _allPluginsMeta {
+        meta: _allPluginsMeta(filter: { manuallyDeprecated: { eq: "false" } }) {
           count
         }
       }
@@ -48,5 +48,5 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
     { includeDrafts },
   );
 
-  return range(2, -1 + Math.ceil(count / perPage)).map((i) => `/marketplace/plugins/browse/p/${i}`);
+  return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/marketplace/plugins/browse/p/${i}`);
 };
