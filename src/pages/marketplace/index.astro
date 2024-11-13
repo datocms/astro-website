@@ -13,6 +13,8 @@ import { buildUrlForHostingApp } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
 import { buildUrlForEnterpriseApp } from '~/lib/datocms/gqlUrlBuilder/enterpriseApp';
 import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 import s from './_style.module.css';
+import { PluginCardFragment } from './_sub/PluginCard/_graphql';
+import { PluginCard } from './_sub/PluginCard';
 
 const { page, demos, plugins, hostingApps, enterpriseApps } = await executeQuery(Astro, query);
 
@@ -107,14 +109,7 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
         {
           page.plugins.map((item) => (
             <div class={s.cardWrapper}>
-              <MarketplaceCard title={item.title} href={buildUrlForPlugin(item)} size="medium">
-                {item.coverImage && (
-                  <Fragment slot="image">
-                    <ResponsiveImage data={item.coverImage.responsiveImage} />
-                  </Fragment>
-                )}
-                {item.description}
-              </MarketplaceCard>
+              <PluginCard plugin={item} size="medium" />
             </div>
           ))
         }
@@ -171,8 +166,9 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
               <MarketplaceCard
                 title={item.title}
                 href={buildUrlForEnterpriseApp(item)}
-                svgLogoUrl={item.logo?.url}
+                svgLogoUrl={item.logo.url}
                 size="medium"
+                background="pink"
               >
                 {item.description}
               </MarketplaceCard>

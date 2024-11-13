@@ -11,6 +11,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { perPage, query } from './_graphql';
 import s from './_style.module.css';
+import { PluginCard } from '~/pages/marketplace/_sub/PluginCard';
 
 export interface Props {
   pageIndex?: number;
@@ -49,18 +50,7 @@ if (!pluginsPage || plugins.length === 0) {
     <Space bottom={2}>
       <!-- TODO: search -->
       <div class={s.grid}>
-        {
-          plugins.map((item) => (
-            <MarketplaceCard href={buildUrlForPlugin(item)} title={item.title}>
-              {item.coverImage && (
-                <Fragment slot="image">
-                  <ResponsiveImage data={item.coverImage.responsiveImage} />
-                </Fragment>
-              )}
-              {item.description}
-            </MarketplaceCard>
-          ))
-        }
+        {plugins.map((item) => <PluginCard plugin={item} />)}
       </div>
     </Space>
 

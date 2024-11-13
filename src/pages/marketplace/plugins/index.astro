@@ -11,6 +11,7 @@ import { Space } from '~/components/Space';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { PluginCard } from '../_sub/PluginCard';
 
 const { page, popular, latest } = await executeQuery(Astro, query);
 
@@ -31,18 +32,7 @@ if (!page || popular.length === 0 || latest.length === 0 || page.collections.len
   <Wrapper>
     <h2 class={s.title}>Editors' Choice</h2>
     <div class={s.highlighted}>
-      {
-        page.highlighted.map((item) => (
-          <MarketplaceCard href={buildUrlForPlugin(item)} title={item.title}>
-            {item.coverImage && (
-              <Fragment slot="image">
-                <ResponsiveImage data={item.coverImage.responsiveImage} />
-              </Fragment>
-            )}
-            {item.description}
-          </MarketplaceCard>
-        ))
-      }
+      {page.highlighted.map((item) => <PluginCard plugin={item} />)}
     </div>
 
     <Space top={2}>
@@ -50,20 +40,7 @@ if (!page || popular.length === 0 || latest.length === 0 || page.collections.len
       <div class={s.popular}>
         {
           popular.map((item) => (
-            <MarketplaceCard
-              href={buildUrlForPlugin(item)}
-              title={item.title}
-              orientation="horizontal"
-              boxed={false}
-              size="small"
-            >
-              {item.coverImage && (
-                <Fragment slot="image">
-                  <ResponsiveImage data={item.coverImage.responsiveImage} />
-                </Fragment>
-              )}
-              {item.description}
-            </MarketplaceCard>
+            <PluginCard plugin={item} orientation="horizontal" boxed={false} size="small" />
           ))
         }
       </div>
@@ -77,14 +54,7 @@ if (!page || popular.length === 0 || latest.length === 0 || page.collections.len
             <Carousel buttonsY="50%" class={s.carousel}>
               {collection.plugins.map((item) => (
                 <div class={s.cardWrapper}>
-                  <MarketplaceCard href={buildUrlForPlugin(item)} title={item.title}>
-                    {item.coverImage && (
-                      <Fragment slot="image">
-                        <ResponsiveImage data={item.coverImage.responsiveImage} />
-                      </Fragment>
-                    )}
-                    {item.description}
-                  </MarketplaceCard>
+                  <PluginCard plugin={item} />
                 </div>
               ))}
             </Carousel>
@@ -98,20 +68,7 @@ if (!page || popular.length === 0 || latest.length === 0 || page.collections.len
       <div class={s.latest}>
         {
           latest.map((item) => (
-            <MarketplaceCard
-              href={buildUrlForPlugin(item)}
-              title={item.title}
-              orientation="horizontal"
-              boxed={false}
-              size="small"
-            >
-              {item.coverImage && (
-                <Fragment slot="image">
-                  <ResponsiveImage data={item.coverImage.responsiveImage} />
-                </Fragment>
-              )}
-              {item.description}
-            </MarketplaceCard>
+            <PluginCard plugin={item} orientation="horizontal" boxed={false} size="small" />
           ))
         }
       </div>

@@ -1,10 +1,10 @@
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { MaybeVideoPlayerFragment } from '~/components/VideoPlayer/graphql';
+import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { PluginUrlFragment, buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
-import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
-import { TagFragment } from '~/lib/datocms/commonFragments';
-import { UploadVideoPlayerFragment } from '~/components/UploadVideoPlayer/graphql';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -17,11 +17,9 @@ export const query = graphql(
         description
         previewImage {
           __typename
+          ...MaybeVideoPlayerFragment
           responsiveImage(imgixParams: { w: 800, auto: format }) {
             ...ResponsiveImageFragment
-          }
-          video {
-            ...UploadVideoPlayerFragment
           }
         }
         coverImage {
@@ -50,7 +48,7 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment, UploadVideoPlayerFragment],
+  [TagFragment, ResponsiveImageFragment, MaybeVideoPlayerFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {

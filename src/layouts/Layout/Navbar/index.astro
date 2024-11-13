@@ -9,6 +9,7 @@ import { Svg } from '~/components/Svg';
 import { TargetToggler } from '~/components/TargetToggler';
 import { Wrapper } from '~/components/Wrapper';
 import s from './style.module.css';
+import { ActiveLink } from '~/components/links/ActiveLink';
 
 const isMarketplace = Astro.url.pathname.startsWith('/marketplace');
 ---
@@ -38,36 +39,41 @@ const isMarketplace = Astro.url.pathname.startsWith('/marketplace');
           </div>
 
           <div class={s.navList}>
-            <a
-              href="/marketplace"
-              class:list={[s.navLink, Astro.url.pathname.endsWith('/marketplace') && s.isActive]}
-            >
+            <ActiveLink href="/marketplace" activeClass={s.isActive} class={s.navLink}>
               <span>Featured</span>
-            </a>
-            <a
+            </ActiveLink>
+            <ActiveLink
               href="/marketplace/starters"
-              class:list={[s.navLink, Astro.url.pathname.endsWith('/starters') && s.isActive]}
+              match={{ alsoMatchChildPathnames: true }}
+              activeClass={s.isActive}
+              class={s.navLink}
             >
               <span>Starters</span>
-            </a>
-            <a
+            </ActiveLink>
+            <ActiveLink
               href="/marketplace/plugins"
-              class:list={[s.navLink, Astro.url.pathname.endsWith('/plugins') && s.isActive]}
+              match={{ alsoMatchChildPathnames: true }}
+              activeClass={s.isActive}
+              class={s.navLink}
             >
               <span>Plugins</span>
-            </a>
-            <a
+            </ActiveLink>
+            <ActiveLink
               href="/marketplace/hosting"
-              class:list={[s.navLink, Astro.url.pathname.endsWith('/hosting') && s.isActive]}
+              match={{ alsoMatchChildPathnames: true }}
+              activeClass={s.isActive}
+              class={s.navLink}
             >
               <span>Hosting</span>
-            </a>
-            <a
+            </ActiveLink>
+            <ActiveLink
               href="/marketplace/enterprise"
-              class:list={[s.navLink, Astro.url.pathname.endsWith('/enterprise') && s.isActive]}
+              match={{ alsoMatchChildPathnames: true }}
+              activeClass={s.isActive}
+              class={s.navLink}
             >
               <span>Enterprise</span>
-            </a>
+            </ActiveLink>
           </div>
 
           <div class={s.navActions}>

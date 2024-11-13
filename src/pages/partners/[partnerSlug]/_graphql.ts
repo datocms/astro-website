@@ -2,9 +2,9 @@ import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { buildUrlForPartner, PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
-import { PluginUrlFragment } from '~/lib/datocms/gqlUrlBuilder/plugin';
 import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { graphql } from '~/lib/datocms/graphql';
+import { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
@@ -77,21 +77,11 @@ export const extraQuery = graphql(
         filter: { author: { eq: $authorId }, manuallyDeprecated: { eq: false } }
         orderBy: installs_DESC
       ) {
-        ...PluginUrlFragment
-        id
-        title
-        description
-        releasedAt
-        packageName
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...PluginCardFragment
       }
     }
   `,
-  [ResponsiveImageFragment, PluginUrlFragment],
+  [ResponsiveImageFragment, PluginCardFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {

@@ -8,13 +8,14 @@ import { Prose } from '~/components/Prose';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Announce } from '~/components/pluginToolkit/Announce';
 import { Space } from '~/components/Space';
-import { UploadVideoPlayer } from '~/components/UploadVideoPlayer';
+import { VideoPlayer } from '~/components/VideoPlayer';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { formatDate } from '~/lib/formatters';
 import { getGravatarUrl } from '~/lib/gravatar';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { isVideo } from '~/components/VideoPlayer/graphql';
 
 const { rest } = Astro.params;
 const variables = {
@@ -74,10 +75,10 @@ const url = `${
           }
 
           {
-            page.previewImage?.video && (
+            page.previewImage && isVideo(page.previewImage) && (
               <div class={s.previewVisual}>
                 <div class={s.previewVisualVideo}>
-                  <UploadVideoPlayer data={page.previewImage.video} />
+                  <VideoPlayer data={page.previewImage} />
                 </div>
               </div>
             )
@@ -109,12 +110,11 @@ const url = `${
                 <div class={s.cardCta}>
                   <Button
                     as="a"
+                    block
                     href={projectDomain
                       ? `https://${projectDomain}${url}`
                       : `https://dashboard.datocms.com/projects/redirect-to-project?path=${url}`}
                     target="_blank"
-                    fs="small"
-                    p="small"
                   >
                     Install this plugin!
                   </Button>

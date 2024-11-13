@@ -17,6 +17,7 @@ import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse
 import { query, extraQuery } from './_graphql';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
+import { PluginCard } from '~/pages/marketplace/_sub/PluginCard';
 
 const { partnerSlug } = Astro.params;
 const variables = { partnerSlug: partnerSlug! };
@@ -138,19 +139,7 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
             <h3 class={s.blockTitle}>Plugins released</h3>
             <div class={s.pluginsGrid}>
               {plugins.map((plugin) => (
-                <MarketplaceCard
-                  title={plugin.title}
-                  size="small"
-                  href={buildUrlForPlugin(plugin)}
-                  lineClamp={3}
-                >
-                  <Fragment slot="image">
-                    {plugin.coverImage && (
-                      <ResponsiveImage data={plugin.coverImage.responsiveImage} />
-                    )}
-                  </Fragment>
-                  {plugin.description}
-                </MarketplaceCard>
+                <PluginCard plugin={plugin} size="small" />
               ))}
             </div>
           </div>

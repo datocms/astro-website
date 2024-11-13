@@ -1,9 +1,9 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
-import { PluginUrlFragment } from '~/lib/datocms/gqlUrlBuilder/plugin';
-import { HostingAppUrlFragment } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
 import { EnterpriseAppUrlFragment } from '~/lib/datocms/gqlUrlBuilder/enterpriseApp';
+import { HostingAppUrlFragment } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
 import { TemplateDemoUrlFragment } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 import { graphql } from '~/lib/datocms/graphql';
+import { PluginCardFragment } from './_sub/PluginCard/_graphql';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -50,14 +50,7 @@ export const query = graphql(
           }
         }
         plugins {
-          ...PluginUrlFragment
-          coverImage {
-            responsiveImage(imgixParams: { auto: format, w: 360, h: 240, fit: crop }) {
-              ...ResponsiveImageFragment
-            }
-          }
-          title
-          description
+          ...PluginCardFragment
         }
         hostingBuilding {
           ...HostingAppUrlFragment
@@ -85,7 +78,7 @@ export const query = graphql(
   [
     ResponsiveImageFragment,
     TemplateDemoUrlFragment,
-    PluginUrlFragment,
+    PluginCardFragment,
     HostingAppUrlFragment,
     EnterpriseAppUrlFragment,
   ],
