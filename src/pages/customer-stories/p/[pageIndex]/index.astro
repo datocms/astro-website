@@ -1,0 +1,106 @@
+---
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { Pagination } from '~/components/Pagination';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { perPage, query } from './_graphql';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import s from './_style.module.css';
+
+export interface Props {
+  pageIndex?: number;
+}
+
+if (Astro.params.pageIndex === '1') {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
+
+const { page, posts, _allCustomerStoriesMeta } = await executeQuery(Astro, query, {
+  variables: {
+    limit: perPage,
+    offset: (pageIndex - 1) * perPage,
+  },
+});
+
+const totalEntries = _allCustomerStoriesMeta.count;
+
+if (!page || posts.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero>
+    <Fragment slot="title"><mark>Customer Stories</mark></Fragment>
+    <Fragment slot="subtitle">
+      Conversations with customers working on some really cool use cases with DatoCMS</Fragment
+    >
+  </Hero>
+
+  <Wrapper>
+    <Space bottom={2}>
+      <div class={s.grid}>
+        {
+          posts.map((post) => (
+            <a href={buildUrlForCustomerStory(post)} class={s.post}>
+              {post.coverImage?.responsiveImage && (
+                <div class={s.coverImage}>
+                  <ResponsiveImage data={post.coverImage.responsiveImage} />
+                </div>
+              )}
+              <div class={s.postBody}>
+                <div class={s.postText}>
+                  <h6 class={s.title}>{post.title}</h6>
+                  <div class={s.excerpt}>{toPlainText(post.excerpt)}</div>
+                </div>
+                <div class={s.footer}>
+                  <div class={s.info}>
+                    <div class={s.avatarWrapper}>
+                      {post.people.map((person, i) => (
+                        <ResponsiveImage
+                          pictureClass={s.avatar}
+                          data={person.avatar.responsiveImage}
+                          pictureStyle={{ zIndex: 10 - i }}
+                        />
+                      ))}
+                    </div>
+
+                    <p>
+                      With{' '}
+                      {post.people.map((person, i) => (
+                        <span>
+                          {person.name}
+                          {i < post.people.length - 2
+                            ? ', '
+                            : i === post.people.length - 2
+                              ? ' and '
+                              : ''}
+                        </span>
+                      ))}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </Space>
+
+    <Pagination
+      perPage={perPage}
+      currentPageIndex={pageIndex}
+      totalEntries={totalEntries}
+      baseUrl="/customer-stories"
+    />
+  </Wrapper>
+</Layout>
