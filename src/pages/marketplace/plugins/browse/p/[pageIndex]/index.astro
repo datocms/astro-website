@@ -1,21 +1,18 @@
 ---
 import Wrapper from '~/components/Wrapper/ReactComponent';
+import ky from 'ky';
+import type { FragmentOf } from 'gql.tada';
+import type { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
 import { Hero } from '~/components/Hero';
 import { Layout } from '~/layouts/Layout';
-import { MarketplaceCard } from '~/components/MarketplaceCard';
 import { Pagination } from '~/components/Pagination';
-import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { PluginCard } from '~/pages/marketplace/_sub/PluginCard';
+import { PluginSearchBox } from '~/pages/marketplace/_sub/PluginSearchBox';
 import { Space } from '~/components/Space';
-import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { perPage, query } from './_graphql';
 import s from './_style.module.css';
-import { PluginCard } from '~/pages/marketplace/_sub/PluginCard';
-import ky from 'ky';
-import type { FragmentOf } from 'gql.tada';
-import type { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
-import { PluginSearchBox } from '~/pages/marketplace/_sub/PluginSearchBox';
 
 export interface Props {
   pageIndex?: number;
