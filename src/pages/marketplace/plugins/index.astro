@@ -1,17 +1,18 @@
 ---
 import Wrapper from '~/components/Wrapper/ReactComponent';
+import { Carousel } from '~/components/Carousel';
 import { Hero } from '~/components/Hero';
 import { Layout } from '~/layouts/Layout';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { Carousel } from '~/components/Carousel';
-import { Space } from '~/components/Space';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
 import { PluginCard } from '../_sub/PluginCard';
 import { PluginSearchBox } from '../_sub/PluginSearchBox';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
 import s from './_style.module.css';
 
-const { page, popular, latest } = await executeQuery(Astro, query);
+const { page, meta, popular, latest } = await executeQuery(Astro, query);
 
 if (!page || popular.length === 0 || latest.length === 0 || page.collections.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
@@ -36,7 +37,14 @@ if (!page || popular.length === 0 || latest.length === 0 || page.collections.len
     </div>
 
     <Space top={2}>
-      <h2 class={s.title}>Most popular</h2>
+      <div class={s.sectionTitleWrapper}>
+        <h2 class={s.title}>Most popular</h2>
+        <a href="/marketplace/plugins/browse" class={s.browseAll}>
+          <span>View all ({meta.count})</span>
+          <Svg name="icons/regular/arrow-right" />
+        </a>
+      </div>
+
       <div class={s.popular}>
         {
           popular.map((item) => (
