@@ -1,0 +1,172 @@
+---
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import { Button } from '~/components/Button';
+import { Layout } from '~/layouts/Layout';
+import { Markdown } from '~/components/Markdown';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Prose } from '~/components/Prose';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Announce } from '~/components/pluginToolkit/Announce';
+import { Space } from '~/components/Space';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { formatDate } from '~/lib/formatters';
+import { getGravatarUrl } from '~/lib/gravatar';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { isVideo } from '~/components/VideoPlayer/graphql';
+
+const { rest } = Astro.params;
+const variables = {
+  slug: rest || '',
+};
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page || !page.readme) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const avatarUrl = getGravatarUrl(page.author.email);
+
+// TODO check
+const urlParams = new URL(Astro.request.url);
+const projectDomain = urlParams.searchParams.get('projectDomain');
+const projectEnvironment = urlParams.searchParams.get('projectEnvironment');
+const url = `${
+  projectEnvironment ? `/environments/${projectEnvironment}` : ''
+}/configuration/plugins/install/${page.packageName}`;
+---
+
+<Layout noFinalCta additionalSeo={page.seo}>
+  <Space top={2}>
+    <Wrapper>
+      <div class={s.grid}>
+        <div class={s.content}>
+          <div class={s.titleWrapper}>
+            <h1 class={s.title}>{page.title}</h1>
+          </div>
+          <h3 class={s.subtitle}>{page.description}</h3>
+          <Space top={1}>
+            <div class={s.ctaMobile}>
+              <Button
+                as="a"
+                href={projectDomain
+                  ? `https://${projectDomain}${url}`
+                  : `https://dashboard.datocms.com/projects/redirect-to-project?path=${url}`}
+                target="_blank"
+                fs="small"
+                p="small"
+              >
+                Install this plugin!
+              </Button>
+            </div>
+          </Space>
+
+          {
+            page.previewImage?.responsiveImage && (
+              <div class={s.previewVisual}>
+                <div class={s.previewVisualImage}>
+                  <ResponsiveImage data={page.previewImage.responsiveImage} />
+                </div>
+              </div>
+            )
+          }
+
+          {
+            page.previewImage && isVideo(page.previewImage) && (
+              <div class={s.previewVisual}>
+                <div class={s.previewVisualVideo}>
+                  <VideoPlayer data={page.previewImage} />
+                </div>
+              </div>
+            )
+          }
+
+          <Announce href="/docs/plugin-sdk/introduction">
+            <strong>This is a Community Plugin!</strong> Learn how create your own plugin, or copy and
+            remix existing ones in our documentation
+          </Announce>
+
+          <Prose>
+            <div class={s.documentation} data-monospace="true">
+              <Markdown of={page.readme} />
+            </div>
+          </Prose>
+        </div>
+
+        <aside class={s.aside}>
+          <div class={s.asideContent}>
+            <MarketplaceCard title={page.title} background="azure">
+              {
+                page.coverImage && (
+                  <Fragment slot="image">
+                    <ResponsiveImage data={page.coverImage.responsiveImage} />
+                  </Fragment>
+                )
+              }
+              <Fragment slot="below">
+                <div class={s.cardCta}>
+                  <Button
+                    as="a"
+                    block
+                    href={projectDomain
+                      ? `https://${projectDomain}${url}`
+                      : `https://dashboard.datocms.com/projects/redirect-to-project?path=${url}`}
+                    target="_blank"
+                  >
+                    Install this plugin!
+                  </Button>
+                </div>
+              </Fragment>
+            </MarketplaceCard>
+
+            <div class={s.publisher}>
+              <h4>Publisher</h4>
+              <article>
+                <div class={s.publisherIcon}>
+                  <img src={avatarUrl} alt={page.author.name} />
+                </div>
+                <p>{page.author.name}</p>
+              </article>
+            </div>
+
+            {
+              page.homepage && (
+                <div class={s.info}>
+                  <h4>Homepage</h4>
+                  <a href={page.homepage} target="_blank">
+                    Visit homepage
+                  </a>
+                </div>
+              )
+            }
+
+            <div class={s.info}>
+              <h4>Package</h4>
+              <a href=`https://www.npmjs.com/package/${page.packageName}` target="_blank">
+                Visit npm
+              </a>
+            </div>
+
+            <div class={s.info}>
+              <h4>Current version</h4>
+              <p>{page.version}</p>
+            </div>
+
+            <div class={s.info}>
+              <h4>Install count</h4>
+              <p>{page.installs}</p>
+            </div>
+
+            <div class={s.info}>
+              <h4>Last update</h4>
+              <p>{formatDate(page.lastUpdate)}</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </Wrapper>
+  </Space>
+</Layout>

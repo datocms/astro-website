@@ -1,0 +1,52 @@
+---
+import s from './_style.module.css';
+---
+
+<auto-submit-on-debounced-change>
+  <form class={s.search} action="/marketplace/plugins/browse" method="GET" data-astro-reload>
+    <input
+      class={s.searchInput}
+      placeholder="Search plugins..."
+      type="search"
+      id="s"
+      name="s"
+      value={Astro.url.searchParams.get('s')}
+    />
+  </form>
+</auto-submit-on-debounced-change>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  function debounce<T extends (...args: any[]) => void>(
+    fn: T,
+    delay: number,
+  ): (...args: Parameters<T>) => void {
+    let timeoutId: NodeJS.Timeout | undefined;
+
+    return (...args: Parameters<T>) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => fn(...args), delay);
+    };
+  }
+
+  window.customElements.define(
+    'auto-submit-on-debounced-change',
+    class AutoSubmitOnDebouncedChange extends WebComponent {
+      parsedCallback() {
+        const input = this.$<HTMLInputElement>('input');
+        const form = this.$<HTMLFormElement>('form');
+
+        this.on(
+          input,
+          'input',
+          debounce(() => {
+            const url = new URL(form.action, window.location.href);
+            url.searchParams.set('s', input.value);
+            document.location = url.toString();
+          }, 1000),
+        );
+      }
+    },
+  );
+</script>

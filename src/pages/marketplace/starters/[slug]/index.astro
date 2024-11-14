@@ -1,0 +1,114 @@
+---
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import { Announce } from '~/components/pluginToolkit/Announce';
+import { Button } from '~/components/Button';
+import { Carousel } from '~/components/Carousel';
+import { Layout } from '~/layouts/Layout';
+import { Markdown } from '~/components/Markdown';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Prose } from '~/components/Prose';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Svg } from '~/components/Svg';
+import { Space } from '~/components/Space';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+
+const { slug } = Astro.params;
+const variables = { slug: slug! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page || !page.readme) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout noFinalCta additionalSeo={page.seo}>
+  <Space top={2}>
+    <Wrapper>
+      <div class={s.grid}>
+        <div class={s.content}>
+          <h3 class={s.smallKicker}>{page.seoH1}</h3>
+          <div class={s.titleWrapper}>
+            <h1 class={s.title}>{page.name}</h1>
+          </div>
+          <h3 class={s.subtitle}>{page.cmsDescription}</h3>
+          <Space top={1}>
+            <div class={s.ctaMobile}>
+              <Button as="a" href="" target="_blank" fs="small" p="small">
+                Start free project!
+              </Button>
+            </div>
+          </Space>
+
+          <Space top={1}>
+            <Carousel buttonsY="50%">
+              <div class={s.slide}>
+                <ResponsiveImage data={page.screenshot.responsiveImage} />
+              </div>
+              <div class={s.slide}>
+                <ResponsiveImage data={page.backendScreenshot.responsiveImage} />
+              </div>
+            </Carousel>
+          </Space>
+
+          <Announce
+            href="/docs/general-concepts/project-starters-and-templates#generate-a-project-starter-button"
+          >
+            <strong>Want to create your own starter project?</strong> Learn how to do that in our documentation!
+          </Announce>
+
+          <Prose>
+            <div class={s.documentation} data-monospace="true">
+              <Markdown of={page.readme} />
+            </div>
+          </Prose>
+        </div>
+
+        <aside class={s.aside}>
+          <div class={s.asideContent}>
+            <MarketplaceCard
+              title={page.name}
+              svgLogoUrl={page.technology.logo.url}
+              background="azure"
+            >
+              {page.cmsDescription}
+              <Fragment slot="below">
+                <div class={s.cardCta}>
+                  <Button as="a" href="" target="_blank" fs="small" p="small">
+                    Start free project!
+                  </Button>
+                </div>
+              </Fragment>
+            </MarketplaceCard>
+
+            <div class={s.publisher}>
+              <h4>Publisher</h4>
+              <article>
+                <div class={s.publisherIcon}>
+                  <Svg name="svg/datocms/icon/color/color_d_icon" />
+                </div>
+                <p>DatoCMS</p>
+              </article>
+            </div>
+
+            <!-- TODO livePreviewUrl? -->
+            <!-- <div class={s.info}>
+              <h4>Preview URL</h4>
+              <a href={page.livePreviewUrl} target="_blank">Visit preview website</a>
+            </div> -->
+
+            <div class={s.info}>
+              <h4>GitHub repo</h4>
+              <a href=`https://www.github.com/${page.githubRepo}` target="_blank">
+                {page.githubRepo.split(':')[0]}
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </Wrapper>
+  </Space>
+</Layout>
