@@ -44,5 +44,5 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
     { includeDrafts },
   );
 
-  return range(2, 2 + Math.ceil(count / perPage)).map((i) => `/product-updates/p/${i}`);
+  return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/product-updates/p/${i}`);
 };

@@ -77,5 +77,5 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
     { includeDrafts },
   );
 
-  return range(2, 2 + Math.ceil(count / perPage)).map((i) => `/blog/p/${i}`);
+  return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/blog/p/${i}`);
 };
