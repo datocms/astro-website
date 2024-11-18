@@ -2,10 +2,10 @@
 import { Hero } from '~/components/Hero';
 import { Layout } from '~/layouts/Layout';
 import { Wrapper } from '~/components/Wrapper';
-import s from './_style.module.css';
 import { query } from './_graphql';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { SingleQuote } from '~/components/quote/SingleQuote';
+import s from './_style.module.css';
 
 const { allPartnerTestimonials, allReviews } = await executeQuery(Astro, query);
 
@@ -31,7 +31,7 @@ const quotes = [...allPartnerTestimonials, ...allReviews].sort((a, b) =>
   </Wrapper>
 
   <div class={s.wrapper}>
-    <masonry-layout maxcolwidth="600" gap="200">
+    <div class={s.quotes}>
       {
         quotes.map((quote) => (
           <div class={s.quote}>
@@ -39,10 +39,6 @@ const quotes = [...allPartnerTestimonials, ...allReviews].sort((a, b) =>
           </div>
         ))
       }
-    </masonry-layout>
+    </div>
   </div>
 </Layout>
-
-<script>
-  import '@appnest/masonry-layout';
-</script>
