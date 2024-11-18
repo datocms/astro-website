@@ -17,6 +17,18 @@ if (!page || techPartners.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const highlighted = techPartners.filter((partner) =>
+  page.highlightedPartners.some((h) => h.slug === partner.slug),
+);
+
+const others = techPartners.filter(
+  (partner) => !page.highlightedPartners.some((h) => h.slug === partner.slug),
+);
+
+const sortedTechPartners = [...highlighted, ...others];
+
+const bkgColors = ['azure', 'pink', 'blue', 'green', 'yellow'] as const;
 ---
 
 <Layout additionalSeo={page.seo}>
@@ -34,9 +46,10 @@ if (!page || techPartners.length === 0) {
     <Space bottom={2}>
       <div class={s.grid}>
         {
-          techPartners.map((partner) => (
+          sortedTechPartners.map((partner, i) => (
             <MarketplaceCard
               title={partner.name}
+              background={bkgColors[i % bkgColors.length]}
               size="small"
               lineClamp={3}
               svgLogoUrl={partner.logo.url}

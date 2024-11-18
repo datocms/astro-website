@@ -9,10 +9,15 @@ export const query = graphql(
         seo: _seoMetaTags {
           ...TagFragment
         }
+        highlightedPartners {
+          slug
+          name
+        }
       }
       techPartners: allTechPartners {
         ...TechPartnerUrlFragment
         name
+        slug
         logo {
           url
         }
