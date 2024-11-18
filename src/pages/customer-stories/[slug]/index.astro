@@ -3,6 +3,10 @@ import {
   render as toPlainText,
   type StructuredTextDocument,
 } from 'datocms-structured-text-to-plain-text';
+import { BlogPostInline } from '~/components/inlineRecords/BlogPostInline';
+import { BlogPostLink } from '~/components/linkToRecords/BlogPostLink';
+import { ChangelogEntryInline } from '~/components/inlineRecords/ChangelogEntryInline';
+import { ChangelogEntryLink } from '~/components/linkToRecords/ChangelogEntryLink';
 import { CodesandboxEmbedBlock } from '~/components/blocks/CodesandboxEmbedBlock';
 import { CtaButton } from '~/components/blocks/CtaButton';
 import { Demo } from '~/components/blocks/Demo';
@@ -23,6 +27,7 @@ import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { filterNodes } from '~/lib/datocms/filterNodes';
+import { intersperse } from '~/lib/intersperse';
 import { isHeading } from 'datocms-structured-text-utils';
 import { query } from './_graphql';
 import { slugify } from '~/lib/slugify';
@@ -78,12 +83,15 @@ const tocItems = filterNodes(
         <p>
           In conversation with
           {
-            post.people.map((person, i) => (
-              <span>
-                {person.name} ({person.title})
-                {i < post.people.length - 2 ? ', ' : i === post.people.length - 2 ? ' and ' : ''}
-              </span>
-            ))
+            intersperse(
+              post.people.map((person) => (
+                <span>
+                  {person.name} ({person.title})
+                </span>
+              )),
+              ', ',
+              ' and ',
+            )
           }
         </p>
       </div>
@@ -104,6 +112,14 @@ const tocItems = filterNodes(
               CodesandboxEmbedBlockRecord: CodesandboxEmbedBlock,
               CtaButtonRecord: CtaButton,
               QuestionAnswerRecord: QuestionAnswer,
+            })}
+            inlineRecordComponents={withAllComponents(post.content.links, {
+              BlogPostRecord: BlogPostInline,
+              ChangelogEntryRecord: ChangelogEntryInline,
+            })}
+            linkToRecordComponents={withAllComponents(post.content.links, {
+              BlogPostRecord: BlogPostLink,
+              ChangelogEntryRecord: ChangelogEntryLink,
             })}
           />
         </Prose>

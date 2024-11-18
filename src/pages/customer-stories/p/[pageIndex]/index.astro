@@ -7,6 +7,7 @@ import { Space } from '~/components/Space';
 import { Wrapper } from '~/components/Wrapper';
 import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { intersperse } from '~/lib/intersperse';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { perPage, query } from './_graphql';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
@@ -42,8 +43,8 @@ if (!page || posts.length === 0) {
   <Hero>
     <Fragment slot="title"><mark>Customer Stories</mark></Fragment>
     <Fragment slot="subtitle">
-      Conversations with customers working on some really cool use cases with DatoCMS</Fragment
-    >
+      Conversations with customers working on some really cool use cases with DatoCMS
+    </Fragment>
   </Hero>
 
   <Wrapper>
@@ -75,17 +76,12 @@ if (!page || posts.length === 0) {
                     </div>
 
                     <p>
-                      With{' '}
-                      {post.people.map((person, i) => (
-                        <span>
-                          {person.name}
-                          {i < post.people.length - 2
-                            ? ', '
-                            : i === post.people.length - 2
-                              ? ' and '
-                              : ''}
-                        </span>
-                      ))}
+                      With
+                      {intersperse(
+                        post.people.map((person) => <span>{person.name}</span>),
+                        ', ',
+                        ' and ',
+                      )}
                     </p>
                   </div>
                 </div>
