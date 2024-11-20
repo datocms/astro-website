@@ -1,19 +1,13 @@
 import type { APIRoute } from 'astro';
-import { readFile } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
 import satori from 'satori';
 import { html } from 'satori-html';
 import sharp from 'sharp';
 import css from 'style-object-to-css-string';
-import { fileURLToPath } from 'url';
 import FullLogo from './_resources/logo.svg?raw';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 export const GET: APIRoute = async ({ url }) => {
-  const colfaxBold = await readFile(
-    resolve(__dirname, '../../../public/fonts/colfax-web-700.woff'),
+  const colfaxBold = await fetch(new URL('/fonts/colfax-web-700.woff', url)).then((res) =>
+    res.arrayBuffer(),
   );
 
   const title = url.searchParams.get('title') || 'General Concepts';
