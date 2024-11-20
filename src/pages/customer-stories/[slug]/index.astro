@@ -1,0 +1,146 @@
+---
+import {
+  render as toPlainText,
+  type StructuredTextDocument,
+} from 'datocms-structured-text-to-plain-text';
+import { BlogPostInline } from '~/components/inlineRecords/BlogPostInline';
+import { BlogPostLink } from '~/components/linkToRecords/BlogPostLink';
+import { ChangelogEntryInline } from '~/components/inlineRecords/ChangelogEntryInline';
+import { ChangelogEntryLink } from '~/components/linkToRecords/ChangelogEntryLink';
+import { CodesandboxEmbedBlock } from '~/components/blocks/CodesandboxEmbedBlock';
+import { CtaButton } from '~/components/blocks/CtaButton';
+import { Demo } from '~/components/blocks/Demo';
+import { Image } from '~/components/blocks/Image';
+import { InternalVideo } from '~/components/blocks/InternalVideo';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { MultipleDemosBlock } from '~/components/blocks/MultipleDemosBlock';
+import { Prose } from '~/components/Prose';
+import { QuestionAnswer } from '~/components/blocks/QuestionAnswer';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { ShowcaseProjectBlock } from '~/components/blocks/ShowcaseProjectBlock';
+import { Table } from '~/components/blocks/Table';
+import { Text } from '~/components/structuredText/Text';
+import { TutorialVideo } from '~/components/blocks/TutorialVideo';
+import { Video } from '~/components/blocks/Video';
+import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { filterNodes } from '~/lib/datocms/filterNodes';
+import { intersperse } from '~/lib/intersperse';
+import { isHeading } from 'datocms-structured-text-utils';
+import { query } from './_graphql';
+import { slugify } from '~/lib/slugify';
+import { withAllComponents } from '~/lib/datocms/structuredText';
+import s from './_style.module.css';
+
+const { slug } = Astro.params;
+const variables = { slug: slug! };
+const { post } = await executeQuery(Astro, query, { variables });
+
+if (!post) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const tocItems = filterNodes(
+  (post.content.value as StructuredTextDocument).document,
+  isHeading,
+).map((heading) => {
+  const innerText = toPlainText(heading)!;
+
+  return {
+    url: `#${slugify(innerText)}`,
+    label: innerText,
+  };
+});
+---
+
+<Layout additionalSeo={post.seo}>
+  <InterstitialTitle
+    seoAnalysis={post.yoastAnalysis}
+    kicker={post.seoH1 || 'Customer Stories'}
+    style="two"
+    mainTitleOfPage
+  >
+    {post.title}
+  </InterstitialTitle>
+
+  <div class={s.postWrapper}>
+    <Wrapper>
+      <div class={s.info}>
+        <div class={s.avatarWrapper}>
+          {
+            post.people.map((author, i) => (
+              <ResponsiveImage
+                pictureClass={s.avatar}
+                data={author.avatar.responsiveImage}
+                pictureStyle={{ zIndex: 10 - i }}
+              />
+            ))
+          }
+        </div>
+        <p>
+          In conversation with
+          {
+            intersperse(
+              post.people.map((person) => (
+                <span>
+                  {person.name} ({person.title})
+                </span>
+              )),
+              ', ',
+              ' and ',
+            )
+          }
+        </p>
+      </div>
+
+      <div id="main-content">
+        <Prose class={s.body}>
+          <Text
+            data={post.content}
+            blockComponents={withAllComponents(post.content.blocks, {
+              ImageRecord: Image,
+              TableRecord: Table,
+              DemoRecord: Demo,
+              MultipleDemosBlockRecord: MultipleDemosBlock,
+              InternalVideoRecord: InternalVideo,
+              TutorialVideoRecord: TutorialVideo,
+              VideoRecord: Video,
+              ShowcaseProjectBlockRecord: ShowcaseProjectBlock,
+              CodesandboxEmbedBlockRecord: CodesandboxEmbedBlock,
+              CtaButtonRecord: CtaButton,
+              QuestionAnswerRecord: QuestionAnswer,
+            })}
+            inlineRecordComponents={withAllComponents(post.content.links, {
+              BlogPostRecord: BlogPostInline,
+              ChangelogEntryRecord: ChangelogEntryInline,
+            })}
+            linkToRecordComponents={withAllComponents(post.content.links, {
+              BlogPostRecord: BlogPostLink,
+              ChangelogEntryRecord: ChangelogEntryLink,
+            })}
+          />
+        </Prose>
+      </div>
+    </Wrapper>
+
+    {
+      tocItems.length > 4 && (
+        <div class={s.tocWrapper}>
+          <div class={s.toc}>
+            <div class={s.tocTitle}>In this story:</div>
+            <ul>
+              {tocItems.map((item) => (
+                <li>
+                  <a href={item.url}>{item.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</Layout>
