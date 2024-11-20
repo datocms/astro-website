@@ -100,7 +100,7 @@ export function FieldReactComponent<
       {label && (
         <label htmlFor={name}>
           {label}
-          {validations && <span className={s.required}>&nbsp;*</span>}
+          {validations && <span className={s.required}> *</span>}
         </label>
       )}
 
