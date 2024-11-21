@@ -17,6 +17,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { Svg } from '~/components/Svg';
 import { OtherPersonasPicker } from '../_OtherPersonasPicker';
 import Illustration from './_Illustration/index.astro';
+import { Wrapper } from '~/components/Wrapper';
 
 const { page, review, integrations } = await executeQuery(Astro, query, {
   variables: { slug: Astro.params.slug! },
@@ -146,7 +147,13 @@ if (!page) {
       </p>
     </Flag>
 
-    {review && <SingleQuote size="big" quote={review} />}
+    {
+      review && (
+        <Wrapper>
+          <SingleQuote quote={review} />
+        </Wrapper>
+      )
+    }
 
     <Flag seoAnalysis={page.yoastAnalysis} style="good">
       <Fragment slot="visual"><Svg name="svg/illustrations/zen-garden" /></Fragment>

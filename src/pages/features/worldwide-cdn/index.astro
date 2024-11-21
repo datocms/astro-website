@@ -25,7 +25,7 @@ if (!page) {
   return notFoundResponse();
 }
 
-const { data: datacenters } = await actions.fastlyApiDatacenters();
+const { data: datacenters } = await Astro.callAction(actions.fastlyApiDatacenters, {});
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
@@ -66,9 +66,11 @@ const { data: datacenters } = await actions.fastlyApiDatacenters();
 
   {
     page.quote && (
-      <Space top={3} bottom={3}>
-        <SingleQuote size="big" quote={page.quote} />
-      </Space>
+      <Wrapper>
+        <Space top={3} bottom={3}>
+          <SingleQuote quote={page.quote} />
+        </Space>
+      </Wrapper>
     )
   }
 
@@ -79,62 +81,60 @@ const { data: datacenters } = await actions.fastlyApiDatacenters();
     <NumbersBlock title="99.99%">Guaranteed uptime</NumbersBlock>
   </Numbers>
 
-  <Wrapper>
-    <Flag style="good">
-      <Fragment slot="visual">
-        <Svg name="svg/illustrations/zen" />
-      </Fragment>
-      <Fragment slot="kicker"></Fragment>
-      <Fragment slot="title">
-        A unified set of <smart>smart, modern APIs</smart> to cover every need</Fragment
-      >
-      <p>
-        DatoCMS offers a coordinated suite of different <strong>APIs and tools</strong> to work seamlessly
-        with the three fundamental blocks of content: <strong>text, images and video</strong>.
-        Everything is built on CDN, <strong>optimized for speed and scalability</strong>, making it
-        the fastest headless CMS.
-      </p>
-      <article>
-        <Bullets style="good">
-          <li>
-            <Svg name="icons/regular/check" />
-            <a href="/features/headless-cms-graphql" title="Headless CMS GraphQL">
-              <span>Content GraphQL API</span>
-            </a>
-          </li>
-          <li>
-            <Svg name="icons/regular/check" />
-            <a href="/features/real-time-api" title="Real-time API">
-              <span>Real-time updates AP</span>
-            </a>
-          </li>
-          <li>
-            <Svg name="icons/regular/check" />
-            <a href="/features/images-api" title="Images API">
-              <span>Images API</span>
-            </a>
-          </li>
-          <li>
-            <Svg name="icons/regular/check" />
-            <a href="/features/video-api" title="Video API">
-              <span>Video API</span>
-            </a>
-          </li>
-        </Bullets>
-      </article>
-    </Flag>
+  <Flag style="good">
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/zen" />
+    </Fragment>
+    <Fragment slot="kicker"></Fragment>
+    <Fragment slot="title">
+      A unified set of <smart>smart, modern APIs</smart> to cover every need</Fragment
+    >
+    <p>
+      DatoCMS offers a coordinated suite of different <strong>APIs and tools</strong> to work seamlessly
+      with the three fundamental blocks of content: <strong>text, images and video</strong>.
+      Everything is built on CDN, <strong>optimized for speed and scalability</strong>, making it
+      the fastest headless CMS.
+    </p>
+    <article>
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/headless-cms-graphql" title="Headless CMS GraphQL">
+            <span>Content GraphQL API</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/real-time-api" title="Real-time API">
+            <span>Real-time updates AP</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/images-api" title="Images API">
+            <span>Images API</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/video-api" title="Video API">
+            <span>Video API</span>
+          </a>
+        </li>
+      </Bullets>
+    </article>
+  </Flag>
 
-    <Flag style="good">
-      <Fragment slot="visual"><Svg name="svg/illustrations/corona2" /></Fragment>
-      <Fragment slot="kicker">Is DatoCMS the fastest headless CMS? </Fragment>
-      <Fragment slot="title">
-        Obsessed by <mark>Performance and speed</mark>
-      </Fragment>
-      <p>
-        Being optimized for lazy image serving, video streaming, and depth-first content delivery,
-        DatoCMS is surely one of the <strong>fastest headless CMSs</strong>. On top of that
-        performance is one of our top day-by-day concerns.
-      </p>
-    </Flag>
-  </Wrapper>
+  <Flag style="good">
+    <Fragment slot="visual"><Svg name="svg/illustrations/corona2" /></Fragment>
+    <Fragment slot="kicker">Is DatoCMS the fastest headless CMS? </Fragment>
+    <Fragment slot="title">
+      Obsessed by <mark>Performance and speed</mark>
+    </Fragment>
+    <p>
+      Being optimized for lazy image serving, video streaming, and depth-first content delivery,
+      DatoCMS is surely one of the <strong>fastest headless CMSs</strong>. On top of that
+      performance is one of our top day-by-day concerns.
+    </p>
+  </Flag>
 </Layout>

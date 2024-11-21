@@ -19,27 +19,27 @@ const { type, kicker } = Astro.props;
     <title>Success | {kicker}</title>
   </Fragment>
 
-  <Wrapper>
-    <Hero>
-      <Fragment slot="kicker">{kicker}</Fragment>
-      <Fragment slot="title"
-        >{
-          type === 'success' ? (
-            Astro.slots.has('successTitle') ? (
-              <slot name="successTitle" />
-            ) : (
-              <>
-                <mark>Thank you</mark> for reaching out!
-              </>
-            )
+  <Hero>
+    <Fragment slot="kicker">{kicker}</Fragment>
+    <Fragment slot="title"
+      >{
+        type === 'success' ? (
+          Astro.slots.has('successTitle') ? (
+            <slot name="successTitle" />
           ) : (
             <>
-              <mark>Ouch!</mark> An error occurred...
+              <mark>Thank you</mark> for reaching out!
             </>
           )
-        }</Fragment
-      >
-    </Hero>
+        ) : (
+          <>
+            <mark>Ouch!</mark> An error occurred...
+          </>
+        )
+      }</Fragment
+    >
+  </Hero>
+  <Wrapper>
     <Prose class={s.result}>
       {
         Astro.slots.has('default') ? (

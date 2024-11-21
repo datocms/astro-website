@@ -16,10 +16,9 @@ interface Props {
     | (FragmentOf<typeof ReviewQuoteFragment> & {
         __typename: 'ReviewRecord';
       });
-  size: 'big' | 'medium' | 'small';
 }
 
-const { quote: maskedQuote, size } = Astro.props;
+const { quote: maskedQuote } = Astro.props;
 
 const quote =
   maskedQuote.__typename === 'PartnerTestimonialRecord'
@@ -27,42 +26,40 @@ const quote =
     : readFragment(ReviewQuoteFragment, maskedQuote);
 ---
 
-<div class={s.root} data-size={size}>
-  <div class={s.quoteInner}>
-    {
-      quote.__typename === 'PartnerTestimonialRecord' ? (
-        <MaybeLink
-          href={quote.partner ? buildUrlForPartner(quote.partner) : undefined}
-          class={s.wrapper}
-        >
-          <p class={s.quote}>
-            <InlineText data={quote.quote} />
-          </p>
+<div class={s.root}>
+  {
+    quote.__typename === 'PartnerTestimonialRecord' ? (
+      <MaybeLink
+        href={quote.partner ? buildUrlForPartner(quote.partner) : undefined}
+        class={s.wrapper}
+      >
+        <p class={s.quote}>
+          <InlineText data={quote.quote} />
+        </p>
 
-          <div class={s.content}>
-            <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
-            <div class={s.authorRole}>
-              <div class={s.name}>{quote.name}</div>
-              <div class={s.role}>{quote.role}</div>
-              <div class={s.company}>{quote.partner.name}</div>
-            </div>
+        <div class={s.content}>
+          <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
+          <div class={s.authorRole}>
+            <div class={s.name}>{quote.name}</div>
+            <div class={s.role}>{quote.role}</div>
+            <div class={s.company}>{quote.partner.name}</div>
           </div>
-        </MaybeLink>
-      ) : (
-        <article class={s.wrapper}>
-          <p class={s.quote}>
-            “<InlineText data={quote.quote} />”
-          </p>
+        </div>
+      </MaybeLink>
+    ) : (
+      <article class={s.wrapper}>
+        <p class={s.quote}>
+          “<InlineText data={quote.quote} />”
+        </p>
 
-          <div class={s.content}>
-            <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
-            <div class={s.authorRole}>
-              <div class={s.name}>{quote.name}</div>
-              <div class={s.role}>{quote.role}</div>
-            </div>
+        <div class={s.content}>
+          <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
+          <div class={s.authorRole}>
+            <div class={s.name}>{quote.name}</div>
+            <div class={s.role}>{quote.role}</div>
           </div>
-        </article>
-      )
-    }
-  </div>
+        </div>
+      </article>
+    )
+  }
 </div>

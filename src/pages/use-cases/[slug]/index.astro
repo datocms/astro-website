@@ -12,6 +12,7 @@ import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Space } from '~/components/Space';
 import { QuotesCarousel } from '~/components/quote/QuotesCarousel';
 import { Svg } from '~/components/Svg';
+import { Prose } from '~/components/Prose';
 import { Checks } from '~/components/Checks';
 import { InlineText } from '~/components/structuredText/InlineText';
 import { Text } from '~/components/structuredText/Text';
@@ -67,7 +68,7 @@ if (!page) {
       <InterstitialTitle style="three">
         <InlineText data={page.quotesHeader} />
       </InterstitialTitle>
-      <QuotesCarousel quotes={page.quotes} animated={false} />
+      <QuotesCarousel quotes={page.quotes} />
     </Space>
   </div>
 
@@ -76,7 +77,9 @@ if (!page) {
       <div class={s.starterBox}>
         <div class={s.starterBoxText}>
           <h2><InlineText data={page.starterTitle} /></h2>
-          <Text data={page.starterDescription} />
+          <Prose>
+            <Text data={page.starterDescription} />
+          </Prose>
           <Space top={1}>
             <Button as="a" p="small" s="purple" href={page.starterLink}>Check it out</Button>
           </Space>
@@ -124,7 +127,7 @@ if (!page) {
             </strong>{' '}
             on the fence about whether or not DatoCMS is for you, you’re probably…
           </p>
-          <Svg name="icons/other/arrow" />
+          <Svg name="svg/illustrations/arrow" />
         </div>
       </div>
     </Wrapper>
@@ -182,7 +185,9 @@ if (!page) {
       <div class={s.successStory}>
         <div class={s.successStoryText}>
           <h2><InlineText data={page.successStoryHeader} /></h2>
-          <Text data={page.successStorySummary} />
+          <Prose>
+            <Text data={page.successStorySummary} />
+          </Prose>
           <Space top={1}>
             <Button as="a" p="small" s="purple" href={buildUrlFromGql(page.caseStudy)}>
               Check it out

@@ -14,15 +14,29 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import ky from 'ky';
+import { type RawManifest, normalizeManifest } from './_utils';
 
 const { slug } = Astro.params;
 const variables = { slug: slug! };
 const { page } = await executeQuery(Astro, query, { variables });
 
-if (!page || !page.readme) {
+if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const parts = page.githubRepo.split(':');
+
+if (parts.length === 1) {
+  parts.push('master');
+}
+
+const manifest = normalizeManifest(
+  await ky<RawManifest>(`https://raw.githubusercontent.com/${parts.join('/')}/datocms.json`).json(),
+  parts[0]!,
+  parts[1]!,
+);
 ---
 
 <Layout noFinalCta additionalSeo={page.seo}>
@@ -60,11 +74,15 @@ if (!page || !page.readme) {
             <strong>Want to create your own starter project?</strong> Learn how to do that in our documentation!
           </Announce>
 
-          <Prose>
-            <div class={s.documentation} data-monospace="true">
-              <Markdown of={page.readme} />
-            </div>
-          </Prose>
+          {
+            page.readme && (
+              <Prose>
+                <div class={s.documentation} data-monospace="true">
+                  <Markdown of={page.readme} />
+                </div>
+              </Prose>
+            )
+          }
         </div>
 
         <aside class={s.aside}>
@@ -94,11 +112,16 @@ if (!page || !page.readme) {
               </article>
             </div>
 
-            <!-- TODO livePreviewUrl? -->
-            <!-- <div class={s.info}>
-              <h4>Preview URL</h4>
-              <a href={page.livePreviewUrl} target="_blank">Visit preview website</a>
-            </div> -->
+            {
+              manifest.livePreviewUrl && (
+                <div class={s.info}>
+                  <h4>Preview URL</h4>
+                  <a href={manifest.livePreviewUrl} target="_blank">
+                    Visit preview website
+                  </a>
+                </div>
+              )
+            }
 
             <div class={s.info}>
               <h4>GitHub repo</h4>

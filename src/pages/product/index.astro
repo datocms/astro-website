@@ -11,7 +11,6 @@ import { IntegrationsBanner } from '~/components/IntegrationsBanner';
 import { QuotesCarousel } from '~/components/quote/QuotesCarousel';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Space } from '~/components/Space';
-import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
@@ -31,20 +30,18 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
-  <Wrapper>
-    <Hero>
-      <Fragment slot="title">
-        <InlineText data={page.header} />
-      </Fragment>
-      <Fragment slot="subtitle">
-        <InlineText data={page.subheader} />
-      </Fragment>
-      <div class={s.buttonContainer}>
-        <Button fs="big" as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
-        <Button fs="big" as="a" s="invert" href="/contact">Contact sales</Button>
-      </div>
-    </Hero>
-  </Wrapper>
+  <Hero>
+    <Fragment slot="title">
+      <InlineText data={page.header} />
+    </Fragment>
+    <Fragment slot="subtitle">
+      <InlineText data={page.subheader} />
+    </Fragment>
+    <div class={s.buttonContainer}>
+      <Button fs="big" as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
+      <Button fs="big" as="a" s="invert" href="/contact">Contact sales</Button>
+    </div>
+  </Hero>
 
   {
     page.pillars.map((pillar, index) => {
@@ -119,7 +116,7 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
   <div class={s.testimonials}>
     <h2 class={s.title}>What our customers say...</h2>
     <Space top={2} bottom={2}>
-      <QuotesCarousel quotes={page.quotes} animated={true} />
+      <QuotesCarousel quotes={page.quotes} />
     </Space>
   </div>
 

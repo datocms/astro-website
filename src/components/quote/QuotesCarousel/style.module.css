@@ -1,33 +1,36 @@
-@keyframes cambio {
+@keyframes scroll {
   from {
     transform: translateX(0);
   }
+
   to {
-    transform: translateX(calc(min(450px, 90vw) * -1 * var(--items-count)));
+    transform: translateX(calc(-1px * var(--scroll-width)));
   }
 }
 
 .quotes {
   overflow: hidden;
+}
 
-  &.isAnimated {
-    justify-content: start;
+.quotesInner {
+  display: flex;
+  align-items: flex-start;
 
-    .quotesInner {
-      animation: cambio calc(10s * var(--items-count)) linear infinite reverse;
+  .quotes[data-animated] & {
+    animation: scroll calc(1s * var(--scroll-width) / 30) linear infinite alternate;
 
-      @media screen and (width > 900px) {
-        animation: cambio calc(10s * var(--items-count)) linear infinite reverse;
-      }
-
-      &:hover {
-        animation-play-state: paused;
-      }
+    &:hover {
+      animation-play-state: paused;
     }
   }
 }
 
-.quotes:not(.isAnimated) {
+.quote {
+  padding: 0 max(3vw, 25px);
+  min-width: max(280px, 27vw);
+}
+
+.quotes:not([data-animated]) {
   display: flex;
   justify-content: center;
 
@@ -52,11 +55,4 @@
       display: block;
     }
   }
-}
-
-.quotesInner {
-  display: flex;
-  align-items: flex-start;
-  justify-items: center;
-  position: relative;
 }

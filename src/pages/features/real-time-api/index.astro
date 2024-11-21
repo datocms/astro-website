@@ -10,10 +10,10 @@ import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import { VideoPlayer } from '~/components/VideoPlayer';
-import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
+import { Wrapper } from '~/components/Wrapper';
 
 const path = Astro.url.pathname;
 const slug = path.split('/').pop() || '';
@@ -52,96 +52,99 @@ if (!page || !page.video) {
 
   {
     page.quote && (
-      <Space top={3} bottom={3}>
-        <SingleQuote size="big" quote={page.quote} />
-      </Space>
+      <Wrapper>
+        <Space top={3} bottom={3}>
+          <SingleQuote quote={page.quote} />
+        </Space>
+      </Wrapper>
     )
   }
 
-  <Wrapper>
-    <Flag>
-      <Fragment slot="visual">
-        <RealtimeUpdatesDemo client:load />
-      </Fragment>
-      <Fragment slot="kicker">Live real-time API </Fragment>
-      <Fragment slot="title">Need to <mark>cover live events</mark> as they happen?</Fragment>
-      <p>
-        The same API used to preview draft content can also be applied to offer
-        <strong> real-time updates to your website's final visitors </strong>. Our infrastructure
-        can <strong>easily handle thousands of live users</strong> with multiple updates per minute.
-      </p>
-      <p>
-        <Button
-          as="a"
-          fs="small"
-          p="small"
-          s="invert"
-          href="/marketplace/starters/next-js-event-coverage-liveblog"
-          title="Next.js real-time"
-        >
-          Try the Live-blog demo for Next.js
-        </Button>
-      </p>
-    </Flag>
+  <Flag>
+    <Fragment slot="visual">
+      <RealtimeUpdatesDemo client:load />
+    </Fragment>
+    <Fragment slot="kicker">Live real-time API </Fragment>
+    <Fragment slot="title">Need to <mark>cover live events</mark> as they happen?</Fragment>
+    <p>
+      The same API used to preview draft content can also be applied to offer
+      <strong> real-time updates to your website's final visitors </strong>. Our infrastructure can <strong
+        >easily handle thousands of live users</strong
+      > with multiple updates per minute.
+    </p>
+    <p>
+      <Button
+        as="a"
+        fs="small"
+        p="small"
+        s="invert"
+        href="/marketplace/starters/next-js-event-coverage-liveblog"
+        title="Next.js real-time"
+      >
+        Try the Live-blog demo for Next.js
+      </Button>
+    </p>
+  </Flag>
 
-    <Flag style="good">
-      <Fragment slot="visual">
-        <Svg name="svg/illustrations/live" />
-      </Fragment>
-      <Fragment slot="kicker">Real-time GraphQL API</Fragment>
-      <Fragment slot="title">
-        GraphQL and Server-Sent Events, to deliver the <strong>best developer ergonomic</strong>
-      </Fragment>
-      <p>
-        The Real-time Updates API uses <em>Server-Sent Events</em>, which is a protocol supported
-        natively from all modern browsers, to
-        <strong>transform your regular GraphQL into streaming subscriptions</strong>. Using our
-        React and Vue libraries you can <strong>get started in literally seconds</strong>.
-      </p>
-    </Flag>
+  <Flag style="good">
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/live" />
+    </Fragment>
+    <Fragment slot="kicker">Real-time GraphQL API</Fragment>
+    <Fragment slot="title">
+      GraphQL and Server-Sent Events, to deliver the <strong>best developer ergonomic</strong>
+    </Fragment>
+    <p>
+      The Real-time Updates API uses <em>Server-Sent Events</em>, which is a protocol supported
+      natively from all modern browsers, to
+      <strong>transform your regular GraphQL into streaming subscriptions</strong>. Using our React
+      and Vue libraries you can <strong>get started in literally seconds</strong>.
+    </p>
+  </Flag>
 
-    <Flag style="good">
-      <Fragment slot="visual">
-        <Svg name="svg/illustrations/zen" />
-      </Fragment>
-      <Fragment slot="kicker">APIs + Worldwide CDN</Fragment>
-      <Fragment slot="title">
-        A complete set of <mark>smart, modern APIs</mark>
-      </Fragment>
-      <p>
-        DatoCMS does not only offer a powerful real-time API but a full coordinated suite of
-        different <strong>APIs and tools</strong> to work seamlessly with the three fundamental blocks
-        of content: <strong>text, images and video</strong>. Everything is built on CDN,
-        <strong>optimized for speed and scalability</strong>.
-      </p>
-      <article>
-        <Bullets style="good">
-          <li>
-            <Svg name="icons/regular/check" />
-            <a href="/features/images-api" title="Images API">
-              <span>Images API</span>
-            </a>
-          </li>
-          <li>
-            <Svg name="icons/regular/check" />
-            <a href="/features/video-api" title="Video API">
-              <span>Video API</span>
-            </a>
-          </li>
-          <li>
-            <Svg name="icons/regular/check" />
-            <a href="/features/worldwide-cdn" title="Fastest headless CMS CDN">
-              <span>Worldwide CDN</span>
-            </a>
-          </li>
-          <li>
-            <Svg name="icons/regular/check" />
-            <a href="/features/headless-cms-graphql" title="Headless CMS GraphQL">
-              <span>Content GraphQL API</span>
-            </a>
-          </li>
-        </Bullets>
-      </article>
-    </Flag>
-  </Wrapper>
+  <Flag style="good">
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/zen" />
+    </Fragment>
+    <Fragment slot="kicker">APIs + Worldwide CDN</Fragment>
+    <Fragment slot="title">
+      A complete set of <mark>smart, modern APIs</mark>
+    </Fragment>
+    <p>
+      DatoCMS does not only offer a powerful real-time API but a full coordinated suite of different <strong
+        >APIs and tools</strong
+      > to work seamlessly with the three fundamental blocks of content: <strong
+        >text, images and video</strong
+      >. Everything is built on CDN,
+      <strong>optimized for speed and scalability</strong>.
+    </p>
+    <article>
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/images-api" title="Images API">
+            <span>Images API</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/video-api" title="Video API">
+            <span>Video API</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/worldwide-cdn" title="Fastest headless CMS CDN">
+            <span>Worldwide CDN</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/headless-cms-graphql" title="Headless CMS GraphQL">
+            <span>Content GraphQL API</span>
+          </a>
+        </li>
+      </Bullets>
+    </article>
+  </Flag>
 </Layout>

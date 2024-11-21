@@ -1,7 +1,6 @@
 ---
 import { Hero } from '~/components/Hero';
 import { LogosBar } from '~/components/LogosBar';
-import Wrapper from '~/components/Wrapper/ReactComponent';
 import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
@@ -9,6 +8,7 @@ import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse
 import { Space } from '~/components/Space';
 import { TopicsPicker, type Topic } from './_TopicsPicker';
 import { render as renderAsHtmlString } from 'datocms-structured-text-to-html-string';
+import { Wrapper } from '~/components/Wrapper';
 
 const { topics } = await executeQuery(Astro, query);
 
@@ -23,15 +23,16 @@ if (topics.length === 0) {
     <title>Support page</title>
   </Fragment>
 
+  <Hero>
+    <Fragment slot="kicker">Support page</Fragment>
+    <Fragment slot="title"
+      >Got issues?
+      <br />
+      <mark>We&apos;re here to help!</mark></Fragment
+    >
+  </Hero>
+
   <Wrapper>
-    <Hero>
-      <Fragment slot="kicker">Support page</Fragment>
-      <Fragment slot="title"
-        >Got issues?
-        <br />
-        <mark>We&apos;re here to help!</mark></Fragment
-      >
-    </Hero>
     <TopicsPicker
       topics={topics.map<Topic>((topic) => ({
         ...topic,
@@ -43,6 +44,7 @@ if (topics.length === 0) {
       client:load
     />
   </Wrapper>
+
   <Space top={3}>
     <LogosBar
       title="We power experiences for over half a billion users"

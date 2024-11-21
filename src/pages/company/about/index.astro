@@ -12,6 +12,7 @@ import { Hero } from '~/components/Hero';
 import { Flag } from '~/components/Flag';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
 
 const { page, members, review1, review2 } = await executeQuery(Astro, query);
 
@@ -45,84 +46,94 @@ if (!page || members.length === 0 || !review1 || !review2) {
     />
   </Space>
 
+  <Flag style="good">
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/team" />
+    </Fragment>
+    <Fragment slot="title">
+      Designed by an agency <mark>with your needs in mind</mark>
+    </Fragment>
+    <p>
+      DatoCMS started in 2015 as an internal tool for our italian{' '}
+      <a href="https://www.leanpanda.com/" target="_blank">web agency</a>.
+      <strong>
+        We understand the needs of your clients and partners because they are just like ours.
+      </strong>
+      We know what worries you, because we too choke up the night before that deploy.
+    </p>
+    <p>
+      We don’t follow trends and we keep our things simple; we design every feature from the
+      practical, real-world needs we see every day in our job.
+    </p>
+    <p>
+      Since 2019, DatoCMS is an independent, profitable company with a fully dedicated team behind
+      it, committed in giving you the best headless CMS in the market.
+    </p>
+  </Flag>
+
   <Wrapper>
-    <Flag style="good">
-      <Fragment slot="visual">
-        <Svg name="svg/illustrations/team" />
-      </Fragment>
-      <Fragment slot="title">
-        Designed by an agency <mark>with your needs in mind</mark>
-      </Fragment>
-      <p>
-        DatoCMS started in 2015 as an internal tool for our italian{' '}
-        <a href="https://www.leanpanda.com/" target="_blank">web agency</a>.
-        <strong>
-          We understand the needs of your clients and partners because they are just like ours.
-        </strong>
-        We know what worries you, because we too choke up the night before that deploy.
-      </p>
-      <p>
-        We don’t follow trends and we keep our things simple; we design every feature from the
-        practical, real-world needs we see every day in our job.
-      </p>
-      <p>
-        Since 2019, DatoCMS is an independent, profitable company with a fully dedicated team behind
-        it, committed in giving you the best headless CMS in the market.
-      </p>
-    </Flag>
-
     <Space top={3}>
-      <SingleQuote quote={review1} size="big" />
-    </Space>
-
-    <Space top={3}>
-      <Flag style="good">
-        <Fragment slot="visual">
-          <Svg name="svg/illustrations/growing" />
-        </Fragment>
-        <Fragment slot="title">
-          Slowly and <mark>steadily</mark>
-        </Fragment>
-        <p>
-          You can call us a bootstrap company, big enough to serve customers all over the world,
-          small enough for a Friday evening spritz together.
-        </p>
-        <p>
-          <strong>We’re healthy, happy and — excuse our language — profitable.</strong>
-        </p>
-        <p>
-          We don’t want venture capital funding. We don’t have an outbound sales team. We like dogs
-          more than unicorns, sharing instead of disrupting and we’re here to stay. We owe only our
-          best efforts to you and ourselves. We've put down our roots and we want them to grow.
-          Slowly but steadily.
-        </p>
-      </Flag>
+      <SingleQuote quote={review1} />
     </Space>
   </Wrapper>
 
   <Space top={3}>
-    <div class={s.membersWrapper}>
-      <div class={s.members}>
-        {
-          members.map((member) => (
-            <div class={s.member}>
-              <div class={s.memberImage}>
-                <ResponsiveImage data={member.avatar.responsiveImage} />
+    <Flag style="good">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/growing" />
+      </Fragment>
+      <Fragment slot="title">
+        Slowly and <mark>steadily</mark>
+      </Fragment>
+      <p>
+        You can call us a bootstrap company, big enough to serve customers all over the world, small
+        enough for a Friday evening spritz together.
+      </p>
+      <p>
+        <strong>We’re healthy, happy and — excuse our language — profitable.</strong>
+      </p>
+      <p>
+        We don’t want venture capital funding. We don’t have an outbound sales team. We like dogs
+        more than unicorns, sharing instead of disrupting and we’re here to stay. We owe only our
+        best efforts to you and ourselves. We've put down our roots and we want them to grow. Slowly
+        but steadily.
+      </p>
+    </Flag>
+  </Space>
+
+  <Space top={3}>
+    <InterstitialTitle style="three">
+      The Team
+      <Fragment slot="subtitle">
+        We keep it simple: build great products and take amazing care of our customers. That's all
+        we do, and that's how we stay small and strong
+      </Fragment>
+      <Fragment slot="below"> </Fragment>
+    </InterstitialTitle>
+    <Space top={1}>
+      <div class={s.membersWrapper}>
+        <div class={s.members}>
+          {
+            members.map((member) => (
+              <div class={s.member}>
+                <div class={s.memberImage}>
+                  <ResponsiveImage data={member.avatar.responsiveImage} />
+                </div>
+                <div class={s.memberInfo}>
+                  <h3>{member.name}</h3>
+                  <p>{member.role}</p>
+                </div>
               </div>
-              <div class={s.memberInfo}>
-                <h3>{member.name}</h3>
-                <p>{member.role}</p>
-              </div>
-            </div>
-          ))
-        }
+            ))
+          }
+        </div>
       </div>
-    </div>
+    </Space>
   </Space>
 
   <Wrapper>
     <Space top={3}>
-      <SingleQuote quote={review2} size="big" />
+      <SingleQuote quote={review2} />
     </Space>
   </Wrapper>
 </Layout>

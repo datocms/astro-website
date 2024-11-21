@@ -13,24 +13,43 @@ interface Props {
         __typename: 'ReviewRecord';
       })
   >;
-  animated?: boolean;
 }
 
-const { animated, quotes } = Astro.props;
-
-function times(n: number): number[] {
-  return Array.from({ length: n }, (_, i) => i);
-}
-
-const repeatCount = animated ? (quotes.length / 4 > 1 ? 2 : 3) : 1;
+const { quotes } = Astro.props;
 ---
 
-<div class:list={[s.quotes, animated && s.isAnimated]} style={`--items-count: ${quotes.length}`}>
-  <div class={s.quotesInner}>
-    {
-      times(repeatCount).map(() =>
-        quotes.map((quote) => <SingleQuote size="big" quote={quote} size="small" />),
-      )
-    }
+<quotes-carousel>
+  <div class={s.quotes} style={`--items-count: ${quotes.length}`} data-container>
+    <div class={s.quotesInner} data-scroller>
+      {
+        quotes.map((quote) => (
+          <div class={s.quote}>
+            <SingleQuote quote={quote} />
+          </div>
+        ))
+      }
+    </div>
   </div>
-</div>
+</quotes-carousel>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'quotes-carousel',
+    class CloneButtonForm extends WebComponent {
+      parsedCallback() {
+        const container = this.$('[data-container]');
+        const scroller = this.$('[data-scroller]');
+
+        if (container.scrollWidth !== container.clientWidth) {
+          container.setAttribute('data-animated', 'true');
+          container.style.setProperty(
+            '--scroll-width',
+            `${scroller.scrollWidth - container.clientWidth}`,
+          );
+        }
+      }
+    },
+  );
+</script>

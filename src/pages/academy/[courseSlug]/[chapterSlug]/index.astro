@@ -56,13 +56,11 @@ const sections = filterNodes(
 ---
 
 <Layout additionalSeo={chapter.seo}>
-  <Wrapper>
-    <InterstitialTitle style="one" mainTitleOfPage>
-      <Fragment slot="kicker"><a href="/academy">DatoCMS Academy</a></Fragment>
-      {chapter.title}
-      <Fragment slot="subtitle"><Text data={course.introduction} /></Fragment>
-    </InterstitialTitle>
-  </Wrapper>
+  <InterstitialTitle style="one" mainTitleOfPage>
+    <Fragment slot="kicker"><a href="/academy">DatoCMS Academy</a></Fragment>
+    {chapter.title}
+    <Fragment slot="subtitle"><Text data={course.introduction} /></Fragment>
+  </InterstitialTitle>
   <Space top={1}>
     <div class={s.contentWrapper}>
       <div class={s.tocWrapper}>
@@ -115,33 +113,39 @@ const sections = filterNodes(
           />
         </Prose>
 
-        <div class={s.prevNext}>
-          <div class={s.prev}>
-            {
-              prevChapter && (
-                <>
-                  <div class={s.prevNextTitle}>Previous chapter</div>
-                  <div class={s.prevNextLink}>
-                    <a href={buildUrlForAcademyChapter(prevChapter)}>&larr; {prevChapter.title}</a>
-                  </div>
-                </>
-              )
-            }
-          </div>
+        <Wrapper>
+          <div class={s.prevNext}>
+            <div class={s.prev}>
+              {
+                prevChapter && (
+                  <>
+                    <div class={s.prevNextTitle}>Previous chapter</div>
+                    <div class={s.prevNextLink}>
+                      <a href={buildUrlForAcademyChapter(prevChapter)}>
+                        &larr; {prevChapter.title}
+                      </a>
+                    </div>
+                  </>
+                )
+              }
+            </div>
 
-          <div class={s.next}>
-            {
-              nextChapter && (
-                <>
-                  <div class={s.prevNextTitle}>Next chapter</div>
-                  <div class={s.prevNextLink}>
-                    <a href={buildUrlForAcademyChapter(nextChapter)}>{nextChapter.title} &rarr;</a>
-                  </div>
-                </>
-              )
-            }
+            <div class={s.next}>
+              {
+                nextChapter && (
+                  <>
+                    <div class={s.prevNextTitle}>Next chapter</div>
+                    <div class={s.prevNextLink}>
+                      <a href={buildUrlForAcademyChapter(nextChapter)}>
+                        {nextChapter.title} &rarr;
+                      </a>
+                    </div>
+                  </>
+                )
+              }
+            </div>
           </div>
-        </div>
+        </Wrapper>
       </div>
     </div>
   </Space>
