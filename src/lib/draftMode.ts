@@ -1,7 +1,7 @@
 import type { AstroGlobal } from 'astro';
 
-export const draftModeHostname = 'datocms-website-1226198adc87.herokuapp.com';
-export const productionHostname = 'datocms-website.global.ssl.fastly.net';
+export const draftModeHostname = 'astro-preview.datocms.com';
+export const productionHostname = 'www2.datocms.com';
 
 export function isDraftModeEnabled(requestOrAstro: Request | AstroGlobal) {
   const url =
