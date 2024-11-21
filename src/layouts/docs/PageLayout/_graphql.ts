@@ -17,9 +17,14 @@ import { GroupLayoutFragment } from '../GroupLayout/_graphql';
 export const PageLayoutFragment = graphql(
   /* GraphQL */ `
     fragment PageLayoutFragment on DocPageRecord {
+      id
       title
       _seoMetaTags {
         ...TagFragment
+      }
+      seo {
+        title
+        description
       }
       parents: _allReferencingDocGroups {
         name
