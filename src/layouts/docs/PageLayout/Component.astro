@@ -5,7 +5,7 @@ import { Image } from '~/components/blocks/Image';
 import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { CloneButtonForm } from '~/components/docs/blocks/CloneButtonForm';
 import { Demo } from '~/components/blocks/Demo';
-import { ogCardUrl } from '~/lib/ogCardUrl';
+import { overrideSeo, changeOgCard } from '~/lib/datocms/seo';
 import { DeployButtonForm } from '~/components/docs/blocks/DeployButtonForm';
 import { DocCallout } from '~/components/docs/blocks/DocCallout';
 import { MultipleDemosBlock } from '~/components/blocks/MultipleDemosBlock';
@@ -59,18 +59,19 @@ const tocGroups = [
   ...tocGroupsFromPageContent,
   ...additionalTocGroups,
 ];
-
-const ogImageUrl = ogCardUrl({
-  kicker: group ? `Documentation: ${group.name}` : 'DatoCMS Docs',
-  title: page.seo?.title || page.title,
-  pills: tocGroups.flatMap((group) => group.entries).map((entry) => entry.label),
-  excerpt: page.seo?.description,
-});
 ---
 
 <GroupLayout
   group={maskedGroup}
-  additionalSeo={page._seoMetaTags}
+  additionalSeo={overrideSeo(
+    page._seoMetaTags,
+    changeOgCard({
+      kicker: group ? `Documentation: ${group.name}` : 'DatoCMS Docs',
+      title: page.seo?.title || page.title,
+      pills: tocGroups.flatMap((group) => group.entries).map((entry) => entry.label),
+      excerpt: page.seo?.description,
+    }),
+  )}
   sidebarItemsIfNoPagesOrSectionsInGroup={buildItemsFromHeadings(page.content.value)}
   additionalSidebarItems={additionalSidebarItems}
 >
