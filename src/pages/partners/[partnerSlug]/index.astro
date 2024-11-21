@@ -17,6 +17,13 @@ import { query, extraQuery } from './_graphql';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 import { PluginCard } from '~/pages/marketplace/_sub/PluginCard';
+import {
+  overrideSeo,
+  replaceDescription,
+  replacePageTitle,
+  replaceShareTitle,
+} from '~/lib/datocms/seo';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 
 const { partnerSlug } = Astro.params;
 const variables = { partnerSlug: partnerSlug! };
@@ -32,7 +39,14 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
 });
 ---
 
-<Layout additionalSeo={page._seoMetaTags}>
+<Layout
+  additionalSeo={overrideSeo(
+    page._seoMetaTags,
+    replacePageTitle(`${page.name} | DatoCMS Partners`),
+    replaceShareTitle(`DatoCMS Partner: ${page.name}`),
+    replaceDescription(toPlainText(page.shortDescription)!),
+  )}
+>
   <InterstitialTitle style="two" bigSubtitle={true} mainTitleOfPage>
     <Fragment slot="kicker"><a href="/partner-program">DatoCMS Agency Partner</a></Fragment>
     <Fragment slot="subtitle">

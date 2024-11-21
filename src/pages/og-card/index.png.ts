@@ -3,24 +3,10 @@ import satori from 'satori';
 import { html } from 'satori-html';
 import sharp from 'sharp';
 import css from 'style-object-to-css-string';
-import { graphql } from '~/lib/datocms/graphql';
+import { ogCardHeight, ogCardWidth } from '~/lib/datocms/seo';
 import type { OgCardData } from '~/lib/ogCardUrl';
 import { invalidRequestResponse } from '~/pages/api/_utils';
 import FullLogo from './_resources/logo.svg?raw';
-
-const query = graphql(/* GraphQL */ `
-  query OgImage($id: ItemId!) {
-    page: docPage(filter: { id: { eq: $id } }) {
-      title
-      parents: _allReferencingDocGroups {
-        name
-      }
-      content {
-        value
-      }
-    }
-  }
-`);
 
 function filterPills(pills: string[]): string[] {
   const result: string[] = [];
@@ -81,7 +67,6 @@ export const GET: APIRoute = async ({ url }) => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          fontWeight: 'bold',
           gap: '20px',
         })}"
       >
@@ -92,6 +77,7 @@ export const GET: APIRoute = async ({ url }) => {
             letterSpacing: '-0.04em',
             textTransform: 'uppercase',
             display: 'flex',
+            fontWeight: 'bold',
           })}"
         >
           ${kicker}
@@ -100,26 +86,27 @@ export const GET: APIRoute = async ({ url }) => {
           style="${css({
             fontSize: `${title.length < 40 ? 90 : 70}px`,
             letterSpacing: '-0.06em',
-            lineHeight: '1',
+            lineHeight: '0.9',
             display: 'flex',
+            fontWeight: 'bold',
           })}"
         >
           ${title}
         </div>
+        ${excerpt
+          ? `
+            <div
+              style="${css({
+                fontSize: '28px',
+                color: '#71788a',
+                letterSpacing: '-0.04em',
+              })}"
+            >
+              ${excerpt}
+            </div>
+          `
+          : ''}
       </div>
-      ${excerpt
-        ? `
-          <div
-            style="${css({
-              fontSize: '28px',
-              color: '#71788a',
-              letterSpacing: '-0.04em',
-            })}"
-          >
-            ${excerpt}
-          </div>
-        `
-        : ''}
       ${pills && pills.length > 1
         ? `
           <div
@@ -165,8 +152,8 @@ export const GET: APIRoute = async ({ url }) => {
   `);
 
   const svg = await satori(markup as any, {
-    width: 1200,
-    height: 675,
+    width: ogCardWidth,
+    height: ogCardHeight,
     fonts: [
       {
         name: 'colfax',

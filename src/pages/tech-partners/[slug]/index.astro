@@ -10,6 +10,13 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import {
+  overrideSeo,
+  replaceDescription,
+  replacePageTitle,
+  replaceShareTitle,
+} from '~/lib/datocms/seo';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 
 const { slug } = Astro.params;
 const variables = { slug: slug! };
@@ -21,7 +28,14 @@ if (!page) {
 }
 ---
 
-<Layout additionalSeo={page.seo}>
+<Layout
+  additionalSeo={overrideSeo(
+    page.seo,
+    replacePageTitle(`${page.name} | DatoCMS Ecosystem Partners`),
+    replaceShareTitle(`DatoCMS Ecosystem Partner: ${page.name}`),
+    replaceDescription(toPlainText(page.shortDescription)!),
+  )}
+>
   <InterstitialTitle style="two" mainTitleOfPage bigSubtitle>
     <Fragment slot="kicker">DatoCMS Technology Partner</Fragment>
     <figure class={s.logoContainer}>

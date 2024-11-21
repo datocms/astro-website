@@ -5,8 +5,8 @@ export type OgCardData = {
   excerpt?: string | null;
 };
 
-export function ogCardUrl(data: OgCardData): string {
-  const url = new URL('/og-card.png', 'http://bogus.com');
+export function ogCardUrl(data: OgCardData, baseUrl: URL): string {
+  const url = new URL('/og-card.png', baseUrl);
   url.searchParams.set('data', JSON.stringify(data));
-  return url.pathname + url.search;
+  return url.toString();
 }

@@ -28,24 +28,31 @@ function editMetaValue(propertyOrName: string, newValue: string) {
     });
 }
 
-export function changeTitle(newTitle: string) {
+export function replacePageTitle(newTitle: string) {
   return editTagContent('title', newTitle);
 }
 
-export function changeOgCard(data: OgCardData) {
-  const url = ogCardUrl(data);
+export function replaceShareTitle(newTitle: string) {
+  return [editMetaValue('og:title', newTitle), editMetaValue('twitter:title', newTitle)];
+}
+
+export const ogCardWidth = 1200;
+export const ogCardHeight = 700;
+
+export function generateCard(baseUrl: URL, data: OgCardData) {
+  const url = ogCardUrl(data, baseUrl);
 
   return [
     editMetaValue('og:image', url),
-    editMetaValue('og:image:width', '1200'),
-    editMetaValue('og:image:height', '675'),
+    editMetaValue('og:image:width', ogCardWidth.toString()),
+    editMetaValue('og:image:height', ogCardHeight.toString()),
     editMetaValue('twitter:image', url),
-    editMetaValue('twitter:image:width', '1200'),
-    editMetaValue('twitter:image:height', '675'),
+    editMetaValue('twitter:image:width', ogCardWidth.toString()),
+    editMetaValue('twitter:image:height', ogCardHeight.toString()),
   ];
 }
 
-export function changeDescription(newDescription: string) {
+export function replaceDescription(newDescription: string) {
   return [
     editMetaValue('description', newDescription),
     editMetaValue('twitter:description', newDescription),
