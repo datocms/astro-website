@@ -11,10 +11,11 @@ import { SingleQuote } from '~/components/quote/SingleQuote';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { Wrapper } from '~/components/Wrapper';
-import { actions } from 'astro:actions';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
+import ky from 'ky';
+import { FASTLY_KEY } from 'astro:env/server';
 
 const path = Astro.url.pathname;
 const slug = path.split('/').pop() || '';
@@ -25,7 +26,17 @@ if (!page) {
   return notFoundResponse();
 }
 
-const { data: datacenters } = await Astro.callAction(actions.fastlyApiDatacenters, {});
+console.log(FASTLY_KEY);
+
+const result = await ky<{ data: any }>('https://api.fastly.com/datacenters', {
+  headers: {
+    'Fastly-Key': FASTLY_KEY,
+  },
+}).json();
+
+console.log(result);
+
+const { data: datacenters } = result;
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
