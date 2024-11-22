@@ -16,6 +16,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import ky from 'ky';
 import { FASTLY_KEY } from 'astro:env/server';
+import { string } from 'astro:schema';
 
 const path = Astro.url.pathname;
 const slug = path.split('/').pop() || '';
@@ -26,17 +27,22 @@ if (!page) {
   return notFoundResponse();
 }
 
-console.log(FASTLY_KEY);
+type DataCenter = {
+  code: string;
+  name: string;
+  group: string;
+  region: string;
+  stats_region: string;
+  billing_region: string;
+  coordinates: { x: number; y: number; latitude: number; longitude: number };
+  shield: string;
+};
 
-const result = await ky<{ data: any }>('https://api.fastly.com/datacenters', {
+const datacenters = await ky<DataCenter[]>('https://api.fastly.com/datacenters', {
   headers: {
     'Fastly-Key': FASTLY_KEY,
   },
 }).json();
-
-console.log(result);
-
-const { data: datacenters } = result;
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
