@@ -1,5 +1,6 @@
 import { ApiError } from '@datocms/cma-client';
 import { serializeError } from 'serialize-error';
+import logToRollbar from '~/lib/logToRollbar';
 
 export function withCORS(responseInit?: ResponseInit): ResponseInit {
   return {
@@ -17,7 +18,9 @@ export function json(response: unknown, init?: ResponseInit): Response {
   return new Response(JSON.stringify(response), init);
 }
 
-export function handleUnexpectedError(error: unknown) {
+export function handleUnexpectedError(request: Request, error: unknown) {
+  logToRollbar(error, { request });
+
   try {
     throw error;
   } catch (e) {

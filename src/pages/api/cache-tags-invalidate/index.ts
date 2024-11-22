@@ -45,6 +45,6 @@ export const POST: APIRoute = async ({ url, request }) => {
 
     return json({ cacheTags, response });
   } catch (error) {
-    return handleUnexpectedError(error);
+    return handleUnexpectedError(request, error);
   }
 };

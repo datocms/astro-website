@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { SitemapStream, streamToPromise } from 'sitemap';
 import { isDraftModeEnabled } from '~/lib/draftMode';
+import { handleUnexpectedError } from './api/_utils';
 
 const allAstroFiles = import.meta.glob<string>('../pages/**/*.astro', {
   query: '?raw',
@@ -53,25 +54,29 @@ export const fetchSitemapUrls = async (includeDrafts: boolean) => {
   return (await Promise.all(urlsPromises)).flat();
 };
 
-export const GET: APIRoute = async (x) => {
-  const stream = new SitemapStream({ hostname: 'https://www.datocms.com/' });
-  const sitemapPromise = streamToPromise(stream);
+export const GET: APIRoute = async ({ request }) => {
+  try {
+    const stream = new SitemapStream({ hostname: 'https://www.datocms.com/' });
+    const sitemapPromise = streamToPromise(stream);
 
-  for (const url of await fetchSitemapUrls(isDraftModeEnabled(x.request))) {
-    if (url === '/404') {
-      continue;
+    for (const url of await fetchSitemapUrls(isDraftModeEnabled(request))) {
+      if (url === '/404') {
+        continue;
+      }
+
+      stream.write({ url });
     }
 
-    stream.write({ url });
+    stream.end();
+
+    const sitemap = await sitemapPromise;
+
+    return new Response(sitemap, {
+      headers: {
+        'Content-Type': 'application/xml',
+      },
+    });
+  } catch (error) {
+    return handleUnexpectedError(request, error);
   }
-
-  stream.end();
-
-  const sitemap = await sitemapPromise;
-
-  return new Response(sitemap, {
-    headers: {
-      'Content-Type': 'application/xml',
-    },
-  });
 };

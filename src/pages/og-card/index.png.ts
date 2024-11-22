@@ -5,7 +5,7 @@ import sharp from 'sharp';
 import css from 'style-object-to-css-string';
 import { ogCardHeight, ogCardWidth } from '~/lib/datocms/seo';
 import type { OgCardData } from '~/lib/ogCardUrl';
-import { invalidRequestResponse } from '~/pages/api/_utils';
+import { handleUnexpectedError, invalidRequestResponse } from '~/pages/api/_utils';
 import FullLogo from './_resources/logo.svg?raw';
 
 function filterPills(pills: string[]): string[] {
@@ -24,91 +24,92 @@ function filterPills(pills: string[]): string[] {
   return result;
 }
 
-export const GET: APIRoute = async ({ url }) => {
-  const [colfaxRegular, colfaxBold] = await Promise.all([
-    fetch(new URL('/fonts/colfax-web-bold.woff', url)).then((res) => res.arrayBuffer()),
-    fetch(new URL('/fonts/colfax-web-700.woff', url)).then((res) => res.arrayBuffer()),
-  ]);
-
-  const rawData = url.searchParams.get('data');
-
-  if (!rawData) {
-    return invalidRequestResponse('Not found', 404);
-  }
-
-  let data;
+export const GET: APIRoute = async ({ request, url }) => {
   try {
-    data = JSON.parse(rawData);
-  } catch (e) {
-    return invalidRequestResponse('Not found', 404);
-  }
+    const [colfaxRegular, colfaxBold] = await Promise.all([
+      fetch(new URL('/fonts/colfax-web-bold.woff', url)).then((res) => res.arrayBuffer()),
+      fetch(new URL('/fonts/colfax-web-700.woff', url)).then((res) => res.arrayBuffer()),
+    ]);
 
-  const { kicker, title, pills, excerpt } = data as OgCardData;
+    const rawData = url.searchParams.get('data');
 
-  const markup = html(/* HTML */ `
-    <div
-      style="${css({
-        display: 'flex',
-        background: 'linear-gradient(to right, #f4f5ff, white 15%, white 75%, #fefae4)',
-        width: '100%',
-        height: '100%',
-        textAlign: 'center',
-        fontFamily: 'colfax',
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        padding: '50px 100px',
-        borderBottom: '20px solid #ff593d',
-      })}"
-    >
+    if (!rawData) {
+      return invalidRequestResponse('Not found', 404);
+    }
+
+    let data;
+    try {
+      data = JSON.parse(rawData);
+    } catch (e) {
+      return invalidRequestResponse('Not found', 404);
+    }
+
+    const { kicker, title, pills, excerpt } = data as OgCardData;
+
+    const markup = html(/* HTML */ `
       <div
         style="${css({
           display: 'flex',
+          background: 'linear-gradient(to right, #f4f5ff, white 15%, white 75%, #fefae4)',
+          width: '100%',
+          height: '100%',
+          textAlign: 'center',
+          fontFamily: 'colfax',
           flexDirection: 'column',
+          justifyContent: 'space-around',
           alignItems: 'center',
-          justifyContent: 'center',
-          gap: '20px',
+          padding: '50px 100px',
+          borderBottom: '20px solid #ff593d',
         })}"
       >
         <div
           style="${css({
-            fontSize: '30px',
-            color: '#71788a',
-            letterSpacing: '-0.04em',
-            textTransform: 'uppercase',
             display: 'flex',
-            fontWeight: 'bold',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '20px',
           })}"
         >
-          ${kicker}
+          <div
+            style="${css({
+              fontSize: '30px',
+              color: '#71788a',
+              letterSpacing: '-0.04em',
+              textTransform: 'uppercase',
+              display: 'flex',
+              fontWeight: 'bold',
+            })}"
+          >
+            ${kicker}
+          </div>
+          <div
+            style="${css({
+              fontSize: `${title.length < 40 ? 90 : 70}px`,
+              letterSpacing: '-0.06em',
+              lineHeight: '0.9',
+              display: 'flex',
+              fontWeight: 'bold',
+            })}"
+          >
+            ${title}
+          </div>
+          ${excerpt
+            ? `
+              <div
+                style="${css({
+                  fontSize: '28px',
+                  color: '#71788a',
+                  letterSpacing: '-0.04em',
+                })}"
+              >
+                ${excerpt}
+              </div>
+            `
+            : ''}
         </div>
-        <div
-          style="${css({
-            fontSize: `${title.length < 40 ? 90 : 70}px`,
-            letterSpacing: '-0.06em',
-            lineHeight: '0.9',
-            display: 'flex',
-            fontWeight: 'bold',
-          })}"
-        >
-          ${title}
-        </div>
-        ${excerpt
+        ${pills && pills.length > 1
           ? `
-            <div
-              style="${css({
-                fontSize: '28px',
-                color: '#71788a',
-                letterSpacing: '-0.04em',
-              })}"
-            >
-              ${excerpt}
-            </div>
-          `
-          : ''}
-      </div>
-      ${pills && pills.length > 1
-        ? `
           <div
             style="${css({
               display: 'flex',
@@ -137,46 +138,49 @@ export const GET: APIRoute = async ({ url }) => {
               )
               .join('')}
           </div>`
-        : ''}
-      <div
-        style="${css({
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          paddingTop: '30px',
-        })}"
-      >
-        ${FullLogo}
+          : ''}
+        <div
+          style="${css({
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            paddingTop: '30px',
+          })}"
+        >
+          ${FullLogo}
+        </div>
       </div>
-    </div>
-  `);
+    `);
 
-  const svg = await satori(markup as any, {
-    width: ogCardWidth,
-    height: ogCardHeight,
-    fonts: [
-      {
-        name: 'colfax',
-        data: colfaxRegular,
-        style: 'normal',
-        weight: 500,
+    const svg = await satori(markup as any, {
+      width: ogCardWidth,
+      height: ogCardHeight,
+      fonts: [
+        {
+          name: 'colfax',
+          data: colfaxRegular,
+          style: 'normal',
+          weight: 500,
+        },
+        {
+          name: 'colfax',
+          data: colfaxBold,
+          style: 'normal',
+          weight: 700,
+        },
+      ],
+    });
+
+    const png = sharp(Buffer.from(svg)).png();
+    const response = await png.toBuffer();
+
+    return new Response(response, {
+      status: 200,
+      headers: {
+        'Content-Type': 'image/png',
       },
-      {
-        name: 'colfax',
-        data: colfaxBold,
-        style: 'normal',
-        weight: 700,
-      },
-    ],
-  });
-
-  const png = sharp(Buffer.from(svg)).png();
-  const response = await png.toBuffer();
-
-  return new Response(response, {
-    status: 200,
-    headers: {
-      'Content-Type': 'image/png',
-    },
-  });
+    });
+  } catch (error) {
+    return handleUnexpectedError(request, error);
+  }
 };

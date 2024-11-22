@@ -1,5 +1,6 @@
 import { defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
+import logToRollbar from '~/lib/logToRollbar';
 import { createLead, createNote, findOrCreateOrgByName, findOrCreatePerson } from './utils';
 
 export default defineAction({
@@ -15,29 +16,35 @@ export default defineAction({
     body: z.string(),
   }),
   handler: async (input) => {
-    const organization = await findOrCreateOrgByName(
-      input.agencyName,
-      'Agency / Freelancer',
-      input.agencyUrl,
-    );
+    try {
+      const organization = await findOrCreateOrgByName(
+        input.agencyName,
+        'Agency / Freelancer',
+        input.agencyUrl,
+      );
 
-    const person = await findOrCreatePerson(
-      input.email,
-      input.firstName,
-      input.lastName,
-      input.country,
-      '',
-      '',
-      organization,
-    );
+      const person = await findOrCreatePerson(
+        input.email,
+        input.firstName,
+        input.lastName,
+        input.country,
+        '',
+        '',
+        organization,
+      );
 
-    const partnershipLabel = '87a60c60-6a8e-11ed-92ec-410445a67487';
-    const lead = await createLead(person, organization, '', [partnershipLabel]);
+      const partnershipLabel = '87a60c60-6a8e-11ed-92ec-410445a67487';
+      const lead = await createLead(person, organization, '', [partnershipLabel]);
 
-    const noteText = `<p>Team size: ${input.teamSize}</p><p>Product familiarity: ${input.productFamiliarity}</p><p>Message: ${input.body}</p>`;
+      const noteText = `<p>Team size: ${input.teamSize}</p><p>Product familiarity: ${input.productFamiliarity}</p><p>Message: ${input.body}</p>`;
 
-    await createNote(lead, noteText);
+      await createNote(lead, noteText);
 
-    return { success: true };
+      return { success: true };
+    } catch (e) {
+      logToRollbar(e, { context: { action: 'pipedrive.createPartnerProgramLead', input } });
+
+      throw e;
+    }
   },
 });

@@ -81,6 +81,6 @@ export const POST: APIRoute = async ({ url, request }) => {
     // Respond in the format expected by the plugin
     return json(response, withCORS());
   } catch (error) {
-    return handleUnexpectedError(error);
+    return handleUnexpectedError(request, error);
   }
 };

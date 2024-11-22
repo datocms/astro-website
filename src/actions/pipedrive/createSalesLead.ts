@@ -1,5 +1,6 @@
 import { defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
+import logToRollbar from '~/lib/logToRollbar';
 import { createLead, createNote, findOrCreateOrgByName, findOrCreatePerson } from './utils';
 
 export default defineAction({
@@ -16,22 +17,28 @@ export default defineAction({
     body: z.string(),
   }),
   handler: async (input) => {
-    const organization = await findOrCreateOrgByName(input.companyName, input.industry);
+    try {
+      const organization = await findOrCreateOrgByName(input.companyName, input.industry);
 
-    const person = await findOrCreatePerson(
-      input.email,
-      input.firstName,
-      input.lastName,
-      input.country,
-      input.jobFunction,
-      input.referral,
-      organization,
-    );
+      const person = await findOrCreatePerson(
+        input.email,
+        input.firstName,
+        input.lastName,
+        input.country,
+        input.jobFunction,
+        input.referral,
+        organization,
+      );
 
-    const lead = await createLead(person, organization, input.useCase);
+      const lead = await createLead(person, organization, input.useCase);
 
-    await createNote(lead, input.body);
+      await createNote(lead, input.body);
 
-    return { success: true };
+      return { success: true };
+    } catch (e) {
+      logToRollbar(e, { context: { action: 'createSalesLead', input } });
+
+      throw e;
+    }
   },
 });

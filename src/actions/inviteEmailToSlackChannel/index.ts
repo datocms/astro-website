@@ -3,6 +3,7 @@ import { ActionError, defineAction } from 'astro:actions';
 import { RECAPTCHA_SECRET_KEY } from 'astro:env/server';
 import { z } from 'astro:schema';
 import ky from 'ky';
+import logToRollbar from '~/lib/logToRollbar';
 
 interface ErrorResponse {
   data: {
@@ -35,7 +36,9 @@ export default defineAction({
       .email('Please, enter a valid email! 😊'),
     token: z.string(),
   }),
-  handler: async ({ email, token }) => {
+  handler: async (input) => {
+    const { email, token } = input;
+
     const { success } = await ky
       .post<{ success: boolean }>('https://www.google.com/recaptcha/api/siteverify', {
         body: new URLSearchParams({
@@ -77,7 +80,7 @@ export default defineAction({
         });
       }
 
-      console.log(e);
+      logToRollbar(e, { context: { action: 'inviteEmailToSlackChannel', input } });
 
       throw e;
     }

@@ -26,7 +26,7 @@ type SeoAnalysis = {
  * https://www.datocms.com/marketplace/plugins/i/datocms-plugin-seo-readability-analysis#the-frontend-metadata-endpoint
  */
 
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ url, request }) => {
   try {
     // Parse query string parameters
     const token = url.searchParams.get('token');
@@ -111,6 +111,6 @@ export const GET: APIRoute = async ({ url }) => {
 
     return json(response, withCORS());
   } catch (error) {
-    return handleUnexpectedError(error);
+    return handleUnexpectedError(request, error);
   }
 };

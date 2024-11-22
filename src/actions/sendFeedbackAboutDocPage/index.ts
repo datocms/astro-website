@@ -2,6 +2,7 @@ import { buildClient } from '@datocms/cma-client';
 import { defineAction } from 'astro:actions';
 import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import { z } from 'astro:schema';
+import logToRollbar from '~/lib/logToRollbar';
 
 export default defineAction({
   accept: 'form',
@@ -12,17 +13,25 @@ export default defineAction({
     notes: z.string().optional(),
     email: z.string().email().optional(),
   }),
-  handler: async ({ url, reaction, notes, email }) => {
-    const client = buildClient({ apiToken: DATOCMS_API_TOKEN });
+  handler: async (input) => {
+    const { url, reaction, notes, email } = input;
 
-    await client.items.create({
-      url,
-      positive_reaction: reaction === 'positive',
-      notes,
-      email,
-      item_type: { id: 'dAVknVWrSCuheQ6Da9v0kQ', type: 'item_type' },
-    });
+    try {
+      const client = buildClient({ apiToken: DATOCMS_API_TOKEN });
 
-    return { success: true };
+      await client.items.create({
+        url,
+        positive_reaction: reaction === 'positive',
+        notes,
+        email,
+        item_type: { id: 'dAVknVWrSCuheQ6Da9v0kQ', type: 'item_type' },
+      });
+
+      return { success: true };
+    } catch (e) {
+      logToRollbar(e, { context: { action: 'sendFeedbackAboutDocPage', input } });
+
+      throw e;
+    }
   },
 });
