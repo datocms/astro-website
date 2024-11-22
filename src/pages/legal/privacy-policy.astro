@@ -2,16 +2,7 @@
 import { Hero } from '~/components/Hero';
 import { Layout } from '~/layouts/Layout';
 import { LegalProse } from '~/components/LegalProse';
-import { readFile } from 'node:fs/promises';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const { content } = JSON.parse(
-  await readFile(resolve(__dirname, '../../../documents/privacy.json'), 'utf8'),
-);
+import privacy from '~/documents/privacy.json';
 ---
 
 <Layout additionalSeo={[]}>
@@ -23,6 +14,6 @@ const { content } = JSON.parse(
     <Fragment slot="title"><mark>Privacy Policy</mark></Fragment>
   </Hero>
   <LegalProse>
-    <Fragment set:html={content} />
+    <Fragment set:html={privacy.content} />
   </LegalProse>
 </Layout>
