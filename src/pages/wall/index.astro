@@ -6,6 +6,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { SingleQuote } from '~/components/quote/SingleQuote';
 import s from './_style.module.css';
 import { Wrapper } from '~/components/Wrapper';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const { allPartnerTestimonials, allReviews } = await executeQuery(Astro, query);
 
@@ -39,4 +40,6 @@ const quotes = [...allPartnerTestimonials, ...allReviews].sort((a, b) =>
       }
     </div>
   </Wrapper>
+
+  <DraftModeQueryListener query={query} />
 </Layout>

@@ -11,6 +11,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const { page, meta, popular, latest } = await executeQuery(Astro, query);
 
@@ -82,4 +83,6 @@ if (!page || popular.length === 0 || latest.length === 0 || page.collections.len
       </div>
     </Space>
   </Wrapper>
+
+  <DraftModeQueryListener query={query} />
 </Layout>

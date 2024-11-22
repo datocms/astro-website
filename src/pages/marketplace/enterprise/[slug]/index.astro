@@ -17,9 +17,9 @@ import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse
 import { withAllComponents } from '~/lib/datocms/structuredText';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const { slug } = Astro.params;
-const variables = { slug: slug! };
+const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
 
 if (!page) {
@@ -102,4 +102,6 @@ if (!page) {
       </div>
     </Wrapper>
   </Space>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

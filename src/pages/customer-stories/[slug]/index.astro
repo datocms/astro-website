@@ -33,9 +33,9 @@ import { query } from './_graphql';
 import { slugify } from '~/lib/slugify';
 import { withAllComponents } from '~/lib/datocms/structuredText';
 import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const { slug } = Astro.params;
-const variables = { slug: slug! };
+const variables = { slug: Astro.params.slug! };
 const { post } = await executeQuery(Astro, query, { variables });
 
 if (!post) {
@@ -143,4 +143,6 @@ const tocItems = filterNodes(
       )
     }
   </div>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

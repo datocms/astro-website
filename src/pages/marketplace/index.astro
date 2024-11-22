@@ -13,6 +13,7 @@ import { buildUrlForEnterpriseApp } from '~/lib/datocms/gqlUrlBuilder/enterprise
 import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 import { PluginCard } from './_sub/PluginCard';
 import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const { page, demos, plugins, hostingApps, enterpriseApps } = await executeQuery(Astro, query);
 
@@ -177,4 +178,6 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
       </Carousel>
     </div>
   </GroupPreview>
+
+  <DraftModeQueryListener query={query} />
 </Layout>

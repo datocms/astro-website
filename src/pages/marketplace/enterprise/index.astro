@@ -8,6 +8,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const { items } = await executeQuery(Astro, query);
 
@@ -45,4 +46,6 @@ if (items.length === 0) {
       }
     </div>
   </Wrapper>
+
+  <DraftModeQueryListener query={query} />
 </Layout>

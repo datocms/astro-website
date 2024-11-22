@@ -22,6 +22,7 @@ import ReadMore from './_sub/ReadMore.astro';
 import { fetchPerOwnerPricingPlans } from './_sub/perOwnerPricingPlans';
 import { SingleQuote } from '~/components/quote/SingleQuote';
 import { formatNumber } from '~/lib/formatters';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const plans = sortBy(await fetchPerOwnerPricingPlans(), 'monthly_price');
 
@@ -277,6 +278,8 @@ if (!page || !freePlan || !proPlan) {
 
     {review1 && <SingleQuote quote={review1} />}
   </Space>
+
+  <DraftModeQueryListener query={query} />
 </Layout>
 
 <script>

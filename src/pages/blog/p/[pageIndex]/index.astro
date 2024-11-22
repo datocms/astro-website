@@ -12,6 +12,7 @@ import s from './_style.module.css';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 export interface Props {
   pageIndex?: number;
@@ -24,11 +25,13 @@ if (Astro.params.pageIndex === '1') {
 
 const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
 
+const variables = {
+  limit: perPage,
+  offset: (pageIndex - 1) * perPage,
+};
+
 const { page, posts, latestChangelogEntry, _allBlogPostsMeta } = await executeQuery(Astro, query, {
-  variables: {
-    limit: perPage,
-    offset: (pageIndex - 1) * perPage,
-  },
+  variables,
 });
 
 const totalEntries = _allBlogPostsMeta.count;
@@ -107,4 +110,6 @@ if (!page || posts.length === 0) {
       baseUrl="/blog"
     />
   </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

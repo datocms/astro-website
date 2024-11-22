@@ -13,6 +13,7 @@ import { query } from './_graphql';
 import { buildUrlForAcademyCourse } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
 import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
 import { intersperse } from '~/lib/intersperse';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const { courses, page } = await executeQuery(Astro, query);
 
@@ -82,4 +83,6 @@ if (!page || courses.length === 0) {
       }
     </Space>
   </Wrapper>
+
+  <DraftModeQueryListener query={query} />
 </Layout>

@@ -7,11 +7,11 @@ import type { TadaDocumentNode } from 'gql.tada';
 import { type ArgumentNode, type FieldNode, Kind, type SelectionNode, visit } from 'graphql';
 import { omit } from 'lodash-es';
 
-export async function rawExecuteQueryWithAutoPagination<Result, Variables>(
+export function convertToAutoPaginationQueryAndVariables<Result, Variables>(
   query: TadaDocumentNode<Result, Variables>,
-  options?: Exclude<CdaExecuteQueryOptions<Variables>, 'token' | 'excludeInvalid'>,
-): Promise<[Result, Response]> {
-  let variables = options!.variables as any;
+  originalVariables?: Variables,
+): [TadaDocumentNode<Result, Variables>, any] {
+  let variables = originalVariables as any;
   let variablesToExclude: string[] = [];
   let alreadyFoundCollectionSelectionSetThatNeedsToBeDuped = false;
 
@@ -24,7 +24,7 @@ export async function rawExecuteQueryWithAutoPagination<Result, Variables>(
         for (const selectionNode of selectionSet.selections) {
           const info = parseCollectionSelectionSetThatNeedsToBeDuped(
             selectionNode,
-            options?.variables,
+            originalVariables,
           );
 
           if (!info) {
@@ -107,9 +107,21 @@ export async function rawExecuteQueryWithAutoPagination<Result, Variables>(
     },
   });
 
+  return [newQuery, variables];
+}
+
+export async function rawExecuteQueryWithAutoPagination<Result, Variables>(
+  query: TadaDocumentNode<Result, Variables>,
+  options?: Exclude<CdaExecuteQueryOptions<Variables>, 'token' | 'excludeInvalid'>,
+): Promise<[Result, Response]> {
+  const [newQuery, newVariables] = convertToAutoPaginationQueryAndVariables(
+    query,
+    options?.variables,
+  );
+
   const [result, response] = await rawCdaExecuteQuery(newQuery, {
     ...options,
-    variables,
+    variables: newVariables,
     excludeInvalid: true,
     token: DATOCMS_API_TOKEN,
   });

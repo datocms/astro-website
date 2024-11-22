@@ -11,6 +11,7 @@ import { query } from './_graphql';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { groupBy } from 'lodash-es';
 import { Layout } from '~/layouts/Layout';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const { entries, page } = await executeQuery(Astro, query);
 
@@ -75,4 +76,6 @@ const entriesByLetter = groupBy(entries, (entry) => entry.title[0]!.toUpperCase(
       </dl>
     </div>
   </Wrapper>
+
+  <DraftModeQueryListener query={query} />
 </Layout>

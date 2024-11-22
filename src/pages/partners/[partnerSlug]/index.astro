@@ -24,9 +24,9 @@ import {
   replaceShareTitle,
 } from '~/lib/datocms/seo';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const { partnerSlug } = Astro.params;
-const variables = { partnerSlug: partnerSlug! };
+const variables = { partnerSlug: Astro.params.partnerSlug! };
 const { page } = await executeQuery(Astro, query, { variables });
 
 if (!page) {
@@ -160,4 +160,6 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
       )
     }
   </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

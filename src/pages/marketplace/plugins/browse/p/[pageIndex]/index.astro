@@ -13,6 +13,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { perPage, query } from './_graphql';
 import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 export interface Props {
   pageIndex?: number;
@@ -25,11 +26,12 @@ if (Astro.params.pageIndex === '1') {
 
 const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
 
+const variables = {
+  limit: perPage,
+  offset: (pageIndex - 1) * perPage,
+};
 const { pluginsPage, ...staticResults } = await executeQuery(Astro, query, {
-  variables: {
-    limit: perPage,
-    offset: (pageIndex - 1) * perPage,
-  },
+  variables,
 });
 
 async function fetchSearchResults(query: string, page: number) {
@@ -105,4 +107,6 @@ if (!pluginsPage) {
       searchParams={Astro.url.searchParams}
     />
   </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

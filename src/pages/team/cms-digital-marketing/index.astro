@@ -17,9 +17,11 @@ import { query } from './_graphql';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { Svg } from '~/components/Svg';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
+const variables = { slug: Astro.params.slug! };
 const { page, integrations, review1 } = await executeQuery(Astro, query, {
-  variables: { slug: Astro.params.slug! },
+  variables,
 });
 
 if (!page) {
@@ -247,4 +249,6 @@ if (!page) {
       currentPersonas="digital-marketers"
     />
   </div>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

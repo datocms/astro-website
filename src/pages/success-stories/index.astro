@@ -9,6 +9,7 @@ import { Svg } from '~/components/Svg';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -98,4 +99,6 @@ if (!page) {
       <Button as="a" href="/wall" p="small">Read our testimonials</Button>
     </Space>
   </Flag>
+
+  <DraftModeQueryListener query={query} />
 </Layout>

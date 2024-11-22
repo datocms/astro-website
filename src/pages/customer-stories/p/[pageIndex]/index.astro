@@ -12,6 +12,7 @@ import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse
 import { perPage, query } from './_graphql';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 export interface Props {
   pageIndex?: number;
@@ -24,11 +25,13 @@ if (Astro.params.pageIndex === '1') {
 
 const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
 
+const variables = {
+  limit: perPage,
+  offset: (pageIndex - 1) * perPage,
+};
+
 const { page, posts, _allCustomerStoriesMeta } = await executeQuery(Astro, query, {
-  variables: {
-    limit: perPage,
-    offset: (pageIndex - 1) * perPage,
-  },
+  variables,
 });
 
 const totalEntries = _allCustomerStoriesMeta.count;
@@ -99,4 +102,6 @@ if (!page || posts.length === 0) {
       baseUrl="/customer-stories"
     />
   </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

@@ -8,6 +8,7 @@ import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { perPage, query } from './_graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 export interface Props {
   pageIndex?: number;
@@ -20,11 +21,13 @@ if (Astro.params.pageIndex === '1') {
 
 const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
 
+const variables = {
+  limit: perPage,
+  offset: (pageIndex - 1) * perPage,
+};
+
 const { page, productUpdates, _allChangelogEntriesMeta } = await executeQuery(Astro, query, {
-  variables: {
-    limit: perPage,
-    offset: (pageIndex - 1) * perPage,
-  },
+  variables,
 });
 
 const totalEntries = _allChangelogEntriesMeta.count;
@@ -53,4 +56,6 @@ if (!page || productUpdates.length === 0) {
       baseUrl="/product-updates"
     />
   </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

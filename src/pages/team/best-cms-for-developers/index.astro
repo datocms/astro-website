@@ -18,9 +18,11 @@ import { Svg } from '~/components/Svg';
 import { OtherPersonasPicker } from '../_OtherPersonasPicker';
 import Illustration from './_Illustration/index.astro';
 import { Wrapper } from '~/components/Wrapper';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
+const variables = { slug: Astro.params.slug! };
 const { page, review, integrations } = await executeQuery(Astro, query, {
-  variables: { slug: Astro.params.slug! },
+  variables,
 });
 
 if (!page) {
@@ -252,4 +254,6 @@ if (!page) {
 
     <OtherPersonasPicker title="Not just for developers" currentPersonas="developers" />
   </div>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

@@ -13,6 +13,7 @@ import { Flag } from '~/components/Flag';
 import { query } from './_graphql';
 import s from './_style.module.css';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const { page, members, review1, review2 } = await executeQuery(Astro, query);
 
@@ -136,4 +137,6 @@ if (!page || members.length === 0 || !review1 || !review2) {
       <SingleQuote quote={review2} />
     </Space>
   </Wrapper>
+
+  <DraftModeQueryListener query={query} />
 </Layout>

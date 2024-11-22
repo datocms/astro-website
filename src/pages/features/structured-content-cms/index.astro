@@ -16,10 +16,10 @@ import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const path = Astro.url.pathname;
-const slug = path.split('/').pop() || '';
-const { page, integrations } = await executeQuery(Astro, query, { variables: { slug } });
+const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const { page, integrations } = await executeQuery(Astro, query, { variables });
 
 if (!page || integrations.length === 0 || !page.video || !page.video2 || !page.video3) {
   avoidAstroTypeCheckBug(notFoundResponse);
@@ -224,4 +224,6 @@ const jsonExample = JSON.stringify(
       </li>
     </Bullets>
   </Flag>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

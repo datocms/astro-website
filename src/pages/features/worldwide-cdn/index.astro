@@ -16,11 +16,10 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import ky from 'ky';
 import { FASTLY_KEY } from 'astro:env/server';
-import { string } from 'astro:schema';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const path = Astro.url.pathname;
-const slug = path.split('/').pop() || '';
-const { page } = await executeQuery(Astro, query, { variables: { slug } });
+const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const { page } = await executeQuery(Astro, query, { variables });
 
 if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
@@ -154,4 +153,6 @@ const datacenters = await ky<DataCenter[]>('https://api.fastly.com/datacenters',
       performance is one of our top day-by-day concerns.
     </p>
   </Flag>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

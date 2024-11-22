@@ -16,9 +16,9 @@ import { query } from './_graphql';
 import s from './_style.module.css';
 import ky from 'ky';
 import { type RawManifest, normalizeManifest } from './_utils';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const { slug } = Astro.params;
-const variables = { slug: slug! };
+const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
 
 if (!page) {
@@ -134,4 +134,6 @@ const manifest = normalizeManifest(
       </div>
     </Wrapper>
   </Space>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

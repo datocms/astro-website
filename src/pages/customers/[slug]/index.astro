@@ -14,9 +14,9 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import { withAllComponents } from '~/lib/datocms/structuredText';
 import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const { slug } = Astro.params;
-const variables = { slug: slug! };
+const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
 
 if (!page) {
@@ -100,4 +100,6 @@ const duotone = `duotone=${colors}`;
       </div>
     </Wrapper>
   </div>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

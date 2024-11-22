@@ -17,8 +17,10 @@ import { Checks } from '~/components/Checks';
 import { InlineText } from '~/components/structuredText/InlineText';
 import { Text } from '~/components/structuredText/Text';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const { page } = await executeQuery(Astro, query, { variables: { slug: Astro.params.slug! } });
+const variables = { slug: Astro.params.slug! };
+const { page } = await executeQuery(Astro, query, { variables });
 
 if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
@@ -236,4 +238,6 @@ if (!page) {
       </Checks>
     </div>
   </Space>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

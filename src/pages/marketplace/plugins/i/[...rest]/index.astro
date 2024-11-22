@@ -16,11 +16,12 @@ import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse
 import { query } from './_graphql';
 import s from './_style.module.css';
 import { isVideo } from '~/components/VideoPlayer/graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const { rest } = Astro.params;
 const variables = {
-  slug: rest || '',
+  slug: Astro.params.rest!,
 };
+
 const { page } = await executeQuery(Astro, query, { variables });
 
 if (!page || !page.readme) {
@@ -171,4 +172,6 @@ const url = `${
       </div>
     </Wrapper>
   </Space>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

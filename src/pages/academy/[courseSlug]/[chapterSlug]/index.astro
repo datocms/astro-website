@@ -21,10 +21,11 @@ import { Image } from '~/components/blocks/Image';
 import { Table } from '~/components/blocks/Table';
 import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const { chapter } = await executeQuery(Astro, query, {
-  variables: { courseSlug: Astro.params.courseSlug!, chapterSlug: Astro.params.chapterSlug! },
-});
+const variables = { courseSlug: Astro.params.courseSlug!, chapterSlug: Astro.params.chapterSlug! };
+
+const { chapter } = await executeQuery(Astro, query, { variables });
 
 if (!chapter) {
   avoidAstroTypeCheckBug(notFoundResponse);
@@ -149,4 +150,6 @@ const sections = filterNodes(
       </div>
     </div>
   </Space>
+
+  <DraftModeQueryListener query={query} variables={variables} />
 </Layout>
