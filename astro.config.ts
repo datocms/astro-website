@@ -55,7 +55,7 @@ export default defineConfig({
           access: 'public',
         }),
       },
-      validateSecrets: true,
+      validateSecrets: false,
     },
   },
   devToolbar: {
