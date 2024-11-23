@@ -28,10 +28,6 @@ FROM base AS runtime
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 
-RUN --mount=type=secret,id=FASTLY_SERVICE_ID \
-    --mount=type=secret,id=FASTLY_KEY \
-    curl -i -X POST "https://api.fastly.com/service/$(cat /run/secrets/FASTLY_SERVICE_ID)/purge_all" -H "Fastly-Key: $(cat /run/secrets/FASTLY_KEY)" -H "Accept: application/json"
-
 ENV HOST=0.0.0.0
 ENV PORT=4321
 EXPOSE 4321

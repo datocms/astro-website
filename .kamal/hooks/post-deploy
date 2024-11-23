@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# A sample post-deploy hook
-#
 # These environment variables are available:
 # KAMAL_RECORDED_AT
 # KAMAL_PERFORMER
@@ -12,3 +10,5 @@
 # KAMAL_RUNTIME
 
 echo "$KAMAL_PERFORMER deployed $KAMAL_VERSION to $KAMAL_DESTINATION in $KAMAL_RUNTIME seconds"
+echo "Purging Fastly cache"
+npm run fastly:purge_all
