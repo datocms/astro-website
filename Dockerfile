@@ -4,7 +4,7 @@
 # ==== Base stage ====
 # Sets up the foundation that other stages will build upon
 
-FROM node:20 AS base
+FROM node:20-alpine AS base
 
 # Flag to indicate we're running in a Docker environment
 ENV INSIDE_DOCKER=true
