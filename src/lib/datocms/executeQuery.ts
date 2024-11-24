@@ -16,55 +16,58 @@ export async function executeQuery<Result, Variables>(
   query: TadaDocumentNode<Result, Variables>,
   options?: Pick<CdaExecuteQueryOptions<Variables>, 'variables'>,
 ) {
-  try {
-    const draftModeEnabled = isDraftModeEnabled(Astro);
-
-    const [result, response] = await rawExecuteQueryWithAutoPagination(query, {
-      variables: options?.variables,
-      returnCacheTags: true,
-      excludeInvalid: true,
-      includeDrafts: draftModeEnabled,
-      token: DATOCMS_API_TOKEN,
-    });
-
-    // biome-ignore lint/style/noNonNullAssertion: We know this is not null
-    const newCacheTags = response.headers.get('x-cache-tags')!.split(' ');
-
-    const surrogateKeyHeaderName = draftModeEnabled ? 'debug-surrogate-key' : 'surrogate-key';
-
-    const existingCacheTags = Astro.response.headers.get(surrogateKeyHeaderName)?.split(' ') ?? [];
-
-    // We want Fastly to cache our resources forever but send headers to
-    // browsers so that they don't cache it at all https://goo.gl/TQ3vqF
-
-    Astro.response.headers.set(
-      surrogateKeyHeaderName,
-      uniq([...existingCacheTags, ...newCacheTags]).join(' '),
-    );
-
-    if (draftModeEnabled) {
-      // No cache!
-      Astro.response.headers.set('cache-control', 'private');
-    } else {
-      Astro.response.headers.set('surrogate-control', 'max-age=31536000');
-    }
-
-    return result;
-  } catch (e) {
-    Astro.response.headers.set('cache-control', 'private');
-    throw e;
-  }
+  return executeQueryOutsideAstro(query, {
+    ...options,
+    request: Astro,
+    responseHeaders: Astro.response.headers,
+  });
 }
 
 export async function executeQueryOutsideAstro<Result, Variables>(
   query: TadaDocumentNode<Result, Variables>,
-  options?: Omit<CdaExecuteQueryOptions<Variables>, 'token' | 'excludeInvalid'>,
+  options: Pick<CdaExecuteQueryOptions<Variables>, 'variables'> & {
+    request: Request | AstroGlobal;
+    responseHeaders: Headers;
+  },
 ) {
-  const [result] = await rawExecuteQueryWithAutoPagination(query, {
+  const draftModeEnabled = isDraftModeEnabled(options.request);
+
+  const [result, datocmsGraphqlResponse] = await rawExecuteQueryWithAutoPagination(query, {
     ...options,
+    returnCacheTags: true,
     excludeInvalid: true,
+    includeDrafts: draftModeEnabled,
     token: DATOCMS_API_TOKEN,
   });
 
+  augmentResponseHeadersWithSurrogateKeys({
+    draftModeEnabled,
+    datocmsGraphqlResponse,
+    responseHeaders: options.responseHeaders,
+  });
+
   return result;
+}
+
+function augmentResponseHeadersWithSurrogateKeys({
+  draftModeEnabled,
+  datocmsGraphqlResponse,
+  responseHeaders,
+}: {
+  draftModeEnabled: boolean;
+  datocmsGraphqlResponse: Response;
+  responseHeaders: Headers;
+}) {
+  const newCacheTags = datocmsGraphqlResponse.headers.get('x-cache-tags')!.split(' ');
+  const surrogateKeyHeaderName = draftModeEnabled ? 'debug-surrogate-key' : 'surrogate-key';
+  const existingCacheTags = responseHeaders.get(surrogateKeyHeaderName)?.split(' ') ?? [];
+  const mergedCacheTags = uniq([...existingCacheTags, ...newCacheTags]).join(' ');
+
+  responseHeaders.set(surrogateKeyHeaderName, mergedCacheTags);
+
+  if (draftModeEnabled) {
+    responseHeaders.set('cache-control', 'private');
+  } else {
+    responseHeaders.set('surrogate-control', 'max-age=31536000');
+  }
 }

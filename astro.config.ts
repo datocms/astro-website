@@ -14,6 +14,16 @@ export default defineConfig({
   experimental: {
     env: {
       schema: {
+        DRAFT_MODE_HOSTNAME: envField.string({
+          context: 'server',
+          access: 'secret',
+          default: 'localhost',
+        }),
+        PUBLIC_HOSTNAME: envField.string({
+          context: 'server',
+          access: 'secret',
+          optional: true,
+        }),
         DATOCMS_API_TOKEN: envField.string({
           context: 'server',
           access: 'secret',

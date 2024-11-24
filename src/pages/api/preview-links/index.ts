@@ -1,8 +1,12 @@
 import { buildClient } from '@datocms/cma-client';
 import type { APIRoute } from 'astro';
-import { DATOCMS_API_TOKEN, SECRET_API_TOKEN } from 'astro:env/server';
+import {
+  DATOCMS_API_TOKEN,
+  DRAFT_MODE_HOSTNAME,
+  PUBLIC_HOSTNAME,
+  SECRET_API_TOKEN,
+} from 'astro:env/server';
 import { recordToWebsiteRoute } from '~/lib/datocms/recordInfo';
-import { draftModeHostname, productionHostname } from '~/lib/draftMode';
 import { handleUnexpectedError, invalidRequestResponse, json, withCORS } from '../_utils';
 
 export const OPTIONS: APIRoute = () => {
@@ -65,7 +69,7 @@ export const POST: APIRoute = async ({ url, request }) => {
       if (item.meta.status !== 'published') {
         response.previewLinks.push({
           label: 'Draft version',
-          url: new URL(recordUrl, `https://${draftModeHostname}/`).toString(),
+          url: new URL(recordUrl, `https://${DRAFT_MODE_HOSTNAME}/`).toString(),
         });
       }
 
@@ -73,7 +77,7 @@ export const POST: APIRoute = async ({ url, request }) => {
       if (item.meta.status !== 'draft') {
         response.previewLinks.push({
           label: 'Published version',
-          url: new URL(recordUrl, `https://${productionHostname}/`).toString(),
+          url: new URL(recordUrl, `https://${PUBLIC_HOSTNAME}/`).toString(),
         });
       }
     }

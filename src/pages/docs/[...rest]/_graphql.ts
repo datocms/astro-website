@@ -44,7 +44,7 @@ export const docPageQuery = graphql(
   [PageLayoutFragment],
 );
 
-export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -56,7 +56,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
       `,
       [DocPageUrlFragment],
     ),
-    { includeDrafts },
+    executeQueryOptions,
   );
 
   return entries

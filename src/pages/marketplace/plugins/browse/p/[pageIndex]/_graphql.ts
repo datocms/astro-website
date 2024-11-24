@@ -1,9 +1,9 @@
 import { range } from 'lodash-es';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { graphql } from '~/lib/datocms/graphql';
 import { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
-import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const perPage = 36;
@@ -34,7 +34,7 @@ export const query = graphql(
   [TagFragment, ResponsiveImageFragment, PluginCardFragment],
 );
 
-export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
   const {
     meta: { count },
   } = await executeQueryOutsideAstro(
@@ -45,7 +45,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
         }
       }
     `),
-    { includeDrafts },
+    executeQueryOptions,
   );
 
   return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/marketplace/plugins/browse/p/${i}`);

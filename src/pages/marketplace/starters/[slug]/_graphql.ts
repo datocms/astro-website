@@ -1,12 +1,12 @@
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
   TemplateDemoUrlFragment,
   buildUrlForTemplateDemo,
 } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
-import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
-import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -48,7 +48,7 @@ export const query = graphql(
   [TagFragment, ResponsiveImageFragment],
 );
 
-export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -60,7 +60,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
       `,
       [TemplateDemoUrlFragment],
     ),
-    { includeDrafts },
+    executeQueryOptions,
   );
 
   return entries.map(buildUrlForTemplateDemo);

@@ -98,7 +98,7 @@ export const query = graphql(
   [TagFragment, VideoFragment, ImageFragment, InternalVideoFragment],
 );
 
-export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -110,7 +110,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
       `,
       [SuccessStoryUrlFragment],
     ),
-    { includeDrafts },
+    executeQueryOptions,
   );
 
   return entries.map(buildUrlForSuccessStory);

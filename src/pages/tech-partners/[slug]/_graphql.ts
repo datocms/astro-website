@@ -35,7 +35,7 @@ export const query = graphql(
   [TagFragment],
 );
 
-export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -47,7 +47,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
       `,
       [TechPartnerUrlFragment],
     ),
-    { includeDrafts },
+    executeQueryOptions,
   );
 
   return entries.map(buildUrlForTechPartner);

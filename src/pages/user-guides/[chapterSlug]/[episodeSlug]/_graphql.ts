@@ -78,7 +78,7 @@ export const query = graphql(
   ],
 );
 
-export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -90,7 +90,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
       `,
       [UserGuideEpisodeUrlFragment],
     ),
-    { includeDrafts },
+    executeQueryOptions,
   );
 
   return entries.map(buildUrlForUserGuideEpisode);

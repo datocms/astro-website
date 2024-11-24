@@ -4,6 +4,7 @@ import RSS from 'rss';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { BlogPostUrlFragment, buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { graphql } from '~/lib/datocms/graphql';
+import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -21,16 +22,23 @@ export const query = graphql(
   [BlogPostUrlFragment],
 );
 
-export const GET: APIRoute = async () => {
-  const { posts } = await executeQueryOutsideAstro(query, { includeDrafts: false });
+export const GET: APIRoute = async ({ request }) => {
+  const responseHeaders = new Headers({
+    'Content-Type': 'application/xml',
+  });
 
-  const baseUrl = new URL('https://www.datocms.com');
+  const { posts } = await executeQueryOutsideAstro(query, {
+    request,
+    responseHeaders,
+  });
+
+  const baseUrl = buildBaseUrl(request);
 
   const feed = new RSS({
     title: 'DatoCMS Blog',
     description:
       'Where we publish articles on topics such as digital publishing, content strategy, and software development.',
-    site_url: baseUrl.toString(),
+    site_url: baseUrl,
     feed_url: new URL('/blog.xml', baseUrl).toString(),
   });
 
@@ -47,8 +55,6 @@ export const GET: APIRoute = async () => {
   }
 
   return new Response(feed.xml({ indent: true }), {
-    headers: {
-      'Content-Type': 'application/xml',
-    },
+    headers: responseHeaders,
   });
 };

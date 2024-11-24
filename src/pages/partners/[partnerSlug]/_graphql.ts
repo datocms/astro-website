@@ -84,7 +84,7 @@ export const extraQuery = graphql(
   [ResponsiveImageFragment, PluginCardFragment],
 );
 
-export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -96,7 +96,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
       `,
       [PartnerUrlFragment],
     ),
-    { includeDrafts },
+    executeQueryOptions,
   );
 
   return entries.map(buildUrlForPartner);

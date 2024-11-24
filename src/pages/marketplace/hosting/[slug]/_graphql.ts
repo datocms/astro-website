@@ -1,15 +1,15 @@
-import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
-import {
-  HostingAppUrlFragment,
-  buildUrlForHostingApp,
-} from '~/lib/datocms/gqlUrlBuilder/hostingApp';
-import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { ImageFragment } from '~/components/blocks/Image/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { VideoFragment } from '~/components/blocks/Video/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import {
+  HostingAppUrlFragment,
+  buildUrlForHostingApp,
+} from '~/lib/datocms/gqlUrlBuilder/hostingApp';
 import { graphql } from '~/lib/datocms/graphql';
+import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -56,7 +56,7 @@ export const query = graphql(
   [TagFragment, ResponsiveImageFragment, ImageFragment, VideoFragment, InternalVideoFragment],
 );
 
-export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
   const { entries } = await executeQueryOutsideAstro(
     graphql(
       /* GraphQL */ `
@@ -68,7 +68,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
       `,
       [HostingAppUrlFragment],
     ),
-    { includeDrafts },
+    executeQueryOptions,
   );
 
   return entries.map(buildUrlForHostingApp);

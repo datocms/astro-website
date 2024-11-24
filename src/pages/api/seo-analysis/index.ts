@@ -1,9 +1,8 @@
 import { buildClient } from '@datocms/cma-client';
 import type { APIRoute } from 'astro';
-import { DATOCMS_API_TOKEN, SECRET_API_TOKEN } from 'astro:env/server';
+import { DATOCMS_API_TOKEN, DRAFT_MODE_HOSTNAME, SECRET_API_TOKEN } from 'astro:env/server';
 import { JSDOM } from 'jsdom';
 import { recordToSlug, recordToWebsiteRoute } from '~/lib/datocms/recordInfo';
-import { draftModeHostname } from '~/lib/draftMode';
 import { handleUnexpectedError, invalidRequestResponse, json, withCORS } from '../_utils';
 
 export const OPTIONS: APIRoute = () => {
@@ -78,7 +77,7 @@ export const GET: APIRoute = async ({ url, request }) => {
      * Draft Mode.
      */
     const pageRequest = await fetch(
-      new URL(websitePath, `https://${draftModeHostname}/`).toString(),
+      new URL(websitePath, `https://${DRAFT_MODE_HOSTNAME}/`).toString(),
     );
 
     if (!pageRequest.ok) {

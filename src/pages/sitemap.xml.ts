@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { SitemapStream, streamToPromise } from 'sitemap';
-import { isDraftModeEnabled } from '~/lib/draftMode';
+import { baseUrl } from '~/lib/draftMode';
 import { handleUnexpectedError } from './api/_utils';
 
 const allAstroFiles = import.meta.glob<string>('../pages/**/*.astro', {
@@ -14,9 +14,12 @@ const allBuildSitemapUrls = import.meta.glob<BuildSitemapUrlsFn>('../pages/**/_g
   eager: false,
 });
 
-export type BuildSitemapUrlsFn = (ctx: { includeDrafts: boolean }) => Promise<string[]>;
+export type BuildSitemapUrlsFn = (ctx: {
+  request: Request;
+  responseHeaders: Headers;
+}) => Promise<string[]>;
 
-export const fetchSitemapUrls = async (includeDrafts: boolean) => {
+export const fetchSitemapUrls = async (request: Request, responseHeaders: Headers) => {
   let urlsPromises: Array<Promise<string[]>> = [];
 
   for (const astroFilePath of Object.keys(allAstroFiles)) {
@@ -42,7 +45,7 @@ export const fetchSitemapUrls = async (includeDrafts: boolean) => {
             throw new Error(`Missing buildSitemapUrls() in ${graphqlPath}`);
           }
 
-          return await buildSitemapUrls({ includeDrafts });
+          return await buildSitemapUrls({ request, responseHeaders });
         })(),
       );
     } else {
@@ -56,10 +59,14 @@ export const fetchSitemapUrls = async (includeDrafts: boolean) => {
 
 export const GET: APIRoute = async ({ request }) => {
   try {
-    const stream = new SitemapStream({ hostname: 'https://www.datocms.com/' });
+    const stream = new SitemapStream({ hostname: baseUrl(request) });
     const sitemapPromise = streamToPromise(stream);
 
-    for (const url of await fetchSitemapUrls(isDraftModeEnabled(request))) {
+    const responseHeaders = new Headers({
+      'Content-Type': 'application/xml',
+    });
+
+    for (const url of await fetchSitemapUrls(request, responseHeaders)) {
       if (url === '/404') {
         continue;
       }
@@ -72,9 +79,7 @@ export const GET: APIRoute = async ({ request }) => {
     const sitemap = await sitemapPromise;
 
     return new Response(sitemap, {
-      headers: {
-        'Content-Type': 'application/xml',
-      },
+      headers: responseHeaders,
     });
   } catch (error) {
     return handleUnexpectedError(request, error);

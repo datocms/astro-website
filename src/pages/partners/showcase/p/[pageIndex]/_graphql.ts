@@ -41,7 +41,7 @@ export const query = graphql(
   [ResponsiveImageFragment, ShowcaseProjectUrlFragment],
 );
 
-export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
   const {
     meta: { count },
   } = await executeQueryOutsideAstro(
@@ -52,7 +52,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
         }
       }
     `),
-    { includeDrafts },
+    executeQueryOptions,
   );
 
   return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/partners/showcase/p/${i}`);

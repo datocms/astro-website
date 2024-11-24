@@ -63,7 +63,7 @@ export const query = graphql(
   [TagFragment, ResponsiveImageFragment, BlogPostUrlFragment, ChangelogEntryUrlFragment],
 );
 
-export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) => {
+export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
   const {
     meta: { count },
   } = await executeQueryOutsideAstro(
@@ -74,7 +74,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async ({ includeDrafts }) =>
         }
       }
     `),
-    { includeDrafts },
+    executeQueryOptions,
   );
 
   return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/blog/p/${i}`);
