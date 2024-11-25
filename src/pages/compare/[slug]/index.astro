@@ -1,0 +1,184 @@
+---
+import { Button } from '~/components/Button';
+import { Checks } from '~/components/Checks';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
+import { QuotesCarousel } from '~/components/quote/QuotesCarousel';
+import { Space } from '~/components/Space';
+import { Text } from '~/components/structuredText/Text';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { Wrapper } from '~/components/Wrapper';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+
+const variables = { slug: Astro.params.slug! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Wrapper>
+    <div class={s.hero}>
+      <div class={s.heroBody}>
+        <h1 class={s.heroTitle}>
+          When to choose DatoCMS over <mark>{page.product}?</mark>
+        </h1>
+        <div class={s.heroSubtitle}>
+          Our customers prefer DatoCMS for its convenient scalability, unrivaled developer
+          experience, and clean editing interface.
+        </div>
+        <Checks>
+          <Button as="a" href="https://dashboard.datocms.com/signup">Try DatoCMS for free!</Button>
+          <Fragment slot="checks">
+            <li>No credit card</li>
+            <li>Easy setup</li>
+          </Fragment>
+        </Checks>
+      </div>
+
+      <div class={s.heroImageWrapper}>
+        <div class={s.heroImage}>
+          <img src="/images/interface/panel-schema.webp" />
+        </div>
+        <div class={s.heroImage}>
+          <img src="/images/interface/panel-editor.webp" />
+        </div>
+      </div>
+    </div>
+  </Wrapper>
+
+  <LogosBar
+    title="We power experiences for over half a billion users"
+    clients={[
+      'svg/logos/polestar',
+      'svg/logos/hashicorp',
+      'svg/logos/verizon',
+      'svg/logos/little-caesars',
+      'svg/logos/vercel',
+    ]}
+  />
+
+  <div id="main-content">
+    <Space top={1} bottom={2}>
+      <TitleStripWithContent>
+        <Fragment slot="title">
+          DatoCMS vs. {page.product}:<br />
+          <mark>How we're different</mark>
+        </Fragment>
+
+        <div class={s.whyDifferent}>
+          <div class={s.whyDifferentBlock}>
+            <Text data={page.datocmsCharacterization} />
+          </div>
+          <div class={s.whyDifferentBlock}>
+            <Text data={page.competitorCharacterization} />
+          </div>
+        </div>
+      </TitleStripWithContent>
+    </Space>
+
+    <Space top={4} bottom={2}>
+      <InterstitialTitle style="two">What our customers say</InterstitialTitle>
+      <QuotesCarousel quotes={page.testimonials} />
+    </Space>
+
+    <Space top={2} bottom={2}>
+      <h2 class={s.topicsTitle}>At a glance comparison</h2>
+      <div class={s.topics}>
+        <div class={s.topicsHeading}>
+          <Wrapper>
+            <div class={s.topicsHeadingInner}>
+              <div class={s.topicsHeadingTitle}>
+                <span>DatoCMS</span>
+              </div>
+              <div class={s.topicsHeadingTitle}>
+                <span>{page.product}</span>
+              </div>
+            </div>
+          </Wrapper>
+        </div>
+        <Wrapper>
+          <div class={s.topicsContent}>
+            <div class={s.topicLines}>
+              <div class={s.topicLine}></div>
+              <div class={s.topicLine}></div>
+            </div>
+            {
+              page.topics.map((topic) => (
+                <div class={s.topic}>
+                  <div class={s.topicName}>{topic.topic}</div>
+                  <div class={s.topicDifferences}>
+                    {topic.differences.map((difference) => (
+                      <div class={s.topicDifference}>
+                        <div class={s.topicTake}>
+                          <div class={s.topicTakeProduct}>DatoCMS...</div>
+                          <Text data={difference.datocmsTake} />
+                        </div>
+                        <div class={s.topicTake}>
+                          <div class={s.topicTakeProduct}>...vs {page.product}</div>
+                          <Text data={difference.competitorTake} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </Wrapper>
+      </div>
+    </Space>
+
+    {
+      page.importer && (
+        <Wrapper>
+          <div class={s.importer}>
+            <div class={s.importerTitle}>{page.importer.header}</div>
+
+            <div class={s.importerSubtitle}>
+              <p>{page.importer.description}</p>
+              <Button
+                as="a"
+                fs="small"
+                p="small"
+                href={`/docs/import-and-export/${page.importer.learnMoreSlug}`}
+              >
+                Learn More
+              </Button>
+            </div>
+          </div>
+        </Wrapper>
+      )
+    }
+
+    <Space top={3} bottom={2}>
+      <div class={s.reasons}>
+        <Wrapper>
+          <div class={s.reasonsTitle}>Three reasons to consider DatoCMS</div>
+          <ol class={s.reasonsList}>
+            {
+              page.reasons.map((reason) => (
+                <li class={s.reason}>
+                  <div class={s.reasonTitle}>{reason.title}</div>
+                  <div class={s.reasonContent}>
+                    <Text data={reason.content} />
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+        </Wrapper>
+      </div>
+    </Space>
+  </div>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

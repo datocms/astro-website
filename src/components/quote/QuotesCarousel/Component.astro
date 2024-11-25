@@ -37,17 +37,36 @@ const { quotes } = Astro.props;
 
   window.customElements.define(
     'quotes-carousel',
-    class CloneButtonForm extends WebComponent {
+    class QuotesCarousel extends WebComponent {
+      private resizeListener?: () => void;
+
       parsedCallback() {
+        this.handleAnimation();
+        this.resizeListener = this.handleAnimation.bind(this);
+        window.addEventListener('resize', this.resizeListener);
+      }
+
+      disconnectedCallback(): void {
+        if (this.resizeListener) {
+          window.removeEventListener('resize', this.resizeListener);
+        }
+        super.disconnectedCallback();
+      }
+
+      handleAnimation(): void {
         const container = this.$('[data-container]');
         const scroller = this.$('[data-scroller]');
 
-        if (container.scrollWidth !== container.clientWidth) {
-          container.setAttribute('data-animated', 'true');
-          container.style.setProperty(
-            '--scroll-width',
-            `${scroller.scrollWidth - container.clientWidth}`,
-          );
+        if (container && scroller) {
+          const isAnimated = scroller.scrollWidth > container.clientWidth;
+          container.toggleAttribute('data-animated', isAnimated);
+
+          if (isAnimated) {
+            container.style.setProperty(
+              '--scroll-width',
+              `${scroller.scrollWidth - container.clientWidth}`,
+            );
+          }
         }
       }
     },
