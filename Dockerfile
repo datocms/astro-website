@@ -75,6 +75,9 @@ COPY --from=prod-deps /app/node_modules ./node_modules
 # Copy only the built application files from the build stage
 COPY --from=build /app/dist ./dist
 
+# Copy config/crontab
+COPY config/crontab .
+
 # Configure the application's runtime environment
 ENV HOST=0.0.0.0
 ENV PORT=4321
