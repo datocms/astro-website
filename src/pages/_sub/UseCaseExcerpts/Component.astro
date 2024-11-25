@@ -1,0 +1,47 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import { UseCaseExcerptsFragment } from './_graphql';
+import { Wrapper } from '~/components/Wrapper';
+import { Text } from '~/components/structuredText/Text';
+import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
+import s from './style.module.css';
+
+type Props = {
+  cases: FragmentOf<typeof UseCaseExcerptsFragment>[];
+};
+
+const { cases } = Astro.props;
+const firstCase = cases[0];
+---
+
+{
+  firstCase && (
+    <div class={s.root}>
+      <Wrapper>
+        <div class={s.inner}>
+          <h2 class={s.title}>Read their stories</h2>
+          <a class={s.mainStory} href={buildUrlForSuccessStory(firstCase)}>
+            <div class={s.mainStoryLogo}>
+              <img loading="lazy" src={firstCase.logo.url} />
+            </div>
+            <h5 class={s.mainStoryTitle}>
+              <Text data={firstCase.title} />
+            </h5>
+            <div class={s.goto}>Read the story →</div>
+          </a>
+          {cases.slice(1).map((useCase) => (
+            <a class={s.otherUseCase} href={buildUrlForSuccessStory(useCase)}>
+              <div class={s.otherStoryLogo}>
+                <img loading="lazy" src={useCase.logo.url} />
+              </div>
+              <h5 class={s.otherUseCaseTitle}>
+                <Text data={useCase.title} />
+              </h5>
+              <div class={s.goto}>Read the story →</div>
+            </a>
+          ))}
+        </div>
+      </Wrapper>
+    </div>
+  )
+}
