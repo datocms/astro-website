@@ -6,11 +6,11 @@ import { addLanguageToUrl, currentLanguage } from './LanguagePicker/utils';
 import type { RestApiEntity } from './types';
 
 export async function buildSidebarItems(
-  Astro: AstroGlobal,
+  astro: AstroGlobal,
   activeEntitySlug?: string,
 ): Promise<SidebarGroup[]> {
-  const schema = await fetchSchema();
-  const language = currentLanguage(Astro)!;
+  const schema = await fetchSchema(astro);
+  const language = currentLanguage(astro)!;
 
   invariant(schema.properties);
 
@@ -27,13 +27,13 @@ export async function buildSidebarItems(
 
         return {
           label: entity.title!,
-          url: addLanguageToUrl(Astro, `/docs/content-management-api/resources/${slug}`, language),
+          url: addLanguageToUrl(astro, `/docs/content-management-api/resources/${slug}`, language),
           entries:
             activeEntitySlug === slug
               ? endpoints.map((endpoint) => ({
                   label: endpoint.title,
                   url: addLanguageToUrl(
-                    Astro,
+                    astro,
                     `/docs/content-management-api/resources/${slug}/${endpoint.rel}`,
                     language,
                   ),

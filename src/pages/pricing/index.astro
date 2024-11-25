@@ -24,11 +24,11 @@ import { SingleQuote } from '~/components/quote/SingleQuote';
 import { formatNumber } from '~/lib/formatters';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const plans = sortBy(await fetchPerOwnerPricingPlans(), 'monthly_price');
+const { page, faqs, review1, planFeatureGroups, hints } = await executeQuery(Astro, query);
+
+const plans = sortBy(await fetchPerOwnerPricingPlans(Astro), 'monthly_price');
 
 const [freePlan, proPlan] = plans;
-
-const { page, faqs, review1, planFeatureGroups, hints } = await executeQuery(Astro, query);
 
 if (!page || !freePlan || !proPlan) {
   avoidAstroTypeCheckBug(notFoundResponse);

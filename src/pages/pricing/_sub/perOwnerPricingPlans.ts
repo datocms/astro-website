@@ -1,16 +1,17 @@
 import ky from 'ky';
-import { cachedFn } from '~/lib/temporarlyCache';
+import { toMemoizedAndResponseTaggingFn } from '~/lib/toMemoizedAndResponseTaggingFn';
 
-export const fetchPerOwnerPricingPlans = cachedFn(async () => {
-  const { data } = await ky<PricingPlanResponse>(
-    'https://account-api.datocms.com/per-owner-pricing-plans',
-    {
-      headers: { accept: 'application/json' },
-    },
-  ).json();
+export const [fetchPerOwnerPricingPlans, maybeInvalidatePerOwnerPricingPlans] =
+  toMemoizedAndResponseTaggingFn('per-owner-pricing-plans', async () => {
+    const { data } = await ky<PricingPlanResponse>(
+      'https://account-api.datocms.com/per-owner-pricing-plans',
+      {
+        headers: { accept: 'application/json' },
+      },
+    ).json();
 
-  return data;
-});
+    return data;
+  });
 
 /** Stores the information regarding the current plan for the account. */
 export interface Plan {

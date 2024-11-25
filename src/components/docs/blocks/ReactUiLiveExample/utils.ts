@@ -1,3 +1,4 @@
+import type { AstroGlobal } from 'astro';
 import { readFragment, type FragmentOf } from 'gql.tada';
 import ky from 'ky';
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
@@ -5,7 +6,7 @@ import { serialize } from 'next-mdx-remote/serialize';
 import { Application, FileRegistry, type JSONOutput } from 'typedoc';
 import { invariant } from '~/lib/invariant';
 import { slugify } from '~/lib/slugify';
-import { cachedFn } from '~/lib/temporarlyCache';
+import { toMemoizedAndResponseTaggingFn } from '~/lib/toMemoizedAndResponseTaggingFn';
 import type { TocEntry, TocGroup } from '../../ContentPlusToc/types';
 import { ReactUiLiveExampleFragment } from './graphql';
 
@@ -13,9 +14,12 @@ type Block = { __typename: 'ReactUiLiveExampleRecord' } & FragmentOf<
   typeof ReactUiLiveExampleFragment
 >;
 
-export async function buildGroupsFromReactUiLiveExamples(content: {
-  blocks: Array<{ __typename: string } | Block>;
-}): Promise<TocGroup[]> {
+export async function buildGroupsFromReactUiLiveExamples(
+  astro: AstroGlobal,
+  content: {
+    blocks: Array<{ __typename: string } | Block>;
+  },
+): Promise<TocGroup[]> {
   const sdkHookGroupBlocks = content.blocks.filter(
     (block): block is Block => block.__typename === 'ReactUiLiveExampleRecord',
   );
@@ -25,7 +29,7 @@ export async function buildGroupsFromReactUiLiveExamples(content: {
       sdkHookGroupBlocks.map(async (block) => {
         const { componentName } = readFragment(ReactUiLiveExampleFragment, block);
 
-        const examples = (await fetchReactUiExamples()).filter(
+        const examples = (await fetchReactUiExamples(astro)).filter(
           (example) => example.componentName === componentName,
         );
 
@@ -52,66 +56,68 @@ export type ReactUiLiveExample = {
 const url =
   'https://gist.githubusercontent.com/stefanoverna/476316a1d441f9f80d5eabac8ea7976e/raw/c64a50482f5aad0762257968dbcf31eb3c2ba91a/types.json';
 
-export const fetchReactUiExamples = cachedFn(async (): Promise<ReactUiLiveExample[]> => {
-  const jsonOutput = await ky<JSONOutput.ProjectReflection>(url).json();
+export const [fetchReactUiExamples, maybeInvalidateReactUiExamples] =
+  toMemoizedAndResponseTaggingFn('react-ui-examples', async (): Promise<ReactUiLiveExample[]> => {
+    const jsonOutput = await ky<JSONOutput.ProjectReflection>(url).json();
 
-  const app = await Application.bootstrap({
-    entryPoints: [],
-    entryPointStrategy: 'merge',
+    const app = await Application.bootstrap({
+      entryPoints: [],
+      entryPointStrategy: 'merge',
+    });
+
+    const project = app.deserializer.reviveProject(
+      jsonOutput,
+      'datocms-react-ui',
+      process.cwd(),
+      new FileRegistry(),
+    );
+
+    const result = await Promise.all(
+      project.children!.flatMap((child) => {
+        const blockTags = child.signatures?.[0]?.comment?.blockTags || child.comment?.blockTags;
+
+        const examples =
+          (blockTags && blockTags.filter((b) => b.tag === '@example' && b.name)) || [];
+
+        return examples.map(async (example) => {
+          invariant(example.name);
+
+          const codePart = example.content.find(
+            (part) => part.kind === 'code' && part.text.match(/```[a-z]*\n/),
+          );
+
+          const normalizedCode = codePart ? removeCommonIndentation(codePart.text) : undefined;
+
+          if (!normalizedCode) {
+            return [];
+          }
+
+          const codeWithoutMarkdown = normalizedCode
+            .match(/```[a-z]*\n([\s\S]*?)\n```/)?.[1]
+            ?.replace(/;$/, '');
+
+          if (!codeWithoutMarkdown) {
+            return [];
+          }
+
+          const allOtherParts = example.content.filter((part) => part !== codePart);
+          const description = allOtherParts.map((part) => part.text).join('');
+
+          return [
+            {
+              componentName: child.name,
+              code: codeWithoutMarkdown,
+              title: example.name,
+              description,
+              serializedMdxExample: await serialize(codeWithoutMarkdown),
+            },
+          ];
+        });
+      }),
+    );
+
+    return result.flat();
   });
-
-  const project = app.deserializer.reviveProject(
-    jsonOutput,
-    'datocms-react-ui',
-    process.cwd(),
-    new FileRegistry(),
-  );
-
-  const result = await Promise.all(
-    project.children!.flatMap((child) => {
-      const blockTags = child.signatures?.[0]?.comment?.blockTags || child.comment?.blockTags;
-
-      const examples = (blockTags && blockTags.filter((b) => b.tag === '@example' && b.name)) || [];
-
-      return examples.map(async (example) => {
-        invariant(example.name);
-
-        const codePart = example.content.find(
-          (part) => part.kind === 'code' && part.text.match(/```[a-z]*\n/),
-        );
-
-        const normalizedCode = codePart ? removeCommonIndentation(codePart.text) : undefined;
-
-        if (!normalizedCode) {
-          return [];
-        }
-
-        const codeWithoutMarkdown = normalizedCode
-          .match(/```[a-z]*\n([\s\S]*?)\n```/)?.[1]
-          ?.replace(/;$/, '');
-
-        if (!codeWithoutMarkdown) {
-          return [];
-        }
-
-        const allOtherParts = example.content.filter((part) => part !== codePart);
-        const description = allOtherParts.map((part) => part.text).join('');
-
-        return [
-          {
-            componentName: child.name,
-            code: codeWithoutMarkdown,
-            title: example.name,
-            description,
-            serializedMdxExample: await serialize(codeWithoutMarkdown),
-          },
-        ];
-      });
-    }),
-  );
-
-  return result.flat();
-});
 
 function removeCommonIndentation(example: string) {
   const lines = example

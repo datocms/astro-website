@@ -2,6 +2,7 @@
 import { Svg } from '~/components/Svg';
 import s from './style.module.css';
 import { Button } from '~/components/Button';
+import { RECAPTCHA_KEY } from 'astro:env/client';
 ---
 
 <share-feedback>
@@ -41,16 +42,27 @@ import { Button } from '~/components/Button';
         <input placeholder="Enter your email" name="email" />
       </div>
 
-      <p class={s.labelInfo}>If you need a reply, please contact support instead.</p>
+      <p class={s.labelInfo}>
+        If you need a reply, <a href="/support">please contact support</a> instead.
+      </p>
 
       <Button as="button" p="small" block type="submit">Submit feedback</Button>
     </div>
   </form>
 
+  <script is:inline src={`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_KEY}`}
+  ></script>
+
   <script>
     import { actions } from 'astro:actions';
     import { isInputError } from 'astro:actions';
     import { WebComponent } from '~/lib/WebComponent';
+    import { RECAPTCHA_KEY } from 'astro:env/client';
+
+    interface Grecaptcha {
+      ready: (callback: () => void) => void;
+      execute: (siteKey: string, options: { action: string }) => Promise<string>;
+    }
 
     window.customElements.define(
       'share-feedback',
@@ -71,32 +83,44 @@ import { Button } from '~/components/Button';
           this.button.innerText = 'Submitting...';
           this.button.disabled = true;
 
-          const formData = new FormData(this.form);
-          const { error } = await actions.sendFeedbackAboutDocPage(formData);
-
-          if (isInputError(error)) {
-            for (const [name, errors] of Object.entries(error.fields)) {
-              const fieldEl = this.form.querySelector(`[name=${name}]`);
-              const message = errors.join(', ');
-
-              if (!fieldEl) {
-                continue;
-              }
-
-              const errorEl = fieldEl.parentElement!.querySelector<HTMLElement>('[data-error]');
-
-              if (errorEl) {
-                errorEl.innerText = message;
-              } else {
-                fieldEl.after(`<div data-error>${errors.join(', ')}</div>`);
-              }
-            }
-
-            this.button.innerText = 'Submit feedback';
-            this.button.disabled = false;
-          } else {
-            this.form.innerHTML = 'Thank you! We received your feedback 🙏';
+          if (!('grecaptcha' in window)) {
+            return;
           }
+
+          const grecaptcha = window.grecaptcha as Grecaptcha;
+
+          grecaptcha.ready(async () => {
+            const token = await grecaptcha.execute(RECAPTCHA_KEY, { action: 'submit' });
+
+            const formData = new FormData(this.form);
+            formData.set('token', token);
+
+            const { error } = await actions.sendFeedbackAboutDocPage(formData);
+
+            if (isInputError(error)) {
+              for (const [name, errors] of Object.entries(error.fields)) {
+                const fieldEl = this.form.querySelector(`[name=${name}]`);
+                const message = errors.join(', ');
+
+                if (!fieldEl) {
+                  continue;
+                }
+
+                const errorEl = fieldEl.parentElement!.querySelector<HTMLElement>('[data-error]');
+
+                if (errorEl) {
+                  errorEl.innerText = message;
+                } else {
+                  fieldEl.after(`<div data-error>${errors.join(', ')}</div>`);
+                }
+              }
+
+              this.button.innerText = 'Submit feedback';
+              this.button.disabled = false;
+            } else {
+              this.form.innerHTML = 'Thank you! We received your feedback 🙏';
+            }
+          });
         }
       },
     );

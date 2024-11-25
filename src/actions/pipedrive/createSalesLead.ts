@@ -1,6 +1,7 @@
-import { defineAction } from 'astro:actions';
+import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
 import logToRollbar from '~/lib/logToRollbar';
+import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 import { createLead, createNote, findOrCreateOrgByName, findOrCreatePerson } from './utils';
 
 export default defineAction({
@@ -15,9 +16,17 @@ export default defineAction({
     referral: z.string(),
     useCase: z.string(),
     body: z.string(),
+    token: z.string(),
   }),
   handler: async (input) => {
     try {
+      if (!(await isRecaptchaTokenValid(input.token))) {
+        throw new ActionError({
+          code: 'UNAUTHORIZED',
+          message: 'Invalid recaptcha token',
+        });
+      }
+
       const organization = await findOrCreateOrgByName(input.companyName, input.industry);
 
       const person = await findOrCreatePerson(

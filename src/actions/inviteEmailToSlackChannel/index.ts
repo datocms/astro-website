@@ -1,9 +1,8 @@
 import { WebClient } from '@slack/web-api';
 import { ActionError, defineAction } from 'astro:actions';
-import { RECAPTCHA_SECRET_KEY } from 'astro:env/server';
 import { z } from 'astro:schema';
-import ky from 'ky';
 import logToRollbar from '~/lib/logToRollbar';
+import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 
 interface ErrorResponse {
   data: {
@@ -39,16 +38,7 @@ export default defineAction({
   handler: async (input) => {
     const { email, token } = input;
 
-    const { success } = await ky
-      .post<{ success: boolean }>('https://www.google.com/recaptcha/api/siteverify', {
-        body: new URLSearchParams({
-          secret: RECAPTCHA_SECRET_KEY,
-          response: token,
-        }),
-      })
-      .json();
-
-    if (!success) {
+    if (!(await isRecaptchaTokenValid(token))) {
       throw new ActionError({
         code: 'UNAUTHORIZED',
         message: 'Invalid recaptcha token',

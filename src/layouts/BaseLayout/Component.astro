@@ -55,3 +55,22 @@ const result = await executeQuery(Astro, query);
     <slot />
   </body>
 </html>
+
+<script>
+  import { getCookie, setCookie } from '~/lib/cookies';
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const source = urlParams.get('utm_source');
+
+  if (source) {
+    const medium = urlParams.get('utm_medium');
+    const campaign = urlParams.get('utm_campaign');
+    const cookieContent = JSON.stringify({ source, medium, campaign });
+
+    setCookie('latestDatoUtm', cookieContent, 365);
+
+    if (!getCookie('datoUtm')) {
+      setCookie('datoUtm', cookieContent, 365);
+    }
+  }
+</script>

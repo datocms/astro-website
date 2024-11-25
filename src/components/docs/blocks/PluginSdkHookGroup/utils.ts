@@ -1,6 +1,7 @@
+import type { AstroGlobal } from 'astro';
 import { readFragment, type FragmentOf } from 'gql.tada';
 import ky from 'ky';
-import { cachedFn } from '~/lib/temporarlyCache';
+import { toMemoizedAndResponseTaggingFn } from '~/lib/toMemoizedAndResponseTaggingFn';
 import type { TocEntry, TocGroup } from '../../ContentPlusToc/types';
 import { PluginSdkHookGroupFragment } from './graphql';
 import type { HookInfo, Manifest } from './manifestTypes';
@@ -9,9 +10,12 @@ type Block = { __typename: 'PluginSdkHookGroupRecord' } & FragmentOf<
   typeof PluginSdkHookGroupFragment
 >;
 
-export async function buildGroupsFromPluginSdkHooks(content: {
-  blocks: Array<{ __typename: string } | Block>;
-}): Promise<TocGroup[]> {
+export async function buildGroupsFromPluginSdkHooks(
+  astro: AstroGlobal,
+  content: {
+    blocks: Array<{ __typename: string } | Block>;
+  },
+): Promise<TocGroup[]> {
   const sdkHookGroupBlocks = content.blocks.filter(
     (block): block is Block => block.__typename === 'PluginSdkHookGroupRecord',
   );
@@ -21,7 +25,7 @@ export async function buildGroupsFromPluginSdkHooks(content: {
       sdkHookGroupBlocks.map(async (block) => {
         const { groupName } = readFragment(PluginSdkHookGroupFragment, block);
 
-        const manifest = await fetchPluginSdkManifest();
+        const manifest = await fetchPluginSdkManifest(astro);
 
         const hooks = sortRelatedHooks(
           Object.values(manifest.hooks).filter((hook) => hook.comment?.tag === groupName),
@@ -82,6 +86,7 @@ function sortRenderAtEnd(a: { name: string }, b: { name: string }): number {
 const url =
   'https://raw.githubusercontent.com/datocms/plugins-sdk/refs/heads/new-hooks/packages/sdk/manifest.json';
 
-export const fetchPluginSdkManifest = cachedFn(async (): Promise<Manifest> => {
-  return await ky<Manifest>(url).json();
-});
+export const [fetchPluginSdkManifest, maybeInvalidateFetchPluginSdkManifest] =
+  toMemoizedAndResponseTaggingFn('plugins-sdk-manifest', async (): Promise<Manifest> => {
+    return await ky<Manifest>(url).json();
+  });
