@@ -5,12 +5,11 @@ import { BaseLayout } from '~/layouts/docs/BaseLayout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
-import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
 import s from './_style.module.css';
 import { Svg } from '~/components/Svg';
-import { Sidebar, type SidebarEntry } from '~/components/docs/Sidebar';
+import { HomeSidebar } from './_sub/HomeSidebar';
 
-const { page, roots, tutorials, tutorialsMeta } = await executeQuery(Astro, query);
+const { page, tutorials, tutorialsMeta } = await executeQuery(Astro, query);
 
 if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
@@ -20,21 +19,7 @@ if (!page) {
 
 <BaseLayout additionalSeo={page._seoMetaTags}>
   <Fragment slot="sidebar">
-    <Sidebar
-      items={[
-        ...roots.map((root) => ({
-          title: root.name,
-          entries: root.children.map<SidebarEntry>((sub) => ({
-            label: sub.name,
-            url: buildUrlFromGql(sub),
-          })),
-        })),
-        {
-          title: 'Community',
-          entries: [{ label: 'Community Videos', url: '/docs/community-tutorials' }],
-        },
-      ]}
-    />
+    <HomeSidebar />
   </Fragment>
 
   <div class={s.container}>

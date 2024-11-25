@@ -1,0 +1,27 @@
+---
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
+import { Sidebar, type SidebarEntry } from '~/components/docs/Sidebar';
+
+const { roots } = await executeQuery(Astro, query);
+---
+
+<Sidebar
+  items={[
+    ...roots.map((root) => ({
+      title: root.name,
+      entries: root.children.map<SidebarEntry>((sub) => ({
+        label: sub.name,
+        url: buildUrlFromGql(sub),
+      })),
+    })),
+    {
+      title: 'Community',
+      entries: [{ label: 'Community Videos', url: '/docs/community-tutorials' }],
+    },
+  ]}
+/>
+
+<DraftModeQueryListener query={query} />

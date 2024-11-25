@@ -1,0 +1,82 @@
+---
+import { BaseLayout } from '~/layouts/docs/BaseLayout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { HomeSidebar } from '../_sub/HomeSidebar';
+import s from './_style.module.css';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
+import { Prose } from '~/components/Prose';
+import { Space } from '~/components/Space';
+
+const { tutorials } = await executeQuery(Astro, query);
+
+if (tutorials.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<BaseLayout additionalSeo={[]}>
+  <Fragment slot="head">
+    <title>Community Video Tutorials — DatoCMS</title>
+  </Fragment>
+
+  <Fragment slot="sidebar">
+    <HomeSidebar />
+  </Fragment>
+
+  <ContentPlusToc tocGroups={[]}>
+    <Fragment slot="title">DatoCMS Community Videos</Fragment>
+
+    <Space bottom={1}>
+      <Prose>
+        <p>
+          New here? We recommend starting with our official{' '}
+          <a href="/user-guides">DatoCMS Editor Guides</a>, which offer a series of videos and
+          written tutorials to help you learn the basics.
+        </p>
+
+        <p>
+          The below are a collection of additional videos made by our awesome community members
+          covering a wide range of topics, from beginner to advanced.
+        </p>
+      </Prose>
+    </Space>
+
+    <div class={s.tutorials}>
+      {
+        tutorials.map((tutorial) => {
+          const resource = tutorial.res;
+
+          return resource.__typename === 'YoutubeVideoResourceRecord' ? (
+            <MarketplaceCard
+              size="small"
+              href={resource.video.url}
+              target="_blank"
+              title={tutorial.title}
+              label="Youtube Video"
+            >
+              <Fragment slot="image">
+                <img loading="lazy" src={resource.video.thumbnailUrl} />
+              </Fragment>
+            </MarketplaceCard>
+          ) : (
+            <MarketplaceCard
+              size="small"
+              href={resource.url}
+              target="_blank"
+              title={tutorial.title}
+            >
+              <Fragment slot="image">
+                <ResponsiveImage data={resource.coverImage.responsiveImage} />
+              </Fragment>
+            </MarketplaceCard>
+          );
+        })
+      }
+    </div>
+  </ContentPlusToc>
+</BaseLayout>
