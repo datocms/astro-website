@@ -180,7 +180,7 @@ export function TopicsPicker({ topics, initialLocationSearch }: Props) {
                     }}
                   />
                 ) : (
-                  <SalesForm />
+                  <SalesForm issueType="sales" />
                 )}
               </div>
             </div>
