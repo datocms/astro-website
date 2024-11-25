@@ -17,10 +17,10 @@ type FormValues = {
   useCase: string;
   body: string;
   referral: string;
-  issueType: 'sales';
+  issueType: 'sales' | 'enterprise';
 };
 
-export function Form() {
+export function Form({ issueType }: { issueType: 'sales' | 'enterprise' }) {
   const defaultValues: FormValues = {
     companyName: '',
     country: '',
@@ -32,7 +32,7 @@ export function Form() {
     useCase: '',
     body: '',
     referral: '',
-    issueType: 'sales',
+    issueType,
   };
 
   return (
@@ -158,7 +158,7 @@ export function Form() {
           options={[
             'A colleague/recommendation/forum',
             'Software review platform (G2, Capterra...)',
-            'Our partners (Gatsby, Next.js...)',
+            'Our partners (Netlify, Vercel, Imgix...)',
             'Social Media (Twitter, LinkedIn...)',
             'Search',
             'Other',
