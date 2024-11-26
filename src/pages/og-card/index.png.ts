@@ -46,7 +46,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       return invalidRequestResponse('Invalid data URL param', 404);
     }
 
-    const { kicker, title, pills, excerpt, logoUrl } = data as OgCardData;
+    const { kicker, title, pills, excerpt, logoPngUrl } = data as OgCardData;
 
     const markup = html(/* HTML */ `
       <div
@@ -85,10 +85,10 @@ export const GET: APIRoute = async ({ request, url }) => {
           >
             ${kicker}
           </div>
-          ${logoUrl
+          ${logoPngUrl
             ? /* HTML */ `
               <img
-                src="${logoUrl}"
+                src="${logoPngUrl}"
                 style"${css({
                   height: '110px',
                   width: '700px',

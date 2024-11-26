@@ -7,7 +7,7 @@ export type OgCardData = {
   title?: string | null;
   pills?: string[] | null;
   excerpt?: string | null;
-  logoUrl?: string | null;
+  logoPngUrl?: string | null;
 };
 
 export function ogCardUrl(data: OgCardData, astroOrRequest: AstroGlobal | Request): string {

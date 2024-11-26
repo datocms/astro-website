@@ -17,10 +17,19 @@ export function overrideSeo(
   tags: SeoMetaTag[],
   ...operations: Array<Operation | Operation[] | undefined | null | false>
 ) {
-  return operations
+  return [baseMetas(), ...operations]
     .flat()
     .filter(isDefined)
     .reduce((acc, operation) => operation(acc), tags);
+}
+
+function baseMetas() {
+  return [
+    seoMeta('og:locale', 'en'),
+    seoMeta('og:type', 'article'),
+    seoMeta('og:site_name', 'DatoCMS'),
+    seoMeta('twitter:site', '@datocms'),
+  ];
 }
 
 export function seoPageTitle(...chunks: string[]) {

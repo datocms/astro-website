@@ -20,6 +20,7 @@ export const query = graphql(
           alt
           width
           height
+          pngUrl: url(imgixParams: { fm: png, h: 200 })
         }
         shortDescription {
           value
