@@ -4,9 +4,9 @@ import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
-  ProductComparisonUrlFragment,
-  buildUrlForProductComparison,
-} from '~/lib/datocms/gqlUrlBuilder/productComparison';
+  LandingPageUrlFragment,
+  buildUrlForLandingPage,
+} from '~/lib/datocms/gqlUrlBuilder/landingPage';
 import { graphql } from '~/lib/datocms/graphql';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
@@ -169,15 +169,15 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     graphql(
       /* GraphQL */ `
         query BuildSitemapUrls {
-          entries: allProductComparisons(first: 500) {
-            ...ProductComparisonUrlFragment
+          entries: allLandingPages(first: 100) {
+            ...LandingPageUrlFragment
           }
         }
       `,
-      [ProductComparisonUrlFragment],
+      [LandingPageUrlFragment],
     ),
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForProductComparison);
+  return entries.map(buildUrlForLandingPage);
 };
