@@ -35,14 +35,14 @@ export const GET: APIRoute = async ({ request, url }) => {
     const rawData = url.searchParams.get('data');
 
     if (!rawData) {
-      return invalidRequestResponse('Not found', 404);
+      return invalidRequestResponse('Missing data URL param', 404);
     }
 
     let data;
     try {
       data = JSON.parse(Buffer.from(rawData, 'base64').toString('ascii'));
     } catch (e) {
-      return invalidRequestResponse('Not found', 404);
+      return invalidRequestResponse('Invalid data URL param', 404);
     }
 
     const { kicker, title, pills, excerpt } = data as OgCardData;
