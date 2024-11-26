@@ -21,6 +21,7 @@ export const query = graphql(
         }
         logo {
           url
+          pngUrl: url(imgixParams: { fm: png, h: 200 })
         }
         description {
           value

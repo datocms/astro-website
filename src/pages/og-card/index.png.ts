@@ -43,11 +43,10 @@ export const GET: APIRoute = async ({ request, url }) => {
       const decoded = Buffer.from(rawData, 'base64').toString('utf-8');
       data = JSON.parse(decoded);
     } catch (e) {
-      console.log(e);
       return invalidRequestResponse('Invalid data URL param', 404);
     }
 
-    const { kicker, title, pills, excerpt } = data as OgCardData;
+    const { kicker, title, pills, excerpt, logoUrl } = data as OgCardData;
 
     const markup = html(/* HTML */ `
       <div
@@ -86,17 +85,34 @@ export const GET: APIRoute = async ({ request, url }) => {
           >
             ${kicker}
           </div>
-          <div
-            style="${css({
-              fontSize: `${title.length < 40 ? 90 : 70}px`,
-              letterSpacing: '-0.06em',
-              lineHeight: '0.9',
-              display: 'flex',
-              fontWeight: 'bold',
-            })}"
-          >
-            ${title}
-          </div>
+          ${logoUrl
+            ? /* HTML */ `
+              <img
+                src="${logoUrl}"
+                style"${css({
+                  height: '110px',
+                  width: '700px',
+                  objectFit: 'contain',
+                  margin: '30px 0',
+                })}"
+              />
+            `
+            : ''}
+          ${title
+            ? /* HTML */ `
+                <div
+                  style="${css({
+                    fontSize: `${title.length < 40 ? 90 : 70}px`,
+                    letterSpacing: '-0.06em',
+                    lineHeight: '0.9',
+                    display: 'flex',
+                    fontWeight: 'bold',
+                  })}"
+                >
+                  ${title}
+                </div>
+              `
+            : ''}
           ${excerpt
             ? `
               <div

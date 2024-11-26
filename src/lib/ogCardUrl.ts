@@ -4,9 +4,10 @@ import { baseUrl } from './draftMode';
 
 export type OgCardData = {
   kicker?: string | null;
-  title: string;
+  title?: string | null;
   pills?: string[] | null;
   excerpt?: string | null;
+  logoUrl?: string | null;
 };
 
 export function ogCardUrl(data: OgCardData, astroOrRequest: AstroGlobal | Request): string {
