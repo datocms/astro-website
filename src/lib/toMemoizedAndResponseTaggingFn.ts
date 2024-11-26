@@ -42,11 +42,15 @@ export function toMemoizedAndResponseTaggingFn<T>(
 
   const maybeInvalidateFn = async () => {
     const result = await fn();
-    const toInvalidate = cache.has(surrogateKey) ? (cache.get(surrogateKey) as T) === result : true;
+    const toInvalidate = cache.has(surrogateKey) ? (cache.get(surrogateKey) as T) !== result : true;
 
     if (toInvalidate) {
       cache.delete(surrogateKey);
       await invalidateFastlySurrogateKeys([surrogateKey]);
+
+      if (result) {
+        cache.set(surrogateKey, result);
+      }
     }
 
     return toInvalidate ? surrogateKey : false;
