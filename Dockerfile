@@ -22,6 +22,9 @@ COPY package.json package-lock.json ./
 
 FROM base AS prod-deps
 
+# crontab requires curl
+RUN apk update && apk add --no-cache curl
+
 # --omit=dev flag excludes development dependencies not needed in production
 RUN npm install --omit=dev
 
