@@ -111,7 +111,7 @@ export const GET: APIRoute = async ({ request, url }) => {
             `
             : ''}
         </div>
-        ${pills && pills.length > 1
+        ${pills && pills.length > 0
           ? `
           <div
             style="${css({

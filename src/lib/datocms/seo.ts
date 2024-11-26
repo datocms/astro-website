@@ -72,6 +72,7 @@ export function seoGeneratedCard(astroOrRequest: AstroGlobal | Request, data: Og
     seoMeta('twitter:image', url),
     seoMeta('twitter:image:width', ogCardWidth.toString()),
     seoMeta('twitter:image:height', ogCardHeight.toString()),
+    seoMeta('twitter:card', 'summary_large_image'),
   ];
 }
 
