@@ -10,12 +10,7 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import s from './_style.module.css';
-import {
-  overrideSeo,
-  replaceDescription,
-  replacePageTitle,
-  replaceShareTitle,
-} from '~/lib/datocms/seo';
+import { overrideSeo, seoDescription, seoPageTitle, seoShareTitle } from '~/lib/datocms/seo';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
@@ -31,9 +26,9 @@ if (!page) {
 <Layout
   additionalSeo={overrideSeo(
     page.seo,
-    replacePageTitle(`${page.name} | DatoCMS Ecosystem Partners`),
-    replaceShareTitle(`DatoCMS Ecosystem Partner: ${page.name}`),
-    replaceDescription(toPlainText(page.shortDescription)!),
+    seoPageTitle(page.name, 'Ecosystem Partners'),
+    seoShareTitle(`DatoCMS Ecosystem Partner: ${page.name}`),
+    seoDescription(toPlainText(page.shortDescription)!),
   )}
 >
   <InterstitialTitle style="two" mainTitleOfPage bigSubtitle>

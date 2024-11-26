@@ -5,7 +5,7 @@ import { Image } from '~/components/blocks/Image';
 import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { CloneButtonForm } from '~/components/docs/blocks/CloneButtonForm';
 import { Demo } from '~/components/blocks/Demo';
-import { overrideSeo, generateCard } from '~/lib/datocms/seo';
+import { overrideSeo, seoGeneratedCard } from '~/lib/datocms/seo';
 import { DeployButtonForm } from '~/components/docs/blocks/DeployButtonForm';
 import { DocCallout } from '~/components/docs/blocks/DocCallout';
 import { MultipleDemosBlock } from '~/components/blocks/MultipleDemosBlock';
@@ -65,7 +65,7 @@ const tocGroups = [
   group={maskedGroup}
   additionalSeo={overrideSeo(
     page._seoMetaTags,
-    generateCard(Astro.url, {
+    seoGeneratedCard(Astro, {
       kicker: group ? `Documentation: ${group.name}` : 'DatoCMS Docs',
       title: page.title,
       pills: tocGroups.flatMap((group) => group.entries).map((entry) => entry.label),

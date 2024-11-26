@@ -1,5 +1,6 @@
 import { createMarkdownProcessor, type AstroMarkdownOptions } from '@astrojs/markdown-remark';
 import rehypeExpressiveCode from 'rehype-expressive-code';
+import striptags from 'striptags';
 import expressiveCodeConfig from '~~/ec.config.mjs';
 import { autolinkHeadings, figureAroundCodeBlocks } from './rehypePlugins';
 
@@ -31,6 +32,10 @@ export async function inlineMarkdown(content: string) {
       ? result.code.slice(3, -4)
       : result.code,
   );
+}
+
+export async function markdownToPlainText(content: string) {
+  return striptags((await markdown(content)).toString());
 }
 
 export class HTMLString extends String {

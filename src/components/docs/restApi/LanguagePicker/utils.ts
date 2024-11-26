@@ -29,5 +29,5 @@ export function addLanguageToUrl(Astro: AstroGlobal, url: URL | string, language
     completeUrl.searchParams.set('language', 'http');
   }
 
-  return completeUrl.toString();
+  return completeUrl.pathname + completeUrl.search;
 }

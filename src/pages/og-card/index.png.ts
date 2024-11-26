@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { truncate } from 'lodash-es';
 import satori from 'satori';
 import { html } from 'satori-html';
 import sharp from 'sharp';
@@ -39,7 +40,7 @@ export const GET: APIRoute = async ({ request, url }) => {
 
     let data;
     try {
-      data = JSON.parse(rawData);
+      data = JSON.parse(Buffer.from(rawData, 'base64').toString('ascii'));
     } catch (e) {
       return invalidRequestResponse('Not found', 404);
     }
@@ -103,7 +104,7 @@ export const GET: APIRoute = async ({ request, url }) => {
                   letterSpacing: '-0.04em',
                 })}"
               >
-                ${excerpt}
+                ${truncate(excerpt, { length: 200 })}
               </div>
             `
             : ''}

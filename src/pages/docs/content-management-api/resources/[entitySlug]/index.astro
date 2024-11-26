@@ -17,6 +17,14 @@ import {
   isValidLanguage,
 } from '~/components/docs/restApi/LanguagePicker/utils';
 import { Heading } from '~/components/Heading';
+import {
+  overrideSeo,
+  seoDescription,
+  seoGeneratedCard,
+  seoPageTitle,
+  seoShareTitle,
+} from '~/lib/datocms/seo';
+import { markdownToPlainText } from '~/components/Markdown/utils';
 
 const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
 const resource = await findEntity(Astro, Astro.params.entitySlug!);
@@ -40,11 +48,25 @@ const [group, queryListenerProps] = result;
 const links = resource.links ? resource.links.filter((l) => !l.private) : [];
 
 const objectPayload = analyzePropertiesOfJsonApiEntity(resource, 'entity', language);
+
+const plainDescription = resource.description
+  ? await markdownToPlainText(resource.description)
+  : undefined;
 ---
 
 <GroupLayout
   group={group}
-  additionalSeo={[]}
+  additionalSeo={overrideSeo(
+    [],
+    seoPageTitle(resource.title!, 'Content Management API'),
+    seoShareTitle(`Content Management API: ${resource.title}`),
+    plainDescription ? seoDescription(plainDescription) : undefined,
+    seoGeneratedCard(Astro, {
+      kicker: `DatoCMS Docs: Content Management API`,
+      title: resource.title!,
+      excerpt: plainDescription,
+    }),
+  )}
   additionalSidebarItems={sidebarItems}
   contentWrapperComponent={LanguagePicker}
 >

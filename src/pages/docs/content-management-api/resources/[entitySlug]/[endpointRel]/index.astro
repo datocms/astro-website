@@ -27,6 +27,14 @@ import { LanguagePicker } from '~/components/docs/restApi/LanguagePicker';
 import { currentLanguage, isValidLanguage } from '~/components/docs/restApi/LanguagePicker/utils';
 import { Heading } from '~/components/Heading';
 import { analyzeResponse } from '~/components/docs/restApi/EndpointResponse/utils';
+import { markdownToPlainText } from '~/components/Markdown/utils';
+import {
+  overrideSeo,
+  seoDescription,
+  seoGeneratedCard,
+  seoPageTitle,
+  seoShareTitle,
+} from '~/lib/datocms/seo';
 
 const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
 const entity = await findEntity(Astro, Astro.params.entitySlug!);
@@ -60,6 +68,7 @@ if (!endpoint) {
 }
 
 const description = endpoint.documentation?.[language]?.description || endpoint.description;
+const plainDescription = description ? await markdownToPlainText(description) : undefined;
 
 const examples = endpoint?.documentation?.[language]?.examples || [];
 
@@ -85,7 +94,17 @@ const propsForExamples = { entity, endpoint, jsClient };
 
 <GroupLayout
   group={group}
-  additionalSeo={[]}
+  additionalSeo={overrideSeo(
+    [],
+    seoPageTitle(endpoint.title, entity.title!, 'Content Management API'),
+    seoShareTitle(`${entity.title}: ${endpoint.title}`),
+    plainDescription ? seoDescription(plainDescription) : undefined,
+    seoGeneratedCard(Astro, {
+      kicker: `Content Management API: ${entity.title}`,
+      title: endpoint.title,
+      excerpt: plainDescription,
+    }),
+  )}
   additionalSidebarItems={sidebarItems}
   contentWrapperComponent={LanguagePicker}
 >
