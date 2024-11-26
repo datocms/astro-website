@@ -40,8 +40,10 @@ export const GET: APIRoute = async ({ request, url }) => {
 
     let data;
     try {
-      data = JSON.parse(Buffer.from(rawData, 'base64').toString('ascii'));
+      const decoded = Buffer.from(rawData, 'base64').toString('utf-8');
+      data = JSON.parse(decoded);
     } catch (e) {
+      console.log(e);
       return invalidRequestResponse('Invalid data URL param', 404);
     }
 
