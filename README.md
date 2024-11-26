@@ -1,6 +1,6 @@
 <!--datocms-autoinclude-header start-->
 
-<a href="https://www.datocms.com/"><img src="https://www.datocms.com/images/full_logo.svg" height="60"></a>
+<a href="https://www.datocms.com/"><img src="https://www.datocms-assets.com/205/1728919607-color_full_logo.svg" height="60"></a>
 
 👉 [Visit the DatoCMS homepage](https://www.datocms.com) or see [What is DatoCMS?](#what-is-datocms)
 
@@ -117,7 +117,7 @@ The title says it all. More info in this [Github issue](https://github.com/witha
 
 # What is DatoCMS?
 
-<a href="https://www.datocms.com/"><img src="https://www.datocms.com/images/full_logo.svg" height="60"></a>
+<a href="https://www.datocms.com/"><img src="https://www.datocms-assets.com/205/1728919607-color_full_logo.svg" height="60"></a>
 
 [DatoCMS](https://www.datocms.com/) is the REST & GraphQL Headless CMS for the modern web.
 
