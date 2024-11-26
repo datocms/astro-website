@@ -904,9 +904,9 @@ type CodeExcerptBlockModelContentField {
 
 input CodeExcerptBlockModelFilter {
   id: ItemIdFilter
+  code: TextFilter
   language: StringFilter
   githubPackageName: StringFilter
-  code: TextFilter
   githubRepoTitle: StringFilter
   OR: [CodeExcerptBlockModelFilter]
   AND: [CodeExcerptBlockModelFilter]
@@ -941,14 +941,14 @@ type CodeExcerptBlockRecord implements RecordInterface {
   code(
     """Process content as markdown"""
     markdown: Boolean
-  ): String
+  ): String!
   content: CodeExcerptBlockModelContentField
   createdAt: DateTime!
   githubPackageName: String
   githubRepoTitle: String
   id: ItemId!
-  language: String
-  title: CodeExcerptBlockModelTitleField
+  language: String!
+  title: CodeExcerptBlockModelTitleField!
   updatedAt: DateTime!
 }
 
@@ -3686,7 +3686,7 @@ type ImageTransformationsBlockRecord implements RecordInterface {
   content: ImageTransformationsBlockModelContentField
   createdAt: DateTime!
   id: ItemId!
-  title: ImageTransformationsBlockModelTitleField
+  title: ImageTransformationsBlockModelTitleField!
   updatedAt: DateTime!
 }
 
@@ -5741,6 +5741,186 @@ enum IntegrationModelOrderBy {
 
 """Record of type 🔧 Integration (integration)"""
 type IntegrationRecord implements RecordInterface {
+  _allReferencingLandingPages(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenLandingPageAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: LandingPageModelFilter
+    orderBy: [LandingPageModelOrderBy] = [_updatedAt_DESC]
+  ): [LandingPageRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingLandingPagesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenLandingPageAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: LandingPageModelFilter
+  ): CollectionMetadata!
+  _allReferencingPartners(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenPartnerAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: PartnerModelFilter
+    orderBy: [PartnerModelOrderBy] = [_updatedAt_DESC]
+  ): [PartnerRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingPartnersMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenPartnerAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: PartnerModelFilter
+  ): CollectionMetadata!
+  _allReferencingShowcaseProjects(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenShowcaseProjectAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: ShowcaseProjectModelFilter
+    orderBy: [ShowcaseProjectModelOrderBy] = [position_ASC]
+  ): [ShowcaseProjectRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingShowcaseProjectsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenShowcaseProjectAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: ShowcaseProjectModelFilter
+  ): CollectionMetadata!
+  _allReferencingTechPartners(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenTechPartnerAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: TechPartnerModelFilter
+    orderBy: [TechPartnerModelOrderBy] = [_updatedAt_DESC]
+  ): [TechPartnerRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingTechPartnersMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenTechPartnerAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: TechPartnerModelFilter
+  ): CollectionMetadata!
+  _allReferencingTemplateDemos(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenTemplateDemoAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: TemplateDemoModelFilter
+    orderBy: [TemplateDemoModelOrderBy] = [position_ASC]
+  ): [TemplateDemoRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingTemplateDemosMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenTemplateDemoAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: TemplateDemoModelFilter
+  ): CollectionMetadata!
+  _allReferencingWebsites(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenWebsiteAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: WebsiteModelFilter
+    orderBy: [WebsiteModelOrderBy] = [position_ASC]
+  ): [WebsiteRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingWebsitesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenWebsiteAndIntegration
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: WebsiteModelFilter
+  ): CollectionMetadata!
   _createdAt: DateTime!
 
   """Editing URL"""
@@ -6046,6 +6226,32 @@ input InverseRelationshipFieldFilterBetweenFeaturesIndexAndUserGuidesVideo {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenLandingPageAndIntegration {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [LandingPageModelFieldsReferencingIntegrationModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [LandingPageModelFieldsReferencingIntegrationModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenPartnerAndIntegration {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [PartnerModelFieldsReferencingIntegrationModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [PartnerModelFieldsReferencingIntegrationModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenPartnerTestimonialAndPartner {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -6085,6 +6291,19 @@ input InverseRelationshipFieldFilterBetweenProductOverviewAndDocPage {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenShowcaseProjectAndIntegration {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [ShowcaseProjectModelFieldsReferencingIntegrationModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [ShowcaseProjectModelFieldsReferencingIntegrationModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenShowcaseProjectAndPartner {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -6095,6 +6314,32 @@ input InverseRelationshipFieldFilterBetweenShowcaseProjectAndPartner {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [ShowcaseProjectModelFieldsReferencingPartnerModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenTechPartnerAndIntegration {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [TechPartnerModelFieldsReferencingIntegrationModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [TechPartnerModelFieldsReferencingIntegrationModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenTemplateDemoAndIntegration {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [TemplateDemoModelFieldsReferencingIntegrationModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [TemplateDemoModelFieldsReferencingIntegrationModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -6121,6 +6366,19 @@ input InverseRelationshipFieldFilterBetweenUserGuidesChapterAndUserGuidesVideo {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [UserGuidesChapterModelFieldsReferencingUserGuidesVideoModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenWebsiteAndIntegration {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [WebsiteModelFieldsReferencingIntegrationModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [WebsiteModelFieldsReferencingIntegrationModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -6227,6 +6485,24 @@ input InverseRelationshipFilterBetweenFeaturesIndexAndUserGuidesVideo {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenLandingPageAndIntegration {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenLandingPageAndIntegration
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenPartnerAndIntegration {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenPartnerAndIntegration
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenPartnerTestimonialAndPartner {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenPartnerTestimonialAndPartner
@@ -6254,9 +6530,36 @@ input InverseRelationshipFilterBetweenProductOverviewAndDocPage {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenShowcaseProjectAndIntegration {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenShowcaseProjectAndIntegration
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenShowcaseProjectAndPartner {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenShowcaseProjectAndPartner
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenTechPartnerAndIntegration {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenTechPartnerAndIntegration
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenTemplateDemoAndIntegration {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenTemplateDemoAndIntegration
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -6275,6 +6578,15 @@ input InverseRelationshipFilterBetweenUseCasePageAndShowcaseProject {
 input InverseRelationshipFilterBetweenUserGuidesChapterAndUserGuidesVideo {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenUserGuidesChapterAndUserGuidesVideo
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenWebsiteAndIntegration {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenWebsiteAndIntegration
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -6363,7 +6675,7 @@ type LandingCdnMapBlockRecord implements RecordInterface {
   createdAt: DateTime!
   description: LandingCdnMapBlockModelDescriptionField
   id: ItemId!
-  title: LandingCdnMapBlockModelTitleField
+  title: LandingCdnMapBlockModelTitleField!
   updatedAt: DateTime!
 }
 
@@ -6411,6 +6723,11 @@ input LandingPageModelContentFieldFilter {
   containsAny: LandingPageModelContentFieldBlocksPresence
 }
 
+"""Linking fields"""
+enum LandingPageModelFieldsReferencingIntegrationModel {
+  landingPage_integration
+}
+
 input LandingPageModelFilter {
   _createdAt: CreatedAtFilter
   createdAt: CreatedAtFilter
@@ -6429,8 +6746,8 @@ input LandingPageModelFilter {
   demo: LinkFilter
   integration: LinkFilter
   title: StructuredTextFilter
-  seoH1: StringFilter
   name: StringFilter
+  seoH1: StringFilter
   subtitle: TextFilter
   docsUrl: StringFilter
   slug: SlugFilter
@@ -6461,10 +6778,10 @@ enum LandingPageModelOrderBy {
   updatedAt_DESC
   _isValid_ASC
   _isValid_DESC
-  seoH1_ASC
-  seoH1_DESC
   name_ASC
   name_DESC
+  seoH1_ASC
+  seoH1_DESC
   docsUrl_ASC
   docsUrl_DESC
 }
@@ -6501,7 +6818,7 @@ type LandingPageRecord implements RecordInterface {
   docsUrl: String
   id: ItemId!
   integration: IntegrationRecord!
-  name: String
+  name: String!
   seo: SeoField
   seoH1: String
   slug: String
@@ -6509,7 +6826,7 @@ type LandingPageRecord implements RecordInterface {
     """Process content as markdown"""
     markdown: Boolean
   ): String
-  title: LandingPageModelTitleField
+  title: LandingPageModelTitleField!
   updatedAt: DateTime!
   yoastAnalysis: JsonField!
 }
@@ -6559,7 +6876,7 @@ type LandingProgressiveImagesBlockRecord implements RecordInterface {
   githubPackageName: String
   githubRepoTitle: String
   id: ItemId!
-  title: LandingProgressiveImagesBlockModelTitleField
+  title: LandingProgressiveImagesBlockModelTitleField!
   updatedAt: DateTime!
 }
 
@@ -6605,9 +6922,9 @@ type LandingVideoBlockRecord implements RecordInterface {
   content: LandingVideoBlockModelContentField
   createdAt: DateTime!
   id: ItemId!
-  title: LandingVideoBlockModelTitleField
+  title: LandingVideoBlockModelTitleField!
   updatedAt: DateTime!
-  video: FileField
+  video: VideoFileField!
 }
 
 type LatLonField {
@@ -6746,7 +7063,7 @@ type ModularBlocksBlockRecord implements RecordInterface {
   content: ModularBlocksBlockModelContentField
   createdAt: DateTime!
   id: ItemId!
-  title: ModularBlocksBlockModelTitleField
+  title: ModularBlocksBlockModelTitleField!
   updatedAt: DateTime!
 }
 
@@ -6968,6 +7285,11 @@ type PartnerModelDescriptionField {
   blocks: [String!]!
   links: [String!]!
   value: JsonField!
+}
+
+"""Linking fields"""
+enum PartnerModelFieldsReferencingIntegrationModel {
+  partner_technologies
 }
 
 input PartnerModelFilter {
@@ -11123,6 +11445,8 @@ input QuoteLinkModelFilter {
   AND: [QuoteLinkModelFilter]
 }
 
+union QuoteLinkModelQuoteField = PartnerTestimonialRecord | ReviewRecord
+
 """Block of type 💬 Quote Link (quote_link)"""
 type QuoteLinkRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -11145,7 +11469,7 @@ type QuoteLinkRecord implements RecordInterface {
   _updatedAt: DateTime!
   createdAt: DateTime!
   id: ItemId!
-  quote: ReviewRecord
+  quote: QuoteLinkModelQuoteField!
   updatedAt: DateTime!
 }
 
@@ -11519,6 +11843,11 @@ type ShowcaseProjectBlockRecord implements RecordInterface {
   id: ItemId!
   showcaseProjects: [ShowcaseProjectRecord!]!
   updatedAt: DateTime!
+}
+
+"""Linking fields"""
+enum ShowcaseProjectModelFieldsReferencingIntegrationModel {
+  showcaseProject_technologies
 }
 
 """Linking fields"""
@@ -12471,6 +12800,11 @@ type TechPartnerModelDescriptionField {
   value: JsonField!
 }
 
+"""Linking fields"""
+enum TechPartnerModelFieldsReferencingIntegrationModel {
+  techPartner_technologies
+}
+
 input TechPartnerModelFilter {
   _createdAt: CreatedAtFilter
   createdAt: CreatedAtFilter
@@ -12596,6 +12930,11 @@ type TechPartnersPageRecord implements RecordInterface {
   id: ItemId!
   seo: SeoField
   updatedAt: DateTime!
+}
+
+"""Linking fields"""
+enum TemplateDemoModelFieldsReferencingIntegrationModel {
+  templateDemo_technology
 }
 
 input TemplateDemoModelFilter {
@@ -12806,7 +13145,7 @@ type TryDemoBlockRecord implements RecordInterface {
   content: TryDemoBlockModelContentField
   createdAt: DateTime!
   id: ItemId!
-  title: TryDemoBlockModelTitleField
+  title: TryDemoBlockModelTitleField!
   updatedAt: DateTime!
 }
 
@@ -14583,6 +14922,11 @@ type WebinarSpeakerRecord implements RecordInterface {
 }
 
 """Linking fields"""
+enum WebsiteModelFieldsReferencingIntegrationModel {
+  website_technologies
+}
+
+"""Linking fields"""
 enum WebsiteModelFieldsReferencingPartnerModel {
   website_madeBy
 }
@@ -14662,7 +15006,7 @@ type WebsiteRecord implements RecordInterface {
   _updatedAt: DateTime!
   createdAt: DateTime!
   id: ItemId!
-  image: FileField!
+  image: ImageFileField!
   madeBy: PartnerRecord
   position: IntType
   technologies: [IntegrationRecord!]!

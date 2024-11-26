@@ -76,7 +76,7 @@ const useData = (url) => {
   return { data, loading, error };
 };
 
-export default function CdnMap({ children, datacenters }) {
+export default function CdnMapReactComponent({ children, datacenters }) {
   const [currentDataCenter, setCurrentDataCenter] = useState(null);
   const [ping, setPing] = useState(null);
 
@@ -86,6 +86,8 @@ export default function CdnMap({ children, datacenters }) {
     (code) => {
       setCurrentDataCenter(code);
       const el = document.getElementById(`datacenter-${code}`);
+
+      console.log(code, el);
 
       if (el) {
         const rect = el.getBoundingClientRect();

@@ -1,0 +1,59 @@
+---
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import s from './style.module.css';
+import { Svg } from '~/components/Svg';
+import { UiChrome } from '~/components/UiChrome';
+import { Button } from '~/components/Button';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import type { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import type { FragmentOf } from 'gql.tada';
+
+type Props = {
+  screenshot: FragmentOf<typeof ResponsiveImageFragment>;
+  windowTitle: string;
+  href: string;
+  docsAs?: string;
+  cta: string;
+};
+
+const { windowTitle, screenshot, href, docsAs, cta } = Astro.props;
+---
+
+<Wrapper>
+  <div class={s.root}>
+    <div class={s.left}>
+      <div class={s.chrometop}>
+        <UiChrome title={windowTitle}>
+          <ResponsiveImage data={screenshot} pictureClass={s.screenshot} />
+        </UiChrome>
+      </div>
+      <div class={s.chromebottom}>
+        <UiChrome title="pages/homepage.js - Visual Studio Code">
+          <div class={s.code}></div>
+        </UiChrome>
+      </div>
+    </div>
+    <div class={s.box}>
+      <div class={s.kicker}>Try our Project starter</div>
+      <h2 class={s.title}>
+        <slot name="title" />
+      </h2>
+      <div class={s.description}>
+        <slot name="description" />
+      </div>
+      <div class={s.actions}>
+        <Button as="a" href={href}>
+          {cta}
+        </Button>
+        {
+          docsAs && (
+            <span class={s.docs}>
+              <span> or </span>
+              <a href={docsAs}>Read our docs</a>
+            </span>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</Wrapper>

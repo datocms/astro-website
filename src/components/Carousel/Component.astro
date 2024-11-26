@@ -6,12 +6,13 @@ type Props = {
   buttonsY?: string;
   class?: string;
   viewportClass?: string;
+  autoScroll?: boolean;
 };
 
-const { buttonsY, class: className, viewportClass } = Astro.props;
+const { buttonsY, class: className, viewportClass, autoScroll } = Astro.props;
 ---
 
-<embla-carousel>
+<embla-carousel data-autoscroll={autoScroll ? 'true' : undefined}>
   <div class:list={[s.embla, className]} data-viewport style={{ '--buttonsY': buttonsY }}>
     <div class:list={[s.emblaContainer, viewportClass]}>
       <slot />
@@ -27,6 +28,7 @@ const { buttonsY, class: className, viewportClass } = Astro.props;
 
 <script>
   import emblaCarousel, { type EmblaCarouselType } from 'embla-carousel';
+  import autoScroll from 'embla-carousel-auto-scroll';
   import { WebComponent } from '~/lib/WebComponent';
 
   customElements.define(
@@ -39,7 +41,11 @@ const { buttonsY, class: className, viewportClass } = Astro.props;
         const prevButton = this.$('[data-prev]');
         const nextButton = this.$('[data-next]');
 
-        this.api = emblaCarousel(node, { loop: false, align: 'start' });
+        this.api = emblaCarousel(
+          node,
+          { loop: false, align: 'start' },
+          this.dataset.autoscroll ? [autoScroll({ playOnInit: true, speed: 1 })] : [],
+        );
 
         this.on(prevButton, 'click', () => this.api.scrollPrev());
         this.on(nextButton, 'click', () => this.api.scrollNext());

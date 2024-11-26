@@ -1,5 +1,5 @@
 ---
-import CdnMap from '~/components/featureAnimations/CdnMap';
+import { CdnMap } from '~/components/featureAnimations/CdnMap';
 import { Bullets } from '~/components/Bullets';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
@@ -14,8 +14,7 @@ import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
-import ky from 'ky';
-import { FASTLY_KEY } from 'astro:env/server';
+
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
@@ -25,23 +24,6 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
-
-type DataCenter = {
-  code: string;
-  name: string;
-  group: string;
-  region: string;
-  stats_region: string;
-  billing_region: string;
-  coordinates: { x: number; y: number; latitude: number; longitude: number };
-  shield: string;
-};
-
-const datacenters = await ky<DataCenter[]>('https://api.fastly.com/datacenters', {
-  headers: {
-    'Fastly-Key': FASTLY_KEY,
-  },
-}).json();
 ---
 
 <Layout additionalSeo={page._seoMetaTags}>
@@ -56,9 +38,7 @@ const datacenters = await ky<DataCenter[]>('https://api.fastly.com/datacenters',
     </Fragment>
   </Hero>
 
-  <CdnMap datacenters={datacenters} client:load>
-    <Svg name="svg/world" />
-  </CdnMap>
+  <CdnMap />
 
   <Wrapper>
     <Space top={2} bottom={1}>
