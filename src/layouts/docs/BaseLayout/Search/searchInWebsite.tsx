@@ -16,7 +16,7 @@ export async function searchInWebsite(query: string) {
       searchParams: {
         fuzzy: 'true',
         'filter[query]': query,
-        'filter[build_trigger_id]': '7497',
+        'filter[build_trigger_id]': '34759',
         'page[limit]': 30,
       },
     },

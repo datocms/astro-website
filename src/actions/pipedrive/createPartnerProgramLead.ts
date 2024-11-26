@@ -18,12 +18,8 @@ export default defineAction({
   }),
   handler: async (input) => {
     try {
-      // if (!(await isRecaptchaTokenValid(input.token))) {
-      //   throw new ActionError({
-      //     code: 'UNAUTHORIZED',
-      //     message: 'Invalid recaptcha token',
-      //   });
-      // }
+      // we cannot validate RECAPTCHA because it's being validated by Front later!
+      // we'd need two different tokens :/
 
       const organization = await findOrCreateOrgByName(
         input.agencyName,

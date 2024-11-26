@@ -43,6 +43,7 @@ export default defineConfig({
         ROLLBAR_TOKEN: envField.string({
           context: 'server',
           access: 'secret',
+          optional: true,
         }),
         PIPEDRIVE_TOKEN: envField.string({
           context: 'server',

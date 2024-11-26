@@ -1,5 +1,5 @@
 import type { AstroGlobal } from 'astro';
-import { uniq } from 'lodash-es';
+import { isEqual, uniq } from 'lodash-es';
 import { LRUCache } from 'lru-cache';
 import { isDraftModeEnabled } from './draftMode';
 import { invalidateFastlySurrogateKeys } from './fastly';
@@ -42,7 +42,9 @@ export function toMemoizedAndResponseTaggingFn<T>(
 
   const maybeInvalidateFn = async () => {
     const result = await fn();
-    const toInvalidate = cache.has(surrogateKey) ? (cache.get(surrogateKey) as T) !== result : true;
+    const toInvalidate = cache.has(surrogateKey)
+      ? !isEqual(cache.get(surrogateKey) as T, result)
+      : true;
 
     if (toInvalidate) {
       cache.delete(surrogateKey);
