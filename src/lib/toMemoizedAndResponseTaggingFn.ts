@@ -81,6 +81,7 @@ function augmentResponseHeadersWithSurrogateKeys(
   const mergedCacheTags = uniq([...existingCacheTags, ...newCacheTags]).join(' ');
 
   responseHeaders.set(surrogateKeyHeaderName, mergedCacheTags);
+  responseHeaders.set('datocms-cache-tags', mergedCacheTags);
 
   if (draftModeEnabled) {
     responseHeaders.set('cache-control', 'private');
