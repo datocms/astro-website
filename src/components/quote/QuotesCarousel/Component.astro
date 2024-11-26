@@ -39,8 +39,13 @@ const { quotes } = Astro.props;
     'quotes-carousel',
     class QuotesCarousel extends WebComponent {
       private resizeListener?: () => void;
+      private container!: HTMLDivElement;
+      private scroller!: HTMLDivElement;
 
       parsedCallback() {
+        this.container = this.$('[data-container]');
+        this.scroller = this.$('[data-scroller]');
+
         this.handleAnimation();
         this.resizeListener = this.handleAnimation.bind(this);
         window.addEventListener('resize', this.resizeListener);
@@ -54,19 +59,14 @@ const { quotes } = Astro.props;
       }
 
       handleAnimation(): void {
-        const container = this.$('[data-container]');
-        const scroller = this.$('[data-scroller]');
+        const toAnimate = this.scroller.scrollWidth > this.container.clientWidth;
+        this.container.toggleAttribute('data-animated', toAnimate);
 
-        if (container && scroller) {
-          const isAnimated = scroller.scrollWidth > container.clientWidth;
-          container.toggleAttribute('data-animated', isAnimated);
-
-          if (isAnimated) {
-            container.style.setProperty(
-              '--scroll-width',
-              `${scroller.scrollWidth - container.clientWidth}`,
-            );
-          }
+        if (toAnimate) {
+          this.container.style.setProperty(
+            '--scroll-width',
+            `${this.scroller.scrollWidth - this.container.clientWidth}`,
+          );
         }
       }
     },
