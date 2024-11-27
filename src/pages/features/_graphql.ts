@@ -9,7 +9,7 @@ import { FeatureUrlFragment } from '~/lib/datocms/gqlUrlBuilder/feature';
 import { HostingAppUrlFragment } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
 import { PluginUrlFragment } from '~/lib/datocms/gqlUrlBuilder/plugin';
 import { TemplateDemoUrlFragment } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
-import { UserGuideEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder/userGuideEpisode';
+import { UserGuidesEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
 import { graphql } from '~/lib/datocms/graphql';
 
 const FeatureSectionFragment = graphql(
@@ -36,7 +36,7 @@ const FeatureSectionFragment = graphql(
           ...FeatureUrlFragment
           ...PluginUrlFragment
           ...TemplateDemoUrlFragment
-          ...UserGuideEpisodeUrlFragment
+          ...UserGuidesEpisodeUrlFragment
           ...HostingAppUrlFragment
           ...EnterpriseAppUrlFragment
         }
@@ -53,7 +53,7 @@ const FeatureSectionFragment = graphql(
     FeatureUrlFragment,
     PluginUrlFragment,
     TemplateDemoUrlFragment,
-    UserGuideEpisodeUrlFragment,
+    UserGuidesEpisodeUrlFragment,
     HostingAppUrlFragment,
     EnterpriseAppUrlFragment,
   ],

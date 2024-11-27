@@ -3,15 +3,15 @@ import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
-  buildUrlForUserGuideEpisode,
-  UserGuideEpisodeUrlFragment,
-} from '~/lib/datocms/gqlUrlBuilder/userGuideEpisode';
+  buildUrlForUserGuidesEpisode,
+  UserGuidesEpisodeUrlFragment,
+} from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
 import { graphql } from '~/lib/datocms/graphql';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const EpisodeFragment = graphql(
   /* GraphQL */ `
-    fragment EpisodeFragment on UserGuidesVideoRecord {
+    fragment EpisodeFragment on UserGuidesEpisodeRecord {
       title
       asset: video {
         video {
@@ -23,16 +23,16 @@ export const EpisodeFragment = graphql(
         }
       }
       thumbTimeSeconds
-      ...UserGuideEpisodeUrlFragment
+      ...UserGuidesEpisodeUrlFragment
     }
   `,
-  [UserGuideEpisodeUrlFragment],
+  [UserGuidesEpisodeUrlFragment],
 );
 
 export const query = graphql(
   /* GraphQL */ `
     query UserGuidesItemQuery($episodeSlug: String!) {
-      episode: userGuidesVideo(filter: { slug: { eq: $episodeSlug } }) {
+      episode: userGuidesEpisode(filter: { slug: { eq: $episodeSlug } }) {
         id
         _seoMetaTags {
           ...TagFragment
@@ -64,7 +64,7 @@ export const query = graphql(
         episodes: videos {
           id
           ...EpisodeFragment
-          ...UserGuideEpisodeUrlFragment
+          ...UserGuidesEpisodeUrlFragment
         }
       }
     }
@@ -74,7 +74,7 @@ export const query = graphql(
     VideoPlayerFragment,
     InternalVideoFragment,
     EpisodeFragment,
-    UserGuideEpisodeUrlFragment,
+    UserGuidesEpisodeUrlFragment,
   ],
 );
 
@@ -83,15 +83,15 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     graphql(
       /* GraphQL */ `
         query BuildSitemapUrls {
-          entries: allUserGuidesVideos(first: 500) {
-            ...UserGuideEpisodeUrlFragment
+          entries: allUserGuidesEpisodes(first: 500) {
+            ...UserGuidesEpisodeUrlFragment
           }
         }
       `,
-      [UserGuideEpisodeUrlFragment],
+      [UserGuidesEpisodeUrlFragment],
     ),
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForUserGuideEpisode);
+  return entries.map(buildUrlForUserGuidesEpisode);
 };

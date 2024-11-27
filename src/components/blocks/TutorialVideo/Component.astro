@@ -6,7 +6,7 @@ import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Image } from 'astro:assets';
 import { MarketplaceCard } from '~/components/MarketplaceCard';
 import { Carousel } from '~/components/Carousel';
-import { buildUrlForUserGuideEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuideEpisode';
+import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
 
 interface Props {
   block: FragmentOf<typeof TutorialVideoFragment>;
@@ -14,12 +14,12 @@ interface Props {
 
 const { block: maskedBlock } = Astro.props;
 
-const { videoTutorialsOrUserGuideEpisodes } = readFragment(TutorialVideoFragment, maskedBlock);
+const { videoTutorialsOrUserGuidesEpisodes } = readFragment(TutorialVideoFragment, maskedBlock);
 ---
 
 <Carousel buttonsY="35%" viewportClass={s.carouselViewport}>
   {
-    videoTutorialsOrUserGuideEpisodes.map((thing) => (
+    videoTutorialsOrUserGuidesEpisodes.map((thing) => (
       <div class={s.card}>
         <MarketplaceCard
           title={thing.title}
@@ -29,7 +29,7 @@ const { videoTutorialsOrUserGuideEpisodes } = readFragment(TutorialVideoFragment
               ? thing.resource.__typename === 'YoutubeVideoResourceRecord'
                 ? thing.resource.video.url
                 : thing.resource.url
-              : buildUrlForUserGuideEpisode(thing)
+              : buildUrlForUserGuidesEpisode(thing)
           }
         >
           <Fragment slot="image">

@@ -16,7 +16,10 @@ import { buildUrlForShowcaseProject, type ShowcaseProjectUrlFragment } from './s
 import { buildUrlForSuccessStory, type SuccessStoryUrlFragment } from './successStory';
 import { buildUrlForTemplateDemo, type TemplateDemoUrlFragment } from './templateDemo';
 import { buildUrlForUseCasePage, type UseCasePageUrlFragment } from './useCasePage';
-import { buildUrlForUserGuideEpisode, type UserGuideEpisodeUrlFragment } from './userGuideEpisode';
+import {
+  buildUrlForUserGuidesEpisode,
+  type UserGuidesEpisodeUrlFragment,
+} from './userGuidesEpisode';
 
 export function buildUrlFromGql(
   thing:
@@ -50,8 +53,8 @@ export function buildUrlFromGql(
     | (FragmentOf<typeof TemplateDemoUrlFragment> & {
         __typename: 'TemplateDemoRecord';
       })
-    | (FragmentOf<typeof UserGuideEpisodeUrlFragment> & {
-        __typename: 'UserGuidesVideoRecord';
+    | (FragmentOf<typeof UserGuidesEpisodeUrlFragment> & {
+        __typename: 'UserGuidesEpisodeRecord';
       })
     | (FragmentOf<typeof ShowcaseProjectUrlFragment> & {
         __typename: 'ShowcaseProjectRecord';
@@ -96,8 +99,8 @@ export function buildUrlFromGql(
       return buildUrlForProductUpdate(thing);
     case 'TemplateDemoRecord':
       return buildUrlForTemplateDemo(thing);
-    case 'UserGuidesVideoRecord':
-      return buildUrlForUserGuideEpisode(thing);
+    case 'UserGuidesEpisodeRecord':
+      return buildUrlForUserGuidesEpisode(thing);
     case 'ShowcaseProjectRecord':
       return buildUrlForShowcaseProject(thing);
     case 'AcademyCourseRecord':

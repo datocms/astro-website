@@ -1,17 +1,17 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
-import { UserGuideEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder/userGuideEpisode';
+import { UserGuidesEpisodeUrlFragment } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const TutorialVideoFragment = graphql(
   /* GraphQL */ `
     fragment TutorialVideoFragment on TutorialVideoRecord {
-      videoTutorialsOrUserGuideEpisodes: tutorials {
+      videoTutorialsOrUserGuidesEpisodes: tutorials {
         ... on RecordInterface {
           id
           __typename
         }
 
-        ... on UserGuidesVideoRecord {
+        ... on UserGuidesEpisodeRecord {
           title
           thumbTimeSeconds
           asset: video {
@@ -22,7 +22,7 @@ export const TutorialVideoFragment = graphql(
               height
             }
           }
-          ...UserGuideEpisodeUrlFragment
+          ...UserGuidesEpisodeUrlFragment
         }
 
         ... on VideoTutorialRecord {
@@ -54,5 +54,5 @@ export const TutorialVideoFragment = graphql(
       }
     }
   `,
-  [ResponsiveImageFragment, UserGuideEpisodeUrlFragment],
+  [ResponsiveImageFragment, UserGuidesEpisodeUrlFragment],
 );
