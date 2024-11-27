@@ -14,6 +14,11 @@ export default defineConfig({
   experimental: {
     env: {
       schema: {
+        DEPLOYMENT_DESTINATION: envField.string({
+          context: 'server',
+          access: 'secret',
+          default: 'development',
+        }),
         DRAFT_MODE_HOSTNAME: envField.string({
           context: 'server',
           access: 'secret',
