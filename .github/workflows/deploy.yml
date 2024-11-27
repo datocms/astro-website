@@ -1,0 +1,44 @@
+name: Deploy on production
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Deploy:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.2
+          bundler-cache: true
+
+      - uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Install dependencies
+        run: |
+          gem install kamal
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Deploy Application
+        env:
+          GITHUB_CONTAINER_REGISTRY_API_TOKEN: ${{ secrets.GCR_API_TOKEN }}
+          PRIVATE_KEY: ${{ secrets.KAVO_PRIVATE_KEY }}
+        run: |
+          cp .kamal/secrets.github .kamal/secrets
+          kamal deploy
