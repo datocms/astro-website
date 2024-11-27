@@ -34,6 +34,7 @@ import { ChangelogEntryInline } from '~/components/inlineRecords/ChangelogEntryI
 import { BlogPostLink } from '~/components/linkToRecords/BlogPostLink';
 import { ChangelogEntryLink } from '~/components/linkToRecords/ChangelogEntryLink';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { overrideSeo, seoTwitterCard } from '~/lib/datocms/seo';
 
 const variables = { slug: Astro.params.slug! };
 const { post } = await executeQuery(Astro, query, { variables });
@@ -56,29 +57,18 @@ const tocItems = filterNodes(
 });
 ---
 
-{
-  /*
+<Layout additionalSeo={overrideSeo(post.seo, seoTwitterCard('summary_large_image'))}>
+  <Fragment slot="head">
+    {
+      post._firstPublishedAt && (
+        <meta
+          property="article:published_time"
+          content={new Date(post._firstPublishedAt).toISOString()}
+        />
+      )
+    }
+  </Fragment>
 
-  TODO:
-
-  canonicalUrl={post.canonicalUrl}
-
-  {post._firstPublishedAt && (
-    <meta
-      property="article:published_time"
-      content={new Date(post._firstPublishedAt).toISOString()}
-    />
-  )}
-  <meta
-    key="meta-twitter:card"
-    name="twitter:card"
-    content="summary_large_image"
-  />
-
-*/
-}
-
-<Layout additionalSeo={post.seo}>
   <InterstitialTitle
     seoAnalysis={post.yoastAnalysis}
     kicker={post.seoH1 || 'The DatoCMS Blog'}

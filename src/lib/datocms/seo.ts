@@ -81,7 +81,7 @@ export function seoGeneratedCard(astroOrRequest: AstroGlobal | Request, data: Og
     seoMeta('twitter:image', url),
     seoMeta('twitter:image:width', ogCardWidth.toString()),
     seoMeta('twitter:image:height', ogCardHeight.toString()),
-    seoMeta('twitter:card', 'summary_large_image'),
+    seoTwitterCard('summary_large_image'),
   ];
 }
 
@@ -93,4 +93,8 @@ export function seoDescription(rawDescription: string) {
     seoMeta('twitter:description', description),
     seoMeta('og:description', description),
   ];
+}
+
+export function seoTwitterCard(type: 'summary' | 'summary_large_image') {
+  return seoMeta('twitter:card', type);
 }

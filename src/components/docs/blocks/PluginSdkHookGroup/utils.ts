@@ -81,10 +81,7 @@ function sortRenderAtEnd(a: { name: string }, b: { name: string }): number {
   }
 }
 
-// TODO: release new version of sdk and use it here!
-
-const url =
-  'https://raw.githubusercontent.com/datocms/plugins-sdk/refs/heads/new-hooks/packages/sdk/manifest.json';
+const url = 'https://cdn.jsdelivr.net/npm/datocms-plugin-sdk/manifest.json';
 
 export const [fetchPluginSdkManifest, maybeInvalidateFetchPluginSdkManifest] =
   toMemoizedAndResponseTaggingFn('plugins-sdk-manifest', async (): Promise<Manifest> => {

@@ -27,6 +27,7 @@ export const query = graphql(
         seo: _seoMetaTags {
           ...TagFragment
         }
+        _firstPublishedAt
         title
         seoH1
         canonicalUrl

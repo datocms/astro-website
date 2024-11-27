@@ -52,9 +52,7 @@ export type ReactUiLiveExample = {
   serializedMdxExample: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>;
 };
 
-// TODO: release new version of sdk and use it here!
-const url =
-  'https://gist.githubusercontent.com/stefanoverna/476316a1d441f9f80d5eabac8ea7976e/raw/c64a50482f5aad0762257968dbcf31eb3c2ba91a/types.json';
+const url = 'https://cdn.jsdelivr.net/npm/datocms-react-ui/types.json';
 
 export const [fetchReactUiExamples, maybeInvalidateReactUiExamples] =
   toMemoizedAndResponseTaggingFn('react-ui-examples', async (): Promise<ReactUiLiveExample[]> => {
