@@ -32,9 +32,6 @@ export const query = graphql(
         pillars {
           id
           theme
-          icon {
-            url
-          }
           pillarCallout
           title {
             value
