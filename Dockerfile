@@ -22,9 +22,6 @@ COPY package.json package-lock.json ./
 
 FROM base AS prod-deps
 
-# crontab requires curl
-RUN apk update && apk add --no-cache curl
-
 # --omit=dev flag excludes development dependencies not needed in production
 RUN npm install --omit=dev
 
@@ -71,6 +68,9 @@ RUN --mount=type=secret,id=RECAPTCHA_KEY \
 # * Build secrets
 
 FROM base AS runtime
+
+# crontab requires curl
+RUN apk update && apk add --no-cache curl
 
 # Copy only the production dependencies from the prod-deps stage
 COPY --from=prod-deps /app/node_modules ./node_modules
