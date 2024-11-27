@@ -1,5 +1,6 @@
 import { WebClient } from '@slack/web-api';
 import { ActionError, defineAction } from 'astro:actions';
+import { SLACK_TOKEN } from 'astro:env/server';
 import { z } from 'astro:schema';
 import logToRollbar from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
@@ -45,7 +46,7 @@ export default defineAction({
       });
     }
 
-    const slack = new WebClient(process.env.SLACK_TOKEN);
+    const slack = new WebClient(SLACK_TOKEN);
 
     try {
       await slack.apiCall('users.admin.invite', {

@@ -11,8 +11,5 @@
 
 echo "$KAMAL_PERFORMER deployed $KAMAL_VERSION to $KAMAL_DESTINATION in $KAMAL_RUNTIME seconds"
 
-echo "Purging Fastly cache"
+echo "Purging Fastly service ID $FASTLY_SERVICE_ID"
 curl -i -X POST "https://api.fastly.com/service/$FASTLY_SERVICE_ID/purge_all" -H "Fastly-Key: $FASTLY_KEY" -H "Accept: application/json"
-
-echo "Re-index website"
-curl -v -X PUT -H "Authorization: Bearer $DATOCMS_API_TOKEN" -H "Accept: application/json" -H "X-Api-Version: 3" 'https://site-api.datocms.com/build-triggers/34759/reindex'

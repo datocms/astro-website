@@ -1,5 +1,6 @@
 import Mailerlite from '@mailerlite/mailerlite-nodejs';
 import { defineAction } from 'astro:actions';
+import { MAILERLITE_TOKEN } from 'astro:env/server';
 import { z } from 'astro:schema';
 import { format } from 'date-fns';
 import logToRollbar from '~/lib/logToRollbar';
@@ -16,7 +17,7 @@ export default defineAction({
 
     try {
       const mailerlite = new Mailerlite({
-        api_key: process.env.MAILERLITE_TOKEN!,
+        api_key: MAILERLITE_TOKEN,
       });
 
       await mailerlite.subscribers.createOrUpdate({

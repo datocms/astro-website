@@ -20,7 +20,7 @@ It can also be directly visited by the content editors to see the result of thei
 
 1. Clone this repository: `git clone https://github.com/datocms/website`
 2. Install dependencies with `npm install`.
-3. Run `npm run decrypt-env` to write the secrets in `.env`.
+3. Run `npm run decrypt-env` to decrypt the secrets.
 4. Run `npm run dev` to start a local development server at [localhost:4321](http://localhost:4321).
 
 # Conventions
