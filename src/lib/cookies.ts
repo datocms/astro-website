@@ -1,3 +1,13 @@
+import { PUBLIC_HOSTNAME } from 'astro:env/client';
+
+function maybeCookieDomain() {
+  if (!PUBLIC_HOSTNAME) {
+    return '';
+  }
+
+  return 'domain=.' + PUBLIC_HOSTNAME.split('.').slice(-2).join('.') + ';';
+}
+
 export const getCookie = (name: string) => {
   if (typeof document === 'undefined') {
     return;
@@ -20,5 +30,5 @@ export const setCookie = (name: string, value: string, days?: number) => {
     expires = `; expires=${date.toUTCString()}`;
   }
 
-  document.cookie = `${name}=${value}${expires}; path=/; domain=.datocms.com; samesite=none; secure`;
+  document.cookie = `${name}=${value}${expires}; path=/; ${maybeCookieDomain()} samesite=none; secure`;
 };

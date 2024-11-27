@@ -1,13 +1,14 @@
-name: Deploy on production
+name: Deploy
 
 on:
   push:
     branches:
       - main
+      - staging
 
 jobs:
   Deploy:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging') }}
     runs-on: ubuntu-latest
 
     steps:
@@ -41,4 +42,9 @@ jobs:
           PRIVATE_KEY: ${{ secrets.KAVO_PRIVATE_KEY }}
         run: |
           sed -i -E -e 's/\-\-break 0/--wrap=0/g' -e '/^SECRETS=/d' -e 's/^GITHUB_CONTAINER_REGISTRY_API_TOKEN=.*$/GITHUB_CONTAINER_REGISTRY_API_TOKEN=$GITHUB_CONTAINER_REGISTRY_API_TOKEN/' .kamal/secrets.production
-          kamal deploy -d production
+
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            kamal deploy -d production
+          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            kamal deploy -d staging
+          fi

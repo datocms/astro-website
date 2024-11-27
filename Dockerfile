@@ -5,9 +5,11 @@
 # Sets up the foundation that other stages will build upon
 
 FROM node:20-alpine AS base
+ARG PUBLIC_HOSTNAME
 
 # Flag to indicate we're running in a Docker environment
 ENV INSIDE_DOCKER=true
+ENV PUBLIC_HOSTNAME=$PUBLIC_HOSTNAME
 
 # Set the working directory for all subsequent operations
 WORKDIR /app

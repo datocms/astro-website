@@ -1,4 +1,13 @@
 import type { APIRoute } from 'astro';
+import { PUBLIC_HOSTNAME } from 'astro:env/client';
+
+function maybeCookieDomain() {
+  if (!PUBLIC_HOSTNAME) {
+    return '';
+  }
+
+  return 'domain=.' + PUBLIC_HOSTNAME.split('.').slice(-2).join('.') + ';';
+}
 
 // Usage:
 // <script type="text/javascript" src="https://www.datocms.com/landing-pages/cookieConsent.js"></script>
@@ -163,7 +172,7 @@ const cookieConsentScript = `
 
   const setCookie = (name, value) => {
     const expiration = new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000).toUTCString();
-    document.cookie = name + '=' + value + '; expires=' + expiration + '; path=/; domain=.datocms.com; samesite=none; secure';
+    document.cookie = name + '=' + value + '; expires=' + expiration + '; path=/; ${maybeCookieDomain()} samesite=none; secure';
   };
 
   onReady(() => {

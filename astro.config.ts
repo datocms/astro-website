@@ -20,8 +20,8 @@ export default defineConfig({
           default: 'localhost',
         }),
         PUBLIC_HOSTNAME: envField.string({
-          context: 'server',
-          access: 'secret',
+          context: 'client',
+          access: 'public',
           optional: true,
         }),
         DATOCMS_API_TOKEN: envField.string({

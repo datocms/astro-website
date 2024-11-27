@@ -1,11 +1,7 @@
 import { buildClient } from '@datocms/cma-client';
 import type { APIRoute } from 'astro';
-import {
-  DATOCMS_API_TOKEN,
-  DRAFT_MODE_HOSTNAME,
-  PUBLIC_HOSTNAME,
-  SECRET_API_TOKEN,
-} from 'astro:env/server';
+import { PUBLIC_HOSTNAME } from 'astro:env/client';
+import { DATOCMS_API_TOKEN, DRAFT_MODE_HOSTNAME, SECRET_API_TOKEN } from 'astro:env/server';
 import { recordToWebsiteRoute } from '~/lib/datocms/recordInfo';
 import { handleUnexpectedError, invalidRequestResponse, json, withCORS } from '../_utils';
 

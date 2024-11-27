@@ -1,5 +1,6 @@
 import type { AstroGlobal } from 'astro';
-import { DRAFT_MODE_HOSTNAME, PUBLIC_HOSTNAME } from 'astro:env/server';
+import { PUBLIC_HOSTNAME } from 'astro:env/client';
+import { DRAFT_MODE_HOSTNAME } from 'astro:env/server';
 
 export function isDraftModeEnabled(requestOrAstro: Request | AstroGlobal) {
   const headers =
