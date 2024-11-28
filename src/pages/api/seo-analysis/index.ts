@@ -76,9 +76,10 @@ export const GET: APIRoute = async ({ url, request }) => {
      * do this, we set the cookies that are obtained by temporarily enabling
      * Draft Mode.
      */
-    const pageRequest = await fetch(
-      new URL(websitePath, `https://${DRAFT_MODE_HOSTNAME}/`).toString(),
-    );
+    const pageUrl = new URL(websitePath, `https://${DRAFT_MODE_HOSTNAME}/`);
+    pageUrl.searchParams.set('token', SECRET_API_TOKEN);
+
+    const pageRequest = await fetch(pageUrl);
 
     if (!pageRequest.ok) {
       return invalidRequestResponse(`Invalid status for ${websitePath}: ${pageRequest.status}`);

@@ -63,9 +63,12 @@ export const POST: APIRoute = async ({ url, request }) => {
        * different from the published one, so it has a draft version!
        */
       if (item.meta.status !== 'published') {
+        const url = new URL(recordUrl, `https://${DRAFT_MODE_HOSTNAME}/`);
+        url.searchParams.set('token', SECRET_API_TOKEN);
+
         response.previewLinks.push({
           label: 'Draft version',
-          url: new URL(recordUrl, `https://${DRAFT_MODE_HOSTNAME}/`).toString(),
+          url: url.toString(),
         });
       }
 
