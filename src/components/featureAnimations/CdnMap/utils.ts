@@ -1,6 +1,6 @@
 import { FASTLY_KEY } from 'astro:env/server';
 import ky from 'ky';
-import { toMemoizedAndResponseTaggingFn } from '~/lib/toMemoizedAndResponseTaggingFn';
+import { dataSource } from '~/lib/dataSource';
 
 type DataCenter = {
   code: string;
@@ -13,11 +13,12 @@ type DataCenter = {
   shield: string;
 };
 
-export const [fetchFastlyDatacenters, maybeInvalidateFastlyDatacenters] =
-  toMemoizedAndResponseTaggingFn('fastly-datacenters', () =>
+export const [fetchFastlyDatacenters, maybeInvalidateFastlyDatacenters] = dataSource(
+  'fastly-datacenters',
+  () =>
     ky<DataCenter[]>('https://api.fastly.com/datacenters', {
       headers: {
         'Fastly-Key': FASTLY_KEY,
       },
     }).json(),
-  );
+);

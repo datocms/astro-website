@@ -1,14 +1,14 @@
 import $RefParser from '@apidevtools/json-schema-ref-parser';
 import type { AstroGlobal } from 'astro';
 import ky from 'ky';
+import { dataSource } from '~/lib/dataSource';
 import { invariant } from '~/lib/invariant';
-import { toMemoizedAndResponseTaggingFn } from '~/lib/toMemoizedAndResponseTaggingFn';
 import type { CmaHyperSchema, RestApiEntity } from './types';
 
 // const url = 'http://localhost:3001/docs/site-api-hyperschema.json';
 const url = 'https://site-api.datocms.com/docs/site-api-hyperschema.json';
 
-export const [fetchSchema, maybeInvalidateSiteApiHyperschema] = toMemoizedAndResponseTaggingFn(
+export const [fetchSchema, maybeInvalidateSiteApiHyperschema] = dataSource(
   'site-api-hyperschema',
   async () => {
     const unreferencedSchema = await ky(url).json();

@@ -1,8 +1,8 @@
 import $RefParser, { type JSONSchema } from '@apidevtools/json-schema-ref-parser';
 import type { AstroGlobal } from 'astro';
 import ky from 'ky';
+import { dataSource } from '~/lib/dataSource';
 import { invariant } from '~/lib/invariant';
-import { toMemoizedAndResponseTaggingFn } from '~/lib/toMemoizedAndResponseTaggingFn';
 
 const schemaUrl = 'https://site-api.datocms.com/docs/dast-schema.json';
 
@@ -41,22 +41,19 @@ export async function fetchDastNodes(astro: AstroGlobal): Promise<Node[]> {
   });
 }
 
-export const [fetchDastSchema, maybeInvalidateDastSchema] = toMemoizedAndResponseTaggingFn(
-  'dast-schema',
-  async () => {
-    const unreferencedSchema = await ky(schemaUrl).json();
+export const [fetchDastSchema, maybeInvalidateDastSchema] = dataSource('dast-schema', async () => {
+  const unreferencedSchema = await ky(schemaUrl).json();
 
-    const schema = await $RefParser.dereference(unreferencedSchema);
+  const schema = await $RefParser.dereference(unreferencedSchema);
 
-    invariant(schema.definitions);
+  invariant(schema.definitions);
 
-    const { Root } = schema.definitions;
+  const { Root } = schema.definitions;
 
-    isJsonSchema(Root);
+  isJsonSchema(Root);
 
-    return recursivelyFindChildren(Root);
-  },
-);
+  return recursivelyFindChildren(Root);
+});
 
 function recursivelyFindChildren(
   definition: JSONSchema,

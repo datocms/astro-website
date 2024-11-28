@@ -20,7 +20,7 @@ type AstroOrRequestResponseHeaders =
       responseHeaders: Headers;
     };
 
-export function toMemoizedAndResponseTaggingFn<T>(
+export function dataSource<T>(
   surrogateKey: string,
   fn: () => Promise<T>,
 ): [MemoizeAndAugumentResponseHeadersFn<T>, () => Promise<string | false>] {
@@ -88,6 +88,9 @@ function augmentResponseHeadersWithSurrogateKeys(
   if (draftModeEnabled) {
     responseHeaders.set('cache-control', 'private');
   } else {
-    responseHeaders.set('surrogate-control', 'max-age=31536000');
+    responseHeaders.set(
+      'surrogate-control',
+      'max-age=31536000, stale-while-revalidate=60, stale-if-error=86400',
+    );
   }
 }

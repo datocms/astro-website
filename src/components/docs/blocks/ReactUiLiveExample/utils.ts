@@ -4,9 +4,9 @@ import ky from 'ky';
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
 import { Application, FileRegistry, type JSONOutput } from 'typedoc';
+import { dataSource } from '~/lib/dataSource';
 import { invariant } from '~/lib/invariant';
 import { slugify } from '~/lib/slugify';
-import { toMemoizedAndResponseTaggingFn } from '~/lib/toMemoizedAndResponseTaggingFn';
 import type { TocEntry, TocGroup } from '../../ContentPlusToc/types';
 import { ReactUiLiveExampleFragment } from './graphql';
 
@@ -54,8 +54,9 @@ export type ReactUiLiveExample = {
 
 const url = 'https://cdn.jsdelivr.net/npm/datocms-react-ui/types.json';
 
-export const [fetchReactUiExamples, maybeInvalidateReactUiExamples] =
-  toMemoizedAndResponseTaggingFn('react-ui-examples', async (): Promise<ReactUiLiveExample[]> => {
+export const [fetchReactUiExamples, maybeInvalidateReactUiExamples] = dataSource(
+  'react-ui-examples',
+  async (): Promise<ReactUiLiveExample[]> => {
     const jsonOutput = await ky<JSONOutput.ProjectReflection>(url).json();
 
     const app = await Application.bootstrap({
@@ -115,7 +116,8 @@ export const [fetchReactUiExamples, maybeInvalidateReactUiExamples] =
     );
 
     return result.flat();
-  });
+  },
+);
 
 function removeCommonIndentation(example: string) {
   const lines = example

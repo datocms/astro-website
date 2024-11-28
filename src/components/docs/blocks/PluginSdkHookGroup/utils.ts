@@ -1,7 +1,7 @@
 import type { AstroGlobal } from 'astro';
 import { readFragment, type FragmentOf } from 'gql.tada';
 import ky from 'ky';
-import { toMemoizedAndResponseTaggingFn } from '~/lib/toMemoizedAndResponseTaggingFn';
+import { dataSource } from '~/lib/dataSource';
 import type { TocEntry, TocGroup } from '../../ContentPlusToc/types';
 import { PluginSdkHookGroupFragment } from './graphql';
 import type { HookInfo, Manifest } from './manifestTypes';
@@ -83,7 +83,9 @@ function sortRenderAtEnd(a: { name: string }, b: { name: string }): number {
 
 const url = 'https://cdn.jsdelivr.net/npm/datocms-plugin-sdk/manifest.json';
 
-export const [fetchPluginSdkManifest, maybeInvalidateFetchPluginSdkManifest] =
-  toMemoizedAndResponseTaggingFn('plugins-sdk-manifest', async (): Promise<Manifest> => {
+export const [fetchPluginSdkManifest, maybeInvalidateFetchPluginSdkManifest] = dataSource(
+  'plugins-sdk-manifest',
+  async (): Promise<Manifest> => {
     return await ky<Manifest>(url).json();
-  });
+  },
+);

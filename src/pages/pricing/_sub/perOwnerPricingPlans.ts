@@ -1,8 +1,9 @@
 import ky from 'ky';
-import { toMemoizedAndResponseTaggingFn } from '~/lib/toMemoizedAndResponseTaggingFn';
+import { dataSource } from '~/lib/dataSource';
 
-export const [fetchPerOwnerPricingPlans, maybeInvalidatePerOwnerPricingPlans] =
-  toMemoizedAndResponseTaggingFn('per-owner-pricing-plans', async () => {
+export const [fetchPerOwnerPricingPlans, maybeInvalidatePerOwnerPricingPlans] = dataSource(
+  'per-owner-pricing-plans',
+  async () => {
     const { data } = await ky<PricingPlanResponse>(
       'https://account-api.datocms.com/per-owner-pricing-plans',
       {
@@ -11,7 +12,8 @@ export const [fetchPerOwnerPricingPlans, maybeInvalidatePerOwnerPricingPlans] =
     ).json();
 
     return data;
-  });
+  },
+);
 
 /** Stores the information regarding the current plan for the account. */
 export interface Plan {
