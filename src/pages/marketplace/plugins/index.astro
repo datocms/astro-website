@@ -86,3 +86,16 @@ if (!page || popular.length === 0 || latest.length === 0 || page.collections.len
 
   <DraftModeQueryListener query={query} />
 </Layout>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const projectDomain = urlParams.get('projectDomain');
+  const projectEnvironment = urlParams.get('projectEnvironment');
+
+  if (projectDomain) {
+    sessionStorage.setItem(
+      'marketplaceProject',
+      JSON.stringify({ domain: projectDomain, environment: projectEnvironment }),
+    );
+  }
+</script>

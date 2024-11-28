@@ -30,13 +30,6 @@ if (!page || !page.readme) {
 }
 
 const avatarUrl = getGravatarUrl(page.author.email);
-
-const urlParams = new URL(Astro.request.url);
-const projectDomain = urlParams.searchParams.get('projectDomain');
-const projectEnvironment = urlParams.searchParams.get('projectEnvironment');
-const url = `${
-  projectEnvironment ? `/environments/${projectEnvironment}` : ''
-}/configuration/plugins/install/${page.packageName}`;
 ---
 
 <Layout noFinalCta additionalSeo={page.seo}>
@@ -50,17 +43,11 @@ const url = `${
           <h3 class={s.subtitle}>{page.description}</h3>
           <Space top={1}>
             <div class={s.ctaMobile}>
-              <Button
-                as="a"
-                href={projectDomain
-                  ? `https://${projectDomain}${url}`
-                  : `https://dashboard.datocms.com/projects/redirect-to-project?path=${url}`}
-                target="_blank"
-                fs="small"
-                p="small"
-              >
-                Install plugin
-              </Button>
+              <set-plugin-install-url data-package-name={page.packageName}>
+                <Button as="a" href="" target="_blank" fs="small" p="small">
+                  Install plugin
+                </Button>
+              </set-plugin-install-url>
             </div>
           </Space>
 
@@ -109,17 +96,11 @@ const url = `${
               {page.description}
               <Fragment slot="below">
                 <div class={s.cardCta}>
-                  <Button
-                    as="a"
-                    block
-                    href={projectDomain
-                      ? `https://${projectDomain}${url}`
-                      : `https://dashboard.datocms.com/projects/redirect-to-project?path=${url}`}
-                    target="_blank"
-                    fs="small"
-                  >
-                    Install plugin
-                  </Button>
+                  <set-plugin-install-url data-package-name={page.packageName}>
+                    <Button as="a" block href="" target="_blank" fs="small">
+                      Install plugin
+                    </Button>
+                  </set-plugin-install-url>
                 </div>
               </Fragment>
             </MarketplaceCard>
@@ -174,3 +155,38 @@ const url = `${
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'set-plugin-install-url',
+    class SetPluginInstallUrl extends WebComponent {
+      parsedCallback() {
+        const packageName = this.dataset?.packageName;
+        const linkEl = this.$('a');
+        const project = this.getProject();
+
+        const url = project
+          ? `https://${project.domain}${project.environment ? `/environments/${project.environment}` : ''}/configuration/plugins/install/${packageName}`
+          : `https://dashboard.datocms.com/projects/redirect-to-project?path=/configuration/plugins/install/${packageName}`;
+
+        linkEl.setAttribute('href', url);
+      }
+
+      getProject() {
+        const value = sessionStorage.getItem('marketplaceProject');
+
+        if (!value) {
+          return undefined;
+        }
+
+        try {
+          return JSON.parse(value) as { domain: string; environment: string | undefined };
+        } catch {
+          return undefined;
+        }
+      }
+    },
+  );
+</script>
