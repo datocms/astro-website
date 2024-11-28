@@ -26,7 +26,11 @@ export const security: MiddlewareHandler = async (context, next) => {
 };
 
 export const basicAuth: MiddlewareHandler = (context, next) => {
-  if (DEPLOYMENT_DESTINATION === 'development' || !isDraftModeEnabled(context.request)) {
+  if (
+    context.url.pathname === '/up' ||
+    DEPLOYMENT_DESTINATION === 'development' ||
+    !isDraftModeEnabled(context.request)
+  ) {
     return next();
   }
 
