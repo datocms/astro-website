@@ -32,7 +32,7 @@ const result = await executeQuery(Astro, query);
 <!doctype html>
 <html lang="en" transition:animate="none">
   <head>
-    <style is:inline>
+    <style id="css-layers" is:inline>
       @layer reset, prose;
     </style>
     <meta charset="UTF-8" />
@@ -73,4 +73,34 @@ const result = await executeQuery(Astro, query);
       setCookie('datoUtm', cookieContent, 365);
     }
   }
+
+  function ensureCssLayersFirst() {
+    const head = document.head;
+    const cssLayersStyle = head.querySelector('style#css-layers');
+
+    if (cssLayersStyle && head.firstChild !== cssLayersStyle) {
+      // Remove the style tag from its current position
+      head.removeChild(cssLayersStyle);
+
+      // Insert it as the first child of head
+      head.insertBefore(cssLayersStyle, head.firstChild);
+    }
+  }
+
+  // With Astro Transitions, sometimes the new <styles> will be inserted BEFORE our
+  // CSS layers ordering directive, breaking the styles.
+
+  ensureCssLayersFirst();
+
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.type === 'childList' && mutation.target === document.head) {
+        ensureCssLayersFirst();
+      }
+    }
+  });
+
+  observer.observe(document.head, {
+    childList: true,
+  });
 </script>
