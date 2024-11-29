@@ -17,6 +17,7 @@ import { query } from './_graphql';
 import s from './_style.module.css';
 import { isVideo } from '~/components/VideoPlayer/graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import xss from 'xss';
 
 const variables = {
   slug: Astro.params.rest!,
@@ -78,7 +79,7 @@ const avatarUrl = getGravatarUrl(page.author.email);
 
           <Prose>
             <div class={s.documentation} data-monospace="true">
-              <Markdown of={page.readme} />
+              <Markdown of={xss(page.readme)} />
             </div>
           </Prose>
         </div>
