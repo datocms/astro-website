@@ -53,13 +53,9 @@ import { Button } from '~/components/Button';
     import { actions } from 'astro:actions';
     import { isInputError } from 'astro:actions';
     import { WebComponent } from '~/lib/WebComponent';
-    import { RECAPTCHA_KEY } from 'astro:env/client';
+    import { loadRecaptcha } from '~/lib/loadRecaptcha';
     import { isActionError } from 'astro:actions';
-
-    interface Grecaptcha {
-      ready: (callback: () => void) => void;
-      execute: (siteKey: string, options: { action: string }) => Promise<string>;
-    }
+    import { RECAPTCHA_KEY } from 'astro:env/client';
 
     window.customElements.define(
       'share-feedback',
@@ -80,9 +76,9 @@ import { Button } from '~/components/Button';
           this.button.innerText = 'Submitting...';
           this.button.disabled = true;
 
-          const client = await this.loadRecaptcha();
+          const client = await loadRecaptcha();
 
-          const token = await client.execute(RECAPTCHA_KEY, { action: 'submit' });
+          const token = await client.execute(RECAPTCHA_KEY, { action: 'sendFeedbackAboutDocPage' });
 
           const formData = new FormData(this.form);
           formData.set('token', token);
@@ -114,40 +110,6 @@ import { Button } from '~/components/Button';
           } else {
             this.form.innerHTML = 'Thank you! We received your feedback 🙏';
           }
-        }
-
-        loadRecaptcha(): Promise<Grecaptcha> {
-          return new Promise((resolve, reject) => {
-            if (!('grecaptcha' in window)) {
-              // Define a global configuration if it doesn't exist
-              const globalConfig = '___grecaptcha_cfg';
-
-              (window as any)[globalConfig] = (window as any)[globalConfig] || {};
-
-              const fns = ((window as any)[globalConfig]['fns'] =
-                (window as any)[globalConfig]['fns'] || []);
-
-              // Enqueue the callback
-              fns.push(() => {
-                resolve((window as any).grecaptcha);
-              });
-
-              // Dynamically load the reCAPTCHA script
-              const script = document.createElement('script');
-              script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_KEY}`;
-              script.async = true;
-              script.onerror = () => reject(new Error('Failed to load the reCAPTCHA script.'));
-
-              // Append the script to the document
-              document.head.appendChild(script);
-              return;
-            }
-
-            const grecaptcha = window.grecaptcha as Grecaptcha;
-
-            // Check if grecaptcha is already defined
-            grecaptcha.ready(() => resolve(grecaptcha));
-          });
         }
       },
     );

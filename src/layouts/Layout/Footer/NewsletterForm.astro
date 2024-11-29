@@ -27,9 +27,11 @@ import { Button } from '~/components/Button';
 </subscribe-newsletter>
 
 <script>
-  import { actions } from 'astro:actions';
+  import { actions, isActionError } from 'astro:actions';
   import { isInputError } from 'astro:actions';
   import { WebComponent } from '~/lib/WebComponent';
+  import { loadRecaptcha } from '~/lib/loadRecaptcha';
+  import { RECAPTCHA_KEY } from 'astro:env/client';
 
   window.customElements.define(
     'subscribe-newsletter',
@@ -52,13 +54,21 @@ import { Button } from '~/components/Button';
         this.button.innerText = 'Submitting...';
         this.button.disabled = true;
 
+        const client = await loadRecaptcha();
+
+        const token = await client.execute(RECAPTCHA_KEY, { action: 'subscribeToNewsletter' });
+
         const formData = new FormData(this.form);
+        formData.set('token', token);
+
         const { error } = await actions.subscribeToNewsletter(formData);
 
         if (isInputError(error)) {
           if (error.fields.email) {
             status.innerHTML = error.fields.email.join(', ');
           }
+        } else if (isActionError(error)) {
+          status.innerHTML = 'Mh! Something went wrong...';
         } else {
           status.innerHTML = 'Successfully subscribed. Welcome on board! 🎉';
         }
