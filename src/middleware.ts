@@ -13,7 +13,7 @@ export const rollbar: MiddlewareHandler = async ({ request, params }, next) => {
   }
 };
 
-export const security: MiddlewareHandler = async (context, next) => {
+export const security: MiddlewareHandler = async (_context, next) => {
   const response = await next();
 
   response.headers.set('strict-transport-security', 'max-age=63072000; includeSubdomains; preload');
@@ -25,9 +25,11 @@ export const security: MiddlewareHandler = async (context, next) => {
   return response;
 };
 
+const routesWithNoAuth = ['/up', '/landing-pages/cookieConsent.js'];
+
 export const basicAuth: MiddlewareHandler = (context, next) => {
   if (
-    context.url.pathname === '/up' ||
+    routesWithNoAuth.includes(context.url.pathname) ||
     DEPLOYMENT_DESTINATION === 'development' ||
     !isDraftModeEnabled(context.request)
   ) {
