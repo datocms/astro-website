@@ -9,6 +9,10 @@ jobs:
     name: Code Quality
     runs-on: ubuntu-latest
 
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
     env:
       DATOCMS_API_TOKEN: ${{ secrets.DATOCMS_API_TOKEN }}
       SECRET_API_TOKEN: bogus
