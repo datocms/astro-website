@@ -2,7 +2,7 @@ import { RECAPTCHA_SECRET_KEY } from 'astro:env/server';
 import ky from 'ky';
 
 export async function isRecaptchaTokenValid(token: string) {
-  const { success } = await ky
+  const result = await ky
     .post<{ success: boolean }>('https://www.google.com/recaptcha/api/siteverify', {
       body: new URLSearchParams({
         secret: RECAPTCHA_SECRET_KEY,
@@ -10,5 +10,6 @@ export async function isRecaptchaTokenValid(token: string) {
       }),
     })
     .json();
-  return success;
+
+  return result.success;
 }

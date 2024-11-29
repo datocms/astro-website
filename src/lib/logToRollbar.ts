@@ -9,6 +9,10 @@ type Options = {
 };
 
 export default function logToRollbar(error: any, options: Options = {}) {
+  if (!ROLLBAR_TOKEN) {
+    return;
+  }
+
   const serializedRequest = options.request
     ? {
         headers: Object.fromEntries(options.request.headers),

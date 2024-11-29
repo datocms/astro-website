@@ -2,7 +2,6 @@
 import { Svg } from '~/components/Svg';
 import s from './style.module.css';
 import { Button } from '~/components/Button';
-import { RECAPTCHA_KEY } from 'astro:env/client';
 ---
 
 <share-feedback>
@@ -50,14 +49,12 @@ import { RECAPTCHA_KEY } from 'astro:env/client';
     </div>
   </form>
 
-  <script is:inline src={`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_KEY}`}
-  ></script>
-
   <script>
     import { actions } from 'astro:actions';
     import { isInputError } from 'astro:actions';
     import { WebComponent } from '~/lib/WebComponent';
     import { RECAPTCHA_KEY } from 'astro:env/client';
+    import { isActionError } from 'astro:actions';
 
     interface Grecaptcha {
       ready: (callback: () => void) => void;
@@ -83,43 +80,73 @@ import { RECAPTCHA_KEY } from 'astro:env/client';
           this.button.innerText = 'Submitting...';
           this.button.disabled = true;
 
-          if (!('grecaptcha' in window)) {
-            return;
-          }
+          const client = await this.loadRecaptcha();
 
-          const grecaptcha = window.grecaptcha as Grecaptcha;
+          const token = await client.execute(RECAPTCHA_KEY, { action: 'submit' });
 
-          grecaptcha.ready(async () => {
-            const token = await grecaptcha.execute(RECAPTCHA_KEY, { action: 'submit' });
+          const formData = new FormData(this.form);
+          formData.set('token', token);
 
-            const formData = new FormData(this.form);
-            formData.set('token', token);
+          const { error } = await actions.sendFeedbackAboutDocPage(formData);
 
-            const { error } = await actions.sendFeedbackAboutDocPage(formData);
+          if (isInputError(error)) {
+            for (const [name, errors] of Object.entries(error.fields)) {
+              const fieldEl = this.form.querySelector(`[name=${name}]`);
+              const message = errors.join(', ');
 
-            if (isInputError(error)) {
-              for (const [name, errors] of Object.entries(error.fields)) {
-                const fieldEl = this.form.querySelector(`[name=${name}]`);
-                const message = errors.join(', ');
-
-                if (!fieldEl) {
-                  continue;
-                }
-
-                const errorEl = fieldEl.parentElement!.querySelector<HTMLElement>('[data-error]');
-
-                if (errorEl) {
-                  errorEl.innerText = message;
-                } else {
-                  fieldEl.after(`<div data-error>${errors.join(', ')}</div>`);
-                }
+              if (!fieldEl) {
+                continue;
               }
 
-              this.button.innerText = 'Submit feedback';
-              this.button.disabled = false;
-            } else {
-              this.form.innerHTML = 'Thank you! We received your feedback 🙏';
+              const errorEl = fieldEl.parentElement!.querySelector<HTMLElement>('[data-error]');
+
+              if (errorEl) {
+                errorEl.innerText = message;
+              } else {
+                fieldEl.after(`<div data-error>${errors.join(', ')}</div>`);
+              }
             }
+
+            this.button.innerText = 'Submit feedback';
+            this.button.disabled = false;
+          } else if (isActionError(error)) {
+            this.form.innerHTML = 'Mh! Something went wrong...';
+          } else {
+            this.form.innerHTML = 'Thank you! We received your feedback 🙏';
+          }
+        }
+
+        loadRecaptcha(): Promise<Grecaptcha> {
+          return new Promise((resolve, reject) => {
+            if (!('grecaptcha' in window)) {
+              // Define a global configuration if it doesn't exist
+              const globalConfig = '___grecaptcha_cfg';
+
+              (window as any)[globalConfig] = (window as any)[globalConfig] || {};
+
+              const fns = ((window as any)[globalConfig]['fns'] =
+                (window as any)[globalConfig]['fns'] || []);
+
+              // Enqueue the callback
+              fns.push(() => {
+                resolve((window as any).grecaptcha);
+              });
+
+              // Dynamically load the reCAPTCHA script
+              const script = document.createElement('script');
+              script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_KEY}`;
+              script.async = true;
+              script.onerror = () => reject(new Error('Failed to load the reCAPTCHA script.'));
+
+              // Append the script to the document
+              document.head.appendChild(script);
+              return;
+            }
+
+            const grecaptcha = window.grecaptcha as Grecaptcha;
+
+            // Check if grecaptcha is already defined
+            grecaptcha.ready(() => resolve(grecaptcha));
           });
         }
       },
