@@ -232,5 +232,7 @@ export default defineConfig({
     '/marketplace/starters/next-13-company-landing-page-demo':
       '/marketplace/starters/next-js-starter-kit',
     '/docs/agency-partner-program/benefits': '/partner-program',
+    '/docs/site-search/excluding-text':
+      '/docs/site-search/how-the-crawling-works#excluding-content-from-indexing',
   },
 });
