@@ -1,0 +1,172 @@
+---
+import { Button } from '~/components/Button';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Prose } from '~/components/Prose';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { SidebarPane } from '~/components/SidebarPane';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { Text } from '~/components/structuredText/Text';
+import { Wrapper } from '~/components/Wrapper';
+import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query, extraQuery } from './_graphql';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import s from './_style.module.css';
+import { PluginCard } from '~/pages/marketplace/_sub/PluginCard';
+import {
+  overrideSeo,
+  seoDescription,
+  seoGeneratedCard,
+  seoPageTitle,
+  seoShareTitle,
+} from '~/lib/datocms/seo';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const variables = { partnerSlug: Astro.params.partnerSlug! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const { plugins } = await executeQuery(Astro, extraQuery, {
+  variables: { authorId: page.npmUser?.id || '' },
+});
+---
+
+<Layout
+  additionalSeo={overrideSeo(
+    page._seoMetaTags,
+    seoPageTitle(page.name, 'DatoCMS Partners'),
+    seoShareTitle(`DatoCMS Partner: ${page.name}`),
+    seoDescription(toPlainText(page.shortDescription)!),
+    seoGeneratedCard(Astro, {
+      kicker: `DatoCMS Agency Partners: ${page.name}`,
+      excerpt: toPlainText(page.shortDescription),
+      pills: [`${page.projects.length} showcased projects`],
+      logoPngUrl: page.logo.pngUrl,
+    }),
+  )}
+>
+  <InterstitialTitle style="two" bigSubtitle={true} mainTitleOfPage>
+    <Fragment slot="kicker"><a href="/partner-program">DatoCMS Agency Partner</a></Fragment>
+    <Fragment slot="subtitle">
+      <Text data={page.shortDescription} />
+    </Fragment>
+    <figure class={s.logoWrapper}>
+      <img loading="lazy" class={s.logo} alt={`${page.name} logo`} src={page.logo.url} />
+    </figure>
+  </InterstitialTitle>
+
+  <Wrapper>
+    <div class={s.contentWrapper}>
+      <div class={s.content}>
+        <h3 class={s.blockTitle}>Description</h3>
+        <section>
+          <Prose>
+            <Text data={page.description} />
+          </Prose>
+          <div class={s.action}>
+            <div class={s.actionButton}>
+              <Button as="a" href={page.websiteUrl} target="_blank">
+                <Svg name="icons/regular/link" /> Visit website
+              </Button>
+            </div>
+            {
+              page.publicContactEmail && (
+                <div class={s.actionButton}>
+                  <Button
+                    as="a"
+                    s="invert"
+                    href={`mailto:${page.publicContactEmail}`}
+                    target="_blank"
+                  >
+                    <Svg name="icons/regular/envelope" /> Contact {page.name}
+                  </Button>
+                </div>
+              )
+            }
+          </div>
+        </section>
+      </div>
+
+      <aside class={s.aside}>
+        <SidebarPane icon="map-marker" title={page.locations.length > 1 ? 'Locations' : 'Location'}>
+          <ul class={s.list}>
+            {
+              page.locations.map((area) => (
+                <li>
+                  {area.emoji} {area.name}
+                </li>
+              ))
+            }
+          </ul>
+        </SidebarPane>
+        <SidebarPane icon="marker" title="Services offered">
+          <ul class={s.list}>
+            {page.areasOfExpertise.map((area) => <li>{area.name}</li>)}
+          </ul>
+        </SidebarPane>
+        <SidebarPane icon="laptop-code" title="Covered technologies">
+          <ul class={s.list}>
+            {page.technologies.map((area) => <li>{area.name}</li>)}
+          </ul>
+        </SidebarPane>
+      </aside>
+    </div>
+  </Wrapper>
+
+  <Wrapper>
+    {
+      page.projects.length > 0 && (
+        <Space top={2}>
+          <div>
+            <h3 class={s.blockTitle}>Projects showcase</h3>
+            <div class={s.projectsGrid}>
+              {page.projects.map((project) => (
+                <MarketplaceCard
+                  title={project.name}
+                  size="small"
+                  lineClamp={3}
+                  svgLogoUrl={
+                    project.technologies.find((t) => t.integrationType.slug === 'framework')?.logo
+                      .url
+                  }
+                  href={buildUrlForShowcaseProject(project)}
+                >
+                  <Fragment slot="image">
+                    <ResponsiveImage data={project.mainImage.responsiveImage} />
+                  </Fragment>
+                  {structuredTextToPlainText(project.headline)}
+                </MarketplaceCard>
+              ))}
+            </div>
+          </div>
+        </Space>
+      )
+    }
+
+    {
+      plugins.length > 0 && (
+        <Space top={2}>
+          <div>
+            <h3 class={s.blockTitle}>Plugins released</h3>
+            <div class={s.pluginsGrid}>
+              {plugins.map((plugin) => (
+                <PluginCard plugin={plugin} size="small" />
+              ))}
+            </div>
+          </div>
+        </Space>
+      )
+    }
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

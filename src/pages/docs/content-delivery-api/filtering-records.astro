@@ -1,0 +1,69 @@
+---
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Heading } from '~/components/Heading';
+import { PageLayout, findGroupAndPage } from '~/layouts/docs/PageLayout';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { slugify } from '~/lib/slugify';
+import Filters from './_Filters.astro';
+import { camelize } from './_gqlExample';
+import { fetchIntrospectionFieldFilters, fieldTypeName } from './_utils';
+
+const result = await findGroupAndPage(Astro, 'content-delivery-api/filtering-records');
+
+if (!result) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const [group, page, queryListenerProps] = result;
+
+const response = await fetchIntrospectionFieldFilters();
+---
+
+<PageLayout
+  page={page}
+  group={group}
+  additionalTocGroups={[
+    {
+      title: 'Filters available for field types',
+      entries: Object.keys(response.field_types).map((fieldName) => ({
+        label: fieldTypeName[fieldName]!,
+        url: `#${slugify(fieldName)}`,
+      })),
+    },
+    {
+      title: 'Filters available for meta fields',
+      entries: Object.keys(response.meta).map((fieldName) => ({
+        label: camelize(fieldName),
+        url: `#${slugify(camelize(fieldName))}`,
+      })),
+    },
+  ]}
+>
+  <Fragment slot="afterPageContent">
+    <Heading anchor="field-types" as="h2">Filters available for field types</Heading>
+    {
+      Object.entries(response.field_types).map(([fieldName, filters]) => (
+        <>
+          <Heading anchor={slugify(fieldName)} as="h4">
+            {fieldTypeName[fieldName]} fields
+          </Heading>
+          <Filters fieldName={fieldName} filters={filters} />
+        </>
+      ))
+    }
+    <Heading anchor="meta-fields" as="h3">Filters available for meta fields</Heading>
+    {
+      Object.entries(response.meta).map(([fieldName, filters]) => (
+        <>
+          <Heading anchor={slugify(camelize(fieldName))} as="h4">
+            Filter by <code>{camelize(fieldName)}</code> meta field
+          </Heading>
+          <Filters fieldName={fieldName} filters={filters} />
+        </>
+      ))
+    }
+  </Fragment>
+</PageLayout>
+
+{queryListenerProps.map((props) => <DraftModeQueryListener {...props} />)}

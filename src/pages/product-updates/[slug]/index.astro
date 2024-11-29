@@ -1,0 +1,33 @@
+---
+import { Hero } from '~/components/Hero';
+import { Wrapper } from '~/components/Wrapper';
+import { ProductUpdate } from '~/components/product-updates/ProductUpdate';
+import { Layout } from '~/layouts/Layout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const variables = { slug: Astro.params.slug! };
+const { productUpdate } = await executeQuery(Astro, query, { variables });
+
+if (!productUpdate) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={productUpdate._seoMetaTags}>
+  <Hero>
+    <Fragment slot="title"><mark>Product Updates</mark></Fragment>
+    <Fragment slot="subtitle">
+      DatoCMS changelog for new features and general improvements
+    </Fragment>
+  </Hero>
+
+  <Wrapper>
+    <ProductUpdate productUpdate={productUpdate} />
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

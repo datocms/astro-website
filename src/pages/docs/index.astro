@@ -1,0 +1,128 @@
+---
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { BaseLayout } from '~/layouts/docs/BaseLayout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { Svg } from '~/components/Svg';
+import { HomeSidebar } from './_sub/HomeSidebar';
+
+const { page, tutorials, tutorialsMeta } = await executeQuery(Astro, query);
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<BaseLayout additionalSeo={page._seoMetaTags}>
+  <Fragment slot="sidebar">
+    <HomeSidebar />
+  </Fragment>
+
+  <div class={s.container}>
+    <h2 class={s.title}>DatoCMS Documentation</h2>
+    <p class={s.subtitle}>
+      Whether you’re a startup or a global enterprise, learn how to integrate with DatoCMS to manage
+      your content in a centralized, structured hub.
+    </p>
+
+    <h6 class={s.introTitle}>For everyone</h6>
+    <div class={s.useCaseCards}>
+      <a href="/docs/general-concepts" class={s.useCaseCard}>
+        <Svg name="svg/illustrations/marketers" />
+        <div class={s.useCaseCardTitle}>What is DatoCMS?</div>
+        <p>Learn the basic concepts and features of DatoCMS.</p>
+      </a>
+
+      <a href="/user-guides" class={s.useCaseCard}>
+        <Svg name="svg/illustrations/video-encoding" />
+        <div class={s.useCaseCardTitle}>Videos & Tutorials</div>
+        <p>Jump right in with our video walkthroughs and step-by-step tutorials.</p>
+      </a>
+
+      <a href="/docs/content-modelling" class={s.useCaseCard}>
+        <Svg name="svg/illustrations/dynamic-layouts" />
+        <div class={s.useCaseCardTitle}>Modeling your first schema</div>
+        <p>Structure your own content in our easy-to-use interface.</p>
+      </a>
+    </div>
+
+    <h6 class={s.introTitle}>For developers</h6>
+    <div class={s.useCaseCards}>
+      <a href="/academy" class={s.useCaseCard}>
+        <Svg name="svg/illustrations/developers-2" />
+        <div class={s.useCaseCardTitle}>What is a headless CMS?</div>
+        <p>Join us for a gentle intro to modern web dev with headless CMSes and JS frontends.</p>
+      </a>
+
+      <a href="/docs/content-delivery-api" class={s.useCaseCard}>
+        <Svg name="svg/illustrations/graphql-api" />
+        <div class={s.useCaseCardTitle}>GraphQL API Reference</div>
+        <p>Fetch exactly what your frontend needs with our Content Delivery API.</p>
+      </a>
+
+      <a href="/docs/content-management-api" class={s.useCaseCard}>
+        <Svg name="svg/illustrations/content-editors2" />
+        <div class={s.useCaseCardTitle}>REST API Reference</div>
+        <p>Programmatically create and edit content with our Content Management API.</p>
+      </a>
+    </div>
+
+    <h6 class={s.introTitle}>Popular integrations</h6>
+    <div class={s.useCaseCards}>
+      <a href="/docs/next-js" class={s.useCaseCard}>
+        <Svg name="svg/logos/next" />
+        <div class={s.useCaseCardTitle}>Next.js + DatoCMS</div>
+        <p>Learn how to integrate your Next.js website with DatoCMS</p>
+      </a>
+
+      <a href="/docs/nuxt" class={s.useCaseCard}>
+        <Svg name="svg/logos/nuxt" />
+        <div class={s.useCaseCardTitle}>Nuxt + DatoCMS</div>
+        <p>Learn how to integrate your Nuxt website with DatoCMS</p>
+      </a>
+
+      <a href="/docs/svelte" class={s.useCaseCard}>
+        <Svg name="svg/logos/svelte" />
+        <div class={s.useCaseCardTitle}>Svelte + DatoCMS</div>
+        <p>Learn how to integrate your Svelte website with DatoCMS</p>
+      </a>
+    </div>
+
+    <h6 class={s.introTitle}>Community Videos</h6>
+    <p>
+      If you're new to DatoCMS, we recommend starting with our official{' '}
+      <a href="/user-guides">User Guides</a>, which cover the basics in a series of videos and
+      written tutorials.
+    </p>
+    <p>Want more videos? Check out these awesome community contributions:</p>
+    <div class={s.useCaseCards}>
+      {
+        tutorials.map((tutorial) =>
+          tutorial.res.__typename === 'YoutubeVideoResourceRecord' ? (
+            <a href={tutorial.res.video.url} class={s.videoCard}>
+              <div class={s.tutorialCover}>
+                <img src={tutorial.res.video.thumbnailUrl} />
+              </div>
+              <div class={s.videoCardTitle}>{tutorial.title}</div>
+            </a>
+          ) : (
+            <a href={tutorial.res.url} class={s.videoCard}>
+              <div class={s.videoCardCover}>
+                <ResponsiveImage data={tutorial.res.coverImage.responsiveImage} />
+              </div>
+              <div class={s.videoCardTitle}>{tutorial.title}</div>
+            </a>
+          ),
+        )
+      }
+    </div>
+    <p>
+      <a href="/docs/community-tutorials">See more videos ({tutorialsMeta.count} total)</a>
+    </p>
+  </div>
+  <DraftModeQueryListener query={query} />
+</BaseLayout>

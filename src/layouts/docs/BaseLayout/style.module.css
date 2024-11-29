@@ -1,0 +1,255 @@
+@media (width < 1000px) {
+  .logo {
+    overflow: hidden;
+    height: 55px;
+    padding: 13px 0;
+    display: block;
+  }
+
+  .sidebarHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 var(--page-margin);
+  }
+
+  .hamburger {
+    background: transparent;
+    padding: 10px;
+    border: 0;
+    font-size: inherit;
+    text-decoration: none;
+    border: 1px solid var(--extra-light-body-color);
+    border-radius: 5px;
+
+    &:focus {
+      outline: none;
+    }
+
+    svg {
+      display: block;
+      color: var(--light-body-color);
+    }
+  }
+
+  .innerSidebar {
+    padding: 30px var(--page-margin);
+    border-bottom: 1px solid var(--border-color);
+    display: none;
+
+    &:is([data-open]) {
+      display: block;
+    }
+  }
+
+  .footer {
+    padding: 30px var(--page-margin);
+  }
+
+  .mainHeader {
+    display: none;
+  }
+
+  .footerCol {
+    margin-bottom: 30px;
+  }
+}
+
+@media (width >= 1000px) {
+  .root {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 252px calc(100vw - 252px);
+    font-size: 16px;
+    position: relative;
+  }
+
+  .sidebar {
+    background: white;
+    position: sticky;
+    flex: 0;
+    flex-grow: 0;
+    display: flex;
+    z-index: 5;
+    flex-direction: column;
+    align-items: flex-end;
+    -moz-user-select: none;
+    user-select: none;
+    width: 100%;
+    width: 252px;
+    height: 100vh;
+    top: 0;
+    flex-grow: 1;
+
+    &:after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 1px;
+      height: 100%;
+      background: #e3e8ee;
+    }
+  }
+
+  .hamburger {
+    display: none;
+  }
+
+  .contentWrapper {
+    outline: none;
+    background: white;
+  }
+
+  .logo {
+    overflow: hidden;
+    width: 230px;
+    height: 55px;
+    padding: 13px 0;
+    flex: none;
+    display: block;
+    border-bottom: 1px solid var(--border-color);
+
+    svg {
+      height: 30px;
+    }
+  }
+
+  .innerSidebar {
+    flex: 1;
+    overflow-y: auto;
+    z-index: 1;
+    width: 230px;
+    margin-top: 1px;
+    padding: 55px 20px 55px 0;
+
+    &:after {
+      content: '';
+      height: 80px;
+      display: block;
+    }
+  }
+
+  .mainHeader {
+    min-width: 700px;
+    border-bottom: 1px solid #e3e8ee;
+    ul {
+      margin: 0;
+      margin-right: var(--page-margin);
+      text-align: right;
+
+      li {
+        display: inline-block;
+
+        a {
+          font-size: 16px;
+          line-height: 56px;
+          padding-left: 30px;
+          color: var(--accent-color);
+          display: flex;
+          align-items: center;
+          text-decoration: none;
+
+          &:hover {
+            text-decoration: underline;
+          }
+
+          svg {
+            margin-right: 5px;
+          }
+        }
+      }
+    }
+  }
+
+  .container {
+    padding-bottom: 33px;
+  }
+
+  .mainHeader {
+    height: 55px;
+  }
+
+  .footer {
+    border-top: 1px solid var(--border-color);
+    padding: 50px var(--page-margin);
+    margin-top: 50px;
+    display: grid;
+    column-gap: 50px;
+    grid-template-columns: 350px auto;
+  }
+
+  .footerCol {
+    flex: 1;
+  }
+}
+
+@media (width >= 1300px) {
+  .root {
+    --content-width: 1010px;
+    --sidebar-width: 270px;
+    grid-template-columns:
+      minmax(
+        var(--sidebar-width),
+        calc((100% - var(--content-width) - var(--sidebar-width)) / 2 + var(--sidebar-width))
+      )
+      var(--content-width) 1fr;
+  }
+
+  .sidebar,
+  .emptySidebar {
+    min-width: 292px;
+    width: 100%;
+  }
+
+  .logo {
+    width: var(--sidebar-width);
+  }
+
+  .innerSidebar {
+    width: var(--sidebar-width);
+  }
+
+  .container {
+    padding-left: 64px;
+  }
+
+  .mainHeader {
+    width: var(--content-width);
+  }
+
+  .footer {
+    padding: 50px 0;
+  }
+}
+
+@media (width >= 1500px) {
+  .root {
+    --content-width: 1110px;
+    --sidebar-width: 300px;
+  }
+}
+
+@media (width >= 1600px) {
+  .root {
+    --content-width: 1210px;
+    --sidebar-width: 300px;
+  }
+}
+
+.footer {
+  font-size: 15px;
+  line-height: 1.3;
+
+  a {
+    color: var(--accent-color);
+  }
+}
+
+.footerTitle {
+  font-weight: bold;
+  margin: 0 0 10px;
+  font-size: 18px;
+}

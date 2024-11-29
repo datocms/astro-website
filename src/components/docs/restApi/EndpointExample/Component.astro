@@ -1,0 +1,111 @@
+---
+import { Heading } from '~/components/Heading';
+import s from './style.module.css';
+import { TargetToggler } from '~/components/TargetToggler';
+import { Markdown } from '~/components/Markdown';
+import { Tab, Tabs } from '~/components/Tabs';
+import { Code } from '~/components/Code';
+import { Prose } from '~/components/Prose';
+
+type Props = {
+  id: string;
+  title: string;
+  description?: string;
+  tabs: Array<{ title: string; description?: string; code: string; language: string }>;
+  startVisible?: boolean;
+};
+
+const { id, title, description, tabs, startVisible } = Astro.props;
+---
+
+<prose-island>
+  <endpoint-example slug={id}>
+    <div class={s.reqRes}>
+      <TargetToggler targetId={`example-${id}`} startVisible={startVisible}>
+        <Heading as="button" class={s.title} anchor={id}>
+          <span class={s.pill}>Example</span>{' '}
+          <span class={s.titleTitle}>{title}</span>
+        </Heading>
+      </TargetToggler>
+
+      <div id={`example-${id}`} class={s.details}>
+        {
+          description && (
+            <Prose class={s.description}>
+              <Markdown of={description} />
+            </Prose>
+          )
+        }
+
+        {
+          tabs.length > 1 ? (
+            <div class={s.tabs}>
+              <Tabs>
+                {tabs.map((tab) => (
+                  <Tab title={tab.title} noPadding>
+                    {tab.description && (
+                      <div class={s.description}>
+                        <Markdown of={tab.description} />
+                      </div>
+                    )}
+
+                    <Code code={tab.code} language={tab.language} />
+                  </Tab>
+                ))}
+              </Tabs>
+            </div>
+          ) : (
+            <>
+              {tabs[0]!.description && (
+                <div class={s.description}>
+                  <Markdown of={tabs[0]!.description} />
+                </div>
+              )}
+
+              <Code code={tabs[0]!.code} language={tabs[0]!.language} />
+            </>
+          )
+        }
+      </div>
+    </div>
+  </endpoint-example>
+</prose-island>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'endpoint-example',
+    class EndpointExample extends WebComponent {
+      toggler!: HTMLButtonElement;
+
+      parsedCallback() {
+        this.handleHashChange();
+        window.addEventListener('hashchange', this.handleHashChange);
+        window.addEventListener('popstate', this.handleHashChange);
+      }
+
+      disconnectedCallback(): void {
+        window.removeEventListener('hashchange', this.handleHashChange);
+        window.removeEventListener('popstate', this.handleHashChange);
+      }
+
+      handleHashChange = (): void => {
+        this.toggler = this.$('target-toggler');
+
+        const currentHash = window.location.hash.slice(1);
+        const slug = this.getAttribute('slug');
+
+        if (currentHash === slug) {
+          (this.toggler as any).toggle(true);
+        }
+      };
+    },
+  );
+</script>
+
+<style>
+  endpoint-example {
+    display: contents;
+  }
+</style>

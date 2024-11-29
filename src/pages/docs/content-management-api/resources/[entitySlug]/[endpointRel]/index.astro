@@ -1,0 +1,201 @@
+---
+import {
+  analyzePropertiesOfGenericObject,
+  analyzePropertiesOfJsonApiEntity,
+} from '~/components/docs/restApi/analyzeSchemaProperties';
+import { buildSidebarItems } from '~/components/docs/restApi/buildSidebarItems';
+import {
+  buildTocGroupsFromExamples,
+  buildTocGroupsFromMarkdown,
+  EndpointDescriptionWithExamples,
+  examplesNotInMarkdown,
+} from '~/components/docs/restApi/EndpointDescriptionWithExamples';
+import { fetchRestApiEndpointJsClient } from '~/components/docs/restApi/fetchRestApiEndpointJsClient';
+import { JsExample } from '~/components/docs/restApi/JsExample';
+import { HttpExample } from '~/components/docs/restApi/HttpExample';
+import { JsonSchemaObjectAnalysis } from '~/components/docs/restApi/JsonSchemaObjectAnalysis';
+import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
+import { Prose } from '~/components/Prose';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Svg } from '~/components/Svg';
+import { findGroup, GroupLayout } from '~/layouts/docs/GroupLayout';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import s from '../_style.module.css';
+import { findEntity } from '~/components/docs/restApi/fetchSchema';
+import { EndpointResponse } from '~/components/docs/restApi/EndpointResponse';
+import { LanguagePicker } from '~/components/docs/restApi/LanguagePicker';
+import { currentLanguage, isValidLanguage } from '~/components/docs/restApi/LanguagePicker/utils';
+import { Heading } from '~/components/Heading';
+import { analyzeResponse } from '~/components/docs/restApi/EndpointResponse/utils';
+import { markdownToPlainText } from '~/components/Markdown/utils';
+import {
+  overrideSeo,
+  seoDescription,
+  seoGeneratedCard,
+  seoPageTitle,
+  seoShareTitle,
+} from '~/lib/datocms/seo';
+
+const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
+const entity = await findEntity(Astro, Astro.params.entitySlug!);
+
+const jsClient = await fetchRestApiEndpointJsClient(
+  Astro.params.entitySlug!,
+  Astro.params.endpointRel!,
+);
+
+const language = currentLanguage(Astro);
+
+if (!isValidLanguage(language)) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const result = await findGroup(Astro, 'content-management-api');
+
+if (!result || !entity || !jsClient) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const [group, queryListenerProps] = result;
+
+const endpoint = entity.links!.find((endpoint) => endpoint.rel === Astro.params.endpointRel);
+
+if (!endpoint) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const description = endpoint.documentation?.[language]?.description || endpoint.description;
+const plainDescription = description ? await markdownToPlainText(description) : undefined;
+
+const examples = endpoint?.documentation?.[language]?.examples || [];
+
+const examplesNotInDescription = examplesNotInMarkdown(examples, description);
+
+const bodyParameters = endpoint.schema?.properties?.data
+  ? analyzePropertiesOfJsonApiEntity(endpoint.schema.properties.data, 'endpointPayload', language, {
+      skipEntityId: endpoint.method === 'PUT',
+    })
+  : undefined;
+
+const queryParameters = endpoint.hrefSchema
+  ? analyzePropertiesOfGenericObject(endpoint.hrefSchema, language, {
+      considerDeprecatedAndRequiredAsRequired: true,
+    })
+  : undefined;
+
+const response = analyzeResponse(endpoint.targetSchema, endpoint.jobSchema);
+
+const Example = language === 'javascript' ? JsExample : HttpExample;
+const propsForExamples = { entity, endpoint, jsClient };
+---
+
+<GroupLayout
+  group={group}
+  additionalSeo={overrideSeo(
+    [],
+    seoPageTitle(endpoint.title, entity.title!, 'Content Management API'),
+    seoShareTitle(`${entity.title}: ${endpoint.title}`),
+    plainDescription ? seoDescription(plainDescription) : undefined,
+    seoGeneratedCard(Astro, {
+      kicker: `Content Management API: ${entity.title}`,
+      title: endpoint.title,
+      excerpt: plainDescription,
+    }),
+  )}
+  additionalSidebarItems={sidebarItems}
+  contentWrapperComponent={LanguagePicker}
+>
+  <ContentPlusToc
+    tocGroups={[
+      ...buildTocGroupsFromMarkdown(description),
+      {
+        title: 'Endpoint info',
+        entries: [
+          ...(queryParameters ? [{ label: 'Query parameters', url: '#query-parameters' }] : []),
+          ...(bodyParameters ? [{ label: 'Body parameters', url: '#body-parameters' }] : []),
+          ...(response ? [{ label: 'Returns', url: '#returns' }] : []),
+        ],
+      },
+      ...buildTocGroupsFromExamples(examples, description),
+    ]}
+  >
+    <Fragment slot="kicker">Content Management API > {entity.title}</Fragment>
+    <Fragment slot="title">{endpoint.title}</Fragment>
+
+    <Prose>
+      {
+        description && (
+          <EndpointDescriptionWithExamples
+            description={description}
+            examples={examples}
+            exampleComponent={Example}
+            additionalProps={propsForExamples}
+          />
+        )
+      }
+
+      {
+        queryParameters && (
+          <>
+            <Heading as="h2" anchor="query-parameters">
+              Query parameters
+            </Heading>
+            <JsonSchemaObjectAnalysis object={queryParameters} showRequiredOptional={false} />
+          </>
+        )
+      }
+
+      {
+        bodyParameters && endpoint.schema && (
+          <>
+            <Heading as="h2" anchor="body-parameters">
+              Body parameters
+            </Heading>
+            {Array.isArray(endpoint.schema.type) && endpoint.schema.type.includes('null') && (
+              <div class={s.optionalSchema}>
+                <Svg name="icons/regular/info-circle" /> For this endpoint, the body is not required
+                and can be entirely omitted.
+              </div>
+            )}
+            <JsonSchemaObjectAnalysis object={bodyParameters} />
+          </>
+        )
+      }
+
+      {
+        response && (
+          <>
+            <Heading as="h2" anchor="returns">
+              Returns
+            </Heading>
+
+            <EndpointResponse response={response} language={language} />
+          </>
+        )
+      }
+
+      {
+        examples.length > 0 ? (
+          examplesNotInDescription.length > 0 && (
+            <>
+              <h2>Other examples</h2>
+              {examplesNotInDescription.map((example) => (
+                <Example {...propsForExamples} id={example.id} example={example as any} />
+              ))}
+            </>
+          )
+        ) : (
+          <>
+            <h2>Examples</h2>
+            <Example {...propsForExamples} id="basic-example" startVisible />
+          </>
+        )
+      }
+    </Prose>
+  </ContentPlusToc>
+</GroupLayout>
+
+{queryListenerProps.map((props) => <DraftModeQueryListener {...props} />)}

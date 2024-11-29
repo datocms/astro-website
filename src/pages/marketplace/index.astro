@@ -1,0 +1,183 @@
+---
+import { Carousel } from '~/components/Carousel';
+import { GroupPreview } from './_sub/GroupPreview';
+import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Svg } from '~/components/Svg';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { buildUrlForHostingApp } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
+import { buildUrlForEnterpriseApp } from '~/lib/datocms/gqlUrlBuilder/enterpriseApp';
+import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
+import { PluginCard } from './_sub/PluginCard';
+import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const { page, demos, plugins, hostingApps, enterpriseApps } = await executeQuery(Astro, query);
+
+if (!page || !demos || !plugins || !hostingApps || !enterpriseApps) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const fullFledged = page.demos.filter((item) => item.starterType === 'fully_fledged');
+const techStarters = page.demos.filter((item) => item.starterType === 'tech_starter');
+---
+
+<Layout noFinalCta additionalSeo={[]}>
+  <Fragment slot="head">
+    <title>Marketplace</title>
+  </Fragment>
+
+  <GroupPreview title="Our Starters">
+    <Fragment slot="browse">
+      <a href="/marketplace/starters" class={s.headerViewAll}>
+        <span>View all</span>
+        <Svg name="icons/regular/arrow-right" />
+      </a>
+    </Fragment>
+    <div class={s.startersWrapper}>
+      <div class={s.fullyFledged}>
+        <div class={s.intro}>
+          <h3>Fully fledged demos</h3>
+          <p>
+            Use our pre-built demo projects to see all of DatoCMS&apos;s features in a realistic
+            production-ready setup. Includes many example content types, and advanced features.
+          </p>
+        </div>
+        {
+          fullFledged.map((item) => (
+            <MarketplaceCard
+              title={item.name}
+              href={buildUrlForTemplateDemo(item)}
+              highlight={'Best choice to start!'}
+              label={item.label ?? undefined}
+              size="large"
+              svgLogoUrl={item.technology.logo.url}
+            >
+              <Fragment slot="image">
+                <ResponsiveImage data={item.screenshot.responsiveImage} />
+              </Fragment>
+              {item.cmsDescription}
+            </MarketplaceCard>
+          ))
+        }
+      </div>
+
+      <div class={s.techStarters}>
+        <div class={s.intro}>
+          <h3>Tech starter kits</h3>
+          <p>Kickstart your next project with our scaffolds.</p>
+        </div>
+
+        {
+          techStarters.map((item) => (
+            <MarketplaceCard
+              href={buildUrlForTemplateDemo(item)}
+              svgLogoUrl={
+                item.technology.squareLogo
+                  ? item.technology.squareLogo.url
+                  : item.technology.logo.url
+              }
+              title={item.name}
+              boxed={false}
+              orientation="horizontal"
+              size="small"
+            >
+              {item.cmsDescription}
+            </MarketplaceCard>
+          ))
+        }
+      </div>
+    </div>
+  </GroupPreview>
+
+  <GroupPreview title="Community Plugins">
+    <Fragment slot="browse">
+      <a href="/marketplace/plugins" class={s.headerViewAll}>
+        <span>View all ({plugins.count})</span>
+        <Svg name="icons/regular/arrow-right" />
+      </a>
+    </Fragment>
+    <Fragment slot="description">
+      <p>Easily expand and customize the capabilities of DatoCMS with community plugins.</p>
+    </Fragment>
+    <div class={s.carouselWrapper}>
+      <Carousel buttonsY="50%">
+        {
+          page.plugins.map((item) => (
+            <div class={s.cardWrapper}>
+              <PluginCard plugin={item} size="medium" />
+            </div>
+          ))
+        }
+      </Carousel>
+    </div>
+  </GroupPreview>
+
+  <GroupPreview title="Hosting & CI Building">
+    <Fragment slot="browse">
+      <a href="/marketplace/hosting" class={s.headerViewAll}>
+        <span>View all ({hostingApps.count})</span>
+        <Svg name="icons/regular/arrow-right" />
+      </a>
+    </Fragment>
+    <Fragment slot="description">
+      <p>Server, serverless or static: no matter the stack you're using, we've got you covered</p>
+    </Fragment>
+    <div class={s.carouselWrapper}>
+      <Carousel buttonsY="50%">
+        {
+          page.hostingBuilding.map((item) => (
+            <div class={s.cardWrapper}>
+              <MarketplaceCard
+                title={item.title}
+                href={buildUrlForHostingApp(item)}
+                size="medium"
+                background="azure"
+                svgLogoUrl={item.logo?.url}
+              >
+                {item.description}
+              </MarketplaceCard>
+            </div>
+          ))
+        }
+      </Carousel>
+    </div>
+  </GroupPreview>
+
+  <GroupPreview title="Enterprise Apps">
+    <Fragment slot="browse">
+      <a href="/marketplace/enterprise" class={s.headerViewAll}>
+        <span>View all ({enterpriseApps.count})</span>
+        <Svg name="icons/regular/arrow-right" />
+      </a>
+    </Fragment>
+    <Fragment slot="description">
+      <p>Keep your company data secure with centralized users management and assets storage</p>
+    </Fragment>
+    <div class={s.carouselWrapper}>
+      <Carousel buttonsY="50%">
+        {
+          page.enterpriseApps.map((item) => (
+            <div class={s.cardWrapper}>
+              <MarketplaceCard
+                title={item.title}
+                href={buildUrlForEnterpriseApp(item)}
+                svgLogoUrl={item.logo.url}
+                size="medium"
+                background="pink"
+              >
+                {item.description}
+              </MarketplaceCard>
+            </div>
+          ))
+        }
+      </Carousel>
+    </div>
+  </GroupPreview>
+
+  <DraftModeQueryListener query={query} />
+</Layout>

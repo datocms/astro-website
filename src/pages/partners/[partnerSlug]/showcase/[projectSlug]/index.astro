@@ -1,0 +1,147 @@
+---
+import { Button } from '~/components/Button';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { Lightbox } from '~/components/Lightbox';
+import { Prose } from '~/components/Prose';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { SidebarPane } from '~/components/SidebarPane';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { Text } from '~/components/structuredText/Text';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { Wrapper } from '~/components/Wrapper';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const { projectSlug } = Astro.params;
+const variables = { projectSlug: projectSlug! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <InterstitialTitle style="one" bigSubtitle={true} kicker="Projects showcase" mainTitleOfPage>
+    {page.name}
+    <Fragment slot="subtitle">
+      <Space top={1}>
+        <Text data={page.headline} />
+      </Space>
+    </Fragment>
+    <Fragment slot="below">
+      <Space top={1}>
+        <div class={s.madeByHead}>
+          Made by
+          <a href={buildUrlForPartner(page.partner)}>{page.partner.name}</a>
+        </div>
+        {
+          page.projectUrl && (
+            <div class={s.action}>
+              <Button as="a" href={page.projectUrl} target="_blank">
+                <Svg name="icons/regular/link" /> Visit project
+              </Button>
+            </div>
+          )
+        }
+      </Space>
+    </Fragment>
+  </InterstitialTitle>
+
+  <Wrapper>
+    <div class={s.mainVisual}>
+      {
+        page.video ? (
+          <div class={s.mainImage}>
+            <VideoPlayer data={page.video} />
+          </div>
+        ) : (
+          <ResponsiveImage data={page.mainImage.responsiveImage} />
+        )
+      }
+    </div>
+  </Wrapper>
+
+  <Wrapper>
+    <div class={s.contentWrapper}>
+      <div class={s.content}>
+        <h3 class={s.blockTitle}>Project shots</h3>
+        <div class={s.gallery}>
+          {
+            page.projectScreenshots.map((screen) => (
+              <figure>
+                <div class={s.shot}>
+                  <Lightbox lightboxUrl={screen.lightboxImageUrl}>
+                    <ResponsiveImage data={screen.responsiveImage} />
+                  </Lightbox>
+                </div>
+                <div class={s.shotTitle}>{screen.title}</div>
+              </figure>
+            ))
+          }
+        </div>
+
+        <Space top={2}>
+          <h3 class={s.blockTitle}>Backend shots</h3>
+          <div class={s.gallery}>
+            {
+              page.datocmsScreenshots.map((screen) => (
+                <figure>
+                  <div class={s.shot}>
+                    <Lightbox lightboxUrl={screen.lightboxImageUrl}>
+                      <ResponsiveImage data={screen.responsiveImage} />
+                    </Lightbox>
+                  </div>
+                  <div class={s.shotTitle}>{screen.title}</div>
+                </figure>
+              ))
+            }
+          </div>
+        </Space>
+      </div>
+
+      <aside class={s.aside}>
+        <SidebarPane icon="info" title="About the project">
+          <Prose>
+            <Text data={page.inDepthExplanation} />
+          </Prose>
+        </SidebarPane>
+        <SidebarPane icon="users" title="Made by">
+          <a href={buildUrlForPartner(page.partner)}>
+            <img
+              loading="lazy"
+              class={s.madeByLogo}
+              alt={`${page.partner.name} logo`}
+              src={page.partner.logo.url}
+            />
+          </a>
+          <Prose>
+            <article>
+              {structuredTextToPlainText(page.partner.shortDescription)}
+            </article>
+            <a href={buildUrlForPartner(page.partner)}>View profile &raquo;</a>
+          </Prose>
+        </SidebarPane>
+        <SidebarPane icon="tag" title="Tags">
+          <div class={s.tagList}>
+            {
+              [...page.areasOfExpertise, ...page.technologies].map((item) => (
+                <div class={s.tag}>{item.name}</div>
+              ))
+            }
+          </div>
+        </SidebarPane>
+      </aside>
+    </div>
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

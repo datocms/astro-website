@@ -1,0 +1,128 @@
+---
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+import { Button } from '~/components/Button';
+import { RECAPTCHA_KEY } from 'astro:env/client';
+---
+
+<share-feedback>
+  <form class={s.form}>
+    <input type="hidden" name="url" value={Astro.url.pathname} />
+    <input type="hidden" name="namespace" value="docs" />
+
+    <div class={s.thumbsButton}>
+      <input type="radio" name="reaction" value="positive" />
+      <Svg name="icons/regular/thumbs-up" />
+      Yes
+    </div>
+
+    <div class={s.thumbsButton}>
+      <input type="radio" name="reaction" value="negative" />
+      <Svg name="icons/regular/thumbs-down" />
+      No
+    </div>
+
+    <div class={s.deets}>
+      <div class={s.field}>
+        <div class={s.label}>
+          <div class={s.labelName}>Would you like to add more information?</div>
+          <div class={s.labelInfo}>Optional</div>
+        </div>
+        <textarea placeholder="Your feedback..." name="notes"></textarea>
+      </div>
+
+      <div class={s.field}>
+        <div class={s.label}>
+          <div class={s.labelName}>
+            To receive further updates or address your feedback, kindly share your email address
+            with us.
+          </div>
+          <div class={s.labelInfo}>Optional</div>
+        </div>
+        <input placeholder="Enter your email" name="email" />
+      </div>
+
+      <p class={s.labelInfo}>
+        If you need a reply, <a href="/support">please contact support</a> instead.
+      </p>
+
+      <Button as="button" p="small" block type="submit">Submit feedback</Button>
+    </div>
+  </form>
+
+  <script is:inline src={`https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_KEY}`}
+  ></script>
+
+  <script>
+    import { actions } from 'astro:actions';
+    import { isInputError } from 'astro:actions';
+    import { WebComponent } from '~/lib/WebComponent';
+    import { RECAPTCHA_KEY } from 'astro:env/client';
+
+    interface Grecaptcha {
+      ready: (callback: () => void) => void;
+      execute: (siteKey: string, options: { action: string }) => Promise<string>;
+    }
+
+    window.customElements.define(
+      'share-feedback',
+      class ShareFeedback extends WebComponent {
+        form!: HTMLFormElement;
+        button!: HTMLButtonElement;
+
+        parsedCallback() {
+          this.form = this.$('form');
+          this.button = this.$('button[type=submit]');
+
+          this.on(this.form, 'submit', this.handleSubmit);
+        }
+
+        async handleSubmit(event: SubmitEvent) {
+          event.preventDefault();
+
+          this.button.innerText = 'Submitting...';
+          this.button.disabled = true;
+
+          if (!('grecaptcha' in window)) {
+            return;
+          }
+
+          const grecaptcha = window.grecaptcha as Grecaptcha;
+
+          grecaptcha.ready(async () => {
+            const token = await grecaptcha.execute(RECAPTCHA_KEY, { action: 'submit' });
+
+            const formData = new FormData(this.form);
+            formData.set('token', token);
+
+            const { error } = await actions.sendFeedbackAboutDocPage(formData);
+
+            if (isInputError(error)) {
+              for (const [name, errors] of Object.entries(error.fields)) {
+                const fieldEl = this.form.querySelector(`[name=${name}]`);
+                const message = errors.join(', ');
+
+                if (!fieldEl) {
+                  continue;
+                }
+
+                const errorEl = fieldEl.parentElement!.querySelector<HTMLElement>('[data-error]');
+
+                if (errorEl) {
+                  errorEl.innerText = message;
+                } else {
+                  fieldEl.after(`<div data-error>${errors.join(', ')}</div>`);
+                }
+              }
+
+              this.button.innerText = 'Submit feedback';
+              this.button.disabled = false;
+            } else {
+              this.form.innerHTML = 'Thank you! We received your feedback 🙏';
+            }
+          });
+        }
+      },
+    );
+  </script>
+</share-feedback>

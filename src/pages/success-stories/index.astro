@@ -1,0 +1,104 @@
+---
+import { Button } from '~/components/Button';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const { page } = await executeQuery(Astro, query);
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero>
+    <Fragment slot="kicker">Success Stories</Fragment>
+    <Fragment slot="title">DatoCMS <mark>in the wild</mark></Fragment>
+    <Fragment slot="subtitle">
+      A compilation of how some of our partners and customers use DatoCMS in production
+    </Fragment>
+  </Hero>
+
+  <Space top={2} bottom={3}>
+    <LogosBar
+      title="We power experiences for over half a billion users"
+      clients={[
+        'svg/logos/deutsche-telekom',
+        'svg/logos/hashicorp',
+        'svg/logos/verizon',
+        'svg/logos/polestar',
+        'svg/logos/vercel',
+      ]}
+    />
+  </Space>
+
+  <Flag style="good" flip>
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/castle" />
+    </Fragment>
+    <Fragment slot="title">
+      Enterprise <mark>Case Studies</mark>
+    </Fragment>
+    <p>
+      An insight into how the most ambitious brands in the world use DatoCMS to manage their content
+    </p>
+    <Space top={1}>
+      <Button as="a" href="/customers" p="small">Explore case studies</Button>
+    </Space>
+  </Flag>
+
+  <Flag style="bad">
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/faces" />
+    </Fragment>
+    <Fragment slot="title">
+      Customer <mark>Stories</mark>
+    </Fragment>
+    <p>Casual conversations with customers working on some really cool use cases with DatoCMS</p>
+    <Space top={1}>
+      <Button as="a" href="/customer-stories" p="small">Explore customer stories</Button>
+    </Space>
+  </Flag>
+
+  <Flag style="good" flip>
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/space" />
+    </Fragment>
+    <Fragment slot="title">
+      <mark>Partner</mark> Projects
+    </Fragment>
+    <p>
+      Our most successful customers work with our agency partners to bring some incredible projects
+      to life
+    </p>
+    <Space top={1}>
+      <Button as="a" href="/partners/showcase" p="small">Explore partner showcase</Button>
+    </Space>
+  </Flag>
+
+  <Flag style="bad">
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/people" />
+    </Fragment>
+    <Fragment slot="title">
+      Wall of <mark>Love</mark>
+    </Fragment>
+    <p>
+      So much 🫶🏽 making us blush! See what our users and partners have to say about working with us
+    </p>
+    <Space top={1}>
+      <Button as="a" href="/wall" p="small">Read our testimonials</Button>
+    </Space>
+  </Flag>
+
+  <DraftModeQueryListener query={query} />
+</Layout>

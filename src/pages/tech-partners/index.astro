@@ -1,0 +1,68 @@
+---
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { buildUrlForTechPartner } from '~/lib/datocms/gqlUrlBuilder/techPartner';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const { page, techPartners } = await executeQuery(Astro, query);
+
+if (!page || techPartners.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const highlighted = techPartners.filter((partner) =>
+  page.highlightedPartners.some((h) => h.slug === partner.slug),
+);
+
+const others = techPartners.filter(
+  (partner) => !page.highlightedPartners.some((h) => h.slug === partner.slug),
+);
+
+const sortedTechPartners = [...highlighted, ...others];
+
+const bkgColors = ['azure', 'pink', 'blue', 'green', 'yellow'] as const;
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero>
+    <Fragment slot="kicker">Ecosystem Partners</Fragment>
+    <Fragment slot="title">
+      Find the perfect Tech Partner to supercharge <mark>your DatoCMS projects</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      DatoCMS partners with leading technology providers and APIs to ensure your projects are
+      getting the best possible treatment.
+    </Fragment>
+  </Hero>
+  <Wrapper>
+    <Space bottom={2}>
+      <div class={s.grid}>
+        {
+          sortedTechPartners.map((partner, i) => (
+            <MarketplaceCard
+              title={partner.name}
+              background={bkgColors[i % bkgColors.length]}
+              size="small"
+              lineClamp={3}
+              svgLogoUrl={partner.logo.url}
+              href={buildUrlForTechPartner(partner)}
+            >
+              {structuredTextToPlainText(partner.shortDescription)}
+            </MarketplaceCard>
+          ))
+        }
+      </div>
+    </Space>
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} />
+</Layout>

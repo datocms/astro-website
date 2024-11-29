@@ -1,0 +1,26 @@
+---
+import s from './style.module.css';
+
+type Props = {
+  title: string;
+};
+
+const { title } = Astro.props;
+---
+
+<div class={s.category}>
+  <div class={s.categoryIntro}>
+    <div class={s.header}>
+      <div class={s.headerTitle}>{title}</div>
+      {Astro.slots.has('browse') && <slot name="browse" />}
+    </div>
+    {
+      Astro.slots.has('description') && (
+        <div class={s.intro}>
+          <slot name="description" />
+        </div>
+      )
+    }
+  </div>
+  <slot />
+</div>

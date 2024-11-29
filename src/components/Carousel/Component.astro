@@ -1,0 +1,70 @@
+---
+import s from './_style.module.css';
+import { Svg } from '~/components/Svg';
+
+type Props = {
+  buttonsY?: string;
+  class?: string;
+  viewportClass?: string;
+  autoScroll?: boolean;
+};
+
+const { buttonsY, class: className, viewportClass, autoScroll } = Astro.props;
+---
+
+<embla-carousel data-autoscroll={autoScroll ? 'true' : undefined}>
+  <div class:list={[s.embla, className]} data-viewport style={{ '--buttonsY': buttonsY }}>
+    <div class:list={[s.emblaContainer, viewportClass]}>
+      <slot />
+    </div>
+    <button class={s.prevSlide} data-prev>
+      <Svg name="icons/regular/angle-left" />
+    </button>
+    <button class={s.nextSlide} data-next>
+      <Svg name="icons/regular/angle-right" />
+    </button>
+  </div>
+</embla-carousel>
+
+<script>
+  import emblaCarousel, { type EmblaCarouselType } from 'embla-carousel';
+  import autoScroll from 'embla-carousel-auto-scroll';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'embla-carousel',
+    class EmblaCarousel extends WebComponent {
+      api!: EmblaCarouselType;
+
+      parsedCallback() {
+        const node = this.$('[data-viewport]');
+        const prevButton = this.$('[data-prev]');
+        const nextButton = this.$('[data-next]');
+
+        this.api = emblaCarousel(
+          node,
+          { loop: false, align: 'start' },
+          this.dataset.autoscroll ? [autoScroll({ playOnInit: true, speed: 1 })] : [],
+        );
+
+        this.on(prevButton, 'click', () => this.api.scrollPrev());
+        this.on(nextButton, 'click', () => this.api.scrollNext());
+
+        const update = () => {
+          prevButton.toggleAttribute('disabled', !this.api.canScrollPrev());
+          nextButton.toggleAttribute('disabled', !this.api.canScrollNext());
+        };
+
+        update();
+
+        this.api.on('init', update);
+        this.api.on('select', update);
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.api.destroy();
+      }
+    },
+  );
+</script>

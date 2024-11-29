@@ -1,0 +1,288 @@
+---
+import { Button } from '~/components/Button';
+import { Checks } from '~/components/Checks';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
+import { Space } from '~/components/Space';
+import { Text } from '~/components/structuredText/Text';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { Wrapper } from '~/components/Wrapper';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { Hero } from '~/components/Hero';
+import { InlineText } from '~/components/structuredText/InlineText';
+import { UiChrome } from '~/components/UiChrome';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { sortBy } from 'lodash-es';
+import { Carousel } from '~/components/Carousel';
+import { Svg } from '~/components/Svg';
+import { CdnMap } from '~/components/featureAnimations/CdnMap';
+import GraphQlDemoA from '~/pages/features/headless-cms-graphql/_GraphQlDemoA';
+import ProgressiveImagesDemo from '~/components/featureAnimations/ProgressiveImagesDemo';
+import { Flag } from '~/components/Flag';
+import UseModularBlocks from '~/components/featureAnimations/UseModularBlocks';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import ImgixTransformations from '~/components/featureAnimations/ImgixTransformations';
+import { GithubButton } from './_sub/GithubButton';
+import { Code } from '~/components/Code';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { TryDemoCta } from './_sub/TryDemoCta';
+
+const variables = { slug: Astro.params.slug! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const sortedWebsites = sortBy(
+  [...page.integration.websites, ...page.integration.showcaseProjects],
+  '_createdAt',
+).reverse();
+
+const { keyword } = page.yoastAnalysis as { keyword: string | null };
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero seoAnalysis={page.yoastAnalysis}>
+    <Fragment slot="kicker">{page.seoH1}</Fragment>
+    <Fragment slot="title"><InlineText data={page.title} /></Fragment>
+    {page.subtitle && <Fragment slot="subtitle">{page.subtitle}</Fragment>}
+
+    {
+      page.demo && (
+        <Space top={1}>
+          <Checks checks={['Best practices', '30s setup']}>
+            <Button
+              fs="big"
+              as="a"
+              href={`https://dashboard.datocms.com/deploy?repo=${page.demo.githubRepo}`}
+            >
+              Try our {page.name} Starter Kit now!
+            </Button>
+          </Checks>
+        </Space>
+      )
+    }
+  </Hero>
+
+  {
+    sortedWebsites.length > 0 && (
+      <div class={s.poweredBy}>
+        <Wrapper>
+          <h5 class={s.poweredByTitle}>
+            Proudly powered by <strong>DatoCMS + {page.name}</strong>:
+          </h5>
+        </Wrapper>
+        <div class={s.websites}>
+          <Carousel buttonsY="50%" viewportClass={s.websitesViewport} autoScroll>
+            {sortedWebsites.map((website, i) => (
+              <div
+                class={s.website}
+                id={Math.floor(sortedWebsites.length / 2) === i ? 'centerwebsite' : null}
+              >
+                <UiChrome title={website.title} url={website.url ?? undefined}>
+                  <ResponsiveImage
+                    pictureClass={s.websiteScreen}
+                    data={website.image.responsiveImage}
+                  />
+                </UiChrome>
+              </div>
+            ))}
+          </Carousel>
+        </div>
+      </div>
+    )
+  }
+
+  <div id="main-content">
+    {
+      page.content.map((block) =>
+        block.__typename === 'LandingCdnMapBlockRecord' ? (
+          <>
+            <Space top={4} bottom={1}>
+              <InterstitialTitle style="two" kicker={'Worldwide CDN'}>
+                <InlineText data={block.title} />
+              </InterstitialTitle>
+            </Space>
+            <Wrapper>
+              <div class={s.copy}>
+                <Text data={block.description} />
+                <p>
+                  <a class={s.readMoreAbout} href="/features/worldwide-cdn">
+                    Read more about our Worldwide CDN <Svg name="svg/illustrations/arrow-usecase" />
+                  </a>
+                </p>
+              </div>
+            </Wrapper>
+            <Space bottom={2}>
+              <CdnMap />
+            </Space>
+          </>
+        ) : block.__typename === 'GraphqlDemoBlockRecord' ? (
+          <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
+            <Fragment slot="kicker">GraphQL Content API</Fragment>
+            <Fragment slot="title">Ask for what you need, get exactly that</Fragment>
+            <Fragment slot="subtitle">
+              <p>
+                Our Content Delivery API is <strong>built with GraphQL</strong>. That means powerful
+                developer tools, multiple resources in a single request and complete control over
+                the data your website downloads. The perfect solution for a{' '}
+                <strong>{keyword}</strong>.
+              </p>
+              <a class={s.readMoreAbout} href="/features/headless-cms-graphql">
+                Read more about our GraphQL API <Svg name="svg/illustrations/arrow-usecase" />
+              </a>
+            </Fragment>
+            <GraphQlDemoA client:visible />
+          </TitleStripWithContent>
+        ) : block.__typename === 'LandingProgressiveImagesBlockRecord' ? (
+          <Space top={3}>
+            <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
+              <Fragment slot="kicker">{page.name} images</Fragment>
+              <Fragment slot="title">
+                <InlineText data={block.title} />
+              </Fragment>
+              <Fragment slot="subtitle">
+                <Text data={block.content} />
+                {block.githubPackageName && (
+                  <div>
+                    <div class={s.readMoreAbout}>{block.githubRepoTitle}</div>
+                    <div class={s.button}>
+                      <Svg name="svg/illustrations/arrow-sketch-1" />
+                      <GithubButton href={`https://github.com/datocms/${block.githubPackageName}`}>
+                        {block.githubPackageName}
+                      </GithubButton>
+                    </div>
+                  </div>
+                )}
+              </Fragment>
+              <ProgressiveImagesDemo client:visible name={`${page.name} with DatoCMS`} />
+            </TitleStripWithContent>
+          </Space>
+        ) : block.__typename === 'CodeExcerptBlockRecord' ? (
+          <Space top={3}>
+            <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
+              <Fragment slot="kicker">{keyword} example</Fragment>
+              <Fragment slot="title">
+                <InlineText data={block.title} />
+              </Fragment>
+              <Fragment slot="subtitle">
+                <Text data={block.content} />
+                {block.githubPackageName && (
+                  <div>
+                    <div class={s.readMoreAbout}>{block.githubRepoTitle}</div>
+                    <div class={s.button}>
+                      <Svg name="svg/illustrations/arrow-sketch-1" />
+                      <GithubButton href={`https://github.com/datocms/${block.githubPackageName}`}>
+                        {block.githubPackageName}
+                      </GithubButton>
+                    </div>
+                  </div>
+                )}
+              </Fragment>
+              <Code
+                language={block.language as 'js'}
+                code={block.code || ''}
+                theme="catppuccin-frappe"
+              />
+            </TitleStripWithContent>
+          </Space>
+        ) : block.__typename === 'ModularBlocksBlockRecord' ? (
+          <Flag style="good" seoAnalysis={page.yoastAnalysis}>
+            <Fragment slot="visual">
+              <UiChrome>
+                <UseModularBlocks client:visible />
+              </UiChrome>
+            </Fragment>
+            <Fragment slot="title">
+              <InlineText data={block.title} />
+            </Fragment>
+
+            <Text data={block.content} />
+            <p>
+              <a class={s.readMoreAbout} href="/features/dynamic-layouts">
+                Read more about DatoCMS modular blocks{' '}
+                <Svg name="svg/illustrations/arrow-usecase" />
+              </a>
+            </p>
+          </Flag>
+        ) : block.__typename === 'QuoteLinkRecord' ? (
+          <Wrapper>
+            <Space top={2} bottom={4}>
+              <SingleQuote quote={block.quote} />
+            </Space>
+          </Wrapper>
+        ) : block.__typename === 'TryDemoBlockRecord' && page.demo ? (
+          <>
+            <TryDemoCta
+              windowTitle={`${page.name} + DatoCMS demo`}
+              screenshot={page.demo.screenshot.responsiveImage}
+              href={`https://dashboard.datocms.com/deploy?repo=${page.demo.githubRepo}`}
+              docsAs={page.docsUrl ?? undefined}
+              cta={`Try our ${page.name} demo project now!`}
+            >
+              <Fragment slot="title">
+                <InlineText data={block.title} />
+              </Fragment>
+              <Fragment slot="description">
+                <Text data={block.content} />
+              </Fragment>
+            </TryDemoCta>
+            <Space top={2} bottom={2}>
+              <LogosBar
+                title="We power experiences for over half a billion users"
+                clients={[
+                  'svg/logos/deutsche-telekom',
+                  'svg/logos/hashicorp',
+                  'svg/logos/verizon',
+                  'svg/logos/nike',
+                  'svg/logos/vercel',
+                ]}
+              />
+            </Space>
+          </>
+        ) : block.__typename === 'LandingVideoBlockRecord' ? (
+          <Space top={3}>
+            <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
+              <Fragment slot="title">
+                <InlineText data={block.title} />
+              </Fragment>
+              <Fragment slot="subtitle">
+                <Text data={block.content} />
+              </Fragment>
+
+              <div class={s.video}>
+                <VideoPlayer data={block.video} />
+              </div>
+            </TitleStripWithContent>
+          </Space>
+        ) : block.__typename === 'ImageTransformationsBlockRecord' ? (
+          <Space top={3}>
+            <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
+              <Fragment slot="title">
+                <InlineText data={block.title} />
+              </Fragment>
+              <Fragment slot="subtitle">
+                <Text data={block.content} />
+                <p>
+                  <a class={s.readMoreAbout} href="/features/images-api">
+                    Read more about DatoCMS Image API <Svg name="svg/illustrations/arrow-usecase" />
+                  </a>
+                </p>
+              </Fragment>
+              <ImgixTransformations client:visible />
+            </TitleStripWithContent>
+          </Space>
+        ) : null,
+      )
+    }
+  </div>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

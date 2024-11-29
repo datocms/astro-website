@@ -1,0 +1,115 @@
+---
+import { Hero } from '~/components/Hero';
+import { Pagination } from '~/components/Pagination';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { Layout } from '~/layouts/Layout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { perPage, query } from './_graphql';
+import { formatDate } from '~/lib/formatters';
+import s from './_style.module.css';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+export interface Props {
+  pageIndex?: number;
+}
+
+if (Astro.params.pageIndex === '1') {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
+
+const variables = {
+  limit: perPage,
+  offset: (pageIndex - 1) * perPage,
+};
+
+const { page, posts, latestChangelogEntry, _allBlogPostsMeta } = await executeQuery(Astro, query, {
+  variables,
+});
+
+const totalEntries = _allBlogPostsMeta.count;
+
+if (!page || posts.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero>
+    <Fragment slot="title">Welcome to the <mark>DatoCMS Blog</mark></Fragment>
+    <Fragment slot="subtitle">News, tips and highlights from the team at DatoCMS</Fragment>
+  </Hero>
+  <Wrapper>
+    {
+      latestChangelogEntry && (
+        <div>
+          <div class={s.changelogIntro}>Latest from our Product Updates changelog →</div>
+          <a href="/product-updates" class={s.changelogEntry}>
+            <div class={s.changelogEntryTitle}>{latestChangelogEntry.title}</div>
+            <div class={s.changelogEntryDate}>
+              {latestChangelogEntry._firstPublishedAt ? (
+                formatDate(latestChangelogEntry._firstPublishedAt)
+              ) : (
+                <>Not published yet</>
+              )}
+            </div>
+          </a>
+        </div>
+      )
+    }
+
+    <Space bottom={2}>
+      <div class={s.grid}>
+        {
+          posts.map((post) => (
+            <a href={buildUrlForBlogPost(post)} class={s.post}>
+              {post.coverImage?.responsiveImage && (
+                <div class={s.coverImage}>
+                  <ResponsiveImage data={post.coverImage.responsiveImage} />
+                  {post.coverImage.author &&
+                    post.coverImage.customData.unsplash_author_username && (
+                      <div
+                        class={s.coverImageAttribution}
+                        data-href={`https://unsplash.com/@${post.coverImage.customData.unsplash_author_username}?utm_source=datocms&utm_medium=referral`}
+                      >
+                        Photo by {post.coverImage.author}
+                      </div>
+                    )}
+                </div>
+              )}
+              <div class={s.postBody}>
+                <div class={s.postText}>
+                  <h6 class={s.title}>{post.title}</h6>
+                  <div class={s.excerpt}>{toPlainText(post.excerpt)}</div>
+                </div>
+                <div class={s.footer}>
+                  <div class={s.date}>
+                    Posted on{' '}
+                    {post._firstPublishedAt ? formatDate(post._firstPublishedAt) : <>???</>}
+                  </div>
+                </div>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </Space>
+
+    <Pagination
+      perPage={perPage}
+      currentPageIndex={pageIndex}
+      totalEntries={totalEntries}
+      baseUrl="/blog"
+    />
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

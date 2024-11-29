@@ -1,0 +1,26 @@
+---
+import s from './style.module.css';
+
+type Props = {
+  keyword: string;
+  title: String;
+  href: string;
+  isNew?: boolean;
+};
+
+const { keyword, title, href, isNew } = Astro.props;
+---
+
+<div class={s.groupLink}>
+  <a title={keyword} href={href}>
+    {title}
+    {
+      isNew && (
+        <>
+          {' '}
+          <span class={s.isNew}>New</span>
+        </>
+      )
+    }
+  </a>
+</div>

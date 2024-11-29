@@ -1,0 +1,121 @@
+---
+import { EndpointExample } from '~/components/docs/restApi/EndpointExample';
+import type { RestApiEndpoint, RestApiEndpointHttpExample, RestApiEntity } from '../types';
+import { buildFetchRequest } from './buildFetchRequest';
+import { buildFetchResponse } from './buildFetchResponse';
+import { buildHttpRequest } from './buildHttpRequest';
+import { buildFetchCodeRequest } from './buildFetchCodeRequest';
+import { buildCurlRequest } from './buildCurlRequest';
+import { buildHttpResponse } from './buildHttpResponse';
+import { findJobResultSelfEndoint } from '../fetchSchema';
+import exampleValueForSchema from '../exampleValueForSchema';
+import { set } from 'lodash-es';
+
+type Props = {
+  id: string;
+  entity: RestApiEntity;
+  endpoint: RestApiEndpoint;
+  example?: RestApiEndpointHttpExample;
+  startVisible?: boolean;
+};
+
+const { id, example, endpoint, entity, startVisible } = Astro.props;
+
+const findJobResultEndpoint = await findJobResultSelfEndoint(Astro);
+
+const fetchRequest = buildFetchRequest(endpoint, example);
+const fetchResponse = buildFetchResponse(endpoint, example);
+---
+
+{
+  example ? (
+    <EndpointExample
+      id={id}
+      startVisible={startVisible}
+      title={example?.title || 'Basic example'}
+      description={example?.description}
+      tabs={[
+        {
+          title: 'HTTP Request',
+          description: example?.request?.description,
+          language: 'http',
+          code: buildHttpRequest(fetchRequest),
+        },
+        {
+          title: 'CURL Request',
+          code: buildCurlRequest(fetchRequest),
+          language: 'bash',
+          description: example?.request?.description ?? '',
+        },
+        {
+          title: 'fetch() Request',
+          code: await buildFetchCodeRequest(fetchRequest),
+          language: 'javascript',
+          description: example?.request?.description ?? '',
+        },
+        ...(fetchResponse
+          ? [
+              {
+                title: 'HTTP Response',
+                description: example?.response?.description,
+                code: buildHttpResponse(fetchResponse),
+                language: 'http',
+              },
+            ]
+          : []),
+      ]}
+    />
+  ) : endpoint.jobSchema ? (
+    <>
+      <Astro.self
+        id={id}
+        endpoint={endpoint}
+        startVisible={startVisible}
+        entity={entity}
+        example={{
+          id,
+          title: 'Step 1: Perform the request',
+          description:
+            'The response contains the ID of the [asynchronous job](/docs/content-management-api/async-jobs) that started:',
+        }}
+      />
+      <Astro.self
+        id={`${id}-step2`}
+        endpoint={findJobResultEndpoint}
+        startVisible={startVisible}
+        entity={entity}
+        example={{
+          id: `${id}-step2`,
+          title: 'Step 2: Poll to get the result of the async job',
+          description: `To get the asynchronous job result, poll the [job result endpoint](/docs/content-management-api/resources/job-result/self). While the task is in progress, the endpoint returns a \`404\` status code. When the job completes, the status changes to \`200 OK\`:`,
+          response: {
+            body: JSON.stringify(
+              set(
+                exampleValueForSchema(findJobResultEndpoint.targetSchema) as Record<
+                  string,
+                  unknown
+                >,
+                'data.attributes.payload',
+                exampleValueForSchema(endpoint.jobSchema),
+              ),
+              null,
+              2,
+            ),
+          },
+        }}
+      />
+    </>
+  ) : (
+    <Astro.self
+      id={`${id}-step1`}
+      endpoint={endpoint}
+      startVisible={startVisible}
+      entity={entity}
+      example={{
+        id: id,
+        title: 'Step 1: Perform the request',
+        description: '',
+      }}
+    />
+  )
+}

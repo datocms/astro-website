@@ -1,0 +1,59 @@
+service: datocms-astro-website
+
+image: datocms/astro-website
+
+registry:
+  server: ghcr.io
+  username: datocms
+  password:
+    - GITHUB_CONTAINER_REGISTRY_API_TOKEN
+
+servers:
+  web:
+    - 188.245.225.239
+  cron:
+    hosts:
+      - 188.245.225.239
+    cmd: sh -c "cat crontab | crontab - && crond -f"
+    options:
+      memory: 1g
+      cpus: 1
+
+ssh:
+  config: true
+
+proxy:
+  ssl: true
+  app_port: 4321
+  healthcheck:
+    path: /up
+  logging:
+    request_headers:
+      - x-original-host
+
+builder:
+  # remote: ssh://root@188.245.225.239
+  arch: amd64
+  secrets:
+    - DATOCMS_API_TOKEN
+    # all public secrets are required during build
+    - RECAPTCHA_KEY
+
+env:
+  secret:
+    - DATOCMS_API_TOKEN
+    - FASTLY_KEY
+    - FASTLY_SERVICE_ID
+    - MAILERLITE_TOKEN
+    - PIPEDRIVE_TOKEN
+    - RECAPTCHA_KEY
+    - RECAPTCHA_SECRET_KEY
+    - ROLLBAR_TOKEN
+    - SECRET_API_TOKEN
+    - SLACK_TOKEN
+
+# Assets in the dist/client/_astro/ folder are the ones that Astro has built.
+# These assets are all named with a hash and therefore can be given long cache
+# headers.
+
+asset_path: /app/dist/client/_astro/

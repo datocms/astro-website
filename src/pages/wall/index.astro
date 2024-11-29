@@ -1,0 +1,42 @@
+---
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { query } from './_graphql';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const { allPartnerTestimonials, allReviews } = await executeQuery(Astro, query);
+
+const quotes = [...allPartnerTestimonials, ...allReviews].sort((a, b) =>
+  b._updatedAt.localeCompare(a._updatedAt),
+);
+---
+
+<Layout additionalSeo={[]}>
+  <Fragment slot="head">
+    <title>Better, with DatoCMS</title>
+  </Fragment>
+
+  <Hero>
+    <Fragment slot="kicker">Customers</Fragment>
+
+    <Fragment slot="title"><mark>Better</mark>, with DatoCMS</Fragment>
+    <Fragment slot="subtitle">
+      Hear from our customers about what changed for the better since they switched to DatoCMS
+    </Fragment>
+  </Hero>
+
+  <div class={s.quotes}>
+    {
+      quotes.map((quote) => (
+        <div class={s.quote}>
+          <SingleQuote quote={quote} />
+        </div>
+      ))
+    }
+  </div>
+
+  <DraftModeQueryListener query={query} />
+</Layout>

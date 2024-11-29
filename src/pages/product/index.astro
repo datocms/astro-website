@@ -1,0 +1,154 @@
+---
+import { Layout } from '~/layouts/Layout';
+import { Bullets } from '~/components/Bullets';
+import { Button } from '~/components/Button';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { FeatureCard } from '~/components/FeatureCard';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { Svg } from '~/components/Svg';
+import { IntegrationsBanner } from '~/components/IntegrationsBanner';
+import { QuotesCarousel } from '~/components/quote/QuotesCarousel';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Space } from '~/components/Space';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { InlineText } from '~/components/structuredText/InlineText';
+
+const { integrations, page } = await executeQuery(Astro, query);
+
+if (!page || integrations.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+// const quotes = page.quotes.filter((quote) => quote.__typename === 'PartnerTestimonialRecord');
+const developerFeatures = page.features.filter((f) => f.featureGroup === 'developers');
+const marketersFeatures = page.features.filter((f) => f.featureGroup === 'marketers');
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="title">
+      <InlineText data={page.header} />
+    </Fragment>
+    <Fragment slot="subtitle">
+      <InlineText data={page.subheader} />
+    </Fragment>
+    <div class={s.buttonContainer}>
+      <Button fs="big" as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
+      <Button fs="big" as="a" s="invert" href="/contact">Contact sales</Button>
+    </div>
+  </Hero>
+
+  {
+    page.pillars.map((pillar, index) => {
+      return (
+        <div class={s.flagContainer}>
+          <Flag flip={index % 2 === 0}>
+            <Fragment slot="kicker">{pillar.theme}</Fragment>
+            <div slot="visual">
+              <ResponsiveImage data={pillar.image.responsiveImage} />
+            </div>
+            <div slot="title">
+              <InlineText data={pillar.title} />
+            </div>
+            <article>
+              {pillar.pillarCallout}
+              <Bullets style="bad">
+                <li>
+                  <Svg name="icons/regular/check" />
+                  <div>
+                    <InlineText data={pillar.capability1} />
+                  </div>
+                </li>
+                <li>
+                  <Svg name="icons/regular/check" />
+                  <div>
+                    <InlineText data={pillar.capability2} />
+                  </div>
+                </li>
+                <li>
+                  <Svg name="icons/regular/check" />
+                  <div>
+                    <InlineText data={pillar.capability3} />
+                  </div>
+                </li>
+              </Bullets>
+            </article>
+          </Flag>
+        </div>
+      );
+    })
+  }
+
+  <IntegrationsBanner
+    bubbles={integrations
+      .filter((i) =>
+        ['ci', 'static-generator', 'language', 'cdn', 'framework'].includes(
+          i.integrationType.slug as string,
+        ),
+      )
+      .slice(0, 30)
+      .map((integration) =>
+        integration.squareLogo ? integration.squareLogo.url : integration.logo.url,
+      )}
+  >
+    <Fragment slot="title">Extensible and integrable by design</Fragment>
+
+    <p>
+      Being a API-first <a href="/">headless CMS</a>, <strong>
+        DatoCMS easily integrates with any third-party platform or service
+      </strong>. DatoCMS is considered to be the best CMS for developers because it offers some of
+      the best tools in the market: plugins, webhooks, templates and SDKs to get you started in no
+      time. Check them out on our <a
+        href="https://github.com/datocms/"
+        target="_blank"
+        rel="noreferrer"
+      >
+        official Github page
+      </a>
+    </p>
+  </IntegrationsBanner>
+
+  <div class={s.testimonials}>
+    <h2 class={s.title}>What our customers say...</h2>
+    <Space top={2} bottom={2}>
+      <QuotesCarousel quotes={page.quotes} />
+    </Space>
+  </div>
+
+  <div class={s.featuresWrapper}>
+    <h2 class={s.featureSectionTitle}>...and the features they love!</h2>
+    <div class={s.featureGroupHeading}>
+      <figure class={s.featureGroupIcon}>
+        <Svg name="svg/illustrations/developers-2" />
+      </figure>
+      <h3 class={s.featureGroupTitle}>For developers</h3>
+    </div>
+    <div data-developers class={s.featuresContainer}>
+      {
+        developerFeatures.map((feature) => {
+          return <FeatureCard feature={feature} />;
+        })
+      }
+    </div>
+    <div class={s.featureGroupHeading}>
+      <figure class={s.featureGroupIcon}>
+        <Svg name="svg/illustrations/content-editors" />
+      </figure>
+      <h3 class={s.featureGroupTitle}>For marketers</h3>
+    </div>
+    <div class={s.featuresContainer}>
+      {
+        marketersFeatures.map((feature) => {
+          return <FeatureCard feature={feature} />;
+        })
+      }
+    </div>
+  </div>
+
+  <DraftModeQueryListener query={query} />
+</Layout>

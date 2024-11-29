@@ -1,0 +1,48 @@
+name: Code Quality Checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    env:
+      DATOCMS_API_TOKEN: ${{ secrets.DATOCMS_API_TOKEN }}
+      SECRET_API_TOKEN: bogus
+      FASTLY_KEY: bogus
+      FASTLY_SERVICE_ID: bogus
+      ROLLBAR_TOKEN: bogus
+      PIPEDRIVE_TOKEN: bogus
+      MAILERLITE_TOKEN: bogus
+      RECAPTCHA_SECRET_KEY: bogus
+      SLACK_TOKEN: bogus
+      RECAPTCHA_KEY: bogus
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check
+        run: npm run check
+
+      - name: Build
+        run: npm run build

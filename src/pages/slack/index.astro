@@ -1,0 +1,56 @@
+---
+import { Hero } from '~/components/Hero';
+import { Wrapper } from '~/components/Wrapper';
+import { Layout } from '~/layouts/Layout';
+import s from './_style.module.css';
+import { WebClient } from '@slack/web-api';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { SLACK_TOKEN } from 'astro:env/server';
+import { Form } from './_Form';
+
+const web = new WebClient(SLACK_TOKEN);
+
+const info = await web.conversations.info({
+  channel: 'C7SS10UUW',
+  include_num_members: true,
+});
+
+if (!info.channel) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={[]}>
+  <Fragment slot="head">
+    <title>Join the DatoCMS Slack Channel</title>
+  </Fragment>
+  <Hero>
+    <Fragment slot="kicker">DatoCMS Community Slack Shannel</Fragment>
+    <Fragment slot="title">Join us on <mark>Slack</mark>!</Fragment>
+    <Fragment slot="subtitle">
+      Try out new product updates before they&apos;re widely released, help us test and improve the
+      product, and connect with other users!
+    </Fragment>
+  </Hero>
+  <Wrapper>
+    <div class={s.notice}>
+      Our Slack is a wonderful place for casual chats and quick questions! If you need official
+      technical support, we kindly suggest checking out the <a
+        href="https://community.datocms.com/"
+        target="_blank">Community Forum</a
+      > or using the <a href="/support">Support Form</a>.
+    </div>
+    <div class={s.form}>
+      <Form client:load />
+    </div>
+
+    <div class={s.stats}>
+      <strong>{info.channel.num_members}</strong> people are already part of the community!
+    </div>
+    <div class={s.info}>
+      Already a member? Enter the channel from{' '}
+      <a href="https://datocms.slack.com/">datocms.slack.com</a>.
+    </div>
+  </Wrapper>
+</Layout>

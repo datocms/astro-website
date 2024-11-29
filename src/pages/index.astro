@@ -1,0 +1,296 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Button } from '~/components/Button';
+import { Checks } from '~/components/Checks';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
+import { OmnichannelIllustration } from '~/components/OmnichannelIllustration';
+import { Result } from '~/components/Result';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { PersonasPicker } from './_sub/PersonasPicker';
+import { UseCaseExcerpts } from './_sub/UseCaseExcerpts';
+import { Wrapper } from '~/components/Wrapper';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+
+const { page, successStories } = await executeQuery(Astro, query);
+
+if (!page || successStories.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero seoAnalysis={page.yoastAnalysis}>
+    <Fragment slot="kicker">Headless CMS, done right</Fragment>
+    <Fragment slot="title">
+      Simply put, the most complete, user-friendly and performant <mark>Headless CMS</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      It's the headless CMS for the modern web. More than 25,000 businesses use DatoCMS to create
+      online content at scale from a central hub and distribute it via API.
+    </Fragment>
+
+    <Space top={1}>
+      <Checks>
+        <div class={s.buttonGroup}>
+          <Button fs="big" as="a" href="https://dashboard.datocms.com/signup">
+            Sign up for free
+          </Button>
+          <Button fs="big" as="a" s="invert" href="/contact"> Contact Sales </Button>
+        </div>
+
+        <Fragment slot="checks">
+          <li>No credit card</li>
+          <li>Easy setup</li>
+        </Fragment>
+      </Checks>
+    </Space>
+  </Hero>
+
+  <LogosBar
+    clients={[
+      'svg/logos/vercel',
+      'svg/logos/dropbox',
+      'svg/logos/hashicorp',
+      'svg/logos/verizon',
+      'svg/logos/vmware',
+      'svg/logos/polestar',
+      'svg/logos/arduino',
+      'svg/logos/cityofsidney',
+      'svg/logos/deutsche-telekom',
+      'svg/logos/linkedin',
+      'svg/logos/oberlo',
+      'svg/logos/nhs',
+      'svg/logos/little-caesars',
+      'svg/logos/mit',
+      'svg/logos/afsp',
+      'svg/logos/harrys',
+    ]}
+  />
+
+  <div id="main-content">
+    <Space top={3}>
+      <PersonasPicker />
+    </Space>
+
+    <Space top={3}>
+      <InterstitialTitle subtitle="Three symptoms to watch out">
+        Are you losing money because of <mark>legacy content infrastructure</mark>?
+      </InterstitialTitle>
+    </Space>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="bad">
+      <Fragment slot="visual"><Svg name="svg/illustrations/random-things" /></Fragment>
+      <Fragment slot="title">
+        Is content spread across <mark style="bad">endless different CMSs?</mark>
+      </Fragment>
+      <p>
+        How can you deliver a cohesive brand and message strategy if your company functions in silos
+        and information is manually copy-pasted across tens of different platforms? A headless CMS
+        allows you to manage your content in one place.
+      </p>
+      <Bullets style="bad">
+        <li>
+          <Svg name="icons/regular/times" />
+          Out-of-sync content
+        </li>
+        <li>
+          <Svg name="icons/regular/times" />
+          Redundant expenses
+        </li>
+        <li>
+          <Svg name="icons/regular/times" />
+          Internal inefficiencies
+        </li>
+      </Bullets>
+    </Flag>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="bad">
+      <Fragment slot="visual"><Svg name="svg/illustrations/stale-flower" /></Fragment>
+      <Fragment slot="title">
+        Are you slowed down by <mark style="bad">legacy&nbsp;technology?</mark>
+      </Fragment>
+      <p>
+        Your customers demand blazing-fast digital products, web standards are evolving at the speed
+        of light, yet you rely on 15-years-old solutions like WordPress that force you to deliver
+        heavy, low-quality user experiences.
+      </p>
+      <Bullets style="bad">
+        <li>
+          <Svg name="icons/regular/times" />
+          Slow development times
+        </li>
+        <li>
+          <Svg name="icons/regular/times" />
+          Rigid structures and models
+        </li>
+        <li>
+          <Svg name="icons/regular/times" />
+          Poor performance in websites and apps
+        </li>
+      </Bullets>
+    </Flag>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="bad">
+      <Fragment slot="visual"><Svg name="svg/illustrations/waves" /></Fragment>
+      <Fragment slot="title">
+        Is your infrastructure <mark style="bad">ready for scale?</mark>
+      </Fragment>
+      <p>
+        New channels, new markets, complex use cases, fast iterations. You can no longer afford to
+        think locally. You need to have a reliable solution that is capable of following your
+        growth, globally, and lets you adapt along the journey.
+      </p>
+      <Bullets style="bad">
+        <li>
+          <Svg name="icons/regular/times" />
+          Complex data migrations
+        </li>
+        <li>
+          <Svg name="icons/regular/times" />
+          Slow access times
+        </li>
+        <li>
+          <Svg name="icons/regular/times" />
+          Missing integrations to new technology
+        </li>
+      </Bullets>
+    </Flag>
+
+    <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
+      <Fragment slot="title">How much is this already costing you?</Fragment>
+
+      <div class={s.grid}>
+        <Result number="89%">
+          <Fragment slot="label">of <mark class="bad">customer loss</mark></Fragment>
+          According to
+          <a
+            href="https://blogs.gartner.com/jake-sorofman/gartner-surveys-confirm-customer-experience-new-battlefield"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <strong>Gartner</strong>
+          </a>, 89 percent of companies plan to compete primarily on the basis of CX this year.
+        </Result>
+
+        <Result number="86%">
+          <Fragment slot="label">of buyers <mark class="neutral">pay more</mark></Fragment>
+          <a
+            href="https://www.oracle.com/us/products/applications/cust-exp-impact-report-epss-1560493.pdf"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <strong>Harris</strong>
+          </a>
+          found 86% of consumers stop interacting/buying from businesses if they have a bad experience.
+        </Result>
+        <Result number="25%">
+          <Fragment slot="label"><mark class="good">in profitability</mark></Fragment>
+          <a
+            href="https://www.oracle.com/a/ocom/docs/applications/siebel/wp-powering-cross-channel-customer-experience.pdf"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <strong>Oracle</strong>
+          </a>
+          reported that multichannel integration has the ability to increase profitability by 25 percent.
+        </Result>
+      </div>
+    </TitleStripWithContent>
+  </div>
+
+  <Space top={4} bottom={2}>
+    <InterstitialTitle style="two">
+      Here's how a headless CMS can help your company
+    </InterstitialTitle>
+  </Space>
+
+  <Space top={2}>
+    <Wrapper>
+      <OmnichannelIllustration />
+    </Wrapper>
+  </Space>
+
+  <Flag seoAnalysis={page.yoastAnalysis} style="good">
+    <Fragment slot="visual"><Svg name="svg/illustrations/box-things" /></Fragment>
+    <Fragment slot="kicker">Headless CMS as a content platform</Fragment>
+    <Fragment slot="title">Manage all your content <mark>in one place</mark></Fragment>
+    <p>
+      Headless CMS means keeping everyone on the same page, storing everything in a single
+      centralized hub, making an edit and publish it instantly, everywhere.
+    </p>
+    <Bullets style="good">
+      <li>
+        <Svg name="icons/regular/check" />
+        <strong>Access every bit of copy, anytime</strong>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <strong>Your content becomes future-proof</strong>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <strong>Deliver real omnichannel experiences</strong>
+      </li>
+    </Bullets>
+  </Flag>
+
+  <Flag seoAnalysis={page.yoastAnalysis} style="good">
+    <Fragment slot="visual"><Svg name="svg/illustrations/people" /></Fragment>
+    <Fragment slot="kicker">Headless CMS boosts your workflow</Fragment>
+    <Fragment slot="title">From idea to market <mark>in hours</mark>, not months</Fragment>
+    <p>
+      Test and iterate painlessly, no matter what’s the digital product you’re working on, without
+      reaching out to your IT for complex migrations.
+    </p>
+    <Bullets style="good">
+      <li>
+        <Svg name="icons/regular/check" />
+        <strong>Flexible content model</strong>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <strong>Fast iterations, instant prototyping</strong>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <strong>Repeatable architecture for all your projects</strong>
+      </li>
+    </Bullets>
+  </Flag>
+
+  <Flag seoAnalysis={page.yoastAnalysis} style="good">
+    <Fragment slot="visual"><Svg name="svg/illustrations/muscles" /></Fragment>
+    <Fragment slot="kicker">Your project cannot be faster</Fragment>
+    <Fragment slot="title">A <mark>global delivery network</mark> at your service</Fragment>
+    <p>
+      With a network that spans 200 cities in more than 90 countries, you can be sure your content
+      is always accessible, performant, secure, and close to every customer.
+    </p>
+    <Bullets style="good">
+      <li>
+        <Svg name="icons/regular/check" />
+        <strong>Reduced architectural complexities</strong>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <strong>Scalability is built-in</strong>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <strong>Integrations ready with any digital product</strong>
+      </li>
+    </Bullets>
+  </Flag>
+
+  <UseCaseExcerpts cases={successStories} />
+</Layout>

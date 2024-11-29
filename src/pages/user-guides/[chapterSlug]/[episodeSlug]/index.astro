@@ -1,0 +1,134 @@
+---
+import { Layout } from '~/layouts/Layout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { InternalVideo } from '~/components/blocks/InternalVideo';
+import s from './_style.module.css';
+import { query } from './_graphql';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { formatVideoDuration } from '~/lib/formatters';
+import { Svg } from '~/components/Svg';
+import NextEpisode from './_NextEpisode.astro';
+import Episode from './_Episode.astro';
+import { TargetToggler } from '~/components/TargetToggler';
+import { Text } from '~/components/structuredText/Text';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { Prose } from '~/components/Prose';
+import { withAllComponents } from '~/lib/datocms/structuredText';
+import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
+
+const { chapterSlug, episodeSlug } = Astro.params;
+
+const variables = { episodeSlug: episodeSlug! };
+
+const { episode, chapters } = await executeQuery(Astro, query, { variables });
+
+const currentChapter = chapters.find((c) => c.slug === chapterSlug);
+
+if (!episode || !currentChapter) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const otherChapters = chapters.filter((c) => c !== currentChapter && c.episodes.length);
+const nextChapter = chapters[chapters.indexOf(currentChapter) + 1];
+const nextEpisode =
+  currentChapter.episodes[currentChapter.episodes.findIndex((e) => e.id === episode.id) + 1] ||
+  nextChapter?.episodes[0];
+---
+
+<Layout additionalSeo={episode._seoMetaTags}>
+  <Space top={1}>
+    <Wrapper>
+      <div class={s.video}>
+        <VideoPlayer data={episode.asset} thumbnailTime={0} />
+      </div>
+      <div class={s.container}>
+        <div class={s.headingWrapper}>
+          <a href="/user-guides" class={s.back}>
+            <Svg name="icons/regular/chevron-left" />
+            <span>Back to All Videos</span>
+          </a>
+
+          <div class={s.heading}>
+            <h1>{episode.title}</h1>
+            <div class={`${s.pill} ${s.isDark}`}>
+              {formatVideoDuration(episode.asset.video.duration)}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <Prose class={s.content}>
+            <Text
+              data={episode.content}
+              blockComponents={withAllComponents(episode.content.blocks, {
+                InternalVideoRecord: InternalVideo,
+              })}
+            />
+          </Prose>
+          {nextEpisode && <NextEpisode episode={nextEpisode} />}
+        </div>
+
+        <div class={s.asideWrapper}>
+          <aside class={s.aside}>
+            <div class={s.asideCurrentChapter}>
+              <div class={s.asideHeadingWrapper}>
+                <div class={s.asideHeadingIntro}>
+                  <p class={s.asideChapterLabel}>
+                    Chapter #{chapters.indexOf(currentChapter) + 1}
+                  </p>
+                  <div class={`${s.pill} ${s.isLight}`}>
+                    {currentChapter.episodes.length} episodes
+                  </div>
+                </div>
+                <h2 class={s.asideListTitle}>
+                  {currentChapter.title}
+                </h2>
+              </div>
+              <div class={s.asideList} id="list">
+                <ul>
+                  {
+                    currentChapter.episodes.map((nthEpisode) => (
+                      <Episode episode={nthEpisode} isActive={nthEpisode.id === episode.id} />
+                    ))
+                  }
+                </ul>
+              </div>
+              <TargetToggler targetId="list">
+                <button type="button" class={s.mobileAccordionCta}>
+                  <div class={s.mobileAccordionCtaIcon}>
+                    <Svg name="icons/regular/chevron-down" />
+                  </div>
+                </button>
+              </TargetToggler>
+            </div>
+            <div class={s.otherChaptersWrapper}>
+              <h3 class={s.otherChaptersTitle}>Other chapters</h3>
+              <div class={s.otherChapters}>
+                {
+                  otherChapters.map((chapter, i) => (
+                    <a
+                      class={s.otherChaptersItem}
+                      href={buildUrlForUserGuidesEpisode(chapter.episodes[0]!)}
+                    >
+                      <div class={s.otherChaptersIntro}>
+                        <p class={s.otherChaptersLabel}>Chapter #{i + 1}</p>
+                        <div class={s.pill}>{chapter.episodes.length} episodes</div>
+                      </div>
+                      <h2 class={s.otherChaptersHeading}>{chapter.title}</h2>
+                    </a>
+                  ))
+                }
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </Wrapper>
+  </Space>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

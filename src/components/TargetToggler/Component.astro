@@ -1,0 +1,75 @@
+---
+type Props = {
+  targetId: string;
+  startVisible?: boolean;
+};
+
+const { targetId, startVisible } = Astro.props;
+---
+
+<target-toggler target-id={targetId} target-start-visible={startVisible ? 'true' : undefined}>
+  <slot />
+</target-toggler>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'target-toggler',
+    class TargetToggler extends WebComponent {
+      button!: HTMLButtonElement;
+      controller!: AbortController;
+
+      parsedCallback() {
+        this.button = this.$('button');
+
+        if (this.startVisible) this.target.setAttribute('data-open', '');
+
+        this.button.setAttribute('aria-expanded', this.startVisible ? 'true' : 'false');
+        this.button.setAttribute('aria-controls', this.targetId);
+
+        this.on(this.button, 'click', this.handleClick);
+      }
+
+      handleClick() {
+        this.toggle();
+      }
+
+      get target() {
+        const el = document.getElementById(this.targetId);
+
+        if (!el) {
+          throw new Error(`[${this.localName}] cannot find element with id "${this.targetId}".`);
+        }
+
+        return el;
+      }
+
+      get targetId() {
+        return this.getAttribute('target-id')!;
+      }
+
+      get startVisible() {
+        const attr = 'target-start-visible';
+        return (this.hasAttribute(attr) && this.getAttribute(attr) !== 'false') || false;
+      }
+
+      get isExpanded() {
+        return this.button.getAttribute('aria-expanded') === 'true' || false;
+      }
+
+      toggle(newExpanded: boolean = !this.isExpanded) {
+        this.button?.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
+        this.target?.toggleAttribute('data-open', newExpanded);
+
+        this.dispatchEvent(
+          new CustomEvent('target-toggler:toggle', {
+            bubbles: true,
+            cancelable: true,
+            detail: { expanded: newExpanded },
+          }),
+        );
+      }
+    },
+  );
+</script>

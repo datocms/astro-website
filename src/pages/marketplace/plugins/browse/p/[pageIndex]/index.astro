@@ -1,0 +1,112 @@
+---
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import ky from 'ky';
+import type { FragmentOf } from 'gql.tada';
+import type { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { Pagination } from '~/components/Pagination';
+import { PluginCard } from '~/pages/marketplace/_sub/PluginCard';
+import { PluginSearchBox } from '~/pages/marketplace/_sub/PluginSearchBox';
+import { Space } from '~/components/Space';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { perPage, query } from './_graphql';
+import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+export interface Props {
+  pageIndex?: number;
+}
+
+if (Astro.params.pageIndex === '1') {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
+
+const variables = {
+  limit: perPage,
+  offset: (pageIndex - 1) * perPage,
+};
+const { pluginsPage, ...staticResults } = await executeQuery(Astro, query, {
+  variables,
+});
+
+async function fetchSearchResults(query: string, page: number) {
+  const response = await ky
+    .post<{ hits: FragmentOf<typeof PluginCardFragment>[]; nbHits: number }>(
+      'https://RBIJYI5XXL-dsn.algolia.net/1/indexes/plugins/query',
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-Algolia-Application-Id': 'RBIJYI5XXL',
+          'X-Algolia-API-Key': '4ad9999225eb7990bd4f641dd1f33357',
+        },
+        json: {
+          params: new URLSearchParams({
+            query: query,
+            hitsPerPage: '36',
+            getRankingInfo: '1',
+            page: page.toString(),
+          }).toString(),
+        },
+      },
+    )
+    .json();
+
+  return [response.hits, response.nbHits] as const;
+}
+
+const [plugins, totalEntries] = Astro.url.searchParams.has('s')
+  ? await fetchSearchResults(Astro.url.searchParams.get('s')!, pageIndex - 1)
+  : [staticResults.plugins, staticResults._allPluginsMeta.count];
+
+if (!pluginsPage) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout noFinalCta additionalSeo={pluginsPage.seo}>
+  <Hero>
+    <Fragment slot="title"
+      >{
+        Astro.url.searchParams.has('s') ? (
+          <>
+            Find Plugins: <mark>"{Astro.url.searchParams.get('s')}"</mark>
+          </>
+        ) : (
+          <>Community Plugins</>
+        )
+      }</Fragment
+    >
+    {
+      !Astro.url.searchParams.has('s') && (
+        <Fragment slot="subtitle">
+          Easily expand and customize the capabilities of DatoCMS with community plugins
+        </Fragment>
+      )
+    }
+  </Hero>
+  <Wrapper>
+    <Space bottom={2}>
+      <PluginSearchBox />
+      {plugins.length === 0 && <div class={s.noResults}>Sorry, no results found!</div>}
+      <div class={s.grid}>
+        {plugins.map((item) => <PluginCard plugin={item} />)}
+      </div>
+    </Space>
+
+    <Pagination
+      perPage={perPage}
+      currentPageIndex={pageIndex}
+      totalEntries={totalEntries}
+      baseUrl="/marketplace/plugins/browse"
+      searchParams={Astro.url.searchParams}
+    />
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

@@ -1,0 +1,88 @@
+---
+import { Layout } from '~/layouts/Layout';
+import s from './_style.module.css';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { Wrapper } from '~/components/Wrapper';
+import { Hero } from '~/components/Hero';
+import { Space } from '~/components/Space';
+import { Button } from '~/components/Button';
+import { Text } from '~/components/structuredText/Text';
+import { Svg } from '~/components/Svg';
+import { query } from './_graphql';
+import { buildUrlForAcademyCourse } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
+import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+import { intersperse } from '~/lib/intersperse';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const { courses, page } = await executeQuery(Astro, query);
+
+if (!page || courses.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero>
+    <Fragment slot="title">DatoCMS <mark>Academy</mark></Fragment>
+    <Fragment slot="subtitle"
+      >Browse the DatoCMS Academy for a deep dive into the concepts around Headless CMS. Content
+      APIs, and frontend frameworks, to get up to speed with headless content management</Fragment
+    >
+  </Hero>
+  <Wrapper>
+    <Space top={2} bottom={2}>
+      {
+        courses
+          .filter((course) => course.chapters.length > 0)
+          .map((course) => {
+            const size = Math.random() * 1.5 + 2;
+            const x = Math.floor(Math.random() * 30);
+            const y = Math.floor(Math.random() * 30) + 20;
+
+            return (
+              <div class={s.course}>
+                <div class={s.courseImage}>
+                  <div
+                    class={s.dot}
+                    style={{
+                      left: `${x}%`,
+                      top: `${y}%`,
+                      height: `calc(var(--dotBaseUnit) * ${size})`,
+                      width: `calc(var(--dotBaseUnit) * ${size})`,
+                    }}
+                  />
+                  <Svg name={`svg/illustrations/${course.illustration}`} />
+                </div>
+                <div class={s.courseContent}>
+                  <div class={s.courseTitle}>
+                    <a href={buildUrlForAcademyCourse(course)}>{course.name}</a>
+                  </div>
+                  <div class={s.courseIntro}>
+                    <Text data={course.introduction} />
+                  </div>
+                  <div>
+                    <Button as="a" p="small" href={buildUrlForAcademyCourse(course)}>
+                      Get started
+                    </Button>
+                  </div>
+                  <div class={s.courseChapters}>
+                    Chapters:{' '}
+                    {intersperse(
+                      course.chapters.map((chapter) => (
+                        <a href={buildUrlForAcademyChapter(chapter)}>{chapter.title}</a>
+                      )),
+                      ', ',
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+      }
+    </Space>
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} />
+</Layout>

@@ -1,0 +1,229 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Button } from '~/components/Button';
+import { Code } from '~/components/Code';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { IntegrationsBanner } from '~/components/IntegrationsBanner';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const { page, integrations } = await executeQuery(Astro, query, { variables });
+
+if (!page || integrations.length === 0 || !page.video || !page.video2 || !page.video3) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const jsonExample = JSON.stringify(
+  {
+    schema: 'dast',
+    document: {
+      type: 'root',
+      children: [
+        {
+          type: 'heading',
+          level: 1,
+          children: [
+            {
+              type: 'span',
+              value: 'Hello ',
+            },
+            {
+              type: 'span',
+              marks: ['strong'],
+              value: 'world!',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  null,
+  2,
+);
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker">Structured content CMS</Fragment>
+    <Fragment slot="title">The smart way to store <mark>rich–text content</mark></Fragment>
+    <Fragment slot="subtitle">
+      Meet our all-encompassing solution designed with <strong>omnichannel</strong> in mind.
+      <strong>DatoCMS structured content</strong> combines a powerful and flexible
+      <strong>rich-text editor with a portable JSON format</strong> to store your content.
+    </Fragment>
+  </Hero>
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker">Notion-like Structured content CMS</Fragment>
+    <Fragment slot="title">A delightfully focused writing experience</Fragment>
+    <Fragment slot="subtitle">
+      <p>
+        DatoCMS Structured Content offers a beautiful, <strong>Notion-like editor</strong> designed for
+        focus, with <strong> slash commands, markdown/keyboard shortcuts, and drag & drop </strong>.
+        Forget the mouse, and just start typing.
+      </p>
+    </Fragment>
+    <VideoPlayer data={page.video} autoPlay={true} />
+  </TitleStripWithContent>
+
+  {
+    page.quote && (
+      <Wrapper>
+        <Space top={3} bottom={3}>
+          <SingleQuote quote={page.quote} />
+        </Space>
+      </Wrapper>
+    )
+  }
+
+  <Wrapper>
+    <Space top={2} bottom={1}>
+      <InterstitialTitle style="two">
+        What problems does <mark>Structured Content</mark> solve?
+      </InterstitialTitle>
+    </Space>
+
+    <Flag>
+      <Fragment slot="visual">
+        <VideoPlayer data={page.video2} autoPlay={true} />
+      </Fragment>
+      <Fragment slot="kicker">Customizable structured content CMS </Fragment>
+      <Fragment slot="title">Easily embed 100% <mark>custom blocks</mark></Fragment>
+      <p>
+        Galleries, call-to-actions, polls, third-party embeds and widgets for YouTube, Twitter...
+        these things have always been a problem to handle. Not with DatoCMS structured content:
+        blocks are completely custom, can be
+        <strong> moved around, edited and composed in any way you want </strong>, and creating them
+        is a matter of seconds.
+      </p>
+    </Flag>
+
+    <Flag>
+      <Fragment slot="visual">
+        <VideoPlayer data={page.video3} autoPlay={true} />
+      </Fragment>
+      <Fragment slot="kicker">Linking structured content </Fragment>
+      <Fragment slot="title">
+        Hyper-link and reference <mark>entities</mark>, not just URLs
+      </Fragment>
+      <p>
+        When you need to deliver content not only through the web, but on an <strong
+          >ever-growing number of different mediums</strong
+        > ranging from native apps, voice assistants, e-books, IoT, etc... that's when being able to
+        only create hyperlinks to fixed web addresses starts to get to you. What you need is
+        <strong>clear separation between content and presentation</strong>.
+      </p>
+    </Flag>
+
+    <Space top={2} bottom={1}>
+      <InterstitialTitle style="two">
+        A portable JSON format, <mark>ready for omnichannel</mark>
+      </InterstitialTitle>
+    </Space>
+
+    <Flag>
+      <Fragment slot="visual">
+        <div style={{ flex: '1' }}>
+          <Code
+            code={jsonExample}
+            language="json"
+            showLineNumbers={false}
+            theme="catppuccin-frappe"
+          />
+        </div>
+      </Fragment>
+      <Fragment slot="kicker">Omnichannel CMS</Fragment>
+      <Fragment slot="title">Highly structured and <strong>deeply typed</strong></Fragment>
+      <p>
+        The Structured Text field saves content in a JSON format called <code>dast</code> to
+        <strong>ensure control of the information</strong> and the ability to unambiguously
+        <strong>parse and serialize the content to any medium</strong>, with clear separation from
+        presentation concerns.
+      </p>
+      <p>
+        <Button
+          as="a"
+          fs="small"
+          p="small"
+          s="invert"
+          href="/docs/structured-text/dast#datocms-abstract-syntax-tree-dast-specification"
+          title="Structured text"
+        >
+          Learn about Structured Text format
+        </Button>
+      </p>
+    </Flag>
+  </Wrapper>
+
+  <IntegrationsBanner
+    bubbles={integrations
+      .filter((i) =>
+        ['static-generator', 'language', 'framework'].includes(i.integrationType.slug as string),
+      )
+      .slice(0, 30)
+      .map((integration) =>
+        integration.squareLogo ? integration.squareLogo.url : integration.logo.url,
+      )}
+  >
+    <Fragment slot="title">Easily integrable by design</Fragment>
+
+    <p>
+      Structured Text format adheres to the <a href="https://unifiedjs.com/">Unified collective</a>,
+      which offers a big ecosystem of utilities to parse, transform, manipulate, convert and
+      serialize content of any kind. This makes
+      <strong> converting from/to Structured Content extremely easy </strong>.
+    </p>
+  </IntegrationsBanner>
+
+  <Flag style="good">
+    <Fragment slot="visual"><Svg name="svg/illustrations/box-things" /></Fragment>
+    <Fragment slot="kicker">The most user-friendly CMS </Fragment>
+    <Fragment slot="title">A complete set of <mark>smart, modern tools</mark></Fragment>
+    <p>
+      DatoCMS does not only offer a powerful editor, but a full, coordinated
+      <strong>suite of different tools</strong> to give you the best writing and development experience.
+      Find out why we are famous for being <strong></strong>the most user-friendly CMS:
+    </p>
+    <Bullets style="good">
+      <li>
+        <Svg name="icons/regular/check" />
+        <a href="/features/data-integrity" title="Fastest headless CMS CDN">
+          <span>Safety and integrity of your content</span>
+        </a>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <a href="/features/headless-cms-multi-language" title="Headless CMS multilanguage">
+          <span>A complete set of multilanguage features</span>
+        </a>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <a href="/features/workflow-cms" title="Workflow CMS">
+          <span>Organization of your workflow</span>
+        </a>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <a href="/features/dynamic-layouts" title="Dynamic Layouts">
+          <span>Dynamic & composable layouts</span>
+        </a>
+      </li>
+    </Bullets>
+  </Flag>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

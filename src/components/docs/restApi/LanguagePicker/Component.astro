@@ -1,0 +1,22 @@
+---
+import s from './style.module.css';
+import { addLanguageToUrl, currentLanguage } from './utils';
+
+const language = currentLanguage(Astro);
+---
+
+<div class={s.picker}>
+  <div class={s.pickerLabel}>Show examples in:</div>
+  <a
+    href={addLanguageToUrl(Astro, Astro.url, 'javascript')}
+    class:list={[s.pickerButton, language === 'javascript' && s.pickerButtonActive]}
+  >
+    Javascript</a
+  >
+  <a
+    href={addLanguageToUrl(Astro, Astro.url, 'http')}
+    class:list={[s.pickerButton, language === 'http' && s.pickerButtonActive]}>HTTP</a
+  >
+</div>
+
+<slot />

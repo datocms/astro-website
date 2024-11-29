@@ -1,0 +1,40 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import s from './_style.module.css';
+import { EpisodeFragment } from './_graphql';
+import { readFragment } from 'gql.tada';
+import { Image } from 'astro:assets';
+import { formatVideoDuration } from '~/lib/formatters';
+import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
+
+interface Props {
+  episode: FragmentOf<typeof EpisodeFragment>;
+}
+
+const episode = readFragment(EpisodeFragment, Astro.props.episode);
+---
+
+<div class={s.nextVideo}>
+  <a href={buildUrlForUserGuidesEpisode(episode)}>
+    <figure>
+      <Image
+        src={`${episode.asset.video.thumbnailUrl}?time=${episode.thumbTimeSeconds}`}
+        inferSize
+        widths={[160, 320]}
+        sizes="160px"
+        alt={episode.title}
+        style={{
+          background: `url(${episode.asset.video.blurUpThumb})`,
+          backgroundSize: 'cover',
+          color: 'transparent',
+        }}
+      />
+    </figure>
+
+    <article>
+      <p class={s.nextVideoLabel}>Next episode</p>
+      <h2>{episode.title}</h2>
+      <div class={s.pill}>{formatVideoDuration(episode.asset.video.duration)}</div>
+    </article>
+  </a>
+</div>

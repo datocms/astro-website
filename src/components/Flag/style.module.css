@@ -1,0 +1,159 @@
+@keyframes move {
+  0% {
+    transform: translateY(-15px);
+  }
+
+  100% {
+    transform: translateY(15px);
+  }
+}
+
+@keyframes opacity {
+  0% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.root {
+  --flip-margin: rfs(60px);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin: rfs(100px) 0;
+
+  @media screen and (min-width: 800px) {
+    --dotBaseUnit: 70px;
+    align-items: center;
+    display: grid;
+    grid-column-gap: 10%;
+    grid-template-columns: 45% 1fr;
+  }
+}
+
+.root.isFlipped {
+  @media screen and (min-width: 800px) {
+    .visual {
+      order: 2;
+    }
+
+    .content {
+      order: 1;
+    }
+  }
+
+  @media screen and (min-width: 1126px) {
+    .content {
+      transform: translateX(var(--flip-margin));
+    }
+  }
+}
+
+.visual {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+
+  svg {
+    aspect-ratio: 5/4;
+    display: block;
+    margin: 0 auto;
+    max-width: 460px;
+    width: 75%;
+
+    @media screen and (min-width: 800px) {
+      width: 100%;
+    }
+  }
+}
+
+.dot {
+  animation: move 3s infinite alternate ease-in-out;
+  border-radius: 50%;
+  height: rfs(200px);
+  min-height: 120px;
+  min-width: 120px;
+  position: absolute;
+  width: rfs(200px);
+  z-index: -1;
+
+  @media (prefers-reduced-motion) {
+    animation: opacity 4s infinite alternate ease-in-out;
+  }
+
+  &[data-style='good'] {
+    background: linear-gradient(#c3f4fa, #9be0e8);
+  }
+
+  &[data-style='bad'] {
+    background: linear-gradient(#fca597, #f78a79);
+  }
+}
+
+.content {
+  text-align: center;
+
+  @media screen and (width > 800px) {
+    text-align: left;
+  }
+
+  p {
+    margin: 0 0 1em 0;
+
+    &:last-child {
+      margin-bottom: rfs(40px);
+    }
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
+.title {
+  font-size: rfs(45px);
+  font-weight: bold;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  margin-bottom: rfs(30px);
+  margin: 0;
+  text-wrap: balance;
+
+  mark {
+    color: var(--azure-color);
+    background-image: none;
+  }
+
+  [data-style='bad'] & mark {
+    color: var(--accent-color);
+  }
+}
+
+.subtitle {
+  font-size: rfs(24px);
+  font-weight: bold;
+  margin-bottom: rfs(20px);
+  margin-top: rfs(50px);
+}
+
+.body {
+  line-height: 1.4;
+  margin-top: rfs(30px);
+
+  @media screen and (width > 1000px) {
+    padding-right: 50px;
+  }
+}
+
+.kicker {
+  color: var(--extra-light-body-color);
+  font-size: rfs(20px);
+  font-weight: bold;
+  margin-bottom: rfs(30px);
+  text-transform: uppercase;
+}

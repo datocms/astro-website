@@ -1,0 +1,48 @@
+---
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+
+type Props = {
+  label?: string;
+};
+
+const { label } = Astro.props;
+---
+
+<expandable-pane>
+  <div class={s.pane}>
+    <button type="button" data-expandable-pane-button class={s.expandablePaneButton}>
+      <span><Svg name="icons/regular/chevron-right" /> {label}</span>
+      <span><Svg name="icons/regular/chevron-down" /> {label}</span>
+    </button>
+
+    <div class={s.expandablePaneContent} data-expandable-pane-content>
+      <slot />
+    </div>
+  </div>
+</expandable-pane>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'expandable-pane',
+    class ExpandablePane extends WebComponent {
+      content!: HTMLElement;
+      toggle!: HTMLButtonElement;
+
+      parsedCallback() {
+        this.toggle = this.$('[data-expandable-pane-button]');
+        this.content = this.$('[data-expandable-pane-content]');
+
+        this.on(this.toggle, 'click', () => {
+          const expanded = this.toggle.getAttribute('aria-expanded') === 'true' || false;
+          const newExpanded = !expanded;
+
+          this.toggle?.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
+          this.content?.toggleAttribute('data-open', newExpanded);
+        });
+      }
+    },
+  );
+</script>

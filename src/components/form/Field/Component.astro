@@ -1,0 +1,27 @@
+---
+import s from './style.module.css';
+
+type Props = {
+  name: string;
+  required?: boolean;
+};
+
+const { name, required } = Astro.props;
+---
+
+<div class:list={[s.field, Astro.slots.has('error') && s.fieldError]}>
+  <label for={name}>
+    <slot name="label" />
+    {required && <span class={s.required}> *</span>}
+  </label>
+
+  <slot />
+
+  {
+    Astro.slots.has('error') && (
+      <div class={s.error}>
+        <slot name="error" />
+      </div>
+    )
+  }
+</div>

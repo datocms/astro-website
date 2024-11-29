@@ -1,0 +1,39 @@
+---
+import s from './style.module.css';
+
+type Props = {
+  href: string;
+  title: string;
+  description?: string;
+  imageUrl?: string;
+  isNew?: boolean;
+  excludeMobile?: boolean;
+};
+
+const { href, title, description, imageUrl, isNew, excludeMobile } = Astro.props;
+
+const isExternal = href.startsWith('http');
+---
+
+<a
+  href={href}
+  class={s.groupItem}
+  target={isExternal ? '_blank' : '_self'}
+  rel={isExternal ? 'noopener noreferrer' : ''}
+  data-exclude-mobile={excludeMobile}
+>
+  {
+    imageUrl && (
+      <div class={s.itemImage}>
+        <img loading="lazy" src={imageUrl} alt={title} />
+      </div>
+    )
+  }
+  <article class={s.itemBody}>
+    <div class={s.itemTitle}>
+      <h4>{title}</h4>
+      {isNew && <span class={s.isNew}>New</span>}
+    </div>
+    {description && <p class={s.itemDescription}>{description}</p>}
+  </article>
+</a>

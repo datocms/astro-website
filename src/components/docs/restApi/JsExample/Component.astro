@@ -1,0 +1,47 @@
+---
+import { EndpointExample } from '~/components/docs/restApi/EndpointExample';
+import type { RestApiEndpoint, RestApiEndpointJsExample, RestApiEntity } from '../types';
+import { buildApiCallSampleCode, buildApiCallReturnValue } from './buildJs';
+import type { RestApiEndpointJsClient } from '../fetchRestApiEndpointJsClient';
+
+type Props = {
+  id: string;
+  entity: RestApiEntity;
+  endpoint: RestApiEndpoint;
+  jsClient: RestApiEndpointJsClient;
+  example?: RestApiEndpointJsExample;
+  startVisible?: boolean;
+};
+
+const { id, example, endpoint, entity, jsClient, startVisible } = Astro.props;
+
+const sampleCode =
+  example?.request?.code || (await buildApiCallSampleCode(entity, endpoint, jsClient));
+
+const output = example?.response?.code || (await buildApiCallReturnValue(endpoint, jsClient));
+---
+
+<EndpointExample
+  id={id}
+  startVisible={startVisible}
+  title={example?.title || 'Basic example'}
+  description={example?.description}
+  tabs={[
+    {
+      title: 'Code',
+      description: example?.request?.description,
+      language: 'javascript',
+      code: sampleCode,
+    },
+    ...(output
+      ? [
+          {
+            title: 'Returned output',
+            description: example?.response?.description,
+            language: 'javascript',
+            code: output,
+          },
+        ]
+      : []),
+  ]}
+/>

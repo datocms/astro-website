@@ -1,0 +1,117 @@
+---
+import type { ActiveLinkMatch } from './types';
+
+interface Props {
+  href: string;
+  activeClass?: string;
+  match?: ActiveLinkMatch;
+  class?: string;
+}
+
+const {
+  href,
+  match = { samePathName: true, sameSearchParams: true },
+  activeClass,
+  class: className,
+  ...props
+} = Astro.props;
+
+function toUrl(input: URL | string): URL {
+  if (typeof input === 'string') {
+    return new URL(input, Astro.url);
+  } else if (input instanceof URL) {
+    return new URL(input.href, Astro.url);
+  } else {
+    throw new Error('Invalid input: must be a URL object or a string');
+  }
+}
+
+function clean(url: URL | string): string {
+  const newUrl = toUrl(url);
+
+  if (!('samePathName' in match) || !match.sameSearchParams) {
+    newUrl.search = '';
+  }
+
+  return newUrl.toString();
+}
+
+const currentUrl = clean(Astro.url);
+const hrefUrl = clean(href);
+
+let active = toUrl(href).hash
+  ? // if the href has a hash (#foo), using ActiveLink component is unnecessary :)
+    false
+  : 'samePathName' in match && match.samePathName
+    ? hrefUrl === currentUrl
+    : currentUrl.includes(hrefUrl);
+---
+
+<active-link-hash data-active-class={activeClass}>
+  <a href={href} class:list={[className, active ? `${activeClass}` : undefined]} {...props}>
+    <slot />
+  </a>
+</active-link-hash>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'active-link-hash',
+    class ActiveLinkHash extends WebComponent {
+      private linkEl!: HTMLAnchorElement;
+
+      constructor() {
+        super();
+      }
+
+      parsedCallback() {
+        this.linkEl = this.$<HTMLAnchorElement>('a');
+
+        if (!this.href.hash) {
+          return;
+        }
+
+        this.updateActiveState();
+
+        window.addEventListener('hashchange', this.updateActiveState);
+        window.addEventListener('popstate', this.updateActiveState);
+      }
+
+      disconnectedCallback(): void {
+        window.removeEventListener('hashchange', this.updateActiveState);
+        window.removeEventListener('popstate', this.updateActiveState);
+      }
+
+      updateActiveState = (): void => {
+        // Compare the full URL without hash (path, origin, etc.)
+        const currentUrlWithoutHash = new URL(window.location.href);
+        currentUrlWithoutHash.hash = ''; // Remove hash from the current page URL
+
+        const hrefWithoutHash = new URL(this.href.href);
+        hrefWithoutHash.hash = ''; // Remove hash from the anchor href
+
+        // If the paths are the same, check the hash.
+        if (currentUrlWithoutHash.href === hrefWithoutHash.href) {
+          // Compare the hash parts
+          if (window.location.hash === this.href.hash) {
+            this.linkEl.classList.add(this.activeClass);
+          } else {
+            this.linkEl.classList.remove(this.activeClass);
+          }
+        } else {
+          // If paths are different, make sure no active class is added.
+          this.linkEl.classList.remove(this.activeClass);
+        }
+      };
+
+      private get href() {
+        return new URL(this.linkEl.getAttribute('href') || '', window.location.href);
+      }
+
+      private get activeClass() {
+        return this.dataset?.activeClass!;
+      }
+    },
+  );
+</script>

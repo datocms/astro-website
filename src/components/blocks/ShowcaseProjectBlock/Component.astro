@@ -1,0 +1,42 @@
+---
+import s from './style.module.css';
+import { ShowcaseProjectBlockFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import { truncate } from 'lodash-es';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
+import { Carousel } from '~/components/Carousel';
+
+interface Props {
+  block: FragmentOf<typeof ShowcaseProjectBlockFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+
+const block = readFragment(ShowcaseProjectBlockFragment, maskedBlock);
+---
+
+<figure>
+  <prose-island>
+    <Carousel buttonsY="35%" viewportClass={s.carouselViewport}>
+      {
+        block.showcaseProjects.map((project) => (
+          <MarketplaceCard
+            title={project.name}
+            href={buildUrlForShowcaseProject(project)}
+            svgLogoUrl={project.partner.logo.url}
+            size="medium"
+            background="pink"
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={project.mainImage.responsiveImage} />
+            </Fragment>
+            {truncate(structuredTextToPlainText(project.headline)!, { length: 200 })}
+          </MarketplaceCard>
+        ))
+      }
+    </Carousel>
+  </prose-island>
+</figure>

@@ -1,0 +1,33 @@
+---
+import EventualResponse from './EventualResponse.astro';
+import { type Analysis } from './utils';
+
+type Props = {
+  response: Analysis;
+  language: 'http' | 'javascript';
+};
+
+const { response, language } = Astro.props;
+---
+
+<p>
+  Returns{' '}
+  {
+    language === 'http' ? (
+      response.returnsResultInAsyncJob ? (
+        <>
+          a Job ID. You can then poll for the
+          {/* prettier-ignore */}
+          <a href="/docs/content-management-api/resources/job-result/self">completion of the job</a>
+          that will eventually return <EventualResponse analysis={response} />
+        </>
+      ) : (
+        <>
+          <EventualResponse analysis={response} />.
+        </>
+      )
+    ) : (
+      <EventualResponse analysis={response} />
+    )
+  }
+</p>

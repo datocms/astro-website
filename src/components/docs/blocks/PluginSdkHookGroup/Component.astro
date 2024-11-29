@@ -1,0 +1,23 @@
+---
+import { fetchPluginSdkManifest, sortRelatedHooks } from './utils';
+import Hook from './Hook/index.astro';
+import { PluginSdkHookGroupFragment } from './graphql';
+import type { FragmentOf } from 'gql.tada';
+import { readFragment } from 'gql.tada';
+
+interface Props {
+  block: FragmentOf<typeof PluginSdkHookGroupFragment>;
+}
+
+const { block } = Astro.props;
+
+const { groupName } = readFragment(PluginSdkHookGroupFragment, block);
+
+const manifest = await fetchPluginSdkManifest(Astro);
+
+const hooks = sortRelatedHooks(
+  Object.values(manifest.hooks).filter((hook) => hook.comment?.tag === groupName),
+);
+---
+
+{hooks.map((hook) => <Hook hook={hook} />)}

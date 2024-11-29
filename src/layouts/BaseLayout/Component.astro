@@ -1,0 +1,76 @@
+---
+import { TagFragment } from '~/lib/datocms/commonFragments';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { graphql } from '~/lib/datocms/graphql';
+import { Seo, type TitleMetaLinkTag } from '@datocms/astro';
+import { ViewTransitions } from 'astro:transitions';
+import './global.css';
+import ProgressBar from './_ProgressBar.astro';
+
+type Props = {
+  additionalSeo: TitleMetaLinkTag[];
+};
+
+const { additionalSeo } = Astro.props;
+
+const query = graphql(
+  /* GraphQL */ `
+    query RootQuery {
+      _site {
+        faviconMetaTags {
+          ...TagFragment
+        }
+      }
+    }
+  `,
+  [TagFragment],
+);
+
+const result = await executeQuery(Astro, query);
+---
+
+<!doctype html>
+<html lang="en" transition:animate="none">
+  <head>
+    <style is:inline>
+      @layer reset, prose;
+    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <Seo data={[...result._site.faviconMetaTags, ...additionalSeo]} />
+    <link rel="alternate" type="application/rss+xml" title="DatoCMS Blog" href="/blog.xml" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="DatoCMS Product Changelog"
+      href="/product-changelog.xml"
+    />
+    <script is:inline src="/landing-pages/cookieConsent.js" async></script>
+    <slot name="head" />
+    <ViewTransitions />
+    <ProgressBar />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<script>
+  import { getCookie, setCookie } from '~/lib/cookies';
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const source = urlParams.get('utm_source');
+
+  if (source) {
+    const medium = urlParams.get('utm_medium');
+    const campaign = urlParams.get('utm_campaign');
+    const cookieContent = JSON.stringify({ source, medium, campaign });
+
+    setCookie('latestDatoUtm', cookieContent, 365);
+
+    if (!getCookie('datoUtm')) {
+      setCookie('datoUtm', cookieContent, 365);
+    }
+  }
+</script>

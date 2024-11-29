@@ -1,0 +1,55 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import s from './style.module.css';
+import { PluginCardFragment } from './_graphql';
+import { readFragment } from 'gql.tada';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import type { ComponentProps } from 'astro/types';
+import { Svg } from '~/components/Svg';
+
+type Props = {
+  plugin: FragmentOf<typeof PluginCardFragment>;
+} & Omit<
+  ComponentProps<typeof MarketplaceCard>,
+  'title' | 'href' | 'description' | 'svgLogoUrl' | 'background' | 'lineClamp'
+>;
+
+const { plugin: maskedPlugin, ...other } = Astro.props;
+const plugin = readFragment(PluginCardFragment, maskedPlugin);
+
+const backgroundFromString = <T extends string>(input: string, options: T[]): T => {
+  // Simple hash function - sum of char codes modulo array length
+  const hash = input.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+  return options[hash % options.length]!;
+};
+---
+
+<MarketplaceCard
+  {...other}
+  title={plugin.title}
+  href={buildUrlForPlugin(plugin)}
+  background={backgroundFromString(plugin.title, [
+    'azure',
+    'pink',
+    'blue',
+    'green',
+    'yellow',
+  ] as const)}
+  lineClamp={3}
+>
+  {
+    plugin.coverImage ? (
+      <Fragment slot="image">
+        <ResponsiveImage data={plugin.coverImage.responsiveImage} />
+      </Fragment>
+    ) : (
+      <Fragment slot="svgLogo">
+        <Svg name="icons/regular/puzzle-piece" class={s.puzzlePiece} width="30%" height={null} />
+      </Fragment>
+    )
+  }
+  {plugin.description}
+</MarketplaceCard>

@@ -1,0 +1,81 @@
+---
+import type { TitleMetaLinkTag } from '@datocms/astro';
+import { BaseLayout } from '~/layouts/BaseLayout';
+import s from './style.module.css';
+import { Svg } from '~/components/Svg';
+import { Search } from './Search';
+import { Feedback } from './Feedback';
+import { TargetToggler } from '~/components/TargetToggler';
+
+type Props = {
+  additionalSeo: TitleMetaLinkTag[];
+  contentWrapperComponent?: (props: any) => any;
+};
+
+const { additionalSeo, contentWrapperComponent } = Astro.props;
+const ContentWrapper = contentWrapperComponent || 'div';
+---
+
+<BaseLayout additionalSeo={additionalSeo}>
+  <slot name="head" slot="head" />
+
+  <div class={s.root}>
+    <div class={s.sidebar}>
+      <div class={s.sidebarHeader}>
+        <a href="/" class={s.logo}>
+          <Svg name="svg/datocms/icon-text/color/color_full_logo" height={30} />
+        </a>
+        <TargetToggler targetId="sidebar">
+          <button type="button" class={s.hamburger}>
+            <Svg name="icons/regular/bars" />
+          </button>
+        </TargetToggler>
+      </div>
+      <div class={s.innerSidebar} data-datocms-noindex id="sidebar">
+        <slot name="sidebar" />
+      </div>
+    </div>
+    <div class={s.contentWrapper}>
+      <Search client:idle />
+      <div class={s.mainHeader}>
+        <ul>
+          <li>
+            <a href="/support">
+              <Svg name="icons/regular/headset" />
+              Ask for help!
+            </a>
+          </li>
+          <li>
+            <a href="https://status.datocms.com" target="_blank" rel="noreferrer">
+              <Svg name="icons/regular/tachometer" />
+              Status page
+            </a>
+          </li>
+        </ul>
+      </div>
+      <ContentWrapper>
+        <div class={s.container} transition:animate="slide">
+          <slot />
+          <div class={s.footer} data-datocms-noindex>
+            <div class={s.footerCol}>
+              <div class={s.footerTitle}>Did this doc help you?</div>
+              <div class={s.footerBody}>
+                <Feedback />
+              </div>
+            </div>
+            <div class={s.footerCol}>
+              <div class={s.footerTitle}>Need help?</div>
+              <div class={s.footerBody}>
+                Explore our <a href="https://community.datocms.com">forum</a>,{' '}
+                <a href="/support">contact support</a>, or{' '}
+                <a href="/enterprise-headless-cms#form"> connect with our sales team </a>
+                . You can also chat live with other users in our{' '}
+                <a href="/slack">Slack channel</a>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </ContentWrapper>
+    </div>
+  </div>
+</BaseLayout>

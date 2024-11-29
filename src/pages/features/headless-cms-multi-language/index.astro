@@ -1,0 +1,144 @@
+---
+import FieldSettings from '~/components/featureAnimations/FieldSettings';
+import ProjectSettings from '~/components/featureAnimations/ProjectSettings';
+import TranslatedUI from '~/components/featureAnimations/TranslatedUI';
+import { Bullets } from '~/components/Bullets';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { IntegrationsBanner } from '~/components/IntegrationsBanner';
+import { Layout } from '~/layouts/Layout';
+import { Svg } from '~/components/Svg';
+import { UiChrome } from '~/components/UiChrome';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+const flags = await Astro.glob('~/svg/flags/*.svg');
+const icons = flags.map((flag) => flag.default.src);
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker">{page.seoH1}</Fragment>
+    <Fragment slot="title">
+      Easily localize <mark>all your content</mark>, from start to finish
+    </Fragment>
+    <Fragment slot="subtitle">
+      Reach your <strong>global audience</strong> by choosing a
+      <strong><a href="/">headless CMS</a> focused on multi-language</strong>. Select from
+      <strong>+400 different locales</strong> and publish multiple versions of your content in different
+      languages to serve your content to the world.
+    </Fragment>
+  </Hero>
+
+  <Flag>
+    <Fragment slot="visual">
+      <UiChrome>
+        <ProjectSettings client:visible />
+      </UiChrome>
+    </Fragment>
+    <Fragment slot="kicker">Multi-language & multi-site headless cms</Fragment>
+    <Fragment slot="title">Translate your <mark>websites and apps</mark></Fragment>
+    <p>
+      <strong>Add all the languages you'd like to support in your app</strong> and start translating
+      your content, with our user-friendly multi-language interface. DatoCMS will deliver your content
+      to your net of projects, using the same <strong>fast and scalable platform</strong>.
+    </p>
+  </Flag>
+
+  <IntegrationsBanner bubbles={icons}>
+    <Fragment slot="title">Localize both content and assets</Fragment>
+    <p>
+      <strong>All your content and assets can be multi-language</strong>, including rich text,
+      responsive images, geo-points, SEO metadata and especially your URLs.
+    </p>
+  </IntegrationsBanner>
+
+  <Flag>
+    <Fragment slot="visual">
+      <UiChrome>
+        <FieldSettings client:visible />
+      </UiChrome>
+    </Fragment>
+    <Fragment slot="kicker">Headless CMS multi-language & flexible</Fragment>
+    <Fragment slot="title">Great <mark>flexibility and granularity</mark></Fragment>
+    <article>
+      <p>
+        DatoCMS gives you a <strong>great deal of customization</strong> for your multi-language project.
+        Specify which types of content need to be translated or not, and in which languages, on a per-field
+        level. Feel free to set a field as localized, or change settings at any time, with
+        <strong>no complex data migrations</strong>.
+      </p>
+    </article>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual">
+      <UiChrome>
+        <TranslatedUI client:visible />
+      </UiChrome>
+    </Fragment>
+    <Fragment slot="kicker">Multi-language headless CMS interface</Fragment>
+    <Fragment slot="title"><mark>Translated</mark> interface</Fragment>
+    <article>
+      <p>
+        It’s super important to offer an <strong>easy-to-understand editing experience</strong>
+        to your non-technical editors. That’s why the interface is available in English, Spanish, German,
+        French, Italian, Dutch, Russian and Turkish (and counting!).
+      </p>
+    </article>
+  </Flag>
+
+  <Flag style="good">
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/box-things" />
+    </Fragment>
+    <Fragment slot="kicker">The most user-friendly headless CMS</Fragment>
+    <Fragment slot="title">A complete set of <mark>smart, modern tools</mark></Fragment>
+    <article>
+      <p>
+        DatoCMS does not only offer powerful multi-language features, but a full, coordinated
+        <strong>suite of different tools</strong> to give you you the best editing and development experience.
+        Find out why we are famous for being
+        <strong>the most user-friendly CMS</strong>:
+      </p>
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/data-integrity" title="Data integrity">
+            <span>Safety and integrity of your content</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/structured-content-cms" title="Structured Content CMS">
+            <span>A flowless editing experience</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/workflow-cms" title="Workflow CMS">
+            <span>Organization of your workflow</span>
+          </a>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <a href="/features/dynamic-layouts" title="Dynamic Layouts">
+            <span>Dynamic & composable layouts</span>
+          </a>
+        </li>
+      </Bullets>
+    </article>
+  </Flag>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

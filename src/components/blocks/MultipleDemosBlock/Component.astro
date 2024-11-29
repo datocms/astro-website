@@ -1,0 +1,40 @@
+---
+import s from './style.module.css';
+import { MultipleDemosBlockFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Carousel } from '~/components/Carousel';
+import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
+
+interface Props {
+  block: FragmentOf<typeof MultipleDemosBlockFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+
+const { demos } = readFragment(MultipleDemosBlockFragment, maskedBlock);
+---
+
+<figure>
+  <prose-island>
+    <Carousel buttonsY="35%" viewportClass={s.carouselViewport}>
+      {
+        demos.map((item) => (
+          <MarketplaceCard
+            title={item.name}
+            href={buildUrlForTemplateDemo(item)}
+            size="small"
+            badge={item.badge ?? undefined}
+            label={item.label ?? undefined}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={item.screenshot.responsiveImage} />
+            </Fragment>
+            Try this demo »
+          </MarketplaceCard>
+        ))
+      }
+    </Carousel>
+  </prose-island>
+</figure>

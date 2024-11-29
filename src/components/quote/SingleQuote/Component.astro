@@ -1,0 +1,65 @@
+---
+import s from './style.module.css';
+import type { FragmentOf } from 'gql.tada';
+import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '../graphql';
+import { readFragment } from 'gql.tada';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { MaybeLink } from '~/components/links/MaybeLink';
+import { InlineText } from '~/components/structuredText/InlineText';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
+
+interface Props {
+  quote:
+    | (FragmentOf<typeof PartnerTestimonialQuoteFragment> & {
+        __typename: 'PartnerTestimonialRecord';
+      })
+    | (FragmentOf<typeof ReviewQuoteFragment> & {
+        __typename: 'ReviewRecord';
+      });
+}
+
+const { quote: maskedQuote } = Astro.props;
+
+const quote =
+  maskedQuote.__typename === 'PartnerTestimonialRecord'
+    ? readFragment(PartnerTestimonialQuoteFragment, maskedQuote)
+    : readFragment(ReviewQuoteFragment, maskedQuote);
+---
+
+<div class={s.root}>
+  {
+    quote.__typename === 'PartnerTestimonialRecord' ? (
+      <MaybeLink
+        href={quote.partner ? buildUrlForPartner(quote.partner) : undefined}
+        class={s.wrapper}
+      >
+        <p class={s.quote}>
+          <InlineText data={quote.quote} />
+        </p>
+
+        <div class={s.content}>
+          <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
+          <div class={s.authorRole}>
+            <div class={s.name}>{quote.name}</div>
+            <div class={s.role}>{quote.role}</div>
+            <div class={s.company}>{quote.partner.name}</div>
+          </div>
+        </div>
+      </MaybeLink>
+    ) : (
+      <article class={s.wrapper}>
+        <p class={s.quote}>
+          “<InlineText data={quote.quote} />”
+        </p>
+
+        <div class={s.content}>
+          <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
+          <div class={s.authorRole}>
+            <div class={s.name}>{quote.name}</div>
+            <div class={s.role}>{quote.role}</div>
+          </div>
+        </div>
+      </article>
+    )
+  }
+</div>

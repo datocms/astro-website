@@ -1,0 +1,71 @@
+---
+import { Wrapper } from '~/components/Wrapper';
+import s from './style.module.css';
+import { Button } from '~/components/Button';
+---
+
+<subscribe-newsletter>
+  <div class={s.newsletter}>
+    <Wrapper>
+      <div class={s.newsletterInner}>
+        <div class={s.newsletterBody}>
+          <div class={s.newsletterTitle}>Subscribe to our newsletter! 📥</div>
+          <div class={s.newsletterDescription}>
+            One update per month. All the latest news and sneak peeks directly in your inbox.
+          </div>
+        </div>
+        <div class={s.formContainer}>
+          <form class={s.form}>
+            <input placeholder="Enter your email" name="email" />
+            <Button as="button" p="tiny" fs="small">Subscribe! </Button>
+          </form>
+          <div class={s.formMessage} data-status></div>
+        </div>
+      </div>
+    </Wrapper>
+  </div>
+</subscribe-newsletter>
+
+<script>
+  import { actions } from 'astro:actions';
+  import { isInputError } from 'astro:actions';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'subscribe-newsletter',
+    class SubscribeNewsletter extends WebComponent {
+      form!: HTMLFormElement;
+      button!: HTMLButtonElement;
+
+      parsedCallback() {
+        this.form = this.$('form');
+        this.button = this.$('button');
+
+        this.on(this.form, 'submit', this.handleSubmit);
+      }
+
+      async handleSubmit(event: SubmitEvent) {
+        event.preventDefault();
+
+        const status = this.$('[data-status]');
+
+        this.button.innerText = 'Submitting...';
+        this.button.disabled = true;
+
+        const formData = new FormData(this.form);
+        const { error } = await actions.subscribeToNewsletter(formData);
+
+        if (isInputError(error)) {
+          if (error.fields.email) {
+            status.innerHTML = error.fields.email.join(', ');
+          }
+        } else {
+          status.innerHTML = 'Successfully subscribed. Welcome on board! 🎉';
+        }
+
+        this.button.innerText = 'Subscribe!';
+        this.button.disabled = false;
+      }
+    },
+  );
+</script>

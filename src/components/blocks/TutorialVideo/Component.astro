@@ -1,0 +1,61 @@
+---
+import s from './style.module.css';
+import { TutorialVideoFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Image } from 'astro:assets';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Carousel } from '~/components/Carousel';
+import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
+
+interface Props {
+  block: FragmentOf<typeof TutorialVideoFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+
+const { videoTutorialsOrUserGuidesEpisodes } = readFragment(TutorialVideoFragment, maskedBlock);
+---
+
+<Carousel buttonsY="35%" viewportClass={s.carouselViewport}>
+  {
+    videoTutorialsOrUserGuidesEpisodes.map((thing) => (
+      <div class={s.card}>
+        <MarketplaceCard
+          title={thing.title}
+          size="small"
+          href={
+            thing.__typename === 'VideoTutorialRecord'
+              ? thing.resource.__typename === 'YoutubeVideoResourceRecord'
+                ? thing.resource.video.url
+                : thing.resource.url
+              : buildUrlForUserGuidesEpisode(thing)
+          }
+        >
+          <Fragment slot="image">
+            {thing.__typename === 'VideoTutorialRecord' ? (
+              thing.resource.__typename === 'YoutubeVideoResourceRecord' ? (
+                <img alt={thing.resource.video.title} src={thing.resource.video.thumbnailUrl} />
+              ) : (
+                <ResponsiveImage data={thing.resource.coverImage.responsiveImage} />
+              )
+            ) : (
+              <Image
+                src={`${thing.asset.video.thumbnailUrl}?time=${thing.thumbTimeSeconds}&width=600&height=400&fit_mode=crop`}
+                inferSize
+                widths={[300, 600]}
+                alt={thing.title}
+                style={{
+                  background: `url(${thing.asset.video.blurUpThumb})`,
+                  backgroundSize: 'cover',
+                  color: 'transparent',
+                }}
+              />
+            )}
+          </Fragment>
+          Play video »
+        </MarketplaceCard>
+      </div>
+    ))
+  }
+</Carousel>

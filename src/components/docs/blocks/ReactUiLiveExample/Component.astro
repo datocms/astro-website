@@ -1,0 +1,52 @@
+---
+import { ReactUiLiveExampleFragment } from './graphql';
+import type { FragmentOf } from 'gql.tada';
+import { readFragment } from 'gql.tada';
+import { fetchReactUiExamples } from './utils';
+import { Code } from '~/components/Code';
+import { Markdown } from '~/components/Markdown';
+import { Heading } from '~/components/Heading';
+import { slugify } from '~/lib/slugify';
+import { LiveExample } from './LiveExample';
+import 'datocms-react-ui/styles.css';
+import s from './style.module.css';
+import { Tabs, Tab } from '~/components/Tabs';
+
+interface Props {
+  block: FragmentOf<typeof ReactUiLiveExampleFragment>;
+}
+
+const { block } = Astro.props;
+
+const examples = await fetchReactUiExamples(Astro);
+
+const { componentName } = readFragment(ReactUiLiveExampleFragment, block);
+
+const componentExamples = examples.filter((example) => example.componentName === componentName);
+---
+
+{
+  componentExamples.map((example) => {
+    return (
+      <Fragment>
+        <Heading anchor={slugify(example.title)}>{example.title}</Heading>
+        <Markdown of={example.description} />
+
+        <figure>
+          <prose-island>
+            <Tabs>
+              <Tab title="Preview">
+                <div class={s.liveExample}>
+                  <LiveExample serializedMdxExample={example.serializedMdxExample} client:idle />
+                </div>
+              </Tab>
+              <Tab title="Code" noPadding>
+                <Code language="js" code={example.code} />
+              </Tab>
+            </Tabs>
+          </prose-island>
+        </figure>
+      </Fragment>
+    );
+  })
+}

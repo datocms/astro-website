@@ -1,0 +1,251 @@
+---
+import { Button } from '~/components/Button';
+import { Heading } from '~/components/Heading';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { Prose } from '~/components/Prose';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { ScrollspyNav } from '~/components/ScrollspyNav';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { Text } from '~/components/structuredText/Text';
+import { Wrapper } from '~/components/Wrapper';
+import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { slugify } from '~/lib/slugify';
+import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const { page } = await executeQuery(Astro, query);
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const {
+  coreFeaturesBlocks,
+  editorExperienceBlocks,
+  developerExperienceBlocks,
+  imageVideoManagementBlocks,
+  localizationBlocks,
+  extensibilityBlocks,
+  contentIntegrityBlocks,
+  governanceAndComplianceBlocks,
+  securityAndInfrastructureBlocks,
+} = page;
+
+const featuresGroup = [
+  {
+    title: 'Core Features',
+    subtitle: 'The essential features that you would interact with most often in DatoCMS.',
+    features: coreFeaturesBlocks,
+  },
+  {
+    title: 'Editor Experience',
+    subtitle: 'Features specifically focused on giving content teams and creators the right tools.',
+    features: editorExperienceBlocks,
+  },
+  {
+    title: 'Developer Experience',
+    subtitle: 'From our APIs to the CLI, we put a lot of focus on delivering a solid DX.',
+    features: developerExperienceBlocks,
+  },
+  {
+    title: 'Image & Video Management',
+    subtitle:
+      'DatoCMS offers Digital Asset Management (DAM) out of the box to optimize your media.',
+    features: imageVideoManagementBlocks,
+  },
+  {
+    title: 'Localization',
+    subtitle:
+      'Granular localization options to ensure you connect with your customers wherever they are.',
+    features: localizationBlocks,
+  },
+  {
+    title: 'Extensibility',
+    subtitle: 'Plugins allow you to extend the capabilities of the CMS for specific use-cases.',
+    features: extensibilityBlocks,
+  },
+  {
+    title: 'Content Integrity',
+    subtitle:
+      'We have measures in place to ensure your content is not at risk of loss or inconsistencies.',
+    features: contentIntegrityBlocks,
+  },
+  {
+    title: 'Governance & Compliance',
+    subtitle: 'Robust features to put your mind at ease when using DatoCMS at scale.',
+    features: governanceAndComplianceBlocks,
+  },
+  {
+    title: 'Security & Infrastructure',
+    subtitle: 'Our foundations help companies of all sizes scale without obstacles.',
+    features: securityAndInfrastructureBlocks,
+  },
+];
+
+const linkLabel: { [key: string]: string } = {
+  docs: 'Docs',
+  guide: 'Guide',
+  learn_more: 'Learn more',
+  watch_demo: 'Watch demo',
+};
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Wrapper>
+    <div class={s.hero}>
+      <div class={s.heroBody}>
+        <h1 class={s.heroTitle}>
+          <Text data={page.title} />
+        </h1>
+        <div class={s.heroSubtitle}>
+          <Text data={page.subtitle} />
+        </div>
+        <div class={s.buttonContainer}>
+          <Button as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
+          <Button as="a" s="invert" href="/contact">Contact sales</Button>
+        </div>
+      </div>
+      <div class={s.heroImageWrapper}>
+        {
+          page.heroImageLeft && page.heroImageRight && (
+            <>
+              <div class={s.heroImage}>
+                <ResponsiveImage data={page.heroImageLeft.responsiveImage} />
+              </div>
+              <div class={s.heroImage}>
+                <ResponsiveImage data={page.heroImageRight.responsiveImage} />
+              </div>
+            </>
+          )
+        }
+      </div>
+    </div>
+
+    <div class={s.features}>
+      <aside class={s.aside}>
+        <div data-mobile-anchors class={s.asideAnchorsWrapper} role="button" aria-expanded="false">
+          <ScrollspyNav>
+            <div class={s.currentAnchor}>
+              <span data-current-anchor>Scroll to</span>
+              <div class={s.currentAnchorArrow}>
+                <Svg name="icons/regular/chevron-down" />
+              </div>
+            </div>
+
+            <div class={s.asideAnchors}>
+              <ul>
+                {
+                  featuresGroup.map(({ title }) => (
+                    <li>
+                      <a href={`#${slugify(title)}`}>{title}</a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </ScrollspyNav>
+        </div>
+      </aside>
+      <div class={s.main}>
+        {
+          featuresGroup.map(({ title, subtitle, features }) => {
+            return (
+              <div id={slugify(title)} class={s.section}>
+                <Space bottom={1}>
+                  <InterstitialTitle style="one">
+                    {title}
+                    <Fragment slot="below">
+                      <h4 class={s.sectionSubtitle}>{subtitle}</h4>
+                    </Fragment>
+                  </InterstitialTitle>
+                </Space>
+
+                <div class={s.blocks}>
+                  {features.map((feature, i) => {
+                    if (feature.__typename === 'FeatureRegularCardRecord') {
+                      return (
+                        <div class={s.feature}>
+                          {feature.image?.responsiveImage && (
+                            <figure class={s.featureImage}>
+                              <ResponsiveImage data={feature.image.responsiveImage} />
+                            </figure>
+                          )}
+                          <article>
+                            {feature.badge && (
+                              <div class={s.featureBadge}>
+                                {feature.badge}
+                                {i % 2 === 0 ? (
+                                  <div class={s.arrow}>
+                                    <Svg name="svg/illustrations/arrow-sketch-5" />
+                                  </div>
+                                ) : (
+                                  <div class={s.arrow2}>
+                                    <Svg name="svg/illustrations/arrow-sketch-1" />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            <Heading as="h3" class={s.featureTitle} anchor={slugify(feature.title)}>
+                              {feature.title}
+                            </Heading>
+
+                            <div class={s.featureDescription}>
+                              <Prose>
+                                <Text data={feature.description} />
+                              </Prose>
+                            </div>
+
+                            {feature.links && (
+                              <div class={s.featureLinks}>
+                                {feature.links.map((link) => {
+                                  const customTitle = linkLabel[link.linkTitle] || link.linkTitle;
+                                  return (
+                                    <a href={buildUrlFromGql(link.content)} class={s.link}>
+                                      {customTitle}
+                                      <span class={s.linkArrow}>→</span>
+                                    </a>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </article>
+                        </div>
+                      );
+                    }
+                    if (feature.__typename === 'TestimonialCardRecord') {
+                      return (
+                        <Space top={2} bottom={2}>
+                          <SingleQuote quote={feature.testimonial} />
+                        </Space>
+                      );
+                    }
+                  })}
+                </div>
+              </div>
+            );
+          })
+        }
+      </div>
+    </div>
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} />
+</Layout>
+
+<script>
+  const mobileAnchors = document.querySelector('[data-mobile-anchors]');
+
+  mobileAnchors?.addEventListener('click', () => {
+    mobileAnchors.setAttribute(
+      'aria-expanded',
+      mobileAnchors.getAttribute('aria-expanded') === 'true' ? 'false' : 'true',
+    );
+  });
+</script>

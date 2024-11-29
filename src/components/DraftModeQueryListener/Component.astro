@@ -1,0 +1,40 @@
+---
+import { QueryListener } from '@datocms/astro';
+import { DATOCMS_API_TOKEN } from 'astro:env/server';
+import type { ComponentProps } from 'react';
+import { convertToAutoPaginationQueryAndVariables } from '~/lib/datocms/rawExecuteQueryWithAutoPagination';
+import { isDraftModeEnabled } from '~/lib/draftMode';
+
+/*
+ * This component utilizes the QueryListener component of @datocms/astro to enable automatic
+ * page refresh whenever the result of the specified query changes. The described effect only
+ * occurs when the draft mode is ON.
+ */
+
+type Props<QueryResult, QueryVariables> = Omit<
+  ComponentProps<typeof QueryListener<QueryResult, QueryVariables>>,
+  'includeDrafts' | 'token' | 'excludeInvalid'
+>;
+
+const draftModeEnabled = isDraftModeEnabled(Astro);
+
+const { query: originalQuery, variables: originalVariables, ...rest } = Astro.props;
+
+const [query, variables] = convertToAutoPaginationQueryAndVariables(
+  originalQuery,
+  originalVariables,
+);
+---
+
+{
+  draftModeEnabled && (
+    <QueryListener
+      {...rest}
+      query={query}
+      variables={variables}
+      token={DATOCMS_API_TOKEN}
+      excludeInvalid
+      includeDrafts
+    />
+  )
+}

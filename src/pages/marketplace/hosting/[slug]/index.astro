@@ -1,0 +1,117 @@
+---
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import { Button } from '~/components/Button';
+import { Carousel } from '~/components/Carousel';
+import { Image } from '~/components/blocks/Image';
+import { InternalVideo } from '~/components/blocks/InternalVideo';
+import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Prose } from '~/components/Prose';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { Text } from '~/components/structuredText/Text';
+import { Video } from '~/components/blocks/Video';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { withAllComponents } from '~/lib/datocms/structuredText';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const variables = { slug: Astro.params.slug! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout noFinalCta additionalSeo={page.seo}>
+  <Space top={2}>
+    <Wrapper>
+      <div class={s.grid}>
+        <div class={s.content}>
+          <div class={s.titleWrapper}>
+            <h1 class={s.title}>{page.title}</h1>
+          </div>
+          <h3 class={s.subtitle}>{page.description}</h3>
+          <Space top={1}>
+            <div class={s.ctaMobile}>
+              <Button
+                as="a"
+                href="https://dashboard.datocms.com/projects/redirect-to-project?path=/admin/build_triggers/new"
+                target="_blank"
+                fs="small"
+              >
+                Setup integration
+              </Button>
+            </div>
+          </Space>
+          {
+            page.gallery.length && (
+              <Space top={1}>
+                <Carousel buttonsY="50%">
+                  {page.gallery.map(
+                    (item) =>
+                      item.responsiveImage && (
+                        <div class={s.slide}>
+                          <ResponsiveImage data={item.responsiveImage} />
+                        </div>
+                      ),
+                  )}
+                </Carousel>
+              </Space>
+            )
+          }
+          <Space top={1}>
+            <Prose>
+              <Text
+                data={page.content}
+                blockComponents={withAllComponents(page.content.blocks, {
+                  ImageRecord: Image,
+                  InternalVideoRecord: InternalVideo,
+                  VideoRecord: Video,
+                })}
+              />
+            </Prose>
+          </Space>
+        </div>
+
+        <aside class={s.aside}>
+          <div class={s.asideContentDesktop}>
+            <MarketplaceCard title={page.title} background="azure" svgLogoUrl={page.logo.url}>
+              {page.shortDescription}
+              <Fragment slot="below">
+                <div class={s.cardCta}>
+                  <Button
+                    as="a"
+                    href="https://dashboard.datocms.com/projects/redirect-to-project?path=/admin/build_triggers/new"
+                    target="_blank"
+                    fs="small"
+                    block
+                  >
+                    Setup integration
+                  </Button>
+                </div>
+              </Fragment>
+            </MarketplaceCard>
+
+            <div class={s.publisher}>
+              <h4>Publisher</h4>
+              <article>
+                <div class={s.publisherIcon}>
+                  <Svg name="svg/datocms/icon/color/color_d_icon" />
+                </div>
+                <p>DatoCMS</p>
+              </article>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </Wrapper>
+  </Space>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

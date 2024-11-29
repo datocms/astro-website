@@ -1,0 +1,53 @@
+---
+import { containsKeywords } from '~/lib/containsKeyword';
+import { Wrapper } from '../Wrapper';
+import s from './style.module.css';
+import striptags from 'striptags';
+
+interface Props {
+  seoAnalysis?: unknown;
+}
+
+const { seoAnalysis } = Astro.props;
+
+const kickerContents = striptags(await Astro.slots.render('kicker'));
+
+let Title: 'h1' | 'h2' = 'h2';
+let Subtitle: 'h3' | 'div' = 'div';
+let Kicker: 'h1' | 'h2' = 'h2';
+
+if (seoAnalysis) {
+  const kickerContainsKeywords = containsKeywords(kickerContents, seoAnalysis);
+  Kicker = kickerContainsKeywords ? 'h1' : 'h2';
+  Title = kickerContainsKeywords ? 'h2' : 'h1';
+  Subtitle = 'h3';
+}
+---
+
+<Wrapper>
+  <div class={s.root}>
+    {
+      Astro.slots.has('kicker') && (
+        <Kicker class={s.kicker}>
+          <slot name="kicker" />
+        </Kicker>
+      )
+    }
+    {
+      Astro.slots.has('title') && (
+        <Title class={s.title}>
+          <slot name="title" />
+        </Title>
+      )
+    }
+    {
+      Astro.slots.has('subtitle') && (
+        <Subtitle class={s.subtitle}>
+          <slot name="subtitle" />
+        </Subtitle>
+      )
+    }
+
+    <slot />
+  </div>
+</Wrapper>

@@ -1,0 +1,222 @@
+---
+import { EnterpriseStrip } from './_sub/EnterpriseStrip';
+import { Flag } from '~/components/Flag';
+import { Form } from './../contact/_Form';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
+import { Result } from '~/components/Result';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import Point from './_sub/Point.astro';
+
+const { page, review1, review2, review3 } = await executeQuery(Astro, query);
+
+if (!page || !review1 || !review2 || !review3) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero seoAnalysis={page.yoastAnalysis}>
+    <Fragment slot="kicker">
+      {page.seoH1}
+    </Fragment>
+    <Fragment slot="subtitle">
+      A complete headless CMS with the <strong>
+        governance, service and features to ensure you take your content machine to scale
+      </strong>. Dedicated onboarding service, premium technical support, private cloud and custom
+      SLAs
+    </Fragment>
+    <Fragment slot="title">
+      Enterprise grade content infrastructure, <mark>security and scalability</mark>
+    </Fragment>
+  </Hero>
+
+  <div id="main-content">
+    <LogosBar
+      title="We power experiences for some of the most renowned brands"
+      clients={[
+        'svg/logos/deutsche-telekom',
+        'svg/logos/hashicorp',
+        'svg/logos/verizon',
+        'svg/logos/vercel',
+        'svg/logos/linkedin',
+        'svg/logos/oberlo',
+        'svg/logos/nhs',
+        'svg/logos/little-caesars',
+        'svg/logos/mit',
+        'svg/logos/afsp',
+        'svg/logos/harrys',
+      ]}
+    />
+
+    <EnterpriseStrip>
+      <Fragment slot="kicker">Safest enterprise headless CMS</Fragment>
+      <Fragment slot="title">Robust data security, privacy and compliance</Fragment>
+      <Fragment slot="description">
+        <p>
+          <strong>Security</strong> and data integrity informs all our decisions. Enterprise headless
+          CMS customers can rely on us to ensure their
+          <strong>data is safe and remains secure</strong>
+        </p>
+      </Fragment>
+      <Point
+        title="Single Sign-On"
+        description="Manage access to DatoCMS through your preferred identity provider."
+      />
+      <Point
+        title="Decoupled Data Storage"
+        description="Data is stored in multiple shards to guarantee performance, integrity and safety."
+      />
+      <Point
+        title="ISO 27001 and GDPR Compliance"
+        description="We have a GDPR DPA and have been officially certified as ISO 27001 compliant."
+      />
+    </EnterpriseStrip>
+
+    <SingleQuote quote={review2} />
+
+    <EnterpriseStrip>
+      <Fragment slot="kicker">Performance and scalability guaranteed</Fragment>
+      <Fragment slot="title">We are here to ensure your content has no limits</Fragment>
+      <Fragment slot="description">
+        <p>
+          Customers of our enterprise headless CMS benefit from performance and service SLAs to
+          ensure they can <strong>scale without lag</strong>.
+        </p>
+      </Fragment>
+      <Point
+        title="Performance SLA"
+        description="Full support with dedicated priority 24/7 guaranteed."
+      />
+      <Point
+        title="Support SLA"
+        description="We tailor solutions to any specific use-case with real-time scaling."
+      />
+      <Point
+        title="Solution Architects"
+        description="We assist companies in their journey to scale, from bottom to top."
+      />
+    </EnterpriseStrip>
+
+    <SingleQuote quote={review1} />
+
+    <EnterpriseStrip>
+      <Fragment slot="kicker">Support with a smile</Fragment>
+      <Fragment slot="title">Extend your team with support that works with you</Fragment>
+      <Fragment slot="description">
+        <p>
+          DatoCMS enterprise customers can rely on a
+          <strong>friendly team that helps all the way</strong>.
+        </p>
+      </Fragment>
+      <Point
+        title="Shared Slack channel"
+        description="Involve the whole team with a dedicated Slack channel."
+      />
+      <Point
+        title="Dedicated Technical & Editorial Onboarding"
+        description="Add a DatoCMS integration expert to your project to help you jumpstart your architecture and get running faster."
+      />
+      <Point
+        title="Multiple sandbox environments for testing and backups"
+        description="DatoCMS has the best solution on the market for managing backups and progress."
+      />
+    </EnterpriseStrip>
+
+    <SingleQuote quote={review3} />
+
+    <EnterpriseStrip>
+      <Fragment slot="kicker">Best CMS for enterprise</Fragment>
+      <Fragment slot="title">Give your team full accountability and governance control</Fragment>
+      <Fragment slot="description">
+        <p>
+          DatoCMS enterprise customers can enjoy features and structures that
+          <strong>empower their content business.</strong>
+        </p>
+      </Fragment>
+      <Point
+        title="Bespoke workflows"
+        description="Set up a precise state machine to bring a draft content up to the final publication through a series of intermediate, fully customizable approval steps."
+      />
+      <Point
+        title="Enhanced per locale permissions & granular roles"
+        description="Assign the appropriate roles and permissions, even per locale, to your team members, precisely determining what actions they can perform."
+      />
+      <Point
+        title="Live sync backups"
+        description="Store all the data, versioned, in your company Amazon AWS account."
+      />
+    </EnterpriseStrip>
+
+    <div class={s.talkWithUs}>
+      <Wrapper>
+        <a id="form" class={s.anchor}></a>
+        <div class={s.talkWithUsInner}>
+          <div class={s.talkWithUsIntro}>
+            <div class={s.talkWithUsTitle}>Talk with us</div>
+            <div class={s.talkWithUsDescription}>
+              <p>
+                <strong>Quick and efficient support</strong> is essential for an enterprise headless
+                CMS. Enterprise accounts are put on a fast lane when it comes to providing help, feature
+                requests and fixes of any kind.
+                <strong> Our experts are available in a number of ways </strong>, any time that you
+                need us.
+              </p>
+            </div>
+          </div>
+          <Form client:load issueType="enterprise" />
+        </div>
+      </Wrapper>
+    </div>
+
+    <TitleStripWithContent
+      seoAnalysis={page.yoastAnalysis}
+      kicker="A CMS that empowers all team"
+      title="A technology investment that doubles performance and productivity"
+    >
+      <Fragment slot="title">
+        A technology investment that doubles performance and productivity
+      </Fragment>
+      <div class={s.grid}>
+        <Result number="38k" href="/customers/oberlo">
+          <Fragment slot="label"><mark class="good">migrated assets</mark></Fragment>
+          <strong>Oberlo</strong> was able to switch to DatoCMS painlessly, offering blinding speed and
+          an intuitive editing process.
+        </Result>
+        <Result number="2TB" href="/customers/hashicorp">
+          <Fragment slot="label"><mark class="good">traffic per month</mark></Fragment>
+          <strong>HashiCorp</strong> needed a flexible and secure enterprise headless CMS to manage its
+          ever-expanding multi-site structure.
+        </Result>
+        <Result number="35k">
+          <Fragment slot="label"><mark class="good">users</mark></Fragment>
+          <strong>Vercel</strong> hosted its
+          <a href="/blog/how-datocms-supports-next-js-conf">Next.js international conference</a>
+          on DatoCMS.
+        </Result>
+      </div>
+    </TitleStripWithContent>
+
+    <Flag style="good" seoAnalysis={page.yoastAnalysis}>
+      <Fragment slot="kicker">Enterprise headless CMS</Fragment>
+      <Fragment slot="title">A headless CMS that is ready to <mark>scale with you</mark></Fragment>
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/key" />
+      </Fragment>
+      <p>
+        The best CMS for enterprise is one that can
+        <strong>scale with your company with minimal effort</strong>. DatoCMS offers the services
+        and support that lets your website reach different market segments and grow with your needs.
+      </p>
+    </Flag>
+  </div>
+</Layout>

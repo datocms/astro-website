@@ -1,0 +1,30 @@
+---
+import { ActiveLink } from '~/components/links/ActiveLink';
+import s from './style.module.css';
+import type { SidebarEntry } from './types';
+
+type Props = SidebarEntry;
+
+const entry = Astro.props;
+---
+
+<ActiveLink class={s.entry} activeClass={s.activeEntry} href={entry.url} match={entry.match}>
+  {entry.label}
+</ActiveLink>
+
+{
+  entry.entries && (
+    <div class={s.subEntries}>
+      {entry.entries.map((subEntry) => (
+        <ActiveLink
+          href={subEntry.url}
+          class={s.entry}
+          activeClass={s.activeEntry}
+          match={subEntry.match}
+        >
+          {subEntry.label}
+        </ActiveLink>
+      ))}
+    </div>
+  )
+}

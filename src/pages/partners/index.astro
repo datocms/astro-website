@@ -1,0 +1,280 @@
+---
+import PartnersMap from './_sub/PartnersMap';
+import s from './_style.module.css';
+import sortBy from 'lodash-es/sortBy';
+import type { FragmentOf } from 'gql.tada';
+import { Announce } from '~/components/pluginToolkit/Announce';
+import { Filter } from './_sub/Filter';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query, PartnerFragment } from './_graphql';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { uniq } from 'lodash-es';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+type Partner = FragmentOf<typeof PartnerFragment>;
+
+const { page, partners } = await executeQuery(Astro, query);
+
+if (!page || partners.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const projectsCountByPartner = partners.reduce<Record<string, number>>((acc, partner) => {
+  acc[partner.id] = partner._allReferencingShowcaseProjectsMeta.count;
+  return acc;
+}, {});
+
+const highlightedPartnerIds = page.highlightedPartners.map((p) => p.id);
+
+const orderedPartners = [
+  ...page.highlightedPartners,
+  ...sortBy(
+    partners.filter((p) => !highlightedPartnerIds.includes(p.id)),
+    [(x) => -(projectsCountByPartner[x.id] || 0), 'name'],
+  ),
+];
+
+const partnersCountByCountryCode = partners
+  .flatMap((partner) => partner.locations.map((location) => location.code))
+  .reduce<Record<string, number>>((acc, code) => {
+    acc[code] = (acc[code] || 0) + 1;
+    return acc;
+  }, {});
+
+const technologyFilter = Astro.url.searchParams.get('technology');
+const areaOfExpertiseFilter = Astro.url.searchParams.get('areaOfExpertise');
+const countryFilter = Astro.url.searchParams.get('country');
+const continentFilter = Astro.url.searchParams.get('continent');
+
+const filteredPartners = orderedPartners.filter((partner) => {
+  if (technologyFilter && !partner.technologies.some((t) => t.name === technologyFilter)) {
+    return false;
+  }
+  if (
+    areaOfExpertiseFilter &&
+    !partner.areasOfExpertise.some((t) => t.name === areaOfExpertiseFilter)
+  ) {
+    return false;
+  }
+  if (countryFilter && !partner.locations.some((t) => `${t.emoji} ${t.name}` === countryFilter)) {
+    return false;
+  }
+  if (continentFilter && !partner.locations.some((t) => t.continent.name === continentFilter)) {
+    return false;
+  }
+
+  return true;
+});
+
+function calculateCounters(partners: Partner[], filterByContinent: string | null) {
+  const technologies: Record<string, number> = {};
+  const areasOfExpertise: Record<string, number> = {};
+  const countries: Record<string, number> = {};
+  const continents: Record<string, number> = {};
+
+  for (const partner of partners) {
+    for (const t of partner.technologies) {
+      technologies[t.name] = (technologies[t.name] || 0) + 1;
+    }
+    for (const t of partner.areasOfExpertise) {
+      areasOfExpertise[t.name] = (areasOfExpertise[t.name] || 0) + 1;
+    }
+    for (const t of partner.locations) {
+      if (!filterByContinent || t.continent.name === filterByContinent)
+        countries[`${t.emoji} ${t.name}`] = (countries[`${t.emoji} ${t.name}`] || 0) + 1;
+    }
+    for (const continentName of uniq(partner.locations.map((t) => t.continent.name))) {
+      continents[continentName] = (continents[continentName] || 0) + 1;
+    }
+  }
+
+  return {
+    technologies,
+    areasOfExpertise,
+    countries,
+    continents,
+  };
+}
+
+const filteredCounters = calculateCounters(filteredPartners, continentFilter);
+const noFilterCounters = calculateCounters(orderedPartners, continentFilter);
+
+const sortByCount = (entryA: [string, number], entryB: [string, number]) => {
+  if (entryA[1] !== entryB[1]) {
+    return entryB[1] - entryA[1];
+  }
+  return entryA[0].localeCompare(entryB[0]);
+};
+
+const toOptionWithCount = (entry: [string, number]) => ({
+  value: entry[0],
+  label: `${entry[0]} (${entry[1]})`,
+});
+
+const continentOptions = Object.entries(noFilterCounters.continents)
+  .sort(sortByCount)
+  .map(toOptionWithCount);
+
+const countryOptions = Object.entries(filteredCounters.countries)
+  .sort(sortByCount)
+  .map(toOptionWithCount);
+
+const technologyOptions = Object.entries(filteredCounters.technologies)
+  .sort(sortByCount)
+  .map(toOptionWithCount);
+
+const areaOfExpertiseOptions = Object.entries(filteredCounters.areasOfExpertise)
+  .sort(sortByCount)
+  .map(toOptionWithCount);
+
+const getLabel = (count: number) => {
+  if (count === 0) {
+    return false;
+  }
+  if (count === 1) {
+    return '1 showcase project';
+  }
+  return `${count} showcase projects`;
+};
+
+const bkgColors = ['azure', 'pink', 'blue', 'green', 'yellow'] as const;
+---
+
+<Layout additionalSeo={[]}>
+  <Fragment slot="head">
+    <title>DatoCMS Solution Partners</title>
+  </Fragment>
+
+  <Hero>
+    <Fragment slot="kicker">Solution Partners</Fragment>
+    <Fragment slot="title">
+      Find the perfect Partner to meet <mark>your digital needs</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      Our most successful customers work with a Solution Partner to accomplish their goals and ship
+      their digital products faster.
+    </Fragment>
+  </Hero>
+
+  <Wrapper>
+    <PartnersMap partnersCountByCountryCode={partnersCountByCountryCode} client:load />
+    <Space bottom={1}>
+      <Announce href="/partner-program" center>
+        <strong>Want to become a DatoCMS Partner?</strong> Learn more about our Partner Program and its
+        benefits!
+      </Announce>
+    </Space>
+  </Wrapper>
+
+  <Wrapper>
+    <load-results-in-page>
+      <form class={s.filterGrid} method="GET">
+        <div>
+          <div class={s.filterLabel}>Filter by Continent</div>
+          <Filter
+            options={continentOptions}
+            value={continentFilter}
+            searchParam="continent"
+            resetSearchParams={['country']}
+          />
+        </div>
+        <div>
+          <div class={s.filterLabel}>Filter by Country</div>
+          <Filter options={countryOptions} value={countryFilter} searchParam="country" />
+        </div>
+        <div>
+          <div class={s.filterLabel}>Filter by Technology</div>
+          <Filter options={technologyOptions} value={technologyFilter} searchParam="technology" />
+        </div>
+        <div>
+          <div class={s.filterLabel}>Filter by Area of Expertise</div>
+          <Filter
+            options={areaOfExpertiseOptions}
+            value={areaOfExpertiseFilter}
+            searchParam="areaOfExpertise"
+          />
+        </div>
+      </form>
+      <div class={s.posts} id="filtered-partners">
+        {
+          filteredPartners.map((partner, i) => (
+            <MarketplaceCard
+              href={buildUrlForPartner(partner)}
+              background={bkgColors[i % bkgColors.length]}
+              label={getLabel(partner._allReferencingShowcaseProjectsMeta.count) || undefined}
+              lineClamp={3}
+              svgLogoUrl={partner.logo.url}
+              title={partner.name}
+            >
+              <Fragment slot="title">
+                <span class={s.cardTitle}>{partner.name}</span>
+                {partner.locations.slice(0, 5).map((l) => (
+                  <span class={s.cardFlag}>{l.emoji}</span>
+                ))}
+                {partner.locations.length > 5 && (
+                  <span class={s.cardMoreLocations}>+ {partner.locations.length - 5} more</span>
+                )}
+              </Fragment>
+              {toPlainText(partner.shortDescription)}
+            </MarketplaceCard>
+          ))
+        }
+      </div>
+    </load-results-in-page>
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} />
+</Layout>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'load-results-in-page',
+    class LoadResultsInPage extends WebComponent {
+      parsedCallback() {
+        const formEl = this.$<HTMLFormElement>('form');
+
+        this.on(formEl, 'submit', async (event) => {
+          event.preventDefault();
+
+          try {
+            const formData = new FormData(formEl);
+            const queryString = new URLSearchParams(formData as any).toString();
+            const url = `?${queryString}`;
+
+            const response = await fetch(url, {
+              headers: {
+                Accept: 'text/html',
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const html = await response.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            const newComponent = tempDiv.querySelector('load-results-in-page');
+            if (newComponent) {
+              this.replaceWith(newComponent);
+              history.pushState({}, '', url);
+            }
+          } catch (error) {
+            console.error('Error loading results:', error);
+          }
+        });
+      }
+    },
+  );
+</script>

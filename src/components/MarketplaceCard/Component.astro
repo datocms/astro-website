@@ -1,0 +1,109 @@
+---
+import { MaybeLink } from '~/components/links/MaybeLink';
+import s from './style.module.css';
+
+type Props = {
+  badge?: { emoji: string; name: string } | null;
+  background?: 'azure' | 'pink' | 'blue' | 'green' | 'yellow' | 'gray';
+  boxed?: boolean;
+  class?: string;
+  highlight?: string;
+  href?: string;
+  target?: astroHTML.JSX.HTMLAttributeAnchorTarget;
+  label?: string;
+  lineClamp?: number;
+  orientation?: 'horizontal' | 'vertical';
+  size?: 'small' | 'micro' | 'medium' | 'large';
+  svgLogoUrl?: string;
+  title: string;
+};
+
+const {
+  badge,
+  background,
+  boxed = true,
+  class: className,
+  highlight,
+  href,
+  target,
+  label,
+  lineClamp = 10,
+  orientation = 'vertical',
+  size = 'medium',
+  svgLogoUrl,
+  title,
+} = Astro.props;
+---
+
+<MaybeLink
+  href={href}
+  target={target}
+  class:list={[s.card, className]}
+  data-size={size}
+  data-orientation={orientation}
+  data-boxed=`${boxed}`
+>
+  {
+    highlight && (
+      <div class={s.highlightBadge}>
+        <span>{highlight}</span>
+      </div>
+    )
+  }
+  <div class={s.visualWrapper}>
+    {
+      Astro.slots.has('image') ? (
+        <slot name="image" />
+      ) : Astro.slots.has('svgLogo') ? (
+        <figure class={s.visualTechnology} data-bkg={background ?? null}>
+          <slot name="svgLogo" />
+        </figure>
+      ) : svgLogoUrl ? (
+        <figure class={s.visualTechnology} data-bkg={background ?? null}>
+          <img loading="lazy" class={s.technology} src={svgLogoUrl} />
+        </figure>
+      ) : null
+    }
+  </div>
+  <article class={s.cardContent}>
+    <h2 class={s.cardTitle}>
+      {Astro.slots.has('title') ? <slot name="title" /> : <>{title}</>}
+    </h2>
+    <div class={s.cardBody}>
+      <p class={s.cardDescription} style=`--lineClamp: ${lineClamp}`>
+        <slot />
+      </p>
+      {
+        Astro.slots.has('below') && (
+          <div class={s.below}>
+            <slot name="below" />
+          </div>
+        )
+      }
+      {
+        Astro.slots.has('image') && svgLogoUrl && (
+          <div class={s.subImageWrapper}>
+            <img loading="lazy" class={s.subImage} src={svgLogoUrl} />
+          </div>
+        )
+      }
+    </div>
+    {
+      (badge || label) && (
+        <footer class={s.cardFooter}>
+          {badge && (
+            <div class={s.cardBadge}>
+              <span class={s.cardBadgeEmoji}>{badge.emoji}</span>
+              <span class={s.cardBadgeName}>{badge.name}</span>
+            </div>
+          )}
+          {label && (
+            <div class={s.cardLabel}>
+              <span class={s.cardBadgeName}>{label}</span>
+            </div>
+          )}
+        </footer>
+      )
+    }
+  </article>
+</MaybeLink>

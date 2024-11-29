@@ -1,0 +1,33 @@
+---
+import s from './style.module.css';
+import { CodesandboxEmbedBlockFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Svg } from '~/components/Svg';
+
+interface Props {
+  block: FragmentOf<typeof CodesandboxEmbedBlockFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+
+const block = readFragment(CodesandboxEmbedBlockFragment, maskedBlock);
+---
+
+<figure>
+  <a
+    class={s.link}
+    target="_blank"
+    rel="noreferrer"
+    href={`https://codesandbox.io/s/${block.slug}`}
+    target="_blank"
+  >
+    <ResponsiveImage data={block.preview.responsiveImage} />
+    <div class={s.lightbox}>
+      <button class={s.lightboxButton} type="button">
+        <Svg name="icons/brands/codesandbox" />
+        Try it on CodeSandbox!
+      </button>
+    </div>
+  </a>
+</figure>

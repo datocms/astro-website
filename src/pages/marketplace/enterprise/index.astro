@@ -1,0 +1,51 @@
+---
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { buildUrlForEnterpriseApp } from '~/lib/datocms/gqlUrlBuilder/enterpriseApp';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const { items } = await executeQuery(Astro, query);
+
+if (items.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout noFinalCta additionalSeo={[]}>
+  <Fragment slot="head">
+    <title>Enterprise apps - Marketplace</title>
+  </Fragment>
+
+  <Hero>
+    <Fragment slot="title">Enterprise Apps</Fragment>
+    <Fragment slot="subtitle">
+      Keep company data secure with centralized users management and assets storage
+    </Fragment>
+  </Hero>
+
+  <Wrapper>
+    <div class={s.grid}>
+      {
+        items.map((item) => (
+          <MarketplaceCard
+            href={buildUrlForEnterpriseApp(item)}
+            title={item.title}
+            svgLogoUrl={item.logo.url}
+            background="pink"
+          >
+            {item.description}
+          </MarketplaceCard>
+        ))
+      }
+    </div>
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} />
+</Layout>

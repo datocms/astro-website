@@ -1,0 +1,33 @@
+---
+import s from './style.module.css';
+import { Toc } from './Toc';
+import type { TocGroup } from './types';
+
+type Props = {
+  tocGroups: TocGroup[];
+};
+
+const { tocGroups } = Astro.props;
+---
+
+<div class={s.articleContainer}>
+  {
+    tocGroups.length > 0 ? (
+      <div class={s.sidebar} data-datocms-noindex>
+        <Toc groups={tocGroups} />
+      </div>
+    ) : (
+      <div class={s.emptySidebar} />
+    )
+  }
+  <div class={s.article}>
+    <h1 class={s.kicker}>
+      <slot name="kicker" />
+    </h1>
+    <div class={s.title}>
+      <slot name="title" />
+    </div>
+
+    <slot />
+  </div>
+</div>

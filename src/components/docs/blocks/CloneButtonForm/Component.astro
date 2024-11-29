@@ -1,0 +1,86 @@
+---
+import { Space } from '~/components/Space';
+import s from './style.module.css';
+import { Field } from '~/components/form/Field';
+import { Tab, Tabs } from '~/components/Tabs';
+---
+
+<clone-button-form>
+  <Space top={1} bottom={1}>
+    <form action="https://dashboard.datocms.com/clone" method="GET" class={s.form}>
+      <Field name="cbg-projectId" required>
+        <Fragment slot="label">Project ID</Fragment>
+        <input type="text" name="projectId" placeholder="54321" id="cbg-projectId" required />
+      </Field>
+      <Field name="cgb-name" required>
+        <Fragment slot="label">Project Name</Fragment>
+        <input type="text" name="name" placeholder="Your project name" id="cbp-name" required />
+      </Field>
+    </form>
+  </Space>
+
+  <div class={s.result}>
+    <p>Use the following code to share the button on your README file or documentation:</p>
+    <Space top={1} bottom={1}>
+      <Tabs>
+        <Tab title="URL">
+          <pre data-url></pre>
+        </Tab>
+        <Tab title="Markdown">
+          <pre data-markdown></pre>
+        </Tab>
+        <Tab title="HTML">
+          <pre data-html></pre>
+        </Tab>
+        <Tab title="Button Preview">
+          <a target="_blank" rel="noopener noreferrer" class={s.button} data-href>
+            <img src="https://dashboard.datocms.com/clone/button.svg" alt="clone project button" />
+          </a>
+        </Tab>
+      </Tabs>
+    </Space>
+  </div>
+</clone-button-form>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'clone-button-form',
+    class CloneButtonForm extends WebComponent {
+      form!: HTMLFormElement;
+      url!: HTMLElement;
+      markdown!: HTMLElement;
+      html!: HTMLElement;
+      href!: HTMLLinkElement;
+
+      parsedCallback() {
+        this.form = this.$('form');
+        this.url = this.$('[data-url]');
+        this.markdown = this.$('[data-markdown]');
+        this.html = this.$('[data-html]');
+        this.href = this.$('[data-href]');
+
+        this.on(this.form, 'input', this.render);
+
+        this.render();
+      }
+
+      render() {
+        const data = new FormData(this.form);
+        const params = new URLSearchParams(data as unknown as Record<string, string>).toString();
+        const url = `https://dashboard.datocms.com/clone?${params}`;
+
+        this.url.innerText = url;
+        this.markdown.innerText = `[![Clone DatoCMS project](https://dashboard.datocms.com/clone/button.svg)](${url})`;
+        this.html.innerText = `<a href="${url}" target="_blank" rel="noopener">
+  <img
+    src="https://dashboard.datocms.com/clone/button.svg"
+    alt="Clone DatoCMS project"
+  />
+</a>`;
+        this.href.href = url;
+      }
+    },
+  );
+</script>

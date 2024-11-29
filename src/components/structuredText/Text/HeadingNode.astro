@@ -1,0 +1,17 @@
+---
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import type { Heading as HeadingNode } from 'datocms-structured-text-utils';
+import { Heading } from '~/components/Heading';
+import { slugify } from '~/lib/slugify';
+
+interface Props {
+  node: HeadingNode;
+}
+
+const { node } = Astro.props;
+
+// Convert the node to plain text, and then slugify
+const slug = slugify(structuredTextToPlainText(node));
+---
+
+<Heading as={`h${node.level}`} anchor={slug}><slot /></Heading>

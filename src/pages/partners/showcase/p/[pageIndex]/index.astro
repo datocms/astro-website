@@ -1,0 +1,86 @@
+---
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Pagination } from '~/components/Pagination';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { perPage, query } from './_graphql';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+export interface Props {
+  pageIndex?: number;
+}
+
+if (Astro.params.pageIndex === '1') {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
+
+const variables = {
+  limit: perPage,
+  offset: (pageIndex - 1) * perPage,
+};
+const { projects, _allShowcaseProjectsMeta } = await executeQuery(Astro, query, {
+  variables,
+});
+
+const totalEntries = _allShowcaseProjectsMeta.count;
+
+if (projects.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={[]}>
+  <Fragment slot="head">
+    <title>Partner Projects Showcase</title>
+  </Fragment>
+  <Hero>
+    <Fragment slot="kicker">Showcase</Fragment>
+    <Fragment slot="title">Projects from Our <mark>Partners</mark></Fragment>
+    <Fragment slot="subtitle"
+      >Check out some of the incredible projects our partners have brought to life.</Fragment
+    >
+  </Hero>
+  <Wrapper>
+    <Space bottom={2}>
+      <div class={s.grid}>
+        {
+          projects.map((project) => (
+            <MarketplaceCard
+              title={project.name}
+              size="small"
+              lineClamp={3}
+              svgLogoUrl={project.partner.logo.url}
+              href={buildUrlForShowcaseProject(project)}
+            >
+              <Fragment slot="image">
+                <ResponsiveImage data={project.mainImage.responsiveImage} />
+              </Fragment>
+              {structuredTextToPlainText(project.headline)}
+            </MarketplaceCard>
+          ))
+        }
+      </div>
+    </Space>
+
+    <Pagination
+      perPage={perPage}
+      currentPageIndex={pageIndex}
+      totalEntries={totalEntries}
+      baseUrl="/partners/showcase"
+    />
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

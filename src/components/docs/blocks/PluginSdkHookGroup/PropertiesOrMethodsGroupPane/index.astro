@@ -1,0 +1,39 @@
+---
+import ExpandablePane from '../ExpandablePane/index.astro';
+import type { PropertiesOrMethodsGroup } from '../manifestTypes';
+import PropertyOrMethod from '../PropertyOrMethod/index.astro';
+
+type Props = { group: PropertiesOrMethodsGroup; nonCollapsible?: boolean };
+
+function capitalize(input: string): string {
+  const transformed = input
+    .replace(/([A-Z])/g, ' $1')
+    .trim()
+    .toLowerCase();
+  return transformed.charAt(0).toUpperCase() + transformed.slice(1);
+}
+
+const { group, nonCollapsible } = Astro.props;
+---
+
+{
+  nonCollapsible ? (
+    <>
+      {group.comment?.markdownText && <div>{group.comment?.markdownText}</div>}
+      {Object.entries(group.items)
+        .filter(([_name, propertyOrMethod]) => !propertyOrMethod.comment?.deprecatedMarkdownText)
+        .map(([name, propertyOrMethod]) => (
+          <PropertyOrMethod name={name} propertyOrMethod={propertyOrMethod} />
+        ))}
+    </>
+  ) : (
+    <ExpandablePane label={group.name ? capitalize(group.name) : 'Properties and methods'}>
+      {group.comment?.markdownText && <div>{group.comment?.markdownText}</div>}
+      {Object.entries(group.items)
+        .filter(([_name, propertyOrMethod]) => !propertyOrMethod.comment?.deprecatedMarkdownText)
+        .map(([name, propertyOrMethod]) => (
+          <PropertyOrMethod name={name} propertyOrMethod={propertyOrMethod} />
+        ))}
+    </ExpandablePane>
+  )
+}

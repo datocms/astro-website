@@ -1,0 +1,34 @@
+---
+import { experimental_AstroContainer } from 'astro/container';
+import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
+import { markdownWithExamples } from './utils';
+
+type Props = {
+  description: string;
+  examples: Array<{ id: string }>;
+  exampleComponent: AstroComponentFactory;
+  additionalProps: Record<string, unknown>;
+};
+
+const { additionalProps, exampleComponent, description, examples } = Astro.props;
+const container = await experimental_AstroContainer.create();
+
+const content = await markdownWithExamples(description, async (exampleId, isAlone) => {
+  const example = examples.find((example) => example.id === exampleId);
+
+  if (!example) {
+    return '';
+  }
+
+  return await container.renderToString(exampleComponent, {
+    props: {
+      ...additionalProps,
+      id: example.id,
+      example,
+      startVisible: isAlone,
+    },
+  });
+});
+---
+
+<Fragment set:html={content} />

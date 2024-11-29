@@ -1,0 +1,74 @@
+---
+import s from './style.module.css';
+import type { FragmentOf } from 'gql.tada';
+import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '../graphql';
+import { SingleQuote } from '../SingleQuote';
+
+interface Props {
+  quotes: Array<
+    | (FragmentOf<typeof PartnerTestimonialQuoteFragment> & {
+        __typename: 'PartnerTestimonialRecord';
+      })
+    | (FragmentOf<typeof ReviewQuoteFragment> & {
+        __typename: 'ReviewRecord';
+      })
+  >;
+}
+
+const { quotes } = Astro.props;
+---
+
+<quotes-carousel>
+  <div class={s.quotes} style={`--items-count: ${quotes.length}`} data-container>
+    <div class={s.quotesInner} data-scroller>
+      {
+        quotes.map((quote) => (
+          <div class={s.quote}>
+            <SingleQuote quote={quote} />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</quotes-carousel>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'quotes-carousel',
+    class QuotesCarousel extends WebComponent {
+      private resizeListener?: () => void;
+      private container!: HTMLDivElement;
+      private scroller!: HTMLDivElement;
+
+      parsedCallback() {
+        this.container = this.$('[data-container]');
+        this.scroller = this.$('[data-scroller]');
+
+        this.handleAnimation();
+        this.resizeListener = this.handleAnimation.bind(this);
+        window.addEventListener('resize', this.resizeListener);
+      }
+
+      disconnectedCallback(): void {
+        if (this.resizeListener) {
+          window.removeEventListener('resize', this.resizeListener);
+        }
+        super.disconnectedCallback();
+      }
+
+      handleAnimation(): void {
+        const toAnimate = this.scroller.scrollWidth > this.container.clientWidth;
+        this.container.toggleAttribute('data-animated', toAnimate);
+
+        if (toAnimate) {
+          this.container.style.setProperty(
+            '--scroll-width',
+            `${this.scroller.scrollWidth - this.container.clientWidth}`,
+          );
+        }
+      }
+    },
+  );
+</script>

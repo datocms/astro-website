@@ -1,0 +1,36 @@
+---
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import { Layout } from '~/layouts/Layout';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import s from './_style.module.css';
+import { Hero } from '~/components/Hero';
+import { Space } from '~/components/Space';
+import Chapter from './_Chapter.astro';
+
+const { page, chapters } = await executeQuery(Astro, query);
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="title"><mark>User Guides</mark></Fragment>
+    <Fragment slot="subtitle">
+      Editors and content creators, this one’s for you. Join along for a casual and non-technical
+      walkthrough of DatoCMS focusing on content creation and the UI.
+    </Fragment>
+  </Hero>
+
+  <Space top={2} bottom={2}>
+    <div class={s.allChapters}>
+      {chapters.map((chapter, index) => <Chapter chapter={chapter} number={index + 1} />)}
+    </div>
+  </Space>
+
+  <DraftModeQueryListener query={query} />
+</Layout>

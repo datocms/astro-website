@@ -1,0 +1,110 @@
+---
+import { inlineMarkdown } from '~/components/Markdown/utils';
+import { Prose } from '~/components/Prose';
+import { intersperse } from '~/lib/intersperse';
+import type { JsonSchemaPropertyAnalysis } from '../../analyzeSchemaProperties';
+import { ExpandablePane } from '../../ExpandablePane';
+import { JsonSchemaObjectAnalysis } from '..';
+import s from './style.module.css';
+import { Markdown } from '~/components/Markdown';
+import { Svg } from '~/components/Svg';
+
+type Props = {
+  property: JsonSchemaPropertyAnalysis;
+  showRequiredOptional?: boolean;
+};
+
+const { property, showRequiredOptional = true } = Astro.props;
+---
+
+<div class={s.schema}>
+  <div class={s.header}>
+    <span>
+      {property.prefix && <span class={s.prefix}>{property.prefix}</span>}<span class={s.name}
+        >{property.property}</span
+      >{property.suffix && <span class={s.prefix}>{property.suffix}</span>}
+    </span>
+
+    {
+      JSON.stringify(property.types).length < 20 && (
+        <span class={s.inlineTypes}>
+          {intersperse(
+            property.types.map((type) => <span class={s.type}>{inlineMarkdown(type)}</span>),
+            ', ',
+          )}
+        </span>
+      )
+    }
+
+    {
+      property.deprecated ? (
+        <span class={s.required}>Deprecated</span>
+      ) : (
+        showRequiredOptional &&
+        (property.required ? (
+          <span class={s.required}>Required</span>
+        ) : (
+          <span class={s.optional}>Optional</span>
+        ))
+      )
+    }
+  </div>
+
+  {
+    (property.description || property.deprecated) && (
+      <Prose class={s.description}>
+        <Markdown of={property.description} />
+
+        {property.deprecated && (
+          <div class={s.deprecatedDescription}>
+            <Markdown of={property.deprecated} />
+          </div>
+        )}
+      </Prose>
+    )
+  }
+
+  {
+    JSON.stringify(property.types).length >= 20 && (
+      <div class={s.types}>
+        <Svg name="icons/regular/code" />
+        <div>
+          Type:
+          {intersperse(
+            property.types.map((type) => <span class={s.type}>{inlineMarkdown(type)}</span>),
+            ', ',
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  {
+    property.examples.length > 0 && (
+      <div class={s.examples}>
+        <Svg name="icons/regular/lightbulb" />
+        <div>
+          {property.examples.length > 1 ? <>Examples:</> : <>Example:</>}
+
+          {intersperse(
+            property.examples.map((example) => <code>{example}</code>),
+            ', ',
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  {
+    property.moreInfo && (
+      <ExpandablePane label={`Show ${property.moreInfo.title}`}>
+        <div class={s.properties}>
+          <JsonSchemaObjectAnalysis
+            object={property.moreInfo.properties}
+            showRequiredOptional={showRequiredOptional}
+          />
+        </div>
+      </ExpandablePane>
+    )
+  }
+</div>

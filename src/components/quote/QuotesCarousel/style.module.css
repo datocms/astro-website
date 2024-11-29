@@ -1,0 +1,58 @@
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-1px * var(--scroll-width)));
+  }
+}
+
+.quotes {
+  overflow: hidden;
+}
+
+.quotesInner {
+  display: flex;
+  align-items: flex-start;
+
+  .quotes[data-animated] & {
+    animation: scroll calc(1s * var(--scroll-width) / 30) linear infinite alternate;
+
+    &:hover {
+      animation-play-state: paused;
+    }
+  }
+}
+
+.quote {
+  padding: 0 max(3vw, 25px);
+  min-width: max(320px, 27vw);
+}
+
+.quotes:not([data-animated]) {
+  display: flex;
+  justify-content: center;
+
+  .root:nth-child(n + 2) {
+    display: none;
+  }
+
+  @media screen and (width > 900px) {
+    .root:nth-child(2) {
+      display: block;
+    }
+  }
+
+  @media screen and (width > 1350px) {
+    .root:nth-child(3) {
+      display: block;
+    }
+  }
+
+  @media screen and (width > 1800px) {
+    .root:nth-child(4) {
+      display: block;
+    }
+  }
+}

@@ -1,0 +1,51 @@
+---
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { buildUrlForHostingApp } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const { items } = await executeQuery(Astro, query);
+
+if (items.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout noFinalCta additionalSeo={[]}>
+  <Fragment slot="head">
+    <title>Hosting & CI Building - Marketplace</title>
+  </Fragment>
+
+  <Hero>
+    <Fragment slot="title">Hosting & CI Building</Fragment>
+    <Fragment slot="subtitle">
+      Server, serverless or static: no matter the stack you're using, we've got you covered
+    </Fragment>
+  </Hero>
+
+  <Wrapper>
+    <div class={s.grid}>
+      {
+        items.map((item) => (
+          <MarketplaceCard
+            href={buildUrlForHostingApp(item)}
+            title={item.title}
+            svgLogoUrl={item.logo.url}
+            background="azure"
+          >
+            {item.description}
+          </MarketplaceCard>
+        ))
+      }
+    </div>
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} />
+</Layout>

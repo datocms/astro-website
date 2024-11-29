@@ -1,0 +1,89 @@
+---
+import { slugify } from '~/lib/slugify';
+import { containsKeywords } from '~/lib/containsKeyword';
+import { Wrapper } from '~/components/Wrapper';
+import { Heading } from '~/components/Heading';
+import s from './style.module.css';
+import striptags from 'striptags';
+
+interface Props {
+  flip?: boolean;
+  hideDot?: boolean;
+  seoAnalysis?: unknown;
+  style?: 'neutral' | 'bad' | 'good';
+}
+
+const { flip, hideDot, seoAnalysis, style = 'neutral' } = Astro.props;
+
+const kickerContents = striptags(await Astro.slots.render('kicker'));
+
+let Title: 'h1' | 'h2' = 'h1';
+let Subtitle: 'h3' | 'div' = 'div';
+let Kicker: 'h1' | 'h2' = 'h2';
+
+if (seoAnalysis) {
+  const kickerContainsKeywords = containsKeywords(kickerContents, seoAnalysis);
+  Kicker = kickerContainsKeywords ? 'h1' : 'h2';
+  Title = kickerContainsKeywords ? 'h2' : 'h1';
+  Subtitle = 'h3';
+}
+
+// random percentage (-30 / +30)
+const randomPercentage = Math.floor(Math.random() * 60) - 30;
+const delay = Math.floor(Math.random() * 5);
+---
+
+<Wrapper>
+  <div data-style={style} class:list={[s.root, flip && s.isFlipped]}>
+    <div class={s.visual}>
+      <slot name="visual" />
+      {
+        ['bad', 'good'].includes(style) && !hideDot && (
+          <div
+            data-style={style}
+            class={s.dot}
+            style={{
+              marginLeft: `${randomPercentage}%`,
+              marginTop: `${randomPercentage}%`,
+              animationDelay: `${-1 * delay}s`,
+            }}
+          />
+        )
+      }
+    </div>
+
+    <div class={s.content}>
+      {
+        Astro.slots.has('kicker') && (
+          <Heading as={Kicker} class={s.kicker} anchor={slugify(kickerContents)}>
+            <slot name="kicker" />
+          </Heading>
+        )
+      }
+
+      {
+        Astro.slots.has('title') && (
+          <Title class={s.title}>
+            <slot name="title" />
+          </Title>
+        )
+      }
+
+      {
+        Astro.slots.has('subtitle') && (
+          <Subtitle class={s.subtitle}>
+            <slot name="subtitle" />
+          </Subtitle>
+        )
+      }
+
+      {
+        Astro.slots.has('default') && (
+          <div class={s.body}>
+            <slot />
+          </div>
+        )
+      }
+    </div>
+  </div>
+</Wrapper>

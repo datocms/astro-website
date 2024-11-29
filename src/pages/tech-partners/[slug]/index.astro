@@ -1,0 +1,76 @@
+---
+import { Button } from '~/components/Button';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { Prose } from '~/components/Prose';
+import { Text } from '~/components/structuredText/Text';
+import { Wrapper } from '~/components/Wrapper';
+import { Svg } from '~/components/Svg';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import {
+  overrideSeo,
+  seoDescription,
+  seoGeneratedCard,
+  seoPageTitle,
+  seoShareTitle,
+} from '~/lib/datocms/seo';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const variables = { slug: Astro.params.slug! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout
+  additionalSeo={overrideSeo(
+    page.seo,
+    seoPageTitle(page.name, 'Ecosystem Partners'),
+    seoShareTitle(`DatoCMS Ecosystem Partner: ${page.name}`),
+    seoDescription(toPlainText(page.shortDescription)!),
+    seoGeneratedCard(Astro, {
+      kicker: `DatoCMS Ecosystem Partners: ${page.name}`,
+      excerpt: toPlainText(page.shortDescription),
+      logoPngUrl: page.logo.pngUrl,
+    }),
+  )}
+>
+  <InterstitialTitle style="two" mainTitleOfPage bigSubtitle>
+    <Fragment slot="kicker">DatoCMS Technology Partner</Fragment>
+    <figure class={s.logoContainer}>
+      <img src={page.logo.url} alt={page.logo.alt} class={s.logo} />
+    </figure>
+    <Fragment slot="subtitle"><Text data={page.shortDescription} /></Fragment>
+  </InterstitialTitle>
+
+  <Wrapper>
+    <div class={s.content}>
+      <Prose>
+        <Text data={page.description} />
+      </Prose>
+
+      <div class={s.actions}>
+        <Button as="a" href={page.websiteUrl} target="_blank">
+          <Svg name="icons/regular/link" />
+          <span>Visit website</span>
+        </Button>
+        {
+          page.publicContactEmail && (
+            <Button as="a" s="invert" href={`mailto:${page.publicContactEmail}`} target="_blank">
+              <Svg name="icons/regular/envelope" /> <span>Contact {page.name}</span>
+            </Button>
+          )
+        }
+      </div>
+    </div>
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

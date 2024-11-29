@@ -1,0 +1,18 @@
+---
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { PageLayout, findGroupAndPage } from '~/layouts/docs/PageLayout';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+
+const result = await findGroupAndPage(Astro, Astro.params.rest!);
+
+if (!result) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const [group, page, queryListenerProps] = result;
+---
+
+<PageLayout page={page} group={group} />
+
+{queryListenerProps.map((props) => <DraftModeQueryListener {...props} />)}

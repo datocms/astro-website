@@ -1,0 +1,30 @@
+---
+import { ActiveLink } from '~/components/links/ActiveLink';
+import type { TocGroup } from '../types';
+import s from './style.module.css';
+
+interface Props {
+  groups: TocGroup[];
+}
+
+const { groups } = Astro.props;
+---
+
+<div class={s.toc}>
+  <div class={s.tocInner}>
+    {
+      groups.map((group) => (
+        <>
+          <div class={s.tocTitle}>{group.title}</div>
+          <div class={s.tocEntries}>
+            {group.entries.map((node) => (
+              <ActiveLink href={node.url} class={s.tocEntry} activeClass={s.tocEntryActive}>
+                {node.badge ? <span class={s.badge}>{node.badge}</span> : ''} {node.label}
+              </ActiveLink>
+            ))}
+          </div>
+        </>
+      ))
+    }
+  </div>
+</div>

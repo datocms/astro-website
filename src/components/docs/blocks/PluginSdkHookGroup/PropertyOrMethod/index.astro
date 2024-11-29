@@ -1,0 +1,103 @@
+---
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+import { Markdown } from '~/components/Markdown';
+import removeMarkdown from 'remove-markdown';
+import { Code } from '~/components/Code';
+import type { PropertyOrMethod } from '../manifestTypes';
+
+type Props = {
+  name: string;
+  propertyOrMethod: PropertyOrMethod;
+};
+
+const { name, propertyOrMethod } = Astro.props;
+
+const baseUrl = 'https://github.com/datocms/plugins-sdk/blob/master/packages/sdk/';
+---
+
+<expandable-attribute>
+  <div class={s.hook}>
+    <div class={s.hookExpand} data-expandable-attribute-button>
+      <span><Svg name="icons/regular/plus" /></span>
+      <span><Svg name="icons/regular/times" /></span>
+    </div>
+    <div class={s.hookBody}>
+      <button type="button" class={s.hookName} data-expandable-attribute-button>
+        <span class={s.hookNameName}>
+          ctx.{name}{
+            propertyOrMethod.type.length > 50
+              ? propertyOrMethod.type.startsWith('(')
+                ? '(...)'
+                : ''
+              : propertyOrMethod.type.startsWith('(')
+                ? propertyOrMethod.type
+                : `: ${propertyOrMethod.type}`
+          }
+        </span>
+        {
+          propertyOrMethod.comment?.markdownText && (
+            <span class={s.hookNameDesc}>
+              {removeMarkdown(propertyOrMethod.comment?.markdownText)}
+            </span>
+          )
+        }
+      </button>
+
+      <div class={s.hookDeets} data-expandable-attribute-content>
+        <div class={s.hookDescription}>
+          {
+            propertyOrMethod.comment?.markdownText && (
+              <Markdown of={propertyOrMethod.comment?.markdownText} />
+            )
+          }
+          <a
+            href={`${baseUrl}${propertyOrMethod.location.filePath}#L${propertyOrMethod.location.lineNumber}`}
+            target="_blank"
+            rel="noreferrer"
+            class={s.hookGithub}
+          >
+            View on Github <Svg name="icons/brands/github" />
+          </a>
+        </div>
+        {
+          propertyOrMethod.comment?.example && (
+            <div class={s.hookCode}>
+              <Code code={propertyOrMethod.comment?.example} language="ts" />
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</expandable-attribute>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'expandable-attribute',
+    class ExpandableAttribute extends WebComponent {
+      content!: HTMLElement;
+      toggles!: HTMLButtonElement[];
+
+      parsedCallback() {
+        this.toggles = this.$$('[data-expandable-attribute-button]');
+        this.content = this.$('[data-expandable-attribute-content]');
+
+        for (const toggle of this.toggles) {
+          this.on(toggle, 'click', (_event, el) => {
+            const expanded = el.getAttribute('aria-expanded') === 'true' || false;
+            const newExpanded = !expanded;
+
+            for (const toggle of this.toggles) {
+              toggle.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
+            }
+
+            this.content.toggleAttribute('data-open', newExpanded);
+          });
+        }
+      }
+    },
+  );
+</script>

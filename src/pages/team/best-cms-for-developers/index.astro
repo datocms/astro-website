@@ -1,0 +1,259 @@
+---
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { IntegrationsBanner } from '~/components/IntegrationsBanner';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { Numbers } from '~/components/numbers/Numbers';
+import { NumbersBlock } from '~/components/numbers/NumbersBlock';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Result } from '~/components/Result';
+import { Space } from '~/components/Space';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import styles from './_style.module.css';
+import { query } from './_graphql';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { Svg } from '~/components/Svg';
+import { OtherPersonasPicker } from '../_OtherPersonasPicker';
+import Illustration from './_Illustration/index.astro';
+import { Wrapper } from '~/components/Wrapper';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+
+const variables = { slug: Astro.params.slug! };
+const { page, review, integrations } = await executeQuery(Astro, query, {
+  variables,
+});
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout additionalSeo={page.seo}>
+  <Hero seoAnalysis={page.yoastAnalysis}>
+    <Fragment slot="kicker">{page.seoH1}</Fragment>
+    <Fragment slot="title">Your tech stack is literally <mark>killing your business</mark></Fragment
+    >
+    <Fragment slot="subtitle">
+      That's right. You're <strong>stuck with legacy web technologies</strong>that make all your
+      websites and apps painfully slow and <strong>impossibly hard to build</strong>, maintain and
+      improve. This needs to stop, now.
+    </Fragment>
+  </Hero>
+  <div id="main-content">
+    <Space top={2} bottom={2}>
+      <InterstitialTitle style="two">
+        Does any of this sound painfully familiar?
+      </InterstitialTitle>
+    </Space>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="bad">
+      <Fragment slot="visual"><Svg name="svg/illustrations/rock-balloons" /></Fragment>
+      <Fragment slot="kicker">A CMS should be fast</Fragment>
+      <Fragment slot="title">Your website is <mark class="bad">slow</mark></Fragment>
+      <Fragment slot="subtitle">
+        Got the guts to run
+        <a
+          href="https://developers.google.com/speed/pagespeed/insights/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          PageSpeed
+        </a>
+        ?
+      </Fragment>
+
+      <p>
+        <strong>Try to check the performance of your site, we'll wait</strong>. Unoptimized images,
+        heavy pages and a shameful overall score? Well, it's not your fault. The web is much harder
+        than it was, and you're using legacy tools that force devs to solve performance issues on
+        their own. <br /> Find out why DatoCMS is considered one of the <strong
+          >best CMS for developers</strong
+        >.
+      </p>
+    </Flag>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="bad">
+      <Fragment slot="visual">
+        <Svg name="svg/illustrations/castle" />
+      </Fragment>
+      <Fragment slot="kicker"> A CMS should grow with you </Fragment>
+      <Fragment slot="title">
+        Your architecture <mark class="bad">doesn&apos;t scale</mark>
+      </Fragment>
+      <Fragment slot="subtitle">
+        Can it handle massive spikes and adapt costs in real-time?
+      </Fragment>
+
+      <p>
+        As long as you're receiving the usual amount of web traffic, pretty much any solution can
+        work. But
+        <strong>
+          is your stack capable of handling prime-time TV website traffic without becoming
+          completely unusable?
+        </strong>
+        And if so, what's the up-front cost you're paying for that?
+      </p>
+    </Flag>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="bad">
+      <Fragment slot="visual"><Svg name="svg/illustrations/statue" /></Fragment>
+      <Fragment slot="kicker">A CMS should be tameable</Fragment>
+      <Fragment slot="title">Your CMS <mark class="bad">is not flexible</mark></Fragment>
+      <Fragment slot="subtitle"
+        >Are your editors free to change websites without asking help from devs?</Fragment
+      >
+
+      <p>
+        It should not be your job to constantly make tiny changes to copy/images as asked by
+        marketing/content teams. Yet, to delegate the job directly to them,
+        <strong>
+          your CMS must be able to enforce strict validation rules to editors, and have a fast way
+          to continuously adapt the backend to their needs
+        </strong>
+        . Is that the case?
+      </p>
+    </Flag>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="bad">
+      <Fragment slot="visual"><Svg name="svg/illustrations/cuckoo" /></Fragment>
+      <Fragment slot="kicker">A CMS should be efficient</Fragment>
+      <Fragment slot="title">You&#39;re <mark class="bad">wasting time</mark></Fragment>
+      <Fragment slot="subtitle">Are your projects reusing code and good practices?</Fragment>
+
+      <p>
+        Most enterprises have many teams working on very similar dev projects, yet successful
+        approaches learnt from deploying one product need to be manually rebuilt in each new
+        product. How efficient is that?
+        <strong>Teams should have a fast, standardized way of working.</strong>
+      </p>
+    </Flag>
+
+    <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
+      <Fragment slot="kicker">DatoCMS makes developers happy</Fragment>
+      <Fragment slot="title">Stop the madness, try headless</Fragment>
+      <Illustration />
+    </TitleStripWithContent>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="good">
+      <Fragment slot="visual"><Svg name="svg/illustrations/people" /></Fragment>
+      <Fragment slot="kicker">DatoCMS is composable</Fragment>
+      <Fragment slot="title">The freedom to use <mark>any modern web tool</mark></Fragment>
+      <p>
+        React, Vue, Gatsby, Next.js: take advantage of the best frameworks around, without carrying
+        around CMS technical debt.
+        <strong>Your content is reusable via API across any digital product</strong>
+        — websites, apps, chatbots, IoT — any technology.
+      </p>
+    </Flag>
+
+    {
+      review && (
+        <Wrapper>
+          <SingleQuote quote={review} />
+        </Wrapper>
+      )
+    }
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="good">
+      <Fragment slot="visual"><Svg name="svg/illustrations/zen-garden" /></Fragment>
+      <Fragment slot="kicker">DatoCMS is user-friendly</Fragment>
+      <Fragment slot="title">Content and presentation, <mark>decoupled</mark></Fragment>
+      <p>
+        By making your editorial team write content using a structured, presentation-free format
+        with a strict set of validation rules,
+        <strong>you'll remove any content bottleneck when shipping new digital projects</strong>.
+      </p>
+    </Flag>
+
+    <IntegrationsBanner
+      bubbles={integrations
+        .filter((i) =>
+          ['ci', 'static-generator', 'language', 'cdn', 'framework'].includes(
+            i.integrationType.slug,
+          ),
+        )
+        .slice(0, 30)
+        .map((integration) =>
+          integration.squareLogo ? integration.squareLogo.url : integration.logo.url,
+        )}
+    >
+      <Fragment slot="title">Extensible and integrable by design</Fragment>
+      Being a API-first <a href="/">headless CMS</a>,
+      <strong>DatoCMS easily integrates with any third-party platform or service</strong>
+      . DatoCMS is considered to be the best CMS for developers because it offers some of the best tools
+      in the market: plugins, webhooks, templates and SDKs to get you started in no time. Check them
+      out on our
+      <a href="https://github.com/datocms/" target="_blank" rel="noreferrer">
+        official Github page
+      </a>
+    </IntegrationsBanner>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="good">
+      <Fragment slot="visual"><Svg name="svg/illustrations/fruit" /></Fragment>
+      <Fragment slot="kicker">DatoCMS is flexible</Fragment>
+      <Fragment slot="title">All the <mark>modelling flexibility</mark> you need</Fragment>
+      <p>
+        From business-critical product pages, to dynamic landing-pages or tiny microcopy:
+        <strong>we give you all the flexibility you need to model any kind of content</strong>
+        . And, most importantly, to change it over time.
+      </p>
+    </Flag>
+
+    <Numbers title="Why you should use DatoCMS">
+      <NumbersBlock href="/customers/chillys" title="+134%" logo="svg/logos/chillys">
+        Mobile conversion rate
+      </NumbersBlock>
+      <NumbersBlock href="/customers/wonderland" title="6x" logo="svg/logos/wonderland">
+        Faster loading times
+      </NumbersBlock>
+      <NumbersBlock href="/customers/matter-supply" title="0,9s" logo="svg/logos/matter-supply">
+        First contentful paint
+      </NumbersBlock>
+    </Numbers>
+
+    <Flag seoAnalysis={page.yoastAnalysis} style="good">
+      <Fragment slot="visual"><Svg name="svg/illustrations/bear-bird" /></Fragment>
+      <Fragment slot="kicker">DatoCMS is built by developers for developers</Fragment>
+      <Fragment slot="title">Build products, <mark>not infrastructure</mark></Fragment>
+      <p>
+        You're not the one that should worry about traffic spikes, performance or maintenance:
+        <strong
+          >our managed global CDN will always ensure that your content is accessible, secure, and
+          close</strong
+        > to every visitor.
+      </p>
+    </Flag>
+
+    <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
+      <Fragment slot="kicker">DatoCMS dev experience empowers all team</Fragment>
+      <Fragment slot="title">
+        A technology investment that doubles performace and dev team productivity
+      </Fragment>
+
+      <div class={styles.grid}>
+        <Result number="-92,5%" href="/customers/arduino">
+          <Fragment slot="label"><mark class="good">lines of code</mark></Fragment>
+          <strong>Arduino</strong> could transition from 26,000 lines of code to just 1,200 switching
+          to DatoCMS.
+        </Result>
+
+        <Result number="-79%" href="/customers/hashicorp">
+          <Fragment slot="label">in <mark class="good">operational costs</mark></Fragment>
+          <strong>HashiCorp</strong> was able to drammatically cut down server expenses.
+        </Result>
+        <Result number="0,9s" href="/customers/matter-supply">
+          <Fragment slot="label">in <mark class="good">loading times</mark></Fragment>
+          <strong>Matter Supply</strong> was able to scale to 200k views/day without sacrificing speed
+          and reliability.
+        </Result>
+      </div>
+    </TitleStripWithContent>
+
+    <OtherPersonasPicker title="Not just for developers" currentPersonas="developers" />
+  </div>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

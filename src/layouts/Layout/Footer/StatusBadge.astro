@@ -1,0 +1,73 @@
+---
+import s from './style.module.css';
+---
+
+<status-badge>
+  <a
+    href="https://status.datocms.com"
+    target="_blank"
+    class={s.status}
+    rel="noreferrer"
+    id="status-badge"
+  >
+    Checking...
+  </a>
+</status-badge>
+
+<script>
+  import { isBefore, subMinutes } from 'date-fns';
+  import ky from 'ky';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  type Component = {
+    id: string;
+    status: 'up' | 'down' | 'loading';
+  };
+
+  interface StatusBadgeData {
+    updatedAt: number;
+    status: Component['status'];
+  }
+
+  const statusLabel: Record<Component['status'], string> = {
+    loading: 'Checking...',
+    down: 'Down',
+    up: 'All systems normal',
+  };
+
+  window.customElements.define(
+    'status-badge',
+    class StatusBadge extends WebComponent {
+      async parsedCallback() {
+        const el = this.$('a');
+
+        if (!this.data || isBefore(new Date(this.data.updatedAt), subMinutes(new Date(), 5))) {
+          el.innerHTML = 'Checking...';
+          const status = await this.getStatus();
+          el.innerText = statusLabel[status];
+          this.data = { updatedAt: Date.now(), status: status };
+        } else {
+          el.innerText = statusLabel[this.data.status];
+        }
+      }
+
+      get data(): StatusBadgeData | null {
+        const data = localStorage.getItem('statusBadgeData');
+        return data ? JSON.parse(data) : null;
+      }
+
+      set data(newData: StatusBadgeData) {
+        localStorage.setItem('statusBadgeData', JSON.stringify(newData));
+      }
+
+      async getStatus() {
+        const components = await ky
+          .get<Component[]>('https://status.datocms.com/.netlify/functions/component-status?days=1')
+          .json();
+
+        const firstComponentNotUp = components.find((component) => component.status !== 'up');
+        return firstComponentNotUp ? firstComponentNotUp.status : 'up';
+      }
+    },
+  );
+</script>

@@ -1,0 +1,130 @@
+---
+import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { findGroup, GroupLayout } from '~/layouts/docs/GroupLayout';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { Markdown } from '~/components/Markdown';
+import { Prose } from '~/components/Prose';
+import { buildSidebarItems } from '~/components/docs/restApi/buildSidebarItems';
+import { LanguagePicker } from '~/components/docs/restApi/LanguagePicker';
+import { buildTocGroupsFromMarkdown } from '~/components/docs/restApi/EndpointDescriptionWithExamples';
+import { analyzePropertiesOfJsonApiEntity } from '~/components/docs/restApi/analyzeSchemaProperties';
+import { JsonSchemaObjectAnalysis } from '~/components/docs/restApi/JsonSchemaObjectAnalysis';
+import { findEntity } from '~/components/docs/restApi/fetchSchema';
+import {
+  addLanguageToUrl,
+  currentLanguage,
+  isValidLanguage,
+} from '~/components/docs/restApi/LanguagePicker/utils';
+import { Heading } from '~/components/Heading';
+import {
+  overrideSeo,
+  seoDescription,
+  seoGeneratedCard,
+  seoPageTitle,
+  seoShareTitle,
+} from '~/lib/datocms/seo';
+import { markdownToPlainText } from '~/components/Markdown/utils';
+
+const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
+const resource = await findEntity(Astro, Astro.params.entitySlug!);
+
+const result = await findGroup(Astro, 'content-management-api');
+
+if (!result || !resource) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const language = currentLanguage(Astro);
+
+if (!isValidLanguage(language)) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const [group, queryListenerProps] = result;
+
+const links = resource.links ? resource.links.filter((l) => !l.private) : [];
+
+const objectPayload = analyzePropertiesOfJsonApiEntity(resource, 'entity', language);
+
+const plainDescription = resource.description
+  ? await markdownToPlainText(resource.description)
+  : undefined;
+---
+
+<GroupLayout
+  group={group}
+  additionalSeo={overrideSeo(
+    [],
+    seoPageTitle(resource.title!, 'Content Management API'),
+    seoShareTitle(`Content Management API: ${resource.title}`),
+    plainDescription ? seoDescription(plainDescription) : undefined,
+    seoGeneratedCard(Astro, {
+      kicker: `DatoCMS Docs: Content Management API`,
+      title: resource.title!,
+      excerpt: plainDescription,
+    }),
+  )}
+  additionalSidebarItems={sidebarItems}
+  contentWrapperComponent={LanguagePicker}
+>
+  <ContentPlusToc
+    tocGroups={[
+      ...buildTocGroupsFromMarkdown(resource.description),
+      {
+        title: 'Resource info',
+        entries: [
+          ...(objectPayload ? [{ label: 'Object payload', url: '#object-payload' }] : []),
+          ...(links.length > 0 ? [{ label: 'Available endpoints', url: '#endpoints' }] : []),
+        ],
+      },
+    ]}
+  >
+    <Fragment slot="kicker">Content Management API > {resource.title}</Fragment>
+    <Fragment slot="title">{resource.title}</Fragment>
+
+    <Prose>
+      {resource.description && <Markdown of={resource.description} />}
+
+      {
+        objectPayload && (
+          <>
+            <Heading as="h2" anchor="object-payload">
+              Object payload
+            </Heading>
+            <JsonSchemaObjectAnalysis object={objectPayload} showRequiredOptional={false} />
+          </>
+        )
+      }
+
+      {
+        links.length > 0 && (
+          <>
+            <Heading as="h2" anchor="endpoints">
+              Available endpoints
+            </Heading>
+            <ul>
+              {links.map((link) => (
+                <li>
+                  <a
+                    href={addLanguageToUrl(
+                      Astro,
+                      `/docs/content-management-api/resources/${Astro.params.entitySlug!}/${link.rel}`,
+                      language,
+                    )}
+                  >
+                    {link.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </Prose>
+  </ContentPlusToc>
+</GroupLayout>
+
+{queryListenerProps.map((props) => <DraftModeQueryListener {...props} />)}

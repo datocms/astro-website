@@ -1,0 +1,43 @@
+---
+import type { TitleMetaLinkTag } from 'react-datocms';
+import { BaseLayout } from '../BaseLayout';
+import Footer from './Footer/index.astro';
+import Navbar from './Navbar/index.astro';
+import { FinalCta } from './FinalCta';
+
+type Props = {
+  additionalSeo: TitleMetaLinkTag[];
+  noFinalCta?: boolean;
+};
+
+const { additionalSeo, noFinalCta } = Astro.props;
+---
+
+<BaseLayout additionalSeo={additionalSeo}>
+  <slot name="head" slot="head" />
+  <Navbar />
+  <div transition:animate="fade">
+    <slot />
+  </div>
+  <Footer>
+    {
+      !noFinalCta && (
+        /* https://github.com/withastro/astro/issues/10024#issuecomment-1933483135 */
+        <Fragment slot={!noFinalCta && 'finalCta'}>
+          <FinalCta href="/pricing">
+            <Fragment slot="title">Start using DatoCMS today</Fragment>
+            <Fragment slot="subtitle">
+              According to Gartner 89% of companies plan to compete primarily on the basis of
+              customer experience this year. Don't get caught unprepared.
+            </Fragment>
+            <Fragment slot="buttonText">Try it for free!</Fragment>
+            <Fragment slot="checks">
+              <li>No credit card</li>
+              <li>Easy setup</li>
+            </Fragment>
+          </FinalCta>
+        </Fragment>
+      )
+    }
+  </Footer>
+</BaseLayout>
