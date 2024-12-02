@@ -1,10 +1,13 @@
-import { type ExecuteQueryOptions as CdaExecuteQueryOptions } from '@datocms/cda-client';
+import {
+  rawExecuteQueryWithAutoPagination,
+  type ExecuteQueryOptions as CdaExecuteQueryOptions,
+} from '@datocms/cda-client';
 import type { AstroGlobal } from 'astro';
 import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import type { TadaDocumentNode } from 'gql.tada';
+import { print } from 'graphql';
 import { isDraftModeEnabled } from '~/lib/draftMode';
 import { augmentResponseHeadersWithSurrogateKeys } from '../surrogateKeys';
-import { rawExecuteQueryWithAutoPagination } from './rawExecuteQueryWithAutoPagination';
 
 /**
  * Executes a GraphQL query using the DatoCMS Content Delivery API, using a
@@ -32,20 +35,25 @@ export async function executeQueryOutsideAstro<Result, Variables>(
 ) {
   const draftModeEnabled = isDraftModeEnabled(options.request);
 
-  const [result, datocmsGraphqlResponse] = await rawExecuteQueryWithAutoPagination(query, {
-    ...options,
-    returnCacheTags: true,
-    excludeInvalid: true,
-    includeDrafts: draftModeEnabled,
-    token: DATOCMS_API_TOKEN,
-  });
+  try {
+    const [result, datocmsGraphqlResponse] = await rawExecuteQueryWithAutoPagination(query, {
+      ...options,
+      returnCacheTags: true,
+      excludeInvalid: true,
+      includeDrafts: draftModeEnabled,
+      token: DATOCMS_API_TOKEN,
+    });
 
-  const newCacheTags = datocmsGraphqlResponse.headers.get('x-cache-tags')!.split(' ');
+    const newCacheTags = datocmsGraphqlResponse.headers.get('x-cache-tags')!.split(' ');
 
-  augmentResponseHeadersWithSurrogateKeys(newCacheTags, {
-    request: options.request,
-    responseHeaders: options.responseHeaders,
-  });
+    augmentResponseHeadersWithSurrogateKeys(newCacheTags, {
+      request: options.request,
+      responseHeaders: options.responseHeaders,
+    });
 
-  return result;
+    return result;
+  } catch (e) {
+    console.log(print(query));
+    throw e;
+  }
 }

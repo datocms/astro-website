@@ -1,8 +1,8 @@
+import { rawExecuteQuery } from '@datocms/cda-client';
 import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import { dataSource } from '~/lib/dataSource';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
-import { rawExecuteQueryWithAutoPagination } from '~/lib/datocms/rawExecuteQueryWithAutoPagination';
 
 const query = graphql(
   /* GraphQL */ `
@@ -18,7 +18,7 @@ const query = graphql(
 );
 
 export const [fetchFavicon, maybeInvalidateFavicon] = dataSource('favicon', async () => {
-  const [result, datocmsGraphqlResponse] = await rawExecuteQueryWithAutoPagination(query, {
+  const [result, datocmsGraphqlResponse] = await rawExecuteQuery(query, {
     returnCacheTags: true,
     excludeInvalid: true,
     token: DATOCMS_API_TOKEN,
