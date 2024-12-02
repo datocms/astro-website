@@ -2,8 +2,8 @@ import { type ExecuteQueryOptions as CdaExecuteQueryOptions } from '@datocms/cda
 import type { AstroGlobal } from 'astro';
 import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import type { TadaDocumentNode } from 'gql.tada';
-import { uniq } from 'lodash-es';
 import { isDraftModeEnabled } from '~/lib/draftMode';
+import { augmentResponseHeadersWithSurrogateKeys } from '../surrogateKeys';
 import { rawExecuteQueryWithAutoPagination } from './rawExecuteQueryWithAutoPagination';
 
 /**
@@ -18,7 +18,7 @@ export async function executeQuery<Result, Variables>(
 ) {
   return executeQueryOutsideAstro(query, {
     ...options,
-    request: Astro,
+    request: Astro.request,
     responseHeaders: Astro.response.headers,
   });
 }
@@ -26,7 +26,7 @@ export async function executeQuery<Result, Variables>(
 export async function executeQueryOutsideAstro<Result, Variables>(
   query: TadaDocumentNode<Result, Variables>,
   options: Pick<CdaExecuteQueryOptions<Variables>, 'variables'> & {
-    request: Request | AstroGlobal;
+    request: Request;
     responseHeaders: Headers;
   },
 ) {
@@ -40,38 +40,12 @@ export async function executeQueryOutsideAstro<Result, Variables>(
     token: DATOCMS_API_TOKEN,
   });
 
-  augmentResponseHeadersWithSurrogateKeys({
-    draftModeEnabled,
-    datocmsGraphqlResponse,
+  const newCacheTags = datocmsGraphqlResponse.headers.get('x-cache-tags')!.split(' ');
+
+  augmentResponseHeadersWithSurrogateKeys(newCacheTags, {
+    request: options.request,
     responseHeaders: options.responseHeaders,
   });
 
   return result;
-}
-
-function augmentResponseHeadersWithSurrogateKeys({
-  draftModeEnabled,
-  datocmsGraphqlResponse,
-  responseHeaders,
-}: {
-  draftModeEnabled: boolean;
-  datocmsGraphqlResponse: Response;
-  responseHeaders: Headers;
-}) {
-  const newCacheTags = datocmsGraphqlResponse.headers.get('x-cache-tags')!.split(' ');
-  const surrogateKeyHeaderName = draftModeEnabled ? 'debug-surrogate-key' : 'surrogate-key';
-  const existingCacheTags = responseHeaders.get(surrogateKeyHeaderName)?.split(' ') ?? [];
-  const mergedCacheTags = uniq([...existingCacheTags, ...newCacheTags]).join(' ');
-
-  responseHeaders.set(surrogateKeyHeaderName, mergedCacheTags);
-  responseHeaders.set('datocms-cache-tags', mergedCacheTags);
-
-  if (draftModeEnabled) {
-    responseHeaders.set('cache-control', 'private');
-  } else {
-    responseHeaders.set(
-      'surrogate-control',
-      'max-age=31536000, stale-while-revalidate=60, stale-if-error=86400',
-    );
-  }
 }

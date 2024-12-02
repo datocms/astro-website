@@ -1,11 +1,9 @@
 ---
-import { TagFragment } from '~/lib/datocms/commonFragments';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { graphql } from '~/lib/datocms/graphql';
 import { Seo, type TitleMetaLinkTag } from '@datocms/astro';
 import { ViewTransitions } from 'astro:transitions';
 import './global.css';
 import ProgressBar from './_ProgressBar.astro';
+import { fetchFavicon } from './fetchFavicon';
 
 type Props = {
   additionalSeo: TitleMetaLinkTag[];
@@ -13,20 +11,7 @@ type Props = {
 
 const { additionalSeo } = Astro.props;
 
-const query = graphql(
-  /* GraphQL */ `
-    query RootQuery {
-      _site {
-        faviconMetaTags {
-          ...TagFragment
-        }
-      }
-    }
-  `,
-  [TagFragment],
-);
-
-const result = await executeQuery(Astro, query);
+const [result] = await fetchFavicon(Astro);
 ---
 
 <!doctype html>

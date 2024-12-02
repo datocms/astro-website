@@ -4,6 +4,7 @@ import { maybeInvalidateFetchPluginSdkManifest } from '~/components/docs/blocks/
 import { maybeInvalidateReactUiExamples } from '~/components/docs/blocks/ReactUiLiveExample/utils';
 import { maybeInvalidateSiteApiHyperschema } from '~/components/docs/restApi/fetchSchema';
 import { maybeInvalidateFastlyDatacenters } from '~/components/featureAnimations/CdnMap/utils';
+import { maybeInvalidateFavicon } from '~/layouts/BaseLayout/fetchFavicon';
 import { maybeInvalidateDastSchema } from '~/pages/docs/structured-text/_utils';
 import { maybeInvalidatePerOwnerPricingPlans } from '~/pages/pricing/_sub/perOwnerPricingPlans';
 import { handleUnexpectedError, invalidRequestResponse, json } from '../_utils';
@@ -25,6 +26,7 @@ export const POST: APIRoute = async ({ url, request }) => {
       maybeInvalidateReactUiExamples(),
       maybeInvalidateDastSchema(),
       maybeInvalidateFastlyDatacenters(),
+      maybeInvalidateFavicon(),
     ]);
 
     return json({ invalidatedSurrogateKeys: results.filter(Boolean) });
