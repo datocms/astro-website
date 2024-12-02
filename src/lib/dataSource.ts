@@ -1,10 +1,7 @@
 import { isEqual } from 'lodash-es';
 import { LRUCache } from 'lru-cache';
 import { invalidateFastlySurrogateKeys } from './fastly';
-import {
-  augmentResponseHeadersWithSurrogateKeys,
-  type AstroOrRequestResponseHeaders,
-} from './surrogateKeys';
+import { augmentResponseHeadersWithSurrogateKeys, type Context } from './surrogateKeys';
 
 export const cache = new LRUCache({
   max: 1000,
@@ -12,7 +9,7 @@ export const cache = new LRUCache({
 });
 
 type MemoizeAndAugumentResponseHeadersFn<T> = (
-  astroOrRequestResponseHeaders: AstroOrRequestResponseHeaders,
+  astroOrRequestResponseHeaders: Context,
 ) => Promise<T>;
 
 export function dataSource<T>(

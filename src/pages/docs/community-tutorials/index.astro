@@ -6,7 +6,7 @@ import { query } from './_graphql';
 import { HomeSidebar } from '../_sub/HomeSidebar';
 import s from './_style.module.css';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Card } from '~/components/Card';
 import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
 import { Prose } from '~/components/Prose';
 import { Space } from '~/components/Space';
@@ -52,7 +52,7 @@ if (tutorials.length === 0) {
           const resource = tutorial.res;
 
           return resource.__typename === 'YoutubeVideoResourceRecord' ? (
-            <MarketplaceCard
+            <Card
               size="small"
               href={resource.video.url}
               target="_blank"
@@ -62,18 +62,13 @@ if (tutorials.length === 0) {
               <Fragment slot="image">
                 <img loading="lazy" src={resource.video.thumbnailUrl} />
               </Fragment>
-            </MarketplaceCard>
+            </Card>
           ) : (
-            <MarketplaceCard
-              size="small"
-              href={resource.url}
-              target="_blank"
-              title={tutorial.title}
-            >
+            <Card size="small" href={resource.url} target="_blank" title={tutorial.title}>
               <Fragment slot="image">
                 <ResponsiveImage data={resource.coverImage.responsiveImage} />
               </Fragment>
-            </MarketplaceCard>
+            </Card>
           );
         })
       }

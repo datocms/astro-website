@@ -5,14 +5,14 @@ import { PluginCardFragment } from './_graphql';
 import { readFragment } from 'gql.tada';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
-import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Card } from '~/components/Card';
 import type { ComponentProps } from 'astro/types';
 import { Svg } from '~/components/Svg';
 
 type Props = {
   plugin: FragmentOf<typeof PluginCardFragment>;
 } & Omit<
-  ComponentProps<typeof MarketplaceCard>,
+  ComponentProps<typeof Card>,
   'title' | 'href' | 'description' | 'svgLogoUrl' | 'background' | 'lineClamp'
 >;
 
@@ -27,7 +27,7 @@ const backgroundFromString = <T extends string>(input: string, options: T[]): T 
 };
 ---
 
-<MarketplaceCard
+<Card
   {...other}
   title={plugin.title}
   href={buildUrlForPlugin(plugin)}
@@ -52,4 +52,4 @@ const backgroundFromString = <T extends string>(input: string, options: T[]): T 
     )
   }
   {plugin.description}
-</MarketplaceCard>
+</Card>

@@ -5,7 +5,7 @@ import { readFragment, type FragmentOf } from 'gql.tada';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import { truncate } from 'lodash-es';
-import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Card } from '~/components/Card';
 import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { Carousel } from '~/components/Carousel';
 
@@ -23,7 +23,7 @@ const block = readFragment(ShowcaseProjectBlockFragment, maskedBlock);
     <Carousel buttonsY="35%" viewportClass={s.carouselViewport}>
       {
         block.showcaseProjects.map((project) => (
-          <MarketplaceCard
+          <Card
             title={project.name}
             href={buildUrlForShowcaseProject(project)}
             svgLogoUrl={project.partner.logo.url}
@@ -34,7 +34,7 @@ const block = readFragment(ShowcaseProjectBlockFragment, maskedBlock);
               <ResponsiveImage data={project.mainImage.responsiveImage} />
             </Fragment>
             {truncate(structuredTextToPlainText(project.headline)!, { length: 200 })}
-          </MarketplaceCard>
+          </Card>
         ))
       }
     </Carousel>

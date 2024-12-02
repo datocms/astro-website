@@ -3,7 +3,7 @@ import s from './style.module.css';
 import { MultipleDemosBlockFragment } from './graphql';
 import { readFragment, type FragmentOf } from 'gql.tada';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { MarketplaceCard } from '~/components/MarketplaceCard';
+import { Card } from '~/components/Card';
 import { Carousel } from '~/components/Carousel';
 import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 
@@ -21,7 +21,7 @@ const { demos } = readFragment(MultipleDemosBlockFragment, maskedBlock);
     <Carousel buttonsY="35%" viewportClass={s.carouselViewport}>
       {
         demos.map((item) => (
-          <MarketplaceCard
+          <Card
             title={item.name}
             href={buildUrlForTemplateDemo(item)}
             size="small"
@@ -32,7 +32,7 @@ const { demos } = readFragment(MultipleDemosBlockFragment, maskedBlock);
               <ResponsiveImage data={item.screenshot.responsiveImage} />
             </Fragment>
             Try this demo »
-          </MarketplaceCard>
+          </Card>
         ))
       }
     </Carousel>
