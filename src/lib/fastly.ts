@@ -8,9 +8,8 @@ export async function invalidateFastlySurrogateKeys(keys: string[]) {
         'fastly-key': FASTLY_KEY,
         // required for stale-while-revalidate to work
         'fastly-soft-purge': '1',
-        'content-type': 'application/json',
       },
-      body: JSON.stringify({ surrogate_keys: keys }),
+      json: { surrogate_keys: keys },
     })
     .json();
 }
