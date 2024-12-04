@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { SECRET_API_TOKEN } from 'astro:env/server';
+import { FASTLY_SERVICE_ID, SECRET_API_TOKEN } from 'astro:env/server';
 import { invalidateFastlySurrogateKeys } from '~/lib/fastly';
 import { handleUnexpectedError, invalidRequestResponse, json } from '../_utils';
 
@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ url, request }) => {
 
     const response = await invalidateFastlySurrogateKeys(cacheTags);
 
-    return json({ cacheTags, response });
+    return json({ cacheTags, response, fastlyServiceId: FASTLY_SERVICE_ID });
   } catch (error) {
     return handleUnexpectedError(request, error);
   }
