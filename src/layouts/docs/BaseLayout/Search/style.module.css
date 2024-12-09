@@ -7,6 +7,11 @@
   }
 }
 
+:root {
+  --search-width: 768px;
+  --spinner-size: 55px;
+}
+
 .overlay {
   position: absolute;
   top: 0;
@@ -26,8 +31,7 @@
   opacity: 0;
   top: -10px;
   padding-top: 10px;
-  width: 768px;
-  width: calc(994px - 226px);
+  width: var(--search-width);
   min-height: 58px;
   background: #fff;
   box-shadow:
@@ -45,6 +49,8 @@
 .results {
   margin-top: 55px;
   padding: 20px;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 
 .result {
@@ -53,7 +59,6 @@
   padding: 15px 20px;
   gap: 20px;
   margin-bottom: 10px;
-  display: block;
   text-decoration: none;
   color: inherit;
   display: flex;
@@ -94,7 +99,6 @@
 .resultBody {
   font-size: 13px;
   color: var(--light-body-color);
-  line-height: 20px;
   padding: 0;
   margin: 0;
   overflow: hidden;
@@ -115,12 +119,11 @@
 .formSearch {
   position: absolute;
   top: 0;
-  width: 500px;
+  width: calc(var(--search-width) - var(--spinner-size) - 1em);
   z-index: 10020;
 
   input {
     color: var(--light-body-color);
-    background-color: transparent;
     background-size: 14px 14px;
     background-position: 32px 20px;
     background-repeat: no-repeat;
@@ -149,8 +152,8 @@
   position: absolute;
   right: 4px;
   top: 12px;
-  width: 55px;
-  height: 55px;
+  width: var(--spinner-size);
+  height: var(--spinner-size);
 }
 
 .spinning div {
@@ -174,8 +177,8 @@
     opacity: 1;
   }
   100% {
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     width: 48px;
     height: 48px;
     opacity: 0;
