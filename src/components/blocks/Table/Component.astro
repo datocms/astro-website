@@ -4,6 +4,7 @@ import { TableFragment } from './graphql';
 import { parseShortCodes, toCss } from './utils';
 import { readFragment } from 'gql.tada';
 import s from './style.module.css';
+import { backticksToHtmlCodeBlock } from '~/lib/backticksToHtmlCodeBlock.ts';
 
 interface Props {
   block: FragmentOf<typeof TableFragment>;
@@ -28,14 +29,18 @@ const columns = table.columns.map((rawName) => parseShortCodes(rawName, ['style'
     <table>
       <thead>
         <tr>
-          {columns.map((col) => <th style={toCss(col.meta.style)}>{col.content}</th>)}
+          {
+            columns.map((col) => (
+              <th style={toCss(col.meta.style)} set:html={backticksToHtmlCodeBlock(col.content)} />
+            ))
+          }
         </tr>
       </thead>
       {
         table.data.map((row) => (
           <tr>
             {columns.map((col) => (
-              <td style={toCss(col.meta.style)}>{row[col.id]}</td>
+              <td style={toCss(col.meta.style)} set:html={backticksToHtmlCodeBlock(row[col.id])} />
             ))}
           </tr>
         ))
