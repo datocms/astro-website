@@ -22,6 +22,8 @@ type TableData<T extends string> = {
 const table = block.table as TableData<string>;
 
 const columns = table.columns.map((rawName) => parseShortCodes(rawName, ['style']));
+
+const addLineBreaks = (input: string): string => input.replace(/[\n\r]/g, '<br/>');
 ---
 
 <figure>
@@ -40,7 +42,10 @@ const columns = table.columns.map((rawName) => parseShortCodes(rawName, ['style'
         table.data.map((row) => (
           <tr>
             {columns.map((col) => (
-              <td style={toCss(col.meta.style)} set:html={backticksToHtmlCodeBlock(row[col.id])} />
+              <td
+                style={toCss(col.meta.style)}
+                set:html={addLineBreaks(backticksToHtmlCodeBlock(row[col.id]))}
+              />
             ))}
           </tr>
         ))
