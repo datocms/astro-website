@@ -13,9 +13,9 @@ import { query } from './_graphql';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const { page, meta, popular, latest } = await executeQuery(Astro, query);
+const { page, collections, meta, popular, latest } = await executeQuery(Astro, query);
 
-if (!page || popular.length === 0 || latest.length === 0 || page.collections.length === 0) {
+if (!page || popular.length === 0 || latest.length === 0 || collections.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
@@ -56,7 +56,7 @@ if (!page || popular.length === 0 || latest.length === 0 || page.collections.len
     </Space>
 
     {
-      page.collections.map((collection) => (
+      collections.map((collection) => (
         <Space top={2}>
           <h2 class={s.title}>{collection.title}</h2>
           <div class={s.carouselWrapper}>

@@ -2724,6 +2724,30 @@ enum FeaturesIndexModelFieldsReferencingDocPageModel {
 }
 
 """Linking fields"""
+enum FeaturesIndexModelFieldsReferencingPluginModel {
+  featuresIndex_contentIntegrityBlocks
+  featuresIndex_contentIntegrityBlocks__featureRegularCard_links__featureLink_content
+  featuresIndex_coreFeaturesBlocks
+  featuresIndex_coreFeaturesBlocks__featureRegularCard_links__featureLink_content
+  featuresIndex_developerExperienceBlocks
+  featuresIndex_developerExperienceBlocks__featureRegularCard_links__featureLink_content
+  featuresIndex_editorExperienceBlocks
+  featuresIndex_editorExperienceBlocks__featureRegularCard_links__featureLink_content
+  featuresIndex_extensibilityBlocks
+  featuresIndex_extensibilityBlocks__featureRegularCard_links__featureLink_content
+  featuresIndex_governanceAndComplianceBlocks
+  featuresIndex_governanceAndComplianceBlocks__featureRegularCard_links__featureLink_content
+  featuresIndex_highlightCards
+  featuresIndex_highlightCards__featureHighlightCard_links__featureLink_content
+  featuresIndex_imageVideoManagementBlocks
+  featuresIndex_imageVideoManagementBlocks__featureRegularCard_links__featureLink_content
+  featuresIndex_localizationBlocks
+  featuresIndex_localizationBlocks__featureRegularCard_links__featureLink_content
+  featuresIndex_securityAndInfrastructureBlocks
+  featuresIndex_securityAndInfrastructureBlocks__featureRegularCard_links__featureLink_content
+}
+
+"""Linking fields"""
 enum FeaturesIndexModelFieldsReferencingUserGuidesEpisodeModel {
   featuresIndex_contentIntegrityBlocks
   featuresIndex_contentIntegrityBlocks__featureRegularCard_links__featureLink_content
@@ -6031,6 +6055,56 @@ type IntegrationTypeRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
+"""Linking fields"""
+enum IntegrationsPageModelFieldsReferencingPluginModel {
+  integrationsPage_plugins
+}
+
+input IntegrationsPageModelFilter {
+  _createdAt: CreatedAtFilter
+  createdAt: CreatedAtFilter
+  id: ItemIdFilter
+  _firstPublishedAt: PublishedAtFilter
+  _publicationScheduledAt: PublishedAtFilter
+  _unpublishingScheduledAt: PublishedAtFilter
+  _publishedAt: PublishedAtFilter
+  _status: StatusFilter
+  _updatedAt: UpdatedAtFilter
+  updatedAt: UpdatedAtFilter
+  _isValid: BooleanFilter
+  enterpriseApps: LinksFilter
+  plugins: LinksFilter
+  demos: LinksFilter
+  hostingBuilding: LinksFilter
+  OR: [IntegrationsPageModelFilter]
+  AND: [IntegrationsPageModelFilter]
+}
+
+enum IntegrationsPageModelOrderBy {
+  _createdAt_ASC
+  _createdAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+  id_ASC
+  id_DESC
+  _firstPublishedAt_ASC
+  _firstPublishedAt_DESC
+  _publicationScheduledAt_ASC
+  _publicationScheduledAt_DESC
+  _unpublishingScheduledAt_ASC
+  _unpublishingScheduledAt_DESC
+  _publishedAt_ASC
+  _publishedAt_DESC
+  _status_ASC
+  _status_DESC
+  _updatedAt_ASC
+  _updatedAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  _isValid_ASC
+  _isValid_DESC
+}
+
 """Record of type 🛒 Marketplace Home (integrations_page)"""
 type IntegrationsPageRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -6213,6 +6287,19 @@ input InverseRelationshipFieldFilterBetweenFeaturesIndexAndDocPage {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenFeaturesIndexAndPlugin {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [FeaturesIndexModelFieldsReferencingPluginModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [FeaturesIndexModelFieldsReferencingPluginModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenFeaturesIndexAndUserGuidesEpisode {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -6223,6 +6310,19 @@ input InverseRelationshipFieldFilterBetweenFeaturesIndexAndUserGuidesEpisode {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [FeaturesIndexModelFieldsReferencingUserGuidesEpisodeModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenIntegrationsPageAndPlugin {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [IntegrationsPageModelFieldsReferencingPluginModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [IntegrationsPageModelFieldsReferencingPluginModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -6275,6 +6375,32 @@ input InverseRelationshipFieldFilterBetweenPartnersPageAndPartner {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [PartnersPageModelFieldsReferencingPartnerModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenPluginCollectionAndPlugin {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [PluginCollectionModelFieldsReferencingPluginModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [PluginCollectionModelFieldsReferencingPluginModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenPluginsPageAndPlugin {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [PluginsPageModelFieldsReferencingPluginModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [PluginsPageModelFieldsReferencingPluginModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -6476,9 +6602,27 @@ input InverseRelationshipFilterBetweenFeaturesIndexAndDocPage {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenFeaturesIndexAndPlugin {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenFeaturesIndexAndPlugin
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenFeaturesIndexAndUserGuidesEpisode {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenFeaturesIndexAndUserGuidesEpisode
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenIntegrationsPageAndPlugin {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenIntegrationsPageAndPlugin
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -6515,6 +6659,24 @@ input InverseRelationshipFilterBetweenPartnerTestimonialAndPartner {
 input InverseRelationshipFilterBetweenPartnersPageAndPartner {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenPartnersPageAndPartner
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenPluginCollectionAndPlugin {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenPluginCollectionAndPlugin
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenPluginsPageAndPlugin {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenPluginsPageAndPlugin
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -6947,6 +7109,33 @@ input LatLonNearFilter {
   latitude: FloatType!
   longitude: FloatType!
   radius: FloatType!
+}
+
+"""Block of type 🧩 Legacy Plugin Collection (legacy_plugin_collection)"""
+type LegacyPluginCollectionRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  id: ItemId!
+  plugins: [PluginRecord!]!
+  title: String!
+  updatedAt: DateTime!
 }
 
 """Specifies how to filter Single-link fields"""
@@ -7999,7 +8188,61 @@ type PluginAuthorRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
-"""Block of type 🧩 Plugin Collection (plugin_collection)"""
+"""Linking fields"""
+enum PluginCollectionModelFieldsReferencingPluginModel {
+  pluginCollection_plugins
+}
+
+input PluginCollectionModelFilter {
+  _createdAt: CreatedAtFilter
+  createdAt: CreatedAtFilter
+  id: ItemIdFilter
+  _firstPublishedAt: PublishedAtFilter
+  position: PositionFilter
+  _publicationScheduledAt: PublishedAtFilter
+  _unpublishingScheduledAt: PublishedAtFilter
+  _publishedAt: PublishedAtFilter
+  _status: StatusFilter
+  _updatedAt: UpdatedAtFilter
+  updatedAt: UpdatedAtFilter
+  _isValid: BooleanFilter
+  plugins: LinksFilter
+  slug: SlugFilter
+  title: StringFilter
+  OR: [PluginCollectionModelFilter]
+  AND: [PluginCollectionModelFilter]
+}
+
+enum PluginCollectionModelOrderBy {
+  _createdAt_ASC
+  _createdAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+  id_ASC
+  id_DESC
+  _firstPublishedAt_ASC
+  _firstPublishedAt_DESC
+  position_ASC
+  position_DESC
+  _publicationScheduledAt_ASC
+  _publicationScheduledAt_DESC
+  _unpublishingScheduledAt_ASC
+  _unpublishingScheduledAt_DESC
+  _publishedAt_ASC
+  _publishedAt_DESC
+  _status_ASC
+  _status_DESC
+  _updatedAt_ASC
+  _updatedAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  _isValid_ASC
+  _isValid_DESC
+  title_ASC
+  title_DESC
+}
+
+"""Record of type 📣 Plugin Collection (plugin_collection)"""
 type PluginCollectionRecord implements RecordInterface {
   _createdAt: DateTime!
 
@@ -8022,6 +8265,8 @@ type PluginCollectionRecord implements RecordInterface {
   createdAt: DateTime!
   id: ItemId!
   plugins: [PluginRecord!]!
+  position: IntType
+  slug: String!
   title: String!
   updatedAt: DateTime!
 }
@@ -8190,6 +8435,126 @@ enum PluginModelOrderBy {
 
 """Record of type 🧩 Plugin (plugin)"""
 type PluginRecord implements RecordInterface {
+  _allReferencingFeaturesIndices(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenFeaturesIndexAndPlugin
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: FeaturesIndexModelFilter
+    orderBy: [FeaturesIndexModelOrderBy] = [_updatedAt_DESC]
+  ): [FeaturesIndexRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingFeaturesIndicesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenFeaturesIndexAndPlugin
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: FeaturesIndexModelFilter
+  ): CollectionMetadata!
+  _allReferencingIntegrationsPages(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenIntegrationsPageAndPlugin
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: IntegrationsPageModelFilter
+    orderBy: [IntegrationsPageModelOrderBy] = [_updatedAt_DESC]
+  ): [IntegrationsPageRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingIntegrationsPagesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenIntegrationsPageAndPlugin
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: IntegrationsPageModelFilter
+  ): CollectionMetadata!
+  _allReferencingPluginCollections(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenPluginCollectionAndPlugin
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: PluginCollectionModelFilter
+    orderBy: [PluginCollectionModelOrderBy] = [position_ASC]
+  ): [PluginCollectionRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingPluginCollectionsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenPluginCollectionAndPlugin
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: PluginCollectionModelFilter
+  ): CollectionMetadata!
+  _allReferencingPluginsPages(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenPluginsPageAndPlugin
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: PluginsPageModelFilter
+    orderBy: [PluginsPageModelOrderBy] = [_updatedAt_DESC]
+  ): [PluginsPageRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingPluginsPagesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenPluginsPageAndPlugin
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: PluginsPageModelFilter
+  ): CollectionMetadata!
   _createdAt: DateTime!
 
   """Editing URL"""
@@ -8319,7 +8684,7 @@ enum PluginTagModelOrderBy {
   tag_DESC
 }
 
-"""Record of type Plugin tag (plugin_tag)"""
+"""Record of type 🏷️ Plugin tag (plugin_tag)"""
 type PluginTagRecord implements RecordInterface {
   _createdAt: DateTime!
 
@@ -8419,6 +8784,56 @@ type PluginTypeRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
+"""Linking fields"""
+enum PluginsPageModelFieldsReferencingPluginModel {
+  pluginsPage_collections
+  pluginsPage_collections__legacyPluginCollection_plugins
+  pluginsPage_highlighted
+}
+
+input PluginsPageModelFilter {
+  _createdAt: CreatedAtFilter
+  createdAt: CreatedAtFilter
+  id: ItemIdFilter
+  _firstPublishedAt: PublishedAtFilter
+  _publicationScheduledAt: PublishedAtFilter
+  _unpublishingScheduledAt: PublishedAtFilter
+  _publishedAt: PublishedAtFilter
+  _status: StatusFilter
+  _updatedAt: UpdatedAtFilter
+  updatedAt: UpdatedAtFilter
+  _isValid: BooleanFilter
+  highlighted: LinksFilter
+  seo: SeoFilter
+  OR: [PluginsPageModelFilter]
+  AND: [PluginsPageModelFilter]
+}
+
+enum PluginsPageModelOrderBy {
+  _createdAt_ASC
+  _createdAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+  id_ASC
+  id_DESC
+  _firstPublishedAt_ASC
+  _firstPublishedAt_DESC
+  _publicationScheduledAt_ASC
+  _publicationScheduledAt_DESC
+  _unpublishingScheduledAt_ASC
+  _unpublishingScheduledAt_DESC
+  _publishedAt_ASC
+  _publishedAt_DESC
+  _status_ASC
+  _status_DESC
+  _updatedAt_ASC
+  _updatedAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  _isValid_ASC
+  _isValid_DESC
+}
+
 """Record of type 🧩 Plugins page (plugins_page)"""
 type PluginsPageRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -8439,7 +8854,7 @@ type PluginsPageRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  collections: [PluginCollectionRecord!]!
+  collections: [LegacyPluginCollectionRecord!]!
   createdAt: DateTime!
   highlighted: [PluginRecord!]!
   id: ItemId!
@@ -9156,6 +9571,13 @@ type Query {
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
     filter: PluginAuthorModelFilter
+  ): CollectionMetadata!
+
+  """Returns meta information regarding a record collection"""
+  _allPluginCollectionsMeta(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: PluginCollectionModelFilter
   ): CollectionMetadata!
 
   """Returns meta information regarding a record collection"""
@@ -9961,6 +10383,25 @@ type Query {
     filter: PluginAuthorModelFilter
     orderBy: [PluginAuthorModelOrderBy] = [_updatedAt_DESC]
   ): [PluginAuthorRecord!]!
+
+  """Returns a collection of records"""
+  allPluginCollections(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: PluginCollectionModelFilter
+    orderBy: [PluginCollectionModelOrderBy] = [position_ASC]
+  ): [PluginCollectionRecord!]!
 
   """Returns a collection of records"""
   allPluginFieldTypes(
@@ -10923,6 +11364,19 @@ type Query {
     filter: PluginAuthorModelFilter
     orderBy: [PluginAuthorModelOrderBy] = [_updatedAt_DESC]
   ): PluginAuthorRecord
+
+  """Returns a specific record"""
+  pluginCollection(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+    filter: PluginCollectionModelFilter
+    orderBy: [PluginCollectionModelOrderBy] = [position_ASC]
+  ): PluginCollectionRecord
 
   """Returns a specific record"""
   pluginFieldType(

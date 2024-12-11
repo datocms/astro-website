@@ -12,11 +12,12 @@ export const query = graphql(
         highlighted {
           ...PluginCardFragment
         }
-        collections {
-          title
-          plugins {
-            ...PluginCardFragment
-          }
+      }
+
+      collections: allPluginCollections(orderBy: position_ASC) {
+        title
+        plugins {
+          ...PluginCardFragment
         }
       }
 
