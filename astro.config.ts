@@ -12,6 +12,7 @@ export default defineConfig({
   },
   trailingSlash: 'never',
   experimental: {
+    globalRoutePriority: true,
     env: {
       schema: {
         DEPLOYMENT_DESTINATION: envField.string({
@@ -296,5 +297,6 @@ export default defineConfig({
     '/docs/deployments/zeit': '/docs',
     '/docs/content-management-api/resources/upload/updatebut':
       '/docs/content-management-api/resources/upload',
+    '/foo': '/docs',
   },
 });
