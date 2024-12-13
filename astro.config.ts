@@ -11,69 +11,67 @@ export default defineConfig({
     domains: ['image.mux.com'],
   },
   trailingSlash: 'never',
-  experimental: {
-    globalRoutePriority: true,
-    env: {
-      schema: {
-        DEPLOYMENT_DESTINATION: envField.string({
-          context: 'server',
-          access: 'secret',
-          default: 'development',
-        }),
-        DRAFT_MODE_HOSTNAME: envField.string({
-          context: 'server',
-          access: 'secret',
-          default: 'localhost',
-        }),
-        PUBLIC_HOSTNAME: envField.string({
-          context: 'client',
-          access: 'public',
-          optional: true,
-        }),
-        DATOCMS_API_TOKEN: envField.string({
-          context: 'server',
-          access: 'secret',
-        }),
-        SECRET_API_TOKEN: envField.string({
-          context: 'server',
-          access: 'secret',
-        }),
-        FASTLY_KEY: envField.string({
-          context: 'server',
-          access: 'secret',
-        }),
-        FASTLY_SERVICE_ID: envField.string({
-          context: 'server',
-          access: 'secret',
-        }),
-        ROLLBAR_TOKEN: envField.string({
-          context: 'server',
-          access: 'secret',
-          optional: true,
-        }),
-        PIPEDRIVE_TOKEN: envField.string({
-          context: 'server',
-          access: 'secret',
-        }),
-        MAILERLITE_TOKEN: envField.string({
-          context: 'server',
-          access: 'secret',
-        }),
-        RECAPTCHA_SECRET_KEY: envField.string({
-          context: 'server',
-          access: 'secret',
-        }),
-        SLACK_TOKEN: envField.string({
-          context: 'server',
-          access: 'secret',
-        }),
-        RECAPTCHA_KEY: envField.string({
-          context: 'client',
-          access: 'public',
-        }),
-      },
-      validateSecrets: false,
+
+  env: {
+    schema: {
+      DEPLOYMENT_DESTINATION: envField.string({
+        context: 'server',
+        access: 'secret',
+        default: 'development',
+      }),
+      DRAFT_MODE_HOSTNAME: envField.string({
+        context: 'server',
+        access: 'secret',
+        default: 'localhost',
+      }),
+      PUBLIC_HOSTNAME: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+      }),
+      DATOCMS_API_TOKEN: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      SECRET_API_TOKEN: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      FASTLY_KEY: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      FASTLY_SERVICE_ID: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      ROLLBAR_TOKEN: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
+      PIPEDRIVE_TOKEN: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      MAILERLITE_TOKEN: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      RECAPTCHA_SECRET_KEY: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      SLACK_TOKEN: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      RECAPTCHA_KEY: envField.string({
+        context: 'client',
+        access: 'public',
+      }),
     },
+    validateSecrets: false,
   },
   devToolbar: {
     enabled: false,
@@ -210,11 +208,10 @@ export default defineConfig({
     '/docs/project-starters-and-templates/project-starter-button':
       '/docs/general-concepts/project-starters-and-templates#generate-a-project-starter-button',
     '/blog/headless-cms-unconventional-use-cases': '/customer-stories/trip-to-japan',
-    '/docs/plugin-sdk/': '/docs/plugin-sdk/introduction',
+    '/docs/plugin-sdk': '/docs/plugin-sdk/introduction',
     '/docs/general-concepts/environments':
       '/docs/general-concepts/primary-and-sandbox-environments',
     '/docs/react/[...rest]': '/docs/next-js/[...rest]',
-    '/docs/plugin-sdk': '/docs/plugin-sdk/introduction',
     '/marketplace/plugins/i/datocms-plugin-gatsby-cloud': '/',
     '/docs/content-management-api/resources/sso-token':
       '/docs/content-management-api/resources/sso-settings/generate_token',
