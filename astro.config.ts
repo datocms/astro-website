@@ -11,7 +11,6 @@ export default defineConfig({
     domains: ['image.mux.com'],
   },
   trailingSlash: 'never',
-
   env: {
     schema: {
       DEPLOYMENT_DESTINATION: envField.string({
@@ -93,6 +92,9 @@ export default defineConfig({
   adapter: node({
     mode: 'standalone',
   }),
+  security: {
+    checkOrigin: false,
+  },
   redirects: {
     '/marketplace/plugins/i/datocms-plugin-yoast-seo':
       '/marketplace/plugins/i/datocms-plugin-seo-readability-analysis',
