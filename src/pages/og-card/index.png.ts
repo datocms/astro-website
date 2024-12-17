@@ -73,18 +73,20 @@ export const GET: APIRoute = async ({ request, url }) => {
             gap: '20px',
           })}"
         >
-          <div
-            style="${css({
-              fontSize: '30px',
-              color: '#71788a',
-              letterSpacing: '-0.04em',
-              textTransform: 'uppercase',
-              display: 'flex',
-              fontWeight: 'bold',
-            })}"
-          >
-            ${kicker}
-          </div>
+          ${kicker
+            ? /* HTML */ `<div
+                style="${css({
+                  fontSize: '30px',
+                  color: '#71788a',
+                  letterSpacing: '-0.04em',
+                  textTransform: 'uppercase',
+                  display: 'flex',
+                  fontWeight: 'bold',
+                })}"
+              >
+                ${kicker}
+              </div>`
+            : ''}
           ${logoPngUrl
             ? /* HTML */ `
               <img

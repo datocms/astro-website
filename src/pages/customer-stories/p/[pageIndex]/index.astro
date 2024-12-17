@@ -13,6 +13,7 @@ import { perPage, query } from './_graphql';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 
 export interface Props {
   pageIndex?: number;
@@ -42,7 +43,19 @@ if (!page || posts.length === 0) {
 }
 ---
 
-<Layout additionalSeo={page.seo}>
+<Layout
+  additionalSeo={overrideSeo(
+    page.seo,
+    seoTitle('Customer stories'),
+    seoDescription(
+      'Conversations with customers working on some really cool use cases with DatoCMS',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Customer stories',
+      excerpt: 'Conversations with customers working on some really cool use cases with DatoCMS',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="title"><mark>Customer Stories</mark></Fragment>
     <Fragment slot="subtitle">
