@@ -75,7 +75,31 @@ export default defineConfig({
   devToolbar: {
     enabled: false,
   },
-  integrations: [react(), expressiveCode()],
+  integrations: [
+    react(),
+    expressiveCode(),
+    {
+      name: 'rollbar',
+      hooks: {
+        'astro:config:setup': async ({ injectScript }) => {
+          injectScript(
+            'page-ssr',
+            `
+              import Rollbar from 'rollbar';
+              import { DEPLOYMENT_DESTINATION, ROLLBAR_TOKEN } from 'astro:env/server';
+
+              new Rollbar({
+                accessToken: ROLLBAR_TOKEN,
+                captureUncaught: true,
+                captureUnhandledRejections: true,
+                environment: DEPLOYMENT_DESTINATION,
+              });
+            `,
+          );
+        },
+      },
+    },
+  ],
   // This project does not use static markdown, only remote. See our <Markdown /> component
   markdown: {},
   vite: {
