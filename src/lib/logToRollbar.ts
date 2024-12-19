@@ -1,7 +1,7 @@
-import { ROLLBAR_TOKEN } from 'astro:env/server';
+import { DEPLOYMENT_DESTINATION, ROLLBAR_TOKEN } from 'astro:env/server';
 import Rollbar from 'rollbar';
 
-const rollbar = new Rollbar({ accessToken: ROLLBAR_TOKEN });
+const rollbar = new Rollbar({ accessToken: ROLLBAR_TOKEN, environment: DEPLOYMENT_DESTINATION });
 
 type Options = {
   request?: Request;
