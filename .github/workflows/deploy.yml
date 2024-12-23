@@ -46,9 +46,8 @@ jobs:
 
       - name: Deploy Application
         env:
-          # this variable needs to NOT be called GITHUB_CONTAINER_REGISTRY_API_TOKEN
           GCR_API_TOKEN: ${{ secrets.GCR_API_TOKEN }}
           PRIVATE_KEY: ${{ secrets.KAVO_PRIVATE_KEY }}
         run: |
-          sed -i -E -e 's/\-\-break 0/--wrap=0/g' -e '/^SECRETS=/d' -e 's/^GITHUB_CONTAINER_REGISTRY_API_TOKEN=.*$/GITHUB_CONTAINER_REGISTRY_API_TOKEN=$GCR_API_TOKEN/' .kamal/secrets.$KAMAL_DESTINATION
+          sed -i -E -e '/^SECRETS=/d' -e 's/^GITHUB_CONTAINER_REGISTRY_API_TOKEN=.*$/GITHUB_CONTAINER_REGISTRY_API_TOKEN=$GCR_API_TOKEN/' .kamal/secrets.$KAMAL_DESTINATION
           kamal deploy -d $KAMAL_DESTINATION
