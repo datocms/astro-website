@@ -15,7 +15,10 @@ export function withCORS(responseInit?: ResponseInit): ResponseInit {
 }
 
 export function json(response: unknown, init?: ResponseInit): Response {
-  return new Response(JSON.stringify(response, null, 2), init);
+  return new Response(JSON.stringify(response, null, 2), {
+    ...init,
+    headers: { ...init?.headers, 'Content-Type': 'application/json' },
+  });
 }
 
 export function handleUnexpectedError(request: Request, error: unknown) {
