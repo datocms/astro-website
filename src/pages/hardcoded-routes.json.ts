@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { handleUnexpectedError, json } from './api/_utils';
+import { handleUnexpectedError, json, withCORS } from './api/_utils';
 import { buildSitemapUrls as cmaResourceEndpointUrls } from './docs/content-management-api/resources/[entitySlug]/[endpointRel]/_graphql';
 import { buildSitemapUrls as cmaResourceUrls } from './docs/content-management-api/resources/[entitySlug]/_graphql';
 
@@ -41,7 +41,7 @@ export const GET: APIRoute = async ({ request }) => {
       cmaResourceEndpointUrls({ request, responseHeaders }),
     ]);
 
-    return json(urls.flat(), { headers: responseHeaders });
+    return json(urls.flat(), withCORS({ headers: responseHeaders }));
   } catch (error) {
     return handleUnexpectedError(request, error);
   }
