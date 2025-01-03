@@ -42,9 +42,7 @@ export async function paramsToRecordId(
     buildEntityUrls(executeQueryOptions),
   ]);
 
-  if ([...routesWithNoParams, ...cmaRoutes.flat()].includes(pathname)) {
-    return { result: 'staticRoute' };
-  }
+  const isKnownRoute = [...routesWithNoParams, ...cmaRoutes.flat()].includes(pathname);
 
   for (const route of routesWithParams) {
     const parts = route.pattern.match(/\/(.*)\/(.*)?/)!;
@@ -75,10 +73,14 @@ export async function paramsToRecordId(
 
       if (recordId) {
         return { result: 'recordFound', recordId };
+      } else if (!isKnownRoute) {
+        return { result: 'invalidParams' };
       }
-
-      return { result: 'invalidParams' };
     }
+  }
+
+  if (isKnownRoute) {
+    return { result: 'staticRoute' };
   }
 
   return { result: 'invalidPathname' };
