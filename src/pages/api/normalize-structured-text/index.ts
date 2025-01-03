@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 import { DATOCMS_API_TOKEN, SECRET_API_TOKEN } from 'astro:env/server';
 import { render } from 'datocms-structured-text-to-plain-text';
 import { isLink, type ItemLink } from 'datocms-structured-text-utils';
-import { handleUnexpectedError, invalidRequestResponse, json } from '../_utils';
+import { handleUnexpectedError, invalidRequestResponse, json, withCORS } from '../_utils';
 import { paramsToRecordId } from './_utils/pathnameToRecordId';
 import { updateStructuredTextFields } from './_utils/updateStructuredTextFields';
 
@@ -161,11 +161,11 @@ export const POST: APIRoute = async ({ url, request }) => {
     );
 
     if (dryMode) {
-      return json({ errors });
+      return json({ errors }, withCORS());
     }
 
     if (typeof result === 'string') {
-      return json({ result: 'No change needed' });
+      return json({ result: 'No change needed' }, withCORS());
     }
 
     for (const touchedField of touchedStructuredTextFields) {
@@ -174,9 +174,13 @@ export const POST: APIRoute = async ({ url, request }) => {
       };
 
       if (validator.item_types.length < 20) {
-        return json({
-          result: `Cannot procede with update as structured text field ${touchedField.id} cannot handle item link nodes!`,
-        });
+        return json(
+          {
+            result: `Cannot procede with update as structured text field ${touchedField.id} cannot handle item link nodes!`,
+            errors,
+          },
+          withCORS(),
+        );
       }
     }
 
@@ -184,7 +188,7 @@ export const POST: APIRoute = async ({ url, request }) => {
       data: { ...result, meta: { current_version: item.meta.current_version } },
     });
 
-    return json({ result: 'Normalized links' });
+    return json({ result: 'Normalized links', errors }, withCORS());
   } catch (error) {
     return handleUnexpectedError(request, error);
   }
