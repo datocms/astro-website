@@ -66,6 +66,10 @@ export default defineConfig({
         context: 'server',
         access: 'secret',
       }),
+      BASECAMP_ACCESS_TOKEN_PROVIDER_URL: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
       RECAPTCHA_KEY: envField.string({
         context: 'client',
         access: 'public',

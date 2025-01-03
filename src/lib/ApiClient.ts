@@ -37,7 +37,7 @@ export class ApiClientError extends Error {
   }
 }
 
-type Request = {
+export type Request = {
   path: string;
   body?: unknown;
   queryString?: Record<string, string>;

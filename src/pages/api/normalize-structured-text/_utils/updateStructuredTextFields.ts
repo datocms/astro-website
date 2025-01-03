@@ -9,20 +9,19 @@ import { visit } from 'unist-util-visit';
  * callback function to each node.
  *
  * @param manager - ItemTypeManager instance for accessing item type information
- * @param touchedStructuredTextFields - Set of fields that have been modified
  * @param item - DatoCMS item to update
  * @param cb - Callback function to apply to each node
  * @returns Updated item data or item ID if no changes were made
  */
 export async function updateStructuredTextFields(
   fieldsFinder: (itemTypeId: string) => SchemaTypes.Field[],
-  touchedStructuredTextFields: Set<SchemaTypes.Field>,
   item: SchemaTypes.Item,
   cb: (
     node: Node,
     index: number,
     parent: WithChildrenNode,
     path: string,
+    field: SchemaTypes.Field,
   ) => Promise<boolean | undefined>,
   path: string[] = [],
 ): Promise<SchemaTypes.ItemUpdateSchema['data'] | string> {
@@ -52,13 +51,10 @@ export async function updateStructuredTextFields(
           if (itemBlock) {
             somethingChangedPromises.push(
               (async () => {
-                const result = await updateStructuredTextFields(
-                  fieldsFinder,
-                  touchedStructuredTextFields,
-                  itemBlock,
-                  cb,
-                  [...path, field.attributes.api_key],
-                );
+                const result = await updateStructuredTextFields(fieldsFinder, itemBlock, cb, [
+                  ...path,
+                  field.attributes.api_key,
+                ]);
                 if (typeof result === 'string') {
                   node.item = result;
                 } else {
@@ -76,6 +72,7 @@ export async function updateStructuredTextFields(
             index!,
             parent as WithChildrenNode,
             [...path, field.attributes.api_key].join('.'),
+            field,
           ),
         );
       });
@@ -83,7 +80,6 @@ export async function updateStructuredTextFields(
       const results = await Promise.all(somethingChangedPromises);
       if (results.some(Boolean)) {
         attributes[field.attributes.api_key] = structuredTextValue;
-        touchedStructuredTextFields.add(field);
       }
     } else if (field.attributes.field_type === 'rich_text') {
       // Handle rich text fields with nested blocks
@@ -91,13 +87,11 @@ export async function updateStructuredTextFields(
       const result: Array<SchemaTypes.ItemUpdateSchema['data'] | string> = [];
       for (const itemBlock of itemBlocks) {
         result.push(
-          await updateStructuredTextFields(
-            fieldsFinder,
-            touchedStructuredTextFields,
-            itemBlock,
-            cb,
-            [...path, field.attributes.api_key, itemBlocks.indexOf(itemBlock).toString()],
-          ),
+          await updateStructuredTextFields(fieldsFinder, itemBlock, cb, [
+            ...path,
+            field.attributes.api_key,
+            itemBlocks.indexOf(itemBlock).toString(),
+          ]),
         );
       }
       if (result.some((item) => typeof item !== 'string')) {
@@ -107,13 +101,10 @@ export async function updateStructuredTextFields(
       // Handle single block fields
       const itemBlock = item.attributes[field.attributes.api_key] as SchemaTypes.Item | null;
       if (itemBlock) {
-        const result = await updateStructuredTextFields(
-          fieldsFinder,
-          touchedStructuredTextFields,
-          itemBlock,
-          cb,
-          [...path, field.attributes.api_key],
-        );
+        const result = await updateStructuredTextFields(fieldsFinder, itemBlock, cb, [
+          ...path,
+          field.attributes.api_key,
+        ]);
         if (typeof result !== 'string') {
           attributes[field.attributes.api_key] = result;
         }
