@@ -66,15 +66,21 @@ export async function paramsToRecordId(
         throw new Error('Missing missingParamsToRecordId');
       }
 
-      const recordId = await paramsToRecordId({
-        executeQueryOptions,
-        params,
-      });
+      try {
+        const recordId = await paramsToRecordId({
+          executeQueryOptions,
+          params,
+        });
 
-      if (recordId) {
-        return { result: 'recordFound', recordId };
-      } else if (!isKnownRoute) {
-        return { result: 'invalidParams' };
+        if (recordId) {
+          return { result: 'recordFound', recordId };
+        } else if (!isKnownRoute) {
+          return { result: 'invalidParams' };
+        }
+      } catch (e) {
+        if (!isKnownRoute) {
+          throw e;
+        }
       }
     }
   }
