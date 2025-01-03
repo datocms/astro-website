@@ -20,6 +20,10 @@ type InternalLinkError = {
   fieldPath: string;
 };
 
+export const OPTIONS: APIRoute = () => {
+  return new Response('OK', withCORS());
+};
+
 export const POST: APIRoute = async ({ url, request }) => {
   try {
     // Parse query string parameters
