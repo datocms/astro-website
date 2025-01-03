@@ -1,0 +1,17 @@
+---
+import { LandingPageInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForLandingPage } from '~/lib/datocms/gqlUrlBuilder/landingPage';
+
+interface Props {
+  record: FragmentOf<typeof LandingPageInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(LandingPageInlineFragment, record);
+---
+
+<a href={buildUrlForLandingPage(unmaskedRecord)}>
+  {unmaskedRecord.name}
+</a>

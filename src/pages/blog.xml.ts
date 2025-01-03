@@ -14,6 +14,12 @@ export const query = graphql(
         title
         excerpt {
           value
+          links {
+            ... on RecordInterface {
+              id
+              __typename
+            }
+          }
         }
         _firstPublishedAt
       }

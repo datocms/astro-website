@@ -1,0 +1,17 @@
+---
+import { UserGuidesEpisodeInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
+
+interface Props {
+  record: FragmentOf<typeof UserGuidesEpisodeInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(UserGuidesEpisodeInlineFragment, record);
+---
+
+<a href={buildUrlForUserGuidesEpisode(unmaskedRecord)}>
+  {unmaskedRecord.title}
+</a>

@@ -2,6 +2,8 @@ import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { ImageFragment } from '~/components/blocks/Image/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { VideoFragment } from '~/components/blocks/Video/graphql';
+import { defaultInlineRecordFragments } from '~/components/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
@@ -9,6 +11,7 @@ import {
   buildUrlForEnterpriseApp,
 } from '~/lib/datocms/gqlUrlBuilder/enterpriseApp';
 import { graphql } from '~/lib/datocms/graphql';
+import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
@@ -34,26 +37,75 @@ export const query = graphql(
         }
         content {
           value
+          links {
+            ... on RecordInterface {
+              id
+              __typename
+            }
+            ...AcademyChapterLinkFragment
+            ...AcademyCourseLinkFragment
+            ...BlogPostLinkFragment
+            ...ChangelogEntryLinkFragment
+            ...CustomerStoryLinkFragment
+            ...DocGroupLinkFragment
+            ...DocPageLinkFragment
+            ...EnterpriseAppLinkFragment
+            ...FeatureLinkFragment
+            ...HostingAppLinkFragment
+            ...LandingPageLinkFragment
+            ...PartnerLinkFragment
+            ...PluginLinkFragment
+            ...ProductComparisonLinkFragment
+            ...ShowcaseProjectLinkFragment
+            ...SuccessStoryLinkFragment
+            ...TechPartnerLinkFragment
+            ...TemplateDemoLinkFragment
+            ...UseCasePageLinkFragment
+            ...UserGuidesEpisodeLinkFragment
+
+            ...AcademyChapterInlineFragment
+            ...AcademyCourseInlineFragment
+            ...BlogPostInlineFragment
+            ...ChangelogEntryInlineFragment
+            ...CustomerStoryInlineFragment
+            ...DocGroupInlineFragment
+            ...DocPageInlineFragment
+            ...EnterpriseAppInlineFragment
+            ...FeatureInlineFragment
+            ...HostingAppInlineFragment
+            ...LandingPageInlineFragment
+            ...PartnerInlineFragment
+            ...PluginInlineFragment
+            ...ProductComparisonInlineFragment
+            ...ShowcaseProjectInlineFragment
+            ...SuccessStoryInlineFragment
+            ...TechPartnerInlineFragment
+            ...TemplateDemoInlineFragment
+            ...UseCasePageInlineFragment
+            ...UserGuidesEpisodeInlineFragment
+          }
           blocks {
             ... on RecordInterface {
               id
               __typename
             }
-            ... on ImageRecord {
-              ...ImageFragment
-            }
-            ... on VideoRecord {
-              ...VideoFragment
-            }
-            ... on InternalVideoRecord {
-              ...InternalVideoFragment
-            }
+            ...ImageFragment
+            ...VideoFragment
+            ...InternalVideoFragment
           }
         }
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment, ImageFragment, VideoFragment, InternalVideoFragment],
+  [
+    TagFragment,
+    ResponsiveImageFragment,
+    ImageFragment,
+    VideoFragment,
+    InternalVideoFragment,
+    ...defaultLinkToRecordFragments,
+    ...defaultInlineRecordFragments,
+  ],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
@@ -72,4 +124,22 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
   );
 
   return entries.map(buildUrlForEnterpriseApp);
+};
+
+export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({
+  executeQueryOptions,
+  params: { slug },
+}) => {
+  const { entity } = await executeQueryOutsideAstro(
+    graphql(/* GraphQL */ `
+      query ParamsToRecordId($slug: String!) {
+        entity: enterpriseApp(filter: { slug: { eq: $slug } }) {
+          id
+        }
+      }
+    `),
+    { ...executeQueryOptions, variables: { slug } },
+  );
+
+  return entity?.id;
 };

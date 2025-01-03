@@ -10,14 +10,15 @@ import { Prose } from '~/components/Prose';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { Video } from '~/components/blocks/Video';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { withAllComponents } from '~/lib/datocms/structuredText';
 import { query } from './_graphql';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -64,11 +65,15 @@ if (!page) {
           <Space top={1}>
             <Prose>
               <Text
-                data={page.content}
-                blockComponents={withAllComponents(page.content.blocks, {
-                  ImageRecord: Image,
-                  InternalVideoRecord: InternalVideo,
-                  VideoRecord: Video,
+                {...ensureValidStructuredTextProps({
+                  data: page.content,
+                  blockComponents: {
+                    ImageRecord: Image,
+                    InternalVideoRecord: InternalVideo,
+                    VideoRecord: Video,
+                  },
+                  linkToRecordComponents: defaultLinkToRecordComponents,
+                  inlineRecordComponents: defaultInlineRecordComponents,
                 })}
               />
             </Prose>

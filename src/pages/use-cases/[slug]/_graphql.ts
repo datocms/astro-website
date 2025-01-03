@@ -10,6 +10,7 @@ import {
   UseCasePageUrlFragment,
 } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import { graphql } from '~/lib/datocms/graphql';
+import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
@@ -94,15 +95,9 @@ export const query = graphql(
           ... on RecordInterface {
             __typename
           }
-          ... on SuccessStoryRecord {
-            ...SuccessStoryUrlFragment
-          }
-          ... on ShowcaseProjectRecord {
-            ...ShowcaseProjectUrlFragment
-          }
-          ... on CustomerStoryRecord {
-            ...CustomerStoryUrlFragment
-          }
+          ...SuccessStoryUrlFragment
+          ...ShowcaseProjectUrlFragment
+          ...CustomerStoryUrlFragment
         }
         successStoryImage: image {
           responsiveImage(imgixParams: { auto: format, w: 1000, h: 1000 }) {
@@ -138,4 +133,22 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
   );
 
   return entries.map(buildUrlForUseCasePage);
+};
+
+export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({
+  executeQueryOptions,
+  params: { slug },
+}) => {
+  const { entity } = await executeQueryOutsideAstro(
+    graphql(/* GraphQL */ `
+      query ParamsToRecordId($slug: String!) {
+        entity: useCasePage(filter: { slug: { eq: $slug } }) {
+          id
+        }
+      }
+    `),
+    { ...executeQueryOptions, variables: { slug } },
+  );
+
+  return entity?.id;
 };

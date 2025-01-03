@@ -1,0 +1,22 @@
+---
+import { LandingPageLinkFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForLandingPage } from '~/lib/datocms/gqlUrlBuilder/landingPage';
+import type { TransformedMeta } from 'datocms-structured-text-generic-html-renderer';
+import type { ItemLink } from 'datocms-structured-text-utils';
+import { augmentLinkWithMeta } from '..';
+
+interface Props {
+  node: ItemLink;
+  attrs: TransformedMeta;
+  record: FragmentOf<typeof LandingPageLinkFragment>;
+}
+
+const { record, attrs, node } = Astro.props;
+
+const unmaskedRecord = readFragment(LandingPageLinkFragment, record);
+---
+
+<a {...attrs} href={augmentLinkWithMeta(node.meta, buildUrlForLandingPage(unmaskedRecord))}
+  ><slot /></a
+>

@@ -8,7 +8,7 @@ import { formatVideoDuration } from '~/lib/formatters';
 import { sum } from 'lodash-es';
 import VideoCard from './_VideoCard.astro';
 import { Carousel } from '~/components/Carousel';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 
 type Props = {
   chapter: FragmentOf<typeof ChapterFragment>;
@@ -40,7 +40,7 @@ const allVideosDurations = sum(
     </div>
     <h2 class={s.chapterIntroHeading}>{chapter.title}</h2>
     <div class={s.chapterIntroDescription}>
-      <Text data={chapter.introduction} />
+      <Text {...ensureValidStructuredTextProps({ data: chapter.introduction })} />
     </div>
   </div>
   <section class={s.chapterVideosWrapper}>

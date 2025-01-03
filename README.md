@@ -82,7 +82,7 @@ Also, make sure to use `withAllComponents`, inside `blockComponents`, `linkToRec
 
 ```jsx
 <Text
-  data={episode.content}
+  {...ensureValidStructuredTextProps({ data: episode.content })}
   blockComponents={withAllComponents(episode.content.blocks, {
     InternalVideoRecord: InternalVideo,
     ImageRecord: Image,

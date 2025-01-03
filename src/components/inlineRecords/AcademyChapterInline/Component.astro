@@ -1,0 +1,17 @@
+---
+import { AcademyChapterInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+
+interface Props {
+  record: FragmentOf<typeof AcademyChapterInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(AcademyChapterInlineFragment, record);
+---
+
+<a href={buildUrlForAcademyChapter(unmaskedRecord)}>
+  {unmaskedRecord.title}
+</a>

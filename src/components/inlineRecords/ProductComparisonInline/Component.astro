@@ -1,0 +1,17 @@
+---
+import { ProductComparisonInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForProductComparison } from '~/lib/datocms/gqlUrlBuilder/productComparison';
+
+interface Props {
+  record: FragmentOf<typeof ProductComparisonInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(ProductComparisonInlineFragment, record);
+---
+
+<a href={buildUrlForProductComparison(unmaskedRecord)}>
+  {unmaskedRecord.product}
+</a>

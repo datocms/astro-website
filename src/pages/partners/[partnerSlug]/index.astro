@@ -8,7 +8,7 @@ import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { SidebarPane } from '~/components/SidebarPane';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { Wrapper } from '~/components/Wrapper';
 import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { executeQuery } from '~/lib/datocms/executeQuery';
@@ -26,6 +26,8 @@ import {
 } from '~/lib/datocms/seo';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const variables = { partnerSlug: Astro.params.partnerSlug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -57,7 +59,7 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
   <InterstitialTitle style="two" bigSubtitle={true} mainTitleOfPage>
     <Fragment slot="kicker"><a href="/partner-program">DatoCMS Agency Partner</a></Fragment>
     <Fragment slot="subtitle">
-      <Text data={page.shortDescription} />
+      <Text {...ensureValidStructuredTextProps({ data: page.shortDescription })} />
     </Fragment>
     <figure class={s.logoWrapper}>
       <img loading="lazy" class={s.logo} alt={`${page.name} logo`} src={page.logo.url} />
@@ -70,7 +72,13 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
         <h3 class={s.blockTitle}>Description</h3>
         <section>
           <Prose>
-            <Text data={page.description} />
+            <Text
+              {...ensureValidStructuredTextProps({
+                data: page.description,
+                linkToRecordComponents: defaultLinkToRecordComponents,
+                inlineRecordComponents: defaultInlineRecordComponents,
+              })}
+            />
           </Prose>
           <div class={s.action}>
             <div class={s.actionButton}>

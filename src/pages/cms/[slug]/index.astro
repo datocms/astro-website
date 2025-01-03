@@ -14,7 +14,7 @@ import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse
 import { query } from './_graphql';
 import s from './_style.module.css';
 import { Hero } from '~/components/Hero';
-import { InlineText } from '~/components/structuredText/InlineText';
+import { InlineText, ensureValidStructuredTextProps } from '~/components/structuredText/InlineText';
 import { UiChrome } from '~/components/UiChrome';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { sortBy } from 'lodash-es';
@@ -31,6 +31,8 @@ import { GithubButton } from './_sub/GithubButton';
 import { Code } from '~/components/Code';
 import { VideoPlayer } from '~/components/VideoPlayer';
 import { TryDemoCta } from './_sub/TryDemoCta';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -51,7 +53,9 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
 <Layout additionalSeo={page.seo}>
   <Hero seoAnalysis={page.yoastAnalysis}>
     <Fragment slot="kicker">{page.seoH1}</Fragment>
-    <Fragment slot="title"><InlineText data={page.title} /></Fragment>
+    <Fragment slot="title"
+      ><InlineText {...ensureValidStructuredTextProps({ data: page.title })} /></Fragment
+    >
     {page.subtitle && <Fragment slot="subtitle">{page.subtitle}</Fragment>}
 
     {
@@ -107,12 +111,12 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
           <>
             <Space top={4} bottom={1}>
               <InterstitialTitle style="two" kicker={'Worldwide CDN'}>
-                <InlineText data={block.title} />
+                <InlineText {...ensureValidStructuredTextProps({ data: block.title })} />
               </InterstitialTitle>
             </Space>
             <Wrapper>
               <div class={s.copy}>
-                <Text data={block.description} />
+                <Text {...ensureValidStructuredTextProps({ data: block.description })} />
                 <p>
                   <a class={s.readMoreAbout} href="/features/worldwide-cdn">
                     Read more about our Worldwide CDN <Svg name="svg/illustrations/arrow-usecase" />
@@ -146,10 +150,10 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
             <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
               <Fragment slot="kicker">{page.name} images</Fragment>
               <Fragment slot="title">
-                <InlineText data={block.title} />
+                <InlineText {...ensureValidStructuredTextProps({ data: block.title })} />
               </Fragment>
               <Fragment slot="subtitle">
-                <Text data={block.content} />
+                <Text {...ensureValidStructuredTextProps({ data: block.content })} />
                 {block.githubPackageName && (
                   <div>
                     <div class={s.readMoreAbout}>{block.githubRepoTitle}</div>
@@ -170,10 +174,10 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
             <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
               <Fragment slot="kicker">{keyword} example</Fragment>
               <Fragment slot="title">
-                <InlineText data={block.title} />
+                <InlineText {...ensureValidStructuredTextProps({ data: block.title })} />
               </Fragment>
               <Fragment slot="subtitle">
-                <Text data={block.content} />
+                <Text {...ensureValidStructuredTextProps({ data: block.content })} />
                 {block.githubPackageName && (
                   <div>
                     <div class={s.readMoreAbout}>{block.githubRepoTitle}</div>
@@ -201,10 +205,10 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
               </UiChrome>
             </Fragment>
             <Fragment slot="title">
-              <InlineText data={block.title} />
+              <InlineText {...ensureValidStructuredTextProps({ data: block.title })} />
             </Fragment>
 
-            <Text data={block.content} />
+            <Text {...ensureValidStructuredTextProps({ data: block.content })} />
             <p>
               <a class={s.readMoreAbout} href="/features/dynamic-layouts">
                 Read more about DatoCMS modular blocks{' '}
@@ -228,10 +232,16 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
               cta={`Try our ${page.name} demo project now!`}
             >
               <Fragment slot="title">
-                <InlineText data={block.title} />
+                <InlineText {...ensureValidStructuredTextProps({ data: block.title })} />
               </Fragment>
               <Fragment slot="description">
-                <Text data={block.content} />
+                <Text
+                  {...ensureValidStructuredTextProps({
+                    data: block.content,
+                    linkToRecordComponents: defaultLinkToRecordComponents,
+                    inlineRecordComponents: defaultInlineRecordComponents,
+                  })}
+                />
               </Fragment>
             </TryDemoCta>
             <Space top={2} bottom={2}>
@@ -251,10 +261,10 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
           <Space top={3}>
             <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
               <Fragment slot="title">
-                <InlineText data={block.title} />
+                <InlineText {...ensureValidStructuredTextProps({ data: block.title })} />
               </Fragment>
               <Fragment slot="subtitle">
-                <Text data={block.content} />
+                <Text {...ensureValidStructuredTextProps({ data: block.content })} />
               </Fragment>
 
               <div class={s.video}>
@@ -266,10 +276,10 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
           <Space top={3}>
             <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
               <Fragment slot="title">
-                <InlineText data={block.title} />
+                <InlineText {...ensureValidStructuredTextProps({ data: block.title })} />
               </Fragment>
               <Fragment slot="subtitle">
-                <Text data={block.content} />
+                <Text {...ensureValidStructuredTextProps({ data: block.content })} />
                 <p>
                   <a class={s.readMoreAbout} href="/features/images-api">
                     Read more about DatoCMS Image API <Svg name="svg/illustrations/arrow-usecase" />

@@ -2,6 +2,7 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import expressiveCode from 'astro-expressive-code';
 import { defineConfig, envField } from 'astro/config';
+import { writeFile } from 'fs/promises';
 
 import bundlesize from 'vite-plugin-bundlesize';
 
@@ -95,6 +96,39 @@ export default defineConfig({
                 environment: DEPLOYMENT_DESTINATION,
               });
             `,
+          );
+        },
+      },
+    },
+    {
+      name: 'routes',
+      hooks: {
+        'astro:routes:resolved': async ({ routes }) => {
+          const routesWithParams = routes
+            .filter(
+              (r) =>
+                r.origin === 'project' &&
+                r.type === 'page' &&
+                r.params.length > 0 &&
+                !r.params.includes('pageIndex'),
+            )
+            .map(({ entrypoint, patternRegex, params }) => ({
+              entrypoint:
+                entrypoint
+                  .replace('src/pages/', '../../../')
+                  .replace('.astro', '')
+                  .replace('/index', '') + '/_graphql.ts',
+              pattern: patternRegex.toString(),
+              params,
+            }));
+
+          const routesWithNoParams = routes
+            .filter((r) => r.origin === 'project' && r.type === 'page' && r.params.length === 0)
+            .map(({ pattern }) => pattern);
+
+          await writeFile(
+            './src/pages/api/normalize-structured-text/_utils/routes.json',
+            JSON.stringify({ routesWithParams, routesWithNoParams }, null, 2),
           );
         },
       },

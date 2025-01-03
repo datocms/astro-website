@@ -1,3 +1,5 @@
+import { defaultInlineRecordFragments } from '~/components/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
@@ -8,6 +10,7 @@ import {
   ShowcaseProjectUrlFragment,
 } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { graphql } from '~/lib/datocms/graphql';
+import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
@@ -34,6 +37,53 @@ export const query = graphql(
         }
         inDepthExplanation {
           value
+          links {
+            ... on RecordInterface {
+              id
+              __typename
+            }
+            ...AcademyChapterLinkFragment
+            ...AcademyCourseLinkFragment
+            ...BlogPostLinkFragment
+            ...ChangelogEntryLinkFragment
+            ...CustomerStoryLinkFragment
+            ...DocGroupLinkFragment
+            ...DocPageLinkFragment
+            ...EnterpriseAppLinkFragment
+            ...FeatureLinkFragment
+            ...HostingAppLinkFragment
+            ...LandingPageLinkFragment
+            ...PartnerLinkFragment
+            ...PluginLinkFragment
+            ...ProductComparisonLinkFragment
+            ...ShowcaseProjectLinkFragment
+            ...SuccessStoryLinkFragment
+            ...TechPartnerLinkFragment
+            ...TemplateDemoLinkFragment
+            ...UseCasePageLinkFragment
+            ...UserGuidesEpisodeLinkFragment
+
+            ...AcademyChapterInlineFragment
+            ...AcademyCourseInlineFragment
+            ...BlogPostInlineFragment
+            ...ChangelogEntryInlineFragment
+            ...CustomerStoryInlineFragment
+            ...DocGroupInlineFragment
+            ...DocPageInlineFragment
+            ...EnterpriseAppInlineFragment
+            ...FeatureInlineFragment
+            ...HostingAppInlineFragment
+            ...LandingPageInlineFragment
+            ...PartnerInlineFragment
+            ...PluginInlineFragment
+            ...ProductComparisonInlineFragment
+            ...ShowcaseProjectInlineFragment
+            ...SuccessStoryInlineFragment
+            ...TechPartnerInlineFragment
+            ...TemplateDemoInlineFragment
+            ...UseCasePageInlineFragment
+            ...UserGuidesEpisodeInlineFragment
+          }
         }
         technologies {
           name
@@ -73,7 +123,14 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment, PartnerUrlFragment, VideoPlayerFragment],
+  [
+    TagFragment,
+    ResponsiveImageFragment,
+    PartnerUrlFragment,
+    VideoPlayerFragment,
+    ...defaultLinkToRecordFragments,
+    ...defaultInlineRecordFragments,
+  ],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
@@ -92,4 +149,22 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
   );
 
   return entries.map(buildUrlForShowcaseProject);
+};
+
+export const paramsToRecordId: ParamsToRecordIdFn<{ projectSlug: string }> = async ({
+  executeQueryOptions,
+  params: { projectSlug },
+}) => {
+  const { entity } = await executeQueryOutsideAstro(
+    graphql(/* GraphQL */ `
+      query ParamsToRecordId($projectSlug: String!) {
+        entity: showcaseProject(filter: { slug: { eq: $projectSlug } }) {
+          id
+        }
+      }
+    `),
+    { ...executeQueryOptions, variables: { projectSlug } },
+  );
+
+  return entity?.id;
 };

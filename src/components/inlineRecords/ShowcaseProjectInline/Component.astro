@@ -1,0 +1,17 @@
+---
+import { ShowcaseProjectInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
+
+interface Props {
+  record: FragmentOf<typeof ShowcaseProjectInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(ShowcaseProjectInlineFragment, record);
+---
+
+<a href={buildUrlForShowcaseProject(unmaskedRecord)}>
+  {unmaskedRecord.name}
+</a>

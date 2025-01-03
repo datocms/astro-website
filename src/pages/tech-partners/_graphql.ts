@@ -1,5 +1,5 @@
-import { TechPartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/techPartner';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { TechPartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/techPartner';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(

@@ -14,7 +14,7 @@ import { QuotesCarousel } from '~/components/quote/QuotesCarousel';
 import { Svg } from '~/components/Svg';
 import { Prose } from '~/components/Prose';
 import { Checks } from '~/components/Checks';
-import { InlineText } from '~/components/structuredText/InlineText';
+import { InlineText, ensureValidStructuredTextProps } from '~/components/structuredText/InlineText';
 import { Text } from '~/components/structuredText/Text';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
@@ -33,10 +33,10 @@ if (!page) {
     <div class={s.hero}>
       <div class={s.heroBody}>
         <h1 class={s.heroTitle}>
-          <InlineText data={page.title} />
+          <InlineText {...ensureValidStructuredTextProps({ data: page.title })} />
         </h1>
         <div class={s.heroSubtitle}>
-          <InlineText data={page.subtitle} />
+          <InlineText {...ensureValidStructuredTextProps({ data: page.subtitle })} />
         </div>
         <div class={s.buttonContainer}>
           <Button as="a" href="https://dashboard.datocms.com/signup"> Try it for free </Button>
@@ -68,7 +68,7 @@ if (!page) {
   <div class={s.testimonials}>
     <Space top={2} bottom={3}>
       <InterstitialTitle style="three">
-        <InlineText data={page.quotesHeader} />
+        <InlineText {...ensureValidStructuredTextProps({ data: page.quotesHeader })} />
       </InterstitialTitle>
       <QuotesCarousel quotes={page.quotes} />
     </Space>
@@ -78,9 +78,9 @@ if (!page) {
     <Wrapper>
       <div class={s.starterBox}>
         <div class={s.starterBoxText}>
-          <h2><InlineText data={page.starterTitle} /></h2>
+          <h2><InlineText {...ensureValidStructuredTextProps({ data: page.starterTitle })} /></h2>
           <Prose>
-            <Text data={page.starterDescription} />
+            <Text {...ensureValidStructuredTextProps({ data: page.starterDescription })} />
           </Prose>
           <Space top={1}>
             <Button as="a" p="small" s="purple" href={page.starterLink}>Check it out</Button>
@@ -141,7 +141,7 @@ if (!page) {
         </div>
         <div class={s.blockText}>
           <h2>{page.featuresHeader}</h2>
-          <Text data={page.featuresDescription} />
+          <Text {...ensureValidStructuredTextProps({ data: page.featuresDescription })} />
         </div>
       </div>
     </Wrapper>
@@ -157,7 +157,7 @@ if (!page) {
             </div>
             <article>
               <h3>{callout.title}</h3>
-              <Text data={callout.description} />
+              <Text {...ensureValidStructuredTextProps({ data: callout.description })} />
             </article>
           </div>
           <div class={s.featuresGrid}>
@@ -171,7 +171,7 @@ if (!page) {
                   )}
                   <div class={s.featureText}>
                     <h4 class={s.featureTitle}>{feature.title}</h4>
-                    <Text data={feature.description} />
+                    <Text {...ensureValidStructuredTextProps({ data: feature.description })} />
                   </div>
                 </article>
               </div>
@@ -186,9 +186,11 @@ if (!page) {
     <Wrapper>
       <div class={s.successStory}>
         <div class={s.successStoryText}>
-          <h2><InlineText data={page.successStoryHeader} /></h2>
+          <h2>
+            <InlineText {...ensureValidStructuredTextProps({ data: page.successStoryHeader })} />
+          </h2>
           <Prose>
-            <Text data={page.successStorySummary} />
+            <Text {...ensureValidStructuredTextProps({ data: page.successStorySummary })} />
           </Prose>
           <Space top={1}>
             <Button as="a" p="small" s="purple" href={buildUrlFromGql(page.caseStudy)}>

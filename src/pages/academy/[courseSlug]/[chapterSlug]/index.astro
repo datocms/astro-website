@@ -14,14 +14,15 @@ import { Layout } from '~/layouts/Layout';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Space } from '~/components/Space';
 import { ActiveLink } from '~/components/links/ActiveLink';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { Prose } from '~/components/Prose';
-import { withAllComponents } from '~/lib/datocms/structuredText';
 import { Image } from '~/components/blocks/Image';
 import { Table } from '~/components/blocks/Table';
 import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const variables = { courseSlug: Astro.params.courseSlug!, chapterSlug: Astro.params.chapterSlug! };
 
@@ -60,7 +61,9 @@ const sections = filterNodes(
   <InterstitialTitle style="one" mainTitleOfPage>
     <Fragment slot="kicker"><a href="/academy">DatoCMS Academy</a></Fragment>
     {chapter.title}
-    <Fragment slot="subtitle"><Text data={course.introduction} /></Fragment>
+    <Fragment slot="subtitle"
+      ><Text {...ensureValidStructuredTextProps({ data: course.introduction })} /></Fragment
+    >
   </InterstitialTitle>
   <Space top={1}>
     <div class={s.contentWrapper}>
@@ -105,11 +108,15 @@ const sections = filterNodes(
       <div id="main-content">
         <Prose class={s.body}>
           <Text
-            data={chapter.content}
-            blockComponents={withAllComponents(chapter.content.blocks, {
-              ImageRecord: Image,
-              TableRecord: Table,
-              InternalVideoRecord: InternalVideo,
+            {...ensureValidStructuredTextProps({
+              data: chapter.content,
+              blockComponents: {
+                ImageRecord: Image,
+                TableRecord: Table,
+                InternalVideoRecord: InternalVideo,
+              },
+              linkToRecordComponents: defaultLinkToRecordComponents,
+              inlineRecordComponents: defaultInlineRecordComponents,
             })}
           />
         </Prose>

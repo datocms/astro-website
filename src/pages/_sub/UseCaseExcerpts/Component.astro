@@ -2,7 +2,7 @@
 import type { FragmentOf } from 'gql.tada';
 import { UseCaseExcerptsFragment } from './_graphql';
 import { Wrapper } from '~/components/Wrapper';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
 import s from './style.module.css';
 
@@ -25,7 +25,7 @@ const firstCase = cases[0];
               <img loading="lazy" src={firstCase.logo.url} />
             </div>
             <h5 class={s.mainStoryTitle}>
-              <Text data={firstCase.title} />
+              <Text {...ensureValidStructuredTextProps({ data: firstCase.title })} />
             </h5>
             <div class={s.goto}>Read the story →</div>
           </a>
@@ -35,7 +35,7 @@ const firstCase = cases[0];
                 <img loading="lazy" src={useCase.logo.url} />
               </div>
               <h5 class={s.otherUseCaseTitle}>
-                <Text data={useCase.title} />
+                <Text {...ensureValidStructuredTextProps({ data: useCase.title })} />
               </h5>
               <div class={s.goto}>Read the story →</div>
             </a>

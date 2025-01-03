@@ -1,0 +1,17 @@
+---
+import { HostingAppInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForHostingApp } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
+
+interface Props {
+  record: FragmentOf<typeof HostingAppInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(HostingAppInlineFragment, record);
+---
+
+<a href={buildUrlForHostingApp(unmaskedRecord)}>
+  {unmaskedRecord.title}
+</a>

@@ -9,8 +9,10 @@ import { ShowcaseProjectBlockFragment } from '~/components/blocks/ShowcaseProjec
 import { TableFragment } from '~/components/blocks/Table/graphql';
 import { TutorialVideoFragment } from '~/components/blocks/TutorialVideo/graphql';
 import { VideoFragment } from '~/components/blocks/Video/graphql';
+import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { BlogPostInlineFragment } from '~/components/inlineRecords/BlogPostInline/graphql';
 import { ChangelogEntryInlineFragment } from '~/components/inlineRecords/ChangelogEntryInline/graphql';
+import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { BlogPostLinkFragment } from '~/components/linkToRecords/BlogPostLink/graphql';
 import { ChangelogEntryLinkFragment } from '~/components/linkToRecords/ChangelogEntryLink/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
@@ -21,6 +23,7 @@ import {
   buildUrlForCustomerStory,
 } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { graphql } from '~/lib/datocms/graphql';
+import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
@@ -41,49 +44,64 @@ export const query = graphql(
               id
               __typename
             }
-            ...BlogPostInlineFragment
-            ...ChangelogEntryInlineFragment
+            ...AcademyChapterLinkFragment
+            ...AcademyCourseLinkFragment
             ...BlogPostLinkFragment
             ...ChangelogEntryLinkFragment
+            ...CustomerStoryLinkFragment
+            ...DocGroupLinkFragment
+            ...DocPageLinkFragment
+            ...EnterpriseAppLinkFragment
+            ...FeatureLinkFragment
+            ...HostingAppLinkFragment
+            ...LandingPageLinkFragment
+            ...PartnerLinkFragment
+            ...PluginLinkFragment
+            ...ProductComparisonLinkFragment
+            ...ShowcaseProjectLinkFragment
+            ...SuccessStoryLinkFragment
+            ...TechPartnerLinkFragment
+            ...TemplateDemoLinkFragment
+            ...UseCasePageLinkFragment
+            ...UserGuidesEpisodeLinkFragment
+
+            ...AcademyChapterInlineFragment
+            ...AcademyCourseInlineFragment
+            ...BlogPostInlineFragment
+            ...ChangelogEntryInlineFragment
+            ...CustomerStoryInlineFragment
+            ...DocGroupInlineFragment
+            ...DocPageInlineFragment
+            ...EnterpriseAppInlineFragment
+            ...FeatureInlineFragment
+            ...HostingAppInlineFragment
+            ...LandingPageInlineFragment
+            ...PartnerInlineFragment
+            ...PluginInlineFragment
+            ...ProductComparisonInlineFragment
+            ...ShowcaseProjectInlineFragment
+            ...SuccessStoryInlineFragment
+            ...TechPartnerInlineFragment
+            ...TemplateDemoInlineFragment
+            ...UseCasePageInlineFragment
+            ...UserGuidesEpisodeInlineFragment
           }
           blocks {
             ... on RecordInterface {
               id
               __typename
             }
-            ... on DemoRecord {
-              ...DemoFragment
-            }
-            ... on ImageRecord {
-              ...ImageFragment
-            }
-            ... on QuestionAnswerRecord {
-              ...QuestionAnswerFragment
-            }
-            ... on MultipleDemosBlockRecord {
-              ...MultipleDemosBlockFragment
-            }
-            ... on InternalVideoRecord {
-              ...InternalVideoFragment
-            }
-            ... on VideoRecord {
-              ...VideoFragment
-            }
-            ... on CodesandboxEmbedBlockRecord {
-              ...CodesandboxEmbedBlockFragment
-            }
-            ... on CtaButtonRecord {
-              ...CtaButtonFragment
-            }
-            ... on TutorialVideoRecord {
-              ...TutorialVideoFragment
-            }
-            ... on ShowcaseProjectBlockRecord {
-              ...ShowcaseProjectBlockFragment
-            }
-            ... on TableRecord {
-              ...TableFragment
-            }
+            ...DemoFragment
+            ...ImageFragment
+            ...QuestionAnswerFragment
+            ...MultipleDemosBlockFragment
+            ...InternalVideoFragment
+            ...VideoFragment
+            ...CodesandboxEmbedBlockFragment
+            ...CtaButtonFragment
+            ...TutorialVideoFragment
+            ...ShowcaseProjectBlockFragment
+            ...TableFragment
           }
         }
         people {
@@ -117,6 +135,8 @@ export const query = graphql(
     ChangelogEntryInlineFragment,
     BlogPostLinkFragment,
     ChangelogEntryLinkFragment,
+    ...defaultLinkToRecordFragments,
+    ...defaultInlineRecordFragments,
   ],
 );
 
@@ -136,4 +156,22 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
   );
 
   return entries.map(buildUrlForCustomerStory);
+};
+
+export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({
+  executeQueryOptions,
+  params: { slug },
+}) => {
+  const { entity } = await executeQueryOutsideAstro(
+    graphql(/* GraphQL */ `
+      query ParamsToRecordId($slug: String!) {
+        entity: customerStory(filter: { slug: { eq: $slug } }) {
+          id
+        }
+      }
+    `),
+    { ...executeQueryOptions, variables: { slug } },
+  );
+
+  return entity?.id;
 };

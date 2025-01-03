@@ -1,0 +1,18 @@
+---
+import { UseCasePageInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { InlineText, ensureValidStructuredTextProps } from '~/components/structuredText/InlineText';
+import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
+
+interface Props {
+  record: FragmentOf<typeof UseCasePageInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(UseCasePageInlineFragment, record);
+---
+
+<a href={buildUrlForUseCasePage(unmaskedRecord)}>
+  <InlineText {...ensureValidStructuredTextProps({ data: unmaskedRecord.title })} />
+</a>

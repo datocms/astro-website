@@ -2,7 +2,7 @@
 import { Heading } from '~/components/Heading';
 import s from './_style.module.css';
 import { MaybeLink } from '~/components/links/MaybeLink';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import Wrapper from '~/components/Wrapper/ReactComponent';
 import { Hero } from '~/components/Hero';
 import { slugify } from '~/lib/slugify';
@@ -65,7 +65,7 @@ const entriesByLetter = groupBy(entries, (entry) => entry.title[0]!.toUpperCase(
                       )}
                     </Heading>
                     <dd class={s.entryDescription}>
-                      <Text data={entry.description} />
+                      <Text {...ensureValidStructuredTextProps({ data: entry.description })} />
                     </dd>
                   </div>
                 ))}

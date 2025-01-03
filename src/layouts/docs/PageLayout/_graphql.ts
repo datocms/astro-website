@@ -9,6 +9,8 @@ import { DeployButtonFormFragment } from '~/components/docs/blocks/DeployButtonF
 import { DocCalloutFragment } from '~/components/docs/blocks/DocCallout/graphql';
 import { PluginSdkHookGroupFragment } from '~/components/docs/blocks/PluginSdkHookGroup/graphql';
 import { ReactUiLiveExampleFragment } from '~/components/docs/blocks/ReactUiLiveExample/graphql';
+import { defaultInlineRecordFragments } from '~/components/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
@@ -31,44 +33,69 @@ export const PageLayoutFragment = graphql(
       }
       content {
         value
+        links {
+          ... on RecordInterface {
+            id
+            __typename
+          }
+          ...AcademyChapterLinkFragment
+          ...AcademyCourseLinkFragment
+          ...BlogPostLinkFragment
+          ...ChangelogEntryLinkFragment
+          ...CustomerStoryLinkFragment
+          ...DocGroupLinkFragment
+          ...DocPageLinkFragment
+          ...EnterpriseAppLinkFragment
+          ...FeatureLinkFragment
+          ...HostingAppLinkFragment
+          ...LandingPageLinkFragment
+          ...PartnerLinkFragment
+          ...PluginLinkFragment
+          ...ProductComparisonLinkFragment
+          ...ShowcaseProjectLinkFragment
+          ...SuccessStoryLinkFragment
+          ...TechPartnerLinkFragment
+          ...TemplateDemoLinkFragment
+          ...UseCasePageLinkFragment
+          ...UserGuidesEpisodeLinkFragment
+
+          ...AcademyChapterInlineFragment
+          ...AcademyCourseInlineFragment
+          ...BlogPostInlineFragment
+          ...ChangelogEntryInlineFragment
+          ...CustomerStoryInlineFragment
+          ...DocGroupInlineFragment
+          ...DocPageInlineFragment
+          ...EnterpriseAppInlineFragment
+          ...FeatureInlineFragment
+          ...HostingAppInlineFragment
+          ...LandingPageInlineFragment
+          ...PartnerInlineFragment
+          ...PluginInlineFragment
+          ...ProductComparisonInlineFragment
+          ...ShowcaseProjectInlineFragment
+          ...SuccessStoryInlineFragment
+          ...TechPartnerInlineFragment
+          ...TemplateDemoInlineFragment
+          ...UseCasePageInlineFragment
+          ...UserGuidesEpisodeInlineFragment
+        }
         blocks {
           ... on RecordInterface {
             id
             __typename
           }
-          ... on ImageRecord {
-            ...ImageFragment
-          }
-          ... on TableRecord {
-            ...TableFragment
-          }
-          ... on DemoRecord {
-            ...DemoFragment
-          }
-          ... on MultipleDemosBlockRecord {
-            ...MultipleDemosBlockFragment
-          }
-          ... on InternalVideoRecord {
-            ...InternalVideoFragment
-          }
-          ... on CloneButtonFormRecord {
-            ...CloneButtonFormFragment
-          }
-          ... on DeployButtonFormRecord {
-            ...DeployButtonFormFragment
-          }
-          ... on PluginSdkHookGroupRecord {
-            ...PluginSdkHookGroupFragment
-          }
-          ... on DocCalloutRecord {
-            ...DocCalloutFragment
-          }
-          ... on ReactUiLiveExampleRecord {
-            ...ReactUiLiveExampleFragment
-          }
-          ... on TutorialVideoRecord {
-            ...TutorialVideoFragment
-          }
+          ...ImageFragment
+          ...TableFragment
+          ...DemoFragment
+          ...MultipleDemosBlockFragment
+          ...InternalVideoFragment
+          ...CloneButtonFormFragment
+          ...DeployButtonFormFragment
+          ...PluginSdkHookGroupFragment
+          ...DocCalloutFragment
+          ...ReactUiLiveExampleFragment
+          ...TutorialVideoFragment
         }
       }
     }
@@ -87,6 +114,8 @@ export const PageLayoutFragment = graphql(
     DocCalloutFragment,
     ReactUiLiveExampleFragment,
     TutorialVideoFragment,
+    ...defaultLinkToRecordFragments,
+    ...defaultInlineRecordFragments,
   ],
 );
 

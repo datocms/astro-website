@@ -1,0 +1,17 @@
+---
+import { TemplateDemoInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
+
+interface Props {
+  record: FragmentOf<typeof TemplateDemoInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(TemplateDemoInlineFragment, record);
+---
+
+<a href={buildUrlForTemplateDemo(unmaskedRecord)}>
+  {unmaskedRecord.name}
+</a>

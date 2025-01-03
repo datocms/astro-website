@@ -17,6 +17,12 @@ export const SupportTopicFragment = graphql(/* GraphQL */ `
     autoResponderType
     description {
       value
+      links {
+        ... on RecordInterface {
+          id
+          __typename
+        }
+      }
     }
     children {
       slug

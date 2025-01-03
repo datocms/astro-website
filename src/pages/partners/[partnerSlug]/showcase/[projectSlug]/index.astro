@@ -8,7 +8,7 @@ import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { SidebarPane } from '~/components/SidebarPane';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { VideoPlayer } from '~/components/VideoPlayer';
 import { Wrapper } from '~/components/Wrapper';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
@@ -18,6 +18,8 @@ import { query } from './_graphql';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const { projectSlug } = Astro.params;
 const variables = { projectSlug: projectSlug! };
@@ -34,7 +36,7 @@ if (!page) {
     {page.name}
     <Fragment slot="subtitle">
       <Space top={1}>
-        <Text data={page.headline} />
+        <Text {...ensureValidStructuredTextProps({ data: page.headline })} />
       </Space>
     </Fragment>
     <Fragment slot="below">
@@ -111,7 +113,13 @@ if (!page) {
       <aside class={s.aside}>
         <SidebarPane icon="info" title="About the project">
           <Prose>
-            <Text data={page.inDepthExplanation} />
+            <Text
+              {...ensureValidStructuredTextProps({
+                data: page.inDepthExplanation,
+                linkToRecordComponents: defaultLinkToRecordComponents,
+                inlineRecordComponents: defaultInlineRecordComponents,
+              })}
+            />
           </Prose>
         </SidebarPane>
         <SidebarPane icon="users" title="Made by">

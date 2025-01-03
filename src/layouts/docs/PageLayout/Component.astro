@@ -23,12 +23,13 @@ import {
   type SidebarEntry,
   type SidebarGroup,
 } from '~/components/docs/Sidebar';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { GroupLayout } from '~/layouts/docs/GroupLayout';
-import { withAllComponents } from '~/lib/datocms/structuredText';
 import { GroupLayoutFragment } from '../GroupLayout/_graphql';
 import { PageLayoutFragment } from './_graphql';
 import { Prose } from '~/components/Prose';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 type Props = {
   group: FragmentOf<typeof GroupLayoutFragment>;
@@ -82,19 +83,23 @@ const tocGroups = [
     <Prose>
       <slot>
         <Text
-          data={page.content}
-          blockComponents={withAllComponents(page.content.blocks, {
-            ImageRecord: Image,
-            TableRecord: Table,
-            DemoRecord: Demo,
-            MultipleDemosBlockRecord: MultipleDemosBlock,
-            InternalVideoRecord: InternalVideo,
-            CloneButtonFormRecord: CloneButtonForm,
-            DeployButtonFormRecord: DeployButtonForm,
-            PluginSdkHookGroupRecord: PluginSdkHookGroup,
-            DocCalloutRecord: DocCallout,
-            ReactUiLiveExampleRecord: ReactUiLiveExample,
-            TutorialVideoRecord: TutorialVideo,
+          {...ensureValidStructuredTextProps({
+            data: page.content,
+            blockComponents: {
+              ImageRecord: Image,
+              TableRecord: Table,
+              DemoRecord: Demo,
+              MultipleDemosBlockRecord: MultipleDemosBlock,
+              InternalVideoRecord: InternalVideo,
+              CloneButtonFormRecord: CloneButtonForm,
+              DeployButtonFormRecord: DeployButtonForm,
+              PluginSdkHookGroupRecord: PluginSdkHookGroup,
+              DocCalloutRecord: DocCallout,
+              ReactUiLiveExampleRecord: ReactUiLiveExample,
+              TutorialVideoRecord: TutorialVideo,
+            },
+            linkToRecordComponents: defaultLinkToRecordComponents,
+            inlineRecordComponents: defaultInlineRecordComponents,
           })}
         />
       </slot>

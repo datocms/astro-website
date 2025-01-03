@@ -1,0 +1,22 @@
+---
+import { CustomerStoryLinkFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
+import type { TransformedMeta } from 'datocms-structured-text-generic-html-renderer';
+import type { ItemLink } from 'datocms-structured-text-utils';
+import { augmentLinkWithMeta } from '..';
+
+interface Props {
+  node: ItemLink;
+  attrs: TransformedMeta;
+  record: FragmentOf<typeof CustomerStoryLinkFragment>;
+}
+
+const { record, attrs, node } = Astro.props;
+
+const unmaskedRecord = readFragment(CustomerStoryLinkFragment, record);
+---
+
+<a {...attrs} href={augmentLinkWithMeta(node.meta, buildUrlForCustomerStory(unmaskedRecord))}
+  ><slot /></a
+>

@@ -3,7 +3,7 @@ import { query } from './_graphql';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { Wrapper } from '~/components/Wrapper';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { Space } from '~/components/Space';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { LogosBar } from '~/components/LogosBar';
@@ -55,7 +55,7 @@ if (!page || posts.length === 0) {
             </div>
             <div class={s.postBody}>
               <div class={s.postTitle}>
-                <Text data={post.title} />
+                <Text {...ensureValidStructuredTextProps({ data: post.title })} />
               </div>
               <img src={post.logo.url} class={s.postLogo} />
             </div>

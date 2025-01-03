@@ -2,7 +2,9 @@
 import s from './style.module.css';
 import { QuestionAnswerFragment } from './graphql';
 import { readFragment, type FragmentOf } from 'gql.tada';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 interface Props {
   block: FragmentOf<typeof QuestionAnswerFragment>;
@@ -15,9 +17,21 @@ const block = readFragment(QuestionAnswerFragment, maskedBlock);
 
 <div class={s.qa}>
   <div class={s.qaQuestion}>
-    <Text data={block.question} />
+    <Text
+      {...ensureValidStructuredTextProps({
+        data: block.question,
+        linkToRecordComponents: defaultLinkToRecordComponents,
+        inlineRecordComponents: defaultInlineRecordComponents,
+      })}
+    />
   </div>
   <div class={s.qaAnswer}>
-    <Text data={block.answer} />
+    <Text
+      {...ensureValidStructuredTextProps({
+        data: block.answer,
+        linkToRecordComponents: defaultLinkToRecordComponents,
+        inlineRecordComponents: defaultInlineRecordComponents,
+      })}
+    />
   </div>
 </div>

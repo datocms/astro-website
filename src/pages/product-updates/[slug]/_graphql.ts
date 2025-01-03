@@ -6,6 +6,7 @@ import {
   ChangelogEntryUrlFragment,
 } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
 import { graphql } from '~/lib/datocms/graphql';
+import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
@@ -38,4 +39,22 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
   );
 
   return entries.map(buildUrlForChangelogEntry);
+};
+
+export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({
+  executeQueryOptions,
+  params: { slug },
+}) => {
+  const { entity } = await executeQueryOutsideAstro(
+    graphql(/* GraphQL */ `
+      query ParamsToRecordId($slug: String!) {
+        entity: changelogEntry(filter: { slug: { eq: $slug } }) {
+          id
+        }
+      }
+    `),
+    { ...executeQueryOptions, variables: { slug } },
+  );
+
+  return entity?.id;
 };

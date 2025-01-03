@@ -15,7 +15,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
-import { InlineText } from '~/components/structuredText/InlineText';
+import { InlineText, ensureValidStructuredTextProps } from '~/components/structuredText/InlineText';
 
 const { integrations, page } = await executeQuery(Astro, query);
 
@@ -32,10 +32,10 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
 <Layout additionalSeo={page._seoMetaTags}>
   <Hero>
     <Fragment slot="title">
-      <InlineText data={page.header} />
+      <InlineText {...ensureValidStructuredTextProps({ data: page.header })} />
     </Fragment>
     <Fragment slot="subtitle">
-      <InlineText data={page.subheader} />
+      <InlineText {...ensureValidStructuredTextProps({ data: page.subheader })} />
     </Fragment>
     <div class={s.buttonContainer}>
       <Button fs="big" as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
@@ -53,7 +53,7 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
               <ResponsiveImage data={pillar.image.responsiveImage} />
             </div>
             <div slot="title">
-              <InlineText data={pillar.title} />
+              <InlineText {...ensureValidStructuredTextProps({ data: pillar.title })} />
             </div>
             <article>
               {pillar.pillarCallout}
@@ -61,19 +61,19 @@ const marketersFeatures = page.features.filter((f) => f.featureGroup === 'market
                 <li>
                   <Svg name="icons/regular/check" />
                   <div>
-                    <InlineText data={pillar.capability1} />
+                    <InlineText {...ensureValidStructuredTextProps({ data: pillar.capability1 })} />
                   </div>
                 </li>
                 <li>
                   <Svg name="icons/regular/check" />
                   <div>
-                    <InlineText data={pillar.capability2} />
+                    <InlineText {...ensureValidStructuredTextProps({ data: pillar.capability2 })} />
                   </div>
                 </li>
                 <li>
                   <Svg name="icons/regular/check" />
                   <div>
-                    <InlineText data={pillar.capability3} />
+                    <InlineText {...ensureValidStructuredTextProps({ data: pillar.capability3 })} />
                   </div>
                 </li>
               </Bullets>

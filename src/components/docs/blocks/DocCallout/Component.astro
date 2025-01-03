@@ -4,8 +4,10 @@ import { Svg } from '~/components/Svg';
 import { DocCalloutFragment } from './graphql';
 import type { FragmentOf } from 'gql.tada';
 import { readFragment } from 'gql.tada';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { Prose } from '~/components/Prose';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 interface Props {
   block: FragmentOf<typeof DocCalloutFragment>;
@@ -41,7 +43,15 @@ const block = readFragment(DocCalloutFragment, maskedBlock);
           </div>
         )
       }
-      <Prose class={s.content}><Text data={block.text} /></Prose>
+      <Prose class={s.content}>
+        <Text
+          {...ensureValidStructuredTextProps({
+            data: block.text,
+            linkToRecordComponents: defaultLinkToRecordComponents,
+            inlineRecordComponents: defaultInlineRecordComponents,
+          })}
+        />
+      </Prose>
     </div>
   </prose-island>
 </figure>

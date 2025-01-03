@@ -13,11 +13,12 @@ import { Svg } from '~/components/Svg';
 import NextEpisode from './_NextEpisode.astro';
 import Episode from './_Episode.astro';
 import { TargetToggler } from '~/components/TargetToggler';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { Prose } from '~/components/Prose';
-import { withAllComponents } from '~/lib/datocms/structuredText';
 import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const { chapterSlug, episodeSlug } = Astro.params;
 
@@ -63,9 +64,13 @@ const nextEpisode =
         <div>
           <Prose class={s.content}>
             <Text
-              data={episode.content}
-              blockComponents={withAllComponents(episode.content.blocks, {
-                InternalVideoRecord: InternalVideo,
+              {...ensureValidStructuredTextProps({
+                data: episode.content,
+                blockComponents: {
+                  InternalVideoRecord: InternalVideo,
+                },
+                linkToRecordComponents: defaultLinkToRecordComponents,
+                inlineRecordComponents: defaultInlineRecordComponents,
               })}
             />
           </Prose>

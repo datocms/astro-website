@@ -4,10 +4,8 @@ import { graphql } from '~/lib/datocms/graphql';
 export const ChangelogEntryInlineFragment = graphql(
   /* GraphQL */ `
     fragment ChangelogEntryInlineFragment on ChangelogEntryRecord {
-      ... on ChangelogEntryRecord {
-        title
-        ...ChangelogEntryUrlFragment
-      }
+      title
+      ...ChangelogEntryUrlFragment
     }
   `,
   [ChangelogEntryUrlFragment],

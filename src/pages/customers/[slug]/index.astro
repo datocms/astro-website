@@ -4,7 +4,7 @@ import { InDepthCtaBlock } from '~/components/blocks/InDepthCtaBlock';
 import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { Layout } from '~/layouts/Layout';
 import { Prose } from '~/components/Prose';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import Head from './_sub/Head.astro';
 import Recap from './_sub/Recap.astro';
 import { Video } from '~/components/blocks/Video';
@@ -12,9 +12,10 @@ import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
-import { withAllComponents } from '~/lib/datocms/structuredText';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -41,17 +42,17 @@ const duotone = `duotone=${colors}`;
       logoUrl={page.logo.url}
       image={`${page.coverImage.url}?fp-y=${page.coverImage.focalPoint.y}&fp-x=${page.coverImage.focalPoint.x}&crop=focalpoint&fit=crop&${duotone}`}
     >
-      <Text data={page.title} />
+      <Text {...ensureValidStructuredTextProps({ data: page.title })} />
     </Head>
 
     <div id="usecase"></div>
 
     <Recap>
       <Fragment slot="challenge">
-        <Text data={page.challenge} />
+        <Text {...ensureValidStructuredTextProps({ data: page.challenge })} />
       </Fragment>
       <Fragment slot="result">
-        <Text data={page.result} />
+        <Text {...ensureValidStructuredTextProps({ data: page.result })} />
       </Fragment>
       <div class={s.numbers}>
         {
@@ -77,7 +78,7 @@ const duotone = `duotone=${colors}`;
           page.mainResults.map((res) => (
             <div class={s.resultsItem}>
               <h3>{res.title}</h3>
-              <Text data={res.description} />
+              <Text {...ensureValidStructuredTextProps({ data: res.description })} />
             </div>
           ))
         }
@@ -88,12 +89,16 @@ const duotone = `duotone=${colors}`;
       <div class={s.fullStory}>
         <Prose class={s.body}>
           <Text
-            data={page.content}
-            blockComponents={withAllComponents(page.content.blocks, {
-              ImageRecord: Image,
-              InDepthCtaBlockRecord: InDepthCtaBlock,
-              InternalVideoRecord: InternalVideo,
-              VideoRecord: Video,
+            {...ensureValidStructuredTextProps({
+              data: page.content,
+              blockComponents: {
+                ImageRecord: Image,
+                InDepthCtaBlockRecord: InDepthCtaBlock,
+                InternalVideoRecord: InternalVideo,
+                VideoRecord: Video,
+              },
+              linkToRecordComponents: defaultLinkToRecordComponents,
+              inlineRecordComponents: defaultInlineRecordComponents,
             })}
           />
         </Prose>

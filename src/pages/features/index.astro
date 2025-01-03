@@ -9,7 +9,7 @@ import { ScrollspyNav } from '~/components/ScrollspyNav';
 import { SingleQuote } from '~/components/quote/SingleQuote';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { Wrapper } from '~/components/Wrapper';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
 import { executeQuery } from '~/lib/datocms/executeQuery';
@@ -102,10 +102,10 @@ const linkLabel: { [key: string]: string } = {
     <div class={s.hero}>
       <div class={s.heroBody}>
         <h1 class={s.heroTitle}>
-          <Text data={page.title} />
+          <Text {...ensureValidStructuredTextProps({ data: page.title })} />
         </h1>
         <div class={s.heroSubtitle}>
-          <Text data={page.subtitle} />
+          <Text {...ensureValidStructuredTextProps({ data: page.subtitle })} />
         </div>
         <div class={s.buttonContainer}>
           <Button as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
@@ -198,7 +198,9 @@ const linkLabel: { [key: string]: string } = {
 
                             <div class={s.featureDescription}>
                               <Prose>
-                                <Text data={feature.description} />
+                                <Text
+                                  {...ensureValidStructuredTextProps({ data: feature.description })}
+                                />
                               </Prose>
                             </div>
 

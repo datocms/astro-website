@@ -1,0 +1,17 @@
+---
+import { TechPartnerInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForTechPartner } from '~/lib/datocms/gqlUrlBuilder/techPartner';
+
+interface Props {
+  record: FragmentOf<typeof TechPartnerInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(TechPartnerInlineFragment, record);
+---
+
+<a href={buildUrlForTechPartner(unmaskedRecord)}>
+  {unmaskedRecord.name}
+</a>

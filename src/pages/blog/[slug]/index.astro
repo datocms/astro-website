@@ -17,24 +17,21 @@ import { Video } from '~/components/blocks/Video';
 import { QuestionAnswer } from '~/components/blocks/QuestionAnswer';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { Wrapper } from '~/components/Wrapper';
 import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { filterNodes } from '~/lib/datocms/filterNodes';
-import { withAllComponents } from '~/lib/datocms/structuredText';
 import { formatDate } from '~/lib/formatters';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { slugify } from '~/lib/slugify';
 import { query } from './_graphql';
 import s from './_style.module.css';
 import { Prose } from '~/components/Prose';
-import { BlogPostInline } from '~/components/inlineRecords/BlogPostInline';
-import { ChangelogEntryInline } from '~/components/inlineRecords/ChangelogEntryInline';
-import { BlogPostLink } from '~/components/linkToRecords/BlogPostLink';
-import { ChangelogEntryLink } from '~/components/linkToRecords/ChangelogEntryLink';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { overrideSeo, seoTwitterCard } from '~/lib/datocms/seo';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const variables = { slug: Astro.params.slug! };
 const { post } = await executeQuery(Astro, query, { variables });
@@ -109,27 +106,23 @@ const tocItems = filterNodes(
       <div id="main-content">
         <Prose class={s.body}>
           <Text
-            data={post.content}
-            blockComponents={withAllComponents(post.content.blocks, {
-              ImageRecord: Image,
-              TableRecord: Table,
-              DemoRecord: Demo,
-              MultipleDemosBlockRecord: MultipleDemosBlock,
-              InternalVideoRecord: InternalVideo,
-              TutorialVideoRecord: TutorialVideo,
-              VideoRecord: Video,
-              ShowcaseProjectBlockRecord: ShowcaseProjectBlock,
-              CodesandboxEmbedBlockRecord: CodesandboxEmbedBlock,
-              CtaButtonRecord: CtaButton,
-              QuestionAnswerRecord: QuestionAnswer,
-            })}
-            inlineRecordComponents={withAllComponents(post.content.links, {
-              BlogPostRecord: BlogPostInline,
-              ChangelogEntryRecord: ChangelogEntryInline,
-            })}
-            linkToRecordComponents={withAllComponents(post.content.links, {
-              BlogPostRecord: BlogPostLink,
-              ChangelogEntryRecord: ChangelogEntryLink,
+            {...ensureValidStructuredTextProps({
+              data: post.content,
+              blockComponents: {
+                ImageRecord: Image,
+                TableRecord: Table,
+                DemoRecord: Demo,
+                MultipleDemosBlockRecord: MultipleDemosBlock,
+                InternalVideoRecord: InternalVideo,
+                TutorialVideoRecord: TutorialVideo,
+                VideoRecord: Video,
+                ShowcaseProjectBlockRecord: ShowcaseProjectBlock,
+                CodesandboxEmbedBlockRecord: CodesandboxEmbedBlock,
+                CtaButtonRecord: CtaButton,
+                QuestionAnswerRecord: QuestionAnswer,
+              },
+              linkToRecordComponents: defaultLinkToRecordComponents,
+              inlineRecordComponents: defaultInlineRecordComponents,
             })}
           />
         </Prose>

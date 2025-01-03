@@ -3,7 +3,7 @@ import { Button } from '~/components/Button';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Layout } from '~/layouts/Layout';
 import { Prose } from '~/components/Prose';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { Wrapper } from '~/components/Wrapper';
 import { Svg } from '~/components/Svg';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
@@ -19,6 +19,8 @@ import {
 } from '~/lib/datocms/seo';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -47,13 +49,21 @@ if (!page) {
     <figure class={s.logoContainer}>
       <img src={page.logo.url} alt={page.logo.alt} class={s.logo} />
     </figure>
-    <Fragment slot="subtitle"><Text data={page.shortDescription} /></Fragment>
+    <Fragment slot="subtitle"
+      ><Text {...ensureValidStructuredTextProps({ data: page.shortDescription })} /></Fragment
+    >
   </InterstitialTitle>
 
   <Wrapper>
     <div class={s.content}>
       <Prose>
-        <Text data={page.description} />
+        <Text
+          {...ensureValidStructuredTextProps({
+            data: page.description,
+            linkToRecordComponents: defaultLinkToRecordComponents,
+            inlineRecordComponents: defaultInlineRecordComponents,
+          })}
+        />
       </Prose>
 
       <div class={s.actions}>

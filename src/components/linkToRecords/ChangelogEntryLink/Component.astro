@@ -4,6 +4,7 @@ import { readFragment, type FragmentOf } from 'gql.tada';
 import { buildUrlForChangelogEntry } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
 import type { TransformedMeta } from 'datocms-structured-text-generic-html-renderer';
 import type { ItemLink } from 'datocms-structured-text-utils';
+import { augmentLinkWithMeta } from '..';
 
 interface Props {
   node: ItemLink;
@@ -11,9 +12,11 @@ interface Props {
   record: FragmentOf<typeof ChangelogEntryLinkFragment>;
 }
 
-const { record, attrs } = Astro.props;
+const { record, attrs, node } = Astro.props;
 
 const unmaskedRecord = readFragment(ChangelogEntryLinkFragment, record);
 ---
 
-<a {...attrs} href={buildUrlForChangelogEntry(unmaskedRecord)}><slot /></a>
+<a {...attrs} href={augmentLinkWithMeta(node.meta, buildUrlForChangelogEntry(unmaskedRecord))}
+  ><slot /></a
+>

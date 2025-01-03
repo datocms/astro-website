@@ -1,0 +1,17 @@
+---
+import { FeatureInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForFeature } from '~/lib/datocms/gqlUrlBuilder/feature';
+
+interface Props {
+  record: FragmentOf<typeof FeatureInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(FeatureInlineFragment, record);
+---
+
+<a href={buildUrlForFeature(unmaskedRecord)}>
+  {unmaskedRecord.seoH1}
+</a>

@@ -1,3 +1,5 @@
+import { defaultInlineRecordFragments } from '~/components/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
@@ -8,6 +10,7 @@ import {
   buildUrlForLandingPage,
 } from '~/lib/datocms/gqlUrlBuilder/landingPage';
 import { graphql } from '~/lib/datocms/graphql';
+import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
@@ -114,12 +117,8 @@ export const query = graphql(
           ... on QuoteLinkRecord {
             quote {
               __typename
-              ... on ReviewRecord {
-                ...ReviewQuoteFragment
-              }
-              ... on PartnerTestimonialRecord {
-                ...PartnerTestimonialQuoteFragment
-              }
+              ...ReviewQuoteFragment
+              ...PartnerTestimonialQuoteFragment
             }
           }
           ... on LandingVideoBlockRecord {
@@ -147,6 +146,53 @@ export const query = graphql(
             }
             content {
               value
+              links {
+                ... on RecordInterface {
+                  id
+                  __typename
+                }
+                ...AcademyChapterLinkFragment
+                ...AcademyCourseLinkFragment
+                ...BlogPostLinkFragment
+                ...ChangelogEntryLinkFragment
+                ...CustomerStoryLinkFragment
+                ...DocGroupLinkFragment
+                ...DocPageLinkFragment
+                ...EnterpriseAppLinkFragment
+                ...FeatureLinkFragment
+                ...HostingAppLinkFragment
+                ...LandingPageLinkFragment
+                ...PartnerLinkFragment
+                ...PluginLinkFragment
+                ...ProductComparisonLinkFragment
+                ...ShowcaseProjectLinkFragment
+                ...SuccessStoryLinkFragment
+                ...TechPartnerLinkFragment
+                ...TemplateDemoLinkFragment
+                ...UseCasePageLinkFragment
+                ...UserGuidesEpisodeLinkFragment
+
+                ...AcademyChapterInlineFragment
+                ...AcademyCourseInlineFragment
+                ...BlogPostInlineFragment
+                ...ChangelogEntryInlineFragment
+                ...CustomerStoryInlineFragment
+                ...DocGroupInlineFragment
+                ...DocPageInlineFragment
+                ...EnterpriseAppInlineFragment
+                ...FeatureInlineFragment
+                ...HostingAppInlineFragment
+                ...LandingPageInlineFragment
+                ...PartnerInlineFragment
+                ...PluginInlineFragment
+                ...ProductComparisonInlineFragment
+                ...ShowcaseProjectInlineFragment
+                ...SuccessStoryInlineFragment
+                ...TechPartnerInlineFragment
+                ...TemplateDemoInlineFragment
+                ...UseCasePageInlineFragment
+                ...UserGuidesEpisodeInlineFragment
+              }
             }
           }
         }
@@ -161,6 +207,8 @@ export const query = graphql(
     PartnerTestimonialQuoteFragment,
     ReviewQuoteFragment,
     VideoPlayerFragment,
+    ...defaultLinkToRecordFragments,
+    ...defaultInlineRecordFragments,
   ],
 );
 
@@ -180,4 +228,22 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
   );
 
   return entries.map(buildUrlForLandingPage);
+};
+
+export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({
+  executeQueryOptions,
+  params: { slug },
+}) => {
+  const { entity } = await executeQueryOutsideAstro(
+    graphql(/* GraphQL */ `
+      query ParamsToRecordId($slug: String!) {
+        entity: landingPage(filter: { slug: { eq: $slug } }) {
+          id
+        }
+      }
+    `),
+    { ...executeQueryOptions, variables: { slug } },
+  );
+
+  return entity?.id;
 };

@@ -11,12 +11,10 @@ export const query = graphql(
         }
         quote {
           __typename
-          ... on ReviewRecord {
-            ...ReviewQuoteFragment
-          }
-          ... on PartnerTestimonialRecord {
-            ...PartnerTestimonialQuoteFragment
-          }
+
+          ...ReviewQuoteFragment
+
+          ...PartnerTestimonialQuoteFragment
         }
       }
     }

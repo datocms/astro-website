@@ -1,3 +1,5 @@
+import { defaultInlineRecordFragments } from '~/components/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
@@ -6,6 +8,7 @@ import {
   buildUrlForProductComparison,
 } from '~/lib/datocms/gqlUrlBuilder/productComparison';
 import { graphql } from '~/lib/datocms/graphql';
+import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
@@ -24,12 +27,8 @@ export const query = graphql(
         }
         testimonials {
           __typename
-          ... on PartnerTestimonialRecord {
-            ...PartnerTestimonialQuoteFragment
-          }
-          ... on ReviewRecord {
-            ...ReviewQuoteFragment
-          }
+          ...PartnerTestimonialQuoteFragment
+          ...ReviewQuoteFragment
         }
         topics {
           id
@@ -38,6 +37,53 @@ export const query = graphql(
             id
             datocmsTake {
               value
+              links {
+                ... on RecordInterface {
+                  id
+                  __typename
+                }
+                ...AcademyChapterLinkFragment
+                ...AcademyCourseLinkFragment
+                ...BlogPostLinkFragment
+                ...ChangelogEntryLinkFragment
+                ...CustomerStoryLinkFragment
+                ...DocGroupLinkFragment
+                ...DocPageLinkFragment
+                ...EnterpriseAppLinkFragment
+                ...FeatureLinkFragment
+                ...HostingAppLinkFragment
+                ...LandingPageLinkFragment
+                ...PartnerLinkFragment
+                ...PluginLinkFragment
+                ...ProductComparisonLinkFragment
+                ...ShowcaseProjectLinkFragment
+                ...SuccessStoryLinkFragment
+                ...TechPartnerLinkFragment
+                ...TemplateDemoLinkFragment
+                ...UseCasePageLinkFragment
+                ...UserGuidesEpisodeLinkFragment
+
+                ...AcademyChapterInlineFragment
+                ...AcademyCourseInlineFragment
+                ...BlogPostInlineFragment
+                ...ChangelogEntryInlineFragment
+                ...CustomerStoryInlineFragment
+                ...DocGroupInlineFragment
+                ...DocPageInlineFragment
+                ...EnterpriseAppInlineFragment
+                ...FeatureInlineFragment
+                ...HostingAppInlineFragment
+                ...LandingPageInlineFragment
+                ...PartnerInlineFragment
+                ...PluginInlineFragment
+                ...ProductComparisonInlineFragment
+                ...ShowcaseProjectInlineFragment
+                ...SuccessStoryInlineFragment
+                ...TechPartnerInlineFragment
+                ...TemplateDemoInlineFragment
+                ...UseCasePageInlineFragment
+                ...UserGuidesEpisodeInlineFragment
+              }
             }
             competitorTake {
               value
@@ -49,6 +95,53 @@ export const query = graphql(
           title
           content {
             value
+            links {
+              ... on RecordInterface {
+                id
+                __typename
+              }
+              ...AcademyChapterLinkFragment
+              ...AcademyCourseLinkFragment
+              ...BlogPostLinkFragment
+              ...ChangelogEntryLinkFragment
+              ...CustomerStoryLinkFragment
+              ...DocGroupLinkFragment
+              ...DocPageLinkFragment
+              ...EnterpriseAppLinkFragment
+              ...FeatureLinkFragment
+              ...HostingAppLinkFragment
+              ...LandingPageLinkFragment
+              ...PartnerLinkFragment
+              ...PluginLinkFragment
+              ...ProductComparisonLinkFragment
+              ...ShowcaseProjectLinkFragment
+              ...SuccessStoryLinkFragment
+              ...TechPartnerLinkFragment
+              ...TemplateDemoLinkFragment
+              ...UseCasePageLinkFragment
+              ...UserGuidesEpisodeLinkFragment
+
+              ...AcademyChapterInlineFragment
+              ...AcademyCourseInlineFragment
+              ...BlogPostInlineFragment
+              ...ChangelogEntryInlineFragment
+              ...CustomerStoryInlineFragment
+              ...DocGroupInlineFragment
+              ...DocPageInlineFragment
+              ...EnterpriseAppInlineFragment
+              ...FeatureInlineFragment
+              ...HostingAppInlineFragment
+              ...LandingPageInlineFragment
+              ...PartnerInlineFragment
+              ...PluginInlineFragment
+              ...ProductComparisonInlineFragment
+              ...ShowcaseProjectInlineFragment
+              ...SuccessStoryInlineFragment
+              ...TechPartnerInlineFragment
+              ...TemplateDemoInlineFragment
+              ...UseCasePageInlineFragment
+              ...UserGuidesEpisodeInlineFragment
+            }
           }
         }
         importer {
@@ -59,7 +152,13 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, PartnerTestimonialQuoteFragment, ReviewQuoteFragment],
+  [
+    TagFragment,
+    PartnerTestimonialQuoteFragment,
+    ReviewQuoteFragment,
+    ...defaultLinkToRecordFragments,
+    ...defaultInlineRecordFragments,
+  ],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
@@ -78,4 +177,22 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
   );
 
   return entries.map(buildUrlForProductComparison);
+};
+
+export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({
+  executeQueryOptions,
+  params: { slug },
+}) => {
+  const { entity } = await executeQueryOutsideAstro(
+    graphql(/* GraphQL */ `
+      query ParamsToRecordId($slug: String!) {
+        entity: productComparison(filter: { slug: { eq: $slug } }) {
+          id
+        }
+      }
+    `),
+    { ...executeQueryOptions, variables: { slug } },
+  );
+
+  return entity?.id;
 };

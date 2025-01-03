@@ -8,7 +8,7 @@ import { Space } from '~/components/Space';
 import { Prose } from '~/components/Prose';
 import { Svg } from '~/components/Svg';
 import { Wrapper } from '~/components/Wrapper';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
@@ -23,6 +23,8 @@ import { fetchPerOwnerPricingPlans } from './_sub/perOwnerPricingPlans';
 import { SingleQuote } from '~/components/quote/SingleQuote';
 import { formatNumber } from '~/lib/formatters';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const { page, faqs, review1, planFeatureGroups, hints } = await executeQuery(Astro, query);
 
@@ -253,7 +255,13 @@ if (!page || !freePlan || !proPlan) {
                 <div class={s.faqQ}>{faq.question}</div>
                 <div class={s.faqA}>
                   <Prose>
-                    <Text data={faq.answer} />
+                    <Text
+                      {...ensureValidStructuredTextProps({
+                        data: faq.answer,
+                        linkToRecordComponents: defaultLinkToRecordComponents,
+                        inlineRecordComponents: defaultInlineRecordComponents,
+                      })}
+                    />
                   </Prose>
                 </div>
               </div>

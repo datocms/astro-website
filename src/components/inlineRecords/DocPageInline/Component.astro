@@ -1,0 +1,17 @@
+---
+import { DocPageInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForDocPage } from '~/lib/datocms/gqlUrlBuilder/docPage';
+
+interface Props {
+  record: FragmentOf<typeof DocPageInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(DocPageInlineFragment, record);
+---
+
+<a href={buildUrlForDocPage(unmaskedRecord)}>
+  {unmaskedRecord.title}
+</a>

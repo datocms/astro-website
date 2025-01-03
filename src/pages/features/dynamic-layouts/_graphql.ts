@@ -11,21 +11,13 @@ export const query = graphql(
         }
         quote {
           __typename
-          ... on ReviewRecord {
-            ...ReviewQuoteFragment
-          }
-          ... on PartnerTestimonialRecord {
-            ...PartnerTestimonialQuoteFragment
-          }
+          ...ReviewQuoteFragment
+          ...PartnerTestimonialQuoteFragment
         }
         quote2 {
           __typename
-          ... on ReviewRecord {
-            ...ReviewQuoteFragment
-          }
-          ... on PartnerTestimonialRecord {
-            ...PartnerTestimonialQuoteFragment
-          }
+          ...ReviewQuoteFragment
+          ...PartnerTestimonialQuoteFragment
         }
       }
     }

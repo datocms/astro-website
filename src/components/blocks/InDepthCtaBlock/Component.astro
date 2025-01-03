@@ -1,7 +1,7 @@
 ---
 import { type FragmentOf, readFragment } from '~/lib/datocms/graphql';
 import { Svg } from '~/components/Svg';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { InDepthCtaBlockFragment } from './graphql';
 import s from './style.module.css';
 
@@ -23,7 +23,7 @@ const unmaskedBlock = readFragment(InDepthCtaBlockFragment, block);
       <div class={s.inDepthTitle}>{unmaskedBlock.cta.title}</div>
 
       <div class={s.inDepthDescription}>
-        <Text data={unmaskedBlock.cta.description} />
+        <Text {...ensureValidStructuredTextProps({ data: unmaskedBlock.cta.description })} />
       </div>
       <div class={s.inDepthCta}>
         {unmaskedBlock.cta.ctaLabel}

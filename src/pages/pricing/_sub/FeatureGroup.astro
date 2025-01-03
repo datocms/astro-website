@@ -1,7 +1,7 @@
 ---
 import { Svg } from '~/components/Svg';
 import s from '../_style.module.css';
-import { InlineText } from '~/components/structuredText/InlineText';
+import { InlineText, ensureValidStructuredTextProps } from '~/components/structuredText/InlineText';
 import Check from './Check.astro';
 import Nope from './Nope.astro';
 import { type FragmentOf } from 'gql.tada';
@@ -38,7 +38,7 @@ const { group, startOpen } = Astro.props;
             <div class={s.fTableFeatureNameInfo}>
               <Svg name="icons/regular/info-circle" />
               <div class={s.fTableFeatureNameInfoHint}>
-                <InlineText data={feature.description} />
+                <InlineText {...ensureValidStructuredTextProps({ data: feature.description })} />
 
                 <div style={{ display: 'none' }}>
                   Related to: {group.name}, {(feature.tags as string[]).join(', ')}

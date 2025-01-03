@@ -7,13 +7,15 @@ import { Layout } from '~/layouts/Layout';
 import { LogosBar } from '~/components/LogosBar';
 import { QuotesCarousel } from '~/components/quote/QuotesCarousel';
 import { Space } from '~/components/Space';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -76,10 +78,10 @@ if (!page) {
 
         <div class={s.whyDifferent}>
           <div class={s.whyDifferentBlock}>
-            <Text data={page.datocmsCharacterization} />
+            <Text {...ensureValidStructuredTextProps({ data: page.datocmsCharacterization })} />
           </div>
           <div class={s.whyDifferentBlock}>
-            <Text data={page.competitorCharacterization} />
+            <Text {...ensureValidStructuredTextProps({ data: page.competitorCharacterization })} />
           </div>
         </div>
       </TitleStripWithContent>
@@ -120,11 +122,19 @@ if (!page) {
                       <div class={s.topicDifference}>
                         <div class={s.topicTake}>
                           <div class={s.topicTakeProduct}>DatoCMS...</div>
-                          <Text data={difference.datocmsTake} />
+                          <Text
+                            {...ensureValidStructuredTextProps({
+                              data: difference.datocmsTake,
+                              linkToRecordComponents: defaultLinkToRecordComponents,
+                              inlineRecordComponents: defaultInlineRecordComponents,
+                            })}
+                          />
                         </div>
                         <div class={s.topicTake}>
                           <div class={s.topicTakeProduct}>...vs {page.product}</div>
-                          <Text data={difference.competitorTake} />
+                          <Text
+                            {...ensureValidStructuredTextProps({ data: difference.competitorTake })}
+                          />
                         </div>
                       </div>
                     ))}
@@ -171,7 +181,13 @@ if (!page) {
                 <li class={s.reason}>
                   <div class={s.reasonTitle}>{reason.title}</div>
                   <div class={s.reasonContent}>
-                    <Text data={reason.content} />
+                    <Text
+                      {...ensureValidStructuredTextProps({
+                        data: reason.content,
+                        linkToRecordComponents: defaultLinkToRecordComponents,
+                        inlineRecordComponents: defaultInlineRecordComponents,
+                      })}
+                    />
                   </div>
                 </li>
               ))

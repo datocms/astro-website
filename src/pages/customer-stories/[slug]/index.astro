@@ -3,10 +3,6 @@ import {
   render as toPlainText,
   type StructuredTextDocument,
 } from 'datocms-structured-text-to-plain-text';
-import { BlogPostInline } from '~/components/inlineRecords/BlogPostInline';
-import { BlogPostLink } from '~/components/linkToRecords/BlogPostLink';
-import { ChangelogEntryInline } from '~/components/inlineRecords/ChangelogEntryInline';
-import { ChangelogEntryLink } from '~/components/linkToRecords/ChangelogEntryLink';
 import { CodesandboxEmbedBlock } from '~/components/blocks/CodesandboxEmbedBlock';
 import { CtaButton } from '~/components/blocks/CtaButton';
 import { Demo } from '~/components/blocks/Demo';
@@ -20,7 +16,7 @@ import { QuestionAnswer } from '~/components/blocks/QuestionAnswer';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { ShowcaseProjectBlock } from '~/components/blocks/ShowcaseProjectBlock';
 import { Table } from '~/components/blocks/Table';
-import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps, Text } from '~/components/structuredText/Text';
 import { TutorialVideo } from '~/components/blocks/TutorialVideo';
 import { Video } from '~/components/blocks/Video';
 import { Wrapper } from '~/components/Wrapper';
@@ -31,9 +27,10 @@ import { intersperse } from '~/lib/intersperse';
 import { isHeading } from 'datocms-structured-text-utils';
 import { query } from './_graphql';
 import { slugify } from '~/lib/slugify';
-import { withAllComponents } from '~/lib/datocms/structuredText';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
 const variables = { slug: Astro.params.slug! };
 const { post } = await executeQuery(Astro, query, { variables });
@@ -99,27 +96,23 @@ const tocItems = filterNodes(
       <div id="main-content">
         <Prose class={s.body}>
           <Text
-            data={post.content}
-            blockComponents={withAllComponents(post.content.blocks, {
-              ImageRecord: Image,
-              TableRecord: Table,
-              DemoRecord: Demo,
-              MultipleDemosBlockRecord: MultipleDemosBlock,
-              InternalVideoRecord: InternalVideo,
-              TutorialVideoRecord: TutorialVideo,
-              VideoRecord: Video,
-              ShowcaseProjectBlockRecord: ShowcaseProjectBlock,
-              CodesandboxEmbedBlockRecord: CodesandboxEmbedBlock,
-              CtaButtonRecord: CtaButton,
-              QuestionAnswerRecord: QuestionAnswer,
-            })}
-            inlineRecordComponents={withAllComponents(post.content.links, {
-              BlogPostRecord: BlogPostInline,
-              ChangelogEntryRecord: ChangelogEntryInline,
-            })}
-            linkToRecordComponents={withAllComponents(post.content.links, {
-              BlogPostRecord: BlogPostLink,
-              ChangelogEntryRecord: ChangelogEntryLink,
+            {...ensureValidStructuredTextProps({
+              data: post.content,
+              blockComponents: {
+                ImageRecord: Image,
+                TableRecord: Table,
+                DemoRecord: Demo,
+                MultipleDemosBlockRecord: MultipleDemosBlock,
+                InternalVideoRecord: InternalVideo,
+                TutorialVideoRecord: TutorialVideo,
+                VideoRecord: Video,
+                ShowcaseProjectBlockRecord: ShowcaseProjectBlock,
+                CodesandboxEmbedBlockRecord: CodesandboxEmbedBlock,
+                CtaButtonRecord: CtaButton,
+                QuestionAnswerRecord: QuestionAnswer,
+              },
+              linkToRecordComponents: defaultLinkToRecordComponents,
+              inlineRecordComponents: defaultInlineRecordComponents,
             })}
           />
         </Prose>

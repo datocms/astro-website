@@ -1,0 +1,17 @@
+---
+import { SuccessStoryInlineFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
+
+interface Props {
+  record: FragmentOf<typeof SuccessStoryInlineFragment>;
+}
+
+const { record } = Astro.props;
+
+const unmaskedRecord = readFragment(SuccessStoryInlineFragment, record);
+---
+
+<a href={buildUrlForSuccessStory(unmaskedRecord)}>
+  {unmaskedRecord.name}
+</a>

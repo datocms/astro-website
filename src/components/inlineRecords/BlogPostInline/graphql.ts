@@ -4,10 +4,8 @@ import { graphql } from '~/lib/datocms/graphql';
 export const BlogPostInlineFragment = graphql(
   /* GraphQL */ `
     fragment BlogPostInlineFragment on BlogPostRecord {
-      ... on BlogPostRecord {
-        title
-        ...BlogPostUrlFragment
-      }
+      title
+      ...BlogPostUrlFragment
     }
   `,
   [BlogPostUrlFragment],
