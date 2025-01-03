@@ -78,15 +78,17 @@ To render markdown, you can use:
 
 Avoid directly using `<StructuredText />`. Prefer `<Text />` or `<InlineText />` which offers a few sane defaults.
 
-Also, make sure to use `withAllComponents`, inside `blockComponents`, `linkToRecordComponents` and `inlineRecordComponents` to type-check that EVERY kind of available block is handled correctly!
+Also, make sure to use [`ensureValidStructuredTextProps`](https://github.com/datocms/astro-datocms/blob/main/src/StructuredText/README.md#strict-props-type-checking) to make sure that EVERY kind of available block/linked record is handled correctly!
 
 ```jsx
 <Text
-  {...ensureValidStructuredTextProps({ data: episode.content })}
-  blockComponents={withAllComponents(episode.content.blocks, {
-    InternalVideoRecord: InternalVideo,
-    ImageRecord: Image,
-    TableRecord: Table,
+  {...ensureValidStructuredTextProps({
+    data: episode.content,
+    blockComponents: {
+      InternalVideoRecord: InternalVideo,
+      ImageRecord: Image,
+      TableRecord: Table,
+    },
   })}
 />
 ```

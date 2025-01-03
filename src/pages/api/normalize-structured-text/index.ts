@@ -186,7 +186,7 @@ export const POST: APIRoute = async ({ url, request }) => {
     }
 
     const impossibleChangesByFieldId = Object.fromEntries(
-      Object.entries(changesByFieldId).filter(([fieldId, changes]) => {
+      Object.entries(changesByFieldId).filter(([fieldId]) => {
         const field = fieldById(fieldId);
 
         const validator = field.attributes.validators.structured_text_links as {
