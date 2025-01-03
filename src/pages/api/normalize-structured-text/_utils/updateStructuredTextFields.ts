@@ -3,6 +3,16 @@ import { type StructuredTextDocument } from 'datocms-structured-text-to-plain-te
 import { isBlock, type Node, type WithChildrenNode } from 'datocms-structured-text-utils';
 import { visit } from 'unist-util-visit';
 
+function isItem(maybeItem: unknown): maybeItem is SchemaTypes.Item {
+  return Boolean(
+    typeof maybeItem === 'object' &&
+      maybeItem &&
+      'type' in maybeItem &&
+      'id' in maybeItem &&
+      maybeItem.type === 'item',
+  );
+}
+
 /**
  * Recursively updates structured text fields within a DatoCMS record/block.
  * Processes all nested blocks and structured text content, applying the provided
@@ -47,11 +57,11 @@ export async function updateStructuredTextFields(
       visit(structuredTextValue.document, (node, index, parent) => {
         if (isBlock(node)) {
           // Recursively process nested blocks
-          const itemBlock = node.item as any as SchemaTypes.Item;
-          if (itemBlock) {
+          const itemBlockOrId = node.item;
+          if (isItem(itemBlockOrId)) {
             somethingChangedPromises.push(
               (async () => {
-                const result = await updateStructuredTextFields(fieldsFinder, itemBlock, cb, [
+                const result = await updateStructuredTextFields(fieldsFinder, itemBlockOrId, cb, [
                   ...path,
                   field.attributes.api_key,
                 ]);
@@ -83,25 +93,33 @@ export async function updateStructuredTextFields(
       }
     } else if (field.attributes.field_type === 'rich_text') {
       // Handle rich text fields with nested blocks
-      const itemBlocks = item.attributes[field.attributes.api_key] as SchemaTypes.Item[];
+      const itemBlocksOrIds = item.attributes[field.attributes.api_key] as (
+        | string
+        | SchemaTypes.Item
+      )[];
       const result: Array<SchemaTypes.ItemUpdateSchema['data'] | string> = [];
-      for (const itemBlock of itemBlocks) {
+      for (const itemBlockOrId of itemBlocksOrIds) {
         result.push(
-          await updateStructuredTextFields(fieldsFinder, itemBlock, cb, [
-            ...path,
-            field.attributes.api_key,
-            itemBlocks.indexOf(itemBlock).toString(),
-          ]),
+          isItem(itemBlockOrId)
+            ? await updateStructuredTextFields(fieldsFinder, itemBlockOrId, cb, [
+                ...path,
+                field.attributes.api_key,
+                itemBlocksOrIds.indexOf(itemBlockOrId).toString(),
+              ])
+            : itemBlockOrId,
         );
       }
-      if (result.some((item) => typeof item !== 'string')) {
+      if (result.some((itemOrItemId) => typeof itemOrItemId !== 'string')) {
         attributes[field.attributes.api_key] = result;
       }
     } else if (field.attributes.field_type === 'single_block') {
       // Handle single block fields
-      const itemBlock = item.attributes[field.attributes.api_key] as SchemaTypes.Item | null;
-      if (itemBlock) {
-        const result = await updateStructuredTextFields(fieldsFinder, itemBlock, cb, [
+      const itemBlockOrId = item.attributes[field.attributes.api_key] as
+        | string
+        | SchemaTypes.Item
+        | null;
+      if (itemBlockOrId && isItem(itemBlockOrId)) {
+        const result = await updateStructuredTextFields(fieldsFinder, itemBlockOrId, cb, [
           ...path,
           field.attributes.api_key,
         ]);
