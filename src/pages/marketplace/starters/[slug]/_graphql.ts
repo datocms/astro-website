@@ -33,13 +33,12 @@ export const query = graphql(
           }
         }
         screenshot {
-          ogImageUrl: url(imgixParams: { auto: format, w: 1200, h: 800, fit: crop, crop: top })
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 500, fit: crop, crop: top }) {
+          responsiveImage(imgixParams: { auto: format, w: 700, h: 400, fit: crop, crop: top }) {
             ...ResponsiveImageFragment
           }
         }
         backendScreenshot {
-          responsiveImage(imgixParams: { auto: format, h: 500, fit: crop, crop: top }) {
+          responsiveImage(imgixParams: { auto: format, w: 700, h: 400, fit: crop, crop: top }) {
             ...ResponsiveImageFragment
           }
         }

@@ -28,7 +28,7 @@ export const query = graphql(
           }
         }
         screenshot {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+          responsiveImage(imgixParams: { auto: format, w: 700, h: 400, fit: crop, crop: top }) {
             ...ResponsiveImageFragment
           }
         }
