@@ -4,6 +4,18 @@ import { sequence } from 'astro:middleware';
 import { isDraftModeEnabled } from './lib/draftMode';
 import logToRollbar from './lib/logToRollbar';
 
+export const removeDoubleSlashes: MiddlewareHandler = async (context, next) => {
+  const { request } = context;
+  const url = new URL(request.url);
+
+  if (url.pathname.includes('//')) {
+    url.pathname = url.pathname.replace(/\/{2,}/g, '/');
+    return Response.redirect(url.toString(), 301);
+  }
+
+  return next();
+};
+
 export const rollbar: MiddlewareHandler = async ({ request, params }, next) => {
   try {
     return await next();
@@ -40,10 +52,8 @@ export const basicAuth: MiddlewareHandler = (context, next) => {
 
   if (basicAuth) {
     const authValue = basicAuth.split(' ')[1];
-
     if (authValue) {
       const [user, pwd] = Buffer.from(authValue, 'base64').toString('utf-8').split(':');
-
       if (user === 'dato' && pwd === SECRET_API_TOKEN) {
         return next();
       }
@@ -60,4 +70,4 @@ export const basicAuth: MiddlewareHandler = (context, next) => {
   });
 };
 
-export const onRequest = sequence(rollbar, security, basicAuth);
+export const onRequest = sequence(removeDoubleSlashes, rollbar, security, basicAuth);
