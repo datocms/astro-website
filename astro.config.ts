@@ -170,7 +170,7 @@ export default defineConfig({
     // '/docs/guides/single-sign-on': '/marketplace/enterprise',
     // '/docs/guides/single-sign-on/configure-sso-with-okta': '/marketplace/enterprise/okta-sso',
     // '/docs/guides/single-sign-on/configure-sso-with-onelogin':
-      // '/marketplace/enterprise/onelogin-sso',
+    // '/marketplace/enterprise/onelogin-sso',
     // '/docs/deployments/travis': '/marketplace/hosting/travis-ci',
     // '/docs/deployments/[...rest]': '/marketplace/hosting/[...rest]',
     // '/plugins/i/@stackbitdatocms-plugin-typed-list':
