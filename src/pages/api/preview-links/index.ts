@@ -1,4 +1,4 @@
-import { buildClient } from '@datocms/cma-client';
+import { buildClient, SchemaTypes } from '@datocms/cma-client';
 import type { APIRoute } from 'astro';
 import { PUBLIC_HOSTNAME } from 'astro:env/client';
 import { DATOCMS_API_TOKEN, DRAFT_MODE_HOSTNAME, SECRET_API_TOKEN } from 'astro:env/server';
@@ -41,7 +41,11 @@ export const POST: APIRoute = async ({ url, request }) => {
      * along with information about which locale they are currently viewing in
      * the interface
      */
-    const { item, itemType, environmentId } = await request.json();
+    const { item, itemType, environmentId } = (await request.json()) as {
+      item: SchemaTypes.Item;
+      itemType: SchemaTypes.ItemType;
+      environmentId: string;
+    };
 
     const client = buildClient({
       apiToken: DATOCMS_API_TOKEN,
@@ -67,7 +71,9 @@ export const POST: APIRoute = async ({ url, request }) => {
         url.searchParams.set('token', SECRET_API_TOKEN);
 
         response.previewLinks.push({
-          label: 'Draft version',
+          label: item.meta.is_current_version_valid
+            ? 'Draft version'
+            : `Draft version (invalid record, won't be shown)`,
           url: url.toString(),
         });
       }
