@@ -18,7 +18,7 @@ import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDem
 type Props = {
   contentWrapperComponent?: (props: any) => any;
   group: FragmentOf<typeof GroupLayoutFragment>;
-  additionalSeo: TitleMetaLinkTag[];
+  seo: TitleMetaLinkTag[];
   sidebarItemsIfNoPagesOrSectionsInGroup?: (SidebarEntry | SidebarGroup)[];
   additionalSidebarItems?: (SidebarEntry | SidebarGroup)[];
 };
@@ -26,7 +26,7 @@ type Props = {
 const {
   contentWrapperComponent,
   group: maskedGroup,
-  additionalSeo,
+  seo,
   sidebarItemsIfNoPagesOrSectionsInGroup = [],
   additionalSidebarItems = [],
 } = Astro.props;
@@ -34,7 +34,7 @@ const {
 const group = readFragment(GroupLayoutFragment, maskedGroup);
 ---
 
-<BaseLayout additionalSeo={additionalSeo} contentWrapperComponent={contentWrapperComponent}>
+<BaseLayout seo={seo} contentWrapperComponent={contentWrapperComponent}>
   <Fragment slot="sidebar">
     <a href="/docs" class={s.backHome}>
       <Svg name="icons/regular/chevron-double-left" /> Home

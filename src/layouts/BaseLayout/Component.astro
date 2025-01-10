@@ -6,10 +6,10 @@ import ProgressBar from './_ProgressBar.astro';
 import { fetchFavicon } from './fetchFavicon';
 
 type Props = {
-  additionalSeo: TitleMetaLinkTag[];
+  seo: TitleMetaLinkTag[];
 };
 
-const { additionalSeo } = Astro.props;
+const { seo } = Astro.props;
 
 const [result] = await fetchFavicon(Astro);
 ---
@@ -23,7 +23,7 @@ const [result] = await fetchFavicon(Astro);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <Seo data={[...result._site.faviconMetaTags, ...additionalSeo]} />
+    <Seo data={[...result._site.faviconMetaTags, ...seo]} />
     <link rel="alternate" type="application/rss+xml" title="DatoCMS Blog" href="/blog.xml" />
     <link
       rel="alternate"
