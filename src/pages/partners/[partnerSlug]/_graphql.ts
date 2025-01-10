@@ -159,19 +159,19 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
   return entries.map(buildUrlForPartner);
 };
 
-export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({
+export const paramsToRecordId: ParamsToRecordIdFn<{ partnerSlug: string }> = async ({
   executeQueryOptions,
-  params: { slug },
+  params: { partnerSlug },
 }) => {
   const { entity } = await executeQueryOutsideAstro(
     graphql(/* GraphQL */ `
-      query ParamsToRecordId($slug: String!) {
-        entity: partner(filter: { slug: { eq: $slug } }) {
+      query ParamsToRecordId($partnerSlug: String!) {
+        entity: partner(filter: { slug: { eq: $partnerSlug } }) {
           id
         }
       }
     `),
-    { ...executeQueryOptions, variables: { slug } },
+    { ...executeQueryOptions, variables: { partnerSlug } },
   );
 
   return entity?.id;
