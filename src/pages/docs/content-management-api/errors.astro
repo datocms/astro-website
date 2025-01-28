@@ -1,0 +1,53 @@
+---
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Heading } from '~/components/Heading';
+import { PageLayout, findGroupAndPage } from '~/layouts/docs/PageLayout';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { fetchErrorCodes } from './_utils';
+import { Markdown } from '~/components/Markdown';
+import { buildSidebarItems } from '~/components/docs/restApi/buildSidebarItems';
+
+const result = await findGroupAndPage(Astro, 'content-management-api/errors');
+
+if (!result) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const [group, page, queryListenerProps] = result;
+const sidebarItems = await buildSidebarItems(Astro);
+
+const response = await fetchErrorCodes(Astro);
+const sortedErrorCodes = Object.keys(response).sort();
+---
+
+<PageLayout
+  page={page}
+  group={group}
+  additionalSidebarItems={sidebarItems}
+  additionalTocGroups={[
+    {
+      title: 'Error codes',
+      entries: sortedErrorCodes.map((errorCode) => ({
+        label: errorCode,
+        url: `#${errorCode}`,
+      })),
+    },
+  ]}
+>
+  <Fragment slot="afterPageContent">
+    <Heading anchor="error-codes" as="h2">Error codes</Heading>
+    {
+      sortedErrorCodes.map((errorCode) => (
+        <>
+          <Heading anchor={errorCode} as="h6">
+            <code>{errorCode}</code>
+          </Heading>
+          <Markdown of={response[errorCode]!} />
+        </>
+      ))
+    }
+  </Fragment>
+</PageLayout>
+
+{queryListenerProps.map((props) => <DraftModeQueryListener {...props} />)}

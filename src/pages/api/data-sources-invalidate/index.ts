@@ -5,6 +5,11 @@ import { maybeInvalidateReactUiExamples } from '~/components/docs/blocks/ReactUi
 import { maybeInvalidateSiteApiHyperschema } from '~/components/docs/restApi/fetchSchema';
 import { maybeInvalidateFastlyDatacenters } from '~/components/featureAnimations/CdnMap/utils';
 import { maybeInvalidateFavicon } from '~/layouts/BaseLayout/fetchFavicon';
+import {
+  maybeInvalidateCdaIntrospectionFieldFilters,
+  maybeInvalidateCdaIntrospectionUploadFilters,
+} from '~/pages/docs/content-delivery-api/_utils';
+import { maybeInvalidateSiteApiErrorCodes } from '~/pages/docs/content-management-api/_utils';
 import { maybeInvalidateDastSchema } from '~/pages/docs/structured-text/_utils';
 import { maybeInvalidatePerOwnerPricingPlans } from '~/pages/pricing/_sub/perOwnerPricingPlans';
 import { handleUnexpectedError, invalidRequestResponse, json } from '../_utils';
@@ -27,6 +32,9 @@ export const POST: APIRoute = async ({ url, request }) => {
       maybeInvalidateDastSchema(),
       maybeInvalidateFastlyDatacenters(),
       maybeInvalidateFavicon(),
+      maybeInvalidateCdaIntrospectionUploadFilters(),
+      maybeInvalidateCdaIntrospectionFieldFilters(),
+      maybeInvalidateSiteApiErrorCodes(),
     ]);
 
     return json({ invalidatedSurrogateKeys: results.filter(Boolean) });

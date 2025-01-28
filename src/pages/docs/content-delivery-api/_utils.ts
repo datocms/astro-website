@@ -1,5 +1,6 @@
 import ky from 'ky';
 import { sortBy } from 'lodash-es';
+import { dataSource } from '~/lib/dataSource';
 
 type ScalarInput = {
   type: 'scalar';
@@ -41,27 +42,29 @@ type Operator = {
 
 export type Filters = Record<string, Operator>;
 
-export async function fetchIntrospectionFieldFilters() {
-  const { field_types, meta } = await ky<{
-    meta: Record<string, Filters>;
-    field_types: Record<string, Filters>;
-  }>(`https://internal.datocms.com/introspection/field-filters`).json();
+export const [fetchIntrospectionFieldFilters, maybeInvalidateCdaIntrospectionFieldFilters] =
+  dataSource('cda-introspection-field-filters', async () => {
+    const { field_types, meta } = await ky<{
+      meta: Record<string, Filters>;
+      field_types: Record<string, Filters>;
+    }>(`https://internal.datocms.com/introspection/field-filters`).json();
 
-  return {
-    field_types: Object.fromEntries(sortBy(Object.entries(field_types), '0')),
-    meta: Object.fromEntries(sortBy(Object.entries(meta), '0')),
-  };
-}
+    return {
+      field_types: Object.fromEntries(sortBy(Object.entries(field_types), '0')),
+      meta: Object.fromEntries(sortBy(Object.entries(meta), '0')),
+    };
+  });
 
-export async function fetchIntrospectionUploadFilters() {
-  const { filters } = await ky<{ filters: Record<string, Filters> }>(
-    `https://internal.datocms.com/introspection/upload-filters`,
-  ).json();
+export const [fetchIntrospectionUploadFilters, maybeInvalidateCdaIntrospectionUploadFilters] =
+  dataSource('cda-introspection-upload-filters', async () => {
+    const { filters } = await ky<{ filters: Record<string, Filters> }>(
+      `https://internal.datocms.com/introspection/upload-filters`,
+    ).json();
 
-  return {
-    filters: Object.fromEntries(sortBy(Object.entries(filters), '0')),
-  };
-}
+    return {
+      filters: Object.fromEntries(sortBy(Object.entries(filters), '0')),
+    };
+  });
 
 export const fieldTypeName: Record<string, string> = {
   boolean: 'Boolean',
