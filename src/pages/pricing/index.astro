@@ -164,26 +164,6 @@ if (!page || !freePlan || !proPlan) {
     </Wrapper>
 
     <pricing-context-provider>
-      <div class={s.modalWrapper} id="free-plan-details">
-        <a href="#" class={s.modalOverlay}></a>
-        <div class={s.modal}>
-          <a href="#" class={s.modalClose}>
-            <Svg name="icons/regular/times-circle" />
-          </a>
-          <div class={s.modalTitle}>Free vs Professional</div>
-          <div class={s.modalWarning}>
-            ⚠️{' '}
-            <strong>In the Free plan, you can&apos;t go over the allowed monthly limits.</strong>{
-              ' '
-            }
-            If you reach these limits, the service will stop responding as expected.
-          </div>
-          <div class={s.fTableScroll}>
-            <FreeLimitsTable hints={hints} freePlan={freePlan} proPlan={proPlan} />
-          </div>
-        </div>
-      </div>
-
       <a id="details"></a>
 
       <Space top={2}>
@@ -289,6 +269,24 @@ if (!page || !freePlan || !proPlan) {
   </Space>
 
   <DraftModeQueryListener query={query} />
+
+  <div class={s.modalWrapper} id="free-plan-details" slot="unwrapped">
+    <a href="#" class={s.modalOverlay}></a>
+    <div class={s.modal}>
+      <a href="#" class={s.modalClose}>
+        <Svg name="icons/regular/times-circle" />
+      </a>
+      <div class={s.modalTitle}>Free vs Professional</div>
+      <div class={s.modalWarning}>
+        ⚠️{' '}
+        <strong>In the Free plan, you can&apos;t go over the allowed monthly limits.</strong>{' '}
+        If you reach these limits, the service will stop responding as expected.
+      </div>
+      <div class={s.fTableScroll}>
+        <FreeLimitsTable hints={hints} freePlan={freePlan} proPlan={proPlan} />
+      </div>
+    </div>
+  </div>
 </Layout>
 
 <script>
