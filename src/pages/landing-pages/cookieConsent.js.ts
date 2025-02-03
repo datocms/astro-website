@@ -58,14 +58,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-TJRM9NT');
 `;
 
+//language=js (please leave this line... it's for IDE syntax highlighting of the following template literal)
 const cookieConsentScript = `
 (() => {
   const scriptsToAddOnCookieConsent = \`${scriptsToAddOnCookieConsent}\`;
 
   function addScripts() {
-    const script = document.createElement('script');
-    script.appendChild(document.createTextNode(scriptsToAddOnCookieConsent));
-    document.getElementsByTagName('head')[0].appendChild(script);
+    try {
+      const script = document.createElement('script');
+      script.appendChild(document.createTextNode(scriptsToAddOnCookieConsent));
+      document.getElementsByTagName('head')[0].appendChild(script);
+    } catch (error) {
+      console.error('Unable to add cookie scripts', error);
+    }
   }
 
   function onReady(cb) {
