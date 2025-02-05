@@ -88,4 +88,16 @@ const [result] = await fetchFavicon(Astro);
   observer.observe(document.head, {
     childList: true,
   });
+
+  document.addEventListener('astro:page-load', () => {
+    if ('posthog' in window) {
+      (window as any).posthog.capture('$pageview');
+    }
+  });
+
+  document.addEventListener('astro:before-swap', () => {
+    if ('posthog' in window) {
+      (window as any).posthog.capture('$pageleave');
+    }
+  });
 </script>
