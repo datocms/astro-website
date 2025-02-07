@@ -5,6 +5,7 @@ import { Markdown } from '~/components/Markdown';
 import removeMarkdown from 'remove-markdown';
 import { Code } from '~/components/Code';
 import type { PropertyOrMethod } from '../manifestTypes';
+import { Prose } from '~/components/Prose';
 
 type Props = {
   name: string;
@@ -16,14 +17,12 @@ const { name, propertyOrMethod } = Astro.props;
 const baseUrl = 'https://github.com/datocms/plugins-sdk/blob/master/packages/sdk/';
 ---
 
-<expandable-attribute>
-  <div class={s.hook}>
-    <div class={s.hookExpand} data-expandable-attribute-button>
-      <span><Svg name="icons/regular/plus" /></span>
-      <span><Svg name="icons/regular/times" /></span>
-    </div>
-    <div class={s.hookBody}>
-      <button type="button" class={s.hookName} data-expandable-attribute-button>
+<prose-island>
+  <details class={s.hook}>
+    <summary class={s.hookExpand}>
+      <Svg name="icons/regular/plus" class={s.closedSvg} />
+      <Svg name="icons/regular/times" class={s.openSvg} />
+      <div class={s.hookName}>
         <span class={s.hookNameName}>
           ctx.{name}{
             propertyOrMethod.type.length > 50
@@ -42,62 +41,33 @@ const baseUrl = 'https://github.com/datocms/plugins-sdk/blob/master/packages/sdk
             </span>
           )
         }
-      </button>
-
-      <div class={s.hookDeets} data-expandable-attribute-content>
-        <div class={s.hookDescription}>
+      </div>
+    </summary>
+    <div class={s.hookBody}>
+      <div class={s.hookDescription}>
+        <Prose>
           {
             propertyOrMethod.comment?.markdownText && (
               <Markdown of={propertyOrMethod.comment?.markdownText} />
             )
           }
-          <a
-            href={`${baseUrl}${propertyOrMethod.location.filePath}#L${propertyOrMethod.location.lineNumber}`}
-            target="_blank"
-            rel="noreferrer"
-            class={s.hookGithub}
-          >
-            View on Github <Svg name="icons/brands/github" />
-          </a>
-        </div>
-        {
-          propertyOrMethod.comment?.example && (
-            <div class={s.hookCode}>
-              <Code code={propertyOrMethod.comment?.example} language="ts" />
-            </div>
-          )
-        }
+        </Prose>
+        <a
+          href={`${baseUrl}${propertyOrMethod.location.filePath}#L${propertyOrMethod.location.lineNumber}`}
+          target="_blank"
+          rel="noreferrer"
+          class={s.hookGithub}
+        >
+          View on Github <Svg name="icons/brands/github" />
+        </a>
       </div>
-    </div>
-  </div>
-</expandable-attribute>
-
-<script>
-  import { WebComponent } from '~/lib/WebComponent';
-
-  window.customElements.define(
-    'expandable-attribute',
-    class ExpandableAttribute extends WebComponent {
-      content!: HTMLElement;
-      toggles!: HTMLButtonElement[];
-
-      parsedCallback() {
-        this.toggles = this.$$('[data-expandable-attribute-button]');
-        this.content = this.$('[data-expandable-attribute-content]');
-
-        for (const toggle of this.toggles) {
-          this.on(toggle, 'click', (_event, el) => {
-            const expanded = el.getAttribute('aria-expanded') === 'true' || false;
-            const newExpanded = !expanded;
-
-            for (const toggle of this.toggles) {
-              toggle.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
-            }
-
-            this.content.toggleAttribute('data-open', newExpanded);
-          });
-        }
+      {
+        propertyOrMethod.comment?.example && (
+          <div class={s.hookCode}>
+            <Code code={propertyOrMethod.comment?.example} language="ts" />
+          </div>
+        )
       }
-    },
-  );
-</script>
+    </div>
+  </details>
+</prose-island>

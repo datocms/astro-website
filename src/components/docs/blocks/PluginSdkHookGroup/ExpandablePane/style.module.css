@@ -3,57 +3,41 @@
   border-radius: 3px;
   overflow: hidden;
   margin: 10px 0;
-}
-
-.expandablePaneButton {
-  background: white;
-  color: var(--base-body-color);
-  border: 0;
-  padding: 10px;
-  font-family: var(--font-sans);
-  font-size: inherit;
-  cursor: pointer;
-  text-decoration: none;
-  background: var(--light-bg-color);
   display: block;
-  width: 100%;
-  font-weight: bold;
-  font-size: 15px;
+  padding: 0;
 
-  & > span {
+  & > summary {
+    background: white;
+    color: var(--base-body-color);
+    border: 0;
+    padding: 10px;
+    font-family: var(--font-sans);
+    font-size: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    background: var(--light-bg-color);
     display: flex;
+    width: 100%;
+    font-weight: bold;
+    font-size: 15px;
     align-items: center;
     gap: 10px;
+
+    & > svg {
+      fill: var(--extra-light-body-color);
+    }
   }
 
-  svg {
-    fill: var(--extra-light-body-color);
-  }
-
-  & > span:first-child {
-    display: flex;
-  }
-
-  & > span:last-child {
+  &[open] > summary > .closedSvg {
     display: none;
   }
 
-  &[aria-expanded='true'] {
-    & > span:first-child {
-      display: none;
-    }
-    & > span:last-child {
-      display: flex;
-    }
+  &:not([open]) > summary > .openSvg {
+    display: none;
   }
 }
 
 .expandablePaneContent {
   padding: 15px;
-  display: none;
   font-size: 16px;
-
-  &[data-open] {
-    display: block;
-  }
 }

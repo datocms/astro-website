@@ -6,41 +6,46 @@
   border-radius: 3px;
   position: relative;
   font-size: 15px;
-}
 
-.hookExpand {
-  position: absolute;
-  top: 11px;
-  left: 13px;
-  cursor: pointer;
+  summary {
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-weight: normal;
 
-  svg {
-    color: var(--extra-light-body-color);
-    flex-shrink: 0;
-    display: block;
-  }
-
-  span:first-child {
-    display: block;
-  }
-  span:last-child {
-    display: none;
-  }
-
-  &[data-open] {
-    span:first-child {
-      display: none;
-    }
-    span:last-child {
+    svg {
+      color: var(--extra-light-body-color);
+      flex-shrink: 0;
       display: block;
     }
+  }
+
+  &[open] {
+    .hookNameDesc {
+      display: none;
+    }
+
+    & > summary > .closedSvg {
+      display: none;
+    }
+  }
+
+  &:not([open]) > summary > .openSvg {
+    display: none;
   }
 }
 
 .hookBody {
-  flex: 1;
   padding-left: 20px;
-  align-self: center;
+  margin-top: 16px;
+  margin-bottom: 5px;
+  line-height: 1.2;
+
+  figure {
+    margin-top: 15px;
+  }
 }
 
 .hookName {
@@ -55,14 +60,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   height: 21px;
-
-  &:hover .hookNameDesc {
-    color: var(--base-body-color);
-  }
-
-  &:not([aria-expanded='true']) .hookNameDesc {
-    display: inline;
-  }
+  display: inline;
 }
 
 .hookNameName {
@@ -72,7 +70,6 @@
 }
 
 .hookNameDesc {
-  display: none;
   padding-left: 10px;
   font-size: 13px;
   color: var(--light-body-color);
@@ -83,21 +80,6 @@ a.hookGithub {
   margin-top: 5px;
   font-size: 13px;
   color: var(--light-body-color);
-}
-
-.hookDeets {
-  margin-top: 16px;
-  margin-bottom: 5px;
-  line-height: 1.2;
-  display: none;
-
-  &[data-open] {
-    display: block;
-  }
-
-  figure {
-    margin-top: 15px;
-  }
 }
 
 .hookCode {
