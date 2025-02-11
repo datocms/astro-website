@@ -52,7 +52,7 @@ const scriptsToAddOnCookieConsent = `
 posthog.init('phc_u7FPCuTnUpVlYYTYmfeutKpnI7qEE2cjwgzjz3JDuH6', {
   api_host: 'https://eu.i.posthog.com',
   person_profiles: 'identified_only',
-})
+});
 
 (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
