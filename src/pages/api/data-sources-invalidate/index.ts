@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { SECRET_API_TOKEN } from 'astro:env/server';
 import { maybeInvalidateFetchPluginSdkManifest } from '~/components/docs/blocks/PluginSdkHookGroup';
-import { maybeInvalidateReactUiExamples } from '~/components/docs/blocks/ReactUiLiveExample/utils';
 import { maybeInvalidateSiteApiHyperschema } from '~/components/docs/restApi/fetchSchema';
 import { maybeInvalidateFastlyDatacenters } from '~/components/featureAnimations/CdnMap/utils';
 import { maybeInvalidateFavicon } from '~/layouts/BaseLayout/fetchFavicon';
@@ -28,7 +27,6 @@ export const POST: APIRoute = async ({ url, request }) => {
       maybeInvalidateFetchPluginSdkManifest(),
       maybeInvalidateSiteApiHyperschema(),
       maybeInvalidatePerOwnerPricingPlans(),
-      maybeInvalidateReactUiExamples(),
       maybeInvalidateDastSchema(),
       maybeInvalidateFastlyDatacenters(),
       maybeInvalidateFavicon(),
