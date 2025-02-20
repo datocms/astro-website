@@ -1,0 +1,316 @@
+---
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import s from './style.module.css';
+import { Button } from '~/components/Button';
+import ky from 'ky';
+import { Svg } from '~/components/Svg';
+
+type Props = {
+  productId: string;
+};
+
+const currencies: Record<string, string> = {
+  USD: '$',
+  EUR: '\u20ac',
+  AED: '\u062f.\u0625',
+  AFN: '\u060b',
+  ALL: 'L',
+  AMD: '\u058f',
+  ANG: '\u0192',
+  AOA: 'Kz',
+  ARS: '$',
+  AUD: '$',
+  AWG: '\u0192',
+  AZN: '\u20bc',
+  BAM: 'KM',
+  BBD: '$',
+  BDT: '\u09f3',
+  BGN: '\u043b\u0432.',
+  BHD: '.\u062f.\u0628',
+  BIF: 'Fr',
+  BMD: '$',
+  BND: '$',
+  BOB: 'Bs.',
+  BRL: 'R$',
+  BSD: '$',
+  BTN: 'Nu.',
+  BWP: 'P',
+  BYN: 'Br',
+  BZD: '$',
+  CAD: '$',
+  CDF: 'Fr',
+  CHF: 'Fr.',
+  CLP: '$',
+  CNY: '\u00a5',
+  COP: '$',
+  CRC: '\u20a1',
+  CUP: '$',
+  CVE: '$',
+  CZK: 'K\u010d',
+  DJF: 'Fr',
+  DKK: 'kr',
+  DOP: 'RD$',
+  DZD: '\u062f.\u062c',
+  EGP: '\u00a3',
+  ERN: 'Nfk',
+  ETB: 'Br',
+  FJD: '$',
+  FKP: '\u00a3',
+  GBP: '\u00a3',
+  GEL: '\u20be',
+  GHS: '\u20b5',
+  GIP: '\u00a3',
+  GMD: 'D',
+  GNF: 'Fr',
+  GTQ: 'Q',
+  GYD: '$',
+  HKD: '$',
+  HNL: 'L',
+  HRK: 'kn',
+  HTG: 'G',
+  HUF: 'Ft',
+  IDR: 'Rp',
+  ILS: '\u20aa',
+  INR: '\u20b9',
+  IQD: '\u0639.\u062f',
+  IRR: '\ufdfc',
+  ISK: 'kr',
+  JMD: '$',
+  JOD: '\u062f.\u0627',
+  JPY: '\u00a5',
+  KES: 'Sh',
+  KGS: '\u0441',
+  KHR: '\u17db',
+  KMF: 'Fr',
+  KPW: '\u20a9',
+  KRW: '\u20a9',
+  KWD: '\u062f.\u0643',
+  KYD: '$',
+  KZT: '\u20b8',
+  LAK: '\u20ad',
+  LBP: '\u0644.\u0644',
+  LKR: 'Rs',
+  LRD: '$',
+  LSL: 'L',
+  LYD: '\u0644.\u062f',
+  MAD: '\u062f.\u0645.',
+  MDL: 'L',
+  MGA: 'Ar',
+  MKD: '\u0434\u0435\u043d',
+  MMK: 'Ks',
+  MNT: '\u20ae',
+  MOP: 'MOP$',
+  MRU: 'UM',
+  MUR: '\u20a8',
+  MVR: '.\u0783',
+  MWK: 'MK',
+  MXN: '$',
+  MYR: 'RM',
+  MZN: 'MT',
+  NAD: '$',
+  NGN: '\u20a6',
+  NIO: 'C$',
+  NOK: 'kr',
+  NPR: '\u0930\u0942',
+  NZD: '$',
+  OMR: '\u0631.\u0639.',
+  PAB: 'B/.',
+  PEN: 'S/.',
+  PGK: 'K',
+  PHP: '\u20b1',
+  PKR: '\u20a8',
+  PLN: 'z\u0142',
+  PYG: '\u20b2',
+  QAR: '\u0631.\u0642',
+  RON: 'lei',
+  RSD: '\u0434\u0438\u043d.',
+  RUB: '\u20bd',
+  RWF: 'Fr',
+  SAR: '\ufdfc',
+  SBD: '$',
+  SCR: '\u20a8',
+  SDG: '\u062c.\u0633.',
+  SEK: 'kr',
+  SGD: '$',
+  SHP: '\u00a3',
+  SLL: 'Le',
+  SOS: 'Sh',
+  SRD: '$',
+  SSP: '\u00a3',
+  STN: 'Db',
+  SYP: '\u00a3',
+  SZL: 'L',
+  THB: '\u0e3f',
+  TJS: '\u0441.',
+  TMT: 'm.',
+  TND: '\u062f.\u062a',
+  TOP: 'T$',
+  TRY: '\u20ba',
+  TTD: '$',
+  TWD: '$',
+  TZS: 'Sh',
+  UAH: '\u20b4',
+  UGX: 'Sh',
+  UYU: '$',
+  UZS: 'S\u02bb',
+  VES: 'Bs.',
+  VND: '\u20ab',
+  VUV: 'Vt',
+  WST: 'T',
+  XAF: 'Fr',
+  XCD: '$',
+  XOF: 'Fr',
+  XPF: '\u20a3',
+  YER: '\ufdfc',
+  ZAR: 'R',
+  ZMW: 'ZK',
+  ZWL: '$',
+};
+
+const {
+  data: { product: shopifyProduct },
+} = await ky
+  .post<{
+    data: {
+      product: {
+        id: string;
+        title: string;
+        handle: string;
+        description: string;
+        onlineStoreUrl: string;
+        availableForSale: boolean;
+        productType: string;
+        priceRange: {
+          maxVariantPrice: {
+            amount: string;
+            currencyCode: string;
+          };
+          minVariantPrice: {
+            amount: string;
+            currencyCode: string;
+          };
+        };
+        variants: {
+          edges: {
+            node: {
+              id: string;
+              sku: string;
+              title: string;
+              weight: number;
+              weightUnit: string;
+              image: {
+                src: string;
+              };
+            };
+          }[];
+        };
+      };
+    };
+  }>('https://graphql.myshopify.com/api/graphql', {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Storefront-Access-Token': '078bc5caa0ddebfa89cccb4a1baa1f5c',
+    },
+    json: {
+      query: /* GraphQL */ `
+        query getProduct($handle: String!) {
+          product: productByHandle(handle: $handle) {
+            id
+            title
+            handle
+            description
+            onlineStoreUrl
+            availableForSale
+            productType
+            priceRange {
+              maxVariantPrice {
+                amount
+                currencyCode
+              }
+              minVariantPrice {
+                amount
+                currencyCode
+              }
+            }
+            variants(first: 100) {
+              edges {
+                node {
+                  id
+                  sku
+                  title
+                  weight
+                  weightUnit
+                  image {
+                    src: transformedSrc(crop: CENTER, maxWidth: 500, maxHeight: 500)
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: { handle: Astro.props.productId },
+    },
+  })
+  .json();
+---
+
+<Wrapper>
+  <shopify-product>
+    <div class={s.root}>
+      <div class={s.left}>
+        <div class={s.category}>
+          Category: {shopifyProduct.productType}
+        </div>
+        <div class={s.title}>{shopifyProduct.title}</div>
+        <div class={s.price}>
+          {currencies[shopifyProduct.priceRange.maxVariantPrice.currencyCode]}{' '}
+          {shopifyProduct.priceRange.maxVariantPrice.amount}
+        </div>
+        <div class={s.description}>{shopifyProduct.description}</div>
+
+        <div class={s.actions}>
+          <div class={s.variants}>
+            <div>Select a variant:</div>
+            <select>
+              {
+                shopifyProduct.variants.edges.map(({ node: variant }) => (
+                  <option value={variant.id} data-image-url={variant.image.src}>
+                    {variant.title}
+                  </option>
+                ))
+              }
+            </select>
+          </div>
+          <Button as="div">
+            <Svg name="icons/regular/cart-plus" />
+            Add to cart
+          </Button>
+        </div>
+      </div>
+      <div class={s.right} data-image-wrapper>
+        <img src={shopifyProduct.variants.edges[0]!.node.image.src} />
+      </div>
+    </div>
+  </shopify-product>
+</Wrapper>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'set-fancy-data-theme',
+    class SetFancyDataTheme extends WebComponent {
+      parsedCallback() {
+        const img = this.$<HTMLSelectElement>('img');
+        const select = this.$<HTMLSelectElement>('select');
+        this.on(select, 'change', () => {
+          const newUrl = select
+            .querySelector(`option[value=${select.value}]`)!
+            .getAttribute('data-image-url')!;
+          img.setAttribute('src', newUrl);
+        });
+      }
+    },
+  );
+</script>

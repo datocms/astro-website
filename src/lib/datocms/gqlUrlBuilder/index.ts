@@ -9,6 +9,7 @@ import { buildUrlForDocPage, type DocPageUrlFragment } from './docPage';
 import { buildUrlForEnterpriseApp, type EnterpriseAppUrlFragment } from './enterpriseApp';
 import { buildUrlForFeature, type FeatureUrlFragment } from './feature';
 import { buildUrlForHostingApp, type HostingAppUrlFragment } from './hostingApp';
+import { buildUrlForLandingPage, type LandingPageUrlFragment } from './landingPage';
 import { buildUrlForPartner, type PartnerUrlFragment } from './partner';
 import { buildUrlForPlugin, type PluginUrlFragment } from './plugin';
 import { buildUrlForProductUpdate, ProductUpdateUrlFragment } from './productUpdate';
@@ -76,6 +77,9 @@ export function buildUrlFromGql(
       })
     | (FragmentOf<typeof UseCasePageUrlFragment> & {
         __typename: 'UseCasePageRecord';
+      })
+    | (FragmentOf<typeof LandingPageUrlFragment> & {
+        __typename: 'LandingPageRecord';
       }),
 ) {
   switch (thing.__typename) {
@@ -115,5 +119,9 @@ export function buildUrlFromGql(
       return buildUrlForCustomerStory(thing);
     case 'UseCasePageRecord':
       return buildUrlForUseCasePage(thing);
+    case 'LandingPageRecord':
+      return buildUrlForLandingPage(thing);
+    default:
+      throw new Error(`Invalid type: ${(thing as any).__typename}`);
   }
 }

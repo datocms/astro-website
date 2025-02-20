@@ -140,6 +140,9 @@ export const query = graphql(
               value
             }
           }
+          ... on ShopifyProductRecord {
+            shopifyProductId
+          }
           ... on TryDemoBlockRecord {
             title {
               value

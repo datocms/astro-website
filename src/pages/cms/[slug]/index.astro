@@ -32,6 +32,7 @@ import { GithubButton } from './_sub/GithubButton';
 import { Code } from '~/components/Code';
 import { VideoPlayer } from '~/components/VideoPlayer';
 import { TryDemoCta } from './_sub/TryDemoCta';
+import { ShopifyProduct } from './_sub/ShopifyProduct';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 
@@ -223,41 +224,43 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
               <SingleQuote quote={block.quote} />
             </Space>
           </Wrapper>
-        ) : block.__typename === 'TryDemoBlockRecord' && page.demo ? (
-          <>
-            <TryDemoCta
-              windowTitle={`${page.name} + DatoCMS demo`}
-              screenshot={page.demo.screenshot.responsiveImage}
-              href={`https://dashboard.datocms.com/deploy?repo=${page.demo.githubRepo}`}
-              docsAs={page.docsUrl ?? undefined}
-              cta={`Try our ${page.name} demo project now!`}
-            >
-              <Fragment slot="title">
-                <InlineText {...ensureValidStructuredTextProps({ data: block.title })} />
-              </Fragment>
-              <Fragment slot="description">
-                <Text
-                  {...ensureValidStructuredTextProps({
-                    data: block.content,
-                    linkToRecordComponents: defaultLinkToRecordComponents,
-                    inlineRecordComponents: defaultInlineRecordComponents,
-                  })}
+        ) : block.__typename === 'TryDemoBlockRecord' ? (
+          page.demo ? (
+            <>
+              <TryDemoCta
+                windowTitle={`${page.name} + DatoCMS demo`}
+                screenshot={page.demo.screenshot.responsiveImage}
+                href={`https://dashboard.datocms.com/deploy?repo=${page.demo.githubRepo}`}
+                docsAs={page.docsUrl ?? undefined}
+                cta={`Try our ${page.name} demo project now!`}
+              >
+                <Fragment slot="title">
+                  <InlineText {...ensureValidStructuredTextProps({ data: block.title })} />
+                </Fragment>
+                <Fragment slot="description">
+                  <Text
+                    {...ensureValidStructuredTextProps({
+                      data: block.content,
+                      linkToRecordComponents: defaultLinkToRecordComponents,
+                      inlineRecordComponents: defaultInlineRecordComponents,
+                    })}
+                  />
+                </Fragment>
+              </TryDemoCta>
+              <Space top={2} bottom={2}>
+                <LogosBar
+                  title="We power experiences for over half a billion users"
+                  clients={[
+                    'svg/logos/deutsche-telekom',
+                    'svg/logos/hashicorp',
+                    'svg/logos/verizon',
+                    'svg/logos/nike',
+                    'svg/logos/vercel',
+                  ]}
                 />
-              </Fragment>
-            </TryDemoCta>
-            <Space top={2} bottom={2}>
-              <LogosBar
-                title="We power experiences for over half a billion users"
-                clients={[
-                  'svg/logos/deutsche-telekom',
-                  'svg/logos/hashicorp',
-                  'svg/logos/verizon',
-                  'svg/logos/nike',
-                  'svg/logos/vercel',
-                ]}
-              />
-            </Space>
-          </>
+              </Space>
+            </>
+          ) : null
         ) : block.__typename === 'LandingVideoBlockRecord' ? (
           <Space top={3}>
             <TitleStripWithContent seoAnalysis={page.yoastAnalysis}>
@@ -290,7 +293,15 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
               <ImgixTransformations client:visible />
             </TitleStripWithContent>
           </Space>
-        ) : null,
+        ) : block.__typename === 'ShopifyProductRecord' ? (
+          <Space top={3}>
+            <ShopifyProduct productId={block.shopifyProductId} />
+          </Space>
+        ) : (
+          <div>
+            Unhandled block type: <pre>{JSON.stringify(block, null, 2)}</pre>
+          </div>
+        ),
       )
     }
   </div>
