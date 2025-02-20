@@ -299,16 +299,15 @@ const {
   import { WebComponent } from '~/lib/WebComponent';
 
   window.customElements.define(
-    'set-fancy-data-theme',
-    class SetFancyDataTheme extends WebComponent {
+    'shopify-product',
+    class ShopifyProduct extends WebComponent {
       parsedCallback() {
-        const img = this.$<HTMLSelectElement>('img');
+        const img = this.$<HTMLImageElement>('img');
         const select = this.$<HTMLSelectElement>('select');
         this.on(select, 'change', () => {
-          const newUrl = select
-            .querySelector(`option[value=${select.value}]`)!
-            .getAttribute('data-image-url')!;
-          img.setAttribute('src', newUrl);
+          const newUrl = select.querySelector<HTMLOptionElement>(`option[value='${select.value}']`)!
+            .dataset.imageUrl!;
+          img.src = newUrl;
         });
       }
     },

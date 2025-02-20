@@ -87,8 +87,6 @@ export default function CdnMapReactComponent({ children, datacenters }) {
       setCurrentDataCenter(code);
       const el = document.getElementById(`datacenter-${code}`);
 
-      console.log(code, el);
-
       if (el) {
         const rect = el.getBoundingClientRect();
 
