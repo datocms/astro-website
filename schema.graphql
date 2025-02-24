@@ -497,7 +497,7 @@ type AcademyChapterRecord implements RecordInterface {
     """Limit the number of results"""
     first: IntType = 20
     filter: ShowcaseProjectModelFilter
-    orderBy: [ShowcaseProjectModelOrderBy] = [position_ASC]
+    orderBy: [ShowcaseProjectModelOrderBy] = [_updatedAt_DESC]
   ): [ShowcaseProjectRecord!]!
 
   """Returns meta information regarding a record collection"""
@@ -1071,7 +1071,7 @@ type AcademyCourseRecord implements RecordInterface {
     """Limit the number of results"""
     first: IntType = 20
     filter: ShowcaseProjectModelFilter
-    orderBy: [ShowcaseProjectModelOrderBy] = [position_ASC]
+    orderBy: [ShowcaseProjectModelOrderBy] = [_updatedAt_DESC]
   ): [ShowcaseProjectRecord!]!
 
   """Returns meta information regarding a record collection"""
@@ -3691,7 +3691,7 @@ type DocPageRecord implements RecordInterface {
     """Limit the number of results"""
     first: IntType = 20
     filter: ShowcaseProjectModelFilter
-    orderBy: [ShowcaseProjectModelOrderBy] = [position_ASC]
+    orderBy: [ShowcaseProjectModelOrderBy] = [_updatedAt_DESC]
   ): [ShowcaseProjectRecord!]!
 
   """Returns meta information regarding a record collection"""
@@ -7770,7 +7770,7 @@ type IntegrationRecord implements RecordInterface {
     """Limit the number of results"""
     first: IntType = 20
     filter: ShowcaseProjectModelFilter
-    orderBy: [ShowcaseProjectModelOrderBy] = [position_ASC]
+    orderBy: [ShowcaseProjectModelOrderBy] = [_updatedAt_DESC]
   ): [ShowcaseProjectRecord!]!
 
   """Returns meta information regarding a record collection"""
@@ -11784,6 +11784,7 @@ enum PartnerModelFieldsReferencingPluginModel {
 """Linking fields"""
 enum PartnerModelFieldsReferencingShowcaseProjectModel {
   partner_description
+  partner_featuredProjects
 }
 
 """Linking fields"""
@@ -11804,6 +11805,7 @@ input PartnerModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   _stage: AgencyProgramWorkflowStageFilter
+  featuredProjects: LinksFilter
   slug: SlugFilter
   description: StructuredTextFilter
   shortDescription: StructuredTextFilter
@@ -12266,7 +12268,7 @@ type PartnerRecord implements RecordInterface {
     """Limit the number of results"""
     first: IntType = 20
     filter: ShowcaseProjectModelFilter
-    orderBy: [ShowcaseProjectModelOrderBy] = [position_ASC]
+    orderBy: [ShowcaseProjectModelOrderBy] = [_updatedAt_DESC]
   ): [ShowcaseProjectRecord!]!
 
   """Returns meta information regarding a record collection"""
@@ -12450,6 +12452,7 @@ type PartnerRecord implements RecordInterface {
   areasOfExpertise: [ExpertiseAreaRecord!]!
   createdAt: DateTime!
   description: PartnerModelDescriptionField!
+  featuredProjects: [ShowcaseProjectRecord!]!
   id: ItemId!
   locations: [CountryRecord!]!
   logo: FileField!
@@ -13669,7 +13672,7 @@ type PluginRecord implements RecordInterface {
     """Limit the number of results"""
     first: IntType = 20
     filter: ShowcaseProjectModelFilter
-    orderBy: [ShowcaseProjectModelOrderBy] = [position_ASC]
+    orderBy: [ShowcaseProjectModelOrderBy] = [_updatedAt_DESC]
   ): [ShowcaseProjectRecord!]!
 
   """Returns meta information regarding a record collection"""
@@ -15891,7 +15894,7 @@ type Query {
     """Limit the number of results"""
     first: IntType = 20
     filter: ShowcaseProjectModelFilter
-    orderBy: [ShowcaseProjectModelOrderBy] = [position_ASC]
+    orderBy: [ShowcaseProjectModelOrderBy] = [_updatedAt_DESC]
   ): [ShowcaseProjectRecord!]!
 
   """Returns a collection of records"""
@@ -16826,7 +16829,7 @@ type Query {
     """
     fallbackLocales: [SiteLocale!]
     filter: ShowcaseProjectModelFilter
-    orderBy: [ShowcaseProjectModelOrderBy] = [position_ASC]
+    orderBy: [ShowcaseProjectModelOrderBy] = [_updatedAt_DESC]
   ): ShowcaseProjectRecord
 
   """Returns the single instance record"""
@@ -17573,7 +17576,6 @@ input ShowcaseProjectModelFilter {
   createdAt: CreatedAtFilter
   id: ItemIdFilter
   _firstPublishedAt: PublishedAtFilter
-  position: PositionFilter
   _publicationScheduledAt: PublishedAtFilter
   _unpublishingScheduledAt: PublishedAtFilter
   _publishedAt: PublishedAtFilter
@@ -17621,8 +17623,6 @@ enum ShowcaseProjectModelOrderBy {
   id_DESC
   _firstPublishedAt_ASC
   _firstPublishedAt_DESC
-  position_ASC
-  position_DESC
   _publicationScheduledAt_ASC
   _publicationScheduledAt_DESC
   _unpublishingScheduledAt_ASC
@@ -17993,7 +17993,7 @@ type ShowcaseProjectRecord implements RecordInterface {
     """Limit the number of results"""
     first: IntType = 20
     filter: ShowcaseProjectModelFilter
-    orderBy: [ShowcaseProjectModelOrderBy] = [position_ASC]
+    orderBy: [ShowcaseProjectModelOrderBy] = [_updatedAt_DESC]
   ): [ShowcaseProjectRecord!]!
 
   """Returns meta information regarding a record collection"""
@@ -18183,7 +18183,6 @@ type ShowcaseProjectRecord implements RecordInterface {
   mainImage: ImageFileField!
   name: String!
   partner: PartnerRecord!
-  position: IntType
   projectScreenshots: [ImageTitleFileField!]!
   projectUrl: String
   slug: String!
@@ -20960,7 +20959,7 @@ type UserGuidesEpisodeRecord implements RecordInterface {
     """Limit the number of results"""
     first: IntType = 20
     filter: ShowcaseProjectModelFilter
-    orderBy: [ShowcaseProjectModelOrderBy] = [position_ASC]
+    orderBy: [ShowcaseProjectModelOrderBy] = [_updatedAt_DESC]
   ): [ShowcaseProjectRecord!]!
 
   """Returns meta information regarding a record collection"""

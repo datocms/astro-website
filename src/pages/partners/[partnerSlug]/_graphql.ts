@@ -94,8 +94,12 @@ export const query = graphql(
         npmUser {
           id
         }
-        projects: _allReferencingShowcaseProjects(first: 100, orderBy: position_ASC) {
+        featuredProjects {
+          id
+        }
+        projects: _allReferencingShowcaseProjects(first: 100, orderBy: _firstPublishedAt_DESC) {
           ...ShowcaseProjectUrlFragment
+          id
           name
           headline {
             value

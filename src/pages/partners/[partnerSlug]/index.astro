@@ -29,6 +29,7 @@ import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { sortBy } from 'lodash-es';
 
 const variables = { partnerSlug: Astro.params.partnerSlug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -41,6 +42,14 @@ if (!page) {
 const { plugins } = await executeQuery(Astro, extraQuery, {
   variables: { authorId: page.npmUser?.id || '' },
 });
+
+const featuredProjectIds = page.featuredProjects.map((p) => p.id);
+
+const sortedProjects = sortBy(page.projects, (project) =>
+  featuredProjectIds.includes(project.id)
+    ? featuredProjectIds.indexOf(project.id)
+    : Number.MAX_SAFE_INTEGER,
+);
 ---
 
 <Layout
@@ -133,12 +142,12 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
 
   <Wrapper>
     {
-      page.projects.length > 0 && (
+      sortedProjects.length > 0 && (
         <Space top={2}>
           <div>
             <h3 class={s.blockTitle}>Projects showcase</h3>
             <div class={s.projectsGrid}>
-              {page.projects.map((project) => (
+              {sortedProjects.map((project) => (
                 <Card
                   title={project.name}
                   size="small"
