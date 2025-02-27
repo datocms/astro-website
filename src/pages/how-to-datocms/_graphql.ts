@@ -3,8 +3,8 @@ import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
   /* GraphQL */ `
-    query ContentCreators {
-      page: successStoriesIndex {
+    query HowToDatocms {
+      page: howToDatocmsIndex {
         seo: _seoMetaTags {
           ...TagFragment
         }
