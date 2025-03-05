@@ -6,6 +6,9 @@ export const PluginInlineFragment = graphql(
     fragment PluginInlineFragment on PluginRecord {
       title
       ...PluginUrlFragment
+      coverImage {
+        url(imgixParams: { auto: format, w: 90, h: 50, fit: crop })
+      }
     }
   `,
   [PluginUrlFragment],
