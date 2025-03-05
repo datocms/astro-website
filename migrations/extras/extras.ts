@@ -23,6 +23,7 @@ export const linkableModelApiKeys = [
   'template_demo',
   'use_case_page',
   'user_guides_episode',
+  'recipe',
 ];
 
 export const knownPaths = [
