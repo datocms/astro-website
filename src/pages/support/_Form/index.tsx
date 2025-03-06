@@ -8,6 +8,7 @@ type FormValues = {
   email: string;
   project: string;
   body: string;
+  subject?: string;
   errorId: string;
   uploads: string;
   issueType: string;
@@ -20,6 +21,7 @@ type Props = {
 export function Form({ initialValues = {} }: Props) {
   const defaultValues: FormValues = {
     project: '',
+    subject: '',
     body: '',
     errorId: '',
     uploads: '',
@@ -57,11 +59,18 @@ export function Form({ initialValues = {} }: Props) {
         />
 
         <FieldReactComponent
+          name="subject"
+          label="Subject"
+          placeholder="Short description of the issue"
+        />
+
+        <FieldReactComponent
           name="body"
           label="What's your question?"
-          placeholder="Please tell us how we can help"
           validations={{ required: 'Required' }}
-          render={({ field }) => <Textarea {...field} />}
+          render={({ field }) => (
+            <Textarea placeholder="Please tell us how we can help" {...field} />
+          )}
         />
 
         {initialValues.errorId && <FieldReactComponent name="errorId" label="Error ID" readOnly />}
