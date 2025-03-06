@@ -1,0 +1,45 @@
+---
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import Wrapper from '~/components/Wrapper/ReactComponent';
+import { Layout } from '~/layouts/Layout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { RecipeCard } from '../_sub/RecipeCard';
+import { Announce } from '~/components/pluginToolkit/Announce';
+
+const { items } = await executeQuery(Astro, query);
+
+if (items.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout noFinalCta seo={[]}>
+  <Fragment slot="head">
+    <title>Schema Recipes - Marketplace</title>
+  </Fragment>
+
+  <Hero>
+    <Fragment slot="title">Schema Recipes</Fragment>
+    <Fragment slot="subtitle">
+      A curated selection of ready-to-use models and blocks that you can import into your projects
+    </Fragment>
+  </Hero>
+
+  <Wrapper>
+    <Announce href="/marketplace/plugins/i/datocms-plugin-schema-import-export">
+      <strong>Want to create your own recipes?</strong> Install the "Schema Import/Export" plugin to
+      export models and reimport them into another DatoCMS project!
+    </Announce>
+
+    <div class={s.grid}>
+      {items.map((item) => <RecipeCard recipe={item} />)}
+    </div>
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} />
+</Layout>

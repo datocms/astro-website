@@ -1,39 +1,39 @@
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { MaybeVideoPlayerFragment } from '~/components/VideoPlayer/graphql';
 import { ImageFragment } from '~/components/blocks/Image/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
-import { VideoFragment } from '~/components/blocks/Video/graphql';
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
-import {
-  EnterpriseAppUrlFragment,
-  buildUrlForEnterpriseApp,
-} from '~/lib/datocms/gqlUrlBuilder/enterpriseApp';
+import { buildUrlForRecipe, RecipeUrlFragment } from '~/lib/datocms/gqlUrlBuilder/recipe';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
-    query EnterpriseAppQuery($slug: String!) {
-      page: enterpriseApp(filter: { slug: { eq: $slug } }) {
+    query RecipeQuery($slug: String!) {
+      page: recipe(filter: { slug: { eq: $slug } }) {
         seo: _seoMetaTags {
           ...TagFragment
         }
         title
-        description
-        shortDescription
-        logo {
-          url
-          width
-          height
-        }
-        gallery {
-          id
-          responsiveImage(imgixParams: { auto: format, w: 1200, h: 800, fit: crop }) {
+        cardDescription
+        cardImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
             ...ResponsiveImageFragment
           }
+        }
+        featuredImage {
+          __typename
+          ...MaybeVideoPlayerFragment
+          responsiveImage(imgixParams: { w: 800, auto: format }) {
+            ...ResponsiveImageFragment
+          }
+        }
+        recipe {
+          url
         }
         content {
           value
@@ -92,7 +92,6 @@ export const query = graphql(
               __typename
             }
             ...ImageFragment
-            ...VideoFragment
             ...InternalVideoFragment
           }
         }
@@ -103,8 +102,8 @@ export const query = graphql(
     TagFragment,
     ResponsiveImageFragment,
     ImageFragment,
-    VideoFragment,
     InternalVideoFragment,
+    MaybeVideoPlayerFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
@@ -115,17 +114,17 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     graphql(
       /* GraphQL */ `
         query BuildSitemapUrls {
-          entries: allEnterpriseApps(first: 100) {
-            ...EnterpriseAppUrlFragment
+          entries: allRecipes(first: 100) {
+            ...RecipeUrlFragment
           }
         }
       `,
-      [EnterpriseAppUrlFragment],
+      [RecipeUrlFragment],
     ),
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForEnterpriseApp);
+  return entries.map(buildUrlForRecipe);
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({
@@ -135,7 +134,7 @@ export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({
   const { entity } = await executeQueryOutsideAstro(
     graphql(/* GraphQL */ `
       query ParamsToRecordId($slug: String!) {
-        entity: enterpriseApp(filter: { slug: { eq: $slug } }) {
+        entity: recipe(filter: { slug: { eq: $slug } }) {
           id
         }
       }

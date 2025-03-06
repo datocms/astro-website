@@ -34,6 +34,8 @@ import { LandingPageLinkFragment } from './LandingPageLink/graphql';
 import { PartnerLinkFragment } from './PartnerLink/graphql';
 import { PluginLinkFragment } from './PluginLink/graphql';
 import { ProductComparisonLinkFragment } from './ProductComparisonLink/graphql';
+import { RecipeLink } from './RecipeLink';
+import { RecipeLinkFragment } from './RecipeLink/graphql';
 import { ShowcaseProjectLinkFragment } from './ShowcaseProjectLink/graphql';
 import { SuccessStoryLinkFragment } from './SuccessStoryLink/graphql';
 import { TechPartnerLinkFragment } from './TechPartnerLink/graphql';
@@ -56,6 +58,7 @@ export const defaultLinkToRecordFragments = [
   PartnerLinkFragment,
   PluginLinkFragment,
   ProductComparisonLinkFragment,
+  RecipeLinkFragment,
   ShowcaseProjectLinkFragment,
   SuccessStoryLinkFragment,
   TechPartnerLinkFragment,
@@ -80,6 +83,7 @@ export const defaultLinkToRecordComponents = {
   PartnerRecord: PartnerLink,
   PluginRecord: PluginLink,
   ProductComparisonRecord: ProductComparisonLink,
+  RecipeRecord: RecipeLink,
   ShowcaseProjectRecord: ShowcaseProjectLink,
   SuccessStoryRecord: SuccessStoryLink,
   TechPartnerRecord: TechPartnerLink,

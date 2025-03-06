@@ -29,6 +29,7 @@ export const DocCalloutFragment = graphql(
           ...PartnerLinkFragment
           ...PluginLinkFragment
           ...ProductComparisonLinkFragment
+          ...RecipeLinkFragment
           ...ShowcaseProjectLinkFragment
           ...SuccessStoryLinkFragment
           ...TechPartnerLinkFragment
@@ -50,6 +51,7 @@ export const DocCalloutFragment = graphql(
           ...PartnerInlineFragment
           ...PluginInlineFragment
           ...ProductComparisonInlineFragment
+          ...RecipeInlineFragment
           ...ShowcaseProjectInlineFragment
           ...SuccessStoryInlineFragment
           ...TechPartnerInlineFragment

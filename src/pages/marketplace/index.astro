@@ -14,10 +14,12 @@ import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDem
 import { PluginCard } from './_sub/PluginCard';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { RecipeCard } from './_sub/RecipeCard';
 
-const { page, demos, plugins, hostingApps, enterpriseApps } = await executeQuery(Astro, query);
+const { page, recipes, pluginsMeta, hostingAppsMeta, enterpriseAppsMeta, recipesMeta } =
+  await executeQuery(Astro, query);
 
-if (!page || !demos || !plugins || !hostingApps || !enterpriseApps) {
+if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
@@ -97,12 +99,12 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
   <GroupPreview title="Community Plugins">
     <Fragment slot="browse">
       <a href="/marketplace/plugins" class={s.headerViewAll}>
-        <span>View all ({plugins.count})</span>
+        <span>View all ({pluginsMeta.count})</span>
         <Svg name="icons/regular/arrow-right" />
       </a>
     </Fragment>
     <Fragment slot="description">
-      <p>Easily expand and customize the capabilities of DatoCMS with community plugins.</p>
+      <p>Easily expand and customize the capabilities of DatoCMS with community plugins</p>
     </Fragment>
     <div class={s.carouselWrapper}>
       <Carousel buttonsY="50%">
@@ -117,10 +119,35 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
     </div>
   </GroupPreview>
 
+  <GroupPreview title="Schema Recipes">
+    <Fragment slot="browse">
+      <a href="/marketplace/recipes" class={s.headerViewAll}>
+        <span>View all ({recipesMeta.count})</span>
+        <Svg name="icons/regular/arrow-right" />
+      </a>
+    </Fragment>
+    <Fragment slot="description">
+      <p>
+        A curated selection of ready-to-use models and blocks that you can import into your projects
+      </p>
+    </Fragment>
+    <div class={s.carouselWrapper}>
+      <Carousel buttonsY="50%">
+        {
+          recipes.map((item) => (
+            <div class={s.cardWrapper}>
+              <RecipeCard recipe={item} size="medium" />
+            </div>
+          ))
+        }
+      </Carousel>
+    </div>
+  </GroupPreview>
+
   <GroupPreview title="Hosting & CI Building">
     <Fragment slot="browse">
       <a href="/marketplace/hosting" class={s.headerViewAll}>
-        <span>View all ({hostingApps.count})</span>
+        <span>View all ({hostingAppsMeta.count})</span>
         <Svg name="icons/regular/arrow-right" />
       </a>
     </Fragment>
@@ -151,7 +178,7 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
   <GroupPreview title="Enterprise Apps">
     <Fragment slot="browse">
       <a href="/marketplace/enterprise" class={s.headerViewAll}>
-        <span>View all ({enterpriseApps.count})</span>
+        <span>View all ({enterpriseAppsMeta.count})</span>
         <Svg name="icons/regular/arrow-right" />
       </a>
     </Fragment>
