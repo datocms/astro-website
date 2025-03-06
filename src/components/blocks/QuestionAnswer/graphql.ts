@@ -26,6 +26,7 @@ export const QuestionAnswerFragment = graphql(
           ...PartnerLinkFragment
           ...PluginLinkFragment
           ...ProductComparisonLinkFragment
+          ...RecipeLinkFragment
           ...ShowcaseProjectLinkFragment
           ...SuccessStoryLinkFragment
           ...TechPartnerLinkFragment
@@ -47,6 +48,7 @@ export const QuestionAnswerFragment = graphql(
           ...PartnerInlineFragment
           ...PluginInlineFragment
           ...ProductComparisonInlineFragment
+          ...RecipeInlineFragment
           ...ShowcaseProjectInlineFragment
           ...SuccessStoryInlineFragment
           ...TechPartnerInlineFragment
@@ -76,6 +78,7 @@ export const QuestionAnswerFragment = graphql(
           ...PartnerLinkFragment
           ...PluginLinkFragment
           ...ProductComparisonLinkFragment
+          ...RecipeLinkFragment
           ...ShowcaseProjectLinkFragment
           ...SuccessStoryLinkFragment
           ...TechPartnerLinkFragment
@@ -97,6 +100,7 @@ export const QuestionAnswerFragment = graphql(
           ...PartnerInlineFragment
           ...PluginInlineFragment
           ...ProductComparisonInlineFragment
+          ...RecipeInlineFragment
           ...ShowcaseProjectInlineFragment
           ...SuccessStoryInlineFragment
           ...TechPartnerInlineFragment
