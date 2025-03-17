@@ -1,546 +1,452 @@
 ---
-import Group from './Group.astro';
-import GroupItem from './GroupItem.astro';
-import NavItem from './NavItem.astro';
-import PanelHighlight from './PanelHighlight.astro';
-import PanelSlice from './PanelSlice.astro';
+import Group from './Group/index.astro';
+import GroupItem from './Group/GroupItem.astro';
+import Quote from './Quote/index.astro';
+import NavItem from './NavItem/index.astro';
+import Cta from './Cta/index.astro';
 import { Button } from '~/components/Button';
 import { Svg } from '~/components/Svg';
 import { TargetToggler } from '~/components/TargetToggler';
 import { Wrapper } from '~/components/Wrapper';
 import s from './style.module.css';
 import { ActiveLink } from '~/components/links/ActiveLink';
+import { fetchNavbar } from './fetchNavbar';
+import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
+import { sortBy, sum } from 'lodash-es';
+import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
+import { buildUrlForDocGroup } from '~/lib/datocms/gqlUrlBuilder/docGroup';
+import { buildUrlForUserGuidesChapter } from '~/lib/datocms/gqlUrlBuilder/userGuidesChapter';
+import { formatDate, formatVideoDuration } from '~/lib/formatters';
+import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
+import { Image } from 'astro:assets';
+import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 
 const isMarketplace = Astro.url.pathname.startsWith('/marketplace');
+
+const [data] = await fetchNavbar(Astro);
+
+const { navigationBar: navbar, partners } = data;
+
+const continentCounters: Record<string, number> = {};
+
+for (const partner of partners) {
+  for (const location of partner.locations) {
+    continentCounters[location.continent.name] ||= 0;
+    continentCounters[location.continent.name]! += 1;
+  }
+}
+
+const sortedContinents = Object.fromEntries(
+  sortBy(Object.entries(continentCounters), ([continent, count]) => -count),
+);
 ---
 
-<div class={s.root} data-datocms-noindex>
-  {
-    isMarketplace && (
-      <>
-        <div data-marketplace-notice class={s.marketplaceNotice}>
-          <Wrapper>
-            <strong>🎈 Welcome to the Marketplace</strong> — Explore and discover the ecosystem
-            around DatoCMS, and share your own work with the community!
-          </Wrapper>
-        </div>
-
-        <nav class={s.nav} id="navbar-marketplace-nav">
-          <div class={s.logoWrapper}>
-            <a href="/" class:list={[s.logo, s.isBlack]}>
-              <Svg name="svg/datocms/icon-text/black/black_full_logo_alt" />
-            </a>
-
-            <TargetToggler targetId="navbar-marketplace-nav">
-              <button type="button" class={s.hamburger} aria-controls="navList">
-                <Svg name="icons/regular/bars" />
-              </button>
-            </TargetToggler>
-          </div>
-
-          <div class={s.navList}>
-            <ActiveLink href="/marketplace" activeClass={s.isActive} class={s.navLink}>
-              <span>Featured</span>
-            </ActiveLink>
-            <ActiveLink
-              href="/marketplace/starters"
-              match={{ alsoMatchChildPathnames: true }}
-              activeClass={s.isActive}
-              class={s.navLink}
-            >
-              <span>Starters</span>
-            </ActiveLink>
-            <ActiveLink
-              href="/marketplace/plugins"
-              match={{ alsoMatchChildPathnames: true }}
-              activeClass={s.isActive}
-              class={s.navLink}
-            >
-              <span>Plugins</span>
-            </ActiveLink>
-            <ActiveLink
-              href="/marketplace/recipes"
-              match={{ alsoMatchChildPathnames: true }}
-              activeClass={s.isActive}
-              class={s.navLink}
-            >
-              <span>Recipes</span>
-            </ActiveLink>
-            <ActiveLink
-              href="/marketplace/hosting"
-              match={{ alsoMatchChildPathnames: true }}
-              activeClass={s.isActive}
-              class={s.navLink}
-            >
-              <span>Hosting</span>
-            </ActiveLink>
-            <ActiveLink
-              href="/marketplace/enterprise"
-              match={{ alsoMatchChildPathnames: true }}
-              activeClass={s.isActive}
-              class={s.navLink}
-            >
-              <span>Enterprise</span>
-            </ActiveLink>
-          </div>
-
-          <div class={s.navActions}>
-            <Button as="a" fs="small" p="tiny" href="/" s="invert">
-              ← Back to datocms.com
-            </Button>
-          </div>
-        </nav>
-      </>
-    )
-  }
-
-  {
-    !isMarketplace && (
-      <site-navbar>
-        {false && (
-          <a href="/webinars/how-to-use-structured-text-on-datocms" data-notice class={s.notice}>
+{
+  navbar && (
+    <div class={s.root} data-datocms-noindex>
+      {isMarketplace && (
+        <>
+          <div data-marketplace-notice class={s.marketplaceNotice}>
             <Wrapper>
-              <strong>
-                📅 Want to learn how to use our new Structured Text field with Next.js?
-              </strong>{' '}
-              Follow our webinar on Wednesday,{' '}
-              {new Date('2021-03-10T18:00:00+01:00').toLocaleTimeString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
-                timeZoneName: 'short',
-              })}
+              <strong>🎈 Welcome to the Marketplace</strong> — Explore and discover the ecosystem
+              around DatoCMS, and share your own work with the community!
             </Wrapper>
-          </a>
-        )}
-
-        <nav class={s.nav} id="navbar-nav">
-          <div class={s.logoWrapper}>
-            <a href="/" class={s.logo}>
-              <Svg name="svg/datocms/icon-text/color/color_full_logo_alt" />
-            </a>
-
-            <TargetToggler targetId="navbar-nav">
-              <button type="button" class={s.hamburger} aria-controls="navList">
-                <Svg name="icons/regular/bars" />
-              </button>
-            </TargetToggler>
           </div>
 
-          <div class={s.navList}>
-            <NavItem name="Product">
-              <PanelHighlight>
-                <Group title="Platform">
-                  <GroupItem
-                    href="/product"
-                    title="Meet DatoCMS!"
-                    description="Explore all the capabilities of the friendliest Headless CMS in town."
-                  />
-                  <GroupItem
-                    href="/product-updates"
-                    title="See what’s new"
-                    description="Check out the latest releases and updates on our changelog."
-                  />
-                </Group>
-                <div class={s.ctaBox} data-exclude-mobile>
-                  <div class={s.ctaBoxShape}>
-                    <div class={s.ctaImageWrapper}>
-                      <div class={s.ctaImage}>
-                        <Svg name="svg/illustrations/box-things" />
-                      </div>
-                    </div>
-                    <article class={s.ctaBody}>
-                      <h3 class={s.ctaTitle}>Try DatoCMS for Free</h3>
-                      <p class={s.ctaDescription}>
-                        Try a no-strings-attached demo. No signup. No email. No credit card.
-                      </p>
-                    </article>
-                    <Button
-                      class={s.ctaButton}
-                      as="a"
-                      p="tiny"
-                      href="https://try.datocms.com/"
-                      target="_blank"
-                    >
-                      Launch interactive demo
-                    </Button>
-                  </div>
-                </div>
-              </PanelHighlight>
-              <PanelSlice columns={2}>
-                <Group columns={2} title="Features" link="/features">
-                  <GroupItem
-                    href="/features/headless-cms-graphql"
-                    title="GraphQL API"
-                    description="See why Headless CMS and GraphQL APIs are a match made in heaven."
-                  />
-                  <GroupItem
-                    href="/features/structured-content-cms"
-                    title="Structured text"
-                    description="Meet (arguably) the best headless content editor out there."
-                  />
-                  <GroupItem
-                    href="/features/headless-cms-multi-language"
-                    title="Localization"
-                    description="With i18n out of the box, meet your customers wherever they are."
-                  />
-                  <GroupItem
-                    href="/features/dynamic-layouts"
-                    title="Modular Content"
-                    description="Check out the dynamic page building experience you’ll fall in love with."
-                  />
-                </Group>
-                <Group title="Use cases">
-                  <GroupItem
-                    href="/use-cases/headless-cms-websites"
-                    title="Modern Websites"
-                    description="Build bold with SEO, Assets, Live Previews, and more, out of the box."
-                  />
-                  <GroupItem
-                    href="/use-cases/headless-ecommerce"
-                    title="eCommerce"
-                    description="Manage content and commerce experiences that fly off the shelf!"
-                  />
-                  <GroupItem
-                    href="/use-cases/headless-cms-publishing"
-                    title="Digital Publishing"
-                    description="Ship content at scale with blazing fast speeds (or in real time)."
-                  />
-                  <GroupItem
-                    href="/use-cases/headless-cms-knowledge-management"
-                    title="Knowledge Management"
-                    description="Simplify complex content for portals, wikis, intranets, and more."
-                  />
-                </Group>
-                <Group title="Happy Teams">
-                  <GroupItem
-                    href="/team/best-cms-for-developers"
-                    title="For Web Developers"
-                    description="Stop settling for legacy web technologies that slow you down."
-                  />
-                  <GroupItem
-                    href="/team/cms-digital-marketing"
-                    title="For Digital Marketers"
-                    description="Take control of your content with a unified platform for all channels."
-                  />
-                  <GroupItem
-                    href="/team/content-creators"
-                    title="For Content Creators"
-                    description="Aggreggate all your content in one place and go live in seconds"
-                  />
-                  <GroupItem
-                    href="/enterprise-headless-cms"
-                    title="For Enterprise"
-                    description="Join 25K+ teams, from governments to the F500, in trusting DatoCMS."
-                  />
-                </Group>
-              </PanelSlice>
-            </NavItem>
-
-            <NavItem name="Customers">
-              <PanelHighlight>
-                <Group title="DatoCMS in production">
-                  <GroupItem
-                    href="/success-stories"
-                    title="DatoCMS Success Stories"
-                    description="See how DatoCMS is used by customers and partners."
-                  />
-                  <GroupItem href="/customers" title="Enterprise Case Studies" />
-                  <GroupItem href="/customer-stories" title="Casual Customer Chats" />
-                  <GroupItem href="/wall" title="Our Wall of Love" />
-                </Group>
-                <div class={s.quoteWrapper}>
-                  <div class={s.quote}>
-                    <blockquote>
-                      <p>
-                        DatoCMS has become an indispensable tool for us. Fast, flexible, and a
-                        pleasure to use.
-                      </p>
-                      <footer>
-                        <div class={s.quoteAvatar}>
-                          <img
-                            loading="lazy"
-                            src={
-                              'https://www.datocms-assets.com/205/1712274924-img_4983.jpg?auto=format&crop=faces&fit=crop&h=300&w=300'
-                            }
-                          />
-                        </div>
-                        <cite>
-                          <div class={s.name}>Tim Chesney</div>
-                          <div class={s.role}>Director at Make</div>
-                        </cite>
-                      </footer>
-                    </blockquote>
-                  </div>
-                </div>
-              </PanelHighlight>
-              <PanelSlice columns={2}>
-                <Group columns={2} title="Enterprise projects" link="/customers">
-                  <GroupItem
-                    href="/customers/polestar"
-                    title="Polestar"
-                    description="Serving content in 28 locales with 250+ editors across 35 custom roles."
-                    imageUrl="https://www.datocms-assets.com/205/1648568107-webimage-31a550ca-084b-46f8-ac8d9741a15c737c.jpeg?auto=format&w=800"
-                  />
-                  <GroupItem
-                    href="/customers/chillys"
-                    title="Chilly’s"
-                    description="Unlocking 166%+ growth in annual revenue with 2M+ monthly users."
-                    imageUrl="https://www.datocms-assets.com/205/1582294156-cover-chillys.jpg?auto=format&w=800"
-                  />
-                  <GroupItem
-                    href="/customers/hashicorp"
-                    title="Hashicorp"
-                    description="Handling 2TB of traffic, with 5M+ monthly API calls on 35K+ records."
-                    imageUrl="https://www.datocms-assets.com/205/1581953189-1569253200-swilson-hc19.png?auto=format&w=800"
-                  />
-                  <GroupItem
-                    href="/customers/arduino"
-                    title="Arduino"
-                    description="Reducing lines of code by 92,5% while gaining 8x faster loading times."
-                    imageUrl="https://www.datocms-assets.com/205/1581958110-copy-of-arduino-teacher-students-978x653.jpeg?auto=format&w=800"
-                  />
-                </Group>
-              </PanelSlice>
-            </NavItem>
-
-            <NavItem name="Partners">
-              <PanelHighlight>
-                <Group title="DatoCMS ❤️ Partners">
-                  <GroupItem
-                    href="/partners"
-                    title="Agency Partner Network"
-                    description="Some of our most successful customer projects come to life thanks to our incredible partners."
-                  />
-                  <GroupItem
-                    href="/tech-partners"
-                    title="Tech Partner Ecosystem"
-                    description="We work with the best APIs and tools in the space to make sure your projects stand out."
-                  />
-                </Group>
-                <div class={s.ctaBox}>
-                  <div class={s.ctaBoxShape}>
-                    <div class={s.ctaImageWrapper}>
-                      <div class={s.ctaImage}>
-                        <Svg name="svg/illustrations/faces-2" />
-                      </div>
-                    </div>
-                    <article class={s.ctaBody}>
-                      <h3 class={s.ctaTitle}>Join The Network</h3>
-                      <p class={s.ctaDescription}>
-                        Explore the benefits you unlock when you join our partner ecosystem.
-                      </p>
-                    </article>
-                    <Button class={s.ctaButton} as="a" p="tiny" href="/partner-program">
-                      Become a partner
-                    </Button>
-                  </div>
-                </div>
-              </PanelHighlight>
-              <PanelSlice columns={2}>
-                <Group columns={2} title="Partner projects" link="/partners/showcase">
-                  <GroupItem
-                    href="/partners/november-five/showcase/mdlbeast"
-                    title="MDLBeast by November Five"
-                    description="One of EMEA's largest entertainment companies uses blocks for a stellar UX."
-                    imageUrl="https://www.datocms-assets.com/205/1685971352-mdlbeast.jpg?auto=format&w=800"
-                  />
-                  <GroupItem
-                    href="/partners/fully-studios/showcase/toca-boca"
-                    title="Toca Boca by Fully Studios"
-                    description="Leading game developer gets a new website on Next.js and AWS."
-                    imageUrl="https://www.datocms-assets.com/205/1715249902-project_img.png?auto=format&w=800"
-                  />
-                  <GroupItem
-                    href="/partners/cantiere-creativo/showcase/l-officiel"
-                    title="L’Officiel by Cantiere Creativo"
-                    description="Global fashion magazine runs 30+ online magazines from a single CMS instance."
-                    imageUrl="https://www.datocms-assets.com/205/1640195611-home-page-fr.png?auto=format&w=800"
-                  />
-                  <GroupItem
-                    href="/partners/rotate/showcase/wild"
-                    title="Wild by Rotate°"
-                    description="Subscription-first cosmetic brand gets a world-class content overhaul."
-                    imageUrl="https://www.datocms-assets.com/205/1718048731-1661957070-wild_02.jpg?auto=format&w=800"
-                  />
-                </Group>
-              </PanelSlice>
-            </NavItem>
-
-            <NavItem name="Developers">
-              <PanelSlice columns={1}>
-                <Group title="Documentation" link="/docs">
-                  <GroupItem
-                    href="/docs/content-delivery-api"
-                    title="GraphQL API Reference"
-                    description="Learn how to fetch your content into any frontend project."
-                  />
-                  <GroupItem
-                    href="/docs/content-management-api"
-                    title="Management API Reference"
-                    description="Handle creating, updating, deleting, and fetching content of your projects via API."
-                  />
-                  <GroupItem
-                    href="/docs/asset-api/images"
-                    title="Assets API Reference"
-                    description="Get up to speed with managing & optimizing images and videos in DatoCMS."
-                  />
-                  <GroupItem
-                    href="/docs/content-modelling"
-                    title="Modelling Your Schema"
-                    description="Build your administrative area and define the structure of your content."
-                  />
-                </Group>
-              </PanelSlice>
-              <PanelSlice columns={2}>
-                <Group columns={2} title="Marketplace" link="/marketplace">
-                  <GroupItem
-                    href="/marketplace/starters"
-                    title="Official Starters"
-                    description="Boilerplate templates to get you from zero-to-live within minutes."
-                    isNew
-                  />
-                  <GroupItem
-                    href="/marketplace/hosting"
-                    title="Hosting & Builds"
-                    description="Server, serverless, or static - we've got you and your stack covered."
-                  />
-                  <GroupItem
-                    href="/marketplace/plugins"
-                    title="Plugins"
-                    description="From web previews to SEO, easily expand DatoCMS’s capabilities."
-                  />
-                  <GroupItem
-                    href="/marketplace/enterprise"
-                    title="Enterprise Apps"
-                    description="Keep your CMS secure with SSO, custom assets, and more."
-                  />
-                </Group>
-                <Group columns={2} title="Community & support">
-                  <GroupItem
-                    href="https://community.datocms.com"
-                    title="Community Forum"
-                    description="Get support, request a feature, or see what we’re working on."
-                  />
-                  <GroupItem
-                    href="/slack"
-                    title="Slack Channel"
-                    description="Connect with 3K+ other developers using DatoCMS in production."
-                  />
-                </Group>
-              </PanelSlice>
-
-              <PanelHighlight orientation="horizontal">
-                <Group columns={3} title="Popular integrations">
-                  <div class={s.integrations}>
-                    <a href="/docs/next-js" class={s.integrationsItem}>
-                      <Svg name="svg/logos/next-squared" class={s.integrationsImage} />
-                      <p class={s.techName}>Next.js</p>
-                    </a>
-
-                    <a href="/docs/svelte" class={s.integrationsItem}>
-                      <Svg name="svg/logos/svelte-squared" class={s.integrationsImage} />
-                      <p class={s.techName}>SvelteKit</p>
-                    </a>
-
-                    <a href="/docs/astro" class={s.integrationsItem}>
-                      <Svg name="svg/logos/astro-squared" class={s.integrationsImage} />
-                      <p class={s.techName}>Astro</p>
-                    </a>
-
-                    <a href="/docs/nuxt" class={s.integrationsItem}>
-                      <Svg name="svg/logos/nuxt-squared" class={s.integrationsImage} />
-                      <p class={s.techName}>Nuxt</p>
-                    </a>
-                  </div>
-                </Group>
-              </PanelHighlight>
-            </NavItem>
-
-            <NavItem name="Resources">
-              <PanelHighlight>
-                <Group title="Core resources">
-                  <GroupItem
-                    href="/docs"
-                    title="Docs"
-                    description="API reference, integrations, and guides to work with DatoCMS."
-                  />
-                  <GroupItem
-                    href="/how-to-datocms"
-                    title="How to DatoCMS"
-                    description="User guides, comparisons, concepts, and so much more!"
-                  />
-                </Group>
-                <Group title="Blog" link="/blog">
-                  <GroupItem
-                    href="/blog/how-to-build-a-multi-language-website-with-next-js-i18n"
-                    title="Multilingual site with Next.js"
-                    description="Let’s build a localized Next.js and GraphQL website with DatoCMS."
-                  />
-                  <GroupItem
-                    href="/blog/introducing-datocms-cache-tags"
-                    title="Introducing Cache Tags"
-                    description="No more costly and inefficient time-based invalidation methods."
-                  />
-                </Group>
-              </PanelHighlight>
-              <PanelSlice columns={2}>
-                <Group columns={2} title="User guides" link="/user-guides">
-                  <GroupItem
-                    href="/user-guides/content-management/deep-dive-into-structured-text-in-datocms"
-                    title="Deep Dive into Structured Text"
-                    description="All the magic of the Structured Text field and why editors LOVE it."
-                    imageUrl="https://image.mux.com/Yc4esLEsoQszLQLgkOKPCmVLARxnrMzV/thumbnail.webp?width=800"
-                  />
-                  <GroupItem
-                    href="/user-guides/content-management/building-pages-and-deep-dive-into-modular-content"
-                    title="Building Pages with Modular Content"
-                    description="A WYSIWYG drag-and-drop experience? In headless? Madness!"
-                    imageUrl="https://image.mux.com/W5jgwKq95fqBS7kmfolmRJHrUx4jtEex/thumbnail.webp?width=800"
-                  />
-                  <GroupItem
-                    href="/user-guides/media-management/videos-and-video-optimizations"
-                    title="Videos and Video Optimizations"
-                    description="Serve crunchy, crispy, 4K videos to any device in any format, with subs."
-                    imageUrl="https://image.mux.com/P1SA01aSHtY1jzHrASAu00jdfIH5OWF01Ih/thumbnail.webp?width=800"
-                  />
-                  <GroupItem
-                    href="/user-guides/the-basics/intro-to-the-schema-builder"
-                    title="Intro to the Schema Builder"
-                    description="Master how to set up the foundations of your project's schema successfully."
-                    imageUrl="https://image.mux.com/ZXrCcv53t00n02f5yS500siKW102xdfJqG025/thumbnail.webp?width=800"
-                  />
-                </Group>
-              </PanelSlice>
-            </NavItem>
-
-            <a href="/pricing" class={s.navLink}>
-              <span>Pricing</span>
-            </a>
-          </div>
-
-          <div class={s.navActions}>
-            <a href="/contact" class={s.navLink}>
-              Contact sales
-            </a>
-            <div class={s.authActions} data-signed-in="true">
-              <Button as="a" p="small" href="https://dashboard.datocms.com/">
-                Enter dashboard
-              </Button>
-            </div>
-            <div class={s.authActions} data-signed-in="false">
-              <a href="https://dashboard.datocms.com/login" class={s.navLink} data-exclude-mobile>
-                <span>Log in</span>
+          <nav class={s.nav} id="navbar-marketplace-nav">
+            <div class={s.logoWrapper}>
+              <a href="/" class:list={[s.logo, s.isBlack]}>
+                <Svg name="svg/datocms/icon-text/black/black_full_logo_alt" />
               </a>
-              <Button as="a" p="small" href="https://dashboard.datocms.com/">
-                Get started
+
+              <TargetToggler targetId="navbar-marketplace-nav">
+                <button type="button" class={s.hamburger} aria-controls="navList">
+                  <Svg name="icons/regular/bars" />
+                </button>
+              </TargetToggler>
+            </div>
+
+            <div class={s.navList}>
+              <ActiveLink href="/marketplace" activeClass={s.isActive} class={s.navLink}>
+                <span>Featured</span>
+              </ActiveLink>
+              <ActiveLink
+                href="/marketplace/starters"
+                match={{ alsoMatchChildPathnames: true }}
+                activeClass={s.isActive}
+                class={s.navLink}
+              >
+                <span>Starters</span>
+              </ActiveLink>
+              <ActiveLink
+                href="/marketplace/plugins"
+                match={{ alsoMatchChildPathnames: true }}
+                activeClass={s.isActive}
+                class={s.navLink}
+              >
+                <span>Plugins</span>
+              </ActiveLink>
+              <ActiveLink
+                href="/marketplace/recipes"
+                match={{ alsoMatchChildPathnames: true }}
+                activeClass={s.isActive}
+                class={s.navLink}
+              >
+                <span>Recipes</span>
+              </ActiveLink>
+              <ActiveLink
+                href="/marketplace/hosting"
+                match={{ alsoMatchChildPathnames: true }}
+                activeClass={s.isActive}
+                class={s.navLink}
+              >
+                <span>Hosting</span>
+              </ActiveLink>
+              <ActiveLink
+                href="/marketplace/enterprise"
+                match={{ alsoMatchChildPathnames: true }}
+                activeClass={s.isActive}
+                class={s.navLink}
+              >
+                <span>Enterprise</span>
+              </ActiveLink>
+            </div>
+
+            <div class={s.navActions}>
+              <Button as="a" fs="small" p="tiny" href="/" s="invert">
+                ← Back to datocms.com
               </Button>
             </div>
-          </div>
-        </nav>
-      </site-navbar>
-    )
-  }
-</div>
+          </nav>
+        </>
+      )}
+
+      {!isMarketplace && (
+        <site-navbar>
+          {false && (
+            <a href="/webinars/how-to-use-structured-text-on-datocms" data-notice class={s.notice}>
+              <Wrapper>
+                <strong>
+                  📅 Want to learn how to use our new Structured Text field with Next.js?
+                </strong>{' '}
+                Follow our webinar on Wednesday,{' '}
+                {new Date('2021-03-10T18:00:00+01:00').toLocaleTimeString('en-US', {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  timeZoneName: 'short',
+                })}
+              </Wrapper>
+            </a>
+          )}
+
+          <nav class={s.nav} id="navbar-nav">
+            <div class={s.logoWrapper}>
+              <a href="/" class={s.logo}>
+                <Svg name="svg/datocms/icon-text/color/color_full_logo_alt" />
+              </a>
+
+              <TargetToggler targetId="navbar-nav">
+                <button type="button" class={s.hamburger} aria-controls="navList">
+                  <Svg name="icons/regular/bars" />
+                </button>
+              </TargetToggler>
+            </div>
+
+            <div class={s.navList}>
+              <NavItem name="Product">
+                <Group
+                  title={navbar.productGroup.title}
+                  link={navbar.productGroup.callToAction?.url}
+                  finalCta={navbar.productGroup.callToAction?.label}
+                >
+                  {navbar.productGroup.links.map((item) => (
+                    <GroupItem href={item.url} title={item.label} description={item.description} />
+                  ))}
+                </Group>
+                <Group
+                  columns={2}
+                  contentColumns={2}
+                  title={navbar.featuresGroup.title}
+                  link={navbar.featuresGroup.callToAction?.url}
+                  finalCta={navbar.featuresGroup.callToAction?.label}
+                >
+                  {navbar.featuresGroup.links.map((item) => (
+                    <GroupItem href={item.url} title={item.label} description={item.description} />
+                  ))}
+                </Group>
+
+                <Group
+                  title={navbar.whoIsItForGroup.title}
+                  link={navbar.whoIsItForGroup.callToAction?.url}
+                  finalCta={navbar.whoIsItForGroup.callToAction?.label}
+                >
+                  {navbar.whoIsItForGroup.links.map((item) => (
+                    <GroupItem href={item.url} title={item.label} description={item.description} />
+                  ))}
+                </Group>
+
+                <Group
+                  title={navbar.useCasesGroup.title}
+                  link={navbar.useCasesGroup.callToAction?.url}
+                  finalCta={navbar.useCasesGroup.callToAction?.label}
+                >
+                  {navbar.useCases.map((useCase) => (
+                    <GroupItem
+                      href={buildUrlForUseCasePage(useCase)}
+                      title={useCase.navigationBarTitle}
+                    />
+                  ))}
+                </Group>
+                <Cta
+                  svgName="svg/illustrations/box-things"
+                  title={navbar.productCallToAction.title}
+                  description={navbar.productCallToAction.description}
+                  href={navbar.productCallToAction.callToAction.url}
+                  cta={navbar.productCallToAction.callToAction.label}
+                />
+              </NavItem>
+
+              <NavItem name="Customers">
+                <Group
+                  columns={2}
+                  contentColumns={2}
+                  title={navbar.customerChatsGroup.title}
+                  link={navbar.customerChatsGroup.callToAction?.url}
+                  finalCta={navbar.customerChatsGroup.callToAction?.label}
+                >
+                  {navbar.customerChats.map((item) => (
+                    <GroupItem
+                      href={buildUrlForCustomerStory(item)}
+                      title={item.title}
+                      description={structuredTextToPlainText(item.excerpt)}
+                      image={item.coverImage?.responsiveImage}
+                    />
+                  ))}
+                </Group>
+                <Group
+                  title="Wall of love"
+                  link="/wall"
+                  contentDirection="center"
+                  finalCta={`See what they say about us (+100)`}
+                >
+                  <Quote quote={navbar.wallOfLoveQuote} />
+                </Group>
+                <Group
+                  columns={2}
+                  contentColumns={2}
+                  title={navbar.enterpriseStoriesGroup.title}
+                  link={navbar.enterpriseStoriesGroup.callToAction?.url}
+                  finalCta={navbar.enterpriseStoriesGroup.callToAction?.label}
+                >
+                  {navbar.enterpriseStories.map((item) => (
+                    <GroupItem
+                      href={buildUrlForSuccessStory(item)}
+                      description={structuredTextToPlainText(item.title)}
+                      logoUrl={item.logo.url}
+                    />
+                  ))}
+                </Group>
+                <Cta
+                  svgName="svg/illustrations/bear-bird"
+                  title={navbar.customersCallToAction.title}
+                  description={navbar.customersCallToAction.description}
+                  href={navbar.customersCallToAction.callToAction.url}
+                  cta={navbar.customersCallToAction.callToAction.label}
+                />
+              </NavItem>
+
+              <NavItem name="Partners">
+                <Group
+                  title={navbar.partnersGroup.title}
+                  link={navbar.partnersGroup.callToAction?.url}
+                  finalCta={navbar.partnersGroup.callToAction?.label}
+                >
+                  <p data-exclude-mobile>{navbar.partnersDescription}</p>
+                  {Object.entries(sortedContinents).map(([continent, counter]) => (
+                    <GroupItem
+                      title={`${continent} (${counter})`}
+                      href={`/partners?continent=${encodeURIComponent(continent)}`}
+                    />
+                  ))}
+                </Group>
+
+                <Group
+                  contentColumns={2}
+                  title={navbar.partnerProjectsGroup.title}
+                  link={navbar.partnerProjectsGroup.callToAction?.url}
+                  finalCta={navbar.partnerProjectsGroup.callToAction?.label}
+                >
+                  {navbar.partnerProjects.map((item) => (
+                    <GroupItem
+                      href={buildUrlForShowcaseProject(item)}
+                      title={item.name}
+                      description={item.partner.name}
+                      image={item.mainImage.responsiveImage}
+                    />
+                  ))}
+                </Group>
+
+                <Cta
+                  svgName="svg/illustrations/faces-2"
+                  title={navbar.partnersCallToAction.title}
+                  description={navbar.partnersCallToAction.description}
+                  href={navbar.partnersCallToAction.callToAction.url}
+                  cta={navbar.partnersCallToAction.callToAction.label}
+                />
+              </NavItem>
+
+              <NavItem name="Developers" panelClass={s.developersPanel}>
+                <Group
+                  title={navbar.docGroup.title}
+                  link={navbar.docGroup.callToAction?.url}
+                  finalCta={navbar.docGroup.callToAction?.label}
+                >
+                  {navbar.docPages.map((item) => (
+                    <GroupItem href={buildUrlForDocGroup(item)} title={item.name} />
+                  ))}
+                </Group>
+
+                <Group
+                  title={navbar.helpGroup.title}
+                  link={navbar.helpGroup.callToAction?.url}
+                  finalCta={navbar.helpGroup.callToAction?.label}
+                >
+                  {navbar.helpGroup.links.map((item) => (
+                    <GroupItem href={item.url} title={item.label} description={item.description} />
+                  ))}
+                </Group>
+
+                <Group
+                  columns={2}
+                  contentColumns={4}
+                  title="Popular integration guides"
+                  class={s.popularIntegrationsGroup}
+                >
+                  <a href="/docs/next-js" class={s.integrationsItem}>
+                    <Svg name="svg/logos/next-squared" class={s.integrationsImage} />
+                    <p class={s.techName}>Next.js</p>
+                  </a>
+
+                  <a href="/docs/svelte" class={s.integrationsItem}>
+                    <Svg name="svg/logos/svelte-squared" class={s.integrationsImage} />
+                    <p class={s.techName}>SvelteKit</p>
+                  </a>
+
+                  <a href="/docs/astro" class={s.integrationsItem}>
+                    <Svg name="svg/logos/astro-squared" class={s.integrationsImage} />
+                    <p class={s.techName}>Astro</p>
+                  </a>
+
+                  <a href="/docs/nuxt" class={s.integrationsItem}>
+                    <Svg name="svg/logos/nuxt-squared" class={s.integrationsImage} />
+                    <p class={s.techName}>Nuxt</p>
+                  </a>
+                </Group>
+
+                <Group
+                  class={s.marketplaceGroup}
+                  title={navbar.marketplaceGroup.title}
+                  link={navbar.marketplaceGroup.callToAction?.url}
+                  finalCta={navbar.marketplaceGroup.callToAction?.label}
+                >
+                  {navbar.marketplaceGroup.links.map((item) => (
+                    <GroupItem href={item.url} title={item.label} description={item.description} />
+                  ))}
+                </Group>
+              </NavItem>
+
+              <NavItem name="Resources">
+                <Group
+                  title={navbar.knowledgeGroup.title}
+                  link={navbar.knowledgeGroup.callToAction?.url}
+                  finalCta={navbar.knowledgeGroup.callToAction?.label}
+                >
+                  {navbar.knowledgeGroup.links.map((item) => (
+                    <GroupItem href={item.url} title={item.label} description={item.description} />
+                  ))}
+                </Group>
+
+                <Group
+                  contentColumns={2}
+                  title={navbar.videoGuidesGroup.title}
+                  link={navbar.videoGuidesGroup.callToAction?.url}
+                  finalCta={navbar.videoGuidesGroup.callToAction?.label}
+                >
+                  {navbar.videoGuides.map((item) => (
+                    <GroupItem
+                      href={buildUrlForUserGuidesChapter(item)}
+                      title={item.title}
+                      description={`${item.chapters.length} episodes, ${formatVideoDuration(sum(item.chapters.map((v) => v.asset.video.duration)))}`}
+                    >
+                      <Fragment slot="image">
+                        <div class={s.videoGuideChapters}>
+                          {item.chapters.slice(0, 1).map((chapter) => (
+                            <Image
+                              src={`${chapter.asset.video.thumbnailUrl}?time=${chapter.thumbTimeSeconds}&width=300`}
+                              inferSize
+                              widths={[300, 100]}
+                              sizes="400px"
+                              alt={chapter.title}
+                              style={{
+                                background: `url(${chapter.asset.video.blurUpThumb})`,
+                                backgroundSize: 'cover',
+                                color: 'transparent',
+                                height: 'auto',
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </Fragment>
+                    </GroupItem>
+                  ))}
+                </Group>
+
+                <Group
+                  title={navbar.blogGroup.title}
+                  link={navbar.blogGroup.callToAction?.url}
+                  finalCta={navbar.blogGroup.callToAction?.label}
+                >
+                  {data.blogPosts.map((item) => (
+                    <GroupItem
+                      href={buildUrlForBlogPost(item)}
+                      title={item.title}
+                      description={formatDate(item._firstPublishedAt!)}
+                    />
+                  ))}
+                </Group>
+              </NavItem>
+
+              <a href="/pricing" class={s.navLink}>
+                <span>Pricing</span>
+              </a>
+            </div>
+
+            <div class={s.navActions}>
+              <a href="/contact" class={s.navLink}>
+                Contact sales
+              </a>
+              <div class={s.authActions} data-signed-in="true">
+                <Button as="a" p="small" href="https://dashboard.datocms.com/">
+                  Enter dashboard
+                </Button>
+              </div>
+              <div class={s.authActions} data-signed-in="false">
+                <a href="https://dashboard.datocms.com/login" class={s.navLink} data-exclude-mobile>
+                  <span>Log in</span>
+                </a>
+                <Button as="a" p="small" href="https://dashboard.datocms.com/">
+                  Get started
+                </Button>
+              </div>
+            </div>
+          </nav>
+        </site-navbar>
+      )}
+    </div>
+  )
+}
 
 <script>
   import { WebComponent } from '~/lib/WebComponent';

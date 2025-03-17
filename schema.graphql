@@ -28,6 +28,7 @@ union AcademyChapterModelContentBlocksField = ImageRecord | InternalVideoRecord 
 
 type AcademyChapterModelContentField {
   blocks: [AcademyChapterModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [AcademyChapterModelContentLinksField!]!
   value: JsonField!
 }
@@ -716,6 +717,7 @@ input AcademyCourseModelFilter {
 
 type AcademyCourseModelIntroductionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -1521,6 +1523,7 @@ union BlogPostModelContentBlocksField = CodesandboxEmbedBlockRecord | CtaButtonR
 
 type BlogPostModelContentField {
   blocks: [BlogPostModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [BlogPostModelContentLinksField!]!
   value: JsonField!
 }
@@ -1582,6 +1585,7 @@ union BlogPostModelContentLinksField = AcademyChapterRecord | AcademyCourseRecor
 
 type BlogPostModelExcerptField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [BlogPostModelExcerptLinksField!]!
   value: JsonField!
 }
@@ -1858,6 +1862,7 @@ union ChangelogEntryModelContentBlocksField = ImageRecord | InternalVideoRecord
 
 type ChangelogEntryModelContentField {
   blocks: [ChangelogEntryModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [ChangelogEntryModelContentLinksField!]!
   value: JsonField!
 }
@@ -2040,6 +2045,7 @@ type CloneButtonFormRecord implements RecordInterface {
 
 type CodeExcerptBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -2056,6 +2062,7 @@ input CodeExcerptBlockModelFilter {
 
 type CodeExcerptBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -2214,6 +2221,36 @@ enum ContinentModelOrderBy {
 
 """Record of type 🌍 Continent (continent)"""
 type ContinentRecord implements RecordInterface {
+  _allReferencingCountries(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenCountryAndContinent
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: CountryModelFilter
+    orderBy: [CountryModelOrderBy] = [_updatedAt_DESC]
+  ): [CountryRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingCountriesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenCountryAndContinent
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: CountryModelFilter
+  ): CollectionMetadata!
   _createdAt: DateTime!
 
   """Editing URL"""
@@ -2237,6 +2274,11 @@ type ContinentRecord implements RecordInterface {
   id: ItemId!
   name: String!
   updatedAt: DateTime!
+}
+
+"""Linking fields"""
+enum CountryModelFieldsReferencingContinentModel {
+  country_continent
 }
 
 input CountryModelFilter {
@@ -2506,6 +2548,7 @@ union CustomerStoryModelContentBlocksField = CodesandboxEmbedBlockRecord | CtaBu
 
 type CustomerStoryModelContentField {
   blocks: [CustomerStoryModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [CustomerStoryModelContentLinksField!]!
   value: JsonField!
 }
@@ -2567,6 +2610,7 @@ union CustomerStoryModelContentLinksField = AcademyChapterRecord | AcademyCourse
 
 type CustomerStoryModelExcerptField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -2597,6 +2641,7 @@ enum CustomerStoryModelFieldsReferencingPartnerModel {
   customerStory_content
   customerStory_content__questionAnswer_answer
   customerStory_content__questionAnswer_question
+  customerStory_partner
 }
 
 """Linking fields"""
@@ -2634,16 +2679,18 @@ input CustomerStoryModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  people: LinksFilter
   coverImage: FileFilter
   yoastAnalysis: JsonFilter
   seoSettings: SeoFilter
   excerpt: StructuredTextFilter
-  title: StringFilter
   seoH1: StringFilter
   canonicalUrl: StringFilter
-  slug: SlugFilter
+  people: LinksFilter
+  partner: LinkFilter
+  prettyVideoFrame: FileFilter
   content: CustomerStoryModelContentFieldFilter
+  slug: SlugFilter
+  title: StringFilter
   OR: [CustomerStoryModelFilter]
   AND: [CustomerStoryModelFilter]
 }
@@ -2671,12 +2718,12 @@ enum CustomerStoryModelOrderBy {
   updatedAt_DESC
   _isValid_ASC
   _isValid_DESC
-  title_ASC
-  title_DESC
   seoH1_ASC
   seoH1_DESC
   canonicalUrl_ASC
   canonicalUrl_DESC
+  title_ASC
+  title_DESC
 }
 
 """Record of type 💁 Customer Story (customer_story)"""
@@ -2705,7 +2752,9 @@ type CustomerStoryRecord implements RecordInterface {
   createdAt: DateTime!
   excerpt: CustomerStoryModelExcerptField!
   id: ItemId!
+  partner: PartnerRecord
   people: [PersonRecord!]!
+  prettyVideoFrame: ImageFileField
   seoH1: String
   seoSettings: SeoField
   slug: String!
@@ -2856,6 +2905,7 @@ input DocCalloutModelFilter {
 
 type DocCalloutModelTextField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [DocCalloutModelTextLinksField!]!
   value: JsonField!
 }
@@ -3162,6 +3212,7 @@ union DocPageModelContentBlocksField = CloneButtonFormRecord | DemoRecord | Depl
 
 type DocPageModelContentField {
   blocks: [DocPageModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [DocPageModelContentLinksField!]!
   value: JsonField!
 }
@@ -3970,6 +4021,7 @@ union EnterpriseAppModelContentBlocksField = ImageRecord | InternalVideoRecord |
 
 type EnterpriseAppModelContentField {
   blocks: [EnterpriseAppModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [EnterpriseAppModelContentLinksField!]!
   value: JsonField!
 }
@@ -4177,6 +4229,7 @@ type ExpertiseAreaRecord implements RecordInterface {
 
 type FaqModelAnswerField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [FaqModelAnswerLinksField!]!
   value: JsonField!
 }
@@ -4302,6 +4355,7 @@ enum FaviconType {
 
 type FeatureHighlightCardModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -4461,6 +4515,7 @@ type FeatureRecord implements RecordInterface {
 
 type FeatureRegularCardModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -4634,12 +4689,14 @@ union FeaturesIndexModelSecurityAndInfrastructureBlocksField = FeatureRegularCar
 
 type FeaturesIndexModelSubtitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type FeaturesIndexModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -4912,6 +4969,36 @@ Represents signed double-precision fractional values as specified by [IEEE 754](
 """
 scalar FloatType
 
+"""
+Block of type ↘️ Freeform Navigation Bar Group (freeform_navigation_bar_group)
+"""
+type FreeformNavigationBarGroupRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  callToAction: NavigationBarGroupCtaRecord
+  createdAt: DateTime!
+  id: ItemId!
+  links: [NavigationBarGroupCtaItemRecord!]!
+  title: String!
+  updatedAt: DateTime!
+}
+
 """Specifies how to filter Multiple files/images field"""
 input GalleryFilter {
   """
@@ -4950,6 +5037,7 @@ type GlobalSeoField {
 
 type GlossaryEntryModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -5118,6 +5206,7 @@ union HostingAppModelContentBlocksField = ImageRecord | InternalVideoRecord | Vi
 
 type HostingAppModelContentField {
   blocks: [HostingAppModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [HostingAppModelContentLinksField!]!
   value: JsonField!
 }
@@ -5512,6 +5601,7 @@ type ImageTitleFileField implements FileFieldInterface {
 
 type ImageTransformationsBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -5524,6 +5614,7 @@ input ImageTransformationsBlockModelFilter {
 
 type ImageTransformationsBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -7589,6 +7680,7 @@ type InDepthCtaBlockRecord implements RecordInterface {
 
 type InDepthCtaModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -8486,6 +8578,19 @@ input InverseRelationshipFieldFilterBetweenChangelogEntryAndUserGuidesEpisode {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenCountryAndContinent {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [CountryModelFieldsReferencingContinentModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [CountryModelFieldsReferencingContinentModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenCustomerStoryAndAcademyChapter {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -9107,6 +9212,19 @@ input InverseRelationshipFieldFilterBetweenLandingPageAndUserGuidesEpisode {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [LandingPageModelFieldsReferencingUserGuidesEpisodeModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenNavigationBarAndShowcaseProject {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [NavigationBarModelFieldsReferencingShowcaseProjectModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [NavigationBarModelFieldsReferencingShowcaseProjectModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -10214,6 +10332,15 @@ input InverseRelationshipFilterBetweenChangelogEntryAndUserGuidesEpisode {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenCountryAndContinent {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenCountryAndContinent
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenCustomerStoryAndAcademyChapter {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenCustomerStoryAndAcademyChapter
@@ -10640,6 +10767,15 @@ input InverseRelationshipFilterBetweenLandingPageAndShowcaseProject {
 input InverseRelationshipFilterBetweenLandingPageAndUserGuidesEpisode {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenLandingPageAndUserGuidesEpisode
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenNavigationBarAndShowcaseProject {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenNavigationBarAndShowcaseProject
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -11301,6 +11437,7 @@ input JsonFilter {
 
 type LandingCdnMapBlockModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11313,6 +11450,7 @@ input LandingCdnMapBlockModelFilter {
 
 type LandingCdnMapBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11495,6 +11633,7 @@ enum LandingPageModelOrderBy {
 
 type LandingPageModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11540,6 +11679,7 @@ type LandingPageRecord implements RecordInterface {
 
 type LandingProgressiveImagesBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11554,6 +11694,7 @@ input LandingProgressiveImagesBlockModelFilter {
 
 type LandingProgressiveImagesBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11589,6 +11730,7 @@ type LandingProgressiveImagesBlockRecord implements RecordInterface {
 
 type LandingVideoBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11602,6 +11744,7 @@ input LandingVideoBlockModelFilter {
 
 type LandingVideoBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11727,10 +11870,40 @@ input LinksFilter {
   exists: BooleanType
 }
 
+"""
+Block of type ↘️ Managed Navigation Bar Group (managed_navigation_bar_group)
+"""
+type ManagedNavigationBarGroupRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  callToAction: NavigationBarGroupCtaRecord
+  createdAt: DateTime!
+  id: ItemId!
+  title: String!
+  updatedAt: DateTime!
+}
+
 scalar MetaTagAttributes
 
 type ModularBlocksBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11743,6 +11916,7 @@ input ModularBlocksBlockModelFilter {
 
 type ModularBlocksBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11813,6 +11987,199 @@ enum MuxThumbnailFormatType {
   gif
 }
 
+"""Block of type 📍 Navigation Bar CTA (navigation_bar_cta)"""
+type NavigationBarCtaRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  callToAction: NavigationBarGroupCtaRecord!
+  createdAt: DateTime!
+  description: String!
+  id: ItemId!
+  title: String!
+  updatedAt: DateTime!
+}
+
+"""
+Block of type 🔗 Navigation Bar Group Item (navigation_bar_group_cta_item)
+"""
+type NavigationBarGroupCtaItemRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  description: String
+  id: ItemId!
+  label: String!
+  updatedAt: DateTime!
+  url: String!
+}
+
+"""Block of type 🚀 Navigation Bar Group CTA (navigation_bar_group_cta)"""
+type NavigationBarGroupCtaRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  id: ItemId!
+  label: String!
+  updatedAt: DateTime!
+  url: String!
+}
+
+"""Linking fields"""
+enum NavigationBarModelFieldsReferencingShowcaseProjectModel {
+  navigationBar_partnerProjects
+}
+
+input NavigationBarModelFilter {
+  _createdAt: CreatedAtFilter
+  createdAt: CreatedAtFilter
+  id: ItemIdFilter
+  _firstPublishedAt: PublishedAtFilter
+  _publicationScheduledAt: PublishedAtFilter
+  _unpublishingScheduledAt: PublishedAtFilter
+  _publishedAt: PublishedAtFilter
+  _status: StatusFilter
+  _updatedAt: UpdatedAtFilter
+  updatedAt: UpdatedAtFilter
+  _isValid: BooleanFilter
+  customerChats: LinksFilter
+  enterpriseStories: LinksFilter
+  videoGuides: LinksFilter
+  partnerProjects: LinksFilter
+  partnersDescription: StringFilter
+  useCases: LinksFilter
+  docPages: LinksFilter
+  wallOfLoveQuote: LinkFilter
+  OR: [NavigationBarModelFilter]
+  AND: [NavigationBarModelFilter]
+}
+
+enum NavigationBarModelOrderBy {
+  _createdAt_ASC
+  _createdAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+  id_ASC
+  id_DESC
+  _firstPublishedAt_ASC
+  _firstPublishedAt_DESC
+  _publicationScheduledAt_ASC
+  _publicationScheduledAt_DESC
+  _unpublishingScheduledAt_ASC
+  _unpublishingScheduledAt_DESC
+  _publishedAt_ASC
+  _publishedAt_DESC
+  _status_ASC
+  _status_DESC
+  _updatedAt_ASC
+  _updatedAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  _isValid_ASC
+  _isValid_DESC
+  partnersDescription_ASC
+  partnersDescription_DESC
+}
+
+union NavigationBarModelWallOfLoveQuoteField = PartnerTestimonialRecord | ReviewRecord
+
+"""Record of type 🍔 Navigation bar (navigation_bar)"""
+type NavigationBarRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  blogGroup: ManagedNavigationBarGroupRecord!
+  createdAt: DateTime!
+  customerChats: [CustomerStoryRecord!]!
+  customerChatsGroup: ManagedNavigationBarGroupRecord!
+  customersCallToAction: NavigationBarCtaRecord!
+  docGroup: ManagedNavigationBarGroupRecord!
+  docPages: [DocGroupRecord!]!
+  enterpriseStories: [SuccessStoryRecord!]!
+  enterpriseStoriesGroup: ManagedNavigationBarGroupRecord!
+  featuresGroup: FreeformNavigationBarGroupRecord!
+  helpGroup: FreeformNavigationBarGroupRecord!
+  id: ItemId!
+  knowledgeGroup: FreeformNavigationBarGroupRecord!
+  marketplaceGroup: FreeformNavigationBarGroupRecord!
+  partnerProjects: [ShowcaseProjectRecord!]!
+  partnerProjectsGroup: ManagedNavigationBarGroupRecord!
+  partnersCallToAction: NavigationBarCtaRecord!
+  partnersDescription: String!
+  partnersGroup: ManagedNavigationBarGroupRecord!
+  productCallToAction: NavigationBarCtaRecord!
+  productGroup: FreeformNavigationBarGroupRecord!
+  updatedAt: DateTime!
+  useCases: [UseCasePageRecord!]!
+  useCasesGroup: ManagedNavigationBarGroupRecord!
+  videoGuides: [UserGuidesChapterRecord!]!
+  videoGuidesGroup: ManagedNavigationBarGroupRecord!
+  wallOfLoveQuote: NavigationBarModelWallOfLoveQuoteField!
+  whoIsItForGroup: FreeformNavigationBarGroupRecord!
+}
+
 """Specifies how to filter by image orientation"""
 input OrientationFilter {
   """Search uploads with the specified orientation"""
@@ -11851,6 +12218,7 @@ type OtherVideoResourceRecord implements RecordInterface {
 
 type OverviewFeatureModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11892,24 +12260,28 @@ type OverviewFeatureRecord implements RecordInterface {
 
 type OverviewPillarModelCapability1Field {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type OverviewPillarModelCapability2Field {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type OverviewPillarModelCapability3Field {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type OverviewPillarModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11989,6 +12361,7 @@ input ParentFilter {
 
 type PartnerModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [PartnerModelDescriptionLinksField!]!
   value: JsonField!
 }
@@ -12098,6 +12471,7 @@ enum PartnerModelOrderBy {
 
 type PartnerModelShortDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -12759,10 +13133,10 @@ input PartnerTestimonialModelFilter {
   _isValid: BooleanFilter
   _stage: AgencyProgramWorkflowStageFilter
   image: FileFilter
-  quote: StructuredTextFilter
   partner: LinkFilter
   role: StringFilter
   name: StringFilter
+  quote: StructuredTextFilter
   OR: [PartnerTestimonialModelFilter]
   AND: [PartnerTestimonialModelFilter]
 }
@@ -12798,6 +13172,7 @@ enum PartnerTestimonialModelOrderBy {
 
 type PartnerTestimonialModelQuoteField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -13066,6 +13441,7 @@ type PlanFeatureGroupRecord implements RecordInterface {
 
 type PlanFeatureModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -14553,6 +14929,7 @@ type PricingPageRecord implements RecordInterface {
 
 type ProductAnnouncementModelAnnouncementField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -14641,12 +15018,14 @@ type ProductAnnouncementRecord implements RecordInterface {
 
 type ProductComparisonModelCompetitorCharacterizationField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type ProductComparisonModelDatocmsCharacterizationField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -14794,12 +15173,14 @@ type ProductComparisonRecord implements RecordInterface {
 
 type ProductDifferenceModelCompetitorTakeField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type ProductDifferenceModelDatocmsTakeField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [ProductDifferenceModelDatocmsTakeLinksField!]!
   value: JsonField!
 }
@@ -14862,6 +15243,7 @@ input ProductOverviewModelFilter {
 
 type ProductOverviewModelHeaderField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -14893,6 +15275,7 @@ enum ProductOverviewModelOrderBy {
 
 type ProductOverviewModelSubheaderField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -16897,6 +17280,17 @@ type Query {
     orderBy: [LandingPageModelOrderBy] = [_updatedAt_DESC]
   ): LandingPageRecord
 
+  """Returns the single instance record"""
+  navigationBar(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): NavigationBarRecord
+
   """Returns a specific record"""
   partner(
     """The locale to use to fetch the field's content"""
@@ -17428,6 +17822,7 @@ type Query {
 
 type QuestionAnswerModelAnswerField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [QuestionAnswerModelAnswerLinksField!]!
   value: JsonField!
 }
@@ -17442,6 +17837,7 @@ input QuestionAnswerModelFilter {
 
 type QuestionAnswerModelQuestionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [QuestionAnswerModelQuestionLinksField!]!
   value: JsonField!
 }
@@ -17545,6 +17941,7 @@ type ReactUiLiveExampleRecord implements RecordInterface {
 
 type ReasonToConsiderModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [ReasonToConsiderModelContentLinksField!]!
   value: JsonField!
 }
@@ -17582,6 +17979,7 @@ union RecipeModelContentBlocksField = ImageRecord | InternalVideoRecord
 
 type RecipeModelContentField {
   blocks: [RecipeModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [RecipeModelContentLinksField!]!
   value: JsonField!
 }
@@ -17642,7 +18040,6 @@ input RecipeModelFilter {
   featuredImage: FileFilter
   cardDescription: StringFilter
   seoSettings: SeoFilter
-  recipeJson: JsonFilter
   slug: SlugFilter
   content: StructuredTextFilter
   OR: [RecipeModelFilter]
@@ -17708,7 +18105,6 @@ type RecipeRecord implements RecordInterface {
   id: ItemId!
   position: IntType
   recipe: FileField!
-  recipeJson: JsonField!
   seoSettings: SeoField
   slug: String!
   title: String!
@@ -17859,6 +18255,7 @@ enum ReviewModelOrderBy {
 
 type ReviewModelQuoteField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -18119,12 +18516,14 @@ input ShowcaseProjectModelFilter {
 
 type ShowcaseProjectModelHeadlineField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type ShowcaseProjectModelInDepthExplanationField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [ShowcaseProjectModelInDepthExplanationLinksField!]!
   value: JsonField!
 }
@@ -18431,6 +18830,36 @@ type ShowcaseProjectRecord implements RecordInterface {
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
     filter: LandingPageModelFilter
+  ): CollectionMetadata!
+  _allReferencingNavigationBars(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenNavigationBarAndShowcaseProject
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: NavigationBarModelFilter
+    orderBy: [NavigationBarModelOrderBy] = [_updatedAt_DESC]
+  ): [NavigationBarRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingNavigationBarsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenNavigationBarAndShowcaseProject
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: NavigationBarModelFilter
   ): CollectionMetadata!
   _allReferencingPartners(
     """Specifies how to filter linking records"""
@@ -18885,6 +19314,7 @@ type SuccessStoriesIndexRecord implements RecordInterface {
 
 type SuccessStoryModelChallengeField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -18893,6 +19323,7 @@ union SuccessStoryModelContentBlocksField = ImageRecord | InDepthCtaBlockRecord 
 
 type SuccessStoryModelContentField {
   blocks: [SuccessStoryModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [SuccessStoryModelContentLinksField!]!
   value: JsonField!
 }
@@ -19031,12 +19462,14 @@ enum SuccessStoryModelOrderBy {
 
 type SuccessStoryModelResultField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type SuccessStoryModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -19110,6 +19543,7 @@ type SuccessStoryRecord implements RecordInterface {
 
 type SuccessStoryResultModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -19215,6 +19649,7 @@ type SuccessStoryTagRecord implements RecordInterface {
 
 type SupportTopicModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [SupportTopicModelDescriptionLinksField!]!
   value: JsonField!
 }
@@ -19551,6 +19986,7 @@ type TeamPageRecord implements RecordInterface {
 
 type TechPartnerModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [TechPartnerModelDescriptionLinksField!]!
   value: JsonField!
 }
@@ -19657,6 +20093,7 @@ enum TechPartnerModelOrderBy {
 
 type TechPartnerModelShortDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -19898,6 +20335,7 @@ input TextFilter {
 
 type TryDemoBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [TryDemoBlockModelContentLinksField!]!
   value: JsonField!
 }
@@ -19912,6 +20350,7 @@ input TryDemoBlockModelFilter {
 
 type TryDemoBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20026,6 +20465,7 @@ type TryTutorialRecord implements RecordInterface {
 
 type TutorialModelExcerptField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20657,6 +21097,7 @@ input UploadWidthFilter {
 
 type UseCaseCalloutModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20692,6 +21133,7 @@ type UseCaseCalloutRecord implements RecordInterface {
 
 type UseCaseFeatureModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20728,6 +21170,7 @@ union UseCasePageModelCaseStudyField = CustomerStoryRecord | ShowcaseProjectReco
 
 type UseCasePageModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20749,6 +21192,7 @@ input UseCasePageModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
+  navigationBarTitle: StringFilter
   heroProduct: FileFilter
   heroCustomer: FileFilter
   featuresHeader: StringFilter
@@ -20771,7 +21215,6 @@ input UseCasePageModelFilter {
   heroImage: FileFilter
   title: StructuredTextFilter
   readability: JsonFilter
-  identifierInternal: StringFilter
   slug: SlugFilter
   OR: [UseCasePageModelFilter]
   AND: [UseCasePageModelFilter]
@@ -20779,12 +21222,14 @@ input UseCasePageModelFilter {
 
 type UseCasePageModelHeaderField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelHeadlineField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20812,54 +21257,61 @@ enum UseCasePageModelOrderBy {
   updatedAt_DESC
   _isValid_ASC
   _isValid_DESC
+  navigationBarTitle_ASC
+  navigationBarTitle_DESC
   featuresHeader_ASC
   featuresHeader_DESC
   heading_ASC
   heading_DESC
   link_ASC
   link_DESC
-  identifierInternal_ASC
-  identifierInternal_DESC
 }
 
 type UseCasePageModelQuotesHeaderField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelStarterDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelStarterTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelSubtitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelSuccessStoryHeaderField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelSummaryField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20896,9 +21348,9 @@ type UseCasePageRecord implements RecordInterface {
   heroImage: ImageFileField!
   heroProduct: ImageFileField!
   id: ItemId!
-  identifierInternal: String
   image: ImageFileField!
   link: String!
+  navigationBarTitle: String!
   quotes: [PartnerTestimonialRecord!]!
   quotesHeader: UseCasePageModelQuotesHeaderField!
   readability: JsonField
@@ -20959,16 +21411,17 @@ input UserGuidesChapterModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  videos: LinksFilter
   introduction: StructuredTextFilter
   title: StringFilter
   slug: SlugFilter
+  videos: LinksFilter
   OR: [UserGuidesChapterModelFilter]
   AND: [UserGuidesChapterModelFilter]
 }
 
 type UserGuidesChapterModelIntroductionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -21034,6 +21487,7 @@ type UserGuidesChapterRecord implements RecordInterface {
 
 type UserGuidesEpisodeModelContentField {
   blocks: [InternalVideoRecord!]!
+  inlineBlocks: [String!]!
   links: [UserGuidesEpisodeModelContentLinksField!]!
   value: JsonField!
 }
