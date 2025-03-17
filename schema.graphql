@@ -2214,6 +2214,36 @@ enum ContinentModelOrderBy {
 
 """Record of type 🌍 Continent (continent)"""
 type ContinentRecord implements RecordInterface {
+  _allReferencingCountries(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenCountryAndContinent
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: CountryModelFilter
+    orderBy: [CountryModelOrderBy] = [_updatedAt_DESC]
+  ): [CountryRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingCountriesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenCountryAndContinent
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: CountryModelFilter
+  ): CollectionMetadata!
   _createdAt: DateTime!
 
   """Editing URL"""
@@ -2237,6 +2267,11 @@ type ContinentRecord implements RecordInterface {
   id: ItemId!
   name: String!
   updatedAt: DateTime!
+}
+
+"""Linking fields"""
+enum CountryModelFieldsReferencingContinentModel {
+  country_continent
 }
 
 input CountryModelFilter {
@@ -2597,6 +2632,7 @@ enum CustomerStoryModelFieldsReferencingPartnerModel {
   customerStory_content
   customerStory_content__questionAnswer_answer
   customerStory_content__questionAnswer_question
+  customerStory_partner
 }
 
 """Linking fields"""
@@ -2634,16 +2670,18 @@ input CustomerStoryModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  people: LinksFilter
   coverImage: FileFilter
   yoastAnalysis: JsonFilter
   seoSettings: SeoFilter
   excerpt: StructuredTextFilter
-  title: StringFilter
   seoH1: StringFilter
   canonicalUrl: StringFilter
-  slug: SlugFilter
+  people: LinksFilter
+  partner: LinkFilter
+  prettyVideoFrame: FileFilter
   content: CustomerStoryModelContentFieldFilter
+  slug: SlugFilter
+  title: StringFilter
   OR: [CustomerStoryModelFilter]
   AND: [CustomerStoryModelFilter]
 }
@@ -2671,12 +2709,12 @@ enum CustomerStoryModelOrderBy {
   updatedAt_DESC
   _isValid_ASC
   _isValid_DESC
-  title_ASC
-  title_DESC
   seoH1_ASC
   seoH1_DESC
   canonicalUrl_ASC
   canonicalUrl_DESC
+  title_ASC
+  title_DESC
 }
 
 """Record of type 💁 Customer Story (customer_story)"""
@@ -2705,7 +2743,9 @@ type CustomerStoryRecord implements RecordInterface {
   createdAt: DateTime!
   excerpt: CustomerStoryModelExcerptField!
   id: ItemId!
+  partner: PartnerRecord
   people: [PersonRecord!]!
+  prettyVideoFrame: ImageFileField
   seoH1: String
   seoSettings: SeoField
   slug: String!
@@ -8486,6 +8526,19 @@ input InverseRelationshipFieldFilterBetweenChangelogEntryAndUserGuidesEpisode {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenCountryAndContinent {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [CountryModelFieldsReferencingContinentModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [CountryModelFieldsReferencingContinentModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenCustomerStoryAndAcademyChapter {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -9107,6 +9160,19 @@ input InverseRelationshipFieldFilterBetweenLandingPageAndUserGuidesEpisode {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [LandingPageModelFieldsReferencingUserGuidesEpisodeModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenNavigationBarAndShowcaseProject {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [NavigationBarModelFieldsReferencingShowcaseProjectModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [NavigationBarModelFieldsReferencingShowcaseProjectModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -10214,6 +10280,15 @@ input InverseRelationshipFilterBetweenChangelogEntryAndUserGuidesEpisode {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenCountryAndContinent {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenCountryAndContinent
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenCustomerStoryAndAcademyChapter {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenCustomerStoryAndAcademyChapter
@@ -10640,6 +10715,15 @@ input InverseRelationshipFilterBetweenLandingPageAndShowcaseProject {
 input InverseRelationshipFilterBetweenLandingPageAndUserGuidesEpisode {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenLandingPageAndUserGuidesEpisode
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenNavigationBarAndShowcaseProject {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenNavigationBarAndShowcaseProject
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -11813,6 +11897,91 @@ enum MuxThumbnailFormatType {
   gif
 }
 
+"""Linking fields"""
+enum NavigationBarModelFieldsReferencingShowcaseProjectModel {
+  navigationBar_partnerProjects
+}
+
+input NavigationBarModelFilter {
+  _createdAt: CreatedAtFilter
+  createdAt: CreatedAtFilter
+  id: ItemIdFilter
+  _firstPublishedAt: PublishedAtFilter
+  _publicationScheduledAt: PublishedAtFilter
+  _unpublishingScheduledAt: PublishedAtFilter
+  _publishedAt: PublishedAtFilter
+  _status: StatusFilter
+  _updatedAt: UpdatedAtFilter
+  updatedAt: UpdatedAtFilter
+  _isValid: BooleanFilter
+  docPages: LinksFilter
+  videoGuides: LinksFilter
+  enterpriseStories: LinksFilter
+  customerChats: LinksFilter
+  partnerProjects: LinksFilter
+  wallOfLoveQuote: LinkFilter
+  OR: [NavigationBarModelFilter]
+  AND: [NavigationBarModelFilter]
+}
+
+enum NavigationBarModelOrderBy {
+  _createdAt_ASC
+  _createdAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+  id_ASC
+  id_DESC
+  _firstPublishedAt_ASC
+  _firstPublishedAt_DESC
+  _publicationScheduledAt_ASC
+  _publicationScheduledAt_DESC
+  _unpublishingScheduledAt_ASC
+  _unpublishingScheduledAt_DESC
+  _publishedAt_ASC
+  _publishedAt_DESC
+  _status_ASC
+  _status_DESC
+  _updatedAt_ASC
+  _updatedAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  _isValid_ASC
+  _isValid_DESC
+}
+
+union NavigationBarModelWallOfLoveQuoteField = PartnerTestimonialRecord | ReviewRecord
+
+"""Record of type 🍔 Navigation bar (navigation_bar)"""
+type NavigationBarRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  customerChats: [CustomerStoryRecord!]!
+  docPages: [DocGroupRecord!]!
+  enterpriseStories: [SuccessStoryRecord!]!
+  id: ItemId!
+  partnerProjects: [ShowcaseProjectRecord!]!
+  updatedAt: DateTime!
+  videoGuides: [UserGuidesChapterRecord!]!
+  wallOfLoveQuote: NavigationBarModelWallOfLoveQuoteField!
+}
+
 """Specifies how to filter by image orientation"""
 input OrientationFilter {
   """Search uploads with the specified orientation"""
@@ -12759,10 +12928,10 @@ input PartnerTestimonialModelFilter {
   _isValid: BooleanFilter
   _stage: AgencyProgramWorkflowStageFilter
   image: FileFilter
-  quote: StructuredTextFilter
   partner: LinkFilter
   role: StringFilter
   name: StringFilter
+  quote: StructuredTextFilter
   OR: [PartnerTestimonialModelFilter]
   AND: [PartnerTestimonialModelFilter]
 }
@@ -16897,6 +17066,17 @@ type Query {
     orderBy: [LandingPageModelOrderBy] = [_updatedAt_DESC]
   ): LandingPageRecord
 
+  """Returns the single instance record"""
+  navigationBar(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): NavigationBarRecord
+
   """Returns a specific record"""
   partner(
     """The locale to use to fetch the field's content"""
@@ -17642,7 +17822,6 @@ input RecipeModelFilter {
   featuredImage: FileFilter
   cardDescription: StringFilter
   seoSettings: SeoFilter
-  recipeJson: JsonFilter
   slug: SlugFilter
   content: StructuredTextFilter
   OR: [RecipeModelFilter]
@@ -17708,7 +17887,6 @@ type RecipeRecord implements RecordInterface {
   id: ItemId!
   position: IntType
   recipe: FileField!
-  recipeJson: JsonField!
   seoSettings: SeoField
   slug: String!
   title: String!
@@ -18431,6 +18609,36 @@ type ShowcaseProjectRecord implements RecordInterface {
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
     filter: LandingPageModelFilter
+  ): CollectionMetadata!
+  _allReferencingNavigationBars(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenNavigationBarAndShowcaseProject
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: NavigationBarModelFilter
+    orderBy: [NavigationBarModelOrderBy] = [_updatedAt_DESC]
+  ): [NavigationBarRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingNavigationBarsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenNavigationBarAndShowcaseProject
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: NavigationBarModelFilter
   ): CollectionMetadata!
   _allReferencingPartners(
     """Specifies how to filter linking records"""
@@ -20959,10 +21167,10 @@ input UserGuidesChapterModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  videos: LinksFilter
   introduction: StructuredTextFilter
   title: StringFilter
   slug: SlugFilter
+  videos: LinksFilter
   OR: [UserGuidesChapterModelFilter]
   AND: [UserGuidesChapterModelFilter]
 }

@@ -1,0 +1,62 @@
+---
+import s from './style.module.css';
+import type { FragmentOf } from 'gql.tada';
+import { readFragment } from 'gql.tada';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { InlineText } from '~/components/structuredText/InlineText';
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
+
+interface Props {
+  quote:
+    | (FragmentOf<typeof PartnerTestimonialQuoteFragment> & {
+        __typename: 'PartnerTestimonialRecord';
+      })
+    | (FragmentOf<typeof ReviewQuoteFragment> & {
+        __typename: 'ReviewRecord';
+      });
+}
+
+const { quote: maskedQuote } = Astro.props;
+
+const quote =
+  maskedQuote.__typename === 'PartnerTestimonialRecord'
+    ? readFragment(PartnerTestimonialQuoteFragment, maskedQuote)
+    : readFragment(ReviewQuoteFragment, maskedQuote);
+---
+
+<blockquote class={s.root}>
+  {
+    quote.__typename === 'PartnerTestimonialRecord' ? (
+      <>
+        <p class={s.quote}>
+          “<InlineText {...ensureValidStructuredTextProps({ data: quote.quote })} />”
+        </p>
+
+        <div class={s.content}>
+          <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
+          <div class={s.authorRole}>
+            <div class={s.name}>{quote.name}</div>
+            <div class={s.role}>
+              {quote.role} at {quote.partner.name}
+            </div>
+          </div>
+        </div>
+      </>
+    ) : (
+      <>
+        <p class={s.quote}>
+          “<InlineText {...ensureValidStructuredTextProps({ data: quote.quote })} />”
+        </p>
+
+        <div class={s.content}>
+          <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
+          <div class={s.authorRole}>
+            <div class={s.name}>{quote.name}</div>
+            <div class={s.role}>{quote.role}</div>
+          </div>
+        </div>
+      </>
+    )
+  }
+</blockquote>

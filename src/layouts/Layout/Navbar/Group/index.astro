@@ -1,0 +1,46 @@
+---
+import s from './style.module.css';
+import Box from '../Box/index.astro';
+
+type Props = {
+  columns?: number;
+  contentColumns?: number;
+  contentDirection?: string;
+  link?: string;
+  title?: string;
+  finalCta?: string;
+  class?: string;
+};
+
+const {
+  columns = 1,
+  contentColumns = 1,
+  contentDirection = 'flex-start',
+  link,
+  title,
+  finalCta,
+  class: className,
+} = Astro.props;
+---
+
+<Box columns={columns} class:list={[s.group, className]}>
+  {
+    title && (
+      <h3 class={s.groupTitle}>{link ? <a href={link}>{title}</a> : <span>{title}</span>}</h3>
+    )
+  }
+  <div
+    class={s.groupContent}
+    data-col={contentColumns}
+    style={{ justifyContent: contentDirection }}
+  >
+    <slot />
+  </div>
+  {
+    finalCta && link && (
+      <a href={link} class={s.groupCta}>
+        <span>{finalCta}</span> <span>→</span>
+      </a>
+    )
+  }
+</Box>

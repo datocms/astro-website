@@ -4,6 +4,7 @@ import { maybeInvalidateFetchPluginSdkManifest } from '~/components/docs/blocks/
 import { maybeInvalidateSiteApiHyperschema } from '~/components/docs/restApi/fetchSchema';
 import { maybeInvalidateFastlyDatacenters } from '~/components/featureAnimations/CdnMap/utils';
 import { maybeInvalidateFavicon } from '~/layouts/BaseLayout/fetchFavicon';
+import { maybeInvalidateNavbar } from '~/layouts/Layout/Navbar/fetchNavbar';
 import {
   maybeInvalidateCdaIntrospectionFieldFilters,
   maybeInvalidateCdaIntrospectionUploadFilters,
@@ -33,6 +34,7 @@ export const POST: APIRoute = async ({ url, request }) => {
       maybeInvalidateCdaIntrospectionUploadFilters(),
       maybeInvalidateCdaIntrospectionFieldFilters(),
       maybeInvalidateSiteApiErrorCodes(),
+      maybeInvalidateNavbar(),
     ]);
 
     return json({ invalidatedSurrogateKeys: results.filter(Boolean) });

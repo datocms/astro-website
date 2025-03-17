@@ -1,0 +1,18 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import s from './style.module.css';
+
+type Props<T extends HTMLTag = 'div'> = Polymorphic<{
+  as: T;
+  class?: string;
+  columns?: number;
+  stretch?: boolean;
+  style?: astroHTML.JSX.CSSProperties;
+}>;
+
+const { as: Tag = 'div' as any, class: className, stretch, columns = 1, ...props } = Astro.props;
+---
+
+<Tag data-col={columns} class:list={[s.box, stretch && s.stretchedBox, className]} {...props}>
+  <slot />
+</Tag>

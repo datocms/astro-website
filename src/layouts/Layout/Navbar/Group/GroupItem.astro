@@ -1,0 +1,51 @@
+---
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import s from './style.module.css';
+import type { FragmentOf } from 'gql.tada';
+import type { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+
+type Props = {
+  href: string;
+  title?: string;
+  description?: string | null;
+  image?: FragmentOf<typeof ResponsiveImageFragment> | null;
+  logoUrl?: string;
+  isNew?: boolean;
+};
+
+const { href, title, description, image, isNew, logoUrl } = Astro.props;
+
+const isExternal = href.startsWith('http');
+---
+
+<a
+  href={href}
+  class:list={[s.groupItem]}
+  target={isExternal ? '_blank' : '_self'}
+  rel={isExternal ? 'noopener noreferrer' : ''}
+>
+  {
+    Astro.slots.has('image') ? (
+      <slot name="image" />
+    ) : image ? (
+      <div class={s.itemImage}>
+        <ResponsiveImage data={image} />
+      </div>
+    ) : logoUrl ? (
+      <div class={s.itemLogo}>
+        <img loading="lazy" src={logoUrl} />
+      </div>
+    ) : null
+  }
+  <article class={s.itemBody}>
+    {
+      title && (
+        <div class={s.itemTitle}>
+          <h4>{title}</h4>
+          {isNew && <span class={s.isNew}>New</span>}
+        </div>
+      )
+    }
+    {description && <p class={s.itemDescription}>{description}</p>}
+  </article>
+</a>

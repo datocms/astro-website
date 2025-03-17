@@ -6,14 +6,16 @@ import { TargetToggler } from '~/components/TargetToggler';
 
 type Props = {
   name: string;
+  active?: boolean;
+  panelClass?: string;
 };
 
-const { name } = Astro.props;
+const { name, active, panelClass } = Astro.props;
 
 const slug = slugify(name);
 ---
 
-<div class={s.navItem} id={slug} data-navbar-navitem>
+<div class:list={[s.navItem, active && s.navItemActive]} id={slug} data-navbar-navitem>
   <TargetToggler targetId={slug}>
     <div class={s.navButtonWrapper}>
       <button type="button" class={s.navButton} data-navbar-navitem-button>
@@ -24,7 +26,7 @@ const slug = slugify(name);
       </div>
     </div>
   </TargetToggler>
-  <div class={s.panel} role="dialog">
-    <div class={s.panelInner}><slot /></div>
+  <div class={s.panelWrapper} role="dialog">
+    <div class={s.panel} class={panelClass}><slot /></div>
   </div>
 </div>
