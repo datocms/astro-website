@@ -12,6 +12,7 @@ import { buildUrlForProductUpdate } from '~/lib/datocms/gqlUrlBuilder/productUpd
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { NullBlock } from '~/components/blocks/NullBlock';
 
 interface Props {
   productUpdate: FragmentOf<typeof ProductUpdateFragment>;
@@ -57,6 +58,10 @@ const productUpdate = readFragment(ProductUpdateFragment, maskedProductUpdate);
         },
         linkToRecordComponents: defaultLinkToRecordComponents,
         inlineRecordComponents: defaultInlineRecordComponents,
+        inlineBlockComponents: {
+          InternalVideoRecord: NullBlock,
+          ImageRecord: NullBlock,
+        },
       })}
     />
   </Prose>

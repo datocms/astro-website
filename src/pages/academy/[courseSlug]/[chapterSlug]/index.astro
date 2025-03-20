@@ -24,6 +24,7 @@ import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyCh
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { NullBlock } from '~/components/blocks/NullBlock';
 
 const variables = { courseSlug: Astro.params.courseSlug!, chapterSlug: Astro.params.chapterSlug! };
 
@@ -115,6 +116,11 @@ const sections = filterNodes(
                 ImageRecord: Image,
                 TableRecord: Table,
                 InternalVideoRecord: InternalVideo,
+              },
+              inlineBlockComponents: {
+                ImageRecord: NullBlock,
+                TableRecord: NullBlock,
+                InternalVideoRecord: NullBlock,
               },
               linkToRecordComponents: defaultLinkToRecordComponents,
               inlineRecordComponents: defaultInlineRecordComponents,
