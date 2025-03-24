@@ -15,7 +15,10 @@
  *       _updated_at: { gt: '2020-04-18T00:00:00' }
  *     }
  *   },
- *   order_by: '_updated_at_ASC'
+ *   order_by: '_updated_at_ASC',
+ *   undefined: 'shouldBeIgnored',
+ *   null: 'shouldAlsoBeIgnored',
+ *   extra: null,
  * };
  *
  * const queryString = buildQueryString(params);
@@ -38,24 +41,33 @@ export const buildQueryString = (obj: Record<string, any>): string => {
   const serialize = (subObj: any, parentKey: string = ''): string =>
     Object.keys(subObj)
       .reduce((acc: string[], key) => {
+        // Skip keys that are either the literal "undefined" or "null".
+        if (key === 'undefined' || key === 'null') {
+          return acc;
+        }
         if (Object.hasOwn(subObj, key)) {
           const value = subObj[key];
+          // Also ignore properties whose value is undefined or null.
+          if (value === undefined || value === null) {
+            return acc;
+          }
           // Build the full key; if there's a parent key, nest the current key.
           const fullKey = parentKey ? `${parentKey}[${key}]` : key;
 
-          if (value !== null && typeof value === 'object') {
+          if (typeof value === 'object') {
             if (Array.isArray(value)) {
               // Reduce over the array immutably.
               const arrayPairs = value.reduce((arrAcc: string[], item) => {
-                if (item !== null && typeof item === 'object') {
+                // If an array item is null or undefined, skip it.
+                if (item === undefined || item === null) {
+                  return arrAcc;
+                }
+                if (typeof item === 'object') {
                   // Recursively serialize objects inside arrays.
                   return [...arrAcc, serialize(item, `${fullKey}[]`)];
                 } else {
                   // For primitive array items, add them directly.
-                  return [
-                    ...arrAcc,
-                    `${encodeURIComponent(fullKey)}[]=${encodeURIComponent(item)}`,
-                  ];
+                  return [...arrAcc, `${fullKey}[]=${item}`];
                 }
               }, [] as string[]);
               return [...acc, ...arrayPairs];
@@ -64,8 +76,8 @@ export const buildQueryString = (obj: Record<string, any>): string => {
               return [...acc, serialize(value, fullKey)];
             }
           } else {
-            // For primitive values, encode the key/value pair.
-            return [...acc, `${encodeURIComponent(fullKey)}=${encodeURIComponent(value)}`];
+            // For primitive values, replace spaces with '%20' for readability.
+            return [...acc, `${fullKey}=${value.toString().replace(' ', '%20')}`];
           }
         }
         return acc;

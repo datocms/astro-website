@@ -36,14 +36,8 @@ export function buildFetchRequest(
 
   const method = request?.method || endpoint.method;
 
-  // Decode the URL to make it more readable, but still encode spaces so the request isn't cut off prematurely
-  const partiallyDecodedUrlForReadability = decodeURI(rawRequestAsURL.toString()).replace(
-    ' ',
-    '%20',
-  );
-
   return {
-    url: partiallyDecodedUrlForReadability,
+    url: rawRequestAsURL.toString(),
     method,
     headers: request?.headers || defaultRequestHeaders(endpoint),
     body:
