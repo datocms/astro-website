@@ -58,8 +58,6 @@ function addSearchParamsToRequestUrl(url: URL, endpoint: RestApiEndpoint) {
 
   const exampleValues = exampleValueForSchema(endpoint.hrefSchema) as Record<string, unknown>;
 
-  console.log('exampleValues', exampleValues);
-
   try {
     if (exampleValues && typeof exampleValues === 'object') {
       // Serialize nested params into a query string
