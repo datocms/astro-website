@@ -44,6 +44,7 @@ export const query = graphql(
             ...PartnerLinkFragment
             ...PluginLinkFragment
             ...ProductComparisonLinkFragment
+            ...RecipeLinkFragment
             ...ShowcaseProjectLinkFragment
             ...SuccessStoryLinkFragment
             ...TechPartnerLinkFragment
@@ -65,6 +66,7 @@ export const query = graphql(
             ...PartnerInlineFragment
             ...PluginInlineFragment
             ...ProductComparisonInlineFragment
+            ...RecipeInlineFragment
             ...ShowcaseProjectInlineFragment
             ...SuccessStoryInlineFragment
             ...TechPartnerInlineFragment
