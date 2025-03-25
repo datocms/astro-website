@@ -52,6 +52,7 @@ export const PageLayoutFragment = graphql(
           ...PartnerLinkFragment
           ...PluginLinkFragment
           ...ProductComparisonLinkFragment
+          ...RecipeLinkFragment
           ...ShowcaseProjectLinkFragment
           ...SuccessStoryLinkFragment
           ...TechPartnerLinkFragment
@@ -73,6 +74,7 @@ export const PageLayoutFragment = graphql(
           ...PartnerInlineFragment
           ...PluginInlineFragment
           ...ProductComparisonInlineFragment
+          ...RecipeInlineFragment
           ...ShowcaseProjectInlineFragment
           ...SuccessStoryInlineFragment
           ...TechPartnerInlineFragment

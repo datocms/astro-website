@@ -1,0 +1,23 @@
+---
+import Box from '../Box/index.astro';
+import { Button } from '~/components/Button';
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+
+type Props = { svgName: string; title: string; description: string; href: string; cta: string };
+
+const { svgName, title, description, href, cta } = Astro.props;
+---
+
+<Box as="a" class={s.ctaBox} href={href}>
+  <div class={s.ctaImage}>
+    <Svg name={svgName} />
+  </div>
+  <div class={s.ctaBody}>
+    <h3 class={s.ctaTitle}>{title}</h3>
+    <p class={s.ctaDescription}>{description}</p>
+  </div>
+  <Button as="div" p="tiny" class={s.button}>
+    {cta}
+  </Button>
+</Box>

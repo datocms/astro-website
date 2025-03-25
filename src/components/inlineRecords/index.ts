@@ -26,6 +26,8 @@ import { PluginInline } from '~/components/inlineRecords/PluginInline';
 import { PluginInlineFragment } from '~/components/inlineRecords/PluginInline/graphql';
 import { ProductComparisonInline } from '~/components/inlineRecords/ProductComparisonInline';
 import { ProductComparisonInlineFragment } from '~/components/inlineRecords/ProductComparisonInline/graphql';
+import { RecipeInline } from '~/components/inlineRecords/RecipeInline';
+import { RecipeInlineFragment } from '~/components/inlineRecords/RecipeInline/graphql';
 import { ShowcaseProjectInline } from '~/components/inlineRecords/ShowcaseProjectInline';
 import { ShowcaseProjectInlineFragment } from '~/components/inlineRecords/ShowcaseProjectInline/graphql';
 import { SuccessStoryInline } from '~/components/inlineRecords/SuccessStoryInline';
@@ -54,6 +56,7 @@ export const defaultInlineRecordFragments = [
   PartnerInlineFragment,
   PluginInlineFragment,
   ProductComparisonInlineFragment,
+  RecipeInlineFragment,
   ShowcaseProjectInlineFragment,
   SuccessStoryInlineFragment,
   TechPartnerInlineFragment,
@@ -77,6 +80,7 @@ export const defaultInlineRecordComponents = {
   PartnerRecord: PartnerInline,
   PluginRecord: PluginInline,
   ProductComparisonRecord: ProductComparisonInline,
+  RecipeRecord: RecipeInline,
   ShowcaseProjectRecord: ShowcaseProjectInline,
   SuccessStoryRecord: SuccessStoryInline,
   TechPartnerRecord: TechPartnerInline,

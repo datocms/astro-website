@@ -31,6 +31,7 @@ export const ProductUpdateFragment = graphql(
           ...PartnerLinkFragment
           ...PluginLinkFragment
           ...ProductComparisonLinkFragment
+          ...RecipeLinkFragment
           ...ShowcaseProjectLinkFragment
           ...SuccessStoryLinkFragment
           ...TechPartnerLinkFragment
@@ -52,6 +53,7 @@ export const ProductUpdateFragment = graphql(
           ...PartnerInlineFragment
           ...PluginInlineFragment
           ...ProductComparisonInlineFragment
+          ...RecipeInlineFragment
           ...ShowcaseProjectInlineFragment
           ...SuccessStoryInlineFragment
           ...TechPartnerInlineFragment

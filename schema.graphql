@@ -28,11 +28,12 @@ union AcademyChapterModelContentBlocksField = ImageRecord | InternalVideoRecord 
 
 type AcademyChapterModelContentField {
   blocks: [AcademyChapterModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [AcademyChapterModelContentLinksField!]!
   value: JsonField!
 }
 
-union AcademyChapterModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union AcademyChapterModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum AcademyChapterModelFieldsReferencingAcademyChapterModel {
@@ -81,11 +82,11 @@ input AcademyChapterModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
-  content: StructuredTextFilter
   seo: SeoFilter
   yoastAnalysis: JsonFilter
   title: StringFilter
+  slug: SlugFilter
+  content: StructuredTextFilter
   OR: [AcademyChapterModelFilter]
   AND: [AcademyChapterModelFilter]
 }
@@ -479,6 +480,36 @@ type AcademyChapterRecord implements RecordInterface {
     locale: SiteLocale
     filter: ProductComparisonModelFilter
   ): CollectionMetadata!
+  _allReferencingRecipes(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndAcademyChapter
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: RecipeModelFilter
+    orderBy: [RecipeModelOrderBy] = [position_ASC]
+  ): [RecipeRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingRecipesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndAcademyChapter
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: RecipeModelFilter
+  ): CollectionMetadata!
   _allReferencingShowcaseProjects(
     """Specifies how to filter linking records"""
     through: InverseRelationshipFilterBetweenShowcaseProjectAndAcademyChapter
@@ -675,17 +706,18 @@ input AcademyCourseModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  illustration: StringFilter
-  slug: SlugFilter
   introduction: StructuredTextFilter
   chapters: LinksFilter
+  illustration: StringFilter
   name: StringFilter
+  slug: SlugFilter
   OR: [AcademyCourseModelFilter]
   AND: [AcademyCourseModelFilter]
 }
 
 type AcademyCourseModelIntroductionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -1053,6 +1085,36 @@ type AcademyCourseRecord implements RecordInterface {
     locale: SiteLocale
     filter: ProductComparisonModelFilter
   ): CollectionMetadata!
+  _allReferencingRecipes(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndAcademyCourse
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: RecipeModelFilter
+    orderBy: [RecipeModelOrderBy] = [position_ASC]
+  ): [RecipeRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingRecipesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndAcademyCourse
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: RecipeModelFilter
+  ): CollectionMetadata!
   _allReferencingShowcaseProjects(
     """Specifies how to filter linking records"""
     through: InverseRelationshipFilterBetweenShowcaseProjectAndAcademyCourse
@@ -1291,9 +1353,9 @@ input AuthorModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   avatar: FileFilter
   name: StringFilter
+  slug: SlugFilter
   OR: [AuthorModelFilter]
   AND: [AuthorModelFilter]
 }
@@ -1461,6 +1523,7 @@ union BlogPostModelContentBlocksField = CodesandboxEmbedBlockRecord | CtaButtonR
 
 type BlogPostModelContentField {
   blocks: [BlogPostModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [BlogPostModelContentLinksField!]!
   value: JsonField!
 }
@@ -1518,15 +1581,16 @@ input BlogPostModelContentFieldFilter {
   blocks: BlogPostModelContentFieldBlocksFilter
 }
 
-union BlogPostModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union BlogPostModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 type BlogPostModelExcerptField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [BlogPostModelExcerptLinksField!]!
   value: JsonField!
 }
 
-union BlogPostModelExcerptLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union BlogPostModelExcerptLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum BlogPostModelFieldsReferencingAcademyChapterModel {
@@ -1603,16 +1667,16 @@ input BlogPostModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  coverImage: FileFilter
-  slug: SlugFilter
-  content: BlogPostModelContentFieldFilter
-  excerpt: StructuredTextFilter
   yoastAnalysis: JsonFilter
   seoSettings: SeoFilter
+  coverImage: FileFilter
   author: LinksFilter
   seoH1: StringFilter
   canonicalUrl: StringFilter
   title: StringFilter
+  slug: SlugFilter
+  content: BlogPostModelContentFieldFilter
+  excerpt: StructuredTextFilter
   OR: [BlogPostModelFilter]
   AND: [BlogPostModelFilter]
 }
@@ -1798,11 +1862,12 @@ union ChangelogEntryModelContentBlocksField = ImageRecord | InternalVideoRecord
 
 type ChangelogEntryModelContentField {
   blocks: [ChangelogEntryModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [ChangelogEntryModelContentLinksField!]!
   value: JsonField!
 }
 
-union ChangelogEntryModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union ChangelogEntryModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum ChangelogEntryModelFieldsReferencingAcademyChapterModel {
@@ -1851,12 +1916,12 @@ input ChangelogEntryModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
-  showInBlog: BooleanFilter
-  content: StructuredTextFilter
   categories: LinksFilter
   seo: SeoFilter
+  showInBlog: BooleanFilter
   title: StringFilter
+  slug: SlugFilter
+  content: StructuredTextFilter
   OR: [ChangelogEntryModelFilter]
   AND: [ChangelogEntryModelFilter]
 }
@@ -1980,6 +2045,7 @@ type CloneButtonFormRecord implements RecordInterface {
 
 type CodeExcerptBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -1996,6 +2062,7 @@ input CodeExcerptBlockModelFilter {
 
 type CodeExcerptBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -2154,6 +2221,36 @@ enum ContinentModelOrderBy {
 
 """Record of type 🌍 Continent (continent)"""
 type ContinentRecord implements RecordInterface {
+  _allReferencingCountries(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenCountryAndContinent
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: CountryModelFilter
+    orderBy: [CountryModelOrderBy] = [_updatedAt_DESC]
+  ): [CountryRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingCountriesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenCountryAndContinent
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: CountryModelFilter
+  ): CollectionMetadata!
   _createdAt: DateTime!
 
   """Editing URL"""
@@ -2177,6 +2274,11 @@ type ContinentRecord implements RecordInterface {
   id: ItemId!
   name: String!
   updatedAt: DateTime!
+}
+
+"""Linking fields"""
+enum CountryModelFieldsReferencingContinentModel {
+  country_continent
 }
 
 input CountryModelFilter {
@@ -2446,6 +2548,7 @@ union CustomerStoryModelContentBlocksField = CodesandboxEmbedBlockRecord | CtaBu
 
 type CustomerStoryModelContentField {
   blocks: [CustomerStoryModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [CustomerStoryModelContentLinksField!]!
   value: JsonField!
 }
@@ -2503,10 +2606,11 @@ input CustomerStoryModelContentFieldFilter {
   blocks: CustomerStoryModelContentFieldBlocksFilter
 }
 
-union CustomerStoryModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union CustomerStoryModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 type CustomerStoryModelExcerptField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -2537,6 +2641,7 @@ enum CustomerStoryModelFieldsReferencingPartnerModel {
   customerStory_content
   customerStory_content__questionAnswer_answer
   customerStory_content__questionAnswer_question
+  customerStory_partner
 }
 
 """Linking fields"""
@@ -2574,16 +2679,18 @@ input CustomerStoryModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
-  people: LinksFilter
   coverImage: FileFilter
   yoastAnalysis: JsonFilter
   seoSettings: SeoFilter
   excerpt: StructuredTextFilter
-  title: StringFilter
   seoH1: StringFilter
   canonicalUrl: StringFilter
+  people: LinksFilter
+  partner: LinkFilter
+  prettyVideoFrame: FileFilter
   content: CustomerStoryModelContentFieldFilter
+  slug: SlugFilter
+  title: StringFilter
   OR: [CustomerStoryModelFilter]
   AND: [CustomerStoryModelFilter]
 }
@@ -2611,12 +2718,12 @@ enum CustomerStoryModelOrderBy {
   updatedAt_DESC
   _isValid_ASC
   _isValid_DESC
-  title_ASC
-  title_DESC
   seoH1_ASC
   seoH1_DESC
   canonicalUrl_ASC
   canonicalUrl_DESC
+  title_ASC
+  title_DESC
 }
 
 """Record of type 💁 Customer Story (customer_story)"""
@@ -2645,7 +2752,9 @@ type CustomerStoryRecord implements RecordInterface {
   createdAt: DateTime!
   excerpt: CustomerStoryModelExcerptField!
   id: ItemId!
+  partner: PartnerRecord
   people: [PersonRecord!]!
+  prettyVideoFrame: ImageFileField
   seoH1: String
   seoSettings: SeoField
   slug: String!
@@ -2796,11 +2905,12 @@ input DocCalloutModelFilter {
 
 type DocCalloutModelTextField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [DocCalloutModelTextLinksField!]!
   value: JsonField!
 }
 
-union DocCalloutModelTextLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union DocCalloutModelTextLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Block of type Doc Callout (doc_callout)"""
 type DocCalloutRecord implements RecordInterface {
@@ -2934,10 +3044,10 @@ input DocGroupModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   techStarterKit: LinkFilter
   pages: DocGroupModelPagesFieldFilter
   name: StringFilter
+  slug: SlugFilter
   OR: [DocGroupModelFilter]
   AND: [DocGroupModelFilter]
 }
@@ -3102,6 +3212,7 @@ union DocPageModelContentBlocksField = CloneButtonFormRecord | DemoRecord | Depl
 
 type DocPageModelContentField {
   blocks: [DocPageModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [DocPageModelContentLinksField!]!
   value: JsonField!
 }
@@ -3159,7 +3270,7 @@ input DocPageModelContentFieldFilter {
   blocks: DocPageModelContentFieldBlocksFilter
 }
 
-union DocPageModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union DocPageModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum DocPageModelFieldsReferencingAcademyChapterModel {
@@ -3216,10 +3327,10 @@ input DocPageModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
-  content: DocPageModelContentFieldFilter
   seo: SeoFilter
   title: StringFilter
+  slug: SlugFilter
+  content: DocPageModelContentFieldFilter
   OR: [DocPageModelFilter]
   AND: [DocPageModelFilter]
 }
@@ -3673,6 +3784,36 @@ type DocPageRecord implements RecordInterface {
     locale: SiteLocale
     filter: ProductOverviewModelFilter
   ): CollectionMetadata!
+  _allReferencingRecipes(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndDocPage
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: RecipeModelFilter
+    orderBy: [RecipeModelOrderBy] = [position_ASC]
+  ): [RecipeRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingRecipesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndDocPage
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: RecipeModelFilter
+  ): CollectionMetadata!
   _allReferencingShowcaseProjects(
     """Specifies how to filter linking records"""
     through: InverseRelationshipFilterBetweenShowcaseProjectAndDocPage
@@ -3880,11 +4021,12 @@ union EnterpriseAppModelContentBlocksField = ImageRecord | InternalVideoRecord |
 
 type EnterpriseAppModelContentField {
   blocks: [EnterpriseAppModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [EnterpriseAppModelContentLinksField!]!
   value: JsonField!
 }
 
-union EnterpriseAppModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union EnterpriseAppModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum EnterpriseAppModelFieldsReferencingAcademyChapterModel {
@@ -3934,14 +4076,14 @@ input EnterpriseAppModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
-  content: StructuredTextFilter
   gallery: GalleryFilter
   seo: SeoFilter
   logo: FileFilter
   title: StringFilter
   description: StringFilter
   shortDescription: StringFilter
+  slug: SlugFilter
+  content: StructuredTextFilter
   OR: [EnterpriseAppModelFilter]
   AND: [EnterpriseAppModelFilter]
 }
@@ -4025,8 +4167,8 @@ input ExpertiseAreaModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   name: StringFilter
+  slug: SlugFilter
   OR: [ExpertiseAreaModelFilter]
   AND: [ExpertiseAreaModelFilter]
 }
@@ -4087,11 +4229,12 @@ type ExpertiseAreaRecord implements RecordInterface {
 
 type FaqModelAnswerField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [FaqModelAnswerLinksField!]!
   value: JsonField!
 }
 
-union FaqModelAnswerLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union FaqModelAnswerLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum FaqModelFieldsReferencingAcademyChapterModel {
@@ -4212,6 +4355,7 @@ enum FaviconType {
 
 type FeatureHighlightCardModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -4287,16 +4431,16 @@ input FeatureModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
+  seo: SeoFilter
+  yoastAnalysis: JsonFilter
+  seoH1: StringFilter
+  githubUrl: StringFilter
   video: FileFilter
   quote: LinkFilter
   quote2: LinkFilter
   video2: FileFilter
   video3: FileFilter
   slug: SlugFilter
-  seo: SeoFilter
-  yoastAnalysis: JsonFilter
-  seoH1: StringFilter
-  githubUrl: StringFilter
   OR: [FeatureModelFilter]
   AND: [FeatureModelFilter]
 }
@@ -4371,6 +4515,7 @@ type FeatureRecord implements RecordInterface {
 
 type FeatureRegularCardModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -4544,12 +4689,14 @@ union FeaturesIndexModelSecurityAndInfrastructureBlocksField = FeatureRegularCar
 
 type FeaturesIndexModelSubtitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type FeaturesIndexModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -4822,6 +4969,36 @@ Represents signed double-precision fractional values as specified by [IEEE 754](
 """
 scalar FloatType
 
+"""
+Block of type ↘️ Freeform Navigation Bar Group (freeform_navigation_bar_group)
+"""
+type FreeformNavigationBarGroupRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  callToAction: NavigationBarGroupCtaRecord
+  createdAt: DateTime!
+  id: ItemId!
+  links: [NavigationBarGroupCtaItemRecord!]!
+  title: String!
+  updatedAt: DateTime!
+}
+
 """Specifies how to filter Multiple files/images field"""
 input GalleryFilter {
   """
@@ -4860,6 +5037,7 @@ type GlobalSeoField {
 
 type GlossaryEntryModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -5028,11 +5206,12 @@ union HostingAppModelContentBlocksField = ImageRecord | InternalVideoRecord | Vi
 
 type HostingAppModelContentField {
   blocks: [HostingAppModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [HostingAppModelContentLinksField!]!
   value: JsonField!
 }
 
-union HostingAppModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union HostingAppModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum HostingAppModelFieldsReferencingAcademyChapterModel {
@@ -5082,7 +5261,6 @@ input HostingAppModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   content: StructuredTextFilter
   logo: FileFilter
   title: StringFilter
@@ -5090,6 +5268,7 @@ input HostingAppModelFilter {
   gallery: GalleryFilter
   description: StringFilter
   shortDescription: StringFilter
+  slug: SlugFilter
   OR: [HostingAppModelFilter]
   AND: [HostingAppModelFilter]
 }
@@ -5422,6 +5601,7 @@ type ImageTitleFileField implements FileFieldInterface {
 
 type ImageTransformationsBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -5434,6 +5614,7 @@ input ImageTransformationsBlockModelFilter {
 
 type ImageTransformationsBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -7499,6 +7680,7 @@ type InDepthCtaBlockRecord implements RecordInterface {
 
 type InDepthCtaModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -7639,7 +7821,6 @@ input IntegrationModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   websites: JsonFilter
   logo: FileFilter
   squareLogo: FileFilter
@@ -7649,6 +7830,7 @@ input IntegrationModelFilter {
   documentationUrl: StringFilter
   landingUrl: StringFilter
   pluginUrl: StringFilter
+  slug: SlugFilter
   OR: [IntegrationModelFilter]
   AND: [IntegrationModelFilter]
 }
@@ -7919,8 +8101,8 @@ input IntegrationTypeModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   name: StringFilter
+  slug: SlugFilter
   OR: [IntegrationTypeModelFilter]
   AND: [IntegrationTypeModelFilter]
 }
@@ -8393,6 +8575,19 @@ input InverseRelationshipFieldFilterBetweenChangelogEntryAndUserGuidesEpisode {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [ChangelogEntryModelFieldsReferencingUserGuidesEpisodeModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenCountryAndContinent {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [CountryModelFieldsReferencingContinentModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [CountryModelFieldsReferencingContinentModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -9020,6 +9215,19 @@ input InverseRelationshipFieldFilterBetweenLandingPageAndUserGuidesEpisode {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenNavigationBarAndShowcaseProject {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [NavigationBarModelFieldsReferencingShowcaseProjectModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [NavigationBarModelFieldsReferencingShowcaseProjectModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenPartnerAndAcademyChapter {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -9277,6 +9485,97 @@ input InverseRelationshipFieldFilterBetweenProductOverviewAndDocPage {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [ProductOverviewModelFieldsReferencingDocPageModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenRecipeAndAcademyChapter {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [RecipeModelFieldsReferencingAcademyChapterModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [RecipeModelFieldsReferencingAcademyChapterModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenRecipeAndAcademyCourse {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [RecipeModelFieldsReferencingAcademyCourseModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [RecipeModelFieldsReferencingAcademyCourseModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenRecipeAndDocPage {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [RecipeModelFieldsReferencingDocPageModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [RecipeModelFieldsReferencingDocPageModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenRecipeAndPartner {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [RecipeModelFieldsReferencingPartnerModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [RecipeModelFieldsReferencingPartnerModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenRecipeAndPlugin {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [RecipeModelFieldsReferencingPluginModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [RecipeModelFieldsReferencingPluginModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenRecipeAndShowcaseProject {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [RecipeModelFieldsReferencingShowcaseProjectModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [RecipeModelFieldsReferencingShowcaseProjectModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenRecipeAndUserGuidesEpisode {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [RecipeModelFieldsReferencingUserGuidesEpisodeModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [RecipeModelFieldsReferencingUserGuidesEpisodeModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -10033,6 +10332,15 @@ input InverseRelationshipFilterBetweenChangelogEntryAndUserGuidesEpisode {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenCountryAndContinent {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenCountryAndContinent
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenCustomerStoryAndAcademyChapter {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenCustomerStoryAndAcademyChapter
@@ -10465,6 +10773,15 @@ input InverseRelationshipFilterBetweenLandingPageAndUserGuidesEpisode {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenNavigationBarAndShowcaseProject {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenNavigationBarAndShowcaseProject
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenPartnerAndAcademyChapter {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenPartnerAndAcademyChapter
@@ -10639,6 +10956,69 @@ input InverseRelationshipFilterBetweenProductComparisonAndUserGuidesEpisode {
 input InverseRelationshipFilterBetweenProductOverviewAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenProductOverviewAndDocPage
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenRecipeAndAcademyChapter {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenRecipeAndAcademyChapter
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenRecipeAndAcademyCourse {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenRecipeAndAcademyCourse
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenRecipeAndDocPage {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenRecipeAndDocPage
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenRecipeAndPartner {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenRecipeAndPartner
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenRecipeAndPlugin {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenRecipeAndPlugin
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenRecipeAndShowcaseProject {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenRecipeAndShowcaseProject
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenRecipeAndUserGuidesEpisode {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenRecipeAndUserGuidesEpisode
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -11057,6 +11437,7 @@ input JsonFilter {
 
 type LandingCdnMapBlockModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11069,6 +11450,7 @@ input LandingCdnMapBlockModelFilter {
 
 type LandingCdnMapBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11203,7 +11585,6 @@ input LandingPageModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   yoastAnalysis: JsonFilter
   seo: SeoFilter
   content: LandingPageModelContentFieldFilter
@@ -11214,6 +11595,7 @@ input LandingPageModelFilter {
   name: StringFilter
   subtitle: TextFilter
   docsUrl: StringFilter
+  slug: SlugFilter
   OR: [LandingPageModelFilter]
   AND: [LandingPageModelFilter]
 }
@@ -11251,6 +11633,7 @@ enum LandingPageModelOrderBy {
 
 type LandingPageModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11296,6 +11679,7 @@ type LandingPageRecord implements RecordInterface {
 
 type LandingProgressiveImagesBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11310,6 +11694,7 @@ input LandingProgressiveImagesBlockModelFilter {
 
 type LandingProgressiveImagesBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11345,6 +11730,7 @@ type LandingProgressiveImagesBlockRecord implements RecordInterface {
 
 type LandingVideoBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11358,6 +11744,7 @@ input LandingVideoBlockModelFilter {
 
 type LandingVideoBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11483,10 +11870,40 @@ input LinksFilter {
   exists: BooleanType
 }
 
+"""
+Block of type ↘️ Managed Navigation Bar Group (managed_navigation_bar_group)
+"""
+type ManagedNavigationBarGroupRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  callToAction: NavigationBarGroupCtaRecord
+  createdAt: DateTime!
+  id: ItemId!
+  title: String!
+  updatedAt: DateTime!
+}
+
 scalar MetaTagAttributes
 
 type ModularBlocksBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11499,6 +11916,7 @@ input ModularBlocksBlockModelFilter {
 
 type ModularBlocksBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11569,6 +11987,199 @@ enum MuxThumbnailFormatType {
   gif
 }
 
+"""Block of type 📍 Navigation Bar CTA (navigation_bar_cta)"""
+type NavigationBarCtaRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  callToAction: NavigationBarGroupCtaRecord!
+  createdAt: DateTime!
+  description: String!
+  id: ItemId!
+  title: String!
+  updatedAt: DateTime!
+}
+
+"""
+Block of type 🔗 Navigation Bar Group Item (navigation_bar_group_cta_item)
+"""
+type NavigationBarGroupCtaItemRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  description: String
+  id: ItemId!
+  label: String!
+  updatedAt: DateTime!
+  url: String!
+}
+
+"""Block of type 🚀 Navigation Bar Group CTA (navigation_bar_group_cta)"""
+type NavigationBarGroupCtaRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  id: ItemId!
+  label: String!
+  updatedAt: DateTime!
+  url: String!
+}
+
+"""Linking fields"""
+enum NavigationBarModelFieldsReferencingShowcaseProjectModel {
+  navigationBar_partnerProjects
+}
+
+input NavigationBarModelFilter {
+  _createdAt: CreatedAtFilter
+  createdAt: CreatedAtFilter
+  id: ItemIdFilter
+  _firstPublishedAt: PublishedAtFilter
+  _publicationScheduledAt: PublishedAtFilter
+  _unpublishingScheduledAt: PublishedAtFilter
+  _publishedAt: PublishedAtFilter
+  _status: StatusFilter
+  _updatedAt: UpdatedAtFilter
+  updatedAt: UpdatedAtFilter
+  _isValid: BooleanFilter
+  customerChats: LinksFilter
+  enterpriseStories: LinksFilter
+  videoGuides: LinksFilter
+  partnerProjects: LinksFilter
+  partnersDescription: StringFilter
+  useCases: LinksFilter
+  docPages: LinksFilter
+  wallOfLoveQuote: LinkFilter
+  OR: [NavigationBarModelFilter]
+  AND: [NavigationBarModelFilter]
+}
+
+enum NavigationBarModelOrderBy {
+  _createdAt_ASC
+  _createdAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+  id_ASC
+  id_DESC
+  _firstPublishedAt_ASC
+  _firstPublishedAt_DESC
+  _publicationScheduledAt_ASC
+  _publicationScheduledAt_DESC
+  _unpublishingScheduledAt_ASC
+  _unpublishingScheduledAt_DESC
+  _publishedAt_ASC
+  _publishedAt_DESC
+  _status_ASC
+  _status_DESC
+  _updatedAt_ASC
+  _updatedAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  _isValid_ASC
+  _isValid_DESC
+  partnersDescription_ASC
+  partnersDescription_DESC
+}
+
+union NavigationBarModelWallOfLoveQuoteField = PartnerTestimonialRecord | ReviewRecord
+
+"""Record of type 🍔 Navigation bar (navigation_bar)"""
+type NavigationBarRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  blogGroup: ManagedNavigationBarGroupRecord!
+  createdAt: DateTime!
+  customerChats: [CustomerStoryRecord!]!
+  customerChatsGroup: ManagedNavigationBarGroupRecord!
+  customersCallToAction: NavigationBarCtaRecord!
+  docGroup: ManagedNavigationBarGroupRecord!
+  docPages: [DocGroupRecord!]!
+  enterpriseStories: [SuccessStoryRecord!]!
+  enterpriseStoriesGroup: ManagedNavigationBarGroupRecord!
+  featuresGroup: FreeformNavigationBarGroupRecord!
+  helpGroup: FreeformNavigationBarGroupRecord!
+  id: ItemId!
+  knowledgeGroup: FreeformNavigationBarGroupRecord!
+  marketplaceGroup: FreeformNavigationBarGroupRecord!
+  partnerProjects: [ShowcaseProjectRecord!]!
+  partnerProjectsGroup: ManagedNavigationBarGroupRecord!
+  partnersCallToAction: NavigationBarCtaRecord!
+  partnersDescription: String!
+  partnersGroup: ManagedNavigationBarGroupRecord!
+  productCallToAction: NavigationBarCtaRecord!
+  productGroup: FreeformNavigationBarGroupRecord!
+  updatedAt: DateTime!
+  useCases: [UseCasePageRecord!]!
+  useCasesGroup: ManagedNavigationBarGroupRecord!
+  videoGuides: [UserGuidesChapterRecord!]!
+  videoGuidesGroup: ManagedNavigationBarGroupRecord!
+  wallOfLoveQuote: NavigationBarModelWallOfLoveQuoteField!
+  whoIsItForGroup: FreeformNavigationBarGroupRecord!
+}
+
 """Specifies how to filter by image orientation"""
 input OrientationFilter {
   """Search uploads with the specified orientation"""
@@ -11607,6 +12218,7 @@ type OtherVideoResourceRecord implements RecordInterface {
 
 type OverviewFeatureModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11648,24 +12260,28 @@ type OverviewFeatureRecord implements RecordInterface {
 
 type OverviewPillarModelCapability1Field {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type OverviewPillarModelCapability2Field {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type OverviewPillarModelCapability3Field {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type OverviewPillarModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -11745,11 +12361,12 @@ input ParentFilter {
 
 type PartnerModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [PartnerModelDescriptionLinksField!]!
   value: JsonField!
 }
 
-union PartnerModelDescriptionLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union PartnerModelDescriptionLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum PartnerModelFieldsReferencingAcademyChapterModel {
@@ -11805,9 +12422,6 @@ input PartnerModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   _stage: AgencyProgramWorkflowStageFilter
-  featuredProjects: LinksFilter
-  slug: SlugFilter
-  description: StructuredTextFilter
   shortDescription: StructuredTextFilter
   areasOfExpertise: LinksFilter
   npmUser: LinkFilter
@@ -11817,6 +12431,9 @@ input PartnerModelFilter {
   publicContactEmail: StringFilter
   name: StringFilter
   websiteUrl: StringFilter
+  featuredProjects: LinksFilter
+  slug: SlugFilter
+  description: StructuredTextFilter
   OR: [PartnerModelFilter]
   AND: [PartnerModelFilter]
 }
@@ -11854,6 +12471,7 @@ enum PartnerModelOrderBy {
 
 type PartnerModelShortDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -12250,6 +12868,36 @@ type PartnerRecord implements RecordInterface {
     locale: SiteLocale
     filter: ProductComparisonModelFilter
   ): CollectionMetadata!
+  _allReferencingRecipes(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndPartner
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: RecipeModelFilter
+    orderBy: [RecipeModelOrderBy] = [position_ASC]
+  ): [RecipeRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingRecipesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndPartner
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: RecipeModelFilter
+  ): CollectionMetadata!
   _allReferencingShowcaseProjects(
     """Specifies how to filter linking records"""
     through: InverseRelationshipFilterBetweenShowcaseProjectAndPartner
@@ -12485,10 +13133,10 @@ input PartnerTestimonialModelFilter {
   _isValid: BooleanFilter
   _stage: AgencyProgramWorkflowStageFilter
   image: FileFilter
-  quote: StructuredTextFilter
   partner: LinkFilter
   role: StringFilter
   name: StringFilter
+  quote: StructuredTextFilter
   OR: [PartnerTestimonialModelFilter]
   AND: [PartnerTestimonialModelFilter]
 }
@@ -12524,6 +13172,7 @@ enum PartnerTestimonialModelOrderBy {
 
 type PartnerTestimonialModelQuoteField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -12644,11 +13293,11 @@ input PersonModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   avatar: FileFilter
   company: StringFilter
   title: StringFilter
   name: StringFilter
+  slug: SlugFilter
   OR: [PersonModelFilter]
   AND: [PersonModelFilter]
 }
@@ -12792,6 +13441,7 @@ type PlanFeatureGroupRecord implements RecordInterface {
 
 type PlanFeatureModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -13654,6 +14304,36 @@ type PluginRecord implements RecordInterface {
     locale: SiteLocale
     filter: ProductComparisonModelFilter
   ): CollectionMetadata!
+  _allReferencingRecipes(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndPlugin
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: RecipeModelFilter
+    orderBy: [RecipeModelOrderBy] = [position_ASC]
+  ): [RecipeRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingRecipesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndPlugin
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: RecipeModelFilter
+  ): CollectionMetadata!
   _allReferencingShowcaseProjects(
     """Specifies how to filter linking records"""
     through: InverseRelationshipFilterBetweenShowcaseProjectAndPlugin
@@ -14249,6 +14929,7 @@ type PricingPageRecord implements RecordInterface {
 
 type ProductAnnouncementModelAnnouncementField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -14265,12 +14946,12 @@ input ProductAnnouncementModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   blogPost: LinkFilter
   cover: FileFilter
   area: StringFilter
   announcement: StructuredTextFilter
   title: StringFilter
+  slug: SlugFilter
   OR: [ProductAnnouncementModelFilter]
   AND: [ProductAnnouncementModelFilter]
 }
@@ -14337,12 +15018,14 @@ type ProductAnnouncementRecord implements RecordInterface {
 
 type ProductComparisonModelCompetitorCharacterizationField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type ProductComparisonModelDatocmsCharacterizationField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -14415,12 +15098,12 @@ input ProductComparisonModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   competitorCharacterization: StructuredTextFilter
   testimonials: LinksFilter
   datocmsCharacterization: StructuredTextFilter
   seoSocial: SeoFilter
   product: StringFilter
+  slug: SlugFilter
   OR: [ProductComparisonModelFilter]
   AND: [ProductComparisonModelFilter]
 }
@@ -14490,17 +15173,19 @@ type ProductComparisonRecord implements RecordInterface {
 
 type ProductDifferenceModelCompetitorTakeField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type ProductDifferenceModelDatocmsTakeField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [ProductDifferenceModelDatocmsTakeLinksField!]!
   value: JsonField!
 }
 
-union ProductDifferenceModelDatocmsTakeLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union ProductDifferenceModelDatocmsTakeLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Block of type ⚖️ Product difference (product_difference)"""
 type ProductDifferenceRecord implements RecordInterface {
@@ -14558,6 +15243,7 @@ input ProductOverviewModelFilter {
 
 type ProductOverviewModelHeaderField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -14589,6 +15275,7 @@ enum ProductOverviewModelOrderBy {
 
 type ProductOverviewModelSubheaderField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -14931,6 +15618,13 @@ type Query {
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
     filter: ProductComparisonModelFilter
+  ): CollectionMetadata!
+
+  """Returns meta information regarding a record collection"""
+  _allRecipesMeta(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: RecipeModelFilter
   ): CollectionMetadata!
 
   """Returns meta information regarding a record collection"""
@@ -15841,6 +16535,25 @@ type Query {
   ): [ProductComparisonRecord!]!
 
   """Returns a collection of records"""
+  allRecipes(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: RecipeModelFilter
+    orderBy: [RecipeModelOrderBy] = [position_ASC]
+  ): [RecipeRecord!]!
+
+  """Returns a collection of records"""
   allReviews(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -16567,6 +17280,17 @@ type Query {
     orderBy: [LandingPageModelOrderBy] = [_updatedAt_DESC]
   ): LandingPageRecord
 
+  """Returns the single instance record"""
+  navigationBar(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): NavigationBarRecord
+
   """Returns a specific record"""
   partner(
     """The locale to use to fetch the field's content"""
@@ -16792,6 +17516,30 @@ type Query {
     """
     fallbackLocales: [SiteLocale!]
   ): ProductOverviewRecord
+
+  """Returns a specific record"""
+  recipe(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+    filter: RecipeModelFilter
+    orderBy: [RecipeModelOrderBy] = [position_ASC]
+  ): RecipeRecord
+
+  """Returns the single instance record"""
+  recipesPage(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): RecipesPageRecord
 
   """Returns a specific record"""
   review(
@@ -17074,11 +17822,12 @@ type Query {
 
 type QuestionAnswerModelAnswerField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [QuestionAnswerModelAnswerLinksField!]!
   value: JsonField!
 }
 
-union QuestionAnswerModelAnswerLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union QuestionAnswerModelAnswerLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 input QuestionAnswerModelFilter {
   id: ItemIdFilter
@@ -17088,11 +17837,12 @@ input QuestionAnswerModelFilter {
 
 type QuestionAnswerModelQuestionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [QuestionAnswerModelQuestionLinksField!]!
   value: JsonField!
 }
 
-union QuestionAnswerModelQuestionLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union QuestionAnswerModelQuestionLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Block of type Question/answer (question_answer)"""
 type QuestionAnswerRecord implements RecordInterface {
@@ -17191,11 +17941,12 @@ type ReactUiLiveExampleRecord implements RecordInterface {
 
 type ReasonToConsiderModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [ReasonToConsiderModelContentLinksField!]!
   value: JsonField!
 }
 
-union ReasonToConsiderModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union ReasonToConsiderModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Block of type 🏆 Reason to consider (reason_to_consider)"""
 type ReasonToConsiderRecord implements RecordInterface {
@@ -17221,6 +17972,168 @@ type ReasonToConsiderRecord implements RecordInterface {
   createdAt: DateTime!
   id: ItemId!
   title: String!
+  updatedAt: DateTime!
+}
+
+union RecipeModelContentBlocksField = ImageRecord | InternalVideoRecord
+
+type RecipeModelContentField {
+  blocks: [RecipeModelContentBlocksField!]!
+  inlineBlocks: [String!]!
+  links: [RecipeModelContentLinksField!]!
+  value: JsonField!
+}
+
+union RecipeModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+
+"""Linking fields"""
+enum RecipeModelFieldsReferencingAcademyChapterModel {
+  recipe_content
+}
+
+"""Linking fields"""
+enum RecipeModelFieldsReferencingAcademyCourseModel {
+  recipe_content
+}
+
+"""Linking fields"""
+enum RecipeModelFieldsReferencingDocPageModel {
+  recipe_content
+}
+
+"""Linking fields"""
+enum RecipeModelFieldsReferencingPartnerModel {
+  recipe_content
+}
+
+"""Linking fields"""
+enum RecipeModelFieldsReferencingPluginModel {
+  recipe_content
+}
+
+"""Linking fields"""
+enum RecipeModelFieldsReferencingShowcaseProjectModel {
+  recipe_content
+}
+
+"""Linking fields"""
+enum RecipeModelFieldsReferencingUserGuidesEpisodeModel {
+  recipe_content
+}
+
+input RecipeModelFilter {
+  _createdAt: CreatedAtFilter
+  createdAt: CreatedAtFilter
+  id: ItemIdFilter
+  _firstPublishedAt: PublishedAtFilter
+  position: PositionFilter
+  _publicationScheduledAt: PublishedAtFilter
+  _unpublishingScheduledAt: PublishedAtFilter
+  _publishedAt: PublishedAtFilter
+  _status: StatusFilter
+  _updatedAt: UpdatedAtFilter
+  updatedAt: UpdatedAtFilter
+  _isValid: BooleanFilter
+  recipe: FileFilter
+  cardImage: FileFilter
+  title: StringFilter
+  featuredImage: FileFilter
+  cardDescription: StringFilter
+  seoSettings: SeoFilter
+  slug: SlugFilter
+  content: StructuredTextFilter
+  OR: [RecipeModelFilter]
+  AND: [RecipeModelFilter]
+}
+
+enum RecipeModelOrderBy {
+  _createdAt_ASC
+  _createdAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+  id_ASC
+  id_DESC
+  _firstPublishedAt_ASC
+  _firstPublishedAt_DESC
+  position_ASC
+  position_DESC
+  _publicationScheduledAt_ASC
+  _publicationScheduledAt_DESC
+  _unpublishingScheduledAt_ASC
+  _unpublishingScheduledAt_DESC
+  _publishedAt_ASC
+  _publishedAt_DESC
+  _status_ASC
+  _status_DESC
+  _updatedAt_ASC
+  _updatedAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  _isValid_ASC
+  _isValid_DESC
+  title_ASC
+  title_DESC
+  cardDescription_ASC
+  cardDescription_DESC
+}
+
+"""Record of type 🍕 Recipe (recipe)"""
+type RecipeRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  cardDescription: String!
+  cardImage: ImageFileField!
+  content: RecipeModelContentField!
+  createdAt: DateTime!
+  featuredImage: FileField!
+  id: ItemId!
+  position: IntType
+  recipe: FileField!
+  seoSettings: SeoField
+  slug: String!
+  title: String!
+  updatedAt: DateTime!
+}
+
+"""Record of type 🍰 Recipes Page (recipes_page)"""
+type RecipesPageRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  id: ItemId!
+  seo: SeoField
   updatedAt: DateTime!
 }
 
@@ -17342,6 +18255,7 @@ enum ReviewModelOrderBy {
 
 type ReviewModelQuoteField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -17584,8 +18498,6 @@ input ShowcaseProjectModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   _stage: AgencyProgramWorkflowStageFilter
-  slug: SlugFilter
-  inDepthExplanation: StructuredTextFilter
   partner: LinkFilter
   headline: StructuredTextFilter
   mainImage: FileFilter
@@ -17596,23 +18508,27 @@ input ShowcaseProjectModelFilter {
   areasOfExpertise: LinksFilter
   name: StringFilter
   projectUrl: StringFilter
+  slug: SlugFilter
+  inDepthExplanation: StructuredTextFilter
   OR: [ShowcaseProjectModelFilter]
   AND: [ShowcaseProjectModelFilter]
 }
 
 type ShowcaseProjectModelHeadlineField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type ShowcaseProjectModelInDepthExplanationField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [ShowcaseProjectModelInDepthExplanationLinksField!]!
   value: JsonField!
 }
 
-union ShowcaseProjectModelInDepthExplanationLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union ShowcaseProjectModelInDepthExplanationLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 enum ShowcaseProjectModelOrderBy {
   _createdAt_ASC
@@ -17915,6 +18831,36 @@ type ShowcaseProjectRecord implements RecordInterface {
     locale: SiteLocale
     filter: LandingPageModelFilter
   ): CollectionMetadata!
+  _allReferencingNavigationBars(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenNavigationBarAndShowcaseProject
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: NavigationBarModelFilter
+    orderBy: [NavigationBarModelOrderBy] = [_updatedAt_DESC]
+  ): [NavigationBarRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingNavigationBarsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenNavigationBarAndShowcaseProject
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: NavigationBarModelFilter
+  ): CollectionMetadata!
   _allReferencingPartners(
     """Specifies how to filter linking records"""
     through: InverseRelationshipFilterBetweenPartnerAndShowcaseProject
@@ -17974,6 +18920,36 @@ type ShowcaseProjectRecord implements RecordInterface {
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
     filter: ProductComparisonModelFilter
+  ): CollectionMetadata!
+  _allReferencingRecipes(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndShowcaseProject
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: RecipeModelFilter
+    orderBy: [RecipeModelOrderBy] = [position_ASC]
+  ): [RecipeRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingRecipesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndShowcaseProject
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: RecipeModelFilter
   ): CollectionMetadata!
   _allReferencingShowcaseProjects(
     """Specifies how to filter linking records"""
@@ -18338,6 +19314,7 @@ type SuccessStoriesIndexRecord implements RecordInterface {
 
 type SuccessStoryModelChallengeField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -18346,6 +19323,7 @@ union SuccessStoryModelContentBlocksField = ImageRecord | InDepthCtaBlockRecord 
 
 type SuccessStoryModelContentField {
   blocks: [SuccessStoryModelContentBlocksField!]!
+  inlineBlocks: [String!]!
   links: [SuccessStoryModelContentLinksField!]!
   value: JsonField!
 }
@@ -18389,7 +19367,7 @@ input SuccessStoryModelContentFieldFilter {
   blocks: SuccessStoryModelContentFieldBlocksFilter
 }
 
-union SuccessStoryModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union SuccessStoryModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum SuccessStoryModelFieldsReferencingAcademyChapterModel {
@@ -18438,8 +19416,6 @@ input SuccessStoryModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
-  content: SuccessStoryModelContentFieldFilter
   title: StructuredTextFilter
   challenge: StructuredTextFilter
   duotoneColor1: ColorFilter
@@ -18451,6 +19427,8 @@ input SuccessStoryModelFilter {
   coverImage: FileFilter
   tags: LinksFilter
   name: StringFilter
+  slug: SlugFilter
+  content: SuccessStoryModelContentFieldFilter
   OR: [SuccessStoryModelFilter]
   AND: [SuccessStoryModelFilter]
 }
@@ -18484,12 +19462,14 @@ enum SuccessStoryModelOrderBy {
 
 type SuccessStoryModelResultField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type SuccessStoryModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -18563,6 +19543,7 @@ type SuccessStoryRecord implements RecordInterface {
 
 type SuccessStoryResultModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -18606,8 +19587,8 @@ input SuccessStoryTagModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   name: StringFilter
+  slug: SlugFilter
   OR: [SuccessStoryTagModelFilter]
   AND: [SuccessStoryTagModelFilter]
 }
@@ -18668,11 +19649,12 @@ type SuccessStoryTagRecord implements RecordInterface {
 
 type SupportTopicModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [SupportTopicModelDescriptionLinksField!]!
   value: JsonField!
 }
 
-union SupportTopicModelDescriptionLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union SupportTopicModelDescriptionLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum SupportTopicModelFieldsReferencingAcademyChapterModel {
@@ -18723,13 +19705,13 @@ input SupportTopicModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
-  description: StructuredTextFilter
   disableContactForm: BooleanFilter
   subtopicQuestion: StringFilter
   autoResponderType: StringFilter
   contactFormType: StringFilter
   title: StringFilter
+  slug: SlugFilter
+  description: StructuredTextFilter
   OR: [SupportTopicModelFilter]
   AND: [SupportTopicModelFilter]
 }
@@ -18938,10 +19920,10 @@ input TeamPageModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
   yoastAnalysis: JsonFilter
   seo: SeoFilter
   seoH1: StringFilter
+  slug: SlugFilter
   OR: [TeamPageModelFilter]
   AND: [TeamPageModelFilter]
 }
@@ -19004,11 +19986,12 @@ type TeamPageRecord implements RecordInterface {
 
 type TechPartnerModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [TechPartnerModelDescriptionLinksField!]!
   value: JsonField!
 }
 
-union TechPartnerModelDescriptionLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union TechPartnerModelDescriptionLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum TechPartnerModelFieldsReferencingAcademyChapterModel {
@@ -19062,8 +20045,6 @@ input TechPartnerModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
-  description: StructuredTextFilter
   npmUser: LinkFilter
   areasOfExpertise: LinksFilter
   technologies: LinksFilter
@@ -19073,6 +20054,8 @@ input TechPartnerModelFilter {
   publicContactEmail: StringFilter
   websiteUrl: StringFilter
   name: StringFilter
+  slug: SlugFilter
+  description: StructuredTextFilter
   OR: [TechPartnerModelFilter]
   AND: [TechPartnerModelFilter]
 }
@@ -19110,6 +20093,7 @@ enum TechPartnerModelOrderBy {
 
 type TechPartnerModelShortDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -19195,7 +20179,6 @@ input TemplateDemoModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  code: SlugFilter
   seo: SeoFilter
   yoastAnalysis: JsonFilter
   readme: TextFilter
@@ -19209,6 +20192,7 @@ input TemplateDemoModelFilter {
   cmsDescription: TextFilter
   label: StringFilter
   githubRepo: StringFilter
+  code: SlugFilter
   OR: [TemplateDemoModelFilter]
   AND: [TemplateDemoModelFilter]
 }
@@ -19351,11 +20335,12 @@ input TextFilter {
 
 type TryDemoBlockModelContentField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [TryDemoBlockModelContentLinksField!]!
   value: JsonField!
 }
 
-union TryDemoBlockModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union TryDemoBlockModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 input TryDemoBlockModelFilter {
   id: ItemIdFilter
@@ -19365,6 +20350,7 @@ input TryDemoBlockModelFilter {
 
 type TryDemoBlockModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -19479,6 +20465,7 @@ type TryTutorialRecord implements RecordInterface {
 
 type TutorialModelExcerptField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20110,6 +21097,7 @@ input UploadWidthFilter {
 
 type UseCaseCalloutModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20145,6 +21133,7 @@ type UseCaseCalloutRecord implements RecordInterface {
 
 type UseCaseFeatureModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20181,6 +21170,7 @@ union UseCasePageModelCaseStudyField = CustomerStoryRecord | ShowcaseProjectReco
 
 type UseCasePageModelDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20202,7 +21192,7 @@ input UseCasePageModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
+  navigationBarTitle: StringFilter
   heroProduct: FileFilter
   heroCustomer: FileFilter
   featuresHeader: StringFilter
@@ -20211,11 +21201,11 @@ input UseCasePageModelFilter {
   successStoryHeader: StructuredTextFilter
   quotesHeader: StructuredTextFilter
   header: StructuredTextFilter
-  image: FileFilter
-  subtitle: StructuredTextFilter
   quotes: LinksFilter
   starterTitle: StructuredTextFilter
   starterImage: FileFilter
+  image: FileFilter
+  subtitle: StructuredTextFilter
   description: StructuredTextFilter
   summary: StructuredTextFilter
   headline: StructuredTextFilter
@@ -20225,19 +21215,21 @@ input UseCasePageModelFilter {
   heroImage: FileFilter
   title: StructuredTextFilter
   readability: JsonFilter
-  identifierInternal: StringFilter
+  slug: SlugFilter
   OR: [UseCasePageModelFilter]
   AND: [UseCasePageModelFilter]
 }
 
 type UseCasePageModelHeaderField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelHeadlineField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20265,54 +21257,61 @@ enum UseCasePageModelOrderBy {
   updatedAt_DESC
   _isValid_ASC
   _isValid_DESC
+  navigationBarTitle_ASC
+  navigationBarTitle_DESC
   featuresHeader_ASC
   featuresHeader_DESC
   heading_ASC
   heading_DESC
   link_ASC
   link_DESC
-  identifierInternal_ASC
-  identifierInternal_DESC
 }
 
 type UseCasePageModelQuotesHeaderField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelStarterDescriptionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelStarterTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelSubtitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelSuccessStoryHeaderField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelSummaryField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
 
 type UseCasePageModelTitleField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20349,9 +21348,9 @@ type UseCasePageRecord implements RecordInterface {
   heroImage: ImageFileField!
   heroProduct: ImageFileField!
   id: ItemId!
-  identifierInternal: String
   image: ImageFileField!
   link: String!
+  navigationBarTitle: String!
   quotes: [PartnerTestimonialRecord!]!
   quotesHeader: UseCasePageModelQuotesHeaderField!
   readability: JsonField
@@ -20412,16 +21411,17 @@ input UserGuidesChapterModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
-  videos: LinksFilter
   introduction: StructuredTextFilter
   title: StringFilter
+  slug: SlugFilter
+  videos: LinksFilter
   OR: [UserGuidesChapterModelFilter]
   AND: [UserGuidesChapterModelFilter]
 }
 
 type UserGuidesChapterModelIntroductionField {
   blocks: [String!]!
+  inlineBlocks: [String!]!
   links: [String!]!
   value: JsonField!
 }
@@ -20487,11 +21487,12 @@ type UserGuidesChapterRecord implements RecordInterface {
 
 type UserGuidesEpisodeModelContentField {
   blocks: [InternalVideoRecord!]!
+  inlineBlocks: [String!]!
   links: [UserGuidesEpisodeModelContentLinksField!]!
   value: JsonField!
 }
 
-union UserGuidesEpisodeModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
+union UserGuidesEpisodeModelContentLinksField = AcademyChapterRecord | AcademyCourseRecord | BlogPostRecord | ChangelogEntryRecord | CustomerStoryRecord | DocGroupRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | LandingPageRecord | PartnerRecord | PluginRecord | ProductComparisonRecord | RecipeRecord | ShowcaseProjectRecord | SuccessStoryRecord | TechPartnerRecord | TemplateDemoRecord | UseCasePageRecord | UserGuidesEpisodeRecord
 
 """Linking fields"""
 enum UserGuidesEpisodeModelFieldsReferencingAcademyChapterModel {
@@ -20540,12 +21541,12 @@ input UserGuidesEpisodeModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  slug: SlugFilter
-  content: StructuredTextFilter
   video: FileFilter
   seo: SeoFilter
   title: StringFilter
   thumbTimeSeconds: IntegerFilter
+  slug: SlugFilter
+  content: StructuredTextFilter
   OR: [UserGuidesEpisodeModelFilter]
   AND: [UserGuidesEpisodeModelFilter]
 }
@@ -20940,6 +21941,36 @@ type UserGuidesEpisodeRecord implements RecordInterface {
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
     filter: ProductComparisonModelFilter
+  ): CollectionMetadata!
+  _allReferencingRecipes(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndUserGuidesEpisode
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: RecipeModelFilter
+    orderBy: [RecipeModelOrderBy] = [position_ASC]
+  ): [RecipeRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingRecipesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndUserGuidesEpisode
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: RecipeModelFilter
   ): CollectionMetadata!
   _allReferencingShowcaseProjects(
     """Specifies how to filter linking records"""
