@@ -14,7 +14,7 @@ export default function PartnersMap({
         <div className={s.map}>
           <ComposableMap
             projection="geoEquirectangular"
-            width={900}
+            width={960}
             height={400}
             projectionConfig={{ center: [0.5, 12] }}
           >
