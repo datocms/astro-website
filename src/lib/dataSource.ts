@@ -19,9 +19,9 @@ export function dataSource<T>(
   const queryFn: MemoizeAndAugumentResponseHeadersFn<T> = async (astroOrRequestResponseHeaders) => {
     augmentResponseHeadersWithSurrogateKeys([surrogateKey], astroOrRequestResponseHeaders);
 
-    // if (cache.has(surrogateKey)) {
-    //   return cache.get(surrogateKey) as T;
-    // }
+    if (cache.has(surrogateKey)) {
+      return cache.get(surrogateKey) as T;
+    }
 
     const result = await fn();
 
