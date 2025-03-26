@@ -14,7 +14,7 @@ import { fetchNavbar } from './fetchNavbar';
 import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
-import { sortBy, sum } from 'lodash-es';
+import { sortBy, sum, uniq } from 'lodash-es';
 import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { buildUrlForDocGroup } from '~/lib/datocms/gqlUrlBuilder/docGroup';
 import { buildUrlForUserGuidesChapter } from '~/lib/datocms/gqlUrlBuilder/userGuidesChapter';
@@ -32,9 +32,9 @@ const { navigationBar: navbar, partners } = data;
 const continentCounters: Record<string, number> = {};
 
 for (const partner of partners) {
-  for (const location of partner.locations) {
-    continentCounters[location.continent.name] ||= 0;
-    continentCounters[location.continent.name]! += 1;
+  for (const continent of uniq(partner.locations.map((l) => l.continent.name))) {
+    continentCounters[continent] ||= 0;
+    continentCounters[continent]! += 1;
   }
 }
 
