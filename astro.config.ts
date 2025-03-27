@@ -262,5 +262,6 @@ export default defineConfig({
     '/features/graphql-content-api': '/features/headless-cms-graphql',
     '/docs/deployments/netlify': '/marketplace/hosting/netlify',
     '/docs/plugins/creating-a-new-plugin': '/docs/plugin-sdk/build-your-first-plugin',
+    '/docs/visual-editing/how-to-use-visual-editing': '/docs/content-link/how-to-use-content-link',
   },
 });
