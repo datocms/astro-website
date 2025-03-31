@@ -11,6 +11,9 @@ export default defineConfig({
   image: {
     domains: ['image.mux.com'],
   },
+  experimental: {
+    preserveScriptOrder: true,
+  },
   trailingSlash: 'never',
   env: {
     schema: {
