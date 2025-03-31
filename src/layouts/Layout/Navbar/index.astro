@@ -10,7 +10,7 @@ import { TargetToggler } from '~/components/TargetToggler';
 import { Wrapper } from '~/components/Wrapper';
 import s from './style.module.css';
 import { ActiveLink } from '~/components/links/ActiveLink';
-import { fetchNavbar } from './fetchNavbar';
+import type { NavbarData } from './fetchNavbar';
 import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
@@ -25,13 +25,17 @@ import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage'
 
 const isMarketplace = Astro.url.pathname.startsWith('/marketplace');
 
-const [data] = await fetchNavbar(Astro);
+type Props = {
+  data: NavbarData;
+};
 
-const { navigationBar: navbar, partners } = data;
+const { data } = Astro.props;
+
+const { navigationBar: navbar } = data;
 
 const continentCounters: Record<string, number> = {};
 
-for (const partner of partners) {
+for (const partner of data.partners) {
   for (const continent of uniq(partner.locations.map((l) => l.continent.name))) {
     continentCounters[continent] ||= 0;
     continentCounters[continent]! += 1;

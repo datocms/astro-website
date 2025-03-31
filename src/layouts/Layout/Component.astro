@@ -4,18 +4,21 @@ import { BaseLayout } from '../BaseLayout';
 import Footer from './Footer/index.astro';
 import Navbar from './Navbar/index.astro';
 import { FinalCta } from './FinalCta';
+import { fetchNavbar } from './Navbar/fetchNavbar';
 
 type Props = {
   seo: TitleMetaLinkTag[];
   noFinalCta?: boolean;
 };
 
+const navbarData = await fetchNavbar(Astro);
+
 const { seo, noFinalCta } = Astro.props;
 ---
 
 <BaseLayout seo={seo}>
   <slot name="head" slot="head" />
-  <Navbar />
+  <Navbar data={navbarData} />
   <div transition:animate="fade">
     <slot />
   </div>

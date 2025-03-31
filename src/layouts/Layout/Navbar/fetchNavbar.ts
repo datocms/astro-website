@@ -1,5 +1,6 @@
-import { rawExecuteQueryWithAutoPagination } from '@datocms/cda-client';
+import { executeQueryWithAutoPagination } from '@datocms/cda-client';
 import { DATOCMS_API_TOKEN } from 'astro:env/server';
+import type { TadaDocumentNode } from 'gql.tada';
 import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { dataSource } from '~/lib/dataSource';
@@ -214,14 +215,12 @@ const query = graphql(
   ],
 );
 
+export type NavbarData = typeof query extends TadaDocumentNode<infer X> ? X : never;
+
 export const [fetchNavbar, maybeInvalidateNavbar] = dataSource('navbar', async () => {
-  const [result, datocmsGraphqlResponse] = await rawExecuteQueryWithAutoPagination(query, {
+  return await executeQueryWithAutoPagination(query, {
     returnCacheTags: true,
     excludeInvalid: true,
     token: DATOCMS_API_TOKEN,
   });
-
-  const cacheTags = datocmsGraphqlResponse.headers.get('x-cache-tags')!.split(' ');
-
-  return [result, cacheTags] as const;
 });
