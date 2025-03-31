@@ -1,7 +1,58 @@
-<lion-tabs>
+<custom-tabs>
+  <div class="handles-group"></div>
+  <div class="panels-group"></div>
   <slot />
-</lion-tabs>
+</custom-tabs>
 
 <script>
-  import '@lion/ui/define/lion-tabs.js';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'custom-tabs',
+    class CustomTabs extends WebComponent {
+      selectedIndex: number = 0;
+      handles!: HTMLElement[];
+      panels!: HTMLElement[];
+
+      parsedCallback() {
+        this.handles = this.$$('[role=tab]');
+        this.panels = this.$$('[role=tabpanel]');
+
+        const handlesGroup = this.$('.handles-group');
+        const panelsGroup = this.$('.panels-group');
+
+        for (const handle of this.handles) {
+          handlesGroup.insertBefore(handle, null);
+        }
+
+        for (const panel of this.panels) {
+          panelsGroup.insertBefore(panel, null);
+        }
+
+        this.on(this, 'click', '[role=tab]', (event, handle) => {
+          const index = Array.prototype.indexOf.call(handlesGroup.children, handle);
+          this.selectedIndex = index;
+          this.update();
+        });
+
+        this.update();
+      }
+
+      update() {
+        for (let index = 0; index < this.handles.length; index += 1) {
+          const panel = this.panels[index]!;
+          const handle = this.handles[index]!;
+          const isSelected = index === this.selectedIndex;
+
+          if (isSelected) {
+            panel.style.display = 'block';
+            handle.setAttribute('aria-selected', 'true');
+          } else {
+            panel.style.display = 'none';
+            handle.removeAttribute('aria-selected');
+          }
+        }
+      }
+    },
+  );
 </script>
