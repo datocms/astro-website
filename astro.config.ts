@@ -7,6 +7,7 @@ import { writeFile } from 'fs/promises';
 import bundlesize from 'vite-plugin-bundlesize';
 
 export default defineConfig({
+  base: '/', // Can be any string, but MUST be set or component imports on astro build will fail.
   output: 'server',
   image: {
     domains: ['image.mux.com'],
