@@ -1,24 +1,26 @@
-import { FASTLY_KEY } from 'astro:env/server';
 import ky from 'ky';
 import { dataSource } from '~/lib/dataSource';
 
-type DataCenter = {
-  code: string;
-  name: string;
-  group: string;
-  region: string;
-  stats_region: string;
-  billing_region: string;
-  coordinates: { x: number; y: number; latitude: number; longitude: number };
-  shield: string;
-};
+type GithubResponse = Record<
+  string,
+  {
+    cca2: string;
+    city: string;
+    country: string;
+    lat: number;
+    lon: number;
+    name: string;
+    region: string;
+  }
+>;
 
-export const [fetchFastlyDatacenters, maybeInvalidateFastlyDatacenters] = dataSource(
-  'fastly-datacenters',
-  () =>
-    ky<DataCenter[]>('https://api.fastly.com/datacenters', {
-      headers: {
-        'Fastly-Key': FASTLY_KEY,
-      },
-    }).json(),
+export const [fetchCloudflareDatacenters, maybeInvalidateCloudflareDatacenters] = dataSource(
+  'cloudflare-datacenters',
+  async () => {
+    const response = await ky<GithubResponse>(
+      'https://raw.githubusercontent.com/Netrvin/cloudflare-colo-list/refs/heads/main/DC-Colos.json',
+    ).json();
+
+    return Object.entries(response).map(([code, dc]) => ({ ...dc, code }));
+  },
 );

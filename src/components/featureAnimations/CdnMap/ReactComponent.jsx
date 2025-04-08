@@ -107,7 +107,7 @@ export default function CdnMapReactComponent({ children, datacenters }) {
       const start = new Date();
 
       const signal = abortController.signal;
-      const data = await ky('https://graphql.datocms.com/geo/ping', { signal }).json();
+      const data = await ky('https://graphql.staging-datocms.com/geo/ping', { signal }).json();
 
       const end = new Date();
       setPing({ ...data, latency: Number.parseInt((end - start) * 0.8) });
@@ -143,7 +143,7 @@ export default function CdnMapReactComponent({ children, datacenters }) {
                 [s.activePoint]: ping && ping.datacenter === dc.code,
               })}
               style={{
-                ...convLatLongToStyle(dc.coordinates.latitude, dc.coordinates.longitude),
+                ...convLatLongToStyle(dc.lat, dc.lon),
                 zIndex: ping && ping.datacenter === dc.code ? 100 : 1,
               }}
               onClick={() => {
@@ -167,9 +167,7 @@ export default function CdnMapReactComponent({ children, datacenters }) {
                 onClick={() => setAndScroll(dc.code)}
               >
                 <div className={s.code}>{dc.code}</div>
-                <div className={s.city}>
-                  {dc.name.split(/ \- /)[0]}, {dc.billing_region}
-                </div>
+                <div className={s.city}>{dc.name}</div>
                 <div className={s.infos}>
                   <div className={s.info}>
                     <div className={s.infoTitle}>Distance</div>
@@ -177,14 +175,7 @@ export default function CdnMapReactComponent({ children, datacenters }) {
                       {location && (
                         <>
                           {numberWithCommas(
-                            Number.parseInt(
-                              distance(
-                                dc.coordinates.latitude,
-                                dc.coordinates.longitude,
-                                location.lat,
-                                location.lon,
-                              ),
-                            ),
+                            Number.parseInt(distance(dc.lat, dc.lon, location.lat, location.lon)),
                           )}{' '}
                           km
                         </>
