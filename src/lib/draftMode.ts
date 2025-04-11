@@ -7,7 +7,7 @@ export function isDraftModeEnabled(requestOrAstro: Request | AstroGlobal) {
     'headers' in requestOrAstro ? requestOrAstro.headers : requestOrAstro.request.headers;
 
   // Header set via custom VCL snippet on Fastly
-  return headers.get('x-original-host') !== PUBLIC_HOSTNAME;
+  return headers.get('host') !== PUBLIC_HOSTNAME;
 }
 
 export function baseUrl(requestOrAstro: Request | AstroGlobal) {

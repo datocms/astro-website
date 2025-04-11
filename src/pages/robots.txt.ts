@@ -12,8 +12,8 @@ export const GET: APIRoute = async ({ request }) => {
     DEPLOYMENT_DESTINATION === 'production' && !draftModeEnabled ? robotsTxt : disallowAll,
     {
       headers: {
-        'Content-Type': 'text/plain',
-        'Surrogate-Control': 'max-age=31536000',
+        'content-type': 'text/plain',
+        'cloudflare-cdn-cache-control': 'max-age=31536000',
       },
     },
   );

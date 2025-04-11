@@ -9,28 +9,26 @@ export type Context =
       responseHeaders: Headers;
     };
 
-export function augmentResponseHeadersWithSurrogateKeys(
-  newSurrogateKeys: string[],
-  context: Context,
-) {
+export function augmentResponseHeadersWithCacheTags(newTags: string[], context: Context) {
   const draftModeEnabled = isDraftModeEnabled('request' in context ? context.request : context);
 
   const responseHeaders =
     'responseHeaders' in context ? context.responseHeaders : context.response.headers;
 
-  const surrogateKeyHeaderName = draftModeEnabled ? 'debug-surrogate-key' : 'surrogate-key';
-  const existingSurrogateKeys = responseHeaders.get(surrogateKeyHeaderName)?.split(' ') ?? [];
-  const finalSurrogateKeys = uniq([...existingSurrogateKeys, ...newSurrogateKeys]).join(' ');
+  const cacheTagHeaderName = draftModeEnabled ? 'debug-cache-tag' : 'cache-tag';
 
-  responseHeaders.set(surrogateKeyHeaderName, finalSurrogateKeys);
+  const existingTags = responseHeaders.get(cacheTagHeaderName)?.split(',') ?? [];
+  const finalTags = uniq([...existingTags, ...newTags]).join(',');
+
+  responseHeaders.set(cacheTagHeaderName, finalTags);
 
   if (draftModeEnabled) {
     responseHeaders.set('cache-control', 'private');
   } else {
-    responseHeaders.set('datocms-cache-tags', finalSurrogateKeys);
+    responseHeaders.set('datocms-cache-tags', finalTags);
 
     responseHeaders.set(
-      'surrogate-control',
+      'cloudflare-cdn-cache-control',
       'max-age=31536000, stale-while-revalidate=60, stale-if-error=86400',
     );
   }

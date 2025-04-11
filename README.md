@@ -12,7 +12,7 @@
 
 This repository contains the source code of [datocms.com](https://www.datocms.com). It's built with Astro, gql.tada and the DatoCMS Astro SDK.
 
-It's a server-only app (every route is dynamic), and it's meant to be the origin for a surrogate-keys-capable CDN like Fastly, which will then apply granular caching rules thanks to [DatoCMS cache tags](https://www.datocms.com/docs/content-delivery-api/cache-tags).
+It's a server-only app (every route is dynamic), and it's meant to be the origin for a cache-tags-capable CDN like Fastly/Cloudflare, which will then apply granular caching rules thanks to [DatoCMS cache tags](https://www.datocms.com/docs/content-delivery-api/cache-tags).
 
 It can also be directly visited by the content editors to see the result of their draft changes in real time.
 

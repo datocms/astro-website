@@ -7,7 +7,7 @@ import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import type { TadaDocumentNode } from 'gql.tada';
 import { print } from 'graphql';
 import { isDraftModeEnabled } from '~/lib/draftMode';
-import { augmentResponseHeadersWithSurrogateKeys } from '../surrogateKeys';
+import { augmentResponseHeadersWithCacheTags } from '../cacheTags';
 
 /**
  * Executes a GraphQL query using the DatoCMS Content Delivery API, using a
@@ -46,7 +46,7 @@ export async function executeQueryOutsideAstro<Result, Variables>(
 
     const newCacheTags = datocmsGraphqlResponse.headers.get('x-cache-tags')!.split(' ');
 
-    augmentResponseHeadersWithSurrogateKeys(newCacheTags, {
+    augmentResponseHeadersWithCacheTags(newCacheTags, {
       request: options.request,
       responseHeaders: options.responseHeaders,
     });

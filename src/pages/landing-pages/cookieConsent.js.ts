@@ -218,7 +218,7 @@ const cookieConsentScript = `
 
 const headers = {
   'content-type': 'application/javascript',
-  'surrogate-control': 'no-store, max-age=0',
+  'cloudflare-cdn-cache-control': 'no-store, max-age=0',
 };
 
 export const GET: APIRoute = async ({ cookies, request }) => {

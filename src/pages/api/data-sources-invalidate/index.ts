@@ -37,7 +37,7 @@ export const POST: APIRoute = async ({ url, request }) => {
       maybeInvalidateNavbar(),
     ]);
 
-    return json({ invalidatedSurrogateKeys: results.filter(Boolean) });
+    return json({ invalidatedCacheTags: results.filter(Boolean) });
   } catch (error) {
     return handleUnexpectedError(request, error);
   }

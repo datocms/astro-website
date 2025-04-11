@@ -1,7 +1,7 @@
 import { isEqual } from 'lodash-es';
 import { LRUCache } from 'lru-cache';
-import { invalidateFastlySurrogateKeys } from './fastly';
-import { augmentResponseHeadersWithSurrogateKeys, type Context } from './surrogateKeys';
+import { augmentResponseHeadersWithCacheTags, type Context } from './cacheTags';
+import { invalidateCacheTags } from './cloudflare';
 
 export const cache = new LRUCache({
   max: 1000,
@@ -13,20 +13,20 @@ type MemoizeAndAugumentResponseHeadersFn<T> = (
 ) => Promise<T>;
 
 export function dataSource<T>(
-  surrogateKey: string,
+  cacheTag: string,
   fn: () => Promise<T>,
 ): [MemoizeAndAugumentResponseHeadersFn<T>, () => Promise<string | false>] {
   const queryFn: MemoizeAndAugumentResponseHeadersFn<T> = async (astroOrRequestResponseHeaders) => {
-    augmentResponseHeadersWithSurrogateKeys([surrogateKey], astroOrRequestResponseHeaders);
+    augmentResponseHeadersWithCacheTags([cacheTag], astroOrRequestResponseHeaders);
 
-    if (cache.has(surrogateKey)) {
-      return cache.get(surrogateKey) as T;
+    if (cache.has(cacheTag)) {
+      return cache.get(cacheTag) as T;
     }
 
     const result = await fn();
 
     if (result) {
-      cache.set(surrogateKey, result);
+      cache.set(cacheTag, result);
     }
 
     return result;
@@ -34,20 +34,18 @@ export function dataSource<T>(
 
   const maybeInvalidateFn = async () => {
     const result = await fn();
-    const toInvalidate = cache.has(surrogateKey)
-      ? !isEqual(cache.get(surrogateKey) as T, result)
-      : true;
+    const toInvalidate = cache.has(cacheTag) ? !isEqual(cache.get(cacheTag) as T, result) : true;
 
     if (toInvalidate) {
-      cache.delete(surrogateKey);
-      await invalidateFastlySurrogateKeys([surrogateKey]);
+      cache.delete(cacheTag);
+      await invalidateCacheTags([cacheTag]);
 
       if (result) {
-        cache.set(surrogateKey, result);
+        cache.set(cacheTag, result);
       }
     }
 
-    return toInvalidate ? surrogateKey : false;
+    return toInvalidate ? cacheTag : false;
   };
 
   return [queryFn, maybeInvalidateFn];
