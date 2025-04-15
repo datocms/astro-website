@@ -268,5 +268,8 @@ export default defineConfig({
     '/docs/plugins/creating-a-new-plugin': '/docs/plugin-sdk/build-your-first-plugin',
     '/docs/visual-editing/how-to-use-visual-editing': '/docs/content-link/how-to-use-content-link',
     '/documentation': '/docs',
+    '/docs/content-delivery-api/tree-like-collections':
+      '/docs/content-delivery-api/hierarchical-sorting',
+    '/docs/content-modelling/trees': '/docs/content-modelling/hierarchical-sorting',
   },
 });
