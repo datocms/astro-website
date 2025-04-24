@@ -17,6 +17,9 @@ import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { InlineText } from '~/components/structuredText/InlineText';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Svg } from '~/components/Svg';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -39,14 +42,28 @@ const duotone = `duotone=${colors}`;
       '--accent': page.accentColor.hex,
     }}
   >
-    <Head
-      logoUrl={page.logo.url}
-      image={`${page.coverImage.url}?fp-y=${page.coverImage.focalPoint.y}&fp-x=${page.coverImage.focalPoint.x}&crop=focalpoint&fit=crop&${duotone}`}
-    >
-      <Text {...ensureValidStructuredTextProps({ data: page.title })} />
-    </Head>
-
-    <div id="usecase"></div>
+    <Wrapper>
+      <div class={s.hero}>
+        <div class={s.heroBody}>
+          <div class={s.headKicker}>
+            <img src={page.logo.url} />
+            <span class={s.plus}>+</span>
+            <Svg name="svg/logos/datocms" />
+          </div>
+          <h1 class={s.heroTitle}>
+            <InlineText {...ensureValidStructuredTextProps({ data: page.title })} />
+          </h1>
+          <!-- <div class={s.heroSubtitle}>
+            <InlineText {...ensureValidStructuredTextProps({ data: page.subtitle })} />
+          </div> -->
+        </div>
+        <div class={s.heroImageWrapper}>
+          <div class={s.heroImage}>
+            <ResponsiveImage data={page.coverImage.responsiveImage} />
+          </div>
+        </div>
+      </div>
+    </Wrapper>
 
     <Recap>
       <Fragment slot="challenge">

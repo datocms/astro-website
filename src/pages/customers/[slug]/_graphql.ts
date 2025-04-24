@@ -5,6 +5,7 @@ import { VideoFragment } from '~/components/blocks/Video/graphql';
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
   buildUrlForSuccessStory,
@@ -35,6 +36,9 @@ export const query = graphql(
         }
         coverImage {
           url
+          responsiveImage(imgixParams: { auto: format, w: 800, h: 500 }) {
+            ...ResponsiveImageFragment
+          }
           focalPoint {
             x
             y
@@ -133,6 +137,7 @@ export const query = graphql(
   `,
   [
     TagFragment,
+    ResponsiveImageFragment,
     VideoFragment,
     ImageFragment,
     InternalVideoFragment,
