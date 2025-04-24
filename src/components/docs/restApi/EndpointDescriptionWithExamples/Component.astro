@@ -1,7 +1,6 @@
 ---
-import { experimental_AstroContainer } from 'astro/container';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';
-import { markdownWithExamples } from './utils';
+import { markdownWithExamples, parseHtmlWithExamples } from './utils';
 
 type Props = {
   description: string;
@@ -10,25 +9,22 @@ type Props = {
   additionalProps: Record<string, unknown>;
 };
 
-const { additionalProps, exampleComponent, description, examples } = Astro.props;
-const container = await experimental_AstroContainer.create();
-
-const content = await markdownWithExamples(description, async (exampleId, isAlone) => {
-  const example = examples.find((example) => example.id === exampleId);
-
-  if (!example) {
-    return '';
-  }
-
-  return await container.renderToString(exampleComponent, {
-    props: {
-      ...additionalProps,
-      id: example.id,
-      example,
-      startVisible: isAlone,
-    },
-  });
-});
+const { description, examples, exampleComponent: ExampleComponent, additionalProps } = Astro.props;
+const html = await markdownWithExamples(description);
+const parsedItems = parseHtmlWithExamples(html);
 ---
 
-<Fragment set:html={content} />
+{
+  parsedItems.map((item) =>
+    item.type === 'html' ? (
+      <Fragment set:html={item.content} />
+    ) : (
+      <ExampleComponent
+        id={item.id}
+        example={examples.find((example) => example.id === item.id)}
+        startVisible={item.alone}
+        {...additionalProps}
+      />
+    ),
+  )
+}
