@@ -1,0 +1,23 @@
+name: Deploy on staging-eu1
+
+permissions:
+  contents: read
+  packages: write
+
+on:
+  push:
+    branches:
+      - staging-eu1
+
+jobs:
+  deploy:
+    name: Deploy on staging-eu1
+    uses: ./.github/workflows/deploy.yml
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      DATOCMS_API_TOKEN: ${{ secrets.DATOCMS_API_TOKEN }}
+      GCR_API_TOKEN: ${{ secrets.GCR_API_TOKEN }}
+    with:
+      environment: staging
+      strategy: rolling

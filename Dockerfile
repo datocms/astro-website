@@ -5,11 +5,9 @@
 # Sets up the foundation that other stages will build upon
 
 FROM node:20-alpine AS base
-ARG PUBLIC_HOSTNAME
 
-# Flag to indicate we're running in a Docker environment
-ENV INSIDE_DOCKER=true
-ENV PUBLIC_HOSTNAME=$PUBLIC_HOSTNAME
+ARG PUBLIC_HOSTNAME
+ARG RECAPTCHA_KEY
 
 # Set the working directory for all subsequent operations
 WORKDIR /app
@@ -19,11 +17,17 @@ WORKDIR /app
 # If dependencies haven't changed, Docker can reuse cached layers
 COPY package.json package-lock.json ./
 
+# Install base packages
+# They're runtime dependencies needed when your app is running
+RUN apk --no-cache add bash curl
+
 # ==== Production dependencies stage ====
 # This stage installs only the dependencies needed for production
 
 FROM base AS prod-deps
 
+# Flag to indicate we're running in a Docker environment
+ENV INSIDE_DOCKER=true
 # --omit=dev flag excludes development dependencies not needed in production
 RUN npm install --omit=dev
 
@@ -47,13 +51,13 @@ COPY . .
 # Generate GraphQL schema using gql.tada
 # Uses Docker's secret mount to securely pass the API token
 # The secret won't be included in any intermediate or final image layers
-RUN --mount=type=secret,id=DATOCMS_API_TOKEN \
-    npx gql.tada generate schema https://graphql.datocms.com --header "X-Exclude-Invalid: true" --header "Authorization: $(cat /run/secrets/DATOCMS_API_TOKEN)"
+RUN --mount=type=secret,id=DATOCMS_API_TOKEN,env=DATOCMS_API_TOKEN \
+    npx gql.tada generate schema https://graphql.datocms.com --header "X-Exclude-Invalid: true" --header "Authorization: Bearer $DATOCMS_API_TOKEN"
 
 # Build the actual Astro standalone production server
-RUN --mount=type=secret,id=RECAPTCHA_KEY \
-    RECAPTCHA_KEY=$(cat /run/secrets/RECAPTCHA_KEY) \
-    npm run build
+ENV RECAPTCHA_KEY=$RECAPTCHA_KEY
+ENV PUBLIC_HOSTNAME=$PUBLIC_HOSTNAME
+RUN npm run build
 
 # ==== Runtime stage ====
 # This is the final production image that will actually run the application.
@@ -71,20 +75,14 @@ RUN --mount=type=secret,id=RECAPTCHA_KEY \
 
 FROM base AS runtime
 
-# crontab requires curl
-RUN apk update && apk add --no-cache curl
-
 # Copy only the production dependencies from the prod-deps stage
 COPY --from=prod-deps /app/node_modules ./node_modules
 
 # Copy only the built application files from the build stage
 COPY --from=build /app/dist ./dist
 
-# Copy config/crontab
-COPY config/crontab .
-
 # Configure the application's runtime environment
 ENV HOST=0.0.0.0
-ENV PORT=4321
-EXPOSE 4321
+ENV PORT=8080
+EXPOSE 8080
 CMD ["node", "./dist/server/entry.mjs"]

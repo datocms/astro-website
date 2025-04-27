@@ -12,6 +12,8 @@
     "astro": "astro",
     "decrypt-env": "npx kavo files:decrypt",
     "generate-schema": "dotenv -e .env.development -c -- bash -c 'gql.tada generate schema https://graphql.datocms.com --header \"X-Exclude-Invalid: true\" --header \"Authorization: $DATOCMS_API_TOKEN\"'",
+    "invalidate-data-sources": "curl -i -X POST \"https://${DRAFT_MODE_HOSTNAME}/api/data-sources-invalidate?token=${SECRET_API_TOKEN}\"",
+    "invalidate-everything": "curl -i -X POST \"https://api.fastly.com/service/$FASTLY_SERVICE_ID/purge_all\" -H \"Fastly-Key: $FASTLY_KEY\" -H \"Accept: application/json\"",
     "lint": "prettier --check .",
     "format": "npx prettier . --write",
     "test": "vitest",
@@ -93,6 +95,7 @@
   },
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.4",
+    "@datocms/cubo": "^0.1.9",
     "@fastify/one-line-logger": "^2.0.0",
     "@types/country-list": "^2.1.4",
     "@types/jsdom": "^21.1.7",

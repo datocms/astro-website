@@ -1,53 +1,98 @@
-name: Deploy
-
 on:
-  push:
-    branches:
-      - main
-      - staging
+  workflow_call:
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      DATOCMS_API_TOKEN:
+        required: true
+      GCR_API_TOKEN:
+        required: true
+    inputs:
+      environment:
+        required: true
+        type: string
+      strategy:
+        required: false
+        type: string
+        default: rolling
+      release-tag:
+        required: false
+        type: string
+        default: ''
+      no-cache:
+        required: false
+        type: boolean
+        default: false
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  DATOCMS_API_TOKEN: ${{ secrets.DATOCMS_API_TOKEN }}
+  GCR_API_TOKEN: ${{ secrets.GCR_API_TOKEN }}
 
 jobs:
-  Deploy:
-    if: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging') }}
+  deploy:
+    name: Deploy on ${{ inputs.environment }}
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write
+
     steps:
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: List files
+        run: ls -a
+
+      # 1) Setup QEMU (optional, but recommended for multi‑arch)
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      # 2) Setup Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 3) Cache Docker BuildKit layers
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.ref }}-${{ hashFiles('Dockerfile', '.dockerignore', 'package-lock.json') }}
+
+      # 4) Log in to GitHub Container Registry (for the `docker push` executed by `cubo deploy`)
+      - name: Log in to registry
+        run: echo "${{ secrets.GCR_API_TOKEN }}" | docker login ghcr.io -u datocms --password-stdin
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.2.2
-          bundler-cache: true
-
-      - uses: webfactory/ssh-agent@v0.7.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
+          cache: 'npm'
       - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy
+        shell: bash
         run: |
-          gem install kamal
+          CMD="./node_modules/.bin/cubo deploy \
+            --env '${{ inputs.environment }}' \
+            --docker-config-json /home/runner/.docker/config.json \
+            --deploy-strategy '${{ inputs.strategy }}'"
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Set Destination
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "KAMAL_DESTINATION=production" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
-            echo "KAMAL_DESTINATION=staging" >> $GITHUB_ENV
+          if [ -n "${{ inputs.release-tag }}" ]; then
+            CMD="$CMD --release-tag '${{ inputs.release-tag }}'"
           fi
 
-      - name: Deploy Application
-        env:
-          GCR_API_TOKEN: ${{ secrets.GCR_API_TOKEN }}
-          PRIVATE_KEY: ${{ secrets.KAVO_PRIVATE_KEY }}
-        run: |
-          sed -i -E -e '/^SECRETS=/d' -e 's/^GITHUB_CONTAINER_REGISTRY_API_TOKEN=.*$/GITHUB_CONTAINER_REGISTRY_API_TOKEN=$GCR_API_TOKEN/' .kamal/secrets.$KAMAL_DESTINATION
-          kamal deploy -d $KAMAL_DESTINATION
+          if ${{ inputs.no-cache }}; then
+            CMD="$CMD --no-cache"
+          fi
+
+          echo "➤ $CMD"
+          eval $CMD
+
+      - name: Invalidate CDN
+        run: ./node_modules/.bin/cubo run 'npm run invalidate-everything' --env '${{ inputs.environment }}'
