@@ -6,8 +6,6 @@ import { Layout } from '~/layouts/Layout';
 import { Prose } from '~/components/Prose';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { Text } from '~/components/structuredText/Text';
-import Head from './_sub/Head.astro';
-import Recap from './_sub/Recap.astro';
 import { Video } from '~/components/blocks/Video';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
@@ -20,6 +18,8 @@ import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { InlineText } from '~/components/structuredText/InlineText';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { Bullets } from '~/components/Bullets';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -65,64 +65,83 @@ const duotone = `duotone=${colors}`;
       </div>
     </Wrapper>
 
-    <Recap>
-      <Fragment slot="challenge">
-        <Text {...ensureValidStructuredTextProps({ data: page.challenge })} />
-      </Fragment>
-      <Fragment slot="result">
-        <Text {...ensureValidStructuredTextProps({ data: page.result })} />
-      </Fragment>
-      <div class={s.numbers}>
-        {
-          page.numbers.map((item) => (
-            <div class={s.numberBlock}>
-              <h3 class={s.numberTitle}>{item.number}</h3>
-              <p class={s.numberLabel}>{item.label}</p>
-            </div>
-          ))
-        }
-      </div>
-    </Recap>
+    <TitleStripWithContent>
+      <Fragment slot="title">In a glance...</Fragment>
+      <Wrapper class={s.glanceWrapper}>
+        <div class={s.challenge}>
+          <h3>Challenge</h3>
+          <Text {...ensureValidStructuredTextProps({ data: page.challenge })} />
+        </div>
+        <div class={s.arrowsWrapper}>
+          <div class={s.arrows}>
+            <Svg name="svg/illustrations/arrow-sketch-3" />
+            <Svg name="svg/illustrations/arrow-sketch-3" />
+          </div>
+        </div>
+        <div class={s.result}>
+          <h3>Result</h3>
+          <Text {...ensureValidStructuredTextProps({ data: page.result })} />
+        </div>
+      </Wrapper>
+    </TitleStripWithContent>
+  </div>
 
+  <!-- Biggest wins -->
+  <Wrapper>
     <div class={s.results}>
       <div class={s.resultsImage}>
-        <img
-          src={`${page.mainResultsImage.url}?${duotone}&fp-y=${page.mainResultsImage.focalPoint?.y}&crop=focalpoint&fp-x=${page.mainResultsImage.focalPoint?.x}`}
-        />
+        <ResponsiveImage data={page.mainResultsImage.responsiveImage} />
       </div>
       <div class={s.resultsBlocks}>
         <div class={s.resultsTitle}>Biggest wins</div>
-        {
-          page.mainResults.map((res) => (
-            <div class={s.resultsItem}>
-              <h3>{res.title}</h3>
-              <Text {...ensureValidStructuredTextProps({ data: res.description })} />
-            </div>
-          ))
-        }
+        <Bullets style="bad">
+          {
+            page.mainResults.map((res) => (
+              <li class={s.resultsItem}>
+                <Svg name="icons/regular/check" />
+
+                <h3>{res.title}</h3>
+                <Text {...ensureValidStructuredTextProps({ data: res.description })} />
+              </li>
+            ))
+          }
+        </Bullets>
       </div>
     </div>
+  </Wrapper>
 
-    <Wrapper>
-      <div class={s.fullStory}>
-        <Prose class={s.body}>
-          <Text
-            {...ensureValidStructuredTextProps({
-              data: page.content,
-              blockComponents: {
-                ImageRecord: Image,
-                InDepthCtaBlockRecord: InDepthCtaBlock,
-                InternalVideoRecord: InternalVideo,
-                VideoRecord: Video,
-              },
-              linkToRecordComponents: defaultLinkToRecordComponents,
-              inlineRecordComponents: defaultInlineRecordComponents,
-            })}
-          />
-        </Prose>
-      </div>
-    </Wrapper>
-  </div>
+  <TitleStripWithContent>
+    <div class={s.numbers}>
+      {
+        page.numbers.map((item) => (
+          <div class={s.numberBlock}>
+            <h3 class={s.numberTitle}>{item.number}</h3>
+            <p class={s.numberLabel}>{item.label}</p>
+          </div>
+        ))
+      }
+    </div>
+  </TitleStripWithContent>
+
+  <Wrapper>
+    <div class={s.fullStory}>
+      <Prose class={s.body}>
+        <Text
+          {...ensureValidStructuredTextProps({
+            data: page.content,
+            blockComponents: {
+              ImageRecord: Image,
+              InDepthCtaBlockRecord: InDepthCtaBlock,
+              InternalVideoRecord: InternalVideo,
+              VideoRecord: Video,
+            },
+            linkToRecordComponents: defaultLinkToRecordComponents,
+            inlineRecordComponents: defaultInlineRecordComponents,
+          })}
+        />
+      </Prose>
+    </div>
+  </Wrapper>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

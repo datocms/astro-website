@@ -1,3 +1,4 @@
+/* hero */
 .hero {
   align-items: center;
   display: flex;
@@ -79,94 +80,78 @@
   }
 }
 
-.recapRoot {
-  padding-bottom: rfs(80px);
-
-  @media screen and (min-width: 900px) {
-    padding: rfs(100px) 0;
-  }
-}
-
-.recapKicker {
-  color: var(--accent);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  margin-bottom: 20px;
-  margin-top: rfs(60px);
-  text-transform: uppercase;
-
-  &:first-child {
-    margin-top: 0;
-  }
-}
-
-.recapText {
-  font-family: var(--font-serif);
-  font-size: rfs(40px);
-  letter-spacing: -0.02em;
-  line-height: 1.3;
-  max-width: 950px;
-
-  p {
-    margin: 0;
-  }
-}
-
-.numbers {
-  margin-top: 60px;
+.glanceWrapper {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  column-gap: 80px;
-}
-
-.numberBlock {
-  margin-bottom: 40px;
-}
-
-.numberTitle {
-  font-weight: 600;
-  font-size: rfs(110px);
-  letter-spacing: -0.05em;
-  color: var(--accent);
-}
-
-.results {
-  align-items: flex-end;
-  background-color: var(--gradient1);
-  clip-path: var(--clip-path);
-  display: flex;
+  gap: rfs(30px);
   flex-direction: column;
+  align-items: center;
+
+  @media screen and (min-width: 768px) {
+    flex-direction: row;
+  }
+}
+
+.challenge,
+.result {
+  padding: rfs(60px) rfs(50px);
+  border-radius: 10px;
+  box-shadow: var(--box-shadow);
+  background-color: #fff;
+  max-width: 480px;
+}
+
+.arrowsWrapper {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-width: rfs(140px);
+
+  .arrows {
+    align-items: center;
+    aspect-ratio: 1/1;
+    display: flex;
+    flex-direction: column;
+    gap: rfs(50px);
+    justify-content: center;
+    max-width: rfs(160px); /* acts as the height because the element is rotated 90deg */
+    transform: rotate(90deg);
+    width: 100%;
+  }
+
+  @media screen and (min-width: 768px) {
+    .arrows {
+      max-width: unset;
+      transform: rotate(0deg);
+    }
+  }
+}
+
+/* results */
+.results {
+  width: 100%;
+  background-color: var(--gradient1);
+  display: flex;
   padding: rfs(140px) 0;
   position: relative;
   width: 100%;
+  flex-direction: column;
+  row-gap: rfs(50px);
+
+  @media screen and (min-width: 768px) {
+    flex-direction: row;
+  }
 }
 
 .resultsImage {
+  border-radius: 10px;
   bottom: 0;
   height: 100%;
   left: 0;
+  overflow: hidden;
   pointer-events: none;
-  position: absolute;
   top: 0;
   width: 100%;
   z-index: -1;
-
-  @media screen and (min-width: 900px) {
-    width: 60%;
-
-    &:after {
-      background-image: linear-gradient(to right, transparent, var(--gradient1));
-      content: '';
-      height: 100%;
-      opacity: 100%;
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 50%;
-      z-index: 1;
-    }
-  }
 
   img {
     width: 100%;
@@ -178,47 +163,73 @@
 .resultsBlocks {
   display: flex;
   flex-direction: column;
-  gap: rfs(40px);
-  color: #fff;
+  gap: rfs(20px);
   padding: 0 40px;
+  width: 100%;
 
   @media screen and (min-width: 900px) {
     max-width: 60%;
-    width: 100%;
   }
 }
 
 .resultsTitle {
   color: var(--accent);
+  font-family: var(--font-sans);
+  font-size: rfs(45px);
   font-weight: 600;
-  letter-spacing: 0.04em;
   max-width: 680px;
-  text-transform: uppercase;
+  text-align: center;
+  width: 100%;
+
+  @media screen and (min-width: 768px) {
+    text-align: left;
+  }
 }
 
 .resultsItem {
-  flex: 1;
+  /* flex: 1; */
   max-width: 680px;
 
   h3 {
-    font-size: rfs(44px);
-    font-weight: bold;
-    letter-spacing: -0.05em;
-    margin-bottom: 0.375em;
+    font-weight: 500;
+    /* font-size: rfs(44px); */
+    /* font-weight: bold; */
+    /* letter-spacing: -0.05em; */
+    /* margin-bottom: 0.375em; */
+  }
+
+  p {
+    display: none; /* temporarily hide the paragraph */
   }
 }
 
-.logo {
-  display: block;
-  height: 25px;
-  margin: 40px auto 0;
-  width: 90%;
-
-  path {
-    fill: var(--base-body-color);
-  }
+/* numbers */
+.numbers {
+  column-gap: rfs(50px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 60px;
 }
 
+.numberBlock {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: var(--box-shadow);
+  flex: 1;
+  margin-bottom: 40px;
+  padding: rfs(30px);
+  text-align: center;
+}
+
+.numberTitle {
+  color: var(--accent);
+  font-size: rfs(64px);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+
+/* text */
 .fullStory {
   margin: rfs(120px) 0;
 }

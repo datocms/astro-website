@@ -36,7 +36,7 @@ export const query = graphql(
         }
         coverImage {
           url
-          responsiveImage(imgixParams: { auto: format, w: 800, h: 500 }) {
+          responsiveImage(imgixParams: { auto: format, w: 1000, h: 600 }) {
             ...ResponsiveImageFragment
           }
           focalPoint {
@@ -59,6 +59,9 @@ export const query = graphql(
         }
         mainResultsImage {
           url
+          responsiveImage(imgixParams: { auto: format, w: 1000, h: 660, fit: crop }) {
+            ...ResponsiveImageFragment
+          }
           focalPoint {
             x
             y
