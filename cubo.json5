@@ -1,10 +1,9 @@
 {
-  $schema: 'https://unpkg.com/@datocms/cubo@0.1.13/schemas/cubo-config-schema.json',
+  $schema: 'https://unpkg.com/@datocms/cubo@0.1.43/schemas/cubo-config-schema.json',
   dockerImage: 'ghcr.io/datocms/astro-website',
   environments: {
     staging: {
-      healthCheckPathname: '/up',
-      docker: {
+      build: {
         args: {
           PUBLIC_HOSTNAME: 'www-eu1.staging-datocms.com',
           RECAPTCHA_KEY: '6Lda4UkgAAAAAE14pGAmMkbHKJCKOzmRoVc9_DE5',
@@ -16,15 +15,20 @@
         namespace: 'dato-website-staging-eu1',
         region: 'eu-west-1',
       },
-      procs: {
-        web: {
-          cmd: 'node ./dist/server/entry.mjs',
-          scale: {
-            min: 1,
-            max: 4,
+      webProc: {
+        healthCheckPathname: '/up',
+        cmd: 'node ./dist/server/entry.mjs',
+        scale: {
+          min: 1,
+          max: 4,
+        },
+        cpu: 1,
+        ram: 1,
+        loadBalancer: {
+          hostname: 'lb-website-eu1.staging-datocms.com',
+          annotations: {
+            'alb.ingress.kubernetes.io/certificate-arn': 'arn:aws:acm:eu-west-1:734741016184:certificate/d691d518-f3fd-4feb-99fa-b51cb127b2fe',
           },
-          cpu: 1,
-          ram: 1,
         },
       },
       cronJobs: {
@@ -41,25 +45,6 @@
         //   cpu: 1,
         //   ram: 1
         // }
-      },
-      loadBalancer: {
-        hostname: 'lb-website-eu1.staging-datocms.com',
-        annotations: {
-          'kubernetes.io/ingress.class': 'alb',
-          // This waits 30 seconds before draining connections to a pod
-          // Together with the K8s postStop hook, it should be enough to avoid any request loss
-          'alb.ingress.kubernetes.io/connection-draining-timeout': '30',
-          // We want a public facing load balancer
-          'alb.ingress.kubernetes.io/scheme': 'internet-facing',
-          // We want the deregistration delay to be 30 seconds to let the pod finish its work
-          'alb.ingress.kubernetes.io/target-group-attributes': 'deregistration_delay.timeout_seconds=30',
-          // We want the target type to be IP so that the traffic goes directly to the pod, the
-          // default is instance, which would be a node
-          'alb.ingress.kubernetes.io/target-type': 'ip',
-          'alb.ingress.kubernetes.io/certificate-arn': 'arn:aws:acm:eu-west-1:734741016184:certificate/d691d518-f3fd-4feb-99fa-b51cb127b2fe',
-          'alb.ingress.kubernetes.io/ssl-redirect': '443',
-          'alb.ingress.kubernetes.io/listen-ports': '[{"HTTP": 80}, {"HTTPS": 443}]',
-        },
       },
     },
   },
