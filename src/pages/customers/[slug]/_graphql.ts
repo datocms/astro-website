@@ -76,6 +76,10 @@ export const query = graphql(
             value
           }
         }
+        projectUrl
+        useCase {
+          navigationBarTitle
+        }
         content {
           value
           blocks {
