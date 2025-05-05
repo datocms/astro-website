@@ -34,6 +34,9 @@ export const query = graphql(
         title {
           value
         }
+        subtitle {
+          value
+        }
         coverImage {
           url
           responsiveImage(imgixParams: { auto: format, w: 1000, h: 600 }) {
