@@ -1,4 +1,4 @@
-name: Deploy on staging-eu1
+name: Deploy
 
 permissions:
   contents: read
@@ -7,16 +7,17 @@ permissions:
 on:
   push:
     branches:
-      - staging-eu1
+      - staging1
+      - staging2
 
 jobs:
   deploy:
-    name: Deploy on staging-eu1
-    uses: ./.github/workflows/deploy.yml
+    name: Deploy on ${{ github.ref_name }}
+    uses: ./.github/workflows/reusable-deploy.yml
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       DATOCMS_API_TOKEN: ${{ secrets.DATOCMS_API_TOKEN }}
     with:
-      environment: staging
+      environment: ${{ github.ref_name }}
       strategy: rolling
