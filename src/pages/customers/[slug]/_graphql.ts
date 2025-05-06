@@ -14,6 +14,7 @@ import {
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
+import { UseCasePageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -79,6 +80,8 @@ export const query = graphql(
         projectUrl
         useCase {
           navigationBarTitle
+          link
+          ...UseCasePageUrlFragment
         }
         content {
           value
@@ -152,6 +155,7 @@ export const query = graphql(
     ImageFragment,
     InternalVideoFragment,
     InDepthCtaBlockFragment,
+    UseCasePageUrlFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
