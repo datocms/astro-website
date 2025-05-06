@@ -34,6 +34,7 @@ export const query = graphql(
         duotoneColor2 {
           hex
         }
+        name
         title {
           value
         }
