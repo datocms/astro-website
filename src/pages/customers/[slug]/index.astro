@@ -22,6 +22,9 @@ import { StripWithContent } from '~/components/StripWithContent';
 import { Bullets } from '~/components/Bullets';
 import { cleanDomain } from '~/lib/cleanDomain';
 import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
+import { buildUrlForFeature } from '~/lib/datocms/gqlUrlBuilder/feature';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
+import { Markdown } from '~/components/Markdown';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -162,6 +165,44 @@ const useCase = page.useCase ? page.useCase : null;
             <>
               <h3>Use case</h3>
               <a href={buildUrlForUseCasePage(page.useCase)}>{page.useCase.navigationBarTitle}</a>
+            </>
+          )
+        }
+        {
+          page.industry && (
+            <>
+              <h3>Industry</h3>
+              <Markdown of={page.industry} />
+            </>
+          )
+        }
+        {
+          page.industry2 && (
+            <>
+              <h3>Industry</h3>
+              <InlineText {...ensureValidStructuredTextProps({ data: page.industry2 })} />
+            </>
+          )
+        }
+        {
+          page.keyFeatures && (
+            <>
+              <h3>Key Featurees</h3>
+              <ul>
+                {page.keyFeatures.map((item) => (
+                  <li>
+                    <a href={buildUrlForFeature(item)}>{item.seoH1}</a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+        {
+          page.partner && (
+            <>
+              <h3>Partner</h3>
+              <a href={buildUrlForPartner(page.partner)}>{page.partner.name}</a>
             </>
           )
         }

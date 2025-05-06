@@ -15,6 +15,8 @@ import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 import { UseCasePageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
+import { FeatureUrlFragment } from '~/lib/datocms/gqlUrlBuilder/feature';
+import { PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -82,6 +84,20 @@ export const query = graphql(
           navigationBarTitle
           link
           ...UseCasePageUrlFragment
+        }
+        industry
+        industry2 {
+          value
+        }
+        keyFeatures {
+          ... on FeatureRecord {
+            seoH1
+            ...FeatureUrlFragment
+          }
+        }
+        partner {
+          name
+          ...PartnerUrlFragment
         }
         content {
           value
@@ -156,6 +172,8 @@ export const query = graphql(
     InternalVideoFragment,
     InDepthCtaBlockFragment,
     UseCasePageUrlFragment,
+    FeatureUrlFragment,
+    PartnerUrlFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
