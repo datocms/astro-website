@@ -10,9 +10,11 @@ import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { LogosBar } from '~/components/LogosBar';
 import { Layout } from '~/layouts/Layout';
 import { Hero } from '~/components/Hero';
-import s from './_style.module.css';
+import { Svg } from '~/components/Svg';
 import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { StripWithContent } from '~/components/StripWithContent';
+import s from './_style.module.css';
 
 const { page, posts } = await executeQuery(Astro, query);
 
@@ -32,7 +34,7 @@ if (!page || posts.length === 0) {
     </Fragment>
   </Hero>
 
-  <Space top={1} bottom={2}>
+  <Space top={1} bottom={1}>
     <LogosBar
       title=""
       clients={[
@@ -46,25 +48,43 @@ if (!page || posts.length === 0) {
     />
   </Space>
 
-  <Wrapper>
-    <div class={s.posts}>
-      {
-        posts.map((post) => (
-          <a class={s.post} href={buildUrlForSuccessStory(post)}>
-            <div class={s.postImage}>
-              <ResponsiveImage data={post.coverImage.responsiveImage} />
-            </div>
-            <div class={s.postBody}>
-              <div class={s.postTitle}>
-                <Text {...ensureValidStructuredTextProps({ data: post.title })} />
+  <div class={s.posts}>
+    {
+      posts.map((post, i) => (
+        <StripWithContent background={i % 2 === 0 ? 'normal' : 'alternative'}>
+          <Wrapper>
+            <a class={s.post} href={buildUrlForSuccessStory(post)}>
+              <div class={s.postVisual}>
+                <div class={s.postImage}>
+                  <ResponsiveImage data={post.coverImage.responsiveImage} />
+                </div>
+                <div class={s.postLogos}>
+                  <img src={post.logo.url} class={s.postLogo} />
+                  <span class={s.plus}>+</span>
+                  <Svg name="svg/logos/datocms" />
+                </div>
               </div>
-              <img src={post.logo.url} class={s.postLogo} />
-            </div>
-          </a>
-        ))
-      }
-    </div>
-  </Wrapper>
+              <div class={s.postBody}>
+                <div class={s.postTitle}>
+                  <Text {...ensureValidStructuredTextProps({ data: post.title })} />
+                </div>
+                {post.numbers.length > 0 && (
+                  <div class={s.postNumbers}>
+                    {post.numbers.map((item) => (
+                      <div class={s.numberBlock}>
+                        <h3 class={s.numberTitle}>{item.number}</h3>
+                        <p class={s.numberLabel}>{item.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </a>
+          </Wrapper>
+        </StripWithContent>
+      ))
+    }
+  </div>
 
   <DraftModeQueryListener query={query} />
 </Layout>

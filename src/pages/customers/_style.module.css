@@ -1,39 +1,121 @@
+.posts {
+  @media (width > 900px) {
+    & > *:nth-child(2n) {
+      .post {
+        .postVisual {
+          order: 2;
+        }
+
+        .postBody {
+          order: 1;
+        }
+      }
+    }
+  }
+}
+
 .post {
+  align-items: flex-start;
   color: inherit;
-  display: block;
-  margin-bottom: rfs(120px);
+  display: flex;
+  flex-direction: column;
+  gap: rfs(50px);
+  grid-template-columns: 1fr;
   text-decoration: none;
+
+  @media (width > 900px) {
+    flex-direction: row;
+  }
+}
+
+.postVisual {
+  flex: 4;
 }
 
 .postImage {
-  border-radius: 5px;
+  border-radius: 6px;
   box-shadow: var(--box-shadow);
-  margin-bottom: 30px;
   overflow: hidden;
   transition: all 0.2s ease;
-  width: 80%;
 
   .post:hover & {
     transform: translateY(-2%) scale(105%);
   }
 }
 
+.postLogos {
+  margin-top: 40px;
+}
+
 .postTitle {
-  font-family: var(--font-serif);
+  font-family: var(--font-headline);
   font-size: rfs(55px);
   line-height: 1;
   margin-bottom: rfs(30px);
 
   @media (width > 600px) {
     font-family: var(--font-headline);
-    font-weight: bold;
   }
 }
 
-.postLogo {
-  height: rfs(40px);
+.postLogos {
+  align-items: center;
+  display: flex;
+  gap: rfs(10px);
+  justify-content: center;
+
+  @media screen and (min-width: 1000px) {
+    justify-content: flex-start;
+  }
+
+  img,
+  svg {
+    flex-shrink: 0;
+    height: rfs(20px);
+    mix-blend-mode: multiply;
+  }
 }
 
 .postBody {
-  padding-left: 20%;
+  flex: 5;
+  position: relative;
+}
+
+.postNumbers {
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: var(--box-shadow);
+  display: flex;
+  gap: rfs(16px);
+  justify-content: space-between;
+  margin-top: rfs(60px);
+  padding: rfs(50px) rfs(34px);
+  width: 100%;
+
+  @media (width > 900px) {
+    position: absolute;
+  }
+}
+
+.numberBlock {
+  flex: 1;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.numberTitle {
+  color: var(--accent);
+  font-size: rfs(32px);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+
+.numberLabel {
+  font-size: 0.75em;
+  font-weight: 600;
+  margin-top: 1em;
+
+  @media (width > 520px) {
+    font-size: 0.875em;
+  }
 }

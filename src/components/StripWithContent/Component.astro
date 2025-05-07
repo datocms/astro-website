@@ -4,12 +4,17 @@ import { containsKeywords } from '~/lib/containsKeyword';
 import { Wrapper } from '~/components/Wrapper';
 import striptags from 'striptags';
 
-const { seoAnalysis } = Astro.props;
+const { seoAnalysis, background = 'normal' } = Astro.props;
 
 const kickerContents = striptags(await Astro.slots.render('kicker'));
 
 let Title: 'h2' | 'h3' = 'h2';
 let Kicker: 'h2' | 'h3' | 'div' = 'div';
+
+type Props = {
+  seoAnalysis?: unknown;
+  background?: 'normal' | 'alternative';
+};
 
 if (seoAnalysis) {
   const kickerContainsKeywords = containsKeywords(kickerContents, seoAnalysis);
@@ -31,7 +36,7 @@ if (seoAnalysis) {
 
   {
     Astro.slots.has('default') && (
-      <div class={s.body}>
+      <div class={s.body} data-background={background}>
         <Wrapper>
           <slot />
         </Wrapper>

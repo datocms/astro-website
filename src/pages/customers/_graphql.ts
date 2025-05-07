@@ -30,12 +30,16 @@ export const query = graphql(
             x
             y
           }
-          responsiveImage(imgixParams: { auto: format, ar: "16:9", w: 1200, fit: crop }) {
+          responsiveImage(imgixParams: { auto: format, ar: "3:2", w: 1200, fit: crop }) {
             ...ResponsiveImageFragment
           }
         }
         logo {
           url
+        }
+        numbers {
+          number
+          label
         }
         ...SuccessStoryUrlFragment
       }

@@ -11,7 +11,6 @@ import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
-import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
@@ -25,6 +24,7 @@ import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage'
 import { buildUrlForFeature } from '~/lib/datocms/gqlUrlBuilder/feature';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { Markdown } from '~/components/Markdown';
+import s from './_style.module.css';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -36,50 +36,48 @@ if (!page) {
 ---
 
 <Layout seo={page.seo}>
-  <div>
-    <Wrapper>
-      <div class={s.hero}>
-        <div class={s.heroBody}>
-          <div class={s.headKicker}>
-            <img src={page.logo.url} />
-            <span class={s.plus}>+</span>
-            <Svg name="svg/logos/datocms" />
-          </div>
-          <h1 class={s.heroTitle}>
-            <InlineText {...ensureValidStructuredTextProps({ data: page.title })} />
-          </h1>
-          <div class={s.heroSubtitle}>
-            <InlineText {...ensureValidStructuredTextProps({ data: page.subtitle })} />
-          </div>
+  <Wrapper>
+    <div class={s.hero}>
+      <div class={s.heroBody}>
+        <div class={s.headKicker}>
+          <img src={page.logo.url} />
+          <span class={s.plus}>+</span>
+          <Svg name="svg/logos/datocms" />
         </div>
-        <div class={s.heroImageWrapper}>
-          <div class={s.heroImage}>
-            <ResponsiveImage data={page.coverImage.responsiveImage} />
-          </div>
+        <h1 class={s.heroTitle}>
+          <InlineText {...ensureValidStructuredTextProps({ data: page.title })} />
+        </h1>
+        <div class={s.heroSubtitle}>
+          <InlineText {...ensureValidStructuredTextProps({ data: page.subtitle })} />
         </div>
       </div>
-    </Wrapper>
+      <div class={s.heroImageWrapper}>
+        <div class={s.heroImage}>
+          <ResponsiveImage data={page.coverImage.responsiveImage} />
+        </div>
+      </div>
+    </div>
+  </Wrapper>
 
-    <StripWithContent>
-      <Fragment slot="title">In a glance...</Fragment>
-      <Wrapper class={s.glanceWrapper}>
-        <div class={s.challenge}>
-          <h3>The challenge</h3>
-          <Text {...ensureValidStructuredTextProps({ data: page.challenge })} />
+  <StripWithContent>
+    <Fragment slot="title">In a glance...</Fragment>
+    <Wrapper class={s.glanceWrapper}>
+      <div class={s.challenge}>
+        <h3>The challenge</h3>
+        <Text {...ensureValidStructuredTextProps({ data: page.challenge })} />
+      </div>
+      <div class={s.arrowsWrapper}>
+        <div class={s.arrows}>
+          <Svg name="svg/illustrations/arrow-sketch-3" />
+          <Svg name="svg/illustrations/arrow-sketch-3" />
         </div>
-        <div class={s.arrowsWrapper}>
-          <div class={s.arrows}>
-            <Svg name="svg/illustrations/arrow-sketch-3" />
-            <Svg name="svg/illustrations/arrow-sketch-3" />
-          </div>
-        </div>
-        <div class={s.result}>
-          <h3>The result</h3>
-          <Text {...ensureValidStructuredTextProps({ data: page.result })} />
-        </div>
-      </Wrapper>
-    </StripWithContent>
-  </div>
+      </div>
+      <div class={s.result}>
+        <h3>The result</h3>
+        <Text {...ensureValidStructuredTextProps({ data: page.result })} />
+      </div>
+    </Wrapper>
+  </StripWithContent>
 
   <Wrapper>
     <div class={s.results}>
@@ -107,18 +105,20 @@ if (!page) {
     </div>
   </Wrapper>
 
-  <StripWithContent>
-    <div class={s.numbers}>
-      {
-        page.numbers.map((item) => (
-          <div class={s.numberBlock}>
-            <h3 class={s.numberTitle}>{item.number}</h3>
-            <p class={s.numberLabel}>{item.label}</p>
-          </div>
-        ))
-      }
-    </div>
-  </StripWithContent>
+  {
+    page.numbers.length > 0 && (
+      <StripWithContent>
+        <div class={s.numbers}>
+          {page.numbers.map((item) => (
+            <div class={s.numberBlock}>
+              <h3 class={s.numberTitle}>{item.number}</h3>
+              <p class={s.numberLabel}>{item.label}</p>
+            </div>
+          ))}
+        </div>
+      </StripWithContent>
+    )
+  }
 
   <Wrapper>
     <div class={s.fullStory}>
