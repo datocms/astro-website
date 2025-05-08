@@ -86,9 +86,8 @@ export const query = graphql(
           link
           ...UseCasePageUrlFragment
         }
-        industry
-        industry2 {
-          value
+        industry {
+          name
         }
         keyFeatures {
           ... on FeatureRecord {
