@@ -5,5 +5,12 @@ export const query = graphql(/* GraphQL */ `
     page: homePage {
       id
     }
+    faqs: allFaqs {
+      id
+      question
+      answer {
+        value
+      }
+    }
   }
 `);
