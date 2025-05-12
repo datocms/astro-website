@@ -16,12 +16,14 @@ import Study from './_Study.astro';
 import Step from './_Step.astro';
 import s from './_style.module.css';
 
-const { page, faqs } = await executeQuery(Astro, query);
+const { page } = await executeQuery(Astro, query);
 
 if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const { studies, faqs } = page;
 ---
 
 <Layout noFinalCta seo={[]}>
@@ -78,38 +80,43 @@ if (!page) {
     </Fragment>
 
     <div class={s.studies}>
-      <Study title="Are you a fresh DatoCMS user?">
-        <p>
-          Share your first impressions and challenges to help us improve the onboarding experience
-          for new users.
-        </p>
+      {
+        studies.length === 0 ? (
+          <Study title="We’re not researching at the moment">
+            <p>There are no studies at the moment, but you can still share your feedback here</p>
 
-        <Space top={1}>
-          <Button fs="small" as="a" s="invert" href="https://dashboard.datocms.com/signup">
-            Share your feedbacks!
-          </Button>
-        </Space>
-      </Study>
+            <Space top={1}>
+              <Button fs="small" as="a" s="invert" href="/share-your-feedback">
+                Tell us what you think!
+              </Button>
+            </Space>
+          </Study>
+        ) : (
+          studies.map((study) => (
+            <Study title={study.title}>
+              <Prose>
+                <Text
+                  {...ensureValidStructuredTextProps({
+                    data: study.text,
+                  })}
+                />
+              </Prose>
 
-      <Study title="Are you an editor using DatoCMS?">
-        <p>
-          We’d love to learn how you work with DatoCMS in your daily tasks. Your insights will help
-          us improve the editing experience and make your workflow smoother.
-        </p>
-
-        <Space top={1}>
-          <Button fs="small" as="a" s="invert" href="https://dashboard.datocms.com/signup">
-            Tell us what you think!
-          </Button>
-        </Space>
-      </Study>
+              <Space top={1}>
+                <Button fs="small" as="a" s="invert" href={study.link} target="_blank">
+                  {study.linkLabel}
+                </Button>
+              </Space>
+            </Study>
+          ))
+        )
+      }
     </div>
   </TitleStripWithContent>
 
   <Space top={3}>
     <InterstitialTitle> Frequently Asked Questions </InterstitialTitle>
     <Wrapper>
-      <!-- TODO: wrong faqs -->
       <div class={s.faqs}>
         {
           faqs.map((faq) => (
