@@ -1,4 +1,3 @@
-import { getData } from 'country-list';
 import Textarea from 'react-textarea-autosize';
 import s from './style.module.css';
 import { FormReactComponent } from '~/components/form/Form/ReactComponent';
@@ -7,31 +6,23 @@ import { getCookie } from '~/lib/cookies';
 import { actions } from 'astro:actions';
 
 type FormValues = {
-  companyName: string;
-  country: string;
-  industry: string;
   firstName: string;
   lastName: string;
   email: string;
   jobFunction: string;
-  useCase: string;
+  title: string;
   body: string;
-  referral: string;
-  issueType: 'sales' | 'enterprise';
+  issueType: 'sales' | 'enterprise' | 'feedback';
 };
 
-export function Form({ issueType }: { issueType: 'sales' | 'enterprise' }) {
+export function Form({ issueType }: { issueType: 'sales' | 'enterprise' | 'feedback' }) {
   const defaultValues: FormValues = {
-    companyName: '',
-    country: '',
-    industry: '',
     firstName: '',
     lastName: '',
     email: getCookie('datoAccountEmail') || '',
     jobFunction: '',
-    useCase: '',
+    title: '',
     body: '',
-    referral: '',
     issueType,
   };
 
@@ -47,45 +38,6 @@ export function Form({ issueType }: { issueType: 'sales' | 'enterprise' }) {
         // https://app.frontapp.com/settings/tim:1275912/channels/edit/9473928/settings
         action="https://webhook.frontapp.com/forms/f51dbf7c0379d350b50e/nzap4XhKrZaOsUgc8z60aWZmDiaXqbcs69ZEcrTnEmrZ9RFy4pLak0OqBcEvkSN-Py6tbtle8KXhPe4X_QgF89gP1Qpl97WhzTQMz8wWQ3hCpUMXJqNtE9056-Av"
       >
-        <FieldReactComponent
-          name="companyName"
-          label="Company name"
-          placeholder="Your company name"
-          validations={{ required: 'Required' }}
-        />
-
-        <div className={s.formCols}>
-          <FieldReactComponent
-            name="country"
-            label="Country"
-            validations={{ required: 'Required' }}
-            options={getData()
-              .map(({ code, name }) => ({
-                value: code,
-                label: name,
-              }))
-              .sort((a, b) => a.label.localeCompare(b.label))}
-          />
-          <FieldReactComponent
-            name="industry"
-            label="Industry"
-            options={[
-              'Agency / Freelancer',
-              'Ecommerce / Retail',
-              'FinTech',
-              'Media / Publishing',
-              'SaaS',
-              'Automotive',
-              'CleanTech / Utility',
-              'Food & Beverage',
-              'Education',
-              'Non-Profit & Culture',
-              'Other',
-            ]}
-            validations={{ required: 'Required' }}
-          />
-        </div>
-
         <div className={s.formCols}>
           <FieldReactComponent
             name="firstName"
@@ -118,7 +70,7 @@ export function Form({ issueType }: { issueType: 'sales' | 'enterprise' }) {
 
           <FieldReactComponent
             name="jobFunction"
-            label="Job function"
+            label="Job role"
             validations={{ required: 'Required' }}
             options={[
               'Editorial & Content',
@@ -132,38 +84,18 @@ export function Form({ issueType }: { issueType: 'sales' | 'enterprise' }) {
         </div>
 
         <FieldReactComponent
-          name="useCase"
-          label="Use case"
-          options={[
-            'Ecommerce',
-            'Moving to headless',
-            'Migrating from other headless CMS',
-            'Agency',
-            'Other',
-          ]}
+          name="title"
+          label="Topic"
+          placeholder="Just a title"
           validations={{ required: 'Required' }}
         />
 
         <FieldReactComponent
           name="body"
-          label="What's your question?"
-          placeholder="Please tell us how we can help"
+          label="Tell us"
+          placeholder="Your feedback"
           validations={{ required: 'Required' }}
-          render={({ field }) => <Textarea {...field} />}
-        />
-
-        <FieldReactComponent
-          name="referral"
-          label="How did you hear about us?"
-          options={[
-            'A colleague/recommendation/forum',
-            'Software review platform (G2, Capterra...)',
-            'Our partners (Netlify, Vercel, Imgix...)',
-            'Social Media (Twitter, LinkedIn...)',
-            'Search',
-            'Other',
-          ]}
-          validations={{ required: 'Required' }}
+          render={({ field }) => <Textarea {...field} placeholder="Your feedback" />}
         />
 
         <FieldReactComponent name="issueType" type="hidden" />
