@@ -1,0 +1,154 @@
+---
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { Layout } from '~/layouts/Layout';
+import { Hero } from '~/components/Hero';
+import { Space } from '~/components/Space';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Wrapper } from '~/components/Wrapper';
+import { Button } from '~/components/Button';
+import { Prose } from '~/components/Prose';
+import { Text } from '~/components/structuredText/Text';
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import Study from './_Study.astro';
+import Step from './_Step.astro';
+import s from './_style.module.css';
+
+const { page } = await executeQuery(Astro, query);
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const { studies, faqs } = page;
+---
+
+<Layout noFinalCta seo={[]}>
+  <Fragment slot="head">
+    <title>Research Program - DatoCMS</title>
+  </Fragment>
+
+  <Hero seoAnalysis={{ keyword: 'research', synonyms: '', relatedKeywords: [] }}>
+    <Fragment slot="kicker">Research Program</Fragment>
+    <Fragment slot="title">Contribute to the evolution of DatoCMS</Fragment>
+    <Fragment slot="subtitle">
+      Become a part of the DatoCMS Research Program and be the first to know what we are working on,
+      try out innovative concepts, offer your feedback and help optimize DatoCMS for your needs.
+    </Fragment>
+
+    <Space top={1}>
+      <Button fs="small" as="a" href="https://forms.gle/VVwuUT3nQCGgArGZA" target="_blank">
+        Sign up and share your opinions!
+      </Button>
+    </Space>
+  </Hero>
+
+  <Space top={2}>
+    <InterstitialTitle style="two">
+      How does it work?
+
+      <Fragment slot="below">
+        <Space top={1}>
+          Register to our Research Program, participate to our studies, get rewarded!
+        </Space>
+      </Fragment>
+    </InterstitialTitle>
+  </Space>
+
+  <Space top={2} bottom={2}>
+    <Wrapper>
+      <ol class={s.steps}>
+        <Step title="Register">
+          Take a 2-minute survey to tell us about yourself. We'll match you with the right studies.
+        </Step>
+        <Step title="Partecipate">
+          Get exclusive invitations to our research studies. Join only when it suits you!
+        </Step>
+        <Step title="Get rewards! "> Receive gift cards, DatoCMS credits and discounts. </Step>
+      </ol>
+    </Wrapper>
+  </Space>
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker">Help make DatoCMS better!</Fragment>
+    <Fragment slot="title">Ongoing studies</Fragment>
+    <Fragment slot="subtitle">
+      Pick a study that fits your skills or interests and share your insights.
+    </Fragment>
+
+    <div class={s.studies}>
+      {
+        studies.length === 0 ? (
+          <Study title="We’re not researching at the moment">
+            <p>There are no studies at the moment, but you can still share your feedback here</p>
+
+            <Space top={1}>
+              <Button fs="small" as="a" s="invert" href="/share-your-feedback">
+                Tell us what you think!
+              </Button>
+            </Space>
+          </Study>
+        ) : (
+          studies.map((study) => (
+            <Study title={study.title}>
+              <Prose>
+                <Text
+                  {...ensureValidStructuredTextProps({
+                    data: study.text,
+                  })}
+                />
+              </Prose>
+
+              <Space top={1}>
+                <Button fs="small" as="a" s="invert" href={study.link} target="_blank">
+                  {study.linkLabel}
+                </Button>
+              </Space>
+            </Study>
+          ))
+        )
+      }
+    </div>
+  </TitleStripWithContent>
+
+  <Space top={3}>
+    <InterstitialTitle> Frequently Asked Questions </InterstitialTitle>
+    <Wrapper>
+      <div class={s.faqs}>
+        {
+          faqs.map((faq) => (
+            <div class={s.faq}>
+              <div class={s.faqQ}>{faq.question}</div>
+              <div class={s.faqA}>
+                <Prose>
+                  <Text
+                    {...ensureValidStructuredTextProps({
+                      data: faq.answer,
+                    })}
+                  />
+                </Prose>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </Wrapper>
+  </Space>
+
+  <Space top={1}>
+    <InterstitialTitle style="one">
+      <Fragment slot="kicker">Join now</Fragment>
+      Get involved!
+      <Fragment slot="below">
+        <Space top={1}>
+          <Button fs="small" as="a" href="https://forms.gle/VVwuUT3nQCGgArGZA" target="_blank">
+            Sign up and share your opinions!
+          </Button>
+        </Space>
+      </Fragment>
+    </InterstitialTitle>
+  </Space>
+</Layout>
