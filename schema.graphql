@@ -4225,6 +4225,40 @@ type ExpertiseAreaRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
+type FaqItemModelAnswerField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+"""Block of type Faq item (faq_item)"""
+type FaqItemRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  answer: FaqItemModelAnswerField!
+  createdAt: DateTime!
+  id: ItemId!
+  question: String!
+  updatedAt: DateTime!
+}
+
 type FaqModelAnswerField {
   blocks: [String!]!
   inlineBlocks: [String!]!
@@ -18300,7 +18334,7 @@ type ResearchProgramHomeRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   createdAt: DateTime!
-  faqs: [FaqRecord!]!
+  faqs: [FaqItemRecord!]!
   id: ItemId!
   studies: [StudyRecord!]!
   updatedAt: DateTime!
