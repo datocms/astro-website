@@ -56,60 +56,60 @@ const projects = posts.filter((post) => post.name !== highlightedProjectId);
 
   <StripWithContent>
     <Wrapper>
-      <a class={s.highlight} href={buildUrlForSuccessStory(highlightedProject)}>
+      <div class={s.highlight}>
         <div class={s.highlightVisual}>
-          <div class={s.highlightImage}>
+          <a class={s.highlightImage} href={buildUrlForSuccessStory(highlightedProject)}>
             <ResponsiveImage data={highlightedProject.coverImage.responsiveImage} />
-          </div>
+          </a>
+        </div>
+        <div class={s.highlightBody}>
           <div class={s.highlightLogos}>
             <img src={highlightedProject.logo.url} class={s.highlightLogo} />
             <span class={s.plus}>+</span>
             <Svg name="svg/logos/datocms" />
           </div>
-        </div>
-        <div class={s.highlightBody}>
           <div class={s.highlightTitle}>
             <Text {...ensureValidStructuredTextProps({ data: highlightedProject.title })} />
           </div>
-          {
-            highlightedProject.numbers.length > 0 && (
-              <div class={s.highlightNumbers}>
-                {highlightedProject.numbers.map((item) => (
-                  <div class={s.numberBlock}>
-                    <h3 class={s.numberTitle}>{item.number}</h3>
-                    <p class={s.numberLabel}>{item.label}</p>
-                  </div>
-                ))}
-              </div>
-            )
-          }
+          <Text {...ensureValidStructuredTextProps({ data: highlightedProject.subtitle })} />
+          <a class={s.readMore} href={buildUrlForSuccessStory(highlightedProject)}>Read more</a>
         </div>
-      </a>
-    </Wrapper>
-  </StripWithContent>
-
-  <Space top={2}>
-    <Wrapper>
-      <div class={s.grid}>
         {
-          projects.map((post, i) => (
-            <Card
-              title={structuredTextToPlainText(post.title) ?? post.name}
-              size="small"
-              lineClamp={3}
-              svgLogoUrl={post.logo.url}
-              href={buildUrlForSuccessStory(post)}
-            >
-              <Fragment slot="image">
-                <ResponsiveImage data={post.coverImage.responsiveImage} />
-              </Fragment>
-              {structuredTextToPlainText(post.subtitle)}
-            </Card>
-          ))
+          highlightedProject.numbers.length > 0 && (
+            <div class={s.highlightNumbers}>
+              {highlightedProject.numbers.map((item) => (
+                <div class={s.numberBlock}>
+                  <h3 class={s.numberTitle}>{item.number}</h3>
+                  <p class={s.numberLabel}>{item.label}</p>
+                </div>
+              ))}
+            </div>
+          )
         }
       </div>
     </Wrapper>
-  </Space>
+  </StripWithContent>
+
+  <Wrapper>
+    <div class={s.grid}>
+      {
+        projects.map((post) => (
+          <Card
+            title={structuredTextToPlainText(post.title) ?? post.name}
+            size="small"
+            lineClamp={3}
+            svgLogoUrl={post.logo.url}
+            href={buildUrlForSuccessStory(post)}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={post.coverImage.responsiveImage} />
+            </Fragment>
+            {structuredTextToPlainText(post.subtitle)}
+          </Card>
+        ))
+      }
+    </div>
+  </Wrapper>
 </Layout>
 
 <DraftModeQueryListener query={query} />

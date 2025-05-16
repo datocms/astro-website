@@ -1,34 +1,46 @@
 .highlight {
   align-items: flex-start;
   color: inherit;
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: rfs(50px);
   grid-template-columns: 1fr;
+  position: relative;
   text-decoration: none;
 
   @media (width > 900px) {
-    flex-direction: row;
+    grid-template-columns: 4fr 5fr;
   }
-}
-
-.highlightVisual {
-  flex: 4;
 }
 
 .highlightImage {
   border-radius: 6px;
   box-shadow: var(--box-shadow);
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease-in-out;
+  display: block;
+
+  @media (width > 900px) {
+    margin-bottom: rfs(40px);
+  }
 
   .highlight:hover & {
-    transform: translateY(-2%) scale(105%);
+    transform: translateY(-5px);
   }
 }
 
 .highlightLogos {
-  margin-top: 40px;
+  align-items: center;
+  display: flex;
+  gap: rfs(10px);
+  justify-content: flex-start;
+  margin-bottom: rfs(30px);
+
+  img,
+  svg {
+    flex-shrink: 0;
+    height: rfs(20px);
+    mix-blend-mode: multiply;
+  }
 }
 
 .highlightTitle {
@@ -42,42 +54,45 @@
   }
 }
 
-.highlightLogos {
-  align-items: center;
-  display: flex;
-  gap: rfs(10px);
-  justify-content: center;
-
-  @media screen and (min-width: 1000px) {
-    justify-content: flex-start;
-  }
-
-  img,
-  svg {
-    flex-shrink: 0;
-    height: rfs(20px);
-    mix-blend-mode: multiply;
-  }
-}
-
 .highlightBody {
   flex: 5;
+  margin-bottom: rfs(40px);
   position: relative;
+}
+
+.readMore {
+  text-transform: uppercase;
+  color: var(--light-body-color);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-block;
+  margin-top: 1em;
+
+  /* make all body linkable */
+  &::after {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    content: '';
+  }
 }
 
 .highlightNumbers {
   background-color: #fff;
   border-radius: 6px;
+  bottom: 0;
   box-shadow: var(--box-shadow);
   display: flex;
   gap: rfs(16px);
   justify-content: space-between;
-  margin-top: rfs(60px);
   padding: rfs(50px) rfs(34px);
+  pointer-events: none;
+  position: absolute;
+  transform: translateY(100%);
   width: 100%;
 
   @media (width > 900px) {
-    position: absolute;
+    grid-column: span 2;
   }
 }
 
@@ -107,6 +122,7 @@
 .grid {
   display: grid;
   gap: rfs(40px) rfs(30px);
+  margin-top: 160px;
 
   @media (width > 640px) {
     grid-template-columns: 1fr 1fr;
