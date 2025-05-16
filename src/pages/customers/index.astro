@@ -25,9 +25,13 @@ if (!page || posts.length === 0) {
   return notFoundResponse();
 }
 
-const highlightedProjectId = (page.highlight as { id: string }).id; // TODO: fix type
+const highlightedProjectId = page.highlight.id;
 const highlightedProject = posts.find((post) => post.id === highlightedProjectId);
-const projects = posts.filter((post) => post.name !== highlightedProjectId);
+const projects = posts.filter((post) => post.id !== highlightedProjectId);
+
+if (!highlightedProject) {
+  return notFoundResponse();
+}
 ---
 
 <Layout seo={page.seo}>
