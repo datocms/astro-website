@@ -33,8 +33,6 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
-
-const { numbers } = page;
 ---
 
 <Layout seo={page.seo}>
@@ -61,10 +59,11 @@ const { numbers } = page;
     </div>
   </Wrapper>
 
-  <StripWithContent>
+  <StripWithContent stripHeight="partial">
     <Fragment slot="title">In a glance...</Fragment>
+
     {
-      page.numbers.length && (
+      page.numbers.length > 0 && (
         <div class={s.numbers}>
           {page.numbers.map((item) => (
             <div class={s.numberBlock}>
