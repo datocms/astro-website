@@ -33,6 +33,8 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const { numbers } = page;
 ---
 
 <Layout seo={page.seo}>
@@ -61,7 +63,20 @@ if (!page) {
 
   <StripWithContent>
     <Fragment slot="title">In a glance...</Fragment>
-    <Wrapper class={s.glanceWrapper}>
+    {
+      page.numbers.length && (
+        <div class={s.numbers}>
+          {page.numbers.map((item) => (
+            <div class={s.numberBlock}>
+              <h3 class={s.numberTitle}>{item.number}</h3>
+              <p class={s.numberLabel}>{item.label}</p>
+            </div>
+          ))}
+        </div>
+      )
+    }
+
+    <div class={s.glanceWrapper}>
       <div class={s.challenge}>
         <h3>The challenge</h3>
         <Text {...ensureValidStructuredTextProps({ data: page.challenge })} />
@@ -76,49 +91,8 @@ if (!page) {
         <h3>The result</h3>
         <Text {...ensureValidStructuredTextProps({ data: page.result })} />
       </div>
-    </Wrapper>
-  </StripWithContent>
-
-  <Wrapper>
-    <div class={s.results}>
-      <div class={s.resultsImage}>
-        <ResponsiveImage data={page.mainResultsImage.responsiveImage} />
-      </div>
-      <div class={s.resultsBlocks}>
-        <div class={s.resultsTitle}>
-          <span class={s.resultsTitleHighlight}>{page.name}’s</span>
-          Biggest wins
-        </div>
-        <Bullets style="bad">
-          {
-            page.mainResults.map((res) => (
-              <li class={s.resultsItem}>
-                <Svg name="icons/regular/check" />
-
-                <h3>{res.title}</h3>
-                <Text {...ensureValidStructuredTextProps({ data: res.description })} />
-              </li>
-            ))
-          }
-        </Bullets>
-      </div>
     </div>
-  </Wrapper>
-
-  {
-    page.numbers.length > 0 && (
-      <StripWithContent>
-        <div class={s.numbers}>
-          {page.numbers.map((item) => (
-            <div class={s.numberBlock}>
-              <h3 class={s.numberTitle}>{item.number}</h3>
-              <p class={s.numberLabel}>{item.label}</p>
-            </div>
-          ))}
-        </div>
-      </StripWithContent>
-    )
-  }
+  </StripWithContent>
 
   <Wrapper>
     <div class={s.fullStory}>
