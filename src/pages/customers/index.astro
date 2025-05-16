@@ -14,6 +14,8 @@ import { Svg } from '~/components/Svg';
 import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { StripWithContent } from '~/components/StripWithContent';
+import { Card } from '~/components/Card';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 
 const { page, posts } = await executeQuery(Astro, query);
@@ -22,6 +24,10 @@ if (!page || posts.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const highlightedProjectId = (page.highlight as { id: string }).id; // TODO: fix type
+const highlightedProject = posts.find((post) => post.id === highlightedProjectId);
+const projects = posts.filter((post) => post.name !== highlightedProjectId);
 ---
 
 <Layout seo={page.seo}>
@@ -48,43 +54,62 @@ if (!page || posts.length === 0) {
     />
   </Space>
 
-  <div class={s.posts}>
-    {
-      posts.map((post, i) => (
-        <StripWithContent background={i % 2 === 0 ? 'normal' : 'alternative'}>
-          <Wrapper>
-            <a class={s.post} href={buildUrlForSuccessStory(post)}>
-              <div class={s.postVisual}>
-                <div class={s.postImage}>
-                  <ResponsiveImage data={post.coverImage.responsiveImage} />
-                </div>
-                <div class={s.postLogos}>
-                  <img src={post.logo.url} class={s.postLogo} />
-                  <span class={s.plus}>+</span>
-                  <Svg name="svg/logos/datocms" />
-                </div>
-              </div>
-              <div class={s.postBody}>
-                <div class={s.postTitle}>
-                  <Text {...ensureValidStructuredTextProps({ data: post.title })} />
-                </div>
-                {post.numbers.length > 0 && (
-                  <div class={s.postNumbers}>
-                    {post.numbers.map((item) => (
-                      <div class={s.numberBlock}>
-                        <h3 class={s.numberTitle}>{item.number}</h3>
-                        <p class={s.numberLabel}>{item.label}</p>
-                      </div>
-                    ))}
+  <StripWithContent>
+    <Wrapper>
+      <a class={s.highlight} href={buildUrlForSuccessStory(highlightedProject)}>
+        <div class={s.highlightVisual}>
+          <div class={s.highlightImage}>
+            <ResponsiveImage data={highlightedProject.coverImage.responsiveImage} />
+          </div>
+          <div class={s.highlightLogos}>
+            <img src={highlightedProject.logo.url} class={s.highlightLogo} />
+            <span class={s.plus}>+</span>
+            <Svg name="svg/logos/datocms" />
+          </div>
+        </div>
+        <div class={s.highlightBody}>
+          <div class={s.highlightTitle}>
+            <Text {...ensureValidStructuredTextProps({ data: highlightedProject.title })} />
+          </div>
+          {
+            highlightedProject.numbers.length > 0 && (
+              <div class={s.highlightNumbers}>
+                {highlightedProject.numbers.map((item) => (
+                  <div class={s.numberBlock}>
+                    <h3 class={s.numberTitle}>{item.number}</h3>
+                    <p class={s.numberLabel}>{item.label}</p>
                   </div>
-                )}
+                ))}
               </div>
-            </a>
-          </Wrapper>
-        </StripWithContent>
-      ))
-    }
-  </div>
+            )
+          }
+        </div>
+      </a>
+    </Wrapper>
+  </StripWithContent>
 
-  <DraftModeQueryListener query={query} />
+  <Space top={2}>
+    <Wrapper>
+      <div class={s.grid}>
+        {
+          projects.map((post, i) => (
+            <Card
+              title={structuredTextToPlainText(post.title) ?? post.name}
+              size="small"
+              lineClamp={3}
+              svgLogoUrl={post.logo.url}
+              href={buildUrlForSuccessStory(post)}
+            >
+              <Fragment slot="image">
+                <ResponsiveImage data={post.coverImage.responsiveImage} />
+              </Fragment>
+              {structuredTextToPlainText(post.subtitle)}
+            </Card>
+          ))
+        }
+      </div>
+    </Wrapper>
+  </Space>
 </Layout>
+
+<DraftModeQueryListener query={query} />

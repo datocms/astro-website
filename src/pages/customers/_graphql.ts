@@ -10,8 +10,15 @@ export const query = graphql(
         seo: _seoMetaTags {
           ...TagFragment
         }
+        highlight {
+          id
+          name
+          ...SuccessStoryUrlFragment
+        }
       }
       posts: allSuccessStories {
+        id
+        name
         accentColor {
           hex
         }
@@ -22,6 +29,9 @@ export const query = graphql(
           hex
         }
         title {
+          value
+        }
+        subtitle {
           value
         }
         coverImage {

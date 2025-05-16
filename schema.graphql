@@ -4225,6 +4225,40 @@ type ExpertiseAreaRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
+type FaqItemModelAnswerField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+"""Block of type Faq item (faq_item)"""
+type FaqItemRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  answer: FaqItemModelAnswerField!
+  createdAt: DateTime!
+  id: ItemId!
+  question: String!
+  updatedAt: DateTime!
+}
+
 type FaqModelAnswerField {
   blocks: [String!]!
   inlineBlocks: [String!]!
@@ -17650,6 +17684,17 @@ type Query {
     fallbackLocales: [SiteLocale!]
   ): RecipesPageRecord
 
+  """Returns the single instance record"""
+  researchProgramHome(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): ResearchProgramHomeRecord
+
   """Returns a specific record"""
   review(
     """The locale to use to fetch the field's content"""
@@ -18266,6 +18311,33 @@ interface RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   id: ItemId!
+}
+
+"""Record of type Research Program Home (research_program_home)"""
+type ResearchProgramHomeRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  faqs: [FaqItemRecord!]!
+  id: ItemId!
+  studies: [StudyRecord!]!
+  updatedAt: DateTime!
 }
 
 """Specifies how to filter by upload type"""
@@ -19395,6 +19467,42 @@ input StructuredTextFilter {
   exists: BooleanType
 }
 
+type StudyModelTextField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+"""Block of type Study (study)"""
+type StudyRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  id: ItemId!
+  link: String
+  linkLabel: String
+  text: StudyModelTextField!
+  title: String!
+  updatedAt: DateTime!
+}
+
 """Record of type 🌟 Success Stories Index (success_stories_index)"""
 type SuccessStoriesIndexRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -19416,6 +19524,7 @@ type SuccessStoriesIndexRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   createdAt: DateTime!
+  highlight: SuccessStoryRecord!
   id: ItemId!
   seo: SeoField
   updatedAt: DateTime!
@@ -19536,7 +19645,6 @@ input SuccessStoryModelFilter {
   useCase: LinkFilter
   name: StringFilter
   content: SuccessStoryModelContentFieldFilter
-  title: StructuredTextFilter
   challenge: StructuredTextFilter
   duotoneColor1: ColorFilter
   mainResultsImage: FileFilter
@@ -19545,6 +19653,7 @@ input SuccessStoryModelFilter {
   duotoneColor2: ColorFilter
   coverImage: FileFilter
   subtitle: StructuredTextFilter
+  title: StructuredTextFilter
   OR: [SuccessStoryModelFilter]
   AND: [SuccessStoryModelFilter]
 }
@@ -19667,7 +19776,7 @@ type SuccessStoryRecord implements RecordInterface {
   slug: String!
   subtitle: SuccessStoryModelSubtitleField
   tags: [SuccessStoryTagRecord!]!
-  title: SuccessStoryModelTitleField
+  title: SuccessStoryModelTitleField!
   updatedAt: DateTime!
   useCase: UseCasePageRecord
 }
