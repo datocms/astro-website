@@ -1,5 +1,5 @@
 {
-  $schema: 'https://unpkg.com/@datocms/cubo@0.2.2/schemas/cubo-config-schema.json',
+  $schema: 'https://unpkg.com/@datocms/cubo@0.2.7/schemas/cubo-config-schema.json',
   dockerImage: 'ghcr.io/datocms/astro-website',
   environments: {
     staging1: {
@@ -20,14 +20,13 @@
           type: 'web',
           healthCheckPathname: '/up',
           cmd: 'node ./dist/server/entry.mjs',
+          resourceRequirements: 'standard-1x',
           scale: {
             min: 1,
-            max: 4,
+            max: 2,
           },
-          cpu: 1,
-          ram: 1,
           loadBalancer: {
-            hostname: 'lb-website-eu1.staging-datocms.com',
+            hostname: 'lb-website.staging-datocms.com',
             annotations: {
               'alb.ingress.kubernetes.io/certificate-arn': 'arn:aws:acm:eu-west-1:734741016184:certificate/d691d518-f3fd-4feb-99fa-b51cb127b2fe',
             },
@@ -38,8 +37,7 @@
         'invalidate-data-sources': {
           schedule: '*/10 * * * *',
           cmd: 'npm run invalidate-data-sources',
-          cpu: 1,
-          ram: 1,
+          resourceRequirements: 'standard-1x',
         },
         // For production only
         // "datocms-site-search-reindex": {
@@ -68,14 +66,13 @@
           type: 'web',
           healthCheckPathname: '/up',
           cmd: 'node ./dist/server/entry.mjs',
+          resourceRequirements: 'standard-1x',
           scale: {
             min: 1,
-            max: 4,
+            max: 2,
           },
-          cpu: 1,
-          ram: 1,
           loadBalancer: {
-            hostname: 'lb-website-eu2.staging-datocms.com',
+            hostname: 'lb-website-2.staging-datocms.com',
             annotations: {
               'alb.ingress.kubernetes.io/certificate-arn': 'arn:aws:acm:eu-west-1:734741016184:certificate/d691d518-f3fd-4feb-99fa-b51cb127b2fe',
             },
@@ -86,8 +83,7 @@
         'invalidate-data-sources': {
           schedule: '*/10 * * * *',
           cmd: 'npm run invalidate-data-sources',
-          cpu: 1,
-          ram: 1,
+          resourceRequirements: 'standard-1x',
         },
         // For production only
         // "datocms-site-search-reindex": {
