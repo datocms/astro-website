@@ -17,8 +17,10 @@ import { Checks } from '~/components/Checks';
 import { InlineText } from '~/components/structuredText/InlineText';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { Text } from '~/components/structuredText/Text';
+import { StripWithContent } from '~/components/StripWithContent';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { SingleQuote } from '~/components/quote/SingleQuote';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -27,6 +29,9 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+// const [quote1 = null, quote2 = null, quote3 = null] = page.quotes;
+const { quotes = [] } = page;
 ---
 
 <Layout seo={page._seoMetaTags} noFinalCta>
@@ -66,16 +71,28 @@ if (!page) {
     ]}
   />
 
-  <div class={s.testimonials}>
-    <Space top={2} bottom={3}>
-      <InterstitialTitle style="three">
-        <InlineText {...ensureValidStructuredTextProps({ data: page.quotesHeader })} />
-      </InterstitialTitle>
-      <QuotesCarousel quotes={page.quotes} />
-    </Space>
-  </div>
+  <StripWithContent>
+    <div class={s.starter}>
+      {
+        page.starterImage?.responsiveImage && (
+          <div class={s.starterVisual}>
+            <ResponsiveImage data={page.starterImage.responsiveImage} />
+          </div>
+        )
+      }
+      <div class={s.starterBody}>
+        <h2><InlineText {...ensureValidStructuredTextProps({ data: page.starterTitle })} /></h2>
+        <Prose>
+          <Text {...ensureValidStructuredTextProps({ data: page.starterDescription })} />
+        </Prose>
+        <Space top={1}>
+          <Button as="a" p="small" href={page.starterLink}>Check it out</Button>
+        </Space>
+      </div>
+    </div>
+  </StripWithContent>
 
-  <div class={s.starterBoxWrapper}>
+  <!-- <div class={s.starterBoxWrapper}>
     <Wrapper>
       <div class={s.starterBox}>
         <div class={s.starterBoxText}>
@@ -107,7 +124,7 @@ if (!page) {
         }
       </div>
     </Wrapper>
-  </div>
+  </div> -->
 
   <div class={s.features}>
     <Wrapper>
@@ -149,36 +166,44 @@ if (!page) {
 
     {
       page.callout.map((callout, index) => (
-        <section class:list={[s.featuresGroup, index === 1 && s.alternative]}>
-          <div class={s.featuresIntro}>
-            <div class={s.visual}>
-              {callout.image?.responsiveImage && (
-                <ResponsiveImage data={callout.image.responsiveImage} />
-              )}
-            </div>
-            <article>
-              <h3>{callout.title}</h3>
-              <Text {...ensureValidStructuredTextProps({ data: callout.description })} />
-            </article>
-          </div>
-          <div class={s.featuresGrid}>
-            {callout.features.map((feature) => (
-              <div class={s.feature}>
-                <article class={s.featureContent}>
-                  {feature.icon?.url && (
-                    <div class={s.featureIcon}>
-                      <img src={feature.icon.url} loading="lazy" height={30} width={30} />
-                    </div>
-                  )}
-                  <div class={s.featureText}>
-                    <h4 class={s.featureTitle}>{feature.title}</h4>
-                    <Text {...ensureValidStructuredTextProps({ data: feature.description })} />
-                  </div>
-                </article>
+        <div>
+          <section class:list={[s.featuresGroup, index === 1 && s.alternative]}>
+            <div class={s.featuresIntro}>
+              <div class={s.visual}>
+                {callout.image?.responsiveImage && (
+                  <ResponsiveImage data={callout.image.responsiveImage} />
+                )}
               </div>
-            ))}
-          </div>
-        </section>
+              <article>
+                <h3>{callout.title}</h3>
+                <Text {...ensureValidStructuredTextProps({ data: callout.description })} />
+              </article>
+            </div>
+            <div class={s.featuresGrid}>
+              {callout.features.map((feature) => (
+                <div class={s.feature}>
+                  <article class={s.featureContent}>
+                    {feature.icon?.url && (
+                      <div class={s.featureIcon}>
+                        <img src={feature.icon.url} loading="lazy" height={30} width={30} />
+                      </div>
+                    )}
+                    <div class={s.featureText}>
+                      <h4 class={s.featureTitle}>{feature.title}</h4>
+                      <Text {...ensureValidStructuredTextProps({ data: feature.description })} />
+                    </div>
+                  </article>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {quotes[index] && (
+            <Space bottom={2}>
+              <SingleQuote quote={quotes[index]} />
+            </Space>
+          )}
+        </div>
       ))
     }
   </div>
