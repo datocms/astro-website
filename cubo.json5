@@ -2,6 +2,69 @@
   $schema: 'https://unpkg.com/@datocms/cubo@0.2.9/schemas/cubo-config-schema.json',
   dockerImage: 'ghcr.io/datocms/astro-website',
   environments: {
+    production: {
+      build: {
+        args: {
+          PUBLIC_HOSTNAME: 'www-newprod.datocms.com',
+          RECAPTCHA_KEY: '6Lda4UkgAAAAAE14pGAmMkbHKJCKOzmRoVc9_DE5',
+        },
+        envVarSecrets: ['DATOCMS_API_TOKEN'],
+      },
+      kubernetes: {
+        cluster: 'dato-production',
+        namespace: 'dato-production-website',
+        region: 'eu-west-1',
+      },
+      deployments: {
+        web: {
+          type: 'web',
+          healthCheckPathname: '/up',
+          cmd: 'node ./dist/server/entry.mjs',
+          resourceRequirements: 'standard-1x',
+          scale: {
+            min: 1,
+            max: 2,
+          },
+          loadBalancer: {
+            hostname: 'www-draft-newprod.staging-datocms.com',
+            annotations: {
+              'alb.ingress.kubernetes.io/certificate-arn': 'arn:aws:acm:eu-west-1:734741016184:certificate/d691d518-f3fd-4feb-99fa-b51cb127b2fe',
+            },
+          },
+        },
+      },
+      cronJobs: {
+        'invalidate-data-sources': {
+          schedule: '*/10 * * * *',
+          cmd: 'npm run invalidate-data-sources',
+          resourceRequirements: {
+            cpu: {
+              request: '50m',
+              limit: '100m',
+            },
+            ram: {
+              request: '10Mi',
+              limit: '50Mi',
+            },
+          },
+        },
+        // For production only
+        // "datocms-site-search-reindex": {
+        //   schedule: "0 0 * * *",
+        //   cmd: 'npm run reindex-site-search',
+        //   resourceRequirements: {
+        //     cpu: {
+        //       request: '50m',
+        //       limit: '100m',
+        //     },
+        //     ram: {
+        //       request: '10Mi',
+        //       limit: '50Mi',
+        //     },
+        //   },
+        // }
+      },
+    },
     staging1: {
       build: {
         args: {
@@ -48,13 +111,6 @@
             },
           },
         },
-        // For production only
-        // "datocms-site-search-reindex": {
-        //   schedule: "0 0 * * *",
-        //   cmd: 'curl -i -X PUT -H "Authorization: Bearer ${DATOCMS_API_TOKEN}" -H "Accept: application/json" -H "X-Api-Version: 3" https://site-api.datocms.com/build-triggers/34759/reindex',
-        //   cpu: 1,
-        //   ram: 1
-        // }
       },
     },
     staging2: {
@@ -103,13 +159,6 @@
             },
           },
         },
-        // For production only
-        // "datocms-site-search-reindex": {
-        //   schedule: "0 0 * * *",
-        //   cmd: 'curl -i -X PUT -H "Authorization: Bearer ${DATOCMS_API_TOKEN}" -H "Accept: application/json" -H "X-Api-Version: 3" https://site-api.datocms.com/build-triggers/34759/reindex',
-        //   cpu: 1,
-        //   ram: 1
-        // }
       },
     },
   },
