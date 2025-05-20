@@ -11,6 +11,10 @@ on:
       - staging1
       - staging2
 
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     name: Deploy on ${{ github.ref_name }}
