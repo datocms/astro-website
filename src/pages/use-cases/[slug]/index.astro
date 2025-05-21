@@ -29,7 +29,6 @@ if (!page) {
   return notFoundResponse();
 }
 
-// const [quote1 = null, quote2 = null, quote3 = null] = page.quotes;
 const { quotes = [] } = page;
 ---
 
@@ -70,117 +69,106 @@ const { quotes = [] } = page;
     ]}
   />
 
-  <StripWithContent>
-    <div class={s.starter}>
-      {
-        page.starterImage?.responsiveImage && (
-          <div class={s.starterVisual}>
-            <ResponsiveImage data={page.starterImage.responsiveImage} />
-          </div>
-        )
-      }
-      <div class={s.starterBody}>
-        <h2><InlineText {...ensureValidStructuredTextProps({ data: page.starterTitle })} /></h2>
-        <Prose>
-          <Text {...ensureValidStructuredTextProps({ data: page.starterDescription })} />
-        </Prose>
-        <Space top={1}>
-          <Button as="a" p="small" href={page.starterLink}>Check it out</Button>
-        </Space>
+  <Space top={1}>
+    <StripWithContent>
+      <div class={s.starter}>
+        <div class={s.starterVisual}>
+          <ResponsiveImage data={page.starterImage.responsiveImage} />
+        </div>
+        <div class={s.starterBody}>
+          <h2><InlineText {...ensureValidStructuredTextProps({ data: page.starterTitle })} /></h2>
+          <Prose>
+            <Text {...ensureValidStructuredTextProps({ data: page.starterDescription })} />
+          </Prose>
+          <Space top={1}>
+            <Button as="a" p="small" href={page.starterLink}>Check it out</Button>
+          </Space>
+        </div>
+      </div>
+    </StripWithContent>
+  </Space>
+
+  <Wrapper>
+    <div class={s.baloons}>
+      <div class={s.dev}>
+        <p>
+          <strong>
+            If you’re a <mark class="good">dev</mark>
+          </strong>{' '}
+          looking to hook up DatoCMS to your repos, head on over to{' '}
+          <a href="docs">our docs</a>
+        </p>
+      </div>
+
+      <div class={s.editor}>
+        <p>
+          <strong>
+            If you’re an{' '}
+            <mark class="good">editor, marketer, or content creator</mark>
+          </strong>{' '}
+          on the fence about whether or not DatoCMS is for you, you’re probably…
+        </p>
+        <Svg name="svg/illustrations/arrow" />
       </div>
     </div>
-  </StripWithContent>
+  </Wrapper>
 
-  <div class={s.features}>
-    <Wrapper>
-      <div class={s.baloons}>
-        <div class={s.dev}>
-          <p>
-            <strong>
-              If you’re a <mark class="good">dev</mark>
-            </strong>{' '}
-            looking to hook up DatoCMS to your repos, head on over to{' '}
-            <a href="docs">our docs</a>
-          </p>
-        </div>
-
-        <div class={s.editor}>
-          <p>
-            <strong>
-              If you’re an{' '}
-              <mark class="good">editor, marketer, or content creator</mark>
-            </strong>{' '}
-            on the fence about whether or not DatoCMS is for you, you’re probably…
-          </p>
-          <Svg name="svg/illustrations/arrow" />
-        </div>
+  <Wrapper>
+    <div class={s.niceBlock}>
+      <div class={s.blockIllustration}>
+        <Svg name="svg/illustrations/zen" />
       </div>
-    </Wrapper>
-
-    <Wrapper>
-      <div class={s.niceBlock}>
-        <div class={s.blockIllustration}>
-          <Svg name="svg/illustrations/zen" />
-        </div>
-        <div class={s.blockText}>
-          <h2>{page.featuresHeader}</h2>
-          <Text {...ensureValidStructuredTextProps({ data: page.featuresDescription })} />
-        </div>
+      <div class={s.blockText}>
+        <h2>{page.featuresHeader}</h2>
+        <Text {...ensureValidStructuredTextProps({ data: page.featuresDescription })} />
       </div>
-    </Wrapper>
+    </div>
+  </Wrapper>
 
-    {
-      page.callout.map((callout, index) => (
-        <div class={s.featuresGroupWrapper}>
-          <StripWithContent background="alternative" stripHeight="partial">
-            <section class={s.featuresGroup}>
-              <div class={s.featuresIntro}>
-                <article>
-                  <h3>{callout.title}</h3>
-                  <Text {...ensureValidStructuredTextProps({ data: callout.description })} />
-                </article>
+  {
+    page.callout.map((callout, index) => (
+      <div class={s.featureWrapper}>
+        <StripWithContent background="alternative" stripHeight="partial">
+          <section class={s.feature}>
+            <div class={s.featureIntro}>
+              <article>
+                <h3>{callout.title}</h3>
+                <Text {...ensureValidStructuredTextProps({ data: callout.description })} />
+              </article>
 
-                <div class={s.visual}>
-                  {callout.image?.responsiveImage && (
-                    <ResponsiveImage data={callout.image.responsiveImage} />
-                  )}
-                </div>
+              <div class={s.visual}>
+                {callout.image?.responsiveImage && (
+                  <ResponsiveImage data={callout.image.responsiveImage} />
+                )}
               </div>
-              <div class={s.featuresGrid}>
-                {callout.features.map((feature) => (
-                  <div class={s.feature}>
-                    <article class={s.featureContent}>
-                      {feature.icon?.url && (
-                        <div class={s.featureIcon}>
-                          <img src={feature.icon.url} loading="lazy" height={30} width={30} />
-                        </div>
-                      )}
-                      <div class={s.featureText}>
-                        <h4 class={s.featureTitle}>{feature.title}</h4>
-                        <Text {...ensureValidStructuredTextProps({ data: feature.description })} />
-                      </div>
-                    </article>
+            </div>
+            <div class={s.featureList}>
+              {callout.features.map((feature) => (
+                <article class={s.featureListItem}>
+                  <div class={s.featureListText}>
+                    <h4 class={s.featureTitle}>{feature.title}</h4>
+                    <Text {...ensureValidStructuredTextProps({ data: feature.description })} />
                   </div>
-                ))}
-              </div>
-            </section>
-          </StripWithContent>
+                </article>
+              ))}
+            </div>
+          </section>
+        </StripWithContent>
 
-          {quotes[index] && (
-            <Space top={1} bottom={1}>
-              <Wrapper>
-                <SingleQuote quote={quotes[index]} />
-              </Wrapper>
-            </Space>
-          )}
-        </div>
-      ))
-    }
-  </div>
+        {quotes[index] && (
+          <Space top={1} bottom={1}>
+            <Wrapper>
+              <SingleQuote quote={quotes[index]} />
+            </Wrapper>
+          </Space>
+        )}
+      </div>
+    ))
+  }
 
   <StripWithContent>
     <div class={s.successStory}>
-      <div class={s.successStoryText}>
+      <div class={s.successStoryBody}>
         <h2>
           <InlineText {...ensureValidStructuredTextProps({ data: page.successStoryHeader })} />
         </h2>
@@ -192,19 +180,15 @@ const { quotes = [] } = page;
         </Space>
       </div>
 
-      {
-        page.successStoryImage?.responsiveImage && (
-          <div class={s.imageWrapper}>
-            <ResponsiveImage
-              data={page.successStoryImage.responsiveImage}
-              pictureStyle={{
-                objectFit: 'contain',
-                objectPosition: 'left',
-              }}
-            />
-          </div>
-        )
-      }
+      <div class={s.successStoryImageWrapper}>
+        <ResponsiveImage
+          data={page.successStoryImage.responsiveImage}
+          pictureStyle={{
+            objectFit: 'contain',
+            objectPosition: 'left',
+          }}
+        />
+      </div>
     </div>
   </StripWithContent>
 
