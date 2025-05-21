@@ -5,6 +5,7 @@ import { VideoFragment } from '~/components/blocks/Video/graphql';
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
   buildUrlForSuccessStory,
@@ -13,6 +14,9 @@ import {
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
+import { UseCasePageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
+import { FeatureUrlFragment } from '~/lib/datocms/gqlUrlBuilder/feature';
+import { PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -30,11 +34,18 @@ export const query = graphql(
         duotoneColor2 {
           hex
         }
+        name
         title {
+          value
+        }
+        subtitle {
           value
         }
         coverImage {
           url
+          responsiveImage(imgixParams: { auto: format, ar: "3:2", w: 1200, fit: crop }) {
+            ...ResponsiveImageFragment
+          }
           focalPoint {
             x
             y
@@ -55,6 +66,9 @@ export const query = graphql(
         }
         mainResultsImage {
           url
+          responsiveImage(imgixParams: { auto: format, w: 1000, h: 660, fit: crop }) {
+            ...ResponsiveImageFragment
+          }
           focalPoint {
             x
             y
@@ -65,6 +79,25 @@ export const query = graphql(
           description {
             value
           }
+        }
+        projectUrl
+        useCase {
+          navigationBarTitle
+          link
+          ...UseCasePageUrlFragment
+        }
+        industry {
+          name
+        }
+        keyFeatures {
+          ... on FeatureRecord {
+            seoH1
+            ...FeatureUrlFragment
+          }
+        }
+        partner {
+          name
+          ...PartnerUrlFragment
         }
         content {
           value
@@ -133,10 +166,14 @@ export const query = graphql(
   `,
   [
     TagFragment,
+    ResponsiveImageFragment,
     VideoFragment,
     ImageFragment,
     InternalVideoFragment,
     InDepthCtaBlockFragment,
+    UseCasePageUrlFragment,
+    FeatureUrlFragment,
+    PartnerUrlFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
