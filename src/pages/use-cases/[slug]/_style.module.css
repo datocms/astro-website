@@ -259,8 +259,9 @@ a.authorRole:hover .name {
   align-items: center;
   display: flex;
   flex-direction: column;
-  margin: rfs(120px) 0 rfs(40px) 0;
+  margin: rfs(80px) 0;
   overflow-x: hidden;
+  width: 100%;
 
   .baloons {
     display: flex;
@@ -387,94 +388,70 @@ a.authorRole:hover .name {
   }
 }
 
-.featuresGroup {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  overflow-x: hidden;
-  padding: rfs(90px) 0;
+.featuresGroupWrapper {
   width: 100%;
+}
 
-  &.alternative {
-    background-color: color-mix(in srgb, var(--accent-color) 10%, transparent);
+.featuresGroup {
+  width: 100%;
+  display: grid;
+  gap: 60px;
+  align-items: flex-start;
+
+  @media screen and (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
 .featuresIntro {
-  align-items: center;
-  display: grid;
-  gap: 40px;
-  margin-bottom: rfs(60px);
-  max-width: var(--page-width-with-margin);
-  padding: 0 var(--page-margin);
+  article {
+    margin-bottom: 40px;
 
-  @media screen and (min-width: 640px) {
-    grid-template-columns: 1fr 1fr;
+    h3 {
+      font-size: rfs(40px);
+      font-weight: bold;
+      line-height: 1.1;
+      margin: 0 0 10px 0;
+      text-transform: uppercase;
+    }
   }
 
   .visual {
     aspect-ratio: 16/9;
     background-color: #fff;
+    border-radius: 6px;
     border: #ddd;
-    border-radius: 4px;
-    width: 100%;
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
     position: relative;
-    border: 1px solid #2f333f;
-
-    &:after {
-      background-color: #c0bac1;
-      border-radius: 4px;
-      content: '';
-      display: block;
-      filter: blur(1px);
-      height: 100%;
-      left: -6px;
-      mix-blend-mode: multiply;
-      position: absolute;
-      top: 6px;
-      width: 100%;
-      z-index: -1;
-    }
-
-    img {
-      border-radius: 3px;
-    }
-  }
-
-  article {
-    h3 {
-      font-size: rfs(28px);
-      margin: 0 0 10px 0;
-    }
+    width: 100%;
   }
 }
 
 .featuresGrid {
-  display: grid;
-  gap: 40px;
-  grid-auto-flow: row dense;
-  grid-template-columns: repeat(1, 1fr);
-  max-width: var(--page-width-with-margin);
-  padding: 0 var(--page-margin);
-
-  @media screen and (min-width: 660px) {
-    grid-template-columns: repeat(2, 1fr);
-    text-align: left;
-  }
-
-  @media screen and (min-width: 860px) {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: var(--box-shadow);
+  display: flex;
+  flex-direction: column;
 }
 
 .feature {
-  border-radius: 12px;
   color: inherit;
   display: grid;
   font-size: rfs(16px);
   grid-template-columns: 1fr;
   line-height: 1.3;
+  padding: 30px;
   text-decoration: none;
+
+  @media (width > 900px) {
+    padding: 40px;
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--border-color);
+  }
 }
 
 .featureIcon {
