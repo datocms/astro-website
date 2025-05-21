@@ -1,6 +1,5 @@
 ---
 import { Layout } from '~/layouts/Layout';
-import s from './_style.module.css';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
@@ -10,7 +9,6 @@ import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { LogosBar } from '~/components/LogosBar';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Space } from '~/components/Space';
-import { QuotesCarousel } from '~/components/quote/QuotesCarousel';
 import { Svg } from '~/components/Svg';
 import { Prose } from '~/components/Prose';
 import { Checks } from '~/components/Checks';
@@ -21,6 +19,7 @@ import { StripWithContent } from '~/components/StripWithContent';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { SingleQuote } from '~/components/quote/SingleQuote';
+import s from './_style.module.css';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -91,40 +90,6 @@ const { quotes = [] } = page;
       </div>
     </div>
   </StripWithContent>
-
-  <!-- <div class={s.starterBoxWrapper}>
-    <Wrapper>
-      <div class={s.starterBox}>
-        <div class={s.starterBoxText}>
-          <h2><InlineText {...ensureValidStructuredTextProps({ data: page.starterTitle })} /></h2>
-          <Prose>
-            <Text {...ensureValidStructuredTextProps({ data: page.starterDescription })} />
-          </Prose>
-          <Space top={1}>
-            <Button as="a" p="small" s="purple" href={page.starterLink}>Check it out</Button>
-          </Space>
-        </div>
-
-        {
-          page.starterImage?.responsiveImage && (
-            <div class={s.starterBoxImage}>
-              <div class={s.imageWrapper}>
-                <div class={s.image}>
-                  <ResponsiveImage
-                    data={page.starterImage.responsiveImage}
-                    pictureStyle={{
-                      objectFit: 'contain',
-                      objectPosition: 'left',
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          )
-        }
-      </div>
-    </Wrapper>
-  </div> -->
 
   <div class={s.features}>
     <Wrapper>
