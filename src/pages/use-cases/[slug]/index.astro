@@ -131,41 +131,46 @@ const { quotes = [] } = page;
 
     {
       page.callout.map((callout, index) => (
-        <div>
-          <section class:list={[s.featuresGroup, index === 1 && s.alternative]}>
-            <div class={s.featuresIntro}>
-              <div class={s.visual}>
-                {callout.image?.responsiveImage && (
-                  <ResponsiveImage data={callout.image.responsiveImage} />
-                )}
-              </div>
-              <article>
-                <h3>{callout.title}</h3>
-                <Text {...ensureValidStructuredTextProps({ data: callout.description })} />
-              </article>
-            </div>
-            <div class={s.featuresGrid}>
-              {callout.features.map((feature) => (
-                <div class={s.feature}>
-                  <article class={s.featureContent}>
-                    {feature.icon?.url && (
-                      <div class={s.featureIcon}>
-                        <img src={feature.icon.url} loading="lazy" height={30} width={30} />
-                      </div>
-                    )}
-                    <div class={s.featureText}>
-                      <h4 class={s.featureTitle}>{feature.title}</h4>
-                      <Text {...ensureValidStructuredTextProps({ data: feature.description })} />
-                    </div>
-                  </article>
+        <div class={s.featuresGroupWrapper}>
+          <StripWithContent background="alternative" stripHeight="partial">
+            <section class={s.featuresGroup}>
+              <div class={s.featuresIntro}>
+                <article>
+                  <h3>{callout.title}</h3>
+                  <Text {...ensureValidStructuredTextProps({ data: callout.description })} />
+                </article>
+
+                <div class={s.visual}>
+                  {callout.image?.responsiveImage && (
+                    <ResponsiveImage data={callout.image.responsiveImage} />
+                  )}
                 </div>
-              ))}
-            </div>
-          </section>
+              </div>
+              <div class={s.featuresGrid}>
+                {callout.features.map((feature) => (
+                  <div class={s.feature}>
+                    <article class={s.featureContent}>
+                      {feature.icon?.url && (
+                        <div class={s.featureIcon}>
+                          <img src={feature.icon.url} loading="lazy" height={30} width={30} />
+                        </div>
+                      )}
+                      <div class={s.featureText}>
+                        <h4 class={s.featureTitle}>{feature.title}</h4>
+                        <Text {...ensureValidStructuredTextProps({ data: feature.description })} />
+                      </div>
+                    </article>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </StripWithContent>
 
           {quotes[index] && (
-            <Space bottom={2}>
-              <SingleQuote quote={quotes[index]} />
+            <Space top={1} bottom={1}>
+              <Wrapper>
+                <SingleQuote quote={quotes[index]} />
+              </Wrapper>
             </Space>
           )}
         </div>
