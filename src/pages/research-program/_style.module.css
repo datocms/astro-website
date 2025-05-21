@@ -1,0 +1,175 @@
+@keyframes MOVE-BG {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 100px 0;
+  }
+}
+
+.steps {
+  align-items: center;
+  counter-reset: steps-counter;
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  padding: 0;
+
+  @media (width > 900px) {
+    flex-direction: row;
+    grid-gap: rfs(80px);
+    justify-content: space-between;
+    margin-top: 50px;
+    position: relative;
+
+    &:before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 10px;
+      right: 10px;
+      height: 15px;
+      margin-top: -7px;
+      background-image: linear-gradient(to right, #f4cf58 50%, transparent 50%);
+      background-position: 0 0;
+      background-repeat: repeat-x;
+      background-size: 25px 15px;
+      animation-name: MOVE-BG;
+      animation-duration: 5s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+  }
+}
+
+.step {
+  aspect-ratio: 1/1;
+  background: white;
+  border-radius: 500px;
+  box-shadow: var(--box-shadow);
+  counter-increment: steps-counter;
+  margin-bottom: 10px;
+  max-width: 300px;
+  position: relative;
+  text-align: center;
+  width: 100%;
+
+  @media (width <= 900px) {
+    margin-top: 60px;
+  }
+
+  &:after {
+    color: var(--azure-color);
+    content: counter(steps-counter);
+    font-size: 80px;
+    font-style: italic;
+    font-weight: 900;
+    left: 50%;
+    position: absolute;
+    top: 0;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.stepMain {
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+}
+
+.stepTitle {
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+
+.stepContent {
+  color: var(--light-body-color);
+  font-size: 15px;
+  line-height: 1.1;
+}
+
+.studies {
+  display: flex;
+  flex-direction: column;
+  grid-gap: rfs(40px);
+  justify-content: center;
+
+  @media (width > 900px) {
+    flex-direction: row;
+  }
+}
+
+.study {
+  background: white;
+  border-radius: 10px;
+  box-shadow: var(--box-shadow);
+  margin-bottom: 10px;
+  margin-bottom: 30px;
+  max-width: 640px;
+  padding: 30px;
+
+  @media (width > 900px) {
+    padding: 50px;
+  }
+}
+
+.studyTitle {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.studyContent {
+  font-size: 17px;
+  line-height: 1.4;
+
+  & > div a {
+    width: 100%;
+    text-align: center;
+    color: var(--darker-accent-color);
+  }
+}
+
+.faqs {
+  max-width: 1000px;
+  margin: 0 auto;
+
+  @media (width > 600px) {
+    column-count: 2;
+    column-gap: 60px;
+  }
+}
+
+.faq {
+  display: inline-block;
+  margin-bottom: rfs(40px);
+  text-align: center;
+  width: 100%;
+
+  @media (width > 600px) {
+    text-align: left;
+  }
+}
+
+.faqQ {
+  color: var(--light-body-color);
+  font-size: rfs(20px);
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.faqA {
+  font-size: 0.9em;
+
+  a {
+    color: inherit;
+
+    &:hover {
+      color: var(--accent-color);
+    }
+  }
+}
