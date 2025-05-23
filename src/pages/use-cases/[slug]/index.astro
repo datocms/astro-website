@@ -32,7 +32,7 @@ if (!page) {
 const { quotes = [] } = page;
 ---
 
-<Layout seo={page._seoMetaTags} noFinalCta>
+<Layout seo={page._seoMetaTags}>
   <Wrapper>
     <div class={s.hero}>
       <div class={s.heroBody}>
@@ -136,11 +136,11 @@ const { quotes = [] } = page;
                 <Text {...ensureValidStructuredTextProps({ data: callout.description })} />
               </article>
 
-              <div class={s.visual}>
+              {/* <div class={s.visual}>
                 {callout.image?.responsiveImage && (
                   <ResponsiveImage data={callout.image.responsiveImage} />
                 )}
-              </div>
+              </div> */}
             </div>
             <div class={s.featureList}>
               {callout.features.map((feature) => (
@@ -156,61 +156,40 @@ const { quotes = [] } = page;
         </StripWithContent>
 
         {quotes[index] && (
-          <Space top={1} bottom={1}>
-            <Wrapper>
-              <SingleQuote quote={quotes[index]} fontSize="small" />
-            </Wrapper>
-          </Space>
+          <Wrapper>
+            <SingleQuote quote={quotes[index]} fontSize="small" />
+          </Wrapper>
         )}
       </div>
     ))
   }
 
-  <StripWithContent>
-    <div class={s.successStory}>
-      <div class={s.successStoryBody}>
-        <h2>
-          <InlineText {...ensureValidStructuredTextProps({ data: page.successStoryHeader })} />
-        </h2>
-        <Prose>
-          <Text {...ensureValidStructuredTextProps({ data: page.successStorySummary })} />
-        </Prose>
-        <Space top={1}>
-          <Button as="a" p="small" href={buildUrlFromGql(page.caseStudy)}> Check it out </Button>
-        </Space>
-      </div>
-
-      <div class={s.successStoryImageWrapper}>
-        <ResponsiveImage
-          data={page.successStoryImage.responsiveImage}
-          pictureStyle={{
-            objectFit: 'contain',
-            objectPosition: 'left',
-          }}
-        />
-      </div>
-    </div>
-  </StripWithContent>
-
   <Space top={1}>
-    <div class={s.outro}>
-      <InterstitialTitle style="one" kicker="Seen enough?">
-        Get started with DatoCMS
-      </InterstitialTitle>
-      <Checks>
-        <div class={s.buttonGroup}>
-          <Button as="a" href="https://dashboard.datocms.com/signup"> Sign up for free </Button>
-          <Button as="a" s="invert" href="https://try.datocms.com" target="_blank">
-            Try our interactive demo ⤑
-          </Button>
+    <StripWithContent>
+      <div class={s.successStory}>
+        <div class={s.successStoryImageWrapper}>
+          <ResponsiveImage
+            data={page.successStoryImage.responsiveImage}
+            pictureStyle={{
+              objectFit: 'contain',
+              objectPosition: 'left',
+            }}
+          />
         </div>
 
-        <Fragment slot="checks">
-          <li>No credit card</li>
-          <li>Easy setup</li>
-        </Fragment>
-      </Checks>
-    </div>
+        <div class={s.successStoryBody}>
+          <h2>
+            <InlineText {...ensureValidStructuredTextProps({ data: page.successStoryHeader })} />
+          </h2>
+          <Prose>
+            <Text {...ensureValidStructuredTextProps({ data: page.successStorySummary })} />
+          </Prose>
+          <Space top={1}>
+            <Button as="a" p="small" href={buildUrlFromGql(page.caseStudy)}> Check it out </Button>
+          </Space>
+        </div>
+      </div>
+    </StripWithContent>
   </Space>
 
   <DraftModeQueryListener query={query} variables={variables} />
