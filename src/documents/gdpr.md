@@ -1,11 +1,8 @@
 DatoCMS takes great care when handling users' personally identifiable data.
 
-Details of this are given in this document,
-in our [Terms of Service][datocms-terms-of-service]
-and our [Privacy Policy][datocms-privacy-policy].
-
-[datocms-terms-of-service]: https://www.datocms.com/legal/terms/
-[datocms-privacy-policy]: https://www.datocms.com/legal/privacy-policy
+Details of this are given in this document for GDPR-specific documentation, then
+in our [Terms of Service](/legal/terms)
+and our [Privacy Policy](/legal/privacy-policy).
 
 ## Personal data we collect
 
@@ -20,17 +17,23 @@ For paying customers we collect also the company billing information.
 
 We collect also IP addresses of end users visiting the projects created with DatoCMS.
 
+We collect all the data that users input during the usage of the software, such as text and images loaded during CMS usage.
+
 ## Data storage
 
-Personal data is stored in the DatoCMS database.
+### AWS
 
-DatoCMS runs on Heroku, in its "Europe" region.
+DatoCMS runs on AWS, in its "eu-west-1" region, located in Ireland.
 
-Heroku's GDPR compliance is described [here][heroku-gdpr-compliance].  
-Heroku's DPA (Data Processing Addendum) is [here][heroku-dpa].
+Personal data is stored in the DatoCMS databases managed by AWS.
 
-[heroku-gdpr-compliance]: https://devcenter.heroku.com/articles/gdpr
-[heroku-dpa]: https://www.salesforce.com/content/dam/web/en_us/www/documents/legal/Agreements/data-processing-addendum.pdf
+[AWS GDPR compliance](https://aws.amazon.com/compliance/gdpr-center/)
+
+### Cloudflare
+
+Any assets uploaded while using the service are stored in Cloudflare R2, in its European Union jurisdiction.
+
+[Cloudflare GDPR compliance](https://www.cloudflare.com/trust-hub/gdpr/)
 
 ## Data shared with third parties
 
@@ -80,21 +83,21 @@ The information is:
 
 [Pipedrive GDPR Compliance](https://www.pipedrive.com/en/privacy)
 
-### Fatture in Cloud
+### QuickBooks and FCC
 
-Our company needs to send certified digital invoices to our Italian customers and to
-the government. To do that we use _Fatture in Cloud_.
+Our company needs to send certified digital invoices to our Italian customers and to the government. To do that we use QuickBooks.
 
-The information passed on to _Fatture in Cloud_ are:
+FCC is a QuickBooks partner company that deals with data sync from Chargebee and generates some Italian specific accounting documents.
 
-- email,
+The information passed on to QuickBooks and FCC are:
+
 - first name,
 - last name,
 - company,
 - VAT number,
 - billing address.
 
-[Fatture in Cloud GDPR Compliance](https://www.fattureincloud.it/gdpr/)
+[QuickBooks GDPR Compliance](https://quickbooks.intuit.com/eu/gdpr/)
 
 ### Front
 
@@ -123,7 +126,7 @@ account, supplying them with:
 - first name,
 - last name.
 
-[MailerLite GDPR Compliance announcement](https://www.mailerlite.com/gdpr-compliance)
+[MailerLite GDPR Compliance](https://www.mailerlite.com/gdpr-compliance)
 
 ### Rollbar
 
@@ -171,10 +174,10 @@ We use your data to do the following:
 
 - to allow you to log in to the site. In this case your data stays in our main servers only.
 - to send you an invoice, we never save your invoicing data, we delegate Stripe and Chargebee the storage and management of your data.
-- as an Italian company we need to send electronic copy of all our invoices to the state. To do that we have an automated service that pulls the data from Chargebee and generates the invoices also on Fatture in Cloud. So your invoicing data will be both on Chargebee and Fatture in Cloud.
-- to send you transactional emails about the service, promotional and marketing emails we use Mailchimp and Hubspot.
+- as an Italian company we need to send electronic copy of all our invoices to the state. To do that we use FCC accounting system to pull the data from Chargebee and generate the invoices also on Quickbooks. So your invoicing data will be stored both on Chargebee and Quickbooks, while passing via FCC accounting system.
+- to send you transactional emails about the service, promotional and marketing emails we use MailerLite.
 - on support request we ask your email address to contact you back and we share that information with Front, the service we use for customer care.
-- when you fill the online forms and when you sign up we send the provided data to Pipedrive and Hubspot to improve the sale process.
+- when you fill the online forms and when you sign up we send the provided data to Pipedrive to improve the sale process.
 - when an error occurs on the platform we automatically send some telemetry data to Rollbar to be notified about the errors and help us to resolve them. If the error happens on the CMS interface we also send the email address of the user to be able to easily get in touch to gain additional information.
 
 ## Duration of data retention
@@ -182,6 +185,8 @@ We use your data to do the following:
 We store your data for the duration of your use of the system.
 
 As soon as you cancel your account, your personal information is erased.
+
+Accounting data is held for 10 years for legal compliance.
 
 ## Your rights over your personal data
 
@@ -198,4 +203,4 @@ Please contact us (at the address below) if you want to do any of the above.
 If you have any doubts, or wish to exercise your rights (as listed above),
 please send us an email here: [support@datocms.com](mailto:support@datocms.com)
 
-Latest update: February 1, 2024
+Latest update: May 30, 2025
