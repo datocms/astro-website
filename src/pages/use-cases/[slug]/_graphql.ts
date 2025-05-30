@@ -105,6 +105,21 @@ export const query = graphql(
           }
         }
       }
+      siblings: allUseCasePages(first: 3, filter: { slug: { neq: $slug } }) {
+        __typename
+        ...UseCasePageUrlFragment
+        title {
+          value
+        }
+        subtitle {
+          value
+        }
+        heroCustomer {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
     }
   `,
   [
@@ -114,6 +129,7 @@ export const query = graphql(
     SuccessStoryUrlFragment,
     ShowcaseProjectUrlFragment,
     CustomerStoryUrlFragment,
+    UseCasePageUrlFragment,
   ],
 );
 
