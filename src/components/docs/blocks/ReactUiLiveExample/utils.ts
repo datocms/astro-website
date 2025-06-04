@@ -62,7 +62,7 @@ async function buildReactUiExamples(): Promise<ReactUiLiveExample[]> {
             title: example.name,
             description,
             serializedMdxExample: await serialize(codeWithoutMarkdown, {
-              mdxOptions: { development: import.meta?.env?.DEV ?? false },
+              mdxOptions: { development: import.meta.env.DEV ?? false },
             }),
           },
         ];
