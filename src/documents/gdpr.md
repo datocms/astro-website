@@ -107,7 +107,7 @@ When you open a support ticket, via email or support form, we supply them the em
 
 ### Calendly
 
-To book meetings or support sessions we ask our users use Calendly. By using Calendly they need to provide their name, email address and optional additional inforamtion. Optionally the user can provide access to their Google Calendar.
+To book meetings or support sessions we ask our users use Calendly. By using Calendly they need to provide their name, email address and optional additional information. Optionally the user can provide access to their Google Calendar.
 
 [Calendly GDPR Compliance](https://help.calendly.com/hc/en-us/articles/360007032633-GDPR-FAQs)
 
