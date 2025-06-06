@@ -1,7 +1,6 @@
 ---
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import findIndex from 'lodash-es/findIndex';
-import s from './_style.module.css';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
@@ -24,6 +23,9 @@ import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyCh
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { ScrollspyNav } from '~/components/ScrollspyNav';
+import { Svg } from '~/components/Svg';
+import s from './_style.module.css';
 
 const variables = { courseSlug: Astro.params.courseSlug!, chapterSlug: Astro.params.chapterSlug! };
 
@@ -66,98 +68,133 @@ const sections = filterNodes(
       ><Text {...ensureValidStructuredTextProps({ data: course.introduction })} /></Fragment
     >
   </InterstitialTitle>
+
   <Space top={1}>
-    <div class={s.contentWrapper}>
-      <div class={s.tocWrapper}>
-        <div class={s.toc}>
-          <div class={s.tocTitle}>Course chapters</div>
-          <ul class={s.tocChapters}>
-            {
-              allChapters.map((nthChapter) => (
-                <li class={s.tocChapter}>
-                  <ActiveLink
-                    href={buildUrlForAcademyChapter(nthChapter)}
-                    class={s.tocChapterLink}
-                    activeClass={s.activeTocChapter}
-                  >
-                    {nthChapter.title}
-                  </ActiveLink>
+    <Wrapper>
+      <div class={s.contentWrapper}>
+        <div id="main-content" class={s.mainContent}>
+          <Prose class={s.body}>
+            <Text
+              {...ensureValidStructuredTextProps({
+                data: chapter.content,
+                blockComponents: {
+                  ImageRecord: Image,
+                  TableRecord: Table,
+                  InternalVideoRecord: InternalVideo,
+                },
+                linkToRecordComponents: defaultLinkToRecordComponents,
+                inlineRecordComponents: defaultInlineRecordComponents,
+              })}
+              nodeOverrides={{
+                // TODO
+              }}
+            />
+          </Prose>
 
-                  {nthChapter.id === chapter.id && sections.length > 0 && (
-                    <ul class={s.tocChapterSections}>
-                      {sections.map((section) => (
-                        <li class={s.tocChapterSection}>
-                          <a title={toPlainText(section.node)} href={section.url}>
-                            {toPlainText(section.node)}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))
-            }
-          </ul>
-          <div class={s.tocFooter}>
-            <p>
-              This <strong>{course.name}</strong> course is part of{' '}
-              <a href="/academy">DatoCMS Academy</a>, a deep dive into the concepts around headless.
-            </p>
-          </div>
+          <Wrapper>
+            <div class={s.prevNext}>
+              <div class={s.prev}>
+                {
+                  prevChapter && (
+                    <>
+                      <div class={s.prevNextTitle}>Previous chapter</div>
+                      <div class={s.prevNextLink}>
+                        <a href={buildUrlForAcademyChapter(prevChapter)}>
+                          &larr; {prevChapter.title}
+                        </a>
+                      </div>
+                    </>
+                  )
+                }
+              </div>
+
+              <div class={s.next}>
+                {
+                  nextChapter && (
+                    <>
+                      <div class={s.prevNextTitle}>Next chapter</div>
+                      <div class={s.prevNextLink}>
+                        <a href={buildUrlForAcademyChapter(nextChapter)}>
+                          {nextChapter.title} &rarr;
+                        </a>
+                      </div>
+                    </>
+                  )
+                }
+              </div>
+            </div>
+          </Wrapper>
         </div>
-      </div>
-      <div id="main-content">
-        <Prose class={s.body}>
-          <Text
-            {...ensureValidStructuredTextProps({
-              data: chapter.content,
-              blockComponents: {
-                ImageRecord: Image,
-                TableRecord: Table,
-                InternalVideoRecord: InternalVideo,
-              },
-              linkToRecordComponents: defaultLinkToRecordComponents,
-              inlineRecordComponents: defaultInlineRecordComponents,
-            })}
-          />
-        </Prose>
 
-        <Wrapper>
-          <div class={s.prevNext}>
-            <div class={s.prev}>
-              {
-                prevChapter && (
-                  <>
-                    <div class={s.prevNextTitle}>Previous chapter</div>
-                    <div class={s.prevNextLink}>
-                      <a href={buildUrlForAcademyChapter(prevChapter)}>
-                        &larr; {prevChapter.title}
-                      </a>
-                    </div>
-                  </>
-                )
-              }
-            </div>
+        <aside class={s.aside}>
+          <div
+            data-mobile-anchors
+            class={s.asideAnchorsWrapper}
+            role="button"
+            aria-expanded="false"
+          >
+            <ScrollspyNav>
+              <div class={s.currentAnchor}>
+                <span data-current-anchor>Scroll to</span>
+                <div class={s.currentAnchorArrow}>
+                  <Svg name="icons/regular/chevron-down" />
+                </div>
+              </div>
 
-            <div class={s.next}>
-              {
-                nextChapter && (
-                  <>
-                    <div class={s.prevNextTitle}>Next chapter</div>
-                    <div class={s.prevNextLink}>
-                      <a href={buildUrlForAcademyChapter(nextChapter)}>
-                        {nextChapter.title} &rarr;
-                      </a>
-                    </div>
-                  </>
-                )
-              }
-            </div>
+              <div class={s.asideAnchors}>
+                <h3>Course chapters</h3>
+                <ul>
+                  {
+                    allChapters.map((nthChapter) => (
+                      <li class={s.tocChapter}>
+                        <ActiveLink
+                          href={buildUrlForAcademyChapter(nthChapter)}
+                          class={s.tocChapterLink}
+                          activeClass={s.activeTocChapter}
+                        >
+                          {nthChapter.title}
+                        </ActiveLink>
+
+                        {nthChapter.id === chapter.id && sections.length > 0 && (
+                          <ul class={s.tocChapterSections}>
+                            {sections.map((section) => (
+                              <li class={s.tocChapterSection}>
+                                <a title={toPlainText(section.node)} href={section.url}>
+                                  {toPlainText(section.node)}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))
+                  }
+                </ul>
+                <div class={s.tocFooter}>
+                  <p>
+                    This <strong>{course.name}</strong> course is part of{' '}
+                    <a href="/academy">DatoCMS Academy</a>, a deep dive into the concepts around
+                    headless.
+                  </p>
+                </div>
+              </div>
+            </ScrollspyNav>
           </div>
-        </Wrapper>
+        </aside>
       </div>
-    </div>
+    </Wrapper>
   </Space>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>
+
+<script>
+  const mobileAnchors = document.querySelector('[data-mobile-anchors]');
+
+  mobileAnchors?.addEventListener('click', () => {
+    mobileAnchors.setAttribute(
+      'aria-expanded',
+      mobileAnchors.getAttribute('aria-expanded') === 'true' ? 'false' : 'true',
+    );
+  });
+</script>
