@@ -31,10 +31,6 @@ if (!page) {
   return notFoundResponse();
 }
 
-const showRelatedItems = page.relatedItems?.showRelatedContent
-  ? page.relatedItems.showRelatedContent
-  : false;
-
 let relatedItems = [];
 
 const allSiblings = siblingSlugs.map((item) => item.slug);
@@ -46,9 +42,9 @@ const prevSlug =
 const nextSlug =
   currentIndex < allSiblings.length - 1 ? allSiblings[currentIndex + 1] : allSiblings[0];
 
-if (showRelatedItems && page.relatedItems?.siblings?.length) {
+if (page.relatedItems?.siblings?.length) {
   relatedItems = [...page.relatedItems.siblings];
-} else if (showRelatedItems && prevSlug && nextSlug) {
+} else if (prevSlug && nextSlug) {
   const { prev, next } = await executeQuery(Astro, siblingsQuery, {
     variables: { prevSlug, nextSlug },
   });
@@ -139,7 +135,7 @@ const duotone = `duotone=${colors}`;
     {
       relatedItems && (
         <SameLevelNavigation
-          title={page.relatedItems?.title ?? undefined}
+          title={page.relatedItems?.title ?? 'Every Story is different...'}
           subtitle={page.relatedItems?.subtitle ?? undefined}
         >
           {relatedItems
