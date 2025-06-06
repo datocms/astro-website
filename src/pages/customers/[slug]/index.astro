@@ -12,18 +12,48 @@ import { Video } from '~/components/blocks/Video';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { query } from './_graphql';
-import s from './_style.module.css';
+import { query, siblingsQuery } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { SameLevelNavigation } from '~/components/SameLevelNavigation';
+import { Card } from '~/components/Card';
+import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import s from './_style.module.css';
 
 const variables = { slug: Astro.params.slug! };
-const { page } = await executeQuery(Astro, query, { variables });
+const { page, siblingSlugs } = await executeQuery(Astro, query, { variables });
 
 if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
+}
+
+const showRelatedItems = page.relatedItems?.showRelatedContent
+  ? page.relatedItems.showRelatedContent
+  : false;
+
+let relatedItems = [];
+
+const allSiblings = siblingSlugs.map((item) => item.slug);
+const currentIndex = allSiblings.indexOf(Astro.params.slug!);
+
+const prevSlug =
+  currentIndex > 0 ? allSiblings[currentIndex - 1] : allSiblings[allSiblings.length - 1];
+
+const nextSlug =
+  currentIndex < allSiblings.length - 1 ? allSiblings[currentIndex + 1] : allSiblings[0];
+
+if (showRelatedItems && page.relatedItems?.siblings?.length) {
+  relatedItems = [...page.relatedItems.siblings];
+} else if (showRelatedItems && prevSlug && nextSlug) {
+  const { prev, next } = await executeQuery(Astro, siblingsQuery, {
+    variables: { prevSlug, nextSlug },
+  });
+  relatedItems.push(prev);
+  relatedItems.push(next);
 }
 
 const colors =
@@ -105,7 +135,31 @@ const duotone = `duotone=${colors}`;
         </Prose>
       </div>
     </Wrapper>
-  </div>
 
-  <DraftModeQueryListener query={query} variables={variables} />
+    {
+      relatedItems && (
+        <SameLevelNavigation
+          title={page.relatedItems?.title ?? undefined}
+          subtitle={page.relatedItems?.subtitle ?? undefined}
+        >
+          {relatedItems
+            .filter((item) => item != null)
+            .map((item) => (
+              <Card
+                title={toPlainText(item.title) ?? ''}
+                href={buildUrlForSuccessStory(item)}
+                size="small"
+                orientation={relatedItems.length > 2 ? 'vertical' : 'horizontal'}
+              >
+                <Fragment slot="image">
+                  <ResponsiveImage data={item.coverImage.responsiveImage} />
+                </Fragment>
+              </Card>
+            ))}
+        </SameLevelNavigation>
+      )
+    }
+
+    <DraftModeQueryListener query={query} variables={variables} />
+  </div>
 </Layout>
