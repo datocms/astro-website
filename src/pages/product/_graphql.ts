@@ -63,7 +63,7 @@ export const query = graphql(
         }
       }
       customerStories: allCustomerStories(
-        first: 5
+        first: 12
         orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
       ) {
         ...CustomerStoryUrlFragment
@@ -72,7 +72,7 @@ export const query = graphql(
           value
         }
         coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 800, h: 450, fill: blur }) {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fill: blur, fit: crop }) {
             ...ResponsiveImageFragment
           }
         }
