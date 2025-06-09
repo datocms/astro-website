@@ -20,6 +20,7 @@ import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerSt
 import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import { Carousel } from '~/components/Carousel';
 import { Card } from '~/components/Card';
+import { StripWithContent } from '~/components/StripWithContent';
 import s from './_style.module.css';
 
 const { integrations, page, customerStories, useCases } = await executeQuery(Astro, query);
@@ -44,46 +45,67 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
     </div>
   </Hero>
 
-  {
-    page.pillars.map((pillar, index) => {
-      return (
-        <div class={s.flagContainer}>
-          <Flag flip={index % 2 === 0}>
-            <Fragment slot="kicker">{pillar.theme}</Fragment>
-            <div slot="visual">
-              <ResponsiveImage data={pillar.image.responsiveImage} />
-            </div>
-            <div slot="title">
-              <InlineText {...ensureValidStructuredTextProps({ data: pillar.title })} />
-            </div>
-            <article>
-              {pillar.pillarCallout}
-              <Bullets style="bad">
-                <li>
-                  <Svg name="icons/regular/check" />
-                  <div>
-                    <InlineText {...ensureValidStructuredTextProps({ data: pillar.capability1 })} />
-                  </div>
-                </li>
-                <li>
-                  <Svg name="icons/regular/check" />
-                  <div>
-                    <InlineText {...ensureValidStructuredTextProps({ data: pillar.capability2 })} />
-                  </div>
-                </li>
-                <li>
-                  <Svg name="icons/regular/check" />
-                  <div>
-                    <InlineText {...ensureValidStructuredTextProps({ data: pillar.capability3 })} />
-                  </div>
-                </li>
-              </Bullets>
-            </article>
-          </Flag>
-        </div>
-      );
-    })
-  }
+  <StripWithContent>
+    <div class={s.explore}>
+      <h2>Everything you need<br />to get you going</h2>
+      <p>
+        Work with <s>1000s</s> the right balance of features.<br />
+        Bell and whistles optional.
+      </p>
+      <Space top={1}>
+        <Button as="a" p="small" s="invert" href="/features">Explore all features</Button>
+      </Space>
+    </div>
+  </StripWithContent>
+
+  <Space bottom={2}>
+    {
+      page.pillars.map((pillar, index) => {
+        return (
+          <div class={s.flagContainer}>
+            <Flag flip={index % 2 === 0}>
+              <Fragment slot="kicker">{pillar.theme}</Fragment>
+              <div slot="visual">
+                <ResponsiveImage data={pillar.image.responsiveImage} />
+              </div>
+              <div slot="title">
+                <InlineText {...ensureValidStructuredTextProps({ data: pillar.title })} />
+              </div>
+              <article>
+                {pillar.pillarCallout}
+                <Bullets style="bad">
+                  <li>
+                    <Svg name="icons/regular/check" />
+                    <div>
+                      <InlineText
+                        {...ensureValidStructuredTextProps({ data: pillar.capability1 })}
+                      />
+                    </div>
+                  </li>
+                  <li>
+                    <Svg name="icons/regular/check" />
+                    <div>
+                      <InlineText
+                        {...ensureValidStructuredTextProps({ data: pillar.capability2 })}
+                      />
+                    </div>
+                  </li>
+                  <li>
+                    <Svg name="icons/regular/check" />
+                    <div>
+                      <InlineText
+                        {...ensureValidStructuredTextProps({ data: pillar.capability3 })}
+                      />
+                    </div>
+                  </li>
+                </Bullets>
+              </article>
+            </Flag>
+          </div>
+        );
+      })
+    }
+  </Space>
 
   <IntegrationsBanner
     bubbles={integrations
