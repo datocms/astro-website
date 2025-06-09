@@ -3,6 +3,7 @@ import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/componen
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { CustomerStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/customerStory';
+import { UseCasePageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -74,6 +75,18 @@ export const query = graphql(
           }
         }
       }
+      useCases: allUseCasePages(first: 4, orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]) {
+        ...UseCasePageUrlFragment
+        title: navigationBarTitle
+        subtitle {
+          value
+        }
+        heroCustomer {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fill: blur, fit: crop }) {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
     }
   `,
   [
@@ -83,5 +96,6 @@ export const query = graphql(
     ReviewQuoteFragment,
     TagFragment,
     CustomerStoryUrlFragment,
+    UseCasePageUrlFragment,
   ],
 );
