@@ -22,6 +22,7 @@ import { formatDate, formatVideoDuration } from '~/lib/formatters';
 import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { Image } from 'astro:assets';
 import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
+import { Search } from './Search';
 
 const isMarketplace = Astro.url.pathname.startsWith('/marketplace');
 
@@ -428,6 +429,15 @@ const sortedContinents = Object.fromEntries(
             </div>
 
             <div class={s.navActions}>
+              <button
+                class={s.searchToggle}
+                id="searchToggle"
+                aria-expanded="false"
+                aria-controls="searchModal"
+              >
+                <Svg name="icons/regular/search" />
+              </button>
+
               <a href="/contact" class={s.navLink}>
                 Contact sales
               </a>
@@ -448,6 +458,12 @@ const sortedContinents = Object.fromEntries(
           </nav>
         </site-navbar>
       )}
+
+      <div id="searchModal" class={s.searchModal} aria-hidden="true" data-hidden="true">
+        <div class={s.searchModalInner}>
+          <Search client:idle />
+        </div>
+      </div>
     </div>
   )
 }
@@ -510,4 +526,28 @@ const sortedContinents = Object.fromEntries(
       }
     },
   );
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchToggle = document.getElementById('searchToggle');
+    const searchModal = document.getElementById('searchModal');
+
+    if (!searchToggle || !searchModal) return;
+
+    searchToggle.addEventListener('click', () => {
+      const isHidden = searchModal.dataset.hidden === 'true';
+
+      searchModal.setAttribute('data-hidden', String(!isHidden));
+      searchModal.setAttribute('aria-hidden', String(!isHidden));
+      searchToggle.setAttribute('aria-expanded', String(!isHidden));
+    });
+
+    searchModal.addEventListener('click', (e) => {
+      if (e.target !== searchModal) {
+        return false;
+      }
+      searchModal.setAttribute('data-hidden', 'true');
+      searchModal.setAttribute('aria-hidden', 'true');
+      searchToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
 </script>
