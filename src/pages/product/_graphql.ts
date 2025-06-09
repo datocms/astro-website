@@ -68,22 +68,9 @@ export const query = graphql(
       ) {
         ...CustomerStoryUrlFragment
         title
-        excerpt {
-          value
-        }
         coverImage {
           responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fill: blur, fit: crop }) {
             ...ResponsiveImageFragment
-          }
-        }
-        people {
-          name
-          title
-          company
-          avatar {
-            responsiveImage(imgixParams: { auto: format, w: 50, h: 50, fit: crop, crop: faces }) {
-              ...ResponsiveImageFragment
-            }
           }
         }
       }
