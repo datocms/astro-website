@@ -2,6 +2,7 @@ import { FeatureCardFragment } from '~/components/FeatureCard/graphql';
 import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
+import { CustomerStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(
@@ -61,6 +62,31 @@ export const query = graphql(
           ...FeatureCardFragment
         }
       }
+      customerStories: allCustomerStories(
+        first: 5
+        orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
+      ) {
+        ...CustomerStoryUrlFragment
+        title
+        excerpt {
+          value
+        }
+        coverImage {
+          responsiveImage(imgixParams: { auto: format, w: 800, h: 450, fill: blur }) {
+            ...ResponsiveImageFragment
+          }
+        }
+        people {
+          name
+          title
+          company
+          avatar {
+            responsiveImage(imgixParams: { auto: format, w: 50, h: 50, fit: crop, crop: faces }) {
+              ...ResponsiveImageFragment
+            }
+          }
+        }
+      }
     }
   `,
   [
@@ -69,5 +95,6 @@ export const query = graphql(
     FeatureCardFragment,
     ReviewQuoteFragment,
     TagFragment,
+    CustomerStoryUrlFragment,
   ],
 );
