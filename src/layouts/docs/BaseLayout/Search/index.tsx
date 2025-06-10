@@ -28,18 +28,18 @@ const areas: Areas = [
     icon: guideIcon,
     urlMatch: '/docs/general-concepts',
   },
-  {
-    id: 'user_guides',
-    label: 'User Guides',
-    icon: guideIcon,
-    urlMatch: '/user-guides',
-  },
-  {
-    id: 'academy',
-    label: 'Headless CMS Academy',
-    icon: guideIcon,
-    urlMatch: '/academy',
-  },
+  // {
+  //   id: 'user_guides',
+  //   label: 'User Guides',
+  //   icon: guideIcon,
+  //   urlMatch: '/user-guides',
+  // },
+  // {
+  //   id: 'academy',
+  //   label: 'Headless CMS Academy',
+  //   icon: guideIcon,
+  //   urlMatch: '/academy',
+  // },
   {
     id: 'content_modelling',
     label: 'Content Modelling',
@@ -100,23 +100,23 @@ const areas: Areas = [
     icon: codeIcon,
     urlMatch: '/docs',
   },
-  {
-    id: 'blog',
-    label: 'Blog',
-    icon: pageIcon,
-    urlMatch: '/blog',
-  },
-  {
-    id: 'product_updates',
-    label: 'Product Updates',
-    icon: pageIcon,
-    urlMatch: '/product-updates',
-  },
-  {
-    id: 'other',
-    label: 'Elsewhere on the website',
-    icon: pageIcon,
-  },
+  // {
+  //   id: 'blog',
+  //   label: 'Blog',
+  //   icon: pageIcon,
+  //   urlMatch: '/blog',
+  // },
+  // {
+  //   id: 'product_updates',
+  //   label: 'Product Updates',
+  //   icon: pageIcon,
+  //   urlMatch: '/product-updates',
+  // },
+  // {
+  //   id: 'other',
+  //   label: 'Elsewhere on the website',
+  //   icon: pageIcon,
+  // },
   {
     id: 'community',
     label: 'Community',

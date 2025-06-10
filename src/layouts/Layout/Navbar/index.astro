@@ -66,11 +66,22 @@ const sortedContinents = Object.fromEntries(
                 <Svg name="svg/datocms/icon-text/black/black_full_logo_alt" />
               </a>
 
-              <TargetToggler targetId="navbar-marketplace-nav">
-                <button type="button" class={s.hamburger} aria-controls="navList">
-                  <Svg name="icons/regular/bars" />
+              <div class={s.navbarActionsMobile}>
+                <button
+                  class:list={[s.searchToggle, s.isMobile]}
+                  data-search-toggle
+                  aria-expanded="false"
+                  aria-controls="searchModal"
+                >
+                  <Svg name="icons/regular/search" />
                 </button>
-              </TargetToggler>
+
+                <TargetToggler targetId="navbar-marketplace-nav">
+                  <button type="button" class={s.hamburger} aria-controls="navList">
+                    <Svg name="icons/regular/bars" />
+                  </button>
+                </TargetToggler>
+              </div>
             </div>
 
             <div class={s.navList}>
@@ -152,11 +163,22 @@ const sortedContinents = Object.fromEntries(
                 <Svg name="svg/datocms/icon-text/color/color_full_logo_alt" />
               </a>
 
-              <TargetToggler targetId="navbar-nav">
-                <button type="button" class={s.hamburger} aria-controls="navList">
-                  <Svg name="icons/regular/bars" />
+              <div class={s.navbarActionsMobile}>
+                <button
+                  class:list={[s.searchToggle, s.isMobile]}
+                  data-search-toggle
+                  aria-expanded="false"
+                  aria-controls="searchModal"
+                >
+                  <Svg name="icons/regular/search" />
                 </button>
-              </TargetToggler>
+
+                <TargetToggler targetId="navbar-nav">
+                  <button type="button" class={s.hamburger} aria-controls="navList">
+                    <Svg name="icons/regular/bars" />
+                  </button>
+                </TargetToggler>
+              </div>
             </div>
 
             <div class={s.navList}>
@@ -430,8 +452,8 @@ const sortedContinents = Object.fromEntries(
 
             <div class={s.navActions}>
               <button
-                class={s.searchToggle}
-                id="searchToggle"
+                class:list={[s.searchToggle, s.isDesktop]}
+                data-search-toggle
                 aria-expanded="false"
                 aria-controls="searchModal"
               >
@@ -528,26 +550,39 @@ const sortedContinents = Object.fromEntries(
   );
 
   document.addEventListener('DOMContentLoaded', () => {
-    const searchToggle = document.getElementById('searchToggle');
-    const searchModal = document.getElementById('searchModal');
+    const allSearchToggle = document.querySelectorAll('[data-search-toggle]');
+    const searchModal = document.querySelector('#searchModal');
 
-    if (!searchToggle || !searchModal) return;
+    if (allSearchToggle.length === 0 || !searchModal) return;
 
-    searchToggle.addEventListener('click', () => {
-      const isHidden = searchModal.dataset.hidden === 'true';
+    allSearchToggle.forEach((toggle) => {
+      toggle.addEventListener('click', () => {
+        const isHidden = searchModal.getAttribute('data-hidden') === 'true';
 
-      searchModal.setAttribute('data-hidden', String(!isHidden));
-      searchModal.setAttribute('aria-hidden', String(!isHidden));
-      searchToggle.setAttribute('aria-expanded', String(!isHidden));
+        searchModal.setAttribute('data-hidden', String(!isHidden));
+        searchModal.setAttribute('aria-hidden', String(!isHidden));
+        toggle.setAttribute('aria-expanded', String(!isHidden));
+      });
     });
 
-    searchModal.addEventListener('click', (e) => {
-      if (e.target !== searchModal) {
-        return false;
-      }
+    const closeSearchModal = () => {
       searchModal.setAttribute('data-hidden', 'true');
       searchModal.setAttribute('aria-hidden', 'true');
-      searchToggle.setAttribute('aria-expanded', 'false');
+
+      allSearchToggle.forEach((toggle) => {
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    };
+
+    searchModal.addEventListener('click', (e) => {
+      if (e.target !== searchModal) return;
+      closeSearchModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && searchModal.getAttribute('data-hidden') === 'false') {
+        closeSearchModal();
+      }
     });
   });
 </script>
