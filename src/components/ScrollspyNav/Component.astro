@@ -3,15 +3,17 @@ type Props = {
   observerRoot?: string;
   observerRootMargin?: string;
   observerThreshold?: number;
+  fromStructuredText?: boolean;
 };
 
-const { observerRoot, observerRootMargin, observerThreshold } = Astro.props;
+const { observerRoot, observerRootMargin, observerThreshold, fromStructuredText } = Astro.props;
 ---
 
 <scrollspy-nav
   observer-root={observerRoot}
   observer-root-margin={observerRootMargin}
   observer-threshold={observerThreshold}
+  from-structured-text={fromStructuredText}
 >
   <slot />
 </scrollspy-nav>
@@ -22,19 +24,20 @@ const { observerRoot, observerRootMargin, observerThreshold } = Astro.props;
   customElements.define(
     'scrollspy-nav',
     class ScrollspyNav extends WebComponent {
-      private activeLink: HTMLAnchorElement | undefined;
+      private activeAnchor: HTMLAnchorElement | undefined;
       private currentAnchor: HTMLElement | null = null;
 
       parsedCallback(): void {
         this.currentAnchor = this.querySelector('[data-current-anchor]');
-        const links = this.$$<HTMLAnchorElement>('a');
+        const anchors = this.$$<HTMLAnchorElement>('a');
         const sections: HTMLElement[] = [];
 
-        links.forEach((link) => {
-          if (new URL(link.href).host !== window.location.host) return;
+        anchors.forEach((anchor) => {
+          if (new URL(anchor.href).host !== window.location.host) return;
+          if (!anchor.hash.startsWith('#')) return;
 
-          const el = document.querySelector(link.hash);
-          const value = link.hash.substring(1);
+          const el = document.querySelector(anchor.hash);
+          const value = anchor.hash.substring(1);
 
           if (!el) {
             console.warn(
@@ -50,35 +53,47 @@ const { observerRoot, observerRootMargin, observerThreshold } = Astro.props;
           for (const entry of entries) {
             if (!entry.isIntersecting) return;
 
-            const link = this.querySelector(`[href="#${entry.target.id}"`) as HTMLAnchorElement;
+            const adjustedEntry = fromStructuredText
+              ? entry.target.querySelector('a')!
+              : entry.target;
 
-            this.setActiveLink(link);
+            const anchor = this.querySelector(`[href="#${adjustedEntry.id}"`) as HTMLAnchorElement;
+
+            if (!anchor) {
+              console.warn(
+                `[${this.localName}]: Link with href "#${adjustedEntry.id}" doesn't exist on this page.`,
+              );
+              continue;
+            }
+
+            this.setActiveAnchor(anchor);
           }
 
-          if (!this.activeLink) {
-            this.setActiveLink(links[0]!);
+          if (!this.activeAnchor) {
+            this.setActiveAnchor(anchors[0]!);
           }
         };
 
         const root = this.getAttribute('observer-root');
         const rootMargin = this.getAttribute('observer-root-margin');
         const threshold = this.getAttribute('observer-threshold');
+        const fromStructuredText = this.getAttribute('from-structured-text');
 
         const observer = new IntersectionObserver(onIntersect, {
           root: root ? document.querySelector(root) : null,
-          rootMargin: rootMargin || '-25% 0% -75% 0%',
+          rootMargin: rootMargin || fromStructuredText ? '-10% 0% -90% 0%' : '-25% 0% -75% 0%',
           threshold: threshold ? Number(threshold) : undefined,
         });
 
         for (const section of sections) {
-          observer.observe(section);
+          observer.observe(fromStructuredText ? section.parentElement! : section);
         }
       }
 
-      setActiveLink(el: HTMLAnchorElement): void {
-        this.activeLink?.removeAttribute('aria-current');
+      setActiveAnchor(el: HTMLAnchorElement): void {
+        this.activeAnchor?.removeAttribute('aria-current');
         el.setAttribute('aria-current', 'true');
-        this.activeLink = el;
+        this.activeAnchor = el;
 
         if (this.currentAnchor) {
           this.currentAnchor.textContent = el.textContent;
