@@ -3,17 +3,34 @@ import s from './_style.module.css';
 import { Svg } from '~/components/Svg';
 
 type Props = {
+  loop?: boolean;
   buttonsY?: string;
+  removeButtons?: boolean;
   class?: string;
   viewportClass?: string;
   autoScroll?: boolean;
 };
 
-const { buttonsY, class: className, viewportClass, autoScroll } = Astro.props;
+const {
+  loop = false,
+  buttonsY = '50%',
+  class: className,
+  viewportClass,
+  autoScroll,
+  removeButtons,
+} = Astro.props;
 ---
 
-<embla-carousel data-autoscroll={autoScroll ? 'true' : undefined}>
-  <div class:list={[s.embla, className]} data-viewport style={{ '--buttonsY': buttonsY }}>
+<embla-carousel
+  data-autoscroll={autoScroll ? 'true' : undefined}
+  data-loop={loop ? 'true' : undefined}
+>
+  <div
+    data-removebuttons={removeButtons ? 'true' : undefined}
+    class:list={[s.embla, className]}
+    data-viewport
+    style={removeButtons ? undefined : `--buttonsY: ${buttonsY}`}
+  >
     <div class:list={[s.emblaContainer, viewportClass]}>
       <slot />
     </div>
@@ -38,12 +55,16 @@ const { buttonsY, class: className, viewportClass, autoScroll } = Astro.props;
 
       parsedCallback() {
         const node = this.$('[data-viewport]');
+        const loop = this.dataset.loop === 'true';
         const prevButton = this.$('[data-prev]');
         const nextButton = this.$('[data-next]');
 
         this.api = emblaCarousel(
           node,
-          { loop: false, align: 'start' },
+          {
+            loop: loop,
+            align: 'start',
+          },
           this.dataset.autoscroll ? [autoScroll({ playOnInit: true, speed: 1 })] : [],
         );
 
