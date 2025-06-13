@@ -11,8 +11,11 @@
     "preview": "astro preview",
     "astro": "astro",
     "decrypt-env": "npx kavo files:decrypt",
-    "generate-schema": "dotenv -e .env.development -c -- bash -c 'gql.tada generate schema https://graphql.datocms.com --header \"X-Exclude-Invalid: true\" --header \"Authorization: $DATOCMS_API_TOKEN\"'",
-    "lint": "prettier --check .",
+    "generate-schema": "dotenv -e .env.development -c -- bash -c 'gql.tada generate schema https://graphql.datocms.com -H \"X-Exclude-Invalid: true\" -H \"Authorization: $DATOCMS_API_TOKEN\"'",
+    "invalidate-data-sources": "curl -i -X POST \"https://$DRAFT_MODE_HOSTNAME/api/data-sources-invalidate?token=$SECRET_API_TOKEN\"",
+    "invalidate-everything": "curl -i -X POST \"https://api.fastly.com/service/$FASTLY_SERVICE_ID/purge_all\" -H \"Fastly-Key: $FASTLY_KEY\" -H \"Accept: application/json\"",
+    "reindex-site-search": "curl -i -X PUT \"https://site-api.datocms.com/build-triggers/34759/reindex\" -H \"X-Api-Version: 3\" -H \"Accept: application/json\" -H \"Authorization: Bearer $DATOCMS_API_TOKEN\"",
+    "lint": "npx prettier --check .",
     "format": "npx prettier . --write",
     "test": "vitest",
     "serve": "dotenv -e .env.production -c -- bash -c 'node ./dist/server/entry.mjs'",
@@ -93,6 +96,7 @@
   },
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.4",
+    "@datocms/cubo": "^0.2.40",
     "@fastify/one-line-logger": "^2.0.0",
     "@types/country-list": "^2.1.4",
     "@types/jsdom": "^21.1.7",
@@ -114,7 +118,7 @@
     "vitest": "^3.0.9"
   },
   "simple-git-hooks": {
-    "pre-commit": "FILES=$(git diff --cached --name-only --diff-filter=ACMR) && echo \"$FILES\" | xargs prettier --ignore-unknown --write && git add $FILES"
+    "pre-commit": "FILES=$(git diff --cached --name-only --diff-filter=ACMR) && echo \"$FILES\" | xargs npx prettier --ignore-unknown --write && git add $FILES"
   },
   "engines": {
     "node": "20"

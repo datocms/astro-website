@@ -271,5 +271,6 @@ export default defineConfig({
     '/docs/content-delivery-api/tree-like-collections':
       '/docs/content-delivery-api/hierarchical-sorting',
     '/docs/content-modelling/trees': '/docs/content-modelling/hierarchical-sorting',
+    '/docs/plugin-sdk': '/docs/plugin-sdk/introduction',
   },
 });

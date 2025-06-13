@@ -56,7 +56,7 @@ export const query = graphql(
         }
         starterLink: link
         starterImage {
-          responsiveImage(imgixParams: { auto: format, w: 1000, h: 1000 }) {
+          responsiveImage(imgixParams: { auto: format, w: 960, h: 540, fit: crop }) {
             ...ResponsiveImageFragment
           }
         }
@@ -70,7 +70,7 @@ export const query = graphql(
             value
           }
           image {
-            responsiveImage(imgixParams: { auto: format, w: 960, h: 540, fit: crop, crop: top }) {
+            responsiveImage(imgixParams: { auto: format, w: 960, h: 540, fit: crop }) {
               ...ResponsiveImageFragment
             }
           }
@@ -100,7 +100,7 @@ export const query = graphql(
           ...CustomerStoryUrlFragment
         }
         successStoryImage: image {
-          responsiveImage(imgixParams: { auto: format, w: 1000, h: 1000 }) {
+          responsiveImage(imgixParams: { auto: format, w: 960, h: 540, fit: crop }) {
             ...ResponsiveImageFragment
           }
         }

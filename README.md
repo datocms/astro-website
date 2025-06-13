@@ -16,6 +16,10 @@ It's a server-only app (every route is dynamic), and it's meant to be the origin
 
 It can also be directly visited by the content editors to see the result of their draft changes in real time.
 
+We have thoroughly discussed this repository on our blog; be sure to explore the complete article series:
+
+https://www.datocms.com/blog/why-we-switched-to-astro
+
 # How to run locally?
 
 1. Clone this repository: `git clone https://github.com/datocms/website`

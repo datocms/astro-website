@@ -1,6 +1,5 @@
 ---
 import { Layout } from '~/layouts/Layout';
-import s from './_style.module.css';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
@@ -10,15 +9,17 @@ import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { LogosBar } from '~/components/LogosBar';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Space } from '~/components/Space';
-import { QuotesCarousel } from '~/components/quote/QuotesCarousel';
 import { Svg } from '~/components/Svg';
 import { Prose } from '~/components/Prose';
 import { Checks } from '~/components/Checks';
 import { InlineText } from '~/components/structuredText/InlineText';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { Text } from '~/components/structuredText/Text';
+import { StripWithContent } from '~/components/StripWithContent';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import s from './_style.module.css';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -27,9 +28,11 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const { quotes = [] } = page;
 ---
 
-<Layout seo={page._seoMetaTags} noFinalCta>
+<Layout seo={page._seoMetaTags}>
   <Wrapper>
     <div class={s.hero}>
       <div class={s.heroBody}>
@@ -66,127 +69,115 @@ if (!page) {
     ]}
   />
 
-  <div class={s.testimonials}>
-    <Space top={2} bottom={3}>
-      <InterstitialTitle style="three">
-        <InlineText {...ensureValidStructuredTextProps({ data: page.quotesHeader })} />
-      </InterstitialTitle>
-      <QuotesCarousel quotes={page.quotes} />
-    </Space>
-  </div>
-
-  <div class={s.starterBoxWrapper}>
-    <Wrapper>
-      <div class={s.starterBox}>
-        <div class={s.starterBoxText}>
+  <Space top={1}>
+    <StripWithContent>
+      <div class={s.starter}>
+        <div class={s.starterVisual}>
+          <ResponsiveImage data={page.starterImage.responsiveImage} />
+        </div>
+        <div class={s.starterBody}>
           <h2><InlineText {...ensureValidStructuredTextProps({ data: page.starterTitle })} /></h2>
           <Prose>
             <Text {...ensureValidStructuredTextProps({ data: page.starterDescription })} />
           </Prose>
           <Space top={1}>
-            <Button as="a" p="small" s="purple" href={page.starterLink}>Check it out</Button>
+            <Button as="a" p="small" href={page.starterLink}>Check it out</Button>
           </Space>
         </div>
+      </div>
+    </StripWithContent>
+  </Space>
 
-        {
-          page.starterImage?.responsiveImage && (
-            <div class={s.starterBoxImage}>
-              <div class={s.imageWrapper}>
-                <div class={s.image}>
-                  <ResponsiveImage
-                    data={page.starterImage.responsiveImage}
-                    pictureStyle={{
-                      objectFit: 'contain',
-                      objectPosition: 'left',
-                    }}
-                  />
-                </div>
-              </div>
+  <Wrapper>
+    <div class={s.baloons}>
+      <div class={s.dev}>
+        <p>
+          <strong>
+            If you’re a <mark class="good">dev</mark>
+          </strong>{' '}
+          looking to hook up DatoCMS to your repos, head on over to{' '}
+          <a href="docs">our docs</a>
+        </p>
+      </div>
+
+      <div class={s.editor}>
+        <p>
+          <strong>
+            If you’re an{' '}
+            <mark class="good">editor, marketer, or content creator</mark>
+          </strong>{' '}
+          on the fence about whether or not DatoCMS is for you, you’re probably…
+        </p>
+        <Svg name="svg/illustrations/arrow" />
+      </div>
+    </div>
+  </Wrapper>
+
+  <Wrapper>
+    <div class={s.niceBlock}>
+      <div class={s.blockIllustration}>
+        <Svg name="svg/illustrations/zen" />
+      </div>
+      <div class={s.blockText}>
+        <h2>{page.featuresHeader}</h2>
+        <Text {...ensureValidStructuredTextProps({ data: page.featuresDescription })} />
+      </div>
+    </div>
+  </Wrapper>
+
+  {
+    page.callout.map((callout, index) => (
+      <div class={s.featureWrapper}>
+        <StripWithContent background="alternative" stripHeight="partial">
+          <section class={s.feature}>
+            <div class={s.featureIntro}>
+              <article>
+                <h3>{callout.title}</h3>
+                <Text {...ensureValidStructuredTextProps({ data: callout.description })} />
+              </article>
+
+              {/* <div class={s.visual}>
+                {callout.image?.responsiveImage && (
+                  <ResponsiveImage data={callout.image.responsiveImage} />
+                )}
+              </div> */}
             </div>
-          )
-        }
-      </div>
-    </Wrapper>
-  </div>
-
-  <div class={s.features}>
-    <Wrapper>
-      <div class={s.baloons}>
-        <div class={s.dev}>
-          <p>
-            <strong>
-              If you’re a <mark class="good">dev</mark>
-            </strong>{' '}
-            looking to hook up DatoCMS to your repos, head on over to{' '}
-            <a href="docs">our docs</a>
-          </p>
-        </div>
-
-        <div class={s.editor}>
-          <p>
-            <strong>
-              If you’re an{' '}
-              <mark class="good">editor, marketer, or content creator</mark>
-            </strong>{' '}
-            on the fence about whether or not DatoCMS is for you, you’re probably…
-          </p>
-          <Svg name="svg/illustrations/arrow" />
-        </div>
-      </div>
-    </Wrapper>
-
-    <Wrapper>
-      <div class={s.niceBlock}>
-        <div class={s.blockIllustration}>
-          <Svg name="svg/illustrations/zen" />
-        </div>
-        <div class={s.blockText}>
-          <h2>{page.featuresHeader}</h2>
-          <Text {...ensureValidStructuredTextProps({ data: page.featuresDescription })} />
-        </div>
-      </div>
-    </Wrapper>
-
-    {
-      page.callout.map((callout, index) => (
-        <section class:list={[s.featuresGroup, index === 1 && s.alternative]}>
-          <div class={s.featuresIntro}>
-            <div class={s.visual}>
-              {callout.image?.responsiveImage && (
-                <ResponsiveImage data={callout.image.responsiveImage} />
-              )}
-            </div>
-            <article>
-              <h3>{callout.title}</h3>
-              <Text {...ensureValidStructuredTextProps({ data: callout.description })} />
-            </article>
-          </div>
-          <div class={s.featuresGrid}>
-            {callout.features.map((feature) => (
-              <div class={s.feature}>
-                <article class={s.featureContent}>
-                  {feature.icon?.url && (
-                    <div class={s.featureIcon}>
-                      <img src={feature.icon.url} loading="lazy" height={30} width={30} />
-                    </div>
-                  )}
-                  <div class={s.featureText}>
+            <div class={s.featureList}>
+              {callout.features.map((feature) => (
+                <article class={s.featureListItem}>
+                  <div class={s.featureListText}>
                     <h4 class={s.featureTitle}>{feature.title}</h4>
                     <Text {...ensureValidStructuredTextProps({ data: feature.description })} />
                   </div>
                 </article>
-              </div>
-            ))}
-          </div>
-        </section>
-      ))
-    }
-  </div>
+              ))}
+            </div>
+          </section>
+        </StripWithContent>
 
-  <div class={s.successStoryWrapper}>
-    <Wrapper>
+        {quotes[index] && (
+          <Wrapper>
+            <SingleQuote quote={quotes[index]} fontSize="small" />
+          </Wrapper>
+        )}
+      </div>
+    ))
+  }
+
+  <Space top={1}>
+    <StripWithContent>
       <div class={s.successStory}>
-        <div class={s.successStoryText}>
+        <div class={s.successStoryImageWrapper}>
+          <ResponsiveImage
+            data={page.successStoryImage.responsiveImage}
+            pictureStyle={{
+              objectFit: 'contain',
+              objectPosition: 'left',
+            }}
+          />
+        </div>
+
+        <div class={s.successStoryBody}>
           <h2>
             <InlineText {...ensureValidStructuredTextProps({ data: page.successStoryHeader })} />
           </h2>
@@ -194,52 +185,11 @@ if (!page) {
             <Text {...ensureValidStructuredTextProps({ data: page.successStorySummary })} />
           </Prose>
           <Space top={1}>
-            <Button as="a" p="small" s="purple" href={buildUrlFromGql(page.caseStudy)}>
-              Check it out
-            </Button>
+            <Button as="a" p="small" href={buildUrlFromGql(page.caseStudy)}> Check it out </Button>
           </Space>
         </div>
-
-        {
-          page.successStoryImage?.responsiveImage && (
-            <div class={s.successStoryImage}>
-              <div class={s.imageWrapper}>
-                <div class={s.image}>
-                  <ResponsiveImage
-                    data={page.successStoryImage.responsiveImage}
-                    pictureStyle={{
-                      objectFit: 'contain',
-                      objectPosition: 'left',
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-          )
-        }
       </div>
-    </Wrapper>
-  </div>
-
-  <Space top={2}>
-    <div class={s.outro}>
-      <InterstitialTitle style="one" kicker="Seen enough?">
-        Get started with DatoCMS
-      </InterstitialTitle>
-      <Checks>
-        <div class={s.buttonGroup}>
-          <Button as="a" href="https://dashboard.datocms.com/signup"> Sign up for free </Button>
-          <Button as="a" s="invert" href="https://try.datocms.com" target="_blank">
-            Try our interactive demo ⤑
-          </Button>
-        </div>
-
-        <Fragment slot="checks">
-          <li>No credit card</li>
-          <li>Easy setup</li>
-        </Fragment>
-      </Checks>
-    </div>
+    </StripWithContent>
   </Space>
 
   <DraftModeQueryListener query={query} variables={variables} />
