@@ -4,6 +4,7 @@ import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql
 import { VideoFragment } from '~/components/blocks/Video/graphql';
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
@@ -64,6 +65,26 @@ export const query = graphql(
           title
           description {
             value
+          }
+        }
+        relatedItems {
+          title
+          subtitle
+          showRelatedContent
+          siblings {
+            ...SuccessStoryUrlFragment
+            ... on SuccessStoryRecord {
+              id
+              slug
+              title {
+                value
+              }
+              coverImage {
+                responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+                  ...ResponsiveImageFragment
+                }
+              }
+            }
           }
         }
         content {
@@ -129,6 +150,9 @@ export const query = graphql(
           }
         }
       }
+      siblingSlugs: allSuccessStories {
+        slug
+      }
     }
   `,
   [
@@ -137,9 +161,49 @@ export const query = graphql(
     ImageFragment,
     InternalVideoFragment,
     InDepthCtaBlockFragment,
+    SuccessStoryUrlFragment,
+    ResponsiveImageFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
+);
+
+export const siblingsQuery = graphql(
+  /* GraphQL */ `
+    query SiblingsQuery($prevSlug: String!, $nextSlug: String!) {
+      prev: successStory(filter: { slug: { eq: $prevSlug } }) {
+        ...SuccessStoryUrlFragment
+        ... on SuccessStoryRecord {
+          id
+          slug
+          title {
+            value
+          }
+          coverImage {
+            responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+              ...ResponsiveImageFragment
+            }
+          }
+        }
+      }
+      next: successStory(filter: { slug: { eq: $nextSlug } }) {
+        ...SuccessStoryUrlFragment
+        ... on SuccessStoryRecord {
+          id
+          slug
+          title {
+            value
+          }
+          coverImage {
+            responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+              ...ResponsiveImageFragment
+            }
+          }
+        }
+      }
+    }
+  `,
+  [SuccessStoryUrlFragment, ResponsiveImageFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
