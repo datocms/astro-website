@@ -56,7 +56,6 @@ export async function recordToWebsiteRoute({
     token: DATOCMS_API_TOKEN,
     includeDrafts: true,
     variables: { id: item.id },
-    environment: 'new-layouts-2025-04-30',
   });
 
   return buildUrlFromGql(thing);
