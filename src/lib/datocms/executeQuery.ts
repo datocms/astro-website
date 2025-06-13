@@ -42,7 +42,6 @@ export async function executeQueryOutsideAstro<Result, Variables>(
       excludeInvalid: true,
       includeDrafts: draftModeEnabled,
       token: DATOCMS_API_TOKEN,
-      environment: 'main-post-customers-update',
     });
 
     const newCacheTags = datocmsGraphqlResponse.headers.get('x-cache-tags')!.split(' ');
