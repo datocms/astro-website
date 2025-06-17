@@ -10,14 +10,26 @@ import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { LogosBar } from '~/components/LogosBar';
 import { Layout } from '~/layouts/Layout';
 import { Hero } from '~/components/Hero';
+import { Svg } from '~/components/Svg';
 import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { StripWithContent } from '~/components/StripWithContent';
+import { Card } from '~/components/Card';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 
 const { page, posts } = await executeQuery(Astro, query);
 
 if (!page || posts.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const highlightedProjectId = page.highlight.id;
+const highlightedProject = posts.find((post) => post.id === highlightedProjectId);
+const projects = posts.filter((post) => post.id !== highlightedProjectId);
+
+if (!highlightedProject) {
   return notFoundResponse();
 }
 ---
@@ -32,7 +44,7 @@ if (!page || posts.length === 0) {
     </Fragment>
   </Hero>
 
-  <Space top={1} bottom={2}>
+  <Space top={1} bottom={1}>
     <LogosBar
       title=""
       clients={[
@@ -46,25 +58,62 @@ if (!page || posts.length === 0) {
     />
   </Space>
 
-  <Wrapper>
-    <div class={s.posts}>
-      {
-        posts.map((post) => (
-          <a class={s.post} href={buildUrlForSuccessStory(post)}>
-            <div class={s.postImage}>
-              <ResponsiveImage data={post.coverImage.responsiveImage} />
-            </div>
-            <div class={s.postBody}>
-              <div class={s.postTitle}>
-                <Text {...ensureValidStructuredTextProps({ data: post.title })} />
-              </div>
-              <img src={post.logo.url} class={s.postLogo} />
-            </div>
+  <StripWithContent>
+    <Wrapper>
+      <div class={s.highlight}>
+        <div class={s.highlightVisual}>
+          <a class={s.highlightImage} href={buildUrlForSuccessStory(highlightedProject)}>
+            <ResponsiveImage data={highlightedProject.coverImage.responsiveImage} />
           </a>
+        </div>
+        <div class={s.highlightBody}>
+          <div class={s.highlightLogos}>
+            <img src={highlightedProject.logo.url} class={s.highlightLogo} />
+            <span class={s.plus}>+</span>
+            <Svg name="svg/logos/datocms" />
+          </div>
+          <div class={s.highlightTitle}>
+            <Text {...ensureValidStructuredTextProps({ data: highlightedProject.title })} />
+          </div>
+          <Text {...ensureValidStructuredTextProps({ data: highlightedProject.subtitle })} />
+          <a class={s.readMore} href={buildUrlForSuccessStory(highlightedProject)}>Read more</a>
+        </div>
+        {
+          highlightedProject.numbers.length > 0 && (
+            <div class={s.highlightNumbers}>
+              {highlightedProject.numbers.map((item) => (
+                <div class={s.numberBlock}>
+                  <h3 class={s.numberTitle}>{item.number}</h3>
+                  <p class={s.numberLabel}>{item.label}</p>
+                </div>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </Wrapper>
+  </StripWithContent>
+
+  <Wrapper>
+    <div class={s.grid}>
+      {
+        projects.map((post) => (
+          <Card
+            title={structuredTextToPlainText(post.title) ?? post.name}
+            size="small"
+            lineClamp={3}
+            svgLogoUrl={post.logo.url}
+            href={buildUrlForSuccessStory(post)}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={post.coverImage.responsiveImage} />
+            </Fragment>
+            {structuredTextToPlainText(post.subtitle)}
+          </Card>
         ))
       }
     </div>
   </Wrapper>
-
-  <DraftModeQueryListener query={query} />
 </Layout>
+
+<DraftModeQueryListener query={query} />

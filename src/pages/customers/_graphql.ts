@@ -10,8 +10,15 @@ export const query = graphql(
         seo: _seoMetaTags {
           ...TagFragment
         }
+        highlight {
+          id
+          name
+          ...SuccessStoryUrlFragment
+        }
       }
       posts: allSuccessStories {
+        id
+        name
         accentColor {
           hex
         }
@@ -24,18 +31,25 @@ export const query = graphql(
         title {
           value
         }
+        subtitle {
+          value
+        }
         coverImage {
           url
           focalPoint {
             x
             y
           }
-          responsiveImage(imgixParams: { auto: format, ar: "16:9", w: 1200, fit: crop }) {
+          responsiveImage(imgixParams: { auto: format, ar: "3:2", w: 1200, fit: crop }) {
             ...ResponsiveImageFragment
           }
         }
         logo {
           url
+        }
+        numbers {
+          number
+          label
         }
         ...SuccessStoryUrlFragment
       }

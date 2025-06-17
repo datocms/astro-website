@@ -82,10 +82,10 @@ input AcademyChapterModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  content: StructuredTextFilter
   seo: SeoFilter
   yoastAnalysis: JsonFilter
   title: StringFilter
+  content: StructuredTextFilter
   slug: SlugFilter
   OR: [AcademyChapterModelFilter]
   AND: [AcademyChapterModelFilter]
@@ -706,10 +706,10 @@ input AcademyCourseModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  introduction: StructuredTextFilter
   chapters: LinksFilter
   illustration: StringFilter
   name: StringFilter
+  introduction: StructuredTextFilter
   slug: SlugFilter
   OR: [AcademyCourseModelFilter]
   AND: [AcademyCourseModelFilter]
@@ -1668,8 +1668,6 @@ input BlogPostModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   yoastAnalysis: JsonFilter
-  excerpt: StructuredTextFilter
-  content: BlogPostModelContentFieldFilter
   seoSettings: SeoFilter
   coverImage: FileFilter
   author: LinksFilter
@@ -1677,6 +1675,8 @@ input BlogPostModelFilter {
   canonicalUrl: StringFilter
   title: StringFilter
   slug: SlugFilter
+  content: BlogPostModelContentFieldFilter
+  excerpt: StructuredTextFilter
   OR: [BlogPostModelFilter]
   AND: [BlogPostModelFilter]
 }
@@ -1916,11 +1916,11 @@ input ChangelogEntryModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  showInBlog: BooleanFilter
-  content: StructuredTextFilter
   categories: LinksFilter
   seo: SeoFilter
+  showInBlog: BooleanFilter
   title: StringFilter
+  content: StructuredTextFilter
   slug: SlugFilter
   OR: [ChangelogEntryModelFilter]
   AND: [ChangelogEntryModelFilter]
@@ -2679,16 +2679,16 @@ input CustomerStoryModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  people: LinksFilter
   coverImage: FileFilter
-  content: CustomerStoryModelContentFieldFilter
+  partner: LinkFilter
+  people: LinksFilter
+  title: StringFilter
   yoastAnalysis: JsonFilter
   seoSettings: SeoFilter
-  excerpt: StructuredTextFilter
-  title: StringFilter
   seoH1: StringFilter
   canonicalUrl: StringFilter
-  partner: LinkFilter
+  content: CustomerStoryModelContentFieldFilter
+  excerpt: StructuredTextFilter
   slug: SlugFilter
   OR: [CustomerStoryModelFilter]
   AND: [CustomerStoryModelFilter]
@@ -3325,9 +3325,9 @@ input DocPageModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  content: DocPageModelContentFieldFilter
   seo: SeoFilter
   title: StringFilter
+  content: DocPageModelContentFieldFilter
   slug: SlugFilter
   OR: [DocPageModelFilter]
   AND: [DocPageModelFilter]
@@ -4074,13 +4074,13 @@ input EnterpriseAppModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  content: StructuredTextFilter
   gallery: GalleryFilter
   seo: SeoFilter
   logo: FileFilter
   title: StringFilter
   description: StringFilter
   shortDescription: StringFilter
+  content: StructuredTextFilter
   slug: SlugFilter
   OR: [EnterpriseAppModelFilter]
   AND: [EnterpriseAppModelFilter]
@@ -4282,8 +4282,8 @@ input FaqModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  answer: StructuredTextFilter
   question: StringFilter
+  answer: StructuredTextFilter
   OR: [FaqModelFilter]
   AND: [FaqModelFilter]
 }
@@ -4433,11 +4433,11 @@ input FeatureModelFilter {
   yoastAnalysis: JsonFilter
   seoH1: StringFilter
   githubUrl: StringFilter
+  video3: FileFilter
   video: FileFilter
   quote: LinkFilter
   quote2: LinkFilter
   video2: FileFilter
-  video3: FileFilter
   slug: SlugFilter
   OR: [FeatureModelFilter]
   AND: [FeatureModelFilter]
@@ -4642,12 +4642,12 @@ input FeaturesIndexModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  title: StructuredTextFilter
-  subtitle: StructuredTextFilter
   heroImageLeft: FileFilter
   heroImageRight: FileFilter
   seo: SeoFilter
   readability: JsonFilter
+  subtitle: StructuredTextFilter
+  title: StructuredTextFilter
   OR: [FeaturesIndexModelFilter]
   AND: [FeaturesIndexModelFilter]
 }
@@ -5259,13 +5259,13 @@ input HostingAppModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  content: StructuredTextFilter
+  gallery: GalleryFilter
   logo: FileFilter
   title: StringFilter
   seo: SeoFilter
-  gallery: GalleryFilter
   description: StringFilter
   shortDescription: StringFilter
+  content: StructuredTextFilter
   slug: SlugFilter
   OR: [HostingAppModelFilter]
   AND: [HostingAppModelFilter]
@@ -7695,10 +7695,10 @@ input InDepthCtaModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  description: StructuredTextFilter
   title: StringFilter
   ctaLabel: StringFilter
   ctaUrl: StringFilter
+  description: StructuredTextFilter
   OR: [InDepthCtaModelFilter]
   AND: [InDepthCtaModelFilter]
 }
@@ -7767,6 +7767,78 @@ type InDepthCtaRecord implements RecordInterface {
 input InUseFilter {
   """Search uploads that are currently used by some record or not"""
   eq: BooleanType
+}
+
+input IndustryModelFilter {
+  _createdAt: CreatedAtFilter
+  createdAt: CreatedAtFilter
+  id: ItemIdFilter
+  _firstPublishedAt: PublishedAtFilter
+  _publicationScheduledAt: PublishedAtFilter
+  _unpublishingScheduledAt: PublishedAtFilter
+  _publishedAt: PublishedAtFilter
+  _status: StatusFilter
+  _updatedAt: UpdatedAtFilter
+  updatedAt: UpdatedAtFilter
+  _isValid: BooleanFilter
+  name: StringFilter
+  slug: SlugFilter
+  OR: [IndustryModelFilter]
+  AND: [IndustryModelFilter]
+}
+
+enum IndustryModelOrderBy {
+  _createdAt_ASC
+  _createdAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+  id_ASC
+  id_DESC
+  _firstPublishedAt_ASC
+  _firstPublishedAt_DESC
+  _publicationScheduledAt_ASC
+  _publicationScheduledAt_DESC
+  _unpublishingScheduledAt_ASC
+  _unpublishingScheduledAt_DESC
+  _publishedAt_ASC
+  _publishedAt_DESC
+  _status_ASC
+  _status_DESC
+  _updatedAt_ASC
+  _updatedAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  _isValid_ASC
+  _isValid_DESC
+  name_ASC
+  name_DESC
+}
+
+"""Record of type 🏭 Industry (industry)"""
+type IndustryRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  id: ItemId!
+  name: String!
+  slug: String!
+  updatedAt: DateTime!
 }
 
 """
@@ -11588,12 +11660,12 @@ input LandingPageModelFilter {
   content: LandingPageModelContentFieldFilter
   demo: LinkFilter
   integration: LinkFilter
-  title: StructuredTextFilter
   seoH1: StringFilter
   name: StringFilter
   subtitle: TextFilter
   docsUrl: StringFilter
   slug: SlugFilter
+  title: StructuredTextFilter
   OR: [LandingPageModelFilter]
   AND: [LandingPageModelFilter]
 }
@@ -12089,12 +12161,12 @@ input NavigationBarModelFilter {
   _isValid: BooleanFilter
   customerChats: LinksFilter
   enterpriseStories: LinksFilter
-  partnerProjects: LinksFilter
   videoGuides: LinksFilter
-  wallOfLoveQuote: LinkFilter
-  docPages: LinksFilter
-  useCases: LinksFilter
+  partnerProjects: LinksFilter
   partnersDescription: StringFilter
+  useCases: LinksFilter
+  docPages: LinksFilter
+  wallOfLoveQuote: LinkFilter
   OR: [NavigationBarModelFilter]
   AND: [NavigationBarModelFilter]
 }
@@ -12420,17 +12492,17 @@ input PartnerModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   _stage: AgencyProgramWorkflowStageFilter
-  npmUser: LinkFilter
   shortDescription: StructuredTextFilter
   areasOfExpertise: LinksFilter
+  npmUser: LinkFilter
   logo: FileFilter
   technologies: LinksFilter
   locations: LinksFilter
-  description: StructuredTextFilter
   publicContactEmail: StringFilter
   name: StringFilter
   websiteUrl: StringFilter
   featuredProjects: LinksFilter
+  description: StructuredTextFilter
   slug: SlugFilter
   OR: [PartnerModelFilter]
   AND: [PartnerModelFilter]
@@ -13131,10 +13203,10 @@ input PartnerTestimonialModelFilter {
   _isValid: BooleanFilter
   _stage: AgencyProgramWorkflowStageFilter
   image: FileFilter
-  quote: StructuredTextFilter
   partner: LinkFilter
   role: StringFilter
   name: StringFilter
+  quote: StructuredTextFilter
   OR: [PartnerTestimonialModelFilter]
   AND: [PartnerTestimonialModelFilter]
 }
@@ -13456,11 +13528,11 @@ input PlanFeatureModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  description: StructuredTextFilter
   availableOnProfessionalPlan: BooleanFilter
   tags: JsonFilter
   name: StringFilter
   moreDetailsUrl: StringFilter
+  description: StructuredTextFilter
   OR: [PlanFeatureModelFilter]
   AND: [PlanFeatureModelFilter]
 }
@@ -13774,11 +13846,11 @@ input PluginModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
+  releasedAt: DateTimeFilter
   legacy: BooleanFilter
   permissions: JsonFilter
   coverImage: FileFilter
   lastUpdate: DateTimeFilter
-  releasedAt: DateTimeFilter
   tags: LinksFilter
   pluginType: LinkFilter
   fieldTypes: LinksFilter
@@ -13789,10 +13861,10 @@ input PluginModelFilter {
   manuallyDeprecated: BooleanFilter
   previewImage: FileFilter
   certifiedVersion: StringFilter
+  installs: IntegerFilter
   entryPoint: StringFilter
   tagsCsv: StringFilter
   packageName: StringFilter
-  installs: IntegerFilter
   homepage: StringFilter
   version: StringFilter
   title: StringFilter
@@ -13824,24 +13896,24 @@ enum PluginModelOrderBy {
   updatedAt_DESC
   _isValid_ASC
   _isValid_DESC
+  releasedAt_ASC
+  releasedAt_DESC
   legacy_ASC
   legacy_DESC
   lastUpdate_ASC
   lastUpdate_DESC
-  releasedAt_ASC
-  releasedAt_DESC
   manuallyDeprecated_ASC
   manuallyDeprecated_DESC
   certifiedVersion_ASC
   certifiedVersion_DESC
+  installs_ASC
+  installs_DESC
   entryPoint_ASC
   entryPoint_DESC
   tagsCsv_ASC
   tagsCsv_DESC
   packageName_ASC
   packageName_DESC
-  installs_ASC
-  installs_DESC
   homepage_ASC
   homepage_DESC
   version_ASC
@@ -14947,8 +15019,8 @@ input ProductAnnouncementModelFilter {
   blogPost: LinkFilter
   cover: FileFilter
   area: StringFilter
-  announcement: StructuredTextFilter
   title: StringFilter
+  announcement: StructuredTextFilter
   slug: SlugFilter
   OR: [ProductAnnouncementModelFilter]
   AND: [ProductAnnouncementModelFilter]
@@ -15096,11 +15168,11 @@ input ProductComparisonModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  competitorCharacterization: StructuredTextFilter
   testimonials: LinksFilter
-  datocmsCharacterization: StructuredTextFilter
   seoSocial: SeoFilter
   product: StringFilter
+  competitorCharacterization: StructuredTextFilter
+  datocmsCharacterization: StructuredTextFilter
   slug: SlugFilter
   OR: [ProductComparisonModelFilter]
   AND: [ProductComparisonModelFilter]
@@ -15231,10 +15303,10 @@ input ProductOverviewModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   readability: JsonFilter
-  header: StructuredTextFilter
   subheader: StructuredTextFilter
   seo: SeoFilter
   testimonials: LinksFilter
+  header: StructuredTextFilter
   OR: [ProductOverviewModelFilter]
   AND: [ProductOverviewModelFilter]
 }
@@ -15497,6 +15569,13 @@ type Query {
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
     filter: InDepthCtaModelFilter
+  ): CollectionMetadata!
+
+  """Returns meta information regarding a record collection"""
+  _allIndustriesMeta(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: IndustryModelFilter
   ): CollectionMetadata!
 
   """Returns meta information regarding a record collection"""
@@ -16208,6 +16287,25 @@ type Query {
     filter: InDepthCtaModelFilter
     orderBy: [InDepthCtaModelOrderBy] = [_updatedAt_DESC]
   ): [InDepthCtaRecord!]!
+
+  """Returns a collection of records"""
+  allIndustries(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: IndustryModelFilter
+    orderBy: [IndustryModelOrderBy] = [_updatedAt_DESC]
+  ): [IndustryRecord!]!
 
   """Returns a collection of records"""
   allIntegrationTypes(
@@ -17229,6 +17327,19 @@ type Query {
   ): InDepthCtaRecord
 
   """Returns a specific record"""
+  industry(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+    filter: IndustryModelFilter
+    orderBy: [IndustryModelOrderBy] = [_updatedAt_DESC]
+  ): IndustryRecord
+
+  """Returns a specific record"""
   integration(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
@@ -18032,13 +18143,13 @@ input RecipeModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  cardImage: FileFilter
+  recipe: FileFilter
   title: StringFilter
-  featuredImage: FileFilter
   cardDescription: StringFilter
   seoSettings: SeoFilter
+  featuredImage: FileFilter
+  cardImage: FileFilter
   content: StructuredTextFilter
-  recipe: FileFilter
   slug: SlugFilter
   OR: [RecipeModelFilter]
   AND: [RecipeModelFilter]
@@ -18206,8 +18317,8 @@ input ReviewModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  quote: StructuredTextFilter
   useInDashboard: BooleanFilter
+  quote: StructuredTextFilter
   image: FileFilter
   role: StringFilter
   website: StringFilter
@@ -18288,35 +18399,6 @@ type ReviewRecord implements RecordInterface {
   updatedAt: DateTime!
   useInDashboard: BooleanType!
   website: String
-}
-
-"""Block of type Same level navigation (same_level_navigation)"""
-type SameLevelNavigationRecord implements RecordInterface {
-  _createdAt: DateTime!
-
-  """Editing URL"""
-  _editingUrl: String
-  _firstPublishedAt: DateTime!
-  _isValid: BooleanType!
-  _modelApiKey: String!
-  _publicationScheduledAt: DateTime
-  _publishedAt: DateTime!
-
-  """Generates SEO and Social card meta tags to be used in your frontend"""
-  _seoMetaTags(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-  ): [Tag!]!
-  _status: ItemStatus!
-  _unpublishingScheduledAt: DateTime
-  _updatedAt: DateTime!
-  createdAt: DateTime!
-  id: ItemId!
-  showRelatedContent: BooleanType!
-  siblings: [SuccessStoryRecord!]!
-  subtitle: String
-  title: String
-  updatedAt: DateTime!
 }
 
 input SchemaMigrationModelFilter {
@@ -18525,17 +18607,17 @@ input ShowcaseProjectModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   _stage: AgencyProgramWorkflowStageFilter
-  headline: StructuredTextFilter
+  partner: LinkFilter
   mainImage: FileFilter
   video: FileFilter
   projectScreenshots: GalleryFilter
   datocmsScreenshots: GalleryFilter
-  inDepthExplanation: StructuredTextFilter
   technologies: LinksFilter
   areasOfExpertise: LinksFilter
-  partner: LinkFilter
   name: StringFilter
   projectUrl: StringFilter
+  headline: StructuredTextFilter
+  inDepthExplanation: StructuredTextFilter
   slug: SlugFilter
   OR: [ShowcaseProjectModelFilter]
   AND: [ShowcaseProjectModelFilter]
@@ -19334,6 +19416,7 @@ type SuccessStoriesIndexRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   createdAt: DateTime!
+  highlight: SuccessStoryRecord!
   id: ItemId!
   seo: SeoField
   updatedAt: DateTime!
@@ -19414,6 +19497,7 @@ enum SuccessStoryModelFieldsReferencingDocPageModel {
 """Linking fields"""
 enum SuccessStoryModelFieldsReferencingPartnerModel {
   successStory_content
+  successStory_partner
 }
 
 """Linking fields"""
@@ -19444,19 +19528,25 @@ input SuccessStoryModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  content: SuccessStoryModelContentFieldFilter
-  title: StructuredTextFilter
-  challenge: StructuredTextFilter
   duotoneColor1: ColorFilter
   mainResultsImage: FileFilter
-  result: StructuredTextFilter
+  challenge: StructuredTextFilter
+  title: StructuredTextFilter
   accentColor: ColorFilter
   duotoneColor2: ColorFilter
+  result: StructuredTextFilter
   logo: FileFilter
   coverImage: FileFilter
   tags: LinksFilter
   name: StringFilter
+  content: SuccessStoryModelContentFieldFilter
   slug: SlugFilter
+  projectUrl: StringFilter
+  useCase: LinkFilter
+  subtitle: StructuredTextFilter
+  keyFeatures: LinksFilter
+  industry: LinksFilter
+  partner: LinkFilter
   OR: [SuccessStoryModelFilter]
   AND: [SuccessStoryModelFilter]
 }
@@ -19488,9 +19578,18 @@ enum SuccessStoryModelOrderBy {
   _isValid_DESC
   name_ASC
   name_DESC
+  projectUrl_ASC
+  projectUrl_DESC
 }
 
 type SuccessStoryModelResultField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+type SuccessStoryModelSubtitleField {
   blocks: [String!]!
   inlineBlocks: [String!]!
   links: [String!]!
@@ -19559,18 +19658,23 @@ type SuccessStoryRecord implements RecordInterface {
   duotoneColor1: ColorField!
   duotoneColor2: ColorField!
   id: ItemId!
+  industry: [IndustryRecord!]!
+  keyFeatures: [FeatureRecord!]!
   logo: FileField!
   mainResults: [SuccessStoryResultRecord!]!
   mainResultsImage: ImageFileField!
   name: String!
   numbers: [SuccessStoryNumberRecord!]!
+  partner: PartnerRecord
   position: IntType
-  relatedItems: SameLevelNavigationRecord
+  projectUrl: String
   result: SuccessStoryModelResultField
   slug: String!
+  subtitle: SuccessStoryModelSubtitleField
   tags: [SuccessStoryTagRecord!]!
   title: SuccessStoryModelTitleField
   updatedAt: DateTime!
+  useCase: UseCasePageRecord
 }
 
 type SuccessStoryResultModelDescriptionField {
@@ -19737,12 +19841,12 @@ input SupportTopicModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  description: StructuredTextFilter
   disableContactForm: BooleanFilter
   subtopicQuestion: StringFilter
   autoResponderType: StringFilter
   contactFormType: StringFilter
   title: StringFilter
+  description: StructuredTextFilter
   slug: SlugFilter
   OR: [SupportTopicModelFilter]
   AND: [SupportTopicModelFilter]
@@ -20077,16 +20181,16 @@ input TechPartnerModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  description: StructuredTextFilter
   npmUser: LinkFilter
   areasOfExpertise: LinksFilter
   technologies: LinksFilter
-  shortDescription: StructuredTextFilter
   logo: FileFilter
+  shortDescription: StructuredTextFilter
   locations: LinksFilter
   publicContactEmail: StringFilter
   websiteUrl: StringFilter
   name: StringFilter
+  description: StructuredTextFilter
   slug: SlugFilter
   OR: [TechPartnerModelFilter]
   AND: [TechPartnerModelFilter]
@@ -20211,11 +20315,11 @@ input TemplateDemoModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  badge: LinkFilter
-  starterType: StringFilter
   seo: SeoFilter
   yoastAnalysis: JsonFilter
   readme: TextFilter
+  badge: LinkFilter
+  starterType: StringFilter
   name: StringFilter
   technology: LinkFilter
   backendScreenshot: FileFilter
@@ -20515,9 +20619,9 @@ input TutorialModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  excerpt: StructuredTextFilter
   url: StringFilter
   title: StringFilter
+  excerpt: StructuredTextFilter
   OR: [TutorialModelFilter]
   AND: [TutorialModelFilter]
 }
@@ -21224,29 +21328,29 @@ input UseCasePageModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  image: FileFilter
-  subtitle: StructuredTextFilter
-  quotes: LinksFilter
-  starterTitle: StructuredTextFilter
-  starterImage: FileFilter
+  navigationBarTitle: StringFilter
   heroProduct: FileFilter
   heroCustomer: FileFilter
   featuresHeader: StringFilter
   heading: StringFilter
   link: StringFilter
-  successStoryHeader: StructuredTextFilter
-  quotesHeader: StructuredTextFilter
-  header: StructuredTextFilter
-  description: StructuredTextFilter
+  quotes: LinksFilter
+  starterTitle: StructuredTextFilter
+  starterImage: FileFilter
+  image: FileFilter
   summary: StructuredTextFilter
-  headline: StructuredTextFilter
-  starterDescription: StructuredTextFilter
   seo: SeoFilter
   caseStudy: LinkFilter
   heroImage: FileFilter
-  title: StructuredTextFilter
   readability: JsonFilter
-  navigationBarTitle: StringFilter
+  description: StructuredTextFilter
+  header: StructuredTextFilter
+  headline: StructuredTextFilter
+  quotesHeader: StructuredTextFilter
+  starterDescription: StructuredTextFilter
+  subtitle: StructuredTextFilter
+  successStoryHeader: StructuredTextFilter
+  title: StructuredTextFilter
   slug: SlugFilter
   OR: [UseCasePageModelFilter]
   AND: [UseCasePageModelFilter]
@@ -21289,14 +21393,14 @@ enum UseCasePageModelOrderBy {
   updatedAt_DESC
   _isValid_ASC
   _isValid_DESC
+  navigationBarTitle_ASC
+  navigationBarTitle_DESC
   featuresHeader_ASC
   featuresHeader_DESC
   heading_ASC
   heading_DESC
   link_ASC
   link_DESC
-  navigationBarTitle_ASC
-  navigationBarTitle_DESC
 }
 
 type UseCasePageModelQuotesHeaderField {
@@ -21443,10 +21547,10 @@ input UserGuidesChapterModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  videos: LinksFilter
-  introduction: StructuredTextFilter
   title: StringFilter
+  videos: LinksFilter
   slug: SlugFilter
+  introduction: StructuredTextFilter
   OR: [UserGuidesChapterModelFilter]
   AND: [UserGuidesChapterModelFilter]
 }
@@ -21575,9 +21679,9 @@ input UserGuidesEpisodeModelFilter {
   _isValid: BooleanFilter
   video: FileFilter
   seo: SeoFilter
-  content: StructuredTextFilter
   title: StringFilter
   thumbTimeSeconds: IntegerFilter
+  content: StructuredTextFilter
   slug: SlugFilter
   OR: [UserGuidesEpisodeModelFilter]
   AND: [UserGuidesEpisodeModelFilter]
