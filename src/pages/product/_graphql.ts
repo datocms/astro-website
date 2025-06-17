@@ -64,7 +64,7 @@ export const query = graphql(
         }
       }
       customerStories: allCustomerStories(
-        first: 12
+        first: 11
         orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
       ) {
         ...CustomerStoryUrlFragment

@@ -231,27 +231,21 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
   <div class={s.testimonials}>
     <h2 class={s.title}>...and have a blast doing it.</h2>
 
-    <div class={s.customerStoryCarouselWrapper}>
-      <Space top={2} bottom={1}>
-        <Carousel autoScroll removeButtons loop>
-          {
-            customerStories.map((item) => (
-              <a
-                href={buildUrlForCustomerStory(item)}
-                class={s.customerStoryItem}
-                title={item.title}
-              >
-                {item.coverImage?.responsiveImage && (
-                  <div class={s.coverImage}>
-                    <ResponsiveImage data={item.coverImage.responsiveImage} />
-                  </div>
-                )}
-              </a>
-            ))
-          }
-        </Carousel>
-      </Space>
-    </div>
+    <Space top={2} bottom={1}>
+      <div class={s.customerStoryWrapper}>
+        {
+          customerStories.map((item) => (
+            <a href={buildUrlForCustomerStory(item)} class={s.customerStoryItem} title={item.title}>
+              {item.coverImage?.responsiveImage && (
+                <div class={s.coverImage}>
+                  <ResponsiveImage data={item.coverImage.responsiveImage} />
+                </div>
+              )}
+            </a>
+          ))
+        }
+      </div>
+    </Space>
 
     <Space top={1} bottom={1}>
       <QuotesCarousel quotes={page.quotes} />
