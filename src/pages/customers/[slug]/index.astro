@@ -6,17 +6,25 @@ import { Layout } from '~/layouts/Layout';
 import { Prose } from '~/components/Prose';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { Text } from '~/components/structuredText/Text';
-import Head from './_sub/Head.astro';
-import Recap from './_sub/Recap.astro';
 import { Video } from '~/components/blocks/Video';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
-import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { InlineText } from '~/components/structuredText/InlineText';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Svg } from '~/components/Svg';
+import { StripWithContent } from '~/components/StripWithContent';
+import { Bullets } from '~/components/Bullets';
+import { cleanDomain } from '~/lib/cleanDomain';
+import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
+import { buildUrlForFeature } from '~/lib/datocms/gqlUrlBuilder/feature';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
+import { Markdown } from '~/components/Markdown';
+import s from './_style.module.css';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -25,87 +33,140 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
-
-const colors =
-  page && [page.duotoneColor1.hex, page.duotoneColor2.hex].map((x) => x.replace(/#/, '')).join(',');
-const duotone = `duotone=${colors}`;
 ---
 
 <Layout seo={page.seo}>
-  <div
-    style={{
-      '--gradient1': page.duotoneColor1.hex,
-      '--gradient2': page.duotoneColor2.hex,
-      '--accent': page.accentColor.hex,
-    }}
-  >
-    <Head
-      logoUrl={page.logo.url}
-      image={`${page.coverImage.url}?fp-y=${page.coverImage.focalPoint.y}&fp-x=${page.coverImage.focalPoint.x}&crop=focalpoint&fit=crop&${duotone}`}
-    >
-      <Text {...ensureValidStructuredTextProps({ data: page.title })} />
-    </Head>
+  <Wrapper>
+    <div class={s.hero}>
+      <div class={s.heroBody}>
+        <div class={s.headKicker}>
+          <img src={page.logo.url} />
+          <span class={s.plus}>+</span>
+          <Svg name="svg/logos/datocms" />
+        </div>
+        <h1 class={s.heroTitle}>
+          <InlineText {...ensureValidStructuredTextProps({ data: page.title })} />
+        </h1>
+        <div class={s.heroSubtitle}>
+          <InlineText {...ensureValidStructuredTextProps({ data: page.subtitle })} />
+        </div>
+      </div>
+      <div class={s.heroImageWrapper}>
+        <div class={s.heroImage}>
+          <ResponsiveImage data={page.coverImage.responsiveImage} />
+        </div>
+      </div>
+    </div>
+  </Wrapper>
 
-    <div id="usecase"></div>
+  <StripWithContent stripHeight="partial">
+    <Fragment slot="title">At a glance...</Fragment>
 
-    <Recap>
-      <Fragment slot="challenge">
-        <Text {...ensureValidStructuredTextProps({ data: page.challenge })} />
-      </Fragment>
-      <Fragment slot="result">
-        <Text {...ensureValidStructuredTextProps({ data: page.result })} />
-      </Fragment>
-      <div class={s.numbers}>
-        {
-          page.numbers.map((item) => (
+    {
+      page.numbers.length > 0 && (
+        <div class={s.numbers}>
+          {page.numbers.map((item) => (
             <div class={s.numberBlock}>
               <h3 class={s.numberTitle}>{item.number}</h3>
               <p class={s.numberLabel}>{item.label}</p>
             </div>
-          ))
-        }
-      </div>
-    </Recap>
+          ))}
+        </div>
+      )
+    }
 
-    <div class={s.results}>
-      <div class={s.resultsImage}>
-        <img
-          src={`${page.mainResultsImage.url}?${duotone}&fp-y=${page.mainResultsImage.focalPoint?.y}&crop=focalpoint&fp-x=${page.mainResultsImage.focalPoint?.x}`}
-        />
+    <div class={s.glanceWrapper}>
+      <div class={s.challenge}>
+        <h3>The challenge</h3>
+        <Text {...ensureValidStructuredTextProps({ data: page.challenge })} />
       </div>
-      <div class={s.resultsBlocks}>
-        <div class={s.resultsTitle}>Biggest wins</div>
-        {
-          page.mainResults.map((res) => (
-            <div class={s.resultsItem}>
-              <h3>{res.title}</h3>
-              <Text {...ensureValidStructuredTextProps({ data: res.description })} />
-            </div>
-          ))
-        }
+      <div class={s.arrowsWrapper}>
+        <div class={s.arrows}>
+          <Svg name="svg/illustrations/arrow-sketch-3" />
+          <Svg name="svg/illustrations/arrow-sketch-3" />
+        </div>
+      </div>
+      <div class={s.result}>
+        <h3>The result</h3>
+        <Text {...ensureValidStructuredTextProps({ data: page.result })} />
       </div>
     </div>
+  </StripWithContent>
 
-    <Wrapper>
-      <div class={s.fullStory}>
-        <Prose class={s.body}>
-          <Text
-            {...ensureValidStructuredTextProps({
-              data: page.content,
-              blockComponents: {
-                ImageRecord: Image,
-                InDepthCtaBlockRecord: InDepthCtaBlock,
-                InternalVideoRecord: InternalVideo,
-                VideoRecord: Video,
-              },
-              linkToRecordComponents: defaultLinkToRecordComponents,
-              inlineRecordComponents: defaultInlineRecordComponents,
-            })}
-          />
-        </Prose>
-      </div>
-    </Wrapper>
-  </div>
+  <Wrapper>
+    <div class={s.fullStory}>
+      <Prose class={s.body}>
+        <Text
+          {...ensureValidStructuredTextProps({
+            data: page.content,
+            blockComponents: {
+              ImageRecord: Image,
+              InDepthCtaBlockRecord: InDepthCtaBlock,
+              InternalVideoRecord: InternalVideo,
+              VideoRecord: Video,
+            },
+            linkToRecordComponents: defaultLinkToRecordComponents,
+            inlineRecordComponents: defaultInlineRecordComponents,
+          })}
+        />
+      </Prose>
+
+      <aside class={s.aside}>
+        {
+          page.projectUrl && (
+            <div class={s.asideItem}>
+              <h3>Project</h3>
+              <a href={page.projectUrl} target="_blank" rel="noopener noreferrer">
+                {cleanDomain(page.projectUrl)}
+              </a>
+            </div>
+          )
+        }
+        {
+          page.useCase && (
+            <div class={s.asideItem}>
+              <h3>Use case</h3>
+              <a href={buildUrlForUseCasePage(page.useCase)}>{page.useCase.navigationBarTitle}</a>
+            </div>
+          )
+        }
+        {
+          page.industry.length > 0 && (
+            <div class={s.asideItem}>
+              <h3>Industry</h3>
+              <ul>
+                {page.industry.map((item) => (
+                  <li>{item.name}</li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        {
+          page.keyFeatures.length > 0 && (
+            <div class={s.asideItem}>
+              <h3>Key Featurees</h3>
+              <ul>
+                {page.keyFeatures.map((item) => (
+                  <li>
+                    <a href={buildUrlForFeature(item)}>{item.seoH1}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        {
+          page.partner && (
+            <div class={s.asideItem}>
+              <h3>Partner</h3>
+              <a href={buildUrlForPartner(page.partner)}>{page.partner.name}</a>
+            </div>
+          )
+        }
+      </aside>
+    </div>
+  </Wrapper>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>
