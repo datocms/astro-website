@@ -7,7 +7,7 @@ import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
 import { Svg } from '~/components/Svg';
 import { IntegrationsBanner } from '~/components/IntegrationsBanner';
-import { QuotesCarousel } from '~/components/quote/QuotesCarousel';
+import { Carousel } from '~/components/Carousel';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Space } from '~/components/Space';
 import { executeQuery } from '~/lib/datocms/executeQuery';
@@ -229,25 +229,34 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
   <Space top={2}>
     <h2 class={s.title}>...and have a blast doing it.</h2>
 
-    <Space top={2} bottom={1}>
+    <Space top={1} bottom={1}>
       <div class={s.customerStoryWrapper}>
-        {
-          customerStories.map((item) => (
-            <Card
-              href={buildUrlForCustomerStory(item)}
-              title={item.title}
-              boxed={false}
-              boxedVisual={false}
-              size="medium"
-              class={s.customerStoryItem}
-            >
-              <Fragment slot="image">
-                <ResponsiveImage data={item.coverImage.responsiveImage} />
-              </Fragment>
-              {/* <InlineText {...ensureValidStructuredTextProps({ data: item.excerpt })} /> */}
-            </Card>
-          ))
-        }
+        <Carousel
+          autoScroll
+          removeButtons
+          loop
+          stopOnInteraction={false}
+          stopOnMouseEnter
+          dragDisable
+        >
+          {
+            customerStories.map((item) => (
+              <Card
+                href={buildUrlForCustomerStory(item)}
+                title={item.title}
+                boxed={false}
+                boxedVisual={false}
+                size="medium"
+                class={s.customerStoryItem}
+              >
+                <Fragment slot="image">
+                  <ResponsiveImage data={item.coverImage.responsiveImage} priority={true} />
+                </Fragment>
+                <span class={s.fakeLink}>Read more →</span>
+              </Card>
+            ))
+          }
+        </Carousel>
       </div>
     </Space>
 
