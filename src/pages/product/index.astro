@@ -58,52 +58,54 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
   </StripWithContent>
 
   <Space bottom={2}>
-    {
-      page.pillars.map((pillar, index) => {
-        return (
-          <div class={s.flagContainer}>
-            <Flag flip={index % 2 === 0}>
-              <Fragment slot="kicker">{pillar.theme}</Fragment>
-              <div slot="visual">
-                <ResponsiveImage data={pillar.image.responsiveImage} />
-              </div>
-              <div slot="title">
-                <InlineText {...ensureValidStructuredTextProps({ data: pillar.title })} />
-              </div>
-              <article>
-                {pillar.pillarCallout}
-                <Bullets style="bad">
-                  <li>
-                    <Svg name="icons/regular/check" />
-                    <div>
-                      <InlineText
-                        {...ensureValidStructuredTextProps({ data: pillar.capability1 })}
-                      />
-                    </div>
-                  </li>
-                  <li>
-                    <Svg name="icons/regular/check" />
-                    <div>
-                      <InlineText
-                        {...ensureValidStructuredTextProps({ data: pillar.capability2 })}
-                      />
-                    </div>
-                  </li>
-                  <li>
-                    <Svg name="icons/regular/check" />
-                    <div>
-                      <InlineText
-                        {...ensureValidStructuredTextProps({ data: pillar.capability3 })}
-                      />
-                    </div>
-                  </li>
-                </Bullets>
-              </article>
-            </Flag>
-          </div>
-        );
-      })
-    }
+    <div class={s.pillarsWrapper}>
+      {
+        page.pillars.map((pillar, index) => {
+          return (
+            <div class={s.flagContainer}>
+              <Flag flip={index % 2 === 0}>
+                <Fragment slot="kicker">{pillar.theme}</Fragment>
+                <div slot="visual">
+                  <ResponsiveImage data={pillar.image.responsiveImage} />
+                </div>
+                <div slot="title">
+                  <InlineText {...ensureValidStructuredTextProps({ data: pillar.title })} />
+                </div>
+                <article>
+                  {pillar.pillarCallout}
+                  <Bullets style="bad">
+                    <li>
+                      <Svg name="icons/regular/check" />
+                      <div>
+                        <InlineText
+                          {...ensureValidStructuredTextProps({ data: pillar.capability1 })}
+                        />
+                      </div>
+                    </li>
+                    <li>
+                      <Svg name="icons/regular/check" />
+                      <div>
+                        <InlineText
+                          {...ensureValidStructuredTextProps({ data: pillar.capability2 })}
+                        />
+                      </div>
+                    </li>
+                    <li>
+                      <Svg name="icons/regular/check" />
+                      <div>
+                        <InlineText
+                          {...ensureValidStructuredTextProps({ data: pillar.capability3 })}
+                        />
+                      </div>
+                    </li>
+                  </Bullets>
+                </article>
+              </Flag>
+            </div>
+          );
+        })
+      }
+    </div>
   </Space>
 
   <IntegrationsBanner
