@@ -35,6 +35,7 @@ export const query = graphql(
           hex
         }
         name
+        position
         title {
           value
         }
@@ -177,6 +178,50 @@ export const query = graphql(
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
+);
+
+export const siblingsQuery = graphql(
+  /* GraphQL */ `
+    query SiblingsQuery($position: IntType!) {
+      previous: successStory(orderBy: position_DESC, filter: { position: { lt: $position } }) {
+        name
+        ...SuccessStoryUrlFragment
+        coverImage {
+          responsiveImage {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+      next: successStory(orderBy: position_ASC, filter: { position: { gt: $position } }) {
+        name
+        ...SuccessStoryUrlFragment
+        coverImage {
+          responsiveImage {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+      first: successStory(orderBy: position_ASC) {
+        name
+        ...SuccessStoryUrlFragment
+        coverImage {
+          responsiveImage {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+      last: successStory(orderBy: position_DESC) {
+        name
+        ...SuccessStoryUrlFragment
+        coverImage {
+          responsiveImage {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+    }
+  `,
+  [SuccessStoryUrlFragment, ResponsiveImageFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

@@ -10,7 +10,7 @@ import { Video } from '~/components/blocks/Video';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { query } from './_graphql';
+import { query, siblingsQuery } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
@@ -18,12 +18,17 @@ import { InlineText } from '~/components/structuredText/InlineText';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Svg } from '~/components/Svg';
 import { StripWithContent } from '~/components/StripWithContent';
-import { Bullets } from '~/components/Bullets';
 import { cleanDomain } from '~/lib/cleanDomain';
 import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import { buildUrlForFeature } from '~/lib/datocms/gqlUrlBuilder/feature';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
-import { Markdown } from '~/components/Markdown';
+
+import { SameLevelNavigation } from '~/components/SameLevelNavigation';
+import { Card } from '~/components/Card';
+import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+
 import s from './_style.module.css';
 
 const variables = { slug: Astro.params.slug! };
@@ -33,6 +38,22 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const position = page.position;
+
+if (position === null) {
+  return { previous: null, next: null, first: null, last: null };
+}
+
+const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery, {
+  variables: { position },
+});
+
+const prevItem = previous ?? last;
+const nextItem = next ?? first;
+
+console.log(prevItem?.name);
+console.log(nextItem?.name);
 ---
 
 <Layout seo={page.seo}>
@@ -167,6 +188,28 @@ if (!page) {
       </aside>
     </div>
   </Wrapper>
+
+  {
+    prevItem && nextItem && (
+      <SameLevelNavigation title={'Nice title'} subtitle={'Nice subtitle'}>
+        {prevItem && nextItem && (
+          <div>
+            <div>
+              Prev:
+              <br />
+              {prevItem.name} |
+            </div>
+
+            <div>
+              Next:
+              <br />
+              {nextItem.name}
+            </div>
+          </div>
+        )}
+      </SameLevelNavigation>
+    )
+  }
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

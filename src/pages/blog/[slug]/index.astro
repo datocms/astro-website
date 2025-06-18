@@ -26,7 +26,7 @@ import { filterNodes } from '~/lib/datocms/filterNodes';
 import { formatDate } from '~/lib/formatters';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { slugify } from '~/lib/slugify';
-import { query } from './_graphql';
+import { query, siblingsQuery } from './_graphql';
 import s from './_style.module.css';
 import { Prose } from '~/components/Prose';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
@@ -53,6 +53,16 @@ const tocItems = filterNodes(
     label: innerText,
   };
 });
+
+// Manage content not yet published
+const dateTime = post._firstPublishedAt ? post._firstPublishedAt : post._createdAt;
+
+const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery, {
+  variables: { dateTime },
+});
+
+const prevItem = previous[0] ?? last;
+const nextItem = next[0] ?? first;
 ---
 
 <Layout seo={overrideSeo(post.seo, seoTwitterCard('summary_large_image'))}>
@@ -146,6 +156,24 @@ const tocItems = filterNodes(
       )
     }
   </div>
+
+  {
+    prevItem && nextItem && (
+      <div>
+        <div>
+          Prev:
+          <br />
+          {prevItem.title} |
+        </div>
+
+        <div>
+          Next:
+          <br />
+          {nextItem.title}
+        </div>
+      </div>
+    )
+  }
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>
