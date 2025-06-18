@@ -69,6 +69,9 @@ export const query = graphql(
       ) {
         ...CustomerStoryUrlFragment
         title
+        excerpt {
+          value
+        }
         coverImage {
           responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fill: blur, fit: crop }) {
             ...ResponsiveImageFragment

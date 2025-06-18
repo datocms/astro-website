@@ -142,11 +142,11 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
         <div class={s.teamCards}>
           <Card
             href={'team/best-cms-for-developers'}
-            target="_blank"
             title="For web developers"
             orientation="horizontal"
             size="large"
             boxed={false}
+            boxedVisual={false}
           >
             <Fragment slot="image">
               <Svg name="svg/illustrations/people" />
@@ -156,11 +156,11 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
 
           <Card
             href={'team/best-cms-for-developers'}
-            target="_blank"
             title="For Digital Marketers"
             orientation="horizontal"
             size="large"
             boxed={false}
+            boxedVisual={false}
           >
             <Fragment slot="image">
               <Svg name="svg/illustrations/growing" />
@@ -170,11 +170,11 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
 
           <Card
             href={'team/best-cms-for-developers'}
-            target="_blank"
             title="For Content Creators"
             orientation="horizontal"
             size="large"
             boxed={false}
+            boxedVisual={false}
           >
             <Fragment slot="image">
               <Svg name="svg/illustrations/box-things" />
@@ -184,11 +184,11 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
 
           <Card
             href={'team/best-cms-for-developers'}
-            target="_blank"
             title="For Enterprise Teams"
             orientation="horizontal"
             size="large"
             boxed={false}
+            boxedVisual={false}
           >
             <Fragment slot="image">
               <Svg name="svg/illustrations/faces" />
@@ -233,26 +233,29 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
       <div class={s.customerStoryWrapper}>
         {
           customerStories.map((item) => (
-            <a href={buildUrlForCustomerStory(item)} class={s.customerStoryItem} title={item.title}>
-              {item.coverImage?.responsiveImage && (
-                <div class={s.coverImage}>
-                  <ResponsiveImage data={item.coverImage.responsiveImage} />
-                </div>
-              )}
-            </a>
+            <Card
+              href={buildUrlForCustomerStory(item)}
+              title={item.title}
+              boxed={false}
+              boxedVisual={false}
+              size="medium"
+              class={s.customerStoryItem}
+            >
+              <Fragment slot="image">
+                <ResponsiveImage data={item.coverImage.responsiveImage} />
+              </Fragment>
+              {/* <InlineText {...ensureValidStructuredTextProps({ data: item.excerpt })} /> */}
+            </Card>
           ))
         }
       </div>
     </Space>
 
-    <Space top={1} bottom={1}>
-      <QuotesCarousel quotes={page.quotes} />
-    </Space>
-    <div class={s.testimonialsButtonWrapper}>
+    <!-- <div class={s.testimonialsButtonWrapper}>
       <Button as="a" href="/wall" s="invert" class={s.testimonialsButton}>
         Hear from our customers
       </Button>
-    </div>
+    </div> -->
   </Space>
 
   <DraftModeQueryListener query={query} />
