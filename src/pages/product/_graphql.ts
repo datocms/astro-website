@@ -63,10 +63,7 @@ export const query = graphql(
           ...FeatureCardFragment
         }
       }
-      customerStories: allCustomerStories(
-        first: 11
-        orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
-      ) {
+      customerStories: allCustomerStories(orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]) {
         ...CustomerStoryUrlFragment
         title
         coverImage {

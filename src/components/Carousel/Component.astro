@@ -9,6 +9,9 @@ type Props = {
   class?: string;
   viewportClass?: string;
   autoScroll?: boolean;
+  stopOnInteraction?: boolean;
+  stopOnMouseEnter?: boolean;
+  dragDisable?: boolean;
 };
 
 const {
@@ -18,12 +21,18 @@ const {
   viewportClass,
   autoScroll,
   removeButtons,
+  stopOnInteraction,
+  stopOnMouseEnter,
+  dragDisable,
 } = Astro.props;
 ---
 
 <embla-carousel
   data-autoscroll={autoScroll ? 'true' : undefined}
   data-loop={loop ? 'true' : undefined}
+  data-stoponinteraction={stopOnInteraction ? 'true' : undefined}
+  data-stoponmouseenter={stopOnMouseEnter ? 'true' : undefined}
+  data-dragdisable={dragDisable ? 'true' : undefined}
 >
   <div
     data-removebuttons={removeButtons ? 'true' : undefined}
@@ -58,14 +67,28 @@ const {
         const loop = this.dataset.loop === 'true';
         const prevButton = this.$('[data-prev]');
         const nextButton = this.$('[data-next]');
+        const stopOnInteraction = this.dataset.stoponInteraction === 'true';
+        const stopOnMouseEnter = this.dataset.stoponmouseenter === 'true';
+        const dragDisable = this.dataset.dragdisable === 'true';
 
         this.api = emblaCarousel(
           node,
           {
             loop: loop,
             align: 'start',
+            watchDrag: !dragDisable,
           },
-          this.dataset.autoscroll ? [autoScroll({ playOnInit: true, speed: 1 })] : [],
+          this.dataset.autoscroll
+            ? [
+                autoScroll({
+                  playOnInit: true,
+                  startDelay: 200,
+                  speed: 1,
+                  stopOnInteraction: stopOnInteraction,
+                  stopOnMouseEnter: stopOnMouseEnter,
+                }),
+              ]
+            : [],
         );
 
         this.on(prevButton, 'click', () => this.api.scrollPrev());
