@@ -5,7 +5,7 @@ import { graphql } from '~/lib/datocms/graphql';
 export const query = graphql(
   /* GraphQL */ `
     query Developers {
-      page: teamPage(filter: { slug: { eq: "developers" } }) {
+      page: teamPage(filter: { slug: { eq: "best-cms-for-developers" } }) {
         seo: _seoMetaTags {
           ...TagFragment
         }
