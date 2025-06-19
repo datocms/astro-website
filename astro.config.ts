@@ -272,5 +272,8 @@ export default defineConfig({
       '/docs/content-delivery-api/hierarchical-sorting',
     '/docs/content-modelling/trees': '/docs/content-modelling/hierarchical-sorting',
     '/docs/plugin-sdk': '/docs/plugin-sdk/introduction',
+    '/team/best-cms-for-developers': '/made-for/best-cms-for-developers',
+    '/team/cms-digital-marketing': '/made-for/cms-digital-marketing',
+    '/team/content-creators': '/made-for/content-creators',
   },
 });
