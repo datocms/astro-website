@@ -33,6 +33,7 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { overrideSeo, seoTwitterCard } from '~/lib/datocms/seo';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { SameLevelNavigation } from '~/components/SameLevelNavigation';
 
 const variables = { slug: Astro.params.slug! };
 const { post } = await executeQuery(Astro, query, { variables });
@@ -159,7 +160,7 @@ const nextItem = next[0] ?? first;
 
   {
     prevItem && nextItem && (
-      <div>
+      <SameLevelNavigation title="Title" subtitle="Subtitle">
         <div>
           Prev:
           <br />
@@ -171,7 +172,7 @@ const nextItem = next[0] ?? first;
           <br />
           {nextItem.title}
         </div>
-      </div>
+      </SameLevelNavigation>
     )
   }
 
