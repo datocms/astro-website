@@ -127,7 +127,7 @@ The title says it all. More info in this [Github issue](https://github.com/witha
 
 [DatoCMS](https://www.datocms.com/) is the REST & GraphQL Headless CMS for the modern web.
 
-Trusted by over 25,000 enterprise businesses, agencies, and individuals across the world, DatoCMS users create online content at scale from a central hub and distribute it via API. We ❤️ our [developers](https://www.datocms.com/made-for/best-cms-for-developers), [content editors](https://www.datocms.com/made-for/content-creators) and [marketers](https://www.datocms.com/made-for/cms-digital-marketing)!
+Trusted by over 25,000 enterprise businesses, agencies, and individuals across the world, DatoCMS users create online content at scale from a central hub and distribute it via API. We ❤️ our [developers](https://www.datocms.com/made-for/developers), [content editors](https://www.datocms.com/made-for/content-creators) and [marketers](https://www.datocms.com/made-for/marketers)!
 
 **Why DatoCMS?**
 
