@@ -6,7 +6,7 @@ export const linkableModelApiKeys = [
   'academy_course',
   'blog_post',
   'changelog_entry',
-  'customer_story',
+  'casual_chat',
   'doc_group',
   'doc_page',
   'enterprise_app',
@@ -18,7 +18,7 @@ export const linkableModelApiKeys = [
   'product_comparison',
   'changelog_entry',
   'showcase_project',
-  'success_story',
+  'case-study',
   'tech_partner',
   'template_demo',
   'use_case_page',
@@ -37,7 +37,7 @@ export const knownPaths = [
   '/contact/error',
   '/contact',
   '/contact/thanks',
-  '/customer-stories',
+  '/casual-chats',
   '/customers',
   '/changelog',
   '/docs/community-tutorials',
@@ -78,7 +78,7 @@ export const knownPaths = [
   '/security',
   '/slack',
   '/slack/thanks',
-  '/success-stories',
+  '/case-studies',
   '/support/error',
   '/support',
   '/support/thanks',
@@ -377,7 +377,7 @@ export const itemFinders = [
     finder: finderByModelField('slug', 'changelog_entry', 'slug'),
   },
   {
-    pattern: '/customer-stories/:slug',
+    pattern: '/casual-chats/:slug',
     finder: finderByModelField('slug', 'customer_story', 'slug'),
   },
   {
@@ -461,7 +461,7 @@ export const itemFinders = [
     finder: finderByModelField('projectSlug', 'showcase_project', 'slug'),
   },
   {
-    pattern: '/customers/:slug',
+    pattern: '/case-studies/:slug',
     finder: finderByModelField('slug', 'success_story', 'slug'),
   },
   {
@@ -581,7 +581,7 @@ export const redirects = Object.entries({
     '/docs/general-concepts/project-starters-and-templates#generate-a-clone-project-button',
   '/docs/project-starters-and-templates/project-starter-button':
     '/docs/general-concepts/project-starters-and-templates#generate-a-project-starter-button',
-  '/blog/headless-cms-unconventional-use-cases': '/customer-stories/trip-to-japan',
+  '/blog/headless-cms-unconventional-use-cases': '/casual-chats/trip-to-japan',
   '/docs/plugin-sdk': '/docs/plugin-sdk/introduction',
   '/docs/general-concepts/environments': '/docs/general-concepts/primary-and-sandbox-environments',
   '/docs/react/*splat': '/docs/next-js/*splat',

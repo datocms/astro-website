@@ -275,5 +275,9 @@ export default defineConfig({
     '/team/best-cms-for-developers': '/made-for/developers',
     '/team/cms-digital-marketing': '/made-for/marketers',
     '/team/content-creators': '/made-for/content-creators',
+    '/customer-stories': '/casual-chats',
+    '/customer-stories/[...rest]': '/casual-chats/[...rest]',
+    '/success-stories': '/customers',
+    '/customers/[...rest]': '/case-studies/[...rest]',
   },
 });
