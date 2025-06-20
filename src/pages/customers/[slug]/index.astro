@@ -22,11 +22,10 @@ import { cleanDomain } from '~/lib/cleanDomain';
 import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import { buildUrlForFeature } from '~/lib/datocms/gqlUrlBuilder/feature';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
-
 import { SameLevelNavigation } from '~/components/SameLevelNavigation';
 import { Card } from '~/components/Card';
 import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
-import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 
 import s from './_style.module.css';
 
@@ -37,6 +36,8 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const siblings = page.siblings.length > 0 ? page.siblings : null;
 
 const position = page.position;
 
@@ -186,23 +187,60 @@ const nextItem = next ?? first;
   </Wrapper>
 
   {
-    prevItem && nextItem && (
-      <SameLevelNavigation title={'Nice title'} subtitle={'Nice subtitle'}>
-        {prevItem && nextItem && (
-          <div>
-            <div>
-              Prev:
-              <br />
-              {prevItem.name} |
-            </div>
+    siblings && (
+      <SameLevelNavigation
+        title={'Not all stories are alike'}
+        subtitle={'Explore more case studies to see how different teams work with DatoCMS at scale'}
+      >
+        {siblings.map((item) => (
+          <Card
+            href={buildUrlForSuccessStory(item)}
+            title={item.name}
+            orientation={siblings.length === 3 ? 'vertical' : 'horizontal'}
+            size={siblings.length === 1 ? 'large' : 'small'}
+            fullTitleLength={true}
+            lineClamp={2}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={item.coverImage.responsiveImage} />
+            </Fragment>
+            {structuredTextToPlainText(item.subtitle)}
+          </Card>
+        ))}
+      </SameLevelNavigation>
+    )
+  }
 
-            <div>
-              Next:
-              <br />
-              {nextItem.name}
-            </div>
-          </div>
-        )}
+  {
+    !siblings && prevItem && nextItem && (
+      <SameLevelNavigation
+        title={'Not all stories are alike'}
+        subtitle={'Explore more case studies to see how different teams work with DatoCMS at scale'}
+      >
+        <Card
+          href={buildUrlForSuccessStory(prevItem)}
+          title={prevItem.name}
+          orientation="horizontal"
+          size="small"
+          fullTitleLength={true}
+        >
+          <Fragment slot="image">
+            <ResponsiveImage data={prevItem.coverImage.responsiveImage} />
+          </Fragment>
+          {structuredTextToPlainText(prevItem.subtitle)}
+        </Card>
+        <Card
+          href={buildUrlForSuccessStory(nextItem)}
+          title={nextItem.name}
+          orientation="horizontal"
+          size="small"
+          fullTitleLength={true}
+        >
+          <Fragment slot="image">
+            <ResponsiveImage data={nextItem.coverImage.responsiveImage} />
+          </Fragment>
+          {structuredTextToPlainText(nextItem.subtitle)}
+        </Card>
       </SameLevelNavigation>
     )
   }

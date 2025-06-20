@@ -162,6 +162,18 @@ export const query = graphql(
             ...UserGuidesEpisodeInlineFragment
           }
         }
+        siblings {
+          name
+          ...SuccessStoryUrlFragment
+          subtitle {
+            value
+          }
+          coverImage {
+            responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+              ...ResponsiveImageFragment
+            }
+          }
+        }
       }
     }
   `,
@@ -175,6 +187,7 @@ export const query = graphql(
     UseCasePageUrlFragment,
     FeatureUrlFragment,
     PartnerUrlFragment,
+    SuccessStoryUrlFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
@@ -186,8 +199,11 @@ export const siblingsQuery = graphql(
       previous: successStory(orderBy: position_DESC, filter: { position: { lt: $position } }) {
         name
         ...SuccessStoryUrlFragment
+        subtitle {
+          value
+        }
         coverImage {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
             ...ResponsiveImageFragment
           }
         }
@@ -195,8 +211,11 @@ export const siblingsQuery = graphql(
       next: successStory(orderBy: position_ASC, filter: { position: { gt: $position } }) {
         name
         ...SuccessStoryUrlFragment
+        subtitle {
+          value
+        }
         coverImage {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
             ...ResponsiveImageFragment
           }
         }
@@ -204,8 +223,11 @@ export const siblingsQuery = graphql(
       first: successStory(orderBy: position_ASC) {
         name
         ...SuccessStoryUrlFragment
+        subtitle {
+          value
+        }
         coverImage {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
             ...ResponsiveImageFragment
           }
         }
@@ -213,8 +235,11 @@ export const siblingsQuery = graphql(
       last: successStory(orderBy: position_DESC) {
         name
         ...SuccessStoryUrlFragment
+        subtitle {
+          value
+        }
         coverImage {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
             ...ResponsiveImageFragment
           }
         }
