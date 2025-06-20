@@ -1,9 +1,15 @@
 .embla {
   position: relative;
-  --buttonsY: 50%;
   overflow: hidden;
   margin: 0 calc(var(--page-margin) * -1);
   padding: 0 var(--page-margin);
+
+  &[data-removebuttons='true'] {
+    .prevSlide,
+    .nextSlide {
+      display: none;
+    }
+  }
 
   @media screen and (min-width: 768px) {
     &::before,
@@ -41,10 +47,19 @@
   }
 }
 
+.emblaViewport {
+  width: 100%;
+}
+
 .emblaContainer {
-  display: flex;
-  gap: 0.75rem;
+  /* gap: 0.75rem; */
   cursor: grab;
+  display: flex;
+  margin-left: -0.75rem;
+
+  & > * {
+    margin-left: 0.75rem;
+  }
 
   &:active {
     cursor: grabbing;

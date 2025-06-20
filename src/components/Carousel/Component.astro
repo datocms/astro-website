@@ -3,19 +3,46 @@ import s from './_style.module.css';
 import { Svg } from '~/components/Svg';
 
 type Props = {
+  loop?: boolean;
   buttonsY?: string;
+  removeButtons?: boolean;
   class?: string;
   viewportClass?: string;
   autoScroll?: boolean;
+  stopOnInteraction?: boolean;
+  stopOnMouseEnter?: boolean;
+  dragDisable?: boolean;
 };
 
-const { buttonsY, class: className, viewportClass, autoScroll } = Astro.props;
+const {
+  loop = false,
+  buttonsY = '50%',
+  class: className,
+  viewportClass,
+  autoScroll,
+  removeButtons,
+  stopOnInteraction,
+  stopOnMouseEnter,
+  dragDisable,
+} = Astro.props;
 ---
 
-<embla-carousel data-autoscroll={autoScroll ? 'true' : undefined}>
-  <div class:list={[s.embla, className]} data-viewport style={{ '--buttonsY': buttonsY }}>
-    <div class:list={[s.emblaContainer, viewportClass]}>
-      <slot />
+<embla-carousel
+  data-autoscroll={autoScroll ? 'true' : undefined}
+  data-loop={loop ? 'true' : undefined}
+  data-stoponinteraction={stopOnInteraction ? 'true' : undefined}
+  data-stoponmouseenter={stopOnMouseEnter ? 'true' : undefined}
+  data-dragdisable={dragDisable ? 'true' : undefined}
+>
+  <div
+    data-removebuttons={removeButtons ? 'true' : undefined}
+    class:list={[s.embla, className]}
+    style={removeButtons ? undefined : `--buttonsY: ${buttonsY}`}
+  >
+    <div class:list={[s.emblaViewport, viewportClass]} data-viewport>
+      <div class={s.emblaContainer}>
+        <slot />
+      </div>
     </div>
     <button class={s.prevSlide} data-prev>
       <Svg name="icons/regular/angle-left" />
@@ -38,13 +65,31 @@ const { buttonsY, class: className, viewportClass, autoScroll } = Astro.props;
 
       parsedCallback() {
         const node = this.$('[data-viewport]');
+        const loop = this.dataset.loop === 'true';
         const prevButton = this.$('[data-prev]');
         const nextButton = this.$('[data-next]');
+        const stopOnInteraction = this.dataset.stoponInteraction === 'true';
+        const stopOnMouseEnter = this.dataset.stoponmouseenter === 'true';
+        const dragDisable = this.dataset.dragdisable === 'true';
 
         this.api = emblaCarousel(
           node,
-          { loop: false, align: 'start' },
-          this.dataset.autoscroll ? [autoScroll({ playOnInit: true, speed: 1 })] : [],
+          {
+            loop: loop,
+            align: 'start',
+            watchDrag: !dragDisable,
+          },
+          this.dataset.autoscroll
+            ? [
+                autoScroll({
+                  playOnInit: true,
+                  startDelay: 200,
+                  speed: 1,
+                  stopOnInteraction: stopOnInteraction,
+                  stopOnMouseEnter: stopOnMouseEnter,
+                }),
+              ]
+            : [],
         );
 
         this.on(prevButton, 'click', () => this.api.scrollPrev());
