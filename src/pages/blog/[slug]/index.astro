@@ -26,13 +26,14 @@ import { filterNodes } from '~/lib/datocms/filterNodes';
 import { formatDate } from '~/lib/formatters';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { slugify } from '~/lib/slugify';
-import { query } from './_graphql';
+import { query, siblingsQuery } from './_graphql';
 import s from './_style.module.css';
 import { Prose } from '~/components/Prose';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { overrideSeo, seoTwitterCard } from '~/lib/datocms/seo';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { SameLevelNavigation } from '~/components/SameLevelNavigation';
 
 const variables = { slug: Astro.params.slug! };
 const { post } = await executeQuery(Astro, query, { variables });
@@ -53,6 +54,16 @@ const tocItems = filterNodes(
     label: innerText,
   };
 });
+
+// Manage content not yet published
+const dateTime = post._firstPublishedAt ? post._firstPublishedAt : post._createdAt;
+
+const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery, {
+  variables: { dateTime },
+});
+
+const prevItem = previous[0] ?? last;
+const nextItem = next[0] ?? first;
 ---
 
 <Layout seo={overrideSeo(post.seo, seoTwitterCard('summary_large_image'))}>
@@ -146,6 +157,24 @@ const tocItems = filterNodes(
       )
     }
   </div>
+
+  {
+    prevItem && nextItem && (
+      <SameLevelNavigation title="Title" subtitle="Subtitle">
+        <div>
+          Prev:
+          <br />
+          {prevItem.title} |
+        </div>
+
+        <div>
+          Next:
+          <br />
+          {nextItem.title}
+        </div>
+      </SameLevelNavigation>
+    )
+  }
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

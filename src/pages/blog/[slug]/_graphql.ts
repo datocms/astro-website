@@ -27,6 +27,7 @@ export const query = graphql(
           ...TagFragment
         }
         _firstPublishedAt
+        _createdAt
         title
         seoH1
         canonicalUrl
@@ -131,6 +132,61 @@ export const query = graphql(
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
+);
+
+export const siblingsQuery = graphql(
+  /* GraphQL */ `
+    query SiblingsQuery($dateTime: DateTime) {
+      previous: allBlogPosts(
+        filter: { _firstPublishedAt: { lt: $dateTime } }
+        orderBy: _firstPublishedAt_DESC
+        first: 1
+      ) {
+        title
+        _firstPublishedAt
+        ...BlogPostUrlFragment
+        coverImage {
+          responsiveImage {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+      next: allBlogPosts(
+        filter: { _firstPublishedAt: { gte: $dateTime } }
+        orderBy: _firstPublishedAt_ASC
+        first: 1
+        skip: 1
+      ) {
+        title
+        _firstPublishedAt
+        ...BlogPostUrlFragment
+        coverImage {
+          responsiveImage {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+      first: blogPost(orderBy: _firstPublishedAt_ASC) {
+        title
+        ...BlogPostUrlFragment
+        coverImage {
+          responsiveImage {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+      last: blogPost(orderBy: _firstPublishedAt_DESC) {
+        title
+        ...BlogPostUrlFragment
+        coverImage {
+          responsiveImage {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+    }
+  `,
+  [BlogPostUrlFragment, ResponsiveImageFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
