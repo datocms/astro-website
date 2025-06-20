@@ -66,5 +66,5 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/customer-stories/p/${i}`);
+  return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/casual-chats/p/${i}`);
 };

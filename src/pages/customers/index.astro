@@ -1,119 +1,107 @@
 ---
-import { query } from './_graphql';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
-import { Wrapper } from '~/components/Wrapper';
-import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/structuredText/Text';
-import { Space } from '~/components/Space';
-import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { LogosBar } from '~/components/LogosBar';
-import { Layout } from '~/layouts/Layout';
+import { Button } from '~/components/Button';
+import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
+import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
-import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { StripWithContent } from '~/components/StripWithContent';
-import { Card } from '~/components/Card';
-import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
-import s from './_style.module.css';
 
-const { page, posts } = await executeQuery(Astro, query);
+const { page } = await executeQuery(Astro, query);
 
-if (!page || posts.length === 0) {
+if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
-  return notFoundResponse();
-}
-
-const highlightedProjectId = page.highlight.id;
-const highlightedProject = posts.find((post) => post.id === highlightedProjectId);
-const projects = posts.filter((post) => post.id !== highlightedProjectId);
-
-if (!highlightedProject) {
   return notFoundResponse();
 }
 ---
 
 <Layout seo={page.seo}>
   <Hero>
-    <Fragment slot="kicker">Success stories</Fragment>
-    <Fragment slot="title">Powered by <mark>DatoCMS</mark></Fragment>
+    <Fragment slot="kicker">Customer Stories</Fragment>
+    <Fragment slot="title">DatoCMS <mark>in the wild</mark></Fragment>
     <Fragment slot="subtitle">
-      Learn how companies are building their next-generation digital products with structured,
-      flexible content at their core
+      A compilation of how some of our partners and customers use DatoCMS in production
     </Fragment>
   </Hero>
 
-  <Space top={1} bottom={1}>
+  <Space top={2} bottom={3}>
     <LogosBar
-      title=""
+      title="We power experiences for over half a billion users"
       clients={[
-        'svg/logos/vercel',
         'svg/logos/deutsche-telekom',
-        'svg/logos/harrys',
-        'svg/logos/nhs',
+        'svg/logos/hashicorp',
         'svg/logos/verizon',
-        'svg/logos/mit',
+        'svg/logos/polestar',
+        'svg/logos/vercel',
       ]}
     />
   </Space>
 
-  <StripWithContent>
-    <Wrapper>
-      <div class={s.highlight}>
-        <div class={s.highlightVisual}>
-          <a class={s.highlightImage} href={buildUrlForSuccessStory(highlightedProject)}>
-            <ResponsiveImage data={highlightedProject.coverImage.responsiveImage} />
-          </a>
-        </div>
-        <div class={s.highlightBody}>
-          <div class={s.highlightLogos}>
-            <img src={highlightedProject.logo.url} class={s.highlightLogo} />
-            <span class={s.plus}>+</span>
-            <Svg name="svg/logos/datocms" />
-          </div>
-          <div class={s.highlightTitle}>
-            <Text {...ensureValidStructuredTextProps({ data: highlightedProject.title })} />
-          </div>
-          <Text {...ensureValidStructuredTextProps({ data: highlightedProject.subtitle })} />
-          <a class={s.readMore} href={buildUrlForSuccessStory(highlightedProject)}>Read more</a>
-        </div>
-        {
-          highlightedProject.numbers.length > 0 && (
-            <div class={s.highlightNumbers}>
-              {highlightedProject.numbers.map((item) => (
-                <div class={s.numberBlock}>
-                  <h3 class={s.numberTitle}>{item.number}</h3>
-                  <p class={s.numberLabel}>{item.label}</p>
-                </div>
-              ))}
-            </div>
-          )
-        }
-      </div>
-    </Wrapper>
-  </StripWithContent>
+  <Flag style="good" flip>
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/castle" />
+    </Fragment>
+    <Fragment slot="title">
+      Enterprise <mark>Case Studies</mark>
+    </Fragment>
+    <p>
+      An insight into how the most ambitious brands in the world use DatoCMS to manage their content
+    </p>
+    <Space top={1}>
+      <Button as="a" href="/case-studies" p="small">Explore case studies</Button>
+    </Space>
+  </Flag>
 
-  <Wrapper>
-    <div class={s.grid}>
-      {
-        projects.map((post) => (
-          <Card
-            title={structuredTextToPlainText(post.title) ?? post.name}
-            size="small"
-            lineClamp={3}
-            svgLogoUrl={post.logo.url}
-            href={buildUrlForSuccessStory(post)}
-          >
-            <Fragment slot="image">
-              <ResponsiveImage data={post.coverImage.responsiveImage} />
-            </Fragment>
-            {structuredTextToPlainText(post.subtitle)}
-          </Card>
-        ))
-      }
-    </div>
-  </Wrapper>
+  <Flag style="bad">
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/faces" />
+    </Fragment>
+    <Fragment slot="title">
+      Customer <mark>Stories</mark>
+    </Fragment>
+    <p>
+      Casual conversations with partners and customers working on some really cool use cases with
+      DatoCMS
+    </p>
+    <Space top={1}>
+      <Button as="a" href="/casual-chats" p="small">Explore casual chats</Button>
+    </Space>
+  </Flag>
+
+  <Flag style="good" flip>
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/space" />
+    </Fragment>
+    <Fragment slot="title">
+      <mark>Partner</mark> Projects
+    </Fragment>
+    <p>
+      Our most successful customers work with our agency partners to bring some incredible projects
+      to life
+    </p>
+    <Space top={1}>
+      <Button as="a" href="/partners/showcase" p="small">Explore partner showcase</Button>
+    </Space>
+  </Flag>
+
+  <Flag style="bad">
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/people" />
+    </Fragment>
+    <Fragment slot="title">
+      Wall of <mark>Love</mark>
+    </Fragment>
+    <p>
+      So much 🫶🏽 making us blush! See what our users and partners have to say about working with us
+    </p>
+    <Space top={1}>
+      <Button as="a" href="/wall" p="small">Read our testimonials</Button>
+    </Space>
+  </Flag>
+
+  <DraftModeQueryListener query={query} />
 </Layout>
-
-<DraftModeQueryListener query={query} />

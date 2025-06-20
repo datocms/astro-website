@@ -8,5 +8,5 @@ export const SuccessStoryUrlFragment = graphql(/* GraphQL */ `
 
 export function buildUrlForSuccessStory(successStory: FragmentOf<typeof SuccessStoryUrlFragment>) {
   const data = readFragment(SuccessStoryUrlFragment, successStory);
-  return `/customers/${data.slug}`;
+  return `/case-studies/${data.slug}`;
 }

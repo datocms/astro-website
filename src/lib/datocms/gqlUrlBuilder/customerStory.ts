@@ -10,5 +10,5 @@ export function buildUrlForCustomerStory(
   customerStory: FragmentOf<typeof CustomerStoryUrlFragment>,
 ) {
   const data = readFragment(CustomerStoryUrlFragment, customerStory);
-  return `/customer-stories/${data.slug}`;
+  return `/casual-chats/${data.slug}`;
 }
