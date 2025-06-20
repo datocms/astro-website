@@ -146,7 +146,7 @@ export const siblingsQuery = graphql(
         _firstPublishedAt
         ...BlogPostUrlFragment
         coverImage {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
             ...ResponsiveImageFragment
           }
         }
@@ -161,7 +161,7 @@ export const siblingsQuery = graphql(
         _firstPublishedAt
         ...BlogPostUrlFragment
         coverImage {
-          responsiveImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
             ...ResponsiveImageFragment
           }
         }

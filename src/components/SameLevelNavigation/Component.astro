@@ -1,22 +1,28 @@
 ---
 import { Wrapper } from '~/components/Wrapper';
+import { Space } from '~/components/Space';
 import s from './style.module.css';
+import { undefined } from 'astro:schema';
 
 type Props = {
   title?: string;
   subtitle?: string;
+  spaceTop?: 1 | 2 | 3 | 4;
+  spaceBottom?: 1 | 2 | 3 | 4;
 };
 
-const { title, subtitle } = Astro.props;
+const { title, subtitle, spaceTop = 2, spaceBottom } = Astro.props;
 ---
 
-<Wrapper>
-  <section class={s.container}>
-    {title && <h2 class={s.title}>{title}</h2>}
-    {subtitle && <p class={s.subtitle}>{subtitle}</p>}
+<Space top={spaceTop} bottom={spaceBottom}>
+  <Wrapper>
+    <section class={s.container}>
+      {title && <h2 class={s.title}>{title}</h2>}
+      {subtitle && <p class={s.subtitle}>{subtitle}</p>}
 
-    <div class={s.items}>
-      <slot />
-    </div>
-  </section>
-</Wrapper>
+      <div class={s.items}>
+        <slot />
+      </div>
+    </section>
+  </Wrapper>
+</Space>
