@@ -37,8 +37,6 @@ if (!page) {
   return notFoundResponse();
 }
 
-const siblings = page.siblings.length > 0 ? page.siblings : null;
-
 const position = page.position;
 
 if (position === null) {
@@ -51,6 +49,10 @@ const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery,
 
 const prevItem = previous ?? last;
 const nextItem = next ?? first;
+
+const siblings = page.siblings;
+const siblingsWithFallback =
+  siblings.length > 0 ? siblings : [prevItem, nextItem].filter((item) => item !== null);
 ---
 
 <Layout seo={page.seo}>
@@ -187,17 +189,17 @@ const nextItem = next ?? first;
   </Wrapper>
 
   {
-    siblings && (
+    siblingsWithFallback && (
       <SameLevelNavigation
-        title={'Not all stories are alike'}
-        subtitle={'Explore more case studies to see how different teams work with DatoCMS at scale'}
+        title="Not all stories are alike"
+        subtitle="Explore more case studies to see how different teams work with DatoCMS at scale"
       >
-        {siblings.map((item) => (
+        {siblingsWithFallback.map((item) => (
           <Card
             href={buildUrlForSuccessStory(item)}
             title={item.name}
-            orientation={siblings.length === 3 ? 'vertical' : 'horizontal'}
-            size={siblings.length === 1 ? 'large' : 'small'}
+            orientation={siblingsWithFallback.length === 3 ? 'vertical' : 'horizontal'}
+            size={siblingsWithFallback.length === 1 ? 'large' : 'small'}
             fullTitleLength={true}
             lineClamp={2}
           >
@@ -207,40 +209,6 @@ const nextItem = next ?? first;
             {structuredTextToPlainText(item.subtitle)}
           </Card>
         ))}
-      </SameLevelNavigation>
-    )
-  }
-
-  {
-    !siblings && prevItem && nextItem && (
-      <SameLevelNavigation
-        title={'Not all stories are alike'}
-        subtitle={'Explore more case studies to see how different teams work with DatoCMS at scale'}
-      >
-        <Card
-          href={buildUrlForSuccessStory(prevItem)}
-          title={prevItem.name}
-          orientation="horizontal"
-          size="small"
-          fullTitleLength={true}
-        >
-          <Fragment slot="image">
-            <ResponsiveImage data={prevItem.coverImage.responsiveImage} />
-          </Fragment>
-          {structuredTextToPlainText(prevItem.subtitle)}
-        </Card>
-        <Card
-          href={buildUrlForSuccessStory(nextItem)}
-          title={nextItem.name}
-          orientation="horizontal"
-          size="small"
-          fullTitleLength={true}
-        >
-          <Fragment slot="image">
-            <ResponsiveImage data={nextItem.coverImage.responsiveImage} />
-          </Fragment>
-          {structuredTextToPlainText(nextItem.subtitle)}
-        </Card>
       </SameLevelNavigation>
     )
   }
