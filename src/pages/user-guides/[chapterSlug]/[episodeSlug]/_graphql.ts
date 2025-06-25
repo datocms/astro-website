@@ -110,6 +110,7 @@ export const query = graphql(
       chapters: allUserGuidesChapters(orderBy: position_ASC) {
         id
         title
+        position
         slug
         episodes: videos {
           id
