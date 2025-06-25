@@ -34,6 +34,8 @@ export const query = graphql(
           ...TagFragment
         }
         title
+        _firstPublishedAt
+        _createdAt
         seoH1
         canonicalUrl
         yoastAnalysis
@@ -116,6 +118,18 @@ export const query = graphql(
             }
           }
         }
+        siblings {
+          title
+          excerpt {
+            value
+          }
+          ...CustomerStoryUrlFragment
+          coverImage {
+            responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+              ...ResponsiveImageFragment
+            }
+          }
+        }
       }
     }
   `,
@@ -137,9 +151,74 @@ export const query = graphql(
     ChangelogEntryInlineFragment,
     BlogPostLinkFragment,
     ChangelogEntryLinkFragment,
+    CustomerStoryUrlFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
+);
+
+export const siblingsQuery = graphql(
+  /* GraphQL */ `
+    query SiblingsQuery($dateTime: DateTime) {
+      previous: allCustomerStories(
+        filter: { _firstPublishedAt: { lt: $dateTime } }
+        orderBy: _firstPublishedAt_DESC
+      ) {
+        title
+        excerpt {
+          value
+        }
+        ...CustomerStoryUrlFragment
+        coverImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+      next: allCustomerStories(
+        filter: { _firstPublishedAt: { gte: $dateTime } }
+        orderBy: _firstPublishedAt_ASC
+        first: 1
+        skip: 1
+      ) {
+        title
+        excerpt {
+          value
+        }
+        ...CustomerStoryUrlFragment
+        coverImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+      first: customerStory(orderBy: _firstPublishedAt_ASC) {
+        title
+        excerpt {
+          value
+        }
+        ...CustomerStoryUrlFragment
+        coverImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+      last: customerStory(orderBy: _firstPublishedAt_DESC) {
+        title
+        excerpt {
+          value
+        }
+        ...CustomerStoryUrlFragment
+        coverImage {
+          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+    }
+  `,
+  [CustomerStoryUrlFragment, ResponsiveImageFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
