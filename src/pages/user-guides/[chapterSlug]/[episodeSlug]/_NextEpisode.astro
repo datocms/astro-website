@@ -6,6 +6,8 @@ import { readFragment } from 'gql.tada';
 import { Image } from 'astro:assets';
 import { formatVideoDuration } from '~/lib/formatters';
 import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
+import { SameLevelNavigation } from '~/components/SameLevelNavigation';
+import { Card } from '~/components/Card';
 
 interface Props {
   episode: FragmentOf<typeof EpisodeFragment>;
@@ -14,9 +16,18 @@ interface Props {
 const episode = readFragment(EpisodeFragment, Astro.props.episode);
 ---
 
-<div class={s.nextVideo}>
-  <a href={buildUrlForUserGuidesEpisode(episode)}>
-    <figure>
+<SameLevelNavigation
+  title="Continue Learning"
+  subtitle="Navigate different chapters in this section to use DatoCMS like a pro"
+>
+  <Card
+    href={buildUrlForUserGuidesEpisode(episode)}
+    title="Next episode"
+    label={formatVideoDuration(episode.asset.video.duration)}
+    orientation="horizontal"
+    noForcedAspectRatio
+  >
+    <Fragment slot="image">
       <Image
         src={`${episode.asset.video.thumbnailUrl}?time=${episode.thumbTimeSeconds}`}
         inferSize
@@ -29,12 +40,7 @@ const episode = readFragment(EpisodeFragment, Astro.props.episode);
           color: 'transparent',
         }}
       />
-    </figure>
-
-    <article>
-      <p class={s.nextVideoLabel}>Next episode</p>
-      <h2>{episode.title}</h2>
-      <div class={s.pill}>{formatVideoDuration(episode.asset.video.duration)}</div>
-    </article>
-  </a>
-</div>
+    </Fragment>
+    {episode.title}
+  </Card>
+</SameLevelNavigation>
