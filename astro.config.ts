@@ -279,5 +279,9 @@ export default defineConfig({
     '/customer-stories/[...rest]': '/casual-chats/[...rest]',
     '/success-stories': '/customers',
     '/customers/[...rest]': '/case-studies/[...rest]',
+    '/use-cases/headless-cms-publishing': '/use-cases/digital-publishing',
+    '/use-cases/headless-cms-websites': '/use-cases/modern-websites',
+    '/use-cases/headless-ecommerce': '/use-cases/ecommerce',
+    '/use-cases/headless-cms-knowledge-management': '/use-cases/knowledge-management',
   },
 });
