@@ -18,13 +18,13 @@ const parsedItems = parseHtmlWithExamples(html);
   parsedItems.map((item) =>
     item.type === 'html' ? (
       <Fragment set:html={item.content} />
-    ) : (
+    ) : examples.find((example) => example.id === item.id) ? (
       <ExampleComponent
         id={item.id}
         example={examples.find((example) => example.id === item.id)}
         startVisible={item.alone}
         {...additionalProps}
       />
-    ),
+    ) : null,
   )
 }
