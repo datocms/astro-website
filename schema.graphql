@@ -1674,9 +1674,9 @@ input BlogPostModelFilter {
   seoH1: StringFilter
   canonicalUrl: StringFilter
   title: StringFilter
-  slug: SlugFilter
   content: BlogPostModelContentFieldFilter
   excerpt: StructuredTextFilter
+  slug: SlugFilter
   OR: [BlogPostModelFilter]
   AND: [BlogPostModelFilter]
 }
@@ -2679,6 +2679,7 @@ input CustomerStoryModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
+  siblings: LinksFilter
   coverImage: FileFilter
   partner: LinkFilter
   people: LinksFilter
@@ -2755,6 +2756,7 @@ type CustomerStoryRecord implements RecordInterface {
   people: [PersonRecord!]!
   seoH1: String
   seoSettings: SeoField
+  siblings: [CustomerStoryRecord!]!
   slug: String!
   title: String!
   updatedAt: DateTime!
@@ -11664,8 +11666,8 @@ input LandingPageModelFilter {
   name: StringFilter
   subtitle: TextFilter
   docsUrl: StringFilter
-  slug: SlugFilter
   title: StructuredTextFilter
+  slug: SlugFilter
   OR: [LandingPageModelFilter]
   AND: [LandingPageModelFilter]
 }
@@ -19540,13 +19542,14 @@ input SuccessStoryModelFilter {
   tags: LinksFilter
   name: StringFilter
   content: SuccessStoryModelContentFieldFilter
-  slug: SlugFilter
   projectUrl: StringFilter
   useCase: LinkFilter
   subtitle: StructuredTextFilter
   keyFeatures: LinksFilter
   industry: LinksFilter
   partner: LinkFilter
+  slug: SlugFilter
+  siblings: LinksFilter
   OR: [SuccessStoryModelFilter]
   AND: [SuccessStoryModelFilter]
 }
@@ -19669,6 +19672,7 @@ type SuccessStoryRecord implements RecordInterface {
   position: IntType
   projectUrl: String
   result: SuccessStoryModelResultField
+  siblings: [SuccessStoryRecord!]!
   slug: String!
   subtitle: SuccessStoryModelSubtitleField
   tags: [SuccessStoryTagRecord!]!
@@ -21549,8 +21553,8 @@ input UserGuidesChapterModelFilter {
   _isValid: BooleanFilter
   title: StringFilter
   videos: LinksFilter
-  slug: SlugFilter
   introduction: StructuredTextFilter
+  slug: SlugFilter
   OR: [UserGuidesChapterModelFilter]
   AND: [UserGuidesChapterModelFilter]
 }

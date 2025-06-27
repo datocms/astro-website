@@ -17,6 +17,7 @@ type Props = {
   size?: 'small' | 'micro' | 'medium' | 'large';
   svgLogoUrl?: string;
   title: string;
+  fullTitleLength?: boolean | undefined;
   noForcedAspectRatio?: boolean;
 };
 
@@ -35,6 +36,7 @@ const {
   size = 'medium',
   svgLogoUrl,
   title,
+  fullTitleLength = false,
   noForcedAspectRatio = false,
 } = Astro.props;
 ---
@@ -72,7 +74,7 @@ const {
     }
   </div>
   <article class={s.cardContent}>
-    <h2 class={s.cardTitle}>
+    <h2 class={s.cardTitle} data-full-title-lenght={fullTitleLength}>
       {Astro.slots.has('title') ? <slot name="title" /> : <>{title}</>}
     </h2>
     <div class={s.cardBody}>

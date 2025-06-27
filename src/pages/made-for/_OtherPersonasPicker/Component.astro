@@ -1,7 +1,10 @@
 ---
-import { Wrapper } from '~/components/Wrapper';
+import { SameLevelNavigation } from '~/components/SameLevelNavigation';
+import { Card } from '~/components/Card';
+import developersIcon from '~/svg/illustrations/developers-2.svg';
+import marketersIcon from '~/svg/illustrations/marketers.svg';
+import contentEditorsIcon from '~/svg/illustrations/content-editors2.svg';
 import s from './style.module.css';
-import { Svg } from '~/components/Svg';
 
 type Props = {
   currentPersonas: 'developers' | 'marketers' | 'content-creators';
@@ -11,66 +14,54 @@ type Props = {
 const { title, currentPersonas } = Astro.props;
 ---
 
-<Wrapper>
-  <div class={s.root}>
-    <div class={s.intro}>
-      <div class={s.introTitle}>{title}</div>
-      <div class={s.introBody}>
-        DatoCMS is a concrete benefit for the whole company. See how DatoCMS can help the entire
-        digital pipeline.
-      </div>
-    </div>
-    <div class={s.picker}>
-      {
-        currentPersonas !== 'developers' && (
-          <a class={s.personas} href="/made-for/developers">
-            <div class={s.personasImage}>
-              <Svg name="svg/illustrations/developers-2" />
-            </div>
-            <div class={s.personasTitle}>For developers</div>
-            <div class={s.personasBody}>
-              Your business needs a reliable and future-proof infrastructure
-            </div>
-            <div class={s.personasLink}>
-              Learn more <Svg name="svg/illustrations/arrow-usecase" />
-            </div>
-          </a>
-        )
-      }
-
-      {
-        currentPersonas !== 'marketers' && (
-          <a class={s.personas} href="/made-for/marketers">
-            <div class={s.personasImage}>
-              <Svg name="svg/illustrations/marketers" />
-            </div>
-            <div class={s.personasTitle}>For digital marketers</div>
-            <div class={s.personasBody}>
-              Solve complex strategic goals with technology that empowers your team
-            </div>
-            <div class={s.personasLink}>
-              Learn more <Svg name="svg/illustrations/arrow-usecase" />
-            </div>
-          </a>
-        )
-      }
-
-      {
-        currentPersonas !== 'content-creators' && (
-          <a class={s.personas} href="/made-for/content-creators">
-            <div class={s.personasImage}>
-              <Svg name="svg/illustrations/content-editors2" />
-            </div>
-            <div class={s.personasTitle}>For content editors</div>
-            <div class={s.personasBody}>
-              Automate SEO and manage content on multiple sites without filing an IT ticket
-            </div>
-            <div class={s.personasLink}>
-              Learn more <Svg name="svg/illustrations/arrow-usecase" />
-            </div>
-          </a>
-        )
-      }
-    </div>
-  </div>
-</Wrapper>
+<SameLevelNavigation
+  spaceTop={3}
+  title={title}
+  subtitle="DatoCMS is a concrete benefit for the whole company. See how DatoCMS can help the entire digital pipeline."
+>
+  {
+    currentPersonas !== 'developers' && (
+      <Card
+        href="/made-for/developers"
+        svgLogoUrl={developersIcon.src}
+        title="For developers"
+        orientation="horizontal"
+      >
+        Your business needs a reliable and future-proof infrastructure
+        <Fragment slot="below">
+          <span class={s.fakeLink}>Read more →</span>
+        </Fragment>
+      </Card>
+    )
+  }
+  {
+    currentPersonas !== 'marketers' && (
+      <Card
+        href="/"
+        svgLogoUrl={marketersIcon.src}
+        title="For digital marketers"
+        orientation="horizontal"
+      >
+        Solve complex strategic goals with technology that empowers your team
+        <Fragment slot="below">
+          <span class={s.fakeLink}>Read more →</span>
+        </Fragment>
+      </Card>
+    )
+  }
+  {
+    currentPersonas !== 'content-creators' && (
+      <Card
+        href="/made-for/content-creators"
+        svgLogoUrl={contentEditorsIcon.src}
+        title="For content editors"
+        orientation="horizontal"
+      >
+        Automate SEO and manage content on multiple sites without filing an IT ticket
+        <Fragment slot="below">
+          <span class={s.fakeLink}>Read more →</span>
+        </Fragment>
+      </Card>
+    )
+  }
+</SameLevelNavigation>

@@ -26,12 +26,16 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { filterNodes } from '~/lib/datocms/filterNodes';
 import { intersperse } from '~/lib/intersperse';
 import { isHeading } from 'datocms-structured-text-utils';
-import { query } from './_graphql';
+import { query, siblingsQuery } from './_graphql';
 import { slugify } from '~/lib/slugify';
-import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { SameLevelNavigation } from '~/components/SameLevelNavigation';
+import { Card } from '~/components/Card';
+import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import s from './_style.module.css';
 
 const variables = { slug: Astro.params.slug! };
 const { post } = await executeQuery(Astro, query, { variables });
@@ -52,6 +56,20 @@ const tocItems = filterNodes(
     label: innerText,
   };
 });
+
+// Manage content not yet published
+const dateTime = post._firstPublishedAt ? post._firstPublishedAt : post._createdAt;
+
+const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery, {
+  variables: { dateTime },
+});
+
+const prevItem = previous[0] ?? last;
+const nextItem = next[0] ?? first;
+
+const siblings = post.siblings;
+const siblingsWithFallback =
+  siblings.length > 0 ? siblings : [prevItem, nextItem].filter((item) => item !== null);
 ---
 
 <Layout seo={post.seo}>
@@ -137,6 +155,31 @@ const tocItems = filterNodes(
       )
     }
   </div>
+
+  {
+    siblingsWithFallback && (
+      <SameLevelNavigation
+        title="Not all stories are alike"
+        subtitle="Discover how different teams work with DatoCMS in their own unique and unconventional ways"
+      >
+        {siblingsWithFallback.map((item) => (
+          <Card
+            href={buildUrlForCustomerStory(item)}
+            title={item.title}
+            orientation={siblingsWithFallback.length === 3 ? 'vertical' : 'horizontal'}
+            size={siblingsWithFallback.length === 1 ? 'medium' : 'small'}
+            fullTitleLength={true}
+            lineClamp={2}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={item.coverImage.responsiveImage} />
+            </Fragment>
+            {/* {structuredTextToPlainText(item.excerpt)} */}
+          </Card>
+        ))}
+      </SameLevelNavigation>
+    )
+  }
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>
