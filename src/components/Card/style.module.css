@@ -77,9 +77,25 @@
 .card[data-orientation='horizontal'] {
   align-items: center;
 
+  &:not([data-no-forced-aspect-ratio='true']) .visualWrapper {
+    height: 100%;
+    position: relative;
+    width: 100%;
+
+    /* TODO check */
+    & *:not(.visualTechnology):not(.technology) {
+      height: 100% !important;
+      inset: 0;
+      object-fit: cover;
+      position: absolute;
+    }
+  }
+
   .visualWrapper {
+    border-right: 1px solid var(--border-color);
     flex-shrink: 0;
     max-width: 33%;
+    width: 100%;
   }
 
   &[data-boxed='true'] {
@@ -90,9 +106,8 @@
   }
 
   .cardContent {
-    border-left: 1px solid var(--border-color);
-    padding: 15px 20px;
     overflow: hidden;
+    padding: 15px 20px;
   }
 
   .cardTitle {
@@ -169,8 +184,8 @@
 
   .visualWrapper {
     border-radius: 6px;
-    overflow: hidden;
     height: auto;
+    overflow: hidden;
     width: 100%;
   }
 
@@ -279,8 +294,8 @@
 .subImageWrapper {
   aspect-ratio: 5/1;
   margin: 20px 0 0 0;
-  width: 40%;
   max-width: 130px;
+  width: 40%;
 }
 
 .subImage {
@@ -304,13 +319,13 @@
 
 .cardBadge,
 .cardLabel {
+  align-items: center;
   border-radius: 40px;
+  display: flex;
   font-size: 14px;
+  gap: 10px;
   line-height: 1;
   padding: 5px 15px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .cardBadge {
