@@ -1,0 +1,119 @@
+---
+import { query } from './_graphql';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { Wrapper } from '~/components/Wrapper';
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { Text } from '~/components/structuredText/Text';
+import { Space } from '~/components/Space';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { LogosBar } from '~/components/LogosBar';
+import { Layout } from '~/layouts/Layout';
+import { Hero } from '~/components/Hero';
+import { Svg } from '~/components/Svg';
+import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { StripWithContent } from '~/components/StripWithContent';
+import { Card } from '~/components/Card';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import s from './_style.module.css';
+
+const { page, posts } = await executeQuery(Astro, query);
+
+if (!page || posts.length === 0) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const highlightedProjectId = page.highlight.id;
+const highlightedProject = posts.find((post) => post.id === highlightedProjectId);
+const projects = posts.filter((post) => post.id !== highlightedProjectId);
+
+if (!highlightedProject) {
+  return notFoundResponse();
+}
+---
+
+<Layout seo={page.seo}>
+  <Hero>
+    <Fragment slot="kicker">Case Studies</Fragment>
+    <Fragment slot="title">Powered by <mark>DatoCMS</mark></Fragment>
+    <Fragment slot="subtitle">
+      Learn how companies are building their next-generation digital products with structured,
+      flexible content at their core
+    </Fragment>
+  </Hero>
+
+  <Space top={1} bottom={1}>
+    <LogosBar
+      title=""
+      clients={[
+        'svg/logos/vercel',
+        'svg/logos/deutsche-telekom',
+        'svg/logos/harrys',
+        'svg/logos/nhs',
+        'svg/logos/verizon',
+        'svg/logos/mit',
+      ]}
+    />
+  </Space>
+
+  <StripWithContent>
+    <Wrapper>
+      <div class={s.highlight}>
+        <div class={s.highlightVisual}>
+          <a class={s.highlightImage} href={buildUrlForSuccessStory(highlightedProject)}>
+            <ResponsiveImage data={highlightedProject.coverImage.responsiveImage} />
+          </a>
+        </div>
+        <div class={s.highlightBody}>
+          <div class={s.highlightLogos}>
+            <img src={highlightedProject.logo.url} class={s.highlightLogo} />
+            <span class={s.plus}>+</span>
+            <Svg name="svg/logos/datocms" />
+          </div>
+          <div class={s.highlightTitle}>
+            <Text {...ensureValidStructuredTextProps({ data: highlightedProject.title })} />
+          </div>
+          <Text {...ensureValidStructuredTextProps({ data: highlightedProject.subtitle })} />
+          <a class={s.readMore} href={buildUrlForSuccessStory(highlightedProject)}>Read more</a>
+        </div>
+        {
+          highlightedProject.numbers.length > 0 && (
+            <div class={s.highlightNumbers}>
+              {highlightedProject.numbers.map((item) => (
+                <div class={s.numberBlock}>
+                  <h3 class={s.numberTitle}>{item.number}</h3>
+                  <p class={s.numberLabel}>{item.label}</p>
+                </div>
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </Wrapper>
+  </StripWithContent>
+
+  <Wrapper>
+    <div class={s.grid}>
+      {
+        projects.map((post) => (
+          <Card
+            title={structuredTextToPlainText(post.title) ?? post.name}
+            size="small"
+            lineClamp={3}
+            svgLogoUrl={post.logo.url}
+            href={buildUrlForSuccessStory(post)}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={post.coverImage.responsiveImage} />
+            </Fragment>
+            {structuredTextToPlainText(post.subtitle)}
+          </Card>
+        ))
+      }
+    </div>
+  </Wrapper>
+</Layout>
+
+<DraftModeQueryListener query={query} />
