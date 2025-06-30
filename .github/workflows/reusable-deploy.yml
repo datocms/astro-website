@@ -32,7 +32,7 @@ env:
 jobs:
   deploy:
     name: Deploy on ${{ inputs.environment }}
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404-arm
 
     permissions:
       contents: read
@@ -55,7 +55,7 @@ jobs:
 
       # 3) Cache Docker BuildKit layers
       - name: Cache Docker layers
-        uses: actions/cache@v4
+        uses: useblacksmith/cache@v5
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.ref }}-${{ hashFiles('Dockerfile', '.dockerignore', 'package-lock.json') }}
@@ -65,11 +65,11 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: useblacksmith/setup-node@v5
         with:
           node-version: 20
           cache: 'npm'
-      - name: Install dependencies
+      - name: Install npm dependencies
         run: npm ci
 
       - name: Deploy
