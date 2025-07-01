@@ -34,7 +34,6 @@ import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { SameLevelNavigation } from '~/components/SameLevelNavigation';
 import { Card } from '~/components/Card';
 import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
-import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 
 const variables = { slug: Astro.params.slug! };
@@ -57,7 +56,6 @@ const tocItems = filterNodes(
   };
 });
 
-// Manage content not yet published
 const dateTime = post._firstPublishedAt ? post._firstPublishedAt : post._createdAt;
 
 const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery, {
@@ -174,7 +172,6 @@ const siblingsWithFallback =
             <Fragment slot="image">
               <ResponsiveImage data={item.coverImage.responsiveImage} />
             </Fragment>
-            {/* {structuredTextToPlainText(item.excerpt)} */}
           </Card>
         ))}
       </SameLevelNavigation>

@@ -82,7 +82,7 @@
     position: relative;
     width: 100%;
 
-    /* TODO check */
+    /* force object-fit cover */
     & *:not(.visualTechnology):not(.technology) {
       height: 100% !important;
       inset: 0;
@@ -111,9 +111,18 @@
   }
 
   .cardTitle {
-    display: block;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    line-clamp: 2;
+    overflow: hidden;
+
+    @media screen and (min-width: 768px) {
+      -webkit-line-clamp: 3;
+    }
 
     &[data-full-title-lenght='false'] {
+      display: block;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
