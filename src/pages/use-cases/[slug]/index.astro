@@ -7,11 +7,9 @@ import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse
 import { Button } from '~/components/Button';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { LogosBar } from '~/components/LogosBar';
-import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { Prose } from '~/components/Prose';
-import { Checks } from '~/components/Checks';
 import { InlineText } from '~/components/structuredText/InlineText';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { Text } from '~/components/structuredText/Text';
@@ -28,7 +26,7 @@ import s from './_style.module.css';
 const variables = { slug: Astro.params.slug! };
 const { page, siblings } = await executeQuery(Astro, query, { variables });
 
-if (!page || siblings.length === 0) {
+if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
@@ -139,12 +137,6 @@ const { quotes = [] } = page;
                 <h3>{callout.title}</h3>
                 <Text {...ensureValidStructuredTextProps({ data: callout.description })} />
               </article>
-
-              {/* <div class={s.visual}>
-                {callout.image?.responsiveImage && (
-                  <ResponsiveImage data={callout.image.responsiveImage} />
-                )}
-              </div> */}
             </div>
             <div class={s.featureList}>
               {callout.features.map((feature) => (
@@ -196,28 +188,30 @@ const { quotes = [] } = page;
     </StripWithContent>
   </Space>
 
-  <Space top={1}>
-    <SameLevelNavigation
-      title="Build incredile things"
-      subtitle="Explore how DatoCMS can help you build better digital experiences"
-    >
-      {
-        siblings.map((item) => (
-          <Card
-            title={toPlainText(item.title) ?? ''}
-            href={buildUrlForUseCasePage(item)}
-            size="small"
-            orientation="vertical"
-          >
-            <Fragment slot="image">
-              <ResponsiveImage data={item.heroCustomer.responsiveImage} />
-            </Fragment>
-            <Text {...ensureValidStructuredTextProps({ data: item.subtitle })} />
-          </Card>
-        ))
-      }
-    </SameLevelNavigation>
-  </Space>
+  {
+    siblings.length > 0 && (
+      <Space top={1}>
+        <SameLevelNavigation
+          title="Build incredible things"
+          subtitle="Explore how DatoCMS can help you build better digital experiences"
+        >
+          {siblings.map((item) => (
+            <Card
+              title={toPlainText(item.title) ?? ''}
+              href={buildUrlForUseCasePage(item)}
+              size="small"
+              orientation="vertical"
+            >
+              <Fragment slot="image">
+                <ResponsiveImage data={item.heroCustomer.responsiveImage} />
+              </Fragment>
+              <Text {...ensureValidStructuredTextProps({ data: item.subtitle })} />
+            </Card>
+          ))}
+        </SameLevelNavigation>
+      </Space>
+    )
+  }
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

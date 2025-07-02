@@ -157,6 +157,21 @@ export const query = graphql(
   ],
 );
 
+const RelatedItemFragment = graphql(/* GraphQL */ `
+  fragment RelatedItemFragment on CustomerStoryRecord @_unmask {
+    title
+    excerpt {
+      value
+    }
+    ...CustomerStoryUrlFragment
+    coverImage {
+      responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+        ...ResponsiveImageFragment
+      }
+    }
+  }
+`);
+
 export const siblingsQuery = graphql(
   /* GraphQL */ `
     query SiblingsQuery($dateTime: DateTime) {
@@ -164,16 +179,7 @@ export const siblingsQuery = graphql(
         filter: { _firstPublishedAt: { lt: $dateTime } }
         orderBy: _firstPublishedAt_DESC
       ) {
-        title
-        excerpt {
-          value
-        }
-        ...CustomerStoryUrlFragment
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
       next: allCustomerStories(
         filter: { _firstPublishedAt: { gte: $dateTime } }
@@ -181,44 +187,17 @@ export const siblingsQuery = graphql(
         first: 1
         skip: 1
       ) {
-        title
-        excerpt {
-          value
-        }
-        ...CustomerStoryUrlFragment
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
       first: customerStory(orderBy: _firstPublishedAt_ASC) {
-        title
-        excerpt {
-          value
-        }
-        ...CustomerStoryUrlFragment
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
       last: customerStory(orderBy: _firstPublishedAt_DESC) {
-        title
-        excerpt {
-          value
-        }
-        ...CustomerStoryUrlFragment
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
     }
   `,
-  [CustomerStoryUrlFragment, ResponsiveImageFragment],
+  [RelatedItemFragment, CustomerStoryUrlFragment, ResponsiveImageFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

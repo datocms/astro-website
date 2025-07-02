@@ -134,6 +134,19 @@ export const query = graphql(
   ],
 );
 
+const RelatedItemFragment = graphql(/* GraphQL */ `
+  fragment RelatedItemFragment on BlogPostRecord @_unmask {
+    title
+    _firstPublishedAt
+    ...BlogPostUrlFragment
+    coverImage {
+      responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+        ...ResponsiveImageFragment
+      }
+    }
+  }
+`);
+
 export const siblingsQuery = graphql(
   /* GraphQL */ `
     query SiblingsQuery($dateTime: DateTime) {
@@ -142,14 +155,7 @@ export const siblingsQuery = graphql(
         orderBy: _firstPublishedAt_DESC
         first: 1
       ) {
-        title
-        _firstPublishedAt
-        ...BlogPostUrlFragment
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
       next: allBlogPosts(
         filter: { _firstPublishedAt: { gte: $dateTime } }
@@ -157,36 +163,17 @@ export const siblingsQuery = graphql(
         first: 1
         skip: 1
       ) {
-        title
-        _firstPublishedAt
-        ...BlogPostUrlFragment
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
       first: blogPost(orderBy: _firstPublishedAt_ASC) {
-        title
-        ...BlogPostUrlFragment
-        coverImage {
-          responsiveImage {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
       last: blogPost(orderBy: _firstPublishedAt_DESC) {
-        title
-        ...BlogPostUrlFragment
-        coverImage {
-          responsiveImage {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
     }
   `,
-  [BlogPostUrlFragment, ResponsiveImageFragment],
+  [RelatedItemFragment, BlogPostUrlFragment, ResponsiveImageFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

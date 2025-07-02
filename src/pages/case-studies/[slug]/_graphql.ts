@@ -193,60 +193,39 @@ export const query = graphql(
   ],
 );
 
+const RelatedItemFragment = graphql(/* GraphQL */ `
+  fragment RelatedItemFragment on SuccessStoryRecord @_unmask {
+    name
+    ...SuccessStoryUrlFragment
+    subtitle {
+      value
+    }
+    coverImage {
+      responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+        ...ResponsiveImageFragment
+      }
+    }
+  }
+`);
+
 export const siblingsQuery = graphql(
   /* GraphQL */ `
     query SiblingsQuery($position: IntType!) {
       previous: successStory(orderBy: position_DESC, filter: { position: { lt: $position } }) {
-        name
-        ...SuccessStoryUrlFragment
-        subtitle {
-          value
-        }
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
       next: successStory(orderBy: position_ASC, filter: { position: { gt: $position } }) {
-        name
-        ...SuccessStoryUrlFragment
-        subtitle {
-          value
-        }
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
       first: successStory(orderBy: position_ASC) {
-        name
-        ...SuccessStoryUrlFragment
-        subtitle {
-          value
-        }
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
       last: successStory(orderBy: position_DESC) {
-        name
-        ...SuccessStoryUrlFragment
-        subtitle {
-          value
-        }
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
+        ...RelatedItemFragment
       }
     }
   `,
-  [SuccessStoryUrlFragment, ResponsiveImageFragment],
+  [RelatedItemFragment, SuccessStoryUrlFragment, ResponsiveImageFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
