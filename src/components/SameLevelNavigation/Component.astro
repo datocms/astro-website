@@ -1,19 +1,23 @@
 ---
+import type { ComponentProps } from 'astro/types';
 import { Wrapper } from '~/components/Wrapper';
 import { Space } from '~/components/Space';
 import s from './style.module.css';
 
+type TopProp = ComponentProps<typeof Space>['top'];
+type BottomProp = ComponentProps<typeof Space>['bottom'];
+
 type Props = {
   title?: string;
   subtitle?: string;
-  spaceTop?: 1 | 2 | 3 | 4;
-  spaceBottom?: 1 | 2 | 3 | 4;
+  top?: TopProp;
+  bottom?: BottomProp;
 };
 
-const { title, subtitle, spaceTop = 2, spaceBottom } = Astro.props;
+const { title, subtitle, top = 2, bottom } = Astro.props;
 ---
 
-<Space top={spaceTop} bottom={spaceBottom}>
+<Space top={top} bottom={bottom}>
   <Wrapper>
     <section class={s.container}>
       {title && <h2 class={s.title}>{title}</h2>}
