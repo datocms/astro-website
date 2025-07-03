@@ -59,11 +59,11 @@ const tocItems = filterNodes(
 const dateTime = post._firstPublishedAt ? post._firstPublishedAt : post._createdAt;
 
 const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery, {
-  variables: { dateTime },
+  variables: { dateTime, slug: post.slug },
 });
 
-const prevItem = previous[0] ?? last;
-const nextItem = next[0] ?? first;
+const prevItem = previous ?? last;
+const nextItem = next ?? first;
 
 const siblings = post.siblings;
 const siblingsWithFallback =

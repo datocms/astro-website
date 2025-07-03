@@ -34,6 +34,7 @@ export const query = graphql(
           ...TagFragment
         }
         title
+        slug
         _firstPublishedAt
         _createdAt
         seoH1
@@ -174,18 +175,16 @@ const RelatedItemFragment = graphql(/* GraphQL */ `
 
 export const siblingsQuery = graphql(
   /* GraphQL */ `
-    query SiblingsQuery($dateTime: DateTime) {
-      previous: allCustomerStories(
+    query SiblingsQuery($dateTime: DateTime, $slug: String) {
+      previous: customerStory(
         filter: { _firstPublishedAt: { lt: $dateTime } }
         orderBy: _firstPublishedAt_DESC
       ) {
         ...RelatedItemFragment
       }
-      next: allCustomerStories(
-        filter: { _firstPublishedAt: { gte: $dateTime } }
+      next: customerStory(
+        filter: { _firstPublishedAt: { gt: $dateTime }, slug: { neq: $slug } }
         orderBy: _firstPublishedAt_ASC
-        first: 1
-        skip: 1
       ) {
         ...RelatedItemFragment
       }

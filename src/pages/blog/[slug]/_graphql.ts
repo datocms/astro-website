@@ -29,6 +29,7 @@ export const query = graphql(
         _firstPublishedAt
         _createdAt
         title
+        slug
         seoH1
         canonicalUrl
         yoastAnalysis
@@ -149,19 +150,16 @@ const RelatedItemFragment = graphql(/* GraphQL */ `
 
 export const siblingsQuery = graphql(
   /* GraphQL */ `
-    query SiblingsQuery($dateTime: DateTime) {
-      previous: allBlogPosts(
+    query SiblingsQuery($dateTime: DateTime, $slug: String) {
+      previous: blogPost(
         filter: { _firstPublishedAt: { lt: $dateTime } }
         orderBy: _firstPublishedAt_DESC
-        first: 1
       ) {
         ...RelatedItemFragment
       }
-      next: allBlogPosts(
-        filter: { _firstPublishedAt: { gte: $dateTime } }
+      next: blogPost(
+        filter: { _firstPublishedAt: { gt: $dateTime }, slug: { neq: $slug } }
         orderBy: _firstPublishedAt_ASC
-        first: 1
-        skip: 1
       ) {
         ...RelatedItemFragment
       }
