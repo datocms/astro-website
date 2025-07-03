@@ -135,18 +135,21 @@ export const query = graphql(
   ],
 );
 
-const RelatedItemFragment = graphql(/* GraphQL */ `
-  fragment RelatedItemFragment on BlogPostRecord @_unmask {
-    title
-    _firstPublishedAt
-    ...BlogPostUrlFragment
-    coverImage {
-      responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-        ...ResponsiveImageFragment
+const RelatedItemFragment = graphql(
+  /* GraphQL */ `
+    fragment RelatedItemFragment on BlogPostRecord @_unmask {
+      title
+      _firstPublishedAt
+      ...BlogPostUrlFragment
+      coverImage {
+        responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+          ...ResponsiveImageFragment
+        }
       }
     }
-  }
-`);
+  `,
+  [ResponsiveImageFragment, BlogPostUrlFragment],
+);
 
 export const siblingsQuery = graphql(
   /* GraphQL */ `

@@ -158,20 +158,23 @@ export const query = graphql(
   ],
 );
 
-const RelatedItemFragment = graphql(/* GraphQL */ `
-  fragment RelatedItemFragment on CustomerStoryRecord @_unmask {
-    title
-    excerpt {
-      value
-    }
-    ...CustomerStoryUrlFragment
-    coverImage {
-      responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-        ...ResponsiveImageFragment
+const RelatedItemFragment = graphql(
+  /* GraphQL */ `
+    fragment RelatedItemFragment on CustomerStoryRecord @_unmask {
+      title
+      excerpt {
+        value
+      }
+      ...CustomerStoryUrlFragment
+      coverImage {
+        responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+          ...ResponsiveImageFragment
+        }
       }
     }
-  }
-`);
+  `,
+  [ResponsiveImageFragment, CustomerStoryUrlFragment],
+);
 
 export const siblingsQuery = graphql(
   /* GraphQL */ `
