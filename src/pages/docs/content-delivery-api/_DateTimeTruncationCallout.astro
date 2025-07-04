@@ -1,0 +1,55 @@
+---
+import s from '~/components/docs/blocks/DocCallout/style.module.css';
+import { Svg } from '~/components/Svg';
+import type { ResultOf } from 'gql.tada';
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { Text } from '~/components/structuredText/Text';
+import { Prose } from '~/components/Prose';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import type { DocCalloutFragment } from '~/components/docs/blocks/DocCallout/graphql';
+
+interface Props {
+  block: ResultOf<typeof DocCalloutFragment>;
+}
+
+const { block } = Astro.props;
+---
+
+<figure>
+  <prose-island>
+    <div
+      class:list={[s.docCallout, s[`docCallout--${block.calloutType}`]]}
+      data-type={block.calloutType}
+    >
+      {
+        block.title && (
+          <div class={s.docCalloutTitle}>
+            {block.calloutType === 'neutral' ? (
+              <Svg name="icons/regular/info-circle" />
+            ) : block.calloutType === 'warning' ? (
+              <Svg name="icons/regular/exclamation-triangle" />
+            ) : block.calloutType === 'positive' ? (
+              <Svg name="icons/regular/smile" />
+            ) : block.calloutType === 'protip' ? (
+              <Svg name="icons/regular/wand-magic" />
+            ) : null}{' '}
+            <span>
+              {block.calloutType === 'protip' && 'Pro tip: '}
+              {block.title}
+            </span>
+          </div>
+        )
+      }
+      <Prose class={s.content}>
+        <Text
+          {...ensureValidStructuredTextProps({
+            data: block.text,
+            linkToRecordComponents: defaultLinkToRecordComponents,
+            inlineRecordComponents: defaultInlineRecordComponents,
+          })}
+        />
+      </Prose>
+    </div>
+  </prose-island>
+</figure>
