@@ -27,7 +27,9 @@ export const query = graphql(
           ...TagFragment
         }
         _firstPublishedAt
+        _createdAt
         title
+        slug
         seoH1
         canonicalUrl
         yoastAnalysis
@@ -131,6 +133,48 @@ export const query = graphql(
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
+);
+
+const RelatedItemFragment = graphql(
+  /* GraphQL */ `
+    fragment RelatedItemFragment on BlogPostRecord @_unmask {
+      title
+      _firstPublishedAt
+      ...BlogPostUrlFragment
+      coverImage {
+        responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+          ...ResponsiveImageFragment
+        }
+      }
+    }
+  `,
+  [ResponsiveImageFragment, BlogPostUrlFragment],
+);
+
+export const siblingsQuery = graphql(
+  /* GraphQL */ `
+    query SiblingsQuery($dateTime: DateTime, $slug: String) {
+      previous: blogPost(
+        filter: { _firstPublishedAt: { lt: $dateTime } }
+        orderBy: _firstPublishedAt_DESC
+      ) {
+        ...RelatedItemFragment
+      }
+      next: blogPost(
+        filter: { _firstPublishedAt: { gt: $dateTime }, slug: { neq: $slug } }
+        orderBy: _firstPublishedAt_ASC
+      ) {
+        ...RelatedItemFragment
+      }
+      first: blogPost(orderBy: _firstPublishedAt_ASC) {
+        ...RelatedItemFragment
+      }
+      last: blogPost(orderBy: _firstPublishedAt_DESC) {
+        ...RelatedItemFragment
+      }
+    }
+  `,
+  [RelatedItemFragment, BlogPostUrlFragment, ResponsiveImageFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
