@@ -228,7 +228,7 @@ export const siblingsQuery = graphql(
       }
     }
   `,
-  [RelatedItemFragment, SuccessStoryUrlFragment, ResponsiveImageFragment],
+  [RelatedItemFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

@@ -166,15 +166,9 @@ export const siblingsQuery = graphql(
       ) {
         ...RelatedItemFragment
       }
-      first: blogPost(orderBy: _firstPublishedAt_ASC) {
-        ...RelatedItemFragment
-      }
-      last: blogPost(orderBy: _firstPublishedAt_DESC) {
-        ...RelatedItemFragment
-      }
     }
   `,
-  [RelatedItemFragment, BlogPostUrlFragment, ResponsiveImageFragment],
+  [RelatedItemFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

@@ -199,7 +199,7 @@ export const siblingsQuery = graphql(
       }
     }
   `,
-  [RelatedItemFragment, CustomerStoryUrlFragment, ResponsiveImageFragment],
+  [RelatedItemFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

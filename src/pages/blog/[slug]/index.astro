@@ -59,12 +59,9 @@ const tocItems = filterNodes(
 
 const dateTime = post._firstPublishedAt ? post._firstPublishedAt : post._createdAt;
 
-const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery, {
+const { previous, next } = await executeQuery(Astro, siblingsQuery, {
   variables: { dateTime, slug: post.slug },
 });
-
-const prevItem = previous ?? last;
-const nextItem = next ?? first;
 ---
 
 <Layout seo={overrideSeo(post.seo, seoTwitterCard('summary_large_image'))}>
@@ -160,35 +157,39 @@ const nextItem = next ?? first;
   </div>
 
   {
-    prevItem && nextItem && (
+    (previous || next) && (
       <SameLevelNavigation
         title="Keep Reading"
         subtitle="Check out other posts we've written on our Blog"
       >
-        <Card
-          href={buildUrlForBlogPost(prevItem)}
-          title={prevItem.title}
-          orientation="horizontal"
-          size="small"
-          fullTitleLength={true}
-          label="Previous post"
-        >
-          <Fragment slot="image">
-            <ResponsiveImage data={prevItem.coverImage.responsiveImage} />
-          </Fragment>
-        </Card>
-        <Card
-          href={buildUrlForBlogPost(prevItem)}
-          title={nextItem.title}
-          orientation="horizontal"
-          size="small"
-          fullTitleLength={true}
-          label="Next post"
-        >
-          <Fragment slot="image">
-            <ResponsiveImage data={nextItem.coverImage.responsiveImage} />
-          </Fragment>
-        </Card>
+        {previous && (
+          <Card
+            href={buildUrlForBlogPost(previous)}
+            title={previous.title}
+            orientation="horizontal"
+            size="small"
+            fullTitleLength={true}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={previous.coverImage.responsiveImage} />
+            </Fragment>
+            {previous._firstPublishedAt ? formatDate(previous._firstPublishedAt) : '???'}
+          </Card>
+        )}
+        {next && (
+          <Card
+            href={buildUrlForBlogPost(next)}
+            title={next.title}
+            orientation="horizontal"
+            size="small"
+            fullTitleLength={true}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={next.coverImage.responsiveImage} />
+            </Fragment>
+            {next._firstPublishedAt ? formatDate(next._firstPublishedAt) : '???'}
+          </Card>
+        )}
       </SameLevelNavigation>
     )
   }
