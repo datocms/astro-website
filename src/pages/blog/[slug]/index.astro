@@ -26,13 +26,16 @@ import { filterNodes } from '~/lib/datocms/filterNodes';
 import { formatDate } from '~/lib/formatters';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { slugify } from '~/lib/slugify';
-import { query } from './_graphql';
-import s from './_style.module.css';
+import { query, siblingsQuery } from './_graphql';
 import { Prose } from '~/components/Prose';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { overrideSeo, seoTwitterCard } from '~/lib/datocms/seo';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { SameLevelNavigation } from '~/components/SameLevelNavigation';
+import { Card } from '~/components/Card';
+import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
+import s from './_style.module.css';
 
 const variables = { slug: Astro.params.slug! };
 const { post } = await executeQuery(Astro, query, { variables });
@@ -52,6 +55,12 @@ const tocItems = filterNodes(
     url: `#${slugify(innerText)}`,
     label: innerText,
   };
+});
+
+const dateTime = post._firstPublishedAt ? post._firstPublishedAt : post._createdAt;
+
+const { previous, next } = await executeQuery(Astro, siblingsQuery, {
+  variables: { dateTime, slug: post.slug },
 });
 ---
 
@@ -146,6 +155,44 @@ const tocItems = filterNodes(
       )
     }
   </div>
+
+  {
+    (previous || next) && (
+      <SameLevelNavigation
+        title="Keep Reading"
+        subtitle="Check out other posts we've written on our Blog"
+      >
+        {previous && (
+          <Card
+            href={buildUrlForBlogPost(previous)}
+            title={previous.title}
+            orientation="horizontal"
+            size="small"
+            fullTitleLength={true}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={previous.coverImage.responsiveImage} />
+            </Fragment>
+            {previous._firstPublishedAt ? formatDate(previous._firstPublishedAt) : '???'}
+          </Card>
+        )}
+        {next && (
+          <Card
+            href={buildUrlForBlogPost(next)}
+            title={next.title}
+            orientation="horizontal"
+            size="small"
+            fullTitleLength={true}
+          >
+            <Fragment slot="image">
+              <ResponsiveImage data={next.coverImage.responsiveImage} />
+            </Fragment>
+            {next._firstPublishedAt ? formatDate(next._firstPublishedAt) : '???'}
+          </Card>
+        )}
+      </SameLevelNavigation>
+    )
+  }
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

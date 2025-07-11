@@ -34,6 +34,9 @@ export const query = graphql(
           ...TagFragment
         }
         title
+        slug
+        _firstPublishedAt
+        _createdAt
         seoH1
         canonicalUrl
         yoastAnalysis
@@ -116,6 +119,18 @@ export const query = graphql(
             }
           }
         }
+        siblings {
+          title
+          excerpt {
+            value
+          }
+          ...CustomerStoryUrlFragment
+          coverImage {
+            responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+              ...ResponsiveImageFragment
+            }
+          }
+        }
       }
     }
   `,
@@ -137,9 +152,54 @@ export const query = graphql(
     ChangelogEntryInlineFragment,
     BlogPostLinkFragment,
     ChangelogEntryLinkFragment,
+    CustomerStoryUrlFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
+);
+
+const RelatedItemFragment = graphql(
+  /* GraphQL */ `
+    fragment RelatedItemFragment on CustomerStoryRecord @_unmask {
+      title
+      excerpt {
+        value
+      }
+      ...CustomerStoryUrlFragment
+      coverImage {
+        responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+          ...ResponsiveImageFragment
+        }
+      }
+    }
+  `,
+  [ResponsiveImageFragment, CustomerStoryUrlFragment],
+);
+
+export const siblingsQuery = graphql(
+  /* GraphQL */ `
+    query SiblingsQuery($dateTime: DateTime, $slug: String) {
+      previous: customerStory(
+        filter: { _firstPublishedAt: { lt: $dateTime } }
+        orderBy: _firstPublishedAt_DESC
+      ) {
+        ...RelatedItemFragment
+      }
+      next: customerStory(
+        filter: { _firstPublishedAt: { gt: $dateTime }, slug: { neq: $slug } }
+        orderBy: _firstPublishedAt_ASC
+      ) {
+        ...RelatedItemFragment
+      }
+      first: customerStory(orderBy: _firstPublishedAt_ASC) {
+        ...RelatedItemFragment
+      }
+      last: customerStory(orderBy: _firstPublishedAt_DESC) {
+        ...RelatedItemFragment
+      }
+    }
+  `,
+  [RelatedItemFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

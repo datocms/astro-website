@@ -35,6 +35,7 @@ export const query = graphql(
           hex
         }
         name
+        position
         title {
           value
         }
@@ -161,6 +162,18 @@ export const query = graphql(
             ...UserGuidesEpisodeInlineFragment
           }
         }
+        siblings {
+          name
+          ...SuccessStoryUrlFragment
+          subtitle {
+            value
+          }
+          coverImage {
+            responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+              ...ResponsiveImageFragment
+            }
+          }
+        }
       }
     }
   `,
@@ -174,9 +187,48 @@ export const query = graphql(
     UseCasePageUrlFragment,
     FeatureUrlFragment,
     PartnerUrlFragment,
+    SuccessStoryUrlFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
+);
+
+const RelatedItemFragment = graphql(
+  /* GraphQL */ `
+    fragment RelatedItemFragment on SuccessStoryRecord @_unmask {
+      name
+      ...SuccessStoryUrlFragment
+      subtitle {
+        value
+      }
+      coverImage {
+        responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
+          ...ResponsiveImageFragment
+        }
+      }
+    }
+  `,
+  [ResponsiveImageFragment, SuccessStoryUrlFragment],
+);
+
+export const siblingsQuery = graphql(
+  /* GraphQL */ `
+    query SiblingsQuery($position: IntType!) {
+      previous: successStory(orderBy: position_DESC, filter: { position: { lt: $position } }) {
+        ...RelatedItemFragment
+      }
+      next: successStory(orderBy: position_ASC, filter: { position: { gt: $position } }) {
+        ...RelatedItemFragment
+      }
+      first: successStory(orderBy: position_ASC) {
+        ...RelatedItemFragment
+      }
+      last: successStory(orderBy: position_DESC) {
+        ...RelatedItemFragment
+      }
+    }
+  `,
+  [RelatedItemFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
