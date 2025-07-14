@@ -2,6 +2,7 @@
 import { Button } from '~/components/Button';
 import { CtaButtonFragment } from './graphql';
 import { readFragment, type FragmentOf } from 'gql.tada';
+import s from './style.module.css';
 
 interface Props {
   block: FragmentOf<typeof CtaButtonFragment>;
@@ -12,6 +13,19 @@ const { block: maskedBlock } = Astro.props;
 const block = readFragment(CtaButtonFragment, maskedBlock);
 ---
 
-<Button as="a" href={block.url} p="tiny" fs="small" s="invert">
-  {block.text}
-</Button>
+<p>
+  <prose-island>
+    <span class={block.alignment === 'center' ? s.center : undefined}>
+      <Button
+        as="a"
+        href={block.url}
+        p={block.padding as any}
+        fs={block.fontSize as any}
+        s={block.style != 'primary' ? 'invert' : undefined}
+        block={block.alignment === 'full_width'}
+      >
+        {block.text}
+      </Button>
+    </span>
+  </prose-island>
+</p>
