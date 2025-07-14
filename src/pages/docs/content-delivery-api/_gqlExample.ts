@@ -3,6 +3,7 @@ import { invariant } from '~/lib/invariant';
 import type { Input } from './_utils';
 
 export function gqlExample(fieldName: string, filterName: string, input: Input) {
+  const comment = commentForType(input);
   const filter = `${camelize(filterName)}: ${exampleForType(filterName, input)}`;
 
   if (filter.length > 30) {
@@ -10,7 +11,7 @@ export function gqlExample(fieldName: string, filterName: string, input: Input) 
   allProducts(
     filter: {
       ${nicerFieldName(fieldName)}: {
-        ${filter}
+        ${[comment, filter].filter(Boolean).join('\n        ')}
       }
     }
   ) {
@@ -58,7 +59,7 @@ const singleExampleForType = (filterName: string, input: Input) => {
   } else if (type === 'integer') {
     return '3';
   } else if (type === 'date_time') {
-    return '"2018-02-13T14:30:00+00:00"';
+    return '"2018-02-13T14:30:13+00:00"';
   } else if (type === 'date') {
     return '"2018-02-13"';
   } else {
@@ -74,6 +75,22 @@ const exampleForType = (filterName: string, input: Input) => {
   }
 
   return singleExample;
+};
+
+const commentForType = (input: Input) => {
+  if (input.type !== 'scalar') {
+    return null;
+  }
+
+  invariant(input.type === 'scalar');
+
+  const type = input.input_type;
+
+  if (type === 'date_time') {
+    return '# Value is truncated to the minute: "2018-02-13T14:30:00+00:00"';
+  } else {
+    return null;
+  }
 };
 
 const isMetaField = (fieldName: string) => {
