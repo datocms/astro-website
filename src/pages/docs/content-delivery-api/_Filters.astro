@@ -4,6 +4,8 @@ import { Tab, Tabs } from '~/components/Tabs';
 import type { Filters } from './_utils';
 import { Code } from '~/components/Code';
 import { gqlExample } from './_gqlExample';
+import { DocCallout } from '~/components/docs/blocks/DocCallout';
+import DateTimeTruncationCallout from './_DateTimeTruncationCallout.astro';
 
 type Props = {
   fieldName: string;
@@ -20,6 +22,85 @@ const { fieldName, filters } = Astro.props;
         <Tab title={filterName} code noPadding>
           <p>{filter.description}</p>
           <Code code={gqlExample(fieldName, filterName, filter.input)} language="graphql" />
+          {filter.input.type === 'scalar' && filter.input.input_type === 'date_time' && (
+            <DateTimeTruncationCallout
+              block={{
+                calloutType: 'neutral',
+                title: 'Filtering adjacent records',
+                text: {
+                  value: {
+                    schema: 'dast',
+                    document: {
+                      children: [
+                        {
+                          children: [
+                            {
+                              value:
+                                'Truncation to the nearest minute may cause filters to return unintended records (e.g., ',
+                              type: 'span',
+                            },
+                            {
+                              value: 'gt: "2025-05-06T09:36:01+02:00"',
+                              marks: ['code'],
+                              type: 'span',
+                            },
+                            {
+                              value: ' becomes ',
+                              type: 'span',
+                            },
+                            {
+                              value: 'gt: "2025-05-06T09:36:00+02:00"',
+                              marks: ['code'],
+                              type: 'span',
+                            },
+                            {
+                              value: ' and unexpectedly includes records at ',
+                              type: 'span',
+                            },
+                            {
+                              value: '2025-05-06T09:36:01+02:00',
+                              marks: ['code'],
+                              type: 'span',
+                            },
+                            {
+                              value: ').',
+                              type: 'span',
+                            },
+                          ],
+                          type: 'paragraph',
+                        },
+                        {
+                          children: [
+                            {
+                              value: 'Add an additional filter condition (like ',
+                              type: 'span',
+                            },
+                            {
+                              value: 'slug: {neq: $slug}',
+                              marks: ['code'],
+                              type: 'span',
+                            },
+                            {
+                              value:
+                                ' in the example below) to ensure unintended records are excluded from the results:',
+                              type: 'span',
+                            },
+                          ],
+                          type: 'paragraph',
+                        },
+                        {
+                          code: 'query NextArticle($slug: String, $firstPublishedAt: DateTime) {\n  next: article(\n    orderBy: _firstPublishedAt_ASC\n    filter: {\n      _firstPublishedAt: {gt: $firstPublishedAt},\n      slug: {neq: $slug}\n    }\n  ) {\n    title\n    _firstPublishedAt\n  }\n}',
+                          type: 'code',
+                        },
+                      ],
+                      type: 'root',
+                    },
+                  },
+                  links: [],
+                },
+              }}
+            />
+          )}
         </Tab>
       ))
     }
