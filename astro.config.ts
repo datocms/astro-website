@@ -283,5 +283,6 @@ export default defineConfig({
     '/use-cases/headless-cms-websites': '/use-cases/modern-websites',
     '/use-cases/headless-ecommerce': '/use-cases/ecommerce',
     '/use-cases/headless-cms-knowledge-management': '/use-cases/knowledge-management',
+    '/partners/boldboy': '/partners/peter-coolen',
   },
 });
