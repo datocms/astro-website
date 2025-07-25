@@ -1,0 +1,41 @@
+---
+import s from './style.module.css';
+import { Svg } from '~/components/Svg';
+import { Prose } from '~/components/Prose';
+
+interface Props {
+  calloutType: string;
+  title?: string | null;
+}
+
+const { calloutType, title } = Astro.props;
+---
+
+<figure>
+  <prose-island>
+    <div class:list={[s.docCallout, s[`docCallout--${calloutType}`]]} data-type={calloutType}>
+      {
+        title && (
+          <div class={s.docCalloutTitle}>
+            {calloutType === 'neutral' ? (
+              <Svg name="icons/regular/info-circle" />
+            ) : calloutType === 'warning' ? (
+              <Svg name="icons/regular/exclamation-triangle" />
+            ) : calloutType === 'positive' ? (
+              <Svg name="icons/regular/smile" />
+            ) : calloutType === 'protip' ? (
+              <Svg name="icons/regular/wand-magic" />
+            ) : null}{' '}
+            <span>
+              {calloutType === 'protip' && 'Pro tip: '}
+              {title}
+            </span>
+          </div>
+        )
+      }
+      <Prose class={s.content}>
+        <slot />
+      </Prose>
+    </div>
+  </prose-island>
+</figure>
