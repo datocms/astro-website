@@ -1,5 +1,7 @@
 ## Our internal security policy
 
+DatoCMS is ISO 27001 certified. The certification and additional documentation are available [upon request](/contact).
+
 ### Objectives of the ISMS (Information Security Management System)
 
 The information security policy aims to:
@@ -42,12 +44,6 @@ The issuing of this policy is the responsibility of the Top Management.
 All stakeholders must take responsibility for the management, quality, continuity and security of information. This document, together with all the documented information produced for its full and specific application, acts as internal regulations for the management of information and, as such, must be observed by employees in compliance with their obligations of diligence pursuant to the Italian law, art. 2104 c.c.
 This information security policy is communicated to all internal and external staff.
 The responsibilities of the ISMS in detail are contained in the Manual.
-
-### Edit
-
-Any change to this document or to any of its operational or documentary applications may be reported by all staff to their contact person or directly to the Information Security Management System Manager (RSGSI).
-
-The methods of proposing changes will be consistent with the documentation management process.
 
 ### Review and development
 
@@ -111,16 +107,12 @@ All our servers and services are protected by firewalls that let traffic through
 
 Read more about the security policies of the infrastructure providers that we use:
 
-- [Heroku](https://www.heroku.com/policy/security)
-- [Digital Ocean](https://www.digitalocean.com/legal/)
 - [AWS](https://aws.amazon.com/security/)
-- [Netlify](https://www.netlify.com/security/)
 - [Cloudflare](https://www.cloudflare.com/security/)
-- [Fastly](https://docs.fastly.com/en/guides/security-program)
 
 ### Application
 
-Our web servers are running in self contained environments, with isolate processes, memory, and file system. We are using standard Heroku dynos, more details on their [dyno page](https://devcenter.heroku.com/articles/dynos#isolation-and-security).
+Our web servers are running in a dedicated Kubernetes cluster in AWS hosted on EKS managed service.
 
 #### PCI
 
@@ -144,7 +136,7 @@ We make sure that every third party that we use is as careful as we are on secur
 
 All the **data is encrypted in transit with TLS**, both internally between services and externally when reaching the users.
 
-All our **database data are encrypted at rest**. We retain database backups for up to a week.
+All our **database data are encrypted at rest**. We retain database backups for up to 30 days.
 
 If you delete your project we delete all data from the live database immediately but we'll retain copies in our backups that are not accessible from the live system.
 
@@ -166,9 +158,9 @@ From the CMS interface you can very **easily rotate the API tokens** used to acc
 
 ### Reliability
 
-**Our entire infrastructure is highly reliable and easy to reproduce by design**. We rely on Heroku's platform-as-a-service which means that we are able to reprovision our entire application in a single deploy.
+**Our entire infrastructure is highly reliable and easy to reproduce by design**. The full infrastructure setup is managed via Terraform, through which we can recreate the full environment in one command. The services are running in a Kubernetes cluster that can automatically scale in case of load. The cluster runs on AWS EC2 instances that are routinely replaced with any scaling event.
 
-Our network is globally distributed. We use two layers of caching, helping our servers to serve as little calls as possible, reducing the risk of downtime in case of server issues.
+Our network is globally distributed. We use a layer of caching with Cloudflare, helping our servers to serve as little calls as possible, reducing the risk of downtime in case of server issues.
 
 In case of incidents we have a team of developers getting notifications on their mobile phone, so that they can take action as soon as possible. We are alerted in case of high error rate or servers unreachable.
 
@@ -184,10 +176,8 @@ Nevertheless we have the following team policies:
 - **remote access**: we minimise the access points to our production environment
 - **computer security**: we enforce strong passwords for our computers, we encrypt disks, we use password managers to create strong passwords and store them safely.
 
-Our offices are also secured with CCTVs and alarm systems.
-
 ### Vulnerability disclosure
 
 If you have found a security vulnerability, please get in touch via [security@datocms.com](mailto:security@datocms.com). You can encrypt the message with our PGP key that you can find [on our site](https://www.datocms.com/.well-known/DatoCMS_security_pub.asc) and on [keys.openpgp.org](https://keys.openpgp.org/search?q=3FBD73EFD6C5268A21C33FE27B94FBC69CD5C678).
 
-Latest update: Oct 2, 2024
+Latest update: Jul 25, 2025
