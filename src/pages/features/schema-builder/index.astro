@@ -1,0 +1,211 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { Wrapper } from '~/components/Wrapper';
+import { Card } from '~/components/Card';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import s from './_style.module.css';
+
+// const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const variables = { slug: 'structured-content-cms' };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page || !page.video) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout seo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker">Schema builer</Fragment>
+    <Fragment slot="title">
+      Define your content <mark>on your terms</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      Define your content <mark>on your terms</mark>
+    </Fragment>
+  </Hero>
+
+  <TitleStripWithContent>
+    <!-- <VideoPlayer data={page.video} autoPlay={true} /> -->
+  </TitleStripWithContent>
+
+  <Space bottom={3}>
+    <h2 class={s.groupTitle}>
+      Your structure.<br />
+      Your way
+    </h2>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Visual schema editor for content modeling </Fragment>
+    <Fragment slot="title"> Lay the foundation of your content the right way </Fragment>
+    <p>
+      The Schema Builder helps you define the core build of your content architecture using models,
+      blocks, and plugins, determining how your content is organized and accessed.
+    </p>
+    <p>Changes apply instantly across the API. No code, no rebuilds.</p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Create your schema with models </Fragment>
+    <Fragment slot="title"> Establish the right structure with Models & Fields </Fragment>
+    <p>
+      Models are your core content types, like posts, pages, or products, built using fields from
+      20+ options like strings, assets, SEO, and JSON for any data type.
+    </p>
+    <p>
+      Group fields, control presentation, and reorder them easily. The schema you define here powers
+      both, the API and UI, instantly.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <Card
+        title={'Feeling uninspired or just getting started with Headless CMS?'}
+        href="/marketplace/recipes"
+        noForcedAspectRatio
+      >
+        We put together a few super common models that most website projects have. Think blog post,
+        author, landing page, and so on. Check out the Recipes in the Marketplace to find a starting
+        point to see how schema building works!
+        <Fragment slot="below">
+          <span class={s.fakeLink}>Check it out →</span>
+        </Fragment>
+      </Card>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker">Enrich it with Dynamic content structures</Fragment>
+    <Fragment slot="title"> Improve flexibility and content integrity with Blocks </Fragment>
+    <p>
+      Blocks are dynamic, flexible, and repeatable structures like CTAs, quotes, and sliders, that
+      you can embed inside your records.
+    </p>
+    <p>
+      You can intersperse text and blocks in Structured Text fields, or give editors a drag-and-drop
+      page builder experience by combining blocks using the Modular Content field.
+    </p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> And then supercharge it with plugins </Fragment>
+    <Fragment slot="title"> Take it a step further with custom capabilities. </Fragment>
+    <p>
+      Need a field to map geolocation data in real time? Or a different layout to let editors pick
+      and choose from a product grid?
+    </p>
+    <p>
+      You can add new field types via the Plugin SDK, either with community plugins or build your
+      own! They run inside the schema builder, fully integrated.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <Card title={'Plugins? In a Headless CMS'} href="/marketplace/plugins" noForcedAspectRatio>
+        Understandable. If the word’s giving you WP PTSD, then you can relax 😅 We prefer to
+        encourage plugins as fields for specific use-cases like star ratings or product pickers to
+        avoid clunking up the CMS with 1000s of niche features.
+        <Fragment slot="below">
+          <span class={s.fakeLink}>Check it out →</span>
+        </Fragment>
+      </Card>
+    </Wrapper>
+  </Space>
+
+  <Space bottom={3}>
+    <h2 class={s.groupTitle}>
+      Get ready-to-ship.<br />
+      Instantly
+    </h2>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Safe schema changes with environments </Fragment>
+    <Fragment slot="title"> Shamelessly built for breaking (changes) </Fragment>
+    <p>
+      Test schema updates in isolated environments to add, remove, or rename fields without
+      affecting your primary environment or production project.
+    </p>
+    <p>
+      Control UI visibility and validation rules per field, make all the breaking changes you need,
+      and merge changes when ready, without blocking your editors.
+    </p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Instant GraphQL and REST APIs </Fragment>
+    <Fragment slot="title"> Query everything, everywhere, all at once </Fragment>
+    <p>
+      Your schema defines your API in real time, with everything instantly available via the GraphQL
+      Content Delivery API.
+    </p>
+    <p>
+      Want to make changes programmatically? Ping the REST Content Management API. Want to test
+      queries? Use the GraphQL API Explorer. Need even more integration? Try our React, Vue, Svelte,
+      and Astro SDKs, to name a few.
+    </p>
+  </Flag>
+
+  {
+    page.quote && (
+      <Wrapper>
+        <Space top={3} bottom={3}>
+          <SingleQuote quote={page.quote} />
+        </Space>
+      </Wrapper>
+    )
+  }
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Great dx, without any sacrifice on the UX </Fragment>
+    <Fragment slot="title"> Loved by 1000s of teams globally for a reason. </Fragment>
+    <p>
+      Developers can update the schema visually without writing migrations or redeploying
+      environments.
+    </p>
+    <p>
+      Editors get clean, structured interfaces tailored to each model and block, with no clutter or
+      ambiguity.
+    </p>
+    <p>Everything just works. No sync issues. No bottlenecks.</p>
+  </Flag>
+
+  <!-- <Space top={3} bottom={2}>
+    <LogosBar
+      title="We power experiences for over half a billion users"
+      clients={[
+        'svg/logos/polestar',
+        'svg/logos/hashicorp',
+        'svg/logos/verizon',
+        'svg/logos/harrys',
+        'svg/logos/vercel',
+      ]}
+    />
+  </Space> -->
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>
