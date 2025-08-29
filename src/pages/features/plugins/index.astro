@@ -1,0 +1,228 @@
+---
+import { Button } from '~/components/Button';
+import { CalloutCard } from '~/components/CalloutCard';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { Image } from 'astro:assets';
+import { Layout } from '~/layouts/Layout';
+import { Space } from '~/components/Space';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import s from './_style.module.css';
+
+const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout seo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker">Plugins</Fragment>
+    <Fragment slot="title">
+      Extend.<br />
+      <mark>Don't bloat</mark>.
+    </Fragment>
+    <Fragment slot="subtitle">
+      Plugins let you customize the editorial experience, inject new functionality, or integrate
+      with third-party tools, all from within the DatoCMS UI.
+    </Fragment>
+    <!-- <a href="/marketplace/plugins" class={s.heroLink}>Explore all plugins →</a> -->
+  </Hero>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1759393796-extend-the-ui.png"
+        inferSize
+        alt="Extend the UI"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> What plugins can do </Fragment>
+    <Fragment slot="title"> Extend the UI anyway and anywhere you want </Fragment>
+    <p>
+      Plugins can add new field types, replace builtin ones, extend sidebars, extend assets, or
+      create whole new screens.
+    </p>
+    <p>
+      If you’re working with other services, integrate with them to interact with other APIs within
+      DatoCMS, all in a browser-safe, scoped way.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <CalloutCard
+        title="How flexible is the CMS? Yes."
+        ctaLink="/features#extensibility"
+        illustration
+        asLink
+      >
+        <Fragment slot="text">
+          The CMS supports plugin hooks for custom fields, sidebars, dropdown actions, assets,
+          entire pages, field extensions, and so much more.
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1759393796-private-community.png"
+        inferSize
+        alt="Private or Public"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> Private and community plugins </Fragment>
+    <Fragment slot="title">
+      Share it with the world, or keep it to yourself. We won’t judge.
+    </Fragment>
+    <p>
+      Plugins you create are yours. If you’re working on something proprietary, hyper-specific,
+      internal tooling related, or just don’t think it’s nice to expose it, keep it private!
+    </p>
+    <p>If you’ve got something to share with the world, publish it to the marketplace.</p>
+  </Flag>
+
+  <Space bottom={3}>
+    <TitleStripWithContent stripHeight="full">
+      <Fragment slot="kicker"> Why we 🧡 plugins </Fragment>
+      <Fragment slot="title">
+        User ratings? Geospatial pins? Dua Lipa lyrics? There’s a plugin for that.
+      </Fragment>
+      <Fragment slot="subtitle">
+        <p>
+          We avoid feature bloat by design. Instead of trying to be everything for everyone, we give
+          you a fast, focused core CMS, and plugins for the rest. If you don’t need it, it’s not in
+          your way.
+        </p>
+      </Fragment>
+    </TitleStripWithContent>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1759393796-real-world-use-cases.png"
+        inferSize
+        alt="Real World Use Cases"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> Real world use cases </Fragment>
+    <Fragment slot="title"> Get inspired by what teams are building today </Fragment>
+    <p>
+      From Shopify product pickers and AI content translators, to interactive geospatial metadata
+      markers and foreign data selectors, our customers are building some incredible stuff with
+      plugins!
+    </p>
+    <p>Check out the marketplace to explore some of the most popular use-cases being unlocked.</p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <div class={s.cardGrid}>
+        <CalloutCard
+          size="small"
+          title="Conditional Fields"
+          ctaLink="/marketplace/plugins/i/datocms-plugin-conditional-fields"
+          asLink
+        >
+          <Fragment slot="text"> Conditionally show or hide fields. </Fragment>
+        </CalloutCard>
+        <CalloutCard
+          size="small"
+          title="Web Previews"
+          ctaLink="/marketplace/plugins/i/datocms-plugin-web-previews"
+          asLink
+        >
+          <Fragment slot="text"> Get live previews of what your work looks like! </Fragment>
+        </CalloutCard>
+        <CalloutCard
+          size="small"
+          title="Schema Import/Export"
+          ctaLink="/marketplace/plugins/i/datocms-plugin-schema-import-export"
+          asLink
+        >
+          <Fragment slot="text"> Use and reuse your schema across projects as JSON. </Fragment>
+        </CalloutCard>
+        <CalloutCard
+          size="small"
+          title="SEO & Readability"
+          ctaLink="/marketplace/plugins/i/datocms-plugin-seo-readability-analysis"
+          asLink
+        >
+          <Fragment slot="text"> Run a SEO Analysis on content using Yoast.js. </Fragment>
+        </CalloutCard>
+      </div>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1759393796-devs.png"
+        inferSize
+        alt="Dev and Editor Friendly"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> Browser-based, config-free, and isolated </Fragment>
+    <Fragment slot="title"> Built for devs. Designed for editors... </Fragment>
+    <p>
+      Each plugin is scoped to your project and runs inside the CMS. Plugins respect field configs,
+      environments, and user roles & permissions.
+    </p>
+    <p>You decide where and when it shows up, and for whom.</p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1759393796-agencies.png"
+        inferSize
+        alt="Agencies"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> Reusable features, minimal overhead </Fragment>
+    <Fragment slot="title"> ... Equally loved by agencies and web dev shops. </Fragment>
+    <p>
+      Agencies use plugins to ship client-specific requests and deliver repeatable, white-labeled
+      components like SEO lists, tag injectors, review widgets, and so much more.
+    </p>
+    <p>
+      No need to rebuild things every time. Just drop in the plugin and configure it per client,
+      done.
+    </p>
+  </Flag>
+
+  <Space bottom={3}>
+    <TitleStripWithContent stripHeight="full">
+      <Fragment slot="kicker"> Build your first plugin </Fragment>
+      <Fragment slot="title"> It takes 5 minutes to go from idea to install </Fragment>
+      <Fragment slot="subtitle">
+        Use the CLI to create a plugin, develop it locally, and preview it in DatoCMS instantly.
+        Publish to the Marketplace or keep it private forever.
+      </Fragment>
+      <div class={s.buttonContainer}>
+        <Button fs="small" as="a" href="https://dashboard.datocms.com/signup">
+          Sign up for free
+        </Button>
+        <Button fs="small" as="a" s="invert" href="/docs"> Read the docs </Button>
+      </div>
+    </TitleStripWithContent>
+  </Space>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

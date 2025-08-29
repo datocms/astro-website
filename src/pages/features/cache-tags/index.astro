@@ -1,0 +1,211 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Button } from '~/components/Button';
+import { CalloutCard } from '~/components/CalloutCard';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { Image } from 'astro:assets';
+import { Layout } from '~/layouts/Layout';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import s from './_style.module.css';
+
+const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout seo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker">Cache Tags</Fragment>
+    <Fragment slot="title">
+      Purge what changed. Leave <mark>everything else cached</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      Get fine-grained cache invalidation for high-performance content delivery. No more stale
+      content. No more full rebuilds.
+    </Fragment>
+  </Hero>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1759394110-logs.png"
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> The cache problem with most setups </Fragment>
+    <Fragment slot="title"> Builds getting hella expensive? </Fragment>
+    <p>Content changes often trigger full purges, slowing down delivery and hurting performance.</p>
+    <p>
+      Cache tags let you purge only what changed, reducing rebuilds, keeping edge caches warm, and
+      improving speed.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <CalloutCard
+        title="The best part? It's OOTB"
+        ctaLink="/docs/remix/using-cache-tags"
+        ctaLabel="Give it a go →"
+        illustration="svg/illustrations/live-4"
+        asLink
+      >
+        <Fragment slot="text">
+          It takes like 2 hours of integration work on your end to get everything up and running to
+          have a perfectly cached site with instant validation. Yeah. That easy.
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1759393730-deterministic.png"
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> How cache tags work </Fragment>
+    <Fragment slot="title"> Deterministic, predictable, and scoped to your environment </Fragment>
+    <p>
+      Every response from the CDA includes an X-Cache-Tags header which represent the exact records,
+      models, or assets involved in that query.
+    </p>
+    <p>
+      When you update content, we automatically purge all matching tags. Nothing more, nothing less.
+    </p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1759393730-integrate.png"
+        inferSize
+        alt="Integrate"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> Integrate natively with any (tag-based) CDN </Fragment>
+    <Fragment slot="title"> You don't even need to overhaul your stack </Fragment>
+    <p>
+      Cache Tags work natively with Fastly (via Surrogate-Key) and Cloudflare (via Cache-Tag),
+      letting you connect purge events via webhooks, or trigger them via CLI or API.
+    </p>
+    <p>
+      It works with any edge-cached SSR, static site revalidation, or serverless functions that
+      honor CDN headers.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <CalloutCard
+        title="Psst: Looking for an example?"
+        ctaLink="/docs/remix/using-cache-tags"
+        illustration
+        asLink
+      >
+        <Fragment slot="text">
+          To illustrate a combination of tools that fit into this category, we have put together a
+          tutorial on implementing DatoCMS Cache Tags with Remix as the framework and Fastly as the
+          cache-tags-capable CDN on top of the Remix app.
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1759394110-speed.png"
+        inferSize
+        alt="Speed"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> Cool in theory, better in practice </Fragment>
+    <Fragment slot="title"> Built for speed. At scale. For the real world. </Fragment>
+    <p>Less redeploying. Less stale content. Less traffic hitting your origin.</p>
+    <article>
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>No full-cache invalidation</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Keep pages fast and cached</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Reduce rebuilds and API calls</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Reflect changes in near real-time</span>
+        </li>
+      </Bullets>
+    </article>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <CalloutCard
+        title="Psst: Need a practical example with your framework?"
+        ctaLink="/docs/next-js/using-cache-tags"
+        illustration
+        asLink
+      >
+        <Fragment slot="text">
+          Let’s talk Next.js, whose <code>fetch()</code> and <code>revalidateTag()</code> are the founding
+          blocks for using cache tags, together with the framework inner logic. So we implemented Cache
+          Tags on a Next.js project to show you how they work.
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
+  </Space>
+
+  {
+    page.quote && (
+      <Wrapper>
+        <Space top={3} bottom={3}>
+          <SingleQuote quote={page.quote} />
+        </Space>
+      </Wrapper>
+    )
+  }
+
+  <Space bottom={3}>
+    <TitleStripWithContent stripHeight="full">
+      <Fragment slot="kicker"> Take it for a spin </Fragment>
+      <Fragment slot="title"> Available on all plans. Not gatekept behind $$$ </Fragment>
+      <Fragment slot="subtitle">
+        We developed Cache Tags for ourselves, and we mean it when we say that they were a
+        gamechanger. So why keep it from you?
+      </Fragment>
+      <div class={s.buttonContainer}>
+        <Button fs="small" as="a" href="https://try.datocms.com">Launch Demo</Button>
+        <Button fs="small" as="a" s="invert" href="/contact"> Contact sales </Button>
+      </div>
+    </TitleStripWithContent>
+  </Space>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>
