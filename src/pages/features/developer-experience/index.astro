@@ -1,0 +1,202 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { ActiveLink } from '~/components/links/ActiveLink';
+import { Wrapper } from '~/components/Wrapper';
+import { Card } from '~/components/Card';
+import { Button } from '~/components/Button';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import s from './_style.module.css';
+
+// const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const variables = { slug: 'structured-content-cms' };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page || !page.video) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout seo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker">Schema builer</Fragment>
+    <Fragment slot="title">
+      Build Fast.<br />
+      <mark>Ship Faster</mark>.
+    </Fragment>
+    <Fragment slot="subtitle">
+      Modern tools, predictable APIs, and full schema control. SDKs, GraphQL, staging envs, SDKs...
+      everything you need to work better, without any surprises.
+    </Fragment>
+    <a href="/features#developer-experience" class={s.heroLink}>Explore all developer features →</a>
+  </Hero>
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker"> We 🧡 our developers </Fragment>
+    <Fragment slot="title"> Schema driven, API-first, GraphQL & REST in perfect harmony </Fragment>
+    <Fragment slot="subtitle">
+      <p>
+        Enjoy what headless content management was meant to be, without sacrificing on performance
+        or the end-editor experience. DatoCMS is the CMS loved by devs across 25K+ teams.
+      </p>
+    </Fragment>
+    <Space top={1}>
+      <!-- <VideoPlayer data={page.video} autoPlay={true} /> -->
+    </Space>
+  </TitleStripWithContent>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Blazing fast APIs </Fragment>
+    <Fragment slot="title"> Low latency, high availability, zero surprises </Fragment>
+    <p>
+      Our GraphQL and REST APIs are backed by a global CDN, optimized for read-heavy workloads. Same
+      goes for media served via imgix and Mux.
+    </p>
+    <p>
+      Every request is served from the closest edge location. No cold starts. No rate limits. No
+      region lock-in.
+    </p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> SDKs for YOUR frontend </Fragment>
+    <Fragment slot="title"> Get all your content with one line of code </Fragment>
+    <p>
+      Use our official SDKs for JavaScript, TypeScript, and Node.js to make your project development
+      a breeze.
+    </p>
+    <p>
+      Integrate easily with frameworks like React, Next.js, Astro, Nuxt, Remix, and SvelteKit with
+      our official integration guides.
+    </p>
+  </Flag>
+
+  <!-- TODO: integration -->
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Staging and CI support </Fragment>
+    <Fragment slot="title"> Don’t fear those breaking changes you’ve got planned </Fragment>
+    <p>
+      Use environments to test schema changes without affecting live content. Happy with your
+      results?
+    </p>
+    <p>
+      Run QA builds, promote envs, trigger CI workflows, and merge changes programmatically via CLI
+      or API.
+    </p>
+    <p>No risky migrations. No content loss. Everything here is trackable and reversible.</p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Structured modeling without the boilerplate </Fragment>
+    <Fragment slot="title"> Fast to define, safe to evolve </Fragment>
+    <p>
+      The Schema Builder gives you full control over content structure with models, fields, blocks,
+      and validations.
+    </p>
+    <p>
+      No config files to sync. No schema drift. No codegen step. Changes go live instantly across
+      your project.
+    </p>
+    <p>
+      Need a headstart on other projects? We’ve got schema imports and exports that are a delight
+      :chef-kiss:
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <div class={s.cardGrid}>
+        <Card title="Blocks" href="/docs/content-modelling/blocks" noForcedAspectRatio>
+          Blocks let you build rich, dynamic layouts
+          <Fragment slot="below">
+            <span class={s.fakeLink}>Check it out →</span>
+          </Fragment>
+        </Card>
+        <Card title="Validations" href="/docs/content-modelling/validations" noForcedAspectRatio>
+          Give your editors guardrails when editing content
+          <Fragment slot="below">
+            <span class={s.fakeLink}>Check it out →</span>
+          </Fragment>
+        </Card>
+        <Card title="Models" href="/docs/general-concepts/data-modelling" noForcedAspectRatio>
+          Define the layout of your schema as you like
+          <Fragment slot="below">
+            <span class={s.fakeLink}>Check it out →</span>
+          </Fragment>
+        </Card>
+        <Card title="Fields" href="/docs/content-modelling" noForcedAspectRatio>
+          Explore all the field types and field plugins in the CMS
+          <Fragment slot="below">
+            <span class={s.fakeLink}>Check it out →</span>
+          </Fragment>
+        </Card>
+      </div>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Performance, cache control, and predictability </Fragment>
+    <Fragment slot="title"> We’re fast. “Not enough time to go make a coffee” fast. </Fragment>
+    <p>
+      CDN-backed APIs ensure low latency worldwide, and not to flex too much, but we’ve been
+      averaging at 40ms on our CDA with a 100% success rate 💁‍♀️
+    </p>
+    <p>
+      Plus, Cache Tags give you granular invalidation to purge only what changed, so even your
+      builds get faster. No full rebuilds unless you want them.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <Card
+        title="Haven’t played with Cache Tags yet?"
+        href="/docs/content-delivery-api/cache-tags"
+        noForcedAspectRatio
+      >
+        DatoCMS Cache Tags give you fine-grained cache invalidation for high-performance content
+        delivery. No more stale content. No more full rebuilds. We originally developed them for
+        ourselves, and they’re pretty sweet.
+        <Fragment slot="below">
+          <span class={s.fakeLink}>Check it out →</span>
+        </Fragment>
+      </Card>
+    </Wrapper>
+  </Space>
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker"> Say hello to headless CMS done right </Fragment>
+    <Fragment slot="title"> Stop fiddling with your CMS. Start shipping. </Fragment>
+    <Fragment slot="subtitle">
+      We developed Cache Tags for ourselves, and we mean it when we say that they were a
+      gamechanger. So why keep it from you?
+    </Fragment>
+    <div class={s.buttonContainer}>
+      <Button fs="small" as="a" href="https://dashboard.datocms.com/signup">
+        Sign up for free
+      </Button>
+      <Button fs="small" as="a" s="invert" href="/docs"> Read the docs </Button>
+    </div>
+  </TitleStripWithContent>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>
