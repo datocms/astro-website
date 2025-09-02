@@ -1,0 +1,171 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { Wrapper } from '~/components/Wrapper';
+import { Card } from '~/components/Card';
+import { Button } from '~/components/Button';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import s from './_style.module.css';
+
+// const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const variables = { slug: 'structured-content-cms' };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page || !page.video) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout seo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker">Schema builer</Fragment>
+    <Fragment slot="title">
+      Purge what changed. Leave <mark>everything else cached</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      Purge what changed. Leave <mark>everything else cached</mark>
+    </Fragment>
+  </Hero>
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker"> The Cache problem with most CMS setups </Fragment>
+    <Fragment slot="title">The Cache problem with most CMS setups</Fragment>
+    <Fragment slot="subtitle">
+      <p>
+        Content changes often trigger full purges, slowing down delivery and hurting performance.
+        And that’s hella expensive and time wasting.
+      </p>
+      <p>
+        Cache Tags let you purge only the parts of your site that changed — reducing rebuilds,
+        keeping edge caches warm, and improving perceived speed.
+      </p>
+    </Fragment>
+    <Space top={1}>
+      <!-- <VideoPlayer data={page.video} autoPlay={true} /> -->
+    </Space>
+  </TitleStripWithContent>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> How cache tags work </Fragment>
+    <Fragment slot="title"> Deterministic, predictable, and scoped to your environment </Fragment>
+    <p>
+      The Schema Builder helps you define the core build of your content architecture using models,
+      blocks, and plugins, determining how your content is organized and accessed.
+    </p>
+    <p>Changes apply instantly across the API. No code, no rebuilds.</p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Integrate natively with any (tag-based) CDN </Fragment>
+    <Fragment slot="title"> Establish the right structure with Models & Fields </Fragment>
+    <p>
+      Cache Tags work natively with Fastly (via Surrogate-Key) and Cloudflare (via Cache-Tag),
+      letting you connect purge events via webhooks, or trigger them via CLI or API.
+    </p>
+    <p>
+      It works with any edge-cached SSR, static site revalidation, or serverless functions that
+      honor CDN headers.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <Card
+        title="Psst: Looking for an example?"
+        href="/docs/remix/using-cache-tags"
+        noForcedAspectRatio
+      >
+        To illustrate a combination of tools that fit into this category, we have put together a
+        tutorial on implementing DatoCMS Cache Tags with Remix as the framework and Fastly as the
+        cache-tags-capable CDN on top of the Remix app.
+        <Fragment slot="below">
+          <span class={s.fakeLink}>Check it out →</span>
+        </Fragment>
+      </Card>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Cool in theory, better in practice </Fragment>
+    <Fragment slot="title"> Built for speed. At scale. For the real world. </Fragment>
+    <p>Less redeploying. Less stale content. Less traffic hitting your origin.</p>
+    <article>
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>No full-cache invalidation</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Keep pages fast and cached</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Reduce rebuilds and API calls</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Reflect changes in near real-time</span>
+        </li>
+      </Bullets>
+    </article>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <Card
+        title="Psst: Need a practical example with your framework?"
+        href="/docs/next-js/using-cache-tags"
+        noForcedAspectRatio
+      >
+        Let’s talk Next.js, whose <code>fetch()</code> and <code>revalidateTag()</code> are the founding
+        blocks for using cache tags, together with the framework inner logic. So we implemented Cache
+        Tags on a Next.js project to show you how they work.
+        <Fragment slot="below">
+          <span class={s.fakeLink}>Check it out →</span>
+        </Fragment>
+      </Card>
+    </Wrapper>
+  </Space>
+
+  {
+    page.quote && (
+      <Wrapper>
+        <Space top={3} bottom={3}>
+          <SingleQuote quote={page.quote} />
+        </Space>
+      </Wrapper>
+    )
+  }
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker"> Take it for a spin </Fragment>
+    <Fragment slot="title"> Available on all plans. Not gatekept behind $$$ </Fragment>
+    <Fragment slot="subtitle">
+      We developed Cache Tags for ourselves, and we mean it when we say that they were a
+      gamechanger. So why keep it from you?
+    </Fragment>
+    <div class={s.buttonContainer}>
+      <Button fs="big" as="a" href="https://try.datocms.com">Launch Demo</Button>
+      <Button fs="big" as="a" s="invert" href="/contact">Contact sales</Button>
+    </div>
+  </TitleStripWithContent>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>
