@@ -1,0 +1,262 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Layout } from '~/layouts/Layout';
+import { LogosBar } from '~/components/LogosBar';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { Wrapper } from '~/components/Wrapper';
+import { Card } from '~/components/Card';
+import { Button } from '~/components/Button';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import s from './_style.module.css';
+
+// const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const variables = { slug: 'structured-content-cms' };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page || !page.video) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout seo={page._seoMetaTags}>
+  <Hero>
+    <Fragment slot="kicker">Editor experience</Fragment>
+    <Fragment slot="title">
+      Ever met a Headless CMS that editors <mark>actually enjoy using</mark>?
+    </Fragment>
+    <Fragment slot="subtitle">
+      Modular content, asset management, scheduling, previews, localization... DatoCMS gives editors
+      just the CMS buzzwords that actually matter.
+    </Fragment>
+  </Hero>
+
+  <Space top={1} bottom={1}>
+    TBD
+    <!-- <VideoPlayer data={page.video} autoPlay={true} /> -->
+  </Space>
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker">Why the editor experience matters</Fragment>
+    <Fragment slot="title">
+      <Fragment slot="kicker">Why the editor experience matters</Fragment>
+    </Fragment>
+    <Fragment slot="subtitle">
+      <p>
+        There’s so much that editors love about their page builders. So why sacrifice that when
+        moving to a Headless CMS? Dato is built to balance the DX and UX in a way that delights
+        editors just as much.
+      </p>
+    </Fragment>
+    <Space top={1}>
+      TBD
+      <!-- <VideoPlayer data={page.video} autoPlay={true} /> -->
+    </Space>
+  </TitleStripWithContent>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Meet modular content </Fragment>
+    <Fragment slot="title"> Composable layouts without dev hand-holding </Fragment>
+    <p>
+      Editors build flexible page layouts using Blocks in Modular Content fields, getting all that
+      WYSIWYG page building fun while still giving you a clean API to manage it all.
+    </p>
+    <p>
+      No more asking devs to add one-off CTAs or sections. Drag-and-drop UX. Structured output. Need
+      more? Slap in a Live Previews plugin to let the UI really shine.
+    </p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Asset Management out of the box </Fragment>
+    <Fragment slot="title"> Media management & optimization done right </Fragment>
+    <p>
+      DatoCMS provides a centralized library for all images, videos, audio, documents, and
+      everything else.
+    </p>
+    <p>
+      Paired with Mux and imgix under the hood, enjoy perfect optimizations, metadata management,
+      and so much more.
+    </p>
+    <p>Upload once, use anywhere. No duplicates, no chaos.</p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <Card
+        title="New to Digital Asset Optimization?"
+        href="/docs/asset-api/images"
+        noForcedAspectRatio
+      >
+        Check out the docs to learn more about the capabilities of Mux and imgix to ensure that your
+        frontend builds are optimized to perfection, regardless of what’s uploaded into the CMS.
+        <Fragment slot="below">
+          <span class={s.fakeLink}>Check it out →</span>
+        </Fragment>
+      </Card>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Localization built in </Fragment>
+    <Fragment slot="title"> 👋 Hallochen. Hablar whichever lingua شما 客戶 parlent </Fragment>
+    <p>
+      Easily manage multiple locales in a single record, and switch between language tabs, compare
+      side by side, or fallback to defaults.
+    </p>
+    <p>
+      Localization works across content, media, metadata, and SEO, and added bonus? Publish or
+      unpublish specific locales as you need. Not all everytime.
+    </p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Structured text </Fragment>
+    <Fragment slot="title"> WYSIWYG without the usual headaches attached. </Fragment>
+    <p>
+      Not to flex too much, but the Structured Text field is one of the best Headless CMS editors
+      out there. Get a writing experience that feels right but still outputs structured JSON.
+    </p>
+    <p>
+      The field supports formatting, slash commands, inline links, media embeds, custom blocks,
+      plugins, and SO MUCH MORE. No messy HTML. No custom parsing.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <Card
+        title="Explore the Structured Text field"
+        href="docs/content-modelling/structured-text"
+        noForcedAspectRatio
+      >
+        This is capable of so many cool things, it’s really hard to summarize into a few words. So
+        check out this extensive video walkthrough for editors to experience everything Structured
+        Text can do.
+        <Fragment slot="below">
+          <span class={s.fakeLink}>Check it out →</span>
+        </Fragment>
+      </Card>
+    </Wrapper>
+  </Space>
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker"> Not just shiny things </Fragment>
+    <Fragment slot="title"> Cool bells. But what about the whistles? </Fragment>
+    <Fragment slot="subtitle">
+      What good is a feature without the right foundations to ensure that they fit your needs
+      without making you need to reinvent all your workflows from the ground up?
+    </Fragment>
+    TBD
+    <!-- <VideoPlayer data={page.video} autoPlay={true} /> -->
+  </TitleStripWithContent>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Real time collaboration </Fragment>
+    <Fragment slot="title"> Seamlessly work together. Not over each other </Fragment>
+    <p>DatoCMS lets you see who’s editing a record in real time.</p>
+    <p>
+      Lock entries, leave notes, or assign records to specific team members. Between native features
+      and plugins, your team comes together without handing off 50 shades of tools.
+    </p>
+    <p>Fewer Slack DMs. Fewer “WHO DID THIS”es. Fewer conflicts.</p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Live previews </Fragment>
+    <Fragment slot="title"> Preview everything before you hit publish. No surprises. </Fragment>
+    <p>
+      Really doesn’t matter if you’re building with Next.js, Vue, Astro, or whatever new framework
+      just became cool last Thursday, DatoCMS gives you easy configuration for live previews
+      regardless of your framework.
+    </p>
+    <p>No guesswork. No broken layouts. Just one plugin and done.</p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> SEO and social previews </Fragment>
+    <Fragment slot="title"> Please the Google gods with the native SEO field. </Fragment>
+    <p>
+      The SEO field in DatoCMS is unique, letting you add custom metadata and OG tags for all your
+      content, with validations, conveniently rendered with the dato-seo package.
+    </p>
+    <p>
+      Pair it with the Socials field to preview how your content will look on Google, Slack,
+      Linkedin, and X.
+    </p>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="kicker"> Versions, history, schedules, and then some </Fragment>
+    <Fragment slot="title">
+      Yep, even the “boring” stuff is handled to appease management
+    </Fragment>
+    <p>Publishing workflows, field validations, and version history, all built in.</p>
+    <p>Schedule content, define approval steps, and prevent bad inputs with structured rules.</p>
+    <p>
+      Every change is tracked, reversible, and safe. No overwrites, no broken content, no surprises.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <Card
+        title="What’s “under the hood”"
+        href="/user-guides/content-management/content-records-publishing-scheduling-and-versioning"
+        noForcedAspectRatio
+      >
+        Editors can manage content metadata, publishing schedules, versioning, content history, and
+        a lot more to ensure that their workflows stay consistent. We put together a video
+        walkthrough explaining the capabilities of this.
+        <Fragment slot="below">
+          <span class={s.fakeLink}>Check it out →</span>
+        </Fragment>
+      </Card>
+    </Wrapper>
+  </Space>
+
+  {
+    page.quote && (
+      <Wrapper>
+        <Space top={3} bottom={3}>
+          <SingleQuote quote={page.quote} />
+        </Space>
+      </Wrapper>
+    )
+  }
+
+  <TitleStripWithContent>
+    <Fragment slot="kicker"> Say hello to headless CMS done right </Fragment>
+    <Fragment slot="title"> See why DatoCMS stands out for editors </Fragment>
+    <Fragment slot="subtitle">
+      Still afraid to commit? Try a no-strings-attached and no-signup-needed demo of DatoCMS to play
+      around with the UI. Or just sign up.
+    </Fragment>
+    <div class={s.buttonContainer}>
+      <Button fs="small" as="a" href="https://try.datocms.com">Launch Demo</Button>
+      <Button fs="small" as="a" s="invert" href="https://dashboard.datocms.com/signup">
+        Sign up for free
+      </Button>
+    </div>
+  </TitleStripWithContent>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>
