@@ -136,7 +136,7 @@ We make sure that every third party that we use is as careful as we are on secur
 
 All the **data is encrypted in transit with TLS**, both internally between services and externally when reaching the users.
 
-All our **database data are encrypted at rest**. We retain database backups for up to 30 days.
+All our **database data are encrypted at rest**. We retain database backups for up to 14 days.
 
 If you delete your project we delete all data from the live database immediately but we'll retain copies in our backups that are not accessible from the live system.
 
@@ -180,4 +180,4 @@ Nevertheless we have the following team policies:
 
 If you have found a security vulnerability, please get in touch via [security@datocms.com](mailto:security@datocms.com). You can encrypt the message with our PGP key that you can find [on our site](https://www.datocms.com/.well-known/DatoCMS_security_pub.asc) and on [keys.openpgp.org](https://keys.openpgp.org/search?q=3FBD73EFD6C5268A21C33FE27B94FBC69CD5C678).
 
-Latest update: Jul 25, 2025
+Latest update: Sep 2, 2025
