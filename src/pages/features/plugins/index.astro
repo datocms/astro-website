@@ -21,11 +21,10 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import s from './_style.module.css';
 import { Image } from 'astro:assets';
 
-// const variables = { slug: Astro.url.pathname.split('/').pop()! };
-const variables = { slug: 'structured-content-cms' };
+const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
 
-if (!page || !page.video) {
+if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
