@@ -18,6 +18,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import s from './_style.module.css';
+import { Image } from 'astro:assets';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -63,20 +64,37 @@ if (!page) {
   </TitleStripWithContent>
 
   <Flag>
-    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="visual">
+      <Image
+        src={`https://www.datocms-assets.com/205/1757608179-deterministic.png`}
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
     <Fragment slot="kicker"> How cache tags work </Fragment>
     <Fragment slot="title"> Deterministic, predictable, and scoped to your environment </Fragment>
     <p>
-      The Schema Builder helps you define the core build of your content architecture using models,
-      blocks, and plugins, determining how your content is organized and accessed.
+      Every response from the CDA includes an X-Cache-Tags header which represent the exact records,
+      models, or assets involved in that query.
     </p>
-    <p>Changes apply instantly across the API. No code, no rebuilds.</p>
+    <p>
+      When you update content, we automatically purge all matching tags from the CDN. Nothing more,
+      nothing less.
+    </p>
   </Flag>
 
   <Flag>
-    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="visual">
+      <Image
+        src={`https://www.datocms-assets.com/205/1757608175-integrate.png`}
+        inferSize
+        alt="Integrate"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
     <Fragment slot="kicker"> Integrate natively with any (tag-based) CDN </Fragment>
-    <Fragment slot="title"> Establish the right structure with Models & Fields </Fragment>
+    <Fragment slot="title"> You don't even need to overhaul your stack </Fragment>
     <p>
       Cache Tags work natively with Fastly (via Surrogate-Key) and Cloudflare (via Cache-Tag),
       letting you connect purge events via webhooks, or trigger them via CLI or API.
@@ -105,7 +123,14 @@ if (!page) {
   </Space>
 
   <Flag>
-    <Fragment slot="visual"> TBD </Fragment>
+    <Fragment slot="visual">
+      <Image
+        src={`https://www.datocms-assets.com/205/1757608175-speed.png`}
+        inferSize
+        alt="Speed"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
     <Fragment slot="kicker"> Cool in theory, better in practice </Fragment>
     <Fragment slot="title"> Built for speed. At scale. For the real world. </Fragment>
     <p>Less redeploying. Less stale content. Less traffic hitting your origin.</p>
