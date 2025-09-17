@@ -2,13 +2,14 @@ import { createMarkdownProcessor, type AstroMarkdownOptions } from '@astrojs/mar
 import rehypeExpressiveCode from 'rehype-expressive-code';
 import striptags from 'striptags';
 import expressiveCodeConfig from '~~/ec.config.mjs';
-import { autolinkHeadings, figureAroundCodeBlocks } from './rehypePlugins';
+import { autolinkHeadings, callouts, figureAroundCodeBlocks } from './rehypePlugins';
 
 export const config: AstroMarkdownOptions = {
   syntaxHighlight: false,
   rehypePlugins: [
     figureAroundCodeBlocks,
     autolinkHeadings,
+    callouts,
     [rehypeExpressiveCode, expressiveCodeConfig],
   ],
   remarkRehype: {},

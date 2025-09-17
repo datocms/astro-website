@@ -42,7 +42,7 @@ export function buildTocGroupsFromMarkdown(rawContent: string | undefined): TocG
   const headings: TocEntry[] = [];
 
   visit(tree, ['heading'], (node) => {
-    if (node.type === 'heading') {
+    if (node.type === 'heading' && node.depth !== 6) {
       const content = toString(node);
 
       headings.push({
