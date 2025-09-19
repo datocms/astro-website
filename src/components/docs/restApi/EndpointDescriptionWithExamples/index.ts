@@ -12,7 +12,7 @@ export const examplePlaceholderRegexp = /(<p>\n*)?::example\[(?<exampleId>[^\]]+
 
 export function exampleIdsInMarkdown(content: string | undefined) {
   return content
-    ? [...content.matchAll(examplePlaceholderRegexp)].map((match) => match.groups!.exampleId)
+    ? [...content.matchAll(examplePlaceholderRegexp)].map((match) => match.groups!.exampleId!)
     : [];
 }
 
@@ -22,7 +22,7 @@ export function examplesInMarkdown<T extends Array<{ id: string }>>(
 ): T {
   const exampleIdsInside = exampleIdsInMarkdown(content);
 
-  return examples.filter((example) => exampleIdsInside.includes(example.id)) as T;
+  return exampleIdsInside.map((id) => examples.find((example) => example.id === id)) as T;
 }
 
 export function examplesNotInMarkdown<T extends Array<{ id: string }>>(
