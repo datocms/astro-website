@@ -1,16 +1,11 @@
 ---
-import { Bullets } from '~/components/Bullets';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
-import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Layout } from '~/layouts/Layout';
-import { LogosBar } from '~/components/LogosBar';
-import { SingleQuote } from '~/components/quote/SingleQuote';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import { VideoPlayer } from '~/components/VideoPlayer';
-import { ActiveLink } from '~/components/links/ActiveLink';
 import { Wrapper } from '~/components/Wrapper';
 import { Card } from '~/components/Card';
 import { Button } from '~/components/Button';
@@ -18,8 +13,8 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import s from './_style.module.css';
 import { Image } from 'astro:assets';
+import s from './_style.module.css';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -105,7 +100,33 @@ if (!page) {
     </p>
   </Flag>
 
-  <!-- TODO: integration -->
+  <Wrapper>
+    <div class={s.integrations}>
+      <p>Official Integration guides to get a headstart with your frameworks</p>
+      <div class={s.integrationsGrid}>
+        <a href="/docs/next-js" class={s.integrationsItem}>
+          <Svg name="svg/logos/next-squared" class={s.integrationsImage} />
+          <p class={s.techName}>Next.js</p>
+        </a>
+
+        <a href="/docs/svelte" class={s.integrationsItem}>
+          <Svg name="svg/logos/svelte-squared" class={s.integrationsImage} />
+          <p class={s.techName}>SvelteKit</p>
+        </a>
+
+        <a href="/docs/astro" class={s.integrationsItem}>
+          <Svg name="svg/logos/astro-squared" class={s.integrationsImage} />
+          <p class={s.techName}>Astro</p>
+        </a>
+
+        <a href="/docs/nuxt" class={s.integrationsItem}>
+          <Svg name="svg/logos/nuxt-squared" class={s.integrationsImage} />
+          <p class={s.techName}>Nuxt</p>
+        </a>
+      </div>
+      <a href="" class={s.more}> Check it out → </a>
+    </div>
+  </Wrapper>
 
   <Flag>
     <Fragment slot="visual">
