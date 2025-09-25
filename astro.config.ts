@@ -162,6 +162,8 @@ export default defineConfig({
     checkOrigin: false,
   },
   redirects: {
+    '/cma-ts-schema':
+      '/docs/content-management-api/resources/item#type-safe-development-with-typescript',
     '/search': '/docs/site-search',
     '/blog/2': '/blog/p/2',
     '/changelog/2': '/product-updates/p/2',
