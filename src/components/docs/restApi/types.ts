@@ -22,8 +22,8 @@ export type RestApiEndpointHttpExample = {
 
 export type RestApiEndpointJsExample = {
   id: string;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   request?: {
     description?: string;
     code?: string;

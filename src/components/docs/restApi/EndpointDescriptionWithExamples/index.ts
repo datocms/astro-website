@@ -71,17 +71,21 @@ export function buildTocGroupsFromExamples(
   const headings: TocEntry[] = [];
 
   for (const example of examplesInMarkdown(examples, content)) {
-    headings.push({
-      label: example.title,
-      url: `#${example.id}`,
-    });
+    if (example?.title) {
+      headings.push({
+        label: example.title,
+        url: `#${example.id}`,
+      });
+    }
   }
 
   for (const example of examplesNotInMarkdown(examples, content)) {
-    headings.push({
-      label: example.title,
-      url: `#${example.id}`,
-    });
+    if (example?.title) {
+      headings.push({
+        label: example.title,
+        url: `#${example.id}`,
+      });
+    }
   }
 
   if (examples.length === 0) {
