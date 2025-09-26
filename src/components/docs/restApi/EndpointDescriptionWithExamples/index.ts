@@ -22,7 +22,9 @@ export function examplesInMarkdown<T extends Array<{ id: string }>>(
 ): T {
   const exampleIdsInside = exampleIdsInMarkdown(content);
 
-  return exampleIdsInside.map((id) => examples.find((example) => example.id === id)) as T;
+  return exampleIdsInside
+    .map((id) => examples.find((example) => example.id === id))
+    .filter(Boolean) as T;
 }
 
 export function examplesNotInMarkdown<T extends Array<{ id: string }>>(
@@ -71,21 +73,17 @@ export function buildTocGroupsFromExamples(
   const headings: TocEntry[] = [];
 
   for (const example of examplesInMarkdown(examples, content)) {
-    if (example?.title) {
-      headings.push({
-        label: example.title,
-        url: `#${example.id}`,
-      });
-    }
+    headings.push({
+      label: example.title,
+      url: `#${example.id}`,
+    });
   }
 
   for (const example of examplesNotInMarkdown(examples, content)) {
-    if (example?.title) {
-      headings.push({
-        label: example.title,
-        url: `#${example.id}`,
-      });
-    }
+    headings.push({
+      label: example.title,
+      url: `#${example.id}`,
+    });
   }
 
   if (examples.length === 0) {
