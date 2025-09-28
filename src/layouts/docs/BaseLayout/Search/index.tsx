@@ -230,7 +230,7 @@ export function Search() {
               );
             })}
 
-          {!isDirty && !isLoading && !hasResults && (
+          {!isDirty && !isLoading && !hasResults && searchInput && (
             <p>Sorry, no results found for "{searchInput}".</p>
           )}
         </div>
