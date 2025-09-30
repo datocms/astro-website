@@ -73,12 +73,20 @@ async function mapWithConcurrency<I, O>(
 
   return ret;
 }
+function escapeMd(s: string) {
+  return s
+    .replace(/\\/g, '\\\\')
+    .replace(/\[/g, '\\[')
+    .replace(/\]/g, '\\]')
+    .replace(/_/g, '\\_')
+    .replace(/\*/g, '\\*')
+    .replace(/`/g, '\\`');
+}
 
 export const GET: APIRoute = async ({ request }) => {
   try {
     const origin = baseUrl(request);
 
-    // 🤞🏾 cache tags work
     const responseHeaders = new Headers({
       'Content-Type': 'text/plain; charset=utf-8',
     });
@@ -120,8 +128,13 @@ export const GET: APIRoute = async ({ request }) => {
     for (const section of Object.keys(bySection).sort()) {
       lines.push(`## ${section}`, '');
       for (const it of bySection[section]) {
-        const line = `- [${it.title}](${it.url})${it.desc ? `: ${it.desc}` : ''}`;
-        lines.push(line);
+        const urlForLlm =
+          section === 'Docs' ? (it.url.endsWith('.md') ? it.url : `${it.url}.md`) : it.url;
+
+        const title = escapeMd(it.title);
+        const desc = it.desc ? `: ${escapeMd(it.desc)}` : '';
+
+        lines.push(`- [${title}](${urlForLlm})${desc}`);
       }
       lines.push('');
     }
