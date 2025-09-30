@@ -1,24 +1,21 @@
 ---
 import { Bullets } from '~/components/Bullets';
+import { Button } from '~/components/Button';
+import { Card } from '~/components/Card';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
-import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Image } from 'astro:assets';
 import { Layout } from '~/layouts/Layout';
-import { LogosBar } from '~/components/LogosBar';
 import { SingleQuote } from '~/components/quote/SingleQuote';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { TitleStripWithContent } from '~/components/TitleStripWithContent';
-import { VideoPlayer } from '~/components/VideoPlayer';
 import { Wrapper } from '~/components/Wrapper';
-import { Card } from '~/components/Card';
-import { Button } from '~/components/Button';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import s from './_style.module.css';
-import { Image } from 'astro:assets';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -40,11 +37,6 @@ if (!page) {
     </Fragment>
   </Hero>
 
-  <Space top={1} bottom={1}>
-    TBD
-    <!-- <VideoPlayer data={page.video} autoPlay={true} /> -->
-  </Space>
-
   <TitleStripWithContent>
     <Fragment slot="kicker"> The Cache problem with most CMS setups </Fragment>
     <Fragment slot="title">The Cache problem with most CMS setups</Fragment>
@@ -58,9 +50,6 @@ if (!page) {
         keeping edge caches warm, and improving perceived speed.
       </p>
     </Fragment>
-    <Space top={1}>
-      <!-- <VideoPlayer data={page.video} autoPlay={true} /> -->
-    </Space>
   </TitleStripWithContent>
 
   <Flag>

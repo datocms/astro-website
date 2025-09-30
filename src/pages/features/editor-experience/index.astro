@@ -1,24 +1,19 @@
 ---
-import { Bullets } from '~/components/Bullets';
+import { Button } from '~/components/Button';
+import { Card } from '~/components/Card';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
-import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { Image } from 'astro:assets';
 import { Layout } from '~/layouts/Layout';
-import { LogosBar } from '~/components/LogosBar';
 import { SingleQuote } from '~/components/quote/SingleQuote';
 import { Space } from '~/components/Space';
-import { Svg } from '~/components/Svg';
 import { TitleStripWithContent } from '~/components/TitleStripWithContent';
-import { VideoPlayer } from '~/components/VideoPlayer';
 import { Wrapper } from '~/components/Wrapper';
-import { Card } from '~/components/Card';
-import { Button } from '~/components/Button';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import s from './_style.module.css';
-import { Image } from 'astro:assets';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -42,16 +37,9 @@ if (!page) {
     <a href="/features#editor-experience" class={s.heroLink}>Explore all developer features →</a>
   </Hero>
 
-  <Space top={1} bottom={1}>
-    TBD
-    <!-- <VideoPlayer data={page.video} autoPlay={true} /> -->
-  </Space>
-
   <TitleStripWithContent>
     <Fragment slot="kicker">Why the editor experience matters</Fragment>
-    <Fragment slot="title">
-      <Fragment slot="kicker">Why the editor experience matters</Fragment>
-    </Fragment>
+    <Fragment slot="title"> Built for speed, safety, scale, and peace of mind. </Fragment>
     <Fragment slot="subtitle">
       <p>
         There’s so much that editors love about their page builders. So why sacrifice that when
@@ -59,10 +47,6 @@ if (!page) {
         editors just as much.
       </p>
     </Fragment>
-    <Space top={1}>
-      TBD
-      <!-- <VideoPlayer data={page.video} autoPlay={true} /> -->
-    </Space>
   </TitleStripWithContent>
 
   <Flag>
@@ -190,8 +174,6 @@ if (!page) {
       What good is a feature without the right foundations to ensure that they fit your needs
       without making you need to reinvent all your workflows from the ground up?
     </Fragment>
-    TBD
-    <!-- <VideoPlayer data={page.video} autoPlay={true} /> -->
   </TitleStripWithContent>
 
   <Flag>
