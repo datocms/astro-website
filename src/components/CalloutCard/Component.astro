@@ -1,0 +1,41 @@
+---
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+
+interface Props {
+  size?: 'small' | 'medium' | 'large';
+  asLink?: boolean;
+  imagePath?: string;
+  title: string;
+  ctaLink?: string;
+  ctaLabel?: string;
+}
+
+const {
+  size = 'large',
+  asLink,
+  imagePath = 'svg/illustrations/developers-2',
+  title,
+  ctaLink,
+  ctaLabel = 'Check it out →',
+} = Astro.props;
+---
+
+<div class={s.calloutWrapper} data-as-link={ctaLink && !!asLink} data-size={size}>
+  <div class={s.calloutImage}>
+    <Svg name={imagePath} />
+  </div>
+  <div class={s.calloutBody}>
+    <h3 class={s.bodyTitle}>{title}</h3>
+    <div class={s.bodyDescription}>
+      <slot name="text" />
+    </div>
+    {
+      ctaLink && (
+        <a href={ctaLink} class={s.ctaLink}>
+          {ctaLabel}
+        </a>
+      )
+    }
+  </div>
+</div>
