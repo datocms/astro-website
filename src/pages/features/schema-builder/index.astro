@@ -1,5 +1,5 @@
 ---
-import { Card } from '~/components/Card';
+import { CalloutCard } from '~/components/CalloutCard';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
@@ -7,12 +7,11 @@ import { Image } from 'astro:assets';
 import { Layout } from '~/layouts/Layout';
 import { SingleQuote } from '~/components/quote/SingleQuote';
 import { Space } from '~/components/Space';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
-import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
-import s from './_style.module.css';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -76,18 +75,18 @@ if (!page) {
 
   <Space top={1} bottom={3}>
     <Wrapper>
-      <Card
-        title={'Psst: Feeling uninspired or just getting started with Headless CMS?'}
-        href="/marketplace/recipes"
-        noForcedAspectRatio
+      <CalloutCard
+        title="Psst: Feeling uninspired or just getting started with Headless CMS?"
+        ctaLink="/marketplace/recipes"
+        illustration="svg/illustrations/live-4"
+        asLink
       >
-        We put together a few super common models that most website projects have. Think blog post,
-        author, landing page, and so on. Check out the Recipes in the Marketplace to find a starting
-        point to see how schema building works!
-        <Fragment slot="below">
-          <span class={s.fakeLink}>Check it out →</span>
+        <Fragment slot="text">
+          We put together a few super common models that most website projects have. Think blog
+          post, author, landing page, and so on. Check out the Recipes in the Marketplace to find a
+          starting point to see how schema building works!
         </Fragment>
-      </Card>
+      </CalloutCard>
     </Wrapper>
   </Space>
 
@@ -135,14 +134,18 @@ if (!page) {
 
   <Space top={1} bottom={3}>
     <Wrapper>
-      <Card title={'Plugins? In a Headless CMS'} href="/marketplace/plugins" noForcedAspectRatio>
-        Understandable. If the word’s giving you WP PTSD, then you can relax 😅 We prefer to
-        encourage plugins as fields for specific use-cases like star ratings or product pickers to
-        avoid clunking up the CMS with 1000s of niche features.
-        <Fragment slot="below">
-          <span class={s.fakeLink}>Check it out →</span>
+      <CalloutCard
+        title="Plugins? In a Headless CMS"
+        ctaLink="/marketplace/plugins"
+        illustration="svg/illustrations/developers-1"
+        asLink
+      >
+        <Fragment slot="text">
+          Understandable. If the word’s giving you WP PTSD, then you can relax 😅 We prefer to
+          encourage plugins as fields for specific use-cases like star ratings or product pickers to
+          avoid clunking up the CMS with 1000s of niche features.
         </Fragment>
-      </Card>
+      </CalloutCard>
     </Wrapper>
   </Space>
 
@@ -231,19 +234,6 @@ if (!page) {
     </p>
     <p>Everything just works. No sync issues. No bottlenecks.</p>
   </Flag>
-
-  <!-- <Space top={3} bottom={2}>
-    <LogosBar
-      title="We power experiences for over half a billion users"
-      clients={[
-        'svg/logos/polestar',
-        'svg/logos/hashicorp',
-        'svg/logos/verizon',
-        'svg/logos/harrys',
-        'svg/logos/vercel',
-      ]}
-    />
-  </Space> -->
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>
