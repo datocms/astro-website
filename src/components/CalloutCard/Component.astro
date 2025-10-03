@@ -5,7 +5,7 @@ import s from './style.module.css';
 interface Props {
   size?: 'small' | 'medium' | 'large';
   asLink?: boolean;
-  imagePath?: string;
+  illustration?: string | true;
   title: string;
   ctaLink?: string;
   ctaLabel?: string;
@@ -14,17 +14,24 @@ interface Props {
 const {
   size = 'large',
   asLink,
-  imagePath = 'svg/illustrations/developers-2',
+  illustration,
   title,
   ctaLink,
   ctaLabel = 'Check it out →',
 } = Astro.props;
+
+const resolvedillustration =
+  illustration === true ? 'svg/illustrations/developers-2' : illustration;
 ---
 
 <div class={s.calloutWrapper} data-as-link={ctaLink && !!asLink} data-size={size}>
-  <div class={s.calloutImage}>
-    <Svg name={imagePath} />
-  </div>
+  {
+    !!resolvedillustration && (
+      <div class={s.calloutImage}>
+        <Svg name={resolvedillustration} />
+      </div>
+    )
+  }
   <div class={s.calloutBody}>
     <h3 class={s.bodyTitle}>{title}</h3>
     <div class={s.bodyDescription}>
