@@ -1,7 +1,7 @@
 ---
 import { Bullets } from '~/components/Bullets';
 import { Button } from '~/components/Button';
-import { Card } from '~/components/Card';
+import { CalloutCard } from '~/components/CalloutCard';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Flag } from '~/components/Flag';
 import { Hero } from '~/components/Hero';
@@ -28,36 +28,55 @@ if (!page) {
 
 <Layout seo={page._seoMetaTags}>
   <Hero>
-    <Fragment slot="kicker">Schema builer</Fragment>
+    <Fragment slot="kicker">Cache Tags</Fragment>
     <Fragment slot="title">
       Purge what changed. Leave <mark>everything else cached</mark>
     </Fragment>
     <Fragment slot="subtitle">
-      Purge what changed. Leave <mark>everything else cached</mark>
+      Get fine-grained cache invalidation for high-performance content delivery. No more stale
+      content. No more full rebuilds.
     </Fragment>
   </Hero>
 
-  <Space bottom={3}>
-    <TitleStripWithContent stripHeight="full">
-      <Fragment slot="kicker"> The Cache problem with most CMS setups </Fragment>
-      <Fragment slot="title">The Cache problem with most CMS setups</Fragment>
-      <Fragment slot="subtitle">
-        <p>
-          Content changes often trigger full purges, slowing down delivery and hurting performance.
-          And that’s hella expensive and time wasting.
-        </p>
-        <p>
-          Cache Tags let you purge only the parts of your site that changed — reducing rebuilds,
-          keeping edge caches warm, and improving perceived speed.
-        </p>
-      </Fragment>
-    </TitleStripWithContent>
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src={`https://www.datocms-assets.com/205/1759394110-logs.png`}
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> The cache problem with most setups </Fragment>
+    <Fragment slot="title"> Builds getting hella expensive? </Fragment>
+    <p>Content changes often trigger full purges, slowing down delivery and hurting performance.</p>
+    <p>
+      Cache tags let you purge only what changed, reducing rebuilds, keeping edge caches warm, and
+      improving speed.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <CalloutCard
+        title="The best part? It's OOTB"
+        ctaLink="/docs/remix/using-cache-tags"
+        ctaLabel="Give it a go →"
+        illustration="svg/illustrations/live-4"
+        asLink
+      >
+        <Fragment slot="text">
+          It takes like 2 hours of integration work on your end to get everything up and running to
+          have a perfectly cached site with instant validation. Yeah. That easy.
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
   </Space>
 
   <Flag>
     <Fragment slot="visual">
       <Image
-        src={`https://www.datocms-assets.com/205/1757608179-deterministic.png`}
+        src={`https://www.datocms-assets.com/205/1759393730-deterministic.png`}
         inferSize
         alt="Deterministic"
         style="width: 100%; height: auto;"
@@ -70,15 +89,14 @@ if (!page) {
       models, or assets involved in that query.
     </p>
     <p>
-      When you update content, we automatically purge all matching tags from the CDN. Nothing more,
-      nothing less.
+      When you update content, we automatically purge all matching tags. Nothing more, nothing less.
     </p>
   </Flag>
 
   <Flag>
     <Fragment slot="visual">
       <Image
-        src={`https://www.datocms-assets.com/205/1757608175-integrate.png`}
+        src={`https://www.datocms-assets.com/205/1759393730-integrate.png`}
         inferSize
         alt="Integrate"
         style="width: 100%; height: auto;"
@@ -98,25 +116,25 @@ if (!page) {
 
   <Space top={1} bottom={3}>
     <Wrapper>
-      <Card
+      <CalloutCard
         title="Psst: Looking for an example?"
-        href="/docs/remix/using-cache-tags"
-        noForcedAspectRatio
+        ctaLink="/docs/remix/using-cache-tags"
+        illustration
+        asLink
       >
-        To illustrate a combination of tools that fit into this category, we have put together a
-        tutorial on implementing DatoCMS Cache Tags with Remix as the framework and Fastly as the
-        cache-tags-capable CDN on top of the Remix app.
-        <Fragment slot="below">
-          <span class={s.fakeLink}>Check it out →</span>
+        <Fragment slot="text">
+          To illustrate a combination of tools that fit into this category, we have put together a
+          tutorial on implementing DatoCMS Cache Tags with Remix as the framework and Fastly as the
+          cache-tags-capable CDN on top of the Remix app.
         </Fragment>
-      </Card>
+      </CalloutCard>
     </Wrapper>
   </Space>
 
   <Flag>
     <Fragment slot="visual">
       <Image
-        src={`https://www.datocms-assets.com/205/1757608175-speed.png`}
+        src={`https://www.datocms-assets.com/205/1759394110-speed.png`}
         inferSize
         alt="Speed"
         style="width: 100%; height: auto;"
@@ -149,18 +167,18 @@ if (!page) {
 
   <Space top={1} bottom={3}>
     <Wrapper>
-      <Card
+      <CalloutCard
         title="Psst: Need a practical example with your framework?"
-        href="/docs/next-js/using-cache-tags"
-        noForcedAspectRatio
+        ctaLink="/docs/next-js/using-cache-tags"
+        illustration
+        asLink
       >
-        Let’s talk Next.js, whose <code>fetch()</code> and <code>revalidateTag()</code> are the founding
-        blocks for using cache tags, together with the framework inner logic. So we implemented Cache
-        Tags on a Next.js project to show you how they work.
-        <Fragment slot="below">
-          <span class={s.fakeLink}>Check it out →</span>
+        <Fragment slot="text">
+          Let’s talk Next.js, whose <code>fetch()</code> and <code>revalidateTag()</code> are the founding
+          blocks for using cache tags, together with the framework inner logic. So we implemented Cache
+          Tags on a Next.js project to show you how they work.
         </Fragment>
-      </Card>
+      </CalloutCard>
     </Wrapper>
   </Space>
 
