@@ -6,7 +6,12 @@ import { Wrapper } from '~/components/Wrapper';
 import { slugify } from '~/lib/slugify';
 import striptags from 'striptags';
 
-const { seoAnalysis } = Astro.props;
+interface Props {
+  seoAnalysis?: unknown;
+  stripHeight?: 'partial' | 'full';
+}
+
+const { seoAnalysis, stripHeight = 'partial' } = Astro.props;
 
 const kickerContents = striptags(await Astro.slots.render('kicker'));
 
@@ -20,7 +25,7 @@ if (seoAnalysis) {
 }
 ---
 
-<div class={s.root}>
+<div class={s.root} data-stripheight={stripHeight}>
   <Wrapper>
     {
       Astro.slots.has('kicker') && (
