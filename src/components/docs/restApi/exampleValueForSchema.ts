@@ -95,5 +95,9 @@ export default function exampleValueForSchema(schema: JSONSchema | undefined): u
     return null;
   }
 
+  if (type === undefined) {
+    return undefined;
+  }
+
   throw new Error(`Don't know how to manage ${type} type!`);
 }
