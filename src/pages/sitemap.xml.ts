@@ -50,7 +50,6 @@ export const fetchSitemapUrls = async (request: Request, responseHeaders: Header
       );
     } else {
       const url = astroFilePath.replace('./', '/').replace('.astro', '').replace('/index', '');
-      console.log(url);
       urlsPromises.push(Promise.resolve([url]));
     }
   }

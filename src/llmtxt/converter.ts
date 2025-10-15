@@ -121,8 +121,8 @@ function extractSidebarData(document: Document, baseUrl: string): SidebarData {
   const links: SidebarLink[] = [];
   const baseUrlObj = new URL(baseUrl);
 
-  // Only process links that come after the h6 element
-  let collectLinks = false;
+  // If there's no h6, collect all links; otherwise only collect links after the h6
+  let collectLinks = !h6Element;
   const allElements = sidebar.querySelectorAll('*');
 
   allElements.forEach((element) => {
@@ -132,7 +132,7 @@ function extractSidebarData(document: Document, baseUrl: string): SidebarData {
       return;
     }
 
-    // Only collect links if we've passed the h6
+    // Only collect links if we've passed the h6 (or if there was no h6)
     if (collectLinks && element.tagName === 'A') {
       const linkElement = element as HTMLAnchorElement;
       const href = linkElement.getAttribute('href');
