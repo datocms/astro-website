@@ -13,7 +13,10 @@ const { calloutType, title } = Astro.props;
 
 <figure>
   <prose-island>
-    <div class:list={[s.docCallout, s[`docCallout--${calloutType}`]]} data-type={calloutType}>
+    <div
+      class:list={[s.docCallout, s[`docCallout--${calloutType}`]]}
+      data-callout-type={calloutType}
+    >
       {
         title && (
           <div class={s.docCalloutTitle}>
@@ -26,16 +29,18 @@ const { calloutType, title } = Astro.props;
             ) : calloutType === 'protip' ? (
               <Svg name="icons/regular/wand-magic" />
             ) : null}{' '}
-            <span>
+            <span data-callout-title>
               {calloutType === 'protip' && 'Pro tip: '}
               {title}
             </span>
           </div>
         )
       }
-      <Prose class={s.content}>
-        <slot />
-      </Prose>
+      <div data-callout-content>
+        <Prose class={s.content}>
+          <slot />
+        </Prose>
+      </div>
     </div>
   </prose-island>
 </figure>

@@ -1,0 +1,218 @@
+---
+import { TargetToggler } from '~/components/TargetToggler';
+import s from './style.module.css';
+import { nanoid } from 'nanoid';
+import { Svg } from '~/components/Svg';
+
+type Props = {
+  markdownUrl: string;
+  className?: string;
+  buttonLabel?: string;
+};
+
+const { markdownUrl, className, buttonLabel = 'Copy page' } = Astro.props;
+const dropdownId = `markdown-actions-${nanoid()}`;
+const requestText = `Read ${markdownUrl} so I can ask questions about it.`;
+const chatGptUrl = `https://chatgpt.com/?hints=search&q=${encodeURIComponent(requestText)}`;
+const claudeUrl = `https://claude.ai/new?q=${encodeURIComponent(requestText)}`;
+---
+
+<markdown-actions-dropdown
+  data-datocms-noindex
+  class:list={[s.root, className]}
+  markdown-url={markdownUrl}
+  dropdown-id={dropdownId}
+>
+  <div class={s.controls}>
+    <button type="button" class={s.copyButton} data-action="copy-page">
+      <span class={s.icon} data-variant="default">
+        <Svg name="icons/regular/copy" />
+      </span>
+      <span class:list={[s.icon, s.loadingIcon]} data-variant="loading" aria-hidden="true">
+        <Svg name="icons/regular/spinner" />
+      </span>
+      <span class:list={[s.icon, s.successIcon]} data-variant="success" aria-hidden="true">
+        <Svg name="icons/regular/check" />
+      </span>
+      <span>{buttonLabel}</span>
+    </button>
+
+    <TargetToggler targetId={dropdownId} closeOnClickOutside>
+      <button type="button" class={s.toggleButton} aria-label="Toggle markdown actions">
+        <span aria-hidden="true" class={s.caret}></span>
+      </button>
+    </TargetToggler>
+  </div>
+
+  <div id={dropdownId} class={s.dropdown} role="menu">
+    <button type="button" class={s.dropdownItem} data-action="copy-link" role="menuitem">
+      <span class={s.dropdownIcon}>
+        <Svg name="icons/regular/link" />
+      </span>
+      <span>Copy Markdown link</span>
+    </button>
+    <a
+      class={s.dropdownItem}
+      href={markdownUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      role="menuitem"
+    >
+      <span class={s.dropdownIcon}>
+        <Svg name="icons/regular/file-alt" />
+      </span>
+      <span>View as Markdown</span>
+    </a>
+    <a
+      class={s.dropdownItem}
+      href={chatGptUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      role="menuitem"
+    >
+      <span class={s.dropdownIcon}>
+        <Svg name="icons/brands/chatgpt" />
+      </span>
+      <span>Open in ChatGPT</span>
+    </a>
+    <a
+      class={s.dropdownItem}
+      href={claudeUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      role="menuitem"
+    >
+      <span class={s.dropdownIcon}>
+        <Svg name="icons/brands/anthropic" />
+      </span>
+      <span>Open in Claude</span>
+    </a>
+  </div>
+</markdown-actions-dropdown>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  type ToggleElement = HTMLElement & { toggle?: (expanded?: boolean) => void };
+
+  class MarkdownActionsDropdownElement extends WebComponent {
+    copyPageButton!: HTMLButtonElement;
+    copyLinkButton!: HTMLButtonElement;
+    dropdown!: HTMLElement;
+    toggler!: ToggleElement;
+    copySuccessTimeoutId: number | null = null;
+
+    parsedCallback() {
+      if (!this.markdownUrl) {
+        console.warn('[MarkdownActionsDropdown] missing markdown-url attribute');
+        return;
+      }
+
+      this.copyPageButton = this.querySelector<HTMLButtonElement>('[data-action="copy-page"]')!;
+      this.copyLinkButton = this.querySelector<HTMLButtonElement>('[data-action="copy-link"]')!;
+      this.dropdown = this.querySelector<HTMLElement>(`#${this.dropdownId}`)!;
+      this.toggler = this.querySelector<ToggleElement>('target-toggler')!;
+
+      if (this.copyLinkButton) {
+        this.on(this.copyLinkButton, 'click', async (event) => {
+          event.preventDefault();
+          const copied = await this.copyToClipboard(this.markdownUrl);
+          if (copied) {
+            this.showCopySuccess();
+          }
+          this.closeDropdown();
+        });
+      }
+
+      if (this.copyPageButton) {
+        this.on(this.copyPageButton, 'click', async (event) => {
+          event.preventDefault();
+
+          this.showLoading();
+
+          try {
+            const response = await fetch(this.markdownUrl);
+
+            if (!response.ok) {
+              throw new Error(`Unexpected response status: ${response.status}`);
+            }
+
+            const content = await response.text();
+            const copied = await this.copyToClipboard(content);
+            if (copied) {
+              this.showCopySuccess();
+            } else {
+              this.hideLoading();
+            }
+          } catch (error) {
+            console.error('[MarkdownActionsDropdown] unable to copy markdown content', error);
+            this.hideLoading();
+          }
+        });
+      }
+
+      if (this.dropdown) {
+        this.on(this.dropdown, 'click', 'a', () => {
+          this.closeDropdown();
+        });
+      }
+    }
+
+    get markdownUrl(): string {
+      return this.getAttribute('markdown-url') || '';
+    }
+
+    get dropdownId(): string | null {
+      return this.getAttribute('dropdown-id');
+    }
+
+    async copyToClipboard(text: string): Promise<boolean> {
+      if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') {
+        console.warn('[MarkdownActionsDropdown] navigator.clipboard.writeText is unavailable');
+        return false;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (error) {
+        console.error('[MarkdownActionsDropdown] unable to copy text', error);
+        return false;
+      }
+    }
+
+    closeDropdown() {
+      this.toggler?.toggle?.(false);
+    }
+
+    showLoading() {
+      if (!this.copyPageButton) return;
+      this.copyPageButton.setAttribute('data-loading', 'true');
+    }
+
+    hideLoading() {
+      if (!this.copyPageButton) return;
+      this.copyPageButton.removeAttribute('data-loading');
+    }
+
+    showCopySuccess() {
+      if (!this.copyPageButton) return;
+
+      this.copyPageButton.removeAttribute('data-loading');
+      this.copyPageButton.setAttribute('data-copied', 'true');
+
+      if (this.copySuccessTimeoutId) {
+        clearTimeout(this.copySuccessTimeoutId);
+      }
+
+      this.copySuccessTimeoutId = window.setTimeout(() => {
+        this.copyPageButton?.removeAttribute('data-copied');
+        this.copySuccessTimeoutId = null;
+      }, 1000);
+    }
+  }
+
+  if (!window.customElements.get('markdown-actions-dropdown')) {
+    window.customElements.define('markdown-actions-dropdown', MarkdownActionsDropdownElement);
+  }
+</script>

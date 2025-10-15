@@ -2,12 +2,18 @@
 import s from './style.module.css';
 import { Toc } from './Toc';
 import type { TocGroup } from './types';
+import { MarkdownActionsDropdown } from '~/components/MarkdownActionsDropdown';
 
 type Props = {
   tocGroups: TocGroup[];
 };
 
 const { tocGroups } = Astro.props;
+
+const markdownUrl = new URL(Astro.url.href);
+markdownUrl.pathname = Astro.url.pathname.endsWith('.md')
+  ? Astro.url.pathname
+  : `${Astro.url.pathname}.md`;
 ---
 
 <div class={s.articleContainer}>
@@ -20,14 +26,18 @@ const { tocGroups } = Astro.props;
       <div class={s.emptySidebar} />
     )
   }
-  <article class={s.article}>
-    <h1 class={s.kicker}>
-      <slot name="kicker" />
-    </h1>
+  <article class={s.article} id="main-content">
+    <div class={s.header}>
+      <div class={s.headerTitles}>
+        <h1 class={s.kicker}>
+          <slot name="kicker" />
+        </h1>
+      </div>
+      <MarkdownActionsDropdown className={s.markdownActions} markdownUrl={markdownUrl.href} />
+    </div>
     <div class={s.title}>
       <slot name="title" />
     </div>
-
     <slot />
   </article>
 </div>

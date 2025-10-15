@@ -2,12 +2,17 @@
 type Props = {
   targetId: string;
   startVisible?: boolean;
+  closeOnClickOutside?: boolean;
 };
 
-const { targetId, startVisible } = Astro.props;
+const { targetId, startVisible, closeOnClickOutside } = Astro.props;
 ---
 
-<target-toggler target-id={targetId} target-start-visible={startVisible ? 'true' : undefined}>
+<target-toggler
+  target-id={targetId}
+  target-start-visible={startVisible ? 'true' : undefined}
+  close-on-click-outside={closeOnClickOutside ? 'true' : undefined}
+>
   <slot />
 </target-toggler>
 
@@ -19,6 +24,7 @@ const { targetId, startVisible } = Astro.props;
     class TargetToggler extends WebComponent {
       button!: HTMLButtonElement;
       controller!: AbortController;
+      outsideClickController?: AbortController;
 
       parsedCallback() {
         this.button = this.$('button');
@@ -33,6 +39,38 @@ const { targetId, startVisible } = Astro.props;
 
       handleClick() {
         this.toggle();
+      }
+
+      handleClickOutside = (event: MouseEvent) => {
+        const targetElement = event.target as Node;
+
+        // Check if the click is outside both the toggler and the target
+        if (!this.contains(targetElement) && !this.target.contains(targetElement)) {
+          this.toggle(false);
+        }
+      };
+
+      setupOutsideClickListener() {
+        if (!this.closeOnClickOutside) return;
+
+        // Clean up existing listener if any
+        this.outsideClickController?.abort();
+
+        // Set up new listener
+        this.outsideClickController = new AbortController();
+        document.addEventListener('click', this.handleClickOutside, {
+          signal: this.outsideClickController.signal,
+          capture: true,
+        });
+      }
+
+      cleanupOutsideClickListener() {
+        this.outsideClickController?.abort();
+        this.outsideClickController = undefined;
+      }
+
+      disconnectedCallback() {
+        this.cleanupOutsideClickListener();
       }
 
       get target() {
@@ -54,6 +92,11 @@ const { targetId, startVisible } = Astro.props;
         return (this.hasAttribute(attr) && this.getAttribute(attr) !== 'false') || false;
       }
 
+      get closeOnClickOutside() {
+        const attr = 'close-on-click-outside';
+        return (this.hasAttribute(attr) && this.getAttribute(attr) !== 'false') || false;
+      }
+
       get isExpanded() {
         return this.button.getAttribute('aria-expanded') === 'true' || false;
       }
@@ -61,6 +104,13 @@ const { targetId, startVisible } = Astro.props;
       toggle(newExpanded: boolean = !this.isExpanded) {
         this.button?.setAttribute('aria-expanded', newExpanded ? 'true' : 'false');
         this.target?.toggleAttribute('data-open', newExpanded);
+
+        // Manage outside click listener based on expanded state
+        if (newExpanded) {
+          this.setupOutsideClickListener();
+        } else {
+          this.cleanupOutsideClickListener();
+        }
 
         this.dispatchEvent(
           new CustomEvent('target-toggler:toggle', {

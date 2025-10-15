@@ -11,7 +11,11 @@ const { title = 'title', code, noPadding } = Astro.props;
 ---
 
 <button slot="tab" role="tab" class:list={[s.handle, code ? s.code : undefined]}>
-  {title}
+  <prose-island>
+    <h6>
+      {code ? <code>{title}</code> : <span>{title}</span>}
+    </h6>
+  </prose-island>
 </button>
 
 <div slot="panel" role="tabpanel" class={noPadding ? s.noPaddingContent : s.content}>

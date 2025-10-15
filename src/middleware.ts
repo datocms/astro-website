@@ -3,6 +3,7 @@ import { DEPLOYMENT_DESTINATION, SECRET_API_TOKEN } from 'astro:env/server';
 import { sequence } from 'astro:middleware';
 import { isDraftModeEnabled } from './lib/draftMode';
 import logToRollbar from './lib/logToRollbar';
+import { convertHtmlToMarkdown } from './llmtxt';
 
 export const rollbar: MiddlewareHandler = async ({ request, params }, next) => {
   try {
@@ -60,4 +61,54 @@ export const basicAuth: MiddlewareHandler = (context, next) => {
   });
 };
 
-export const onRequest = sequence(rollbar, security, basicAuth);
+export const markdownProxy: MiddlewareHandler = async (context, next) => {
+  const pathname = context.url.pathname;
+
+  // Check if the request is for a .md version (llmstxt.org spec)
+  // Handles both /page.html.md and /index.html.md patterns
+  if (pathname.endsWith('.md')) {
+    try {
+      // Remove the .md extension to get the original HTML URL
+      const htmlPath = pathname.slice(0, -3);
+
+      // Build the HTML URL with the same origin and search params
+      const htmlUrl = new URL(htmlPath, context.url.origin);
+      htmlUrl.search = context.url.search;
+
+      // Fetch the HTML version
+      const htmlResponse = await fetch(htmlUrl);
+
+      if (!htmlResponse.ok) {
+        return new Response(`HTML page not found: ${htmlUrl.pathname}`, {
+          status: 404,
+          headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+        });
+      }
+
+      // Get the HTML content
+      const htmlContent = await htmlResponse.text();
+
+      // Convert HTML to Markdown
+      const markdown = convertHtmlToMarkdown(htmlContent, htmlUrl.href, {
+        includeTitle: true,
+        preserveTables: true,
+      });
+
+      return new Response(markdown, {
+        status: 200,
+        headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return new Response(`Error converting to markdown: ${errorMessage}`, {
+        status: 500,
+        headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+      });
+    }
+  }
+
+  // Not a .md request, continue with normal flow
+  return next();
+};
+
+export const onRequest = sequence(rollbar, markdownProxy, security, basicAuth);
