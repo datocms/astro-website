@@ -94,9 +94,20 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
         preserveTables: true,
       });
 
+      // Copy cache-related headers from the HTML response
+      const headers = new Headers({ 'Content-Type': 'text/markdown; charset=utf-8' });
+
+      const headersToCopy = ['cache-control', 'datocms-cache-tags', 'surrogate-control'];
+      for (const header of headersToCopy) {
+        const value = htmlResponse.headers.get(header);
+        if (value) {
+          headers.set(header, value);
+        }
+      }
+
       return new Response(markdown, {
         status: 200,
-        headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
+        headers,
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
