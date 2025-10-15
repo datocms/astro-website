@@ -2,7 +2,6 @@ import type { APIRoute } from 'astro';
 import type { TadaDocumentNode } from 'gql.tada';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { BlogPostUrlFragment, buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
-import { DocGroupUrlFragment, buildUrlForDocGroup } from '~/lib/datocms/gqlUrlBuilder/docGroup';
 import { DocPageUrlFragment, buildUrlForDocPage } from '~/lib/datocms/gqlUrlBuilder/docPage';
 import {
   ProductUpdateUrlFragment,
@@ -31,8 +30,6 @@ const llmsTxtQuery = graphql(
         name
         children {
           name
-          __typename
-          ...DocGroupUrlFragment
           pagesTree: pages {
             __typename
             ... on DocGroupPageRecord {
@@ -70,7 +67,7 @@ const llmsTxtQuery = graphql(
       }
     }
   `,
-  [DocGroupUrlFragment, BlogPostUrlFragment, ProductUpdateUrlFragment, DocPageUrlFragment],
+  [BlogPostUrlFragment, ProductUpdateUrlFragment, DocPageUrlFragment],
 );
 
 /**
@@ -185,7 +182,6 @@ function buildDocumentationSections(
     for (const child of root.children ?? []) {
       items.push({
         description: child.name,
-        url: `${siteBaseUrl}${buildUrlForDocGroup(child)}.md`,
         depth: 0,
       });
 
