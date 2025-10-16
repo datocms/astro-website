@@ -13,6 +13,7 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -26,7 +27,20 @@ if (!page) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Multi-Language Headless CMS - Localize Your Content Globally'),
+    seoDescription(
+      'Reach your global audience with DatoCMS multi-language features. Support 400+ locales, translate content and assets, and deliver localized experiences to users worldwide.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Multi-Language Headless CMS',
+      excerpt:
+        'Localize all your content with support for 400+ locales and flexible translation workflows',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">{page.seoH1}</Fragment>
     <Fragment slot="title">

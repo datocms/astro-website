@@ -16,6 +16,7 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -26,7 +27,20 @@ if (!page) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Cache Tags - Fine-Grained Cache Invalidation - DatoCMS'),
+    seoDescription(
+      'Purge only what changed with DatoCMS Cache Tags. Get fine-grained cache invalidation for high-performance content delivery. No more stale content or full rebuilds. Works with Fastly, Cloudflare, and any tag-based CDN.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Cache Tags - Fine-Grained Cache Invalidation',
+      excerpt:
+        'Purge what changed. Leave everything else cached. Fast content delivery without full rebuilds.',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">Cache Tags</Fragment>
     <Fragment slot="title">

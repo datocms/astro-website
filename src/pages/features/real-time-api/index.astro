@@ -15,6 +15,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import { Wrapper } from '~/components/Wrapper';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -25,7 +26,20 @@ if (!page || !page.video) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Real-time API - Live Content Updates & Preview | DatoCMS'),
+    seoDescription(
+      'Transform content workflows with DatoCMS Real-time API. Preview changes instantly on production, stream live updates via GraphQL subscriptions, and handle thousands of concurrent users with Server-Sent Events.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Real-time API',
+      excerpt:
+        'Instant content preview and live updates powered by GraphQL subscriptions and Server-Sent Events',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">Real-time API</Fragment>
     <Fragment slot="title">

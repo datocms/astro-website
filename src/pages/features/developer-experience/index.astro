@@ -14,6 +14,7 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -24,7 +25,20 @@ if (!page) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Developer Experience - Modern Headless CMS - DatoCMS'),
+    seoDescription(
+      'Build fast, ship faster with DatoCMS. GraphQL & REST APIs, staging environments, official SDKs for React, Next.js, Astro, Nuxt, and more. Low latency, high availability, zero surprises. Join 25K+ teams building with the CMS loved by developers.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Developer Experience - Build Fast, Ship Faster',
+      excerpt:
+        'Modern tools, predictable APIs, and full schema control. Everything you need to work better, without any surprises.',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">Developer experience</Fragment>
     <Fragment slot="title">

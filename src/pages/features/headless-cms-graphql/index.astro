@@ -15,6 +15,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -25,7 +26,20 @@ if (!page || !page.quote || !page.video) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Headless CMS with GraphQL API - Superior Developer Experience'),
+    seoDescription(
+      'Build faster apps with DatoCMS GraphQL API. Get exactly the data you need in a single request, with powerful developer tools and predictable results.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Headless CMS GraphQL',
+      excerpt:
+        'Superior developer experience with GraphQL API, faster responses, and powerful tools built on a worldwide CDN',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">{page.seoH1}</Fragment>
     <Fragment slot="title">GraphQL means <mark>superior developer experience</mark></Fragment>

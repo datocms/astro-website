@@ -11,6 +11,7 @@ import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 import { query } from './_graphql';
 import s from './_style.module.css';
 
@@ -23,7 +24,20 @@ if (!page) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Plugins - Extend Your Headless CMS Without Bloat'),
+    seoDescription(
+      'Customize DatoCMS with plugins for custom fields, sidebars, integrations, and more. Build private tools or share with the community. Extend without bloat.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Plugins',
+      excerpt:
+        'Extend your CMS with custom fields, integrations, and functionality without feature bloat.',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">Plugins</Fragment>
     <Fragment slot="title">

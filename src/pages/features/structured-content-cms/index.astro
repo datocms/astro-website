@@ -17,6 +17,7 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page, integrations } = await executeQuery(Astro, query, { variables });
@@ -55,7 +56,20 @@ const jsonExample = JSON.stringify(
 );
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Structured Content CMS - Smart Rich-Text Editor for Omnichannel'),
+    seoDescription(
+      'Store rich-text content the smart way with DatoCMS structured content. Notion-like editor, portable JSON format, custom blocks, and entity linking for seamless omnichannel delivery.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Structured Content CMS',
+      excerpt:
+        'Powerful rich-text editor with portable JSON format designed for omnichannel content delivery',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">Structured content CMS</Fragment>
     <Fragment slot="title">The smart way to store <mark>rich–text content</mark></Fragment>

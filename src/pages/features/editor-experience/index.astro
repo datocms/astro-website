@@ -12,6 +12,7 @@ import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 import { query } from './_graphql';
 import s from './_style.module.css';
 
@@ -24,7 +25,19 @@ if (!page) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Editor Experience - A Headless CMS That Editors Actually Love'),
+    seoDescription(
+      'DatoCMS delivers a headless CMS editor experience with modular content, asset management, live previews, localization, and structured text. Built for editors and developers alike.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Editor Experience',
+      excerpt: 'Ever met a Headless CMS that editors actually enjoy using? Meet DatoCMS.',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">Editor experience</Fragment>
     <Fragment slot="title">

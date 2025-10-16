@@ -11,7 +11,7 @@ export type OgCardData = {
 };
 
 export function ogCardUrl(data: OgCardData, astroOrRequest: AstroGlobal | Request): string {
-  const url = new URL('/og-card.png', baseUrl(astroOrRequest));
+  const url = new URL('/og-card/index.png', baseUrl(astroOrRequest));
   url.searchParams.set(
     'data',
     Buffer.from(

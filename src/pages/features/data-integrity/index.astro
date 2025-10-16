@@ -18,6 +18,7 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -28,7 +29,20 @@ if (!page) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Data Integrity & Content Safety - DatoCMS Features'),
+    seoDescription(
+      'Ensure clean, safe content with DatoCMS field validations, sandbox environments, custom permissions, and approval workflows. Build editorial workflows that prevent mistakes before they happen.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Data Integrity & Content Safety',
+      excerpt:
+        'Field validations, sandbox environments, and approval workflows to keep your content clean and safe.',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">Data integrity</Fragment>
     <Fragment slot="title">

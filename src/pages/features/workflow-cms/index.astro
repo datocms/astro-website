@@ -15,6 +15,7 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -25,7 +26,20 @@ if (!page) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Workflow CMS - Content Approval & Editorial Lifecycle Management'),
+    seoDescription(
+      'Streamline your content approval process with DatoCMS Workflows. Eliminate bottlenecks with customizable approval steps, role-based permissions, and flexible workflows for different content types.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Workflow CMS',
+      excerpt:
+        'Supercharge your content approval workflow with customizable steps, clear team responsibilities, and eliminate content creation bottlenecks',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">Workflow CMS</Fragment>
     <Fragment slot="title">

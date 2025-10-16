@@ -11,6 +11,7 @@ import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 import { query } from './_graphql';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
@@ -22,7 +23,19 @@ if (!page) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Schema Builder - Visual Content Modeling for Headless CMS'),
+    seoDescription(
+      'Build flexible content structures with DatoCMS visual schema builder. Define models, blocks, and custom fields with instant GraphQL and REST APIs. No code required.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Schema Builder',
+      excerpt: 'Define your content structure on your terms with models, blocks, and plugins.',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">Schema builder</Fragment>
     <Fragment slot="title">

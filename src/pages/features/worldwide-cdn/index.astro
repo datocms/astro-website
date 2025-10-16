@@ -16,6 +16,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -26,7 +27,19 @@ if (!page) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Worldwide CDN - Lightning Fast Content Delivery at the Edge'),
+    seoDescription(
+      'Deliver content, images and videos at lightning speed with DatoCMS worldwide CDN. 74 edge locations, 650TB data served monthly, and 99.99% uptime guarantee for global performance.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Worldwide CDN',
+      excerpt: 'Content, images and videos delivered at the edge with 74 CDN locations worldwide',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">Fastest headless CMS</Fragment>
     <Fragment slot="title">

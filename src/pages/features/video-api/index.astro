@@ -13,6 +13,7 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { query } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -23,7 +24,20 @@ if (!page || !page.video) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Video API - Adaptive Streaming & Encoding for Any Device | DatoCMS'),
+    seoDescription(
+      'Stream beautiful videos everywhere with DatoCMS Video API. Powered by Mux, enjoy adaptive bitrate streaming, support for all video formats, automatic thumbnails, and fast delivery to any device.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Video API',
+      excerpt:
+        'Adaptive bitrate video streaming powered by Mux with support for all formats and instant playback',
+    }),
+  )}
+>
   <Hero>
     <Fragment slot="kicker">Video API encoding and streaming</Fragment>
     <Fragment slot="title">Stream beautifully, <mark>everywhere</mark></Fragment>
