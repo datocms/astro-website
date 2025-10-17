@@ -90,7 +90,8 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
 
       // Convert HTML to Markdown
       const markdown = convertHtmlToMarkdown(htmlContent, htmlUrl.href, {
-        includeTitle: true,
+        includeTitle: false,
+        includeSidebar: true,
         preserveTables: true,
       });
 

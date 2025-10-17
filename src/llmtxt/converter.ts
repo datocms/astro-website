@@ -12,6 +12,7 @@ import TurndownService from 'turndown';
 export interface ConversionOptions {
   includeTitle?: boolean;
   preserveTables?: boolean;
+  includeSidebar?: boolean;
 }
 
 interface SidebarLink {
@@ -27,6 +28,7 @@ interface SidebarData {
 const DEFAULT_OPTIONS: ConversionOptions = {
   includeTitle: false,
   preserveTables: true,
+  includeSidebar: false,
 };
 
 /**
@@ -84,7 +86,7 @@ export function convertHtmlToMarkdown(
 
   // Append sidebar links if any
   // Skip if all links are just anchors to the same URL (current page)
-  if (sidebarData.links.length > 0) {
+  if (options.includeSidebar && sidebarData.links.length > 0) {
     const currentPageUrl = new URL(url).href.replace(/\/?$/, '.md');
     const allLinksAreSameUrl = sidebarData.links.every((link: SidebarLink) => {
       // Remove hash from link URL for comparison
@@ -93,7 +95,7 @@ export function convertHtmlToMarkdown(
     });
 
     if (!allLinksAreSameUrl) {
-      markdown += `\n\n## ${sidebarData.sectionTitle}\n\n`;
+      markdown += `\n\n## Related content in "${sidebarData.sectionTitle}"\n\n`;
       sidebarData.links.forEach((link: SidebarLink) => {
         markdown += `- [${link.title}](${link.url})\n`;
       });

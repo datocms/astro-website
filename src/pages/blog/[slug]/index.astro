@@ -82,45 +82,45 @@ markdownUrl.pathname = Astro.url.pathname.endsWith('.md')
     }
   </Fragment>
 
-  <InterstitialTitle
-    seoAnalysis={post.yoastAnalysis}
-    kicker={post.seoH1 || 'The DatoCMS Blog'}
-    style="two"
-    mainTitleOfPage
-  >
-    {post.title}
-  </InterstitialTitle>
-  <div class={s.postWrapper}>
-    <Wrapper>
-      <div class={s.info}>
-        <div class={s.avatarWrapper}>
-          {
-            post.author.map((author, i) => (
-              <ResponsiveImage
-                pictureClass={s.avatar}
-                data={author.avatar.responsiveImage}
-                pictureStyle={{ zIndex: 10 - i }}
-              />
-            ))
-          }
+  <div id="main-content">
+    <InterstitialTitle
+      seoAnalysis={post.yoastAnalysis}
+      kicker={post.seoH1 || 'The DatoCMS Blog'}
+      style="two"
+      mainTitleOfPage
+    >
+      {post.title}
+    </InterstitialTitle>
+    <div class={s.postWrapper}>
+      <Wrapper>
+        <div class={s.info}>
+          <div class={s.avatarWrapper} data-datocms-noindex>
+            {
+              post.author.map((author, i) => (
+                <ResponsiveImage
+                  pictureClass={s.avatar}
+                  data={author.avatar.responsiveImage}
+                  pictureStyle={{ zIndex: 10 - i }}
+                />
+              ))
+            }
+          </div>
+          <p>
+            Posted on{' '}
+            {post._firstPublishedAt ? formatDate(post._firstPublishedAt) : '???'}{' '}
+            by{' '}
+            {
+              post.author.map((author, i) => (
+                <span>
+                  {author.name}
+                  {i < post.author.length - 2 ? ', ' : i === post.author.length - 2 ? ' and ' : ''}
+                </span>
+              ))
+            }
+          </p>
+          <MarkdownActionsDropdown markdownUrl={markdownUrl.href} />
         </div>
-        <p>
-          Posted on{' '}
-          {post._firstPublishedAt ? formatDate(post._firstPublishedAt) : '???'}{' '}
-          by{' '}
-          {
-            post.author.map((author, i) => (
-              <span>
-                {author.name}
-                {i < post.author.length - 2 ? ', ' : i === post.author.length - 2 ? ' and ' : ''}
-              </span>
-            ))
-          }
-        </p>
-        <MarkdownActionsDropdown markdownUrl={markdownUrl.href} />
-      </div>
 
-      <div id="main-content">
         <Prose class={s.body}>
           <Text
             {...ensureValidStructuredTextProps({
@@ -143,24 +143,24 @@ markdownUrl.pathname = Astro.url.pathname.endsWith('.md')
             })}
           />
         </Prose>
-      </div>
-    </Wrapper>
-    {
-      tocItems.length > 4 && (
-        <div class={s.tocWrapper}>
-          <div class={s.toc}>
-            <div class={s.tocTitle}>In this article:</div>
-            <ul>
-              {tocItems.map((item) => (
-                <li>
-                  <a href={item.url}>{item.label}</a>
-                </li>
-              ))}
-            </ul>
+      </Wrapper>
+      {
+        tocItems.length > 4 && (
+          <div class={s.tocWrapper}>
+            <div class={s.toc}>
+              <div class={s.tocTitle}>In this article:</div>
+              <ul>
+                {tocItems.map((item) => (
+                  <li>
+                    <a href={item.url}>{item.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </div>
-      )
-    }
+        )
+      }
+    </div>
   </div>
 
   {
