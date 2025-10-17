@@ -2,8 +2,8 @@ import type { MiddlewareHandler } from 'astro';
 import { DEPLOYMENT_DESTINATION, SECRET_API_TOKEN } from 'astro:env/server';
 import { sequence } from 'astro:middleware';
 import { isDraftModeEnabled } from './lib/draftMode';
+import { convertHtmlToMarkdown } from './lib/llmtxt';
 import logToRollbar from './lib/logToRollbar';
-import { convertHtmlToMarkdown } from './llmtxt';
 
 export const rollbar: MiddlewareHandler = async ({ request, params }, next) => {
   try {

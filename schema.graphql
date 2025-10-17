@@ -1341,6 +1341,34 @@ input AgencyProgramWorkflowStageFilter {
   notIn: [AgencyProgramWorkflowStage!]
 }
 
+"""
+Record of type 🧮 Assets hardcoded in website (assets_hardcoded_in_website)
+"""
+type AssetsHardcodedInWebsiteRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  assets: [FileField!]!
+  createdAt: DateTime!
+  id: ItemId!
+  updatedAt: DateTime!
+}
+
 input AuthorModelFilter {
   _createdAt: CreatedAtFilter
   createdAt: CreatedAtFilter
@@ -11950,6 +11978,35 @@ input LinksFilter {
   exists: BooleanType
 }
 
+"""Record of type 👨‍🎓 llms-full (llms_full)"""
+type LlmsFullRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  content(
+    """Process content as markdown"""
+    markdown: Boolean
+  ): String
+  createdAt: DateTime!
+  id: ItemId!
+  updatedAt: DateTime!
+}
+
 """
 Block of type ↘️ Managed Navigation Bar Group (managed_navigation_bar_group)
 """
@@ -17001,6 +17058,17 @@ type Query {
     orderBy: [WebsiteModelOrderBy] = [position_ASC]
   ): [WebsiteRecord!]!
 
+  """Returns the single instance record"""
+  assetsHardcodedInWebsite(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): AssetsHardcodedInWebsiteRecord
+
   """Returns a specific record"""
   author(
     """The locale to use to fetch the field's content"""
@@ -17398,6 +17466,17 @@ type Query {
     filter: LandingPageModelFilter
     orderBy: [LandingPageModelOrderBy] = [_updatedAt_DESC]
   ): LandingPageRecord
+
+  """Returns the single instance record"""
+  llmsFull(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): LlmsFullRecord
 
   """Returns the single instance record"""
   navigationBar(

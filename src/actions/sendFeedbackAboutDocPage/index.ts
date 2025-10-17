@@ -2,6 +2,7 @@ import { buildClient } from '@datocms/cma-client';
 import { ActionError, defineAction } from 'astro:actions';
 import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import { z } from 'astro:schema';
+import type { DocFeedback } from '~/lib/cma-schema';
 import logToRollbar from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 
@@ -28,7 +29,7 @@ export default defineAction({
 
       const client = buildClient({ apiToken: DATOCMS_API_TOKEN });
 
-      await client.items.create({
+      await client.items.create<DocFeedback>({
         url,
         positive_reaction: reaction === 'positive',
         notes,

@@ -264,6 +264,7 @@ function cleanContent(content: HTMLElement, settings: ConversionOptions): void {
     '.sidebar',
     'svg',
     '[data-datocms-noindex]',
+    '[data-datocms-nomd]',
   ];
 
   // Remove unwanted elements
