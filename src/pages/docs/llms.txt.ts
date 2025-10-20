@@ -7,7 +7,7 @@ import { handleUnexpectedError } from '../api/_utils';
 const query = graphql(/* GraphQL */ `
   query LlmsFullTxtQuery {
     llmstxt {
-      llmstxtFull
+      llmstxt
     }
   }
 `);
@@ -24,7 +24,7 @@ export const GET: APIRoute = async ({ request }) => {
       responseHeaders,
     });
 
-    return new Response(llmstxt?.llmstxtFull || '', {
+    return new Response(llmstxt?.llmstxt || '', {
       status: 200,
       headers: responseHeaders,
     });

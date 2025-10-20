@@ -11978,8 +11978,8 @@ input LinksFilter {
   exists: BooleanType
 }
 
-"""Record of type 👨‍🎓 llms-full (llms_full)"""
-type LlmsFullRecord implements RecordInterface {
+"""Record of type 👨‍🎓 LLMS.txt (llmstxt)"""
+type LlmstxtRecord implements RecordInterface {
   _createdAt: DateTime!
 
   """Editing URL"""
@@ -11998,12 +11998,16 @@ type LlmsFullRecord implements RecordInterface {
   _status: ItemStatus!
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
-  content(
+  createdAt: DateTime!
+  id: ItemId!
+  llmstxt(
     """Process content as markdown"""
     markdown: Boolean
   ): String
-  createdAt: DateTime!
-  id: ItemId!
+  llmstxtFull(
+    """Process content as markdown"""
+    markdown: Boolean
+  ): String
   updatedAt: DateTime!
 }
 
@@ -17468,7 +17472,7 @@ type Query {
   ): LandingPageRecord
 
   """Returns the single instance record"""
-  llmsFull(
+  llmstxt(
     """The locale to use to fetch the field's content"""
     locale: SiteLocale
 
@@ -17476,7 +17480,7 @@ type Query {
     If you want to fallback to a default translation when a translation has not been found
     """
     fallbackLocales: [SiteLocale!]
-  ): LlmsFullRecord
+  ): LlmstxtRecord
 
   """Returns the single instance record"""
   navigationBar(

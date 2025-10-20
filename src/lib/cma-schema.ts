@@ -2,11 +2,14 @@ import { ItemTypeDefinition } from '@datocms/cma-client';
 type EnvironmentSettings = {
   locales: 'en';
 };
-export type LlmsFull = ItemTypeDefinition<
+export type Llmstxt = ItemTypeDefinition<
   EnvironmentSettings,
   'PvVIeFX5QROO2tUujtmr6g',
   {
-    content: {
+    llmstxt: {
+      type: 'text';
+    };
+    llmstxt_full: {
       type: 'text';
     };
   }
@@ -3124,7 +3127,7 @@ export type AnyBlock =
   | Image
   | InternalVideo;
 export type AnyModel =
-  | LlmsFull
+  | Llmstxt
   | AssetsHardcodedInWebsite
   | TeamPage
   | Partner
