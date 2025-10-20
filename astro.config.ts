@@ -115,10 +115,11 @@ export default defineConfig({
           const routesWithParams = routes
             .filter(
               (r) =>
-                r.origin === 'project' &&
-                r.type === 'page' &&
-                r.params.length > 0 &&
-                !r.params.includes('pageIndex'),
+                (r.origin === 'project' && r.type === 'endpoint') ||
+                (r.origin === 'project' &&
+                  r.type === 'page' &&
+                  r.params.length > 0 &&
+                  !r.params.includes('pageIndex')),
             )
             .map(({ entrypoint, patternRegex, params }) => ({
               entrypoint:
@@ -130,9 +131,21 @@ export default defineConfig({
               params,
             }));
 
-          const routesWithNoParams = routes
-            .filter((r) => r.origin === 'project' && r.type === 'page' && r.params.length === 0)
-            .map(({ pattern }) => pattern);
+          const routesWithNoParams = [
+            ...routes
+              .filter((r) => r.origin === 'project' && r.type === 'page' && r.params.length === 0)
+              .map(({ pattern }) => pattern),
+            ...routes
+              .filter(
+                (r) =>
+                  r.origin === 'project' &&
+                  r.type === 'endpoint' &&
+                  r.params.length === 0 &&
+                  !r.pattern.startsWith('/api/') &&
+                  !r.pattern.endsWith('.js'),
+              )
+              .map(({ pattern }) => pattern),
+          ];
 
           await writeFile(
             './src/pages/api/normalize-structured-text/_utils/routes.json',
