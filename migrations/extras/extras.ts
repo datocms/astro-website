@@ -1,4 +1,4 @@
-import type { Client, SchemaTypes } from '@datocms/cma-client';
+import type { Client, RawApiTypes } from '@datocms/cma-client';
 import { match } from 'path-to-regexp';
 
 export const linkableModelApiKeys = [
@@ -391,7 +391,7 @@ export const itemFinders = [
         filter: { type: 'doc_page', fields: { slug: { eq: pageSlug } } },
       });
 
-      const matchingDocPages: SchemaTypes.Item[] = [];
+      const matchingDocPages: RawApiTypes.Item[] = [];
       for (const docPage of possibleDocPages) {
         const docGroups = await client.items.references(docPage, { version: 'published' });
         if (docGroups.find((docGroup) => docGroup.slug === docGroupSlug)) {

@@ -1,12 +1,12 @@
 import type { Result } from './types';
 import { Highlight } from './Highlight';
 import ky from 'ky';
-import type { SchemaTypes } from '@datocms/cma-client';
+import type { RawApiTypes } from '@datocms/cma-client';
 
 const matchRegexp = /\[h\](.+?)\[\/h\]/g;
 
 export async function searchInWebsite(query: string) {
-  const { data: results } = await ky<SchemaTypes.SearchResultInstancesTargetSchema>(
+  const { data: results } = await ky<RawApiTypes.SearchResultInstancesTargetSchema>(
     'https://site-api.datocms.com/search-results',
     {
       headers: {

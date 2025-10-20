@@ -1,9 +1,9 @@
-import { SchemaTypes } from '@datocms/cli/lib/cma-client-node';
+import { type RawApiTypes } from '@datocms/cli/lib/cma-client-node';
 import { type StructuredTextDocument } from 'datocms-structured-text-to-plain-text';
 import { isBlock, type Node, type WithChildrenNode } from 'datocms-structured-text-utils';
 import { visit } from 'unist-util-visit';
 
-function isItem(maybeItem: unknown): maybeItem is SchemaTypes.Item {
+function isItem(maybeItem: unknown): maybeItem is RawApiTypes.Item {
   return Boolean(
     typeof maybeItem === 'object' &&
       maybeItem &&
@@ -24,17 +24,17 @@ function isItem(maybeItem: unknown): maybeItem is SchemaTypes.Item {
  * @returns Updated item data or item ID if no changes were made
  */
 export async function updateStructuredTextFields(
-  fieldsFinder: (itemTypeId: string) => SchemaTypes.Field[],
-  item: SchemaTypes.Item,
+  fieldsFinder: (itemTypeId: string) => RawApiTypes.Field[],
+  item: RawApiTypes.Item,
   cb: (
     node: Node,
     index: number,
     parent: WithChildrenNode,
     path: string,
-    field: SchemaTypes.Field,
+    field: RawApiTypes.Field,
   ) => Promise<boolean | undefined>,
   path: string[] = [],
-): Promise<SchemaTypes.ItemUpdateSchema['data'] | string> {
+): Promise<RawApiTypes.ItemUpdateSchema['data'] | string> {
   const fields = fieldsFinder(item.relationships.item_type.data.id);
 
   const attributes: Record<string, unknown> = {};
@@ -95,9 +95,9 @@ export async function updateStructuredTextFields(
       // Handle rich text fields with nested blocks
       const itemBlocksOrIds = item.attributes[field.attributes.api_key] as (
         | string
-        | SchemaTypes.Item
+        | RawApiTypes.Item
       )[];
-      const result: Array<SchemaTypes.ItemUpdateSchema['data'] | string> = [];
+      const result: Array<RawApiTypes.ItemUpdateSchema['data'] | string> = [];
       for (const itemBlockOrId of itemBlocksOrIds) {
         result.push(
           isItem(itemBlockOrId)
@@ -116,7 +116,7 @@ export async function updateStructuredTextFields(
       // Handle single block fields
       const itemBlockOrId = item.attributes[field.attributes.api_key] as
         | string
-        | SchemaTypes.Item
+        | RawApiTypes.Item
         | null;
       if (itemBlockOrId && isItem(itemBlockOrId)) {
         const result = await updateStructuredTextFields(fieldsFinder, itemBlockOrId, cb, [

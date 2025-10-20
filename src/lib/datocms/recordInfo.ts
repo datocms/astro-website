@@ -1,5 +1,5 @@
 import { executeQuery } from '@datocms/cda-client';
-import type { Client, SchemaTypes } from '@datocms/cma-client';
+import type { Client, RawApiTypes } from '@datocms/cma-client';
 import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import type { TadaDocumentNode } from 'gql.tada';
 import type { FragmentDefinitionNode } from 'graphql';
@@ -12,7 +12,7 @@ const allUrlBuilderFragments = import.meta.glob('./gqlUrlBuilder/*.ts', {
 });
 
 type RecordToWebsiteRouteOptions = {
-  item: SchemaTypes.Item;
+  item: RawApiTypes.Item;
   itemTypeApiKey: string;
   client: Client;
 };
@@ -62,7 +62,7 @@ export async function recordToWebsiteRoute({
 }
 
 export async function recordToSlug(
-  item: SchemaTypes.Item,
+  item: RawApiTypes.Item,
   itemTypeApiKey: string,
 ): Promise<string | null> {
   switch (itemTypeApiKey) {

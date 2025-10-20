@@ -1,17 +1,17 @@
-import type { Client, SchemaTypes } from '@datocms/cma-client';
+import type { Client, RawApiTypes } from '@datocms/cma-client';
 
 export class ItemTypeManager {
   private client: Client;
-  private itemTypesPromise: Promise<SchemaTypes.ItemType[]> | null = null;
-  private itemTypesByApiKey: Map<string, SchemaTypes.ItemType> = new Map();
-  private itemTypesById: Map<string, SchemaTypes.ItemType> = new Map();
-  private fieldsByItemType: Map<string, SchemaTypes.Field[]> = new Map();
+  private itemTypesPromise: Promise<RawApiTypes.ItemType[]> | null = null;
+  private itemTypesByApiKey: Map<string, RawApiTypes.ItemType> = new Map();
+  private itemTypesById: Map<string, RawApiTypes.ItemType> = new Map();
+  private fieldsByItemType: Map<string, RawApiTypes.Field[]> = new Map();
 
   constructor(client: Client) {
     this.client = client;
   }
 
-  private async loadItemTypes(): Promise<SchemaTypes.ItemType[]> {
+  private async loadItemTypes(): Promise<RawApiTypes.ItemType[]> {
     if (!this.itemTypesPromise) {
       this.itemTypesPromise = (async () => {
         const { data: itemTypes } = await this.client.itemTypes.rawList();
@@ -29,22 +29,22 @@ export class ItemTypeManager {
     return this.itemTypesPromise;
   }
 
-  async getAllItemTypes(): Promise<SchemaTypes.ItemType[]> {
+  async getAllItemTypes(): Promise<RawApiTypes.ItemType[]> {
     const itemTypes = await this.loadItemTypes();
     return itemTypes;
   }
 
-  async getAllModels(): Promise<SchemaTypes.ItemType[]> {
+  async getAllModels(): Promise<RawApiTypes.ItemType[]> {
     const itemTypes = await this.loadItemTypes();
     return itemTypes.filter((it) => !it.attributes.modular_block);
   }
 
-  async getAllBlockModels(): Promise<SchemaTypes.ItemType[]> {
+  async getAllBlockModels(): Promise<RawApiTypes.ItemType[]> {
     const itemTypes = await this.loadItemTypes();
     return itemTypes.filter((it) => it.attributes.modular_block);
   }
 
-  async getItemTypeByApiKey(apiKey: string): Promise<SchemaTypes.ItemType> {
+  async getItemTypeByApiKey(apiKey: string): Promise<RawApiTypes.ItemType> {
     await this.loadItemTypes();
 
     const itemType = this.itemTypesByApiKey.get(apiKey);
@@ -55,7 +55,7 @@ export class ItemTypeManager {
     return itemType;
   }
 
-  async getItemTypeById(id: string): Promise<SchemaTypes.ItemType> {
+  async getItemTypeById(id: string): Promise<RawApiTypes.ItemType> {
     await this.loadItemTypes();
 
     const itemType = this.itemTypesById.get(id);
@@ -66,7 +66,7 @@ export class ItemTypeManager {
     return itemType;
   }
 
-  async getItemTypeFields(itemType: SchemaTypes.ItemType): Promise<SchemaTypes.Field[]> {
+  async getItemTypeFields(itemType: RawApiTypes.ItemType): Promise<RawApiTypes.Field[]> {
     // Check if we already have the fields cached
     const cachedFields = this.fieldsByItemType.get(itemType.id);
     if (cachedFields) {

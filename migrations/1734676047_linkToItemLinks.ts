@@ -1,4 +1,4 @@
-import { Client, SchemaTypes } from '@datocms/cli/lib/cma-client-node';
+import { Client, type RawApiTypes } from '@datocms/cli/lib/cma-client-node';
 import { render, type StructuredTextDocument } from 'datocms-structured-text-to-plain-text';
 import {
   isBlock,
@@ -54,10 +54,10 @@ async function fetchItemIdForPathname(client: Client, pathname: string): Promise
  */
 async function updateStructuredTextFields(
   manager: ItemTypeManager,
-  touchedStructuredTextFields: Set<SchemaTypes.Field>,
-  item: SchemaTypes.Item,
+  touchedStructuredTextFields: Set<RawApiTypes.Field>,
+  item: RawApiTypes.Item,
   cb: (node: Node, index: number, parent: WithChildrenNode) => Promise<boolean | undefined>,
-): Promise<SchemaTypes.ItemUpdateSchema['data'] | string> {
+): Promise<RawApiTypes.ItemUpdateSchema['data'] | string> {
   const itemType = await manager.getItemTypeById(item.relationships.item_type.data.id);
   const fields = await manager.getItemTypeFields(itemType);
 
@@ -81,7 +81,7 @@ async function updateStructuredTextFields(
       visit(structuredTextValue.document, (node, index, parent) => {
         if (isBlock(node)) {
           // Recursively process nested blocks
-          const itemBlock = node.item as any as SchemaTypes.Item;
+          const itemBlock = node.item as any as RawApiTypes.Item;
           if (itemBlock) {
             somethingChangedPromises.push(
               (async () => {
@@ -112,8 +112,8 @@ async function updateStructuredTextFields(
       }
     } else if (field.attributes.field_type === 'rich_text') {
       // Handle rich text fields with nested blocks
-      const itemBlocks = item.attributes[field.attributes.api_key] as SchemaTypes.Item[];
-      const result: Array<SchemaTypes.ItemUpdateSchema['data'] | string> = [];
+      const itemBlocks = item.attributes[field.attributes.api_key] as RawApiTypes.Item[];
+      const result: Array<RawApiTypes.ItemUpdateSchema['data'] | string> = [];
       for (const itemBlock of itemBlocks) {
         result.push(
           await updateStructuredTextFields(manager, touchedStructuredTextFields, itemBlock, cb),
@@ -124,7 +124,7 @@ async function updateStructuredTextFields(
       }
     } else if (field.attributes.field_type === 'single_block') {
       // Handle single block fields
-      const itemBlock = item.attributes[field.attributes.api_key] as SchemaTypes.Item | null;
+      const itemBlock = item.attributes[field.attributes.api_key] as RawApiTypes.Item | null;
       if (itemBlock) {
         const result = await updateStructuredTextFields(
           manager,
@@ -164,7 +164,7 @@ export default async function (client: Client) {
   const manager = new ItemTypeManager(client);
 
   const updateOperations: Array<[Parameters<typeof client.items.rawUpdate>, boolean]> = [];
-  const touchedStructuredTextFields = new Set<SchemaTypes.Field>();
+  const touchedStructuredTextFields = new Set<RawApiTypes.Field>();
 
   // Process all models and their items
   for (const model of await manager.getAllModels()) {

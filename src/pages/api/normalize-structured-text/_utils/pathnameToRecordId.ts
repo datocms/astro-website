@@ -49,24 +49,24 @@ export async function paramsToRecordId(
     const matches = pathname.match(new RegExp(parts[1]!, parts[2] || ''));
 
     if (matches) {
-      const params: Record<string, string> = {};
-      for (const [index, param] of route.params.entries()) {
-        params[param.replace('...', '')] = matches[index + 1]!;
-      }
-
-      const ParamsToRecordIdFnPromise = allParamsToRecordIds[route.entrypoint];
-
-      if (!ParamsToRecordIdFnPromise) {
-        throw new Error('Missing route');
-      }
-
-      const paramsToRecordId = await ParamsToRecordIdFnPromise();
-
-      if (!paramsToRecordId) {
-        throw new Error('Missing missingParamsToRecordId');
-      }
-
       try {
+        const params: Record<string, string> = {};
+        for (const [index, param] of route.params.entries()) {
+          params[param.replace('...', '')] = matches[index + 1]!;
+        }
+
+        const ParamsToRecordIdFnPromise = allParamsToRecordIds[route.entrypoint];
+
+        if (!ParamsToRecordIdFnPromise) {
+          throw new Error('Missing route');
+        }
+
+        const paramsToRecordId = await ParamsToRecordIdFnPromise();
+
+        if (!paramsToRecordId) {
+          throw new Error('Missing missingParamsToRecordId');
+        }
+
         const recordId = await paramsToRecordId({
           executeQueryOptions,
           params,

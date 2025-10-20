@@ -1,4 +1,4 @@
-import { buildClient, SchemaTypes } from '@datocms/cma-client';
+import { buildClient, type RawApiTypes } from '@datocms/cma-client';
 import type { APIRoute } from 'astro';
 import { PUBLIC_HOSTNAME } from 'astro:env/client';
 import { DATOCMS_API_TOKEN, DRAFT_MODE_HOSTNAME, SECRET_API_TOKEN } from 'astro:env/server';
@@ -42,8 +42,8 @@ export const POST: APIRoute = async ({ url, request }) => {
      * the interface
      */
     const { item, itemType, environmentId } = (await request.json()) as {
-      item: SchemaTypes.Item;
-      itemType: SchemaTypes.ItemType;
+      item: RawApiTypes.Item;
+      itemType: RawApiTypes.ItemType;
       environmentId: string;
     };
 

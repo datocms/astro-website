@@ -1,4 +1,4 @@
-import { buildClient, SchemaTypes } from '@datocms/cli/lib/cma-client-node';
+import { buildClient, type RawApiTypes } from '@datocms/cli/lib/cma-client-node';
 import type { APIRoute } from 'astro';
 import { DATOCMS_API_TOKEN, SECRET_API_TOKEN } from 'astro:env/server';
 import { render } from 'datocms-structured-text-to-plain-text';
@@ -9,8 +9,8 @@ import { paramsToRecordId } from './_utils/pathnameToRecordId';
 import { updateStructuredTextFields } from './_utils/updateStructuredTextFields';
 
 type Payload = {
-  entity: SchemaTypes.Item;
-  related_entities: [SchemaTypes.ItemType];
+  entity: RawApiTypes.Item;
+  related_entities: [RawApiTypes.ItemType];
 };
 
 type InternalLinkError = {
@@ -188,6 +188,10 @@ export const POST: APIRoute = async ({ url, request }) => {
     const impossibleChangesByFieldId = Object.fromEntries(
       Object.entries(changesByFieldId).filter(([fieldId]) => {
         const field = fieldById(fieldId);
+
+        if (field.attributes.field_type !== 'structured_text') {
+          throw new Error();
+        }
 
         const validator = field.attributes.validators.structured_text_links as {
           item_types: string[];
