@@ -79,10 +79,14 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
       const htmlResponse = await fetch(htmlUrl);
 
       if (!htmlResponse.ok) {
-        return new Response(`HTML page not found: ${htmlUrl.pathname}`, {
-          status: 404,
-          headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
-        });
+        return next();
+      }
+
+      // Check if the response is HTML - only convert HTML to markdown
+      const contentType = htmlResponse.headers.get('content-type') || '';
+      if (!contentType.includes('text/html')) {
+        // Not HTML, skip markdown conversion
+        return next();
       }
 
       // Get the HTML content

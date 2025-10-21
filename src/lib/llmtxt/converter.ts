@@ -145,8 +145,12 @@ function extractSidebarData(document: Document, baseUrl: string): SidebarData {
           const absoluteUrl = new URL(href, baseUrl);
 
           // For internal links (same origin), add .md to the pathname
+          // unless the pathname already has a file extension
           if (absoluteUrl.origin === baseUrlObj.origin) {
-            absoluteUrl.pathname = absoluteUrl.pathname + '.md';
+            const hasExtension = /\.[^/.]+$/.test(absoluteUrl.pathname);
+            if (!hasExtension) {
+              absoluteUrl.pathname = absoluteUrl.pathname + '.md';
+            }
           }
 
           links.push({
@@ -327,9 +331,12 @@ function makeUrlsAbsolute(content: HTMLElement, baseUrl: string): void {
         const absoluteUrl = new URL(href, baseUrl);
 
         // For internal links (same origin), add .md to the pathname
+        // unless the pathname already has a file extension
         if (absoluteUrl.origin === baseUrlObj.origin) {
-          // Add .md extension to the pathname
-          absoluteUrl.pathname = absoluteUrl.pathname + '.md';
+          const hasExtension = /\.[^/.]+$/.test(absoluteUrl.pathname);
+          if (!hasExtension) {
+            absoluteUrl.pathname = absoluteUrl.pathname + '.md';
+          }
         }
 
         link.setAttribute('href', absoluteUrl.href);
