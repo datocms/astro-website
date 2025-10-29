@@ -238,7 +238,7 @@ function extractMainContent(document: Document): HTMLElement {
 /**
  * Clean the HTML content before conversion
  */
-function cleanContent(content: HTMLElement, settings: ConversionOptions): void {
+function cleanContent(content: HTMLElement, _settings: ConversionOptions): void {
   // Replace videos with placeholder
   const videos = content.querySelectorAll(
     'video, iframe[src*="youtube"], iframe[src*="vimeo"], astro-island[component-export="VideoPlayer"]',
@@ -366,7 +366,7 @@ function configureTurndownService(settings: ConversionOptions): TurndownService 
         node.nodeName === 'PRE' && node.firstChild !== null && node.firstChild.nodeName === 'CODE'
       );
     },
-    replacement: function (content, node) {
+    replacement: function (_content, node) {
       const preNode = node as HTMLElement;
       const codeNode = preNode.firstChild as HTMLElement;
 
@@ -400,7 +400,7 @@ function configureTurndownService(settings: ConversionOptions): TurndownService 
     filter: function (node) {
       return node.nodeName === 'DIV' && node.hasAttribute('data-callout-type');
     },
-    replacement: function (content, node) {
+    replacement: function (_content, node) {
       const calloutType =
         (node as HTMLElement).getAttribute('data-callout-type')?.toUpperCase() || 'NOTE';
       const titleElement = (node as HTMLElement).querySelector('[data-callout-title]');

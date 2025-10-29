@@ -9,7 +9,6 @@ const { seoAnalysis, background = 'normal', stripHeight = 'full' } = Astro.props
 const kickerContents = striptags(await Astro.slots.render('kicker'));
 
 let Title: 'h2' | 'h3' = 'h2';
-let Kicker: 'h2' | 'h3' | 'div' = 'div';
 
 type Props = {
   seoAnalysis?: unknown;
@@ -19,7 +18,6 @@ type Props = {
 
 if (seoAnalysis) {
   const kickerContainsKeywords = containsKeywords(kickerContents, seoAnalysis);
-  Kicker = kickerContainsKeywords ? 'h2' : 'h3';
   Title = kickerContainsKeywords ? 'h3' : 'h2';
 }
 ---
