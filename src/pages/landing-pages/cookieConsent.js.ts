@@ -63,11 +63,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 const cookieConsentScript = `
 (() => {
-  const scriptsToAddOnCookieConsent = \`${scriptsToAddOnCookieConsent}\`;
-
   function addScripts() {
     const script = document.createElement('script');
-    script.appendChild(document.createTextNode(scriptsToAddOnCookieConsent));
+    script.src = '/landing-pages/cookieConsent.js?loadTracking=true';
     document.getElementsByTagName('head')[0].appendChild(script);
   }
 
