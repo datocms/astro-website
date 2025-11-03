@@ -65,7 +65,7 @@ const cookieConsentScript = `
 (() => {
   function addScripts() {
     const script = document.createElement('script');
-    script.src = '/landing-pages/cookieConsent.js?loadTracking=true';
+    script.src = 'https://www.datocms.com/landing-pages/cookieConsent.js?loadTracking=true';
     document.getElementsByTagName('head')[0].appendChild(script);
   }
 
