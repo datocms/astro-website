@@ -1,5 +1,6 @@
 import { BASE64_SPAM_DETECTOR_PROMPT, OPENAI_API_KEY } from 'astro:env/server';
 import OpenAI from 'openai';
+import logToRollbar from './logToRollbar';
 
 type SpamResult = {
   is_spam: 'yes' | 'no' | 'manual_review';
@@ -92,20 +93,25 @@ export async function isSpam(input: Input, fieldsToIgnore: Array<keyof Input>): 
     });
 
     if (!res.output_text) {
-      return false;
+      throw new Error('Missing res.output_text');
     }
 
     const result = JSON.parse(res.output_text);
 
     if (!isSpamResult(result)) {
-      return false;
+      throw new Error('Response is not valid spam result');
     }
 
     console.log(JSON.stringify(result, null, 2));
 
+    if (result.is_spam === 'yes') {
+      logToRollbar({ result }, { context: { action: 'isSpam', input, fieldsToIgnore } });
+    }
+
     return result.is_spam === 'yes';
   } catch (err) {
-    console.log(err);
+    logToRollbar(err, { context: { action: 'isSpam', input, fieldsToIgnore } });
+
     return false;
   }
 }
