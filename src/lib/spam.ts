@@ -13,7 +13,7 @@ const spamJsonSchema = {
   properties: {
     is_spam: { enum: ['yes', 'no', 'manual_review'] },
     spam_score: { type: 'number', minimum: 0, maximum: 1 },
-    spam_reason: { type: 'string', maxLength: 50 },
+    spam_reason: { type: 'string', maxLength: 30 },
   },
   required: ['is_spam', 'spam_score', 'spam_reason'],
   additionalProperties: false,
@@ -104,6 +104,8 @@ export async function isSpam(input: Input, fieldsToIgnore: Array<keyof Input>): 
       logToRollbar('Detected spam', {
         context: { action: 'isSpam', input, fieldsToIgnore, result },
       });
+
+      console.log(JSON.stringify(result, null, 2));
     }
 
     return isSpam;
