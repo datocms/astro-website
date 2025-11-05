@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import {
   FormProvider,
   useForm,
@@ -17,19 +17,15 @@ import { isActionError, isInputError } from 'astro:actions';
 type Props<TFieldValues extends FieldValues = FieldValues> = {
   children: ReactNode;
   defaultValues?: DefaultValues<TFieldValues>;
-  action?: string;
   submitLabel?: ReactNode;
-  onSubmit?: (values: TFieldValues & { token: string }) => Promise<void>;
-  nativeSubmitForm?: boolean;
+  onSubmit?: (data: FormData) => Promise<void>;
 };
 
 export function FormReactComponent<TFieldValues extends FieldValues = FieldValues>({
   children,
   defaultValues,
-  action,
   submitLabel,
   onSubmit,
-  nativeSubmitForm,
 }: Props<TFieldValues>) {
   const execute = useRecaptcha({
     // must be v3 Recaptcha!
@@ -43,22 +39,18 @@ export function FormReactComponent<TFieldValues extends FieldValues = FieldValue
 
   const { clearErrors, setError, handleSubmit, formState } = methods;
 
-  const recaptchaInput = useRef<HTMLInputElement>(null);
-
   const defaultSubmit: SubmitHandler<TFieldValues> = async (values, event) => {
-    if (!recaptchaInput.current) {
-      return;
-    }
-
     event?.preventDefault();
 
     const token = await execute('form');
 
-    recaptchaInput.current.value = token;
-
-    if (onSubmit) {
+    if (onSubmit && event?.target) {
       try {
-        await onSubmit({ ...values, token });
+        // Create FormData from the native form element
+        const formData = new FormData(event.target as HTMLFormElement);
+        formData.append('token', token);
+
+        await onSubmit(formData);
       } catch (e) {
         if (isInputError(e)) {
           for (const [name, errors] of Object.entries(e.fields)) {
@@ -77,28 +69,15 @@ export function FormReactComponent<TFieldValues extends FieldValues = FieldValue
         return;
       }
     }
-
-    if (nativeSubmitForm) {
-      event?.target.submit();
-    }
   };
 
-  const waiting = formState.isSubmitting || (formState.isSubmitSuccessful && nativeSubmitForm);
+  const waiting = formState.isSubmitting;
 
   return (
     <FormProvider {...methods}>
       <Toaster position="bottom-right" toastOptions={{ className: s.toastNotification }} />
-      <form
-        className={s.form}
-        onSubmit={handleSubmit(defaultSubmit)}
-        method="POST"
-        action={action}
-        encType="multipart/form-data"
-        acceptCharset="utf-8"
-      >
+      <form className={s.form} onSubmit={handleSubmit(defaultSubmit)}>
         {children}
-
-        <input type="hidden" name="g-recaptcha-response" ref={recaptchaInput} />
 
         <div className={s.submit}>
           <div className={s.agree}>

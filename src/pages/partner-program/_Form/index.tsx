@@ -1,4 +1,5 @@
 import { getData } from 'country-list';
+import { navigate } from 'astro:transitions/client';
 import Textarea from 'react-textarea-autosize';
 import s from './style.module.css';
 import { FormReactComponent } from '~/components/form/Form/ReactComponent';
@@ -36,11 +37,10 @@ export function Form() {
       <FormReactComponent
         defaultValues={defaultValues}
         submitLabel="Let's have a chat!"
-        nativeSubmitForm
-        onSubmit={async (formValues) => {
-          await actions.pipedrive.createPartnerProgramLead.orThrow(formValues);
+        onSubmit={async (formData) => {
+          const redirectUrl = await actions.forms.submitPartnerProgramRequest.orThrow(formData);
+          navigate(redirectUrl);
         }}
-        action="https://webhook.frontapp.com/forms/f51dbf7c0379d350b50e/3Sm_zJWUNAZjGDEATKFPqvusB9OfzY8rqYlrGJ1mjrCkgevT-jE7_fNnB8SOeobAgkr4Pff6S4eAjQN6f_euzEjsDxk76hp1CkVYfevIYPSpmoXztVnRgA86Dseo"
       >
         <div className={s.formCols}>
           <FieldReactComponent

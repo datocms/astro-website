@@ -1,4 +1,5 @@
 import { getData } from 'country-list';
+import { navigate } from 'astro:transitions/client';
 import Textarea from 'react-textarea-autosize';
 import s from './style.module.css';
 import { FormReactComponent } from '~/components/form/Form/ReactComponent';
@@ -40,12 +41,10 @@ export function Form({ issueType }: { issueType: 'sales' | 'enterprise' }) {
       <FormReactComponent
         defaultValues={defaultValues}
         submitLabel="Get in touch"
-        nativeSubmitForm
-        onSubmit={async (formValues) => {
-          await actions.pipedrive.createSalesLead.orThrow(formValues);
+        onSubmit={async (formData) => {
+          const redirectUrl = await actions.forms.submitSalesRequest.orThrow(formData);
+          navigate(redirectUrl);
         }}
-        // https://app.frontapp.com/settings/tim:1275912/channels/edit/9473928/settings
-        action="https://webhook.frontapp.com/forms/f51dbf7c0379d350b50e/nzap4XhKrZaOsUgc8z60aWZmDiaXqbcs69ZEcrTnEmrZ9RFy4pLak0OqBcEvkSN-Py6tbtle8KXhPe4X_QgF89gP1Qpl97WhzTQMz8wWQ3hCpUMXJqNtE9056-Av"
       >
         <FieldReactComponent
           name="companyName"

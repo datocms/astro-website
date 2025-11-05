@@ -1,8 +1,10 @@
+import { navigate } from 'astro:transitions/client';
 import Textarea from 'react-textarea-autosize';
 import s from './style.module.css';
 import { FormReactComponent } from '~/components/form/Form/ReactComponent';
 import { FieldReactComponent } from '~/components/form/Field/ReactComponent';
 import { getCookie } from '~/lib/cookies';
+import { actions } from 'astro:actions';
 
 type FormValues = {
   email: string;
@@ -10,7 +12,7 @@ type FormValues = {
   body: string;
   subject?: string;
   errorId: string;
-  uploads: string;
+  uploads?: FileList;
   issueType: string;
 };
 
@@ -19,12 +21,11 @@ type Props = {
 };
 
 export function Form({ initialValues = {} }: Props) {
-  const defaultValues: FormValues = {
+  const defaultValues = {
     project: '',
     subject: '',
     body: '',
     errorId: '',
-    uploads: '',
     issueType: '',
     ...initialValues,
     email: initialValues.email || getCookie('datoAccountEmail') || '',
@@ -35,9 +36,10 @@ export function Form({ initialValues = {} }: Props) {
       <FormReactComponent
         defaultValues={defaultValues}
         submitLabel="Get in touch"
-        nativeSubmitForm
-        // https://app.frontapp.com/settings/tim:1275912/channels/edit/2627592/settings
-        action="https://webhook.frontapp.com/forms/f51dbf7c0379d350b50e/PDaCIm6Sjad1ZB19swTizIZHgnFCnk0gEd2P97xZTsF_ZRHeTxSY6SUa_bNxF5yUR9I_1JjwZugyWTypqNlVrxGKafAmMA_PgF5EZ2AOnZ5ROsZc9jI0qblkauNC"
+        onSubmit={async (formData) => {
+          const redirectUrl = await actions.forms.submitSupportRequest.orThrow(formData);
+          navigate(redirectUrl);
+        }}
       >
         <FieldReactComponent
           name="email"
