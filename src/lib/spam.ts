@@ -102,12 +102,6 @@ export async function isSpam(input: Input, fieldsToIgnore: Array<keyof Input>): 
       throw new Error('Response is not valid spam result');
     }
 
-    console.log(JSON.stringify(result, null, 2));
-
-    if (result.is_spam === 'yes') {
-      logToRollbar({ result }, { context: { action: 'isSpam', input, fieldsToIgnore } });
-    }
-
     return result.is_spam === 'yes';
   } catch (err) {
     logToRollbar(err, { context: { action: 'isSpam', input, fieldsToIgnore } });
