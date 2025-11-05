@@ -3,7 +3,7 @@ import { ActionError, defineAction } from 'astro:actions';
 import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import { z } from 'astro:schema';
 import type { DocFeedback } from '~/lib/cma-schema';
-import logToRollbar from '~/lib/logToRollbar';
+import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 
 export default defineAction({
@@ -39,7 +39,7 @@ export default defineAction({
 
       return { success: true };
     } catch (e) {
-      logToRollbar(e, { context: { action: 'sendFeedbackAboutDocPage', input } });
+      logErrorToRollbar(e, { context: { action: 'sendFeedbackAboutDocPage', input } });
 
       throw e;
     }

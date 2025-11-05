@@ -3,7 +3,7 @@ import { ActionError, defineAction } from 'astro:actions';
 import { MAILERLITE_TOKEN } from 'astro:env/server';
 import { z } from 'astro:schema';
 import { format } from 'date-fns';
-import logToRollbar from '~/lib/logToRollbar';
+import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 
 export default defineAction({
@@ -37,7 +37,7 @@ export default defineAction({
 
       return { success: true };
     } catch (e) {
-      logToRollbar(e, { context: { action: 'subscribeToNewsletter', input } });
+      logErrorToRollbar(e, { context: { action: 'subscribeToNewsletter', input } });
 
       throw e;
     }

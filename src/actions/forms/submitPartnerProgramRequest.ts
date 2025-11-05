@@ -2,7 +2,7 @@ import { ActionError, defineAction } from 'astro:actions';
 import { FRONT_CHANNEL_URL_PARTNER_PROGRAM } from 'astro:env/server';
 import { z } from 'astro:schema';
 import { sendToFrontChannel } from '~/lib/front';
-import logToRollbar from '~/lib/logToRollbar';
+import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 import { isSpam } from '~/lib/spam';
 import {
@@ -65,20 +65,20 @@ export default defineAction({
       const partnershipLabel = '87a60c60-6a8e-11ed-92ec-410445a67487';
       const lead = await createLead(person, organization, '', [partnershipLabel]);
 
-      // Step 5: Add note to Pipedrive with additional details
+      // Step 5 & 6: Add note to Pipedrive and send to Front channel in parallel
       const noteText = `<p>Team size: ${input.teamSize}</p><p>Product familiarity: ${input.productFamiliarity}</p><p>Message: ${input.body}</p>`;
-      await createNote(lead, noteText);
-
-      // Step 6: Send notification to Front channel
-      const redirectUrl = await sendToFrontChannel(
-        FRONT_CHANNEL_URL_PARTNER_PROGRAM,
-        input,
-        'https://www.datocms.com/partner-program',
-      );
+      const [, redirectUrl] = await Promise.all([
+        createNote(lead, noteText),
+        sendToFrontChannel(
+          FRONT_CHANNEL_URL_PARTNER_PROGRAM,
+          input,
+          'https://www.datocms.com/partner-program',
+        ),
+      ]);
 
       return redirectUrl;
     } catch (e) {
-      logToRollbar(e, { context: { action: 'forms.submitPartnerProgramRequest', input } });
+      logErrorToRollbar(e, { context: { action: 'forms.submitPartnerProgramRequest', input } });
       throw e;
     }
   },

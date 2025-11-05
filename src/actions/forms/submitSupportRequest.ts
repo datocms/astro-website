@@ -2,7 +2,7 @@ import { ActionError, defineAction } from 'astro:actions';
 import { FRONT_CHANNEL_URL_SUPPORT } from 'astro:env/server';
 import { z } from 'astro:schema';
 import { sendToFrontChannel } from '~/lib/front';
-import logToRollbar from '~/lib/logToRollbar';
+import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 import { isSpam } from '~/lib/spam';
 
@@ -44,7 +44,7 @@ export default defineAction({
 
       return redirectUrl;
     } catch (e) {
-      logToRollbar(e, { context: { action: 'forms.submitSupportRequest', input } });
+      logErrorToRollbar(e, { context: { action: 'forms.submitSupportRequest', input } });
       throw e;
     }
   },

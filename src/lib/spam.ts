@@ -5,8 +5,7 @@ import logToRollbar from './logToRollbar';
 type SpamResult = {
   is_spam: 'yes' | 'no' | 'manual_review';
   spam_score: number; // 0..1
-  reasons: string[];
-  notes?: string;
+  spam_reason: string;
 };
 
 const spamJsonSchema = {
@@ -14,10 +13,9 @@ const spamJsonSchema = {
   properties: {
     is_spam: { enum: ['yes', 'no', 'manual_review'] },
     spam_score: { type: 'number', minimum: 0, maximum: 1 },
-    reasons: { type: 'array', items: { type: 'string' } },
-    notes: { type: 'string', minLength: 5 },
+    spam_reason: { type: 'string', maxLength: 50 },
   },
-  required: ['is_spam', 'spam_score', 'reasons', 'notes'],
+  required: ['is_spam', 'spam_score', 'spam_reason'],
   additionalProperties: false,
 };
 
@@ -25,9 +23,7 @@ function isSpamResult(obj: any): obj is SpamResult {
   if (!obj || typeof obj !== 'object') return false;
   if (!['yes', 'no', 'manual_review'].includes(obj.is_spam)) return false;
   if (typeof obj.spam_score !== 'number' || obj.spam_score < 0 || obj.spam_score > 1) return false;
-  if (!Array.isArray(obj.reasons) || !obj.reasons.every((r: any) => typeof r === 'string'))
-    return false;
-  if (obj.notes !== undefined && typeof obj.notes !== 'string') return false;
+  if (typeof obj.spam_reason !== 'string') return false;
   return true;
 }
 
@@ -102,7 +98,15 @@ export async function isSpam(input: Input, fieldsToIgnore: Array<keyof Input>): 
       throw new Error('Response is not valid spam result');
     }
 
-    return result.is_spam === 'yes';
+    const isSpam = result.is_spam === 'yes';
+
+    if (isSpam) {
+      logToRollbar('Detected spam', {
+        context: { action: 'isSpam', input, fieldsToIgnore, result },
+      });
+    }
+
+    return isSpam;
   } catch (err) {
     logToRollbar(err, { context: { action: 'isSpam', input, fieldsToIgnore } });
 

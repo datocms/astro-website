@@ -2,7 +2,7 @@ import { ActionError, defineAction } from 'astro:actions';
 import { FRONT_CHANNEL_URL_SALES } from 'astro:env/server';
 import { z } from 'astro:schema';
 import { sendToFrontChannel } from '~/lib/front';
-import logToRollbar from '~/lib/logToRollbar';
+import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 import { isSpam } from '~/lib/spam';
 import {
@@ -62,19 +62,15 @@ export default defineAction({
       // Step 4: Create lead in Pipedrive
       const lead = await createLead(person, organization, input.useCase);
 
-      // Step 5: Add note to Pipedrive with message
-      await createNote(lead, input.body);
-
-      // Step 6: Send notification to Front channel
-      const redirectUrl = await sendToFrontChannel(
-        FRONT_CHANNEL_URL_SALES,
-        input,
-        'https://www.datocms.com/contact',
-      );
+      // Step 5 & 6: Add note to Pipedrive and send to Front channel in parallel
+      const [, redirectUrl] = await Promise.all([
+        createNote(lead, input.body),
+        sendToFrontChannel(FRONT_CHANNEL_URL_SALES, input, 'https://www.datocms.com/contact'),
+      ]);
 
       return redirectUrl;
     } catch (e) {
-      logToRollbar(e, { context: { action: 'forms.submitSalesRequest', input } });
+      logErrorToRollbar(e, { context: { action: 'forms.submitSalesRequest', input } });
       throw e;
     }
   },

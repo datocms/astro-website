@@ -8,7 +8,7 @@ type Options = {
   context?: Record<string, unknown>;
 };
 
-export default function logToRollbar(error: any, options: Options = {}) {
+export function logErrorToRollbar(error: any, options: Options = {}) {
   if (!ROLLBAR_TOKEN) {
     return;
   }
@@ -22,4 +22,20 @@ export default function logToRollbar(error: any, options: Options = {}) {
     : undefined;
 
   rollbar.error(error, options.context, serializedRequest);
+}
+
+export default function logToRollbar(error: any, options: Options = {}) {
+  if (!ROLLBAR_TOKEN) {
+    return;
+  }
+
+  const serializedRequest = options.request
+    ? {
+        headers: Object.fromEntries(options.request.headers),
+        url: options.request.url,
+        method: options.request.method,
+      }
+    : undefined;
+
+  rollbar.log(error, options.context, serializedRequest);
 }

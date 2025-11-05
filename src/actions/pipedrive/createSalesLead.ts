@@ -1,6 +1,6 @@
 import { defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
-import logToRollbar from '~/lib/logToRollbar';
+import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { createLead, createNote, findOrCreateOrgByName, findOrCreatePerson } from './utils';
 
 export default defineAction({
@@ -40,7 +40,7 @@ export default defineAction({
 
       return { success: true };
     } catch (e) {
-      logToRollbar(e, { context: { action: 'createSalesLead', input } });
+      logErrorToRollbar(e, { context: { action: 'createSalesLead', input } });
 
       throw e;
     }

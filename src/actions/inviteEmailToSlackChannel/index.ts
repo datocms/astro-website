@@ -2,7 +2,7 @@ import { WebClient } from '@slack/web-api';
 import { ActionError, defineAction } from 'astro:actions';
 import { SLACK_TOKEN } from 'astro:env/server';
 import { z } from 'astro:schema';
-import logToRollbar from '~/lib/logToRollbar';
+import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 
 interface ErrorResponse {
@@ -71,7 +71,7 @@ export default defineAction({
         });
       }
 
-      logToRollbar(e, { context: { action: 'inviteEmailToSlackChannel', input } });
+      logErrorToRollbar(e, { context: { action: 'inviteEmailToSlackChannel', input } });
 
       throw e;
     }
