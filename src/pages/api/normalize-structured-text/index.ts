@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 import { DATOCMS_API_TOKEN, SECRET_API_TOKEN } from 'astro:env/server';
 import { render } from 'datocms-structured-text-to-plain-text';
 import { isLink, type ItemLink, type Node } from 'datocms-structured-text-utils';
-import { BasecampClient } from '~/lib/BasecampClient';
+import buildBasecampClient from '~/lib/basecamp';
 import { handleUnexpectedError, invalidRequestResponse, json, withCORS } from '../_utils';
 import { paramsToRecordId } from './_utils/pathnameToRecordId';
 import { updateStructuredTextFields } from './_utils/updateStructuredTextFields';
@@ -202,11 +202,10 @@ export const POST: APIRoute = async ({ url, request }) => {
     );
 
     if (Object.keys(impossibleChangesByFieldId).length > 0) {
-      const DATOCMS_ACCOUNT = 5656352;
       const ON_CALL_PROJECT = 33592490;
       const TRIAGE_LIST = 6361603214;
 
-      const basecamp = new BasecampClient(DATOCMS_ACCOUNT);
+      const basecamp = await buildBasecampClient();
 
       const content = /* HTML */ `
         <p>
@@ -242,9 +241,15 @@ export const POST: APIRoute = async ({ url, request }) => {
         </ul>
       `;
 
-      await basecamp.createCard(ON_CALL_PROJECT, TRIAGE_LIST, {
-        title: '[Website] Unable to link to records in some structured text fields',
-        content,
+      await basecamp.cardTableCards.create({
+        params: {
+          bucketId: ON_CALL_PROJECT,
+          columnId: TRIAGE_LIST,
+        },
+        body: {
+          title: '[Website] Unable to link to records in some structured text fields',
+          content,
+        },
       });
 
       return json(

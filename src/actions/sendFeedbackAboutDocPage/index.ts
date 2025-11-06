@@ -1,10 +1,11 @@
-import { buildClient } from '@datocms/cma-client';
 import { ActionError, defineAction } from 'astro:actions';
-import { DATOCMS_API_TOKEN } from 'astro:env/server';
 import { z } from 'astro:schema';
-import type { DocFeedback } from '~/lib/cma-schema';
+import buildBasecampClient from '~/lib/basecamp';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
+
+const SUPPORT_TEAM = 33592869;
+const TRIAGE_COLUMN = 9255769099;
 
 export default defineAction({
   accept: 'form',
@@ -27,14 +28,28 @@ export default defineAction({
         });
       }
 
-      const client = buildClient({ apiToken: DATOCMS_API_TOKEN });
+      const basecamp = await buildBasecampClient();
 
-      await client.items.create<DocFeedback>({
-        url,
-        positive_reaction: reaction === 'positive',
-        notes,
-        email,
-        item_type: { id: 'dAVknVWrSCuheQ6Da9v0kQ', type: 'item_type' },
+      await basecamp.cardTableCards.create({
+        params: {
+          bucketId: SUPPORT_TEAM,
+          columnId: TRIAGE_COLUMN,
+        },
+        body: {
+          title:
+            reaction === 'positive'
+              ? '🏆 Positive feedback received'
+              : '🙁 Negative feedback received',
+          content: /* HTML */ `
+            ${notes}
+            <br /><br />
+            <ul>
+              <li><strong>Where:</strong> https://www.datocms.com${url}</li>
+              <li><strong>Email:</strong> ${email || 'N/A'}</li>
+            </ul>
+          `,
+          assignee_ids: [44231845, 44779107], // Support team
+        },
       });
 
       return { success: true };

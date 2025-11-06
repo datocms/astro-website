@@ -70,7 +70,23 @@ export default defineConfig({
         context: 'server',
         access: 'secret',
       }),
-      BASECAMP_ACCESS_TOKEN_PROVIDER_URL: envField.string({
+      BASECAMP_ACCOUNT_ID: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      BASECAMP_CLIENT_ID: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      BASECAMP_CLIENT_SECRET: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      BASECAMP_REFRESH_TOKEN: envField.string({
+        context: 'server',
+        access: 'secret',
+      }),
+      BASECAMP_USER_AGENT: envField.string({
         context: 'server',
         access: 'secret',
       }),
