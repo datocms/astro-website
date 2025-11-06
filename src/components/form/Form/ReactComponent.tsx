@@ -39,7 +39,7 @@ export function FormReactComponent<TFieldValues extends FieldValues = FieldValue
 
   const { clearErrors, setError, handleSubmit, formState } = methods;
 
-  const defaultSubmit: SubmitHandler<TFieldValues> = async (values, event) => {
+  const defaultSubmit: SubmitHandler<TFieldValues> = async (_values, event) => {
     event?.preventDefault();
 
     const token = await execute('form');
