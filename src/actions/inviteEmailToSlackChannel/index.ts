@@ -30,6 +30,7 @@ const errorLabels: Partial<Record<string, string>> = {
 };
 
 export default defineAction({
+  accept: 'form',
   input: z.object({
     email: z
       .string({ invalid_type_error: 'Please, enter your email! 😊' })
