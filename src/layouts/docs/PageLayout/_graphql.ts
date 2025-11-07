@@ -21,6 +21,7 @@ export const PageLayoutFragment = graphql(
     fragment PageLayoutFragment on DocPageRecord {
       id
       title
+      _publishedAt
       _seoMetaTags {
         ...TagFragment
       }

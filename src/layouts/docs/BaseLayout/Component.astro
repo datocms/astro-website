@@ -6,13 +6,15 @@ import { Svg } from '~/components/Svg';
 import { Search } from './Search';
 import { Feedback } from './Feedback';
 import { TargetToggler } from '~/components/TargetToggler';
+import { formatDate } from '~/lib/formatters';
 
 type Props = {
   seo: TitleMetaLinkTag[];
   contentWrapperComponent?: (props: any) => any;
+  lastUpdatedAt?: string;
 };
 
-const { seo, contentWrapperComponent } = Astro.props;
+const { seo, contentWrapperComponent, lastUpdatedAt } = Astro.props;
 const ContentWrapper = contentWrapperComponent || 'div';
 ---
 
@@ -56,6 +58,7 @@ const ContentWrapper = contentWrapperComponent || 'div';
       <ContentWrapper>
         <div class={s.container} transition:animate="slide">
           <slot />
+          {lastUpdatedAt && <p class={s.lastUpdate}>Last updated: {formatDate(lastUpdatedAt)}</p>}
           <div class={s.footer} data-datocms-noindex>
             <div class={s.footerCol}>
               <div class={s.footerTitle}>Did this doc help you?</div>

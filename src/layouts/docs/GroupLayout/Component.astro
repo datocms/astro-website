@@ -21,6 +21,7 @@ type Props = {
   seo: TitleMetaLinkTag[];
   sidebarItemsIfNoPagesOrSectionsInGroup?: (SidebarEntry | SidebarGroup)[];
   additionalSidebarItems?: (SidebarEntry | SidebarGroup)[];
+  lastUpdatedAt?: string;
 };
 
 const {
@@ -29,12 +30,17 @@ const {
   seo,
   sidebarItemsIfNoPagesOrSectionsInGroup = [],
   additionalSidebarItems = [],
+  lastUpdatedAt,
 } = Astro.props;
 
 const group = readFragment(GroupLayoutFragment, maskedGroup);
 ---
 
-<BaseLayout seo={seo} contentWrapperComponent={contentWrapperComponent}>
+<BaseLayout
+  seo={seo}
+  contentWrapperComponent={contentWrapperComponent}
+  lastUpdatedAt={lastUpdatedAt}
+>
   <Fragment slot="sidebar">
     <a href="/docs" class={s.backHome}>
       <Svg name="icons/regular/chevron-double-left" /> Home
