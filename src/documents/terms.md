@@ -1,7 +1,7 @@
 Please read these Terms of Service, our Privacy Policy and our Documentation
 (collectively, the "Agreement") carefully before using DatoCMS software platform
-(hereinafter “DatoCMS”, “Service”) provided by DATO SRL, Via Giuseppe Garibaldi 15, Firenze,
-Italy (hereinafter indicated as "DATO SRL or "We" or "Us").
+(hereinafter “DatoCMS”, “Service”) provided by DATO SRL, Via U. Visconti di Modrone 2,
+20122, Milano, Italy (hereinafter indicated as "DATO SRL or "We" or "Us").
 By using or accessing the Service, you ("Customer" or "you") agree to become bound
 by all the terms and conditions of this Agreement. If you do not agree to all the
 terms and conditions of this Agreement, or if you do not have the legal capacity
@@ -553,4 +553,4 @@ upon receipt, when delivered in person by nationally recognized overnight courie
 class, registered or certified mail, postage prepaid, to DATO SRL SRL, Via Giuseppe Garibaldi 15, 50123
 Firenze, Italy
 
-Version ID: 0.1.3, February 24, 2023
+Version ID: 0.1.4, November 12, 2025
