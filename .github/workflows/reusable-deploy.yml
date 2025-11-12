@@ -1,10 +1,6 @@
 on:
   workflow_call:
     secrets:
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
       DATOCMS_API_TOKEN:
         required: true
     inputs:
@@ -25,8 +21,6 @@ on:
         default: false
 
 env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   DATOCMS_API_TOKEN: ${{ secrets.DATOCMS_API_TOKEN }}
 
 jobs:
@@ -35,6 +29,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404-arm
 
     permissions:
+      id-token: write # This is required for requesting the JWT from AWS using OIDC
       contents: read
       packages: write
 
@@ -71,6 +66,12 @@ jobs:
           cache: 'npm'
       - name: Install npm dependencies
         run: npm ci
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::734741016184:role/github-actions-deploy
+          aws-region: eu-west-1
 
       - name: Deploy
         shell: bash
