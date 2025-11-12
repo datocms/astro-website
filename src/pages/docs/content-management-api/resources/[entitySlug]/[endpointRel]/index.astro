@@ -35,6 +35,12 @@ import {
   seoPageTitle,
   seoShareTitle,
 } from '~/lib/datocms/seo';
+import DocCalloutBase from '~/components/docs/blocks/DocCallout/Base.astro';
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { defaultLinkToRecordComponents } from '../../../../../../components/linkToRecords';
+import { defaultInlineRecordComponents } from '../../../../../../components/inlineRecords';
+import Base from '../../../../../../components/docs/blocks/DocCallout/Base.astro';
+import { Text } from '../../../../../../components/structuredText/Text';
 
 const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
 const entity = await findEntity(Astro, Astro.params.entitySlug!);
@@ -124,6 +130,22 @@ const propsForExamples = { entity, endpoint, jsClient };
   >
     <Fragment slot="kicker">Content Management API > {entity.title}</Fragment>
     <Fragment slot="title">{endpoint.title}</Fragment>
+
+    {
+      !!endpoint.private && (
+        <DocCalloutBase calloutType="warning" title="Warning: Unsupported API endpoint">
+          <p>
+            This API method or resource is for DatoCMS internal use. It is undocumented and
+            unsupported, and its use is discouraged. It is subject to change at any time, without
+            notice, and may cause your scripts to break unexpectedly.
+          </p>
+          <p>
+            We recommend reaching out to support@datocms.com instead to see if there's another way
+            to accomplish what you need.
+          </p>
+        </DocCalloutBase>
+      )
+    }
 
     <Prose>
       {
