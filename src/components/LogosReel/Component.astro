@@ -1,0 +1,38 @@
+---
+import { Wrapper } from '~/components/Wrapper';
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+import { Carousel } from '../Carousel';
+
+type Card = {
+  logo: string;
+  description: string;
+  href: string;
+};
+
+type Props = {
+  title?: string;
+  cards: Card[];
+};
+
+const { title, cards } = Astro.props;
+---
+
+<Wrapper>
+  <div class={s.root} data-datocms-noindex>
+    {title && <div class={s.title}>{title}</div>}
+
+    <Carousel autoScroll loop stopOnMouseEnter stopOnInteraction removeButtons>
+      {
+        cards.map((c) => (
+          <a class={s.card} href={c.href}>
+            <div class={s.cardLogo}>
+              <Svg name={c.logo} />
+            </div>
+            <p class={s.cardDesc}>{c.description}</p>
+          </a>
+        ))
+      }
+    </Carousel>
+  </div>
+</Wrapper>
