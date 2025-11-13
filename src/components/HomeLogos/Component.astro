@@ -2,10 +2,10 @@
 import { Wrapper } from '~/components/Wrapper';
 import { Svg } from '~/components/Svg';
 import s from './style.module.css';
+import { Carousel } from '../Carousel';
 
 type Card = {
   logo: string;
-  name: string;
   description: string;
   href: string;
 };
@@ -13,44 +13,26 @@ type Card = {
 type Props = {
   title?: string;
   cards: Card[];
-  plainLogos?: string[];
 };
 
-const { title, cards = [], plainLogos = [] } = Astro.props;
-
-const cardItems = cards.slice(0, 6);
-const logoRow = plainLogos.slice(0, 6);
+const { title, cards } = Astro.props;
 ---
 
 <Wrapper>
   <div class={s.root} data-datocms-noindex>
     {title && <div class={s.title}>{title}</div>}
 
-    <div class={s.cardsGrid}>
+    <Carousel autoScroll loop stopOnMouseEnter stopOnInteraction removeButtons>
       {
-        cardItems.map((c) => (
-          <article class={s.card}>
+        cards.map((c) => (
+          <a class={s.card} href={c.href}>
             <div class={s.cardLogo}>
               <Svg name={c.logo} />
             </div>
-            <h4 class={s.cardTitle}>{c.name}</h4>
             <p class={s.cardDesc}>{c.description}</p>
-            <a class={s.cardLink} href={c.href}>
-              See Details
-            </a>
-          </article>
+          </a>
         ))
       }
-    </div>
-
-    <div class={s.justLogosRow} aria-hidden="true">
-      {
-        logoRow.map((name) => (
-          <div class={s.logoItem}>
-            <Svg name={name} />
-          </div>
-        ))
-      }
-    </div>
+    </Carousel>
   </div>
 </Wrapper>
