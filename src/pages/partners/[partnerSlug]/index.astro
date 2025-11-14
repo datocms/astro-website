@@ -14,7 +14,7 @@ import { Wrapper } from '~/components/Wrapper';
 import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query, extraQuery } from './_graphql';
+import { query, extraQuery, chatQuery } from './_graphql';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 import { PluginCard } from '~/pages/marketplace/_sub/PluginCard';
@@ -30,6 +30,7 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { sortBy } from 'lodash-es';
+import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 
 const variables = { partnerSlug: Astro.params.partnerSlug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -43,6 +44,10 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
   variables: { authorId: page.npmUser?.id || '' },
 });
 
+const { chats } = await executeQuery(Astro, chatQuery, {
+  variables: { partnerId: page.id },
+});
+
 const featuredProjectIds = page.featuredProjects.map((p) => p.id);
 
 const sortedProjects = sortBy(page.projects, (project) =>
@@ -50,6 +55,8 @@ const sortedProjects = sortBy(page.projects, (project) =>
     ? featuredProjectIds.indexOf(project.id)
     : Number.MAX_SAFE_INTEGER,
 );
+
+const relatedChats = chats ?? [];
 ---
 
 <Layout
@@ -139,6 +146,37 @@ const sortedProjects = sortBy(page.projects, (project) =>
       </aside>
     </div>
   </Wrapper>
+
+  {
+    relatedChats.length > 0 && (
+      <Wrapper>
+        <Space top={2}>
+          <div>
+            <h3 class={s.blockTitle}>Behind the Scenes</h3>
+            <p>Join us to get familiar with our partners</p>
+
+            <div class={s.projectsGrid}>
+              {relatedChats.map((chat) => (
+                <Card
+                  title={chat.title}
+                  size="small"
+                  lineClamp={3}
+                  href={buildUrlForCustomerStory(chat)}
+                >
+                  <Fragment slot="image">
+                    {chat.coverImage?.responsiveImage && (
+                      <ResponsiveImage data={chat.coverImage.responsiveImage} />
+                    )}
+                  </Fragment>
+                  {chat.excerpt ? structuredTextToPlainText(chat.excerpt) : ''}
+                </Card>
+              ))}
+            </div>
+          </div>
+        </Space>
+      </Wrapper>
+    )
+  }
 
   <Wrapper>
     {
