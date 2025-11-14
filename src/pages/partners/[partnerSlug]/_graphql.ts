@@ -9,6 +9,7 @@ import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
+import { CustomerStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -116,7 +117,7 @@ export const query = graphql(
             }
           }
           mainImage {
-            responsiveImage(imgixParams: { auto: format, w: 750, h: 500, fit: crop, crop: top }) {
+            responsiveImage(imgixParams: { auto: format, w: 800, h: 450, fill: blur }) {
               ...ResponsiveImageFragment
             }
           }
@@ -145,6 +146,31 @@ export const extraQuery = graphql(
     }
   `,
   [ResponsiveImageFragment, PluginCardFragment],
+);
+
+export const chatQuery = graphql(
+  /* GraphQL */ `
+    query PartnerChatsQuery($partnerId: ItemId!) {
+      chats: allCustomerStories(
+        filter: { partner: { eq: $partnerId } }
+        orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
+        first: 100
+      ) {
+        ...CustomerStoryUrlFragment
+        id
+        title
+        excerpt {
+          value
+        }
+        coverImage {
+          responsiveImage(imgixParams: { auto: format, w: 750, h: 500, fit: crop, crop: top }) {
+            ...ResponsiveImageFragment
+          }
+        }
+      }
+    }
+  `,
+  [ResponsiveImageFragment, CustomerStoryUrlFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
