@@ -117,7 +117,7 @@ export const query = graphql(
             }
           }
           mainImage {
-            responsiveImage(imgixParams: { auto: format, w: 800, h: 450, fill: blur }) {
+            responsiveImage(imgixParams: { auto: format, w: 750, h: 500, fit: crop, crop: top }) {
               ...ResponsiveImageFragment
             }
           }
