@@ -119,18 +119,6 @@ export const query = graphql(
             }
           }
         }
-        siblings {
-          title
-          excerpt {
-            value
-          }
-          ...CustomerStoryUrlFragment
-          coverImage {
-            responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-              ...ResponsiveImageFragment
-            }
-          }
-        }
       }
     }
   `,

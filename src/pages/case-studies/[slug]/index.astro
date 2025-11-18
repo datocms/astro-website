@@ -27,6 +27,7 @@ import { Card } from '~/components/Card';
 import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
+import { isDefined } from '~/lib/isDefined';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -36,22 +37,11 @@ if (!page) {
   return notFoundResponse();
 }
 
-const position = page.position;
-
-if (position === null) {
-  return { previous: null, next: null, first: null, last: null };
-}
-
 const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery, {
-  variables: { position },
+  variables: { position: page.position! },
 });
 
-const prevItem = previous ?? last;
-const nextItem = next ?? first;
-
-const siblings = page.siblings;
-const siblingsWithFallback =
-  siblings.length > 0 ? siblings : [prevItem, nextItem].filter((item) => item !== null);
+const siblings = [previous ?? last, next ?? first].filter(isDefined);
 ---
 
 <Layout seo={page.seo}>
@@ -187,30 +177,28 @@ const siblingsWithFallback =
     </div>
   </Wrapper>
 
-  {
-    siblingsWithFallback && (
-      <SameLevelNavigation
-        title="Not all stories are alike"
-        subtitle="Explore more case studies to see how different teams work with DatoCMS at scale"
-      >
-        {siblingsWithFallback.map((item) => (
-          <Card
-            href={buildUrlForSuccessStory(item)}
-            title={item.name}
-            orientation={siblingsWithFallback.length === 3 ? 'vertical' : 'horizontal'}
-            size={siblingsWithFallback.length === 1 ? 'medium' : 'small'}
-            fullTitleLength={true}
-            lineClamp={2}
-          >
-            <Fragment slot="image">
-              <ResponsiveImage data={item.coverImage.responsiveImage} />
-            </Fragment>
-            {structuredTextToPlainText(item.subtitle)}
-          </Card>
-        ))}
-      </SameLevelNavigation>
-    )
-  }
+  <SameLevelNavigation
+    title="Not all stories are alike"
+    subtitle="Explore more case studies to see how different teams work with DatoCMS at scale"
+  >
+    {
+      siblings.map((item) => (
+        <Card
+          href={buildUrlForSuccessStory(item)}
+          title={item.name}
+          orientation={siblings.length === 3 ? 'vertical' : 'horizontal'}
+          size={siblings.length === 1 ? 'medium' : 'small'}
+          fullTitleLength={true}
+          lineClamp={2}
+        >
+          <Fragment slot="image">
+            <ResponsiveImage data={item.coverImage.responsiveImage} />
+          </Fragment>
+          {structuredTextToPlainText(item.subtitle)}
+        </Card>
+      ))
+    }
+  </SameLevelNavigation>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

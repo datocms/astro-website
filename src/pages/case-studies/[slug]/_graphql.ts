@@ -4,19 +4,19 @@ import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql
 import { VideoFragment } from '~/components/blocks/Video/graphql';
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
-import { TagFragment } from '~/lib/datocms/commonFragments';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import { FeatureUrlFragment } from '~/lib/datocms/gqlUrlBuilder/feature';
+import { PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
 import {
   buildUrlForSuccessStory,
   SuccessStoryUrlFragment,
 } from '~/lib/datocms/gqlUrlBuilder/successStory';
+import { UseCasePageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
-import { UseCasePageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
-import { FeatureUrlFragment } from '~/lib/datocms/gqlUrlBuilder/feature';
-import { PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -160,18 +160,6 @@ export const query = graphql(
             ...TemplateDemoInlineFragment
             ...UseCasePageInlineFragment
             ...UserGuidesEpisodeInlineFragment
-          }
-        }
-        siblings {
-          name
-          ...SuccessStoryUrlFragment
-          subtitle {
-            value
-          }
-          coverImage {
-            responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-              ...ResponsiveImageFragment
-            }
           }
         }
       }

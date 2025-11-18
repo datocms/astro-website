@@ -106,8 +106,16 @@ export type FeatureHighlightCard = ItemTypeDefinition<
     };
   }
 >;
-export type CloneButtonForm = ItemTypeDefinition<EnvironmentSettings, '810884', {}>;
-export type DeployButtonForm = ItemTypeDefinition<EnvironmentSettings, '810885', {}>;
+export type CloneButtonForm = ItemTypeDefinition<
+  EnvironmentSettings,
+  '810884',
+  {}
+>;
+export type DeployButtonForm = ItemTypeDefinition<
+  EnvironmentSettings,
+  '810885',
+  {}
+>;
 export type CodeExcerptBlock = ItemTypeDefinition<
   EnvironmentSettings,
   '810886',
@@ -311,7 +319,11 @@ export type LandingProgressiveImagesBlock = ItemTypeDefinition<
     };
   }
 >;
-export type GraphqlDemoBlock = ItemTypeDefinition<EnvironmentSettings, '810957', {}>;
+export type GraphqlDemoBlock = ItemTypeDefinition<
+  EnvironmentSettings,
+  '810957',
+  {}
+>;
 export type LandingCdnMapBlock = ItemTypeDefinition<
   EnvironmentSettings,
   '810958',
@@ -947,24 +959,6 @@ export type VideoTutorial = ItemTypeDefinition<
     };
     show_in_docs_homepage: {
       type: 'boolean';
-    };
-  }
->;
-export type DocFeedback = ItemTypeDefinition<
-  EnvironmentSettings,
-  'dAVknVWrSCuheQ6Da9v0kQ',
-  {
-    url: {
-      type: 'string';
-    };
-    positive_reaction: {
-      type: 'boolean';
-    };
-    notes: {
-      type: 'text';
-    };
-    email: {
-      type: 'string';
     };
   }
 >;
@@ -1654,11 +1648,17 @@ export type SuccessStory = ItemTypeDefinition<
   EnvironmentSettings,
   '810887',
   {
-    siblings: {
-      type: 'links';
+    duotone_color1: {
+      type: 'color';
+    };
+    main_results_image: {
+      type: 'file';
     };
     project_url: {
       type: 'string';
+    };
+    challenge: {
+      type: 'structured_text';
     };
     content: {
       type: 'structured_text';
@@ -1692,18 +1692,6 @@ export type SuccessStory = ItemTypeDefinition<
     cover_image: {
       type: 'file';
     };
-    duotone_color1: {
-      type: 'color';
-    };
-    main_results_image: {
-      type: 'file';
-    };
-    challenge: {
-      type: 'structured_text';
-    };
-    name: {
-      type: 'string';
-    };
     slug: {
       type: 'slug';
     };
@@ -1723,21 +1711,24 @@ export type SuccessStory = ItemTypeDefinition<
     title: {
       type: 'structured_text';
     };
-    logo: {
-      type: 'file';
+    name: {
+      type: 'string';
+    };
+    accent_color: {
+      type: 'color';
     };
     numbers: {
       type: 'rich_text';
       blocks: SuccessStoryNumber;
-    };
-    accent_color: {
-      type: 'color';
     };
     subtitle: {
       type: 'structured_text';
     };
     key_features: {
       type: 'links';
+    };
+    logo: {
+      type: 'file';
     };
     industry: {
       type: 'links';
@@ -2068,9 +2059,6 @@ export type CustomerStory = ItemTypeDefinition<
     cover_image: {
       type: 'file';
     };
-    siblings: {
-      type: 'links';
-    };
     seo_settings: {
       type: 'seo';
     };
@@ -2082,6 +2070,9 @@ export type CustomerStory = ItemTypeDefinition<
     };
     slug: {
       type: 'slug';
+    };
+    agency: {
+      type: 'link';
     };
     canonical_url: {
       type: 'string';
@@ -3134,7 +3125,6 @@ export type AnyModel =
   | IntegrationType
   | DocGroup
   | VideoTutorial
-  | DocFeedback
   | ChangelogCategory
   | Website
   | Tutorial
