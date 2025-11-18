@@ -46,6 +46,11 @@ enum AcademyChapterModelFieldsReferencingAcademyCourseModel {
 }
 
 """Linking fields"""
+enum AcademyChapterModelFieldsReferencingCustomerStoryModel {
+  academyChapter_content
+}
+
+"""Linking fields"""
 enum AcademyChapterModelFieldsReferencingDocPageModel {
   academyChapter_content
 }
@@ -1642,6 +1647,14 @@ enum BlogPostModelFieldsReferencingAuthorModel {
 }
 
 """Linking fields"""
+enum BlogPostModelFieldsReferencingCustomerStoryModel {
+  blogPost_content
+  blogPost_content__questionAnswer_answer
+  blogPost_content__questionAnswer_question
+  blogPost_excerpt
+}
+
+"""Linking fields"""
 enum BlogPostModelFieldsReferencingDocPageModel {
   blogPost_content
   blogPost_content__questionAnswer_answer
@@ -1904,6 +1917,11 @@ enum ChangelogEntryModelFieldsReferencingAcademyChapterModel {
 
 """Linking fields"""
 enum ChangelogEntryModelFieldsReferencingAcademyCourseModel {
+  changelogEntry_content
+}
+
+"""Linking fields"""
+enum ChangelogEntryModelFieldsReferencingCustomerStoryModel {
   changelogEntry_content
 }
 
@@ -2666,6 +2684,13 @@ enum CustomerStoryModelFieldsReferencingAcademyCourseModel {
 }
 
 """Linking fields"""
+enum CustomerStoryModelFieldsReferencingCustomerStoryModel {
+  customerStory_content
+  customerStory_content__questionAnswer_answer
+  customerStory_content__questionAnswer_question
+}
+
+"""Linking fields"""
 enum CustomerStoryModelFieldsReferencingDocPageModel {
   customerStory_content
   customerStory_content__questionAnswer_answer
@@ -2765,6 +2790,576 @@ enum CustomerStoryModelOrderBy {
 
 """Record of type 💁 Customer Story (customer_story)"""
 type CustomerStoryRecord implements RecordInterface {
+  _allReferencingAcademyChapters(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenAcademyChapterAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: AcademyChapterModelFilter
+    orderBy: [AcademyChapterModelOrderBy] = [_updatedAt_DESC]
+  ): [AcademyChapterRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingAcademyChaptersMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenAcademyChapterAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: AcademyChapterModelFilter
+  ): CollectionMetadata!
+  _allReferencingBlogPosts(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenBlogPostAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: BlogPostModelFilter
+    orderBy: [BlogPostModelOrderBy] = [_updatedAt_DESC]
+  ): [BlogPostRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingBlogPostsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenBlogPostAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: BlogPostModelFilter
+  ): CollectionMetadata!
+  _allReferencingChangelogEntries(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenChangelogEntryAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: ChangelogEntryModelFilter
+    orderBy: [ChangelogEntryModelOrderBy] = [_updatedAt_DESC]
+  ): [ChangelogEntryRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingChangelogEntriesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenChangelogEntryAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: ChangelogEntryModelFilter
+  ): CollectionMetadata!
+  _allReferencingCustomerStories(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenCustomerStoryAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: CustomerStoryModelFilter
+    orderBy: [CustomerStoryModelOrderBy] = [_updatedAt_DESC]
+  ): [CustomerStoryRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingCustomerStoriesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenCustomerStoryAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: CustomerStoryModelFilter
+  ): CollectionMetadata!
+  _allReferencingDocPages(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenDocPageAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: DocPageModelFilter
+    orderBy: [DocPageModelOrderBy] = [_updatedAt_DESC]
+  ): [DocPageRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingDocPagesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenDocPageAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: DocPageModelFilter
+  ): CollectionMetadata!
+  _allReferencingEnterpriseApps(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenEnterpriseAppAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: EnterpriseAppModelFilter
+    orderBy: [EnterpriseAppModelOrderBy] = [position_ASC]
+  ): [EnterpriseAppRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingEnterpriseAppsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenEnterpriseAppAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: EnterpriseAppModelFilter
+  ): CollectionMetadata!
+  _allReferencingFaqs(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenFaqAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: FaqModelFilter
+    orderBy: [FaqModelOrderBy] = [position_ASC]
+  ): [FaqRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingFaqsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenFaqAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: FaqModelFilter
+  ): CollectionMetadata!
+  _allReferencingHostingApps(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenHostingAppAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: HostingAppModelFilter
+    orderBy: [HostingAppModelOrderBy] = [position_ASC]
+  ): [HostingAppRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingHostingAppsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenHostingAppAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: HostingAppModelFilter
+  ): CollectionMetadata!
+  _allReferencingLandingPages(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenLandingPageAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: LandingPageModelFilter
+    orderBy: [LandingPageModelOrderBy] = [_updatedAt_DESC]
+  ): [LandingPageRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingLandingPagesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenLandingPageAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: LandingPageModelFilter
+  ): CollectionMetadata!
+  _allReferencingNavigationBars(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenNavigationBarAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: NavigationBarModelFilter
+    orderBy: [NavigationBarModelOrderBy] = [_updatedAt_DESC]
+  ): [NavigationBarRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingNavigationBarsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenNavigationBarAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: NavigationBarModelFilter
+  ): CollectionMetadata!
+  _allReferencingPartners(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenPartnerAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: PartnerModelFilter
+    orderBy: [PartnerModelOrderBy] = [_updatedAt_DESC]
+  ): [PartnerRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingPartnersMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenPartnerAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: PartnerModelFilter
+  ): CollectionMetadata!
+  _allReferencingProductComparisons(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenProductComparisonAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: ProductComparisonModelFilter
+    orderBy: [ProductComparisonModelOrderBy] = [_updatedAt_DESC]
+  ): [ProductComparisonRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingProductComparisonsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenProductComparisonAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: ProductComparisonModelFilter
+  ): CollectionMetadata!
+  _allReferencingRecipes(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: RecipeModelFilter
+    orderBy: [RecipeModelOrderBy] = [position_ASC]
+  ): [RecipeRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingRecipesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenRecipeAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: RecipeModelFilter
+  ): CollectionMetadata!
+  _allReferencingShowcaseProjects(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenShowcaseProjectAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: ShowcaseProjectModelFilter
+    orderBy: [ShowcaseProjectModelOrderBy] = [_updatedAt_DESC]
+  ): [ShowcaseProjectRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingShowcaseProjectsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenShowcaseProjectAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: ShowcaseProjectModelFilter
+  ): CollectionMetadata!
+  _allReferencingSuccessStories(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenSuccessStoryAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: SuccessStoryModelFilter
+    orderBy: [SuccessStoryModelOrderBy] = [position_ASC]
+  ): [SuccessStoryRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingSuccessStoriesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenSuccessStoryAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: SuccessStoryModelFilter
+  ): CollectionMetadata!
+  _allReferencingSupportTopics(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenSupportTopicAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: SupportTopicModelFilter
+    orderBy: [SupportTopicModelOrderBy] = [position_ASC]
+  ): [SupportTopicRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingSupportTopicsMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenSupportTopicAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: SupportTopicModelFilter
+  ): CollectionMetadata!
+  _allReferencingTechPartners(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenTechPartnerAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: TechPartnerModelFilter
+    orderBy: [TechPartnerModelOrderBy] = [_updatedAt_DESC]
+  ): [TechPartnerRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingTechPartnersMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenTechPartnerAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: TechPartnerModelFilter
+  ): CollectionMetadata!
+  _allReferencingUseCasePages(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenUseCasePageAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: UseCasePageModelFilter
+    orderBy: [UseCasePageModelOrderBy] = [_updatedAt_DESC]
+  ): [UseCasePageRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingUseCasePagesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenUseCasePageAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: UseCasePageModelFilter
+  ): CollectionMetadata!
+  _allReferencingUserGuidesEpisodes(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenUserGuidesEpisodeAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: UserGuidesEpisodeModelFilter
+    orderBy: [UserGuidesEpisodeModelOrderBy] = [_updatedAt_DESC]
+  ): [UserGuidesEpisodeRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingUserGuidesEpisodesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenUserGuidesEpisodeAndCustomerStory
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: UserGuidesEpisodeModelFilter
+  ): CollectionMetadata!
   _createdAt: DateTime!
 
   """Editing URL"""
@@ -3234,6 +3829,12 @@ enum DocPageModelFieldsReferencingAcademyChapterModel {
 
 """Linking fields"""
 enum DocPageModelFieldsReferencingAcademyCourseModel {
+  docPage_content
+  docPage_content__docCallout_text
+}
+
+"""Linking fields"""
+enum DocPageModelFieldsReferencingCustomerStoryModel {
   docPage_content
   docPage_content__docCallout_text
 }
@@ -3993,6 +4594,11 @@ enum EnterpriseAppModelFieldsReferencingAcademyCourseModel {
 }
 
 """Linking fields"""
+enum EnterpriseAppModelFieldsReferencingCustomerStoryModel {
+  enterpriseApp_content
+}
+
+"""Linking fields"""
 enum EnterpriseAppModelFieldsReferencingDocPageModel {
   enterpriseApp_content
 }
@@ -4197,6 +4803,11 @@ enum FaqModelFieldsReferencingAcademyChapterModel {
 
 """Linking fields"""
 enum FaqModelFieldsReferencingAcademyCourseModel {
+  faq_answer
+}
+
+"""Linking fields"""
+enum FaqModelFieldsReferencingCustomerStoryModel {
   faq_answer
 }
 
@@ -5174,6 +5785,11 @@ enum HostingAppModelFieldsReferencingAcademyChapterModel {
 
 """Linking fields"""
 enum HostingAppModelFieldsReferencingAcademyCourseModel {
+  hostingApp_content
+}
+
+"""Linking fields"""
+enum HostingAppModelFieldsReferencingCustomerStoryModel {
   hostingApp_content
 }
 
@@ -8331,6 +8947,19 @@ input InverseRelationshipFieldFilterBetweenAcademyChapterAndAcademyCourse {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenAcademyChapterAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [AcademyChapterModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [AcademyChapterModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenAcademyChapterAndDocPage {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -8448,6 +9077,19 @@ input InverseRelationshipFieldFilterBetweenBlogPostAndAuthor {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenBlogPostAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [BlogPostModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [BlogPostModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenBlogPostAndDocPage {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -8536,6 +9178,19 @@ input InverseRelationshipFieldFilterBetweenChangelogEntryAndAcademyCourse {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [ChangelogEntryModelFieldsReferencingAcademyCourseModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenChangelogEntryAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [ChangelogEntryModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [ChangelogEntryModelFieldsReferencingCustomerStoryModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -8643,6 +9298,19 @@ input InverseRelationshipFieldFilterBetweenCustomerStoryAndAcademyCourse {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenCustomerStoryAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [CustomerStoryModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [CustomerStoryModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenCustomerStoryAndDocPage {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -8747,6 +9415,19 @@ input InverseRelationshipFieldFilterBetweenDocPageAndAcademyCourse {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenDocPageAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [DocPageModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [DocPageModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenDocPageAndDocPage {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -8838,6 +9519,19 @@ input InverseRelationshipFieldFilterBetweenEnterpriseAppAndAcademyCourse {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenEnterpriseAppAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [EnterpriseAppModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [EnterpriseAppModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenEnterpriseAppAndDocPage {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -8926,6 +9620,19 @@ input InverseRelationshipFieldFilterBetweenFaqAndAcademyCourse {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [FaqModelFieldsReferencingAcademyCourseModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenFaqAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [FaqModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [FaqModelFieldsReferencingCustomerStoryModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -9059,6 +9766,19 @@ input InverseRelationshipFieldFilterBetweenHostingAppAndAcademyCourse {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenHostingAppAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [HostingAppModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [HostingAppModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenHostingAppAndDocPage {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -9163,6 +9883,19 @@ input InverseRelationshipFieldFilterBetweenLandingPageAndAcademyCourse {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenLandingPageAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [LandingPageModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [LandingPageModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenLandingPageAndDocPage {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -9241,6 +9974,19 @@ input InverseRelationshipFieldFilterBetweenLandingPageAndUserGuidesEpisode {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenNavigationBarAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [NavigationBarModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [NavigationBarModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenNavigationBarAndShowcaseProject {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -9277,6 +10023,19 @@ input InverseRelationshipFieldFilterBetweenPartnerAndAcademyCourse {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [PartnerModelFieldsReferencingAcademyCourseModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenPartnerAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [PartnerModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [PartnerModelFieldsReferencingCustomerStoryModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -9436,6 +10195,19 @@ input InverseRelationshipFieldFilterBetweenProductComparisonAndAcademyCourse {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenProductComparisonAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [ProductComparisonModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [ProductComparisonModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenProductComparisonAndDocPage {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -9540,6 +10312,19 @@ input InverseRelationshipFieldFilterBetweenRecipeAndAcademyCourse {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenRecipeAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [RecipeModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [RecipeModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenRecipeAndDocPage {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -9628,6 +10413,19 @@ input InverseRelationshipFieldFilterBetweenShowcaseProjectAndAcademyCourse {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [ShowcaseProjectModelFieldsReferencingAcademyCourseModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenShowcaseProjectAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [ShowcaseProjectModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [ShowcaseProjectModelFieldsReferencingCustomerStoryModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -9735,6 +10533,19 @@ input InverseRelationshipFieldFilterBetweenSuccessStoryAndAcademyCourse {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenSuccessStoryAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [SuccessStoryModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [SuccessStoryModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenSuccessStoryAndDocPage {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -9823,6 +10634,19 @@ input InverseRelationshipFieldFilterBetweenSupportTopicAndAcademyCourse {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [SupportTopicModelFieldsReferencingAcademyCourseModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenSupportTopicAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [SupportTopicModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [SupportTopicModelFieldsReferencingCustomerStoryModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -9917,6 +10741,19 @@ input InverseRelationshipFieldFilterBetweenTechPartnerAndAcademyCourse {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenTechPartnerAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [TechPartnerModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [TechPartnerModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenTechPartnerAndDocPage {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -10008,6 +10845,19 @@ input InverseRelationshipFieldFilterBetweenTemplateDemoAndIntegration {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenUseCasePageAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [UseCasePageModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [UseCasePageModelFieldsReferencingCustomerStoryModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenUseCasePageAndShowcaseProject {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -10057,6 +10907,19 @@ input InverseRelationshipFieldFilterBetweenUserGuidesEpisodeAndAcademyCourse {
   Filter linking records that do not reference current record in any of the specified fields
   """
   notIn: [UserGuidesEpisodeModelFieldsReferencingAcademyCourseModel!]
+}
+
+"""Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenUserGuidesEpisodeAndCustomerStory {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [UserGuidesEpisodeModelFieldsReferencingCustomerStoryModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [UserGuidesEpisodeModelFieldsReferencingCustomerStoryModel!]
 }
 
 """Specifies how to filter by linking fields"""
@@ -10169,6 +11032,15 @@ input InverseRelationshipFilterBetweenAcademyChapterAndAcademyCourse {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenAcademyChapterAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenAcademyChapterAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenAcademyChapterAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenAcademyChapterAndDocPage
@@ -10250,6 +11122,15 @@ input InverseRelationshipFilterBetweenBlogPostAndAuthor {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenBlogPostAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenBlogPostAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenBlogPostAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenBlogPostAndDocPage
@@ -10307,6 +11188,15 @@ input InverseRelationshipFilterBetweenChangelogEntryAndAcademyChapter {
 input InverseRelationshipFilterBetweenChangelogEntryAndAcademyCourse {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenChangelogEntryAndAcademyCourse
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenChangelogEntryAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenChangelogEntryAndCustomerStory
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -10385,6 +11275,15 @@ input InverseRelationshipFilterBetweenCustomerStoryAndAcademyCourse {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenCustomerStoryAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenCustomerStoryAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenCustomerStoryAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenCustomerStoryAndDocPage
@@ -10457,6 +11356,15 @@ input InverseRelationshipFilterBetweenDocPageAndAcademyCourse {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenDocPageAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenDocPageAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenDocPageAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenDocPageAndDocPage
@@ -10520,6 +11428,15 @@ input InverseRelationshipFilterBetweenEnterpriseAppAndAcademyCourse {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenEnterpriseAppAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenEnterpriseAppAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenEnterpriseAppAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenEnterpriseAppAndDocPage
@@ -10577,6 +11494,15 @@ input InverseRelationshipFilterBetweenFaqAndAcademyChapter {
 input InverseRelationshipFilterBetweenFaqAndAcademyCourse {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenFaqAndAcademyCourse
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenFaqAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenFaqAndCustomerStory
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -10673,6 +11599,15 @@ input InverseRelationshipFilterBetweenHostingAppAndAcademyCourse {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenHostingAppAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenHostingAppAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenHostingAppAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenHostingAppAndDocPage
@@ -10745,6 +11680,15 @@ input InverseRelationshipFilterBetweenLandingPageAndAcademyCourse {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenLandingPageAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenLandingPageAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenLandingPageAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenLandingPageAndDocPage
@@ -10799,6 +11743,15 @@ input InverseRelationshipFilterBetweenLandingPageAndUserGuidesEpisode {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenNavigationBarAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenNavigationBarAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenNavigationBarAndShowcaseProject {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenNavigationBarAndShowcaseProject
@@ -10820,6 +11773,15 @@ input InverseRelationshipFilterBetweenPartnerAndAcademyChapter {
 input InverseRelationshipFilterBetweenPartnerAndAcademyCourse {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenPartnerAndAcademyCourse
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenPartnerAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenPartnerAndCustomerStory
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -10934,6 +11896,15 @@ input InverseRelationshipFilterBetweenProductComparisonAndAcademyCourse {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenProductComparisonAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenProductComparisonAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenProductComparisonAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenProductComparisonAndDocPage
@@ -11006,6 +11977,15 @@ input InverseRelationshipFilterBetweenRecipeAndAcademyCourse {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenRecipeAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenRecipeAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenRecipeAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenRecipeAndDocPage
@@ -11063,6 +12043,15 @@ input InverseRelationshipFilterBetweenShowcaseProjectAndAcademyChapter {
 input InverseRelationshipFilterBetweenShowcaseProjectAndAcademyCourse {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenShowcaseProjectAndAcademyCourse
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenShowcaseProjectAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenShowcaseProjectAndCustomerStory
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -11141,6 +12130,15 @@ input InverseRelationshipFilterBetweenSuccessStoryAndAcademyCourse {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenSuccessStoryAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenSuccessStoryAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenSuccessStoryAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenSuccessStoryAndDocPage
@@ -11198,6 +12196,15 @@ input InverseRelationshipFilterBetweenSupportTopicAndAcademyChapter {
 input InverseRelationshipFilterBetweenSupportTopicAndAcademyCourse {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenSupportTopicAndAcademyCourse
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenSupportTopicAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenSupportTopicAndCustomerStory
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -11267,6 +12274,15 @@ input InverseRelationshipFilterBetweenTechPartnerAndAcademyCourse {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenTechPartnerAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenTechPartnerAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenTechPartnerAndDocPage {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenTechPartnerAndDocPage
@@ -11330,6 +12346,15 @@ input InverseRelationshipFilterBetweenTemplateDemoAndIntegration {
 }
 
 """Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenUseCasePageAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenUseCasePageAndCustomerStory
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
 input InverseRelationshipFilterBetweenUseCasePageAndShowcaseProject {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenUseCasePageAndShowcaseProject
@@ -11360,6 +12385,15 @@ input InverseRelationshipFilterBetweenUserGuidesEpisodeAndAcademyChapter {
 input InverseRelationshipFilterBetweenUserGuidesEpisodeAndAcademyCourse {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenUserGuidesEpisodeAndAcademyCourse
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenUserGuidesEpisodeAndCustomerStory {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenUserGuidesEpisodeAndCustomerStory
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter
@@ -11560,6 +12594,12 @@ enum LandingPageModelFieldsReferencingAcademyChapterModel {
 
 """Linking fields"""
 enum LandingPageModelFieldsReferencingAcademyCourseModel {
+  landingPage_content
+  landingPage_content__tryDemoBlock_content
+}
+
+"""Linking fields"""
+enum LandingPageModelFieldsReferencingCustomerStoryModel {
   landingPage_content
   landingPage_content__tryDemoBlock_content
 }
@@ -12132,6 +13172,11 @@ type NavigationBarGroupCtaRecord implements RecordInterface {
 }
 
 """Linking fields"""
+enum NavigationBarModelFieldsReferencingCustomerStoryModel {
+  navigationBar_customerChats
+}
+
+"""Linking fields"""
 enum NavigationBarModelFieldsReferencingShowcaseProjectModel {
   navigationBar_partnerProjects
 }
@@ -12434,6 +13479,11 @@ enum PartnerModelFieldsReferencingAcademyChapterModel {
 
 """Linking fields"""
 enum PartnerModelFieldsReferencingAcademyCourseModel {
+  partner_description
+}
+
+"""Linking fields"""
+enum PartnerModelFieldsReferencingCustomerStoryModel {
   partner_description
 }
 
@@ -15099,6 +16149,14 @@ enum ProductComparisonModelFieldsReferencingAcademyChapterModel {
 
 """Linking fields"""
 enum ProductComparisonModelFieldsReferencingAcademyCourseModel {
+  productComparison_reasons
+  productComparison_reasons__reasonToConsider_content
+  productComparison_topics
+  productComparison_topics__differencesOnTopic_differences__productDifference_datocmsTake
+}
+
+"""Linking fields"""
+enum ProductComparisonModelFieldsReferencingCustomerStoryModel {
   productComparison_reasons
   productComparison_reasons__reasonToConsider_content
   productComparison_topics
@@ -18078,6 +19136,11 @@ enum RecipeModelFieldsReferencingAcademyCourseModel {
 }
 
 """Linking fields"""
+enum RecipeModelFieldsReferencingCustomerStoryModel {
+  recipe_content
+}
+
+"""Linking fields"""
 enum RecipeModelFieldsReferencingDocPageModel {
   recipe_content
 }
@@ -18532,6 +19595,11 @@ enum ShowcaseProjectModelFieldsReferencingAcademyChapterModel {
 
 """Linking fields"""
 enum ShowcaseProjectModelFieldsReferencingAcademyCourseModel {
+  showcaseProject_inDepthExplanation
+}
+
+"""Linking fields"""
+enum ShowcaseProjectModelFieldsReferencingCustomerStoryModel {
   showcaseProject_inDepthExplanation
 }
 
@@ -19462,6 +20530,11 @@ enum SuccessStoryModelFieldsReferencingAcademyCourseModel {
 }
 
 """Linking fields"""
+enum SuccessStoryModelFieldsReferencingCustomerStoryModel {
+  successStory_content
+}
+
+"""Linking fields"""
 enum SuccessStoryModelFieldsReferencingDocPageModel {
   successStory_content
 }
@@ -19771,6 +20844,11 @@ enum SupportTopicModelFieldsReferencingAcademyChapterModel {
 
 """Linking fields"""
 enum SupportTopicModelFieldsReferencingAcademyCourseModel {
+  supportTopic_description
+}
+
+"""Linking fields"""
+enum SupportTopicModelFieldsReferencingCustomerStoryModel {
   supportTopic_description
 }
 
@@ -20110,6 +21188,11 @@ enum TechPartnerModelFieldsReferencingAcademyChapterModel {
 
 """Linking fields"""
 enum TechPartnerModelFieldsReferencingAcademyCourseModel {
+  techPartner_description
+}
+
+"""Linking fields"""
+enum TechPartnerModelFieldsReferencingCustomerStoryModel {
   techPartner_description
 }
 
@@ -21302,6 +22385,11 @@ type UseCasePageModelDescriptionField {
 }
 
 """Linking fields"""
+enum UseCasePageModelFieldsReferencingCustomerStoryModel {
+  useCasePage_caseStudy
+}
+
+"""Linking fields"""
 enum UseCasePageModelFieldsReferencingShowcaseProjectModel {
   useCasePage_caseStudy
 }
@@ -21627,6 +22715,11 @@ enum UserGuidesEpisodeModelFieldsReferencingAcademyChapterModel {
 
 """Linking fields"""
 enum UserGuidesEpisodeModelFieldsReferencingAcademyCourseModel {
+  userGuidesEpisode_content
+}
+
+"""Linking fields"""
+enum UserGuidesEpisodeModelFieldsReferencingCustomerStoryModel {
   userGuidesEpisode_content
 }
 

@@ -3,13 +3,13 @@ import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
+import { CustomerStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { buildUrlForPartner, PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
-import { CustomerStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -122,6 +122,19 @@ export const query = graphql(
             }
           }
         }
+        chats: _allReferencingCustomerStories(first: 100, orderBy: _firstPublishedAt_DESC) {
+          ...CustomerStoryUrlFragment
+          id
+          title
+          excerpt {
+            value
+          }
+          coverImage {
+            responsiveImage(imgixParams: { auto: format, w: 750, h: 500, fit: crop, crop: top }) {
+              ...ResponsiveImageFragment
+            }
+          }
+        }
       }
     }
   `,
@@ -129,6 +142,8 @@ export const query = graphql(
     TagFragment,
     ResponsiveImageFragment,
     ShowcaseProjectUrlFragment,
+    ResponsiveImageFragment,
+    CustomerStoryUrlFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
@@ -146,31 +161,6 @@ export const extraQuery = graphql(
     }
   `,
   [ResponsiveImageFragment, PluginCardFragment],
-);
-
-export const chatQuery = graphql(
-  /* GraphQL */ `
-    query PartnerChatsQuery($partnerId: ItemId!) {
-      chats: allCustomerStories(
-        filter: { partner: { eq: $partnerId } }
-        orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
-        first: 100
-      ) {
-        ...CustomerStoryUrlFragment
-        id
-        title
-        excerpt {
-          value
-        }
-        coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 750, h: 500, fit: crop, crop: top }) {
-            ...ResponsiveImageFragment
-          }
-        }
-      }
-    }
-  `,
-  [ResponsiveImageFragment, CustomerStoryUrlFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
