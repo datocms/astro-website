@@ -2,7 +2,6 @@ import { range } from 'lodash-es';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
-// import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
@@ -10,10 +9,9 @@ export const perPage = 36;
 
 export const query = graphql(
   /* GraphQL */ `
-    query ProjectsShowcase($limit: IntType!, $offset: IntType!) {
+    query ProjectsShowcase {
       projects: allShowcaseProjects(
-        first: $limit
-        skip: $offset
+        first: 500
         orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
       ) {
         ...ShowcaseProjectUrlFragment
@@ -31,10 +29,13 @@ export const query = graphql(
           logo {
             url
           }
+          areasOfExpertise {
+            name
+          }
         }
-      }
-      _allShowcaseProjectsMeta {
-        count
+        technologies {
+          name
+        }
       }
     }
   `,

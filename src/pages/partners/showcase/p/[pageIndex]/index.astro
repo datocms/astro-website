@@ -13,6 +13,7 @@ import { perPage, query } from './_graphql';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Filter } from '../../../_sub/Filter';
 
 export interface Props {
   pageIndex?: number;
@@ -23,64 +24,219 @@ if (Astro.params.pageIndex === '1') {
   return notFoundResponse();
 }
 
-const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
+const rawPageIndex =
+  Astro.props.pageIndex ||
+  (Astro.params.pageIndex ? Number.parseInt(Astro.params.pageIndex, 10) : 1) ||
+  1;
 
-const variables = {
-  limit: perPage,
-  offset: (pageIndex - 1) * perPage,
-};
-const { projects, _allShowcaseProjectsMeta } = await executeQuery(Astro, query, {
-  variables,
-});
+const partnerFilter = Astro.url.searchParams.get('partner');
+const technologyFilter = Astro.url.searchParams.get('technology');
+const areaOfExpertiseFilter = Astro.url.searchParams.get('areaOfExpertise');
 
-const totalEntries = _allShowcaseProjectsMeta.count;
+const { projects } = await executeQuery(Astro, query);
 
-if (projects.length === 0) {
+if (!projects || projects.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const filteredProjects = projects.filter((project) => {
+  if (partnerFilter && project.partner?.name !== partnerFilter) {
+    return false;
+  }
+
+  if (technologyFilter && !project.technologies?.some((t) => t?.name === technologyFilter)) {
+    return false;
+  }
+
+  if (
+    areaOfExpertiseFilter &&
+    !project.partner?.areasOfExpertise?.some((a) => a?.name === areaOfExpertiseFilter)
+  ) {
+    return false;
+  }
+
+  return true;
+});
+
+function calculateCounters(projects: typeof filteredProjects) {
+  const partners: Record<string, number> = {};
+  const technologies: Record<string, number> = {};
+  const areasOfExpertise: Record<string, number> = {};
+
+  for (const project of projects) {
+    if (project.partner) {
+      const partnerName = project.partner.name;
+      partners[partnerName] = (partners[partnerName] || 0) + 1;
+
+      for (const area of project.partner.areasOfExpertise || []) {
+        if (!area) continue;
+        areasOfExpertise[area.name] = (areasOfExpertise[area.name] || 0) + 1;
+      }
+    }
+
+    for (const tech of project.technologies || []) {
+      if (!tech) continue;
+      technologies[tech.name] = (technologies[tech.name] || 0) + 1;
+    }
+  }
+
+  return {
+    partners,
+    technologies,
+    areasOfExpertise,
+  };
+}
+
+const counters = calculateCounters(filteredProjects);
+
+const sortByCount = (a: [string, number], b: [string, number]) => {
+  if (a[1] !== b[1]) {
+    return b[1] - a[1];
+  }
+  return a[0].localeCompare(b[0]);
+};
+
+const sortAlphabetically = (a: [string, number], b: [string, number]) => a[0].localeCompare(b[0]);
+
+const toOptionWithCount = ([value, count]: [string, number]) => ({
+  value,
+  label: `${value} (${count})`,
+});
+
+const partnerOptions = Object.entries(counters.partners)
+  .sort(sortAlphabetically)
+  .map(toOptionWithCount);
+
+const technologyOptions = Object.entries(counters.technologies)
+  .sort(sortByCount)
+  .map(toOptionWithCount);
+
+const areaOfExpertiseOptions = Object.entries(counters.areasOfExpertise)
+  .sort(sortAlphabetically)
+  .map(toOptionWithCount);
+
+const totalEntries = filteredProjects.length;
+const totalPages = Math.max(1, Math.ceil(totalEntries / perPage));
+const pageIndex = Math.min(Math.max(rawPageIndex, 1), totalPages);
+
+const start = (pageIndex - 1) * perPage;
+const end = start + perPage;
+const pageProjects = filteredProjects.slice(start, end);
 ---
 
 <Layout seo={[]}>
   <Fragment slot="head">
     <title>Partner Projects Showcase</title>
   </Fragment>
+
   <Hero>
     <Fragment slot="kicker">Showcase</Fragment>
     <Fragment slot="title">Projects from Our <mark>Partners</mark></Fragment>
-    <Fragment slot="subtitle"
-      >Check out some of the incredible projects our partners have brought to life.</Fragment
-    >
+    <Fragment slot="subtitle">
+      Check out some of the incredible projects our partners have brought to life.
+    </Fragment>
   </Hero>
-  <Wrapper>
-    <Space bottom={2}>
-      <div class={s.grid}>
-        {
-          projects.map((project) => (
-            <Card
-              title={project.name}
-              size="small"
-              lineClamp={3}
-              svgLogoUrl={project.partner.logo.url}
-              href={buildUrlForShowcaseProject(project)}
-            >
-              <Fragment slot="image">
-                <ResponsiveImage data={project.mainImage.responsiveImage} />
-              </Fragment>
-              {structuredTextToPlainText(project.headline)}
-            </Card>
-          ))
-        }
-      </div>
-    </Space>
 
-    <Pagination
-      perPage={perPage}
-      currentPageIndex={pageIndex}
-      totalEntries={totalEntries}
-      baseUrl="/partners/showcase"
-    />
+  <Wrapper>
+    <load-results-in-page>
+      <form class={s.filterGrid} method="GET">
+        <div>
+          <div class={s.filterLabel}>Filter by Partner</div>
+          <Filter options={partnerOptions} value={partnerFilter} searchParam="partner" />
+        </div>
+
+        <div>
+          <div class={s.filterLabel}>Filter by Technologies Used</div>
+          <Filter options={technologyOptions} value={technologyFilter} searchParam="technology" />
+        </div>
+
+        <div>
+          <div class={s.filterLabel}>Filter by Partner Expertise</div>
+          <Filter
+            options={areaOfExpertiseOptions}
+            value={areaOfExpertiseFilter}
+            searchParam="areaOfExpertise"
+          />
+        </div>
+      </form>
+
+      <Space bottom={2}>
+        <div class={s.grid}>
+          {
+            pageProjects.map((project) => (
+              <Card
+                title={project.name}
+                size="small"
+                lineClamp={3}
+                svgLogoUrl={project.partner.logo.url}
+                href={buildUrlForShowcaseProject(project)}
+              >
+                <Fragment slot="image">
+                  <ResponsiveImage data={project.mainImage.responsiveImage} />
+                </Fragment>
+                {structuredTextToPlainText(project.headline)}
+              </Card>
+            ))
+          }
+
+          {pageProjects.length === 0 && <p>No projects match your current filters.</p>}
+        </div>
+      </Space>
+
+      <Pagination
+        perPage={perPage}
+        currentPageIndex={pageIndex}
+        totalEntries={totalEntries}
+        baseUrl="/partners/showcase"
+      />
+    </load-results-in-page>
   </Wrapper>
 
-  <DraftModeQueryListener query={query} variables={variables} />
+  <DraftModeQueryListener query={query} />
 </Layout>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'load-results-in-page',
+    class LoadResultsInPage extends WebComponent {
+      parsedCallback() {
+        const formEl = this.$<HTMLFormElement>('form');
+
+        this.on(formEl, 'submit', async (event) => {
+          event.preventDefault();
+
+          try {
+            const formData = new FormData(formEl);
+            const queryString = new URLSearchParams(formData as any).toString();
+            const url = `?${queryString}`;
+
+            const response = await fetch(url, {
+              headers: {
+                Accept: 'text/html',
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const html = await response.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            const newComponent = tempDiv.querySelector('load-results-in-page');
+            if (newComponent) {
+              this.replaceWith(newComponent);
+              history.pushState({}, '', url);
+            }
+          } catch (error) {
+            console.error('Error loading results:', error);
+          }
+        });
+      }
+    },
+  );
+</script>
