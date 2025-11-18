@@ -335,5 +335,40 @@ export default defineConfig({
     '/use-cases/headless-ecommerce': '/use-cases/ecommerce',
     '/use-cases/headless-cms-knowledge-management': '/use-cases/knowledge-management',
     '/partners/boldboy': '/partners/peter-coolen',
+    '/marketplace/starters/nuxt-js-blog': '/blog/how-to-build-a-nuxt-blog',
+    '/docs/building-plugins/publishing': '/docs/plugin-sdk/publishing-to-marketplace',
+    '/docs/pro-tips/create-a-select-with-a-single-line-string-field':
+      '/docs/content-management-api/resources/field',
+    '/docs/plugins/publishing': '/docs/plugin-sdk/publishing-to-marketplace',
+    '/docs/building-plugins/creating-a-new-plugin': '/docs/plugin-sdk/build-your-first-plugin',
+    '/docs/next-js/setting-up-next-js-preview-mode':
+      '/docs/legacy-next-js-documentation/setting-up-next-js-preview-mode',
+    '/blog/static-ecommerce-website-snipcart-gatsbyjs-datocms':
+      '/marketplace/starters/ecommerce-website',
+    '/blog/live-preview-changes-on-gatsby-preview': '/docs',
+    '/enterprise': '/enterprise-headless-cms',
+    '/docs/content-management-api/resources/item/batch_unpublish':
+      '/docs/content-management-api/resources/item/bulk_unpublish',
+    '/docs/content-management-api/resources/item/batch_destroy':
+      '/docs/content-management-api/resources/item/bulk_destroy',
+    '/docs/plugins/install': '/docs/general-concepts/plugins',
+    '/docs/content-management-api/resources/item/batch_publish':
+      '/docs/content-management-api/resources/item/bulk_publish',
+    '/plugins/i/datocms-plugin-shopify-product':
+      '/marketplace/plugins/i/datocms-plugin-shopify-product',
+    '/docs/building-plugins/entry-point': '/docs/plugin-sdk/introduction',
+    '/marketplace/plugins/i/CHANGELOG.md': '/marketplace/plugins',
+    '/docs/content-management-api/resources/upload/batch_add_tags':
+      '/docs/content-management-api/resources/upload/bulk_tag',
+    '/docs/content-management-api/resources/sso-token':
+      '/docs/content-management-api/resources/sso-settings',
+    '/plugins/i/datocms-plugin-shopify-product-json':
+      '/marketplace/plugins/i/datocms-plugin-shopify-product-json',
+    '/marketplace/plugins/i/shopify-product-plugin-datocms':
+      '/marketplace/plugins/i/datocms-plugin-shopify-product',
+    '/marketplace/plugins/i/datocms-plugin-datocms-plugin-next-preview-redux':
+      '/marketplace/plugins/i/datocms-plugin-web-previews',
+    '/docs/content-management-api/resources/upload/batch_destroy':
+      '/docs/content-management-api/resources/item/bulk_destroy',
   },
 });
