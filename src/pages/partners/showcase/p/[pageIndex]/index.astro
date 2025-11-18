@@ -88,7 +88,22 @@ function calculateCounters(projectsList: typeof projects) {
   };
 }
 
-const allCounters = calculateCounters(projects);
+const projectsForPartnerCounters = projects.filter((project) => {
+  if (technologyFilter && !project.technologies?.some((t) => t?.name === technologyFilter)) {
+    return false;
+  }
+
+  if (
+    areaOfExpertiseFilter &&
+    !project.partner?.areasOfExpertise?.some((a) => a?.name === areaOfExpertiseFilter)
+  ) {
+    return false;
+  }
+
+  return true;
+});
+
+const partnerCounters = calculateCounters(projectsForPartnerCounters).partners;
 const filteredCounters = calculateCounters(filteredProjects);
 
 const sortByCount = (a: [string, number], b: [string, number]) => {
@@ -105,7 +120,7 @@ const toOptionWithCount = ([value, count]: [string, number]) => ({
   label: `${value} (${count})`,
 });
 
-const partnerOptions = Object.entries(allCounters.partners)
+const partnerOptions = Object.entries(partnerCounters)
   .sort(sortAlphabetically)
   .map(toOptionWithCount);
 
