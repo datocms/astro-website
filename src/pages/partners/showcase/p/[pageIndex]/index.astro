@@ -59,12 +59,12 @@ const filteredProjects = projects.filter((project) => {
   return true;
 });
 
-function calculateCounters(projects: typeof filteredProjects) {
+function calculateCounters(projectsList: typeof projects) {
   const partners: Record<string, number> = {};
   const technologies: Record<string, number> = {};
   const areasOfExpertise: Record<string, number> = {};
 
-  for (const project of projects) {
+  for (const project of projectsList) {
     if (project.partner) {
       const partnerName = project.partner.name;
       partners[partnerName] = (partners[partnerName] || 0) + 1;
@@ -88,7 +88,8 @@ function calculateCounters(projects: typeof filteredProjects) {
   };
 }
 
-const counters = calculateCounters(filteredProjects);
+const allCounters = calculateCounters(projects);
+const filteredCounters = calculateCounters(filteredProjects);
 
 const sortByCount = (a: [string, number], b: [string, number]) => {
   if (a[1] !== b[1]) {
@@ -104,15 +105,15 @@ const toOptionWithCount = ([value, count]: [string, number]) => ({
   label: `${value} (${count})`,
 });
 
-const partnerOptions = Object.entries(counters.partners)
+const partnerOptions = Object.entries(allCounters.partners)
   .sort(sortAlphabetically)
   .map(toOptionWithCount);
 
-const technologyOptions = Object.entries(counters.technologies)
+const technologyOptions = Object.entries(filteredCounters.technologies)
   .sort(sortByCount)
   .map(toOptionWithCount);
 
-const areaOfExpertiseOptions = Object.entries(counters.areasOfExpertise)
+const areaOfExpertiseOptions = Object.entries(filteredCounters.areasOfExpertise)
   .sort(sortAlphabetically)
   .map(toOptionWithCount);
 
