@@ -13,6 +13,10 @@ import { perPage, query } from './_graphql';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { countersForDropdown } from './_facets';
+import { countersToOptions } from '~/pages/partners/_facets';
+import { FetchAndReplaceFormOnSubmit } from '~/components/filtering/FetchAndReplaceFormOnSubmit';
+import { Filter } from '~/components/filtering/Filter';
 
 export interface Props {
   pageIndex?: number;
@@ -23,64 +27,121 @@ if (Astro.params.pageIndex === '1') {
   return notFoundResponse();
 }
 
-const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
+const rawPageIndex =
+  Astro.props.pageIndex ||
+  (Astro.params.pageIndex ? Number.parseInt(Astro.params.pageIndex, 10) : 1) ||
+  1;
 
-const variables = {
-  limit: perPage,
-  offset: (pageIndex - 1) * perPage,
-};
-const { projects, _allShowcaseProjectsMeta } = await executeQuery(Astro, query, {
-  variables,
-});
+const technologyFilter = Astro.url.searchParams.get('technology');
+const areaOfExpertiseFilter = Astro.url.searchParams.get('areaOfExpertise');
 
-const totalEntries = _allShowcaseProjectsMeta.count;
+const { projects } = await executeQuery(Astro, query);
 
-if (projects.length === 0) {
+if (!projects || projects.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+// Faceted search: build dropdown options
+const activeFilters = {
+  technology: technologyFilter,
+  areaOfExpertise: areaOfExpertiseFilter,
+};
+
+const technologyCounters = countersForDropdown(projects, activeFilters, 'technology');
+const areaCounters = countersForDropdown(projects, activeFilters, 'areaOfExpertise');
+
+const technologyOptions = countersToOptions(technologyCounters.technologies);
+const areaOfExpertiseOptions = countersToOptions(areaCounters.areasOfExpertise);
+
+// Filter projects based on active filters
+const filteredProjects = projects.filter((project) => {
+  if (technologyFilter && !project.technologies?.some((t) => t?.name === technologyFilter)) {
+    return false;
+  }
+
+  if (
+    areaOfExpertiseFilter &&
+    !project.partner?.areasOfExpertise?.some((a) => a?.name === areaOfExpertiseFilter)
+  ) {
+    return false;
+  }
+
+  return true;
+});
+
+const totalEntries = filteredProjects.length;
+const totalPages = Math.max(1, Math.ceil(totalEntries / perPage));
+const pageIndex = Math.min(Math.max(rawPageIndex, 1), totalPages);
+
+const start = (pageIndex - 1) * perPage;
+const end = start + perPage;
+const pageProjects = filteredProjects.slice(start, end);
 ---
 
 <Layout seo={[]}>
   <Fragment slot="head">
     <title>Partner Projects Showcase</title>
   </Fragment>
+
   <Hero>
     <Fragment slot="kicker">Showcase</Fragment>
     <Fragment slot="title">Projects from Our <mark>Partners</mark></Fragment>
-    <Fragment slot="subtitle"
-      >Check out some of the incredible projects our partners have brought to life.</Fragment
-    >
+    <Fragment slot="subtitle">
+      Check out some of the projects our incredible agency partners have brought to life with
+      DatoCMS.
+    </Fragment>
   </Hero>
-  <Wrapper>
-    <Space bottom={2}>
-      <div class={s.grid}>
-        {
-          projects.map((project) => (
-            <Card
-              title={project.name}
-              size="small"
-              lineClamp={3}
-              svgLogoUrl={project.partner.logo.url}
-              href={buildUrlForShowcaseProject(project)}
-            >
-              <Fragment slot="image">
-                <ResponsiveImage data={project.mainImage.responsiveImage} />
-              </Fragment>
-              {structuredTextToPlainText(project.headline)}
-            </Card>
-          ))
-        }
-      </div>
-    </Space>
 
-    <Pagination
-      perPage={perPage}
-      currentPageIndex={pageIndex}
-      totalEntries={totalEntries}
-      baseUrl="/partners/showcase"
-    />
+  <Wrapper>
+    <FetchAndReplaceFormOnSubmit>
+      <form class={s.filterGrid} method="GET">
+        <div>
+          <div class={s.filterLabel}>Filter by Technology</div>
+          <Filter options={technologyOptions} value={technologyFilter} searchParam="technology" />
+        </div>
+
+        <div>
+          <div class={s.filterLabel}>Filter by Partner Expertise</div>
+          <Filter
+            options={areaOfExpertiseOptions}
+            value={areaOfExpertiseFilter}
+            searchParam="areaOfExpertise"
+          />
+        </div>
+      </form>
+
+      <Space bottom={2}>
+        <div class={s.grid}>
+          {
+            pageProjects.map((project) => (
+              <Card
+                title={project.name}
+                size="small"
+                lineClamp={3}
+                svgLogoUrl={project.partner.logo.url}
+                href={buildUrlForShowcaseProject(project)}
+              >
+                <Fragment slot="image">
+                  <ResponsiveImage data={project.mainImage.responsiveImage} />
+                </Fragment>
+                {structuredTextToPlainText(project.headline)}
+              </Card>
+            ))
+          }
+
+          {pageProjects.length === 0 && <p>No projects match your current filters.</p>}
+        </div>
+      </Space>
+
+      <Pagination
+        perPage={perPage}
+        currentPageIndex={pageIndex}
+        totalEntries={totalEntries}
+        baseUrl="/partners/showcase"
+      />
+    </FetchAndReplaceFormOnSubmit>
   </Wrapper>
 
-  <DraftModeQueryListener query={query} variables={variables} />
+  <DraftModeQueryListener query={query} />
 </Layout>
