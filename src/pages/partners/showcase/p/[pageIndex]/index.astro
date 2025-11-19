@@ -13,7 +13,10 @@ import { perPage, query } from './_graphql';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { Filter } from '../../../_sub/Filter';
+import { countersForDropdown } from './_facets';
+import { countersToOptions } from '~/pages/partners/_facets';
+import { FetchAndReplaceFormOnSubmit } from '~/components/filtering/FetchAndReplaceFormOnSubmit';
+import { Filter } from '~/components/filtering/Filter';
 
 export interface Props {
   pageIndex?: number;
@@ -29,7 +32,6 @@ const rawPageIndex =
   (Astro.params.pageIndex ? Number.parseInt(Astro.params.pageIndex, 10) : 1) ||
   1;
 
-const partnerFilter = Astro.url.searchParams.get('partner');
 const technologyFilter = Astro.url.searchParams.get('technology');
 const areaOfExpertiseFilter = Astro.url.searchParams.get('areaOfExpertise');
 
@@ -40,97 +42,33 @@ if (!projects || projects.length === 0) {
   return notFoundResponse();
 }
 
-const filteredProjects = projects.filter((project) => {
-  if (partnerFilter && project.partner?.name !== partnerFilter) {
-    return false;
-  }
-
-  if (technologyFilter && !project.technologies?.some((t) => t?.name === technologyFilter)) {
-    return false;
-  }
-
-  if (
-    areaOfExpertiseFilter &&
-    !project.partner?.areasOfExpertise?.some((a) => a?.name === areaOfExpertiseFilter)
-  ) {
-    return false;
-  }
-
-  return true;
-});
-
-function calculateCounters(projectsList: typeof projects) {
-  const partners: Record<string, number> = {};
-  const technologies: Record<string, number> = {};
-  const areasOfExpertise: Record<string, number> = {};
-
-  for (const project of projectsList) {
-    if (project.partner) {
-      const partnerName = project.partner.name;
-      partners[partnerName] = (partners[partnerName] || 0) + 1;
-
-      for (const area of project.partner.areasOfExpertise || []) {
-        if (!area) continue;
-        areasOfExpertise[area.name] = (areasOfExpertise[area.name] || 0) + 1;
-      }
-    }
-
-    for (const tech of project.technologies || []) {
-      if (!tech) continue;
-      technologies[tech.name] = (technologies[tech.name] || 0) + 1;
-    }
-  }
-
-  return {
-    partners,
-    technologies,
-    areasOfExpertise,
-  };
-}
-
-const projectsForPartnerCounters = projects.filter((project) => {
-  if (technologyFilter && !project.technologies?.some((t) => t?.name === technologyFilter)) {
-    return false;
-  }
-
-  if (
-    areaOfExpertiseFilter &&
-    !project.partner?.areasOfExpertise?.some((a) => a?.name === areaOfExpertiseFilter)
-  ) {
-    return false;
-  }
-
-  return true;
-});
-
-const partnerCounters = calculateCounters(projectsForPartnerCounters).partners;
-const filteredCounters = calculateCounters(filteredProjects);
-
-const sortByCount = (a: [string, number], b: [string, number]) => {
-  if (a[1] !== b[1]) {
-    return b[1] - a[1];
-  }
-  return a[0].localeCompare(b[0]);
+// Faceted search: build dropdown options
+const activeFilters = {
+  technology: technologyFilter,
+  areaOfExpertise: areaOfExpertiseFilter,
 };
 
-const sortAlphabetically = (a: [string, number], b: [string, number]) => a[0].localeCompare(b[0]);
+const technologyCounters = countersForDropdown(projects, activeFilters, 'technology');
+const areaCounters = countersForDropdown(projects, activeFilters, 'areaOfExpertise');
 
-const toOptionWithCount = ([value, count]: [string, number]) => ({
-  value,
-  label: `${value} (${count})`,
+const technologyOptions = countersToOptions(technologyCounters.technologies);
+const areaOfExpertiseOptions = countersToOptions(areaCounters.areasOfExpertise);
+
+// Filter projects based on active filters
+const filteredProjects = projects.filter((project) => {
+  if (technologyFilter && !project.technologies?.some((t) => t?.name === technologyFilter)) {
+    return false;
+  }
+
+  if (
+    areaOfExpertiseFilter &&
+    !project.partner?.areasOfExpertise?.some((a) => a?.name === areaOfExpertiseFilter)
+  ) {
+    return false;
+  }
+
+  return true;
 });
-
-const partnerOptions = Object.entries(partnerCounters)
-  .sort(sortAlphabetically)
-  .map(toOptionWithCount);
-
-const technologyOptions = Object.entries(filteredCounters.technologies)
-  .sort(sortByCount)
-  .map(toOptionWithCount);
-
-const areaOfExpertiseOptions = Object.entries(filteredCounters.areasOfExpertise)
-  .sort(sortAlphabetically)
-  .map(toOptionWithCount);
 
 const totalEntries = filteredProjects.length;
 const totalPages = Math.max(1, Math.ceil(totalEntries / perPage));
@@ -156,15 +94,10 @@ const pageProjects = filteredProjects.slice(start, end);
   </Hero>
 
   <Wrapper>
-    <load-results-in-page>
+    <FetchAndReplaceFormOnSubmit>
       <form class={s.filterGrid} method="GET">
         <div>
-          <div class={s.filterLabel}>Filter by Partner</div>
-          <Filter options={partnerOptions} value={partnerFilter} searchParam="partner" />
-        </div>
-
-        <div>
-          <div class={s.filterLabel}>Filter by Technologies Used</div>
+          <div class={s.filterLabel}>Filter by Technology</div>
           <Filter options={technologyOptions} value={technologyFilter} searchParam="technology" />
         </div>
 
@@ -207,53 +140,8 @@ const pageProjects = filteredProjects.slice(start, end);
         totalEntries={totalEntries}
         baseUrl="/partners/showcase"
       />
-    </load-results-in-page>
+    </FetchAndReplaceFormOnSubmit>
   </Wrapper>
 
   <DraftModeQueryListener query={query} />
 </Layout>
-
-<script>
-  import { WebComponent } from '~/lib/WebComponent';
-
-  customElements.define(
-    'load-results-in-page',
-    class LoadResultsInPage extends WebComponent {
-      parsedCallback() {
-        const formEl = this.$<HTMLFormElement>('form');
-
-        this.on(formEl, 'submit', async (event) => {
-          event.preventDefault();
-
-          try {
-            const formData = new FormData(formEl);
-            const queryString = new URLSearchParams(formData as any).toString();
-            const url = `?${queryString}`;
-
-            const response = await fetch(url, {
-              headers: {
-                Accept: 'text/html',
-              },
-            });
-
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const html = await response.text();
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-
-            const newComponent = tempDiv.querySelector('load-results-in-page');
-            if (newComponent) {
-              this.replaceWith(newComponent);
-              history.pushState({}, '', url);
-            }
-          } catch (error) {
-            console.error('Error loading results:', error);
-          }
-        });
-      }
-    },
-  );
-</script>
