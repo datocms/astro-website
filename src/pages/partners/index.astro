@@ -2,9 +2,7 @@
 import PartnersMap from './_sub/PartnersMap';
 import s from './_style.module.css';
 import sortBy from 'lodash-es/sortBy';
-import type { FragmentOf } from 'gql.tada';
 import { Announce } from '~/components/pluginToolkit/Announce';
-import { Filter } from './_sub/Filter';
 import { Hero } from '~/components/Hero';
 import { Layout } from '~/layouts/Layout';
 import { Card } from '~/components/Card';
@@ -12,13 +10,13 @@ import { Space } from '~/components/Space';
 import { Wrapper } from '~/components/Wrapper';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query, PartnerFragment } from './_graphql';
+import { query } from './_graphql';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
-import { uniq } from 'lodash-es';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-
-type Partner = FragmentOf<typeof PartnerFragment>;
+import { countersForDropdown, countersToOptions } from './_facets';
+import { FetchAndReplaceFormOnSubmit } from '~/components/filtering/FetchAndReplaceFormOnSubmit';
+import { Filter } from '~/components/filtering/Filter';
 
 const { page, partners } = await executeQuery(Astro, query);
 
@@ -74,66 +72,23 @@ const filteredPartners = orderedPartners.filter((partner) => {
   return true;
 });
 
-function calculateCounters(partners: Partner[], filterByContinent: string | null) {
-  const technologies: Record<string, number> = {};
-  const areasOfExpertise: Record<string, number> = {};
-  const countries: Record<string, number> = {};
-  const continents: Record<string, number> = {};
-
-  for (const partner of partners) {
-    for (const t of partner.technologies) {
-      technologies[t.name] = (technologies[t.name] || 0) + 1;
-    }
-    for (const t of partner.areasOfExpertise) {
-      areasOfExpertise[t.name] = (areasOfExpertise[t.name] || 0) + 1;
-    }
-    for (const t of partner.locations) {
-      if (!filterByContinent || t.continent.name === filterByContinent)
-        countries[`${t.emoji} ${t.name}`] = (countries[`${t.emoji} ${t.name}`] || 0) + 1;
-    }
-    for (const continentName of uniq(partner.locations.map((t) => t.continent.name))) {
-      continents[continentName] = (continents[continentName] || 0) + 1;
-    }
-  }
-
-  return {
-    technologies,
-    areasOfExpertise,
-    countries,
-    continents,
-  };
-}
-
-const filteredCounters = calculateCounters(filteredPartners, continentFilter);
-const noFilterCounters = calculateCounters(orderedPartners, continentFilter);
-
-const sortByCount = (entryA: [string, number], entryB: [string, number]) => {
-  if (entryA[1] !== entryB[1]) {
-    return entryB[1] - entryA[1];
-  }
-  return entryA[0].localeCompare(entryB[0]);
+// Faceted search: build dropdown options
+const activeFilters = {
+  technology: technologyFilter,
+  areaOfExpertise: areaOfExpertiseFilter,
+  country: countryFilter,
+  continent: continentFilter,
 };
 
-const toOptionWithCount = (entry: [string, number]) => ({
-  value: entry[0],
-  label: `${entry[0]} (${entry[1]})`,
-});
+const techCounters = countersForDropdown(orderedPartners, activeFilters, 'technology');
+const areaCounters = countersForDropdown(orderedPartners, activeFilters, 'areaOfExpertise');
+const countryCounters = countersForDropdown(orderedPartners, activeFilters, 'country');
+const continentCounters = countersForDropdown(orderedPartners, activeFilters, 'continent');
 
-const continentOptions = Object.entries(noFilterCounters.continents)
-  .sort(sortByCount)
-  .map(toOptionWithCount);
-
-const countryOptions = Object.entries(filteredCounters.countries)
-  .sort(sortByCount)
-  .map(toOptionWithCount);
-
-const technologyOptions = Object.entries(filteredCounters.technologies)
-  .sort(sortByCount)
-  .map(toOptionWithCount);
-
-const areaOfExpertiseOptions = Object.entries(filteredCounters.areasOfExpertise)
-  .sort(sortByCount)
-  .map(toOptionWithCount);
+const continentOptions = countersToOptions(continentCounters.continents);
+const countryOptions = countersToOptions(countryCounters.countries);
+const technologyOptions = countersToOptions(techCounters.technologies);
+const areaOfExpertiseOptions = countersToOptions(areaCounters.areasOfExpertise);
 
 const getLabel = (count: number) => {
   if (count === 0) {
@@ -175,7 +130,7 @@ const bkgColors = ['azure', 'pink', 'blue', 'green', 'yellow'] as const;
   </Wrapper>
 
   <Wrapper>
-    <load-results-in-page>
+    <FetchAndReplaceFormOnSubmit>
       <form class={s.filterGrid} method="GET">
         <div>
           <div class={s.filterLabel}>Filter by Continent</div>
@@ -228,53 +183,8 @@ const bkgColors = ['azure', 'pink', 'blue', 'green', 'yellow'] as const;
           ))
         }
       </div>
-    </load-results-in-page>
+    </FetchAndReplaceFormOnSubmit>
   </Wrapper>
 
   <DraftModeQueryListener query={query} />
 </Layout>
-
-<script>
-  import { WebComponent } from '~/lib/WebComponent';
-
-  customElements.define(
-    'load-results-in-page',
-    class LoadResultsInPage extends WebComponent {
-      parsedCallback() {
-        const formEl = this.$<HTMLFormElement>('form');
-
-        this.on(formEl, 'submit', async (event) => {
-          event.preventDefault();
-
-          try {
-            const formData = new FormData(formEl);
-            const queryString = new URLSearchParams(formData as any).toString();
-            const url = `?${queryString}`;
-
-            const response = await fetch(url, {
-              headers: {
-                Accept: 'text/html',
-              },
-            });
-
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const html = await response.text();
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = html;
-
-            const newComponent = tempDiv.querySelector('load-results-in-page');
-            if (newComponent) {
-              this.replaceWith(newComponent);
-              history.pushState({}, '', url);
-            }
-          } catch (error) {
-            console.error('Error loading results:', error);
-          }
-        });
-      }
-    },
-  );
-</script>

@@ -1,0 +1,55 @@
+---
+/**
+ * Wraps filterable content that reloads via AJAX when the form is submitted.
+ * Prevents full page reloads and updates the URL using pushState.
+ */
+---
+
+<fetch-and-replace-form-on-submit>
+  <slot />
+</fetch-and-replace-form-on-submit>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'fetch-and-replace-form-on-submit',
+    class FetchAndReplaceFormOnSubmit extends WebComponent {
+      parsedCallback() {
+        const formEl = this.$<HTMLFormElement>('form');
+
+        this.on(formEl, 'submit', async (event) => {
+          event.preventDefault();
+
+          try {
+            const formData = new FormData(formEl);
+            const queryString = new URLSearchParams(formData as any).toString();
+            const url = `?${queryString}`;
+
+            const response = await fetch(url, {
+              headers: {
+                Accept: 'text/html',
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const html = await response.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            const newComponent = tempDiv.querySelector('fetch-and-replace-form-on-submit');
+            if (newComponent) {
+              this.replaceWith(newComponent);
+              history.pushState({}, '', url);
+            }
+          } catch (error) {
+            console.error('Error loading results:', error);
+          }
+        });
+      }
+    },
+  );
+</script>
