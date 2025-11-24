@@ -30,65 +30,13 @@ src/pages/docs/dashboard-api/
             └── _graphql.ts                # Sitemap for endpoints
 ```
 
+## Completed Steps
+
+### 0. Refactor existing code to separate shared vs API-specific logic ✅
+
+**Completed in commit 3348367**: Refactored CMA-specific code into dedicated `cmaApi` module, updated all imports, added multi-API support to HttpExample component. See commit message for full details.
+
 ## Implementation Steps
-
-### 0. Refactor existing code to separate shared vs API-specific logic
-
-**Goal**: Move API-specific code out of the generic `restApi` components into separate `cmaApi` and `dashboardApi` modules.
-
-#### 0.1. Create CMA-specific modules
-
-- **Create**: `src/components/docs/cmaApi/fetchSchema.ts`
-
-  - Move current `fetchSchema.ts` content here
-  - Keep URL: `https://site-api.datocms.com/docs/site-api-hyperschema.json`
-  - **Rename functions** for clarity:
-    - `fetchSchema` → `fetchCmaSchema`
-    - `maybeInvalidateSiteApiHyperschema` → `maybeInvalidateCmaHyperschema`
-    - `findEntity` → `findCmaEntity`
-    - `findJobResultSelfEndoint` → `findCmaJobResultSelfEndpoint`
-
-- **Create**: `src/components/docs/cmaApi/buildSidebarItems.ts`
-  - Move current `buildSidebarItems.ts` content here
-  - **Rename function**: `buildSidebarItems` → `buildCmaSidebarItems`
-  - Update import to use `./fetchSchema` (local to cmaApi)
-  - Update to call `fetchCmaSchema`
-  - Keep URL paths: `/docs/content-management-api/resources/...`
-
-#### 0.2. Update CMA page imports and function calls
-
-Update all files in `src/pages/docs/content-management-api/` to import from the new locations and use renamed functions:
-
-**Import changes:**
-
-- `~/components/docs/restApi/fetchSchema` → `~/components/docs/cmaApi/fetchSchema`
-- `~/components/docs/restApi/buildSidebarItems` → `~/components/docs/cmaApi/buildSidebarItems`
-
-**Function call changes:**
-
-- `fetchSchema` → `fetchCmaSchema`
-- `buildSidebarItems` → `buildCmaSidebarItems`
-- `findEntity` → `findCmaEntity`
-- `findJobResultSelfEndoint` → `findCmaJobResultSelfEndpoint`
-
-**Files to update:**
-
-- `src/pages/docs/content-management-api/index.astro`
-- `src/pages/docs/content-management-api/[slug]/index.astro`
-- `src/pages/docs/content-management-api/resources/[entitySlug]/index.astro`
-- `src/pages/docs/content-management-api/resources/[entitySlug]/_graphql.ts`
-- `src/pages/docs/content-management-api/resources/[entitySlug]/[endpointRel]/index.astro`
-- `src/pages/docs/content-management-api/resources/[entitySlug]/[endpointRel]/_graphql.ts`
-
-#### 0.3. Delete old files from restApi
-
-- **Delete**: `src/components/docs/restApi/fetchSchema.ts`
-- **Delete**: `src/components/docs/restApi/buildSidebarItems.ts`
-
-#### 0.4. Verify CMA still works
-
-- Build the project and verify no import errors
-- Test that CMA documentation pages still render correctly
 
 ### 1. Create Dashboard API specific modules
 
@@ -179,6 +127,7 @@ Update all files in `src/pages/docs/content-management-api/` to import from the 
 - Update all URLs to `/docs/dashboard-api/resources/...`
 - Update SEO and kicker text to "Dashboard API"
 - Update group lookup to `'dashboard-api'`
+- Update api prop: `api: 'dashboard-api'`
 
 #### 2.8. Create endpoint routing utilities
 
