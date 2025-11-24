@@ -57,6 +57,8 @@ export const fetchSitemapUrls = async (request: Request, responseHeaders: Header
   return (await Promise.all(urlsPromises)).flat();
 };
 
+const BLACKLISTED_URL_PREFIXES = ['/docs/dashboard-api'];
+
 export const GET: APIRoute = async ({ request }) => {
   try {
     const stream = new SitemapStream({ hostname: baseUrl(request) });
@@ -68,6 +70,10 @@ export const GET: APIRoute = async ({ request }) => {
 
     for (const url of await fetchSitemapUrls(request, responseHeaders)) {
       if (url === '/404') {
+        continue;
+      }
+
+      if (BLACKLISTED_URL_PREFIXES.some((prefix) => url.startsWith(prefix))) {
         continue;
       }
 
