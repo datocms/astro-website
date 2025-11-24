@@ -8,6 +8,7 @@ import { buildFetchCodeRequest } from './buildFetchCodeRequest';
 import { buildCurlRequest } from './buildCurlRequest';
 import { buildHttpResponse } from './buildHttpResponse';
 import { findCmaJobResultSelfEndpoint } from '~/components/docs/cmaApi/fetchSchema';
+import { findDashboardJobResultSelfEndpoint } from '~/components/docs/dashboardApi/fetchSchema';
 import exampleValueForSchema from '../exampleValueForSchema';
 import { set } from 'lodash-es';
 
@@ -17,12 +18,17 @@ type Props = {
   endpoint: RestApiEndpoint;
   example?: RestApiEndpointHttpExample;
   startVisible?: boolean;
-  api: 'cma';
+  api: 'cma' | 'dashboard-api';
 };
 
 const { id, example, endpoint, entity, startVisible, api } = Astro.props;
 
-const findJobResultEndpoint = api === 'cma' ? await findCmaJobResultSelfEndpoint(Astro) : undefined;
+const findJobResultEndpoint =
+  api === 'cma'
+    ? await findCmaJobResultSelfEndpoint(Astro)
+    : api === 'dashboard-api'
+      ? await findDashboardJobResultSelfEndpoint(Astro)
+      : undefined;
 
 const fetchRequest = buildFetchRequest(endpoint, example);
 const fetchResponse = buildFetchResponse(endpoint, example);

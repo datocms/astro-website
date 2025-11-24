@@ -63,7 +63,7 @@ export type RestApiEntity = JSONSchema & {
   links?: RestApiEndpoint[];
 };
 
-export type CmaHyperSchema = JSONSchema & {
+export type Hyperschema = JSONSchema & {
   groups: Array<{
     title: string;
     resources: string[];

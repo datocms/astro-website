@@ -1,0 +1,21 @@
+---
+import { buildDashboardSidebarItems } from '~/components/docs/dashboardApi/buildSidebarItems';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { PageLayout, findGroupAndPage } from '~/layouts/docs/PageLayout';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+
+const result = await findGroupAndPage(Astro, `dashboard-api/${Astro.params.slug}`);
+
+if (!result) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const [group, page, queryListenerProps] = result;
+
+const sidebarItems = await buildDashboardSidebarItems(Astro);
+---
+
+<PageLayout page={page} group={group} additionalSidebarItems={sidebarItems} />
+
+{queryListenerProps.map((props) => <DraftModeQueryListener {...props} />)}
