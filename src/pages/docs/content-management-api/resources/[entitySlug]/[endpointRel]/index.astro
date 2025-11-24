@@ -3,7 +3,7 @@ import {
   analyzePropertiesOfGenericObject,
   analyzePropertiesOfJsonApiEntity,
 } from '~/components/docs/restApi/analyzeSchemaProperties';
-import { buildSidebarItems } from '~/components/docs/restApi/buildSidebarItems';
+import { buildCmaSidebarItems } from '~/components/docs/cmaApi/buildSidebarItems';
 import {
   buildTocGroupsFromExamples,
   buildTocGroupsFromMarkdown,
@@ -21,7 +21,7 @@ import { Svg } from '~/components/Svg';
 import { findGroup, GroupLayout } from '~/layouts/docs/GroupLayout';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import s from '../_style.module.css';
-import { findEntity } from '~/components/docs/restApi/fetchSchema';
+import { findCmaEntity } from '~/components/docs/cmaApi/fetchSchema';
 import { EndpointResponse } from '~/components/docs/restApi/EndpointResponse';
 import { LanguagePicker } from '~/components/docs/restApi/LanguagePicker';
 import { currentLanguage, isValidLanguage } from '~/components/docs/restApi/LanguagePicker/utils';
@@ -37,8 +37,8 @@ import {
 } from '~/lib/datocms/seo';
 import DocCalloutBase from '~/components/docs/blocks/DocCallout/Base.astro';
 
-const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
-const entity = await findEntity(Astro, Astro.params.entitySlug!);
+const sidebarItems = await buildCmaSidebarItems(Astro, Astro.params.entitySlug!);
+const entity = await findCmaEntity(Astro, Astro.params.entitySlug!);
 
 const jsClient = await fetchRestApiEndpointJsClient(
   Astro.params.entitySlug!,
@@ -90,7 +90,7 @@ const queryParameters = endpoint.hrefSchema
 const response = analyzeResponse(endpoint.targetSchema, endpoint.jobSchema);
 
 const Example = language === 'javascript' ? JsExample : HttpExample;
-const propsForExamples = { entity, endpoint, jsClient };
+const propsForExamples = { entity, endpoint, jsClient, api: 'cma' as const };
 ---
 
 <GroupLayout

@@ -7,7 +7,7 @@ import { buildHttpRequest } from './buildHttpRequest';
 import { buildFetchCodeRequest } from './buildFetchCodeRequest';
 import { buildCurlRequest } from './buildCurlRequest';
 import { buildHttpResponse } from './buildHttpResponse';
-import { findJobResultSelfEndoint } from '../fetchSchema';
+import { findCmaJobResultSelfEndpoint } from '~/components/docs/cmaApi/fetchSchema';
 import exampleValueForSchema from '../exampleValueForSchema';
 import { set } from 'lodash-es';
 
@@ -17,11 +17,12 @@ type Props = {
   endpoint: RestApiEndpoint;
   example?: RestApiEndpointHttpExample;
   startVisible?: boolean;
+  api: 'cma';
 };
 
-const { id, example, endpoint, entity, startVisible } = Astro.props;
+const { id, example, endpoint, entity, startVisible, api } = Astro.props;
 
-const findJobResultEndpoint = await findJobResultSelfEndoint(Astro);
+const findJobResultEndpoint = api === 'cma' ? await findCmaJobResultSelfEndpoint(Astro) : undefined;
 
 const fetchRequest = buildFetchRequest(endpoint, example);
 const fetchResponse = buildFetchResponse(endpoint, example);
@@ -65,13 +66,14 @@ const fetchResponse = buildFetchResponse(endpoint, example);
           : []),
       ]}
     />
-  ) : endpoint.jobSchema ? (
+  ) : endpoint.jobSchema && findJobResultEndpoint ? (
     <>
       <Astro.self
         id={id}
         endpoint={endpoint}
         startVisible={startVisible}
         entity={entity}
+        api={api}
         example={{
           id,
           title: 'Step 1: Perform the request',
@@ -84,6 +86,7 @@ const fetchResponse = buildFetchResponse(endpoint, example);
         endpoint={findJobResultEndpoint}
         startVisible={startVisible}
         entity={entity}
+        api={api}
         example={{
           id: `${id}-step2`,
           title: 'Step 2: Poll to get the result of the async job',
@@ -111,6 +114,7 @@ const fetchResponse = buildFetchResponse(endpoint, example);
       endpoint={endpoint}
       startVisible={startVisible}
       entity={entity}
+      api={api}
       example={{
         id: id,
         title: 'Basic example',

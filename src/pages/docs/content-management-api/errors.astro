@@ -5,7 +5,7 @@ import { PageLayout, findGroupAndPage } from '~/layouts/docs/PageLayout';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { fetchErrorCodes } from './_utils';
 import { Markdown } from '~/components/Markdown';
-import { buildSidebarItems } from '~/components/docs/restApi/buildSidebarItems';
+import { buildCmaSidebarItems } from '~/components/docs/cmaApi/buildSidebarItems';
 
 const result = await findGroupAndPage(Astro, 'content-management-api/errors');
 
@@ -15,7 +15,7 @@ if (!result) {
 }
 
 const [group, page, queryListenerProps] = result;
-const sidebarItems = await buildSidebarItems(Astro);
+const sidebarItems = await buildCmaSidebarItems(Astro);
 
 const response = await fetchErrorCodes(Astro);
 const sortedErrorCodes = Object.keys(response).sort();

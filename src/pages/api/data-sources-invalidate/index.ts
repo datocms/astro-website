@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { SECRET_API_TOKEN } from 'astro:env/server';
 import { maybeInvalidateFetchPluginSdkManifest } from '~/components/docs/blocks/PluginSdkHookGroup';
-import { maybeInvalidateSiteApiHyperschema } from '~/components/docs/restApi/fetchSchema';
+import { maybeInvalidateCmaHyperschema } from '~/components/docs/cmaApi/fetchSchema';
 import { maybeInvalidateCloudflareDatacenters } from '~/components/featureAnimations/CdnMap/utils';
 import { maybeInvalidateFavicon } from '~/layouts/BaseLayout/fetchFavicon';
 import { maybeInvalidateNavbar } from '~/layouts/Layout/Navbar/fetchNavbar';
@@ -26,7 +26,7 @@ export const POST: APIRoute = async ({ url, request }) => {
 
     const results = await Promise.all([
       maybeInvalidateFetchPluginSdkManifest(),
-      maybeInvalidateSiteApiHyperschema(),
+      maybeInvalidateCmaHyperschema(),
       maybeInvalidatePerOwnerPricingPlans(),
       maybeInvalidateDastSchema(),
       maybeInvalidateCloudflareDatacenters(),

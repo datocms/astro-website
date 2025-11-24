@@ -5,12 +5,12 @@ import { findGroup, GroupLayout } from '~/layouts/docs/GroupLayout';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { Markdown } from '~/components/Markdown';
 import { Prose } from '~/components/Prose';
-import { buildSidebarItems } from '~/components/docs/restApi/buildSidebarItems';
+import { buildCmaSidebarItems } from '~/components/docs/cmaApi/buildSidebarItems';
 import { LanguagePicker } from '~/components/docs/restApi/LanguagePicker';
 import { buildTocGroupsFromMarkdown } from '~/components/docs/restApi/EndpointDescriptionWithExamples';
 import { analyzePropertiesOfJsonApiEntity } from '~/components/docs/restApi/analyzeSchemaProperties';
 import { JsonSchemaObjectAnalysis } from '~/components/docs/restApi/JsonSchemaObjectAnalysis';
-import { findEntity } from '~/components/docs/restApi/fetchSchema';
+import { findCmaEntity } from '~/components/docs/cmaApi/fetchSchema';
 import {
   addLanguageToUrl,
   currentLanguage,
@@ -26,8 +26,8 @@ import {
 } from '~/lib/datocms/seo';
 import { markdownToPlainText } from '~/components/Markdown/utils';
 
-const sidebarItems = await buildSidebarItems(Astro, Astro.params.entitySlug!);
-const resource = await findEntity(Astro, Astro.params.entitySlug!);
+const sidebarItems = await buildCmaSidebarItems(Astro, Astro.params.entitySlug!);
+const resource = await findCmaEntity(Astro, Astro.params.entitySlug!);
 
 const result = await findGroup(Astro, 'content-management-api');
 

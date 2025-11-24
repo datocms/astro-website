@@ -1,15 +1,15 @@
 import type { AstroGlobal } from 'astro';
 import type { SidebarGroup } from '~/components/docs/Sidebar';
 import { invariant } from '~/lib/invariant';
-import { fetchSchema } from './fetchSchema';
-import { addLanguageToUrl, currentLanguage } from './LanguagePicker/utils';
-import type { RestApiEntity } from './types';
+import { fetchCmaSchema } from './fetchSchema';
+import { addLanguageToUrl, currentLanguage } from '../restApi/LanguagePicker/utils';
+import type { RestApiEntity } from '../restApi/types';
 
-export async function buildSidebarItems(
+export async function buildCmaSidebarItems(
   astro: AstroGlobal,
   activeEntitySlug?: string,
 ): Promise<SidebarGroup[]> {
-  const schema = await fetchSchema(astro);
+  const schema = await fetchCmaSchema(astro);
   const language = currentLanguage(astro)!;
 
   invariant(schema.properties);
