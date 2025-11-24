@@ -20,6 +20,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const { page, successStories } = await executeQuery(Astro, query);
 
@@ -43,9 +44,7 @@ if (!page || successStories.length === 0) {
     <Space top={1}>
       <Checks>
         <div class={s.buttonGroup}>
-          <Button fs="big" as="a" href="https://dashboard.datocms.com/signup">
-            Sign up for free
-          </Button>
+          <Button fs="big" as="a" href={dashboardUrl('/signup')}> Sign up for free </Button>
           <Button fs="big" as="a" s="invert" href="/contact"> Contact Sales </Button>
         </div>
 

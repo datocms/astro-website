@@ -17,6 +17,7 @@ import { query } from './_graphql';
 import s from './_style.module.css';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -39,7 +40,7 @@ if (!page) {
           experience, and clean editing interface.
         </div>
         <Checks>
-          <Button as="a" href="https://dashboard.datocms.com/signup">Try DatoCMS for free!</Button>
+          <Button as="a" href={dashboardUrl('/signup')}>Try DatoCMS for free!</Button>
           <Fragment slot="checks">
             <li>No credit card</li>
             <li>Easy setup</li>

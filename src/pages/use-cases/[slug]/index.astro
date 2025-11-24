@@ -22,6 +22,7 @@ import { Card } from '~/components/Card';
 import { SameLevelNavigation } from '~/components/SameLevelNavigation';
 import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import s from './_style.module.css';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const variables = { slug: Astro.params.slug! };
 const { page, siblings } = await executeQuery(Astro, query, { variables });
@@ -45,7 +46,7 @@ const { quotes = [] } = page;
           <InlineText {...ensureValidStructuredTextProps({ data: page.subtitle })} />
         </div>
         <div class={s.buttonContainer}>
-          <Button as="a" href="https://dashboard.datocms.com/signup"> Try it for free </Button>
+          <Button as="a" href={dashboardUrl('/signup')}> Try it for free </Button>
           <Button as="a" s="invert" href="/contact"> Contact sales </Button>
         </div>
       </div>

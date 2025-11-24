@@ -14,6 +14,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -230,9 +231,7 @@ if (!page) {
         Publish to the Marketplace or keep it private forever.
       </Fragment>
       <div class={s.buttonContainer}>
-        <Button fs="small" as="a" href="https://dashboard.datocms.com/signup">
-          Sign up for free
-        </Button>
+        <Button fs="small" as="a" href={dashboardUrl('/signup')}> Sign up for free </Button>
         <Button fs="small" as="a" s="invert" href="/docs"> Read the docs </Button>
       </div>
     </TitleStripWithContent>

@@ -17,6 +17,7 @@ import s from './_style.module.css';
 import ky from 'ky';
 import { type RawManifest, normalizeManifest } from './_utils';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -39,7 +40,7 @@ const manifest = normalizeManifest(
 );
 
 const githubRepoWebUrl = `https://www.github.com/${page.githubRepo.replace(':', '/tree/')}`;
-const datoDeployUrl = `https://dashboard.datocms.com/deploy?repo=${page.githubRepo}`;
+const datoDeployUrl = dashboardUrl(`/deploy?repo=${page.githubRepo}`);
 ---
 
 <Layout noFinalCta seo={page.seo}>
