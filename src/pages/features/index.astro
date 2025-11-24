@@ -19,6 +19,7 @@ import { query } from './_graphql';
 import { slugify } from '~/lib/slugify';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -109,7 +110,7 @@ const linkLabel: { [key: string]: string } = {
           <Text {...ensureValidStructuredTextProps({ data: page.subtitle })} />
         </div>
         <div class={s.buttonContainer}>
-          <Button as="a" href="https://dashboard.datocms.com/signup">Try it for free</Button>
+          <Button as="a" href={dashboardUrl('/signup')}>Try it for free</Button>
           <Button as="a" s="invert" href="/contact">Contact sales</Button>
         </div>
       </div>

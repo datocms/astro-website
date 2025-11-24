@@ -26,6 +26,7 @@ import { formatNumber } from '~/lib/formatters';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const { page, faqs, review1, planFeatureGroups, hints } = await executeQuery(Astro, query);
 
@@ -77,7 +78,9 @@ if (!page || !freePlan || !proPlan) {
                   block
                   s="invert"
                   as="a"
-                  href="https://dashboard.datocms.com/personal-account/plan-billing/change?plan_id=294&utm_source=datocms&utm_medium=website&utm_campaign=pricing"
+                  href={dashboardUrl(
+                    '/personal-account/plan-billing/change?plan_id=294&utm_source=datocms&utm_medium=website&utm_campaign=pricing',
+                  )}
                 >
                   Purchase now
                 </Button>
@@ -155,9 +158,7 @@ if (!page || !freePlan || !proPlan) {
           </div>
         </div>
         <div class={s.freePlanCta}>
-          <Button block s="invert" as="a" href="https://dashboard.datocms.com/signup">
-            Sign up for free
-          </Button>
+          <Button block s="invert" as="a" href={dashboardUrl('/signup')}> Sign up for free </Button>
           <div class={s.freePlanCtaReassurance}>Easy setup, no credit card required</div>
         </div>
       </div>
@@ -203,7 +204,9 @@ if (!page || !freePlan || !proPlan) {
                     s="invert"
                     as="a"
                     p="tiny"
-                    href="https://dashboard.datocms.com/personal-account/plan-billing/change?plan_id=294&utm_source=datocms&utm_medium=website&utm_campaign=pricing"
+                    href={dashboardUrl(
+                      '/personal-account/plan-billing/change?plan_id=294&utm_source=datocms&utm_medium=website&utm_campaign=pricing',
+                    )}
                   >
                     Purchase now
                   </Button>

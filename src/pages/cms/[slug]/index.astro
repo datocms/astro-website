@@ -35,6 +35,7 @@ import { TryDemoCta } from './_sub/TryDemoCta';
 import { ShopifyProduct } from './_sub/ShopifyProduct';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -64,11 +65,7 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
       page.demo && (
         <Space top={1}>
           <Checks checks={['Best practices', '30s setup']}>
-            <Button
-              fs="big"
-              as="a"
-              href={`https://dashboard.datocms.com/deploy?repo=${page.demo.githubRepo}`}
-            >
+            <Button fs="big" as="a" href={dashboardUrl(`/deploy?repo=${page.demo.githubRepo}`)}>
               Try our {page.name} Starter Kit now!
             </Button>
           </Checks>
@@ -230,7 +227,7 @@ const { keyword } = page.yoastAnalysis as { keyword: string | null };
               <TryDemoCta
                 windowTitle={`${page.name} + DatoCMS demo`}
                 screenshot={page.demo.screenshot.responsiveImage}
-                href={`https://dashboard.datocms.com/deploy?repo=${page.demo.githubRepo}`}
+                href={dashboardUrl(`/deploy?repo=${page.demo.githubRepo}`)}
                 docsAs={page.docsUrl ?? undefined}
                 cta={`Try our ${page.name} demo project now!`}
               >

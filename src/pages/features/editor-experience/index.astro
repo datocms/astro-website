@@ -15,6 +15,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -310,7 +311,7 @@ if (!page) {
       </Fragment>
       <div class={s.buttonContainer}>
         <Button fs="small" as="a" href="https://try.datocms.com">Launch Demo</Button>
-        <Button fs="small" as="a" s="invert" href="https://dashboard.datocms.com/signup">
+        <Button fs="small" as="a" s="invert" href={dashboardUrl('/signup')}>
           Sign up for free
         </Button>
       </div>

@@ -22,6 +22,7 @@ import { formatDate, formatVideoDuration } from '~/lib/formatters';
 import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { Image } from 'astro:assets';
 import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const isMarketplace = Astro.url.pathname.startsWith('/marketplace');
 
@@ -432,15 +433,15 @@ const sortedContinents = Object.fromEntries(
                 Contact sales
               </a>
               <div class={s.authActions} data-signed-in="true">
-                <Button as="a" p="small" href="https://dashboard.datocms.com/">
+                <Button as="a" p="small" href={dashboardUrl()}>
                   Enter dashboard
                 </Button>
               </div>
               <div class={s.authActions} data-signed-in="false">
-                <a href="https://dashboard.datocms.com/login" class={s.navLink} data-exclude-mobile>
+                <a href={dashboardUrl('/login')} class={s.navLink} data-exclude-mobile>
                   <span>Log in</span>
                 </a>
-                <Button as="a" p="small" href="https://dashboard.datocms.com/">
+                <Button as="a" p="small" href={dashboardUrl()}>
                   Get started
                 </Button>
               </div>

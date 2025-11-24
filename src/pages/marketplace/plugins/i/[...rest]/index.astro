@@ -18,6 +18,7 @@ import s from './_style.module.css';
 import { isVideo } from '~/components/VideoPlayer/graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import xss from 'xss';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const variables = {
   slug: Astro.params.rest!,
@@ -45,7 +46,7 @@ const avatarUrl = getGravatarUrl(page.author.email);
           <Space top={1}>
             <div class={s.ctaMobile}>
               <set-plugin-install-url data-package-name={page.packageName}>
-                <Button as="a" href="" target="_blank" fs="small" p="small">
+                <Button as="a" href={dashboardUrl()} target="_blank" fs="small" p="small">
                   Install plugin
                 </Button>
               </set-plugin-install-url>
@@ -98,7 +99,7 @@ const avatarUrl = getGravatarUrl(page.author.email);
               <Fragment slot="below">
                 <div class={s.cardCta}>
                   <set-plugin-install-url data-package-name={page.packageName}>
-                    <Button as="a" block href="" target="_blank" fs="small">
+                    <Button as="a" block href={dashboardUrl()} target="_blank" fs="small">
                       Install plugin
                     </Button>
                   </set-plugin-install-url>
@@ -170,7 +171,7 @@ const avatarUrl = getGravatarUrl(page.author.email);
 
         const url = project
           ? `https://${project.domain}${project.environment ? `/environments/${project.environment}` : ''}/configuration/plugins/install/${packageName}`
-          : `https://dashboard.datocms.com/projects/redirect-to-project?path=/configuration/plugins/install/${packageName}`;
+          : `${linkEl.getAttribute('href')}projects/redirect-to-project?path=/configuration/plugins/install/${packageName}`;
 
         linkEl.setAttribute('href', url);
       }

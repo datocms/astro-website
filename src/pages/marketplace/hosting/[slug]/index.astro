@@ -20,6 +20,7 @@ import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -43,7 +44,7 @@ if (!page) {
             <div class={s.ctaMobile}>
               <Button
                 as="a"
-                href="https://dashboard.datocms.com/projects/redirect-to-project?path=/admin/build_triggers/new"
+                href={dashboardUrl('/projects/redirect-to-project?path=/admin/build_triggers/new')}
                 target="_blank"
                 fs="small"
               >
@@ -93,7 +94,9 @@ if (!page) {
                 <div class={s.cardCta}>
                   <Button
                     as="a"
-                    href="https://dashboard.datocms.com/projects/redirect-to-project?path=/admin/build_triggers/new"
+                    href={dashboardUrl(
+                      '/projects/redirect-to-project?path=/admin/build_triggers/new',
+                    )}
                     target="_blank"
                     fs="small"
                     block

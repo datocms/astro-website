@@ -22,6 +22,7 @@ import { Announce } from '~/components/pluginToolkit/Announce';
 import { VideoPlayer } from '~/components/VideoPlayer';
 import { isVideo } from '~/components/VideoPlayer/graphql';
 import { overrideSeo, seoPageTitle, seoShareTitle, seoTwitterCard } from '~/lib/datocms/seo';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -35,7 +36,9 @@ const params = new URLSearchParams({
   recipe_url: page.recipe.url,
   recipe_title: page.title,
 }).toString();
-const installUrl = `https://dashboard.datocms.com/projects/redirect-to-project?path=/configuration/recipes/import?${params}`;
+const installUrl = dashboardUrl(
+  `/projects/redirect-to-project?path=/configuration/recipes/import?${params}`,
+);
 ---
 
 <Layout
