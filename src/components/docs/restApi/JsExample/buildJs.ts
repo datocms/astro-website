@@ -159,12 +159,13 @@ function buildApiCallAssignment(endpoint: RestApiEndpoint, jsClient: RestApiEndp
 }
 
 function rawBuildApiCallSampleCode(
+  importStatement: string,
   entity: RestApiEntity,
   endpoint: RestApiEndpoint,
   jsClient: RestApiEndpointJsClient,
 ) {
   return `
-    import { buildClient } from '@datocms/cma-client-node';
+    ${importStatement}
 
     async function run() {
       ${buildLinesBeforeApiCall(entity, jsClient).join('\n')}
@@ -176,11 +177,12 @@ function rawBuildApiCallSampleCode(
 }
 
 export async function buildApiCallSampleCode(
+  importStatement: string,
   entity: RestApiEntity,
   endpoint: RestApiEndpoint,
   jsClient: RestApiEndpointJsClient,
 ) {
-  return prettier.format(rawBuildApiCallSampleCode(entity, endpoint, jsClient), {
+  return prettier.format(rawBuildApiCallSampleCode(importStatement, entity, endpoint, jsClient), {
     parser: 'babel',
   });
 }

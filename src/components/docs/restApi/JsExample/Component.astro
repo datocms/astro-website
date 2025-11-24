@@ -1,7 +1,14 @@
 ---
 import { EndpointExample } from '~/components/docs/restApi/EndpointExample';
 import type { RestApiEndpoint, RestApiEndpointJsExample, RestApiEntity } from '../types';
-import { buildApiCallSampleCode, buildApiCallReturnValue } from './buildJs';
+import {
+  buildApiCallSampleCode as buildApiCallSampleCodeCma,
+  buildApiCallReturnValue as buildApiCallReturnValueCma,
+} from '~/components/docs/cmaApi/buildJs';
+import {
+  buildApiCallSampleCode as buildApiCallSampleCodeDashboard,
+  buildApiCallReturnValue as buildApiCallReturnValueDashboard,
+} from '~/components/docs/dashboardApi/buildJs';
 import type { RestApiEndpointJsClient } from '../fetchRestApiEndpointJsClient';
 
 type Props = {
@@ -11,9 +18,15 @@ type Props = {
   jsClient: RestApiEndpointJsClient;
   example?: RestApiEndpointJsExample;
   startVisible?: boolean;
+  api: 'cma' | 'dashboard-api';
 };
 
-const { id, example, endpoint, entity, jsClient, startVisible } = Astro.props;
+const { id, example, endpoint, entity, jsClient, startVisible, api } = Astro.props;
+
+const buildApiCallSampleCode =
+  api === 'cma' ? buildApiCallSampleCodeCma : buildApiCallSampleCodeDashboard;
+const buildApiCallReturnValue =
+  api === 'cma' ? buildApiCallReturnValueCma : buildApiCallReturnValueDashboard;
 
 const sampleCode =
   example?.request?.code || (await buildApiCallSampleCode(entity, endpoint, jsClient));

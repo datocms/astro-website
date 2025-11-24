@@ -1,6 +1,9 @@
+// Shared types and implementation for REST API JavaScript client information
+// Used by both CMA and Dashboard API implementations
+
 import ky from 'ky';
 
-type EndpointInfo = {
+export type EndpointInfo = {
   rel: string;
   name?: string;
   rawName: string;
@@ -44,17 +47,19 @@ export type RestApiEndpointJsClient = {
   resourceClassName: string;
 } & EndpointInfo;
 
-type Response = Array<{
+export type JsClientResourcesResponse = Array<{
   jsonApiType: string;
   namespace: string;
   resourceClassName: string;
   endpoints: EndpointInfo[];
 }>;
 
-export async function fetchRestApiEndpointJsClient(entitySlug: string, endpointRel: string) {
-  const resources = await ky<Response>(
-    'https://cdn.jsdelivr.net/npm/@datocms/cma-client@latest/resources.json',
-  ).json();
+export async function fetchRestApiEndpointJsClient(
+  resourcesJsonUrl: string,
+  entitySlug: string,
+  endpointRel: string,
+): Promise<RestApiEndpointJsClient | null> {
+  const resources = await ky<JsClientResourcesResponse>(resourcesJsonUrl).json();
 
   const foundResource = resources.find((r) => r.jsonApiType === entitySlug.replace(/\-/g, '_'));
 
