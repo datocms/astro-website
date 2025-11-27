@@ -1,0 +1,268 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Button } from '~/components/Button';
+import { CalloutCard } from '~/components/CalloutCard';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { Image } from 'astro:assets';
+import { Layout } from '~/layouts/Layout';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
+
+const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('DatoCMS MCP Beta'),
+    seoDescription(
+      'LLM-friendly. Token Hungry. 6 months and 3 rewrites later, the DatoCMS MCP Beta is here.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'DatoCMS MCP Beta',
+      excerpt:
+        'LLM-friendly. Token Hungry. 6 months and 3 rewrites later, the DatoCMS MCP Beta is here.',
+    }),
+  )}
+>
+  <Hero>
+    <Fragment slot="kicker">DatoCMS MCP (Beta)</Fragment>
+    <Fragment slot="title">
+      LLM-friendly. Token Hungry. <mark>NotTheWorst</mark>™
+    </Fragment>
+    <Fragment slot="subtitle">
+      6 months and 3 rewrites later, the DatoCMS MCP Beta is here. Not because its perfect, but
+      because it needs work.
+    </Fragment>
+    <div class={s.buttonContainer}>
+      <Button fs="big" as="a" href="https://github.com/datocms/mcp">Check the repo</Button>
+      <Button fs="big" as="a" s="invert" href="/blog/we-have-released-an-mcp-sometimes-it-works"
+        >Learn more</Button
+      >
+    </div>
+  </Hero>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1761921587-logs.png"
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> We built an MCP </Fragment>
+    <Fragment slot="title"> It works. Terms & Conditions Apply. </Fragment>
+    <p>
+      We built the MCP to run through discovery, planning, and execution, using scripts,
+      documentation, and actual reasoning.
+    </p>
+    <p>While its in Beta, it’s slow, token-hungry, and unpredictable, but it gets things done.</p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <CalloutCard
+        title="Works with what you're used to"
+        ctaLink="https://github.com/datocms/mcp?tab=readme-ov-file#datocms-mcp"
+        ctaLabel="Get started →"
+        illustration="svg/illustrations/live-4"
+        asLink
+      >
+        <Fragment slot="text">
+          We've tested the MCP most with Claude Code and Cursor, but you can get it up and running
+          with any tool you're used to like Gemini CLI, VS Code, and Windsurf, using the standard
+          config.
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1761921589-deterministic.png"
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> How we built it </Fragment>
+    <Fragment slot="title"> Our approach to the MCP </Fragment>
+    <p>
+      Rather than throwing endpoints against the wall, we've taken a carefully layered approach.
+    </p>
+    <article>
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>A local MCP server for the DatoCMS API</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>10 carefully layered tools, not 150+ raw endpoints</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Script-based reasoning, not single call guessing</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Documentation- and schema-aware</span>
+        </li>
+      </Bullets>
+    </article>
+  </Flag>
+
+  <Space bottom={3}>
+    <TitleStripWithContent stripHeight="full">
+      <Fragment slot="kicker"> Take it for a spin </Fragment>
+      <Fragment slot="title"> Here's where you come in </Fragment>
+      <Fragment slot="subtitle">
+        Its not perfect, but while MCP standards are still forming, we'd love real world feedback
+        from your usage to help us make it better.
+      </Fragment>
+      <div class={s.buttonContainer}>
+        <Button fs="big" as="a" href="https://github.com/datocms/mcp">Check the repo</Button>
+        <Button fs="big" as="a" s="invert" href="/blog/we-have-released-an-mcp-sometimes-it-works"
+          >Learn more</Button
+        >
+      </div>
+    </TitleStripWithContent>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1761921589-integrate.png"
+        inferSize
+        alt="Integrate"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> Here's what it does really well </Fragment>
+    <Fragment slot="title"> The Capabilities </Fragment>
+    <article>
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Generate new records, and translate content well</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Correctly modify model and field settings</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Run structured and chained batch operations with TypeScript scripts</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Fetch docs for context before attempting calls</span>
+        </li>
+      </Bullets>
+    </article>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1761921589-integrate.png"
+        inferSize
+        alt="Integrate"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> Here's where it struggles </Fragment>
+    <Fragment slot="title"> The Limitations </Fragment>
+    <article>
+      <Bullets style="bad">
+        <li>
+          <Svg name="icons/regular/toilet-paper-alt" />
+          <span>Its slow. Discovery and planning takes time.</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/toilet-paper-alt" />
+          <span>Its hungry. Docs lookups eat up context and tokens.</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/toilet-paper-alt" />
+          <span>Its unpredictable. It may take weird approaches.</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/toilet-paper-alt" />
+          <span>Its not scalable (yet). Big operations can time out.</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/toilet-paper-alt" />
+          <span>Its you. Your model and prompt style matter. A LOT.</span>
+        </li>
+      </Bullets>
+    </article>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1761921587-logs.png"
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> What you can expect </Fragment>
+    <Fragment slot="title"> What's in the box? </Fragment>
+    <p>If you take the MCP out for a spin, here's what you get</p>
+    <article>
+      <Bullets style="good">
+        <li>
+          <Svg name="icons/regular/check" />
+          <span
+            >10 carefully crafted tools with full script lifecycle for creates, edits, views, and
+            runs.</span
+          >
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Schema introspection, TypeScript, AST Validation, and secure sandboxing</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Works with Claude, Cursor, VS Code, and more.</span>
+        </li>
+        <li>
+          <Svg name="icons/regular/check" />
+          <span>Token vs. No-token modes with helpful docs.</span>
+        </li>
+      </Bullets>
+    </article>
+  </Flag>
+
+  {
+    page.quote && (
+      <Wrapper>
+        <Space top={3} bottom={3}>
+          <SingleQuote quote={page.quote} />
+        </Space>
+      </Wrapper>
+    )
+  }
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>
