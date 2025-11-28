@@ -37,7 +37,7 @@ export const query = graphql(
         coverImage {
           author
           customData
-          responsiveImage(imgixParams: { auto: format, w: 550, h: 340, fit: fill, fill: blur }) {
+          responsiveImage(imgixParams: { auto: format, w: 550, h: 330, fit: fill, fill: blur }) {
             ...ResponsiveImageFragment
           }
         }
