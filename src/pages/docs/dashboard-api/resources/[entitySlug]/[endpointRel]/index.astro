@@ -35,7 +35,7 @@ import {
   seoPageTitle,
   seoShareTitle,
 } from '~/lib/datocms/seo';
-import DocCalloutBase from '~/components/docs/blocks/DocCallout/Base.astro';
+import DashboardExperimentalAPIWarning from '../../../components/_DashboardExperimentalAPIWarning.astro';
 
 const sidebarItems = await buildDashboardSidebarItems(Astro, Astro.params.entitySlug!);
 const entity = await findDashboardEntity(Astro, Astro.params.entitySlug!);
@@ -126,19 +126,7 @@ const propsForExamples = { entity, endpoint, jsClient, api: 'dashboard-api' as c
     <Fragment slot="kicker">Dashboard API > {entity.title}</Fragment>
     <Fragment slot="title">{endpoint.title}</Fragment>
 
-    {
-      !!endpoint.private && (
-        <DocCalloutBase calloutType="warning" title="Warning: Experimental API">
-          <p>
-            Please note that this API method is marked as unstable and should be avoided in
-            production environments. Changes may occur at any time without warning, potentially
-            impacting your scripts. We recommend contacting{' '}
-            <a href="/support?topics=technical-support">our Support Team</a> to explore alternative
-            approaches that are safer and more reliable!
-          </p>
-        </DocCalloutBase>
-      )
-    }
+    <DashboardExperimentalAPIWarning />
 
     <Prose>
       {

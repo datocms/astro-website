@@ -25,6 +25,7 @@ import {
   seoShareTitle,
 } from '~/lib/datocms/seo';
 import { markdownToPlainText } from '~/components/Markdown/utils';
+import DashboardExperimentalAPIWarning from '../../components/_DashboardExperimentalAPIWarning.astro';
 
 const sidebarItems = await buildDashboardSidebarItems(Astro, Astro.params.entitySlug!);
 const resource = await findDashboardEntity(Astro, Astro.params.entitySlug!);
@@ -88,6 +89,8 @@ const plainDescription = resource.description
     <Fragment slot="title">{resource.title}</Fragment>
 
     <Prose>
+      <DashboardExperimentalAPIWarning />
+
       {resource.description && <Markdown of={resource.description} />}
 
       {
