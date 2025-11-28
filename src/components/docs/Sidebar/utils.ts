@@ -2,7 +2,7 @@ import {
   render as toPlainText,
   type StructuredTextDocument,
 } from 'datocms-structured-text-to-plain-text';
-import { isHeading } from 'datocms-structured-text-utils';
+import { isHeading, type Heading } from 'datocms-structured-text-utils';
 import { filterNodes } from '~/lib/datocms/filterNodes';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
 import { DocPageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/docPage';
@@ -62,14 +62,15 @@ export function buildItemsForDocGroup(
 export function buildItemsFromHeadings(
   structuredTextValue: unknown,
 ): Array<SidebarEntry | SidebarGroup> {
-  return filterNodes((structuredTextValue as StructuredTextDocument).document, isHeading).map(
-    (heading) => {
-      const innerText = toPlainText(heading)!;
+  return filterNodes(
+    (structuredTextValue as StructuredTextDocument).document,
+    (node): node is Heading => isHeading(node) && node.level !== 6,
+  ).map((heading) => {
+    const innerText = toPlainText(heading)!;
 
-      return {
-        url: `#${slugify(innerText)}`,
-        label: innerText,
-      };
-    },
-  );
+    return {
+      url: `#${slugify(innerText)}`,
+      label: innerText,
+    };
+  });
 }
