@@ -19,6 +19,7 @@ export const UseCaseExcerptsFragment = graphql(
       slug
       logo {
         url
+        alt
       }
       ...SuccessStoryUrlFragment
     }
