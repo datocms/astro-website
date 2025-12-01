@@ -7,6 +7,7 @@ import { Text } from '~/components/structuredText/Text';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import Base from './Base.astro';
+import { stripStega } from '@datocms/content-link/stega';
 
 interface Props {
   block: FragmentOf<typeof DocCalloutFragment>;
@@ -19,7 +20,7 @@ const block = readFragment(DocCalloutFragment, maskedBlock);
 const { calloutType, title, text } = block;
 ---
 
-<Base calloutType={calloutType} title={title}>
+<Base calloutType={stripStega(calloutType)} title={title}>
   <Text
     {...ensureValidStructuredTextProps({
       data: text,
