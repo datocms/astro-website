@@ -11,6 +11,8 @@ export const VideoPlayerFragment = graphql(/* GraphQL */ `
       # if provided, title is displayed in the upper left corner of the video
       title
 
+      alt
+
       # if provided, width and height are used to define the aspect ratio of the
       # player, so to avoid layout jumps during the rendering.
       width
@@ -32,6 +34,8 @@ export const MaybeVideoPlayerFragment = graphql(/* GraphQL */ `
 
       # if provided, title is displayed in the upper left corner of the video
       title
+
+      alt
 
       # if provided, width and height are used to define the aspect ratio of the
       # player, so to avoid layout jumps during the rendering.
