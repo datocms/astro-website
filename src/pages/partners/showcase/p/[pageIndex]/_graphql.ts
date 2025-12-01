@@ -15,6 +15,7 @@ export const query = graphql(
         orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
       ) {
         ...ShowcaseProjectUrlFragment
+        id
         name
         headline {
           value
@@ -28,6 +29,7 @@ export const query = graphql(
           name
           logo {
             url
+            alt
           }
           areasOfExpertise {
             name

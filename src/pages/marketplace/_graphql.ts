@@ -39,9 +39,11 @@ export const query = graphql(
             name
             logo {
               url
+              alt
             }
             squareLogo {
               url
+              alt
             }
           }
           screenshot {
@@ -59,6 +61,7 @@ export const query = graphql(
           description: shortDescription
           logo {
             url
+            alt
             width
             height
           }
@@ -69,6 +72,7 @@ export const query = graphql(
           description: shortDescription
           logo {
             url
+            alt
             width
             height
           }

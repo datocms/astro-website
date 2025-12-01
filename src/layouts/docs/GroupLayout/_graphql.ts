@@ -39,9 +39,11 @@ export const GroupLayoutFragment = graphql(
           name
           logo {
             url
+            alt
           }
           squareLogo {
             url
+            alt
           }
         }
         screenshot {

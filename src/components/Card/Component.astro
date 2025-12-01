@@ -15,7 +15,7 @@ type Props = {
   lineClamp?: number;
   orientation?: 'horizontal' | 'vertical';
   size?: 'small' | 'micro' | 'medium' | 'large';
-  svgLogoUrl?: string;
+  svgLogo?: { url: string; alt: string | null };
   title: string;
   fullTitleLength?: boolean | undefined;
   noForcedAspectRatio?: boolean;
@@ -34,7 +34,7 @@ const {
   lineClamp = 10,
   orientation = 'vertical',
   size = 'medium',
-  svgLogoUrl,
+  svgLogo,
   title,
   fullTitleLength = false,
   noForcedAspectRatio = false,
@@ -66,9 +66,9 @@ const {
         <figure class={s.visualTechnology} data-bkg={background ?? null}>
           <slot name="svgLogo" />
         </figure>
-      ) : svgLogoUrl ? (
+      ) : svgLogo ? (
         <figure class={s.visualTechnology} data-bkg={background ?? null}>
-          <img loading="lazy" class={s.technology} src={svgLogoUrl} />
+          <img loading="lazy" alt={svgLogo.alt} class={s.technology} src={svgLogo.url} />
         </figure>
       ) : null
     }
@@ -89,9 +89,9 @@ const {
         )
       }
       {
-        Astro.slots.has('image') && svgLogoUrl && (
+        Astro.slots.has('image') && svgLogo && (
           <div class={s.subImageWrapper}>
-            <img loading="lazy" class={s.subImage} src={svgLogoUrl} />
+            <img loading="lazy" alt={svgLogo.alt} class={s.subImage} src={svgLogo.url} />
           </div>
         )
       }

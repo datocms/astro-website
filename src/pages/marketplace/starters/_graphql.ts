@@ -22,9 +22,11 @@ export const query = graphql(
           name
           logo {
             url
+            alt
           }
           squareLogo {
             url
+            alt
           }
         }
         screenshot {

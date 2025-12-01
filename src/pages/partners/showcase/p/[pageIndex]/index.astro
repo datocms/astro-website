@@ -14,7 +14,7 @@ import { render as structuredTextToPlainText } from 'datocms-structured-text-to-
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { countersForDropdown } from './_facets';
-import { countersToOptions } from '~/pages/partners/_facets';
+import { countersToOptions, recursiveStripStega } from '~/pages/partners/_facets';
 import { FetchAndReplaceFormOnSubmit } from '~/components/filtering/FetchAndReplaceFormOnSubmit';
 import { Filter } from '~/components/filtering/Filter';
 
@@ -35,12 +35,14 @@ const rawPageIndex =
 const technologyFilter = Astro.url.searchParams.get('technology');
 const areaOfExpertiseFilter = Astro.url.searchParams.get('areaOfExpertise');
 
-const { projects } = await executeQuery(Astro, query);
+const { projects: projectsWithStega } = await executeQuery(Astro, query);
 
-if (!projects || projects.length === 0) {
+if (!projectsWithStega || projectsWithStega.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const projectsWithoutStega = recursiveStripStega(projectsWithStega);
 
 // Faceted search: build dropdown options
 const activeFilters = {
@@ -48,14 +50,14 @@ const activeFilters = {
   areaOfExpertise: areaOfExpertiseFilter,
 };
 
-const technologyCounters = countersForDropdown(projects, activeFilters, 'technology');
-const areaCounters = countersForDropdown(projects, activeFilters, 'areaOfExpertise');
+const technologyCounters = countersForDropdown(projectsWithoutStega, activeFilters, 'technology');
+const areaCounters = countersForDropdown(projectsWithoutStega, activeFilters, 'areaOfExpertise');
 
 const technologyOptions = countersToOptions(technologyCounters.technologies);
 const areaOfExpertiseOptions = countersToOptions(areaCounters.areasOfExpertise);
 
 // Filter projects based on active filters
-const filteredProjects = projects.filter((project) => {
+const filteredProjects = projectsWithoutStega.filter((project) => {
   if (technologyFilter && !project.technologies?.some((t) => t?.name === technologyFilter)) {
     return false;
   }
@@ -114,20 +116,22 @@ const pageProjects = filteredProjects.slice(start, end);
       <Space bottom={2}>
         <div class={s.grid}>
           {
-            pageProjects.map((project) => (
-              <Card
-                title={project.name}
-                size="small"
-                lineClamp={3}
-                svgLogoUrl={project.partner.logo.url}
-                href={buildUrlForShowcaseProject(project)}
-              >
-                <Fragment slot="image">
-                  <ResponsiveImage data={project.mainImage.responsiveImage} />
-                </Fragment>
-                {structuredTextToPlainText(project.headline)}
-              </Card>
-            ))
+            pageProjects
+              .map((p) => projectsWithStega.find((op) => op.id === p.id)!)
+              .map((project) => (
+                <Card
+                  title={project.name}
+                  size="small"
+                  lineClamp={3}
+                  svgLogo={project.partner.logo}
+                  href={buildUrlForShowcaseProject(project)}
+                >
+                  <Fragment slot="image">
+                    <ResponsiveImage data={project.mainImage.responsiveImage} />
+                  </Fragment>
+                  {structuredTextToPlainText(project.headline)}
+                </Card>
+              ))
           }
 
           {pageProjects.length === 0 && <p>No projects match your current filters.</p>}

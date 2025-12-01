@@ -20,6 +20,7 @@ export const query = graphql(
         slug
         logo {
           url
+          alt
         }
         shortDescription {
           value

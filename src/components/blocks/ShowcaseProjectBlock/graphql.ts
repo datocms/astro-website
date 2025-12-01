@@ -11,6 +11,7 @@ export const ShowcaseProjectBlockFragment = graphql(
           name
           logo {
             url
+            alt
           }
           shortDescription {
             value
@@ -23,6 +24,7 @@ export const ShowcaseProjectBlockFragment = graphql(
           name
           logo {
             url
+            alt
           }
         }
         name

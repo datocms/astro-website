@@ -25,6 +25,7 @@ export const query = graphql(
         }
         logo {
           url
+          alt
           pngUrl: url(imgixParams: { fm: png, h: 200 })
         }
         description {
@@ -114,6 +115,7 @@ export const query = graphql(
             }
             logo {
               url
+              alt
             }
           }
           mainImage {

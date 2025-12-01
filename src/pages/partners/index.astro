@@ -14,7 +14,7 @@ import { query } from './_graphql';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { countersForDropdown, countersToOptions } from './_facets';
+import { countersForDropdown, countersToOptions, recursiveStripStega } from './_facets';
 import { FetchAndReplaceFormOnSubmit } from '~/components/filtering/FetchAndReplaceFormOnSubmit';
 import { Filter } from '~/components/filtering/Filter';
 
@@ -32,13 +32,15 @@ const projectsCountByPartner = partners.reduce<Record<string, number>>((acc, par
 
 const highlightedPartnerIds = page.highlightedPartners.map((p) => p.id);
 
-const orderedPartners = [
+const orderedPartnersWithStega = [
   ...page.highlightedPartners,
   ...sortBy(
     partners.filter((p) => !highlightedPartnerIds.includes(p.id)),
     [(x) => -(projectsCountByPartner[x.id] || 0), 'name'],
   ),
 ];
+
+const orderedPartnersWithoutStega = recursiveStripStega(orderedPartnersWithStega);
 
 const partnersCountByCountryCode = partners
   .flatMap((partner) => partner.locations.map((location) => location.code))
@@ -52,7 +54,7 @@ const areaOfExpertiseFilter = Astro.url.searchParams.get('areaOfExpertise');
 const countryFilter = Astro.url.searchParams.get('country');
 const continentFilter = Astro.url.searchParams.get('continent');
 
-const filteredPartners = orderedPartners.filter((partner) => {
+const filteredPartners = orderedPartnersWithoutStega.filter((partner) => {
   if (technologyFilter && !partner.technologies.some((t) => t.name === technologyFilter)) {
     return false;
   }
@@ -80,10 +82,18 @@ const activeFilters = {
   continent: continentFilter,
 };
 
-const techCounters = countersForDropdown(orderedPartners, activeFilters, 'technology');
-const areaCounters = countersForDropdown(orderedPartners, activeFilters, 'areaOfExpertise');
-const countryCounters = countersForDropdown(orderedPartners, activeFilters, 'country');
-const continentCounters = countersForDropdown(orderedPartners, activeFilters, 'continent');
+const techCounters = countersForDropdown(orderedPartnersWithoutStega, activeFilters, 'technology');
+const areaCounters = countersForDropdown(
+  orderedPartnersWithoutStega,
+  activeFilters,
+  'areaOfExpertise',
+);
+const countryCounters = countersForDropdown(orderedPartnersWithoutStega, activeFilters, 'country');
+const continentCounters = countersForDropdown(
+  orderedPartnersWithoutStega,
+  activeFilters,
+  'continent',
+);
 
 const continentOptions = countersToOptions(continentCounters.continents);
 const countryOptions = countersToOptions(countryCounters.countries);
@@ -160,27 +170,29 @@ const bkgColors = ['azure', 'pink', 'blue', 'green', 'yellow'] as const;
       </form>
       <div class={s.posts} id="filtered-partners">
         {
-          filteredPartners.map((partner, i) => (
-            <Card
-              href={buildUrlForPartner(partner)}
-              background={bkgColors[i % bkgColors.length]}
-              label={getLabel(partner._allReferencingShowcaseProjectsMeta.count) || undefined}
-              lineClamp={3}
-              svgLogoUrl={partner.logo.url}
-              title={partner.name}
-            >
-              <Fragment slot="title">
-                <span class={s.cardTitle}>{partner.name}</span>
-                {partner.locations.slice(0, 5).map((l) => (
-                  <span class={s.cardFlag}>{l.emoji}</span>
-                ))}
-                {partner.locations.length > 5 && (
-                  <span class={s.cardMoreLocations}>+ {partner.locations.length - 5} more</span>
-                )}
-              </Fragment>
-              {toPlainText(partner.shortDescription)}
-            </Card>
-          ))
+          filteredPartners
+            .map((p) => orderedPartnersWithStega.find((op) => op.id === p.id)!)
+            .map((partner, i) => (
+              <Card
+                href={buildUrlForPartner(partner)}
+                background={bkgColors[i % bkgColors.length]}
+                label={getLabel(partner._allReferencingShowcaseProjectsMeta.count) || undefined}
+                lineClamp={3}
+                svgLogo={partner.logo}
+                title={partner.name}
+              >
+                <Fragment slot="title">
+                  <span class={s.cardTitle}>{partner.name}</span>
+                  {partner.locations.slice(0, 5).map((l) => (
+                    <span class={s.cardFlag}>{l.emoji}</span>
+                  ))}
+                  {partner.locations.length > 5 && (
+                    <span class={s.cardMoreLocations}>+ {partner.locations.length - 5} more</span>
+                  )}
+                </Fragment>
+                {toPlainText(partner.shortDescription)}
+              </Card>
+            ))
         }
       </div>
     </FetchAndReplaceFormOnSubmit>

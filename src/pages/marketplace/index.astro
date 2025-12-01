@@ -15,6 +15,7 @@ import { PluginCard } from './_sub/PluginCard';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { RecipeCard } from './_sub/RecipeCard';
+import { stripStega } from '@datocms/content-link/stega';
 
 const { page, recipes, pluginsMeta, hostingAppsMeta, enterpriseAppsMeta, recipesMeta } =
   await executeQuery(Astro, query);
@@ -24,8 +25,8 @@ if (!page) {
   return notFoundResponse();
 }
 
-const fullFledged = page.demos.filter((item) => item.starterType === 'fully_fledged');
-const techStarters = page.demos.filter((item) => item.starterType === 'tech_starter');
+const fullFledged = page.demos.filter((item) => stripStega(item.starterType) === 'fully_fledged');
+const techStarters = page.demos.filter((item) => stripStega(item.starterType) === 'tech_starter');
 ---
 
 <Layout noFinalCta seo={[]}>
@@ -57,7 +58,7 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
               highlight={'Best choice to start!'}
               label={item.label ?? undefined}
               size="large"
-              svgLogoUrl={item.technology.logo.url}
+              svgLogo={item.technology.logo}
             >
               <Fragment slot="image">
                 <ResponsiveImage data={item.screenshot.responsiveImage} />
@@ -78,11 +79,7 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
           techStarters.map((item) => (
             <Card
               href={buildUrlForTemplateDemo(item)}
-              svgLogoUrl={
-                item.technology.squareLogo
-                  ? item.technology.squareLogo.url
-                  : item.technology.logo.url
-              }
+              svgLogo={item.technology.squareLogo || item.technology.logo}
               title={item.name}
               boxed={false}
               orientation="horizontal"
@@ -164,7 +161,7 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
                 href={buildUrlForHostingApp(item)}
                 size="medium"
                 background="azure"
-                svgLogoUrl={item.logo?.url}
+                svgLogo={item.logo}
               >
                 {item.description}
               </Card>
@@ -193,7 +190,7 @@ const techStarters = page.demos.filter((item) => item.starterType === 'tech_star
               <Card
                 title={item.title}
                 href={buildUrlForEnterpriseApp(item)}
-                svgLogoUrl={item.logo.url}
+                svgLogo={item.logo}
                 size="medium"
                 background="pink"
               >

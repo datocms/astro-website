@@ -26,6 +26,7 @@ export const query = graphql(
         shortDescription
         logo {
           url
+          alt
           width
           height
         }
