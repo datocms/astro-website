@@ -3,7 +3,9 @@ import { Seo, type TitleMetaLinkTag } from '@datocms/astro';
 import { ClientRouter } from 'astro:transitions';
 import './global.css';
 import ProgressBar from './_ProgressBar.astro';
+import VisualEditing from './_VisualEditing.astro';
 import { fetchFavicon } from './fetchFavicon';
+import { isDraftModeEnabled } from '~/lib/draftMode';
 
 type Props = {
   seo: TitleMetaLinkTag[];
@@ -12,6 +14,7 @@ type Props = {
 const { seo } = Astro.props;
 
 const result = await fetchFavicon(Astro);
+const draftModeEnabled = isDraftModeEnabled(Astro);
 ---
 
 <!doctype html>
@@ -38,6 +41,7 @@ const result = await fetchFavicon(Astro);
   </head>
   <body>
     <slot />
+    {draftModeEnabled && <VisualEditing />}
   </body>
 </html>
 

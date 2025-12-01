@@ -11,6 +11,7 @@ import { Wrapper } from '~/components/Wrapper';
 import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { stripStega } from '@datocms/content-link/stega';
 
 const { starters } = await executeQuery(Astro, query);
 
@@ -19,9 +20,13 @@ if (!starters) {
   return notFoundResponse();
 }
 
-const fullyFledged = starters.filter((starter) => starter.starterType === 'fully_fledged');
-const techStarters = starters.filter((starter) => starter.starterType === 'tech_starter');
-const community = starters.filter((starter) => starter.starterType === 'community');
+const fullyFledged = starters.filter(
+  (starter) => stripStega(starter.starterType) === 'fully_fledged',
+);
+const techStarters = starters.filter(
+  (starter) => stripStega(starter.starterType) === 'tech_starter',
+);
+const community = starters.filter((starter) => stripStega(starter.starterType) === 'community');
 ---
 
 <Layout noFinalCta seo={[]}>

@@ -1,0 +1,26 @@
+<script>
+  import { createController } from '@datocms/content-link';
+  import { navigate } from 'astro:transitions/client';
+
+  const controller = createController({
+    onNavigateTo: (path) => {
+      navigate(path);
+    },
+  });
+
+  document.addEventListener('astro:page-load', () => {
+    controller.setCurrentPath(document.location.toString());
+  });
+
+  document.addEventListener('datocms:click-to-edit:toggle', (e) => {
+    const ce = e as CustomEvent<boolean>;
+    const enabled = ce.detail;
+    console.log('Click-to-edit enabled?', enabled);
+  });
+
+  const isInFrame = typeof window !== 'undefined' && window.parent !== window;
+
+  if (!isInFrame) {
+    controller.enableClickToEdit({ scrollToNearestTarget: false });
+  }
+</script>
