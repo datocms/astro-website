@@ -25,6 +25,7 @@ export const query = graphql(
           name
           logo {
             url
+            alt
           }
           shortDescription {
             value
@@ -89,9 +90,6 @@ export const query = graphql(
         }
         technologies {
           name
-          logo {
-            url
-          }
         }
         areasOfExpertise {
           name

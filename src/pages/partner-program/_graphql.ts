@@ -10,6 +10,7 @@ export const query = graphql(
           name
           logo {
             url
+            alt
           }
           ...PartnerUrlFragment
         }

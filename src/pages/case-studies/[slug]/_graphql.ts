@@ -54,6 +54,7 @@ export const query = graphql(
         }
         logo {
           url
+          alt
         }
         challenge {
           value

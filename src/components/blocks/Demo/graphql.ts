@@ -15,6 +15,7 @@ export const DemoFragment = graphql(
           name
           logo {
             url
+            alt
           }
         }
         screenshot {

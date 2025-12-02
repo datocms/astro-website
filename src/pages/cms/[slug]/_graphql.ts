@@ -28,12 +28,6 @@ export const query = graphql(
         subtitle
         integration {
           id
-          squareLogo {
-            url
-          }
-          logo {
-            url
-          }
           websites: _allReferencingWebsites {
             __typename
             id

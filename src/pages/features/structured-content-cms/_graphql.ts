@@ -29,12 +29,14 @@ export const query = graphql(
         id
         logo {
           url
+          alt
         }
         integrationType {
           slug
         }
         squareLogo {
           url
+          alt
         }
       }
     }

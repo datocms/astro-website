@@ -16,12 +16,14 @@ export const query = graphql(
         id
         logo {
           url
+          alt
         }
         integrationType {
           slug
         }
         squareLogo {
           url
+          alt
         }
       }
       review1: review(filter: { name: { eq: "Russell Gardner" } }) {
