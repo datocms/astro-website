@@ -4918,43 +4918,6 @@ enum FaviconType {
   msApplication
 }
 
-type FeatureHighlightCardModelDescriptionField {
-  blocks: [String!]!
-  inlineBlocks: [String!]!
-  links: [String!]!
-  value: JsonField!
-}
-
-"""Block of type 💖 Feature highlight card (feature_highlight_card)"""
-type FeatureHighlightCardRecord implements RecordInterface {
-  _createdAt: DateTime!
-
-  """Editing URL"""
-  _editingUrl: String
-  _firstPublishedAt: DateTime!
-  _isValid: BooleanType!
-  _modelApiKey: String!
-  _publicationScheduledAt: DateTime
-  _publishedAt: DateTime!
-
-  """Generates SEO and Social card meta tags to be used in your frontend"""
-  _seoMetaTags(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-  ): [Tag!]!
-  _status: ItemStatus!
-  _unpublishingScheduledAt: DateTime
-  _updatedAt: DateTime!
-  cardType: String!
-  createdAt: DateTime!
-  description: FeatureHighlightCardModelDescriptionField
-  id: ItemId!
-  image: FileField
-  links: [FeatureLinkRecord!]!
-  title: String!
-  updatedAt: DateTime!
-}
-
 union FeatureLinkModelContentField = BlogPostRecord | ChangelogEntryRecord | DocPageRecord | EnterpriseAppRecord | FeatureRecord | HostingAppRecord | PluginRecord | TemplateDemoRecord | UserGuidesEpisodeRecord
 
 """Block of type 🔗 Feature link (feature_link)"""
@@ -5108,6 +5071,7 @@ type FeatureRegularCardRecord implements RecordInterface {
   badge: String
   createdAt: DateTime!
   description: FeatureRegularCardModelDescriptionField
+  emoji: String
   id: ItemId!
   image: ImageFileField
   links: [FeatureLinkRecord!]!
@@ -5139,8 +5103,6 @@ enum FeaturesIndexModelFieldsReferencingDocPageModel {
   featuresIndex_extensibilityBlocks__featureRegularCard_links__featureLink_content
   featuresIndex_governanceAndComplianceBlocks
   featuresIndex_governanceAndComplianceBlocks__featureRegularCard_links__featureLink_content
-  featuresIndex_highlightCards
-  featuresIndex_highlightCards__featureHighlightCard_links__featureLink_content
   featuresIndex_imageVideoManagementBlocks
   featuresIndex_imageVideoManagementBlocks__featureRegularCard_links__featureLink_content
   featuresIndex_localizationBlocks
@@ -5163,8 +5125,6 @@ enum FeaturesIndexModelFieldsReferencingPluginModel {
   featuresIndex_extensibilityBlocks__featureRegularCard_links__featureLink_content
   featuresIndex_governanceAndComplianceBlocks
   featuresIndex_governanceAndComplianceBlocks__featureRegularCard_links__featureLink_content
-  featuresIndex_highlightCards
-  featuresIndex_highlightCards__featureHighlightCard_links__featureLink_content
   featuresIndex_imageVideoManagementBlocks
   featuresIndex_imageVideoManagementBlocks__featureRegularCard_links__featureLink_content
   featuresIndex_localizationBlocks
@@ -5187,8 +5147,6 @@ enum FeaturesIndexModelFieldsReferencingUserGuidesEpisodeModel {
   featuresIndex_extensibilityBlocks__featureRegularCard_links__featureLink_content
   featuresIndex_governanceAndComplianceBlocks
   featuresIndex_governanceAndComplianceBlocks__featureRegularCard_links__featureLink_content
-  featuresIndex_highlightCards
-  featuresIndex_highlightCards__featureHighlightCard_links__featureLink_content
   featuresIndex_imageVideoManagementBlocks
   featuresIndex_imageVideoManagementBlocks__featureRegularCard_links__featureLink_content
   featuresIndex_localizationBlocks
@@ -5295,7 +5253,6 @@ type FeaturesIndexRecord implements RecordInterface {
   governanceAndComplianceBlocks: [FeaturesIndexModelGovernanceAndComplianceBlocksField!]!
   heroImageLeft: ImageFileField!
   heroImageRight: ImageFileField!
-  highlightCards: [FeatureHighlightCardRecord!]!
   id: ItemId!
   imageVideoManagementBlocks: [FeaturesIndexModelImageVideoManagementBlocksField!]!
   localizationBlocks: [FeaturesIndexModelLocalizationBlocksField!]!

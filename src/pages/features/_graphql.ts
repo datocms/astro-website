@@ -17,6 +17,7 @@ const FeatureSectionFragment = graphql(
     fragment FeatureSectionFragment on FeatureRegularCardRecord @_unmask {
       __typename
       title
+      emoji
       description {
         value
       }

@@ -233,12 +233,12 @@
     color: inherit;
     display: inline-block;
     padding: 0.5em 0 0 0;
-    /* text-decoration: none; */
+    text-decoration: none;
     transition: all 0.3s;
 
-    /* &:hover {
+    &:hover {
       text-decoration: underline;
-    } */
+    }
 
     &[aria-current='true'] {
       color: var(--accent-color);
@@ -282,23 +282,24 @@
   font-family: var(--font-sans);
   font-size: rfs(24px);
   font-weight: 400;
-  margin-top: rfs(40px);
+  margin-top: rfs(20px);
 }
 
 .blocks {
   align-items: stretch;
   display: flex;
   flex-direction: column;
-  gap: rfs(40px);
+  gap: rfs(60px);
 }
 
 .feature {
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: rfs(30px);
+  gap: rfs(15px);
   position: relative;
-  padding-bottom: rfs(40px);
+  padding-bottom: rfs(60px);
+  align-items: start;
 
   &:after {
     content: '';
@@ -312,15 +313,11 @@
 
   &:hover {
     .featureBadge {
-      transform: rotate(8deg) translateX(80px) translateY(-40%);
+      transform: rotate(-15deg);
     }
-  }
-
-  article {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    position: relative;
+    .featureEmoji {
+      transform: scale(1.2);
+    }
   }
 }
 
@@ -334,10 +331,12 @@
   position: absolute;
   text-align: center;
   top: 0;
-  right: 0;
-  transform: rotate(10deg) translateX(85px) translateY(-55%);
+  right: 100%;
+  transform: rotate(-5deg);
+  transform-origin: bottom right;
   transition: transform 0.3s;
   width: 110px;
+  margin-right: 20px;
 
   @media screen and (max-width: 1199px) {
     display: none;
@@ -346,22 +345,30 @@
   .arrow {
     fill: var(--light-body-color);
     height: auto;
-    transform: translateX(-20px);
+    transform: scaleX(-1) translateX(-20px);
     width: 30px;
   }
 
   .arrow2 {
     fill: var(--light-body-color);
     height: auto;
-    transform: scaleX(-1) rotate(30deg) translateX(12px);
+    transform: rotate(36deg) translateX(12px);
     width: 40px;
   }
 }
 
 .featureTitle {
-  font-size: rfs(20px);
+  font-size: rfs(30px);
   font-weight: bold;
   margin: 0;
+  align-self: stretch;
+}
+
+.featureEmoji {
+  margin-right: 5px;
+  display: inline-block;
+  transition: transform 0.3s;
+  transform: scale(1);
 }
 
 .featureImage {
@@ -370,7 +377,10 @@
   border: #ddd;
   box-shadow: var(--box-shadow);
   position: relative;
-  width: 100%;
+  width: 80%;
+  align-self: start;
+  margin-top: 25px;
+  margin-bottom: 25px;
 
   img {
     border-radius: 6px;

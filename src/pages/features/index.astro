@@ -20,6 +20,7 @@ import { slugify } from '~/lib/slugify';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
+import { splitStega } from '@datocms/content-link/stega';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -150,59 +151,66 @@ const linkLabel: { [key: string]: string } = {
                     if (feature.__typename === 'FeatureRegularCardRecord') {
                       return (
                         <div class={s.feature}>
+                          {feature.badge && (
+                            <div class={s.featureBadge}>
+                              {feature.badge}
+                              {i % 2 === 0 ? (
+                                <div class={s.arrow}>
+                                  <Svg name="svg/illustrations/arrow-sketch-5" />
+                                </div>
+                              ) : (
+                                <div class={s.arrow2}>
+                                  <Svg name="svg/illustrations/arrow-sketch-1" />
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          <Heading as="h3" class={s.featureTitle}>
+                            <span class={s.featureEmoji}>{feature.emoji}</span>
+                            {feature.title}
+                          </Heading>
+
                           {feature.image?.responsiveImage && (
                             <figure class={s.featureImage}>
                               <ResponsiveImage data={feature.image.responsiveImage} />
                             </figure>
                           )}
-                          <article>
-                            {feature.badge && (
-                              <div class={s.featureBadge}>
-                                {feature.badge}
-                                {i % 2 === 0 ? (
-                                  <div class={s.arrow}>
-                                    <Svg name="svg/illustrations/arrow-sketch-5" />
-                                  </div>
-                                ) : (
-                                  <div class={s.arrow2}>
-                                    <Svg name="svg/illustrations/arrow-sketch-1" />
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            <Heading as="h3" class={s.featureTitle} anchor={slugify(feature.title)}>
-                              {feature.title}
-                            </Heading>
 
-                            <div class={s.featureDescription}>
-                              <Prose>
-                                <Text
-                                  {...ensureValidStructuredTextProps({ data: feature.description })}
-                                />
-                              </Prose>
+                          <div class={s.featureDescription}>
+                            <Prose>
+                              <Text
+                                {...ensureValidStructuredTextProps({ data: feature.description })}
+                              />
+                            </Prose>
+                          </div>
+
+                          {feature.links && (
+                            <div class={s.featureLinks}>
+                              {feature.links.map((link) => {
+                                const { cleaned, encoded } = splitStega(link.linkTitle);
+
+                                const customTitle =
+                                  cleaned in linkLabel
+                                    ? `${encoded}${linkLabel[cleaned]}`
+                                    : link.linkTitle;
+
+                                return (
+                                  <a href={buildUrlFromGql(link.content)} class={s.link}>
+                                    {customTitle}
+                                    <span class={s.linkArrow}>→</span>
+                                  </a>
+                                );
+                              })}
                             </div>
-
-                            {feature.links && (
-                              <div class={s.featureLinks}>
-                                {feature.links.map((link) => {
-                                  const customTitle = linkLabel[link.linkTitle] || link.linkTitle;
-                                  return (
-                                    <a href={buildUrlFromGql(link.content)} class={s.link}>
-                                      {customTitle}
-                                      <span class={s.linkArrow}>→</span>
-                                    </a>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </article>
+                          )}
                         </div>
                       );
                     }
                     if (feature.__typename === 'TestimonialCardRecord') {
                       return (
                         <Space top={2} bottom={2}>
-                          <SingleQuote quote={feature.testimonial} />
+                          <SingleQuote quote={feature.testimonial} fontSize="small" />
                         </Space>
                       );
                     }
