@@ -3,12 +3,13 @@ import { Svg } from '~/components/Svg';
 import s from './style.module.css';
 
 interface Props {
-  size?: 'small' | 'medium' | 'large';
+  size?: 'small' | 'large';
   asLink?: boolean;
   illustration?: string | true;
   title: string;
   ctaLink?: string;
   ctaLabel?: string;
+  color: 'pink' | 'azure' | 'gray' | 'blue' | 'green' | 'yellow';
 }
 
 const {
@@ -18,13 +19,14 @@ const {
   title,
   ctaLink,
   ctaLabel = 'Check it out →',
+  color,
 } = Astro.props;
 
 const resolvedIllustration =
   illustration === true ? 'svg/illustrations/developers-2' : illustration;
 ---
 
-<div class={s.calloutWrapper} data-as-link={ctaLink && !!asLink} data-size={size}>
+<div class={s.calloutWrapper} data-bkg={color} data-as-link={ctaLink && !!asLink} data-size={size}>
   {
     !!resolvedIllustration && (
       <div class={s.calloutImage}>
