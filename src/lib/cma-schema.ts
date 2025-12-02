@@ -2,6 +2,27 @@ import type { ItemTypeDefinition } from '@datocms/cma-client';
 type EnvironmentSettings = {
   locales: 'en';
 };
+export type PricingHint = ItemTypeDefinition<
+  EnvironmentSettings,
+  '810916',
+  {
+    name: {
+      type: 'string';
+    };
+    api_id: {
+      type: 'slug';
+    };
+    description: {
+      type: 'string';
+    };
+    documentation_url: {
+      type: 'string';
+    };
+    position: {
+      type: 'integer';
+    };
+  }
+>;
 export type Llmstxt = ItemTypeDefinition<
   EnvironmentSettings,
   'PvVIeFX5QROO2tUujtmr6g',
@@ -11,6 +32,66 @@ export type Llmstxt = ItemTypeDefinition<
     };
     llmstxt_full: {
       type: 'text';
+    };
+  }
+>;
+export type FeaturesIndex = ItemTypeDefinition<
+  EnvironmentSettings,
+  'IFE-sYUmTDao2ng75Qc6Jw',
+  {
+    security_and_infrastructure_blocks: {
+      type: 'rich_text';
+      blocks: TestimonialCard | FeatureRegularCard;
+    };
+    core_features_blocks: {
+      type: 'rich_text';
+      blocks: TestimonialCard | FeatureRegularCard;
+    };
+    developer_experience_blocks: {
+      type: 'rich_text';
+      blocks: TestimonialCard | FeatureRegularCard;
+    };
+    editor_experience_blocks: {
+      type: 'rich_text';
+      blocks: TestimonialCard | FeatureRegularCard;
+    };
+    localization_blocks: {
+      type: 'rich_text';
+      blocks: TestimonialCard | FeatureRegularCard;
+    };
+    extensibility_blocks: {
+      type: 'rich_text';
+      blocks: TestimonialCard | FeatureRegularCard;
+    };
+    content_integrity_blocks: {
+      type: 'rich_text';
+      blocks: TestimonialCard | FeatureRegularCard;
+    };
+    image_video_management_blocks: {
+      type: 'rich_text';
+      blocks: TestimonialCard | FeatureRegularCard;
+    };
+    governance_and_compliance_blocks: {
+      type: 'rich_text';
+      blocks: TestimonialCard | FeatureRegularCard;
+    };
+    seo: {
+      type: 'seo';
+    };
+    title: {
+      type: 'structured_text';
+    };
+    readability: {
+      type: 'json';
+    };
+    subtitle: {
+      type: 'structured_text';
+    };
+    hero_image_left: {
+      type: 'file';
+    };
+    hero_image_right: {
+      type: 'file';
     };
   }
 >;
@@ -81,28 +162,6 @@ export type FeatureLink = ItemTypeDefinition<
     };
     link_title: {
       type: 'string';
-    };
-  }
->;
-export type FeatureHighlightCard = ItemTypeDefinition<
-  EnvironmentSettings,
-  'ZkcaTdMtToeCy95LTLI0-g',
-  {
-    card_type: {
-      type: 'string';
-    };
-    title: {
-      type: 'string';
-    };
-    image: {
-      type: 'file';
-    };
-    description: {
-      type: 'structured_text';
-    };
-    links: {
-      type: 'rich_text';
-      blocks: FeatureLink;
     };
   }
 >;
@@ -758,6 +817,9 @@ export type FeatureRegularCard = ItemTypeDefinition<
     title: {
       type: 'string';
     };
+    emoji: {
+      type: 'string';
+    };
     image: {
       type: 'file';
     };
@@ -1040,27 +1102,6 @@ export type Review = ItemTypeDefinition<
     };
     use_in_dashboard: {
       type: 'boolean';
-    };
-    position: {
-      type: 'integer';
-    };
-  }
->;
-export type PricingHint = ItemTypeDefinition<
-  EnvironmentSettings,
-  '810916',
-  {
-    name: {
-      type: 'string';
-    };
-    api_id: {
-      type: 'string';
-    };
-    description: {
-      type: 'string';
-    };
-    documentation_url: {
-      type: 'string';
     };
     position: {
       type: 'integer';
@@ -3001,77 +3042,12 @@ export type NavigationBar = ItemTypeDefinition<
     };
   }
 >;
-export type FeaturesIndex = ItemTypeDefinition<
-  EnvironmentSettings,
-  'IFE-sYUmTDao2ng75Qc6Jw',
-  {
-    security_and_infrastructure_blocks: {
-      type: 'rich_text';
-      blocks: TestimonialCard | FeatureRegularCard;
-    };
-    core_features_blocks: {
-      type: 'rich_text';
-      blocks: TestimonialCard | FeatureRegularCard;
-    };
-    developer_experience_blocks: {
-      type: 'rich_text';
-      blocks: TestimonialCard | FeatureRegularCard;
-    };
-    editor_experience_blocks: {
-      type: 'rich_text';
-      blocks: TestimonialCard | FeatureRegularCard;
-    };
-    localization_blocks: {
-      type: 'rich_text';
-      blocks: TestimonialCard | FeatureRegularCard;
-    };
-    extensibility_blocks: {
-      type: 'rich_text';
-      blocks: TestimonialCard | FeatureRegularCard;
-    };
-    content_integrity_blocks: {
-      type: 'rich_text';
-      blocks: TestimonialCard | FeatureRegularCard;
-    };
-    image_video_management_blocks: {
-      type: 'rich_text';
-      blocks: TestimonialCard | FeatureRegularCard;
-    };
-    governance_and_compliance_blocks: {
-      type: 'rich_text';
-      blocks: TestimonialCard | FeatureRegularCard;
-    };
-    seo: {
-      type: 'seo';
-    };
-    title: {
-      type: 'structured_text';
-    };
-    readability: {
-      type: 'json';
-    };
-    subtitle: {
-      type: 'structured_text';
-    };
-    hero_image_left: {
-      type: 'file';
-    };
-    hero_image_right: {
-      type: 'file';
-    };
-    highlight_cards: {
-      type: 'rich_text';
-      blocks: FeatureHighlightCard;
-    };
-  }
->;
 export type AnyBlock =
   | ManagedNavigationBarGroup
   | NavigationBarGroupCta
   | NavigationBarGroupCtaItem
   | Table
   | FeatureLink
-  | FeatureHighlightCard
   | CloneButtonForm
   | DeployButtonForm
   | CodeExcerptBlock
@@ -3118,7 +3094,9 @@ export type AnyBlock =
   | Image
   | InternalVideo;
 export type AnyModel =
+  | PricingHint
   | Llmstxt
+  | FeaturesIndex
   | AssetsHardcodedInWebsite
   | TeamPage
   | Partner
@@ -3129,7 +3107,6 @@ export type AnyModel =
   | Website
   | Tutorial
   | Review
-  | PricingHint
   | Integration
   | Customer
   | PluginFieldType
@@ -3195,6 +3172,5 @@ export type AnyModel =
   | Blog
   | PluginsPage
   | UseCasesPage
-  | NavigationBar
-  | FeaturesIndex;
+  | NavigationBar;
 export type AnyBlockOrModel = AnyBlock | AnyModel;

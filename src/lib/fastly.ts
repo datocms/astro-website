@@ -11,7 +11,7 @@ export async function invalidateFastlySurrogateKeys(keys: string[]) {
         headers: {
           'fastly-key': FASTLY_KEY,
           // required for stale-while-revalidate to work
-          'fastly-soft-purge': '1',
+          // 'fastly-soft-purge': '1',
         },
         json: { surrogate_keys: chunkKeys },
       })
