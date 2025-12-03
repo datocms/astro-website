@@ -15,6 +15,7 @@ import { buildUrlForAcademyCourse } from '~/lib/datocms/gqlUrlBuilder/academyCou
 import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
 import { intersperse } from '~/lib/intersperse';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { stripStega } from '@datocms/content-link/stega';
 
 const { courses, page } = await executeQuery(Astro, query);
 
@@ -54,7 +55,7 @@ if (!page || courses.length === 0) {
                       width: `calc(var(--dotBaseUnit) * ${size})`,
                     }}
                   />
-                  <Svg name={`svg/illustrations/${course.illustration}`} />
+                  <Svg name={`svg/illustrations/${stripStega(course.illustration)}`} />
                 </div>
                 <div class={s.courseContent}>
                   <div class={s.courseTitle}>
