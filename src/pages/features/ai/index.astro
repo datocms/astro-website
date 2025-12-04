@@ -1,0 +1,201 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Button } from '~/components/Button';
+import { CalloutCard } from '~/components/CalloutCard';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { Image } from 'astro:assets';
+import { Layout } from '~/layouts/Layout';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
+
+const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('AI & Automation at DatoCMS'),
+    seoDescription('Lets talk about AI innovation at DatoCMS'),
+    seoGeneratedCard(Astro, {
+      title: 'AI & Automation at DatoCMS',
+      excerpt: 'Lets talk about AI innovation at DatoCMS',
+    }),
+  )}
+>
+  <Hero>
+    <Fragment slot="kicker">AI & Automation</Fragment>
+    <Fragment slot="title">
+      Buzzwords. But make them <mark>useful</mark>.
+    </Fragment>
+    <Fragment slot="subtitle">
+      We take a conservative and pragmatic approach with adding AI at DatoCMS. Here's what we're
+      working on.
+    </Fragment>
+    <div class={s.buttonContainer}>
+      <Button fs="big" as="a" href="/docs/mcp-server">Try the MCP</Button>
+      <Button fs="big" as="a" s="invert" href="/docs/llm-ready-docs">Docs for LLMs</Button>
+    </div>
+  </Hero>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1764759009-mcp.png"
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> DatoCMS MCP (Beta) </Fragment>
+    <Fragment slot="title"> LLM-friendly. Token Hungry. NotTheWorst™</Fragment>
+    <p>
+      We built the MCP to run through discovery, planning, and execution, using scripts,
+      documentation, and actual reasoning.
+    </p>
+    <div>
+      <article>
+        <Bullets style="good">
+          <li>
+            <Svg name="icons/regular/check" />
+            <span>A local MCP server for the DatoCMS API</span>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <span>10 carefully layered tools, not 150+ raw endpoints</span>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <span>Script-based reasoning, not single call guessing</span>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <span>Documentation and schema aware</span>
+          </li>
+        </Bullets>
+      </article>
+    </div>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <CalloutCard
+        title="Try the MCP"
+        ctaLink="/docs/mcp-server"
+        ctaLabel="Get started →"
+        illustration="svg/illustrations/zen"
+        color="green"
+        asLink
+      >
+        <Fragment slot="text">
+          Get it up and running with any tool you're used to like Claude Code and Cursor. We're keen
+          to get your feedback!
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1764759009-docs-for-llms.png"
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> LLM Ready Docs </Fragment>
+    <Fragment slot="title"> Context over everything</Fragment>
+    <p>
+      We've generated an LLM friendly way to utilize our complete documentation, all 500+ pages,
+      available in one clean Markdown file optimized for the hungry AI tools to gobble up.
+    </p>
+    <p>
+      Drop the file into Claude Projects, custom GPTs, or any AI assistant and get accurate,
+      context-aware answers about DatoCMS that's always up to date.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <CalloutCard
+        title="Close your tabs"
+        ctaLink="/docs/llm-ready-docs"
+        ctaLabel="cmd+C cmd+V →"
+        illustration="svg/illustrations/eye-gazing"
+        color="azure"
+        asLink
+      >
+        <Fragment slot="text">
+          Stop going back and forth between docs tabs. Drop the txt into your LLM. Happy days!
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1764759009-ai-translate.png"
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> AI Translations </Fragment>
+    <Fragment slot="title"> Translate 语言 automaticamente pour deine پروژه‌ها </Fragment>
+    <p>
+      Bring high-quality translations directly into the CMS. The plugin understands context,
+      preserves formatting, and produces natural-sounding translations that adapt to your content.
+    </p>
+    <p>
+      Translate fields, records, or entire models. One at a time, or in bulk. The flexibility is
+      yours.
+    </p>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <CalloutCard
+        title="Hello AI Translations"
+        ctaLink="/marketplace/plugins/i/datocms-plugin-ai-translations"
+        ctaLabel="Install the plugin →"
+        illustration="svg/illustrations/workflows"
+        color="pink"
+        asLink
+      >
+        <Fragment slot="text">
+          One click brings OpenAI (ChatGPT), Google (Gemini), Anthropic (Claude), and DeepL —
+          directly into DatoCMS.
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
+  </Space>
+
+  {
+    page.quote && (
+      <Wrapper>
+        <Space top={3} bottom={3}>
+          <SingleQuote quote={page.quote} />
+        </Space>
+      </Wrapper>
+    )
+  }
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>
