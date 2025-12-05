@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { SitemapStream, streamToPromise } from 'sitemap';
 import { baseUrl } from '~/lib/draftMode';
+import { toArrayBuffer } from '~/lib/toArrayBuffer';
 import { handleUnexpectedError } from './api/_utils';
 
 const allAstroFiles = import.meta.glob<string>('../pages/**/*.astro', {
@@ -84,7 +85,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     const sitemap = await sitemapPromise;
 
-    return new Response(sitemap, {
+    return new Response(toArrayBuffer(sitemap), {
       headers: responseHeaders,
     });
   } catch (error) {

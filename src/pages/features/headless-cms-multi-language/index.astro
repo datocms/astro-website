@@ -18,8 +18,8 @@ import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/d
 const variables = { slug: Astro.url.pathname.split('/').pop()! };
 const { page } = await executeQuery(Astro, query, { variables });
 
-const flags = await Astro.glob('~/svg/flags/*.svg');
-const icons = flags.map((flag) => flag.default.src);
+const flags = Object.values(import.meta.glob('~/svg/flags/*.svg', { eager: true }));
+const icons = flags.map((flag) => (flag as any).default.src);
 
 if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
@@ -63,9 +63,9 @@ if (!page) {
     <Fragment slot="kicker">Multi-language & multi-site headless cms</Fragment>
     <Fragment slot="title">Translate your <mark>websites and apps</mark></Fragment>
     <p>
-      <strong>Add all the languages you'd like to support in your app</strong> and start translating
-      your content, with our user-friendly multi-language interface. DatoCMS will deliver your content
-      to your net of projects, using the same <strong>fast and scalable platform</strong>.
+      <strong>Add all the languages you'd like to support in your app</strong> and start translating your
+      content, with our user-friendly multi-language interface. DatoCMS will deliver your content to your
+      net of projects, using the same <strong>fast and scalable platform</strong>.
     </p>
   </Flag>
 

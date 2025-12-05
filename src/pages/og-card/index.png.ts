@@ -6,6 +6,7 @@ import sharp from 'sharp';
 import css from 'style-object-to-css-string';
 import { ogCardHeight, ogCardWidth } from '~/lib/datocms/seo';
 import type { OgCardData } from '~/lib/ogCardUrl';
+import { toArrayBuffer } from '~/lib/toArrayBuffer';
 import { handleUnexpectedError, invalidRequestResponse } from '~/pages/api/_utils';
 import FullLogo from './_resources/logo.svg?raw';
 
@@ -195,7 +196,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     const png = sharp(Buffer.from(svg)).png();
     const response = await png.toBuffer();
 
-    return new Response(response, {
+    return new Response(toArrayBuffer(response), {
       status: 200,
       headers: {
         'Content-Type': 'image/png',

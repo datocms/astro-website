@@ -1,15 +1,19 @@
 import { type RawApiTypes } from '@datocms/cli/lib/cma-client-node';
 import { type StructuredTextDocument } from 'datocms-structured-text-to-plain-text';
-import { isBlock, type Node, type WithChildrenNode } from 'datocms-structured-text-utils';
-import { visit } from 'unist-util-visit';
+import {
+  forEachNode,
+  isBlock,
+  type Node,
+  type WithChildrenNode,
+} from 'datocms-structured-text-utils';
 
 function isItem(maybeItem: unknown): maybeItem is RawApiTypes.Item {
   return Boolean(
     typeof maybeItem === 'object' &&
-      maybeItem &&
-      'type' in maybeItem &&
-      'id' in maybeItem &&
-      maybeItem.type === 'item',
+    maybeItem &&
+    'type' in maybeItem &&
+    'id' in maybeItem &&
+    maybeItem.type === 'item',
   );
 }
 
@@ -54,7 +58,9 @@ export async function updateStructuredTextFields(
       const somethingChangedPromises: Array<Promise<boolean | undefined>> = [];
 
       // Visit each node in the structured text
-      visit(structuredTextValue.document, (node, index, parent) => {
+      forEachNode(structuredTextValue.document, (node, parent) => {
+        const index = parent ? parent.children.indexOf(node as any) : undefined;
+
         if (isBlock(node)) {
           // Recursively process nested blocks
           const itemBlockOrId = node.item;

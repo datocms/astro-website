@@ -2,11 +2,11 @@
 
 import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 import type { InclusiveDescendant } from '@flex-development/unist-util-types';
-import { JSDOM } from 'jsdom';
+import { forEachNode } from 'datocms-structured-text-utils';
 import type { Root } from 'mdast';
 import type { LeafDirective } from 'mdast-util-directive';
+import { parse, type HTMLElement } from 'node-html-parser';
 import remarkDirective from 'remark-directive';
-import { visit } from 'unist-util-visit';
 import { config as baseConfig } from '~/components/Markdown/utils';
 import { invariant } from '~/lib/invariant';
 
@@ -23,7 +23,9 @@ export function findExamplesInHyperschema() {
       isAlone: boolean;
     }> = [];
 
-    visit(tree, (node, index, parent) => {
+    forEachNode(tree, (node, parent) => {
+      const index = parent ? parent.children.indexOf(node as any) : undefined;
+
       if (index && parent && isExample(node)) {
         const previousNode = index === 0 ? null : parent.children[index - 1];
 
@@ -34,7 +36,7 @@ export function findExamplesInHyperschema() {
 
         invariant(node.children[0] && 'value' in node.children[0]);
 
-        const exampleId = node.children[0].value;
+        const exampleId = node.children[0].value.trim();
         const isAlone =
           (!previousNode || !isExample(previousNode)) && (!nextNode || !isExample(nextNode));
 
@@ -73,8 +75,13 @@ type ParsedItem =
   | { type: 'example'; id: string; alone?: boolean };
 
 export function parseHtmlWithExamples(html: string): ParsedItem[] {
-  const dom = new JSDOM(html);
-  const document = dom.window.document;
+  const root = parse(html);
+  const body = root.querySelector('body');
+
+  if (!body) {
+    return [];
+  }
+
   const items: ParsedItem[] = [];
   let buffer = '';
 
@@ -85,31 +92,29 @@ export function parseHtmlWithExamples(html: string): ParsedItem[] {
     }
   };
 
-  document.body.childNodes.forEach((node) => {
-    if (
-      node.nodeType === dom.window.Node.ELEMENT_NODE &&
-      (node as Element).tagName.toLowerCase() === 'example'
-    ) {
-      // Flush any accumulated HTML
-      flushBuffer();
+  body.childNodes.forEach((node) => {
+    if (node.nodeType === 1) {
+      // Element node - cast to HTMLElement
+      const element = node as HTMLElement;
 
-      const exampleEl = node as Element;
-      const id = exampleEl.getAttribute('id');
-      if (!id) return;
-      const alone = exampleEl.hasAttribute('alone');
+      if (element.tagName.toLowerCase() === 'example') {
+        // Flush any accumulated HTML
+        flushBuffer();
 
-      items.push({ type: 'example', id, ...(alone ? { alone: true } : {}) });
-    } else {
-      // Accumulate HTML for other nodes
-      if (node.nodeType === dom.window.Node.ELEMENT_NODE) {
-        // Element nodes: include full outer HTML
-        buffer += (node as Element).outerHTML;
-      } else if (node.nodeType === dom.window.Node.TEXT_NODE) {
-        // Text nodes: include text content
-        buffer += node.textContent;
+        const id = element.getAttribute('id');
+        if (!id) return;
+        const alone = element.hasAttribute('alone');
+
+        items.push({ type: 'example', id, ...(alone ? { alone: true } : {}) });
+      } else {
+        // Other element nodes: include full outer HTML
+        buffer += element.outerHTML;
       }
-      // Other node types (e.g., comments) are ignored
+    } else if (node.nodeType === 3) {
+      // Text nodes: include text content
+      buffer += node.textContent;
     }
+    // Other node types (e.g., comments) are ignored
   });
 
   // Flush remaining buffer

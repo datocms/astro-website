@@ -6,7 +6,7 @@
  */
 
 import { Readability } from '@mozilla/readability';
-import { JSDOM, VirtualConsole } from 'jsdom';
+import { parseHTML } from 'linkedom';
 import TurndownService from 'turndown';
 
 export interface ConversionOptions {
@@ -45,15 +45,8 @@ export function convertHtmlToMarkdown(
 ): string {
   const settings = { ...DEFAULT_OPTIONS, ...options };
 
-  // Suppress JSDOM CSS parsing errors (they're harmless but verbose)
-  const virtualConsole = new VirtualConsole();
-  virtualConsole.on('error', () => {
-    // Suppress CSS parsing errors
-  });
-
-  // Parse HTML with JSDOM
-  const dom = new JSDOM(htmlString, { url, virtualConsole });
-  const document = dom.window.document;
+  // Parse HTML with linkedom
+  const { document } = parseHTML(htmlString);
 
   // Extract sidebar data before cleaning (sidebar will be removed during cleaning)
   const sidebarData = extractSidebarData(document, url);

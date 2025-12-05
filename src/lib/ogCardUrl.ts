@@ -1,3 +1,4 @@
+import { stripStega } from '@datocms/content-link/stega';
 import type { AstroGlobal } from 'astro';
 import { truncate } from 'lodash-es';
 import { baseUrl } from './draftMode';
@@ -10,14 +11,20 @@ export type OgCardData = {
   logoPngUrl?: string | null;
 };
 
-export function ogCardUrl(data: OgCardData, astroOrRequest: AstroGlobal | Request): string {
+export function ogCardUrl(
+  { kicker, title, pills, excerpt, logoPngUrl }: OgCardData,
+  astroOrRequest: AstroGlobal | Request,
+): string {
   const url = new URL('/og-card/index.png', baseUrl(astroOrRequest));
   url.searchParams.set(
     'data',
     Buffer.from(
       JSON.stringify({
-        ...data,
-        excerpt: data.excerpt ? truncate(data.excerpt, { length: 300 }) : undefined,
+        kicker: kicker ? stripStega(kicker) : undefined,
+        title: title ? stripStega(title) : undefined,
+        pills: pills ? pills.map((p) => stripStega(p)) : undefined,
+        logoPngUrl: logoPngUrl ? stripStega(logoPngUrl) : undefined,
+        excerpt: excerpt ? truncate(excerpt, { length: 300 }) : undefined,
       }),
     ).toString('base64'),
   );

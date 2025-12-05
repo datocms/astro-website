@@ -1,7 +1,7 @@
+import { forEachNode } from 'datocms-structured-text-utils';
 import { toString } from 'mdast-util-to-string';
 import remarkParse from 'remark-parse';
 import { unified } from 'unified';
-import { visit } from 'unist-util-visit';
 import { slugify } from '~/lib/slugify';
 import type { TocEntry, TocGroup } from '../../ContentPlusToc/types';
 import type { RestApiEndpointJsExample } from '../types';
@@ -43,7 +43,7 @@ export function buildTocGroupsFromMarkdown(rawContent: string | undefined): TocG
 
   const headings: TocEntry[] = [];
 
-  visit(tree, ['heading'], (node) => {
+  forEachNode(tree, (node) => {
     if (node.type === 'heading' && node.depth !== 6) {
       const content = toString(node);
 
