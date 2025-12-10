@@ -76,11 +76,10 @@ type ParsedItem =
 
 export function parseHtmlWithExamples(html: string): ParsedItem[] {
   const root = parse(html);
-  const body = root.querySelector('body');
 
-  if (!body) {
-    return [];
-  }
+  // If there's already a <body>, use it; otherwise treat the root
+  // as our container so that examples keep working
+  const containerElement: HTMLElement = (root.querySelector('body') as HTMLElement) ?? root;
 
   const items: ParsedItem[] = [];
   let buffer = '';
@@ -92,7 +91,7 @@ export function parseHtmlWithExamples(html: string): ParsedItem[] {
     }
   };
 
-  body.childNodes.forEach((node) => {
+  containerElement.childNodes.forEach((node) => {
     if (node.nodeType === 1) {
       // Element node - cast to HTMLElement
       const element = node as HTMLElement;
