@@ -3,6 +3,7 @@ import {
   render as toPlainText,
   type StructuredTextDocument,
 } from 'datocms-structured-text-to-plain-text';
+import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
 import { isHeading } from 'datocms-structured-text-utils';
 import { Image } from '~/components/blocks/Image';
 import { InternalVideo } from '~/components/blocks/InternalVideo';
@@ -64,10 +65,11 @@ const { previous, next } = await executeQuery(Astro, siblingsQuery, {
   variables: { dateTime, slug: post.slug },
 });
 
-const markdownUrl = new URL(Astro.url.href);
-markdownUrl.pathname = Astro.url.pathname.endsWith('.md')
-  ? Astro.url.pathname
-  : `${Astro.url.pathname}.md`;
+const baseUrl = buildBaseUrl(Astro);
+const markdownUrl = new URL(
+  Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
+  baseUrl,
+);
 ---
 
 <Layout seo={overrideSeo(post.seo, seoTwitterCard('summary_large_image'))}>

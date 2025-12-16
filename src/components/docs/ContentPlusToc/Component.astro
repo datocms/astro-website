@@ -1,4 +1,5 @@
 ---
+import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
 import s from './style.module.css';
 import { Toc } from './Toc';
 import type { TocGroup } from './types';
@@ -10,10 +11,12 @@ type Props = {
 
 const { tocGroups } = Astro.props;
 
-const markdownUrl = new URL(Astro.url.href);
-markdownUrl.pathname = Astro.url.pathname.endsWith('.md')
-  ? Astro.url.pathname
-  : `${Astro.url.pathname}.md`;
+const baseUrl = buildBaseUrl(Astro);
+
+const markdownUrl = new URL(
+  Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
+  baseUrl,
+);
 ---
 
 <div class={s.articleContainer}>
