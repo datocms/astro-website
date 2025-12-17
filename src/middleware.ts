@@ -1,7 +1,7 @@
 import type { MiddlewareHandler } from 'astro';
 import { DEPLOYMENT_DESTINATION, SECRET_API_TOKEN } from 'astro:env/server';
 import { sequence } from 'astro:middleware';
-import { isDraftModeEnabled } from './lib/draftMode';
+import { baseUrl, isDraftModeEnabled } from './lib/draftMode';
 import { convertHtmlToMarkdown } from './lib/llmtxt';
 import logToRollbar from './lib/logToRollbar';
 
@@ -63,41 +63,52 @@ export const basicAuth: MiddlewareHandler = (context, next) => {
 
 export const markdownProxy: MiddlewareHandler = async (context, next) => {
   const pathname = context.url.pathname;
+  console.log('[markdownProxy] Request received:', pathname);
 
   // Check if the request is for a .md version (llmstxt.org spec)
   // Handles both /page.html.md and /index.html.md patterns
   if (pathname.endsWith('.md')) {
+    console.log('[markdownProxy] .md request detected');
     try {
       // Remove the .md extension to get the original HTML URL
-      const htmlPath = pathname.slice(0, -3);
+      const htmlPathPlusSearch = pathname.slice(0, -3) + context.url.search;
+      console.log('[markdownProxy] HTML path:', htmlPathPlusSearch);
 
       // Build the HTML URL with the same origin and search params
-      const htmlUrl = new URL(htmlPath, context.url.origin);
+      const htmlUrl = new URL(htmlPathPlusSearch, baseUrl(context.request));
       htmlUrl.search = context.url.search;
+      console.log('[markdownProxy] Fetching HTML from:', htmlUrl.href);
 
       // Fetch the HTML version
       const htmlResponse = await fetch(htmlUrl);
+      console.log('[markdownProxy] HTML response status:', htmlResponse.status);
 
       if (!htmlResponse.ok) {
+        console.log('[markdownProxy] HTML response not OK, passing to next middleware');
         return next();
       }
 
       // Check if the response is HTML - only convert HTML to markdown
       const contentType = htmlResponse.headers.get('content-type') || '';
+      console.log('[markdownProxy] Content-Type:', contentType);
       if (!contentType.includes('text/html')) {
         // Not HTML, skip markdown conversion
+        console.log('[markdownProxy] Not HTML content, skipping conversion');
         return next();
       }
 
       // Get the HTML content
       const htmlContent = await htmlResponse.text();
+      console.log('[markdownProxy] HTML content length:', htmlContent.length, 'characters');
 
       // Convert HTML to Markdown
+      console.log('[markdownProxy] Converting HTML to Markdown...');
       const markdown = convertHtmlToMarkdown(htmlContent, htmlUrl.href, {
         includeTitle: false,
         includeSidebar: true,
         preserveTables: true,
       });
+      console.log('[markdownProxy] Markdown length:', markdown.length, 'characters');
 
       // Copy cache-related headers from the HTML response
       const headers = new Headers({ 'Content-Type': 'text/markdown; charset=utf-8' });
@@ -107,15 +118,19 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
         const value = htmlResponse.headers.get(header);
         if (value) {
           headers.set(header, value);
+          console.log(`[markdownProxy] Copied header ${header}:`, value);
         }
       }
 
+      console.log('[markdownProxy] Returning markdown response');
       return new Response(markdown, {
         status: 200,
         headers,
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[markdownProxy] Error during conversion:', errorMessage);
+      console.error('[markdownProxy] Error stack:', error instanceof Error ? error.stack : 'N/A');
       return new Response(`Error converting to markdown: ${errorMessage}`, {
         status: 500,
         headers: { 'Content-Type': 'text/markdown; charset=utf-8' },
@@ -124,6 +139,7 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
   }
 
   // Not a .md request, continue with normal flow
+  console.log('[markdownProxy] Not a .md request, passing to next middleware');
   return next();
 };
 
