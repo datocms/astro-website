@@ -1,7 +1,7 @@
 import type { MiddlewareHandler } from 'astro';
 import { DEPLOYMENT_DESTINATION, SECRET_API_TOKEN } from 'astro:env/server';
 import { sequence } from 'astro:middleware';
-import { isDraftModeEnabled } from './lib/draftMode';
+import { baseUrl, isDraftModeEnabled } from './lib/draftMode';
 import { convertHtmlToMarkdown } from './lib/llmtxt';
 import logToRollbar from './lib/logToRollbar';
 
@@ -69,10 +69,10 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
   if (pathname.endsWith('.md')) {
     try {
       // Remove the .md extension to get the original HTML URL
-      const htmlPath = pathname.slice(0, -3);
+      const htmlPathPlusSearch = pathname.slice(0, -3) + context.url.search;
 
       // Build the HTML URL with the same origin and search params
-      const htmlUrl = new URL(htmlPath, context.url.origin);
+      const htmlUrl = new URL(htmlPathPlusSearch, baseUrl(context.request));
       htmlUrl.search = context.url.search;
 
       // Fetch the HTML version
