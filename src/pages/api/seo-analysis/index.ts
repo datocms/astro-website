@@ -96,6 +96,9 @@ export const GET: APIRoute = async ({ url, request }) => {
       return invalidRequestResponse('No content found');
     }
 
+    // Remove all elements with data-datocms-noindex attribute
+    contentEl.querySelectorAll('[data-datocms-noindex]').forEach((el) => el.remove());
+
     // Build the response in the format expected by the plugin
     const response: SeoAnalysis = {
       locale: root.querySelector('html')?.getAttribute('lang') || 'en',
