@@ -1552,7 +1552,7 @@ type BadgeRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
-union BlogPostModelContentBlocksField = CodesandboxEmbedBlockRecord | CtaButtonRecord | DemoRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | QuestionAnswerRecord | ShowcaseProjectBlockRecord | TableRecord | TutorialVideoRecord | VideoRecord
+union BlogPostModelContentBlocksField = CodesandboxEmbedBlockRecord | CtaButtonRecord | DemoRecord | ImageCarouselRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | QuestionAnswerRecord | ShowcaseProjectBlockRecord | TableRecord | TutorialVideoRecord | VideoRecord
 
 type BlogPostModelContentField {
   blocks: [BlogPostModelContentBlocksField!]!
@@ -1563,7 +1563,6 @@ type BlogPostModelContentField {
 
 """Specify nested blocks fields conditions"""
 input BlogPostModelContentFieldBlocksConditions {
-  table: TableModelFilter
   demo: DemoModelFilter
   image: ImageModelFilter
   questionAnswer: QuestionAnswerModelFilter
@@ -1572,8 +1571,10 @@ input BlogPostModelContentFieldBlocksConditions {
   video: VideoModelFilter
   codesandboxEmbedBlock: CodesandboxEmbedBlockModelFilter
   ctaButton: CtaButtonModelFilter
-  showcaseProjectBlock: ShowcaseProjectBlockModelFilter
   tutorialVideo: TutorialVideoModelFilter
+  showcaseProjectBlock: ShowcaseProjectBlockModelFilter
+  table: TableModelFilter
+  imageCarousel: ImageCarouselModelFilter
 }
 
 """Specify how to filter based on this field's blocks"""
@@ -1592,7 +1593,6 @@ input BlogPostModelContentFieldBlocksFilter {
 
 """Specify nested blocks types presence"""
 input BlogPostModelContentFieldBlocksPresence {
-  table: BooleanType
   demo: BooleanType
   image: BooleanType
   questionAnswer: BooleanType
@@ -1601,8 +1601,10 @@ input BlogPostModelContentFieldBlocksPresence {
   video: BooleanType
   codesandboxEmbedBlock: BooleanType
   ctaButton: BooleanType
-  showcaseProjectBlock: BooleanType
   tutorialVideo: BooleanType
+  showcaseProjectBlock: BooleanType
+  table: BooleanType
+  imageCarousel: BooleanType
 }
 
 """Specify how to filter this specific Structured Text field instance"""
@@ -1708,16 +1710,16 @@ input BlogPostModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
+  content: BlogPostModelContentFieldFilter
   author: LinksFilter
   seoH1: StringFilter
   canonicalUrl: StringFilter
   title: StringFilter
   yoastAnalysis: JsonFilter
   seoSettings: SeoFilter
-  coverImage: FileFilter
-  content: BlogPostModelContentFieldFilter
   excerpt: StructuredTextFilter
   slug: SlugFilter
+  coverImage: FileFilter
   OR: [BlogPostModelFilter]
   AND: [BlogPostModelFilter]
 }
@@ -5890,6 +5892,41 @@ type HowToDatocmsIndexRecord implements RecordInterface {
   createdAt: DateTime!
   id: ItemId!
   seo: SeoField
+  updatedAt: DateTime!
+}
+
+input ImageCarouselModelFilter {
+  id: ItemIdFilter
+  gallery: GalleryFilter
+  carouselHeight: IntegerFilter
+  OR: [ImageCarouselModelFilter]
+  AND: [ImageCarouselModelFilter]
+}
+
+"""Block of type 🎠 Image Carousel (image_carousel)"""
+type ImageCarouselRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  carouselHeight: IntType!
+  createdAt: DateTime!
+  gallery: [ImageFileField!]!
+  id: ItemId!
   updatedAt: DateTime!
 }
 

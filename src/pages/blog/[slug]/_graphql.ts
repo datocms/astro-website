@@ -2,6 +2,7 @@ import { CodesandboxEmbedBlockFragment } from '~/components/blocks/CodesandboxEm
 import { CtaButtonFragment } from '~/components/blocks/CtaButton/graphql';
 import { DemoFragment } from '~/components/blocks/Demo/graphql';
 import { ImageFragment } from '~/components/blocks/Image/graphql';
+import { ImageCarouselFragment } from '~/components/blocks/ImageCarousel/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { MultipleDemosBlockFragment } from '~/components/blocks/MultipleDemosBlock/graphql';
 import { QuestionAnswerFragment } from '~/components/blocks/QuestionAnswer/graphql';
@@ -93,6 +94,7 @@ export const query = graphql(
             ...TutorialVideoFragment
             ...ShowcaseProjectBlockFragment
             ...ImageFragment
+            ...ImageCarouselFragment
             ...CodesandboxEmbedBlockFragment
             ...VideoFragment
             ...CtaButtonFragment
@@ -125,6 +127,7 @@ export const query = graphql(
     MultipleDemosBlockFragment,
     VideoFragment,
     ImageFragment,
+    ImageCarouselFragment,
     TutorialVideoFragment,
     CodesandboxEmbedBlockFragment,
     CtaButtonFragment,

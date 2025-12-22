@@ -1,0 +1,35 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import { readFragment } from 'gql.tada';
+import { ImageCarouselFragment } from './graphql';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Lightbox } from '~/components/Lightbox';
+import s from './style.module.css';
+import { Carousel } from '~/components/Carousel';
+
+interface Props {
+  block: FragmentOf<typeof ImageCarouselFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+
+const { carouselHeight, gallery } = readFragment(ImageCarouselFragment, maskedBlock);
+---
+
+<figure data-datocms-content-link-boundary>
+  <prose-island>
+    <Carousel buttonsY="50%">
+      {
+        gallery.map((asset) => (
+          <div>
+            <ResponsiveImage
+              imgStyle={{ width: null, height: `${carouselHeight}px` }}
+              imgClass={s.responsiveImage}
+              data={asset.responsiveImage}
+            />
+          </div>
+        ))
+      }
+    </Carousel>
+  </prose-island>
+</figure>

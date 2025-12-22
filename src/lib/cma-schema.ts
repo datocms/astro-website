@@ -23,6 +23,15 @@ export type PricingHint = ItemTypeDefinition<
     };
   }
 >;
+export type ImageCarousel = ItemTypeDefinition<
+  EnvironmentSettings,
+  'HX6gB2qVTHqjaHQL6EnJkw',
+  {
+    gallery: {
+      type: 'gallery';
+    };
+  }
+>;
 export type Llmstxt = ItemTypeDefinition<
   EnvironmentSettings,
   'PvVIeFX5QROO2tUujtmr6g',
@@ -2643,7 +2652,6 @@ export type BlogPost = ItemTypeDefinition<
     content: {
       type: 'structured_text';
       blocks:
-        | Table
         | Demo
         | Image
         | QuestionAnswer
@@ -2652,30 +2660,32 @@ export type BlogPost = ItemTypeDefinition<
         | Video
         | CodesandboxEmbedBlock
         | CtaButton
+        | TutorialVideo
         | ShowcaseProjectBlock
-        | TutorialVideo;
+        | Table
+        | ImageCarousel;
       inline_blocks:
-        | Partner
-        | ShowcaseProject
-        | EnterpriseApp
         | SuccessStory
-        | DocGroup
-        | AcademyCourse
-        | CustomerStory
-        | HostingApp
         | DocPage
-        | ChangelogEntry
-        | TemplateDemo
-        | Feature
-        | ProductComparison
-        | TechPartner
-        | AcademyChapter
-        | Plugin
-        | UseCasePage
         | LandingPage
         | BlogPost
-        | UserGuidesEpisode
-        | Recipe;
+        | ChangelogEntry
+        | TemplateDemo
+        | Plugin
+        | Partner
+        | EnterpriseApp
+        | HostingApp
+        | DocGroup
+        | Feature
+        | ShowcaseProject
+        | UseCasePage
+        | CustomerStory
+        | TechPartner
+        | Recipe
+        | AcademyChapter
+        | AcademyCourse
+        | ProductComparison
+        | UserGuidesEpisode;
     };
     author: {
       type: 'links';
@@ -3043,6 +3053,7 @@ export type NavigationBar = ItemTypeDefinition<
   }
 >;
 export type AnyBlock =
+  | ImageCarousel
   | ManagedNavigationBarGroup
   | NavigationBarGroupCta
   | NavigationBarGroupCtaItem
