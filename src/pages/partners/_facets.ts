@@ -1,4 +1,3 @@
-import { stripStega } from '@datocms/content-link/stega';
 import type { FragmentOf } from 'gql.tada';
 import type { PartnerFragment } from './_graphql';
 
@@ -137,28 +136,4 @@ const toOptionWithCount = (entry: [string, number]) => ({
  */
 export function countersToOptions(counters: Record<string, number>) {
   return Object.entries(counters).sort(sortByCount).map(toOptionWithCount);
-}
-
-/**
- * Recursively strips Stega encoding from all strings in an object, array, or primitive value.
- * Handles nested structures by traversing objects and arrays.
- */
-export function recursiveStripStega<T>(value: T): T {
-  if (typeof value === 'string') {
-    return stripStega(value) as T;
-  }
-
-  if (Array.isArray(value)) {
-    return value.map((item) => recursiveStripStega(item)) as T;
-  }
-
-  if (value !== null && typeof value === 'object') {
-    const result: Record<string, unknown> = {};
-    for (const [key, val] of Object.entries(value)) {
-      result[key] = recursiveStripStega(val);
-    }
-    return result as T;
-  }
-
-  return value;
 }

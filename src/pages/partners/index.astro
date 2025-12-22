@@ -14,9 +14,10 @@ import { query } from './_graphql';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { countersForDropdown, countersToOptions, recursiveStripStega } from './_facets';
+import { countersForDropdown, countersToOptions } from './_facets';
 import { FetchAndReplaceFormOnSubmit } from '~/components/filtering/FetchAndReplaceFormOnSubmit';
 import { Filter } from '~/components/filtering/Filter';
+import { stripStega } from '@datocms/content-link';
 
 const { page, partners } = await executeQuery(Astro, query);
 
@@ -40,7 +41,7 @@ const orderedPartnersWithStega = [
   ),
 ];
 
-const orderedPartnersWithoutStega = recursiveStripStega(orderedPartnersWithStega);
+const orderedPartnersWithoutStega = stripStega(orderedPartnersWithStega);
 
 const partnersCountByCountryCode = partners
   .flatMap((partner) => partner.locations.map((location) => location.code))

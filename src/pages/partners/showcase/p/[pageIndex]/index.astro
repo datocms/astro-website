@@ -14,9 +14,10 @@ import { render as structuredTextToPlainText } from 'datocms-structured-text-to-
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { countersForDropdown } from './_facets';
-import { countersToOptions, recursiveStripStega } from '~/pages/partners/_facets';
+import { countersToOptions } from '~/pages/partners/_facets';
 import { FetchAndReplaceFormOnSubmit } from '~/components/filtering/FetchAndReplaceFormOnSubmit';
 import { Filter } from '~/components/filtering/Filter';
+import { stripStega } from '@datocms/content-link';
 
 export interface Props {
   pageIndex?: number;
@@ -42,7 +43,7 @@ if (!projectsWithStega || projectsWithStega.length === 0) {
   return notFoundResponse();
 }
 
-const projectsWithoutStega = recursiveStripStega(projectsWithStega);
+const projectsWithoutStega = stripStega(projectsWithStega);
 
 // Faceted search: build dropdown options
 const activeFilters = {

@@ -1,3 +1,4 @@
+import { stripStega } from '@datocms/content-link';
 import type { MiddlewareHandler } from 'astro';
 import { DEPLOYMENT_DESTINATION, SECRET_API_TOKEN } from 'astro:env/server';
 import { sequence } from 'astro:middleware';
@@ -93,7 +94,7 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
       const htmlContent = await htmlResponse.text();
 
       // Convert HTML to Markdown
-      const markdown = convertHtmlToMarkdown(htmlContent, htmlUrl.href, {
+      const markdown = convertHtmlToMarkdown(stripStega(htmlContent), htmlUrl.href, {
         includeTitle: false,
         includeSidebar: true,
         preserveTables: true,

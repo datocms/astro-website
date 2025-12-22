@@ -1,4 +1,5 @@
 import { buildClient } from '@datocms/cma-client';
+import { stripStega } from '@datocms/content-link';
 import type { APIRoute } from 'astro';
 import { DATOCMS_API_TOKEN, DRAFT_MODE_HOSTNAME, SECRET_API_TOKEN } from 'astro:env/server';
 import { parse } from 'node-html-parser';
@@ -89,11 +90,7 @@ export const GET: APIRoute = async ({ url, request }) => {
     const html = await pageRequest.text();
     const root = parse(html);
 
-    /*
-     * To get only the page content without the header/footer, use a specific
-     * selector on the page instead of taking everything from the body.
-     */
-    const contentEl = root.querySelector('body');
+    const contentEl = root.querySelector('#layout-content') || root.querySelector('body');
 
     if (!contentEl) {
       return invalidRequestResponse('No content found');
@@ -106,7 +103,7 @@ export const GET: APIRoute = async ({ url, request }) => {
       permalink: websitePath,
       title: root.querySelector('title')?.text || null,
       description: root.querySelector('meta[name="description"]')?.getAttribute('content') || null,
-      content: contentEl.innerHTML,
+      content: stripStega(contentEl.innerHTML),
     };
 
     return json(response, withCORS());
