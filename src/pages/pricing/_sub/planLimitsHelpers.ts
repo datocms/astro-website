@@ -67,9 +67,9 @@ export const formatValue = (limitId: string, value: number): string => {
   }
 
   if (limitId.endsWith('seconds')) {
-    return value / 60 >= 5000
-      ? `${Math.floor(value / 60 / 60)} hrs`
-      : `${Math.floor(value / 60)} mins`;
+    const minutes = Math.round(value / 60);
+    const formatted = minutes.toLocaleString('en-US');
+    return `${formatted} mins`;
   }
 
   if (limitId.endsWith('bytes')) {
