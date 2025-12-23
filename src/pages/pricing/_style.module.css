@@ -311,11 +311,7 @@
 }
 
 .fTableScroll {
-  overflow: scroll;
-
-  @media screen and (height >= 750px) and (width >= 850px) {
-    overflow: unset;
-  }
+  /* Do not add scrolling here since the outer wrapper can scroll */
 }
 
 .fTableAnchor {
@@ -686,15 +682,20 @@
   cursor: pointer;
   overflow: scroll;
   display: none;
+  background: rgba(0, 0, 0, 0.2); /* Should be here instead of on the overlay or it'll scroll */
 
   &:target {
     display: block;
   }
 }
 
+/* Lock the background page so it doesn't scroll while the modal is open */
+body:has(.modalWrapper:target) {
+  overflow-y: hidden;
+}
+
 .modalOverlay {
   position: absolute;
-  background: rgba(0, 0, 0, 0.2);
   left: 0;
   right: 0;
   bottom: 0;
