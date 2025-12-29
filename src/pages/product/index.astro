@@ -21,6 +21,8 @@ import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage'
 import { Card } from '~/components/Card';
 import { StripWithContent } from '~/components/StripWithContent';
 import s from './_style.module.css';
+import { CalloutCard } from '~/components/CalloutCard';
+import { Image } from 'astro:assets';
 
 const { integrations, page, customerStories, useCases } = await executeQuery(Astro, query);
 
@@ -44,7 +46,7 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
     </div>
   </Hero>
 
-  <StripWithContent>
+  <!-- <StripWithContent>
     <div class={s.explore}>
       <h2>Everything you need<br />to get you going</h2>
       <p>
@@ -55,57 +57,263 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
         <Button as="a" p="small" s="invert" href="/features">Explore all features</Button>
       </Space>
     </div>
-  </StripWithContent>
+  </StripWithContent> -->
 
-  <Space bottom={2}>
-    <div class={s.pillarsWrapper}>
-      {
-        page.pillars.map((pillar, index) => {
-          return (
-            <div class={s.flagContainer}>
-              <Flag flip={index % 2 === 0}>
-                <Fragment slot="kicker">{pillar.theme}</Fragment>
-                <div slot="visual">
-                  <ResponsiveImage data={pillar.image.responsiveImage} />
-                </div>
-                <div slot="title">
-                  <InlineText {...ensureValidStructuredTextProps({ data: pillar.title })} />
-                </div>
-                <article>
-                  {pillar.pillarCallout}
-                  <Bullets style="bad">
-                    <li>
-                      <Svg name="icons/regular/check" />
-                      <div>
-                        <InlineText
-                          {...ensureValidStructuredTextProps({ data: pillar.capability1 })}
-                        />
-                      </div>
-                    </li>
-                    <li>
-                      <Svg name="icons/regular/check" />
-                      <div>
-                        <InlineText
-                          {...ensureValidStructuredTextProps({ data: pillar.capability2 })}
-                        />
-                      </div>
-                    </li>
-                    <li>
-                      <Svg name="icons/regular/check" />
-                      <div>
-                        <InlineText
-                          {...ensureValidStructuredTextProps({ data: pillar.capability3 })}
-                        />
-                      </div>
-                    </li>
-                  </Bullets>
-                </article>
-              </Flag>
-            </div>
-          );
-        })
-      }
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1715694230-why-datocms-jumpstart-your-projects.png"
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> DEVELOPER EXPERIENCE </Fragment>
+    <Fragment slot="title"> Jumpstart your projects </Fragment>
+    <p>Sick of wrestling with a CMS that boxes you in? Break free and focus on what matters.</p>
+    <div>
+      <article>
+        <Bullets style="good">
+          <li>
+            <Svg name="icons/regular/check" />
+            <span
+              >Flexible content modeling and modular fields to create structures for your editors.</span
+            >
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <span
+              >Solid GraphQL Content API and cache tags to handle the most complex queries. Fast.</span
+            >
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <span>A local DatoCMS MCP and LLM-friendly docs to speed you up.</span>
+          </li>
+        </Bullets>
+      </article>
     </div>
+  </Flag>
+
+  <Space top={1} bottom={1}>
+    <Wrapper>
+      <CalloutCard
+        title="How much do we love developers? Yes."
+        ctaLink="/features#developer-experience"
+        illustration
+        color="gray"
+        asLink
+      >
+        <Fragment slot="text">
+          Modern tools, predictable APIs, full schema control, GraphQL, envs, SDKs, roles, i18n,
+          assets... everything you need to work better, without any surprises.
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
+  </Space>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <div class={s.cardGrid}>
+        <CalloutCard
+          size="small"
+          title="Cache Tags"
+          ctaLink="/features/cache-tags"
+          color="pink"
+          asLink
+        >
+          <Fragment slot="text"> Granular cache invalidation for high performance. </Fragment>
+        </CalloutCard>
+        <CalloutCard
+          size="small"
+          title="Schema Builder"
+          ctaLink="/features/schema-builder"
+          color="blue"
+          asLink
+        >
+          <Fragment slot="text"> Define custom structures with models and blocks. </Fragment>
+        </CalloutCard>
+        <CalloutCard
+          size="small"
+          title="GraphQL API"
+          ctaLink="/features/headless-cms-graphql"
+          color="yellow"
+          asLink
+        >
+          <Fragment slot="text"> Faster responses with introspection and auto-docs. </Fragment>
+        </CalloutCard>
+        <CalloutCard
+          size="small"
+          title="DatoCMS CLI"
+          ctaLink="/docs/scripting-migrations/installing-the-cli"
+          color="green"
+          asLink
+        >
+          <Fragment slot="text">
+            Automate everything from the command line. 100% Type Safe.
+          </Fragment>
+        </CalloutCard>
+      </div>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1715694042-why-datocms-create-content-with-ease.png"
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> EDITOR EXPERIENCE </Fragment>
+    <Fragment slot="title"> Create content with ease </Fragment>
+    <p>
+      With an intuitive and familiar interface, zip through creating content and pushing updates
+      before you can say “Publish!”
+    </p>
+    <div>
+      <article>
+        <Bullets style="good">
+          <li>
+            <Svg name="icons/regular/check" />
+            <span>Clean UI to create content, with cozy side-by-side real-time previews.</span>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <span>Native localization out of the box with granular publishing control.</span>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <span
+              >A banger of a text editor, WYSIWYG layouts, and endless customization with Plugins.</span
+            >
+          </li>
+        </Bullets>
+      </article>
+    </div>
+  </Flag>
+
+  <Space top={1} bottom={1}>
+    <Wrapper>
+      <CalloutCard
+        title="Ever met a Headless CMS loved by editors? You have now."
+        ctaLink="/features/editor-experience"
+        illustration="svg/illustrations/content-editors2"
+        color="green"
+        asLink
+      >
+        <Fragment slot="text">
+          Modular content, asset management, Structured Text, scheduling, previews, localization...
+          DatoCMS gives editors the CMS buzzwords that actually matter.
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
+  </Space>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <div class={s.cardGrid}>
+        <CalloutCard
+          size="small"
+          title="Structured Text"
+          ctaLink="/features/structured-content-cms"
+          color="blue"
+          asLink
+        >
+          <Fragment slot="text">
+            The best text editor you've seen in a Headless CMS. Period.
+          </Fragment>
+        </CalloutCard>
+        <CalloutCard
+          size="small"
+          title="Modular Content"
+          ctaLink="/features/dynamic-layouts"
+          color="gray"
+          asLink
+        >
+          <Fragment slot="text">
+            Build dynamic layouts with that drag-and-drop WYSIWYG vibe.
+          </Fragment>
+        </CalloutCard>
+        <CalloutCard
+          size="small"
+          title="Localization"
+          ctaLink="/features/headless-cms-multi-language"
+          color="pink"
+          asLink
+        >
+          <Fragment slot="text">
+            Hablar whichever lingua شما 客戶 parlent with in-built localization.
+          </Fragment>
+        </CalloutCard>
+        <CalloutCard
+          size="small"
+          title="Asset Management"
+          ctaLink="/features/images-api"
+          color="yellow"
+          asLink
+        >
+          <Fragment slot="text">
+            Stop wasting time editing and optimizing assets. We handle it perfectly.
+          </Fragment>
+        </CalloutCard>
+      </div>
+    </Wrapper>
+  </Space>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1715694060-why-datocms-peace-of-mind.png"
+        inferSize
+        alt="Deterministic"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker"> PERFORMANCE & SECURITY </Fragment>
+    <Fragment slot="title"> All-round peace of mind </Fragment>
+    <p>
+      Enjoy peak performance with speed & reliability. The likes you haven't seen with a Headless
+      CMS.
+    </p>
+    <div>
+      <article>
+        <Bullets style="good">
+          <li>
+            <Svg name="icons/regular/check" />
+            <span>Global CDN network with maximum security and performance.</span>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <span>Out-of-the box Image & Video APIs optimization via imgix and Mux.</span>
+          </li>
+          <li>
+            <Svg name="icons/regular/check" />
+            <span
+              >High-grade security & reliability, with TLS encryption, SSO and SCIM, 99.99% average
+              uptime, and more.</span
+            >
+          </li>
+        </Bullets>
+      </article>
+    </div>
+  </Flag>
+
+  <Space top={1} bottom={1}>
+    <Wrapper>
+      <CalloutCard
+        title="Still not convinved? Looking for more?"
+        ctaLink="/features"
+        illustration="svg/illustrations/zen"
+        color="yellow"
+        asLink
+      >
+        <Fragment slot="text">
+          Explore the 100+ features that make DatoCMS the last Headless CMS you'll ever want to use.</Fragment
+        >
+      </CalloutCard>
+    </Wrapper>
   </Space>
 
   <IntegrationsBanner
