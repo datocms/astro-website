@@ -1,5 +1,3 @@
-import { FeatureCardFragment } from '~/components/FeatureCard/graphql';
-import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { CustomerStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/customerStory';
@@ -33,39 +31,11 @@ export const query = graphql(
         subheader {
           value
         }
-        pillars {
-          id
-          theme
-          pillarCallout
-          title {
-            value
-          }
-          capability1 {
-            value
-          }
-          capability2 {
-            value
-          }
-          capability3 {
-            value
-          }
-          image {
-            responsiveImage(imgixParams: { auto: format, w: 1000, h: 1000 }) {
-              ...ResponsiveImageFragment
-            }
-          }
-        }
-        quotes: testimonials {
-          __typename
-          ...PartnerTestimonialQuoteFragment
-          ...ReviewQuoteFragment
-        }
-        features {
-          featureGroup
-          ...FeatureCardFragment
-        }
       }
-      customerStories: allCustomerStories(orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]) {
+      customerStories: allCustomerStories(
+        first: 15
+        orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
+      ) {
         ...CustomerStoryUrlFragment
         title
         coverImage {
@@ -88,13 +58,5 @@ export const query = graphql(
       }
     }
   `,
-  [
-    ResponsiveImageFragment,
-    PartnerTestimonialQuoteFragment,
-    FeatureCardFragment,
-    ReviewQuoteFragment,
-    TagFragment,
-    CustomerStoryUrlFragment,
-    UseCasePageUrlFragment,
-  ],
+  [ResponsiveImageFragment, TagFragment, CustomerStoryUrlFragment, UseCasePageUrlFragment],
 );
