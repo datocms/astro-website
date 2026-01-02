@@ -30,6 +30,9 @@ export type ImageCarousel = ItemTypeDefinition<
     gallery: {
       type: 'gallery';
     };
+    carousel_height: {
+      type: 'integer';
+    };
   }
 >;
 export type Llmstxt = ItemTypeDefinition<
