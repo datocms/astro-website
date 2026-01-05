@@ -5,6 +5,7 @@ import Footer from './Footer/index.astro';
 import Navbar from './Navbar/index.astro';
 import { FinalCta } from './FinalCta';
 import { fetchNavbar } from './Navbar/fetchNavbar';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 type Props = {
   seo: TitleMetaLinkTag[];
@@ -27,7 +28,7 @@ const { seo, noFinalCta } = Astro.props;
       !noFinalCta && (
         /* https://github.com/withastro/astro/issues/10024#issuecomment-1933483135 */
         <Fragment slot={!noFinalCta && 'finalCta'}>
-          <FinalCta href="/pricing">
+          <FinalCta href={dashboardUrl('/signup')}>
             <Fragment slot="title">Start using DatoCMS today</Fragment>
             <Fragment slot="subtitle">
               According to Gartner 89% of companies plan to compete primarily on the basis of
