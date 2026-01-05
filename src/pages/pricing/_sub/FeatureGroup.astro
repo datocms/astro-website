@@ -16,7 +16,7 @@ type Props = {
 const { group, startOpen } = Astro.props;
 ---
 
-<tr class={s.fTableGroup} data-header-for-group={group.id} data-open={startOpen ?? undefined}>
+<tr class={s.fTableGroup} data-header-for-group={group.id} data-open={startOpen || undefined}>
   <td colspan={3}>
     <Svg name="icons/regular/chevron-down" class={s.fTableGroupIcon} data-show-if="open" />
     <Svg name="icons/regular/chevron-right" class={s.fTableGroupIcon} data-show-if="closed" />
@@ -29,7 +29,7 @@ const { group, startOpen } = Astro.props;
     <tr
       class:list={[s.fTableFeature, i % 2 === 0 && s.fTableFeatureOdd]}
       data-part-of-group={group.id}
-      data-open={startOpen ?? undefined}
+      data-open={startOpen || undefined}
       data-closed-if-only-show-differences={feature.availableOnProfessionalPlan || undefined}
     >
       <th class={s.fTableFeatureName}>
