@@ -18,22 +18,27 @@ const { hints, freePlan, proPlan } = Astro.props;
 
 <table class={s.fTable}>
   <thead class={s.fReducedHead}>
-    <th class={s.fReducedHeadTitle}>Limit</th>
+    <th class={s.fReducedHeadTitle}>Plan limits & overages</th>
     <th class={s.fReducedHeadPlan}>Free plan</th>
     <th class={s.fReducedHeadPlan}>Professional plan</th>
   </thead>
   <tbody>
     {
       [
+        'sites',
         'users',
+        'sandbox_environments',
+        'item_types',
+        'locales',
         'items',
-        'uploadable_bytes',
-        'indexable_pages',
-        'history_retention_days',
         'traffic_bytes',
         'api_calls',
-        'mux_encoding_seconds',
         'mux_streaming_seconds',
+        'support_level',
+        'uploadable_bytes',
+        'mux_encoding_seconds',
+        'history_retention_days',
+        'indexable_pages',
       ].map((limitId, i) => {
         const hint = hints.find((h) => h.apiId === limitId)!;
         const freePlanLimit = freePlan.attributes.limits.find((l) => l.id === limitId)!;
