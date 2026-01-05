@@ -276,27 +276,20 @@ if (!page || !freePlan || !proPlan) {
 
   <DraftModeQueryListener query={query} />
 
-  {
-    /* This modal's open state is controlled by CSS (not JS!),
-  in _style.module.css under the &:target property for the modalWrapper */
-  }
-  <div class={s.modalWrapper} id="free-plan-details" slot="unwrapped">
-    <a href="#" class={s.modalOverlay}></a>
-    <div class={s.modal}>
-      <a href="#" class={s.modalClose}>
-        <Svg name="icons/regular/times-circle" />
-      </a>
-      <div class={s.modalTitle}>Free vs Professional</div>
-      <div class={s.modalWarning}>
-        ⚠️{' '}
-        <strong>In the Free plan, you can&apos;t go over the allowed monthly limits.</strong>{' '}
-        If you reach these limits, the service will stop responding as expected.
-      </div>
-      <div class={s.fTableScroll}>
-        <FreeLimitsTable hints={hints} freePlan={freePlan} proPlan={proPlan} />
-      </div>
+  <dialog class={s.modal} id="free-plan-details" slot="unwrapped">
+    <button class={s.modalClose} autofocus aria-label="Close dialog">
+      <Svg name="icons/regular/times-circle" />
+    </button>
+    <div class={s.modalTitle}>Free vs Professional</div>
+    <div class={s.modalWarning}>
+      ⚠️{' '}
+      <strong>In the Free plan, you can&apos;t go over the allowed monthly limits.</strong>{' '}
+      If you reach these limits, the service will stop responding as expected.
     </div>
-  </div>
+    <div class={s.fTableScroll}>
+      <FreeLimitsTable hints={hints} freePlan={freePlan} proPlan={proPlan} />
+    </div>
+  </dialog>
 
   <script>
     import { WebComponent } from '~/lib/WebComponent';
@@ -405,5 +398,25 @@ if (!page || !freePlan || !proPlan) {
         }
       },
     );
+
+    // Handle free plan modal dialog
+    const dialog = document.getElementById('free-plan-details') as HTMLDialogElement;
+    const closeButton = dialog?.querySelector('button[aria-label="Close dialog"]');
+
+    // Open dialog when clicking links to #free-plan-details
+    document.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      const link = target.closest('a[href="#free-plan-details"]');
+
+      if (link && dialog) {
+        event.preventDefault();
+        dialog.showModal();
+      }
+    });
+
+    // Close dialog when clicking the close button
+    closeButton?.addEventListener('click', () => {
+      dialog?.close();
+    });
   </script>
 </Layout>
