@@ -63,7 +63,7 @@
 }
 
 .plansContainer {
-  padding-bottom: 40px;
+  margin-bottom: 40px;
 }
 
 .plan {
@@ -287,7 +287,7 @@
 .fTableHead,
 .fTablePlan {
   border-bottom: 1px solid var(--border-color);
-  padding: 15px 30px;
+  padding: 0 30px 30px;
   background: white;
 
   @media screen and (height >= 750px) and (width >= 850px) {
@@ -333,11 +333,6 @@
   line-height: 1.1;
 }
 
-.fTableHeadSub {
-  font-size: 13px;
-  color: var(--light-body-color);
-}
-
 .fTableHeadDiff {
   display: flex;
   margin-top: 10px;
@@ -362,9 +357,14 @@
   margin-bottom: 10px;
 }
 
-.fTableFeature td,
-.fTableFeature th {
+.fTableFeature:last-child td,
+.fTableFeature:last-child th {
   border-bottom: 1px solid var(--border-color);
+}
+
+.fTableGroup + .fTableFeature td,
+.fTableGroup + .fTableFeature th {
+  border-top: 1px solid var(--border-color);
 }
 
 .fTableFeatureOdd {
@@ -421,11 +421,19 @@
 
   td {
     font-weight: bold;
-    padding: 20px 30px;
+    padding: 25px 30px 15px;
     border: 1px solid var(--border-color);
-    border-top: 0;
+    border-bottom-width: 0;
     cursor: pointer;
     vertical-align: middle;
+  }
+
+  &:first-child td {
+    border-top: 0;
+  }
+
+  &:not([data-open]):not(:has(~ .fTableGroup)) td {
+    border-bottom-width: 1px;
   }
 }
 
@@ -443,8 +451,8 @@
   vertical-align: middle;
   fill: var(--azure-color);
   transition: all 0.2s ease-in-out;
-  width: 1.2em;
-  height: 1.2em;
+  width: 1em;
+  height: 1em;
 }
 
 .fTableGroupCount {
@@ -556,7 +564,11 @@
 }
 
 .freePlan {
+  padding: 30px 50px;
+  border-radius: 10px;
   text-align: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px;
 }
 
 .freePlanContent {
@@ -579,7 +591,7 @@
 
 .freePlanTitle {
   font-weight: bold;
-  font-size: 25px;
+  font-size: 23px;
   margin-bottom: 15px;
 }
 
@@ -612,23 +624,24 @@
   position: relative;
   font-size: 17px;
   max-width: 400px;
-  margin: rfs(30px) auto 0px;
+  margin: 10px 0;
 
   input {
     display: block;
-    margin: 20px auto;
     width: 100%;
     padding: 10px;
     font-family: var(--font-sans);
-    font-size: 17px;
+    font-size: 16px;
     border: 1px solid var(--border-color);
     border-radius: 5px;
     background: white;
     padding-left: 40px;
+    background: var(--light-bg-color);
 
     &:focus {
       outline: none;
-      box-shadow: var(--box-shadow);
+      background: white;
+      border-color: var(--accent-color);
     }
   }
 

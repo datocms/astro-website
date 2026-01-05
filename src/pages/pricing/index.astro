@@ -27,10 +27,11 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
+import { Switch } from '~/components/Switch';
 
 const { page, faqs, review1, planFeatureGroups, hints } = await executeQuery(Astro, query);
 
-const plans = sortBy(await fetchPerOwnerPricingPlans(Astro), 'monthly_price');
+const plans = sortBy(await fetchPerOwnerPricingPlans(Astro), 'attributes.monthly_price');
 
 const [freePlan, proPlan] = plans;
 
@@ -53,6 +54,27 @@ if (!page || !freePlan || !proPlan) {
   </Hero>
 
   <Space top={1}>
+    <Wrapper>
+      <div class={s.freePlan}>
+        <div class={s.freePlanContent}>
+          <div class={s.freePlanTitle}>
+            Just getting started? Try DatoCMS out for free, forever (yes really)
+          </div>
+          <div class={s.freePlanDescription}>
+            Free plan comes with 2 editors and 300 records, with 10GB of traffic and 100k API calls
+            each month. No overages allowed.{' '}
+            <a href="#free-plan-details">
+              See all limits in detail <Svg name="icons/regular/info-circle" />
+            </a>
+          </div>
+        </div>
+        <div class={s.freePlanCta}>
+          <Button block s="invert" as="a" href={dashboardUrl('/signup')}> Sign up for free </Button>
+          <div class={s.freePlanCtaReassurance}>Easy setup, no credit card required</div>
+        </div>
+      </div>
+    </Wrapper>
+
     <div class={s.plansStrip}>
       <Wrapper>
         <div class={s.plansContainer}>
@@ -143,94 +165,70 @@ if (!page || !freePlan || !proPlan) {
       </Wrapper>
     </div>
 
-    <Wrapper>
-      <div class={s.freePlan}>
-        <div class={s.freePlanContent}>
-          <div class={s.freePlanTitle}>
-            Just getting started? Try DatoCMS out for free, forever (yes really)
-          </div>
-          <div class={s.freePlanDescription}>
-            Free plan comes with 2 editors and 300 records, with 10GB of traffic and 100k API calls
-            each month. No overages allowed.{' '}
-            <a href="#free-plan-details">
-              See all limits in detail <Svg name="icons/regular/info-circle" />
-            </a>
-          </div>
-        </div>
-        <div class={s.freePlanCta}>
-          <Button block s="invert" as="a" href={dashboardUrl('/signup')}> Sign up for free </Button>
-          <div class={s.freePlanCtaReassurance}>Easy setup, no credit card required</div>
-        </div>
-      </div>
-    </Wrapper>
-
     <pricing-context-provider>
       <a id="details"></a>
 
       <Space top={2}>
         <InterstitialTitle style="three">
           Compare plans
-          <div class={s.searchFeatures}>
-            <Svg name="icons/regular/search" />
-            <input type="text" name="searchTerm" placeholder="Search features" />
-
-            <button type="button" id="clearSearchTerm">
-              <Svg name="icons/regular/times-circle" />
-            </button>
-          </div>
+          <Fragment slot="subtitle">
+            Explore our features and choose the best plan for you
+          </Fragment>
         </InterstitialTitle>
-        <Wrapper>
-          <div class={s.fTableScroll}>
-            <a class={s.fTableAnchor} id="detailsTable"></a>
-            <table class={s.fTable} data-details-table>
-              <thead>
-                <th class={s.fTableHead}>
-                  <div class={s.fTableHeadTitle}>Features by plan</div>
-                  <div class={s.fTableHeadSub}>
-                    Explore our features and choose the best plan for you
-                  </div>
-                  <label class={s.fTableHeadDiff}>
-                    <input name="onlyShowDifferences" type="checkbox" />{' '}
-                    <span>Only show differences</span>
-                  </label>
-                </th>
-                <th class={s.fTablePlan}>
-                  <div class={s.fTablePlanName}>Professional</div>
-                  <div class={s.fTablePlanPrice}>
-                    From €{formatNumber(149)}/month (billed annually)
-                  </div>
-                  <Button
-                    block
-                    s="invert"
-                    as="a"
-                    p="tiny"
-                    href={dashboardUrl(
-                      '/personal-account/plan-billing/change?plan_id=294&utm_source=datocms&utm_medium=website&utm_campaign=pricing',
-                    )}
-                  >
-                    Purchase now
-                  </Button>
-                </th>
-                <th class={s.fTablePlan}>
-                  <div class={s.fTablePlanName}>Enterprise</div>
-                  <div class={s.fTablePlanPrice}>Tailored on your needs</div>
-                  <Button block p="tiny" s="invert" as="a" href="/contact"> Contact us </Button>
-                </th>
-              </thead>
-              {
-                planFeatureGroups.map((group, i) => (
-                  <FeatureGroup startOpen={i === 0} group={group} />
-                ))
-              }
-              <LimitsGroup freePlan={freePlan} proPlan={proPlan} hints={hints} />
-            </table>
-          </div>
-        </Wrapper>
       </Space>
+
+      <Wrapper>
+        <div class={s.fTableScroll}>
+          <a class={s.fTableAnchor} id="detailsTable"></a>
+          <table class={s.fTable} data-details-table>
+            <thead>
+              <th class={s.fTableHead}>
+                <div class={s.fTableHeadTitle}>Features by plan</div>
+
+                <div class={s.searchFeatures}>
+                  <Svg name="icons/regular/search" />
+                  <input type="text" name="searchTerm" placeholder="Search something..." />
+
+                  <button type="button" id="clearSearchTerm">
+                    <Svg name="icons/regular/times" />
+                  </button>
+                </div>
+
+                <Switch name="onlyShowDifferences">Only show differences</Switch>
+              </th>
+              <th class={s.fTablePlan}>
+                <div class={s.fTablePlanName}>Professional</div>
+                <div class={s.fTablePlanPrice}>
+                  From €{formatNumber(149)}/month (billed annually)
+                </div>
+                <Button
+                  block
+                  s="invert"
+                  as="a"
+                  p="tiny"
+                  href={dashboardUrl(
+                    '/personal-account/plan-billing/change?plan_id=294&utm_source=datocms&utm_medium=website&utm_campaign=pricing',
+                  )}
+                >
+                  Purchase now
+                </Button>
+              </th>
+              <th class={s.fTablePlan}>
+                <div class={s.fTablePlanName}>Enterprise</div>
+                <div class={s.fTablePlanPrice}>Tailored on your needs</div>
+                <Button block p="tiny" s="invert" as="a" href="/contact"> Contact us </Button>
+              </th>
+            </thead>
+            <LimitsGroup freePlan={freePlan} proPlan={proPlan} hints={hints} />
+
+            {planFeatureGroups.map((group, i) => <FeatureGroup group={group} />)}
+          </table>
+        </div>
+      </Wrapper>
     </pricing-context-provider>
 
     <Space top={3}>
-      <InterstitialTitle>Frequently asked questions</InterstitialTitle>
+      <InterstitialTitle>Frequently Asked Questions</InterstitialTitle>
       <Wrapper>
         <div class={s.faqs}>
           {
@@ -290,111 +288,113 @@ if (!page || !freePlan || !proPlan) {
       </div>
     </div>
   </div>
-</Layout>
 
-<script>
-  import { WebComponent } from '~/lib/WebComponent';
+  <script>
+    import { WebComponent } from '~/lib/WebComponent';
 
-  window.customElements.define(
-    'pricing-context-provider',
-    class PricingContextProvider extends WebComponent {
-      _searchTerm: string = '';
-      _onlyShowDifferences: boolean = false;
+    window.customElements.define(
+      'pricing-context-provider',
+      class PricingContextProvider extends WebComponent {
+        _searchTerm: string = '';
+        _onlyShowDifferences: boolean = false;
 
-      parsedCallback() {
-        const searchTermEl = this.$<HTMLInputElement>('input[name="searchTerm"]');
-        this.on(searchTermEl, 'keydown', () => {
-          this.searchTerm = searchTermEl.value;
-          this.onlyShowDifferences = false;
-        });
+        parsedCallback() {
+          const searchTermEl = this.$<HTMLInputElement>('input[name="searchTerm"]');
+          this.on(searchTermEl, 'input', () => {
+            this.searchTerm = searchTermEl.value;
+            this.onlyShowDifferences = false;
+          });
 
-        const clearSearchTermEl = this.$<HTMLButtonElement>('#clearSearchTerm');
-        this.on(clearSearchTermEl, 'click', () => {
-          searchTermEl.value = '';
-          this.searchTerm = '';
-        });
-
-        const onlyShowDifferencesEl = this.$<HTMLInputElement>('input[name="onlyShowDifferences"]');
-        this.on(onlyShowDifferencesEl, 'change', () => {
-          this.onlyShowDifferences = onlyShowDifferencesEl.checked;
-          this.$('#detailsTable').scrollIntoView({ behavior: 'smooth' });
-
-          if (onlyShowDifferencesEl.checked) {
+          const clearSearchTermEl = this.$<HTMLButtonElement>('#clearSearchTerm');
+          this.on(clearSearchTermEl, 'click', () => {
             searchTermEl.value = '';
             this.searchTerm = '';
-          }
-        });
+          });
 
-        this.on(
-          this.getRootNode()! as HTMLElement,
-          'click',
-          'tr[data-header-for-group]',
-          (_event, groupEl) => {
-            groupEl.toggleAttribute('data-open');
-            this.copyGroupVisibilityOnSubElements(groupEl);
-          },
-        );
+          const onlyShowDifferencesEl = this.$<HTMLInputElement>(
+            'input[name="onlyShowDifferences"]',
+          );
+          this.on(onlyShowDifferencesEl, 'change', () => {
+            this.onlyShowDifferences = onlyShowDifferencesEl.checked;
+            this.$('#detailsTable').scrollIntoView({ behavior: 'smooth' });
 
-        this.searchTerm = searchTermEl.value;
-        this.onlyShowDifferences = onlyShowDifferencesEl.checked;
-      }
+            if (onlyShowDifferencesEl.checked) {
+              searchTermEl.value = '';
+              this.searchTerm = '';
+            }
+          });
 
-      get searchTerm() {
-        return this._searchTerm;
-      }
+          this.on(
+            this.getRootNode()! as HTMLElement,
+            'click',
+            'tr[data-header-for-group]',
+            (_event, groupEl) => {
+              groupEl.toggleAttribute('data-open');
+              this.copyGroupVisibilityOnSubElements(groupEl);
+            },
+          );
 
-      set searchTerm(newSearchTerm: string) {
-        this._searchTerm = newSearchTerm;
-        this.filterSubElements();
-      }
-
-      get onlyShowDifferences() {
-        return this._onlyShowDifferences;
-      }
-
-      set onlyShowDifferences(newOnlyShowDifferences: boolean) {
-        this._onlyShowDifferences = newOnlyShowDifferences;
-        this.filterSubElements();
-      }
-
-      copyGroupVisibilityOnSubElements(groupEl: HTMLElement) {
-        const groupId = groupEl.getAttribute('data-header-for-group')!;
-
-        for (const subElement of this.$$(`[data-part-of-group="${groupId}"]`)) {
-          subElement.toggleAttribute('data-open', groupEl.hasAttribute('data-open'));
+          this.searchTerm = searchTermEl.value;
+          this.onlyShowDifferences = onlyShowDifferencesEl.checked;
         }
-      }
 
-      filterSubElements() {
-        const isFiltering = this.onlyShowDifferences || Boolean(this.searchTerm);
+        get searchTerm() {
+          return this._searchTerm;
+        }
 
-        this.$('[data-details-table]').toggleAttribute('data-is-filtering', isFiltering);
+        set searchTerm(newSearchTerm: string) {
+          this._searchTerm = newSearchTerm;
+          this.filterSubElements();
+        }
 
-        for (const groupEl of this.$$('tr[data-header-for-group]')) {
+        get onlyShowDifferences() {
+          return this._onlyShowDifferences;
+        }
+
+        set onlyShowDifferences(newOnlyShowDifferences: boolean) {
+          this._onlyShowDifferences = newOnlyShowDifferences;
+          this.filterSubElements();
+        }
+
+        copyGroupVisibilityOnSubElements(groupEl: HTMLElement) {
           const groupId = groupEl.getAttribute('data-header-for-group')!;
-          const groupIsOpen = groupEl.hasAttribute('data-open');
-
-          let someOpen = false;
 
           for (const subElement of this.$$(`[data-part-of-group="${groupId}"]`)) {
-            const closedIfOnlyShowDifferences = subElement.hasAttribute(
-              'data-closed-if-only-show-differences',
-            );
-            const innerText = subElement.querySelector('th')!.textContent || '';
-
-            const toOpen = isFiltering
-              ? (!this.onlyShowDifferences || !closedIfOnlyShowDifferences) &&
-                (!this.searchTerm || innerText.includes(this.searchTerm))
-              : groupIsOpen;
-
-            subElement.toggleAttribute('data-open', toOpen);
-
-            someOpen ||= toOpen;
+            subElement.toggleAttribute('data-open', groupEl.hasAttribute('data-open'));
           }
-
-          groupEl.toggleAttribute('data-hidden', isFiltering && !someOpen);
         }
-      }
-    },
-  );
-</script>
+
+        filterSubElements() {
+          const isFiltering = this.onlyShowDifferences || Boolean(this.searchTerm);
+
+          this.$('[data-details-table]').toggleAttribute('data-is-filtering', isFiltering);
+
+          for (const groupEl of this.$$('tr[data-header-for-group]')) {
+            const groupId = groupEl.getAttribute('data-header-for-group')!;
+            const groupIsOpen = groupEl.hasAttribute('data-open');
+
+            let someOpen = false;
+
+            for (const subElement of this.$$(`[data-part-of-group="${groupId}"]`)) {
+              const closedIfOnlyShowDifferences = subElement.hasAttribute(
+                'data-closed-if-only-show-differences',
+              );
+              const innerText = subElement.querySelector('th')!.textContent || '';
+
+              const toOpen = isFiltering
+                ? (!this.onlyShowDifferences || !closedIfOnlyShowDifferences) &&
+                  (!this.searchTerm || innerText.includes(this.searchTerm))
+                : groupIsOpen;
+
+              subElement.toggleAttribute('data-open', toOpen);
+
+              someOpen ||= toOpen;
+            }
+
+            groupEl.toggleAttribute('data-hidden', isFiltering && !someOpen);
+          }
+        }
+      },
+    );
+  </script>
+</Layout>

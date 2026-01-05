@@ -18,8 +18,8 @@ const { group, startOpen } = Astro.props;
 
 <tr class={s.fTableGroup} data-header-for-group={group.id} data-open={startOpen ?? undefined}>
   <td colspan={3}>
-    <Svg name="icons/regular/minus-circle" class={s.fTableGroupIcon} data-show-if="open" />
-    <Svg name="icons/regular/plus-circle" class={s.fTableGroupIcon} data-show-if="closed" />
+    <Svg name="icons/regular/chevron-down" class={s.fTableGroupIcon} data-show-if="open" />
+    <Svg name="icons/regular/chevron-right" class={s.fTableGroupIcon} data-show-if="closed" />
     {group.name}
     <span class={s.fTableGroupCount} data-show-if="closed">({group.features.length})</span>
   </td>
@@ -30,7 +30,7 @@ const { group, startOpen } = Astro.props;
       class:list={[s.fTableFeature, i % 2 === 0 && s.fTableFeatureOdd]}
       data-part-of-group={group.id}
       data-open={startOpen ?? undefined}
-      data-closed-if-only-show-differences={feature.availableOnProfessionalPlan ?? undefined}
+      data-closed-if-only-show-differences={feature.availableOnProfessionalPlan || undefined}
     >
       <th class={s.fTableFeatureName}>
         <div class={s.fTableFeatureNameSplit}>
@@ -49,9 +49,7 @@ const { group, startOpen } = Astro.props;
           )}
         </div>
       </th>
-      <td class={s.fTableFeaturePlan}>
-        {feature.availableOnProfessionalPlan ? <Check /> : <Nope />}
-      </td>
+      <td class={s.fTableFeaturePlan}>{feature.availableOnProfessionalPlan ? <Check /> : '—'}</td>
       <td class={s.fTableFeaturePlan}>
         <Check />
       </td>
