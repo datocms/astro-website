@@ -199,7 +199,7 @@ if (!page || !freePlan || !proPlan) {
               <th class={s.fTablePlan}>
                 <div class={s.fTablePlanName}>Professional</div>
                 <div class={s.fTablePlanPrice}>
-                  From €{formatNumber(149)}/month (billed annually)
+                  From €{formatNumber(149)}/month
                 </div>
                 <Button
                   block
@@ -221,7 +221,7 @@ if (!page || !freePlan || !proPlan) {
             </thead>
             <LimitsGroup freePlan={freePlan} proPlan={proPlan} hints={hints} />
 
-            {planFeatureGroups.map((group, i) => <FeatureGroup group={group} />)}
+            {planFeatureGroups.map((group, i) => <FeatureGroup startOpen={false} group={group} />)}
           </table>
         </div>
 
@@ -330,7 +330,8 @@ if (!page || !freePlan || !proPlan) {
             this.getRootNode()! as HTMLElement,
             'click',
             'tr[data-header-for-group]',
-            (_event, groupEl) => {
+            (event, groupEl) => {
+              event.stopPropagation();
               groupEl.toggleAttribute('data-open');
               this.copyGroupVisibilityOnSubElements(groupEl);
             },
