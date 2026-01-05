@@ -310,11 +310,6 @@
   }
 }
 
-.fTableScroll {
-  overflow-x: scroll;
-  /* Do not add vertical (overflow-y) scrolling here since the outer wrapper can scroll */
-}
-
 .fTableAnchor {
   position: relative;
   top: 0;
@@ -374,10 +369,6 @@
 
 .fTableFeatureOdd:hover {
   background: var(--darker-lighlight-bg-color);
-}
-
-.fTableFeatureOdd [data-enterprise-limits-cell] {
-  background: var(--highlight-bg-color) !important;
 }
 
 .fTableFeatureName {
@@ -706,23 +697,47 @@
   }
 }
 
+.modalWrapper {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  z-index: 1000;
+  cursor: pointer;
+  overflow: scroll;
+  display: none;
+  background: rgba(0, 0, 0, 0.2); /* Should be here instead of on the overlay or it'll scroll */
+
+  &:target {
+    display: block;
+  }
+}
+
+/* Lock the background page so it doesn't scroll while the modal is open */
+body:has(.modalWrapper:target) {
+  overflow-y: hidden;
+}
+
+.modalOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+}
+
 .modal {
   background: white;
   padding: rfs(40px);
   border-radius: 10px;
   max-width: calc(100% - 40px);
-  border: none;
-  margin: auto;
-  max-height: calc(100vh - 40px);
-  overflow-y: auto;
+  position: relative;
+  cursor: default;
+  margin: 20px auto;
 
   @media screen and (width >= 930px) {
     max-width: 1000px;
-  }
-
-  &::backdrop {
-    background: rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(2px);
   }
 }
 
@@ -768,23 +783,10 @@
   position: absolute;
   right: 20px;
   top: 20px;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  color: inherit;
-  font: inherit;
-  outline: inherit;
 
   svg {
-    display: block;
     width: 1.5em;
     height: 1.5em;
     fill: var(--light-body-color);
-    transition: fill 0.2s ease-in-out;
-  }
-
-  &:hover svg {
-    fill: var(--accent-color);
   }
 }
