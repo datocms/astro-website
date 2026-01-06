@@ -68,8 +68,8 @@ export const formatValue = (limitId: string, value: number): string => {
 
   if (limitId.endsWith('seconds')) {
     return value / 60 >= 5000
-      ? `${Math.floor(value / 60 / 60)} hrs`
-      : `${Math.floor(value / 60)} mins`;
+      ? `${Math.floor(value / 60 / 60).toLocaleString('en-US', { maximumFractionDigits: 1 })} hrs`
+      : `${Math.floor(value / 60).toLocaleString('en-US', { maximumFractionDigits: 1 })} mins`;
   }
 
   if (limitId.endsWith('bytes')) {
@@ -165,4 +165,17 @@ export const formatExtra = (limit: Limit) => {
   return limit.extra_packet_amount === 1
     ? `€${limit.extra_packet_price}/mo per extra ${limitLabel(limit.id)}`
     : `€${limit.extra_packet_price}/mo every ${formatValue(limit.id, limit.extra_packet_amount)} ${hasUnit(limit.id) ? ' of ' : ' '} extra ${limitLabel(limit.id).replace(/_/g, ' ')}`;
+};
+
+export const getPerUnit = (limit: Limit): string | undefined => {
+  switch (limit.type) {
+    case 'per_site_quota_managed_site_resource':
+      return 'per project';
+    case 'per_environment_quota_managed_site_resource':
+      return 'per environment';
+    case 'shared_quota_metered_site_resource':
+      return 'per month';
+    default:
+      return undefined;
+  }
 };
