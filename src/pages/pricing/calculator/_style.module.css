@@ -1,0 +1,362 @@
+.calculator {
+  display: grid;
+  gap: 40px;
+  margin-bottom: 80px;
+
+  @media screen and (width >= 900px) {
+    grid-template-columns: 1fr 360px;
+    gap: 60px;
+  }
+}
+
+.calculatorMain {
+  min-width: 0;
+}
+
+.calculatorSidebar {
+  @media screen and (width >= 900px) {
+    position: sticky;
+    top: 120px;
+    align-self: start;
+  }
+}
+
+/* Billing Toggle */
+.billingToggle {
+  display: inline-flex;
+  background: var(--light-bg-color);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 40px;
+}
+
+.billingOption {
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--light-body-color);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &[data-active] {
+    background: white;
+    color: var(--base-body-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  &:hover:not([data-active]) {
+    color: var(--base-body-color);
+  }
+}
+
+.saveBadge {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+/* Sections */
+.section {
+  margin-bottom: 50px;
+}
+
+.sectionHeader {
+  margin-bottom: 30px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--base-body-color);
+}
+
+.sectionDescription {
+  font-size: 14px;
+  color: var(--light-body-color);
+  margin: 0;
+  max-width: 600px;
+}
+
+/* Slider Group */
+.sliderGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Individual Slider */
+.slider {
+  padding: 20px 24px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+
+  &:hover {
+    border-color: #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  &:has(input:focus) {
+    border-color: var(--azure-color);
+    box-shadow: 0 0 0 3px rgba(255, 89, 61, 0.1);
+  }
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.sliderLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--base-body-color);
+}
+
+.perProject,
+.perMonth {
+  font-weight: 400;
+  color: var(--light-body-color);
+  font-size: 13px;
+}
+
+.sliderValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--azure-color);
+  min-width: 60px;
+  text-align: right;
+}
+
+.sliderTrackWrapper {
+  position: relative;
+}
+
+.sliderInput {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(
+    to right,
+    var(--azure-color) 0%,
+    var(--azure-color) var(--progress, 0%),
+    #e5e7eb var(--progress, 0%),
+    #e5e7eb 100%
+  );
+  border-radius: 100px;
+  outline: none;
+  cursor: pointer;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border: 2px solid var(--azure-color);
+    border-radius: 50%;
+    cursor: grab;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    &:active {
+      cursor: grabbing;
+      transform: scale(1.05);
+    }
+  }
+
+  &::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    background: white;
+    border: 2px solid var(--azure-color);
+    border-radius: 50%;
+    cursor: grab;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+}
+
+.sliderTicks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--extra-light-body-color);
+}
+
+.sliderCost {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--light-body-color);
+  padding: 8px 12px;
+  background: var(--light-bg-color);
+  border-radius: 6px;
+  text-align: center;
+
+  &:global(.has-cost) {
+    background: var(--darker-highlight-bg-color);
+    font-weight: 500;
+  }
+}
+
+/* Price Card */
+.priceCard {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.priceCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.planName {
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+}
+
+.billingCycle {
+  font-size: 12px;
+  color: var(--light-body-color);
+  background: var(--light-bg-color);
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+
+.priceBreakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.priceRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--light-body-color);
+
+  span:last-child {
+    font-weight: 500;
+    color: var(--base-body-color);
+  }
+}
+
+.priceDivider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 20px 0;
+}
+
+.totalPrice {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.totalLabel {
+  font-size: 13px;
+  color: var(--light-body-color);
+  margin-bottom: 8px;
+}
+
+.totalAmount {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+}
+
+.currency {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--base-body-color);
+}
+
+.totalValue {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--base-body-color);
+  letter-spacing: -0.02em;
+}
+
+.perMonthLabel {
+  font-size: 16px;
+  color: var(--light-body-color);
+  margin-left: 4px;
+}
+
+.annualTotal {
+  font-size: 13px;
+  color: var(--light-body-color);
+  margin-top: 8px;
+  min-height: 1.2em;
+}
+
+.ctaWrapper {
+  margin-bottom: 16px;
+}
+
+.disclaimer {
+  font-size: 11px;
+  color: var(--extra-light-body-color);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.backLink {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--light-body-color);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--azure-color);
+  }
+}

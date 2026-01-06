@@ -17,7 +17,10 @@ export function formatNumberInMetricSystem(num: number) {
     }
   }
 
-  return (num / si[i]!.value).toFixed(0).replace(rx, '$1') + si[i]!.symbol;
+  return (
+    (num / si[i]!.value).toLocaleString('en-US', { maximumFractionDigits: 1 }).replace(rx, '$1') +
+    si[i]!.symbol
+  );
 }
 
 const units = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'];
@@ -33,7 +36,7 @@ export function formatNumberInBytes(num: number) {
 
   const number = Math.floor(Math.log(num) / Math.log(1024));
 
-  return `${(num / 1024 ** Math.floor(number)).toFixed(0)}${units[number]}`;
+  return `${(num / 1024 ** Math.floor(number)).toLocaleString('en-US', { maximumFractionDigits: 1 })}${units[number]}`;
 }
 
 export function formatNumber(x: string | number) {
