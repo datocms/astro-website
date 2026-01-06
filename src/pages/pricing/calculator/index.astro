@@ -1,0 +1,701 @@
+---
+import { Hero } from '~/components/Hero';
+import { Wrapper } from '~/components/Wrapper';
+import { Space } from '~/components/Space';
+import { Layout } from '~/layouts/Layout';
+import { fetchPerOwnerPricingPlans } from '../_sub/perOwnerPricingPlans';
+import { sortBy } from 'lodash-es';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { Button } from '~/components/Button';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
+import s from './_style.module.css';
+
+const plans = sortBy(await fetchPerOwnerPricingPlans(Astro), 'attributes.monthly_price');
+const [, proPlan] = plans;
+
+if (!proPlan) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+// Extract limits we need for the calculator
+const limits = proPlan.attributes.limits;
+
+// Helper to get limit by ID
+const getLimit = (id: string) => limits.find((l) => l.id === id);
+
+// Plan limits with overages (bounded)
+const sitesLimit = getLimit('sites') as Extract<typeof limits[number], { type: 'owner_managed_resource' }>;
+const usersLimit = getLimit('users') as Extract<typeof limits[number], { type: 'per_site_quota_managed_site_resource' }>;
+const itemTypesLimit = getLimit('item_types') as Extract<typeof limits[number], { type: 'per_environment_quota_managed_site_resource' }>;
+const localesLimit = getLimit('locales') as Extract<typeof limits[number], { type: 'per_environment_quota_managed_site_resource' }>;
+const itemsLimit = getLimit('items') as Extract<typeof limits[number], { type: 'shared_quota_managed_site_resource' }>;
+
+// Usage-based limits (unbounded metered)
+const trafficLimit = getLimit('traffic_bytes') as Extract<typeof limits[number], { type: 'shared_quota_metered_site_resource' }>;
+const apiCallsLimit = getLimit('api_calls') as Extract<typeof limits[number], { type: 'shared_quota_metered_site_resource' }>;
+const muxEncodingLimit = getLimit('mux_encoding_seconds') as Extract<typeof limits[number], { type: 'shared_quota_metered_site_resource' }>;
+const muxStreamingLimit = getLimit('mux_streaming_seconds') as Extract<typeof limits[number], { type: 'shared_quota_metered_site_resource' }>;
+
+// Base price
+const yearlyPricePerMonth = proPlan.attributes.yearly_price / 12;
+const monthlyPrice = proPlan.attributes.monthly_price;
+
+// Serialize the limits data for client-side JavaScript
+const calculatorData = {
+  yearlyPricePerMonth,
+  monthlyPrice,
+  limits: {
+    sites: sitesLimit,
+    users: usersLimit,
+    itemTypes: itemTypesLimit,
+    locales: localesLimit,
+    items: itemsLimit,
+    traffic: trafficLimit,
+    apiCalls: apiCallsLimit,
+    muxEncoding: muxEncodingLimit,
+    muxStreaming: muxStreamingLimit,
+  },
+};
+
+const seo = [
+  { tag: 'title', content: 'Pricing Calculator - DatoCMS' },
+  { tag: 'meta', attributes: { name: 'description', content: 'Estimate the total cost of a DatoCMS Professional plan subscription based on your needs.' } },
+];
+---
+
+<Layout seo={seo}>
+  <Hero>
+    <Fragment slot="kicker">Professional Plan</Fragment>
+    <Fragment slot="title">
+      Pricing <mark>Calculator</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      Estimate your monthly cost based on your project requirements
+    </Fragment>
+  </Hero>
+
+  <Space top={1}>
+    <Wrapper>
+      <pricing-calculator data-config={JSON.stringify(calculatorData)}>
+        <div class={s.calculator}>
+          <div class={s.calculatorMain}>
+            <div class={s.billingToggle}>
+              <button type="button" class={s.billingOption} data-billing="yearly" data-active>
+                Annual billing <span class={s.saveBadge}>Save 25%</span>
+              </button>
+              <button type="button" class={s.billingOption} data-billing="monthly">
+                Monthly billing
+              </button>
+            </div>
+
+            <div class={s.section}>
+              <div class={s.sectionHeader}>
+                <h2 class={s.sectionTitle}>Plan limits & overages</h2>
+                <p class={s.sectionDescription}>
+                  These resources have an included quota and allow you to purchase additional packets up to a maximum limit.
+                </p>
+              </div>
+
+              <div class={s.sliderGroup}>
+                <div class={s.slider} data-slider="sites">
+                  <div class={s.sliderHeader}>
+                    <label class={s.sliderLabel}>Projects</label>
+                    <span class={s.sliderValue} data-value></span>
+                  </div>
+                  <div class={s.sliderTrackWrapper}>
+                    <input
+                      type="range"
+                      min={sitesLimit.free_of_charge_usage}
+                      max={sitesLimit.free_of_charge_usage + (sitesLimit.max_extra_packets || 0) * (sitesLimit.extra_packet_amount || 1)}
+                      value={sitesLimit.free_of_charge_usage}
+                      class={s.sliderInput}
+                    />
+                    <div class={s.sliderTicks}>
+                      <span>{sitesLimit.free_of_charge_usage} included</span>
+                      <span>max {sitesLimit.free_of_charge_usage + (sitesLimit.max_extra_packets || 0) * (sitesLimit.extra_packet_amount || 1)}</span>
+                    </div>
+                  </div>
+                  <div class={s.sliderCost} data-cost></div>
+                </div>
+
+                <div class={s.slider} data-slider="users">
+                  <div class={s.sliderHeader}>
+                    <label class={s.sliderLabel}>Collaborators <span class={s.perProject}>per project</span></label>
+                    <span class={s.sliderValue} data-value></span>
+                  </div>
+                  <div class={s.sliderTrackWrapper}>
+                    <input
+                      type="range"
+                      min={usersLimit.free_of_charge_per_site_usage}
+                      max={usersLimit.free_of_charge_per_site_usage + (usersLimit.max_extra_packets || 0) * (usersLimit.extra_packet_amount || 1)}
+                      value={usersLimit.free_of_charge_per_site_usage}
+                      class={s.sliderInput}
+                    />
+                    <div class={s.sliderTicks}>
+                      <span>{usersLimit.free_of_charge_per_site_usage} included</span>
+                      <span>max {usersLimit.free_of_charge_per_site_usage + (usersLimit.max_extra_packets || 0) * (usersLimit.extra_packet_amount || 1)}</span>
+                    </div>
+                  </div>
+                  <div class={s.sliderCost} data-cost></div>
+                </div>
+
+                <div class={s.slider} data-slider="itemTypes">
+                  <div class={s.sliderHeader}>
+                    <label class={s.sliderLabel}>Models <span class={s.perProject}>per environment</span></label>
+                    <span class={s.sliderValue} data-value></span>
+                  </div>
+                  <div class={s.sliderTrackWrapper}>
+                    <input
+                      type="range"
+                      min={itemTypesLimit.free_of_charge_per_environment_usage}
+                      max={itemTypesLimit.free_of_charge_per_environment_usage + (itemTypesLimit.max_extra_packets || 0) * (itemTypesLimit.extra_packet_amount || 1)}
+                      value={itemTypesLimit.free_of_charge_per_environment_usage}
+                      class={s.sliderInput}
+                    />
+                    <div class={s.sliderTicks}>
+                      <span>{itemTypesLimit.free_of_charge_per_environment_usage} included</span>
+                      <span>max {itemTypesLimit.free_of_charge_per_environment_usage + (itemTypesLimit.max_extra_packets || 0) * (itemTypesLimit.extra_packet_amount || 1)}</span>
+                    </div>
+                  </div>
+                  <div class={s.sliderCost} data-cost></div>
+                </div>
+
+                <div class={s.slider} data-slider="locales">
+                  <div class={s.sliderHeader}>
+                    <label class={s.sliderLabel}>Locales <span class={s.perProject}>per environment</span></label>
+                    <span class={s.sliderValue} data-value></span>
+                  </div>
+                  <div class={s.sliderTrackWrapper}>
+                    <input
+                      type="range"
+                      min={localesLimit.free_of_charge_per_environment_usage}
+                      max={localesLimit.free_of_charge_per_environment_usage + (localesLimit.max_extra_packets || 0) * (localesLimit.extra_packet_amount || 1)}
+                      value={localesLimit.free_of_charge_per_environment_usage}
+                      class={s.sliderInput}
+                    />
+                    <div class={s.sliderTicks}>
+                      <span>{localesLimit.free_of_charge_per_environment_usage} included</span>
+                      <span>max {localesLimit.free_of_charge_per_environment_usage + (localesLimit.max_extra_packets || 0) * (localesLimit.extra_packet_amount || 1)}</span>
+                    </div>
+                  </div>
+                  <div class={s.sliderCost} data-cost></div>
+                </div>
+
+                <div class={s.slider} data-slider="items">
+                  <div class={s.sliderHeader}>
+                    <label class={s.sliderLabel}>Records</label>
+                    <span class={s.sliderValue} data-value></span>
+                  </div>
+                  <div class={s.sliderTrackWrapper}>
+                    <input
+                      type="range"
+                      min={itemsLimit.free_of_charge_usage}
+                      max={itemsLimit.free_of_charge_usage + (itemsLimit.max_extra_packets || 0) * (itemsLimit.extra_packet_amount || 1)}
+                      step={itemsLimit.extra_packet_amount || 1}
+                      value={itemsLimit.free_of_charge_usage}
+                      class={s.sliderInput}
+                    />
+                    <div class={s.sliderTicks}>
+                      <span>100k included</span>
+                      <span>max 200k</span>
+                    </div>
+                  </div>
+                  <div class={s.sliderCost} data-cost></div>
+                </div>
+              </div>
+            </div>
+
+            <div class={s.section}>
+              <div class={s.sectionHeader}>
+                <h2 class={s.sectionTitle}>Usage-based limits</h2>
+                <p class={s.sectionDescription}>
+                  These resources are billed based on actual monthly usage with no upper bound. Estimate your expected usage.
+                </p>
+              </div>
+
+              <div class={s.sliderGroup}>
+                <div class={s.slider} data-slider="traffic">
+                  <div class={s.sliderHeader}>
+                    <label class={s.sliderLabel}>Asset traffic <span class={s.perMonth}>per month</span></label>
+                    <span class={s.sliderValue} data-value></span>
+                  </div>
+                  <div class={s.sliderTrackWrapper}>
+                    <input
+                      type="range"
+                      min="0"
+                      max="10"
+                      step="1"
+                      value="0"
+                      class={s.sliderInput}
+                    />
+                    <div class={s.sliderTicks}>
+                      <span>1TB included</span>
+                      <span>+1.5TB</span>
+                    </div>
+                  </div>
+                  <div class={s.sliderCost} data-cost></div>
+                </div>
+
+                <div class={s.slider} data-slider="apiCalls">
+                  <div class={s.sliderHeader}>
+                    <label class={s.sliderLabel}>API calls <span class={s.perMonth}>per month</span></label>
+                    <span class={s.sliderValue} data-value></span>
+                  </div>
+                  <div class={s.sliderTrackWrapper}>
+                    <input
+                      type="range"
+                      min="0"
+                      max="20"
+                      step="1"
+                      value="0"
+                      class={s.sliderInput}
+                    />
+                    <div class={s.sliderTicks}>
+                      <span>1M included</span>
+                      <span>+5M</span>
+                    </div>
+                  </div>
+                  <div class={s.sliderCost} data-cost></div>
+                </div>
+
+                <div class={s.slider} data-slider="muxEncoding">
+                  <div class={s.sliderHeader}>
+                    <label class={s.sliderLabel}>Video encoding <span class={s.perMonth}>per month</span></label>
+                    <span class={s.sliderValue} data-value></span>
+                  </div>
+                  <div class={s.sliderTrackWrapper}>
+                    <input
+                      type="range"
+                      min="0"
+                      max="20"
+                      step="1"
+                      value="0"
+                      class={s.sliderInput}
+                    />
+                    <div class={s.sliderTicks}>
+                      <span>3hrs included</span>
+                      <span>+60hrs</span>
+                    </div>
+                  </div>
+                  <div class={s.sliderCost} data-cost></div>
+                </div>
+
+                <div class={s.slider} data-slider="muxStreaming">
+                  <div class={s.sliderHeader}>
+                    <label class={s.sliderLabel}>Video streaming <span class={s.perMonth}>per month</span></label>
+                    <span class={s.sliderValue} data-value></span>
+                  </div>
+                  <div class={s.sliderTrackWrapper}>
+                    <input
+                      type="range"
+                      min="0"
+                      max="20"
+                      step="1"
+                      value="0"
+                      class={s.sliderInput}
+                    />
+                    <div class={s.sliderTicks}>
+                      <span>150hrs included</span>
+                      <span>+3,000hrs</span>
+                    </div>
+                  </div>
+                  <div class={s.sliderCost} data-cost></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class={s.calculatorSidebar}>
+            <div class={s.priceCard}>
+              <div class={s.priceCardHeader}>
+                <span class={s.planName}>Professional</span>
+                <span class={s.billingCycle} data-billing-label>Billed annually</span>
+              </div>
+
+              <div class={s.priceBreakdown}>
+                <div class={s.priceRow}>
+                  <span>Base plan</span>
+                  <span data-base-price></span>
+                </div>
+                <div class={s.priceRow} data-extras-row style="display: none;">
+                  <span>Additional resources</span>
+                  <span data-extras-price></span>
+                </div>
+                <div class={s.priceRow} data-usage-row style="display: none;">
+                  <span>Estimated usage</span>
+                  <span data-usage-price></span>
+                </div>
+              </div>
+
+              <div class={s.priceDivider}></div>
+
+              <div class={s.totalPrice}>
+                <div class={s.totalLabel}>Estimated monthly cost</div>
+                <div class={s.totalAmount}>
+                  <span class={s.currency}>€</span>
+                  <span class={s.totalValue} data-total-price></span>
+                  <span class={s.perMonthLabel}>/month</span>
+                </div>
+                <div class={s.annualTotal} data-annual-total></div>
+              </div>
+
+              <div class={s.ctaWrapper}>
+                <Button
+                  block
+                  s="invert"
+                  as="a"
+                  href={dashboardUrl(
+                    '/personal-account/plan-billing/change?plan_id=294&utm_source=datocms&utm_medium=website&utm_campaign=pricing-calculator',
+                  )}
+                >
+                  Get started
+                </Button>
+              </div>
+
+              <div class={s.disclaimer}>
+                Final pricing may vary. Usage-based costs are estimates based on your projected consumption.
+              </div>
+            </div>
+
+            <a href="/pricing" class={s.backLink}>
+              ← Back to pricing
+            </a>
+          </div>
+        </div>
+      </pricing-calculator>
+    </Wrapper>
+  </Space>
+
+  <script>
+    import { WebComponent } from '~/lib/WebComponent';
+
+    interface LimitConfig {
+      sites: OwnerManagedResource;
+      users: PerSiteQuotaManagedSiteResource;
+      itemTypes: PerEnvironmentQuotaManagedSiteResource;
+      locales: PerEnvironmentQuotaManagedSiteResource;
+      items: SharedQuotaManagedSiteResource;
+      traffic: SharedQuotaMeteredSiteResource;
+      apiCalls: SharedQuotaMeteredSiteResource;
+      muxEncoding: SharedQuotaMeteredSiteResource;
+      muxStreaming: SharedQuotaMeteredSiteResource;
+    }
+
+    interface OwnerManagedResource {
+      free_of_charge_usage: number;
+      max_extra_packets: number | null;
+      extra_packet_amount: number | null;
+      extra_packet_price: number | null;
+    }
+
+    interface PerSiteQuotaManagedSiteResource {
+      free_of_charge_per_site_usage: number;
+      max_extra_packets: number | null;
+      extra_packet_amount: number | null;
+      extra_packet_price: number | null;
+    }
+
+    interface PerEnvironmentQuotaManagedSiteResource {
+      free_of_charge_per_environment_usage: number;
+      max_extra_packets: number | null;
+      extra_packet_amount: number | null;
+      extra_packet_price: number | null;
+    }
+
+    interface SharedQuotaManagedSiteResource {
+      free_of_charge_usage: number;
+      max_extra_packets: number | null;
+      extra_packet_amount: number | null;
+      extra_packet_price: number | null;
+    }
+
+    interface SharedQuotaMeteredSiteResource {
+      free_of_charge_usage: number;
+      extra_packet_amount: number | null;
+      extra_packet_price: number | null;
+    }
+
+    interface CalculatorConfig {
+      yearlyPricePerMonth: number;
+      monthlyPrice: number;
+      limits: LimitConfig;
+    }
+
+    window.customElements.define(
+      'pricing-calculator',
+      class PricingCalculator extends WebComponent {
+        config!: CalculatorConfig;
+        isYearly = true;
+
+        parsedCallback() {
+          this.config = JSON.parse(this.dataset.config || '{}');
+          this.setupEventListeners();
+          this.updateAllSliders();
+          this.calculateTotal();
+        }
+
+        setupEventListeners() {
+          // Billing toggle
+          for (const btn of this.$$<HTMLButtonElement>('[data-billing]')) {
+            this.on(btn, 'click', () => {
+              this.isYearly = btn.dataset.billing === 'yearly';
+              for (const b of this.$$<HTMLButtonElement>('[data-billing]')) {
+                b.toggleAttribute('data-active', b === btn);
+              }
+              this.$('[data-billing-label]').textContent = this.isYearly
+                ? 'Billed annually'
+                : 'Billed monthly';
+              this.calculateTotal();
+            });
+          }
+
+          // Slider inputs
+          for (const slider of this.$$('[data-slider]')) {
+            const input = slider.querySelector('input')!;
+            this.on(input, 'input', () => {
+              this.updateSlider(slider as HTMLElement);
+              this.calculateTotal();
+            });
+          }
+        }
+
+        updateAllSliders() {
+          for (const slider of this.$$('[data-slider]')) {
+            this.updateSlider(slider as HTMLElement);
+          }
+        }
+
+        updateSlider(slider: HTMLElement) {
+          const type = slider.dataset.slider!;
+          const input = slider.querySelector('input')!;
+          const valueEl = slider.querySelector('[data-value]')!;
+          const costEl = slider.querySelector('[data-cost]')!;
+          const value = Number(input.value);
+
+          // Update progress bar appearance
+          const min = Number(input.min);
+          const max = Number(input.max);
+          const percentage = ((value - min) / (max - min)) * 100;
+          input.style.setProperty('--progress', `${percentage}%`);
+
+          // Get limit info and calculate cost
+          const { displayValue, cost, includedValue } = this.getSliderInfo(type, value);
+
+          valueEl.textContent = displayValue;
+
+          if (cost > 0) {
+            costEl.textContent = `+€${cost}/mo for ${this.getExtraText(type, value, includedValue)}`;
+            costEl.classList.add('has-cost');
+          } else {
+            costEl.textContent = 'Included in base plan';
+            costEl.classList.remove('has-cost');
+          }
+        }
+
+        getSliderInfo(
+          type: string,
+          value: number,
+        ): { displayValue: string; cost: number; includedValue: number } {
+          const limits = this.config.limits;
+
+          switch (type) {
+            case 'sites': {
+              const l = limits.sites;
+              const extra = Math.max(0, value - l.free_of_charge_usage);
+              const cost = extra * (l.extra_packet_price || 0);
+              return { displayValue: String(value), cost, includedValue: l.free_of_charge_usage };
+            }
+            case 'users': {
+              const l = limits.users;
+              const extra = Math.max(0, value - l.free_of_charge_per_site_usage);
+              const cost = extra * (l.extra_packet_price || 0);
+              return {
+                displayValue: String(value),
+                cost,
+                includedValue: l.free_of_charge_per_site_usage,
+              };
+            }
+            case 'itemTypes': {
+              const l = limits.itemTypes;
+              const extra = Math.max(0, value - l.free_of_charge_per_environment_usage);
+              const packets = Math.ceil(extra / (l.extra_packet_amount || 1));
+              const cost = packets * (l.extra_packet_price || 0);
+              return {
+                displayValue: String(value),
+                cost,
+                includedValue: l.free_of_charge_per_environment_usage,
+              };
+            }
+            case 'locales': {
+              const l = limits.locales;
+              const extra = Math.max(0, value - l.free_of_charge_per_environment_usage);
+              const cost = extra * (l.extra_packet_price || 0);
+              return {
+                displayValue: String(value),
+                cost,
+                includedValue: l.free_of_charge_per_environment_usage,
+              };
+            }
+            case 'items': {
+              const l = limits.items;
+              const extra = Math.max(0, value - l.free_of_charge_usage);
+              const packets = Math.ceil(extra / (l.extra_packet_amount || 1));
+              const cost = packets * (l.extra_packet_price || 0);
+              return {
+                displayValue: this.formatNumber(value),
+                cost,
+                includedValue: l.free_of_charge_usage,
+              };
+            }
+            case 'traffic': {
+              // value is number of extra packets (0-10)
+              const l = limits.traffic;
+              const totalBytes = l.free_of_charge_usage + value * (l.extra_packet_amount || 0);
+              const cost = value * (l.extra_packet_price || 0);
+              return {
+                displayValue: this.formatBytes(totalBytes),
+                cost,
+                includedValue: l.free_of_charge_usage,
+              };
+            }
+            case 'apiCalls': {
+              // value is number of extra packets (0-20)
+              const l = limits.apiCalls;
+              const totalCalls = l.free_of_charge_usage + value * (l.extra_packet_amount || 0);
+              const cost = value * (l.extra_packet_price || 0);
+              return {
+                displayValue: this.formatNumber(totalCalls),
+                cost,
+                includedValue: l.free_of_charge_usage,
+              };
+            }
+            case 'muxEncoding': {
+              // value is number of extra packets (0-20)
+              const l = limits.muxEncoding;
+              const totalSeconds = l.free_of_charge_usage + value * (l.extra_packet_amount || 0);
+              const cost = value * (l.extra_packet_price || 0);
+              return {
+                displayValue: this.formatHours(totalSeconds),
+                cost,
+                includedValue: l.free_of_charge_usage,
+              };
+            }
+            case 'muxStreaming': {
+              // value is number of extra packets (0-20)
+              const l = limits.muxStreaming;
+              const totalSeconds = l.free_of_charge_usage + value * (l.extra_packet_amount || 0);
+              const cost = value * (l.extra_packet_price || 0);
+              return {
+                displayValue: this.formatHours(totalSeconds),
+                cost,
+                includedValue: l.free_of_charge_usage,
+              };
+            }
+          }
+          return { displayValue: '', cost: 0, includedValue: 0 };
+        }
+
+        getExtraText(type: string, value: number, includedValue: number): string {
+          switch (type) {
+            case 'sites':
+              return `${value - includedValue} extra project${value - includedValue > 1 ? 's' : ''}`;
+            case 'users':
+              return `${value - includedValue} extra collaborator${value - includedValue > 1 ? 's' : ''}`;
+            case 'itemTypes':
+              return `${value - includedValue} extra model${value - includedValue > 1 ? 's' : ''}`;
+            case 'locales':
+              return `${value - includedValue} extra locale${value - includedValue > 1 ? 's' : ''}`;
+            case 'items':
+              return `${this.formatNumber(value - includedValue)} extra records`;
+            case 'traffic':
+              return `${value} extra packet${value > 1 ? 's' : ''} (${this.formatBytes(value * (this.config.limits.traffic.extra_packet_amount || 0))})`;
+            case 'apiCalls':
+              return `${value} extra packet${value > 1 ? 's' : ''} (${this.formatNumber(value * (this.config.limits.apiCalls.extra_packet_amount || 0))} calls)`;
+            case 'muxEncoding':
+              return `${value} extra packet${value > 1 ? 's' : ''} (${this.formatHours(value * (this.config.limits.muxEncoding.extra_packet_amount || 0))})`;
+            case 'muxStreaming':
+              return `${value} extra packet${value > 1 ? 's' : ''} (${this.formatHours(value * (this.config.limits.muxStreaming.extra_packet_amount || 0))})`;
+          }
+          return '';
+        }
+
+        formatNumber(n: number): string {
+          if (n >= 1000000) return `${(n / 1000000).toFixed(n % 1000000 === 0 ? 0 : 1)}M`;
+          if (n >= 1000) return `${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k`;
+          return String(n);
+        }
+
+        formatBytes(bytes: number): string {
+          if (bytes >= 1099511627776) return `${(bytes / 1099511627776).toFixed(1)}TB`;
+          if (bytes >= 1073741824) return `${(bytes / 1073741824).toFixed(0)}GB`;
+          if (bytes >= 1048576) return `${(bytes / 1048576).toFixed(0)}MB`;
+          return `${bytes} bytes`;
+        }
+
+        formatHours(seconds: number): string {
+          const hours = seconds / 3600;
+          if (hours >= 1) return `${hours.toFixed(0)}hrs`;
+          return `${(seconds / 60).toFixed(0)}mins`;
+        }
+
+        calculateTotal() {
+          const basePrice = this.isYearly
+            ? this.config.yearlyPricePerMonth
+            : this.config.monthlyPrice;
+
+          let extrasCost = 0;
+          let usageCost = 0;
+
+          // Calculate plan limits costs
+          const boundedSliders = ['sites', 'users', 'itemTypes', 'locales', 'items'];
+          for (const type of boundedSliders) {
+            const slider = this.$(`[data-slider="${type}"]`);
+            const input = slider.querySelector('input')!;
+            const { cost } = this.getSliderInfo(type, Number(input.value));
+            extrasCost += cost;
+          }
+
+          // Calculate usage-based costs
+          const usageSliders = ['traffic', 'apiCalls', 'muxEncoding', 'muxStreaming'];
+          for (const type of usageSliders) {
+            const slider = this.$(`[data-slider="${type}"]`);
+            const input = slider.querySelector('input')!;
+            const { cost } = this.getSliderInfo(type, Number(input.value));
+            usageCost += cost;
+          }
+
+          const total = basePrice + extrasCost + usageCost;
+
+          // Update UI
+          this.$('[data-base-price]').textContent = `€${basePrice.toFixed(0)}`;
+
+          const extrasRow = this.$('[data-extras-row]') as HTMLElement;
+          if (extrasCost > 0) {
+            extrasRow.style.display = '';
+            this.$('[data-extras-price]').textContent = `€${extrasCost.toFixed(0)}`;
+          } else {
+            extrasRow.style.display = 'none';
+          }
+
+          const usageRow = this.$('[data-usage-row]') as HTMLElement;
+          if (usageCost > 0) {
+            usageRow.style.display = '';
+            this.$('[data-usage-price]').textContent = `€${usageCost.toFixed(0)}`;
+          } else {
+            usageRow.style.display = 'none';
+          }
+
+          this.$('[data-total-price]').textContent = total.toFixed(0);
+
+          const annualTotalEl = this.$('[data-annual-total]');
+          if (this.isYearly) {
+            annualTotalEl.textContent = `€${(total * 12).toLocaleString()} billed annually`;
+          } else {
+            annualTotalEl.textContent = '';
+          }
+        }
+      },
+    );
+  </script>
+</Layout>
