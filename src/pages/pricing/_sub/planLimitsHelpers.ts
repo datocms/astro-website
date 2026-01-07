@@ -1,6 +1,44 @@
 import { formatNumberInBytes, formatNumberInMetricSystem } from '~/lib/formatters';
 import type { Limit } from './perOwnerPricingPlans';
 
+/**
+ * Formats seconds into a human-readable time string with optional precision.
+ *
+ * @param num - The number of seconds to format
+ * @param precision - Decimal places for values >= 60k seconds (default: 2)
+ *
+ * Examples:
+ *   formatSeconds(1) → "1 sec"
+ *   formatSeconds(45) → "45 secs"
+ *   formatSeconds(60) → "1 min"
+ *   formatSeconds(90) → "2 mins"
+ *   formatSeconds(3661) → "61 mins"
+ *   formatSeconds(65000) → "1.08k mins"
+ *   formatSeconds(65000, 0) → "1k mins"
+ *   formatSeconds(65000, 2) → "1.08k mins"
+ */
+export function formatSeconds(num: number | null, precision = 2) {
+  if (!num) {
+    return '-';
+  }
+
+  if (num >= 60 * 1000) {
+    let formattedNumber = (num / (60 * 1000)).toFixed(precision);
+    if (/\.0+$/.test(formattedNumber)) {
+      formattedNumber = parseFloat(formattedNumber).toFixed(0);
+    }
+    return `${formattedNumber}k mins`;
+  }
+
+  if (num >= 60) {
+    const formattedNumber = (num / 60).toFixed(0);
+    return formattedNumber === '1' ? `${formattedNumber} min` : `${formattedNumber} mins`;
+  }
+
+  const rounded = num.toFixed(0);
+  return rounded === '1' ? `${rounded} sec` : `${rounded} secs`;
+}
+
 export const hasUnit = (limitId: string) => {
   return limitId.endsWith('days') || limitId.endsWith('seconds') || limitId.endsWith('bytes');
 };
@@ -67,9 +105,7 @@ export const formatValue = (limitId: string, value: number): string => {
   }
 
   if (limitId.endsWith('seconds')) {
-    return value / 60 >= 5000
-      ? `${Math.floor(value / 60 / 60)} hrs`
-      : `${Math.floor(value / 60)} mins`;
+    return formatSeconds(value);
   }
 
   if (limitId.endsWith('bytes')) {
