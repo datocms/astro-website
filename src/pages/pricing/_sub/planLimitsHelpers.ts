@@ -93,7 +93,7 @@ export const limitLabel = (limitId: string) => {
 
 export const formatValue = (limitId: string, value: number): string => {
   if (limitId === 'support_level') {
-    return value === 1 ? 'Community-based' : 'Mon/Fri, response in 24h';
+    return value === 1 ? 'Community-based' : 'Mon-Fri, response in 24h';
   }
 
   if (limitId.endsWith('days')) {
