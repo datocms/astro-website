@@ -1,5 +1,6 @@
 ---
 import { Svg } from '~/components/Svg';
+import Tooltip from '~/components/Tooltip/Tooltip.astro';
 import s from '../_style.module.css';
 import { formatLimit, formatExtra, formatUpperBoundLimitRaw } from './planLimitsHelpers';
 import { HintFragment } from '../_graphql';
@@ -77,12 +78,15 @@ const { proPlan, hints } = Astro.props;
             >
               <th class={s.fTableFeatureName}>
                 <div class={s.fTableFeatureNameSplit}>
-                  <div class={s.fTableFeatureNameName}>{hint.name} </div>
+                  <div class={s.fTableFeatureNameName}>{hint.name}</div>
                   {hint.description && (
-                    <div class={s.fTableFeatureNameInfo}>
+                    <Tooltip
+                      class={s.fTableFeatureNameInfo}
+                      tooltipClass={s.fTableFeatureNameInfoHint}
+                    >
                       <Svg name="icons/regular/info-circle" />
-                      <div class={s.fTableFeatureNameInfoHint}>{hint.description}</div>
-                    </div>
+                      <div slot="tooltip">{hint.description}</div>
+                    </Tooltip>
                   )}
                 </div>
               </th>

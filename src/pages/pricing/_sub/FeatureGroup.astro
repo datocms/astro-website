@@ -1,5 +1,6 @@
 ---
 import { Svg } from '~/components/Svg';
+import Tooltip from '~/components/Tooltip/Tooltip.astro';
 import s from '../_style.module.css';
 import { InlineText } from '~/components/structuredText/InlineText';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
@@ -36,16 +37,15 @@ const { group, startOpen } = Astro.props;
         <div class={s.fTableFeatureNameSplit}>
           <div class={s.fTableFeatureNameName}>{feature.name} </div>
           {feature.description && (
-            <div class={s.fTableFeatureNameInfo}>
+            <Tooltip class={s.fTableFeatureNameInfo} tooltipClass={s.fTableFeatureNameInfoHint}>
               <Svg name="icons/regular/info-circle" />
-              <div class={s.fTableFeatureNameInfoHint}>
+              <div slot="tooltip">
                 <InlineText {...ensureValidStructuredTextProps({ data: feature.description })} />
-
                 <div style={{ display: 'none' }}>
                   Related to: {group.name}, {(feature.tags as string[]).join(', ')}
                 </div>
               </div>
-            </div>
+            </Tooltip>
           )}
         </div>
       </th>

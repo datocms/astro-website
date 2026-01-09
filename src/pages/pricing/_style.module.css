@@ -311,7 +311,7 @@
 }
 
 .fTableScroll {
-  overflow: scroll;
+  overflow-x: scroll;
 
   @media screen and (height >= 750px) and (width >= 850px) {
     overflow: unset;
@@ -372,11 +372,7 @@
 }
 
 .fTableFeature:hover {
-  background: #fffff0;
-}
-
-.fTableFeatureOdd:hover {
-  background: var(--darker-lighlight-bg-color);
+  background: color-mix(in oklch, var(--highlight-bg-color) 92%, var(--azure-color));
 }
 
 .fTableFeatureName {
@@ -394,6 +390,10 @@
   font-size: 15px;
   padding: 10px 20px;
   border-right: 1px solid var(--border-color);
+
+  .fTableFeature:hover &[data-enterprise-limits-cell] {
+    background: var(--highlight-bg-color);
+  }
 }
 
 .fTableFeaturePlanNotAvailable {
@@ -486,9 +486,9 @@
 
 .fTableFeatureNameInfo {
   margin-left: 10px;
-  position: relative;
   padding: 14px;
   padding-right: 30px;
+
   svg {
     width: 15px;
     height: 15px;
@@ -497,43 +497,33 @@
 }
 
 .fTableFeatureNameInfoHint {
-  display: none;
-  position: absolute;
-  bottom: 100%;
-  right: 0;
   max-width: 400px;
   min-width: 300px;
   background: var(--dark-bg-color);
   color: white;
-  z-index: 110;
   padding: rfs(30px);
   border-radius: 4px;
   font-size: 14px;
-  text-wrap: balance;
-
-  &:before {
-    content: '';
-    position: absolute;
-    top: 100%;
-    right: 29px;
-    margin-left: -9px;
-    border-width: 9px;
-    border-style: solid;
-    border-color: var(--dark-bg-color) transparent transparent transparent;
-  }
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --tooltip-arrow-bg: var(--dark-bg-color);
 
   p {
     margin: 0;
     margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
-}
 
-.fTableFeatureNameInfoHint .fTableFeatureNameInfoHint p:last-child {
-  margin-bottom: 0;
-}
+  a {
+    color: inherit;
+    text-decoration: underline;
 
-.fTableFeatureNameInfo:hover .fTableFeatureNameInfoHint {
-  display: block;
+    &:hover {
+      color: var(--accent-color);
+    }
+  }
 }
 
 .check {

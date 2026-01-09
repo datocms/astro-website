@@ -1,0 +1,129 @@
+---
+import s from './style.module.css';
+
+interface Props {
+  class?: string;
+  tooltipClass?: string;
+  arrow?: boolean;
+}
+
+const { class: className, tooltipClass: tooltipClassName, arrow: showArrow = true } = Astro.props;
+---
+
+<dato-tooltip data-arrow={showArrow || undefined}>
+  <span class:list={[s.trigger, className]}>
+    <slot />
+  </span>
+  <div class:list={[s.tooltipContent, tooltipClassName]} role="tooltip">
+    <slot name="tooltip" />
+    {showArrow && <div class={s.arrow} data-arrow />}
+  </div>
+</dato-tooltip>
+
+<script>
+  import { computePosition, flip, shift, offset, arrow, autoUpdate, hide } from '@floating-ui/dom';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  window.customElements.define(
+    'dato-tooltip',
+    class DatoTooltip extends WebComponent {
+      trigger!: HTMLElement;
+      tooltip!: HTMLElement;
+      arrowElement: HTMLElement | null = null;
+      isVisible = false;
+      cleanupAutoUpdate: (() => void) | null = null;
+
+      parsedCallback() {
+        this.trigger = this.$('[class*="trigger"]');
+        this.tooltip = this.$('[role="tooltip"]');
+        this.arrowElement = this.$('[data-arrow]');
+
+        this.on(this.trigger, 'mouseenter', () => this.show());
+        this.on(this.trigger, 'mouseleave', () => this.hide());
+        this.on(this.trigger, 'focus', () => this.show());
+        this.on(this.trigger, 'blur', () => this.hide());
+      }
+
+      show() {
+        if (this.isVisible) return;
+
+        this.isVisible = true;
+        this.tooltip.style.display = 'block';
+
+        // Auto-update position on scroll/resize
+        this.cleanupAutoUpdate = autoUpdate(this.trigger, this.tooltip, async () => {
+          const { x, y, middlewareData, placement } = await computePosition(
+            this.trigger,
+            this.tooltip,
+            {
+              placement: 'top',
+              strategy: 'fixed',
+              middleware: [
+                offset(10),
+                flip({
+                  fallbackPlacements: ['bottom', 'left', 'right'],
+                }),
+                shift({ padding: 10 }),
+                ...(this.arrowElement ? [arrow({ element: this.arrowElement, padding: 5 })] : []),
+                hide(),
+              ],
+            },
+          );
+
+          Object.assign(this.tooltip.style, {
+            left: `${x}px`,
+            top: `${y}px`,
+          });
+
+          // Position arrow
+          if (this.arrowElement && middlewareData.arrow) {
+            const { x: arrowX, y: arrowY } = middlewareData.arrow;
+
+            const side = placement.split('-')[0]!;
+
+            const staticSide = {
+              top: 'bottom',
+              right: 'left',
+              bottom: 'top',
+              left: 'right',
+            }[side]!;
+
+            Object.assign(this.arrowElement.style, {
+              left: arrowX != null ? `${arrowX}px` : '',
+              top: arrowY != null ? `${arrowY}px` : '',
+              // Ensure the static side gets unset when
+              // flipping to other placements' axes.
+              right: '',
+              bottom: '',
+              [staticSide]: `${-this.arrowElement.offsetWidth / 2}px`,
+              transform: 'rotate(45deg)',
+            });
+          }
+
+          if (middlewareData.hide) {
+            Object.assign(this.tooltip.style, {
+              visibility: middlewareData.hide.referenceHidden ? 'hidden' : 'visible',
+            });
+          }
+        });
+      }
+
+      hide() {
+        if (!this.isVisible) return;
+        this.isVisible = false;
+        this.tooltip.style.display = 'none';
+        if (this.cleanupAutoUpdate) {
+          this.cleanupAutoUpdate();
+          this.cleanupAutoUpdate = null;
+        }
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        if (this.cleanupAutoUpdate) {
+          this.cleanupAutoUpdate();
+        }
+      }
+    },
+  );
+</script>
