@@ -523,9 +523,9 @@ in writing. Before resorting to litigation, we strongly encourage you to contact
 friendly resolution.
 In case an agreement cannot be reached, this Agreement shall be governed in all respects by the
 laws of Italy without regard to conflict of law provisions. You agree that any claim or dispute
-you may have against DATO SRL must be resolved exclusively by a state court located in Firenze,
+you may have against DATO SRL must be resolved exclusively by a state court located in Milano,
 Italy, except as otherwise agreed by the parties. You agree to submit to the personal jurisdiction
-of the courts located in Firenze, Italy, for the purpose of litigating all such claims or disputes.
+of the courts located in Milano, Italy, for the purpose of litigating all such claims or disputes.
 
 ### 24. Miscellaneous
 
@@ -550,7 +550,7 @@ partnership, joint venture, or employment is created as a result of this Agreeme
 have any authority of any kind to bind DATO SRL in any respect whatsoever. Any notice to DATO SRL
 that is required or permitted by this Agreement shall be in writing and shall be deemed effective
 upon receipt, when delivered in person by nationally recognized overnight courier or mailed by first
-class, registered or certified mail, postage prepaid, to DATO SRL SRL, Via Giuseppe Garibaldi 15, 50123
-Firenze, Italy
+class, registered or certified mail, postage prepaid, to DATO SRL SRL, Via U. Visconti di Modrone 2,
+20122, Milano, Italy
 
-Version ID: 0.1.4, November 12, 2025
+Version ID: 0.1.5, January 13, 2026
