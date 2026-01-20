@@ -19,7 +19,9 @@ export function buildFetchResponse(
     return undefined;
   }
 
-  const statusCode = endpoint.jobSchema ? 202 : response?.statusCode || 200;
+  // Prefer an explicit status code from the response definition
+  // Otherwise fall back to defaults (202 for a job, 200 for others)
+  const statusCode = response?.statusCode ?? (endpoint.jobSchema ? 202 : 200);
 
   return {
     statusCode,
