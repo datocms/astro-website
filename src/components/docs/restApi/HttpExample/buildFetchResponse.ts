@@ -32,10 +32,11 @@ export function buildFetchResponse(
       'X-RateLimit-Limit': '30',
       'X-RateLimit-Remaining': '28',
     },
-    body: response?.body
-      ? response.body.trim()
-      : endpoint.targetSchema
-        ? JSON.stringify(exampleValueForSchema(endpoint.targetSchema), null, 2).trim()
-        : null,
+    body:
+      typeof response?.body === 'string'
+        ? response.body.trim()
+        : endpoint.targetSchema
+          ? JSON.stringify(exampleValueForSchema(endpoint.targetSchema), null, 2).trim()
+          : null,
   };
 }
