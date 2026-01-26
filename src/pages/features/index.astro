@@ -9,7 +9,7 @@ import { ScrollspyNav } from '~/components/ScrollspyNav';
 import { SingleQuote } from '~/components/quote/SingleQuote';
 import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
-import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
 import { Text } from '~/components/structuredText/Text';
 import { Wrapper } from '~/components/Wrapper';
 import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
@@ -20,7 +20,6 @@ import { slugify } from '~/lib/slugify';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
-import { splitStega } from '@datocms/content-link/stega';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -92,7 +91,7 @@ const featuresGroup = [
   },
 ];
 
-const linkLabel: { [key: string]: string } = {
+const linkTitleToLabel: { [key: string]: string } = {
   docs: 'Docs',
   guide: 'Guide',
   learn_more: 'Learn more',
@@ -188,16 +187,15 @@ const linkLabel: { [key: string]: string } = {
                           {feature.links && (
                             <div class={s.featureLinks}>
                               {feature.links.map((link) => {
-                                const { cleaned, encoded } = splitStega(link.linkTitle);
-
-                                const customTitle =
-                                  cleaned in linkLabel
-                                    ? `${encoded}${linkLabel[cleaned]}`
-                                    : link.linkTitle;
+                                const linkTitle = stripStega(link.linkTitle);
 
                                 return (
-                                  <a href={buildUrlFromGql(link.content)} class={s.link}>
-                                    {customTitle}
+                                  <a
+                                    href={buildUrlFromGql(link.content)}
+                                    class={s.link}
+                                    data-datocms-content-link-source={link.linkTitle}
+                                  >
+                                    {linkTitleToLabel[linkTitle] || linkTitle}
                                     <span class={s.linkArrow}>→</span>
                                   </a>
                                 );

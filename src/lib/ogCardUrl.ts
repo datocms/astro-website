@@ -1,4 +1,4 @@
-import { stripStega } from '@datocms/content-link/stega';
+import { stripStega } from '@datocms/astro';
 import type { AstroGlobal } from 'astro';
 import { truncate } from 'lodash-es';
 import { baseUrl } from './draftMode';

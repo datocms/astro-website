@@ -1,4 +1,4 @@
-import { stripStega } from '@datocms/content-link';
+import { stripStega } from '@datocms/astro';
 import type { MiddlewareHandler } from 'astro';
 import { DEPLOYMENT_DESTINATION, SECRET_API_TOKEN } from 'astro:env/server';
 import { sequence } from 'astro:middleware';

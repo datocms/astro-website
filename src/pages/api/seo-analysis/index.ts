@@ -1,5 +1,5 @@
 import { buildClient } from '@datocms/cma-client';
-import { stripStega } from '@datocms/content-link';
+import { stripStega } from '@datocms/astro';
 import type { APIRoute } from 'astro';
 import { DATOCMS_API_TOKEN, DRAFT_MODE_HOSTNAME, SECRET_API_TOKEN } from 'astro:env/server';
 import { parse } from 'node-html-parser';
