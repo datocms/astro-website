@@ -162,6 +162,9 @@ export function Search() {
     search(searchTerm).then((results) => {
       setIsLoading(false);
       setResults(results);
+      if ('posthog' in window) {
+        (window as any).posthog.capture('docs_search');
+      }
     });
   };
 
