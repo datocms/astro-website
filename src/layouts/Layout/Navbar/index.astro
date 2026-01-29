@@ -481,6 +481,15 @@ const sortedContinents = Object.fromEntries(
       handleNavItems() {
         const root = this.children[0] as HTMLElement;
         const targetTogglers = this.$$('[data-navbar-navitem] > target-toggler');
+        const navItems = this.$$('[data-navbar-navitem]');
+
+        for (const navItem of navItems) {
+          navItem.addEventListener('mouseenter', () => {
+            if ('posthog' in window) {
+              (window as any).posthog.capture('navbar_open');
+            }
+          });
+        }
 
         this.on<CustomEvent<{ expanded: boolean }>>(
           root,
