@@ -4,6 +4,7 @@ import s from './style.module.css';
 import { Button } from '~/components/Button';
 import ky from 'ky';
 import { Svg } from '~/components/Svg';
+import { stripStega } from '@datocms/astro';
 
 type Props = {
   productId: string;
@@ -249,7 +250,7 @@ const {
           }
         }
       `,
-      variables: { handle: Astro.props.productId },
+      variables: { handle: stripStega(Astro.props.productId) },
     },
   })
   .json();
