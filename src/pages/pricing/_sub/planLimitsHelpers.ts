@@ -56,8 +56,12 @@ export const limitLabel = (limitId: string) => {
     return 'traffic';
   }
 
-  if (limitId === 'api_calls') {
-    return 'API calls';
+  if (limitId === 'cda_api_calls') {
+    return 'CDA API calls';
+  }
+
+  if (limitId === 'cma_api_calls') {
+    return 'CMA API calls';
   }
 
   if (limitId === 'mux_encoding_seconds') {
@@ -117,7 +121,13 @@ export const formatValue = (limitId: string, value: number): string => {
 
 export const perMonth = (name: string, value: string) => {
   if (
-    ['api_calls', 'mux_encoding_seconds', 'mux_streaming_seconds', 'traffic_bytes'].includes(name)
+    [
+      'cda_api_calls',
+      'cma_api_calls',
+      'mux_encoding_seconds',
+      'mux_streaming_seconds',
+      'traffic_bytes',
+    ].includes(name)
   ) {
     return `${value}/mo`;
   }
