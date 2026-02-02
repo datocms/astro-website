@@ -92,6 +92,10 @@ export const limitLabel = (limitId: string) => {
     return 'project';
   }
 
+  if (limitId === 'sandbox_environments') {
+    return 'sandbox environment';
+  }
+
   return limitId;
 };
 
