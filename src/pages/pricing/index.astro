@@ -332,6 +332,12 @@ if (!page || !freePlan || !proPlan) {
             'tr[data-header-for-group]',
             (event, groupEl) => {
               event.stopPropagation();
+
+              const isFiltering = this.onlyShowDifferences || Boolean(this.searchTerm);
+              if (isFiltering) {
+                return;
+              }
+
               groupEl.toggleAttribute('data-open');
               this.copyGroupVisibilityOnSubElements(groupEl);
             },
