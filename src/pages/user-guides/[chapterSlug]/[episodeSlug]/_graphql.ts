@@ -10,7 +10,7 @@ import {
 } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
-import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
+import type { BuildSitemapUrlsFn, SitemapEntry } from '~/pages/sitemap.xml';
 
 export const EpisodeFragment = graphql(
   /* GraphQL */ `
@@ -138,6 +138,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
         query BuildSitemapUrls {
           entries: allUserGuidesEpisodes(first: 500) {
             ...UserGuidesEpisodeUrlFragment
+            _updatedAt
           }
         }
       `,
@@ -146,7 +147,12 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForUserGuidesEpisode);
+  return entries.map(
+    (entry): SitemapEntry => ({
+      url: buildUrlForUserGuidesEpisode(entry),
+      lastmod: entry._updatedAt,
+    }),
+  );
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{ episodeSlug: string }> = async ({

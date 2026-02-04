@@ -12,7 +12,7 @@ import {
 } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
-import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
+import type { BuildSitemapUrlsFn, SitemapEntry } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -118,6 +118,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
         query BuildSitemapUrls {
           entries: allHostingApps(first: 100) {
             ...HostingAppUrlFragment
+            _updatedAt
           }
         }
       `,
@@ -126,7 +127,9 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForHostingApp);
+  return entries.map(
+    (entry): SitemapEntry => ({ url: buildUrlForHostingApp(entry), lastmod: entry._updatedAt }),
+  );
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({

@@ -18,7 +18,7 @@ import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { BlogPostUrlFragment, buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
-import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
+import type { BuildSitemapUrlsFn, SitemapEntry } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -29,11 +29,20 @@ export const query = graphql(
         }
         _firstPublishedAt
         _createdAt
+        _updatedAt
         title
         slug
         seoH1
         canonicalUrl
         yoastAnalysis
+        coverImage {
+          url
+          width
+          height
+        }
+        excerpt {
+          value
+        }
         content {
           value
           links {
@@ -181,6 +190,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
         query BuildSitemapUrls {
           entries: allBlogPosts(first: 500) {
             ...BlogPostUrlFragment
+            _updatedAt
           }
         }
       `,
@@ -189,7 +199,12 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForBlogPost);
+  return entries.map(
+    (entry): SitemapEntry => ({
+      url: buildUrlForBlogPost(entry),
+      lastmod: entry._updatedAt,
+    }),
+  );
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({

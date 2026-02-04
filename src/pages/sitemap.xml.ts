@@ -15,13 +15,18 @@ const allBuildSitemapUrls = import.meta.glob<BuildSitemapUrlsFn>('../pages/**/_g
   eager: false,
 });
 
+export type SitemapEntry = {
+  url: string;
+  lastmod?: string;
+};
+
 export type BuildSitemapUrlsFn = (ctx: {
   request: Request;
   responseHeaders: Headers;
-}) => Promise<string[]>;
+}) => Promise<SitemapEntry[]>;
 
 export const fetchSitemapUrls = async (request: Request, responseHeaders: Headers) => {
-  let urlsPromises: Array<Promise<string[]>> = [];
+  let urlsPromises: Array<Promise<SitemapEntry[]>> = [];
 
   for (const astroFilePath of Object.keys(allAstroFiles)) {
     if (astroFilePath.includes('_')) {
@@ -51,7 +56,7 @@ export const fetchSitemapUrls = async (request: Request, responseHeaders: Header
       );
     } else {
       const url = astroFilePath.replace('./', '/').replace('.astro', '').replace('/index', '');
-      urlsPromises.push(Promise.resolve([url]));
+      urlsPromises.push(Promise.resolve([{ url }]));
     }
   }
 
@@ -69,16 +74,19 @@ export const GET: APIRoute = async ({ request }) => {
       'Content-Type': 'application/xml',
     });
 
-    for (const url of await fetchSitemapUrls(request, responseHeaders)) {
-      if (url === '/404') {
+    for (const entry of await fetchSitemapUrls(request, responseHeaders)) {
+      if (entry.url === '/404') {
         continue;
       }
 
-      if (BLACKLISTED_URL_PREFIXES.some((prefix) => url.startsWith(prefix))) {
+      if (BLACKLISTED_URL_PREFIXES.some((prefix) => entry.url.startsWith(prefix))) {
         continue;
       }
 
-      stream.write({ url });
+      stream.write({
+        url: entry.url,
+        ...(entry.lastmod && { lastmod: entry.lastmod }),
+      });
     }
 
     stream.end();

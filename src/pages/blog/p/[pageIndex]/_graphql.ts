@@ -5,7 +5,7 @@ import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { BlogPostUrlFragment } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { ChangelogEntryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
 import { graphql } from '~/lib/datocms/graphql';
-import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
+import type { BuildSitemapUrlsFn, SitemapEntry } from '~/pages/sitemap.xml';
 
 export const perPage = 15;
 
@@ -83,5 +83,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/blog/p/${i}`);
+  return range(2, 1 + Math.ceil(count / perPage)).map(
+    (i): SitemapEntry => ({ url: `/blog/p/${i}` }),
+  );
 };

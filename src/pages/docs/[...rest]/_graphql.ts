@@ -5,7 +5,7 @@ import { buildUrlForDocPage, DocPageUrlFragment } from '~/lib/datocms/gqlUrlBuil
 import { graphql } from '~/lib/datocms/graphql';
 import { isDefined } from '~/lib/isDefined';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
-import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
+import type { BuildSitemapUrlsFn, SitemapEntry } from '~/pages/sitemap.xml';
 
 export const docGroupQuery = graphql(
   /* GraphQL */ `
@@ -52,6 +52,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
         query BuildSitemapUrls {
           entries: allDocPages(first: 500) {
             ...DocPageUrlFragment
+            _updatedAt
           }
         }
       `,
@@ -61,9 +62,12 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
   );
 
   return entries
-    .map((page) => {
+    .map((page): SitemapEntry | undefined => {
       try {
-        return buildUrlForDocPage(page);
+        return {
+          url: buildUrlForDocPage(page),
+          lastmod: page._updatedAt,
+        };
       } catch (e) {
         return undefined;
       }

@@ -32,6 +32,7 @@ import { query, siblingsQuery } from './_graphql';
 import { Prose } from '~/components/Prose';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { overrideSeo, seoTwitterCard } from '~/lib/datocms/seo';
+import { articleSchema, breadcrumbSchema } from '~/lib/jsonLd';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { SameLevelNavigation } from '~/components/SameLevelNavigation';
@@ -71,6 +72,24 @@ const markdownUrl = new URL(
   Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
   baseUrl,
 );
+
+const excerptText = post.excerpt ? toPlainText(post.excerpt) : undefined;
+
+const blogArticleSchema = articleSchema(Astro, {
+  title: post.title,
+  description: excerptText || undefined,
+  slug: post.slug,
+  datePublished: post._firstPublishedAt,
+  dateModified: post._updatedAt,
+  authors: post.author,
+  coverImage: post.coverImage,
+});
+
+const blogBreadcrumbSchema = breadcrumbSchema(Astro, [
+  { name: 'Home', url: '/' },
+  { name: 'Blog', url: '/blog' },
+  { name: post.title, url: `/blog/${post.slug}` },
+]);
 ---
 
 <Layout seo={overrideSeo(post.seo, seoTwitterCard('summary_large_image'))}>
@@ -83,6 +102,8 @@ const markdownUrl = new URL(
         />
       )
     }
+    <script type="application/ld+json" set:html={JSON.stringify(blogArticleSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(blogBreadcrumbSchema)} />
   </Fragment>
 
   <div id="main-content">

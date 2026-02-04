@@ -6,6 +6,7 @@ import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { CloneButtonForm } from '~/components/docs/blocks/CloneButtonForm';
 import { Demo } from '~/components/blocks/Demo';
 import { overrideSeo, seoGeneratedCard } from '~/lib/datocms/seo';
+import { breadcrumbSchema } from '~/lib/jsonLd';
 import { DeployButtonForm } from '~/components/docs/blocks/DeployButtonForm';
 import { DocCallout } from '~/components/docs/blocks/DocCallout';
 import { MultipleDemosBlock } from '~/components/blocks/MultipleDemosBlock';
@@ -61,6 +62,13 @@ const tocGroups = [
   ...tocGroupsFromPageContent,
   ...additionalTocGroups,
 ];
+
+const docsBreadcrumbSchema = breadcrumbSchema(Astro, [
+  { name: 'Home', url: '/' },
+  { name: 'Documentation', url: '/docs' },
+  { name: group.name, url: `/docs/${group.slug}` },
+  { name: page.title, url: Astro.url.pathname },
+]);
 ---
 
 <GroupLayout
@@ -78,6 +86,9 @@ const tocGroups = [
   additionalSidebarItems={additionalSidebarItems}
   lastUpdatedAt={page._publishedAt}
 >
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(docsBreadcrumbSchema)} />
+  </Fragment>
   <ContentPlusToc tocGroups={tocGroups}>
     <Fragment slot="kicker">{page.parents[0]!.name}</Fragment>
     <Fragment slot="title">{page.title}</Fragment>
