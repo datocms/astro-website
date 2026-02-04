@@ -4,7 +4,7 @@ import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { graphql } from '~/lib/datocms/graphql';
 import { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
-import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
+import type { BuildSitemapUrlsFn, SitemapEntry } from '~/pages/sitemap.xml';
 
 export const perPage = 36;
 
@@ -48,5 +48,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/marketplace/plugins/browse/p/${i}`);
+  return range(2, 1 + Math.ceil(count / perPage)).map(
+    (i): SitemapEntry => ({ url: `/marketplace/plugins/browse/p/${i}` }),
+  );
 };

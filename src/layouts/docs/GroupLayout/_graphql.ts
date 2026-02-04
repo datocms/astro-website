@@ -8,6 +8,7 @@ export const GroupLayoutFragment = graphql(
     fragment GroupLayoutFragment on DocGroupRecord {
       ...DocGroupItemsFragment
       name
+      slug
       pagesOrSections: pages {
         __typename
         ... on DocGroupPageRecord {
