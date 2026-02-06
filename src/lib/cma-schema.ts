@@ -923,6 +923,9 @@ export type Partner = ItemTypeDefinition<
     name: {
       type: 'string';
     };
+    slug: {
+      type: 'slug';
+    };
     description: {
       type: 'structured_text';
       inline_blocks:
@@ -948,17 +951,14 @@ export type Partner = ItemTypeDefinition<
         | UserGuidesEpisode
         | Recipe;
     };
-    slug: {
-      type: 'slug';
-    };
     public_contact_email: {
       type: 'string';
     };
-    short_description: {
-      type: 'structured_text';
-    };
     npm_user: {
       type: 'link';
+    };
+    short_description: {
+      type: 'structured_text';
     };
     website_url: {
       type: 'string';
@@ -1307,6 +1307,9 @@ export type PlanFeature = ItemTypeDefinition<
     tags: {
       type: 'json';
     };
+    related_pricing_hint: {
+      type: 'link';
+    };
   }
 >;
 export type AcademyCourse = ItemTypeDefinition<
@@ -1561,11 +1564,11 @@ export type ProductComparison = ItemTypeDefinition<
       type: 'rich_text';
       blocks: ReasonToConsider;
     };
-    datocms_characterization: {
-      type: 'structured_text';
-    };
     slug: {
       type: 'slug';
+    };
+    datocms_characterization: {
+      type: 'structured_text';
     };
     seo_social: {
       type: 'seo';
@@ -1622,6 +1625,9 @@ export type TechPartner = ItemTypeDefinition<
     name: {
       type: 'string';
     };
+    slug: {
+      type: 'slug';
+    };
     description: {
       type: 'structured_text';
       inline_blocks:
@@ -1647,17 +1653,14 @@ export type TechPartner = ItemTypeDefinition<
         | UserGuidesEpisode
         | Recipe;
     };
-    slug: {
-      type: 'slug';
-    };
-    short_description: {
-      type: 'structured_text';
-    };
     public_contact_email: {
       type: 'string';
     };
     npm_user: {
       type: 'link';
+    };
+    short_description: {
+      type: 'structured_text';
     };
     logo: {
       type: 'file';
@@ -1707,12 +1710,6 @@ export type SuccessStory = ItemTypeDefinition<
     main_results_image: {
       type: 'file';
     };
-    project_url: {
-      type: 'string';
-    };
-    challenge: {
-      type: 'structured_text';
-    };
     content: {
       type: 'structured_text';
       blocks: Image | InternalVideo | Video | InDepthCtaBlock;
@@ -1739,17 +1736,24 @@ export type SuccessStory = ItemTypeDefinition<
         | UserGuidesEpisode
         | Recipe;
     };
-    tags: {
-      type: 'links';
-    };
     cover_image: {
       type: 'file';
     };
-    slug: {
-      type: 'slug';
+    tags: {
+      type: 'links';
     };
-    use_case: {
-      type: 'link';
+    project_url: {
+      type: 'string';
+    };
+    challenge: {
+      type: 'structured_text';
+    };
+    name: {
+      type: 'string';
+    };
+    main_results: {
+      type: 'rich_text';
+      blocks: SuccessStoryResult;
     };
     result: {
       type: 'structured_text';
@@ -1757,15 +1761,20 @@ export type SuccessStory = ItemTypeDefinition<
     duotone_color2: {
       type: 'color';
     };
-    main_results: {
-      type: 'rich_text';
-      blocks: SuccessStoryResult;
+    use_case: {
+      type: 'link';
     };
     title: {
       type: 'structured_text';
     };
-    name: {
-      type: 'string';
+    slug: {
+      type: 'slug';
+    };
+    subtitle: {
+      type: 'structured_text';
+    };
+    key_features: {
+      type: 'links';
     };
     accent_color: {
       type: 'color';
@@ -1773,12 +1782,6 @@ export type SuccessStory = ItemTypeDefinition<
     numbers: {
       type: 'rich_text';
       blocks: SuccessStoryNumber;
-    };
-    subtitle: {
-      type: 'structured_text';
-    };
-    key_features: {
-      type: 'links';
     };
     logo: {
       type: 'file';
@@ -2230,9 +2233,6 @@ export type UseCasePage = ItemTypeDefinition<
     header: {
       type: 'structured_text';
     };
-    summary: {
-      type: 'structured_text';
-    };
     hero_customer: {
       type: 'file';
     };
@@ -2242,12 +2242,15 @@ export type UseCasePage = ItemTypeDefinition<
     description: {
       type: 'structured_text';
     };
-    callout: {
-      type: 'rich_text';
-      blocks: UseCaseCallout;
+    summary: {
+      type: 'structured_text';
     };
     starter_title: {
       type: 'structured_text';
+    };
+    callout: {
+      type: 'rich_text';
+      blocks: UseCaseCallout;
     };
     hero_product: {
       type: 'file';
@@ -2264,11 +2267,11 @@ export type UseCasePage = ItemTypeDefinition<
     hero_image: {
       type: 'file';
     };
-    link: {
-      type: 'string';
-    };
     slug: {
       type: 'slug';
+    };
+    link: {
+      type: 'string';
     };
     starter_image: {
       type: 'file';
@@ -2493,6 +2496,9 @@ export type Recipe = ItemTypeDefinition<
     card_description: {
       type: 'string';
     };
+    slug: {
+      type: 'slug';
+    };
     content: {
       type: 'structured_text';
       blocks: Image | InternalVideo;
@@ -2518,9 +2524,6 @@ export type Recipe = ItemTypeDefinition<
         | BlogPost
         | UserGuidesEpisode
         | Recipe;
-    };
-    slug: {
-      type: 'slug';
     };
     position: {
       type: 'integer';
@@ -2763,11 +2766,11 @@ export type ProductOverview = ItemTypeDefinition<
     header: {
       type: 'structured_text';
     };
-    subheader: {
-      type: 'structured_text';
-    };
     readability: {
       type: 'json';
+    };
+    subheader: {
+      type: 'structured_text';
     };
   }
 >;
