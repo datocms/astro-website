@@ -8,7 +8,7 @@ import {
 } from '~/lib/datocms/gqlUrlBuilder/techPartner';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
-import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
+import type { BuildSitemapUrlsFn, SitemapEntry } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -95,6 +95,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
         query BuildSitemapUrls {
           entries: allTechPartners(first: 500) {
             ...TechPartnerUrlFragment
+            _updatedAt
           }
         }
       `,
@@ -103,7 +104,9 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForTechPartner);
+  return entries.map(
+    (entry): SitemapEntry => ({ url: buildUrlForTechPartner(entry), lastmod: entry._updatedAt }),
+  );
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({

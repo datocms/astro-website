@@ -2,7 +2,7 @@ import { fetchCmaSchema } from '~/components/docs/cmaApi/fetchSchema';
 import type { RestApiEntity } from '~/components/docs/restApi/types';
 import { invariant } from '~/lib/invariant';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
-import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
+import type { BuildSitemapUrlsFn, SitemapEntry } from '~/pages/sitemap.xml';
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (ctx) => {
   const schema = await fetchCmaSchema(ctx);
@@ -11,7 +11,9 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (ctx) => {
   return Object.entries(schema.properties).flatMap(([entityName, entitySchema]) => {
     const entitySlug = entityName.replace(/_/g, '-');
     return (entitySchema as RestApiEntity).links!.map(
-      (endpoint) => `/docs/content-management-api/resources/${entitySlug}/${endpoint.rel}`,
+      (endpoint): SitemapEntry => ({
+        url: `/docs/content-management-api/resources/${entitySlug}/${endpoint.rel}`,
+      }),
     );
   });
 };
