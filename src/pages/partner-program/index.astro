@@ -9,11 +9,10 @@ import { Hero } from '~/components/Hero';
 import { Space } from '~/components/Space';
 import { LogosBar } from '~/components/LogosBar';
 import { QuotesCarousel } from '~/components/quote/QuotesCarousel';
-import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import Benefit from './_Benefit.astro';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Wrapper } from '~/components/Wrapper';
-import Step from './_Step.astro';
+import { Button } from '~/components/Button';
 import { Form } from './_Form';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 
@@ -35,140 +34,157 @@ const shortPartnerTestimonials = partnerTestimonials.filter(
   </Fragment>
 
   <Hero seoAnalysis={{ keyword: 'agencies', synonyms: '', relatedKeywords: [] }}>
-    <Fragment slot="kicker">Partner with DatoCMS</Fragment>
-    <Fragment slot="title"><mark>Agency Partner</mark> Program</Fragment>
-    <Fragment slot="subtitle"
-      >We designed our partnership program to help agencies find new clients, gain more flexibility,
-      and receive assistance in implementing projects with DatoCMS.</Fragment
-    >
+    <Fragment slot="kicker">DatoCMS Agency Partner Program</Fragment>
+    <Fragment slot="title">Become a <mark>Partner</mark></Fragment>
+    <Fragment slot="subtitle">
+      Agency-specific plans <b>from €390/year</b>. No sales targets. No reselling requirements. No
+      BS. Just real benefits including 30% off for your clients and free access to every project you
+      manage.
+    </Fragment>
+    <div class={s.heroCta}>
+      <Button as="a" href="#partner-form" p="big">Become a Partner</Button>
+    </div>
   </Hero>
 
   <Space top={1} bottom={1}>
     <LogosBar
-      title="150+ Agency Partners distributed in 50+ countries"
+      title="250+ happy Partners in 50+ Countries"
       clients={page.highlightedPartners.slice(0, 7).map((partner) => ({
         href: buildUrlForPartner(partner),
         imageUrl: partner.logo.url,
         alt: partner.logo.alt,
       }))}
     />
-
-    <Space top={1} bottom={1}>
-      <QuotesCarousel quotes={shortPartnerTestimonials} />
-    </Space>
   </Space>
 
-  <TitleStripWithContent>
-    <Fragment slot="title">Here&apos;s what it means to partner with us</Fragment>
-    <Fragment slot="subtitle">
-      In our partner program, we&apos;ve incorporated all the essential elements to support the
-      success of your agency. In addition to utilizing DatoCMS, you will receive additional
-      advantages to get the most out of our product, and grow as we grow.
-    </Fragment>
-
-    <div class={s.benefits}>
-      <Benefit title="💰 Special plans and discounts">
-        You get access to customised plans, specifically designed to get you started with DatoCMS
-        without any big price jumps/committments. Or, if you prefer, a 30% discount on the
-        Professional public plan.
-      </Benefit>
-
-      <Benefit title="🎁 30% off for your clients">
-        Partners can enable special plans — or a 30% discount on the public Professional plan — on
-        their customers&apos; accounts.
-        <a href="/docs/agency-partner-program/partners-dashboard#enabling-special-plans-to-clients">
-          Directly from their dashboard
-        </a>, autonomously, without having to ask us for anything.
-      </Benefit>
-
-      <Benefit title="🔑 Full-access to all your clients' projects">
-        Assign your team members a special
-        <a
-          href="/docs/agency-partner-program/partners-dashboard#developer-and-projects-manager-roles"
-        >
-          Developer role
-        </a>
-        to give them
-        <a
-          href="/docs/agency-partner-program/partners-dashboard#automatic-access-to-your-clients-projects"
-        >
-          access to all projects
-        </a>
-        . Even when they reside on a separate account, managed by the end customer. And without having
-        to purchase additional collaborator seats.
-      </Benefit>
-
-      <Benefit title="🏆 Partner listing for winning new clients">
-        We&apos;ll get you in front of new potential clients by featuring your agency (and projects)
-        as part of our
-        <a href="/partners">Partners page</a>. Teams in need of development resources go there to
-        find the right level of support for their projects.
-      </Benefit>
-
-      <Benefit title="👩‍💼 Dedicated partner account manager">
-        Get the most out of DatoCMS: gain access to the constant support of our Partner Team to
-        address any questions you (or your customers) may have. Participate in webinars specifically
-        dedicated to our partners.
-      </Benefit>
-
-      <Benefit title="📈 Co-marketing opportunities">
-        Our marketing relies on real success stories — and we know that our Partners will provide
-        some great ones. We&apos;ll promote your projects, <a href="/customers"
-          >create case studies</a
-        >
-        and articles, and feature your logo on our website.
-      </Benefit>
-    </div>
-  </TitleStripWithContent>
-
-  <Space top={4}>
+  <div class={s.benefitsSection}>
     <InterstitialTitle style="two">
-      The process
+      Partnerships done right
 
       <Fragment slot="below">
         <Space top={1}>
-          Join our Partner Program and start your journey to become a certified DatoCMS Partner
-          today.
+          DatoCMS was born out of an agency. It&apos;s only natural that our partner program
+          incorporates all the essential elements to support the success of your agency.
+        </Space>
+      </Fragment>
+    </InterstitialTitle>
+
+    <Wrapper>
+      <div class={s.benefits}>
+        <Benefit title="💰 Special plans and deals">
+          Custom plans to get you started without surprises, and a 30% discount on the Professional
+          plan for your clients.
+        </Benefit>
+
+        <Benefit title="🎁 Discounts for your clients">
+          Enable special plans on your clients&apos; accounts{' '}
+          <a
+            href="/docs/agency-partner-program/partners-dashboard#enabling-special-plans-to-clients"
+          >
+            directly from your dashboard
+          </a>
+          , no need to ask us.
+        </Benefit>
+
+        <Benefit title="🔑 Full access to your clients' projects">
+          Give your team{' '}
+          <a
+            href="/docs/agency-partner-program/partners-dashboard#automatic-access-to-your-clients-projects"
+          >
+            predefined access to all client projects</a
+          > without any extra collaborator seats.
+        </Benefit>
+
+        <Benefit title="🧙‍♂️ Dedicated partner manager">
+          Direct access to our Partner Team for you and your clients, with constant updates and
+          support.
+        </Benefit>
+
+        <Benefit title="🔖 Dedicated partner listing">
+          Get listed on our <a href="/partners">Partners page</a> with your projects and co-marketing
+          content so teams looking for development help can find you.
+          <div class={s.benefitLink}><a href="/partners">Explore our partner listings →</a></div>
+        </Benefit>
+
+        <Benefit title="🫶 Co-marketing">
+          We&apos;ll promote your work through <a href="/customers">case studies</a>, articles, and
+          other collaborations. We also LOVE to talk to you about your work.
+          <div class={s.benefitLink}>
+            <a href="/casual-chats">Explore our partner chats →</a>
+          </div>
+        </Benefit>
+      </div>
+    </Wrapper>
+  </div>
+
+  <Space top={1} bottom={1}>
+    <QuotesCarousel quotes={shortPartnerTestimonials} />
+  </Space>
+
+  <div class={s.agencyPlans}>
+    <Wrapper>
+      <h2 class={s.agencyPlansTitle}>Agency partners unlock plans starting at just €390/year</h2>
+      <p class={s.agencyPlansSubtitle}>
+        Yeah, that&apos;s not a typo. We designed our partnership program to help you find new
+        clients, gain more flexibility, and receive assistance in implementing projects with
+        DatoCMS.
+      </p>
+      <Button as="a" href="#partner-form" p="big">Become a Partner</Button>
+    </Wrapper>
+  </div>
+
+  <Space top={2}>
+    <InterstitialTitle style="two">
+      Getting started is easy
+
+      <Fragment slot="below">
+        <Space top={1}>
+          Join our Partner Program and start your journey to become a DatoCMS Partner today.
         </Space>
       </Fragment>
     </InterstitialTitle>
 
     <Wrapper>
       <ol class={s.steps}>
-        <Step title="Submit the form">
-          Fill in the form below to express your interest in joining the program, and tell us a bit
-          about who you are.
-        </Step>
-        <Step title="Join the webinar">
-          Unpack all the details of our program, and the special agency plans, by joining one of our
-          weekly webinars.
-        </Step>
-        <Step title="Complete the enrollment">
-          While you can already enjoy the benefits, activate a paid plan and fill out your public
-          Partner profile.
-        </Step>
-        <Step title="Get certified">
-          Get listed in our Partners page, utilize the support of our partnership and grow your
-          business with DatoCMS.
-        </Step>
+        <li class={s.step}>
+          <div class={s.stepNumber}>01</div>
+          <div class={s.stepTitle}>Submit the form</div>
+          <div class={s.stepContent}>
+            Fill in the form below to share some details, and tell us a bit about who you are and
+            what you're working on.
+          </div>
+        </li>
+        <li class={s.step}>
+          <div class={s.stepNumber}>02</div>
+          <div class={s.stepTitle}>Complete the enrollment</div>
+          <div class={s.stepContent}>
+            While you can already enjoy the benefits, activate a paid plan and fill out your public
+            Partner profile for us to get you listed.
+          </div>
+        </li>
+        <li class={s.step}>
+          <div class={s.stepNumber}>03</div>
+          <div class={s.stepTitle}>It&apos;s official</div>
+          <div class={s.stepContent}>
+            Utilize the support of our partnership and grow your business. We'll reach out about
+            co-marketing opportunities all the time!
+          </div>
+        </li>
       </ol>
     </Wrapper>
   </Space>
 
   <Space top={3}>
-    <InterstitialTitle kicker="Enroll the Agency Partner Program">
-      Interested? <mark>Then let&apos;s talk!</mark>
+    <InterstitialTitle>
+      <mark>Let&apos;s talk!</mark>
 
       <Fragment slot="below">
-        <Space top={1}>
-          Fill in this form, and we&apos;ll send you a a to join our next webinar to learn all the
-          deets of our program. You are one step away from unlocking all the benefits!
-        </Space>
+        <Space top={1}> Fill in the form, and we&apos;ll be in touch! </Space>
       </Fragment>
     </InterstitialTitle>
   </Space>
 
-  <div class={s.form}>
+  <div id="partner-form" class={s.form}>
     <Form client:load />
   </div>
 </Layout>
