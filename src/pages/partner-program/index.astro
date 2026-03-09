@@ -13,6 +13,7 @@ import Benefit from './_Benefit.astro';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Wrapper } from '~/components/Wrapper';
 import { Button } from '~/components/Button';
+import Step from './_Step.astro';
 import { Form } from './_Form';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 
@@ -133,7 +134,7 @@ const shortPartnerTestimonials = partnerTestimonials.filter(
     </Wrapper>
   </div>
 
-  <Space top={2}>
+  <Space top={2} bottom={2}>
     <InterstitialTitle style="two">
       Getting started is easy
 
@@ -145,32 +146,31 @@ const shortPartnerTestimonials = partnerTestimonials.filter(
     </InterstitialTitle>
 
     <Wrapper>
-      <ol class={s.steps}>
-        <li class={s.step}>
-          <div class={s.stepNumber}>01</div>
-          <div class={s.stepTitle}>Submit the form</div>
-          <div class={s.stepContent}>
+      <div class={s.stepsWrapper}>
+        <svg
+          class={s.stepsConnector}
+          viewBox="0 0 900 200"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path class={s.stepsPath} d="M 150 0 Q 300 -65 450 0"></path>
+          <path class={s.stepsPath} d="M 450 200 Q 600 265 750 200"></path>
+        </svg>
+        <ol class={s.steps}>
+          <Step number="01" title="Submit the form">
             Fill in the form below to share some details, and tell us a bit about who you are and
             what you're working on.
-          </div>
-        </li>
-        <li class={s.step}>
-          <div class={s.stepNumber}>02</div>
-          <div class={s.stepTitle}>Complete the enrollment</div>
-          <div class={s.stepContent}>
+          </Step>
+          <Step number="02" title="Complete the enrollment">
             While you can already enjoy the benefits, activate a paid plan and fill out your public
             Partner profile for us to get you listed.
-          </div>
-        </li>
-        <li class={s.step}>
-          <div class={s.stepNumber}>03</div>
-          <div class={s.stepTitle}>It&apos;s official</div>
-          <div class={s.stepContent}>
+          </Step>
+          <Step number="03" title="It's official">
             Utilize the support of our partnership and grow your business. We'll reach out about
             co-marketing opportunities all the time!
-          </div>
-        </li>
-      </ol>
+          </Step>
+        </ol>
+      </div>
     </Wrapper>
   </Space>
 
