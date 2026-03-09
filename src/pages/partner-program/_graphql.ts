@@ -15,7 +15,7 @@ export const query = graphql(
           ...PartnerUrlFragment
         }
       }
-      partnerTestimonials: allPartnerTestimonials(first: 10) {
+      partnerTestimonials: allPartnerTestimonials(first: 25) {
         __typename
         ...PartnerTestimonialQuoteFragment
         quote {

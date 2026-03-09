@@ -124,7 +124,7 @@ export function Form() {
           label="Please introduce yourself and your agency. If you have any additional question or concern, please ask!"
           validations={{ required: 'Required' }}
           render={({ field }) => (
-            <Textarea placeholder="Looking forward to chat with you! ;-)" {...field} />
+            <Textarea placeholder="Looking forward to chatting with you!" {...field} />
           )}
         />
       </FormReactComponent>
