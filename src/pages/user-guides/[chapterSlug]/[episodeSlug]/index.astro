@@ -7,7 +7,7 @@ import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { query } from './_graphql';
 import { Space } from '~/components/Space';
 import { Wrapper } from '~/components/Wrapper';
-import { formatVideoDuration } from '~/lib/formatters';
+import { formatVideoDuration, toIso8601Duration } from '~/lib/formatters';
 import { Svg } from '~/components/Svg';
 import { TargetToggler } from '~/components/TargetToggler';
 import { Text } from '~/components/structuredText/Text';
@@ -19,6 +19,8 @@ import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import NextEpisode from './_NextEpisode.astro';
 import Episode from './_Episode.astro';
+import { JsonLd } from '~/components/JsonLd';
+import { extractFromSeoTags } from '~/lib/datocms/seo';
 import s from './_style.module.css';
 
 const { chapterSlug, episodeSlug } = Astro.params;
@@ -42,6 +44,29 @@ const nextEpisode =
 ---
 
 <Layout seo={episode._seoMetaTags}>
+  <Fragment slot="head">
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'VideoObject',
+        name: episode.title,
+        uploadDate: episode._firstPublishedAt,
+        duration: toIso8601Duration(episode.asset.video.duration!),
+        thumbnailUrl: episode.asset.video.muxPlaybackId
+          ? `https://image.mux.com/${episode.asset.video.muxPlaybackId}/thumbnail.jpg`
+          : undefined,
+        description: extractFromSeoTags(episode._seoMetaTags).description,
+      }}
+    />
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'Course',
+        name: currentChapter.title,
+        provider: { '@type': 'Organization' as const, name: 'DatoCMS' },
+      }}
+    />
+  </Fragment>
   <Space top={1}>
     <Wrapper>
       <div class={s.video}>

@@ -9,7 +9,10 @@ import { Text } from '~/components/structuredText/Text';
 import { Video } from '~/components/blocks/Video';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { JsonLd } from '~/components/JsonLd';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { extractFromSeoTags } from '~/lib/datocms/seo';
+import { baseUrl } from '~/lib/draftMode';
 import { query, siblingsQuery } from './_graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
@@ -45,6 +48,19 @@ const siblings = [previous ?? last, next ?? first].filter(isDefined);
 ---
 
 <Layout seo={page.seo}>
+  <Fragment slot="head">
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: structuredTextToPlainText(page.title) ?? page.name,
+        url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
+        datePublished: page._firstPublishedAt,
+        description: extractFromSeoTags(page.seo).description,
+        image: page.coverImage.url,
+      }}
+    />
+  </Fragment>
   <Wrapper>
     <div class={s.hero}>
       <div class={s.heroBody}>

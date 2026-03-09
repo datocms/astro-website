@@ -24,6 +24,9 @@ import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyCh
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { JsonLd } from '~/components/JsonLd';
+import { extractFromSeoTags } from '~/lib/datocms/seo';
+import { baseUrl } from '~/lib/draftMode';
 
 const variables = { courseSlug: Astro.params.courseSlug!, chapterSlug: Astro.params.chapterSlug! };
 
@@ -59,6 +62,17 @@ const sections = filterNodes(
 ---
 
 <Layout seo={chapter.seo}>
+  <Fragment slot="head">
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'TechArticle',
+        headline: chapter.title,
+        url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
+        description: extractFromSeoTags(chapter.seo).description,
+      }}
+    />
+  </Fragment>
   <InterstitialTitle style="one" mainTitleOfPage>
     <Fragment slot="kicker"><a href="/academy">DatoCMS Academy</a></Fragment>
     {chapter.title}

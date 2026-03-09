@@ -37,6 +37,7 @@ export const query = graphql(
     query UserGuidesItemQuery($episodeSlug: String!) {
       episode: userGuidesEpisode(filter: { slug: { eq: $episodeSlug } }) {
         id
+        _firstPublishedAt
         _seoMetaTags {
           ...TagFragment
         }
@@ -45,6 +46,7 @@ export const query = graphql(
           ...VideoPlayerFragment
           video {
             duration
+            muxPlaybackId
           }
         }
         content {

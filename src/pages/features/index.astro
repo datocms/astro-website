@@ -19,6 +19,9 @@ import { query } from './_graphql';
 import { slugify } from '~/lib/slugify';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { JsonLd } from '~/components/JsonLd';
+import { extractFromSeoTags } from '~/lib/datocms/seo';
+import { baseUrl } from '~/lib/draftMode';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const { page } = await executeQuery(Astro, query);
@@ -100,6 +103,19 @@ const linkTitleToLabel: { [key: string]: string } = {
 ---
 
 <Layout seo={page._seoMetaTags}>
+  <Fragment slot="head">
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'DatoCMS',
+        applicationCategory: 'WebApplication',
+        operatingSystem: 'Web',
+        url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
+        description: extractFromSeoTags(page._seoMetaTags).description,
+      }}
+    />
+  </Fragment>
   <Wrapper>
     <div class={s.hero}>
       <div class={s.heroBody}>

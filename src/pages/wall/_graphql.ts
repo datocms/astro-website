@@ -8,11 +8,24 @@ export const query = graphql(
         __typename
         ...ReviewQuoteFragment
         _updatedAt
+        name
+        role
+        quote {
+          value
+        }
       }
       allPartnerTestimonials(first: 500) {
         __typename
         ...PartnerTestimonialQuoteFragment
         _updatedAt
+        name
+        role
+        quote {
+          value
+        }
+        partner {
+          name
+        }
       }
     }
   `,

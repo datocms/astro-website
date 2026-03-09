@@ -15,13 +15,15 @@ const allBuildSitemapUrls = import.meta.glob<BuildSitemapUrlsFn>('../pages/**/_g
   eager: false,
 });
 
+export type SitemapItem = { url: string; lastmod?: string };
+
 export type BuildSitemapUrlsFn = (ctx: {
   request: Request;
   responseHeaders: Headers;
-}) => Promise<string[]>;
+}) => Promise<Array<string | SitemapItem>>;
 
 export const fetchSitemapUrls = async (request: Request, responseHeaders: Headers) => {
-  let urlsPromises: Array<Promise<string[]>> = [];
+  let urlsPromises: Array<Promise<Array<string | SitemapItem>>> = [];
 
   for (const astroFilePath of Object.keys(allAstroFiles)) {
     if (astroFilePath.includes('_')) {
@@ -69,7 +71,9 @@ export const GET: APIRoute = async ({ request }) => {
       'Content-Type': 'application/xml',
     });
 
-    for (const url of await fetchSitemapUrls(request, responseHeaders)) {
+    for (const item of await fetchSitemapUrls(request, responseHeaders)) {
+      const url = typeof item === 'string' ? item : item.url;
+
       if (url === '/404') {
         continue;
       }
@@ -78,7 +82,7 @@ export const GET: APIRoute = async ({ request }) => {
         continue;
       }
 
-      stream.write({ url });
+      stream.write(typeof item === 'string' ? { url } : item);
     }
 
     stream.end();

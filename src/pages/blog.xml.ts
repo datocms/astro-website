@@ -9,7 +9,7 @@ import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
 export const query = graphql(
   /* GraphQL */ `
     query BlogPosts {
-      posts: allBlogPosts(first: 10, orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]) {
+      posts: allBlogPosts(first: 30, orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]) {
         ...BlogPostUrlFragment
         title
         excerpt {

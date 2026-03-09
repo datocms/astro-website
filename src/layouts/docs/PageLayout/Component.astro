@@ -6,6 +6,8 @@ import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { CloneButtonForm } from '~/components/docs/blocks/CloneButtonForm';
 import { Demo } from '~/components/blocks/Demo';
 import { overrideSeo, seoGeneratedCard } from '~/lib/datocms/seo';
+import { JsonLd } from '~/components/JsonLd';
+import { baseUrl } from '~/lib/draftMode';
 import { DeployButtonForm } from '~/components/docs/blocks/DeployButtonForm';
 import { DocCallout } from '~/components/docs/blocks/DocCallout';
 import { MultipleDemosBlock } from '~/components/blocks/MultipleDemosBlock';
@@ -78,6 +80,18 @@ const tocGroups = [
   additionalSidebarItems={additionalSidebarItems}
   lastUpdatedAt={page._publishedAt}
 >
+  <Fragment slot="head">
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'TechArticle',
+        headline: page.title,
+        url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
+        datePublished: page._publishedAt,
+        description: page.seo?.description ?? undefined,
+      }}
+    />
+  </Fragment>
   <ContentPlusToc tocGroups={tocGroups}>
     <Fragment slot="kicker">{page.parents[0]!.name}</Fragment>
     <Fragment slot="title">{page.title}</Fragment>

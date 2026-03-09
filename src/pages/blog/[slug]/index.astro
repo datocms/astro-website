@@ -31,7 +31,8 @@ import { slugify } from '~/lib/slugify';
 import { query, siblingsQuery } from './_graphql';
 import { Prose } from '~/components/Prose';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { overrideSeo, seoTwitterCard } from '~/lib/datocms/seo';
+import { overrideSeo, seoTwitterCard, extractFromSeoTags } from '~/lib/datocms/seo';
+import { JsonLd } from '~/components/JsonLd';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { SameLevelNavigation } from '~/components/SameLevelNavigation';
@@ -67,6 +68,7 @@ const { previous, next } = await executeQuery(Astro, siblingsQuery, {
 });
 
 const baseUrl = buildBaseUrl(Astro);
+const { description: seoDescription, image: seoImage } = extractFromSeoTags(post.seo);
 const markdownUrl = new URL(
   Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
   baseUrl,
@@ -83,6 +85,25 @@ const markdownUrl = new URL(
         />
       )
     }
+    {
+      post._updatedAt && (
+        <meta property="article:modified_time" content={new Date(post._updatedAt).toISOString()} />
+      )
+    }
+    {post.author.map((a) => <meta property="article:author" content={a.name} />)}
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: post.title,
+        url: new URL(Astro.url.pathname, baseUrl).href,
+        datePublished: dateTime,
+        dateModified: post._updatedAt ? new Date(post._updatedAt).toISOString() : undefined,
+        author: post.author.map((a) => ({ '@type': 'Person' as const, name: a.name })),
+        description: seoDescription,
+        image: seoImage,
+      }}
+    />
   </Fragment>
 
   <div id="main-content">

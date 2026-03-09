@@ -36,6 +36,9 @@ import { Card } from '~/components/Card';
 import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import s from './_style.module.css';
 import { isDefined } from '~/lib/isDefined';
+import { JsonLd } from '~/components/JsonLd';
+import { extractFromSeoTags } from '~/lib/datocms/seo';
+import { baseUrl } from '~/lib/draftMode';
 
 const variables = { slug: Astro.params.slug! };
 const { post } = await executeQuery(Astro, query, { variables });
@@ -67,6 +70,18 @@ const siblings = [previous ?? last, next ?? first].filter(isDefined);
 ---
 
 <Layout seo={post.seo}>
+  <Fragment slot="head">
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: post.title,
+        url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
+        datePublished: dateTime,
+        description: extractFromSeoTags(post.seo).description,
+      }}
+    />
+  </Fragment>
   <InterstitialTitle
     seoAnalysis={post.yoastAnalysis}
     kicker={post.seoH1 || 'Customer Stories'}

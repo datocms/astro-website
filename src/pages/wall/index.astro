@@ -1,5 +1,8 @@
 ---
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import type { Review } from 'schema-dts';
 import { Hero } from '~/components/Hero';
+import { JsonLd } from '~/components/JsonLd';
 import { Layout } from '~/layouts/Layout';
 import { query } from './_graphql';
 import { executeQuery } from '~/lib/datocms/executeQuery';
@@ -12,11 +15,26 @@ const { allPartnerTestimonials, allReviews } = await executeQuery(Astro, query);
 const quotes = [...allPartnerTestimonials, ...allReviews].sort((a, b) =>
   b._updatedAt.localeCompare(a._updatedAt),
 );
+
+const reviewsData: Review[] = quotes.map((item) => ({
+  '@type': 'Review',
+  itemReviewed: { '@type': 'SoftwareApplication', name: 'DatoCMS' },
+  author: {
+    '@type': 'Person' as const,
+    name: item.name ?? undefined,
+    ...(item.role ? { jobTitle: item.role } : {}),
+    ...(item.__typename === 'PartnerTestimonialRecord' && item.partner
+      ? { worksFor: { '@type': 'Organization' as const, name: item.partner.name } }
+      : {}),
+  },
+  reviewBody: toPlainText(item.quote) || undefined,
+}));
 ---
 
 <Layout seo={[]}>
   <Fragment slot="head">
     <title>Better, with DatoCMS</title>
+    <JsonLd data={{ '@context': 'https://schema.org', '@graph': reviewsData }} />
   </Fragment>
 
   <Hero>

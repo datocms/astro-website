@@ -98,3 +98,15 @@ export function seoDescription(rawDescription: string) {
 export function seoTwitterCard(type: 'summary' | 'summary_large_image') {
   return seoMeta('twitter:card', type);
 }
+
+export function extractFromSeoTags(tags: SeoMetaTag[]) {
+  const findAttr = (key: string) =>
+    tags.find((t) => t.attributes?.name === key || t.attributes?.property === key)?.attributes
+      ?.content;
+
+  return {
+    title: tags.find((t) => t.tag === 'title')?.content,
+    description: findAttr('description'),
+    image: findAttr('og:image'),
+  };
+}

@@ -16,7 +16,10 @@ import { TitleStripWithContent } from '~/components/TitleStripWithContent';
 import { PersonasPicker } from './_sub/PersonasPicker';
 import { UseCaseExcerpts } from './_sub/UseCaseExcerpts';
 import { Wrapper } from '~/components/Wrapper';
+import { JsonLd } from '~/components/JsonLd';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { baseUrl } from '~/lib/draftMode';
+import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
@@ -31,6 +34,17 @@ if (!page || successStories.length === 0) {
 ---
 
 <Layout seo={page.seo}>
+  <Fragment slot="head">
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'DatoCMS',
+        url: new URL('/', baseUrl(Astro)).href,
+        description: extractFromSeoTags(page.seo).description,
+      }}
+    />
+  </Fragment>
   <Hero seoAnalysis={page.yoastAnalysis}>
     <Fragment slot="kicker">Headless CMS, done right</Fragment>
     <Fragment slot="title">

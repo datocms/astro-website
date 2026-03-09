@@ -22,6 +22,9 @@ import { Card } from '~/components/Card';
 import s from './_style.module.css';
 import { CalloutCard } from '~/components/CalloutCard';
 import { Image } from 'astro:assets';
+import { JsonLd } from '~/components/JsonLd';
+import { extractFromSeoTags } from '~/lib/datocms/seo';
+import { baseUrl } from '~/lib/draftMode';
 
 const { integrations, page, customerStories, useCases } = await executeQuery(Astro, query);
 
@@ -32,6 +35,19 @@ if (!page || integrations.length === 0 || customerStories.length === 0 || useCas
 ---
 
 <Layout seo={page._seoMetaTags}>
+  <Fragment slot="head">
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'DatoCMS',
+        applicationCategory: 'WebApplication',
+        operatingSystem: 'Web',
+        url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
+        description: extractFromSeoTags(page._seoMetaTags).description,
+      }}
+    />
+  </Fragment>
   <Hero>
     <Fragment slot="title">
       <InlineText {...ensureValidStructuredTextProps({ data: page.header })} />

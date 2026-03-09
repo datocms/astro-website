@@ -23,6 +23,9 @@ import { SameLevelNavigation } from '~/components/SameLevelNavigation';
 import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import s from './_style.module.css';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
+import { JsonLd } from '~/components/JsonLd';
+import { extractFromSeoTags } from '~/lib/datocms/seo';
+import { baseUrl } from '~/lib/draftMode';
 
 const variables = { slug: Astro.params.slug! };
 const { page, siblings } = await executeQuery(Astro, query, { variables });
@@ -36,6 +39,19 @@ const { quotes = [] } = page;
 ---
 
 <Layout seo={page._seoMetaTags}>
+  <Fragment slot="head">
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        name: 'DatoCMS',
+        applicationCategory: 'WebApplication',
+        operatingSystem: 'Web',
+        url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
+        description: extractFromSeoTags(page._seoMetaTags).description,
+      }}
+    />
+  </Fragment>
   <Wrapper>
     <div class={s.hero}>
       <div class={s.heroBody}>
