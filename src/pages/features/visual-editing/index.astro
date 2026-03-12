@@ -1,0 +1,240 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Button } from '~/components/Button';
+import { CalloutCard } from '~/components/CalloutCard';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { Image } from 'astro:assets';
+import { Layout } from '~/layouts/Layout';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { TitleStripWithContent } from '~/components/TitleStripWithContent';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { Wrapper } from '~/components/Wrapper';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { query } from './_graphql';
+import s from './_style.module.css';
+import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
+
+const variables = { slug: Astro.url.pathname.split('/').pop()! };
+const { page } = await executeQuery(Astro, query, { variables });
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout
+  noFinalCta
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoTitle('Visual Editing Headless CMS'),
+    seoDescription(
+      'Click any element on your live site to edit it in DatoCMS. Visual Editing combines draft mode, real-time updates, and stega-encoded metadata for a seamless editing experience.',
+    ),
+    seoGeneratedCard(Astro, {
+      title: 'Visual Editing',
+      excerpt:
+        'Click any element on your live site to edit it in DatoCMS. No form-hunting. No context switching.',
+    }),
+  )}
+>
+  <Hero>
+    <Fragment slot="kicker">Visual Editing</Fragment>
+    <Fragment slot="title">
+      See it. Click it. <mark>Change it.</mark>
+    </Fragment>
+    <Fragment slot="subtitle">
+      Click any element on your site to jump straight to editing it in DatoCMS. Combine with draft
+      mode and real-time updates for the ideal visual editing experience in a Headless CMS.
+    </Fragment>
+  </Hero>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Svg name="svg/illustrations/lock" />
+    </Fragment>
+    <Fragment slot="kicker">The problem with headless editing</Fragment>
+    <Fragment slot="title">Your editors think in pages and posts. Not in forms and fields.</Fragment
+    >
+    <p>
+      Traditional headless means navigating models, records, and fields to find that one SEO field
+      your editors want to change.
+    </p>
+    <p>
+      Visual Editing closes that gap. Enable draft mode, hover over any element, click it, and
+      change it. No context switching. No guessing which record owns what field.
+    </p>
+  </Flag>
+
+  {
+    page.video && (
+      <Space bottom={3}>
+        <TitleStripWithContent>
+          <Fragment slot="kicker">Easy Peasy</Fragment>
+          <Fragment slot="title">
+            And just like that, "Where do I change this?!?!" was never heard again...
+          </Fragment>
+          <VideoPlayer data={page.video} />
+        </TitleStripWithContent>
+      </Space>
+    )
+  }
+
+  <Flag flip>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1773307515-contentlink.png"
+        inferSize
+        alt="Content Link"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker">DatoCMS Content Link</Fragment>
+    <Fragment slot="title">Click-to-edit, straight from your live site</Fragment>
+    <p>
+      Drop <code>&lt;ContentLink /&gt;</code> into your layout. When editors visit in draft mode, overlays
+      appear on every editable element. One click opens DatoCMS at the exact field, eliminating hunting
+      through records and tabs.
+    </p>
+    <Bullets style="good">
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>Works on any hosting platform</span>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>No backend changes or plugin needed</span>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>Detects records, fields, and locales automatically</span>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>Alt/⌥ triggers a temporary overlay mode</span>
+      </li>
+    </Bullets>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1773307515-sidebyside.png"
+        inferSize
+        alt="Side by side editing"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker">DatoCMS Visual Mode</Fragment>
+    <Fragment slot="title">Preview and edit, side by side</Fragment>
+    <p>
+      The Web Previews plugin embeds your preview directly inside DatoCMS under a new "Visual Mode".
+      Click an element in the preview and the edit panel jumps to that field. Edit that field and
+      the preview updates as you go. Bidirectional. Real-time. That's all.
+    </p>
+    <Bullets style="good">
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>Full-screen visual editing mode</span>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>Multiple environments supported</span>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>Quick preview links in the record sidebar</span>
+      </li>
+    </Bullets>
+  </Flag>
+
+  <Space bottom={3}>
+    <Wrapper>
+      <CalloutCard
+        title="No extra plugins needed"
+        ctaLink="/marketplace/plugins/i/datocms-plugin-web-previews"
+        ctaLabel="Install Web Previews →"
+        illustration="svg/illustrations/live-4"
+        color="azure"
+        asLink
+      >
+        <Fragment slot="text">
+          Visual Mode is now available on the same Web Previews plugin you all love so much. Install
+          it or update it and you're good to go.
+        </Fragment>
+      </CalloutCard>
+    </Wrapper>
+  </Space>
+
+  <Space bottom={3}>
+    <TitleStripWithContent stripHeight="full">
+      <Fragment slot="kicker">No gatekeeping</Fragment>
+      <Fragment slot="title">Visual editing is included on every plan. Including Free.</Fragment>
+      <Fragment slot="subtitle">
+        Visual Editing is available to everyone.<br />Install it. Use it. Break it. And let us know
+        how we can improve it.
+      </Fragment>
+      <div class={s.buttonContainer}>
+        <Button p="big" as="a" href="https://try.datocms.com">Try the live demo</Button>
+        <Button p="big" as="a" s="invert" href="/docs/visual-editing">Read the docs</Button>
+      </div>
+    </TitleStripWithContent>
+  </Space>
+
+  <Flag flip>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1773307515-stenography.png"
+        inferSize
+        alt="Steganography metadata"
+        style="width: 100%; height: auto;"
+      />
+    </Fragment>
+    <Fragment slot="kicker">How it works</Fragment>
+    <Fragment slot="title">Invisible metadata. Just enable stega encoding.</Fragment>
+    <p>
+      All you need to do is add 2 headers to your GraphQL requests, and add the <code
+        >ContentLink</code
+      > component to your layout.
+    </p>
+    <p>
+      The <code>&lt;ContentLink /&gt;</code> component scans for embedded metadata and renders edit overlays
+      on the right DOM nodes. No manual mapping. Structured Text, blocks, linked records... all works
+      out of the box.
+    </p>
+  </Flag>
+
+  <Wrapper>
+    <CalloutCard color="blue" title="Ready. Set. Edit.">
+      <Fragment slot="text">
+        We've already wired Visual Editing into the SDKs for the frameworks you're using 👇
+      </Fragment>
+      <Fragment slot="text">
+        <div class={s.integrationsGrid}>
+          <a href="/docs/next-js/visual-editing" class={s.integrationsItem}>
+            <Svg name="svg/logos/next-squared" class={s.integrationsImage} />
+            <p class={s.techName}>Next.js</p>
+          </a>
+          <a href="/docs/svelte/visual-editing" class={s.integrationsItem}>
+            <Svg name="svg/logos/svelte-squared" class={s.integrationsImage} />
+            <p class={s.techName}>SvelteKit</p>
+          </a>
+          <a href="/docs/astro/visual-editing" class={s.integrationsItem}>
+            <Svg name="svg/logos/astro-squared" class={s.integrationsImage} />
+            <p class={s.techName}>Astro</p>
+          </a>
+          <a href="/docs/nuxt/visual-editing" class={s.integrationsItem}>
+            <Svg name="svg/logos/nuxt-squared" class={s.integrationsImage} />
+            <p class={s.techName}>Nuxt</p>
+          </a>
+        </div>
+      </Fragment>
+    </CalloutCard>
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>
