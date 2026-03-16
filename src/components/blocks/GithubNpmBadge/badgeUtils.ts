@@ -154,5 +154,85 @@ export function renderBadgeHtml(badge: BadgeData): string {
   const clipId = `r-${id}`;
   const ariaLabel = `${badge.label}: ${badge.value}`;
 
-  return `<a href="${badge.url}" target="_blank" rel="noreferrer"><svg xmlns="http://www.w3.org/2000/svg" width="${badge.totalWidth}" height="20" role="img" aria-label="${ariaLabel}"><title>${ariaLabel}</title><linearGradient id="${gradientId}" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="${clipId}"><rect width="${badge.totalWidth}" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#${clipId})"><rect width="${badge.labelRectWidth}" height="20" fill="#555"/><rect x="${badge.labelRectWidth}" width="${badge.valueRectWidth}" height="20" fill="${badge.color}"/><rect width="${badge.totalWidth}" height="20" fill="url(#${gradientId})"/></g><g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110"><image x="5" y="3" width="14" height="14" href="${badge.logo}"/><text aria-hidden="true" x="${badge.labelX}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${badge.labelTextWidth}">${badge.label}</text><text x="${badge.labelX}" y="140" transform="scale(.1)" fill="#fff" textLength="${badge.labelTextWidth}">${badge.label}</text><text aria-hidden="true" x="${badge.valueX}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${badge.valueTextWidth}">${badge.value}</text><text x="${badge.valueX}" y="140" transform="scale(.1)" fill="#fff" textLength="${badge.valueTextWidth}">${badge.value}</text></g></svg></a>`;
+  return `<a href="${badge.url}" target="_blank" rel="noreferrer">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="${badge.totalWidth}"
+      height="20"
+      role="img"
+      aria-label="${ariaLabel}"
+    >
+      <title>${ariaLabel}</title>
+      <linearGradient id="${gradientId}" x2="0" y2="100%">
+        <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
+        <stop offset="1" stop-opacity=".1" />
+      </linearGradient>
+      <clipPath id="${clipId}">
+        <rect width="${badge.totalWidth}" height="20" rx="3" fill="#fff" />
+      </clipPath>
+      <g clip-path="url(#${clipId})">
+        <rect width="${badge.labelRectWidth}" height="20" fill="#555" />
+        <rect
+          x="${badge.labelRectWidth}"
+          width="${badge.valueRectWidth}"
+          height="20"
+          fill="${badge.color}"
+        />
+        <rect
+          width="${badge.totalWidth}"
+          height="20"
+          fill="url(#${gradientId})"
+        />
+      </g>
+      <g
+        fill="#fff"
+        text-anchor="middle"
+        font-family="Verdana,Geneva,DejaVu Sans,sans-serif"
+        text-rendering="geometricPrecision"
+        font-size="110"
+      >
+        <image x="5" y="3" width="14" height="14" href="${badge.logo}" />
+        <text
+          aria-hidden="true"
+          x="${badge.labelX}"
+          y="150"
+          fill="#010101"
+          fill-opacity=".3"
+          transform="scale(.1)"
+          textLength="${badge.labelTextWidth}"
+        >
+          ${badge.label}
+        </text>
+        <text
+          x="${badge.labelX}"
+          y="140"
+          transform="scale(.1)"
+          fill="#fff"
+          textLength="${badge.labelTextWidth}"
+        >
+          ${badge.label}
+        </text>
+        <text
+          aria-hidden="true"
+          x="${badge.valueX}"
+          y="150"
+          fill="#010101"
+          fill-opacity=".3"
+          transform="scale(.1)"
+          textLength="${badge.valueTextWidth}"
+        >
+          ${badge.value}
+        </text>
+        <text
+          x="${badge.valueX}"
+          y="140"
+          transform="scale(.1)"
+          fill="#fff"
+          textLength="${badge.valueTextWidth}"
+        >
+          ${badge.value}
+        </text>
+      </g>
+    </svg>
+  </a>`;
 }
