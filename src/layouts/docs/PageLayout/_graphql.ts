@@ -1,4 +1,5 @@
 import { DemoFragment } from '~/components/blocks/Demo/graphql';
+import { GithubNpmBadgeFragment } from '~/components/blocks/GithubNpmBadge/graphql';
 import { ImageFragment } from '~/components/blocks/Image/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { MultipleDemosBlockFragment } from '~/components/blocks/MultipleDemosBlock/graphql';
@@ -97,6 +98,7 @@ export const PageLayoutFragment = graphql(
           ...DeployButtonFormFragment
           ...PluginSdkHookGroupFragment
           ...DocCalloutFragment
+          ...GithubNpmBadgeFragment
           ...ReactUiLiveExampleFragment
           ...TutorialVideoFragment
         }
@@ -115,6 +117,7 @@ export const PageLayoutFragment = graphql(
     DeployButtonFormFragment,
     PluginSdkHookGroupFragment,
     DocCalloutFragment,
+    GithubNpmBadgeFragment,
     ReactUiLiveExampleFragment,
     TutorialVideoFragment,
     ...defaultLinkToRecordFragments,

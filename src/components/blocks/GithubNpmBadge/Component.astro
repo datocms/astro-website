@@ -1,0 +1,333 @@
+---
+import { GithubNpmBadgeFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import s from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof GithubNpmBadgeFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+const block = readFragment(GithubNpmBadgeFragment, maskedBlock);
+
+function getRepoName(url: string): string {
+  try {
+    const pathname = new URL(url).pathname;
+    return pathname.replace(/^\//, '').replace(/\/$/, '');
+  } catch {
+    return url;
+  }
+}
+
+function getPackageName(url: string): string {
+  try {
+    const pathname = new URL(url).pathname;
+    const match = pathname.match(/\/package\/(.+?)(?:\/)?$/);
+    return match?.[1] ?? pathname;
+  } catch {
+    return url;
+  }
+}
+
+// Verdana 11px character widths in tenths of pixels (from shields.io badge-maker)
+const charWidths: Record<string, number> = {
+  ' ': 33,
+  '!': 39,
+  '"': 49,
+  '#': 73,
+  $: 58,
+  '%': 83,
+  '&': 71,
+  "'": 27,
+  '(': 39,
+  ')': 39,
+  '*': 47,
+  '+': 73,
+  ',': 33,
+  '-': 38,
+  '.': 33,
+  '/': 43,
+  '0': 58,
+  '1': 58,
+  '2': 58,
+  '3': 58,
+  '4': 58,
+  '5': 58,
+  '6': 58,
+  '7': 58,
+  '8': 58,
+  '9': 58,
+  ':': 38,
+  ';': 38,
+  '<': 73,
+  '=': 73,
+  '>': 73,
+  '?': 53,
+  '@': 88,
+  A: 67,
+  B: 67,
+  C: 67,
+  D: 73,
+  E: 61,
+  F: 56,
+  G: 73,
+  H: 72,
+  I: 39,
+  J: 47,
+  K: 67,
+  L: 56,
+  M: 83,
+  N: 72,
+  O: 73,
+  P: 61,
+  Q: 73,
+  R: 67,
+  S: 61,
+  T: 61,
+  U: 72,
+  V: 67,
+  W: 94,
+  X: 61,
+  Y: 61,
+  Z: 61,
+  '[': 39,
+  '\\': 43,
+  ']': 39,
+  '^': 73,
+  _: 55,
+  '`': 55,
+  a: 56,
+  b: 58,
+  c: 50,
+  d: 58,
+  e: 56,
+  f: 33,
+  g: 58,
+  h: 58,
+  i: 24,
+  j: 30,
+  k: 56,
+  l: 24,
+  m: 88,
+  n: 58,
+  o: 58,
+  p: 58,
+  q: 58,
+  r: 38,
+  s: 47,
+  t: 38,
+  u: 58,
+  v: 53,
+  w: 78,
+  x: 53,
+  y: 53,
+  z: 47,
+  '{': 39,
+  '|': 39,
+  '}': 39,
+  '~': 73,
+};
+
+function measureText(text: string): number {
+  let width = 0;
+  for (const char of text) {
+    width += charWidths[char] ?? 58;
+  }
+  // Scale up to match actual Verdana 11px rendering in browsers
+  return Math.round(width * 1.2);
+}
+
+function makeBadge(label: string, value: string, color: string) {
+  const HORIZ_PADDING = 50; // 5px per side in SVG coordinate units
+
+  const labelTextWidth = measureText(label);
+  const valueTextWidth = measureText(value);
+
+  const labelRectWidth = Math.round((labelTextWidth + 2 * HORIZ_PADDING) / 10);
+  const valueRectWidth = Math.round((valueTextWidth + 2 * HORIZ_PADDING) / 10);
+  const totalWidth = labelRectWidth + valueRectWidth;
+
+  // Text center positions in SVG coordinate units (pre scale(0.1))
+  const labelX = Math.round(labelRectWidth * 5);
+  const valueX = Math.round(labelRectWidth * 10 + valueRectWidth * 5);
+
+  return {
+    totalWidth,
+    labelRectWidth,
+    valueRectWidth,
+    labelTextWidth,
+    valueTextWidth,
+    labelX,
+    valueX,
+    color,
+    label,
+    value,
+  };
+}
+
+const githubRepo = block.githubUrl ? getRepoName(block.githubUrl) : null;
+const npmPackage = block.npmUrl ? getPackageName(block.npmUrl) : null;
+
+const github = githubRepo ? makeBadge('github', githubRepo, '#007ec6') : null;
+const npm = npmPackage ? makeBadge('npm', npmPackage, '#fe7d37') : null;
+
+const uid = Math.random().toString(36).slice(2, 8);
+---
+
+<div class={s.badges} data-datocms-content-link-boundary>
+  {
+    github && block.githubUrl && (
+      <a href={block.githubUrl} target="_blank" rel="noreferrer">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={github.totalWidth}
+          height="20"
+          role="img"
+          aria-label={`github: ${github.value}`}
+        >
+          <title>{`github: ${github.value}`}</title>
+          <linearGradient id={`s-gh-${uid}`} x2="0" y2="100%">
+            <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
+            <stop offset="1" stop-opacity=".1" />
+          </linearGradient>
+          <clipPath id={`r-gh-${uid}`}>
+            <rect width={github.totalWidth} height="20" rx="3" fill="#fff" />
+          </clipPath>
+          <g clip-path={`url(#r-gh-${uid})`}>
+            <rect width={github.labelRectWidth} height="20" fill="#555" />
+            <rect
+              x={github.labelRectWidth}
+              width={github.valueRectWidth}
+              height="20"
+              fill={github.color}
+            />
+            <rect width={github.totalWidth} height="20" fill={`url(#s-gh-${uid})`} />
+          </g>
+          <g
+            fill="#fff"
+            text-anchor="middle"
+            font-family="Verdana,Geneva,DejaVu Sans,sans-serif"
+            text-rendering="geometricPrecision"
+            font-size="110"
+          >
+            <text
+              aria-hidden="true"
+              x={github.labelX}
+              y="150"
+              fill="#010101"
+              fill-opacity=".3"
+              transform="scale(.1)"
+              textLength={github.labelTextWidth}
+            >
+              {github.label}
+            </text>
+            <text
+              x={github.labelX}
+              y="140"
+              transform="scale(.1)"
+              fill="#fff"
+              textLength={github.labelTextWidth}
+            >
+              {github.label}
+            </text>
+            <text
+              aria-hidden="true"
+              x={github.valueX}
+              y="150"
+              fill="#010101"
+              fill-opacity=".3"
+              transform="scale(.1)"
+              textLength={github.valueTextWidth}
+            >
+              {github.value}
+            </text>
+            <text
+              x={github.valueX}
+              y="140"
+              transform="scale(.1)"
+              fill="#fff"
+              textLength={github.valueTextWidth}
+            >
+              {github.value}
+            </text>
+          </g>
+        </svg>
+      </a>
+    )
+  }
+  {
+    npm && block.npmUrl && (
+      <a href={block.npmUrl} target="_blank" rel="noreferrer">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={npm.totalWidth}
+          height="20"
+          role="img"
+          aria-label={`npm: ${npm.value}`}
+        >
+          <title>{`npm: ${npm.value}`}</title>
+          <linearGradient id={`s-npm-${uid}`} x2="0" y2="100%">
+            <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
+            <stop offset="1" stop-opacity=".1" />
+          </linearGradient>
+          <clipPath id={`r-npm-${uid}`}>
+            <rect width={npm.totalWidth} height="20" rx="3" fill="#fff" />
+          </clipPath>
+          <g clip-path={`url(#r-npm-${uid})`}>
+            <rect width={npm.labelRectWidth} height="20" fill="#555" />
+            <rect x={npm.labelRectWidth} width={npm.valueRectWidth} height="20" fill={npm.color} />
+            <rect width={npm.totalWidth} height="20" fill={`url(#s-npm-${uid})`} />
+          </g>
+          <g
+            fill="#fff"
+            text-anchor="middle"
+            font-family="Verdana,Geneva,DejaVu Sans,sans-serif"
+            text-rendering="geometricPrecision"
+            font-size="110"
+          >
+            <text
+              aria-hidden="true"
+              x={npm.labelX}
+              y="150"
+              fill="#010101"
+              fill-opacity=".3"
+              transform="scale(.1)"
+              textLength={npm.labelTextWidth}
+            >
+              {npm.label}
+            </text>
+            <text
+              x={npm.labelX}
+              y="140"
+              transform="scale(.1)"
+              fill="#fff"
+              textLength={npm.labelTextWidth}
+            >
+              {npm.label}
+            </text>
+            <text
+              aria-hidden="true"
+              x={npm.valueX}
+              y="150"
+              fill="#010101"
+              fill-opacity=".3"
+              transform="scale(.1)"
+              textLength={npm.valueTextWidth}
+            >
+              {npm.value}
+            </text>
+            <text
+              x={npm.valueX}
+              y="140"
+              transform="scale(.1)"
+              fill="#fff"
+              textLength={npm.valueTextWidth}
+            >
+              {npm.value}
+            </text>
+          </g>
+        </svg>
+      </a>
+    )
+  }
+</div>
