@@ -1506,7 +1506,6 @@ export type DocPage = ItemTypeDefinition<
     content: {
       type: 'structured_text';
       blocks:
-        | Table
         | CloneButtonForm
         | DeployButtonForm
         | Demo
@@ -1516,29 +1515,31 @@ export type DocPage = ItemTypeDefinition<
         | PluginSdkHookGroup
         | DocCallout
         | ReactUiLiveExample
-        | TutorialVideo;
+        | TutorialVideo
+        | Table
+        | GithubNpmBadge;
       inline_blocks:
         | Partner
-        | ShowcaseProject
-        | EnterpriseApp
-        | SuccessStory
         | DocGroup
         | AcademyCourse
-        | CustomerStory
         | HostingApp
         | DocPage
-        | ChangelogEntry
-        | TemplateDemo
-        | Feature
         | ProductComparison
         | TechPartner
+        | SuccessStory
         | AcademyChapter
-        | Plugin
-        | UseCasePage
+        | EnterpriseApp
+        | ChangelogEntry
         | LandingPage
+        | CustomerStory
+        | UseCasePage
+        | TemplateDemo
+        | Feature
+        | ShowcaseProject
+        | Recipe
+        | Plugin
         | BlogPost
-        | UserGuidesEpisode
-        | Recipe;
+        | UserGuidesEpisode;
     };
     seo: {
       type: 'seo';
@@ -3058,6 +3059,18 @@ export type NavigationBar = ItemTypeDefinition<
     };
   }
 >;
+export type GithubNpmBadge = ItemTypeDefinition<
+  EnvironmentSettings,
+  'T6Mjq1StSxW48KN6GVaqKA',
+  {
+    github_url: {
+      type: 'string';
+    };
+    npm_url: {
+      type: 'string';
+    };
+  }
+>;
 export type AnyBlock =
   | ImageCarousel
   | ManagedNavigationBarGroup
@@ -3109,7 +3122,8 @@ export type AnyBlock =
   | FreeformNavigationBarGroup
   | NavigationBarCta
   | Image
-  | InternalVideo;
+  | InternalVideo
+  | GithubNpmBadge;
 export type AnyModel =
   | PricingHint
   | Llmstxt

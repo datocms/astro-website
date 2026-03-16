@@ -90,8 +90,8 @@ input AcademyChapterModelFilter {
   title: StringFilter
   seo: SeoFilter
   yoastAnalysis: JsonFilter
-  content: StructuredTextFilter
   slug: SlugFilter
+  content: StructuredTextFilter
   OR: [AcademyChapterModelFilter]
   AND: [AcademyChapterModelFilter]
 }
@@ -714,8 +714,8 @@ input AcademyCourseModelFilter {
   chapters: LinksFilter
   illustration: StringFilter
   name: StringFilter
-  introduction: StructuredTextFilter
   slug: SlugFilter
+  introduction: StructuredTextFilter
   OR: [AcademyCourseModelFilter]
   AND: [AcademyCourseModelFilter]
 }
@@ -1710,16 +1710,16 @@ input BlogPostModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  content: BlogPostModelContentFieldFilter
   author: LinksFilter
   seoH1: StringFilter
   canonicalUrl: StringFilter
   title: StringFilter
   yoastAnalysis: JsonFilter
   seoSettings: SeoFilter
-  excerpt: StructuredTextFilter
   slug: SlugFilter
   coverImage: FileFilter
+  content: BlogPostModelContentFieldFilter
+  excerpt: StructuredTextFilter
   OR: [BlogPostModelFilter]
   AND: [BlogPostModelFilter]
 }
@@ -1968,8 +1968,8 @@ input ChangelogEntryModelFilter {
   categories: LinksFilter
   seo: SeoFilter
   showInBlog: BooleanFilter
-  content: StructuredTextFilter
   slug: SlugFilter
+  content: StructuredTextFilter
   OR: [ChangelogEntryModelFilter]
   AND: [ChangelogEntryModelFilter]
 }
@@ -2744,8 +2744,6 @@ input CustomerStoryModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   agency: LinkFilter
-  content: CustomerStoryModelContentFieldFilter
-  excerpt: StructuredTextFilter
   partner: LinkFilter
   people: LinksFilter
   yoastAnalysis: JsonFilter
@@ -2755,6 +2753,8 @@ input CustomerStoryModelFilter {
   coverImage: FileFilter
   title: StringFilter
   slug: SlugFilter
+  content: CustomerStoryModelContentFieldFilter
+  excerpt: StructuredTextFilter
   OR: [CustomerStoryModelFilter]
   AND: [CustomerStoryModelFilter]
 }
@@ -3759,7 +3759,7 @@ type DocGroupSectionRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
-union DocPageModelContentBlocksField = CloneButtonFormRecord | DemoRecord | DeployButtonFormRecord | DocCalloutRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | PluginSdkHookGroupRecord | ReactUiLiveExampleRecord | TableRecord | TutorialVideoRecord
+union DocPageModelContentBlocksField = CloneButtonFormRecord | DemoRecord | DeployButtonFormRecord | DocCalloutRecord | GithubNpmBadgeRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | PluginSdkHookGroupRecord | ReactUiLiveExampleRecord | TableRecord | TutorialVideoRecord
 
 type DocPageModelContentField {
   blocks: [DocPageModelContentBlocksField!]!
@@ -3770,7 +3770,6 @@ type DocPageModelContentField {
 
 """Specify nested blocks fields conditions"""
 input DocPageModelContentFieldBlocksConditions {
-  table: TableModelFilter
   cloneButtonForm: CloneButtonFormModelFilter
   deployButtonForm: DeployButtonFormModelFilter
   demo: DemoModelFilter
@@ -3781,6 +3780,8 @@ input DocPageModelContentFieldBlocksConditions {
   docCallout: DocCalloutModelFilter
   reactUiLiveExample: ReactUiLiveExampleModelFilter
   tutorialVideo: TutorialVideoModelFilter
+  table: TableModelFilter
+  githubNpmBadge: GithubNpmBadgeModelFilter
 }
 
 """Specify how to filter based on this field's blocks"""
@@ -3799,7 +3800,6 @@ input DocPageModelContentFieldBlocksFilter {
 
 """Specify nested blocks types presence"""
 input DocPageModelContentFieldBlocksPresence {
-  table: BooleanType
   cloneButtonForm: BooleanType
   deployButtonForm: BooleanType
   demo: BooleanType
@@ -3810,6 +3810,8 @@ input DocPageModelContentFieldBlocksPresence {
   docCallout: BooleanType
   reactUiLiveExample: BooleanType
   tutorialVideo: BooleanType
+  table: BooleanType
+  githubNpmBadge: BooleanType
 }
 
 """Specify how to filter this specific Structured Text field instance"""
@@ -3886,8 +3888,8 @@ input DocPageModelFilter {
   _isValid: BooleanFilter
   title: StringFilter
   seo: SeoFilter
-  content: DocPageModelContentFieldFilter
   slug: SlugFilter
+  content: DocPageModelContentFieldFilter
   OR: [DocPageModelFilter]
   AND: [DocPageModelFilter]
 }
@@ -4644,8 +4646,8 @@ input EnterpriseAppModelFilter {
   gallery: GalleryFilter
   seo: SeoFilter
   logo: FileFilter
-  content: StructuredTextFilter
   slug: SlugFilter
+  content: StructuredTextFilter
   OR: [EnterpriseAppModelFilter]
   AND: [EnterpriseAppModelFilter]
 }
@@ -5551,6 +5553,41 @@ input GalleryFilter {
   exists: BooleanType
 }
 
+input GithubNpmBadgeModelFilter {
+  id: ItemIdFilter
+  githubUrl: StringFilter
+  npmUrl: StringFilter
+  OR: [GithubNpmBadgeModelFilter]
+  AND: [GithubNpmBadgeModelFilter]
+}
+
+"""Block of type 🛡️ Github/NPM Badge (Shield) (github_npm_badge)"""
+type GithubNpmBadgeRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  githubUrl: String
+  id: ItemId!
+  npmUrl: String
+  updatedAt: DateTime!
+}
+
 type GlobalSeoField {
   facebookPageUrl: String
   fallbackSeo: SeoField
@@ -5796,8 +5833,8 @@ input HostingAppModelFilter {
   logo: FileFilter
   title: StringFilter
   seo: SeoFilter
-  content: StructuredTextFilter
   slug: SlugFilter
+  content: StructuredTextFilter
   OR: [HostingAppModelFilter]
   AND: [HostingAppModelFilter]
 }
@@ -12653,9 +12690,9 @@ input LandingPageModelFilter {
   seo: SeoFilter
   demo: LinkFilter
   integration: LinkFilter
-  title: StructuredTextFilter
   slug: SlugFilter
   content: LandingPageModelContentFieldFilter
+  title: StructuredTextFilter
   OR: [LandingPageModelFilter]
   AND: [LandingPageModelFilter]
 }
@@ -13528,15 +13565,15 @@ input PartnerModelFilter {
   publicContactEmail: StringFilter
   name: StringFilter
   websiteUrl: StringFilter
-  shortDescription: StructuredTextFilter
   areasOfExpertise: LinksFilter
   npmUser: LinkFilter
   logo: FileFilter
   technologies: LinksFilter
   locations: LinksFilter
   featuredProjects: LinksFilter
-  description: StructuredTextFilter
   slug: SlugFilter
+  description: StructuredTextFilter
+  shortDescription: StructuredTextFilter
   OR: [PartnerModelFilter]
   AND: [PartnerModelFilter]
 }
@@ -14561,6 +14598,7 @@ input PlanFeatureModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
+  relatedPricingHint: LinkFilter
   name: StringFilter
   moreDetailsUrl: StringFilter
   availableOnProfessionalPlan: BooleanFilter
@@ -14627,6 +14665,7 @@ type PlanFeatureRecord implements RecordInterface {
   id: ItemId!
   moreDetailsUrl: String
   name: String!
+  relatedPricingHint: PricingHintRecord
   tags: JsonField
   updatedAt: DateTime!
 }
@@ -16051,8 +16090,8 @@ input ProductAnnouncementModelFilter {
   title: StringFilter
   blogPost: LinkFilter
   cover: FileFilter
-  announcement: StructuredTextFilter
   slug: SlugFilter
+  announcement: StructuredTextFilter
   OR: [ProductAnnouncementModelFilter]
   AND: [ProductAnnouncementModelFilter]
 }
@@ -16210,9 +16249,9 @@ input ProductComparisonModelFilter {
   testimonials: LinksFilter
   seoSocial: SeoFilter
   product: StringFilter
+  slug: SlugFilter
   competitorCharacterization: StructuredTextFilter
   datocmsCharacterization: StructuredTextFilter
-  slug: SlugFilter
   OR: [ProductComparisonModelFilter]
   AND: [ProductComparisonModelFilter]
 }
@@ -16341,11 +16380,11 @@ input ProductOverviewModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  subheader: StructuredTextFilter
   seo: SeoFilter
   testimonials: LinksFilter
   readability: JsonFilter
   header: StructuredTextFilter
+  subheader: StructuredTextFilter
   OR: [ProductOverviewModelFilter]
   AND: [ProductOverviewModelFilter]
 }
@@ -19176,8 +19215,8 @@ input RecipeModelFilter {
   seoSettings: SeoFilter
   featuredImage: FileFilter
   cardImage: FileFilter
-  content: StructuredTextFilter
   slug: SlugFilter
+  content: StructuredTextFilter
   OR: [RecipeModelFilter]
   AND: [RecipeModelFilter]
 }
@@ -19347,9 +19386,9 @@ input ReviewModelFilter {
   website: StringFilter
   name: StringFilter
   useInDashboard: BooleanFilter
-  quote: StructuredTextFilter
   image: FileFilter
   role: StringFilter
+  quote: StructuredTextFilter
   OR: [ReviewModelFilter]
   AND: [ReviewModelFilter]
 }
@@ -19648,9 +19687,9 @@ input ShowcaseProjectModelFilter {
   datocmsScreenshots: GalleryFilter
   technologies: LinksFilter
   areasOfExpertise: LinksFilter
+  slug: SlugFilter
   headline: StructuredTextFilter
   inDepthExplanation: StructuredTextFilter
-  slug: SlugFilter
   OR: [ShowcaseProjectModelFilter]
   AND: [ShowcaseProjectModelFilter]
 }
@@ -20569,21 +20608,21 @@ input SuccessStoryModelFilter {
   name: StringFilter
   duotoneColor1: ColorFilter
   mainResultsImage: FileFilter
-  challenge: StructuredTextFilter
-  title: StructuredTextFilter
   accentColor: ColorFilter
   duotoneColor2: ColorFilter
-  result: StructuredTextFilter
   coverImage: FileFilter
   tags: LinksFilter
-  content: SuccessStoryModelContentFieldFilter
   projectUrl: StringFilter
   useCase: LinkFilter
-  subtitle: StructuredTextFilter
   keyFeatures: LinksFilter
   industry: LinksFilter
   partner: LinkFilter
   slug: SlugFilter
+  challenge: StructuredTextFilter
+  title: StructuredTextFilter
+  result: StructuredTextFilter
+  content: SuccessStoryModelContentFieldFilter
+  subtitle: StructuredTextFilter
   OR: [SuccessStoryModelFilter]
   AND: [SuccessStoryModelFilter]
 }
@@ -20888,8 +20927,8 @@ input SupportTopicModelFilter {
   title: StringFilter
   disableContactForm: BooleanFilter
   subtopicQuestion: StringFilter
-  description: StructuredTextFilter
   slug: SlugFilter
+  description: StructuredTextFilter
   OR: [SupportTopicModelFilter]
   AND: [SupportTopicModelFilter]
 }
@@ -21232,15 +21271,15 @@ input TechPartnerModelFilter {
   _isValid: BooleanFilter
   technologies: LinksFilter
   logo: FileFilter
-  shortDescription: StructuredTextFilter
   locations: LinksFilter
   publicContactEmail: StringFilter
   websiteUrl: StringFilter
   name: StringFilter
   npmUser: LinkFilter
   areasOfExpertise: LinksFilter
-  description: StructuredTextFilter
   slug: SlugFilter
+  shortDescription: StructuredTextFilter
+  description: StructuredTextFilter
   OR: [TechPartnerModelFilter]
   AND: [TechPartnerModelFilter]
 }
@@ -22398,7 +22437,6 @@ input UseCasePageModelFilter {
   _updatedAt: UpdatedAtFilter
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
-  summary: StructuredTextFilter
   seo: SeoFilter
   caseStudy: LinkFilter
   heroImage: FileFilter
@@ -22410,9 +22448,11 @@ input UseCasePageModelFilter {
   heading: StringFilter
   link: StringFilter
   quotes: LinksFilter
-  starterTitle: StructuredTextFilter
   starterImage: FileFilter
   image: FileFilter
+  slug: SlugFilter
+  summary: StructuredTextFilter
+  starterTitle: StructuredTextFilter
   description: StructuredTextFilter
   header: StructuredTextFilter
   headline: StructuredTextFilter
@@ -22421,7 +22461,6 @@ input UseCasePageModelFilter {
   subtitle: StructuredTextFilter
   successStoryHeader: StructuredTextFilter
   title: StructuredTextFilter
-  slug: SlugFilter
   OR: [UseCasePageModelFilter]
   AND: [UseCasePageModelFilter]
 }
@@ -22619,8 +22658,8 @@ input UserGuidesChapterModelFilter {
   _isValid: BooleanFilter
   title: StringFilter
   videos: LinksFilter
-  introduction: StructuredTextFilter
   slug: SlugFilter
+  introduction: StructuredTextFilter
   OR: [UserGuidesChapterModelFilter]
   AND: [UserGuidesChapterModelFilter]
 }
@@ -22756,8 +22795,8 @@ input UserGuidesEpisodeModelFilter {
   thumbTimeSeconds: IntegerFilter
   video: FileFilter
   seo: SeoFilter
-  content: StructuredTextFilter
   slug: SlugFilter
+  content: StructuredTextFilter
   OR: [UserGuidesEpisodeModelFilter]
   AND: [UserGuidesEpisodeModelFilter]
 }
