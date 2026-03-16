@@ -13,8 +13,11 @@ const block = readFragment(GithubNpmBadgeFragment, maskedBlock);
 
 function getRepoName(url: string): string {
   try {
-    const pathname = new URL(url).pathname;
-    return pathname.replace(/^\//, '').replace(/\/$/, '');
+    // More intelligent Github URL handling
+    // e.g. https://github.com/datocms/react-datocms/blob/master/docs/image.md only shows datocms/react-datocms
+    // But the full URL still works when clicked on
+    const segments = new URL(url).pathname.split('/').filter(Boolean);
+    return segments.slice(0, 2).join('/');
   } catch {
     return url;
   }
