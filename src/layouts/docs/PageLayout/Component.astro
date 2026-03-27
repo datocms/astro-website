@@ -70,7 +70,7 @@ const tocGroups = [
   group={maskedGroup}
   seo={overrideSeo(
     page._seoMetaTags,
-    prependToSeoPageTitle(`${group.name}: `),
+    prependToSeoPageTitle(group.pagesOrSections.length > 1 ? `${group.name}: ` : ''),
     seoGeneratedCard(Astro, {
       kicker: group ? `Documentation: ${group.name}` : 'DatoCMS Docs',
       title: page.title,
@@ -95,7 +95,7 @@ const tocGroups = [
     />
   </Fragment>
   <ContentPlusToc tocGroups={tocGroups}>
-    <Fragment slot="kicker">{page.parents[0]!.name}</Fragment>
+    {group.pagesOrSections.length > 1 && <Fragment slot="kicker">{page.parents[0]!.name}</Fragment>}
     <Fragment slot="title">{page.title}</Fragment>
 
     <Prose>
