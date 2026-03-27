@@ -1,5 +1,5 @@
 import type { AstroGlobal } from 'astro';
-import { truncate } from 'lodash-es';
+import { truncate, without } from 'lodash-es';
 import { isDefined } from '../isDefined';
 import { ogCardUrl, type OgCardData } from '../ogCardUrl';
 
@@ -41,6 +41,21 @@ export function seoPageTitle(...chunks: string[]) {
       attributes: {},
     },
   ];
+}
+
+export function prependToSeoPageTitle(...chunks: string[]) {
+  return (tags: SeoMetaTag[]) => {
+    const title = tags.find((tag) => tag.tag === 'title')!;
+
+    return [
+      ...without(tags, title),
+      {
+        tag: 'title',
+        content: [...chunks, title.content].join(''),
+        attributes: {},
+      },
+    ];
+  };
 }
 
 function seoMeta(propertyOrName: string, newValue: string) {
