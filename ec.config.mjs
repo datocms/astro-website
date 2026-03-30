@@ -1,8 +1,9 @@
-import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers';
 import { defineEcConfig } from 'astro-expressive-code';
 
-/** Adds `translate="no"` and `class="notranslate"` to <code> elements
- *  to prevent Google & Translate from breaking code block layout */
+/**
+ * Prevents translation services (Google, Baidu, etc.) from breaking code blocks.
+ * - Adds `translate="no"` and `class="notranslate"` to <code> elements
+ */
 function pluginNoTranslate() {
   return {
     name: 'no-translate',
@@ -24,7 +25,7 @@ function addNoTranslate(node) {
 
 export default defineEcConfig({
   themes: ['catppuccin-latte', 'catppuccin-frappe'],
-  plugins: [pluginLineNumbers(), pluginNoTranslate()],
+  plugins: [pluginNoTranslate()],
   styleOverrides: {
     codeFontSize: '1em',
     codeFontFamily: 'var(--font-mono)',
