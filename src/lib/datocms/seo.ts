@@ -51,8 +51,8 @@ export function seoReplaceTitleSuffix(newSuffix: string) {
 
 type SeoMetaTag = {
   tag: string;
-  attributes: Record<string, string> | null;
-  content: string | null;
+  attributes?: Record<string, string> | null;
+  content?: string | null;
 };
 
 type Operation = (tags: SeoMetaTag[]) => SeoMetaTag[];
