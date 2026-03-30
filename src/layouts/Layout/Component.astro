@@ -6,15 +6,22 @@ import Navbar from './Navbar/index.astro';
 import { FinalCta } from './FinalCta';
 import { fetchNavbar } from './Navbar/fetchNavbar';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
+import { seoReplaceTitleSuffix, titleSuffixForPath } from '~/lib/datocms/seo';
 
 type Props = {
   seo: TitleMetaLinkTag[];
   noFinalCta?: boolean;
+  titleSuffix?: string;
 };
 
 const navbarData = await fetchNavbar(Astro);
 
-const { seo, noFinalCta } = Astro.props;
+const { seo: rawSeo, noFinalCta, titleSuffix: titleSuffixProp } = Astro.props;
+
+// Apply a section-specific title suffix (e.g. "DatoCMS Blog" instead of
+// "DatoCMS") based on the current URL path, unless explicitly overridden via prop.
+const suffix = titleSuffixProp ?? titleSuffixForPath(Astro.url.pathname);
+const seo = suffix ? seoReplaceTitleSuffix(suffix)(rawSeo) : rawSeo;
 ---
 
 <BaseLayout seo={seo}>
