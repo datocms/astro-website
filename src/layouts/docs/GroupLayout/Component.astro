@@ -14,6 +14,7 @@ import { BaseLayout } from '~/layouts/docs/BaseLayout';
 import { GroupLayoutFragment } from './_graphql';
 import s from './_style.module.css';
 import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
+import { seoReplaceTitleSuffix, titleSuffixForPath } from '~/lib/datocms/seo';
 
 type Props = {
   contentWrapperComponent?: (props: any) => any;
@@ -22,16 +23,24 @@ type Props = {
   sidebarItemsIfNoPagesOrSectionsInGroup?: (SidebarEntry | SidebarGroup)[];
   additionalSidebarItems?: (SidebarEntry | SidebarGroup)[];
   lastUpdatedAt?: string;
+  titleSuffix?: string;
 };
 
 const {
   contentWrapperComponent,
   group: maskedGroup,
-  seo,
+  seo: rawSeo,
   sidebarItemsIfNoPagesOrSectionsInGroup = [],
   additionalSidebarItems = [],
   lastUpdatedAt,
+  titleSuffix: titleSuffixProp,
 } = Astro.props;
+
+// Apply a section-specific title suffix (e.g. "DatoCMS Developer Docs"
+// instead of "DatoCMS") based on the current URL path, unless explicitly
+// overridden via prop.
+const suffix = titleSuffixProp ?? titleSuffixForPath(Astro.url.pathname);
+const seo = suffix ? seoReplaceTitleSuffix(suffix)(rawSeo) : rawSeo;
 
 const group = readFragment(GroupLayoutFragment, maskedGroup);
 ---
