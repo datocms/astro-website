@@ -21,20 +21,26 @@ const { id, title, description, tabs, startVisible } = Astro.props;
 <style is:global>
   /* CSS fix for Google Translate spacing... don't remove without asking Roger!
   See https://3.basecamp.com/5656352/buckets/33592490/card_tables/cards/9712869637
+  Only active when the HTML has .translated-ltr/rtl appended by Google
   */
-
-  /* Only active when the HTML has .translated-ltr/rtl appended by Google */
   html.translated-ltr,
   html.translated-rtl {
     .expressive-code code {
-      white-space-collapse: collapse !important;
-      div.ec-line {
-        white-space-collapse: preserve-spaces !important;
-        div.gutter {
-          display: none !important; /* We have to hide line numbesr or it interferes with the hack */
-        }
-        div.code {
-          margin-left: -180px !important;
+      white-space-collapse: collapse !important; /* Google was adding extra whitespace */
+
+      div.gutter {
+        display: none !important; /* We have to hide line numbers or it interferes with the hack */
+      }
+
+      /* Only Firefox supports preserve-spaces so we can make it look slightly better there
+      https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/white-space-collapse#browser_compatibility
+      */
+      @supports (white-space-collapse: preserve-spaces) {
+        div.ec-line {
+          white-space-collapse: preserve-spaces !important;
+          div.code {
+            margin-left: -180px !important;
+          }
         }
       }
     }
