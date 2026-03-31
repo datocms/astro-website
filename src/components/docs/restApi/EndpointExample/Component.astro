@@ -23,12 +23,19 @@ const { id, title, description, tabs, startVisible } = Astro.props;
   See https://3.basecamp.com/5656352/buckets/33592490/card_tables/cards/9712869637
   */
 
-  html.translated-ltr .expressive-code code {
-    white-space-collapse: collapse !important;
-    div.ec-line {
-      white-space-collapse: preserve-spaces !important;
-      div.code {
-        margin-left: -180px !important;
+  /* Only active when the HTML has .translated-ltr/rtl appended by Google */
+  html.translated-ltr,
+  html.translated-rtl {
+    .expressive-code code {
+      white-space-collapse: collapse !important;
+      div.ec-line {
+        white-space-collapse: preserve-spaces !important;
+        div.gutter {
+          display: none; /* We have to hide line numbesr or it interferes with the hack */
+        }
+        div.code {
+          margin-left: -180px !important;
+        }
       }
     }
   }
