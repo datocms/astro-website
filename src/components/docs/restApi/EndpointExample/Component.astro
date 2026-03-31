@@ -18,6 +18,27 @@ type Props = {
 const { id, title, description, tabs, startVisible } = Astro.props;
 ---
 
+<style is:global>
+  /* CSS fix for Google Translate spacing... don't remove without asking Roger!
+  See https://3.basecamp.com/5656352/buckets/33592490/card_tables/cards/9712869637
+  */
+
+  html.translated-ltr .expressive-code code {
+    white-space-collapse: collapse !important;
+    div.ec-line {
+      white-space-collapse: preserve-spaces !important;
+      div.code {
+        margin-left: -180px !important;
+      }
+    }
+  }
+
+  /* Ask Stefano about this; not sure why this is needed */
+  endpoint-example {
+    display: contents;
+  }
+</style>
+
 <prose-island>
   <endpoint-example slug={id}>
     <details class={s.reqRes} open={startVisible}>
@@ -59,11 +80,11 @@ const { id, title, description, tabs, startVisible } = Astro.props;
             <>
               {tabs[0]!.description && (
                 <div class={s.description}>
-                  <Markdown of={stripStega(tabs[0]!.description)} />
+                  <Markdown of={tabs[0]!.description} />
                 </div>
               )}
 
-              <Code code={stripStega(tabs[0]!.code)} language={stripStega(tabs[0]!.language)} />
+              <Code code={tabs[0]!.code} language={tabs[0]!.language} />
             </>
           )
         }
@@ -102,9 +123,3 @@ const { id, title, description, tabs, startVisible } = Astro.props;
     },
   );
 </script>
-
-<style>
-  endpoint-example {
-    display: contents;
-  }
-</style>
