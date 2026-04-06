@@ -35,32 +35,36 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: List files
         run: ls -a
 
       # 1) Setup QEMU (optional, but recommended for multi‑arch)
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v4
 
       # 2) Setup Buildx
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       # 3) Cache Docker BuildKit layers
       - name: Cache Docker layers
-        uses: useblacksmith/cache@v5
+        uses: actions/cache@v5
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.ref }}-${{ hashFiles('Dockerfile', '.dockerignore', 'package-lock.json') }}
 
       # 4) Log in to GitHub Container Registry (for the `docker push` executed by `cubo deploy`)
       - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node
-        uses: useblacksmith/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: 'npm'
@@ -68,7 +72,7 @@ jobs:
         run: npm ci
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::734741016184:role/github-actions-deploy
           aws-region: eu-west-1
