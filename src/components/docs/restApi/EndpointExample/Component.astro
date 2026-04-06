@@ -1,11 +1,11 @@
 ---
 import { Heading } from '~/components/Heading';
 import s from './style.module.css';
-import { TargetToggler } from '~/components/TargetToggler';
 import { Markdown } from '~/components/Markdown';
 import { Tab, Tabs } from '~/components/Tabs';
 import { Code } from '~/components/Code';
 import { Prose } from '~/components/Prose';
+import { stripStega } from '@datocms/astro';
 
 type Props = {
   id: string;
@@ -18,21 +18,53 @@ type Props = {
 const { id, title, description, tabs, startVisible } = Astro.props;
 ---
 
+<style is:global>
+  /* CSS fix for Google Translate spacing... don't remove without asking Roger!
+  See https://3.basecamp.com/5656352/buckets/33592490/card_tables/cards/9712869637
+  Only active when the HTML has .translated-ltr/rtl appended by Google
+  */
+  html.translated-ltr,
+  html.translated-rtl {
+    .expressive-code code {
+      white-space-collapse: collapse !important; /* Google was adding extra whitespace */
+
+      div.gutter {
+        display: none !important; /* We have to hide line numbers or it interferes with the hack */
+      }
+
+      /* Only Firefox supports preserve-spaces so we can make it look slightly better there
+      https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/white-space-collapse#browser_compatibility
+      */
+      @supports (white-space-collapse: preserve-spaces) {
+        div.ec-line {
+          white-space-collapse: preserve-spaces !important;
+          div.code {
+            margin-left: -180px !important;
+          }
+        }
+      }
+    }
+  }
+
+  /* Ask Stefano about this; not sure why this is needed */
+  endpoint-example {
+    display: contents;
+  }
+</style>
+
 <prose-island>
   <endpoint-example slug={id}>
-    <div class={s.reqRes}>
-      <TargetToggler targetId={`example-${id}`} startVisible={startVisible}>
-        <Heading as="button" class={s.title} anchor={id}>
-          <span class={s.pill}>Example</span>{' '}
-          <span class={s.titleTitle}>{title}</span>
-        </Heading>
-      </TargetToggler>
+    <details class={s.reqRes} open={startVisible}>
+      <Heading as="summary" class={s.title} anchor={id}>
+        <span class={s.pill}>Example</span>{' '}
+        <span class={s.titleTitle}>{title}</span>
+      </Heading>
 
-      <div id={`example-${id}`} class={s.details}>
+      <div class={s.details}>
         {
           description && (
             <Prose class={s.description}>
-              <Markdown of={description} />
+              <Markdown of={stripStega(description)} />
             </Prose>
           )
         }
@@ -41,17 +73,20 @@ const { id, title, description, tabs, startVisible } = Astro.props;
           tabs.length > 1 ? (
             <div class={s.tabs}>
               <Tabs>
-                {tabs.map((tab) => (
-                  <Tab title={tab.title} noPadding>
-                    {tab.description && (
-                      <div class={s.description}>
-                        <Markdown of={tab.description} />
-                      </div>
-                    )}
+                {tabs.map((rawTab) => {
+                  const tab = stripStega(rawTab);
+                  return (
+                    <Tab title={tab.title} noPadding>
+                      {tab.description && (
+                        <div class={s.description}>
+                          <Markdown of={tab.description} />
+                        </div>
+                      )}
 
-                    <Code code={tab.code} language={tab.language} />
-                  </Tab>
-                ))}
+                      <Code code={tab.code} language={tab.language} />
+                    </Tab>
+                  );
+                })}
               </Tabs>
             </div>
           ) : (
@@ -67,7 +102,7 @@ const { id, title, description, tabs, startVisible } = Astro.props;
           )
         }
       </div>
-    </div>
+    </details>
   </endpoint-example>
 </prose-island>
 
@@ -77,8 +112,6 @@ const { id, title, description, tabs, startVisible } = Astro.props;
   window.customElements.define(
     'endpoint-example',
     class EndpointExample extends WebComponent {
-      toggler!: HTMLButtonElement;
-
       parsedCallback() {
         this.handleHashChange();
         window.addEventListener('hashchange', this.handleHashChange);
@@ -91,21 +124,15 @@ const { id, title, description, tabs, startVisible } = Astro.props;
       }
 
       handleHashChange = (): void => {
-        this.toggler = this.$('target-toggler');
+        const details = this.$('details') as HTMLDetailsElement;
 
         const currentHash = window.location.hash.slice(1);
         const slug = this.getAttribute('slug');
 
         if (currentHash === slug) {
-          (this.toggler as any).toggle(true);
+          details.open = true;
         }
       };
     },
   );
 </script>
-
-<style>
-  endpoint-example {
-    display: contents;
-  }
-</style>
