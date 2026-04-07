@@ -4,7 +4,7 @@
 # ==== Base stage ====
 # Sets up the foundation that other stages will build upon
 
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 ARG PUBLIC_HOSTNAME
 ARG RECAPTCHA_KEY
