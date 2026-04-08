@@ -102,6 +102,9 @@ export const PageLayoutFragment = graphql(
           ...ReactUiLiveExampleFragment
           ...TutorialVideoFragment
         }
+        inlineBlocks {
+          ...GithubNpmBadgeFragment
+        }
       }
     }
   `,

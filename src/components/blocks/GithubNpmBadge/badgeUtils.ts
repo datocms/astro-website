@@ -152,7 +152,7 @@ export function renderBadgeHtml(badge: BadgeData): string {
   const id = `badge-${badgeCounter++}`;
   const gradientId = `s-${id}`;
   const clipId = `r-${id}`;
-  const ariaLabel = `${badge.label}: ${badge.value}`;
+  const ariaLabel = `A badge linking to this package on ${badge.label}`;
 
   return `<a href="${badge.url}" target="_blank" rel="noreferrer">
     <svg
@@ -162,7 +162,7 @@ export function renderBadgeHtml(badge: BadgeData): string {
       role="img"
       aria-label="${ariaLabel}"
     >
-      <title>${ariaLabel}</title>
+      <title>${badge.url}</title>
       <linearGradient id="${gradientId}" x2="0" y2="100%">
         <stop offset="0" stop-color="#bbb" stop-opacity=".1" />
         <stop offset="1" stop-opacity=".1" />

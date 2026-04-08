@@ -6,18 +6,28 @@ import s from './style.module.css';
 
 interface Props {
   block: FragmentOf<typeof GithubNpmBadgeFragment>;
+  inline?: boolean;
 }
 
-const { block: maskedBlock } = Astro.props;
+const { block: maskedBlock, inline = false } = Astro.props;
 const block = readFragment(GithubNpmBadgeFragment, maskedBlock);
 
 function getRepoName(url: string): string {
   try {
-    // More intelligent Github URL handling
-    // e.g. https://github.com/datocms/react-datocms/blob/master/docs/image.md only shows datocms/react-datocms
-    // But the full URL still works when clicked on
+    // More intelligent Github URL handling to make shorter badges for long URLs
     const segments = new URL(url).pathname.split('/').filter(Boolean);
-    return segments.slice(0, 2).join('/');
+    const repoName = segments.slice(0, 2).join('/');
+    const lastSegment = segments[segments.length - 1];
+
+    // If it's a long repo name (like from our monorepos), shorten the middle
+    // e.g. https://github.com/datocms/react-datocms/blob/master/docs/image.md shows datocms/react-datocms/.../image.md
+    // Only do this if the path is longer than owner + repo, and only if the end of the path isn't the same as the repo
+    if (segments.length > 2 && lastSegment !== segments[1]) {
+      return `${repoName}/.../${lastSegment}`;
+    }
+
+    // Otherwise just return the owner + repo
+    return repoName;
   } catch {
     return url;
   }
@@ -38,17 +48,29 @@ const badges: BadgeData[] = [];
 if (block.githubUrl) {
   badges.push({
     url: block.githubUrl,
-    ...makeBadge('github', getRepoName(block.githubUrl), '#007ec6', GITHUB_LOGO),
+    ...makeBadge('GitHub', getRepoName(block.githubUrl), '#007ec6', GITHUB_LOGO),
   });
 }
 if (block.npmUrl) {
   badges.push({
     url: block.npmUrl,
-    ...makeBadge('npm', getPackageName(block.npmUrl), '#e05d44', NPM_LOGO),
+    ...makeBadge('NPM', getPackageName(block.npmUrl), '#e05d44', NPM_LOGO),
   });
 }
 ---
 
-<p class={s.badges} data-datocms-content-link-boundary>
-  {badges.map((badge) => <Fragment set:html={renderBadgeHtml(badge)} />)}
-</p>
+{
+  inline ? (
+    <span class={s.badgesInline} data-datocms-content-link-boundary>
+      {badges.map((badge) => (
+        <Fragment set:html={renderBadgeHtml(badge)} />
+      ))}
+    </span>
+  ) : (
+    <p class={s.badges} data-datocms-content-link-boundary>
+      {badges.map((badge) => (
+        <Fragment set:html={renderBadgeHtml(badge)} />
+      ))}
+    </p>
+  )
+}
