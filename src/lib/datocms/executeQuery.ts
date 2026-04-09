@@ -42,9 +42,7 @@ export async function executeQueryOutsideAstro<Result, Variables>(
       excludeInvalid: true,
       includeDrafts: draftModeEnabled,
       token: DATOCMS_API_TOKEN,
-      ...(draftModeEnabled
-        ? { contentLink: 'vercel-v1', baseEditingUrl: 'https://cms.datocms.com' }
-        : {}),
+      ...(draftModeEnabled ? { contentLink: 'v1', baseEditingUrl: 'https://cms.datocms.com' } : {}),
     });
 
     const newCacheTags = datocmsGraphqlResponse.headers.get('x-cache-tags')!.split(' ');
