@@ -6,6 +6,7 @@ import { Form } from '../_Form';
 import { Form as SalesForm } from '../../contact/_Form';
 import { parseUrlSearchParams, useSearchParams } from './utils';
 import ProseReactComponent from '~/components/Prose/ReactComponent';
+import { stripStega } from '@datocms/astro';
 
 type GqlTopic = ResultOf<typeof SupportTopicFragment>;
 export type Topic = Omit<GqlTopic, 'description'> & { description: string | undefined };
@@ -170,7 +171,7 @@ export function TopicsPicker({ topics, initialLocationSearch }: Props) {
                 </div>
               </div>
               <div className={s.form}>
-                {leafTopic.contactFormType === 'support' ? (
+                {stripStega(leafTopic.contactFormType) === 'support' ? (
                   <Form
                     initialValues={{
                       email: queryString.email || '',
