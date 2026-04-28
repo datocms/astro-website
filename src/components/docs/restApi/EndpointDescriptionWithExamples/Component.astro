@@ -12,6 +12,8 @@ type Props = {
 const { description, examples, exampleComponent: ExampleComponent, additionalProps } = Astro.props;
 const html = await markdownWithExamples(description);
 const parsedItems = parseHtmlWithExamples(html);
+
+const collapseAll = examples.length > 7;
 ---
 
 {
@@ -22,7 +24,7 @@ const parsedItems = parseHtmlWithExamples(html);
       <ExampleComponent
         id={item.id}
         example={examples.find((example) => example.id === item.id)}
-        startVisible={item.alone}
+        startVisible={!collapseAll && item.alone}
         {...additionalProps}
       />
     ) : null,
