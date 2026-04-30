@@ -28,6 +28,7 @@ import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import { Switch } from '~/components/Switch';
+import { Faqs, Faq } from '~/components/Faqs';
 
 const { page, faqs, review1, planFeatureGroups, hints } = await executeQuery(Astro, query);
 
@@ -239,26 +240,23 @@ if (!page || !freePlan || !proPlan) {
     <Space top={3}>
       <InterstitialTitle>Frequently Asked Questions</InterstitialTitle>
       <Wrapper>
-        <div class={s.faqs}>
+        <Faqs>
           {
             faqs.map((faq) => (
-              <div class={s.faq}>
-                <div class={s.faqQ}>{faq.question}</div>
-                <div class={s.faqA}>
-                  <Prose>
-                    <Text
-                      {...ensureValidStructuredTextProps({
-                        data: faq.answer,
-                        linkToRecordComponents: defaultLinkToRecordComponents,
-                        inlineRecordComponents: defaultInlineRecordComponents,
-                      })}
-                    />
-                  </Prose>
-                </div>
-              </div>
+              <Faq question={faq.question}>
+                <Prose>
+                  <Text
+                    {...ensureValidStructuredTextProps({
+                      data: faq.answer,
+                      linkToRecordComponents: defaultLinkToRecordComponents,
+                      inlineRecordComponents: defaultInlineRecordComponents,
+                    })}
+                  />
+                </Prose>
+              </Faq>
             ))
           }
-        </div>
+        </Faqs>
       </Wrapper>
     </Space>
 
