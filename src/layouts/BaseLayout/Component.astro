@@ -1,10 +1,11 @@
 ---
-import { ContentLink, Seo, type TitleMetaLinkTag } from '@datocms/astro';
+import { ContentLink, Seo, stripStega, type TitleMetaLinkTag } from '@datocms/astro';
 import { ClientRouter } from 'astro:transitions';
 import './global.css';
 import ProgressBar from './_ProgressBar.astro';
 import { fetchFavicon } from './fetchFavicon';
 import { isDraftModeEnabled } from '~/lib/draftMode';
+import { overrideSeo, replaceSeoPageTitleSuffix } from '~/lib/datocms/seo';
 
 type Props = {
   seo: TitleMetaLinkTag[];
@@ -14,6 +15,28 @@ const { seo } = Astro.props;
 
 const result = await fetchFavicon(Astro);
 const draftModeEnabled = isDraftModeEnabled(Astro);
+
+// Maps route prefixes to section-specific title suffixes. Top-level pages
+// (e.g. `/blog` itself) are excluded so that titles like "DatoCMS Blog — DatoCMS Blog"
+// are avoided.
+const titleSuffixByPathPrefix: [string, string][] = [
+  ['/docs', 'DatoCMS Docs'],
+  ['/academy', 'DatoCMS Academy'],
+  ['/user-guides', 'DatoCMS User Guides'],
+  ['/product-updates', 'DatoCMS Product Updates'],
+  ['/blog', 'DatoCMS Blog'],
+];
+
+function titleSuffixForPath(pathname: string): string | undefined {
+  const normalized = pathname.replace(/\/+$/, '');
+
+  return titleSuffixByPathPrefix.find(
+    ([prefix]) => normalized.startsWith(prefix) && normalized !== prefix,
+  )?.[1];
+}
+
+const suffix = titleSuffixForPath(Astro.url.pathname);
+const finalSeo = suffix ? overrideSeo(seo, replaceSeoPageTitleSuffix(suffix)) : seo;
 ---
 
 <!doctype html>
@@ -25,7 +48,9 @@ const draftModeEnabled = isDraftModeEnabled(Astro);
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <Seo data={[...result._site.faviconMetaTags, ...seo]} />
+    <!-- Strip stega (content-link annotation) characters from head meta tags so
+         that invisible markers don't inflate the <title> length in draft mode -->
+    <Seo data={stripStega([...result._site.faviconMetaTags, ...finalSeo])} />
     <link rel="alternate" type="application/rss+xml" title="DatoCMS Blog" href="/blog.xml" />
     <link
       rel="alternate"
