@@ -16,7 +16,7 @@ export type JsonSchemaPropertyAnalysis = {
   types: string[];
   examples: Promise<string>[];
   description: string;
-  moreInfo?: MoreInfo;
+  moreInfo?: MoreInfo[];
 };
 
 export type JsonSchemaObjectAnalysis = {
@@ -79,7 +79,15 @@ function splitPropertiesByType(
 
 const toArray = <T>(t: T | T[]) => (Array.isArray(t) ? t : [t]);
 
-function buildTypes(schema: JSONSchema) {
+function buildTypes(schema: JSONSchema): string[] {
+  if (!schema.type) {
+    const variants = schema.anyOf || schema.oneOf;
+    if (variants) {
+      const variantTypes = variants.flatMap((v) => buildTypes(v));
+      return [...new Set(variantTypes)];
+    }
+  }
+
   return toArray(schema.type).map((type) => {
     if (type === 'string' && schema.format) {
       return `${schema.format}`;
@@ -96,6 +104,14 @@ function buildTypes(schema: JSONSchema) {
     if (type === 'array') {
       if (!schema.items || Array.isArray(schema.items)) {
         return 'Array';
+      }
+
+      const variants = schema.items.oneOf || schema.items.anyOf;
+      if (variants) {
+        const variantTypes = [
+          ...new Set(variants.flatMap((v) => toArray(v.type).filter(Boolean) as string[])),
+        ];
+        return `Array\\<${variantTypes.join(' | ')}\\>`;
       }
 
       return `Array\\<${toArray(schema.items.type).join(' | ')}\\>`;
@@ -127,34 +143,79 @@ function buildRelationshipTypes(schema: JSONSchema) {
   return returnsAnArray ? [`Array<${formattedTypes.join(' | ')}>`] : formattedTypes;
 }
 
+function findDiscriminator(variants: JSONSchema[]): string | undefined {
+  if (variants.length < 2) return undefined;
+
+  const firstProps = variants[0]?.properties || {};
+  const candidates = Object.keys(firstProps).filter((name) =>
+    variants.every((v) => {
+      const propSchema = v.properties?.[name];
+      return Array.isArray(propSchema?.enum) && propSchema!.enum!.length > 0;
+    }),
+  );
+
+  for (const name of candidates) {
+    const enumSets = variants.map(
+      (v) => new Set((v.properties![name]!.enum as unknown[]).map((x) => String(x))),
+    );
+
+    let disjoint = true;
+    outer: for (let i = 0; i < enumSets.length; i++) {
+      for (let j = i + 1; j < enumSets.length; j++) {
+        for (const x of enumSets[i]!) {
+          if (enumSets[j]!.has(x)) {
+            disjoint = false;
+            break outer;
+          }
+        }
+      }
+    }
+
+    if (disjoint) return name;
+  }
+
+  return undefined;
+}
+
+function buildVariantTitle(discriminator: string, variant: JSONSchema): string {
+  const enumValues = variant.properties?.[discriminator]?.enum as unknown[] | undefined;
+  if (!enumValues || enumValues.length === 0) return 'object format';
+  const formatted = enumValues.map((v) => `"${v}"`).join(' or ');
+  return `object format when ${discriminator} is ${formatted}`;
+}
+
 function buildPropertyMoreInfo(
   schema: JSONSchema,
   language: Language,
   considerDeprecatedAndRequiredAsRequired: boolean,
-): MoreInfo | undefined {
+): MoreInfo[] | undefined {
   const types = toArray(schema.type);
 
   if (types.includes('object') && schema.properties) {
-    return buildMoreInfo('object format', schema, language, {
-      considerDeprecatedAndRequiredAsRequired,
-    });
+    return [
+      buildMoreInfo('object format', schema, language, {
+        considerDeprecatedAndRequiredAsRequired,
+      }),
+    ];
   }
 
   if (schema.enum) {
-    return {
-      title: 'enum values',
-      properties: {
-        regular: schema.enum
-          .filter((enumValue): enumValue is string => typeof enumValue === 'string')
-          .map((enumValue) => ({
-            property: enumValue,
-            description: schema.enumDescription?.[enumValue] || '',
-            types: [],
-            examples: [],
-          })),
-        deprecated: [],
+    return [
+      {
+        title: 'enum values',
+        properties: {
+          regular: schema.enum
+            .filter((enumValue): enumValue is string => typeof enumValue === 'string')
+            .map((enumValue) => ({
+              property: enumValue,
+              description: schema.enumDescription?.[enumValue] || '',
+              types: [],
+              examples: [],
+            })),
+          deprecated: [],
+        },
       },
-    };
+    ];
   }
 
   if (types.includes('array') && schema.items) {
@@ -162,11 +223,29 @@ function buildPropertyMoreInfo(
     const objectType = items.find((items) => toArray(items.type).includes('object'));
 
     if (objectType && objectType.properties) {
-      return buildMoreInfo('objects format inside array', objectType, language, {
-        considerDeprecatedAndRequiredAsRequired,
+      return [
+        buildMoreInfo('objects format inside array', objectType, language, {
+          considerDeprecatedAndRequiredAsRequired,
+        }),
+      ];
+    }
+
+    const itemsSchema = !Array.isArray(schema.items) ? schema.items : undefined;
+    const variants = itemsSchema?.oneOf || itemsSchema?.anyOf;
+    if (variants && variants.every((v) => toArray(v.type).includes('object') && v.properties)) {
+      const discriminator = findDiscriminator(variants);
+      return variants.map((variant, idx) => {
+        const title = discriminator
+          ? buildVariantTitle(discriminator, variant)
+          : `object format inside array (variant #${idx + 1})`;
+        return buildMoreInfo(title, variant, language, {
+          considerDeprecatedAndRequiredAsRequired,
+        });
       });
     }
   }
+
+  return undefined;
 }
 
 function buildJsonSchemaPropertyAnalysis(

@@ -96,15 +96,16 @@ const { property, showRequiredOptional = true } = Astro.props;
   }
 
   {
-    property.moreInfo && (
-      <ExpandablePane label={`Show ${property.moreInfo.title}`}>
-        <div class={s.properties}>
-          <JsonSchemaObjectAnalysis
-            object={property.moreInfo.properties}
-            showRequiredOptional={showRequiredOptional}
-          />
-        </div>
-      </ExpandablePane>
-    )
+    property.moreInfo &&
+      property.moreInfo.map((info) => (
+        <ExpandablePane label={`Show ${info.title}`}>
+          <div class={s.properties}>
+            <JsonSchemaObjectAnalysis
+              object={info.properties}
+              showRequiredOptional={showRequiredOptional}
+            />
+          </div>
+        </ExpandablePane>
+      ))
   }
 </div>
