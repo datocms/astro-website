@@ -1,4 +1,4 @@
-import type { Root } from 'hast';
+import type { ElementContent, Root } from 'hast';
 import { matches, select, selectAll } from 'hast-util-select';
 import { toString } from 'hast-util-to-string';
 import { h } from 'hastscript';
@@ -55,6 +55,7 @@ export function autolinkHeadings() {
 }
 
 const calloutRegex = /^\[!(\w+)\](?:\s+(.*))?/;
+const calloutMarkerRegex = /^\[!\w+\][ \t]*/;
 
 export function callouts() {
   return function transformer(tree: Root) {
@@ -80,17 +81,60 @@ export function callouts() {
         return;
       }
 
-      const [, calloutType, title] = match;
+      const [, calloutType] = match;
       const lowerCaseType = calloutType!.toLowerCase();
 
-      // We need to remove the "[!TYPE] Title" line from the content.
-      // We find the specific text node and modify it.
-      const textNode = firstChild.children.find((child) => child.type === 'text');
-      if (textNode && textNode.type === 'text') {
-        textNode.value = textNode.value.replace(calloutRegex, '').trimStart();
+      // Split the first paragraph's inline children into the title (everything
+      // up to the first newline, after the `[!TYPE] ` marker) and the rest of
+      // the content. This preserves inline formatting (e.g. `<code>`) inside
+      // the title and prevents the title text from leaking into the content.
+      const titleChildren: ElementContent[] = [];
+      const remainingFirstPChildren: ElementContent[] = [];
+      let titleConsumed = false;
+      let regexStripped = false;
+
+      for (const child of firstChild.children) {
+        if (titleConsumed) {
+          remainingFirstPChildren.push(child);
+          continue;
+        }
+
+        if (child.type === 'text') {
+          let value = child.value;
+          if (!regexStripped) {
+            value = value.replace(calloutMarkerRegex, '');
+            regexStripped = true;
+          }
+          const newlineIdx = value.indexOf('\n');
+          if (newlineIdx !== -1) {
+            const titlePart = value.slice(0, newlineIdx);
+            const contentPart = value.slice(newlineIdx + 1);
+            if (titlePart) titleChildren.push({ type: 'text', value: titlePart });
+            if (contentPart) remainingFirstPChildren.push({ type: 'text', value: contentPart });
+            titleConsumed = true;
+          } else if (value) {
+            titleChildren.push({ type: 'text', value });
+          }
+        } else {
+          titleChildren.push(child);
+        }
       }
 
-      // Create the new HAST node that mimics your Astro component's output
+      // Trim leading whitespace from the first remaining title node.
+      while (titleChildren[0]?.type === 'text') {
+        titleChildren[0].value = titleChildren[0].value.trimStart();
+        if (titleChildren[0].value) break;
+        titleChildren.shift();
+      }
+
+      // Replace the first paragraph's children with the leftover content; if
+      // empty, drop the paragraph altogether.
+      firstChild.children = remainingFirstPChildren;
+      const contentChildren =
+        remainingFirstPChildren.length > 0
+          ? node.children
+          : node.children.filter((child) => child !== firstChild);
+
       const newNode = h('figure', [
         h(
           'div',
@@ -98,8 +142,10 @@ export function callouts() {
             'data-callout-type': lowerCaseType,
           },
           [
-            ...(title ? [h('div', { 'data-callout-title': true }, [title])] : []),
-            h('div', { 'data-callout-content': true }, ...node.children), // Pass the original children
+            ...(titleChildren.length > 0
+              ? [h('div', { 'data-callout-title': true }, titleChildren)]
+              : []),
+            h('div', { 'data-callout-content': true }, ...contentChildren),
           ],
         ),
       ]);
