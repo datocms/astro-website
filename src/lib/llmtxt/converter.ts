@@ -428,6 +428,27 @@ function configureTurndownService(settings: ConversionOptions): TurndownService 
     },
   });
 
+  // Definition list term -> render as a heading so glossary-style content
+  // gets a proper structure in markdown
+  turndownService.addRule('definitionTerm', {
+    filter: 'dt',
+    replacement: function (content) {
+      const text = content.trim();
+      if (!text) return '';
+      return `\n\n### ${text}\n\n`;
+    },
+  });
+
+  // Definition list description -> render as a paragraph
+  turndownService.addRule('definitionDescription', {
+    filter: 'dd',
+    replacement: function (content) {
+      const text = content.trim();
+      if (!text) return '';
+      return `${text}\n\n`;
+    },
+  });
+
   // Add details/summary support (expandable/collapsible sections)
   turndownService.addRule('details', {
     filter: function (node) {

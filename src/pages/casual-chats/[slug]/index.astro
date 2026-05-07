@@ -82,87 +82,89 @@ const siblings = [previous ?? last, next ?? first].filter(isDefined);
       }}
     />
   </Fragment>
-  <InterstitialTitle
-    seoAnalysis={post.yoastAnalysis}
-    kicker={post.seoH1 || 'Customer Stories'}
-    style="two"
-    mainTitleOfPage
-  >
-    {post.title}
-  </InterstitialTitle>
+  <div id="main-content">
+    <InterstitialTitle
+      seoAnalysis={post.yoastAnalysis}
+      kicker={post.seoH1 || 'Customer Stories'}
+      style="two"
+      mainTitleOfPage
+    >
+      {post.title}
+    </InterstitialTitle>
 
-  <div class={s.postWrapper}>
-    <Wrapper>
-      <div class={s.info}>
-        <div class={s.avatarWrapper}>
-          {
-            post.people.map((author, i) => (
-              <ResponsiveImage
-                pictureClass={s.avatar}
-                data={author.avatar.responsiveImage}
-                pictureStyle={{ zIndex: 10 - i }}
-              />
-            ))
-          }
-        </div>
-        <p>
-          In conversation with
-          {
-            intersperse(
-              post.people.map((person) => (
-                <span>
-                  {person.name} ({person.title})
-                </span>
-              )),
-              ', ',
-              ' and ',
-            )
-          }
-        </p>
-      </div>
-
-      <div id="main-content">
-        <Prose class={s.body}>
-          <Text
-            {...ensureValidStructuredTextProps({
-              data: post.content,
-              blockComponents: {
-                ImageRecord: Image,
-                TableRecord: Table,
-                DemoRecord: Demo,
-                MultipleDemosBlockRecord: MultipleDemosBlock,
-                InternalVideoRecord: InternalVideo,
-                TutorialVideoRecord: TutorialVideo,
-                VideoRecord: Video,
-                ShowcaseProjectBlockRecord: ShowcaseProjectBlock,
-                CodesandboxEmbedBlockRecord: CodesandboxEmbedBlock,
-                CtaButtonRecord: CtaButton,
-                QuestionAnswerRecord: QuestionAnswer,
-              },
-              linkToRecordComponents: defaultLinkToRecordComponents,
-              inlineRecordComponents: defaultInlineRecordComponents,
-            })}
-          />
-        </Prose>
-      </div>
-    </Wrapper>
-
-    {
-      tocItems.length > 4 && (
-        <div class={s.tocWrapper}>
-          <div class={s.toc}>
-            <div class={s.tocTitle}>In this story:</div>
-            <ul>
-              {tocItems.map((item) => (
-                <li>
-                  <a href={item.url}>{item.label}</a>
-                </li>
-              ))}
-            </ul>
+    <div class={s.postWrapper}>
+      <Wrapper>
+        <div class={s.info}>
+          <div class={s.avatarWrapper}>
+            {
+              post.people.map((author, i) => (
+                <ResponsiveImage
+                  pictureClass={s.avatar}
+                  data={author.avatar.responsiveImage}
+                  pictureStyle={{ zIndex: 10 - i }}
+                />
+              ))
+            }
           </div>
+          <p>
+            In conversation with
+            {
+              intersperse(
+                post.people.map((person) => (
+                  <span>
+                    {person.name} ({person.title})
+                  </span>
+                )),
+                ', ',
+                ' and ',
+              )
+            }
+          </p>
         </div>
-      )
-    }
+
+        <div>
+          <Prose class={s.body}>
+            <Text
+              {...ensureValidStructuredTextProps({
+                data: post.content,
+                blockComponents: {
+                  ImageRecord: Image,
+                  TableRecord: Table,
+                  DemoRecord: Demo,
+                  MultipleDemosBlockRecord: MultipleDemosBlock,
+                  InternalVideoRecord: InternalVideo,
+                  TutorialVideoRecord: TutorialVideo,
+                  VideoRecord: Video,
+                  ShowcaseProjectBlockRecord: ShowcaseProjectBlock,
+                  CodesandboxEmbedBlockRecord: CodesandboxEmbedBlock,
+                  CtaButtonRecord: CtaButton,
+                  QuestionAnswerRecord: QuestionAnswer,
+                },
+                linkToRecordComponents: defaultLinkToRecordComponents,
+                inlineRecordComponents: defaultInlineRecordComponents,
+              })}
+            />
+          </Prose>
+        </div>
+      </Wrapper>
+
+      {
+        tocItems.length > 4 && (
+          <div class={s.tocWrapper} data-datocms-nomd>
+            <div class={s.toc}>
+              <div class={s.tocTitle}>In this story:</div>
+              <ul>
+                {tocItems.map((item) => (
+                  <li>
+                    <a href={item.url}>{item.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )
+      }
+    </div>
   </div>
 
   <SameLevelNavigation

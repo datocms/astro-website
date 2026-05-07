@@ -73,54 +73,55 @@ const sections = filterNodes(
       }}
     />
   </Fragment>
-  <InterstitialTitle style="one" mainTitleOfPage>
-    <Fragment slot="kicker"><a href="/academy">DatoCMS Academy</a></Fragment>
-    {chapter.title}
-    <Fragment slot="subtitle"
-      ><Text {...ensureValidStructuredTextProps({ data: course.introduction })} /></Fragment
-    >
-  </InterstitialTitle>
-  <Space top={1}>
-    <div class={s.contentWrapper}>
-      <div class={s.tocWrapper}>
-        <div class={s.toc}>
-          <div class={s.tocTitle}>Course chapters</div>
-          <ul class={s.tocChapters}>
-            {
-              allChapters.map((nthChapter) => (
-                <li class={s.tocChapter}>
-                  <ActiveLink
-                    href={buildUrlForAcademyChapter(nthChapter)}
-                    class={s.tocChapterLink}
-                    activeClass={s.activeTocChapter}
-                  >
-                    {nthChapter.title}
-                  </ActiveLink>
+  <div id="main-content">
+    <InterstitialTitle style="one" mainTitleOfPage>
+      <Fragment slot="kicker"><a href="/academy">DatoCMS Academy</a></Fragment>
+      {chapter.title}
+      <Fragment slot="subtitle"
+        ><Text {...ensureValidStructuredTextProps({ data: course.introduction })} /></Fragment
+      >
+    </InterstitialTitle>
+    <Space top={1}>
+      <div class={s.contentWrapper}>
+        <div class={s.tocWrapper} data-datocms-nomd>
+          <div class={s.toc}>
+            <div class={s.tocTitle}>Course chapters</div>
+            <ul class={s.tocChapters}>
+              {
+                allChapters.map((nthChapter) => (
+                  <li class={s.tocChapter}>
+                    <ActiveLink
+                      href={buildUrlForAcademyChapter(nthChapter)}
+                      class={s.tocChapterLink}
+                      activeClass={s.activeTocChapter}
+                    >
+                      {nthChapter.title}
+                    </ActiveLink>
 
-                  {nthChapter.id === chapter.id && sections.length > 0 && (
-                    <ul class={s.tocChapterSections}>
-                      {sections.map((section) => (
-                        <li class={s.tocChapterSection}>
-                          <a title={toPlainText(section.node)} href={section.url}>
-                            {toPlainText(section.node)}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))
-            }
-          </ul>
-          <div class={s.tocFooter}>
-            <p>
-              This <strong>{course.name}</strong> course is part of{' '}
-              <a href="/academy">DatoCMS Academy</a>, a deep dive into the concepts around headless.
-            </p>
+                    {nthChapter.id === chapter.id && sections.length > 0 && (
+                      <ul class={s.tocChapterSections}>
+                        {sections.map((section) => (
+                          <li class={s.tocChapterSection}>
+                            <a title={toPlainText(section.node)} href={section.url}>
+                              {toPlainText(section.node)}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))
+              }
+            </ul>
+            <div class={s.tocFooter}>
+              <p>
+                This <strong>{course.name}</strong> course is part of{' '}
+                <a href="/academy">DatoCMS Academy</a>, a deep dive into the concepts around
+                headless.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-      <div id="main-content">
         <Prose class={s.body}>
           <Text
             {...ensureValidStructuredTextProps({
@@ -136,37 +137,37 @@ const sections = filterNodes(
           />
         </Prose>
       </div>
-    </div>
-    <Wrapper>
-      <div class={s.prevNext}>
-        <div class={s.prev}>
-          {
-            prevChapter && (
-              <>
-                <div class={s.prevNextTitle}>Previous chapter</div>
-                <div class={s.prevNextLink}>
-                  <a href={buildUrlForAcademyChapter(prevChapter)}>&larr; {prevChapter.title}</a>
-                </div>
-              </>
-            )
-          }
-        </div>
-
-        <div class={s.next}>
-          {
-            nextChapter && (
-              <>
-                <div class={s.prevNextTitle}>Next chapter</div>
-                <div class={s.prevNextLink}>
-                  <a href={buildUrlForAcademyChapter(nextChapter)}>{nextChapter.title} &rarr;</a>
-                </div>
-              </>
-            )
-          }
-        </div>
+    </Space>
+  </div>
+  <Wrapper>
+    <div class={s.prevNext}>
+      <div class={s.prev}>
+        {
+          prevChapter && (
+            <>
+              <div class={s.prevNextTitle}>Previous chapter</div>
+              <div class={s.prevNextLink}>
+                <a href={buildUrlForAcademyChapter(prevChapter)}>&larr; {prevChapter.title}</a>
+              </div>
+            </>
+          )
+        }
       </div>
-    </Wrapper>
-  </Space>
+
+      <div class={s.next}>
+        {
+          nextChapter && (
+            <>
+              <div class={s.prevNextTitle}>Next chapter</div>
+              <div class={s.prevNextLink}>
+                <a href={buildUrlForAcademyChapter(nextChapter)}>{nextChapter.title} &rarr;</a>
+              </div>
+            </>
+          )
+        }
+      </div>
+    </div>
+  </Wrapper>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

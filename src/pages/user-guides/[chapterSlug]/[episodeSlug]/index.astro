@@ -73,34 +73,36 @@ const nextEpisode =
         <VideoPlayer data={episode.asset} thumbnailTime={0} />
       </div>
       <div class={s.container}>
-        <div class={s.headingWrapper}>
-          <a href="/user-guides" class={s.back}>
-            <Svg name="icons/regular/chevron-left" />
-            <span>Back to All Videos</span>
-          </a>
+        <div id="main-content">
+          <div class={s.headingWrapper}>
+            <a href="/user-guides" class={s.back} data-datocms-nomd>
+              <Svg name="icons/regular/chevron-left" />
+              <span>Back to All Videos</span>
+            </a>
 
-          <div class={s.heading}>
-            <h1>{episode.title}</h1>
-            <div class={`${s.pill} ${s.isDark}`}>
-              {formatVideoDuration(episode.asset.video.duration)}
+            <div class={s.heading}>
+              <h1>{episode.title}</h1>
+              <div class={`${s.pill} ${s.isDark}`}>
+                {formatVideoDuration(episode.asset.video.duration)}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div>
-          <Prose class={s.content}>
-            <Text
-              {...ensureValidStructuredTextProps({
-                data: episode.content,
-                blockComponents: {
-                  InternalVideoRecord: InternalVideo,
-                },
-                linkToRecordComponents: defaultLinkToRecordComponents,
-                inlineRecordComponents: defaultInlineRecordComponents,
-              })}
-            />
-          </Prose>
-          {nextEpisode && <NextEpisode episode={nextEpisode} />}
+          <div>
+            <Prose class={s.content}>
+              <Text
+                {...ensureValidStructuredTextProps({
+                  data: episode.content,
+                  blockComponents: {
+                    InternalVideoRecord: InternalVideo,
+                  },
+                  linkToRecordComponents: defaultLinkToRecordComponents,
+                  inlineRecordComponents: defaultInlineRecordComponents,
+                })}
+              />
+            </Prose>
+            {nextEpisode && <NextEpisode episode={nextEpisode} />}
+          </div>
         </div>
 
         <div class={s.asideWrapper}>

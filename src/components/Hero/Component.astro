@@ -6,13 +6,14 @@ import striptags from 'striptags';
 
 interface Props {
   seoAnalysis?: unknown;
+  mainTitleOfPage?: boolean;
 }
 
-const { seoAnalysis } = Astro.props;
+const { seoAnalysis, mainTitleOfPage } = Astro.props;
 
 const kickerContents = striptags(await Astro.slots.render('kicker'));
 
-let Title: 'h1' | 'h2' = 'h2';
+let Title: 'h1' | 'h2' = mainTitleOfPage ? 'h1' : 'h2';
 let Subtitle: 'h3' | 'div' = 'div';
 let Kicker: 'h1' | 'h2' = 'h2';
 

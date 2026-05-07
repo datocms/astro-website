@@ -15,11 +15,14 @@ import { ensureValidStructuredTextProps } from '@datocms/astro';
 
 interface Props {
   productUpdate: FragmentOf<typeof ProductUpdateFragment>;
+  mainTitleOfPage?: boolean;
 }
 
-const { productUpdate: maskedProductUpdate } = Astro.props;
+const { productUpdate: maskedProductUpdate, mainTitleOfPage } = Astro.props;
 
 const productUpdate = readFragment(ProductUpdateFragment, maskedProductUpdate);
+
+const Title = mainTitleOfPage ? 'h1' : 'h2';
 ---
 
 <article class={s.post}>
@@ -33,9 +36,15 @@ const productUpdate = readFragment(ProductUpdateFragment, maskedProductUpdate);
     }
   </div>
 
-  <h2 class={s.title}>
-    <a href={buildUrlForProductUpdate(productUpdate)}>{productUpdate.title}</a>
-  </h2>
+  <Title class={s.title}>
+    {
+      mainTitleOfPage ? (
+        productUpdate.title
+      ) : (
+        <a href={buildUrlForProductUpdate(productUpdate)}>{productUpdate.title}</a>
+      )
+    }
+  </Title>
 
   <div class={s.info}>
     {

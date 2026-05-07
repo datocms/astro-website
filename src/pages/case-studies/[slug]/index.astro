@@ -61,137 +61,140 @@ const siblings = [previous ?? last, next ?? first].filter(isDefined);
       }}
     />
   </Fragment>
-  <Wrapper>
-    <div class={s.hero}>
-      <div class={s.heroBody}>
-        <div class={s.headKicker}>
-          <img alt={page.logo.alt} src={page.logo.url} />
-          <span class={s.plus}>+</span>
-          <Svg name="svg/logos/datocms" />
+  <div id="main-content">
+    <Wrapper>
+      <div class={s.hero}>
+        <div class={s.heroBody}>
+          <div class={s.headKicker} data-datocms-nomd>
+            <img alt={page.logo.alt} src={page.logo.url} />
+            <span class={s.plus}>+</span>
+            <Svg name="svg/logos/datocms" />
+          </div>
+          <h1 class={s.heroName}>{page.name}</h1>
+          <h2 class={s.heroTitle}>
+            <InlineText {...ensureValidStructuredTextProps({ data: page.title })} />
+          </h2>
+          <div class={s.heroSubtitle}>
+            <InlineText {...ensureValidStructuredTextProps({ data: page.subtitle })} />
+          </div>
         </div>
-        <h1 class={s.heroTitle}>
-          <InlineText {...ensureValidStructuredTextProps({ data: page.title })} />
-        </h1>
-        <div class={s.heroSubtitle}>
-          <InlineText {...ensureValidStructuredTextProps({ data: page.subtitle })} />
-        </div>
-      </div>
-      <div class={s.heroImageWrapper}>
-        <div class={s.heroImage}>
-          <ResponsiveImage data={page.coverImage.responsiveImage} />
-        </div>
-      </div>
-    </div>
-  </Wrapper>
-
-  <StripWithContent stripHeight="partial">
-    <Fragment slot="title">At a glance...</Fragment>
-
-    {
-      page.numbers.length > 0 && (
-        <div class={s.numbers}>
-          {page.numbers.map((item) => (
-            <div class={s.numberBlock}>
-              <h3 class={s.numberTitle}>{item.number}</h3>
-              <p class={s.numberLabel}>{item.label}</p>
-            </div>
-          ))}
-        </div>
-      )
-    }
-
-    <div class={s.glanceWrapper}>
-      <div class={s.challenge}>
-        <h3>The challenge</h3>
-        <Text {...ensureValidStructuredTextProps({ data: page.challenge })} />
-      </div>
-      <div class={s.arrowsWrapper}>
-        <div class={s.arrows}>
-          <Svg name="svg/illustrations/arrow-sketch-3" />
-          <Svg name="svg/illustrations/arrow-sketch-3" />
+        <div class={s.heroImageWrapper}>
+          <div class={s.heroImage}>
+            <ResponsiveImage data={page.coverImage.responsiveImage} />
+          </div>
         </div>
       </div>
-      <div class={s.result}>
-        <h3>The result</h3>
-        <Text {...ensureValidStructuredTextProps({ data: page.result })} />
+    </Wrapper>
+
+    <StripWithContent stripHeight="partial">
+      <Fragment slot="title">At a glance...</Fragment>
+
+      {
+        page.numbers.length > 0 && (
+          <div class={s.numbers}>
+            {page.numbers.map((item) => (
+              <div class={s.numberBlock}>
+                <h3 class={s.numberTitle}>{item.number}</h3>
+                <p class={s.numberLabel}>{item.label}</p>
+              </div>
+            ))}
+          </div>
+        )
+      }
+
+      <div class={s.glanceWrapper}>
+        <div class={s.challenge}>
+          <h3>The challenge</h3>
+          <Text {...ensureValidStructuredTextProps({ data: page.challenge })} />
+        </div>
+        <div class={s.arrowsWrapper}>
+          <div class={s.arrows}>
+            <Svg name="svg/illustrations/arrow-sketch-3" />
+            <Svg name="svg/illustrations/arrow-sketch-3" />
+          </div>
+        </div>
+        <div class={s.result}>
+          <h3>The result</h3>
+          <Text {...ensureValidStructuredTextProps({ data: page.result })} />
+        </div>
       </div>
-    </div>
-  </StripWithContent>
+    </StripWithContent>
 
-  <Wrapper>
-    <div class={s.fullStory}>
-      <Prose class={s.body}>
-        <Text
-          {...ensureValidStructuredTextProps({
-            data: page.content,
-            blockComponents: {
-              ImageRecord: Image,
-              InDepthCtaBlockRecord: InDepthCtaBlock,
-              InternalVideoRecord: InternalVideo,
-              VideoRecord: Video,
-            },
-            linkToRecordComponents: defaultLinkToRecordComponents,
-            inlineRecordComponents: defaultInlineRecordComponents,
-          })}
-        />
-      </Prose>
+    <Wrapper>
+      <div class={s.fullStory}>
+        <Prose class={s.body}>
+          <Text
+            {...ensureValidStructuredTextProps({
+              data: page.content,
+              blockComponents: {
+                ImageRecord: Image,
+                InDepthCtaBlockRecord: InDepthCtaBlock,
+                InternalVideoRecord: InternalVideo,
+                VideoRecord: Video,
+              },
+              linkToRecordComponents: defaultLinkToRecordComponents,
+              inlineRecordComponents: defaultInlineRecordComponents,
+            })}
+          />
+        </Prose>
 
-      <aside class={s.aside}>
-        {
-          page.projectUrl && (
-            <div class={s.asideItem}>
-              <h3>Project</h3>
-              <a href={page.projectUrl} target="_blank" rel="noopener noreferrer">
-                {cleanDomain(page.projectUrl)}
-              </a>
-            </div>
-          )
-        }
-        {
-          page.useCase && (
-            <div class={s.asideItem}>
-              <h3>Use case</h3>
-              <a href={buildUrlForUseCasePage(page.useCase)}>{page.useCase.navigationBarTitle}</a>
-            </div>
-          )
-        }
-        {
-          page.industry.length > 0 && (
-            <div class={s.asideItem}>
-              <h3>Industry</h3>
-              <ul>
-                {page.industry.map((item) => (
-                  <li>{item.name}</li>
-                ))}
-              </ul>
-            </div>
-          )
-        }
-        {
-          page.keyFeatures.length > 0 && (
-            <div class={s.asideItem}>
-              <h3>Key Features</h3>
-              <ul>
-                {page.keyFeatures.map((item) => (
-                  <li>
-                    <a href={buildUrlForFeature(item)}>{item.seoH1}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )
-        }
-        {
-          page.partner && (
-            <div class={s.asideItem}>
-              <h3>Partner</h3>
-              <a href={buildUrlForPartner(page.partner)}>{page.partner.name}</a>
-            </div>
-          )
-        }
-      </aside>
-    </div>
-  </Wrapper>
+        <aside class={s.aside}>
+          {
+            page.projectUrl && (
+              <div class={s.asideItem}>
+                <h3>Project</h3>
+                <a href={page.projectUrl} target="_blank" rel="noopener noreferrer">
+                  {cleanDomain(page.projectUrl)}
+                </a>
+              </div>
+            )
+          }
+          {
+            page.useCase && (
+              <div class={s.asideItem}>
+                <h3>Use case</h3>
+                <a href={buildUrlForUseCasePage(page.useCase)}>{page.useCase.navigationBarTitle}</a>
+              </div>
+            )
+          }
+          {
+            page.industry.length > 0 && (
+              <div class={s.asideItem}>
+                <h3>Industry</h3>
+                <ul>
+                  {page.industry.map((item) => (
+                    <li>{item.name}</li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+          {
+            page.keyFeatures.length > 0 && (
+              <div class={s.asideItem}>
+                <h3>Key Features</h3>
+                <ul>
+                  {page.keyFeatures.map((item) => (
+                    <li>
+                      <a href={buildUrlForFeature(item)}>{item.seoH1}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+          {
+            page.partner && (
+              <div class={s.asideItem}>
+                <h3>Partner</h3>
+                <a href={buildUrlForPartner(page.partner)}>{page.partner.name}</a>
+              </div>
+            )
+          }
+        </aside>
+      </div>
+    </Wrapper>
+  </div>
 
   <SameLevelNavigation
     title="Not all stories are alike"
