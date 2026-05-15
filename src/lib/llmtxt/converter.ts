@@ -299,6 +299,98 @@ function cleanContent(content: HTMLElement, _settings: ConversionOptions): void 
   emptyElements.forEach((element) => {
     element.parentNode?.removeChild(element);
   });
+
+  normalizeWhitespace(content);
+}
+
+/**
+ * Collapse insignificant whitespace text nodes in the DOM, similar to how a
+ * browser treats whitespace when rendering. This stops turndown from being
+ * misled by source indentation (e.g. flipping list items between tight and
+ * loose, or treating cell content as paragraphs). Content inside <pre>,
+ * <code>, <textarea>, <script>, <style> is left untouched.
+ */
+function normalizeWhitespace(content: HTMLElement): void {
+  const PRESERVE = new Set(['PRE', 'CODE', 'TEXTAREA', 'SCRIPT', 'STYLE']);
+  const BLOCK = new Set([
+    'ADDRESS',
+    'ARTICLE',
+    'ASIDE',
+    'BLOCKQUOTE',
+    'BODY',
+    'BR',
+    'CANVAS',
+    'DD',
+    'DETAILS',
+    'DIALOG',
+    'DIV',
+    'DL',
+    'DT',
+    'FIELDSET',
+    'FIGCAPTION',
+    'FIGURE',
+    'FOOTER',
+    'FORM',
+    'H1',
+    'H2',
+    'H3',
+    'H4',
+    'H5',
+    'H6',
+    'HEADER',
+    'HR',
+    'LI',
+    'MAIN',
+    'NAV',
+    'OL',
+    'P',
+    'PRE',
+    'SECTION',
+    'SUMMARY',
+    'TABLE',
+    'TBODY',
+    'TD',
+    'TH',
+    'THEAD',
+    'TFOOT',
+    'TR',
+    'UL',
+    'VIDEO',
+  ]);
+
+  const inPreserved = (node: Node): boolean => {
+    let p: Node | null = node.parentNode;
+    while (p) {
+      if (p.nodeType === 1 && PRESERVE.has((p as Element).tagName)) return true;
+      p = p.parentNode;
+    }
+    return false;
+  };
+
+  const isBlock = (node: Node | null): boolean =>
+    !!node && node.nodeType === 1 && BLOCK.has((node as Element).tagName);
+
+  // Snapshot text nodes first — mutating during the walk would skip siblings
+  const textNodes: Text[] = [];
+  const walker = content.ownerDocument.createTreeWalker(content, 4 /* SHOW_TEXT */);
+  let n: Node | null;
+  while ((n = walker.nextNode())) textNodes.push(n as Text);
+
+  for (const t of textNodes) {
+    if (inPreserved(t)) continue;
+    const text = t.textContent ?? '';
+    if (/^\s*$/.test(text)) {
+      const prev = t.previousSibling;
+      const next = t.nextSibling;
+      if (!prev || !next || isBlock(prev) || isBlock(next)) {
+        t.parentNode?.removeChild(t);
+      } else {
+        t.textContent = ' ';
+      }
+    } else {
+      t.textContent = text.replace(/\s+/g, ' ');
+    }
+  }
 }
 
 /**
@@ -496,8 +588,18 @@ function addTableSupport(turndownService: TurndownService): void {
   turndownService.addRule('tableCell', {
     filter: ['th', 'td'],
     replacement: function (cellContent) {
-      return ' ' + cellContent.trim() + ' |';
+      // Collapse newlines so block-level descendants (e.g. <div>) don't
+      // break the row layout in GFM tables.
+      return ' ' + cellContent.trim().replace(/\s*\n+\s*/g, ' ') + ' |';
     },
+  });
+
+  // Pass through thead/tbody/tfoot without surrounding blank lines —
+  // otherwise turndown treats them as block elements and inserts a blank
+  // line between the header-separator row and the first body row.
+  turndownService.addRule('tableSection', {
+    filter: ['thead', 'tbody', 'tfoot'],
+    replacement: (content) => content,
   });
 
   turndownService.addRule('tableRow', {
@@ -538,8 +640,9 @@ function postProcessMarkdown(markdown: string): string {
   // Ensure proper spacing around headings
   markdown = markdown.replace(/([^\n])(\n#{1,6} )/g, '$1\n\n$2');
 
-  // Fix list item spacing
-  markdown = markdown.replace(/(\n[*\-+] [^\n]+)(\n[*\-+] )/g, '$1\n$2');
+  // Collapse blank lines between adjacent list items (turndown can emit
+  // "loose" items with surrounding whitespace; force them tight)
+  markdown = markdown.replace(/(\n[*\-+] +[^\n]+)\n\s*\n(?=[*\-+] +)/g, '$1\n');
 
   return markdown.trim();
 }

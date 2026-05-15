@@ -19,7 +19,6 @@ import Bullet from './_sub/Bullet.astro';
 import FeatureGroup from './_sub/FeatureGroup.astro';
 import FreeLimitsTable from './_sub/FreeLimitsTable.astro';
 import LimitsGroup from './_sub/LimitsGroup.astro';
-import ReadMore from './_sub/ReadMore.astro';
 import { fetchPerOwnerPricingPlans } from './_sub/perOwnerPricingPlans';
 import { SingleQuote } from '~/components/quote/SingleQuote';
 import { formatNumber } from '~/lib/formatters';
@@ -43,255 +42,274 @@ if (!page || !freePlan || !proPlan) {
 ---
 
 <Layout seo={page.seo}>
-  <Hero>
-    <Fragment slot="kicker"> Future-proof your digital experiences </Fragment>
-    <Fragment slot="title">
-      Flexible pricing,<br /><mark>ready to scale</mark>
-    </Fragment>
-    <Fragment slot="subtitle">
-      Effortless maintenance, seamless operations: unlock substantial savings every year by
-      leveraging DatoCMS headless technology and content infrastructure
-    </Fragment>
-  </Hero>
+  <div id="main-content">
+    <Hero mainTitleOfPage seoAnalysis={{ keyword: 'pricing' }}>
+      <Fragment slot="kicker">DatoCMS Pricing</Fragment>
+      <Fragment slot="title">
+        Flexible pricing, <mark>ready to scale</mark>
+      </Fragment>
+      <Fragment slot="subtitle">
+        Effortless maintenance, seamless operations: unlock substantial savings every year by
+        leveraging DatoCMS headless technology and content infrastructure
+      </Fragment>
+    </Hero>
 
-  <Space top={1}>
-    <Wrapper>
-      <div class={s.freePlan}>
-        <div class={s.freePlanContent}>
-          <div class={s.freePlanTitle}>
-            Just getting started? Try DatoCMS out for free, forever (yes really)
-          </div>
-          <div class={s.freePlanDescription}>
-            Free plan comes with 2 editors and 300 records, with 10GB of traffic and 100k API calls
-            each month. No overages allowed.{' '}
-            <a href="#free-plan-details">
-              See all limits in detail <Svg name="icons/regular/info-circle" />
-            </a>
-          </div>
-        </div>
-        <div class={s.freePlanCta}>
-          <Button block s="invert" as="a" href={dashboardUrl('/signup')}> Sign up for free </Button>
-          <div class={s.freePlanCtaReassurance}>Easy setup, no credit card required</div>
-        </div>
-      </div>
-    </Wrapper>
-
-    <Wrapper>
-      <a href="/partner-program" class={s.agenciesCta}>
-        <Svg name="svg/illustrations/marketers" />
-        <span>
-          <strong>Working on client projects?</strong>{' '}<mark
-            >Our Agency Partner Program starts at €39/month</mark
-          > &raquo;
-        </span>
-      </a>
-    </Wrapper>
-
-    <div class={s.plansStrip}>
+    <Space top={1}>
       <Wrapper>
-        <div class={s.plansContainer}>
-          <div class={s.plan}>
-            <div class={s.planInner}>
-              <div class={s.planName}>Professional</div>
-              <div class={s.planDescription}>
-                Everything you need — and more – to build professional digital projects
-              </div>
-
-              <div class={s.planPriceContainer}>
-                <span class={s.planPricePerMonth}>Start at </span>
-                <span class={s.planPrice}>€{formatNumber(149)}</span>
-                <span class={s.planPricePerMonth}>/month (billed annually)</span>
-
-                <span class={s.planYearlyPrice}>
-                  or <strong>€{formatNumber(199)}/month</strong>
-                </span>
-              </div>
-
-              <div class={s.planAction}>
-                <Button
-                  block
-                  s="invert"
-                  as="a"
-                  href={dashboardUrl(
-                    '/personal-account/plan-billing/change?plan_id=899&utm_source=datocms&utm_medium=website&utm_campaign=pricing',
-                  )}
-                >
-                  Purchase now
-                </Button>
-              </div>
-
-              <div class={s.planBullets}>
-                <Bullet>
-                  Generous quota included, with soft limits you can exceed and pay-as-you-go
-                </Bullet>
-                <Bullet>
-                  10 collaborators included on each project (you can purchase more if needed)
-                </Bullet>
-                <Bullet>Additional projects can be added for as low as €39/month</Bullet>
-                <Bullet>Expanded authoring roles to support most publishing workflows</Bullet>
-                <ReadMore />
-              </div>
+        <div class={s.freePlan}>
+          <div class={s.freePlanContent}>
+            <h3 class={s.freePlanTitle}>
+              Just getting started? Try DatoCMS out for free, forever (yes really)
+            </h3>
+            <div class={s.freePlanDescription}>
+              Free plan comes with 2 editors and 300 records, with 10GB of traffic and 100k API
+              calls each month. No overages allowed.{' '}
+              <a href="#free-plan-details">
+                See all limits in detail <Svg name="icons/regular/info-circle" />
+              </a>
             </div>
           </div>
-
-          <div class={s.plan}>
-            <div class={s.planInner}>
-              <div class={s.planName}>Enterprise</div>
-              <div class={s.planDescription}>
-                Premium features, high-touch support and advanced compliance for scaled experiences
-              </div>
-
-              <div class={s.planPriceContainer}>
-                <span class={s.planPrice}>Custom</span>
-
-                <span class={s.planYearlyPrice}> payable by credit card or wire transfer </span>
-              </div>
-
-              <div class={s.planAction}>
-                <Button block s="invert" as="a" href="/contact"> Contact us </Button>
-              </div>
-
-              <div class={s.planBullets}>
-                <Bullet>Guaranteed support and uptime SLAs</Bullet>
-                <Bullet>SSO, Audit logs and Static webhook IPs for enhanced security</Bullet>
-                <Bullet>
-                  Fully customizable roles and tasks for granular workflows, tailored to your
-                  specific needs
-                </Bullet>
-                <Bullet>
-                  Support via shared Slack channel, editorial onboarding, plus access to our
-                  solution architects
-                </Bullet>
-                <ReadMore />
-              </div>
-            </div>
+          <div class={s.freePlanCta} data-datocms-nomd>
+            <Button block s="invert" as="a" href={dashboardUrl('/signup')}>
+              Sign up for free
+            </Button>
+            <div class={s.freePlanCtaReassurance}>Easy setup, no credit card required</div>
           </div>
         </div>
       </Wrapper>
-    </div>
 
-    <pricing-context-provider>
-      <a id="details"></a>
+      <dialog class={s.modal} id="free-plan-details">
+        <button class={s.modalClose} autofocus aria-label="Close dialog">
+          <Svg name="icons/regular/times-circle" />
+        </button>
+        <h6 class={s.modalTitle}>Free vs Professional</h6>
+        <div class={s.modalWarning}>
+          ⚠️{' '}
+          <strong>In the Free plan, you can&apos;t go over the allowed monthly limits.</strong>
+          <br />
+          If you reach these limits, the service will stop responding as expected.
+        </div>
+        <div class={s.fTableScroll}>
+          <FreeLimitsTable hints={hints} freePlan={freePlan} proPlan={proPlan} />
+        </div>
+      </dialog>
 
-      <Space top={2}>
-        <InterstitialTitle style="three">
-          Compare plans
-          <Fragment slot="subtitle">
-            Explore our features and choose the best plan for you
-          </Fragment>
-        </InterstitialTitle>
+      <Wrapper>
+        <a href="/partner-program" class={s.agenciesCta}>
+          <Svg name="svg/illustrations/marketers" />
+          <span>
+            <strong>Working on many client projects?</strong>
+            <mark>Our Agency Partner Program starts at €39/month</mark> &raquo;
+          </span>
+        </a>
+      </Wrapper>
+
+      <div class={s.plansStrip}>
+        <Wrapper>
+          <div class={s.plansContainer}>
+            <div class={s.plan}>
+              <div class={s.planInner}>
+                <h3 class={s.planName}>Professional</h3>
+                <div class={s.planDescription}>
+                  Everything you need — and more – to build professional digital projects
+                </div>
+
+                <div class={s.planPriceContainer}>
+                  <span class={s.planPricePerMonth}>Start at </span>
+                  <span class={s.planPrice}>€{formatNumber(149)}</span>
+                  <span class={s.planPricePerMonth}>/month (billed annually)</span>
+
+                  <span class={s.planYearlyPrice}>
+                    or <strong>€{formatNumber(199)}/month</strong>
+                  </span>
+                </div>
+
+                <div class={s.planAction} data-datocms-nomd>
+                  <Button
+                    block
+                    s="invert"
+                    as="a"
+                    href={dashboardUrl(
+                      '/personal-account/plan-billing/change?plan_id=899&utm_source=datocms&utm_medium=website&utm_campaign=pricing',
+                    )}
+                  >
+                    Purchase now
+                  </Button>
+                </div>
+
+                <ul class={s.planBullets}>
+                  <Bullet>
+                    Generous quota included, with soft limits you can exceed and pay-as-you-go
+                  </Bullet>
+                  <Bullet>
+                    10 collaborators included on each project (you can purchase more if needed)
+                  </Bullet>
+                  <Bullet>Additional projects can be added for as low as €39/month</Bullet>
+                  <Bullet>Expanded authoring roles to support most publishing workflows</Bullet>
+                </ul>
+              </div>
+            </div>
+
+            <div class={s.plan}>
+              <div class={s.planInner}>
+                <h3 class={s.planName}>Enterprise</h3>
+                <div class={s.planDescription}>
+                  Premium features, high-touch support and advanced compliance for scaled
+                  experiences
+                </div>
+
+                <div class={s.planPriceContainer}>
+                  <span class={s.planPrice}>Custom</span>
+
+                  <span class={s.planYearlyPrice}> payable by credit card or wire transfer </span>
+                </div>
+
+                <div class={s.planAction} data-datocms-nomd>
+                  <Button block s="invert" as="a" href="/contact"> Contact us </Button>
+                </div>
+
+                <ul class={s.planBullets}>
+                  <Bullet>Guaranteed support and uptime SLAs</Bullet>
+                  <Bullet>SSO, Audit logs and Static webhook IPs for enhanced security</Bullet>
+                  <Bullet>
+                    Fully customizable roles and tasks for granular workflows, tailored to your
+                    specific needs
+                  </Bullet>
+                  <Bullet>
+                    Support via shared Slack channel, editorial onboarding, plus access to our
+                    solution architects
+                  </Bullet>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </Wrapper>
+      </div>
+
+      <pricing-context-provider>
+        <a id="details"></a>
+
+        <Space top={2}>
+          <InterstitialTitle style="three">
+            Compare plans
+            <Fragment slot="subtitle">
+              Explore our features and choose the best plan for you
+            </Fragment>
+          </InterstitialTitle>
+        </Space>
+
+        <Wrapper>
+          <div class={s.fTableScroll}>
+            <a class={s.fTableAnchor} id="detailsTable"></a>
+            <table class={s.fTable} data-details-table>
+              <thead>
+                <tr>
+                  <th class={s.fTableHead}>
+                    <div class={s.fTableHeadTitle}>Features by plan</div>
+
+                    <div class={s.searchFeatures} data-datocms-nomd>
+                      <Svg name="icons/regular/search" />
+                      <input type="text" name="searchTerm" placeholder="Search something..." />
+
+                      <button type="button" id="clearSearchTerm">
+                        <Svg name="icons/regular/times" />
+                      </button>
+                    </div>
+
+                    <span data-datocms-nomd>
+                      <Switch name="onlyShowDifferences">Only show differences</Switch>
+                    </span>
+                  </th>
+                  <th class={s.fTablePlan}>
+                    <div class={s.fTablePlanName}>Professional</div>
+                    <div class={s.fTablePlanPrice}>
+                      From €{formatNumber(149)}/month
+                    </div>
+                    <span data-datocms-nomd>
+                      <Button
+                        block
+                        s="invert"
+                        as="a"
+                        p="tiny"
+                        href={dashboardUrl(
+                          '/personal-account/plan-billing/change?plan_id=899&utm_source=datocms&utm_medium=website&utm_campaign=pricing',
+                        )}
+                      >
+                        Purchase now
+                      </Button>
+                    </span>
+                  </th>
+                  <th class={s.fTablePlan}>
+                    <div class={s.fTablePlanName}>Enterprise</div>
+                    <div class={s.fTablePlanPrice}>Tailored on your needs</div>
+                    <span data-datocms-nomd>
+                      <Button block p="tiny" s="invert" as="a" href="/contact"> Contact us </Button>
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+              <LimitsGroup freePlan={freePlan} proPlan={proPlan} hints={hints} />
+
+              {planFeatureGroups.map((group) => <FeatureGroup startOpen={false} group={group} />)}
+            </table>
+          </div>
+
+          <div class={s.freePlanReminder} data-datocms-nomd>
+            We also offer a <strong>100% free plan</strong>. No overages allowed.{' '}
+            <a href="#free-plan-details">See all limits in detail</a>
+          </div>
+        </Wrapper>
+      </pricing-context-provider>
+
+      <Space top={3}>
+        <InterstitialTitle>Frequently Asked Questions</InterstitialTitle>
+        <Wrapper>
+          <Faqs>
+            {
+              faqs.map((faq) => (
+                <Faq question={faq.question}>
+                  <Prose>
+                    <Text
+                      {...ensureValidStructuredTextProps({
+                        data: faq.answer,
+                        linkToRecordComponents: defaultLinkToRecordComponents,
+                        inlineRecordComponents: defaultInlineRecordComponents,
+                      })}
+                    />
+                  </Prose>
+                </Faq>
+              ))
+            }
+          </Faqs>
+        </Wrapper>
       </Space>
 
-      <Wrapper>
-        <div class={s.fTableScroll}>
-          <a class={s.fTableAnchor} id="detailsTable"></a>
-          <table class={s.fTable} data-details-table>
-            <thead>
-              <th class={s.fTableHead}>
-                <div class={s.fTableHeadTitle}>Features by plan</div>
+      <div data-datocms-nomd>
+        <Space top={2}>
+          <LogosBar
+            title="We power experiences for over half a billion users"
+            clients={[
+              'svg/logos/deutsche-telekom',
+              'svg/logos/hashicorp',
+              'svg/logos/verizon',
+              'svg/logos/polestar',
+              'svg/logos/vercel',
+            ]}
+          />
+        </Space>
+      </div>
 
-                <div class={s.searchFeatures}>
-                  <Svg name="icons/regular/search" />
-                  <input type="text" name="searchTerm" placeholder="Search something..." />
-
-                  <button type="button" id="clearSearchTerm">
-                    <Svg name="icons/regular/times" />
-                  </button>
-                </div>
-
-                <Switch name="onlyShowDifferences">Only show differences</Switch>
-              </th>
-              <th class={s.fTablePlan}>
-                <div class={s.fTablePlanName}>Professional</div>
-                <div class={s.fTablePlanPrice}>
-                  From €{formatNumber(149)}/month
-                </div>
-                <Button
-                  block
-                  s="invert"
-                  as="a"
-                  p="tiny"
-                  href={dashboardUrl(
-                    '/personal-account/plan-billing/change?plan_id=899&utm_source=datocms&utm_medium=website&utm_campaign=pricing',
-                  )}
-                >
-                  Purchase now
-                </Button>
-              </th>
-              <th class={s.fTablePlan}>
-                <div class={s.fTablePlanName}>Enterprise</div>
-                <div class={s.fTablePlanPrice}>Tailored on your needs</div>
-                <Button block p="tiny" s="invert" as="a" href="/contact"> Contact us </Button>
-              </th>
-            </thead>
-            <LimitsGroup freePlan={freePlan} proPlan={proPlan} hints={hints} />
-
-            {planFeatureGroups.map((group) => <FeatureGroup startOpen={false} group={group} />)}
-          </table>
-        </div>
-
-        <div class={s.freePlanReminder}>
-          We also offer a <strong>100% free plan</strong>. No overages allowed.{' '}
-          <a href="#free-plan-details">See all limits in detail</a>
-        </div>
-      </Wrapper>
-    </pricing-context-provider>
-
-    <Space top={3}>
-      <InterstitialTitle>Frequently Asked Questions</InterstitialTitle>
-      <Wrapper>
-        <Faqs>
-          {
-            faqs.map((faq) => (
-              <Faq question={faq.question}>
-                <Prose>
-                  <Text
-                    {...ensureValidStructuredTextProps({
-                      data: faq.answer,
-                      linkToRecordComponents: defaultLinkToRecordComponents,
-                      inlineRecordComponents: defaultInlineRecordComponents,
-                    })}
-                  />
-                </Prose>
-              </Faq>
-            ))
-          }
-        </Faqs>
-      </Wrapper>
+      {
+        review1 && (
+          <div data-datocms-nomd>
+            <SingleQuote quote={review1} />
+          </div>
+        )
+      }
     </Space>
 
-    <Space top={2}>
-      <LogosBar
-        title="We power experiences for over half a billion users"
-        clients={[
-          'svg/logos/deutsche-telekom',
-          'svg/logos/hashicorp',
-          'svg/logos/verizon',
-          'svg/logos/polestar',
-          'svg/logos/vercel',
-        ]}
-      />
-    </Space>
-
-    {review1 && <SingleQuote quote={review1} />}
-  </Space>
-
-  <DraftModeQueryListener query={query} />
-
-  <dialog class={s.modal} id="free-plan-details" slot="unwrapped">
-    <button class={s.modalClose} autofocus aria-label="Close dialog">
-      <Svg name="icons/regular/times-circle" />
-    </button>
-    <div class={s.modalTitle}>Free vs Professional</div>
-    <div class={s.modalWarning}>
-      ⚠️{' '}
-      <strong>In the Free plan, you can&apos;t go over the allowed monthly limits.</strong><br />
-      If you reach these limits, the service will stop responding as expected.
-    </div>
-    <div class={s.fTableScroll}>
-      <FreeLimitsTable hints={hints} freePlan={freePlan} proPlan={proPlan} />
-    </div>
-  </dialog>
+    <DraftModeQueryListener query={query} />
+  </div>
 
   <script>
     import { WebComponent } from '~/lib/WebComponent';

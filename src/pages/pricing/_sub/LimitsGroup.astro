@@ -53,7 +53,12 @@ const { proPlan, hints } = Astro.props;
 
     return (
       <>
-        <tr class={s.fTableGroup} data-header-for-group={`limits-${groupIndex}`} data-open>
+        <tr
+          class={s.fTableGroup}
+          data-header-for-group={`limits-${groupIndex}`}
+          data-open
+          data-datocms-nomd
+        >
           <td colspan={3}>
             <Svg name="icons/regular/chevron-down" class={s.fTableGroupIcon} data-show-if="open" />
             <Svg
@@ -84,13 +89,15 @@ const { proPlan, hints } = Astro.props;
                 <div class={s.fTableFeatureNameSplit}>
                   <div class={s.fTableFeatureNameName}>{hint.name}</div>
                   {hint.description && (
-                    <Tooltip
-                      class={s.fTableFeatureNameInfo}
-                      tooltipClass={s.fTableFeatureNameInfoHint}
-                    >
-                      <Svg name="icons/regular/info-circle" />
-                      <div slot="tooltip">{hint.description}</div>
-                    </Tooltip>
+                    <span data-datocms-nomd>
+                      <Tooltip
+                        class={s.fTableFeatureNameInfo}
+                        tooltipClass={s.fTableFeatureNameInfoHint}
+                      >
+                        <Svg name="icons/regular/info-circle" />
+                        <div slot="tooltip">{hint.description}</div>
+                      </Tooltip>
+                    </span>
                   )}
                 </div>
               </th>

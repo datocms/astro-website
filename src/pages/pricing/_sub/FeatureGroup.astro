@@ -16,7 +16,12 @@ type Props = {
 const { group, startOpen } = Astro.props;
 ---
 
-<tr class={s.fTableGroup} data-header-for-group={group.id} data-open={startOpen || undefined}>
+<tr
+  class={s.fTableGroup}
+  data-header-for-group={group.id}
+  data-open={startOpen || undefined}
+  data-datocms-nomd
+>
   <td colspan={3}>
     <Svg name="icons/regular/chevron-down" class={s.fTableGroupIcon} data-show-if="open" />
     <Svg name="icons/regular/chevron-right" class={s.fTableGroupIcon} data-show-if="closed" />
@@ -36,15 +41,17 @@ const { group, startOpen } = Astro.props;
         <div class={s.fTableFeatureNameSplit}>
           <div class={s.fTableFeatureNameName}>{feature.name} </div>
           {feature.description && (
-            <Tooltip class={s.fTableFeatureNameInfo} tooltipClass={s.fTableFeatureNameInfoHint}>
-              <Svg name="icons/regular/info-circle" />
-              <div slot="tooltip">
-                <InlineText {...ensureValidStructuredTextProps({ data: feature.description })} />
-                <div style={{ display: 'none' }}>
-                  Related to: {group.name}, {(feature.tags as string[]).join(', ')}
+            <span data-datocms-nomd>
+              <Tooltip class={s.fTableFeatureNameInfo} tooltipClass={s.fTableFeatureNameInfoHint}>
+                <Svg name="icons/regular/info-circle" />
+                <div slot="tooltip">
+                  <InlineText {...ensureValidStructuredTextProps({ data: feature.description })} />
+                  <div style={{ display: 'none' }}>
+                    Related to: {group.name}, {(feature.tags as string[]).join(', ')}
+                  </div>
                 </div>
-              </div>
-            </Tooltip>
+              </Tooltip>
+            </span>
           )}
         </div>
       </th>
