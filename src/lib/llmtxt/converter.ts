@@ -541,6 +541,23 @@ function configureTurndownService(settings: ConversionOptions): TurndownService 
     },
   });
 
+  // Compare-page "take" <dd>: when a description-list pair carries a
+  // data-compare-product attribute, collapse it into a single
+  // bold-prefixed paragraph so each side reads as "**Product:** text".
+  // Must be registered AFTER definitionDescription so turndown picks this
+  // more specific rule first.
+  turndownService.addRule('compareProductTake', {
+    filter: function (node) {
+      return node.nodeName === 'DD' && node.hasAttribute('data-compare-product');
+    },
+    replacement: function (content, node) {
+      const product = (node as HTMLElement).getAttribute('data-compare-product') || '';
+      const trimmed = content.trim();
+      if (!trimmed) return '';
+      return `\n\n**${product}:** ${trimmed}\n\n`;
+    },
+  });
+
   // Add details/summary support (expandable/collapsible sections)
   turndownService.addRule('details', {
     filter: function (node) {
