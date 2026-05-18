@@ -31,83 +31,87 @@ if (!page) {
 ---
 
 <Layout noFinalCta seo={page.seo}>
-  <Space top={2}>
-    <Wrapper>
-      <div class={s.grid}>
-        <div class={s.content}>
-          <div class={s.titleWrapper}>
-            <h1 class={s.title}>{page.title}</h1>
-            <span class={s.badge}>Enterprise integration</span>
-          </div>
-          <h3 class={s.subtitle}>{page.description}</h3>
-          <Space top={1}>
-            <div class={s.ctaMobile}>
-              <Button as="a" href="/contact" target="_blank" fs="small">
-                Request activation
-              </Button>
+  <div id="main-content">
+    <Space top={2}>
+      <Wrapper>
+        <div class={s.grid}>
+          <div class={s.content}>
+            <div class={s.titleWrapper}>
+              <h1 class={s.title}>{page.title}</h1>
+              <span class={s.badge} data-datocms-nomd>Enterprise integration</span>
             </div>
-          </Space>
-          {
-            page.gallery.length && (
-              <Space top={1}>
-                <Carousel buttonsY="50%">
-                  {page.gallery.map(
-                    (item) =>
-                      item.responsiveImage && (
-                        <div class={s.slide}>
-                          <ResponsiveImage data={item.responsiveImage} />
-                        </div>
-                      ),
-                  )}
-                </Carousel>
-              </Space>
-            )
-          }
-          <Space top={1}>
-            <Prose>
-              <Text
-                {...ensureValidStructuredTextProps({
-                  data: page.content,
-                  blockComponents: {
-                    ImageRecord: Image,
-                    InternalVideoRecord: InternalVideo,
-                    VideoRecord: Video,
-                  },
-                  linkToRecordComponents: defaultLinkToRecordComponents,
-                  inlineRecordComponents: defaultInlineRecordComponents,
-                })}
-              />
-            </Prose>
-          </Space>
+            <h3 class={s.subtitle}>{page.description}</h3>
+            <Space top={1}>
+              <div class={s.ctaMobile} data-datocms-nomd>
+                <Button as="a" href="/contact" target="_blank" fs="small">
+                  Request activation
+                </Button>
+              </div>
+            </Space>
+            {
+              page.gallery.length && (
+                <Space top={1}>
+                  <div data-datocms-nomd>
+                    <Carousel buttonsY="50%">
+                      {page.gallery.map(
+                        (item) =>
+                          item.responsiveImage && (
+                            <div class={s.slide}>
+                              <ResponsiveImage data={item.responsiveImage} />
+                            </div>
+                          ),
+                      )}
+                    </Carousel>
+                  </div>
+                </Space>
+              )
+            }
+            <Space top={1}>
+              <Prose>
+                <Text
+                  {...ensureValidStructuredTextProps({
+                    data: page.content,
+                    blockComponents: {
+                      ImageRecord: Image,
+                      InternalVideoRecord: InternalVideo,
+                      VideoRecord: Video,
+                    },
+                    linkToRecordComponents: defaultLinkToRecordComponents,
+                    inlineRecordComponents: defaultInlineRecordComponents,
+                  })}
+                />
+              </Prose>
+            </Space>
+          </div>
+
+          <aside class={s.aside} data-datocms-nomd>
+            <div class={s.asideContentDesktop}>
+              <Card title={page.title} background="pink" svgLogo={page.logo}>
+                {page.shortDescription}
+                <Fragment slot="below">
+                  <div class={s.cardCta}>
+                    <Button as="a" href="/contact" target="_blank" fs="small" block>
+                      Request activation
+                    </Button>
+                  </div>
+                </Fragment>
+              </Card>
+
+              <div class={s.publisher}>
+                <h4>Publisher</h4>
+                <article>
+                  <div class={s.publisherIcon}>
+                    <Svg name="svg/datocms/icon/color/color_d_icon" />
+                  </div>
+                  <p>DatoCMS</p>
+                </article>
+              </div>
+            </div>
+          </aside>
         </div>
-
-        <aside class={s.aside}>
-          <div class={s.asideContentDesktop}>
-            <Card title={page.title} background="pink" svgLogo={page.logo}>
-              {page.shortDescription}
-              <Fragment slot="below">
-                <div class={s.cardCta}>
-                  <Button as="a" href="/contact" target="_blank" fs="small" block>
-                    Request activation
-                  </Button>
-                </div>
-              </Fragment>
-            </Card>
-
-            <div class={s.publisher}>
-              <h4>Publisher</h4>
-              <article>
-                <div class={s.publisherIcon}>
-                  <Svg name="svg/datocms/icon/color/color_d_icon" />
-                </div>
-                <p>DatoCMS</p>
-              </article>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </Wrapper>
-  </Space>
+      </Wrapper>
+    </Space>
+  </div>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>
