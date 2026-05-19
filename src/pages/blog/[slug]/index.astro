@@ -25,7 +25,7 @@ import { Wrapper } from '~/components/Wrapper';
 import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { filterNodes } from '~/lib/datocms/filterNodes';
-import { formatDate } from '~/lib/formatters';
+import LLMDate from '~/components/LLMDate/Component.astro';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { slugify } from '~/lib/slugify';
 import { query, siblingsQuery } from './_graphql';
@@ -130,7 +130,7 @@ const markdownUrl = new URL(
           </div>
           <p>
             Posted on{' '}
-            {post._firstPublishedAt ? formatDate(post._firstPublishedAt) : '???'}{' '}
+            {post._firstPublishedAt ? <LLMDate date={post._firstPublishedAt} /> : '???'}{' '}
             by{' '}
             {
               post.author.map((author, i) => (
@@ -204,7 +204,7 @@ const markdownUrl = new URL(
             <Fragment slot="image">
               <ResponsiveImage data={previous.coverImage.responsiveImage} />
             </Fragment>
-            {previous._firstPublishedAt ? formatDate(previous._firstPublishedAt) : '???'}
+            {previous._firstPublishedAt ? <LLMDate date={previous._firstPublishedAt} /> : '???'}
           </Card>
         )}
         {next && (
@@ -218,7 +218,7 @@ const markdownUrl = new URL(
             <Fragment slot="image">
               <ResponsiveImage data={next.coverImage.responsiveImage} />
             </Fragment>
-            {next._firstPublishedAt ? formatDate(next._firstPublishedAt) : '???'}
+            {next._firstPublishedAt ? <LLMDate date={next._firstPublishedAt} /> : '???'}
           </Card>
         )}
       </SameLevelNavigation>

@@ -667,6 +667,17 @@ function configureTurndownService(settings: ConversionOptions): TurndownService 
     },
   });
 
+  // Replace <time data-datocms-llm-date> with ISO-based marker
+  turndownService.addRule('llmDate', {
+    filter: function (node) {
+      return node.nodeName === 'TIME' && node.hasAttribute('data-datocms-llm-date');
+    },
+    replacement: function (_content, node) {
+      const iso = (node as HTMLElement).getAttribute('datetime') || '';
+      return `[date: ${iso}]`;
+    },
+  });
+
   return turndownService;
 }
 

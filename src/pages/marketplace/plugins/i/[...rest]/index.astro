@@ -10,7 +10,7 @@ import { Announce } from '~/components/pluginToolkit/Announce';
 import { Space } from '~/components/Space';
 import { VideoPlayer } from '~/components/VideoPlayer';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { formatDate } from '~/lib/formatters';
+import LLMDate from '~/components/LLMDate/Component.astro';
 import { getGravatarUrl } from '~/lib/gravatar';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
@@ -147,7 +147,7 @@ const avatarUrl = getGravatarUrl(page.author.email);
 
             <div class={s.info}>
               <h4>Last update</h4>
-              <p>{formatDate(page.lastUpdate)}</p>
+              <p><LLMDate date={page.lastUpdate} /></p>
             </div>
           </div>
         </aside>

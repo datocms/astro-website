@@ -6,7 +6,7 @@ import { Svg } from '~/components/Svg';
 import { Search } from './Search';
 import { Feedback } from './Feedback';
 import { TargetToggler } from '~/components/TargetToggler';
-import { formatDate } from '~/lib/formatters';
+import LLMDate from '~/components/LLMDate/Component.astro';
 
 type Props = {
   seo: TitleMetaLinkTag[];
@@ -58,7 +58,13 @@ const ContentWrapper = contentWrapperComponent || 'div';
       <ContentWrapper>
         <div class={s.container} transition:animate="slide">
           <slot />
-          {lastUpdatedAt && <p class={s.lastUpdate}>Last updated: {formatDate(lastUpdatedAt)}</p>}
+          {
+            lastUpdatedAt && (
+              <p class={s.lastUpdate}>
+                Last updated: <LLMDate date={lastUpdatedAt} />
+              </p>
+            )
+          }
           <div class={s.footer} data-datocms-noindex>
             <div class={s.footerCol}>
               <div class={s.footerTitle}>Did this doc help you?</div>

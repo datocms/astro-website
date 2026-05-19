@@ -7,7 +7,7 @@ import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { perPage, query } from './_graphql';
-import { formatDate } from '~/lib/formatters';
+import LLMDate from '~/components/LLMDate/Component.astro';
 import s from './_style.module.css';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
@@ -56,7 +56,7 @@ if (!page || posts.length === 0) {
             <div class={s.changelogEntryTitle}>{latestChangelogEntry.title}</div>
             <div class={s.changelogEntryDate}>
               {latestChangelogEntry._firstPublishedAt ? (
-                formatDate(latestChangelogEntry._firstPublishedAt)
+                <LLMDate date={latestChangelogEntry._firstPublishedAt} />
               ) : (
                 <>Not published yet</>
               )}
@@ -93,7 +93,7 @@ if (!page || posts.length === 0) {
                 <div class={s.footer}>
                   <div class={s.date}>
                     Posted on{' '}
-                    {post._firstPublishedAt ? formatDate(post._firstPublishedAt) : <>???</>}
+                    {post._firstPublishedAt ? <LLMDate date={post._firstPublishedAt} /> : <>???</>}
                   </div>
                 </div>
               </div>
