@@ -12,7 +12,11 @@ import { createCodePlugin } from '@streamdown/code';
 
 import s from '../../style.module.css';
 import { streamAskAi } from '../../apis/ask';
+import { useSearch } from '../../context';
 import { Thinking } from './Thinking';
+
+import thumbsUpIcon from '~/icons/regular/thumbs-up.svg?raw';
+import thumbsDownIcon from '~/icons/regular/thumbs-down.svg?raw';
 
 const codePlugin = createCodePlugin({ themes: ['github-light', 'github-light'] });
 
@@ -43,7 +47,13 @@ function renderLink(href: string | undefined, children: React.ReactNode) {
 }
 
 type AiState = 'streaming' | 'done' | 'error';
-type Turn = { role: 'user' | 'assistant'; content: string; reasoning?: string };
+type Sentiment = 'up' | 'down';
+type Turn = {
+  role: 'user' | 'assistant';
+  content: string;
+  reasoning?: string;
+  feedback?: Sentiment;
+};
 
 export type AskAiHandle = {
   submit: (question: string) => void;
@@ -54,6 +64,9 @@ type Props = {
 };
 
 export const AskAi = forwardRef<AskAiHandle, Props>(function AskAi({ initialQuestion }, ref) {
+  const {
+    telemetry: { posthogReady, trackAiQuestion, trackAiFeedback },
+  } = useSearch();
   const [turns, setTurns] = useState<Turn[]>([]);
   const [aiState, setAiState] = useState<AiState>('streaming');
   const [aiError, setAiError] = useState<string>('');
@@ -103,6 +116,8 @@ export const AskAi = forwardRef<AskAiHandle, Props>(function AskAi({ initialQues
 
     const baseTurns = turnsRef.current;
     const userTurn: Turn = { role: 'user', content: question };
+    const turnIndex = baseTurns.length;
+    trackAiQuestion({ turn_index: turnIndex });
     updateTurns([...baseTurns, userTurn, { role: 'assistant', content: '' }]);
     setAiState('streaming');
     setAiError('');
@@ -168,6 +183,15 @@ export const AskAi = forwardRef<AskAiHandle, Props>(function AskAi({ initialQues
     -1,
   );
 
+  const submitFeedback = (turnIndex: number, sentiment: Sentiment) => {
+    const current = turnsRef.current;
+    const turn = current[turnIndex];
+    if (!turn || turn.role !== 'assistant' || turn.feedback) return;
+    updateTurns(current.map((t, i) => (i === turnIndex ? { ...t, feedback: sentiment } : t)));
+    const question = sentiment === 'down' ? current[turnIndex - 1]?.content : undefined;
+    trackAiFeedback({ turn_index: turnIndex, sentiment, question });
+  };
+
   return (
     <div className={s.conversation} ref={conversationRef}>
       {turns.map((turn, i) => {
@@ -210,6 +234,42 @@ export const AskAi = forwardRef<AskAiHandle, Props>(function AskAi({ initialQues
             >
               {turn.content}
             </Streamdown>
+            {posthogReady &&
+              turn.content &&
+              !(i === lastAssistantTurnIndex && aiState === 'streaming') && (
+                <div className={s.feedbackRow} data-state={turn.feedback ? 'done' : 'prompt'}>
+                  <div className={s.feedbackPrompt}>
+                    <span className={s.feedbackLabel}>Was this helpful?</span>
+                    <button
+                      type="button"
+                      className={s.feedbackButton}
+                      aria-label="Helpful"
+                      onClick={() => submitFeedback(i, 'up')}
+                    >
+                      <span
+                        className={s.feedbackButtonIcon}
+                        dangerouslySetInnerHTML={{ __html: thumbsUpIcon }}
+                      />
+                      Yes
+                    </button>
+                    <button
+                      type="button"
+                      className={s.feedbackButton}
+                      aria-label="Not helpful"
+                      onClick={() => submitFeedback(i, 'down')}
+                    >
+                      <span
+                        className={s.feedbackButtonIcon}
+                        dangerouslySetInnerHTML={{ __html: thumbsDownIcon }}
+                      />
+                      No
+                    </button>
+                  </div>
+                  <div className={s.feedbackThanks} aria-live="polite">
+                    Thank you for your feedback!
+                  </div>
+                </div>
+              )}
           </div>
         );
       })}

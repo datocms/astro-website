@@ -1157,6 +1157,122 @@ a.linkPill {
   }
 }
 
+/* === AI answer feedback row === */
+
+.feedbackRow {
+  position: relative;
+  margin-top: 16px;
+  min-height: 28px;
+  animation: feedbackRowIn 220ms var(--ease-out) both;
+}
+
+@keyframes feedbackRowIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+}
+
+.feedbackPrompt,
+.feedbackThanks {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
+  font-size: 13px;
+  color: var(--light-body-color);
+  transition-property: opacity, transform;
+  transition-duration: 200ms;
+  transition-timing-function: var(--search-ease-spring);
+}
+
+.feedbackThanks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.feedbackRow[data-state='prompt'] .feedbackPrompt {
+  opacity: 1;
+  transform: none;
+}
+
+.feedbackRow[data-state='prompt'] .feedbackThanks {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.feedbackRow[data-state='done'] .feedbackPrompt {
+  opacity: 0;
+  transform: translateY(-2px);
+  pointer-events: none;
+}
+
+.feedbackRow[data-state='done'] .feedbackThanks {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.feedbackLabel {
+  margin-right: 8px;
+}
+
+.feedbackButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: var(--search-r-sm);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  color: var(--light-body-color);
+  transition-property: background-color, color, scale;
+  transition-duration: 150ms;
+  transition-timing-function: ease-out;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: var(--light-bg-color);
+      color: var(--body-color);
+    }
+  }
+
+  &:active {
+    scale: 0.96;
+  }
+}
+
+.feedbackButtonIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    color: currentColor;
+    fill: currentColor;
+    display: block;
+  }
+}
+
 .ticker {
   margin-top: 10px;
   display: flex;
@@ -1293,6 +1409,10 @@ a.linkPill {
   .skeleton::after,
   .disclaimer,
   .disclaimerClose,
+  .feedbackRow,
+  .feedbackPrompt,
+  .feedbackThanks,
+  .feedbackButton,
   .tickerTrack {
     transform: none !important;
     scale: 1 !important;

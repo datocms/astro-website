@@ -70,27 +70,26 @@ export type GoToEntry = { label: string; url: string };
 export const goToEntries: GoToEntry[] = [
   { label: 'General Concepts', url: '/docs/general-concepts' },
   { label: 'Content Modelling', url: '/docs/content-modelling' },
-  { label: 'Content Delivery API', url: '/docs/content-delivery-api' },
-  { label: 'Content Management API', url: '/docs/content-management-api' },
-  { label: 'Next.js quickstart', url: '/docs/next-js' },
+  { label: 'Content Delivery API (CDA)', url: '/docs/content-delivery-api' },
+  { label: 'Content Management API (CMA)', url: '/docs/content-management-api' },
   { label: 'Plugin SDK', url: '/docs/plugin-sdk/introduction' },
-  { label: 'Plans & Billing', url: '/docs/plans-pricing-and-billing' },
+  { label: 'Next.js quickstart', url: '/docs/next-js' },
 ];
 
 export const searchStarterPrompts = [
-  'GraphQL Content Delivery API',
-  'Next.js quickstart',
+  'Visual Editing',
   'Structured Text',
   'Modular content',
-  'Draft mode and previews',
+  'Cache Tags',
   'Plugin SDK',
+  'MCP Server',
 ];
 
 export const aiStarterPrompts = [
   'How do I fetch content from DatoCMS?',
-  'How do I set up Next.js with DatoCMS?',
-  'How do I model my content?',
-  'How do I upload images and videos?',
-  'How do I configure draft and preview?',
-  'How do I create a custom plugin?',
+  'How can I optimize my website cache?',
+  "What's the difference between a model and a block?",
+  'What a DatoCMS plugin can offer?',
+  'Can I offer click-to-edit experience to my editors, straight from the site?',
+  "What is a DatoCMS environment, and why it's useful?",
 ];

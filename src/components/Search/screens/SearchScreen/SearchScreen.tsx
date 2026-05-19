@@ -27,6 +27,7 @@ export function SearchScreen() {
   const {
     state: { searchInput },
     actions: { setSearchInput },
+    telemetry: { trackSearchQuery },
   } = useSearch();
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -66,14 +67,14 @@ export function SearchScreen() {
       .then((res) => {
         setResults(res);
         setIsLoading(false);
-        if ('posthog' in window) (window as any).posthog.capture('docs_search');
+        trackSearchQuery({ group: selectedGroup, result_count: res.length });
       })
       .catch((error) => {
         if ((error as Error)?.name === 'AbortError') return;
         setIsLoading(false);
       });
     return () => controller.abort();
-  }, [debouncedSearchTerm, selectedGroup, isQueryLongEnough]);
+  }, [debouncedSearchTerm, selectedGroup, isQueryLongEnough, trackSearchQuery]);
 
   useEffect(() => {
     if (!isQueryLongEnough) {
