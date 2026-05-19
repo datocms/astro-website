@@ -2,16 +2,34 @@
 import type { JsonSchemaObjectAnalysis } from '../analyzeSchemaProperties';
 import { ExpandablePane } from '../ExpandablePane';
 import { JsonSchemaPropertyAnalysis } from './JsonSchemaPropertyAnalysis';
+import { objectAnalysisToMarkdown } from '../objectAnalysisToMarkdown';
 
 type Props = {
   object: JsonSchemaObjectAnalysis;
   showRequiredOptional?: boolean;
+  /**
+   * Top-level invocations emit a hidden markdown twin for the .md endpoint.
+   * Nested invocations (from `moreInfo`) opt out, since their content is
+   * already covered by the outer markdown render.
+   */
+  emitMarkdown?: boolean;
 };
 
-const { object, showRequiredOptional = true } = Astro.props;
+const { object, showRequiredOptional = true, emitMarkdown = true } = Astro.props;
+
+const rawMarkdown = emitMarkdown
+  ? await objectAnalysisToMarkdown(object, {
+      showRequiredOptional,
+      baseUrl: Astro.url.href,
+    })
+  : null;
+
+// Inside <script>, `</script>` would close the element prematurely.
+// The converter unescapes the matching `<\/script>` back when reading.
+const markdown = rawMarkdown?.replace(/<\/script>/gi, '<\\/script>');
 ---
 
-<prose-island>
+<prose-island data-datocms-nomd>
   {
     object.regular.map((property) => (
       <JsonSchemaPropertyAnalysis property={property} showRequiredOptional={showRequiredOptional} />
@@ -31,3 +49,4 @@ const { object, showRequiredOptional = true } = Astro.props;
     )
   }
 </prose-island>
+{markdown && <script type="text/markdown" is:inline set:html={markdown} />}

@@ -54,16 +54,28 @@ export function convertHtmlToMarkdown(
   // Extract content based on scope
   const content: HTMLElement = extractMainContent(document);
 
+  // Rewrite elements carrying data-datocms-as-tag to the requested tag,
+  // so downstream cleanup and turndown rules treat them as that tag.
+  applyAsTagOverrides(content);
+
   // Clean the content before conversion
   cleanContent(content, settings);
 
   // Make URLs absolute
   makeUrlsAbsolute(content, url);
 
+  // Lift <script type="text/markdown"> bodies out of the DOM before turndown
+  // runs. Turndown's own `collapseWhitespace` pre-pass would otherwise
+  // collapse newlines inside the rawtext body — and that pass fires before
+  // any custom rule can intercept the node.
+  const placeholders = extractPreRenderedMarkdown(content);
+
   // Convert to Markdown using TurndownService
   const turndownService = configureTurndownService(settings);
 
   let markdown = turndownService.turndown(content);
+
+  markdown = restorePreRenderedMarkdown(markdown, placeholders);
 
   if (!markdown || markdown.trim() === '') {
     throw new Error('Conversion resulted in empty markdown');
@@ -229,6 +241,62 @@ function extractMainContent(document: Document): HTMLElement {
 }
 
 /**
+ * Pull each `<script type="text/markdown">` out of the DOM and replace it
+ * with a placeholder div whose only content is a unique token. The token
+ * survives turndown verbatim; we substitute the stored markdown back in
+ * after turndown has run. This bypasses turndown's `collapseWhitespace`
+ * pre-pass, which would otherwise eat the newlines inside the rawtext body.
+ */
+function extractPreRenderedMarkdown(content: HTMLElement): Map<string, string> {
+  const placeholders = new Map<string, string>();
+  const scripts = content.querySelectorAll('script[type="text/markdown"]');
+  scripts.forEach((script, i) => {
+    const token = `LLMTXTMDPLACEHOLDER${i}${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+    const raw = script.textContent ?? '';
+    // Reverse the `</script>` -> `<\/script>` escape applied at emit time
+    // (needed so the closer doesn't end the rawtext element prematurely).
+    placeholders.set(token, raw.replace(/<\\\/script>/gi, '</script>').trim());
+    const placeholder = content.ownerDocument.createElement('div');
+    placeholder.textContent = token;
+    script.parentNode?.replaceChild(placeholder, script);
+  });
+  return placeholders;
+}
+
+function restorePreRenderedMarkdown(markdown: string, placeholders: Map<string, string>): string {
+  let result = markdown;
+  for (const [token, md] of placeholders) {
+    result = result.replace(token, `\n\n${md}\n\n`);
+  }
+  return result;
+}
+
+/**
+ * Replace elements that declare `data-datocms-as-tag="<tag>"` with a new
+ * element of the requested tag, preserving children and other attributes.
+ */
+function applyAsTagOverrides(content: HTMLElement): void {
+  const doc = content.ownerDocument;
+  const elements = Array.from(content.querySelectorAll('[data-datocms-as-tag]'));
+
+  for (const el of elements) {
+    const asTag = el.getAttribute('data-datocms-as-tag')?.trim().toLowerCase();
+    if (!asTag || asTag === el.tagName.toLowerCase()) {
+      el.removeAttribute('data-datocms-as-tag');
+      continue;
+    }
+
+    const replacement = doc.createElement(asTag);
+    for (const attr of Array.from(el.attributes)) {
+      if (attr.name === 'data-datocms-as-tag') continue;
+      replacement.setAttribute(attr.name, attr.value);
+    }
+    while (el.firstChild) replacement.appendChild(el.firstChild);
+    el.parentNode?.replaceChild(replacement, el);
+  }
+}
+
+/**
  * Clean the HTML content before conversion
  */
 function cleanContent(content: HTMLElement, _settings: ConversionOptions): void {
@@ -250,7 +318,7 @@ function cleanContent(content: HTMLElement, _settings: ConversionOptions): void 
 
   // Remove elements that shouldn't be included
   const elementsToRemove = [
-    'script',
+    'script:not([type="text/markdown"])',
     'style',
     'noscript',
     'iframe',
@@ -394,11 +462,30 @@ function normalizeWhitespace(content: HTMLElement): void {
 }
 
 /**
+ * Resolve an href against a base URL, and for same-origin docs paths without
+ * a file extension append `.md` (so internal cross-doc links point to the
+ * markdown twin). Returns the original href unchanged on parse failure.
+ */
+export function resolveDocsHref(href: string, baseUrl: string): string {
+  try {
+    const baseUrlObj = new URL(baseUrl);
+    const absoluteUrl = new URL(href, baseUrl);
+    if (absoluteUrl.origin === baseUrlObj.origin) {
+      const hasExtension = /\.[^/.]+$/.test(absoluteUrl.pathname);
+      if (!hasExtension) {
+        absoluteUrl.pathname = absoluteUrl.pathname + '.md';
+      }
+    }
+    return absoluteUrl.href;
+  } catch {
+    return href;
+  }
+}
+
+/**
  * Make all URLs in the content absolute
  */
 function makeUrlsAbsolute(content: HTMLElement, baseUrl: string): void {
-  const baseUrlObj = new URL(baseUrl);
-
   // Convert links
   const links = content.querySelectorAll('a[href]');
   links.forEach((link) => {
@@ -412,22 +499,7 @@ function makeUrlsAbsolute(content: HTMLElement, baseUrl: string): void {
         return;
       }
 
-      try {
-        const absoluteUrl = new URL(href, baseUrl);
-
-        // For internal links (same origin), add .md to the pathname
-        // unless the pathname already has a file extension
-        if (absoluteUrl.origin === baseUrlObj.origin) {
-          const hasExtension = /\.[^/.]+$/.test(absoluteUrl.pathname);
-          if (!hasExtension) {
-            absoluteUrl.pathname = absoluteUrl.pathname + '.md';
-          }
-        }
-
-        link.setAttribute('href', absoluteUrl.href);
-      } catch (e) {
-        // Invalid URL, keep as is
-      }
+      link.setAttribute('href', resolveDocsHref(href, baseUrl));
     }
   });
 }
