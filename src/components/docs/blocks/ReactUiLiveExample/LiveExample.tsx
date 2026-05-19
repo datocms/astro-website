@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import chevronDownIcon from '~/icons/regular/chevron-down.svg?raw';
 import plusIcon from '~/icons/regular/plus.svg?raw';
-import trashIcon from '~/icons/regular/trash.svg?raw';
+import trashIcon from '~/icons/regular/trash-can.svg?raw';
 import type { ReactUiLiveExample } from './utils';
 import * as SDK from 'datocms-react-ui';
 import { MDXRemote } from 'next-mdx-remote';

@@ -8,6 +8,7 @@ FROM node:22-alpine AS base
 
 ARG PUBLIC_HOSTNAME
 ARG RECAPTCHA_KEY
+ARG KNOWLEDGE_BASE_URL
 
 # Set the working directory for all subsequent operations
 WORKDIR /app
@@ -57,6 +58,7 @@ RUN --mount=type=secret,id=DATOCMS_API_TOKEN,env=DATOCMS_API_TOKEN \
 # Build the actual Astro standalone production server
 ENV RECAPTCHA_KEY=$RECAPTCHA_KEY
 ENV PUBLIC_HOSTNAME=$PUBLIC_HOSTNAME
+ENV KNOWLEDGE_BASE_URL=$KNOWLEDGE_BASE_URL
 RUN npm run build
 
 # ==== Runtime stage ====

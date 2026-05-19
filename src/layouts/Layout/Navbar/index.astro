@@ -23,6 +23,7 @@ import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { Image } from 'astro:assets';
 import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
+import { Search } from '~/components/Search';
 
 const isMarketplace = Astro.url.pathname.startsWith('/marketplace');
 
@@ -152,11 +153,17 @@ const sortedContinents = Object.fromEntries(
                 <Svg name="svg/datocms/icon-text/color/color_full_logo_alt" />
               </a>
 
-              <TargetToggler targetId="navbar-nav">
-                <button type="button" class={s.hamburger} aria-controls="navList">
-                  <Svg name="icons/regular/bars" />
-                </button>
-              </TargetToggler>
+              <div class={s.mobileActions}>
+                <div class={s.searchAction}>
+                  <Search client:idle variant="icon" />
+                </div>
+
+                <TargetToggler targetId="navbar-nav">
+                  <button type="button" class={s.hamburger} aria-controls="navList">
+                    <Svg name="icons/regular/bars" />
+                  </button>
+                </TargetToggler>
+              </div>
             </div>
 
             <div class={s.navList}>
@@ -429,6 +436,9 @@ const sortedContinents = Object.fromEntries(
             </div>
 
             <div class={s.navActions}>
+              <div class={s.searchAction} data-exclude-mobile>
+                <Search client:idle variant="icon" />
+              </div>
               <a href="/contact" class={s.navLink}>
                 Contact sales
               </a>

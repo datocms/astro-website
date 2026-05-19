@@ -1,0 +1,1291 @@
+:root {
+  --search-width: 768px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --search-ease-spring: cubic-bezier(0.2, 0, 0, 1);
+  --search-shadow-border:
+    0 0 0 1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.06),
+    0 2px 4px 0 rgba(0, 0, 0, 0.04);
+  --search-shadow-border-hover:
+    0 0 0 1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.08),
+    0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  --search-shadow-card:
+    0 0 0 1px rgba(0, 0, 0, 0.06), 0 8px 24px -8px rgba(0, 0, 0, 0.15),
+    0 24px 56px -12px rgba(0, 0, 0, 0.18);
+  --search-scrim: rgba(28, 28, 32, 0.45);
+  --search-warning-bg: #fff8f0;
+  --search-warning-border: #f4dfc4;
+  --search-warning-fg: #8a5a1e;
+  --search-error-fg: #c0392b;
+  --search-r-xs: 3px;
+  --search-r-sm: 4px;
+  --search-r-md: 8px;
+  --search-r-lg: 12px;
+  --search-r-pill: 999px;
+
+  /* Backdrop padding around the modal card. The top padding scales with the
+     viewport so the card sits visually anchored under the page header. */
+  --search-backdrop-padding-top: max(72px, 12vh);
+  --search-backdrop-padding-bottom: 16px;
+
+  /* Vertical space the card can occupy inside the backdrop. */
+  --search-card-available-height: calc(
+    100vh - var(--search-backdrop-padding-top) - var(--search-backdrop-padding-bottom)
+  );
+}
+
+/* === Trigger button === */
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  color: var(--light-body-color);
+  letter-spacing: inherit;
+  transition:
+    color 150ms ease,
+    box-shadow 150ms ease,
+    scale 160ms var(--ease-out);
+
+  /* Acts as a container so the kbd hint can hug the label on wide widths. */
+  container-type: inline-size;
+  container-name: searchTrigger;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      color: var(--body-color);
+    }
+  }
+
+  &:active {
+    scale: 0.98;
+  }
+}
+
+/* Sits inside the docs main header — borderless, fixed width, aligned to the
+   left of the row next to the page links. */
+.triggerDocs {
+  width: 100%;
+  max-width: var(--search-width);
+  height: 55px;
+  padding: 0 14px 0 30px;
+}
+
+/* Pseudo-input look — fills the container, no positioning. */
+.triggerInput {
+  width: 100%;
+  padding: 0.6em;
+  border-radius: var(--search-r-md);
+  border: 1px solid var(--border-color);
+  background: var(--base-bg-color);
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      border-color: var(--extra-light-body-color);
+    }
+  }
+}
+
+.triggerIconOnly {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--search-r-md);
+  cursor: pointer;
+  color: inherit;
+  font-family: inherit;
+  transition:
+    color 150ms ease,
+    scale 160ms var(--ease-out);
+
+  &:active {
+    scale: 0.96;
+  }
+}
+
+.triggerIconOnly .triggerIcon {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+}
+
+.triggerIconOnly .triggerIcon svg {
+  width: 20px;
+  height: 20px;
+  color: currentColor;
+  fill: currentColor;
+  display: block;
+}
+
+.triggerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  flex-shrink: 0;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: var(--light-body-color);
+    fill: currentColor;
+    display: block;
+  }
+}
+
+.triggerLabel {
+  flex: 1;
+  color: var(--light-body-color);
+}
+
+.triggerKbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+
+  kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: var(--search-r-sm);
+    border: 1px solid var(--border-color);
+    background: var(--light-bg-color);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--light-body-color);
+    line-height: 1;
+  }
+}
+
+/* On wide renderings, anchor the kbd hint next to the label instead of
+   floating it at the far right edge. Declared after the base rules so it
+   wins the cascade at equal specificity. */
+@container searchTrigger (min-width: 520px) {
+  .triggerLabel {
+    flex: 0 0 auto;
+  }
+
+  .triggerKbd {
+    margin-right: auto;
+  }
+}
+
+/* === Modal backdrop & card === */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--search-scrim);
+  -webkit-backdrop-filter: blur(6px) saturate(140%);
+  backdrop-filter: blur(6px) saturate(140%);
+  z-index: 11000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--search-backdrop-padding-bottom);
+  padding-top: var(--search-backdrop-padding-top);
+}
+
+.backdrop[data-state='open'] {
+  animation: backdropIn 150ms var(--ease-out);
+}
+
+.backdrop[data-state='closing'] {
+  animation: backdropOut 150ms var(--ease-out) forwards;
+}
+
+@keyframes backdropIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes backdropOut {
+  to {
+    opacity: 0;
+  }
+}
+
+.card {
+  width: 100%;
+  max-width: var(--search-width);
+  min-height: min(500px, var(--search-card-available-height));
+  max-height: var(--search-card-available-height);
+  background: var(--base-bg-color);
+  border-radius: var(--search-r-lg);
+  box-shadow: var(--search-shadow-card);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform-origin: top center;
+}
+
+/* On the AI streaming screen, fix the card to its max height so cardBody has
+   a stable flex-allocated size and the dynamic spacer can size itself in one
+   pass without the card growing with content. */
+.card:has(.conversation) {
+  height: calc(var(--search-card-available-height) - 60px);
+}
+
+.card[data-state='open'] {
+  animation: cardIn 180ms var(--search-ease-spring) both;
+}
+
+.card[data-state='closing'] {
+  animation: cardOut 150ms var(--ease-out) forwards;
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+}
+
+@keyframes cardOut {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.97) translateY(-4px);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.backButton {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  border-radius: var(--search-r-md);
+  cursor: pointer;
+  color: var(--light-body-color);
+  font-family: inherit;
+  flex-shrink: 0;
+  transition-property: background-color, color, scale;
+  transition-duration: 150ms;
+  transition-timing-function: ease-out;
+
+  /* Expanded hit area for keyboard / touch users */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: currentColor;
+    fill: currentColor;
+    display: block;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: var(--light-bg-color);
+      color: var(--body-color);
+    }
+  }
+
+  &:active {
+    scale: 0.96;
+  }
+}
+
+.cardHeaderTitle {
+  font-size: 16px;
+  color: var(--body-color);
+  font-weight: 600;
+  text-box: cap alphabetic;
+}
+
+/* === Input rows (top for home/docs, bottom for ai) === */
+
+.inputRow,
+.bottomInputRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  height: 52px;
+  flex-shrink: 0;
+}
+
+.inputRow {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.bottomInputRow {
+  border-top: 1px solid var(--border-color);
+}
+
+.inputIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  flex-shrink: 0;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: var(--light-body-color);
+    fill: currentColor;
+    display: block;
+  }
+}
+
+.inputRow input,
+.bottomInputRow input {
+  flex: 1;
+  color: var(--body-color);
+  font-size: 16px;
+  background: transparent;
+  outline: none;
+  appearance: none;
+  border: 0;
+  font-family: inherit;
+  height: 100%;
+  padding: 0;
+  text-box: cap alphabetic;
+
+  &::placeholder {
+    color: var(--light-body-color);
+    opacity: 1;
+  }
+
+  &::-webkit-search-cancel-button {
+    display: none;
+  }
+}
+
+/* === Card body (scrollable content area) === */
+
+.cardBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 16px;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  scrollbar-color: var(--border-color) transparent;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black 8px,
+    black calc(100% - 8px),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black 8px,
+    black calc(100% - 8px),
+    transparent 100%
+  );
+}
+
+.cardBodyEndAligned {
+  display: flex;
+  flex-direction: column;
+}
+
+.cardBodyEndAligned > :first-child {
+  margin-top: auto;
+}
+
+/* === Section label (DOCS, GO TO, EXAMPLES) === */
+
+.sectionLabel {
+  padding: 12px 4px 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--light-body-color);
+  text-transform: uppercase;
+}
+
+.sectionLabel:first-child {
+  padding-top: 6px;
+}
+
+/* === Home / starter / go-to rows === */
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: var(--search-r-md);
+  background: transparent;
+  color: var(--body-color);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  text-box: cap alphabetic;
+  transition:
+    scale 160ms var(--ease-out),
+    background-color 150ms ease,
+    color 150ms ease;
+
+  &:active {
+    scale: 0.99;
+  }
+}
+
+.rowSelected,
+.row:focus-visible {
+  background: var(--light-bg-color);
+  outline: none;
+
+  .rowIcon svg {
+    color: var(--accent-color);
+  }
+}
+
+.rowIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  flex-shrink: 0;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: var(--light-body-color);
+    fill: currentColor;
+    transition: color 150ms ease-out;
+    display: block;
+  }
+}
+
+.rowLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* === Disclaimer footer (ai screen) === */
+
+.disclaimer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--search-warning-bg);
+  border-top: 1px solid var(--search-warning-border);
+  color: var(--search-warning-fg);
+  font-size: 12px;
+  line-height: 1.45;
+  flex-shrink: 0;
+  overflow: hidden;
+  max-height: 160px;
+  transition:
+    max-height 220ms var(--ease-out),
+    opacity 180ms var(--ease-out),
+    padding-top 220ms var(--ease-out),
+    padding-bottom 220ms var(--ease-out),
+    border-top-color 220ms var(--ease-out);
+}
+
+.disclaimer[data-state='dismissing'] {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-top-color: transparent;
+}
+
+.disclaimerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--search-r-sm);
+  background: var(--search-warning-fg);
+  color: var(--base-bg-color);
+  flex-shrink: 0;
+
+  svg {
+    width: 11px;
+    height: 11px;
+    color: currentColor;
+    fill: currentColor;
+    display: block;
+  }
+}
+
+.disclaimerText {
+  flex: 1;
+  min-width: 0;
+}
+
+.disclaimerClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  background: transparent;
+  color: var(--search-warning-fg);
+  border-radius: var(--search-r-sm);
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.6;
+  transition:
+    opacity 150ms ease,
+    background-color 150ms ease,
+    scale 160ms var(--ease-out);
+
+  svg {
+    width: 10px;
+    height: 10px;
+    color: currentColor;
+    fill: currentColor;
+    display: block;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      opacity: 1;
+      background: rgba(138, 90, 30, 0.1);
+    }
+  }
+
+  &:active {
+    scale: 0.92;
+  }
+}
+
+/* === Source filter chips === */
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0 12px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.filterDivider {
+  flex-shrink: 0;
+  width: 1px;
+  height: 16px;
+  background: var(--border-color);
+  margin-left: auto;
+  margin-right: 4px;
+}
+
+.filterChip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: var(--search-r-pill);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--light-body-color);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  text-box: cap alphabetic;
+  transition:
+    scale 160ms var(--ease-out),
+    background-color 150ms ease,
+    color 150ms ease;
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: var(--light-bg-color);
+      color: var(--body-color);
+    }
+  }
+
+  &:active {
+    scale: 0.94;
+  }
+}
+
+.filterChipActive,
+.filterChipActive:hover {
+  background: var(--base-body-color);
+  color: #fff;
+}
+
+.filterChipIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    display: block;
+  }
+}
+
+/* === Search result items === */
+
+.result {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: var(--search-r-md);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  background: transparent;
+  animation: resultIn 220ms var(--ease-out) backwards;
+  animation-delay: calc(min(var(--i, 0), 4) * 32ms);
+  transition:
+    scale 160ms var(--ease-out),
+    background-color 150ms ease,
+    border-color 150ms ease;
+
+  svg {
+    width: 1em;
+    color: var(--light-body-color);
+    fill: currentColor;
+    transition: color 150ms var(--ease-out);
+    display: block;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background-color: var(--light-bg-color);
+      border-color: var(--accent-color);
+
+      svg {
+        color: var(--accent-color);
+      }
+    }
+  }
+
+  &.selected {
+    background-color: var(--light-bg-color);
+    border-color: var(--accent-color);
+
+    svg {
+      color: var(--accent-color);
+    }
+  }
+
+  &:active {
+    scale: 0.97;
+  }
+}
+
+@keyframes resultIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.resultTitle {
+  font-size: 15px;
+  font-weight: bold;
+  margin-top: 4px;
+  margin-right: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+    background: var(--light-bg-color);
+    border-radius: var(--search-r-xs);
+    padding: 1px 5px;
+  }
+}
+
+.resultBodyWrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.resultBlurb {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--light-body-color);
+  line-height: 1.2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  mark {
+    background: transparent;
+    color: var(--body-color);
+    font-weight: 600;
+  }
+}
+
+.resultArea {
+  font-weight: 600;
+  color: var(--light-body-color);
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.area {
+  margin-top: 4px;
+}
+
+.areaTitle {
+  padding: 8px 0 8px;
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--light-body-color);
+  text-transform: uppercase;
+}
+
+/* === Skeleton (loading) rows === */
+
+.skeleton {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
+  animation: skeletonFadeIn 180ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 32ms);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, hsla(0, 0%, 0%, 0.04) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: skeletonShimmer 1.4s linear infinite;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+
+.skeletonIcon {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--search-r-xs);
+  background: var(--light-bg-color);
+  flex-shrink: 0;
+}
+
+.skeletonBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.skeletonLine {
+  height: 11px;
+  border-radius: var(--search-r-xs);
+  background: var(--light-bg-color);
+}
+
+.skeletonLineTitle {
+  width: 45%;
+}
+
+.skeletonLineMeta {
+  width: 70%;
+  height: 9px;
+  opacity: 0.6;
+}
+
+@keyframes skeletonFadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.resultsDimmed {
+  opacity: 0.5;
+  transition: opacity 200ms var(--ease-out);
+}
+
+/* === Conversation (Q + streamed answer) === */
+
+.conversation {
+  padding: 8px 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.questionBubble {
+  align-self: flex-end;
+  max-width: 80%;
+  padding: 8px 14px;
+  border-radius: var(--search-r-lg) var(--search-r-lg) var(--search-r-sm) var(--search-r-lg);
+  background: var(--accent-color);
+  color: var(--base-bg-color);
+  word-break: break-word;
+  transform-origin: bottom right;
+  animation: questionBubbleIn 220ms var(--ease-out) both;
+}
+
+@keyframes questionBubbleIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.answer {
+  color: var(--body-color);
+
+  /* Hide streamdown's language-label header */
+  [data-streamdown='code-block-header'] {
+    display: none;
+  }
+
+  [data-streamdown='code-block-body'] {
+    margin: 0 0 0.8em;
+    border-radius: var(--search-r-sm);
+    overflow: hidden;
+
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-x: hidden;
+      margin: 0;
+    }
+
+    code > span {
+      display: block;
+    }
+
+    /* Apply shiki colors via the inline custom property streamdown sets */
+    code span {
+      color: var(--sdm-c, inherit);
+      background: var(--sdm-tbg, transparent);
+    }
+  }
+
+  p {
+    margin: 0 0 0.8em;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 0.8em;
+    padding-left: 1.4em;
+  }
+
+  li {
+    margin: 0.2em 0;
+  }
+
+  strong,
+  [data-streamdown='strong'] {
+    font-weight: 600;
+    color: var(--body-color);
+  }
+
+  code {
+    background: var(--light-bg-color);
+    border-radius: var(--search-r-xs);
+    padding: 1px 5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+  }
+
+  blockquote {
+    margin: 0 0 0.8em;
+    padding: 2px 0 2px 12px;
+    border-left: 3px solid var(--border-color);
+    color: var(--light-body-color);
+  }
+
+  blockquote > :last-child {
+    margin-bottom: 0;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    margin: 1.2em 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 0.8em;
+    font-size: 0.95em;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--border-color);
+    padding: 6px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--light-bg-color);
+    font-weight: 600;
+  }
+
+  pre {
+    background: var(--light-bg-color);
+    border-radius: var(--search-r-sm);
+    padding: 10px 12px;
+    overflow-x: auto;
+    margin: 0 0 0.8em;
+
+    code {
+      background: transparent;
+      padding: 0;
+    }
+  }
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--accent-color);
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0.8em 0 0.4em;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-size: 1.2em;
+  }
+  h2 {
+    font-size: 1.1em;
+  }
+  h3 {
+    font-size: 1em;
+  }
+}
+
+a.linkPill {
+  display: inline;
+  padding: 2px 4px;
+  font-size: 0.9em;
+  border-radius: var(--search-r-pill);
+  background: var(--light-bg-color);
+  color: var(--light-body-color);
+  border: 1px solid var(--border-color);
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--body-color);
+  }
+}
+
+/* === Thinking (reasoning) panel === */
+
+.thinking {
+  margin: 0 0 12px;
+  border-left: 2px solid var(--border-color);
+  padding-left: 10px;
+}
+
+.thinkingWindow {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--light-body-color);
+  max-height: calc(13px * 1.5 * 3);
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, transparent, black 50%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 50%);
+}
+
+.thinkingInner {
+  transition: transform 200ms var(--ease-out);
+
+  a {
+    color: inherit;
+  }
+
+  p {
+    margin: 0 0 0.6em;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 0.6em;
+    padding-left: 1.4em;
+  }
+
+  li {
+    margin: 0.15em 0;
+  }
+
+  code {
+    background: var(--light-bg-color);
+    border-radius: var(--search-r-xs);
+    padding: 1px 4px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+  }
+
+  strong,
+  [data-streamdown='strong'] {
+    font-weight: 600;
+    color: var(--body-color);
+  }
+
+  blockquote {
+    margin: 0 0 0.6em;
+    padding-left: 10px;
+    border-left: 2px solid var(--border-color);
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    margin: 0.8em 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 0.6em;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--border-color);
+    padding: 3px 6px;
+    text-align: left;
+  }
+}
+
+.ticker {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--light-body-color);
+}
+
+.tickerDots {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.tickerDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.3;
+  animation: tickerPulse 1.2s ease-in-out infinite;
+}
+
+.tickerDot:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.tickerDot:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+@keyframes tickerPulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+.tickerViewport {
+  display: block;
+  height: 1.5em;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+
+.tickerTrack {
+  display: block;
+  transition: transform 350ms var(--ease-in-out);
+  will-change: transform;
+}
+
+.tickerItem {
+  display: block;
+  height: 1.5em;
+  line-height: 1.5em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.errorLine {
+  margin: 8px 0 0;
+  color: var(--search-error-fg);
+  font-size: 15px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.statusLine {
+  padding: 16px 8px;
+  margin: 0;
+  color: var(--light-body-color);
+  font-size: 15px;
+}
+
+/* === Responsive — hide on narrow viewports === */
+
+@media (width < 1000px) {
+  .triggerDocs {
+    width: 100%;
+    height: 40px;
+    padding: 0 10px 0 12px;
+    gap: 10px;
+    border-radius: var(--search-r-md);
+    border: 1px solid var(--border-color);
+    background: var(--base-bg-color);
+  }
+
+  .triggerLabel {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .triggerKbd {
+    display: none;
+  }
+
+  .backdrop {
+    padding: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .card,
+  .questionBubble,
+  .result,
+  .filterChip,
+  .row,
+  .escalationRow,
+  .trigger,
+  .skeleton,
+  .skeleton::after,
+  .disclaimer,
+  .disclaimerClose,
+  .tickerTrack {
+    transform: none !important;
+    scale: 1 !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}

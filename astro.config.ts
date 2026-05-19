@@ -106,6 +106,10 @@ export default defineConfig({
         context: 'client',
         access: 'public',
       }),
+      KNOWLEDGE_BASE_URL: envField.string({
+        context: 'client',
+        access: 'public',
+      }),
       OPENAI_API_KEY: envField.string({
         context: 'server',
         access: 'secret',

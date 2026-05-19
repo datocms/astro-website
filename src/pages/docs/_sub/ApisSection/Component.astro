@@ -1,0 +1,86 @@
+---
+import { Code } from 'astro-expressive-code/components';
+import { APIS } from '../../_content';
+import s from './style.module.css';
+---
+
+<docs-api-switcher class={s.root}>
+  <div class={s.cards}>
+    {
+      APIS.map((api, i) => (
+        <a
+          href={api.href}
+          class={s.card}
+          data-api-index={i}
+          data-api-name={api.name}
+          data-api-endpoint={api.endpoint}
+          data-api-href={api.href}
+        >
+          <div class={s.cardHeader}>
+            <h3 class={s.cardTitle}>{api.name}</h3>
+            <span class={s.protocol}>{api.protocol}</span>
+          </div>
+          <p class={s.cardDesc}>{api.desc}</p>
+          {api.pkg && <code class={s.pkg}>{api.pkg}</code>}
+        </a>
+      ))
+    }
+  </div>
+
+  <div class={s.preview}>
+    <div class={s.previewHeader}>
+      <span class={s.previewDot}></span>
+      <span class={s.previewName} data-preview-name>{APIS[0]!.name}</span>
+      <span class={s.previewEndpoint} data-preview-endpoint>{APIS[0]!.endpoint}</span>
+    </div>
+    <div class={s.previewCodes}>
+      {
+        APIS.map((api, i) => (
+          <div class={s.previewCode} data-api-code={i} hidden={i !== 0}>
+            <Code code={api.code} lang={api.language} frame="none" meta="showLineNumbers=false" />
+          </div>
+        ))
+      }
+    </div>
+    <div class={s.previewFooter}>
+      <span>Hover any API to switch snippet</span>
+      <a href={APIS[0]!.href} data-preview-link>Open full reference →</a>
+    </div>
+  </div>
+</docs-api-switcher>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  class DocsApiSwitcher extends WebComponent {
+    currentIndex = 0;
+
+    parsedCallback() {
+      this.on(this, 'mouseover', '[data-api-index]', (_e, el) => {
+        const i = Number(el.dataset.apiIndex);
+        if (!Number.isNaN(i) && i !== this.currentIndex) this.select(i, el);
+      });
+      this.on(this, 'focusin', '[data-api-index]', (_e, el) => {
+        const i = Number(el.dataset.apiIndex);
+        if (!Number.isNaN(i) && i !== this.currentIndex) this.select(i, el);
+      });
+    }
+
+    select(i: number, sourceCard: HTMLElement) {
+      this.currentIndex = i;
+      for (const pre of this.$$<HTMLElement>('[data-api-code]')) {
+        pre.hidden = pre.dataset.apiCode !== String(i);
+      }
+      const nameEl = this.$<HTMLElement>('[data-preview-name]');
+      const endpointEl = this.$<HTMLElement>('[data-preview-endpoint]');
+      const linkEl = this.$<HTMLAnchorElement>('[data-preview-link]');
+      if (sourceCard.dataset.apiName) nameEl.textContent = sourceCard.dataset.apiName;
+      if (sourceCard.dataset.apiEndpoint) endpointEl.textContent = sourceCard.dataset.apiEndpoint;
+      if (sourceCard.dataset.apiHref) linkEl.href = sourceCard.dataset.apiHref;
+    }
+  }
+
+  if (!customElements.get('docs-api-switcher')) {
+    customElements.define('docs-api-switcher', DocsApiSwitcher);
+  }
+</script>
