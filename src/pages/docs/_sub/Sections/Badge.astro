@@ -1,0 +1,15 @@
+---
+import { stripStega } from '@datocms/astro';
+import s from './style.module.css';
+
+export type BadgeValue = 'new' | 'soon' | 'moved';
+
+interface Props {
+  badge: BadgeValue;
+}
+
+const badge = stripStega(Astro.props.badge) as BadgeValue;
+const cls = badge === 'new' ? s.pillNew : badge === 'soon' ? s.pillSoon : s.pillMoved;
+---
+
+<span class={`${s.pill} ${cls}`}>{badge}</span>

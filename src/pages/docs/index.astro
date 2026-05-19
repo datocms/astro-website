@@ -5,19 +5,13 @@ import { Svg } from '~/components/Svg';
 import { BaseLayout } from '~/layouts/docs/BaseLayout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import {
-  AI_CARDS,
-  BUILD_CARDS,
-  COMMUNITY_PANEL,
-  FRAMEWORKS,
-  HELP_CARDS,
-  OPERATE_CARDS,
-} from './_content';
+import { FRAMEWORKS } from './_content';
 import { query } from './_graphql';
 import s from './_style.module.css';
 import { ApisSection } from './_sub/ApisSection';
 import { HeroShader } from './_sub/HeroShader';
 import { HomeSidebar } from './_sub/HomeSidebar';
+import { Sections } from './_sub/Sections';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -25,13 +19,6 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
-
-const pillClass = (badge?: 'NEW' | 'SOON' | 'MOVED') => {
-  if (badge === 'NEW') return s.pillNew;
-  if (badge === 'SOON') return s.pillSoon;
-  if (badge === 'MOVED') return s.pillMoved;
-  return '';
-};
 ---
 
 <BaseLayout seo={page._seoMetaTags}>
@@ -84,124 +71,7 @@ const pillClass = (badge?: 'NEW' | 'SOON' | 'MOVED') => {
       </div>
     </section>
 
-    <section class={s.section}>
-      <div class={s.inner}>
-        <div class={s.sectionHeader}>
-          <div class={s.sectionHeaderLeft}>
-            <span class={s.kicker}>02 · AI & Automation</span>
-            <h2 class={s.sectionTitle}>Build with AI. Ship to AI.</h2>
-          </div>
-        </div>
-        <div class={s.cards4}>
-          {
-            AI_CARDS.map((card) => (
-              <a href={card.href} class={s.card}>
-                <h3 class={s.cardTitle}>
-                  {card.name}
-                  {card.badge && (
-                    <span class={`${s.pill} ${pillClass(card.badge)}`}>{card.badge}</span>
-                  )}
-                </h3>
-                <p class={s.cardDesc}>{card.desc}</p>
-              </a>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
-    <section class={s.section}>
-      <div class={s.inner}>
-        <div class={s.twoUp}>
-          <div>
-            <div class={s.sectionHeader}>
-              <div class={s.sectionHeaderLeft}>
-                <span class={s.kicker}>03 · Build</span>
-                <h2 class={s.sectionTitle}>Extend & integrate</h2>
-              </div>
-            </div>
-            <div class={s.cards2x3}>
-              {
-                BUILD_CARDS.map((card) => (
-                  <a href={card.href} class={s.card}>
-                    <h3 class={s.cardTitle}>
-                      {card.name}
-                      {card.badge && (
-                        <span class={`${s.pill} ${pillClass(card.badge)}`}>{card.badge}</span>
-                      )}
-                    </h3>
-                    <p class={s.cardDesc}>{card.desc}</p>
-                  </a>
-                ))
-              }
-            </div>
-          </div>
-          <div>
-            <div class={s.sectionHeader}>
-              <div class={s.sectionHeaderLeft}>
-                <span class={s.kicker}>04 · Operate</span>
-                <h2 class={s.sectionTitle}>Run in production</h2>
-              </div>
-            </div>
-            <div class={s.cards2x3}>
-              {
-                OPERATE_CARDS.map((card) => (
-                  <a href={card.href} class={s.card}>
-                    <h3 class={s.cardTitle}>
-                      {card.name}
-                      {card.badge && (
-                        <span class={`${s.pill} ${pillClass(card.badge)}`}>{card.badge}</span>
-                      )}
-                    </h3>
-                    <p class={s.cardDesc}>{card.desc}</p>
-                  </a>
-                ))
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class={s.helpFooter}>
-      <div class={s.inner}>
-        <div class={s.resourcesGrid}>
-          <div>
-            <div class={s.sectionHeader}>
-              <div class={s.sectionHeaderLeft}>
-                <span class={s.kicker}>05 · Community</span>
-                <h2 class={s.sectionTitle}>{COMMUNITY_PANEL.title}</h2>
-              </div>
-            </div>
-            <a href={COMMUNITY_PANEL.href} class={s.videosPanel}>
-              <p class={s.videosPanelDesc}>{COMMUNITY_PANEL.desc}</p>
-              <span class={s.videosPanelCta}>
-                {COMMUNITY_PANEL.cta}
-                <span aria-hidden="true">→</span>
-              </span>
-            </a>
-          </div>
-          <div>
-            <div class={s.sectionHeader}>
-              <div class={s.sectionHeaderLeft}>
-                <span class={s.kicker}>06 · More</span>
-                <h2 class={s.sectionTitle}>Other resources</h2>
-              </div>
-            </div>
-            <div class={s.cardsStack}>
-              {
-                HELP_CARDS.map((card) => (
-                  <a href={card.href} class={s.card}>
-                    <h3 class={s.cardTitle}>{card.name}</h3>
-                    <p class={s.cardDesc}>{card.desc}</p>
-                  </a>
-                ))
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <Sections page={page} startNumber={2} />
   </div>
 
   <DraftModeQueryListener query={query} />

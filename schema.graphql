@@ -4103,6 +4103,36 @@ type DocPageRecord implements RecordInterface {
     locale: SiteLocale
     filter: DocPageModelFilter
   ): CollectionMetadata!
+  _allReferencingDocsPages(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenDocsPageAndDocPage
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+
+    """Skip the first results"""
+    skip: IntType
+
+    """Limit the number of results"""
+    first: IntType = 20
+    filter: DocsPageModelFilter
+    orderBy: [DocsPageModelOrderBy] = [_updatedAt_DESC]
+  ): [DocsPageRecord!]!
+
+  """Returns meta information regarding a record collection"""
+  _allReferencingDocsPagesMeta(
+    """Specifies how to filter linking records"""
+    through: InverseRelationshipFilterBetweenDocsPageAndDocPage
+
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+    filter: DocsPageModelFilter
+  ): CollectionMetadata!
   _allReferencingEnterpriseApps(
     """Specifies how to filter linking records"""
     through: InverseRelationshipFilterBetweenEnterpriseAppAndDocPage
@@ -4550,6 +4580,147 @@ type DocPageRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
+union DocsHomeDocCardBlockModelTargetField = DocGroupRecord | DocPageRecord
+
+"""Block of type 📙 Docs Group (docs_home_doc_card_block)"""
+type DocsHomeDocCardBlockRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  badge: String
+  createdAt: DateTime!
+  description: String!
+  id: ItemId!
+  overrideTitle: String
+  target: DocsHomeDocCardBlockModelTargetField!
+  updatedAt: DateTime!
+}
+
+"""Block of type 🔗 External (docs_home_external_card_block)"""
+type DocsHomeExternalCardBlockRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  badge: String
+  createdAt: DateTime!
+  ctaLabel: String
+  description: String!
+  id: ItemId!
+  title: String!
+  updatedAt: DateTime!
+  url: String!
+}
+
+union DocsHomeSectionBlockModelCardsField = DocsHomeDocCardBlockRecord | DocsHomeExternalCardBlockRecord
+
+"""Block of type 🗂️ Section (docs_home_section_block)"""
+type DocsHomeSectionBlockRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  cards: [DocsHomeSectionBlockModelCardsField!]!
+  columns: String!
+  createdAt: DateTime!
+  id: ItemId!
+  kicker: String
+  title: String!
+  updatedAt: DateTime!
+  width: String!
+}
+
+"""Linking fields"""
+enum DocsPageModelFieldsReferencingDocPageModel {
+  docsPage_sections
+  docsPage_sections__docsHomeSectionBlock_cards__docsHomeDocCardBlock_target
+}
+
+input DocsPageModelFilter {
+  _createdAt: CreatedAtFilter
+  createdAt: CreatedAtFilter
+  id: ItemIdFilter
+  _firstPublishedAt: PublishedAtFilter
+  _publicationScheduledAt: PublishedAtFilter
+  _unpublishingScheduledAt: PublishedAtFilter
+  _publishedAt: PublishedAtFilter
+  _status: StatusFilter
+  _updatedAt: UpdatedAtFilter
+  updatedAt: UpdatedAtFilter
+  _isValid: BooleanFilter
+  seo: SeoFilter
+  OR: [DocsPageModelFilter]
+  AND: [DocsPageModelFilter]
+}
+
+enum DocsPageModelOrderBy {
+  _createdAt_ASC
+  _createdAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+  id_ASC
+  id_DESC
+  _firstPublishedAt_ASC
+  _firstPublishedAt_DESC
+  _publicationScheduledAt_ASC
+  _publicationScheduledAt_DESC
+  _unpublishingScheduledAt_ASC
+  _unpublishingScheduledAt_DESC
+  _publishedAt_ASC
+  _publishedAt_DESC
+  _status_ASC
+  _status_DESC
+  _updatedAt_ASC
+  _updatedAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  _isValid_ASC
+  _isValid_DESC
+}
+
 """Record of type 📖 Docs Home (docs_page)"""
 type DocsPageRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -4572,6 +4743,7 @@ type DocsPageRecord implements RecordInterface {
   _updatedAt: DateTime!
   createdAt: DateTime!
   id: ItemId!
+  sections: [DocsHomeSectionBlockRecord!]!
   seo: SeoField
   updatedAt: DateTime!
 }
@@ -9524,6 +9696,19 @@ input InverseRelationshipFieldFilterBetweenDocPageAndUserGuidesEpisode {
 }
 
 """Specifies how to filter by linking fields"""
+input InverseRelationshipFieldFilterBetweenDocsPageAndDocPage {
+  """
+  Filter linking records that reference current record in at least one of the specified fields
+  """
+  anyIn: [DocsPageModelFieldsReferencingDocPageModel!]
+
+  """
+  Filter linking records that do not reference current record in any of the specified fields
+  """
+  notIn: [DocsPageModelFieldsReferencingDocPageModel!]
+}
+
+"""Specifies how to filter by linking fields"""
 input InverseRelationshipFieldFilterBetweenEnterpriseAppAndAcademyChapter {
   """
   Filter linking records that reference current record in at least one of the specified fields
@@ -11435,6 +11620,15 @@ input InverseRelationshipFilterBetweenDocPageAndShowcaseProject {
 input InverseRelationshipFilterBetweenDocPageAndUserGuidesEpisode {
   """Specifies how to filter by linking fields"""
   fields: InverseRelationshipFieldFilterBetweenDocPageAndUserGuidesEpisode
+
+  """Specifies how to filter by linking locales"""
+  locales: LinkingLocalesFilter
+}
+
+"""Specifies how to filter linking records"""
+input InverseRelationshipFilterBetweenDocsPageAndDocPage {
+  """Specifies how to filter by linking fields"""
+  fields: InverseRelationshipFieldFilterBetweenDocsPageAndDocPage
 
   """Specifies how to filter by linking locales"""
   locales: LinkingLocalesFilter

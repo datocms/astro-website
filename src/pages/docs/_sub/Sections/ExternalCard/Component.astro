@@ -1,0 +1,34 @@
+---
+import { stripStega } from '@datocms/astro';
+import { type FragmentOf, readFragment } from 'gql.tada';
+import Badge, { type BadgeValue } from '../Badge.astro';
+import s from '../style.module.css';
+import { ExternalCardFragment } from './graphql';
+
+interface Props {
+  block: FragmentOf<typeof ExternalCardFragment>;
+}
+
+const block = readFragment(ExternalCardFragment, Astro.props.block);
+const url = stripStega(block.url);
+---
+
+{
+  block.ctaLabel ? (
+    <a href={url} class={s.panel}>
+      <p class={s.panelDesc}>{block.description}</p>
+      <span class={s.panelCta}>
+        {block.ctaLabel}
+        <span aria-hidden="true">→</span>
+      </span>
+    </a>
+  ) : (
+    <a href={url} class={s.card}>
+      <h3 class={s.cardTitle}>
+        {block.title}
+        {block.badge && <Badge badge={block.badge as BadgeValue} />}
+      </h3>
+      <p class={s.cardDesc}>{block.description}</p>
+    </a>
+  )
+}

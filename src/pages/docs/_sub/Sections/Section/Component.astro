@@ -1,0 +1,37 @@
+---
+import { stripStega } from '@datocms/astro';
+import { type FragmentOf, readFragment } from 'gql.tada';
+import DocCard from '../DocCard/Component.astro';
+import ExternalCard from '../ExternalCard/Component.astro';
+import s from '../style.module.css';
+import { SectionFragment } from './graphql';
+
+interface Props {
+  block: FragmentOf<typeof SectionFragment>;
+  number: number;
+}
+
+const block = readFragment(SectionFragment, Astro.props.block);
+const padded = String(Astro.props.number).padStart(2, '0');
+const kicker = block.kicker ? `${padded} · ${block.kicker}` : padded;
+---
+
+<div>
+  <div class={s.sectionHeader}>
+    <div class={s.sectionHeaderLeft}>
+      <span class={s.kicker}>{kicker}</span>
+      <h2 class={s.sectionTitle}>{block.title}</h2>
+    </div>
+  </div>
+  <div class={s.cards} data-cols={stripStega(block.columns)}>
+    {
+      block.cards.map((card) =>
+        card.__typename === 'DocsHomeDocCardBlockRecord' ? (
+          <DocCard block={card} />
+        ) : card.__typename === 'DocsHomeExternalCardBlockRecord' ? (
+          <ExternalCard block={card} />
+        ) : null,
+      )
+    }
+  </div>
+</div>

@@ -1,0 +1,28 @@
+---
+import { type FragmentOf, readFragment } from 'gql.tada';
+import { buildUrlForDocGroup } from '~/lib/datocms/gqlUrlBuilder/docGroup';
+import { buildUrlForDocPage } from '~/lib/datocms/gqlUrlBuilder/docPage';
+import Badge, { type BadgeValue } from '../Badge.astro';
+import s from '../style.module.css';
+import { DocCardFragment } from './graphql';
+
+interface Props {
+  block: FragmentOf<typeof DocCardFragment>;
+}
+
+const block = readFragment(DocCardFragment, Astro.props.block);
+const target = block.target;
+
+const fallbackTitle = target.__typename === 'DocGroupRecord' ? target.name : target.title;
+const title = block.overrideTitle || fallbackTitle;
+const href =
+  target.__typename === 'DocGroupRecord' ? buildUrlForDocGroup(target) : buildUrlForDocPage(target);
+---
+
+<a href={href} class={s.card}>
+  <h3 class={s.cardTitle}>
+    {title}
+    {block.badge && <Badge badge={block.badge as BadgeValue} />}
+  </h3>
+  <p class={s.cardDesc}>{block.description}</p>
+</a>

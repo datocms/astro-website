@@ -1,0 +1,58 @@
+---
+import { stripStega } from '@datocms/astro';
+import { type FragmentOf, readFragment } from 'gql.tada';
+import Section from './Section/Component.astro';
+import { SectionsFragment } from './graphql';
+import s from './style.module.css';
+
+interface Props {
+  page: FragmentOf<typeof SectionsFragment>;
+  startNumber?: number;
+}
+
+const { startNumber = 1 } = Astro.props;
+const page = readFragment(SectionsFragment, Astro.props.page);
+
+const widthSpan: Record<string, number> = {
+  full: 12,
+  two_thirds: 8,
+  half: 6,
+  one_third: 4,
+};
+
+type SectionBlock = (typeof page.sections)[number];
+const rows: Array<Array<{ section: SectionBlock; number: number; span: number }>> = [];
+let currentRow: (typeof rows)[number] = [];
+let currentSum = 0;
+let n = startNumber;
+
+for (const section of page.sections) {
+  if (section.__typename !== 'DocsHomeSectionBlockRecord') continue;
+  const span = widthSpan[stripStega(section.width)] ?? 12;
+  if (currentSum + span > 12) {
+    rows.push(currentRow);
+    currentRow = [];
+    currentSum = 0;
+  }
+  currentRow.push({ section, number: n, span });
+  currentSum += span;
+  n += 1;
+}
+if (currentRow.length > 0) rows.push(currentRow);
+---
+
+{
+  rows.map((row) => (
+    <section class={s.section}>
+      <div class={s.inner}>
+        <div class={s.row}>
+          {row.map(({ section, number, span }) => (
+            <div style={`grid-column: span ${span}`} class={s.rowItem}>
+              <Section block={section} number={number} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))
+}
