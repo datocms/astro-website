@@ -1,20 +1,26 @@
 import cn from 'classnames';
+import { formatDistanceToNowStrict } from 'date-fns';
 
 import s from '../../style.module.css';
 import { renderBackticks } from './renderText';
 import type { ResultWithArea } from './types';
 
+function relativeDate(date: string): string | null {
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return null;
+  return `${formatDistanceToNowStrict(d)} ago`;
+}
+
 type Props = {
   results: ResultWithArea[];
   selectedIndex: number;
   onHover: (idx: number) => void;
-  dimmed: boolean;
 };
 
-export function ResultsList({ results, selectedIndex, onHover, dimmed }: Props) {
+export function ResultsList({ results, selectedIndex, onHover }: Props) {
   const isCommunity = results[0]?.area.id === 'community';
   return (
-    <div className={cn(dimmed && s.resultsDimmed, isCommunity && s.area)}>
+    <div className={cn(isCommunity && s.area)}>
       {results.map((result, i) => (
         <a
           href={result.url}
@@ -38,6 +44,9 @@ export function ResultsList({ results, selectedIndex, onHover, dimmed }: Props) 
                 </>
               ) : (
                 result.area.label
+              )}
+              {result.date && relativeDate(result.date) && (
+                <span className={s.resultDate}> · {relativeDate(result.date)}</span>
               )}
             </div>
             <div className={s.resultTitle}>

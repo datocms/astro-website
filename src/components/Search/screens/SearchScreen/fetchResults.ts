@@ -1,9 +1,9 @@
 import { areasBySource, communityArea, otherArea } from '../../constants';
-import { searchInWebsite } from '../../apis/search';
+import { searchInWebsite, type SearchFilter } from '../../apis/search';
 import { searchInCommunity } from '../../apis/community';
 import type { ResultWithArea } from './types';
 
-export type FetchMode = { kind: 'docs'; sources: string[] } | { kind: 'community' };
+export type FetchMode = { kind: 'docs'; filter: SearchFilter } | { kind: 'community' };
 
 export async function fetchResults(
   query: string,
@@ -19,7 +19,7 @@ export async function fetchResults(
       return [{ ...r, area: communityArea }];
     });
   }
-  const results = await searchInWebsite(query, mode.sources, signal);
+  const results = await searchInWebsite(query, mode.filter, signal);
   return results.map((r) => ({
     ...r,
     area: (r.source && areasBySource[r.source]) || otherArea,

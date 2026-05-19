@@ -5,4 +5,5 @@ export type Result = {
   url: string;
   category?: string;
   blurb?: ReactNode;
+  date?: string;
 };

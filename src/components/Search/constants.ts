@@ -1,14 +1,16 @@
+import type { SearchFilter } from './apis/search';
+
 import githubIcon from '~/icons/brands/github.svg?raw';
-import balanceScaleIcon from '~/icons/regular/scale-balanced.svg?raw';
 import hamburgerIcon from '~/icons/regular/bars.svg?raw';
 import bookAltIcon from '~/icons/regular/book-blank.svg?raw';
 import bookIcon from '~/icons/regular/book.svg?raw';
 import browserIcon from '~/icons/regular/browser.svg?raw';
-import forumIcon from '~/icons/regular/message-lines.svg?raw';
 import commentsIcon from '~/icons/regular/comments.svg?raw';
 import graduationCapIcon from '~/icons/regular/graduation-cap.svg?raw';
+import forumIcon from '~/icons/regular/message-lines.svg?raw';
 import penNibIcon from '~/icons/regular/pen-nib.svg?raw';
 import rocketIcon from '~/icons/regular/rocket.svg?raw';
+import balanceScaleIcon from '~/icons/regular/scale-balanced.svg?raw';
 import trophyIcon from '~/icons/regular/trophy.svg?raw';
 import videoIcon from '~/icons/regular/video.svg?raw';
 import wandMagicIcon from '~/icons/regular/wand-magic.svg?raw';
@@ -30,18 +32,34 @@ export const areasBySource: Record<string, Area> = {
   marketing: { id: 'marketing', label: 'Website', icon: browserIcon },
 };
 
-export const ALL_SOURCE_IDS = Object.keys(areasBySource).filter((id) => id !== 'skills');
+export type Group = { id: string; label: string; filter?: SearchFilter };
 
-export type Group = { id: string; label: string; sources: string[] };
-
+export const ALL_GROUP_ID = 'all';
 export const COMMUNITY_GROUP_ID = 'community';
 
 export const groups: Group[] = [
-  { id: 'developers', label: 'For Developers', sources: ['docs', 'github', 'skills'] },
-  { id: 'editors', label: 'For Editors', sources: ['academy', 'glossary', 'user-guides'] },
-  { id: 'news', label: 'News', sources: ['blog', 'product-updates'] },
-  { id: 'customers', label: 'Stories', sources: ['case-studies', 'casual-chats'] },
-  { id: COMMUNITY_GROUP_ID, label: 'Community', sources: [] },
+  {
+    id: ALL_GROUP_ID,
+    label: 'Top picks',
+    filter: { exclude: ['skills', 'blog', 'product-updates'] },
+  },
+  {
+    id: 'developers',
+    label: 'For Developers',
+    filter: { include: ['docs', 'github', 'skills'] },
+  },
+  {
+    id: 'editors',
+    label: 'For Editors',
+    filter: { include: ['academy', 'glossary', 'user-guides'] },
+  },
+  { id: 'news', label: 'News', filter: { include: ['blog', 'product-updates'] } },
+  {
+    id: 'customers',
+    label: 'Stories',
+    filter: { include: ['case-studies', 'casual-chats'] },
+  },
+  { id: COMMUNITY_GROUP_ID, label: 'Community' },
 ];
 
 export const otherArea: Area = { id: 'other', label: 'Elsewhere', icon: hamburgerIcon };

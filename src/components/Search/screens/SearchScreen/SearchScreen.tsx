@@ -13,7 +13,7 @@ import { ModalHeader } from '../../modal/Header';
 import { ModalInputRow } from '../../modal/InputRow';
 import { ModalBody } from '../../modal/Body';
 import { useSearch } from '../../context';
-import { ALL_SOURCE_IDS, COMMUNITY_GROUP_ID, groups, searchStarterPrompts } from '../../constants';
+import { ALL_GROUP_ID, COMMUNITY_GROUP_ID, groups, searchStarterPrompts } from '../../constants';
 import { searchInCommunity } from '../../apis/community';
 import { FilterChips } from './FilterChips';
 import { ResultsList } from './ResultsList';
@@ -34,14 +34,13 @@ export function SearchScreen() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [results, setResults] = useState<ResultWithArea[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<string>(ALL_GROUP_ID);
   const [communityCount, setCommunityCount] = useState(0);
 
   const trimmedInput = searchInput.trim();
   const debouncedSearchTerm = useDebounce<string>(trimmedInput, 200);
   const isPending = trimmedInput !== debouncedSearchTerm;
   const hasResults = results.length > 0;
-  const isAllSelected = selectedGroup === null;
   const isShowingPrompts = !trimmedInput;
   const isQueryLongEnough = debouncedSearchTerm.length >= 2;
   const totalItems = isShowingPrompts ? searchStarterPrompts.length : results.length;
@@ -56,15 +55,11 @@ export function SearchScreen() {
       setIsLoading(false);
       return;
     }
+    const group = groups.find((g) => g.id === selectedGroup);
     const mode =
-      selectedGroup === COMMUNITY_GROUP_ID
+      selectedGroup === COMMUNITY_GROUP_ID || !group?.filter
         ? ({ kind: 'community' } as const)
-        : ({
-            kind: 'docs',
-            sources: isAllSelected
-              ? ALL_SOURCE_IDS
-              : (groups.find((g) => g.id === selectedGroup)?.sources ?? ALL_SOURCE_IDS),
-          } as const);
+        : ({ kind: 'docs', filter: group.filter } as const);
     const controller = new AbortController();
     setIsLoading(true);
     fetchResults(debouncedSearchTerm, mode, controller.signal)
@@ -78,7 +73,7 @@ export function SearchScreen() {
         setIsLoading(false);
       });
     return () => controller.abort();
-  }, [debouncedSearchTerm, selectedGroup, isAllSelected, isQueryLongEnough]);
+  }, [debouncedSearchTerm, selectedGroup, isQueryLongEnough]);
 
   useEffect(() => {
     if (!isQueryLongEnough) {
@@ -102,7 +97,7 @@ export function SearchScreen() {
 
   useEffect(() => {
     if (!showCommunity && selectedGroup === COMMUNITY_GROUP_ID) {
-      setSelectedGroup(null);
+      setSelectedGroup(ALL_GROUP_ID);
     }
   }, [showCommunity, selectedGroup]);
 
@@ -127,20 +122,19 @@ export function SearchScreen() {
   };
 
   const handleKeyDown: KeyboardEventHandler<HTMLInputElement> = (e) => {
+    const isNavKey = e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter';
+    if (!isNavKey) return;
+    e.preventDefault();
+    if (!isShowingPrompts && (isLoading || isPending)) return;
     if (e.key === 'ArrowDown') {
-      e.preventDefault();
       setSelectedIndex((prev) => (totalItems === 0 ? 0 : (prev + 1) % totalItems));
       return;
     }
     if (e.key === 'ArrowUp') {
-      e.preventDefault();
       setSelectedIndex((prev) => (totalItems === 0 ? 0 : (prev - 1 + totalItems) % totalItems));
       return;
     }
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      activateSelection();
-    }
+    activateSelection();
   };
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -185,16 +179,15 @@ export function SearchScreen() {
               showCommunity={showCommunity}
             />
 
-            {(isLoading || isPending) && !hasResults && <SkeletonResults />}
-
-            {hasResults && (
+            {isLoading || isPending ? (
+              <SkeletonResults />
+            ) : hasResults ? (
               <ResultsList
                 results={results}
                 selectedIndex={selectedIndex}
                 onHover={setSelectedIndex}
-                dimmed={isLoading || isPending}
               />
-            )}
+            ) : null}
 
             {!isPending && !isLoading && !hasResults && isQueryLongEnough && (
               <p className={s.statusLine}>
