@@ -117,149 +117,159 @@ const linkTitleToLabel: { [key: string]: string } = {
     />
   </Fragment>
   <Wrapper>
-    <div class={s.hero}>
-      <div class={s.heroBody}>
-        <h1 class={s.heroTitle}>
-          <Text {...ensureValidStructuredTextProps({ data: page.title })} />
-        </h1>
-        <div class={s.heroSubtitle}>
-          <Text {...ensureValidStructuredTextProps({ data: page.subtitle })} />
+    <div id="main-content">
+      <div class={s.hero}>
+        <div class={s.heroBody}>
+          <h1 class={s.heroKicker}>DatoCMS Features</h1>
+          <div class={s.heroTitle}>
+            <Text {...ensureValidStructuredTextProps({ data: page.title })} />
+          </div>
+          <div class={s.heroSubtitle}>
+            <Text {...ensureValidStructuredTextProps({ data: page.subtitle })} />
+          </div>
+          <div class={s.buttonContainer} data-datocms-nomd>
+            <Button as="a" href={dashboardUrl('/signup')}>Try it for free</Button>
+            <Button as="a" s="invert" href="/contact">Contact sales</Button>
+          </div>
         </div>
-        <div class={s.buttonContainer}>
-          <Button as="a" href={dashboardUrl('/signup')}>Try it for free</Button>
-          <Button as="a" s="invert" href="/contact">Contact sales</Button>
+        <div class={s.heroImageWrapper} data-datocms-nomd>
+          {
+            page.heroImageLeft && page.heroImageRight && (
+              <>
+                <div class={s.heroImage}>
+                  <ResponsiveImage data={page.heroImageLeft.responsiveImage} />
+                </div>
+                <div class={s.heroImage}>
+                  <ResponsiveImage data={page.heroImageRight.responsiveImage} />
+                </div>
+              </>
+            )
+          }
         </div>
       </div>
-      <div class={s.heroImageWrapper}>
-        {
-          page.heroImageLeft && page.heroImageRight && (
-            <>
-              <div class={s.heroImage}>
-                <ResponsiveImage data={page.heroImageLeft.responsiveImage} />
-              </div>
-              <div class={s.heroImage}>
-                <ResponsiveImage data={page.heroImageRight.responsiveImage} />
-              </div>
-            </>
-          )
-        }
-      </div>
-    </div>
 
-    <div class={s.features}>
-      <div class={s.main}>
-        {
-          featuresGroup.map(({ title, subtitle, features }) => {
-            return (
-              <div id={slugify(title)} class={s.section}>
-                <Space bottom={1}>
-                  <InterstitialTitle style="one">
-                    {title}
-                    <Fragment slot="below">
-                      <h4 class={s.sectionSubtitle}>{subtitle}</h4>
-                    </Fragment>
-                  </InterstitialTitle>
-                </Space>
+      <div class={s.features}>
+        <div class={s.main}>
+          {
+            featuresGroup.map(({ title, subtitle, features }) => {
+              return (
+                <div id={slugify(title)} class={s.section}>
+                  <Space bottom={1}>
+                    <InterstitialTitle style="one">
+                      {title}
+                      <Fragment slot="below">
+                        <p class={s.sectionSubtitle}>{subtitle}</p>
+                      </Fragment>
+                    </InterstitialTitle>
+                  </Space>
 
-                <div class={s.blocks}>
-                  {features.map((feature, i) => {
-                    if (feature.__typename === 'FeatureRegularCardRecord') {
-                      return (
-                        <div class={s.feature}>
-                          {feature.badge && (
-                            <div class={s.featureBadge}>
-                              {feature.badge}
-                              {i % 2 === 0 ? (
-                                <div class={s.arrow}>
-                                  <Svg name="svg/illustrations/arrow-sketch-5" />
-                                </div>
-                              ) : (
-                                <div class={s.arrow2}>
-                                  <Svg name="svg/illustrations/arrow-sketch-1" />
-                                </div>
-                              )}
+                  <div class={s.blocks}>
+                    {features.map((feature, i) => {
+                      if (feature.__typename === 'FeatureRegularCardRecord') {
+                        return (
+                          <div class={s.feature}>
+                            {feature.badge && (
+                              <div class={s.featureBadge} data-datocms-nomd>
+                                {feature.badge}
+                                {i % 2 === 0 ? (
+                                  <div class={s.arrow}>
+                                    <Svg name="svg/illustrations/arrow-sketch-5" />
+                                  </div>
+                                ) : (
+                                  <div class={s.arrow2}>
+                                    <Svg name="svg/illustrations/arrow-sketch-1" />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            <Heading as="h3" class={s.featureTitle}>
+                              <span class={s.featureEmoji}>{feature.emoji}</span>
+                              {feature.title}
+                            </Heading>
+
+                            {feature.image?.responsiveImage && (
+                              <figure class={s.featureImage} data-datocms-nomd>
+                                <ResponsiveImage data={feature.image.responsiveImage} />
+                              </figure>
+                            )}
+
+                            <div class={s.featureDescription} data-datocms-content-link-group>
+                              <Prose>
+                                <Text
+                                  {...ensureValidStructuredTextProps({ data: feature.description })}
+                                />
+                              </Prose>
                             </div>
-                          )}
 
-                          <Heading as="h3" class={s.featureTitle}>
-                            <span class={s.featureEmoji}>{feature.emoji}</span>
-                            {feature.title}
-                          </Heading>
+                            {feature.links && (
+                              <div class={s.featureLinks} data-datocms-nomd>
+                                {feature.links.map((link) => {
+                                  const linkTitle = stripStega(link.linkTitle);
 
-                          {feature.image?.responsiveImage && (
-                            <figure class={s.featureImage}>
-                              <ResponsiveImage data={feature.image.responsiveImage} />
-                            </figure>
-                          )}
-
-                          <div class={s.featureDescription}>
-                            <Prose>
-                              <Text
-                                {...ensureValidStructuredTextProps({ data: feature.description })}
-                              />
-                            </Prose>
+                                  return (
+                                    <a
+                                      href={buildUrlFromGql(link.content)}
+                                      class={s.link}
+                                      data-datocms-content-link-source={link.linkTitle}
+                                    >
+                                      {linkTitleToLabel[linkTitle] || linkTitle}
+                                      <span class={s.linkArrow}>→</span>
+                                    </a>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
-
-                          {feature.links && (
-                            <div class={s.featureLinks}>
-                              {feature.links.map((link) => {
-                                const linkTitle = stripStega(link.linkTitle);
-
-                                return (
-                                  <a
-                                    href={buildUrlFromGql(link.content)}
-                                    class={s.link}
-                                    data-datocms-content-link-source={link.linkTitle}
-                                  >
-                                    {linkTitleToLabel[linkTitle] || linkTitle}
-                                    <span class={s.linkArrow}>→</span>
-                                  </a>
-                                );
-                              })}
+                        );
+                      }
+                      if (feature.__typename === 'TestimonialCardRecord') {
+                        return (
+                          <Space top={2} bottom={2}>
+                            <div data-datocms-nomd>
+                              <SingleQuote quote={feature.testimonial} fontSize="small" />
                             </div>
-                          )}
-                        </div>
-                      );
-                    }
-                    if (feature.__typename === 'TestimonialCardRecord') {
-                      return (
-                        <Space top={2} bottom={2}>
-                          <SingleQuote quote={feature.testimonial} fontSize="small" />
-                        </Space>
-                      );
-                    }
-                  })}
+                          </Space>
+                        );
+                      }
+                    })}
+                  </div>
+                </div>
+              );
+            })
+          }
+        </div>
+        <aside class={s.aside} data-datocms-nomd>
+          <div
+            data-mobile-anchors
+            class={s.asideAnchorsWrapper}
+            role="button"
+            aria-expanded="false"
+          >
+            <ScrollspyNav>
+              <div class={s.currentAnchor}>
+                <span data-current-anchor>Scroll to</span>
+                <div class={s.currentAnchorArrow}>
+                  <Svg name="icons/regular/chevron-down" />
                 </div>
               </div>
-            );
-          })
-        }
-      </div>
-      <aside class={s.aside}>
-        <div data-mobile-anchors class={s.asideAnchorsWrapper} role="button" aria-expanded="false">
-          <ScrollspyNav>
-            <div class={s.currentAnchor}>
-              <span data-current-anchor>Scroll to</span>
-              <div class={s.currentAnchorArrow}>
-                <Svg name="icons/regular/chevron-down" />
-              </div>
-            </div>
 
-            <div class={s.asideAnchors}>
-              <h3>Quick menu</h3>
-              <ul>
-                {
-                  featuresGroup.map(({ title }) => (
-                    <li>
-                      <a href={`#${slugify(title)}`}>{title}</a>
-                    </li>
-                  ))
-                }
-              </ul>
-            </div>
-          </ScrollspyNav>
-        </div>
-      </aside>
+              <div class={s.asideAnchors}>
+                <h3>Quick menu</h3>
+                <ul>
+                  {
+                    featuresGroup.map(({ title }) => (
+                      <li>
+                        <a href={`#${slugify(title)}`}>{title}</a>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+            </ScrollspyNav>
+          </div>
+        </aside>
+      </div>
     </div>
   </Wrapper>
 
