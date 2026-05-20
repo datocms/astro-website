@@ -128,4 +128,17 @@ const finalSeo = suffix ? overrideSeo(seo, replaceSeoPageTitleSuffix(suffix)) : 
       (window as any).posthog.capture('$pageleave');
     }
   });
+
+  document.addEventListener('click', (e) => {
+    const link = (e.target as Element).closest('a');
+    if (!link?.href?.includes('dashboard.datocms.com') || !('gtag' in window)) return;
+
+    const label = (link.textContent ?? '').toLowerCase();
+    if (/log.?in|sign.?in|enter dashboard/i.test(label)) return;
+
+    (window as any).gtag('event', 'conversion', {
+      send_to: 'AW-11079629404/jWVKCJSzqrAcENz0lqMp',
+      transport_type: 'beacon',
+    });
+  });
 </script>

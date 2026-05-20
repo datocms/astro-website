@@ -49,6 +49,9 @@ const gdprCountries = [
 ];
 
 const scriptsToAddOnCookieConsent = `
+var _gtag=document.createElement("script");_gtag.async=true;_gtag.src="https://www.googletagmanager.com/gtag/js?id=AW-11079629404";document.head.appendChild(_gtag);
+window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","AW-11079629404");
+
 window._linkedin_partner_id="${LINKEDIN_PARTNER_ID}";
 window._linkedin_data_partner_ids=window._linkedin_data_partner_ids||[];
 window._linkedin_data_partner_ids.push(window._linkedin_partner_id);
