@@ -118,6 +118,16 @@ export default defineConfig({
         context: 'server',
         access: 'secret',
       }),
+      LINKEDIN_ACCESS_TOKEN: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
+      LINKEDIN_PARTNER_ID: envField.string({
+        context: 'client',
+        access: 'public',
+        optional: true,
+      }),
     },
     validateSecrets: false,
   },

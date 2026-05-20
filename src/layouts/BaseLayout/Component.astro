@@ -71,6 +71,7 @@ const finalSeo = suffix ? overrideSeo(seo, replaceSeoPageTitleSuffix(suffix)) : 
 
 <script>
   import { getCookie, setCookie } from '~/lib/cookies';
+  import { GOOGLE_ADS_CONVERSIONS } from '~/lib/googleAds';
 
   const urlParams = new URLSearchParams(window.location.search);
   const source = urlParams.get('utm_source');
@@ -127,5 +128,18 @@ const finalSeo = suffix ? overrideSeo(seo, replaceSeoPageTitleSuffix(suffix)) : 
     if ('posthog' in window) {
       (window as any).posthog.capture('$pageleave');
     }
+  });
+
+  document.addEventListener('click', (e) => {
+    const link = (e.target as Element).closest('a');
+    if (!link?.href?.includes('dashboard.datocms.com') || !('gtag' in window)) return;
+
+    const label = (link.textContent ?? '').toLowerCase();
+    if (/log.?in|sign.?in|enter dashboard/i.test(label)) return;
+
+    (window as any).gtag('event', 'conversion', {
+      send_to: GOOGLE_ADS_CONVERSIONS.dashboardClick,
+      transport_type: 'beacon',
+    });
   });
 </script>

@@ -1,8 +1,16 @@
 ---
 import { FormResultLayout } from '~/layouts/FormResultLayout';
+import { GOOGLE_ADS_CONVERSIONS } from '~/lib/googleAds';
 ---
 
 <FormResultLayout type="success" kicker="Agency Partner Program">
+  <script is:inline define:vars={{ GADS_CONVERSION: GOOGLE_ADS_CONVERSIONS.partnerSubmit }}>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag('event', 'conversion', { send_to: GADS_CONVERSION });
+  </script>
   <p>
     We have successfully received your request, and <strong
       >you will soon receive an automated confirmation via email</strong
