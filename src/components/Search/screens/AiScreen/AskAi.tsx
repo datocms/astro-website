@@ -182,6 +182,7 @@ export const AskAi = forwardRef<AskAiHandle, Props>(function AskAi({ initialQues
     (acc, turn, i) => (turn.role === 'assistant' ? i : acc),
     -1,
   );
+  const firstAssistantTurnIndex = turns.findIndex((turn) => turn.role === 'assistant');
 
   const submitFeedback = (turnIndex: number, sentiment: Sentiment) => {
     const current = turnsRef.current;
@@ -236,6 +237,7 @@ export const AskAi = forwardRef<AskAiHandle, Props>(function AskAi({ initialQues
             </Streamdown>
             {posthogReady &&
               turn.content &&
+              i === firstAssistantTurnIndex &&
               !(i === lastAssistantTurnIndex && aiState === 'streaming') && (
                 <div className={s.feedbackRow} data-state={turn.feedback ? 'done' : 'prompt'}>
                   <div className={s.feedbackPrompt}>
