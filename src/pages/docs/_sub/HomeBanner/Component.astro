@@ -1,0 +1,34 @@
+---
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+
+const resources = [
+  { title: 'General concepts', href: '/docs/general-concepts' },
+  { title: 'CMS Academy', href: '/academy' },
+  { title: 'Video user guides', href: '/user-guides' },
+];
+---
+
+<div class={s.banner} data-datocms-noindex>
+  <div class={s.inner}>
+    <strong class={s.headline}>Code-heavy docs ahead.</strong>
+    <span class={s.subhead}>Want a softer landing?</span>
+    <ul class={s.links}>
+      {
+        resources.map((resource, index) => (
+          <li>
+            {index > 0 && (
+              <span class={s.divider} aria-hidden="true">
+                ·
+              </span>
+            )}
+            <a href={resource.href} class={s.link}>
+              {resource.title}
+              <Svg name="icons/regular/arrow-up-right-from-square" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>

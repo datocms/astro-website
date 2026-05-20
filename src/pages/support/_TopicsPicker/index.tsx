@@ -177,6 +177,8 @@ export function TopicsPicker({ topics, initialLocationSearch }: Props) {
                       email: queryString.email || '',
                       errorId: queryString.errorId || '',
                       project: queryString.projectUrl || '',
+                      subject: queryString.subject || '',
+                      body: queryString.body || '',
                       issueType: leafTopic.autoResponderType,
                     }}
                   />

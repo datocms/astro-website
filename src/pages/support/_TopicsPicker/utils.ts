@@ -8,6 +8,8 @@ export function parseUrlSearchParams(urlParams: URLSearchParams) {
     email: urlParams.get('email'),
     errorId: urlParams.get('errorId'),
     projectUrl: urlParams.get('projectUrl'),
+    subject: urlParams.get('subject'),
+    body: urlParams.get('body'),
   };
 }
 

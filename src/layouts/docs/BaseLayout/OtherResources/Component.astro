@@ -1,0 +1,56 @@
+---
+import { TargetToggler } from '~/components/TargetToggler';
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+
+const dropdownId = 'docs-other-resources-menu';
+
+const resources = [
+  {
+    title: 'General concepts',
+    description: 'How DatoCMS works, in plain English.',
+    href: '/docs/general-concepts',
+  },
+  {
+    title: 'CMS Academy',
+    description: 'Deep-dive courses on headless CMS, APIs, and frameworks.',
+    href: '/academy',
+  },
+  {
+    title: 'Video user guides',
+    description: 'A non-technical walkthrough of the UI for editors.',
+    href: '/user-guides',
+  },
+  {
+    title: 'Glossary',
+    description: 'Key DatoCMS and headless CMS terms, explained.',
+    href: '/glossary',
+  },
+];
+---
+
+<div class={s.root} data-datocms-noindex>
+  <TargetToggler targetId={dropdownId} closeOnClickOutside>
+    <button type="button" class={s.trigger}>
+      <span>Not a developer?</span>
+      <span aria-hidden="true" class={s.caret}></span>
+    </button>
+  </TargetToggler>
+
+  <div id={dropdownId} class={s.dropdown} role="menu">
+    <p class={s.dropdownHeader}>Other DatoCMS resources</p>
+    {
+      resources.map((resource) => (
+        <a class={s.dropdownItem} href={resource.href} role="menuitem">
+          <div class={s.dropdownItemBody}>
+            <p class={s.dropdownItemTitle}>{resource.title}</p>
+            <p class={s.dropdownItemDesc}>{resource.description}</p>
+          </div>
+          <span class={s.dropdownItemArrow} aria-hidden="true">
+            <Svg name="icons/regular/arrow-up-right-from-square" />
+          </span>
+        </a>
+      ))
+    }
+  </div>
+</div>
