@@ -121,18 +121,12 @@ export default defineConfig({
       LINKEDIN_ACCESS_TOKEN: envField.string({
         context: 'server',
         access: 'secret',
-      }),
-      LINKEDIN_CONVERSION_RULE_SALES_LEAD: envField.string({
-        context: 'server',
-        access: 'secret',
-      }),
-      LINKEDIN_CONVERSION_RULE_PARTNER_LEAD: envField.string({
-        context: 'server',
-        access: 'secret',
+        optional: true,
       }),
       LINKEDIN_PARTNER_ID: envField.string({
-        context: 'server',
-        access: 'secret',
+        context: 'client',
+        access: 'public',
+        optional: true,
       }),
     },
     validateSecrets: false,

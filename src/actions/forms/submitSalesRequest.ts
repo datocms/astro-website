@@ -1,6 +1,7 @@
 import { ActionError, defineAction } from 'astro:actions';
-import { FRONT_CHANNEL_URL_SALES, LINKEDIN_CONVERSION_RULE_SALES_LEAD } from 'astro:env/server';
+import { FRONT_CHANNEL_URL_SALES } from 'astro:env/server';
 import { z } from 'astro:schema';
+import { hasMarketingConsent } from '~/lib/consent';
 import { sendToFrontChannel } from '~/lib/front';
 import { trackConversion } from '~/lib/linkedin';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
@@ -12,6 +13,8 @@ import {
   findOrCreateOrgByName,
   findOrCreatePerson,
 } from '../pipedrive/utils';
+
+const LINKEDIN_CONVERSION_RULE_SALES_LEAD = '27784874';
 
 export default defineAction({
   accept: 'form',
@@ -29,7 +32,7 @@ export default defineAction({
     issueType: z.enum(['sales', 'enterprise']).optional(),
     token: z.string(),
   }),
-  handler: async ({ token, ...input }) => {
+  handler: async ({ token, ...input }, { request, cookies }) => {
     try {
       // Step 1: Validate reCAPTCHA token
       if (!(await isRecaptchaTokenValid(token))) {
@@ -46,10 +49,20 @@ export default defineAction({
         });
       }
 
-      // Step 2: Find or create organization in Pipedrive
-      const organization = await findOrCreateOrgByName(input.companyName, input.industry);
+      // Side-effects with no Pipedrive dependency — kick off in parallel with the Pipedrive chain
+      const linkedinPromise = hasMarketingConsent(request, cookies)
+        ? trackConversion(LINKEDIN_CONVERSION_RULE_SALES_LEAD, input.email).catch((e) =>
+            logErrorToRollbar(e, { context: { action: 'linkedin.trackConversion.sales' } }),
+          )
+        : Promise.resolve();
 
-      // Step 3: Find or create person contact in Pipedrive
+      const frontPromise = sendToFrontChannel(
+        FRONT_CHANNEL_URL_SALES,
+        input,
+        'https://www.datocms.com/contact',
+      );
+
+      const organization = await findOrCreateOrgByName(input.companyName, input.industry);
       const person = await findOrCreatePerson(
         input.email,
         input.firstName,
@@ -59,19 +72,13 @@ export default defineAction({
         input.referral,
         organization,
       );
-
-      // Step 4: Create lead in Pipedrive
       const lead = await createLead(person, organization, input.useCase);
 
-      // Step 5 & 6: Add note to Pipedrive and send to Front channel in parallel
       const [, redirectUrl] = await Promise.all([
         createNote(lead, input.body),
-        sendToFrontChannel(FRONT_CHANNEL_URL_SALES, input, 'https://www.datocms.com/contact'),
+        frontPromise,
+        linkedinPromise,
       ]);
-
-      trackConversion(LINKEDIN_CONVERSION_RULE_SALES_LEAD, input.email).catch((e) =>
-        logErrorToRollbar(e, { context: { action: 'linkedin.trackConversion.sales' } }),
-      );
 
       return redirectUrl;
     } catch (e) {

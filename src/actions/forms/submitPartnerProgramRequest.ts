@@ -1,9 +1,7 @@
 import { ActionError, defineAction } from 'astro:actions';
-import {
-  FRONT_CHANNEL_URL_PARTNER_PROGRAM,
-  LINKEDIN_CONVERSION_RULE_PARTNER_LEAD,
-} from 'astro:env/server';
+import { FRONT_CHANNEL_URL_PARTNER_PROGRAM } from 'astro:env/server';
 import { z } from 'astro:schema';
+import { hasMarketingConsent } from '~/lib/consent';
 import { sendToFrontChannel } from '~/lib/front';
 import { trackConversion } from '~/lib/linkedin';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
@@ -15,6 +13,8 @@ import {
   findOrCreateOrgByName,
   findOrCreatePerson,
 } from '../pipedrive/utils';
+
+const LINKEDIN_CONVERSION_RULE_PARTNER_LEAD = '27784882';
 
 export default defineAction({
   accept: 'form',
@@ -30,7 +30,7 @@ export default defineAction({
     body: z.string(),
     token: z.string(),
   }),
-  handler: async ({ token, ...input }) => {
+  handler: async ({ token, ...input }, { request, cookies }) => {
     try {
       // Step 1: Validate reCAPTCHA token
       if (!(await isRecaptchaTokenValid(token))) {
@@ -47,14 +47,24 @@ export default defineAction({
         });
       }
 
-      // Step 2: Find or create organization in Pipedrive
+      // Side-effects with no Pipedrive dependency — kick off in parallel with the Pipedrive chain
+      const linkedinPromise = hasMarketingConsent(request, cookies)
+        ? trackConversion(LINKEDIN_CONVERSION_RULE_PARTNER_LEAD, input.email).catch((e) =>
+            logErrorToRollbar(e, { context: { action: 'linkedin.trackConversion.partner' } }),
+          )
+        : Promise.resolve();
+
+      const frontPromise = sendToFrontChannel(
+        FRONT_CHANNEL_URL_PARTNER_PROGRAM,
+        input,
+        'https://www.datocms.com/partner-program',
+      );
+
       const organization = await findOrCreateOrgByName(
         input.agencyName,
         'Agency / Freelancer',
         input.agencyUrl,
       );
-
-      // Step 3: Find or create person contact in Pipedrive
       const person = await findOrCreatePerson(
         input.email,
         input.firstName,
@@ -64,25 +74,15 @@ export default defineAction({
         '',
         organization,
       );
-
-      // Step 4: Create lead in Pipedrive with partnership label
       const partnershipLabel = '87a60c60-6a8e-11ed-92ec-410445a67487';
       const lead = await createLead(person, organization, '', [partnershipLabel]);
 
-      // Step 5 & 6: Add note to Pipedrive and send to Front channel in parallel
       const noteText = `<p>Team size: ${input.teamSize}</p><p>Product familiarity: ${input.productFamiliarity}</p><p>Message: ${input.body}</p>`;
       const [, redirectUrl] = await Promise.all([
         createNote(lead, noteText),
-        sendToFrontChannel(
-          FRONT_CHANNEL_URL_PARTNER_PROGRAM,
-          input,
-          'https://www.datocms.com/partner-program',
-        ),
+        frontPromise,
+        linkedinPromise,
       ]);
-
-      trackConversion(LINKEDIN_CONVERSION_RULE_PARTNER_LEAD, input.email).catch((e) =>
-        logErrorToRollbar(e, { context: { action: 'linkedin.trackConversion.partner' } }),
-      );
 
       return redirectUrl;
     } catch (e) {
