@@ -1,7 +1,8 @@
 import { ActionError, defineAction } from 'astro:actions';
-import { FRONT_CHANNEL_URL_SALES } from 'astro:env/server';
+import { FRONT_CHANNEL_URL_SALES, LINKEDIN_CONVERSION_RULE_SALES_LEAD } from 'astro:env/server';
 import { z } from 'astro:schema';
 import { sendToFrontChannel } from '~/lib/front';
+import { trackConversion } from '~/lib/linkedin';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 import { isSpam } from '~/lib/spam';
@@ -67,6 +68,10 @@ export default defineAction({
         createNote(lead, input.body),
         sendToFrontChannel(FRONT_CHANNEL_URL_SALES, input, 'https://www.datocms.com/contact'),
       ]);
+
+      trackConversion(LINKEDIN_CONVERSION_RULE_SALES_LEAD, input.email).catch((e) =>
+        logErrorToRollbar(e, { context: { action: 'linkedin.trackConversion.sales' } }),
+      );
 
       return redirectUrl;
     } catch (e) {

@@ -1,7 +1,11 @@
 import { ActionError, defineAction } from 'astro:actions';
-import { FRONT_CHANNEL_URL_PARTNER_PROGRAM } from 'astro:env/server';
+import {
+  FRONT_CHANNEL_URL_PARTNER_PROGRAM,
+  LINKEDIN_CONVERSION_RULE_PARTNER_LEAD,
+} from 'astro:env/server';
 import { z } from 'astro:schema';
 import { sendToFrontChannel } from '~/lib/front';
+import { trackConversion } from '~/lib/linkedin';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 import { isSpam } from '~/lib/spam';
@@ -75,6 +79,10 @@ export default defineAction({
           'https://www.datocms.com/partner-program',
         ),
       ]);
+
+      trackConversion(LINKEDIN_CONVERSION_RULE_PARTNER_LEAD, input.email).catch((e) =>
+        logErrorToRollbar(e, { context: { action: 'linkedin.trackConversion.partner' } }),
+      );
 
       return redirectUrl;
     } catch (e) {
