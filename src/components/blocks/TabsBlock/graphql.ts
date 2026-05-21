@@ -1,15 +1,14 @@
 import { ImageFragment } from '~/components/blocks/Image/graphql';
-import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
-import { TabsBlockFragment } from '~/components/blocks/TabsBlock/graphql';
+import { VideoFragment } from '~/components/blocks/Video/graphql';
+import { DocCalloutFragment } from '~/components/docs/blocks/DocCallout/graphql';
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
-import { ProductUpdateUrlFragment } from '~/lib/datocms/gqlUrlBuilder/productUpdate';
 import { graphql } from '~/lib/datocms/graphql';
 
-export const ProductUpdateFragment = graphql(
+export const TabBlockFragment = graphql(
   /* GraphQL */ `
-    fragment ProductUpdateFragment on ChangelogEntryRecord {
-      ...ProductUpdateUrlFragment
+    fragment TabBlockFragment on TabBlockRecord {
+      id
       title
       content {
         value
@@ -68,25 +67,31 @@ export const ProductUpdateFragment = graphql(
             __typename
           }
           ...ImageFragment
-          ...InternalVideoFragment
-          ...TabsBlockFragment
-        }
-      }
-      _firstPublishedAt
-      categories {
-        name
-        color {
-          hex
+          ...VideoFragment
+          ...DocCalloutFragment
         }
       }
     }
   `,
   [
     ImageFragment,
-    InternalVideoFragment,
-    TabsBlockFragment,
-    ProductUpdateUrlFragment,
+    VideoFragment,
+    DocCalloutFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],
+);
+
+export const TabsBlockFragment = graphql(
+  /* GraphQL */ `
+    fragment TabsBlockFragment on TabsBlockRecord {
+      id
+      tabs {
+        ... on TabBlockRecord {
+          ...TabBlockFragment
+        }
+      }
+    }
+  `,
+  [TabBlockFragment],
 );

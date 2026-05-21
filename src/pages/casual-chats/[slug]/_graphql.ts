@@ -7,6 +7,7 @@ import { MultipleDemosBlockFragment } from '~/components/blocks/MultipleDemosBlo
 import { QuestionAnswerFragment } from '~/components/blocks/QuestionAnswer/graphql';
 import { ShowcaseProjectBlockFragment } from '~/components/blocks/ShowcaseProjectBlock/graphql';
 import { TableFragment } from '~/components/blocks/Table/graphql';
+import { TabsBlockFragment } from '~/components/blocks/TabsBlock/graphql';
 import { TutorialVideoFragment } from '~/components/blocks/TutorialVideo/graphql';
 import { VideoFragment } from '~/components/blocks/Video/graphql';
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
@@ -107,6 +108,7 @@ export const query = graphql(
             ...TutorialVideoFragment
             ...ShowcaseProjectBlockFragment
             ...TableFragment
+            ...TabsBlockFragment
           }
         }
         people {
@@ -126,6 +128,7 @@ export const query = graphql(
     TagFragment,
     ResponsiveImageFragment,
     TableFragment,
+    TabsBlockFragment,
     InternalVideoFragment,
     DemoFragment,
     MultipleDemosBlockFragment,

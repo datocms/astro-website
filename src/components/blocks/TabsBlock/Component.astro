@@ -1,0 +1,53 @@
+---
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { ensureValidStructuredTextProps, type CdaStructuredTextValue } from '@datocms/astro';
+import { TabBlockFragment, TabsBlockFragment } from './graphql';
+import { Tab, Tabs } from '~/components/Tabs';
+import { Text } from '~/components/structuredText/Text';
+import { Image } from '~/components/blocks/Image';
+import { Video } from '~/components/blocks/Video';
+import { DocCallout } from '~/components/docs/blocks/DocCallout';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { isCode, type Document } from 'datocms-structured-text-utils';
+import { Prose } from '~/components/Prose';
+
+interface Props {
+  block: FragmentOf<typeof TabsBlockFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+
+const block = readFragment(TabsBlockFragment, maskedBlock);
+const tabs = block.tabs.map((tab) => readFragment(TabBlockFragment, tab));
+
+function justOneCodeNode(content: unknown) {
+  const nodes = (content as Document | undefined)?.document.children || [];
+  return nodes.length === 1 && isCode(nodes[0]!);
+}
+---
+
+<figure>
+  <Tabs>
+    {
+      tabs.map((tab) => (
+        <Tab title={tab.title} noPadding>
+          <Prose>
+            <Text
+              {...ensureValidStructuredTextProps({
+                data: tab.content,
+                blockComponents: {
+                  ImageRecord: Image,
+                  VideoRecord: Video,
+                  DocCalloutRecord: DocCallout,
+                },
+                linkToRecordComponents: defaultLinkToRecordComponents,
+                inlineRecordComponents: defaultInlineRecordComponents,
+              })}
+            />
+          </Prose>
+        </Tab>
+      ))
+    }
+  </Tabs>
+</figure>

@@ -4,6 +4,7 @@ import { ImageFragment } from '~/components/blocks/Image/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { MultipleDemosBlockFragment } from '~/components/blocks/MultipleDemosBlock/graphql';
 import { TableFragment } from '~/components/blocks/Table/graphql';
+import { TabsBlockFragment } from '~/components/blocks/TabsBlock/graphql';
 import { TutorialVideoFragment } from '~/components/blocks/TutorialVideo/graphql';
 import { CloneButtonFormFragment } from '~/components/docs/blocks/CloneButtonForm/graphql';
 import { DeployButtonFormFragment } from '~/components/docs/blocks/DeployButtonForm/graphql';
@@ -91,6 +92,7 @@ export const PageLayoutFragment = graphql(
           }
           ...ImageFragment
           ...TableFragment
+          ...TabsBlockFragment
           ...DemoFragment
           ...MultipleDemosBlockFragment
           ...InternalVideoFragment
@@ -110,6 +112,7 @@ export const PageLayoutFragment = graphql(
     ResponsiveImageFragment,
     ImageFragment,
     TableFragment,
+    TabsBlockFragment,
     DemoFragment,
     MultipleDemosBlockFragment,
     InternalVideoFragment,

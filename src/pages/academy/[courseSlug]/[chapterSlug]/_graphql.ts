@@ -1,6 +1,7 @@
 import { ImageFragment } from '~/components/blocks/Image/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { TableFragment } from '~/components/blocks/Table/graphql';
+import { TabsBlockFragment } from '~/components/blocks/TabsBlock/graphql';
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
@@ -82,6 +83,7 @@ export const query = graphql(
             ...ImageFragment
             ...InternalVideoFragment
             ...TableFragment
+            ...TabsBlockFragment
           }
         }
         matchingCourses: _allReferencingAcademyCourses(filter: { slug: { eq: $courseSlug } }) {
@@ -103,6 +105,7 @@ export const query = graphql(
     ImageFragment,
     InternalVideoFragment,
     TableFragment,
+    TabsBlockFragment,
     AcademyChapterUrlFragment,
     ResponsiveImageFragment,
     ...defaultLinkToRecordFragments,
