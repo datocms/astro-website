@@ -1,4 +1,11 @@
 ---
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
+import { InlineText } from '~/components/structuredText/InlineText';
+import { Text } from '~/components/structuredText/Text';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { query } from './_graphql';
 import { Layout } from '~/layouts/Layout';
 import { Hero } from '~/components/Hero';
 import { Space } from '~/components/Space';
@@ -8,119 +15,76 @@ import { Wrapper } from '~/components/Wrapper';
 import { Button } from '~/components/Button';
 import { Journey, Step } from '~/components/Journey';
 import { Faqs, Faq } from '~/components/Faqs';
+
+const { page } = await executeQuery(Astro, query);
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
 ---
 
-<Layout seo={[]} noFinalCta>
-  <Fragment slot="head">
-    <title>User research program - DatoCMS</title>
-  </Fragment>
-
+<Layout seo={page.seo} noFinalCta>
   <Hero seoAnalysis={{ keyword: 'research', synonyms: '', relatedKeywords: [] }}>
-    <Fragment slot="kicker">Research Program</Fragment>
-    <Fragment slot="title">Contribute to the <mark>evolution of DatoCMS</mark></Fragment>
-    <Fragment slot="subtitle">
-      Become a part of the DatoCMS Research Program and be the first to know what we are working on,
-      try out innovative concepts, offer your feedback and help optimize DatoCMS for your needs.
+    <Fragment slot="kicker">{page.heroKicker}</Fragment>
+    <Fragment slot="title">
+      <InlineText {...ensureValidStructuredTextProps({ data: page.heroTitle })} />
     </Fragment>
+    <Fragment slot="subtitle">{page.heroSubtitle}</Fragment>
     <Space top={1}>
-      <Button as="a" href="https://forms.datocms.com/form/W_5PwC3kQy6585D09e4lUA">
-        Sign up and share your opinions!
-      </Button>
+      <Button as="a" href={stripStega(page.heroCtaUrl)}>{page.heroCtaLabel}</Button>
     </Space>
   </Hero>
 
   <Space top={3} bottom={2}>
     <InterstitialTitle style="two">
-      How does it work?
+      {page.journeyTitle}
 
       <Fragment slot="below">
-        <Space top={1}>
-          Register to our Research Program, participate to our studies, get rewarded!
-        </Space>
+        <Space top={1}>{page.journeySubtitle}</Space>
       </Fragment>
     </InterstitialTitle>
 
     <Wrapper>
       <Journey>
-        <Step number="01" title="Register…">
-          Take a 2-minute survey to tell us about yourself. We'll match you with the right studies.
-        </Step>
-        <Step number="02" title="Participate…">
-          Get exclusive invitations to our research studies. Join only when it suits you!
-        </Step>
-        <Step number="03" title="Get rewards!"> Receive gift cards or DatoCMS credits. </Step>
+        <Step number="01" title={page.step1Title}>{page.step1Body}</Step>
+        <Step number="02" title={page.step2Title}>{page.step2Body}</Step>
+        <Step number="03" title={page.step3Title}>{page.step3Body}</Step>
       </Journey>
     </Wrapper>
   </Space>
 
   <Space top={3}>
-    <InterstitialTitle>Frequently Asked Questions</InterstitialTitle>
+    <InterstitialTitle>{page.faqSectionTitle}</InterstitialTitle>
     <Wrapper>
       <Faqs>
-        <Faq question="Do I have to be an existing customer to join the panel?">
-          <Prose>
-            No you don't have to be a current customer. Anyone with an interest in participating is
-            welcome to join!
-          </Prose>
-        </Faq>
-        <Faq question="How often will I receive invitations to participate?">
-          <Prose>
-            We generally reach out less than once per quarter, ensuring we respect your time and
-            inbox.
-          </Prose>
-        </Faq>
-        <Faq question="What should I expect after registering for the panel?">
-          <Prose>
-            After registration, you'll periodically receive invitations to participate in research
-            activities tailored to your profile and interests. You have the freedom to accept or
-            decline each invitation.
-          </Prose>
-        </Faq>
-        <Faq question="What types of research opportunities can I expect?">
-          <Prose>
-            Our research involves a variety of activities, including brief online surveys, detailed
-            one-on-one interviews, usability tests of websites or products, and occasionally other
-            interactive studies.
-          </Prose>
-        </Faq>
-        <Faq question="How is my personal information handled?">
-          <Prose>
-            We collect only the essential details required to match you with relevant research
-            opportunities. We maintain strict confidentiality and prioritize your privacy.
-          </Prose>
-        </Faq>
-        <Faq question="Am I obliged to participate in every activity I'm invited to?">
-          <Prose>
-            Not at all. Your participation is always voluntary. You have full control over when and
-            how often you'd like to engage.
-          </Prose>
-        </Faq>
+        {
+          page.faqs.map((faq) => (
+            <Faq question={faq.question}>
+              <Prose>
+                <Text {...ensureValidStructuredTextProps({ data: faq.answer })} />
+              </Prose>
+            </Faq>
+          ))
+        }
       </Faqs>
     </Wrapper>
   </Space>
 
   <Space top={2} bottom={2}>
     <InterstitialTitle style="two">
-      <mark>Have a say</mark> in what we build next!
+      <InlineText {...ensureValidStructuredTextProps({ data: page.bottomCtaTitle })} />
 
       <Fragment slot="below">
+        <Space top={1}>{page.bottomCtaBody}</Space>
         <Space top={1}>
-          Every interview, survey and usability test feeds directly into the roadmap and the
-          decisions our team makes. Sign up once, participate only when a study fits your profile
-          and your schedule, and get rewarded with gift cards or DatoCMS credits every time you take
-          part.
-        </Space>
-        <Space top={1}>
-          <Button
-            as="a"
-            href="https://forms.datocms.com/form/W_5PwC3kQy6585D09e4lUA"
-            p="big"
-            fs="big"
-          >
-            Sign up to the panel
+          <Button as="a" href={stripStega(page.bottomCtaButtonUrl)} p="big" fs="big">
+            {page.bottomCtaButtonLabel}
           </Button>
         </Space>
       </Fragment>
     </InterstitialTitle>
   </Space>
+
+  <DraftModeQueryListener query={query} />
 </Layout>
