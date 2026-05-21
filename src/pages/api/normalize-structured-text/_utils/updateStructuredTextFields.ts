@@ -1,4 +1,4 @@
-import { type RawApiTypes } from '@datocms/cma-client-node';
+import { type RawApiTypes } from '@datocms/cma-client';
 import { type StructuredTextDocument } from 'datocms-structured-text-to-plain-text';
 import {
   forEachNode,

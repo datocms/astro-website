@@ -1,4 +1,4 @@
-import { buildClient as buildCmaClient, type RawApiTypes } from '@datocms/cma-client-node';
+import { buildClient as buildCmaClient, type RawApiTypes } from '@datocms/cma-client';
 import { buildClient as buildDashboardClient } from '@datocms/dashboard-client';
 import type { APIRoute } from 'astro';
 import { DATOCMS_API_TOKEN, SECRET_API_TOKEN } from 'astro:env/server';

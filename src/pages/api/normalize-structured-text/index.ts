@@ -1,4 +1,4 @@
-import { buildClient, type RawApiTypes } from '@datocms/cma-client-node';
+import { buildClient, type RawApiTypes } from '@datocms/cma-client';
 import type { APIRoute } from 'astro';
 import { DATOCMS_API_TOKEN, SECRET_API_TOKEN } from 'astro:env/server';
 import { render } from 'datocms-structured-text-to-plain-text';
