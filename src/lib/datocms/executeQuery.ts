@@ -3,7 +3,7 @@ import {
   type ExecuteQueryOptions as CdaExecuteQueryOptions,
 } from '@datocms/cda-client';
 import type { AstroGlobal } from 'astro';
-import { DATOCMS_API_TOKEN } from 'astro:env/server';
+import { DATOCMS_API_TOKEN, DATOCMS_ENVIRONMENT } from 'astro:env/server';
 import type { TadaDocumentNode } from 'gql.tada';
 import { print } from 'graphql';
 import { isDraftModeEnabled } from '~/lib/draftMode';
@@ -42,6 +42,7 @@ export async function executeQueryOutsideAstro<Result, Variables>(
       excludeInvalid: true,
       includeDrafts: draftModeEnabled,
       token: DATOCMS_API_TOKEN,
+      environment: DATOCMS_ENVIRONMENT,
       ...(draftModeEnabled ? { contentLink: 'v1', baseEditingUrl: 'https://cms.datocms.com' } : {}),
     });
 
