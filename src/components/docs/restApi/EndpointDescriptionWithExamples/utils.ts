@@ -92,13 +92,13 @@ export function findExamplesInHyperschema() {
 }
 
 export async function markdownWithExamples(content: string) {
+  // We build the remark plugin list explicitly instead of spreading
+  // `baseConfig.remarkPlugins`, because that already includes
+  // `remarkTabs` whose stray-directive handler would turn `::example`
+  // into plain text before `findExamplesInHyperschema` ever sees it.
   const processor = await createMarkdownProcessor({
     ...baseConfig,
-    remarkPlugins: [
-      ...(baseConfig.remarkPlugins || []),
-      remarkDirective,
-      findExamplesInHyperschema,
-    ],
+    remarkPlugins: [remarkDirective, findExamplesInHyperschema],
   });
   const result = await processor.render(content);
 

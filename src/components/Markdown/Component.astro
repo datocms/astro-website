@@ -1,4 +1,6 @@
 ---
+import { Tab, Tabs } from '~/components/Tabs';
+import { parseTabsInHtml } from './parseTabsInHtml';
 import { markdown } from './utils';
 
 type Props = {
@@ -6,6 +8,22 @@ type Props = {
 };
 
 const { of: content } = Astro.props;
+const html = (await markdown(content)).toString();
+const items = parseTabsInHtml(html);
 ---
 
-<Fragment set:html={markdown(content)} />
+{
+  items.map((item) =>
+    item.type === 'html' ? (
+      <Fragment set:html={item.content} />
+    ) : (
+      <Tabs>
+        {item.tabs.map((tab) => (
+          <Tab title={tab.title}>
+            <Fragment set:html={tab.html} />
+          </Tab>
+        ))}
+      </Tabs>
+    ),
+  )
+}

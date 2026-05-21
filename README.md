@@ -78,6 +78,35 @@ To render markdown, you can use:
 - `<Markdown of={content} />` or `markdown(content)` (they're basically the same).
 - `inlineMarkdown` for small, single-paragraph markdown content that you want to render without the wrapping paragraph.
 
+On top of standard GFM, the markdown pipeline supports a few extras:
+
+- **Callouts** — GitHub-style blockquotes: `> [!NOTE] Title\n> Body` (also `TIP`, `WARNING`, etc.).
+- **Tabs** — `remark-directive` container syntax for grouping mixed content into tabs:
+
+  ````md
+  ::::tabs
+  :::tab[Overview]
+  A paragraph, then code:
+
+  ```js
+  console.log('hi');
+  ```
+
+  :::
+
+  :::tab[Details]
+
+  - bullet
+  - list
+    :::
+    ::::
+  ````
+
+  Outer container needs more colons than inner (`::::` vs `:::`). Each tab can contain any markdown (paragraphs, code, lists, blockquotes, …). Only recognized at the root level.
+
+- **Syntax highlighting** — fenced code blocks are rendered through [Expressive Code](https://expressive-code.com/) (see `ec.config.mjs`).
+- **Auto-linked headings** — every heading gets an anchor and a permalink, slugified from its text.
+
 ## Structured Text
 
 Avoid directly using `<StructuredText />`. Prefer `<Text />` or `<InlineText />` which offers a few sane defaults.
