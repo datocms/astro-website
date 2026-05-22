@@ -18995,6 +18995,17 @@ type Query {
     fallbackLocales: [SiteLocale!]
   ): RecipesPageRecord
 
+  """Returns the single instance record"""
+  researchProgramPage(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+
+    """
+    If you want to fallback to a default translation when a translation has not been found
+    """
+    fallbackLocales: [SiteLocale!]
+  ): ResearchProgramPageRecord
+
   """Returns a specific record"""
   review(
     """The locale to use to fetch the field's content"""
@@ -19616,6 +19627,114 @@ interface RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   id: ItemId!
+}
+
+type ResearchFaqItemModelAnswerField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+"""Block of type Research FAQ Item (research_faq_item)"""
+type ResearchFaqItemRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  answer: ResearchFaqItemModelAnswerField
+  createdAt: DateTime!
+  id: ItemId!
+  question: String!
+  updatedAt: DateTime!
+}
+
+type ResearchProgramPageModelBottomCtaTitleField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+type ResearchProgramPageModelHeroTitleField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+"""Record of type Research Program Page (research_program_page)"""
+type ResearchProgramPageRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  bottomCtaBody(
+    """Process content as markdown"""
+    markdown: Boolean
+  ): String
+  bottomCtaButtonLabel: String
+  bottomCtaButtonUrl: String
+  bottomCtaTitle: ResearchProgramPageModelBottomCtaTitleField!
+  createdAt: DateTime!
+  faqSectionTitle: String
+  faqs: [ResearchFaqItemRecord!]!
+  heroCtaLabel: String
+  heroCtaUrl: String
+  heroKicker: String
+  heroSubtitle(
+    """Process content as markdown"""
+    markdown: Boolean
+  ): String
+  heroTitle: ResearchProgramPageModelHeroTitleField!
+  id: ItemId!
+  journeySubtitle: String
+  journeyTitle: String
+  seo: SeoField
+  step1Body(
+    """Process content as markdown"""
+    markdown: Boolean
+  ): String
+  step1Title: String
+  step2Body(
+    """Process content as markdown"""
+    markdown: Boolean
+  ): String
+  step2Title: String
+  step3Body(
+    """Process content as markdown"""
+    markdown: Boolean
+  ): String
+  step3Title: String
+  updatedAt: DateTime!
 }
 
 """Specifies how to filter by upload type"""

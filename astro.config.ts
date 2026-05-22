@@ -110,10 +110,14 @@ export default defineConfig({
       RECAPTCHA_KEY: envField.string({
         context: 'client',
         access: 'public',
+        optional: true,
+        default: '',
       }),
       KNOWLEDGE_BASE_URL: envField.string({
         context: 'client',
         access: 'public',
+        optional: true,
+        default: '',
       }),
       OPENAI_API_KEY: envField.string({
         context: 'server',
