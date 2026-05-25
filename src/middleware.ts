@@ -2,6 +2,7 @@ import { stripStega } from '@datocms/astro';
 import type { MiddlewareHandler } from 'astro';
 import { DEPLOYMENT_DESTINATION, SECRET_API_TOKEN } from 'astro:env/server';
 import { sequence } from 'astro:middleware';
+import { parse } from 'node-html-parser';
 import { baseUrl, isDraftModeEnabled } from './lib/draftMode';
 import { convertHtmlToMarkdown } from './lib/llmtxt';
 import logToRollbar from './lib/logToRollbar';
@@ -128,4 +129,43 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
   return next();
 };
 
-export const onRequest = sequence(rollbar, markdownProxy, security, basicAuth);
+export const propagateToken: MiddlewareHandler = async (context, next) => {
+  const token = context.url.searchParams.get('token');
+  if (!token) return next();
+
+  const response = await next();
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('text/html')) return response;
+
+  const html = await response.text();
+  const root = parse(html);
+  const origin = context.url.origin;
+
+  for (const a of root.querySelectorAll('a[href]')) {
+    const href = a.getAttribute('href');
+    if (!href) continue;
+    if (/^(#|mailto:|tel:|javascript:|data:)/i.test(href)) continue;
+
+    try {
+      const url = new URL(href, context.url);
+      if (url.origin !== origin) continue;
+      if (url.searchParams.has('token')) continue;
+      url.searchParams.set('token', token);
+      const isRelative = !/^https?:\/\//i.test(href);
+      a.setAttribute('href', isRelative ? url.pathname + url.search + url.hash : url.toString());
+    } catch {
+      // ignore malformed hrefs
+    }
+  }
+
+  const headers = new Headers(response.headers);
+  headers.delete('content-length');
+
+  return new Response(root.toString(), {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+};
+
+export const onRequest = sequence(rollbar, markdownProxy, security, basicAuth, propagateToken);
