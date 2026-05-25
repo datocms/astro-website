@@ -1,5 +1,6 @@
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
+import { FaqBlockFragment } from '~/components/Faqs/graphql';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -8,39 +9,26 @@ export const query = graphql(
         seo: _seoMetaTags {
           ...TagFragment
         }
-        heroKicker
-        heroTitle {
-          value
-        }
-        heroSubtitle
         heroCtaLabel
-        heroCtaUrl
-        journeyTitle
-        journeySubtitle
-        step1Title
-        step1Body
-        step2Title
-        step2Body
-        step3Title
-        step3Body
-        faqSectionTitle
-        faqs {
-          ... on ResearchFaqItemRecord {
+        ctaUrl
+        steps {
+          ... on ProcessStepBlockRecord {
             id
-            question
-            answer {
+            title
+            body {
               value
             }
           }
         }
-        bottomCtaTitle {
-          value
+        faqs {
+          ... on QuestionAnswerRecord {
+            id
+            ...FaqBlockFragment
+          }
         }
-        bottomCtaBody
         bottomCtaButtonLabel
-        bottomCtaButtonUrl
       }
     }
   `,
-  [TagFragment],
+  [TagFragment, FaqBlockFragment],
 );

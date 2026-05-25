@@ -1,5 +1,4 @@
-import { defaultInlineRecordFragments } from '~/components/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
+import { FaqRecordFragment } from '~/components/Faqs/graphql';
 import { ReviewQuoteFragment } from '~/components/quote/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
@@ -39,59 +38,7 @@ export const query = graphql(
       }
       faqs: allFaqs {
         id
-        question
-        answer {
-          value
-          links {
-            ... on RecordInterface {
-              id
-              __typename
-            }
-            ...AcademyChapterLinkFragment
-            ...AcademyCourseLinkFragment
-            ...BlogPostLinkFragment
-            ...ChangelogEntryLinkFragment
-            ...CustomerStoryLinkFragment
-            ...DocGroupLinkFragment
-            ...DocPageLinkFragment
-            ...EnterpriseAppLinkFragment
-            ...FeatureLinkFragment
-            ...HostingAppLinkFragment
-            ...LandingPageLinkFragment
-            ...PartnerLinkFragment
-            ...PluginLinkFragment
-            ...ProductComparisonLinkFragment
-            ...RecipeLinkFragment
-            ...ShowcaseProjectLinkFragment
-            ...SuccessStoryLinkFragment
-            ...TechPartnerLinkFragment
-            ...TemplateDemoLinkFragment
-            ...UseCasePageLinkFragment
-            ...UserGuidesEpisodeLinkFragment
-
-            ...AcademyChapterInlineFragment
-            ...AcademyCourseInlineFragment
-            ...BlogPostInlineFragment
-            ...ChangelogEntryInlineFragment
-            ...CustomerStoryInlineFragment
-            ...DocGroupInlineFragment
-            ...DocPageInlineFragment
-            ...EnterpriseAppInlineFragment
-            ...FeatureInlineFragment
-            ...HostingAppInlineFragment
-            ...LandingPageInlineFragment
-            ...PartnerInlineFragment
-            ...PluginInlineFragment
-            ...ProductComparisonInlineFragment
-            ...RecipeInlineFragment
-            ...ShowcaseProjectInlineFragment
-            ...SuccessStoryInlineFragment
-            ...TechPartnerInlineFragment
-            ...TemplateDemoInlineFragment
-            ...UseCasePageInlineFragment
-            ...UserGuidesEpisodeInlineFragment
-          }
-        }
+        ...FaqRecordFragment
       }
       planFeatureGroups: allPlanFeatureGroups(orderBy: position_ASC, first: 100) {
         ...PlanFeatureGroupFragment
@@ -105,12 +52,5 @@ export const query = graphql(
       }
     }
   `,
-  [
-    ReviewQuoteFragment,
-    TagFragment,
-    HintFragment,
-    PlanFeatureGroupFragment,
-    ...defaultLinkToRecordFragments,
-    ...defaultInlineRecordFragments,
-  ],
+  [ReviewQuoteFragment, TagFragment, HintFragment, PlanFeatureGroupFragment, FaqRecordFragment],
 );

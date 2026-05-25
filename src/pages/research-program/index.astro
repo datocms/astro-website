@@ -2,14 +2,12 @@
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
-import { InlineText } from '~/components/structuredText/InlineText';
 import { Text } from '~/components/structuredText/Text';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { query } from './_graphql';
 import { Layout } from '~/layouts/Layout';
 import { Hero } from '~/components/Hero';
 import { Space } from '~/components/Space';
-import { Prose } from '~/components/Prose';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Wrapper } from '~/components/Wrapper';
 import { Button } from '~/components/Button';
@@ -26,59 +24,63 @@ if (!page) {
 
 <Layout seo={page.seo} noFinalCta>
   <Hero seoAnalysis={{ keyword: 'research', synonyms: '', relatedKeywords: [] }}>
-    <Fragment slot="kicker">{page.heroKicker}</Fragment>
-    <Fragment slot="title">
-      <InlineText {...ensureValidStructuredTextProps({ data: page.heroTitle })} />
+    <Fragment slot="kicker">Research Program</Fragment>
+    <Fragment slot="title">Contribute to the <mark>evolution of DatoCMS</mark></Fragment>
+    <Fragment slot="subtitle">
+      Become a part of the DatoCMS Research Program and be the first to know what we are working on,
+      try out innovative concepts, offer your feedback and help optimize DatoCMS for your needs.
     </Fragment>
-    <Fragment slot="subtitle">{page.heroSubtitle}</Fragment>
     <Space top={1}>
-      <Button as="a" href={stripStega(page.heroCtaUrl)}>{page.heroCtaLabel}</Button>
+      <Button as="a" href={stripStega(page.ctaUrl)}>{page.heroCtaLabel}</Button>
     </Space>
   </Hero>
 
   <Space top={3} bottom={2}>
     <InterstitialTitle style="two">
-      {page.journeyTitle}
+      How does it work?
 
       <Fragment slot="below">
-        <Space top={1}>{page.journeySubtitle}</Space>
+        <Space top={1}>
+          Register to our Research Program, participate to our studies, get rewarded!
+        </Space>
       </Fragment>
     </InterstitialTitle>
 
     <Wrapper>
       <Journey>
-        <Step number="01" title={page.step1Title ?? ''}>{page.step1Body}</Step>
-        <Step number="02" title={page.step2Title ?? ''}>{page.step2Body}</Step>
-        <Step number="03" title={page.step3Title ?? ''}>{page.step3Body}</Step>
+        {
+          page.steps.map((step, i) => (
+            <Step number={String(i + 1).padStart(2, '0')} title={step.title}>
+              <Text {...ensureValidStructuredTextProps({ data: step.body })} />
+            </Step>
+          ))
+        }
       </Journey>
     </Wrapper>
   </Space>
 
   <Space top={3}>
-    <InterstitialTitle>{page.faqSectionTitle}</InterstitialTitle>
+    <InterstitialTitle>Frequently Asked Questions</InterstitialTitle>
     <Wrapper>
       <Faqs>
-        {
-          page.faqs.map((faq) => (
-            <Faq question={faq.question}>
-              <Prose>
-                <Text {...ensureValidStructuredTextProps({ data: faq.answer })} />
-              </Prose>
-            </Faq>
-          ))
-        }
+        {page.faqs.map((faq) => <Faq block={faq} />)}
       </Faqs>
     </Wrapper>
   </Space>
 
   <Space top={2} bottom={2}>
     <InterstitialTitle style="two">
-      <InlineText {...ensureValidStructuredTextProps({ data: page.bottomCtaTitle })} />
+      <mark>Have a say</mark> in what we build next!
 
       <Fragment slot="below">
-        <Space top={1}>{page.bottomCtaBody}</Space>
         <Space top={1}>
-          <Button as="a" href={stripStega(page.bottomCtaButtonUrl)} p="big" fs="big">
+          Every interview, survey and usability test feeds directly into the roadmap and the
+          decisions our team makes. Sign up once, participate only when a study fits your profile
+          and your schedule, and get rewarded with gift cards or DatoCMS credits every time you take
+          part.
+        </Space>
+        <Space top={1}>
+          <Button as="a" href={stripStega(page.ctaUrl)} p="big" fs="big">
             {page.bottomCtaButtonLabel}
           </Button>
         </Space>
