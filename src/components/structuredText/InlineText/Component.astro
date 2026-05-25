@@ -1,15 +1,13 @@
 ---
 import { StructuredText } from '@datocms/astro';
 import NoParagraph from './NoParagraph.astro';
-import type { CdaStructuredTextRecord, StructuredTextPropTypes } from 'react-datocms';
+import type { ComponentProps } from 'astro/types';
 
-type Props = {
-  data: StructuredTextPropTypes<CdaStructuredTextRecord, CdaStructuredTextRecord>['data'];
-};
+type Props = ComponentProps<typeof StructuredText>;
 
-const { data } = Astro.props;
+const { nodeOverrides, ...props } = Astro.props;
 ---
 
 <span data-datocms-content-link-group>
-  <StructuredText data={data} nodeOverrides={{ paragraph: NoParagraph }} />
+  <StructuredText {...props} nodeOverrides={{ paragraph: NoParagraph, ...nodeOverrides }} />
 </span>

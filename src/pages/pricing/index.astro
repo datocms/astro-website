@@ -5,11 +5,8 @@ import { Hero } from '~/components/Hero';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { LogosBar } from '~/components/LogosBar';
 import { Space } from '~/components/Space';
-import { Prose } from '~/components/Prose';
 import { Svg } from '~/components/Svg';
 import { Wrapper } from '~/components/Wrapper';
-import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/structuredText/Text';
 import { Layout } from '~/layouts/Layout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
@@ -23,8 +20,6 @@ import { fetchPerOwnerPricingPlans } from './_sub/perOwnerPricingPlans';
 import { SingleQuote } from '~/components/quote/SingleQuote';
 import { formatNumber } from '~/lib/formatters';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
-import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import { Switch } from '~/components/Switch';
 import { Faqs, Faq } from '~/components/Faqs';
@@ -265,21 +260,7 @@ if (!page || !freePlan || !proPlan) {
         <InterstitialTitle>Frequently Asked Questions</InterstitialTitle>
         <Wrapper>
           <Faqs>
-            {
-              faqs.map((faq) => (
-                <Faq question={faq.question}>
-                  <Prose>
-                    <Text
-                      {...ensureValidStructuredTextProps({
-                        data: faq.answer,
-                        linkToRecordComponents: defaultLinkToRecordComponents,
-                        inlineRecordComponents: defaultInlineRecordComponents,
-                      })}
-                    />
-                  </Prose>
-                </Faq>
-              ))
-            }
+            {faqs.map((faq) => <Faq block={faq} />)}
           </Faqs>
         </Wrapper>
       </Space>

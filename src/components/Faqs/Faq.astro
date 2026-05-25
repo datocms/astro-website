@@ -1,14 +1,53 @@
 ---
 import s from './style.module.css';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { FaqRecordFragment, FaqBlockFragment } from './graphql';
+import { InlineText } from '~/components/structuredText/InlineText';
+import { Text } from '~/components/structuredText/Text';
+import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/inlineRecords';
+import { Prose } from '~/components/Prose';
 
 type Props = {
-  question: string;
+  block: FragmentOf<typeof FaqRecordFragment> | FragmentOf<typeof FaqBlockFragment>;
 };
 
-const { question } = Astro.props;
+const { block: maskedBlock } = Astro.props;
+
+const typename = (maskedBlock as unknown as { __typename: string }).__typename;
+const isBlock = typename === 'QuestionAnswerRecord';
+
+const blockData = isBlock
+  ? readFragment(FaqBlockFragment, maskedBlock as FragmentOf<typeof FaqBlockFragment>)
+  : readFragment(FaqRecordFragment, maskedBlock as FragmentOf<typeof FaqRecordFragment>);
 ---
 
 <div class={s.faq}>
-  <h6 class={s.faqQ}>{question}</h6>
-  <div class={s.faqA}><slot /></div>
+  <h6 class={s.faqQ}>
+    {
+      blockData.__typename === 'QuestionAnswerRecord' ? (
+        <InlineText
+          {...ensureValidStructuredTextProps({
+            data: blockData.question,
+            linkToRecordComponents: defaultLinkToRecordComponents,
+            inlineRecordComponents: defaultInlineRecordComponents,
+          })}
+        />
+      ) : (
+        blockData.question
+      )
+    }
+  </h6>
+  <div class={s.faqA}>
+    <Prose>
+      <Text
+        {...ensureValidStructuredTextProps({
+          data: blockData.answer,
+          linkToRecordComponents: defaultLinkToRecordComponents,
+          inlineRecordComponents: defaultInlineRecordComponents,
+        })}
+      />
+    </Prose>
+  </div>
 </div>

@@ -37,6 +37,11 @@ export default defineConfig({
         context: 'server',
         access: 'secret',
       }),
+      DATOCMS_ENVIRONMENT: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+      }),
       SECRET_API_TOKEN: envField.string({
         context: 'server',
         access: 'secret',
