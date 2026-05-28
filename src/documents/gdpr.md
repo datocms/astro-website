@@ -17,7 +17,7 @@ For paying customers we collect also the company billing information.
 
 We collect also IP addresses of end users visiting the projects created with DatoCMS.
 
-We collect all the data that users input during the usage of the software, such as text, images, videos, and other files loaded during CMS usage.
+We collect all the data that users input during the usage of the software, such as text and images loaded during CMS usage.
 
 ## Data storage
 
@@ -40,9 +40,8 @@ Any assets uploaded while using the service are stored in Cloudflare R2, in its 
 ### Chargebee
 
 When you sign up for a paid plan, we ask for the information that is legally
-required for invoicing and billing. This data is stored in Chargebee and may
-also be stored in DatoCMS systems where needed to manage subscriptions and
-legal accounting obligations.
+required for invoicing and supply it directly to Chargebee. We do not store
+this information in our systems.
 
 The information is:
 
@@ -255,7 +254,6 @@ We collect and store your data for the following reasons:
   entering into a contract with a data controller.
 - To comply with legal obligations, including accounting and invoicing obligations.
 - Based on your consent, for example for newsletter and marketing communications.
-- Based on our legitimate interests, including service security, abuse prevention, support, monitoring, and product improvement.
 
 (For more information about these reasons, see [the explanation on Wikipedia][wikipedia-gdpr-lawful-basis])
 
@@ -276,9 +274,9 @@ We use your data to do the following:
 
 ## Duration of data retention
 
-We store your data for the duration of your use of the system, unless a longer retention period is required by law or needed for legitimate service, security, support, or accounting purposes.
+We store your data for the duration of your use of the system, unless a longer retention period is required by law.
 
-When you cancel your account, personal data associated with the account is deleted or anonymized unless we need to retain it for legal compliance or another legitimate purpose.
+When you cancel your account, personal data associated with the account is deleted or anonymized unless we need to retain it for legal compliance.
 
 Accounting data is held for 10 years for legal compliance.
 
