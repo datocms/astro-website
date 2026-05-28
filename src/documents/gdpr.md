@@ -17,7 +17,7 @@ For paying customers we collect also the company billing information.
 
 We collect also IP addresses of end users visiting the projects created with DatoCMS.
 
-We collect all the data that users input during the usage of the software, such as text and images loaded during CMS usage.
+We collect all the data that users input during the usage of the software, such as text, images, videos, and other files loaded during CMS usage.
 
 ## Data storage
 
@@ -40,8 +40,9 @@ Any assets uploaded while using the service are stored in Cloudflare R2, in its 
 ### Chargebee
 
 When you sign up for a paid plan, we ask for the information that is legally
-required for invoicing and supply it directly to Chargebee. We do not store
-this information in our systems.
+required for invoicing and billing. This data is stored in Chargebee and may
+also be stored in DatoCMS systems where needed to manage subscriptions and
+legal accounting obligations.
 
 The information is:
 
@@ -83,13 +84,11 @@ The information is:
 
 [Pipedrive GDPR Compliance](https://www.pipedrive.com/en/privacy)
 
-### QuickBooks and FCC
+### QuickBooks
 
-Our company needs to send certified digital invoices to our Italian customers and to the government. To do that we use QuickBooks.
+Our company needs to manage accounting records and send certified digital invoices to our Italian customers and to the government. To do that we use QuickBooks.
 
-FCC is a QuickBooks partner company that deals with data sync from Chargebee and generates some Italian specific accounting documents.
-
-The information passed on to QuickBooks and FCC are:
+The information passed on to QuickBooks is:
 
 - first name,
 - last name,
@@ -98,6 +97,21 @@ The information passed on to QuickBooks and FCC are:
 - billing address.
 
 [QuickBooks GDPR Compliance](https://quickbooks.intuit.com/eu/gdpr/)
+
+### Invoicetronic
+
+For Italian electronic invoicing, we use Invoicetronic to send and receive invoices through SDI.
+
+The information passed on to Invoicetronic is:
+
+- invoice data,
+- first name,
+- last name,
+- company,
+- VAT number,
+- billing address.
+
+[Invoicetronic GDPR Compliance](https://invoicetronic.com/en/gdpr/)
 
 ### Front
 
@@ -111,22 +125,46 @@ To book meetings or support sessions we ask our users use Calendly. By using Cal
 
 [Calendly GDPR Compliance](https://help.calendly.com/hc/en-us/articles/360007032633-GDPR-FAQs)
 
-### Google workspace
+### Google Workspace
 
-Underlying Front, we use Google workspace to send and receive email and to book meetings.
+Underlying Front, we use Google Workspace to send and receive email and to book meetings.
+
+[Google GDPR Compliance](https://cloud.google.com/privacy/gdpr)
+
+### Google reCAPTCHA
+
+We use Google reCAPTCHA to protect website forms, newsletter signup, docs feedback, and Slack invite requests from spam and abuse.
+
+Google reCAPTCHA may process:
+
+- IP address,
+- device information,
+- browser information,
+- user interaction data.
 
 [Google GDPR Compliance](https://cloud.google.com/privacy/gdpr)
 
 ### MailerLite
 
-If you opt to sign up for our newsletter, we register you on our MailerLite
-account, supplying them with:
+If you opt to sign up for our newsletter or marketing communications, we register you on our MailerLite account, supplying them with:
 
 - email,
 - first name,
 - last name.
 
 [MailerLite GDPR Compliance](https://www.mailerlite.com/gdpr-compliance)
+
+### Postmark
+
+We use Postmark to send transactional and service emails, such as account and service notifications.
+
+The information sent to Postmark is:
+
+- email,
+- first name,
+- last name.
+
+[Postmark GDPR Compliance](https://postmarkapp.com/support/article/1168-postmarks-gdpr-compliance)
 
 ### Rollbar
 
@@ -156,6 +194,58 @@ The information that we send are:
 
 [PostHog GDPR Compliance](https://posthog.com/handbook/company/security#gdpr)
 
+### Imgix
+
+We use Imgix to optimize and deliver uploaded images.
+
+Imgix may process:
+
+- uploaded image data,
+- Usage Data,
+- IP address,
+- device information,
+- browser information.
+
+[Imgix Privacy Policy](https://imgix.com/privacy)
+
+### Mux
+
+We use Mux to encode, process, and stream uploaded videos.
+
+Mux may process:
+
+- uploaded video data,
+- Usage Data,
+- IP address,
+- device information,
+- browser information.
+
+[Mux Privacy Policy](https://www.mux.com/privacy)
+
+### Pusher
+
+We use Pusher to deliver realtime notifications and updates in the CMS and related API flows.
+
+Pusher may process:
+
+- Usage Data,
+- IP address,
+- device information,
+- browser information.
+
+[Pusher Privacy Policy](https://bird.com/legal/privacy)
+
+### Elastic
+
+We use Elastic as backend search and indexing infrastructure.
+
+Elastic may process:
+
+- Usage Data,
+- data needed to search and index service content.
+
+[Elastic Privacy Statement](https://www.elastic.co/legal/privacy-statement)
+
 ## Legal basis
 
 We collect and store your data for the following reasons:
@@ -163,6 +253,9 @@ We collect and store your data for the following reasons:
 - To fulfill contractual obligations with a data subject.
 - To perform tasks at the request of a data subject who is in the process of
   entering into a contract with a data controller.
+- To comply with legal obligations, including accounting and invoicing obligations.
+- Based on your consent, for example for newsletter and marketing communications.
+- Based on our legitimate interests, including service security, abuse prevention, support, monitoring, and product improvement.
 
 (For more information about these reasons, see [the explanation on Wikipedia][wikipedia-gdpr-lawful-basis])
 
@@ -173,18 +266,19 @@ We collect and store your data for the following reasons:
 We use your data to do the following:
 
 - to allow you to log in to the site. In this case your data stays in our main servers only.
-- to send you an invoice, we never save your invoicing data, we delegate Stripe and Chargebee the storage and management of your data.
-- as an Italian company we need to send electronic copy of all our invoices to the state. To do that we use FCC accounting system to pull the data from Chargebee and generate the invoices also on Quickbooks. So your invoicing data will be stored both on Chargebee and Quickbooks, while passing via FCC accounting system.
-- to send you transactional emails about the service, promotional and marketing emails we use MailerLite.
+- to process payments and send invoices, we use Stripe and Chargebee. Billing and invoicing data may also be stored in DatoCMS systems where needed to manage subscriptions and legal accounting obligations.
+- as an Italian company we need to send electronic copies of invoices to the state. To do that we use QuickBooks and our internal accounting system, which receives data from Chargebee and sends electronic invoices through SDI using Invoicetronic.
+- to send you transactional emails about the service, we use Postmark.
+- to send promotional and marketing emails, we use MailerLite.
 - on support request we ask your email address to contact you back and we share that information with Front, the service we use for customer care.
 - when you fill the online forms and when you sign up we send the provided data to Pipedrive to improve the sale process.
 - when an error occurs on the platform we automatically send some telemetry data to Rollbar to be notified about the errors and help us to resolve them. If the error happens on the CMS interface we also send the email address of the user to be able to easily get in touch to gain additional information.
 
 ## Duration of data retention
 
-We store your data for the duration of your use of the system.
+We store your data for the duration of your use of the system, unless a longer retention period is required by law or needed for legitimate service, security, support, or accounting purposes.
 
-As soon as you cancel your account, your personal information is erased.
+When you cancel your account, personal data associated with the account is deleted or anonymized unless we need to retain it for legal compliance or another legitimate purpose.
 
 Accounting data is held for 10 years for legal compliance.
 
@@ -203,4 +297,4 @@ Please contact us (at the address below) if you want to do any of the above.
 If you have any doubts, or wish to exercise your rights (as listed above),
 please send us an email here: [support@datocms.com](mailto:support@datocms.com)
 
-Latest update: May 30, 2025
+Latest update: May 28, 2026
