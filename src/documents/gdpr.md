@@ -124,22 +124,9 @@ To book meetings or support sessions we ask our users use Calendly. By using Cal
 
 [Calendly GDPR Compliance](https://help.calendly.com/hc/en-us/articles/360007032633-GDPR-FAQs)
 
-### Google Workspace
+### Google workspace
 
-Underlying Front, we use Google Workspace to send and receive email and to book meetings.
-
-[Google GDPR Compliance](https://cloud.google.com/privacy/gdpr)
-
-### Google reCAPTCHA
-
-We use Google reCAPTCHA to protect website forms, newsletter signup, docs feedback, and Slack invite requests from spam and abuse.
-
-Google reCAPTCHA may process:
-
-- IP address,
-- device information,
-- browser information,
-- user interaction data.
+Underlying Front, we use Google workspace to send and receive email and to book meetings.
 
 [Google GDPR Compliance](https://cloud.google.com/privacy/gdpr)
 
