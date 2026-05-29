@@ -17,3 +17,13 @@ import privacy from '~/documents/privacy.json';
     <Fragment set:html={privacy.content} />
   </LegalProse>
 </Layout>
+
+<script>
+  document.querySelectorAll('details').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      if ((e.target as Element).closest('summary, a, button, input, select, textarea')) return;
+      e.preventDefault();
+      el.open = !el.open;
+    });
+  });
+</script>
