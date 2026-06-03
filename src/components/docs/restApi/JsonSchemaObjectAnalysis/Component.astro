@@ -24,8 +24,9 @@ const rawMarkdown = emitMarkdown
     })
   : null;
 
-// Inside <script>, `</script>` would close the element prematurely.
-// The converter unescapes the matching `<\/script>` back when reading.
+// A literal closing script tag inside the markdown would terminate the
+// element prematurely, so escape it; the converter unescapes it when reading.
+// (Also keeps Vite's raw-source dependency scanner from misreading this file.)
 const markdown = rawMarkdown?.replace(/<\/script>/gi, '<\\/script>');
 ---
 

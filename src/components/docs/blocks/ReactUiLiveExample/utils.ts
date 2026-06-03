@@ -34,8 +34,16 @@ async function buildReactUiExamples(): Promise<ReactUiLiveExample[]> {
       return examples.map(async (example) => {
         invariant(example.name);
 
+        // Only JS/JSX/TSX examples can be rendered live: next-mdx-remote treats the
+        // example body as MDX, where `{…}` is a JS expression. A non-JSX block like
+        // `--color--{property}` would compile `{property}` to a bare `property`
+        // reference and throw "property is not defined" at render time.
+        const LIVE_LANGUAGES = ['js', 'jsx', 'ts', 'tsx', 'javascript', 'typescript'];
+
         const codePart = example.content.find(
-          (part) => part.kind === 'code' && part.text.match(/```[a-z]*\n/),
+          (part) =>
+            part.kind === 'code' &&
+            LIVE_LANGUAGES.includes(part.text.match(/```([a-z]*)\n/)?.[1] ?? ''),
         );
 
         const normalizedCode = codePart ? removeCommonIndentation(codePart.text) : undefined;
@@ -76,9 +84,9 @@ async function buildReactUiExamples(): Promise<ReactUiLiveExample[]> {
 let _cachedReactUiExamples: Promise<ReactUiLiveExample[]> | undefined;
 
 export function getReactUiExamples() {
-  if (_cachedReactUiExamples) {
-    return _cachedReactUiExamples;
-  }
+  // if (_cachedReactUiExamples) {
+  //   return _cachedReactUiExamples;
+  // }
 
   _cachedReactUiExamples = buildReactUiExamples();
 

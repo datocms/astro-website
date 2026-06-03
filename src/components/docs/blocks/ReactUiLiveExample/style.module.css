@@ -13,11 +13,6 @@
     font-family: inherit;
   }
 
-  p,
-  span:not([class]) {
-    display: contents;
-  }
-
   svg {
     width: 1em;
   }
@@ -43,4 +38,273 @@
     border-left: 1px dashed var(--border-color);
     z-index: 1;
   }
+}
+
+/* Swatches */
+
+.swatches {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-s);
+}
+
+.swatch {
+  display: flex;
+  align-items: stretch;
+  gap: var(--spacing-m);
+  min-height: 56px;
+  border: 1px solid var(--color--border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--color--surface);
+}
+
+.swatchInfo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-s) var(--spacing-s) var(--spacing-s) 0;
+  min-width: 0;
+}
+
+.swatchToken {
+  font-size: var(--font-size-xs);
+}
+
+.swatchDescription {
+  font-size: var(--font-size-xs);
+  color: var(--color--ink-subtle);
+  line-height: 1.3;
+}
+
+/* square chip that stretches to the full height of its row */
+.swatchPreview {
+  flex: 0 0 auto;
+  width: 64px;
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+}
+
+.swatchPreviewShadow,
+.swatchPreviewFontSize {
+  background: var(--color--surface-muted);
+}
+
+.swatchPreviewFontSize {
+  overflow: hidden;
+}
+
+.swatchPreviewFontSizeSample {
+  font-size: var(--swatch-token);
+  color: var(--color--ink);
+  line-height: 1;
+}
+
+.swatchPreviewShadowChip {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: var(--color--surface);
+  box-shadow: var(--swatch-token);
+}
+
+/* `ink` — "Aa" in the ink color on the inferred context surface */
+.swatchPreviewInk {
+  background: var(--ink-surface, var(--color--surface));
+  box-shadow: 3px 3px 11px rgba(0, 0, 0, 0.1);
+}
+
+.swatchPreviewInkSample {
+  color: var(--swatch-token);
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* `border` / `outline` — top-left corner crop of a rounded rect */
+.swatchPreviewBorder {
+  position: relative;
+  overflow: hidden;
+}
+
+.swatchPreviewBorderChip {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 120px;
+  height: 100px;
+  border-radius: 14px;
+  border: 2px solid var(--swatch-token);
+  box-shadow: 3px 3px 11px rgba(0, 0, 0, 0.1);
+}
+
+/* group chip — wider chip, checkerboard backing, rounded rect on top with surface/border/outline/ink */
+.swatchPreviewGroupChip {
+  width: 110px;
+  background-color: #fff;
+  background-image: conic-gradient(
+    rgba(0, 0, 0, 0.07) 25%,
+    transparent 0 50%,
+    rgba(0, 0, 0, 0.07) 0 75%,
+    transparent 0
+  );
+  background-size: 14px 14px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 3px 3px 11px rgba(0, 0, 0, 0.1);
+}
+
+.swatchPreviewGroupRect {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 140px;
+  padding: 20px;
+  border-radius: 18px;
+  background: var(--group-surface, transparent);
+  border: 3px solid var(--group-border, transparent);
+  box-shadow: 0 0 0 6px var(--group-outline, transparent);
+  color: var(--group-ink);
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  white-space: nowrap;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s,
+    color 0.15s;
+}
+
+.swatch:hover .swatchPreviewGroupRect {
+  background: var(--group-surface-hover, var(--group-surface, transparent));
+  border-color: var(--group-border-hover, var(--group-border, transparent));
+  box-shadow: 0 0 0 6px var(--group-outline-hover, var(--group-outline, transparent));
+  color: var(--group-ink-hover, var(--group-ink));
+}
+
+/* `pair` — checkerboard backing, rounded rect on top with surface fill and ink "Aa" */
+.swatchPreviewPair {
+  width: 110px;
+  background-color: #fff;
+  background-image: conic-gradient(
+    rgba(0, 0, 0, 0.07) 25%,
+    transparent 0 50%,
+    rgba(0, 0, 0, 0.07) 0 75%,
+    transparent 0
+  );
+  background-size: 14px 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.swatchPreviewPairFill {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 140px;
+  padding: 20px;
+  border-radius: 18px;
+  background: var(--pair-surface);
+  display: grid;
+  place-items: center;
+  white-space: nowrap;
+}
+
+.swatchPreviewPairSample {
+  color: var(--pair-ink);
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.swatchPairTokens {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+.swatchPairPrefix {
+  color: var(--color--ink-subtle);
+}
+
+/* PairSwatches: badges side by side (no per-token descriptions) */
+.swatchPairSuffixes {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+}
+
+/* Swatches auto-pair: each badge + description on its own line */
+.swatchPairSuffixRows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.swatchPairSuffixLine {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+}
+
+.swatchPairSuffix {
+  font-size: var(--font-size-xs);
+  background: var(--color--surface-muted);
+  border: 1px solid var(--color--border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* `color` — checkerboard backing so transparent / white tokens stay visible */
+.swatchPreviewColor {
+  background-color: #fff;
+  background-image: conic-gradient(
+    rgba(0, 0, 0, 0.07) 25%,
+    transparent 0 50%,
+    rgba(0, 0, 0, 0.07) 0 75%,
+    transparent 0
+  );
+  background-size: 14px 14px;
+  box-shadow: 3px 3px 11px rgba(0, 0, 0, 0.1);
+}
+
+.swatchPreviewColorFill {
+  width: 100%;
+  height: 100%;
+  background: var(--swatch-token);
+}
+
+/* Spacings — bar ramp: token name + accent bar sized to the spacing value */
+
+.spacings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-s);
+}
+
+.spacing {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-m);
+}
+
+.spacingToken {
+  flex: 0 0 auto;
+  width: 160px;
+  font-size: var(--font-size-xs);
+}
+
+.spacingBar {
+  flex: 0 0 auto;
+  height: 16px;
+  width: var(--spacing-token);
+  background: var(--color--primary--surface);
+  border-radius: 3px;
 }

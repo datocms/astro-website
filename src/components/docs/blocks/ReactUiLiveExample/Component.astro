@@ -11,6 +11,7 @@ import { LiveExample } from './LiveExample';
 import 'datocms-react-ui/styles.css';
 import s from './style.module.css';
 import { Tabs, Tab } from '~/components/Tabs';
+import { stripStega } from '@datocms/astro';
 
 interface Props {
   block: FragmentOf<typeof ReactUiLiveExampleFragment>;
@@ -22,14 +23,18 @@ const examples = await getReactUiExamples();
 
 const { componentName } = readFragment(ReactUiLiveExampleFragment, block);
 
-const componentExamples = examples.filter((example) => example.componentName === componentName);
+const componentExamples = examples.filter(
+  (example) => example.componentName === stripStega(componentName),
+);
 ---
 
 {
   componentExamples.map((example) => {
     return (
       <Fragment>
-        <Heading anchor={slugify(example.title)}>{example.title}</Heading>
+        <Heading as="h3" anchor={slugify(example.title)}>
+          {example.title}
+        </Heading>
         <Markdown of={example.description} />
 
         <figure>

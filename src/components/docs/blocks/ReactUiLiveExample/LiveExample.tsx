@@ -1,26 +1,10 @@
-import { useState, type ReactNode } from 'react';
-import chevronDownIcon from '~/icons/regular/chevron-down.svg?raw';
-import plusIcon from '~/icons/regular/plus.svg?raw';
-import trashIcon from '~/icons/regular/trash-can.svg?raw';
 import type { ReactUiLiveExample } from './utils';
 import * as SDK from 'datocms-react-ui';
 import { MDXRemote } from 'next-mdx-remote';
-
-const PlusIcon = () => <span dangerouslySetInnerHTML={{ __html: plusIcon }} />;
-const TrashIcon = () => <span dangerouslySetInnerHTML={{ __html: trashIcon }} />;
-const ChevronDownIcon = () => <span dangerouslySetInnerHTML={{ __html: chevronDownIcon }} />;
-
-function StateManager<T>({
-  initial,
-  children,
-}: {
-  initial: T;
-  children: (value: T, setValue: (newValue: T) => void) => ReactNode;
-}) {
-  const [value, setValue] = useState(initial);
-
-  return children(value, setValue);
-}
+import { PlusIcon, TrashIcon, ChevronDownIcon } from './supportingComponents/icons';
+import { Swatches, PairSwatches } from './supportingComponents/Swatches';
+import { Spacings } from './supportingComponents/Spacings';
+import { StateManager } from './supportingComponents/StateManager';
 
 export function LiveExample({
   serializedMdxExample,
@@ -41,6 +25,132 @@ export function LiveExample({
             lightColor: 'rgb(229, 249, 252)',
             darkColor: 'rgb(80, 50, 83)',
           },
+          // src/utils/color/readSemanticColorTokens.ts
+          cssDesignTokens: {
+            '--color--border': 'oklch(0.9595 0 0)',
+            '--color--border-hover': 'oklch(0.8760 0 0)',
+            '--color--ink': 'oklch(0.1800 0 0)',
+            '--color--ink-danger': '#c92910',
+            '--color--ink-disabled': 'oklch(0.7950 0 0)',
+            '--color--ink-hover': 'oklch(0.4306 0 0)',
+            '--color--ink-link': 'oklch(0.4645 0.2103 296.00)',
+            '--color--ink-muted': 'oklch(0.8760 0 0)',
+            '--color--ink-placeholder': 'oklch(0.7950 0 0)',
+            '--color--ink-primary': 'oklch(0.5972 0.2497 296.00)',
+            '--color--ink-subtle': 'oklch(0.5040 0 0)',
+            '--color--ink-success': '#49ab09',
+            '--color--ink-warning': '#683f00',
+            '--color--surface': 'oklch(1.0000 0 0)',
+            '--color--surface-hover': 'oklch(0.9772 0 0)',
+            '--color--surface-muted': 'oklch(0.9595 0 0)',
+            '--color--surface-raised-active': 'oklch(0.9367 0 0)',
+            '--color--surface-raised-hover': 'oklch(0.9595 0 0)',
+            '--color--surface-raised': 'oklch(1.0000 0 0)',
+            '--color--primary--surface': 'oklch(0.4645 0.2103 296.00)',
+            '--color--primary--surface-hover': 'oklch(0.6817 0.1906 296.00)',
+            '--color--primary--surface-active': 'oklch(0.7563 0.1415 296.00)',
+            '--color--primary--surface-muted': 'oklch(0.6938 0 0)',
+            '--color--primary--surface-secondary': 'oklch(0.7563 0.1415 296.00)',
+            '--color--primary--ink': 'oklch(1.0000 0 0)',
+            '--color--primary--border': 'rgba(0, 0, 0, 0.1)',
+            '--color--primary-soft--surface': 'oklch(0.9204 0.0431 296.00)',
+            '--color--primary-soft--surface-hover': 'oklch(0.9204 0.0431 296.00)',
+            '--color--primary-soft--surface-active': 'oklch(0.8757 0.0687 296.00)',
+            '--color--primary-soft--ink': 'oklch(0.4645 0.2103 296.00)',
+            '--color--primary-soft--border': 'oklch(0.8210 0.1012 296.00)',
+            '--color--selected--surface': 'oklch(0.8757 0.0687 296.00)',
+            '--color--selected--surface-hover': 'oklch(0.8210 0.1012 296.00)',
+            '--color--selected--ink': 'oklch(0.1800 0 0)',
+            '--color--selected--border': 'oklch(0.4645 0.2103 296.00)',
+            '--color--disabled--surface': 'oklch(0.9367 0 0)',
+            '--color--disabled--ink': 'oklch(0.6356 0 0)',
+            '--color--danger--surface': '#c92910',
+            '--color--danger--ink': 'oklch(1.0000 0 0)',
+            '--color--focus--border': 'oklch(0.4645 0.2103 296.00)',
+            '--color--focus--outline': 'oklch(0.9552 0.0239 296.00)',
+            '--color--danger-soft--ink': '#c92910',
+            '--color--danger-soft--border': '#cd3a24',
+            '--color--danger-soft--outline': 'color-mix(in oklch, #d66351 30%, transparent)',
+            '--color--danger-soft--surface': '#f6e2df',
+            '--color--warning-soft--ink': '#683f00',
+            '--color--warning-soft--border': '#f1a10d',
+            '--color--warning-soft--outline': 'color-mix(in oklch, #f1a10d 30%, transparent)',
+            '--color--warning-soft--surface': '#f9e0b9',
+            '--color--success-soft--ink': '#49ab09',
+            '--color--success-soft--border': '#70ca2f',
+            '--color--success-soft--outline': 'color-mix(in oklch, #70ca2f 30%, transparent)',
+            '--color--success-soft--surface': '#ceeabe',
+            '--color--highlight--surface': '#f9ea43',
+            '--color--diff-added--ink-subtle': '#d5ebe4',
+            '--color--diff-added--ink': '#54b091',
+            '--color--diff-added--outline': '#d5ebe4',
+            '--color--diff-added--surface': '#e1f5ef',
+            '--color--diff-changed--outline': '#d5e0eb',
+            '--color--diff-changed--surface': '#e1ebf5',
+            '--color--diff-removed--ink-subtle': '#ebd5d9',
+            '--color--diff-removed--ink': '#b05463',
+            '--color--diff-removed--outline': '#ebd5d9',
+            '--color--diff-removed--surface': '#f5e1e5',
+            '--color--status-draft--ink': 'oklch(0.5723 0 0)',
+            '--color--status-outdated--ink': '#f4b74d',
+            '--color--status-published--ink': '#70ca2f',
+            '--color--backdrop--surface': 'rgba(0, 0, 0, 0.6)',
+            '--color--backdrop--ink': 'oklch(0.9367 0 0)',
+            '--color--overlay--surface': 'rgba(0, 0, 0, 0.2)',
+            '--color--overlay--surface-hover': 'rgba(0, 0, 0, 0.3)',
+            '--color--overlay--surface-active': 'rgba(0, 0, 0, 0.4)',
+            '--color--overlay--ink': 'oklch(0.9367 0 0)',
+            '--color--stacked--surface': 'oklch(0.3521 0 0)',
+            '--color--stacked--surface-upper': 'oklch(0.2686 0 0)',
+            '--color--stacked--ink': 'oklch(0.9595 0 0)',
+            '--color--stacked--ink-subtle': 'oklch(0.7469 0 0)',
+            '--color--stacked--border': 'color-mix(in oklch, oklch(0.9991 0 0) 20%, transparent)',
+            '--color--stacked--surface-action': 'transparent',
+            '--color--stacked--surface-action-hover':
+              'color-mix(in oklch, oklch(0.9991 0 0) 10%, transparent)',
+            '--color--stacked--surface-action-active':
+              'color-mix(in oklch, oklch(0.9991 0 0) 20%, transparent)',
+            '--color--progress--track': 'oklch(0.9595 0 0)',
+            '--color--progress--fill': 'oklch(0.5972 0.2497 296.00)',
+            '--color--progress--fill-hover': 'oklch(0.7469 0 0)',
+            '--color--tooltip--surface': 'oklch(0.9899 0 0)',
+            '--color--tooltip--surface-hover': 'oklch(0.9772 0 0)',
+            '--color--tooltip--ink': 'oklch(0.3521 0 0)',
+            '--color--tooltip--ink-subtle': 'oklch(0.5040 0 0)',
+            '--color--code--surface': '#f6f8fa',
+            '--color--code--ink': '#393a34',
+            '--color--scrollbar--fill': 'color-mix(in oklch, oklch(0.1800 0 0) 30%, transparent)',
+            '--color--field-group-text--ink': '#998100',
+            '--color--field-group-text--surface': '#fff8d6',
+            '--color--field-group-rich-text--ink': '#38388d',
+            '--color--field-group-rich-text--surface': '#e2e2fa',
+            '--color--field-group-media--ink': '#38ada3',
+            '--color--field-group-media--surface': '#e5fbf9',
+            '--color--field-group-datetime--ink': '#d76f0e',
+            '--color--field-group-datetime--surface': '#fef0e2',
+            '--color--field-group-number--ink': '#008499',
+            '--color--field-group-number--surface': '#d7faff',
+            '--color--field-group-boolean--ink': '#c82b1d',
+            '--color--field-group-boolean--surface': '#fde5e3',
+            '--color--field-group-location--ink': '#1d9f2f',
+            '--color--field-group-location--surface': '#defce2',
+            '--color--field-group-color--ink': '#b02857',
+            '--color--field-group-color--surface': '#fce2eb',
+            '--color--field-group-seo--ink': '#7e2e86',
+            '--color--field-group-seo--surface': '#f8dffa',
+            '--color--field-group-reference--ink': '#1b5899',
+            '--color--field-group-reference--surface': '#ddecfc',
+            '--color--field-group-json--ink': '#80a617',
+            '--color--field-group-json--surface': '#f5fdde',
+            '--shadow--raised':
+              '0 0.5px 1.2px rgba(0, 0, 0, 0.035),    0 1.5px 3px rgba(0, 0, 0, 0.05),    0 4px 8px rgba(0, 0, 0, 0.07)',
+            '--shadow--floating':
+              '0 0.9px 2.2px rgba(0, 0, 0, 0.02),    0 2.2px 5.3px rgba(0, 0, 0, 0.028),    0 4.1px 10px rgba(0, 0, 0, 0.035),    0 7.4px 17.9px rgba(0, 0, 0, 0.042),    0 13.8px 33.4px rgba(0, 0, 0, 0.05),    0 33px 80px rgba(0, 0, 0, 0.07)',
+            '--shadow--lifted':
+              '0px 2.8px 2.2px rgba(0, 0, 0, 0.02),    0px 6.7px 5.3px rgba(0, 0, 0, 0.028),    0px 12.5px 10px rgba(0, 0, 0, 0.035),    0px 22.3px 17.9px rgba(0, 0, 0, 0.042),    0px 41.8px 33.4px rgba(0, 0, 0, 0.05),    0px 100px 80px rgba(0, 0, 0, 0.07)',
+            '--shadow--ambient':
+              '0px 0px 2.2px rgba(0, 0, 0, 0.02),    0px 0px 5.3px rgba(0, 0, 0, 0.028),    0px 0px 10px rgba(0, 0, 0, 0.035),    0px 0px 17.9px rgba(0, 0, 0, 0.042),    0px 0px 33.4px rgba(0, 0, 0, 0.05),    0px 0px 80px rgba(0, 0, 0, 0.07)',
+          },
         },
       }}
       components={{
@@ -48,6 +158,9 @@ export function LiveExample({
         ChevronDownIcon: ChevronDownIcon,
         TrashIcon: TrashIcon,
         StateManager: StateManager,
+        Swatches: Swatches,
+        PairSwatches: PairSwatches,
+        Spacings: Spacings,
         ...(SDK as any),
       }}
     />
