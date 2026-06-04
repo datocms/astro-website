@@ -1,0 +1,165 @@
+---
+import { Bullets } from '~/components/Bullets';
+import { Button } from '~/components/Button';
+import { CalloutCard } from '~/components/CalloutCard';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Flag } from '~/components/Flag';
+import { Hero } from '~/components/Hero';
+import { Layout } from '~/layouts/Layout';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { VideoPlayer } from '~/components/VideoPlayer';
+import { Image } from 'astro:assets';
+import { Wrapper } from '~/components/Wrapper';
+import { HeroShader } from '~/components/HeroShader';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { overrideSeo, seoGeneratedCard } from '~/lib/datocms/seo';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
+
+const { page } = await executeQuery(Astro, query);
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<Layout
+  seo={overrideSeo(
+    page._seoMetaTags,
+    seoGeneratedCard(Astro, {
+      title: 'Dark Mode',
+      excerpt: 'Your eyes called. They said thank you.',
+    }),
+  )}
+>
+  <div class={s.heroSection}>
+    <HeroShader variant="night-sky" />
+    <div class={s.heroContent}>
+      <Hero>
+        <Fragment slot="kicker">🌚 Dark Mode 🌚</Fragment>
+        <Fragment slot="title">
+          Your eyes can<br />
+          <mark>now thank you.</mark>
+        </Fragment>
+        <Fragment slot="subtitle">
+          Dark Mode is finally here. Stop squinting at white screens at 11pm trying to hit that
+          publishing deadline. We got you.
+        </Fragment>
+        <div class={s.heroButtons}>
+          <Button p="big" as="a" href="https://dashboard.datocms.com">Launch DatoCMS</Button>
+        </div>
+      </Hero>
+      {
+        page.video && (
+          <Wrapper>
+            <div class={s.heroVideo}>
+              <VideoPlayer data={page.video} autoPlay={true} thumbnailTime={15} />
+            </div>
+          </Wrapper>
+        )
+      }
+    </div>
+  </div>
+
+  <Flag flip>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1780388601-dark-mode-content.png"
+        inferSize
+        alt="DatoCMS dark mode interface"
+        style="width: 100%; height: auto; border-radius: 8px;"
+      />
+    </Fragment>
+    <Fragment slot="kicker">No toggle hunting required</Fragment>
+    <Fragment slot="title">Follows your <mark>OS preference</mark>. Obviously.</Fragment>
+    <p>
+      DatoCMS respects your system settings out of the box by default. Got dark mode on in your OS?
+      We're already dark when you log in. Change your system preference and we change too.
+    </p>
+    <Bullets style="good">
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>Automatic system preference detection</span>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>Instant switching without page reloads</span>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>prefers-color-scheme aware</span>
+      </li>
+    </Bullets>
+  </Flag>
+
+  <Flag>
+    <Fragment slot="visual">
+      <Image
+        src="https://www.datocms-assets.com/205/1780388601-selector.png"
+        inferSize
+        alt="DatoCMS dark mode selector"
+        style="width: 100%; height: auto; border-radius: 8px;"
+      />
+    </Fragment>
+    <Fragment slot="kicker">Everyone gets a choice</Fragment>
+    <Fragment slot="title">
+      Dark for you. Light for <mark>Sandra in Marketing</mark>.
+    </Fragment>
+    <p>
+      Each team member sets their own preference independently. Your dark mode follows you across
+      devices, browsers, and unfortunately scheduled 3am publishing sessions.
+    </p>
+    <Bullets style="good">
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>Preference synced to your account</span>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>Works across all your devices</span>
+      </li>
+      <li>
+        <Svg name="icons/regular/check" />
+        <span>Override system setting anytime</span>
+      </li>
+    </Bullets>
+  </Flag>
+
+  <Space top={1} bottom={3}>
+    <Wrapper>
+      <div class={s.featureGrid}>
+        <CalloutCard title="WCAG compliant" illustration="svg/illustrations/lock3" color="green">
+          <Fragment slot="text">
+            Contrast ratios checked across every view. Not the kind of dark mode where text becomes
+            invisible because we slapped on a bg-black and called it a day.
+          </Fragment>
+        </CalloutCard>
+        <CalloutCard
+          title="Every single view"
+          illustration="svg/illustrations/workflows"
+          color="azure"
+        >
+          <Fragment slot="text">
+            Schema Builder, Record Editor, Media Library, Settings pages. Even the bits you'd
+            forgotten existed until the one time you really needed them.
+          </Fragment>
+        </CalloutCard>
+        <CalloutCard
+          title="Plugin-friendly"
+          illustration="svg/illustrations/developers-2"
+          color="blue"
+        >
+          <Fragment slot="text">
+            Theme context exposed via the Plugin SDK. Build your plugins to respect user preferences
+            and they'll slot in seamlessly. No awkward bright islands.
+          </Fragment>
+        </CalloutCard>
+      </div>
+    </Wrapper>
+  </Space>
+
+  <DraftModeQueryListener query={query} />
+</Layout>

@@ -26,25 +26,32 @@ const resolvedIllustration =
   illustration === true ? 'svg/illustrations/developers-2' : illustration;
 ---
 
-<div class={s.calloutWrapper} data-bkg={color} data-as-link={ctaLink && !!asLink} data-size={size}>
-  {
-    !!resolvedIllustration && (
-      <div class={s.calloutImage}>
-        <Svg name={resolvedIllustration} />
-      </div>
-    )
-  }
-  <div class={s.calloutBody}>
-    <h3 class={s.bodyTitle}>{title}</h3>
-    <div class={s.bodyDescription}>
-      <slot name="text" />
-    </div>
+<div class={s.calloutOuter}>
+  <div
+    class={s.calloutWrapper}
+    data-bkg={color}
+    data-as-link={ctaLink && !!asLink}
+    data-size={size}
+  >
     {
-      ctaLink && (
-        <a href={ctaLink} class={s.ctaLink}>
-          {ctaLabel}
-        </a>
+      !!resolvedIllustration && (
+        <div class={s.calloutImage}>
+          <Svg name={resolvedIllustration} />
+        </div>
       )
     }
+    <div class={s.calloutBody}>
+      <h3 class={s.bodyTitle}>{title}</h3>
+      <div class={s.bodyDescription}>
+        <slot name="text" />
+      </div>
+      {
+        ctaLink && (
+          <a href={ctaLink} class={s.ctaLink}>
+            {ctaLabel}
+          </a>
+        )
+      }
+    </div>
   </div>
 </div>

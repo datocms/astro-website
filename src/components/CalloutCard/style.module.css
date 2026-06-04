@@ -1,3 +1,8 @@
+.calloutOuter {
+  container-type: inline-size;
+  padding-top: 28px;
+}
+
 .calloutWrapper {
   align-items: center;
   background-color: #fff;
@@ -11,7 +16,7 @@
   transform: rotate(-1deg);
   width: 100%;
   z-index: 10;
-  padding: 25px 20px;
+  padding: 43px 20px 25px;
   max-width: 560px;
   margin: 0 auto;
   align-self: center;
@@ -59,7 +64,7 @@
   }
 
   &[data-size='large'] {
-    @media screen and (min-width: 640px) {
+    @container (min-width: 400px) {
       gap: rfs(20px);
       flex-direction: row;
       padding: rfs(36px);
@@ -71,28 +76,41 @@
 }
 
 .calloutImage {
-  height: auto;
   position: absolute;
-  right: 0;
   top: 0;
-  width: rfs(70px);
+  left: 20px;
+  height: 55px;
+  width: auto;
   transition: transform 0.3s;
-  transform: scale(2) rotate(0deg);
+  transform: translateY(-60%) rotate(-5deg);
+
+  svg {
+    height: 55px;
+    width: auto;
+  }
 
   .calloutWrapper:hover & {
-    transform: scale(2.1) rotate(-2deg);
+    transform: translateY(-60%) rotate(-8deg) scale(1.05);
   }
 
   .calloutWrapper[data-size='large'] & {
-    @media screen and (min-width: 640px) {
+    @container (min-width: 400px) {
       position: static;
-      width: rfs(110px);
+      top: auto;
+      left: auto;
+      margin: 0;
+      height: 110px;
+      width: auto;
       transform: scale(1.8) translateY(-10%) translateX(-30%);
+
+      svg {
+        height: 110px;
+      }
     }
   }
 
   .calloutWrapper[data-size='large']:hover & {
-    @media screen and (min-width: 640px) {
+    @container (min-width: 400px) {
       transform: rotate(-2deg) scale(1.9) translateY(-10%) translateX(-30%);
     }
   }
@@ -102,10 +120,10 @@
   flex: 1;
   font-size: rfs(16px);
   width: 100%;
-  padding-right: 10%;
+  padding-right: 0;
 
   .calloutWrapper[data-size='large'] & {
-    @media screen and (min-width: 640px) {
+    @container (min-width: 400px) {
       padding-right: 0%;
     }
   }
@@ -118,7 +136,7 @@
   font-weight: bold;
 
   .calloutWrapper[data-size='large'] & {
-    @media screen and (min-width: 640px) {
+    @container (min-width: 400px) {
       font-size: rfs(30px);
     }
   }

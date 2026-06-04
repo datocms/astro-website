@@ -2,20 +2,31 @@
 import s from './style.module.css';
 
 type Props = {
+  variant?: 'diamonds' | 'night-sky';
   accent?: string;
 };
 
-const { accent = '#ff593d' } = Astro.props;
+const { variant = 'diamonds', accent = '#ff593d' } = Astro.props;
+
+const fallbackStyle =
+  variant === 'night-sky'
+    ? 'background: radial-gradient(ellipse at 55% 35%, #0d1b3e 0%, #060c1a 55%, #030710 100%)'
+    : 'background: radial-gradient(ellipse at 100% 100%, #fdf2ed 0%, #feffe9 30%, white 65%)';
 ---
 
-<hero-shader class={s.shader} data-accent={accent}>
-  <div class={s.fallback}></div>
+<hero-shader class={s.shader} data-variant={variant} data-accent={accent}>
+  <div class={s.fallback} style={fallbackStyle}></div>
   <canvas aria-hidden="true"></canvas>
 </hero-shader>
 
 <script>
   import { WebComponent } from '~/lib/WebComponent';
-  import { FRAGMENT_SHADER, VERTEX_SHADER } from './shaders';
+  import { VERTEX_SHADER, DIAMONDS_FRAGMENT_SHADER, NIGHT_SKY_FRAGMENT_SHADER } from './shaders';
+
+  const FRAGMENT_SHADERS: Record<string, string> = {
+    diamonds: DIAMONDS_FRAGMENT_SHADER,
+    'night-sky': NIGHT_SKY_FRAGMENT_SHADER,
+  };
 
   function hexToVec3(hex: string): [number, number, number] {
     const h = hex.replace('#', '');
@@ -57,10 +68,12 @@ const { accent = '#ff593d' } = Astro.props;
         gl.STATIC_DRAW,
       );
 
+      const variant = this.dataset.variant || 'diamonds';
+      const fragmentShaderSrc = FRAGMENT_SHADERS[variant] ?? DIAMONDS_FRAGMENT_SHADER;
       const accent = hexToVec3(this.dataset.accent || '#ff593d');
 
       const vs = compile(VERTEX_SHADER, gl.VERTEX_SHADER);
-      const fs = compile(FRAGMENT_SHADER, gl.FRAGMENT_SHADER);
+      const fs = compile(fragmentShaderSrc, gl.FRAGMENT_SHADER);
       if (!vs || !fs) return;
 
       const prog = gl.createProgram();
