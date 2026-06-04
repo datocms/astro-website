@@ -60,7 +60,7 @@ export const fetchSitemapUrls = async (request: Request, responseHeaders: Header
   return (await Promise.all(urlsPromises)).flat();
 };
 
-const BLACKLISTED_URL_PREFIXES = ['/docs/dashboard-api'];
+const BLACKLISTED_URL_PREFIXES = ['/docs/dashboard-api', '/lp'];
 
 export const GET: APIRoute = async ({ request }) => {
   try {

@@ -1,0 +1,68 @@
+---
+import type { TitleMetaLinkTag } from '@datocms/astro';
+import { BaseLayout } from '~/layouts/BaseLayout';
+import s from './style.module.css';
+
+type Partner = {
+  name: string;
+  logoUrl: string;
+  siteUrl: string;
+};
+
+type Props = {
+  title: string;
+  partner?: Partner;
+};
+
+const { title, partner } = Astro.props;
+const seo: TitleMetaLinkTag[] = [{ tag: 'title', content: title }];
+---
+
+<BaseLayout seo={seo}>
+  <Fragment slot="head">
+    <meta name="robots" content="noindex, nofollow, noarchive, noimageindex" />
+  </Fragment>
+
+  <div class={s.root}>
+    <header class={s.header}>
+      <div class={s.headerLogos}>
+        <a href="https://www.datocms.com" class={s.logoLink}>
+          <img src="/images/full_logo.svg" alt="DatoCMS" height="26" />
+        </a>
+        {
+          partner && (
+            <>
+              <span class={s.collab}>×</span>
+              <a
+                href={partner.siteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class={s.logoLink}
+              >
+                <img src={partner.logoUrl} alt={partner.name} height="22" />
+              </a>
+            </>
+          )
+        }
+      </div>
+      <a href="#lp-form" class={s.headerCta}>Book free assessment</a>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class={s.footer}>
+      <div class={s.footerInner}>
+        <span class={s.footerCopy}>
+          &copy; {new Date().getFullYear()} DatoCMS{partner ? ` & ${partner.name}` : ''}. All rights
+          reserved.
+        </span>
+        <nav class={s.footerLinks}>
+          <a href="/legal/privacy-policy">Privacy Policy</a>
+          <a href="/legal/terms">Terms of Service</a>
+        </nav>
+      </div>
+    </footer>
+  </div>
+</BaseLayout>

@@ -1,6 +1,8 @@
 import { PIPEDRIVE_TOKEN } from 'astro:env/server';
 import PipedriveClient, { type Lead, type Organization, type Person } from './PipedriveClient';
 
+export const partnershipLabel = '87a60c60-6a8e-11ed-92ec-410445a67487';
+
 const pipedrive = new PipedriveClient(PIPEDRIVE_TOKEN);
 
 export async function createNote(lead: Lead, content: string) {

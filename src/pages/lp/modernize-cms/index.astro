@@ -1,0 +1,379 @@
+---
+import { LpLayout } from '~/layouts/lp';
+import { Button } from '~/components/Button';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { Journey, Step } from '~/components/Journey';
+import { Form } from './_Form';
+import { ReviewQuoteFragment } from '~/components/quote/graphql';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { graphql } from '~/lib/datocms/graphql';
+import s from './_style.module.css';
+
+const lpQuotesQuery = graphql(
+  `
+    query ModernizeLpQuotes {
+      quotes: allReviews(filter: { id: { in: ["HS9E9PYbR8ire8XgT3eI7g"] } }, first: 1) {
+        __typename
+        ...ReviewQuoteFragment
+      }
+    }
+  `,
+  [ReviewQuoteFragment],
+);
+
+const { quotes } = await executeQuery(Astro, lpQuotesQuery);
+---
+
+<LpLayout
+  title="Modernize Your Legacy CMS with DatoCMS & De Voorhoede"
+  partner={{
+    name: 'De Voorhoede',
+    logoUrl:
+      'https://www.datocms-assets.com/205/1649929882-logo-on-transparent-without-padding.svg',
+    siteUrl: 'https://www.devoorhoede.nl',
+  }}
+>
+  <section class={s.hero}>
+    <div class={s.sectionInner}>
+      <div class={s.heroBadge}>
+        <span class={s.heroBadgeDot}></span>
+        Legacy Enterprise CMS Migration
+      </div>
+
+      <h1 class={s.heroTitle}>
+        How many more <mark>legacy CMS headaches</mark> will you tolerate?
+      </h1>
+
+      <p class={s.heroSubtitle}>
+        Licensing fees. Slow builds. Hosting overhead. Budget overflows. Frustrated teams. Need we
+        say more?
+      </p>
+
+      <div class={s.heroCta}>
+        <Button as="a" href="#lp-form" p="big">Book your free migration assessment</Button>
+        <p class={s.heroTrust}>Used by 25,000+ development teams worldwide</p>
+      </div>
+    </div>
+  </section>
+
+  <div class={s.statsBar}>
+    <Wrapper>
+      <div class={s.statsGrid}>
+        <div class={s.stat}>
+          <span class={s.statNumber}>25K+</span>
+          <span class={s.statLabel}>Teams using DatoCMS</span>
+        </div>
+        <div class={s.stat}>
+          <span class={s.statNumber}>4.8/5</span>
+          <span class={s.statLabel}>Av. customer ratings</span>
+        </div>
+        <div class={s.stat}>
+          <span class={s.statNumber}>99.99%</span>
+          <span class={s.statLabel}>Av. API Uptime</span>
+        </div>
+        <div class={s.stat}>
+          <span class={s.statNumber}>33ms</span>
+          <span class={s.statLabel}>Av. API response time</span>
+        </div>
+      </div>
+    </Wrapper>
+  </div>
+
+  <Space top={2} bottom={1}>
+    <div class={s.sectionHeader}>
+      <Wrapper>
+        <p class={s.sectionKicker}>The actual cost of staying put</p>
+        <h2 class={s.sectionTitle}>What your legacy CMS is costing you. Every quarter.</h2>
+        <p class={s.sectionSubtitle}>
+          The license is the line on the invoice. This is everything else.
+        </p>
+      </Wrapper>
+    </div>
+  </Space>
+
+  <Wrapper>
+    <div class={s.painGrid}>
+      <div class={s.painCard}>
+        <div class={s.painIcon}>💰</div>
+        <div>
+          <h3 class={s.cardTitle}>Licensing that never stops.</h3>
+          <p class={s.cardText}>
+            Annual contracts. Support agreements. Partner fees just to get basic work done. And the
+            price goes up every renewal.
+          </p>
+        </div>
+      </div>
+
+      <div class={s.painCard}>
+        <div class={s.painIcon}>👩‍💻</div>
+        <div>
+          <h3 class={s.cardTitle}>Nobody wants to work on it.</h3>
+          <p class={s.cardText}>
+            Post the job. Wait. The good engineers doing modern work aren't applying for legacy CMS
+            roles.
+          </p>
+        </div>
+      </div>
+
+      <div class={s.painCard}>
+        <div class={s.painIcon}>🔧</div>
+        <div>
+          <h3 class={s.cardTitle}>Upgrades are full projects.</h3>
+          <p class={s.cardText}>
+            A major version bump means months, specialists, and a rollback plan. For a CMS.
+          </p>
+        </div>
+      </div>
+
+      <div class={s.painCard}>
+        <div class={s.painIcon}>🖥️</div>
+        <div>
+          <h3 class={s.cardTitle}>Hosting is a part-time job.</h3>
+          <p class={s.cardText}>
+            Dedicated servers. Manual patching. Your infra team didn't sign up to babysit a CMS that
+            predates containers.
+          </p>
+        </div>
+      </div>
+
+      <div class={s.painCard}>
+        <div class={s.painIcon}>🐌</div>
+        <div>
+          <h3 class={s.cardTitle}>Your frontend is fighting the CMS.</h3>
+          <p class={s.cardText}>
+            Tightly coupled rendering. Slow builds. Core Web Vitals are a fire drill, not a solved
+            problem.
+          </p>
+        </div>
+      </div>
+
+      <div class={s.painCard}>
+        <div class={s.painIcon}>✏️</div>
+        <div>
+          <h3 class={s.cardTitle}>Editors are doing workarounds.</h3>
+          <p class={s.cardText}>
+            The spreadsheet your content team built to track what's published? That's a CMS problem.
+          </p>
+        </div>
+      </div>
+    </div>
+  </Wrapper>
+
+  <Space top={2} bottom={1}>
+    <div class={s.sectionHeader}>
+      <Wrapper>
+        <p class={s.sectionKicker}>OK. What's the play?</p>
+        <h2 class={s.sectionTitle}>Here's what breaking up with your CMS looks like</h2>
+        <p class={s.sectionSubtitle}>
+          De Voorhoede does the build. DatoCMS handles the content. Your team gets a stack they
+          actually enjoy. And you get to focus on actual work.
+        </p>
+      </Wrapper>
+    </div>
+  </Space>
+
+  <Wrapper>
+    <div class={s.solutionGrid}>
+      <div class={s.solutionCard}>
+        <img
+          src="https://www.datocms-assets.com/205/1649929882-logo-on-transparent-without-padding.svg"
+          alt="De Voorhoede"
+          class={s.solutionCardLogo}
+        />
+        <h3 class={s.solutionCardTitle}>We've done this before. Many times.</h3>
+        <ul class={s.solutionCardList}>
+          <li>Vue and Nuxt contributors, deep on frontend architecture.</li>
+          <li>Dozens of legacy CMS migrations across enterprise teams.</li>
+          <li>Long-standing DatoCMS Agency Partner.</li>
+          <li>Amsterdam-based, working globally.</li>
+        </ul>
+      </div>
+
+      <div class={s.solutionCard}>
+        <img src="/images/full_logo.svg" alt="DatoCMS" class={s.solutionCardLogo} />
+        <h3 class={s.solutionCardTitle}>Headless CMS built for the modern web.</h3>
+        <ul class={s.solutionCardList}>
+          <li>GraphQL and REST APIs with a delightful DX.</li>
+          <li>Visual Editing, Localization, SEO... all out of the box.</li>
+          <li>First-class Nuxt and Vue support.</li>
+          <li>25K+ teams trust DatoCMS with ambitious projects.</li>
+        </ul>
+      </div>
+    </div>
+  </Wrapper>
+
+  <Space top={2} bottom={1}>
+    <div class={s.sectionHeader}>
+      <Wrapper>
+        <p class={s.sectionKicker}>No mystery. No black box.</p>
+        <h2 class={s.sectionTitle}>How it works</h2>
+        <p class={s.sectionSubtitle}>Three phases. No surprises.</p>
+      </Wrapper>
+    </div>
+  </Space>
+
+  <div class={s.journeyWrap}>
+    <Wrapper>
+      <Journey>
+        <Step number="01" title="Discovery & audit">
+          We dig into your current setup: content models, templates, integrations, editor workflows.
+          You get a clear scope before anything gets built.
+        </Step>
+        <Step number="02" title="Rebuild & migrate">
+          De Voorhoede builds the frontend. DatoCMS gets set up with your models, locales, and
+          workflows. Content moves over. Editors are up and running from day one.
+        </Step>
+        <Step number="03" title="Launch & handoff">
+          QA, performance checks, documentation, handoff session. We don't ghost you once the site
+          goes live.
+        </Step>
+      </Journey>
+    </Wrapper>
+  </div>
+
+  <Space top={2} bottom={1}>
+    <div class={s.sectionHeader}>
+      <Wrapper>
+        <p class={s.sectionKicker}>What you're getting</p>
+        <h2 class={s.sectionTitle}>Say 👋 to the CMS your team has been asking for</h2>
+        <p class={s.sectionSubtitle}>
+          Built for editors who want control and devs who want clean APIs. Here's what ships out of
+          the box.
+        </p>
+      </Wrapper>
+    </div>
+  </Space>
+
+  <Wrapper>
+    <div class={s.featuresGrid}>
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>✏️</div>
+        <h3 class={s.cardTitle}>Visual Editing</h3>
+        <p class={s.cardText}>
+          Click any element on the live site to edit it. No preview tabs, no dev tickets for copy
+          changes.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>📝</div>
+        <h3 class={s.cardTitle}>Structured Text</h3>
+        <p class={s.cardText}>
+          The best rich text editor in a headless CMS. Your components control the rendering. No
+          <code>innerHTML</code> hacks.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>🧱</div>
+        <h3 class={s.cardTitle}>Modular Content</h3>
+        <p class={s.cardText}>
+          Editors build pages from typed blocks you define. Drag-and-drop. Devs own the structure,
+          editors own the content.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>🌍</div>
+        <h3 class={s.cardTitle}>Localization</h3>
+        <p class={s.cardText}>
+          Field-level translations, locale fallbacks, per-locale publishing. One schema, every
+          market.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>🖼️</div>
+        <h3 class={s.cardTitle}>Image & asset optimization</h3>
+        <p class={s.cardText}>
+          imgix and Mux under the hood. Upload once, 100+ optimization options, zero manual work.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>👁️</div>
+        <h3 class={s.cardTitle}>Live previews</h3>
+        <p class={s.cardText}>
+          Editors see changes on the real site before anything goes live. No more "it looked fine in
+          the CMS."
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>⚡</div>
+        <h3 class={s.cardTitle}>GraphQL API</h3>
+        <p class={s.cardText}>
+          Your content schema generates a typed GraphQL API. It caches, introspects, and works
+          natively with Nuxt composables.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>🤖</div>
+        <h3 class={s.cardTitle}>AI, built in</h3>
+        <p class={s.cardText}>
+          MCP server, Agent Skills, AI translations. Use what fits. Skip what doesn't.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>🔀</div>
+        <h3 class={s.cardTitle}>Environments</h3>
+        <p class={s.cardText}>
+          Staging and production, each with their own schema and content. Break things in staging.
+          Promote to main. Repeat.
+        </p>
+      </div>
+    </div>
+  </Wrapper>
+
+  <div class={s.quotesSection}>
+    <Wrapper>
+      <p class={s.sectionKicker} style="text-align: center; display: block; margin-bottom: 48px;">
+        Trusted by teams worldwide
+      </p>
+      <div class={s.quotesGrid}>
+        {quotes.map((quote) => <SingleQuote quote={quote} fontSize="small" />)}
+        <article class={s.staticQuote}>
+          <p class={s.staticQuoteText}>
+            "The organisation is so complex, with so many stakeholders, that it was clear you could
+            never have a plan for all of them. We needed{' '}
+            <mark>a lot more flexibility than a monolithic CMS could offer.</mark>"
+          </p>
+          <div class={s.staticQuoteContent}>
+            <img
+              src="https://www.datocms-assets.com/31538/1620223971-iacopinothomas.jpg"
+              alt="Thomas Iacopino"
+              class={s.staticQuoteImage}
+            />
+            <div class={s.staticQuoteAttribution}>
+              <span class={s.staticQuoteName}>Thomas Iacopino</span>
+              <span class={s.staticQuoteRole}>Web Team Lead @ Eurac Research</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </Wrapper>
+  </div>
+
+  <Space top={2} bottom={1} id="lp-form">
+    <div class={s.sectionHeader}>
+      <Wrapper>
+        <p class={s.sectionKicker}>Ready to talk?</p>
+        <h2 class={s.sectionTitle}>Tell us about your setup.</h2>
+        <p class={s.sectionSubtitle}>
+          Fill in the form and we'll schedule a call. No sales deck, just a real conversation about
+          whether this makes sense.
+        </p>
+      </Wrapper>
+    </div>
+  </Space>
+
+  <div class={s.formWrap}>
+    <Form client:load />
+  </div>
+
+  <Space bottom={2} />
+</LpLayout>

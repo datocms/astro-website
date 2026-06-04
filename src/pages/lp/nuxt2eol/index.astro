@@ -1,0 +1,352 @@
+---
+import { LpLayout } from '~/layouts/lp';
+import { Button } from '~/components/Button';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { Journey, Step } from '~/components/Journey';
+import { Form } from './_Form';
+import { ReviewQuoteFragment } from '~/components/quote/graphql';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { graphql } from '~/lib/datocms/graphql';
+import s from './_style.module.css';
+
+const lpQuotesQuery = graphql(
+  `
+    query NuxtLpQuotes {
+      quotes: allReviews(filter: { id: { in: ["39832256", "47253817"] } }, first: 2) {
+        __typename
+        ...ReviewQuoteFragment
+      }
+    }
+  `,
+  [ReviewQuoteFragment],
+);
+
+const { quotes } = await executeQuery(Astro, lpQuotesQuery);
+---
+
+<LpLayout
+  title="Migrate to Nuxt 3/4 with DatoCMS & De Voorhoede"
+  partner={{
+    name: 'De Voorhoede',
+    logoUrl:
+      'https://www.datocms-assets.com/205/1649929882-logo-on-transparent-without-padding.svg',
+    siteUrl: 'https://www.devoorhoede.nl',
+  }}
+>
+  <section class={s.hero}>
+    <div class={s.sectionInner}>
+      <div class={s.heroBadge}>
+        <span class={s.heroBadgeDot}></span>
+        Nuxt 2 — End of Life: December 31, 2023
+      </div>
+
+      <h1 class={s.heroTitle}>
+        Your Nuxt 2 website has been at risk for <mark>over a year</mark>.
+      </h1>
+
+      <p class={s.heroSubtitle}>
+        Still got projects live on Nuxt 2? De Voorhoede migrates your frontend to Nuxt 3 or 4.
+        DatoCMS replaces your content layer. Easy Peasy.
+      </p>
+
+      <div class={s.heroCta}>
+        <Button as="a" href="#lp-form" p="big">Book your free migration assessment</Button>
+        <p class={s.heroTrust}>Used by 25,000+ development teams worldwide</p>
+      </div>
+    </div>
+  </section>
+
+  <div class={s.statsBar}>
+    <Wrapper>
+      <div class={s.statsGrid}>
+        <div class={s.stat}>
+          <span class={s.statNumber}>25K+</span>
+          <span class={s.statLabel}>Teams using DatoCMS</span>
+        </div>
+        <div class={s.stat}>
+          <span class={s.statNumber}>4.8/5</span>
+          <span class={s.statLabel}>Av. customer ratings</span>
+        </div>
+        <div class={s.stat}>
+          <span class={s.statNumber}>99.99%</span>
+          <span class={s.statLabel}>Av. API Uptime</span>
+        </div>
+        <div class={s.stat}>
+          <span class={s.statNumber}>33ms</span>
+          <span class={s.statLabel}>Av. API response time</span>
+        </div>
+      </div>
+    </Wrapper>
+  </div>
+
+  <Space top={2} bottom={1}>
+    <div class={s.sectionHeader}>
+      <Wrapper>
+        <p class={s.sectionKicker}>What's going on</p>
+        <h2 class={s.sectionTitle}>
+          This is what Nuxt 2 "end of life" actually means for your codebase
+        </h2>
+        <p class={s.sectionSubtitle}>
+          Nuxt 2 and Vue 2 both hit EOL on December 31, 2023. No more security patches, no bug
+          fixes, no framework updates.
+        </p>
+      </Wrapper>
+    </div>
+  </Space>
+
+  <Wrapper>
+    <div class={s.riskGrid}>
+      <div class={s.riskCard}>
+        <div class={s.riskIcon}>🔴</div>
+        <div>
+          <h3 class={s.cardTitle}>No more patches.</h3>
+          <p class={s.cardText}>
+            The last Nuxt 2 release was December 2023. Any vulnerability found in the framework or
+            Vue 2 since then stays open. Permanently. Unless you move.
+          </p>
+        </div>
+      </div>
+
+      <div class={s.riskCard}>
+        <div class={s.riskIcon}>📦</div>
+        <div>
+          <h3 class={s.cardTitle}>Your dependencies are leaving.</h3>
+          <p class={s.cardText}>
+            Libraries drop Vue 2 support in patch and minor releases, sometimes with a changelog
+            entry, sometimes not. You'll find out when something breaks. Or your CI will. The hard
+            way.
+          </p>
+        </div>
+      </div>
+
+      <div class={s.riskCard}>
+        <div class={s.riskIcon}>👩‍💻</div>
+        <div>
+          <h3 class={s.cardTitle}>Engineers don't want to work on it.</h3>
+          <p class={s.cardText}>
+            Most Vue developers today learned the framework on Vue 3. Asking them to work in a Vue 2
+            codebase is a major risk.
+          </p>
+        </div>
+      </div>
+
+      <div class={s.riskCard}>
+        <div class={s.riskIcon}>⚡</div>
+        <div>
+          <h3 class={s.cardTitle}>Nuxt 3+ ships with Vite and Nitro.</h3>
+          <p class={s.cardText}>
+            Faster builds, faster cold starts, better Core Web Vitals... Your risk grows every
+            quarter you stay on the old stack.
+          </p>
+        </div>
+      </div>
+    </div>
+  </Wrapper>
+
+  <Space top={2} bottom={1}>
+    <div class={s.sectionHeader}>
+      <Wrapper>
+        <p class={s.sectionKicker}>OK. So what's the plan?</p>
+        <h2 class={s.sectionTitle}>Here's what's up</h2>
+        <p class={s.sectionSubtitle}>
+          De Voorhoede handles your implementation. DatoCMS handles the content layer. Between the
+          two, you're getting the best possible Nuxt combo to handle your projects.
+        </p>
+      </Wrapper>
+    </div>
+  </Space>
+
+  <Wrapper>
+    <div class={s.solutionGrid}>
+      <div class={s.solutionCard}>
+        <img
+          src="https://www.datocms-assets.com/205/1649929882-logo-on-transparent-without-padding.svg"
+          alt="De Voorhoede"
+          class={s.solutionCardLogo}
+        />
+        <h3 class={s.solutionCardTitle}>
+          The agency that's been working on Nuxt since the beginning of time.
+        </h3>
+        <ul class={s.solutionCardList}>
+          <li>Vue contributors with a performance obsession.</li>
+          <li>Done countless Nuxt 2 migrations for all sorts of use cases.</li>
+          <li>Expertise in DatoCMS as a long standing Agency Partner</li>
+          <li>Based in Amsterdam, working with teams globally</li>
+        </ul>
+      </div>
+
+      <div class={s.solutionCard}>
+        <img src="/images/full_logo.svg" alt="DatoCMS" class={s.solutionCardLogo} />
+        <h3 class={s.solutionCardTitle}>Headless CMS with first-class tooling for Nuxt and Vue.</h3>
+        <ul class={s.solutionCardList}>
+          <li>Visual Editing, SEO, Localization, and SO much more.</li>
+          <li>GraphQL & REST APIs with incredible performance.</li>
+          <li>Unmatched Developer Experience AND Editor Experience.</li>
+          <li>25K+ teams trust DatoCMS with business critical projects.</li>
+        </ul>
+      </div>
+    </div>
+  </Wrapper>
+
+  <Space top={2} bottom={1}>
+    <div class={s.sectionHeader}>
+      <Wrapper>
+        <p class={s.sectionKicker}>Sounds exciting? Here's what we do now</p>
+        <h2 class={s.sectionTitle}>How it works</h2>
+        <p class={s.sectionSubtitle}>
+          You tell us a little bit about what you're working on and what Nuxt 2 projects are beefing
+          up your technical debt, and we'll get to work.
+        </p>
+      </Wrapper>
+    </div>
+  </Space>
+
+  <div class={s.journeyWrap}>
+    <Wrapper>
+      <Journey>
+        <Step number="01" title="Discovery & planning">
+          We dig into your Nuxt 2 setup: routes, components, how you're fetching content, what your
+          CMS looks like underneath... Then we'll come up with a clear and concrete plan.
+        </Step>
+        <Step number="02" title="Nuxt 3/4 rebuild">
+          De Voorhoede rebuilds your website or app with all the bells and whistles. DatoCMS handles
+          content, previews, image optimisations, and whatever other functionality you need.
+        </Step>
+        <Step number="03" title="Deploy & handoff">
+          We do all the performance checks, QA, deployment, documentation, and a handoff session
+          with your team. Oh, and we won't ghost you after the site goes live.
+        </Step>
+      </Journey>
+    </Wrapper>
+  </div>
+
+  <Space top={2} bottom={1}>
+    <div class={s.sectionHeader}>
+      <Wrapper>
+        <p class={s.sectionKicker}>Sounds good. What am I getting?</p>
+        <h2 class={s.sectionTitle}>Say 👋 to the CMS your team has been asking for</h2>
+        <p class={s.sectionSubtitle}>
+          Built for both: editors who want control, and devs who want clean APIs. Here's a small
+          sample of the features DatoCMS gives you out of the box.
+        </p>
+      </Wrapper>
+    </div>
+  </Space>
+
+  <Wrapper>
+    <div class={s.featuresGrid}>
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>✏️</div>
+        <h3 class={s.cardTitle}>Visual Editing</h3>
+        <p class={s.cardText}>
+          Editors click on the live site to make changes. No separate preview mode, no tab
+          switching. What they see is what goes live, without any dev tickets.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>📝</div>
+        <h3 class={s.cardTitle}>Structured Text</h3>
+        <p class={s.cardText}>
+          Arguably the best text editor in a Headless CMS. Period. Your Nuxt components control how
+          it renders. No parser gymnastics, no <code>innerHTML</code>.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>🧱</div>
+        <h3 class={s.cardTitle}>Modular Content</h3>
+        <p class={s.cardText}>
+          Editors assemble pages from strongly-typed content blocks you define. They pick what to
+          place and where with a true drag-ang-drop WYSIWYG UX.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>🌍</div>
+        <h3 class={s.cardTitle}>Localization</h3>
+        <p class={s.cardText}>
+          Field-level translations, locale fallbacks, and per-locale publishing, out of the box. One
+          schema serves every market so you can speak to your customers wherever they are.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>🖼️</div>
+        <h3 class={s.cardTitle}>Image & asset optimization</h3>
+        <p class={s.cardText}>
+          With powerful imgix and Mux capabilities under the hood, upload an asset once and get 100+
+          optimization options without having to do anything manually.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>👁️</div>
+        <h3 class={s.cardTitle}>Live previews</h3>
+        <p class={s.cardText}>
+          No more guessing. Editors see unpublished changes on the actual site before anything goes
+          live, to make sure your users only see everything when it's perfect.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>⚡</div>
+        <h3 class={s.cardTitle}>GraphQL API</h3>
+        <p class={s.cardText}>
+          Your content schema generates a typed GraphQL API. Every field you define becomes a
+          queryable endpoint. It introspects, it caches, and it works with Nuxt composables without
+          ceremony.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>🤖</div>
+        <h3 class={s.cardTitle}>AI, AI, AI</h3>
+        <p class={s.cardText}>
+          DatoCMS has a remote MCP server, Agent Skills, and AI translations. Use whichever ones
+          suit your workflow without them coming in the way.
+        </p>
+      </div>
+
+      <div class={s.featureCard}>
+        <div class={s.featureIcon}>🔀</div>
+        <h3 class={s.cardTitle}>Environments</h3>
+        <p class={s.cardText}>
+          Enjoy separate staging and production environments, each with their own schema and
+          content. Break things in staging. Promote successful changes to main. Repeat.
+        </p>
+      </div>
+    </div>
+  </Wrapper>
+
+  <div class={s.quotesSection}>
+    <Wrapper>
+      <p class={s.sectionKicker} style="text-align: center; display: block; margin-bottom: 48px;">
+        Trusted by developers worldwide
+      </p>
+      <div class={s.quotesGrid}>
+        {quotes.map((quote) => <SingleQuote quote={quote} fontSize="small" />)}
+      </div>
+    </Wrapper>
+  </div>
+
+  <Space top={2} bottom={1} id="lp-form">
+    <div class={s.sectionHeader}>
+      <Wrapper>
+        <p class={s.sectionKicker}>Ready to talk?</p>
+        <h2 class={s.sectionTitle}>Let's chat about your migration.</h2>
+        <p class={s.sectionSubtitle}>
+          Fill in the form so we can check your needs, and we'll schedule a call and go from there.
+        </p>
+      </Wrapper>
+    </div>
+  </Space>
+
+  <div class={s.formWrap}>
+    <Form client:load />
+  </div>
+
+  <Space bottom={2} />
+</LpLayout>

@@ -12,6 +12,7 @@ import {
   createNote,
   findOrCreateOrgByName,
   findOrCreatePerson,
+  partnershipLabel,
 } from '../pipedrive/utils';
 
 const LINKEDIN_CONVERSION_RULE_PARTNER_LEAD = '27784882';
@@ -74,7 +75,6 @@ export default defineAction({
         '',
         organization,
       );
-      const partnershipLabel = '87a60c60-6a8e-11ed-92ec-410445a67487';
       const lead = await createLead(person, organization, '', [partnershipLabel]);
 
       const noteText = `<p>Team size: ${input.teamSize}</p><p>Product familiarity: ${input.productFamiliarity}</p><p>Message: ${input.body}</p>`;
