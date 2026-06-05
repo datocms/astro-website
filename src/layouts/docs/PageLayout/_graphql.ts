@@ -1,3 +1,4 @@
+import { CopyPromptButtonFragment } from '~/components/blocks/CopyPromptButton/graphql';
 import { DemoFragment } from '~/components/blocks/Demo/graphql';
 import { GithubNpmBadgeFragment } from '~/components/blocks/GithubNpmBadge/graphql';
 import { ImageFragment } from '~/components/blocks/Image/graphql';
@@ -103,6 +104,7 @@ export const PageLayoutFragment = graphql(
           ...GithubNpmBadgeFragment
           ...ReactUiLiveExampleFragment
           ...TutorialVideoFragment
+          ...CopyPromptButtonFragment
         }
       }
     }
@@ -123,6 +125,7 @@ export const PageLayoutFragment = graphql(
     GithubNpmBadgeFragment,
     ReactUiLiveExampleFragment,
     TutorialVideoFragment,
+    CopyPromptButtonFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],

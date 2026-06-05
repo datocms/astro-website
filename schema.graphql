@@ -1628,7 +1628,7 @@ type BadgeRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
-union BlogPostModelContentBlocksField = CodesandboxEmbedBlockRecord | CtaButtonRecord | DemoRecord | ImageCarouselRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | QuestionAnswerRecord | ShowcaseProjectBlockRecord | TableRecord | TabsBlockRecord | TutorialVideoRecord | VideoRecord
+union BlogPostModelContentBlocksField = CodesandboxEmbedBlockRecord | CopyPromptButtonBlockRecord | CtaButtonRecord | DemoRecord | ImageCarouselRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | QuestionAnswerRecord | ShowcaseProjectBlockRecord | TableRecord | TabsBlockRecord | TutorialVideoRecord | VideoRecord
 
 type BlogPostModelContentField {
   blocks: [BlogPostModelContentBlocksField!]!
@@ -1652,6 +1652,7 @@ input BlogPostModelContentFieldBlocksConditions {
   table: TableModelFilter
   imageCarousel: ImageCarouselModelFilter
   tabsBlock: TabsBlockModelFilter
+  copyPromptButtonBlock: CopyPromptButtonBlockModelFilter
 }
 
 """Specify how to filter based on this field's blocks"""
@@ -1683,6 +1684,7 @@ input BlogPostModelContentFieldBlocksPresence {
   table: BooleanType
   imageCarousel: BooleanType
   tabsBlock: BooleanType
+  copyPromptButtonBlock: BooleanType
 }
 
 """Specify how to filter this specific Structured Text field instance"""
@@ -1995,7 +1997,7 @@ type ChangelogCategoryRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
-union ChangelogEntryModelContentBlocksField = ImageRecord | InternalVideoRecord | TabsBlockRecord
+union ChangelogEntryModelContentBlocksField = CopyPromptButtonBlockRecord | ImageRecord | InternalVideoRecord | TabsBlockRecord
 
 type ChangelogEntryModelContentField {
   blocks: [ChangelogEntryModelContentBlocksField!]!
@@ -2431,6 +2433,42 @@ type ContinentRecord implements RecordInterface {
   createdAt: DateTime!
   id: ItemId!
   name: String!
+  updatedAt: DateTime!
+}
+
+input CopyPromptButtonBlockModelFilter {
+  id: ItemIdFilter
+  prompt: TextFilter
+  OR: [CopyPromptButtonBlockModelFilter]
+  AND: [CopyPromptButtonBlockModelFilter]
+}
+
+"""Block of type 💬 Copy Prompt Button (copy_prompt_button_block)"""
+type CopyPromptButtonBlockRecord implements RecordInterface {
+  _createdAt: DateTime!
+
+  """Editing URL"""
+  _editingUrl: String
+  _firstPublishedAt: DateTime!
+  _isValid: BooleanType!
+  _modelApiKey: String!
+  _publicationScheduledAt: DateTime
+  _publishedAt: DateTime!
+
+  """Generates SEO and Social card meta tags to be used in your frontend"""
+  _seoMetaTags(
+    """The locale to use to fetch the field's content"""
+    locale: SiteLocale
+  ): [Tag!]!
+  _status: ItemStatus!
+  _unpublishingScheduledAt: DateTime
+  _updatedAt: DateTime!
+  createdAt: DateTime!
+  id: ItemId!
+  prompt(
+    """Process content as markdown"""
+    markdown: Boolean
+  ): String!
   updatedAt: DateTime!
 }
 
@@ -3917,11 +3955,11 @@ type DocGroupSectionRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
-union DocPageModelContentBlocksField = CloneButtonFormRecord | DemoRecord | DeployButtonFormRecord | DocCalloutRecord | GithubNpmBadgeRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | PluginSdkHookGroupRecord | ReactUiLiveExampleRecord | TableRecord | TabsBlockRecord | TutorialVideoRecord
+union DocPageModelContentBlocksField = CloneButtonFormRecord | CopyPromptButtonBlockRecord | DemoRecord | DeployButtonFormRecord | DocCalloutRecord | GithubNpmBadgeRecord | ImageRecord | InternalVideoRecord | MultipleDemosBlockRecord | PluginSdkHookGroupRecord | ReactUiLiveExampleRecord | TableRecord | TabsBlockRecord | TutorialVideoRecord
 
 type DocPageModelContentField {
   blocks: [DocPageModelContentBlocksField!]!
-  inlineBlocks: [GithubNpmBadgeRecord!]!
+  inlineBlocks: [String!]!
   links: [DocPageModelContentLinksField!]!
   value: JsonField!
 }
@@ -3940,6 +3978,7 @@ input DocPageModelContentFieldBlocksConditions {
   tutorialVideo: TutorialVideoModelFilter
   table: TableModelFilter
   tabsBlock: TabsBlockModelFilter
+  copyPromptButtonBlock: CopyPromptButtonBlockModelFilter
   githubNpmBadge: GithubNpmBadgeModelFilter
 }
 
@@ -3971,6 +4010,7 @@ input DocPageModelContentFieldBlocksPresence {
   tutorialVideo: BooleanType
   table: BooleanType
   tabsBlock: BooleanType
+  copyPromptButtonBlock: BooleanType
   githubNpmBadge: BooleanType
 }
 

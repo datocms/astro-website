@@ -1,3 +1,4 @@
+import { CopyPromptButtonFragment } from '~/components/blocks/CopyPromptButton/graphql';
 import { ImageFragment } from '~/components/blocks/Image/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { TabsBlockFragment } from '~/components/blocks/TabsBlock/graphql';
@@ -70,6 +71,7 @@ export const ProductUpdateFragment = graphql(
           ...ImageFragment
           ...InternalVideoFragment
           ...TabsBlockFragment
+          ...CopyPromptButtonFragment
         }
       }
       _firstPublishedAt
@@ -85,6 +87,7 @@ export const ProductUpdateFragment = graphql(
     ImageFragment,
     InternalVideoFragment,
     TabsBlockFragment,
+    CopyPromptButtonFragment,
     ProductUpdateUrlFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,

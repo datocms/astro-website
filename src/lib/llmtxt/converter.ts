@@ -247,15 +247,24 @@ function extractMainContent(document: Document): HTMLElement {
  * after turndown has run. This bypasses turndown's `collapseWhitespace`
  * pre-pass, which would otherwise eat the newlines inside the rawtext body.
  */
-function extractPreRenderedMarkdown(content: HTMLElement): Map<string, string> {
-  const placeholders = new Map<string, string>();
+interface MarkdownPlaceholder {
+  content: string;
+  fenced: boolean;
+}
+
+function extractPreRenderedMarkdown(content: HTMLElement): Map<string, MarkdownPlaceholder> {
+  const placeholders = new Map<string, MarkdownPlaceholder>();
   const scripts = content.querySelectorAll('script[type="text/markdown"]');
   scripts.forEach((script, i) => {
     const token = `LLMTXTMDPLACEHOLDER${i}${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
     const raw = script.textContent ?? '';
     // Reverse the `</script>` -> `<\/script>` escape applied at emit time
     // (needed so the closer doesn't end the rawtext element prematurely).
-    placeholders.set(token, raw.replace(/<\\\/script>/gi, '</script>').trim());
+    const fenced = (script as HTMLElement).dataset.fenced === 'true';
+    placeholders.set(token, {
+      content: raw.replace(/<\\\/script>/gi, '</script>').trim(),
+      fenced,
+    });
     const placeholder = content.ownerDocument.createElement('div');
     placeholder.textContent = token;
     script.parentNode?.replaceChild(placeholder, script);
@@ -263,10 +272,19 @@ function extractPreRenderedMarkdown(content: HTMLElement): Map<string, string> {
   return placeholders;
 }
 
-function restorePreRenderedMarkdown(markdown: string, placeholders: Map<string, string>): string {
+function restorePreRenderedMarkdown(
+  markdown: string,
+  placeholders: Map<string, MarkdownPlaceholder>,
+): string {
   let result = markdown;
-  for (const [token, md] of placeholders) {
-    result = result.replace(token, `\n\n${md}\n\n`);
+  for (const [token, { content, fenced }] of placeholders) {
+    const restored = fenced
+      ? content
+          .split('\n')
+          .map((line) => `    ${line}`)
+          .join('\n')
+      : content;
+    result = result.replace(token, `\n\n${restored}\n\n`);
   }
   return result;
 }

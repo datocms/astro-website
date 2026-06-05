@@ -1,3 +1,4 @@
+import { CopyPromptButtonFragment } from '~/components/blocks/CopyPromptButton/graphql';
 import { CodesandboxEmbedBlockFragment } from '~/components/blocks/CodesandboxEmbedBlock/graphql';
 import { CtaButtonFragment } from '~/components/blocks/CtaButton/graphql';
 import { DemoFragment } from '~/components/blocks/Demo/graphql';
@@ -105,6 +106,7 @@ export const query = graphql(
             ...QuestionAnswerFragment
             ...TableFragment
             ...TabsBlockFragment
+            ...CopyPromptButtonFragment
           }
         }
         _firstPublishedAt
@@ -137,6 +139,7 @@ export const query = graphql(
     CtaButtonFragment,
     ShowcaseProjectBlockFragment,
     QuestionAnswerFragment,
+    CopyPromptButtonFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],

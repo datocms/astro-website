@@ -1,0 +1,108 @@
+---
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { CopyPromptButtonFragment } from './graphql';
+import { Svg } from '~/components/Svg';
+import s from './style.module.css';
+import { stripStega } from '@datocms/astro';
+
+interface Props {
+  block: FragmentOf<typeof CopyPromptButtonFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+const block = readFragment(CopyPromptButtonFragment, maskedBlock);
+
+// A literal closing script tag inside the markdown would terminate the
+// element prematurely, so escape it; the converter unescapes it when reading.
+// (Also keeps Vite's raw-source dependency scanner from misreading this file.)
+const prompt = stripStega(block.prompt)?.replace(/<\/script>/gi, '<\\/script>');
+---
+
+<copy-prompt-button>
+  <div class={s.root}>
+    <button type="button" class={s.button} aria-label="Copy prompt to clipboard" data-datocms-nomd>
+      <Svg name="icons/regular/copy" />
+      <span data-label>Copy prompt</span>
+    </button>
+    <p class={s.hint} data-hint aria-live="polite"></p>
+  </div>
+  <script type="text/markdown" is:inline data-fenced="true" set:html={prompt} />
+</copy-prompt-button>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  class CopyPromptButtonElement extends WebComponent {
+    copied = false;
+    hideTimer: ReturnType<typeof setTimeout> | null = null;
+
+    get prompt(): string {
+      return this.querySelector('script[type="text/markdown"]')?.textContent?.trim() ?? '';
+    }
+
+    get firstLine(): string {
+      return this.prompt.split('\n').find((l) => l.trim()) ?? '';
+    }
+
+    get label() {
+      return this.$<HTMLElement>('[data-label]');
+    }
+
+    get hint() {
+      return this.$<HTMLElement>('[data-hint]');
+    }
+
+    parsedCallback() {
+      const button = this.$<HTMLButtonElement>('button');
+      this.on(button, 'mouseenter', () => this.handleMouseEnter());
+      this.on(button, 'mouseleave', () => this.handleMouseLeave());
+      this.on(button, 'click', () => this.handleClick());
+    }
+
+    handleMouseEnter() {
+      if (this.copied) return;
+      this.hint.textContent = `"${this.firstLine}"`;
+    }
+
+    handleMouseLeave() {
+      if (this.copied) return;
+      this.hint.textContent = '';
+    }
+
+    async handleClick() {
+      const copied = await this.copyToClipboard(this.prompt);
+      if (!copied) return;
+
+      this.copied = true;
+      this.hint.textContent = '✓ Copied: now paste that into your preferred AI agent!';
+      this.hint.setAttribute('data-copied', '');
+
+      if (this.hideTimer) clearTimeout(this.hideTimer);
+      this.hideTimer = setTimeout(() => {
+        this.copied = false;
+        this.label.textContent = 'Copy prompt';
+        this.hint.textContent = '';
+        this.hint.removeAttribute('data-copied');
+        this.hideTimer = null;
+      }, 3000);
+    }
+
+    async copyToClipboard(text: string): Promise<boolean> {
+      if (!navigator.clipboard?.writeText) {
+        console.warn('[copy-prompt-button] navigator.clipboard.writeText is unavailable');
+        return false;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (error) {
+        console.error('[copy-prompt-button] unable to copy text', error);
+        return false;
+      }
+    }
+  }
+
+  if (!window.customElements.get('copy-prompt-button')) {
+    window.customElements.define('copy-prompt-button', CopyPromptButtonElement);
+  }
+</script>
