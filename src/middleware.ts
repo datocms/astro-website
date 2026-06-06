@@ -129,6 +129,41 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
   return next();
 };
 
+export const contentNegotiation: MiddlewareHandler = async (context, next) => {
+  const accept = context.request.headers.get('accept') || '';
+  const wantsMarkdown = accept.includes('text/markdown');
+
+  const response = await next();
+  const contentType = response.headers.get('content-type') || '';
+
+  if (!contentType.includes('text/html')) {
+    return response;
+  }
+
+  // Tell Fastly to cache separate versions per Accept value
+  response.headers.append('vary', 'Accept');
+
+  if (!wantsMarkdown) {
+    return response;
+  }
+
+  const htmlContent = await response.text();
+  const markdown = convertHtmlToMarkdown(stripStega(htmlContent), context.url.href, {
+    includeTitle: false,
+    includeSidebar: true,
+    preserveTables: true,
+  });
+
+  const headers = new Headers({ 'Content-Type': 'text/markdown; charset=utf-8', Vary: 'Accept' });
+
+  for (const header of ['cache-control', 'datocms-cache-tags', 'surrogate-control']) {
+    const value = response.headers.get(header);
+    if (value) headers.set(header, value);
+  }
+
+  return new Response(markdown, { status: 200, headers });
+};
+
 export const propagateToken: MiddlewareHandler = async (context, next) => {
   const token = context.url.searchParams.get('token');
   if (!token) return next();
@@ -168,4 +203,11 @@ export const propagateToken: MiddlewareHandler = async (context, next) => {
   });
 };
 
-export const onRequest = sequence(rollbar, markdownProxy, security, basicAuth, propagateToken);
+export const onRequest = sequence(
+  rollbar,
+  markdownProxy,
+  security,
+  basicAuth,
+  propagateToken,
+  contentNegotiation,
+);
