@@ -110,13 +110,36 @@
   margin: rfs(50px) 0;
 }
 
-details > summary {
-  list-style: none;
+.body :global(details) {
+  cursor: pointer;
 }
-details > summary::-webkit-details-marker {
+
+.body :global(details > summary) {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.body :global(details > summary::-webkit-details-marker) {
   display: none;
 }
 
-details {
-  display: contents;
+.body :global(details > summary::after) {
+  content: '';
+  display: inline-block;
+  flex-shrink: 0;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 7px solid currentColor;
+  transition: transform 0.2s ease;
+  margin-top: 0.35em;
+}
+
+.body :global(details[open] > summary::after) {
+  transform: rotate(90deg);
 }
