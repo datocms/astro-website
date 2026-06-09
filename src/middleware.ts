@@ -28,7 +28,7 @@ export const security: MiddlewareHandler = async (_context, next) => {
   return response;
 };
 
-const routesWithNoAuth = ['/up', '/landing-pages/cookieConsent.js'];
+const routesWithNoAuth = ['/up', '/landing-pages/cookieConsent.js', '/_image'];
 
 export const basicAuth: MiddlewareHandler = (context, next) => {
   if (
