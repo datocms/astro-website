@@ -1,0 +1,396 @@
+---
+import { LpLayout } from '~/layouts/lp';
+import { Button } from '~/components/Button';
+import { Space } from '~/components/Space';
+import { Wrapper } from '~/components/Wrapper';
+import { Form } from './_Form';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { ReviewQuoteFragment } from '~/components/quote/graphql';
+import { SingleQuote } from '~/components/quote/SingleQuote';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { graphql } from '~/lib/datocms/graphql';
+import s from './_style.module.css';
+
+const lpQuotesQuery = graphql(
+  `
+    query MigcsLpQuotes {
+      calebWise: review(filter: { name: { eq: "Caleb Wise" } }) {
+        ...ReviewQuoteFragment
+      }
+      andrewSmith: review(filter: { name: { eq: "Andrew Smith" } }) {
+        ...ReviewQuoteFragment
+      }
+      rauch: review(filter: { name: { eq: "Guillermo Rauch" } }) {
+        ...ReviewQuoteFragment
+      }
+    }
+  `,
+  [ReviewQuoteFragment],
+);
+
+const { calebWise, andrewSmith, rauch } = await executeQuery(Astro, lpQuotesQuery);
+const quotes = [calebWise, andrewSmith, rauch].filter(Boolean);
+---
+
+<LpLayout title="Headless CMS for those frustrated with theirs — DatoCMS">
+  <section class={s.hero}>
+    <div class={s.heroInner}>
+      <p class={s.heroKicker}>CMS become a trigger word for you lately?</p>
+      <h1 class={s.heroTitle}>
+        DatoCMS is built for <mark>your</mark> content team.<mark> Not </mark> some earnings call.
+      </h1>
+      <p class={s.heroSub}>
+        Worried that your Enterprise Headless CMS exists just to maximize shareholder value? Try one
+        that focuses on the people who actually use it.
+      </p>
+      <Button as="a" href="#lp-form" p="big">Talk to us about switching</Button>
+    </div>
+    <div class={s.heroStatsBar}>
+      <Wrapper>
+        <div class={s.box}>
+          <div class={s.statsGrid}>
+            <div class={s.stat}>
+              <span class={s.statNum}>25K+</span>
+              <span class={s.statLabel}>teams using DatoCMS</span>
+            </div>
+            <div class={s.stat}>
+              <span class={s.statNum}>4.8/5</span>
+              <span class={s.statLabel}>average customer rating</span>
+            </div>
+            <div class={s.stat}>
+              <span class={s.statNum}>99.99%</span>
+              <span class={s.statLabel}>average API uptime</span>
+            </div>
+            <div class={s.stat}>
+              <span class={s.statNum}>33ms</span>
+              <span class={s.statLabel}>avg. API response time</span>
+            </div>
+          </div>
+        </div>
+      </Wrapper>
+    </div>
+  </section>
+
+  {
+    quotes.length > 0 && (
+      <section class={s.quotesSection}>
+        <Wrapper>
+          <div class={s.box}>
+            <div class={s.quotesGrid}>
+              {quotes.map((quote) => (
+                <SingleQuote quote={quote} fontSize="small" />
+              ))}
+            </div>
+          </div>
+        </Wrapper>
+      </section>
+    )
+  }
+
+  <section class={s.glossarySection}>
+    <Wrapper>
+      <div class={s.box}>
+        <div class={s.glossaryHeader}>
+          <p class={s.sectionKicker}>A translation guide to your Enterprise CMS</p>
+          <h2 class={s.glossaryTitle}>
+            Enterprise software has its own language.<br />Here's what it actually means for you.
+          </h2>
+        </div>
+
+        <div class={s.glossaryGrid}>
+          <div class={s.glossaryItem}>
+            <span class={s.glossaryTerm}>Pricing that scales for you</span>
+            <p class={s.glossaryDef}>
+              Renewal rates go up (like up up) annually, with every negotiation becoming a battle
+              royale with their account team.
+            </p>
+          </div>
+
+          <div class={s.glossaryItem}>
+            <span class={s.glossaryTerm}>Premium global 24/7 SLA support</span>
+            <p class={s.glossaryDef}>
+              Standard support existed. Then someone noticed it was useful. Now it's a priced
+              product to "politely help" you understand why you want the higher one.
+            </p>
+          </div>
+
+          <div class={s.glossaryItem}>
+            <span class={s.glossaryTerm}>Roadmap alignment and involvement</span>
+            <p class={s.glossaryDef}>
+              The product ships what enterprise sales teams can demo. The feedback you submitted in
+              their portal is still open. It has a lot of upvotes. It's marked "considering."
+            </p>
+          </div>
+
+          <div class={s.glossaryItem}>
+            <span class={s.glossaryTerm}>Platform ecosystem</span>
+            <p class={s.glossaryDef}>
+              Your CMS is now a module in a much larger suite. The integrations that ship next are
+              the ones that help their sales team cross-sell. Whether you need them or not.
+            </p>
+          </div>
+
+          <div class={s.glossaryItem}>
+            <span class={s.glossaryTerm}>Flexible enterprise contracts</span>
+            <p class={s.glossaryDef}>
+              Annual minimums. Auto-renewal clauses. 90-day notice windows to exit. "Flexible" for
+              you is not what they meant there.
+            </p>
+          </div>
+
+          <div class={s.glossaryItem}>
+            <span class={s.glossaryTerm}>Dedicated customer success management</span>
+            <p class={s.glossaryDef}>
+              You get access to a team whose KPIs are measured in your retention and renewal rate,
+              not your team's happiness. There is a difference.
+            </p>
+          </div>
+        </div>
+      </div>
+    </Wrapper>
+  </section>
+
+  <section class={s.pivotSection}>
+    <Wrapper>
+      <div class={s.pivotInner}>
+        <p class={s.pivotLabel}>Any of this sounds familiar?</p>
+        <p class={s.pivotText}>
+          Most teams who've been on enterprise headless CMS software for a while find a moment where
+          they realize the product stopped being designed for them.
+        </p>
+        <p class={s.pivotText}>
+          DatoCMS was built the other way around. No publicly-traded parent. No quarterly earnings
+          targets. No VCs to maximize shareholder value for. Just a Headless CMS that works for you.
+        </p>
+        <a href="#lp-form" class={s.pivotCta}>See if it's a fit for your team →</a>
+      </div>
+    </Wrapper>
+  </section>
+
+  <section class={s.featuresSection}>
+    <Wrapper>
+      <div class={s.box}>
+        <div class={s.sectionHeader}>
+          <p class={s.sectionKicker}>What DatoCMS actually gives you</p>
+          <h2 class={s.sectionTitle}>Everything you were promised. Actually delivered.</h2>
+          <p class={s.sectionSubtitle}>
+            25,000+ teams use DatoCMS in production. Here's some of what they get.
+          </p>
+        </div>
+
+        <div class={s.featList}>
+          <div class={s.featItem}>
+            <div class={s.featLeft}>
+              <span class={s.featIcon}>📝</span>
+            </div>
+            <div class={s.featRight}>
+              <h3 class={s.featTitle}>Structured Text</h3>
+              <p class={s.featText}>
+                A rich text editor that doesn't fight your frontend. Your components control
+                rendering. No <code>innerHTML</code>, no parser gymnastics. Embed typed blocks and
+                links directly inside prose.
+              </p>
+            </div>
+          </div>
+
+          <div class={s.featItem}>
+            <div class={s.featLeft}>
+              <span class={s.featIcon}>✏️</span>
+            </div>
+            <div class={s.featRight}>
+              <h3 class={s.featTitle}>Visual Editing</h3>
+              <p class={s.featText}>
+                Editors click any element on the live site to open it in the CMS. No separate
+                preview tab, no dev tickets for copy changes. The kind of feature that would have
+                been on every headless CMS roadmap for years if roadmaps were driven by editor
+                feedback.
+              </p>
+            </div>
+          </div>
+
+          <div class={s.featItem}>
+            <div class={s.featLeft}>
+              <span class={s.featIcon}>🧱</span>
+            </div>
+            <div class={s.featRight}>
+              <h3 class={s.featTitle}>Flexible content modeling</h3>
+              <p class={s.featText}>
+                Content types, modular blocks, and typed links. Editors assemble pages from
+                components you define. Strongly typed. Drag-and-drop. Your schema, your rules.
+              </p>
+            </div>
+          </div>
+
+          <div class={s.featItem}>
+            <div class={s.featLeft}>
+              <span class={s.featIcon}>🔀</span>
+            </div>
+            <div class={s.featRight}>
+              <h3 class={s.featTitle}>Environments</h3>
+              <p class={s.featText}>
+                Staging and production environments, each with their own schema and content. Break
+                things in staging. Promote changes when you're ready. Add more environments if you
+                need them.
+              </p>
+            </div>
+          </div>
+
+          <div class={s.featItem}>
+            <div class={s.featLeft}>
+              <span class={s.featIcon}>🌍</span>
+            </div>
+            <div class={s.featRight}>
+              <h3 class={s.featTitle}>Localization</h3>
+              <p class={s.featText}>
+                Field-level translations, locale fallbacks, and per-locale publishing. One content
+                schema helps you serve your customers in languages they expect from you.
+              </p>
+            </div>
+          </div>
+
+          <div class={s.featItem}>
+            <div class={s.featLeft}>
+              <span class={s.featIcon}>🖼️</span>
+            </div>
+            <div class={s.featRight}>
+              <h3 class={s.featTitle}>Asset Optimizatios</h3>
+              <p class={s.featText}>
+                Upload once and get 100+ image transforms, focal-point croppings, and responsive
+                images, automatically. The same works for video. No separate infrastructure
+                contract.
+              </p>
+            </div>
+          </div>
+
+          <div class={s.featItem}>
+            <div class={s.featLeft}>
+              <span class={s.featIcon}>⚡</span>
+            </div>
+            <div class={s.featRight}>
+              <h3 class={s.featTitle}>REST and GraphQL APIs</h3>
+              <p class={s.featText}>
+                Your content schema generates a fully typed, cached, introspectable GraphQL API.
+                REST APIs for management and assets too. Blazing fast.
+              </p>
+            </div>
+          </div>
+
+          <div class={s.featItem}>
+            <div class={s.featLeft}>
+              <span class={s.featIcon}>🤖</span>
+            </div>
+            <div class={s.featRight}>
+              <h3 class={s.featTitle}>AI without the $$$$</h3>
+              <p class={s.featText}>
+                MCP server, Agent Skills, and AI translations — all built in, included for free. Use
+                what you need. None of it requires a agreement or a tier upgrade.
+              </p>
+            </div>
+          </div>
+
+          <div class={s.featItem}>
+            <div class={s.featLeft}>
+              <span class={s.featIcon}>🔐</span>
+            </div>
+            <div class={s.featRight}>
+              <h3 class={s.featTitle}>Security and Governance</h3>
+              <p class={s.featText}>
+                Granular custom roles, single sign-on, and a full audit trail included if you want,
+                without any shocks on renewal
+              </p>
+            </div>
+          </div>
+
+          <div class={s.featItem}>
+            <div class={s.featLeft}>
+              <span class={s.featIcon}>💳</span>
+            </div>
+            <div class={s.featRight}>
+              <h3 class={s.featTitle}>Transparent, predictable pricing</h3>
+              <p class={s.featText}>
+                Need custom pricing aside from the published ones? You'll get clarity based on your
+                needs, with no renewal uncertainty anxiety.
+              </p>
+              <p class={s.featText}>Oh, and new features always get thrown in, not sold on top.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class={s.featFooter}>
+          <a href="/features" target="_blank" rel="noopener noreferrer" class={s.featLink}>
+            Want to see everything? Browse all features →
+          </a>
+        </div>
+      </div>
+    </Wrapper>
+  </section>
+
+  <section class={s.migrationSection}>
+    <Wrapper>
+      <div class={s.box}>
+        <div class={s.migrationHeader}>
+          <p class={s.sectionKicker}>Switching is less scary than staying</p>
+          <h2 class={s.sectionTitle}>How migration actually works</h2>
+          <p class={s.sectionSubtitle}>
+            The migration is usually less painful than your last contract renewal. Here's what the
+            process looks like.
+          </p>
+        </div>
+        <ol class={s.flowSteps}>
+          <li class={s.flowStep}>
+            <div class={s.flowNumWrap}>
+              <span class={s.flowNum}>1</span>
+            </div>
+            <h3 class={s.flowTitle}>Book a 30-min call</h3>
+            <p class={s.flowText}>
+              No sales deck. No demo script. We ask about your setup, content model, and what's
+              prompting the move. You ask us anything.
+            </p>
+          </li>
+          <li class={s.flowStep}>
+            <div class={s.flowNumWrap}>
+              <span class={s.flowNum}>2</span>
+            </div>
+            <h3 class={s.flowTitle}>We scope it together</h3>
+            <p class={s.flowText}>
+              We walk through your content types, integrations, and frontend. You'll leave with a
+              realistic timeline and an honest list of what's to be done.
+            </p>
+          </li>
+          <li class={s.flowStep}>
+            <div class={s.flowNumWrap}>
+              <span class={s.flowNum}>3</span>
+            </div>
+            <h3 class={s.flowTitle}>Move at your pace</h3>
+            <p class={s.flowText}>
+              Run DatoCMS alongside your current CMS for as long as you need. Migrate content type
+              by type. No hard cutover deadline. Go live when you're ready.
+            </p>
+          </li>
+        </ol>
+      </div>
+    </Wrapper>
+  </section>
+
+  <Space top={2} bottom={1} id="lp-form">
+    <div class={s.sectionHeader}>
+      <Wrapper>
+        <div class={s.box}>
+          <p class={s.sectionKicker}>Ready to talk?</p>
+          <h2 class={s.sectionTitle}>Tell us what you're working with.</h2>
+          <p class={s.sectionSubtitle}>
+            Fill in the form and we'll set up a call. No sales deck, just a real conversation about
+            whether DatoCMS is the right fit for your team.
+          </p>
+        </div>
+      </Wrapper>
+    </div>
+  </Space>
+
+  <div class={s.formWrap}>
+    <Form client:load />
+  </div>
+
+  <Space bottom={2} />
+  <DraftModeQueryListener query={lpQuotesQuery} />
+</LpLayout>
