@@ -1,5 +1,7 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
+import { hasMarketingConsent } from '~/lib/consent';
+import { trackConversion } from '~/lib/linkedin';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isRecaptchaTokenValid } from '~/lib/recaptcha';
 import { isSpam } from '~/lib/spam';
@@ -10,6 +12,8 @@ import {
   findOrCreatePerson,
   partnershipLabel,
 } from '../pipedrive/utils';
+
+const LINKEDIN_CONVERSION_RULE_PARTNER_LEAD = '27784882';
 
 export default defineAction({
   accept: 'form',
@@ -24,7 +28,7 @@ export default defineAction({
     body: z.string(),
     token: z.string(),
   }),
-  handler: async ({ token, ...input }, { request }) => {
+  handler: async ({ token, ...input }, { request, cookies }) => {
     try {
       if (!(await isRecaptchaTokenValid(token))) {
         throw new ActionError({
@@ -39,6 +43,12 @@ export default defineAction({
           message: 'Your submission was flagged as spam',
         });
       }
+
+      const linkedinPromise = hasMarketingConsent(request, cookies)
+        ? trackConversion(LINKEDIN_CONVERSION_RULE_PARTNER_LEAD, input.email).catch((e) =>
+            logErrorToRollbar(e, { context: { action: 'linkedin.trackConversion.dv' } }),
+          )
+        : Promise.resolve();
 
       const organization = await findOrCreateOrgByName(
         input.companyName,
@@ -67,7 +77,7 @@ export default defineAction({
         `<p>Message: ${input.body}</p>`,
       ].join('');
 
-      await createNote(lead, noteText);
+      await Promise.all([createNote(lead, noteText), linkedinPromise]);
 
       return '/lp/nuxt2eol/thanks';
     } catch (e) {
