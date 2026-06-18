@@ -29,7 +29,9 @@ const lpQuotesQuery = graphql(
 );
 
 const { calebWise, andrewSmith, rauch } = await executeQuery(Astro, lpQuotesQuery);
-const quotes = [calebWise, andrewSmith, rauch].filter(Boolean);
+const quotes = [calebWise, andrewSmith, rauch].filter(
+  (q): q is NonNullable<typeof q> => q !== null,
+);
 ---
 
 <LpLayout title="Headless CMS for those frustrated with theirs — DatoCMS">
