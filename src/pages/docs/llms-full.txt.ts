@@ -1,33 +1,10 @@
 import type { APIRoute } from 'astro';
-import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
-import { graphql } from '~/lib/datocms/graphql';
+import { serveLlmsBundle } from '~/lib/serveLlmsBundle';
 import { handleUnexpectedError } from '../api/_utils';
-
-// Query to get all doc group starting points
-const query = graphql(/* GraphQL */ `
-  query LlmsFullTxtQuery {
-    llmstxt {
-      llmstxtFull
-    }
-  }
-`);
 
 export const GET: APIRoute = async ({ request }) => {
   try {
-    const responseHeaders = new Headers({
-      'Content-Type': 'text/markdown; charset=utf-8',
-    });
-
-    // Fetch all doc groups from DatoCMS
-    const { llmstxt } = await executeQueryOutsideAstro(query, {
-      request,
-      responseHeaders,
-    });
-
-    return new Response(llmstxt?.llmstxtFull || '', {
-      status: 200,
-      headers: responseHeaders,
-    });
+    return await serveLlmsBundle('llms-full.txt');
   } catch (error) {
     return handleUnexpectedError(request, error);
   }

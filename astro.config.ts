@@ -133,6 +133,12 @@ export default defineConfig({
         access: 'public',
         optional: true,
       }),
+      // Public base URL of the Vercel Blob store that holds the generated
+      // llms.txt bundles (see the `llms-full` repo). No trailing slash.
+      LLMS_BLOB_BASE_URL: envField.string({
+        context: 'server',
+        access: 'public',
+      }),
     },
     validateSecrets: false,
   },
