@@ -8916,11 +8916,13 @@ input IntegrationModelFilter {
   integrationType: LinkFilter
   landingUrl: StringFilter
   logo: FileFilter
+  logoDark: FileFilter
   name: StringFilter
   pluginUrl: StringFilter
   projectUrl: StringFilter
   slug: SlugFilter
   squareLogo: FileFilter
+  squareLogoDark: FileFilter
   websites: JsonFilter
   OR: [IntegrationModelFilter]
   AND: [IntegrationModelFilter]
@@ -9169,12 +9171,14 @@ type IntegrationRecord implements RecordInterface {
   integrationType: IntegrationTypeRecord!
   landingUrl: String
   logo: FileField!
+  logoDark: FileField
   name: String!
   pluginUrl: String
   position: IntType
   projectUrl: String
   slug: String
   squareLogo: FileField
+  squareLogoDark: FileField
   updatedAt: DateTime!
   websites: JsonField
 }
@@ -13583,43 +13587,6 @@ input LinksFilter {
   exists: BooleanType
 }
 
-"""Record of type 👨‍🎓 LLMS.txt (llmstxt)"""
-type LlmstxtRecord implements RecordInterface {
-  _createdAt: DateTime!
-
-  """Editing URL"""
-  _editingUrl: String
-  _firstPublishedAt: DateTime!
-  _isValid: BooleanType!
-  _modelApiKey: String!
-  _publicationScheduledAt: DateTime
-  _publishedAt: DateTime!
-
-  """Generates SEO and Social card meta tags to be used in your frontend"""
-  _seoMetaTags(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-  ): [Tag!]!
-  _status: ItemStatus!
-  _unpublishingScheduledAt: DateTime
-  _updatedAt: DateTime!
-  createdAt: DateTime!
-  extras(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String
-  id: ItemId!
-  llmstxt(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String
-  llmstxtFull(
-    """Process content as markdown"""
-    markdown: Boolean
-  ): String
-  updatedAt: DateTime!
-}
-
 """
 Block of type ↘️ Managed Navigation Bar Group (managed_navigation_bar_group)
 """
@@ -13731,10 +13698,29 @@ type MultipleDemosBlockRecord implements RecordInterface {
   updatedAt: DateTime!
 }
 
+enum MuxThumbnailFitMode {
+  preserve
+  stretch
+  crop
+  smartcrop
+  pad
+}
+
 enum MuxThumbnailFormatType {
   jpg
   png
   gif
+}
+
+enum MuxThumbnailRotation {
+  """Rotate 90° clockwise"""
+  ROTATE_90
+
+  """Rotate 180° clockwise"""
+  ROTATE_180
+
+  """Rotate 270° clockwise"""
+  ROTATE_270
 }
 
 """Block of type 📍 Navigation Bar CTA (navigation_bar_cta)"""
@@ -15569,7 +15555,6 @@ input PluginModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   author: LinkFilter
-  certifiedVersion: StringFilter
   coverImage: FileFilter
   description: TextFilter
   entryPoint: StringFilter
@@ -15618,8 +15603,6 @@ enum PluginModelOrderBy {
   updatedAt_DESC
   _isValid_ASC
   _isValid_DESC
-  certifiedVersion_ASC
-  certifiedVersion_DESC
   entryPoint_ASC
   entryPoint_DESC
   homepage_ASC
@@ -16325,7 +16308,6 @@ type PluginRecord implements RecordInterface {
   _unpublishingScheduledAt: DateTime
   _updatedAt: DateTime!
   author: PluginAuthorRecord!
-  certifiedVersion: String
   coverImage: ImageFileField
   createdAt: DateTime!
   description(
@@ -19152,17 +19134,6 @@ type Query {
     filter: LandingPageModelFilter
     orderBy: [LandingPageModelOrderBy] = [_updatedAt_DESC]
   ): LandingPageRecord
-
-  """Returns the single instance record"""
-  llmstxt(
-    """The locale to use to fetch the field's content"""
-    locale: SiteLocale
-
-    """
-    If you want to fallback to a default translation when a translation has not been found
-    """
-    fallbackLocales: [SiteLocale!]
-  ): LlmstxtRecord
 
   """Returns the single instance record"""
   navigationBar(
@@ -23257,13 +23228,41 @@ type UploadVideoField {
   ): String
   muxAssetId: String!
   muxPlaybackId: String!
+
+  """
+  Default poster frame, in seconds into the video. Resolves to the record-level field override when present, otherwise the upload-level default. `null` means Mux's default (middle of the video).
+  """
+  posterTime: Float
   streamingUrl: String!
   thumbhash: String
   thumbnailUrl(
-    """
-    The file extension of the requested image format. Either png, jpg or gif
-    """
+    """The file extension of the requested image. Either jpg, png or gif"""
     format: MuxThumbnailFormatType = jpg
+
+    """
+    Maps to the Mux `time` param: seconds into the video to grab the frame. When omitted, the upload's poster time is auto-injected (not applied to gif)
+    """
+    time: Float
+
+    """Maps to the Mux `width` param: thumbnail width in pixels"""
+    width: Int
+
+    """Maps to the Mux `height` param: thumbnail height in pixels"""
+    height: Int
+
+    """
+    Maps to the Mux `fit_mode` param: how the image fits the given dimensions
+    """
+    fitMode: MuxThumbnailFitMode
+
+    """Maps to the Mux `rotate` param: clockwise rotation in degrees"""
+    rotate: MuxThumbnailRotation
+
+    """Maps to the Mux `flip_v` param: flip the image vertically"""
+    flipV: Boolean
+
+    """Maps to the Mux `flip_h` param: flip the image horizontally"""
+    flipH: Boolean
   ): String!
   title(
     """The locale to use to fetch the field's content"""

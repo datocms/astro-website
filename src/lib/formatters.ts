@@ -1,4 +1,4 @@
-import { format, parse } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 
 const si = [
   { value: 1, symbol: '' },
@@ -41,7 +41,10 @@ export function formatNumber(x: string | number) {
 }
 
 export function formatDate(isoDate: string): string {
-  const date = parse(isoDate, "yyyy-MM-dd'T'HH:mm:ssxxx", new Date());
+  const date = parseISO(isoDate);
+  if (!isValid(date)) {
+    return '';
+  }
   return format(date, 'MMMM do, yyyy');
 }
 
