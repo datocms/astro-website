@@ -23,6 +23,7 @@ import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { Image } from 'astro:assets';
 import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
+import { muxThumbnailUrl } from '~/lib/muxThumbnailUrl';
 import { Search } from '~/components/Search';
 
 const isMarketplace = Astro.url.pathname.startsWith('/marketplace');
@@ -396,7 +397,10 @@ const sortedContinents = Object.fromEntries(
                         <div class={s.videoGuideChapters}>
                           {item.chapters.slice(0, 1).map((chapter) => (
                             <Image
-                              src={`${chapter.asset.video.thumbnailUrl}?time=${chapter.thumbTimeSeconds}&width=300`}
+                              src={muxThumbnailUrl(chapter.asset.video.thumbnailUrl, {
+                                time: chapter.thumbTimeSeconds,
+                                width: 300,
+                              })}
                               inferSize
                               widths={[300, 100]}
                               sizes="400px"
