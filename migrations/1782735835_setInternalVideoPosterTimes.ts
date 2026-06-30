@@ -100,7 +100,10 @@ export default async function (client: Client): Promise<void> {
                 }
 
                 const ivBlock = block as RawApiTypes.ItemInNestedResponse<Schema.InternalVideo>;
-                const thumb = ivBlock.attributes.thumb_time_seconds;
+                // thumb_time_seconds was dropped from the schema by a later
+                // migration; this historical script still reads it at runtime.
+                const thumb = (ivBlock.attributes as { thumb_time_seconds?: number })
+                  .thumb_time_seconds;
                 const video = ivBlock.attributes.video;
                 const uploadId = video?.upload_id;
 

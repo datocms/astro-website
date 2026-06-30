@@ -72,7 +72,9 @@ export default async function (client: Client): Promise<void> {
     filter: { type: model.id },
     version: 'current',
   })) {
-    const thumb = record.attributes.thumb_time_seconds;
+    // thumb_time_seconds was dropped from the schema by a later migration;
+    // this historical script still reads it at runtime.
+    const thumb = (record.attributes as { thumb_time_seconds?: number }).thumb_time_seconds;
     if (typeof thumb !== 'number') continue;
 
     let recordHasOverride = false;

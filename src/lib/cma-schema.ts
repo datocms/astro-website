@@ -1287,9 +1287,6 @@ export type InternalVideo = ItemTypeDefinition<
     video: {
       type: 'file';
     };
-    thumb_time_seconds: {
-      type: 'integer';
-    };
   }
 >;
 export const InternalVideo = {
@@ -3279,9 +3276,6 @@ export type UserGuidesEpisode = ItemTypeDefinition<
     };
     video: {
       type: 'file';
-    };
-    thumb_time_seconds: {
-      type: 'integer';
     };
     content: {
       type: 'structured_text';
