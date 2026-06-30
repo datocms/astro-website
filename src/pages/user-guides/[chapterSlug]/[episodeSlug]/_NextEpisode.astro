@@ -7,7 +7,6 @@ import { formatVideoDuration } from '~/lib/formatters';
 import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
 import { SameLevelNavigation } from '~/components/SameLevelNavigation';
 import { Card } from '~/components/Card';
-import { muxThumbnailUrl } from '~/lib/muxThumbnailUrl';
 
 interface Props {
   episode: FragmentOf<typeof EpisodeFragment>;
@@ -26,7 +25,7 @@ const episode = readFragment(EpisodeFragment, Astro.props.episode);
   >
     <Fragment slot="image">
       <Image
-        src={muxThumbnailUrl(episode.asset.video.thumbnailUrl, { time: episode.thumbTimeSeconds })}
+        src={episode.asset.video.thumbnailUrl}
         inferSize
         widths={[160, 320]}
         sizes="160px"

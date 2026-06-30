@@ -155,10 +155,11 @@ const query = graphql(
           title
           chapters: videos {
             id
-            thumbTimeSeconds
             title
             asset: video {
               video {
+                # carries the upload's poster_time as ?time=…; the width is
+                # layered on at render time via muxThumbnailUrl()
                 thumbnailUrl
                 width
                 height

@@ -13,9 +13,10 @@ export const TutorialVideoFragment = graphql(
 
         ... on UserGuidesEpisodeRecord {
           title
-          thumbTimeSeconds
           asset: video {
             video {
+              # carries the upload's poster_time as ?time=…; dimensions are
+              # layered on at render time via muxThumbnailUrl()
               thumbnailUrl
               blurUpThumb
               width

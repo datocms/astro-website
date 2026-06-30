@@ -6,7 +6,6 @@ import { readFragment } from 'gql.tada';
 import { Image } from 'astro:assets';
 import { formatVideoDuration } from '~/lib/formatters';
 import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
-import { muxThumbnailUrl } from '~/lib/muxThumbnailUrl';
 
 interface Props {
   episode: FragmentOf<typeof EpisodeFragment>;
@@ -22,7 +21,7 @@ const episode = readFragment(EpisodeFragment, Astro.props.episode);
   <a href={buildUrlForUserGuidesEpisode(episode)} class={s.asideListItem}>
     <figure>
       <Image
-        src={muxThumbnailUrl(episode.asset.video.thumbnailUrl, { time: episode.thumbTimeSeconds })}
+        src={episode.asset.video.thumbnailUrl}
         inferSize
         widths={[80, 160]}
         sizes="80px"

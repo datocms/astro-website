@@ -18,6 +18,7 @@ export const EpisodeFragment = graphql(
       title
       asset: video {
         video {
+          # no time argument: resolves to the upload's poster_time
           thumbnailUrl
           width
           height
@@ -25,7 +26,6 @@ export const EpisodeFragment = graphql(
           duration
         }
       }
-      thumbTimeSeconds
       ...UserGuidesEpisodeUrlFragment
     }
   `,
