@@ -20,6 +20,10 @@ export const VideoPlayerFragment = graphql(/* GraphQL */ `
 
       # if provided, it shows a blurred placeholder for the video
       blurUpThumb
+
+      # used as the player's poster image; with no time argument it resolves to
+      # the record-level poster_time override, else the upload's default poster
+      thumbnailUrl
     }
   }
 `);
@@ -44,6 +48,10 @@ export const MaybeVideoPlayerFragment = graphql(/* GraphQL */ `
 
       # if provided, it shows a blurred placeholder for the video
       blurUpThumb
+
+      # used as the player's poster image; with no time argument it resolves to
+      # the record-level poster_time override, else the upload's default poster
+      thumbnailUrl
     }
   }
 `);
