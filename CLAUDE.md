@@ -61,3 +61,14 @@ Examples in repo: `DATOCMS_API_TOKEN` (also build-time, see above), `ROLLBAR_TOK
 
 - Edit `cubo.json5` for declarative changes (build args, secret declarations, resources, scaling, cron jobs). Commit and deploy via the normal pipeline.
 - Use `cubo config:set` for ad-hoc runtime secret rotation; no code change needed.
+
+## Migrations (`migrations/`)
+
+DatoCMS schema/data migrations live in `migrations/`, prefixed with a unix timestamp, and are tracked in the `schema_migration` model (re-running requires clearing that record).
+
+- **Scaffold with `datocms migrations:new <name> --schema=<api_keys>` (or `--schema=all`).** This embeds a **frozen, inline schema snapshot** (the `ItemTypeDefinition` types + `{ ID, REF }` consts) into the migration file. A migration must be self-contained and reproducible forever.
+- **Never `import … from '../src/lib/cma-schema'` in a migration.** That file is regenerated (`npm run generate-cma-schema`) whenever the schema changes — so a later migration that drops a field will break the _type-checking_ of every earlier migration that referenced it via the shared file. The inline snapshot from `--schema` is immune to this.
+- The scaffold imports must be type-only where needed (`verbatimModuleSyntax` is on): `import { type Client, type ItemTypeDefinition } from 'datocms/lib/cma-client-node'`.
+- **Running:** `npx dotenv -e .env.development -- npx datocms migrations:run --in-place --allow-primary` runs un-run migrations against primary. Add `--dry-run` first to validate (it simulates without executing the body, so `console.log` counts won't print). `migrations:run` does **not** run the `cma:script` structural validator, so `error: unknown` etc. are fine there.
+- **`--allow-primary` is meant for strictly additive changes** (no rollback on partial failure). Destructive migrations (e.g. `client.fields.destroy`) work but are irreversible — confirm first, and make them idempotent (look the field up by `api_key`, skip if absent) so a re-run is a no-op.
+- After a schema-changing migration, regenerate both schemas: `npm run generate-cma-schema` and `npm run generate-schema`, then `npx astro check`.
