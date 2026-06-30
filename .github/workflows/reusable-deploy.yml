@@ -40,20 +40,28 @@ jobs:
       - name: List files
         run: ls -a
 
-      # 1) Setup QEMU (optional, but recommended for multi‑arch)
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
+      # QEMU is only needed for cross-arch emulation. We build ARM on an ARM
+      # runner, so it's omitted on purpose.
 
-      # 2) Setup Buildx
+      # Setup Buildx (docker-container driver, required to export the local cache)
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      # 3) Cache Docker BuildKit layers
+      # Cache Docker BuildKit layers.
+      # cubo builds with `--cache-to type=local,dest=/tmp/.buildx-cache,mode=max`,
+      # so we persist that directory between runs. The key is unique per commit so
+      # the post-job save ALWAYS fires (actions/cache skips saving on a key hit),
+      # and restore-keys seeds each build from the most recent cache on the branch
+      # (falling back to any branch). On Blacksmith runners actions/cache
+      # transparently uses their colocated backend — no package swap needed.
       - name: Cache Docker layers
         uses: actions/cache@v5
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.ref }}-${{ hashFiles('Dockerfile', '.dockerignore', 'package-lock.json') }}
+          key: ${{ runner.os }}-buildx-${{ github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ github.ref_name }}-
+            ${{ runner.os }}-buildx-
 
       # 4) Log in to GitHub Container Registry (for the `docker push` executed by `cubo deploy`)
       - name: Log in to registry
@@ -68,8 +76,17 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
-      - name: Install npm dependencies
-        run: npm ci
+
+      # The actual app build happens inside Docker, so the runner only needs the
+      # `cubo` CLI — not the full ~1GB dependency tree. Install it globally,
+      # reading the exact version straight from the lockfile so it stays in sync
+      # automatically when @datocms/cubo is bumped.
+      - name: Install cubo
+        shell: bash
+        run: |
+          CUBO_VERSION=$(node -p "require('./package-lock.json').packages['node_modules/@datocms/cubo'].version")
+          echo "Installing @datocms/cubo@$CUBO_VERSION"
+          npm install -g "@datocms/cubo@$CUBO_VERSION"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
@@ -80,7 +97,7 @@ jobs:
       - name: Deploy
         shell: bash
         run: |
-          CMD="./node_modules/.bin/cubo deploy \
+          CMD="cubo deploy \
             --env '${{ inputs.environment }}' \
             --strategy '${{ inputs.strategy }}'"
 
@@ -96,4 +113,4 @@ jobs:
           eval $CMD
 
       - name: Invalidate CDN
-        run: ./node_modules/.bin/cubo run 'npm run invalidate-everything' --env '${{ inputs.environment }}'
+        run: cubo run 'npm run invalidate-everything' --env '${{ inputs.environment }}'
