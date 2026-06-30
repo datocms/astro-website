@@ -43,27 +43,18 @@ jobs:
       # QEMU is only needed for cross-arch emulation. We build ARM on an ARM
       # runner, so it's omitted on purpose.
 
-      # Setup Buildx (docker-container driver, required to export the local cache)
+      # Set up Buildx with the docker-container driver. cubo needs it in CI to
+      # use the registry-backed build cache (--cache-to/from type=registry) and
+      # to push the image straight from BuildKit (--output type=registry).
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
-      # Cache Docker BuildKit layers.
-      # cubo builds with `--cache-to type=local,dest=/tmp/.buildx-cache,mode=max`,
-      # so we persist that directory between runs. The key is unique per commit so
-      # the post-job save ALWAYS fires (actions/cache skips saving on a key hit),
-      # and restore-keys seeds each build from the most recent cache on the branch
-      # (falling back to any branch). On Blacksmith runners actions/cache
-      # transparently uses their colocated backend — no package swap needed.
-      - name: Cache Docker layers
-        uses: actions/cache@v5
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.ref_name }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-${{ github.ref_name }}-
-            ${{ runner.os }}-buildx-
+      # No layer-cache step here on purpose: cubo stores the build cache in the
+      # registry (ghcr.io/.../astro-website:buildcache-<env>), so there is no
+      # /tmp/.buildx-cache to persist with actions/cache anymore.
 
-      # 4) Log in to GitHub Container Registry (for the `docker push` executed by `cubo deploy`)
+      # Log in to GitHub Container Registry — authorizes the image push, the
+      # registry build cache, and the `imagetools` retags done by `cubo deploy`.
       - name: Log in to registry
         uses: docker/login-action@v4
         with:
