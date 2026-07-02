@@ -47,7 +47,9 @@ jobs:
       # use the registry-backed build cache (--cache-to/from type=registry) and
       # to push the image straight from BuildKit (--output type=registry).
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: useblacksmith/setup-docker-builder@v1
+        with:
+          nofallback: true
 
       # No layer-cache step here on purpose: cubo stores the build cache in the
       # registry (ghcr.io/.../astro-website:buildcache-<env>), so there is no
