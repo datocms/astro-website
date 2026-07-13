@@ -10,8 +10,13 @@ export const perPage = 36;
 
 export const query = graphql(
   /* GraphQL */ `
-    query PluginsShowcase($limit: IntType!, $offset: IntType!) {
-      _allPluginsMeta(filter: { manuallyDeprecated: { eq: "false" } }) {
+    query PluginsShowcase(
+      $limit: IntType!
+      $offset: IntType!
+      $authorFilter: LinkFilter
+      $orderBy: [PluginModelOrderBy]
+    ) {
+      _allPluginsMeta(filter: { author: $authorFilter, manuallyDeprecated: { eq: "false" } }) {
         count
       }
 
@@ -24,8 +29,8 @@ export const query = graphql(
       plugins: allPlugins(
         first: $limit
         skip: $offset
-        orderBy: installs_DESC
-        filter: { manuallyDeprecated: { eq: false } }
+        orderBy: $orderBy
+        filter: { author: $authorFilter, manuallyDeprecated: { eq: false } }
       ) {
         ...PluginCardFragment
       }
@@ -33,6 +38,14 @@ export const query = graphql(
   `,
   [TagFragment, ResponsiveImageFragment, PluginCardFragment],
 );
+
+export const officialAuthorsQuery = graphql(/* GraphQL */ `
+  query OfficialPluginAuthors {
+    officialAuthors: allPluginAuthors(filter: { official: { eq: true } }, first: 500) {
+      id
+    }
+  }
+`);
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
   const {
