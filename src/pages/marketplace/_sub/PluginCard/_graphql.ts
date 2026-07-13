@@ -13,6 +13,9 @@ export const PluginCardFragment = graphql(
       }
       title
       description
+      author {
+        official
+      }
     }
   `,
   [ResponsiveImageFragment, PluginUrlFragment],

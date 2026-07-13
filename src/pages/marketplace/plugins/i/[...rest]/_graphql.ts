@@ -31,6 +31,7 @@ export const query = graphql(
         author {
           name
           email
+          official
         }
         homepage
         entryPoint

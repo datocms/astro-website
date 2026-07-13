@@ -40,7 +40,32 @@ export const query = graphql(
       ) {
         ...PluginCardFragment
       }
+
+      officialAuthors: allPluginAuthors(filter: { official: { eq: true } }, first: 20) {
+        id
+      }
     }
   `,
   [TagFragment, PluginCardFragment],
+);
+
+export const officialPluginsQuery = graphql(
+  /* GraphQL */ `
+    query OfficialPlugins($authorIds: [ItemId]!) {
+      official: allPlugins(
+        first: 6
+        orderBy: installs_DESC
+        filter: { author: { in: $authorIds }, manuallyDeprecated: { eq: "false" } }
+      ) {
+        ...PluginCardFragment
+      }
+
+      officialMeta: _allPluginsMeta(
+        filter: { author: { in: $authorIds }, manuallyDeprecated: { eq: "false" } }
+      ) {
+        count
+      }
+    }
+  `,
+  [PluginCardFragment],
 );
