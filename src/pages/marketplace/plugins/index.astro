@@ -9,16 +9,23 @@ import { Space } from '~/components/Space';
 import { Svg } from '~/components/Svg';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
+import { officialPluginsQuery, query } from './_graphql';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
-const { page, collections, meta, popular, latest } = await executeQuery(Astro, query);
+const { page, collections, meta, popular, latest, officialAuthors } = await executeQuery(
+  Astro,
+  query,
+);
 
 if (!page || popular.length === 0 || latest.length === 0 || collections.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const { official, officialMeta } = await executeQuery(Astro, officialPluginsQuery, {
+  variables: { authorIds: officialAuthors.map((author) => author.id) },
+});
 ---
 
 <Layout noFinalCta seo={page.seo}>
@@ -40,7 +47,7 @@ if (!page || popular.length === 0 || latest.length === 0 || collections.length =
     <Space top={2}>
       <div class={s.sectionTitleWrapper}>
         <h2 class={s.title}>Most popular</h2>
-        <a href="/marketplace/plugins/browse" class={s.browseAll}>
+        <a href="/marketplace/plugins/browse?sort=popular" class={s.browseAll}>
           <span>View all ({meta.count})</span>
           <Svg name="icons/regular/arrow-right" />
         </a>
@@ -54,6 +61,26 @@ if (!page || popular.length === 0 || latest.length === 0 || collections.length =
         }
       </div>
     </Space>
+
+    {
+      official.length > 0 && (
+        <Space top={2}>
+          <div class={s.sectionTitleWrapper}>
+            <h2 class={s.title}>DatoCMS Official Plugins</h2>
+            <a href="/marketplace/plugins/browse?official=true" class={s.browseAll}>
+              <span>View all ({officialMeta.count})</span>
+              <Svg name="icons/regular/arrow-right" />
+            </a>
+          </div>
+
+          <div class={s.popular}>
+            {official.map((item) => (
+              <PluginCard plugin={item} orientation="horizontal" boxed={false} size="small" />
+            ))}
+          </div>
+        </Space>
+      )
+    }
 
     {
       collections.map((collection) => (

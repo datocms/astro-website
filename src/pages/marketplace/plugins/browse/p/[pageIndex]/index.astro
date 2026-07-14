@@ -11,7 +11,7 @@ import { PluginSearchBox } from '~/pages/marketplace/_sub/PluginSearchBox';
 import { Space } from '~/components/Space';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { perPage, query } from './_graphql';
+import { officialAuthorsQuery, perPage, query } from './_graphql';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
@@ -25,10 +25,18 @@ if (Astro.params.pageIndex === '1') {
 }
 
 const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
+const officialOnly = Astro.url.searchParams.get('official') === 'true';
+const sort = Astro.url.searchParams.get('sort');
+
+const authorFilter = officialOnly
+  ? { in: (await executeQuery(Astro, officialAuthorsQuery)).officialAuthors.map((a) => a.id) }
+  : null;
 
 const variables = {
   limit: perPage,
   offset: (pageIndex - 1) * perPage,
+  authorFilter,
+  orderBy: [sort === 'latest' ? ('_createdAt_DESC' as const) : ('installs_DESC' as const)],
 };
 const { pluginsPage, ...staticResults } = await executeQuery(Astro, query, {
   variables,
