@@ -8,7 +8,6 @@ import { Prose } from '~/components/Prose';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Announce } from '~/components/pluginToolkit/Announce';
 import { Space } from '~/components/Space';
-import { Tooltip } from '~/components/Tooltip';
 import { VideoPlayer } from '~/components/VideoPlayer';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import LLMDate from '~/components/LLMDate/Component.astro';
@@ -20,6 +19,7 @@ import { isVideo } from '~/components/VideoPlayer/graphql';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import xss from 'xss';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
+import { OfficialPluginIndicator } from '~/pages/marketplace/_sub/OfficialPluginIndicator';
 
 const variables = {
   slug: Astro.params.rest!,
@@ -120,15 +120,10 @@ const avatarUrl = getGravatarUrl(page.author.email);
                 <div class={s.publisherIcon}>
                   <img src={avatarUrl} alt={page.author.name} />
                 </div>
-                <p>{page.author.name}</p>
-                {
-                  page.author.official && (
-                    <Tooltip>
-                      <span aria-label="Official author">⭐</span>
-                      <Fragment slot="tooltip">Official DatoCMS author</Fragment>
-                    </Tooltip>
-                  )
-                }
+                <div class={s.publisherName}>
+                  {page.author.official && <OfficialPluginIndicator size={16} />}
+                  <span>{page.author.name}</span>
+                </div>
               </article>
             </div>
 

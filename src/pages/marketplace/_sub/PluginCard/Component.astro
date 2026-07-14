@@ -8,6 +8,7 @@ import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
 import { Card } from '~/components/Card';
 import type { ComponentProps } from 'astro/types';
 import { Svg } from '~/components/Svg';
+import { OfficialPluginIndicator } from '~/pages/marketplace/_sub/OfficialPluginIndicator';
 
 type Props = {
   plugin: FragmentOf<typeof PluginCardFragment>;
@@ -18,6 +19,9 @@ type Props = {
 
 const { plugin: maskedPlugin, ...other } = Astro.props;
 const plugin = readFragment(PluginCardFragment, maskedPlugin);
+const cardSize = other.size ?? 'medium';
+const officialIndicatorSize =
+  cardSize === 'small' || cardSize === 'micro' ? 14 : cardSize === 'medium' ? 16 : 18;
 
 const backgroundFromString = <T extends string>(input: string, options: T[]): T => {
   // Simple hash function - sum of char codes modulo array length
@@ -41,8 +45,10 @@ const backgroundFromString = <T extends string>(input: string, options: T[]): T 
   lineClamp={3}
 >
   <Fragment slot="title">
-    {plugin.title}
-    {plugin.author?.official && ' ⭐'}
+    <span class={s.title}>
+      {plugin.author?.official && <OfficialPluginIndicator size={officialIndicatorSize} />}
+      {plugin.title}
+    </span>
   </Fragment>
   {
     plugin.coverImage ? (
