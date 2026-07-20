@@ -6,6 +6,10 @@ import { parse } from 'node-html-parser';
 import { baseUrl, isDraftModeEnabled } from './lib/draftMode';
 import { convertHtmlToMarkdown } from './lib/llmtxt';
 import logToRollbar from './lib/logToRollbar';
+import apiCatalog from './documents/well-known/api-catalog.json?raw';
+import mcpServerCard from './documents/well-known/mcp.json?raw';
+import agentSkills from './documents/well-known/agent-skills.json?raw';
+import authMarkdown from './documents/well-known/auth.md?raw';
 
 export const rollbar: MiddlewareHandler = async ({ request, params }, next) => {
   try {
@@ -16,6 +20,25 @@ export const rollbar: MiddlewareHandler = async ({ request, params }, next) => {
   }
 };
 
+const wellKnownFiles: Record<string, { body: string; contentType: string }> = {
+  '/.well-known/api-catalog': { body: apiCatalog, contentType: 'application/linkset+json' },
+  '/.well-known/mcp.json': { body: mcpServerCard, contentType: 'application/json' },
+  '/.well-known/agent-skills.json': { body: agentSkills, contentType: 'application/json' },
+  '/.well-known/auth.md': { body: authMarkdown, contentType: 'text/markdown; charset=utf-8' },
+};
+
+export const wellKnown: MiddlewareHandler = ({ url }, next) => {
+  const file = wellKnownFiles[url.pathname];
+  if (!file) return next();
+
+  return new Response(file.body, {
+    headers: {
+      'Content-Type': file.contentType,
+      'Surrogate-Control': 'max-age=31536000',
+    },
+  });
+};
+
 export const security: MiddlewareHandler = async (_context, next) => {
   const response = await next();
 
@@ -24,6 +47,12 @@ export const security: MiddlewareHandler = async (_context, next) => {
     'content-security-policy',
     'frame-ancestors https://datocms.admin.datocms.com https://cms.datocms.com https://plugins-cdn.datocms.com http://localhost:3002 http://localhost:3000',
   );
+
+  // ronak: point agents at our machine-readable resources
+  if ((response.headers.get('content-type') || '').includes('text/html')) {
+    response.headers.append('link', '</sitemap.xml>; rel="sitemap"; type="application/xml"');
+    response.headers.append('link', '</.well-known/api-catalog>; rel="api-catalog"');
+  }
 
   return response;
 };
@@ -205,6 +234,7 @@ export const propagateToken: MiddlewareHandler = async (context, next) => {
 
 export const onRequest = sequence(
   rollbar,
+  wellKnown,
   markdownProxy,
   security,
   basicAuth,
