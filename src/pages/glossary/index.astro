@@ -13,6 +13,9 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { groupBy } from 'lodash-es';
 import { Layout } from '~/layouts/Layout';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { JsonLd } from '~/components/JsonLd';
+import { baseUrl } from '~/lib/draftMode';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 
 const { entries, page } = await executeQuery(Astro, query);
 
@@ -22,9 +25,26 @@ if (!page || entries.length === 0) {
 }
 
 const entriesByLetter = groupBy(entries, (entry) => entry.title[0]!.toUpperCase());
+
+const glossaryUrl = new URL('/glossary', baseUrl(Astro)).href;
+const definedTermSet = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTermSet',
+  name: 'DatoCMS Glossary',
+  url: glossaryUrl,
+  hasDefinedTerm: entries.map((entry) => ({
+    '@type': 'DefinedTerm' as const,
+    name: entry.title,
+    description: toPlainText(entry.description) ?? undefined,
+    url: `${glossaryUrl}#${slugify(entry.title)}`,
+  })),
+} as const;
 ---
 
 <Layout seo={page.seo}>
+  <Fragment slot="head">
+    <JsonLd data={definedTermSet} />
+  </Fragment>
   <div id="main-content">
     <Hero mainTitleOfPage>
       <Fragment slot="title">DatoCMS <mark>Glossary</mark></Fragment>

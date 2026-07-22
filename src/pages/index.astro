@@ -20,6 +20,7 @@ import { JsonLd } from '~/components/JsonLd';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { baseUrl } from '~/lib/draftMode';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
+import { organizationId, organizationNode, websiteId } from '~/lib/jsonLd';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
@@ -38,10 +39,16 @@ if (!page || successStories.length === 0) {
     <JsonLd
       data={{
         '@context': 'https://schema.org',
-        '@type': 'Organization',
-        name: 'DatoCMS',
-        url: new URL('/', baseUrl(Astro)).href,
-        description: extractFromSeoTags(page.seo).description,
+        '@graph': [
+          organizationNode(baseUrl(Astro), extractFromSeoTags(page.seo).description),
+          {
+            '@type': 'WebSite',
+            '@id': websiteId(baseUrl(Astro)),
+            name: 'DatoCMS',
+            url: new URL('/', baseUrl(Astro)).href,
+            publisher: { '@id': organizationId(baseUrl(Astro)) },
+          },
+        ],
       }}
     />
   </Fragment>

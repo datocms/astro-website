@@ -41,6 +41,7 @@ import {
   extractFromSeoTags,
 } from '~/lib/datocms/seo';
 import { JsonLd } from '~/components/JsonLd';
+import { publisherRef } from '~/lib/jsonLd';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { SameLevelNavigation } from '~/components/SameLevelNavigation';
@@ -115,6 +116,7 @@ const markdownUrl = new URL(
         datePublished: dateTime,
         dateModified: post._updatedAt ? new Date(post._updatedAt).toISOString() : undefined,
         author: post.author.map((a) => ({ '@type': 'Person' as const, name: a.name })),
+        publisher: publisherRef(baseUrl),
         description: seoDescription,
         image: seoImage,
       }}

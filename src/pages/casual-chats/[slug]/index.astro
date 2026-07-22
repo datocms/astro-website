@@ -38,6 +38,7 @@ import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerSt
 import s from './_style.module.css';
 import { isDefined } from '~/lib/isDefined';
 import { JsonLd } from '~/components/JsonLd';
+import { publisherRef } from '~/lib/jsonLd';
 import { extractFromSeoTags, seoCanonical } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
 
@@ -79,7 +80,10 @@ const siblings = [previous ?? last, next ?? first].filter(isDefined);
         headline: post.title,
         url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
         datePublished: dateTime,
+        author: post.people.map((p) => ({ '@type': 'Person' as const, name: p.name })),
+        publisher: publisherRef(baseUrl(Astro)),
         description: extractFromSeoTags(post.seo).description,
+        image: extractFromSeoTags(post.seo).image,
       }}
     />
   </Fragment>
