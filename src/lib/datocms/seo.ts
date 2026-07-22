@@ -38,7 +38,7 @@ export function overrideSeo(
 function baseMetas() {
   return [
     seoMeta('og:locale', 'en'),
-    seoMeta('og:type', 'article'),
+    seoMeta('og:type', 'website'),
     seoMeta('og:site_name', 'DatoCMS'),
     seoMeta('twitter:site', '@datocms'),
   ];
@@ -159,6 +159,21 @@ export function seoDescription(rawDescription: string) {
 
 export function seoTwitterCard(type: 'summary' | 'summary_large_image') {
   return seoMeta('twitter:card', type);
+}
+
+export function seoOgType(type: 'website' | 'article') {
+  return seoMeta('og:type', type);
+}
+
+export function seoCanonical(href: string) {
+  return (tags: TitleMetaLinkTag[]) => [
+    ...tags.filter((tag) => !(tag.tag === 'link' && tag.attributes?.rel === 'canonical')),
+    {
+      tag: 'link',
+      attributes: { rel: 'canonical', href },
+      content: null,
+    } as TitleMetaLinkTag,
+  ];
 }
 
 export function extractFromSeoTags(tags: TitleMetaLinkTag[]) {
