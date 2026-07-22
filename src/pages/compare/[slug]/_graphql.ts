@@ -16,7 +16,7 @@ export const query = graphql(
     query Compare($slug: String!) {
       page: productComparison(filter: { slug: { eq: $slug } }) {
         _firstPublishedAt
-        _updatedAt
+        _publishedAt
         _seoMetaTags {
           ...TagFragment
         }
@@ -173,7 +173,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allProductComparisons(first: 500) {
-            _updatedAt
+            _publishedAt
             ...ProductComparisonUrlFragment
           }
         }
@@ -185,7 +185,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
 
   return entries.map((entry) => ({
     url: buildUrlForProductComparison(entry),
-    lastmod: entry._updatedAt ?? undefined,
+    lastmod: entry._publishedAt ?? undefined,
   }));
 };
 

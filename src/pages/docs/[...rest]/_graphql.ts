@@ -51,7 +51,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allDocPages(first: 500) {
-            _updatedAt
+            _publishedAt
             ...DocPageUrlFragment
           }
         }
@@ -64,7 +64,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
   return entries
     .map((page) => {
       try {
-        return { url: buildUrlForDocPage(page), lastmod: page._updatedAt ?? undefined };
+        return { url: buildUrlForDocPage(page), lastmod: page._publishedAt ?? undefined };
       } catch (e) {
         return undefined;
       }

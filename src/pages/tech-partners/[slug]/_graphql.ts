@@ -94,7 +94,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allTechPartners(first: 500) {
-            _updatedAt
+            _publishedAt
             ...TechPartnerUrlFragment
           }
         }
@@ -106,7 +106,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
 
   return entries.map((entry) => ({
     url: buildUrlForTechPartner(entry),
-    lastmod: entry._updatedAt ?? undefined,
+    lastmod: entry._publishedAt ?? undefined,
   }));
 };
 

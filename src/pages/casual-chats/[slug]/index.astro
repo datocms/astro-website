@@ -39,7 +39,13 @@ import s from './_style.module.css';
 import { isDefined } from '~/lib/isDefined';
 import { JsonLd } from '~/components/JsonLd';
 import { publisherRef } from '~/lib/jsonLd';
-import { extractFromSeoTags, seoCanonical } from '~/lib/datocms/seo';
+import {
+  extractFromSeoTags,
+  overrideSeo,
+  seoCanonical,
+  seoOgType,
+  seoTwitterCard,
+} from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
 
 const variables = { slug: Astro.params.slug! };
@@ -71,7 +77,14 @@ const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery,
 const siblings = [previous ?? last, next ?? first].filter(isDefined);
 ---
 
-<Layout seo={post.canonicalUrl ? seoCanonical(post.canonicalUrl)(post.seo) : post.seo}>
+<Layout
+  seo={overrideSeo(
+    post.seo,
+    post.canonicalUrl ? seoCanonical(post.canonicalUrl) : undefined,
+    seoOgType('article'),
+    seoTwitterCard('summary_large_image'),
+  )}
+>
   <Fragment slot="head">
     <JsonLd
       data={{

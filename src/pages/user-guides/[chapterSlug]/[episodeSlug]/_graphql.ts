@@ -139,7 +139,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allUserGuidesEpisodes(first: 500) {
-            _updatedAt
+            _publishedAt
             ...UserGuidesEpisodeUrlFragment
           }
         }
@@ -151,7 +151,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
 
   return entries.map((entry) => ({
     url: buildUrlForUserGuidesEpisode(entry),
-    lastmod: entry._updatedAt ?? undefined,
+    lastmod: entry._publishedAt ?? undefined,
   }));
 };
 

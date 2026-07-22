@@ -117,7 +117,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allEnterpriseApps(first: 100) {
-            _updatedAt
+            _publishedAt
             ...EnterpriseAppUrlFragment
           }
         }
@@ -129,7 +129,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
 
   return entries.map((entry) => ({
     url: buildUrlForEnterpriseApp(entry),
-    lastmod: entry._updatedAt ?? undefined,
+    lastmod: entry._publishedAt ?? undefined,
   }));
 };
 

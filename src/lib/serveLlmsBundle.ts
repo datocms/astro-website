@@ -1,20 +1,14 @@
 import { LLMS_BLOB_BASE_URL } from 'astro:env/server';
+import { isDefined } from './isDefined';
 
-/**
- * The llms.txt bundles are generated nightly by the `llms-full` repo and stored
- * as public files in a Vercel Blob store. We stream them through this endpoint
- * (rather than redirecting) so the public URLs stay under datocms.com, and we
- * cache aggressively at the CDN so blob reads happen ~once per day per bundle.
- */
-export async function serveLlmsBundle(filename: string): Promise<Response> {
+async function fetchBlob(filename: string): Promise<string | null> {
   const upstream = await fetch(`${LLMS_BLOB_BASE_URL}/${filename}`);
+  return upstream.ok ? upstream.text() : null;
+}
 
-  if (!upstream.ok) {
-    return new Response('', { status: 502 });
-  }
-
-  return new Response(upstream.body, {
-    status: 200,
+function blobResponse(body: string | null) {
+  return new Response(body ?? '', {
+    status: body ? 200 : 502,
     headers: {
       'Content-Type': 'text/markdown; charset=utf-8',
       'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
@@ -22,26 +16,22 @@ export async function serveLlmsBundle(filename: string): Promise<Response> {
   });
 }
 
-// ronak: one file with everything — docs + the rest of the site
-export async function serveConcatenatedLlmsBundles(filenames: string[]): Promise<Response> {
-  const parts = await Promise.all(
-    filenames.map(async (filename) => {
-      const upstream = await fetch(`${LLMS_BLOB_BASE_URL}/${filename}`);
-      return upstream.ok ? upstream.text() : null;
-    }),
-  );
-
-  const available = parts.filter((part): part is string => part !== null);
+/**
+ * The llms.txt bundles are generated nightly by the `llms-full` repo and stored
+ * as public files in a Vercel Blob store. We stream them through this endpoint
+ * (rather than redirecting) so the public URLs stay under datocms.com, and we
+ * cache aggressively at the CDN so blob reads happen ~once per day per bundle.
+ *
+ * Pass a single filename to serve one blob; pass multiple filenames to fetch,
+ * concatenate, and return them as one response.
+ */
+export async function serveLlmsBundle(...filenames: string[]): Promise<Response> {
+  const parts = await Promise.all(filenames.map(fetchBlob));
+  const available = parts.filter(isDefined);
 
   if (available.length === 0) {
-    return new Response('', { status: 502 });
+    return blobResponse(null);
   }
 
-  return new Response(available.join('\n\n'), {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/markdown; charset=utf-8',
-      'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
-    },
-  });
+  return blobResponse(available.join('\n\n'));
 }

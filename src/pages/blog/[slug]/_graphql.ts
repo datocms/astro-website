@@ -110,7 +110,7 @@ export const query = graphql(
           }
         }
         _firstPublishedAt
-        _updatedAt
+        _publishedAt
         _createdAt
         author {
           name
@@ -187,7 +187,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allBlogPosts(first: 500) {
-            _updatedAt
+            _publishedAt
             ...BlogPostUrlFragment
           }
         }
@@ -199,7 +199,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
 
   return entries.map((entry) => ({
     url: buildUrlForBlogPost(entry),
-    lastmod: entry._updatedAt ?? undefined,
+    lastmod: entry._publishedAt ?? undefined,
   }));
 };
 
