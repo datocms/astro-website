@@ -2,6 +2,7 @@
 import Wrapper from '~/components/Wrapper/ReactComponent';
 import { Button } from '~/components/Button';
 import { Layout } from '~/layouts/Layout';
+import { overrideSeo, seoOgType } from '~/lib/datocms/seo';
 import { Markdown } from '~/components/Markdown';
 import { Card } from '~/components/Card';
 import { Prose } from '~/components/Prose';
@@ -35,7 +36,7 @@ if (!page || !page.readme) {
 const avatarUrl = getGravatarUrl(page.author.email);
 ---
 
-<Layout noFinalCta seo={page.seo}>
+<Layout noFinalCta seo={overrideSeo(page.seo, seoOgType('website'))}>
   <Space top={2}>
     <Wrapper>
       <div class={s.grid}>

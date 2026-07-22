@@ -38,7 +38,8 @@ export function overrideSeo(
 function baseMetas() {
   return [
     seoMeta('og:locale', 'en'),
-    seoMeta('og:type', 'website'),
+    // ronak: default only; a page opting into og:type=article must survive re-application in BaseLayout
+    seoMetaDefault('og:type', 'website'),
     seoMeta('og:site_name', 'DatoCMS'),
     seoMeta('twitter:site', '@datocms'),
   ];
@@ -120,6 +121,17 @@ function seoMeta(propertyOrName: string, newValue: string) {
       content: null,
     } as TitleMetaLinkTag,
   ];
+}
+
+// ronak: like seoMeta but yields to an existing value instead of replacing it
+function seoMetaDefault(propertyOrName: string, newValue: string) {
+  return (tags: TitleMetaLinkTag[]) =>
+    tags.some(
+      (tag) =>
+        tag.attributes?.property === propertyOrName || tag.attributes?.name === propertyOrName,
+    )
+      ? tags
+      : seoMeta(propertyOrName, newValue)(tags);
 }
 
 export function seoShareTitle(newTitle: string) {

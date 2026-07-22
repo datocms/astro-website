@@ -4,6 +4,7 @@ import { Checks } from '~/components/Checks';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
 import { Layout } from '~/layouts/Layout';
+import { overrideSeo, seoOgType } from '~/lib/datocms/seo';
 import { LogosBar } from '~/components/LogosBar';
 import { Space } from '~/components/Space';
 import { Text } from '~/components/structuredText/Text';
@@ -53,7 +54,7 @@ const sortedWebsites = sortBy(
 const { keyword } = page.yoastAnalysis as { keyword: string | null };
 ---
 
-<Layout seo={page.seo}>
+<Layout seo={overrideSeo(page.seo, seoOgType('website'))}>
   <Hero seoAnalysis={page.yoastAnalysis}>
     <Fragment slot="kicker">{page.seoH1}</Fragment>
     <Fragment slot="title"

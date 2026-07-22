@@ -21,7 +21,13 @@ import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { Announce } from '~/components/pluginToolkit/Announce';
 import { VideoPlayer } from '~/components/VideoPlayer';
 import { isVideo } from '~/components/VideoPlayer/graphql';
-import { overrideSeo, seoPageTitle, seoShareTitle, seoTwitterCard } from '~/lib/datocms/seo';
+import {
+  overrideSeo,
+  seoOgType,
+  seoPageTitle,
+  seoShareTitle,
+  seoTwitterCard,
+} from '~/lib/datocms/seo';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const variables = { slug: Astro.params.slug! };
@@ -48,6 +54,7 @@ const installUrl = dashboardUrl(
     seoPageTitle(`${page.title} — Schema Recipes — DatoCMS`),
     seoShareTitle(`Schema Recipe for ${page.title}`),
     seoTwitterCard('summary_large_image'),
+    seoOgType('website'),
   )}
 >
   <Space top={2}>
