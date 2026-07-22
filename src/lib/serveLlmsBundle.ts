@@ -21,3 +21,27 @@ export async function serveLlmsBundle(filename: string): Promise<Response> {
     },
   });
 }
+
+// ronak: one file with everything — docs + the rest of the site
+export async function serveConcatenatedLlmsBundles(filenames: string[]): Promise<Response> {
+  const parts = await Promise.all(
+    filenames.map(async (filename) => {
+      const upstream = await fetch(`${LLMS_BLOB_BASE_URL}/${filename}`);
+      return upstream.ok ? upstream.text() : null;
+    }),
+  );
+
+  const available = parts.filter((part): part is string => part !== null);
+
+  if (available.length === 0) {
+    return new Response('', { status: 502 });
+  }
+
+  return new Response(available.join('\n\n'), {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/markdown; charset=utf-8',
+      'Cache-Control': 'public, s-maxage=86400, stale-while-revalidate=604800',
+    },
+  });
+}
