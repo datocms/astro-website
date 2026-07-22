@@ -24,7 +24,7 @@ import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage'
 import s from './_style.module.css';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import { JsonLd } from '~/components/JsonLd';
-import { extractFromSeoTags } from '~/lib/datocms/seo';
+import { extractFromSeoTags, overrideSeo, seoOgType } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
 
 const variables = { slug: Astro.params.slug! };
@@ -38,7 +38,7 @@ if (!page) {
 const { quotes = [] } = page;
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout seo={overrideSeo(page._seoMetaTags, seoOgType('website'))}>
   <Fragment slot="head">
     <JsonLd
       data={{
