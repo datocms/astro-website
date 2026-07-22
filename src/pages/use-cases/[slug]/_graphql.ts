@@ -139,6 +139,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allUseCasePages(first: 500) {
+            _updatedAt
             ...UseCasePageUrlFragment
           }
         }
@@ -148,7 +149,10 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForUseCasePage);
+  return entries.map((entry) => ({
+    url: buildUrlForUseCasePage(entry),
+    lastmod: entry._updatedAt ?? undefined,
+  }));
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({

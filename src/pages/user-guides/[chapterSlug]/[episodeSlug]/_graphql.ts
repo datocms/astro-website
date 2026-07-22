@@ -139,6 +139,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allUserGuidesEpisodes(first: 500) {
+            _updatedAt
             ...UserGuidesEpisodeUrlFragment
           }
         }
@@ -148,7 +149,10 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForUserGuidesEpisode);
+  return entries.map((entry) => ({
+    url: buildUrlForUserGuidesEpisode(entry),
+    lastmod: entry._updatedAt ?? undefined,
+  }));
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{ episodeSlug: string }> = async ({
