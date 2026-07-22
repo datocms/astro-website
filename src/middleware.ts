@@ -8,7 +8,7 @@ import { convertHtmlToMarkdown } from './lib/llmtxt';
 import logToRollbar from './lib/logToRollbar';
 import apiCatalog from './documents/well-known/api-catalog.json?raw';
 import mcpServerCard from './documents/well-known/mcp.json?raw';
-import agentSkills from './documents/well-known/agent-skills.json?raw';
+import agentSkillsIndex from './documents/well-known/agent-skills/index.json?raw';
 import authMarkdown from './documents/well-known/auth.md?raw';
 
 export const rollbar: MiddlewareHandler = async ({ request, params }, next) => {
@@ -23,7 +23,10 @@ export const rollbar: MiddlewareHandler = async ({ request, params }, next) => {
 const wellKnownFiles: Record<string, { body: string; contentType: string }> = {
   '/.well-known/api-catalog': { body: apiCatalog, contentType: 'application/linkset+json' },
   '/.well-known/mcp.json': { body: mcpServerCard, contentType: 'application/json' },
-  '/.well-known/agent-skills.json': { body: agentSkills, contentType: 'application/json' },
+  '/.well-known/agent-skills/index.json': {
+    body: agentSkillsIndex,
+    contentType: 'application/json',
+  },
   '/.well-known/auth.md': { body: authMarkdown, contentType: 'text/markdown; charset=utf-8' },
 };
 
@@ -31,12 +34,25 @@ export const wellKnown: MiddlewareHandler = ({ url }, next) => {
   const file = wellKnownFiles[url.pathname];
   if (!file) return next();
 
-  return new Response(file.body, {
-    headers: {
-      'Content-Type': file.contentType,
-      'Surrogate-Control': 'max-age=31536000',
-    },
+  const headers = new Headers({
+    'Content-Type': file.contentType,
+    'Surrogate-Control': 'max-age=31536000',
   });
+
+  // RFC 9727 §2: HEAD must include Link headers for catalog discovery.
+  // §4.2: Linkset representing an API catalog SHOULD declare the profile.
+  if (url.pathname === '/.well-known/api-catalog') {
+    headers.set(
+      'Content-Type',
+      'application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"',
+    );
+    headers.append(
+      'Link',
+      '</.well-known/api-catalog>; rel="self"; type="application/linkset+json"',
+    );
+  }
+
+  return new Response(file.body, { headers });
 };
 
 export const security: MiddlewareHandler = async (_context, next) => {

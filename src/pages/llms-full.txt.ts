@@ -1,10 +1,10 @@
 import type { APIRoute } from 'astro';
-import { serveConcatenatedLlmsBundles } from '~/lib/serveLlmsBundle';
+import { serveLlmsBundle } from '~/lib/serveLlmsBundle';
 import { handleUnexpectedError } from './api/_utils';
 
 export const GET: APIRoute = async ({ request }) => {
   try {
-    return await serveConcatenatedLlmsBundles(['llms-full.txt', 'llms-extras.txt']);
+    return await serveLlmsBundle('llms-full.txt', 'llms-extras.txt');
   } catch (error) {
     return handleUnexpectedError(request, error);
   }

@@ -5,7 +5,7 @@ import './global.css';
 import ProgressBar from './_ProgressBar.astro';
 import { fetchFavicon } from './fetchFavicon';
 import { baseUrl, isDraftModeEnabled } from '~/lib/draftMode';
-import { overrideSeo, replaceSeoPageTitleSuffix } from '~/lib/datocms/seo';
+import { pipeSeo, replaceSeoPageTitleSuffix, seoCanonicalIfMissing } from '~/lib/datocms/seo';
 
 type Props = {
   seo: TitleMetaLinkTag[];
@@ -36,13 +36,13 @@ function titleSuffixForPath(pathname: string): string | undefined {
 }
 
 const suffix = titleSuffixForPath(Astro.url.pathname);
-const finalSeo = suffix ? overrideSeo(seo, replaceSeoPageTitleSuffix(suffix)) : seo;
-
-// ronak: self-referencing canonical unless the page already set one (e.g. syndicated posts)
-const hasCanonical = finalSeo.some(
-  (tag) => tag.tag === 'link' && tag.attributes?.rel === 'canonical',
-);
 const canonicalHref = new URL(Astro.url.pathname, baseUrl(Astro)).href;
+
+const finalSeo = pipeSeo(
+  seo,
+  suffix ? replaceSeoPageTitleSuffix(suffix) : undefined,
+  seoCanonicalIfMissing(canonicalHref),
+);
 ---
 
 <!doctype html>
@@ -57,7 +57,6 @@ const canonicalHref = new URL(Astro.url.pathname, baseUrl(Astro)).href;
     <!-- Strip stega (content-link annotation) characters from head meta tags so
          that invisible markers don't inflate the <title> length in draft mode -->
     <Seo data={stripStega([...result._site.faviconMetaTags, ...finalSeo])} />
-    {!hasCanonical && <link rel="canonical" href={canonicalHref} />}
     <link rel="alternate" type="text/markdown" href={`${Astro.url.pathname}.md`} />
     <link rel="alternate" type="application/rss+xml" title="DatoCMS Blog" href="/blog.xml" />
     <link

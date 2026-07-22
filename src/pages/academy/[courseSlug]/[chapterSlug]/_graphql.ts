@@ -21,7 +21,7 @@ export const query = graphql(
       chapter: academyChapter(filter: { slug: { eq: $chapterSlug } }) {
         id
         _firstPublishedAt
-        _updatedAt
+        _publishedAt
         seo: _seoMetaTags {
           ...TagFragment
         }
@@ -121,7 +121,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allAcademyChapters(first: 500) {
-            _updatedAt
+            _publishedAt
             ...AcademyChapterUrlFragment
           }
         }
@@ -133,7 +133,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
 
   return entries.map((entry) => ({
     url: buildUrlForAcademyChapter(entry),
-    lastmod: entry._updatedAt ?? undefined,
+    lastmod: entry._publishedAt ?? undefined,
   }));
 };
 

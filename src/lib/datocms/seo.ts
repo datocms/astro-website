@@ -25,21 +25,33 @@ export function replaceSeoPageTitleSuffix(newSuffix: string) {
 
 type Operation = (tags: TitleMetaLinkTag[]) => TitleMetaLinkTag[];
 
+/**
+ * Pipes tags through a chain of operations. Unlike {@link overrideSeo}, does
+ * NOT prepend base metas — use when the caller already has a full tag set
+ * and only wants to layer on non-defaulting transforms.
+ */
+export function pipeSeo(
+  tags: TitleMetaLinkTag[],
+  ...operations: Array<Operation | Operation[] | undefined | null | false>
+) {
+  return operations
+    .flat()
+    .filter(isDefined)
+    .reduce((acc, operation) => operation(acc), tags);
+}
+
 export function overrideSeo(
   tags: TitleMetaLinkTag[],
   ...operations: Array<Operation | Operation[] | undefined | null | false>
 ) {
-  return [baseMetas(), ...operations]
-    .flat()
-    .filter(isDefined)
-    .reduce((acc, operation) => operation(acc), tags);
+  return pipeSeo(tags, baseMetas(), ...operations);
 }
 
 function baseMetas() {
   return [
     seoMeta('og:locale', 'en'),
     // ronak: default only; a page opting into og:type=article must survive re-application in BaseLayout
-    seoMetaDefault('og:type', 'website'),
+    seoMeta('og:type', 'website'),
     seoMeta('og:site_name', 'DatoCMS'),
     seoMeta('twitter:site', '@datocms'),
   ];
@@ -123,17 +135,6 @@ function seoMeta(propertyOrName: string, newValue: string) {
   ];
 }
 
-// ronak: like seoMeta but yields to an existing value instead of replacing it
-function seoMetaDefault(propertyOrName: string, newValue: string) {
-  return (tags: TitleMetaLinkTag[]) =>
-    tags.some(
-      (tag) =>
-        tag.attributes?.property === propertyOrName || tag.attributes?.name === propertyOrName,
-    )
-      ? tags
-      : seoMeta(propertyOrName, newValue)(tags);
-}
-
 export function seoShareTitle(newTitle: string) {
   return [seoMeta('og:title', newTitle), seoMeta('twitter:title', newTitle)];
 }
@@ -186,6 +187,26 @@ export function seoCanonical(href: string) {
       content: null,
     } as TitleMetaLinkTag,
   ];
+}
+
+/**
+ * Like {@link seoCanonical}, but only adds a self-referencing canonical when no
+ * canonical is already present (e.g. syndicated posts bring their own).
+ */
+export function seoCanonicalIfMissing(href: string) {
+  return (tags: TitleMetaLinkTag[]) => {
+    if (tags.some((tag) => tag.tag === 'link' && tag.attributes?.rel === 'canonical')) {
+      return tags;
+    }
+    return [
+      ...tags,
+      {
+        tag: 'link',
+        attributes: { rel: 'canonical', href },
+        content: null,
+      } as TitleMetaLinkTag,
+    ];
+  };
 }
 
 export function extractFromSeoTags(tags: TitleMetaLinkTag[]) {
