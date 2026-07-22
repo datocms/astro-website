@@ -13,6 +13,8 @@ import { Wrapper } from '~/components/Wrapper';
 import { Button } from '~/components/Button';
 import { Journey, Step } from '~/components/Journey';
 import { Faqs, Faq } from '~/components/Faqs';
+import { JsonLd } from '~/components/JsonLd';
+import { faqsToJsonLd } from '~/components/Faqs/jsonLd';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -20,9 +22,18 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const faqJsonLd = faqsToJsonLd(page.faqs);
 ---
 
 <Layout seo={page.seo} noFinalCta>
+  {
+    faqJsonLd && (
+      <Fragment slot="head">
+        <JsonLd data={faqJsonLd} />
+      </Fragment>
+    )
+  }
   <Hero seoAnalysis={{ keyword: 'research', synonyms: '', relatedKeywords: [] }}>
     <Fragment slot="kicker">Research Program</Fragment>
     <Fragment slot="title">Contribute to the <mark>evolution of DatoCMS</mark></Fragment>

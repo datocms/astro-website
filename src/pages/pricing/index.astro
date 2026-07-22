@@ -23,8 +23,12 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import { Switch } from '~/components/Switch';
 import { Faqs, Faq } from '~/components/Faqs';
+import { JsonLd } from '~/components/JsonLd';
+import { faqsToJsonLd } from '~/components/Faqs/jsonLd';
 
 const { page, faqs, review1, planFeatureGroups, hints } = await executeQuery(Astro, query);
+
+const faqJsonLd = faqsToJsonLd(faqs);
 
 const plans = sortBy(await fetchPerOwnerPricingPlans(Astro), 'attributes.monthly_price');
 
@@ -37,6 +41,13 @@ if (!page || !freePlan || !proPlan) {
 ---
 
 <Layout seo={page.seo}>
+  {
+    faqJsonLd && (
+      <Fragment slot="head">
+        <JsonLd data={faqJsonLd} />
+      </Fragment>
+    )
+  }
   <div id="main-content">
     <Hero mainTitleOfPage seoAnalysis={{ keyword: 'pricing' }}>
       <Fragment slot="kicker">DatoCMS Pricing</Fragment>

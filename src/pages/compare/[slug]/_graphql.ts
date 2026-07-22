@@ -15,6 +15,8 @@ export const query = graphql(
   /* GraphQL */ `
     query Compare($slug: String!) {
       page: productComparison(filter: { slug: { eq: $slug } }) {
+        _firstPublishedAt
+        _updatedAt
         _seoMetaTags {
           ...TagFragment
         }

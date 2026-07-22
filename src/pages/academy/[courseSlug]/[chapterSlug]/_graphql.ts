@@ -20,6 +20,8 @@ export const query = graphql(
     query AcademyChapter($courseSlug: String!, $chapterSlug: String!) {
       chapter: academyChapter(filter: { slug: { eq: $chapterSlug } }) {
         id
+        _firstPublishedAt
+        _updatedAt
         seo: _seoMetaTags {
           ...TagFragment
         }

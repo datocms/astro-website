@@ -26,6 +26,7 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
 import { JsonLd } from '~/components/JsonLd';
+import { publisherRef } from '~/lib/jsonLd';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
 
@@ -45,6 +46,12 @@ if (!course) {
 }
 
 const allChapters = course.chapters;
+
+// ronak: no course landing page — course entry point is its first chapter
+const firstChapter = allChapters[0];
+const courseUrl = firstChapter
+  ? new URL(buildUrlForAcademyChapter(firstChapter), baseUrl(Astro)).href
+  : undefined;
 
 const chapterIndex = findIndex(allChapters, (c) => c.id === chapter.id);
 
@@ -70,7 +77,42 @@ const sections = filterNodes(
         '@type': 'TechArticle',
         headline: chapter.title,
         url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
+        datePublished: chapter._firstPublishedAt ?? undefined,
+        dateModified: chapter._updatedAt ?? undefined,
+        image: extractFromSeoTags(chapter.seo).image,
+        isPartOf: {
+          '@type': 'Course',
+          name: course.name,
+          url: courseUrl,
+        },
+        publisher: publisherRef(baseUrl(Astro)),
         description: extractFromSeoTags(chapter.seo).description,
+      }}
+    />
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'DatoCMS Academy',
+            item: new URL('/academy', baseUrl(Astro)).href,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: course.name,
+            item: courseUrl,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: chapter.title,
+            item: new URL(Astro.url.pathname, baseUrl(Astro)).href,
+          },
+        ],
       }}
     />
   </Fragment>

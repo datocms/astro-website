@@ -10,6 +10,7 @@ import { Video } from '~/components/blocks/Video';
 import { Wrapper } from '~/components/Wrapper';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { JsonLd } from '~/components/JsonLd';
+import { publisherRef } from '~/lib/jsonLd';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
@@ -56,6 +57,7 @@ const siblings = [previous ?? last, next ?? first].filter(isDefined);
         headline: structuredTextToPlainText(page.title) ?? page.name,
         url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
         datePublished: page._firstPublishedAt,
+        publisher: publisherRef(baseUrl(Astro)),
         description: extractFromSeoTags(page.seo).description,
         image: page.coverImage.url,
       }}
