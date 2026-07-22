@@ -121,6 +121,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allAcademyChapters(first: 500) {
+            _updatedAt
             ...AcademyChapterUrlFragment
           }
         }
@@ -130,7 +131,10 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForAcademyChapter);
+  return entries.map((entry) => ({
+    url: buildUrlForAcademyChapter(entry),
+    lastmod: entry._updatedAt ?? undefined,
+  }));
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{

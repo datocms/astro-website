@@ -173,6 +173,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allProductComparisons(first: 500) {
+            _updatedAt
             ...ProductComparisonUrlFragment
           }
         }
@@ -182,7 +183,10 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForProductComparison);
+  return entries.map((entry) => ({
+    url: buildUrlForProductComparison(entry),
+    lastmod: entry._updatedAt ?? undefined,
+  }));
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({

@@ -217,6 +217,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allLandingPages(first: 100) {
+            _updatedAt
             ...LandingPageUrlFragment
           }
         }
@@ -226,7 +227,10 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForLandingPage);
+  return entries.map((entry) => ({
+    url: buildUrlForLandingPage(entry),
+    lastmod: entry._updatedAt ?? undefined,
+  }));
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({

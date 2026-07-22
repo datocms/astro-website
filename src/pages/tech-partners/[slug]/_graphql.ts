@@ -94,6 +94,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allTechPartners(first: 500) {
+            _updatedAt
             ...TechPartnerUrlFragment
           }
         }
@@ -103,7 +104,10 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForTechPartner);
+  return entries.map((entry) => ({
+    url: buildUrlForTechPartner(entry),
+    lastmod: entry._updatedAt ?? undefined,
+  }));
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({

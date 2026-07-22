@@ -117,6 +117,7 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
       /* GraphQL */ `
         query BuildSitemapUrls {
           entries: allHostingApps(first: 100) {
+            _updatedAt
             ...HostingAppUrlFragment
           }
         }
@@ -126,7 +127,10 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return entries.map(buildUrlForHostingApp);
+  return entries.map((entry) => ({
+    url: buildUrlForHostingApp(entry),
+    lastmod: entry._updatedAt ?? undefined,
+  }));
 };
 
 export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({
