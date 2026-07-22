@@ -33,7 +33,13 @@ import { slugify } from '~/lib/slugify';
 import { query, siblingsQuery } from './_graphql';
 import { Prose } from '~/components/Prose';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { overrideSeo, seoTwitterCard, extractFromSeoTags } from '~/lib/datocms/seo';
+import {
+  overrideSeo,
+  seoTwitterCard,
+  seoCanonical,
+  seoOgType,
+  extractFromSeoTags,
+} from '~/lib/datocms/seo';
 import { JsonLd } from '~/components/JsonLd';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
@@ -77,7 +83,14 @@ const markdownUrl = new URL(
 );
 ---
 
-<Layout seo={overrideSeo(post.seo, seoTwitterCard('summary_large_image'))}>
+<Layout
+  seo={overrideSeo(
+    post.seo,
+    post.canonicalUrl ? seoCanonical(post.canonicalUrl) : undefined,
+    seoOgType('article'),
+    seoTwitterCard('summary_large_image'),
+  )}
+>
   <Fragment slot="head">
     {
       post._firstPublishedAt && (

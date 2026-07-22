@@ -38,7 +38,7 @@ import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerSt
 import s from './_style.module.css';
 import { isDefined } from '~/lib/isDefined';
 import { JsonLd } from '~/components/JsonLd';
-import { extractFromSeoTags } from '~/lib/datocms/seo';
+import { extractFromSeoTags, seoCanonical } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
 
 const variables = { slug: Astro.params.slug! };
@@ -70,7 +70,7 @@ const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery,
 const siblings = [previous ?? last, next ?? first].filter(isDefined);
 ---
 
-<Layout seo={post.seo}>
+<Layout seo={post.canonicalUrl ? seoCanonical(post.canonicalUrl)(post.seo) : post.seo}>
   <Fragment slot="head">
     <JsonLd
       data={{
