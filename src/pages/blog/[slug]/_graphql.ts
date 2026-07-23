@@ -111,7 +111,6 @@ export const query = graphql(
         }
         _firstPublishedAt
         _publishedAt
-        _updatedAt
         _createdAt
         author {
           name
