@@ -4,7 +4,7 @@ import { handleUnexpectedError } from './api/_utils';
 
 export const GET: APIRoute = async ({ request }) => {
   try {
-    return await serveLlmsBundle('llms-full.txt', 'llms-extras.txt');
+    return await serveLlmsBundle('llms-full.txt', 'llms-extras-full.txt');
   } catch (error) {
     return handleUnexpectedError(request, error);
   }
