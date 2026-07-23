@@ -138,6 +138,7 @@ export default defineConfig({
       LLMS_BLOB_BASE_URL: envField.string({
         context: 'server',
         access: 'public',
+        optional: true,
       }),
     },
     validateSecrets: false,
