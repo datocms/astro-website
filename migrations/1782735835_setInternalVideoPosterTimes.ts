@@ -119,7 +119,7 @@ export default async function (client: Client): Promise<void> {
                     overriddenBlocks++;
                     return buildBlockRecord<Schema.InternalVideo>({
                       id: ivBlock.id,
-                      video: { ...video, poster_time: thumb },
+                      video: { ...video, poster_time: thumb } as typeof video,
                     });
                   }
                 }
