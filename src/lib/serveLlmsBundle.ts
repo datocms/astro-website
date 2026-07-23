@@ -2,6 +2,7 @@ import { LLMS_BLOB_BASE_URL } from 'astro:env/server';
 import { isDefined } from './isDefined';
 
 export async function fetchBlob(filename: string): Promise<string | null> {
+  if (!LLMS_BLOB_BASE_URL) return null;
   const upstream = await fetch(`${LLMS_BLOB_BASE_URL}/${filename}`);
   return upstream.ok ? upstream.text() : null;
 }
