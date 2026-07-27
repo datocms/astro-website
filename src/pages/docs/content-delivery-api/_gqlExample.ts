@@ -35,11 +35,31 @@ export const camelize = (name: string) => {
   return camelCase(name);
 };
 
+const objectExampleForType = (input: Input): string => {
+  invariant(input.type === 'object');
+
+  // Runtime type is actually Record<string, ScalarInput | EnumInput>, not an array
+  const argsRecord = input.arguments as unknown as Record<string, Input>;
+
+  const args = Object.entries(argsRecord)
+    .map(([name, arg]) => {
+      const value = singleExampleForType(name, arg);
+      return `${camelize(name)}: ${value}`;
+    })
+    .join(', ');
+
+  return `{ ${args} }`;
+};
+
 const singleExampleForType = (filterName: string, input: Input) => {
   if (filterName === 'matches' || filterName === 'not_matches') {
     return '{ pattern: "bi(cycl|k)e", caseSensitive: false }';
   } else if (filterName === 'near') {
     return '{ latitude: 40.73, longitude: -73.93, radius: 10 }';
+  }
+
+  if (input.type === 'object') {
+    return objectExampleForType(input);
   }
 
   invariant(input.type === 'scalar');

@@ -10,6 +10,8 @@ import { fetchIntrospectionFieldFilters, fieldTypeName } from './_utils';
 
 const result = await findGroupAndPage(Astro, 'content-delivery-api/filtering-records');
 
+const CMA_ONLY_META_FIELDS = ['_creator'];
+
 if (!result) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
@@ -33,10 +35,12 @@ const response = await fetchIntrospectionFieldFilters(Astro);
     },
     {
       title: 'Filters available for meta fields',
-      entries: Object.keys(response.meta).map((fieldName) => ({
-        label: camelize(fieldName),
-        url: `#${slugify(camelize(fieldName))}`,
-      })),
+      entries: Object.keys(response.meta)
+        .filter((fieldName) => !CMA_ONLY_META_FIELDS.includes(fieldName))
+        .map((fieldName) => ({
+          label: camelize(fieldName),
+          url: `#${slugify(camelize(fieldName))}`,
+        })),
     },
   ]}
 >
@@ -54,14 +58,16 @@ const response = await fetchIntrospectionFieldFilters(Astro);
     }
     <Heading anchor="meta-fields" as="h3">Filters available for meta fields</Heading>
     {
-      Object.entries(response.meta).map(([fieldName, filters]) => (
-        <>
-          <Heading anchor={slugify(camelize(fieldName))} as="h4">
-            Filter by <code>{camelize(fieldName)}</code> meta field
-          </Heading>
-          <Filters fieldName={fieldName} filters={filters} />
-        </>
-      ))
+      Object.entries(response.meta)
+        .filter(([fieldName]) => !CMA_ONLY_META_FIELDS.includes(fieldName))
+        .map(([fieldName, filters]) => (
+          <>
+            <Heading anchor={slugify(camelize(fieldName))} as="h4">
+              Filter by <code>{camelize(fieldName)}</code> meta field
+            </Heading>
+            <Filters fieldName={fieldName} filters={filters} />
+          </>
+        ))
     }
   </Fragment>
 </PageLayout>
