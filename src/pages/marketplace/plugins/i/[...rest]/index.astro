@@ -9,6 +9,7 @@ import { Prose } from '~/components/Prose';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Announce } from '~/components/pluginToolkit/Announce';
 import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
 import { Tooltip } from '~/components/Tooltip';
 import { VideoPlayer } from '~/components/VideoPlayer';
 import { executeQuery } from '~/lib/datocms/executeQuery';
@@ -42,7 +43,22 @@ const avatarUrl = getGravatarUrl(page.author.email);
       <div class={s.grid}>
         <div class={s.content}>
           <div class={s.titleWrapper}>
-            <h1 class={s.title}>{page.title}</h1>
+            <h1 class={s.title}>
+              {page.title}
+              {
+                page.author.official && (
+                  <Tooltip class={s.officialBadge} tooltipClass={s.officialAuthorTooltip}>
+                    <Svg
+                      name="svg/datocms/icon/color/color_d_icon"
+                      aria-label="DatoCMS Official Plugin"
+                      width={28}
+                      height={28}
+                    />
+                    <Fragment slot="tooltip">DatoCMS Official Plugin</Fragment>
+                  </Tooltip>
+                )
+              }
+            </h1>
           </div>
           <h3 class={s.subtitle}>{page.description}</h3>
           <Space top={1}>
@@ -82,7 +98,7 @@ const avatarUrl = getGravatarUrl(page.author.email);
                   ? 'This is an Official DatoCMS Plugin!'
                   : 'This is a Community Plugin!'
               }
-            </strong>{' '}
+            </strong>{' '}
             Learn how create your own plugin, or copy and remix existing ones in our documentation
           </Announce>
 
@@ -96,6 +112,24 @@ const avatarUrl = getGravatarUrl(page.author.email);
         <aside class={s.aside}>
           <div class={s.asideContent}>
             <Card title={page.title} background="azure">
+              <Fragment slot="title">
+                <span>
+                  {page.title}
+                  {
+                    page.author.official && (
+                      <Tooltip class={s.officialBadge} tooltipClass={s.officialAuthorTooltip}>
+                        <Svg
+                          name="svg/datocms/icon/color/color_d_icon"
+                          aria-label="DatoCMS Official Plugin"
+                          width={16}
+                          height={16}
+                        />
+                        <Fragment slot="tooltip">DatoCMS Official Plugin</Fragment>
+                      </Tooltip>
+                    )
+                  }
+                </span>
+              </Fragment>
               {
                 page.coverImage && (
                   <Fragment slot="image">
@@ -122,14 +156,6 @@ const avatarUrl = getGravatarUrl(page.author.email);
                   <img src={avatarUrl} alt={page.author.name} />
                 </div>
                 <p>{page.author.name}</p>
-                {
-                  page.author.official && (
-                    <Tooltip tooltipClass={s.officialAuthorTooltip}>
-                      <span aria-label="Official author">⭐</span>
-                      <Fragment slot="tooltip">Official DatoCMS author</Fragment>
-                    </Tooltip>
-                  )
-                }
               </article>
             </div>
 

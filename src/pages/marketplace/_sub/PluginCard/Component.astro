@@ -8,6 +8,7 @@ import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
 import { Card } from '~/components/Card';
 import type { ComponentProps } from 'astro/types';
 import { Svg } from '~/components/Svg';
+import { Tooltip } from '~/components/Tooltip';
 
 type Props = {
   plugin: FragmentOf<typeof PluginCardFragment>;
@@ -41,8 +42,17 @@ const backgroundFromString = <T extends string>(input: string, options: T[]): T 
   lineClamp={3}
 >
   <Fragment slot="title">
-    {plugin.title}
-    {plugin.author?.official && ' ⭐'}
+    <span>
+      {plugin.title}
+      {
+        plugin.author?.official && (
+          <Tooltip class={s.officialIcon}>
+            <Svg name="svg/datocms/icon/color/color_d_icon" width={16} height={16} />
+            <Fragment slot="tooltip">DatoCMS Official Plugin</Fragment>
+          </Tooltip>
+        )
+      }
+    </span>
   </Fragment>
   {
     plugin.coverImage ? (
