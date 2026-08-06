@@ -74,7 +74,7 @@ await client.items.publish(post.id);`,
     desc: 'Upload, transform, and serve images, video, and files from a global CDN.',
     pkg: null,
     endpoint: 'www.datocms-assets.com',
-    href: '/docs/asset-api',
+    href: '/docs/asset-api/images',
     language: 'bash',
     code: `# Upload a file via the CMA, then transform via the CDN.
 curl https://www.datocms-assets.com/12345/hero.jpg \\
