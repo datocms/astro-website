@@ -6,6 +6,7 @@ import { parse } from 'node-html-parser';
 import { baseUrl, isDraftModeEnabled } from './lib/draftMode';
 import { convertHtmlToMarkdown } from './lib/llmtxt';
 import logToRollbar from './lib/logToRollbar';
+import { prefersMarkdown } from './lib/prefersMarkdown';
 import apiCatalog from './documents/well-known/api-catalog.json?raw';
 import mcpServerCard from './documents/well-known/mcp.json?raw';
 import agentSkillsIndex from './documents/well-known/agent-skills/index.json?raw';
@@ -55,7 +56,7 @@ export const wellKnown: MiddlewareHandler = ({ url }, next) => {
   return new Response(file.body, { headers });
 };
 
-export const security: MiddlewareHandler = async (_context, next) => {
+export const security: MiddlewareHandler = async (context, next) => {
   const response = await next();
 
   response.headers.set('strict-transport-security', 'max-age=63072000; includeSubdomains; preload');
@@ -68,6 +69,16 @@ export const security: MiddlewareHandler = async (_context, next) => {
   if ((response.headers.get('content-type') || '').includes('text/html')) {
     response.headers.append('link', '</sitemap.xml>; rel="sitemap"; type="application/xml"');
     response.headers.append('link', '</.well-known/api-catalog>; rel="api-catalog"');
+
+    // Advertise the markdown twin of this page. This header is identical for
+    // every visitor, so it survives caching and gives an agent a way to find
+    // the markdown even when it was handed a cached HTML response. We run
+    // `trailingSlash: 'never'`, so a trailing slash means the homepage, which
+    // has no `.md` twin to point at.
+    const { pathname } = context.url;
+    if (!pathname.endsWith('/') && !pathname.endsWith('.md')) {
+      response.headers.append('link', `<${pathname}.md>; rel="alternate"; type="text/markdown"`);
+    }
   }
 
   return response;
@@ -175,8 +186,7 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
 };
 
 export const contentNegotiation: MiddlewareHandler = async (context, next) => {
-  const accept = context.request.headers.get('accept') || '';
-  const wantsMarkdown = accept.includes('text/markdown');
+  const wantsMarkdown = prefersMarkdown(context.request);
 
   const response = await next();
   const contentType = response.headers.get('content-type') || '';
@@ -185,8 +195,10 @@ export const contentNegotiation: MiddlewareHandler = async (context, next) => {
     return response;
   }
 
-  // Tell Fastly to cache separate versions per Accept value
-  response.headers.append('vary', 'Accept');
+  // Tell Fastly to cache separate versions per Accept value, and per user agent
+  // now that the user agent can flip the representation too. See the note in
+  // `prefersMarkdown` about normalising this at the edge.
+  response.headers.append('vary', 'Accept, User-Agent');
 
   if (!wantsMarkdown) {
     return response;
@@ -199,7 +211,10 @@ export const contentNegotiation: MiddlewareHandler = async (context, next) => {
     preserveTables: true,
   });
 
-  const headers = new Headers({ 'Content-Type': 'text/markdown; charset=utf-8', Vary: 'Accept' });
+  const headers = new Headers({
+    'Content-Type': 'text/markdown; charset=utf-8',
+    Vary: 'Accept, User-Agent',
+  });
 
   for (const header of ['cache-control', 'datocms-cache-tags', 'surrogate-control']) {
     const value = response.headers.get(header);
