@@ -396,5 +396,14 @@ export default defineConfig({
       '/marketplace/plugins/i/datocms-plugin-web-previews',
     '/docs/content-management-api/resources/upload/batch_destroy':
       '/docs/content-management-api/resources/item/bulk_destroy',
+    '/docs/remix': '/docs/react-router',
+    '/docs/remix/get-started': '/docs/react-router',
+    '/docs/remix/remix-images': '/docs/react-router/managing-images',
+    '/docs/remix/remix-structured-text-fields': '/docs/react-router/structured-text-fields',
+    '/docs/remix/add-seo-to-remix': '/docs/react-router/seo-management',
+    '/docs/remix/setting-up-a-preview-mode-with-remix':
+      '/docs/react-router/setting-up-a-preview-mode',
+    '/docs/remix/using-cache-tags': '/docs/content-delivery-api/cache-tags',
+    '/docs/remix/[...rest]': '/docs/react-router/[...rest]',
   },
 });
