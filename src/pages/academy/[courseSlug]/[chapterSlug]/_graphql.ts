@@ -11,6 +11,7 @@ import {
   AcademyChapterUrlFragment,
   buildUrlForAcademyChapter,
 } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+import { AcademyCourseUrlFragment } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
@@ -98,6 +99,7 @@ export const query = graphql(
             id
             title
           }
+          ...AcademyCourseUrlFragment
         }
       }
     }
@@ -109,6 +111,7 @@ export const query = graphql(
     TableFragment,
     TabsBlockFragment,
     AcademyChapterUrlFragment,
+    AcademyCourseUrlFragment,
     ResponsiveImageFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,

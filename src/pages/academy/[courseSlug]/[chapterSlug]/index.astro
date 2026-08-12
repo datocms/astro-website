@@ -5,10 +5,9 @@ import s from './_style.module.css';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
-import { filterNodes } from '~/lib/datocms/filterNodes';
-import { isHeading, type Heading } from 'datocms-structured-text-utils';
-import { slugify } from '~/lib/slugify';
+import { assignHeadingAnchors } from '~/lib/academyAnchors';
 import { type StructuredTextDocument } from 'datocms-structured-text-to-plain-text';
+import HeadingNode from './_HeadingNode.astro';
 import { Wrapper } from '~/components/Wrapper';
 import { Layout } from '~/layouts/Layout';
 import { InterstitialTitle } from '~/components/InterstitialTitle';
@@ -22,6 +21,7 @@ import { Table } from '~/components/blocks/Table';
 import { TabsBlock } from '~/components/blocks/TabsBlock';
 import { InternalVideo } from '~/components/blocks/InternalVideo';
 import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+import { buildUrlForAcademyCourse } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/inlineRecords';
@@ -47,11 +47,7 @@ if (!course) {
 
 const allChapters = course.chapters;
 
-// ronak: no course landing page — course entry point is its first chapter
-const firstChapter = allChapters[0];
-const courseUrl = firstChapter
-  ? new URL(buildUrlForAcademyChapter(firstChapter), baseUrl(Astro)).href
-  : undefined;
+const courseUrl = new URL(buildUrlForAcademyCourse(course), baseUrl(Astro)).href;
 
 const chapterIndex = findIndex(allChapters, (c) => c.id === chapter.id);
 
@@ -60,13 +56,12 @@ const prevChapter = chapterIndex > 0 ? allChapters[chapterIndex - 1] : undefined
 const nextChapter =
   chapterIndex < allChapters.length - 1 ? allChapters[chapterIndex + 1] : undefined;
 
-const sections = filterNodes(
-  (chapter.content.value as StructuredTextDocument).document,
-  (node): node is Heading => isHeading(node) && node.level < 4,
-).map((heading) => ({
-  url: `#${slugify(toPlainText(heading))}`,
-  node: heading,
-}));
+const sections = assignHeadingAnchors((chapter.content.value as StructuredTextDocument).document)
+  .filter(({ heading }) => heading.level < 4)
+  .map(({ heading, anchor }) => ({
+    url: `#${anchor}`,
+    node: heading,
+  }));
 ---
 
 <Layout seo={chapter.seo}>
@@ -158,8 +153,9 @@ const sections = filterNodes(
             </ul>
             <div class={s.tocFooter}>
               <p>
-                This <strong>{course.name}</strong> course is part of{' '}
-                <a href="/academy">DatoCMS Academy</a>, a deep dive into the concepts around
+                This <a href={buildUrlForAcademyCourse(course)}>{course.name}</a> course is part of{
+                  ' '
+                }<a href="/academy">DatoCMS Academy</a>, a deep dive into the concepts around
                 headless.
               </p>
             </div>
@@ -178,6 +174,7 @@ const sections = filterNodes(
               linkToRecordComponents: defaultLinkToRecordComponents,
               inlineRecordComponents: defaultInlineRecordComponents,
             })}
+            nodeOverrides={{ heading: HeadingNode }}
           />
         </Prose>
       </div>

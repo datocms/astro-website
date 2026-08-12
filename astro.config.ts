@@ -396,5 +396,9 @@ export default defineConfig({
       '/marketplace/plugins/i/datocms-plugin-web-previews',
     '/docs/content-management-api/resources/upload/batch_destroy':
       '/docs/content-management-api/resources/item/bulk_destroy',
+    '/academy/ancillary-concepts': '/academy/frontend-frameworks',
+    '/academy/ancillary-concepts/react-concepts': '/academy/frontend-frameworks/react',
+    '/academy/ancillary-concepts/astro-concepts': '/academy/frontend-frameworks/astro',
+    '/academy/ancillary-concepts/next-js-concepts': '/academy/frontend-frameworks/nextjs',
   },
 });
