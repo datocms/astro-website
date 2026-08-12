@@ -56,41 +56,33 @@ function isHtmlOnlyClient(userAgent: string): boolean {
 }
 
 /**
- * Decide whether a request should be answered with markdown instead of HTML.
+ * An explicit `Accept: text/markdown`. The only signal a caller can rely on,
+ * and the only one we let change the body at a cacheable URL — it costs us a
+ * `Vary: Accept`, which has a handful of distinct values in practice.
+ */
+export function acceptsMarkdown(request: Request): boolean {
+  return (request.headers.get('accept') || '').includes('text/markdown');
+}
+
+/**
+ * A client that is not a browser and would be better served markdown, inferred
+ * rather than declared. Two signals:
  *
- * Three signals, in precedence order:
- *
- * 1. `Accept: text/markdown` — an explicit request always wins, in both
- *    directions. This is the only signal a caller can rely on.
- * 2. `Sec-Fetch-Mode` — browsers send it on every navigation and non-browser
+ * 1. `Sec-Fetch-Mode` — browsers send it on every navigation and non-browser
  *    clients essentially never do, so its presence means "a human is looking at
  *    this". Cheaper and more robust than trying to enumerate browser UAs.
- * 3. The user agent itself, via `isbot`: not a browser and not on the HTML-only
+ * 2. The user agent itself, via `isbot`: not a browser and not on the HTML-only
  *    list above, so markdown is the more useful representation.
  *
- * The `Signature-Agent` header (RFC 9421 web bot auth) counts as agent traffic
- * too — an agent that bothers to sign its requests is not rendering HTML.
+ * The `Signature-Agent` header (RFC 9421 web bot auth) counts too — an agent
+ * that bothers to sign its requests is not rendering HTML.
  *
- * Caching note: because the user agent can now change the representation, HTML
- * responses carry `Vary: Accept, User-Agent`, and Fastly will keep one cached
- * variant per distinct user agent string. The fix, when we want the hit ratio
- * back, is to collapse the dimension at the edge rather than to drop the
- * signal here — have VCL compute the boolean once and vary on that instead:
- *
- *   sub vcl_recv {
- *     set req.http.X-Prefers-Markdown = req.http.User-Agent ~ "(?i)bot|agent|crawler" ? "1" : "0";
- *   }
- *
- * then `Vary: Accept, X-Prefers-Markdown`, which has exactly two values.
+ * Deliberately *not* used to swap the body of a cacheable response. Doing that
+ * would mean `Vary: User-Agent`, and Fastly would then keep one variant per
+ * distinct user agent string against objects we cache for a year. The caller
+ * redirects to the `.md` twin instead — see `agentRedirect` in the middleware.
  */
-export function prefersMarkdown(request: Request): boolean {
-  const accept = request.headers.get('accept') || '';
-
-  if (accept.includes('text/markdown')) {
-    return true;
-  }
-
-  // A browser navigation. Nothing else to consider.
+export function looksLikeAgent(request: Request): boolean {
   if (request.headers.get('sec-fetch-mode')) {
     return false;
   }

@@ -6,7 +6,7 @@ import { parse } from 'node-html-parser';
 import { baseUrl, isDraftModeEnabled } from './lib/draftMode';
 import { convertHtmlToMarkdown } from './lib/llmtxt';
 import logToRollbar from './lib/logToRollbar';
-import { prefersMarkdown } from './lib/prefersMarkdown';
+import { acceptsMarkdown, looksLikeAgent } from './lib/markdownNegotiation';
 import apiCatalog from './documents/well-known/api-catalog.json?raw';
 import mcpServerCard from './documents/well-known/mcp.json?raw';
 import agentSkillsIndex from './documents/well-known/agent-skills/index.json?raw';
@@ -185,8 +185,52 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
   return next();
 };
 
+/**
+ * Point agents at the `.md` twin of the page they asked for, without ever
+ * making the canonical URL's body depend on the user agent.
+ *
+ * The response is explicitly uncacheable, which is what makes this safe: Fastly
+ * stores only the HTML variant of a canonical URL, so no `Vary: User-Agent` is
+ * needed and the cache keeps a single entry per URL. The trade is that this
+ * only fires on a cache miss — an agent that lands on a warm HTML object gets
+ * HTML. That degradation is fine, and it degrades to a page carrying a
+ * `Link: rel="alternate"` header pointing at the same `.md` URL (see
+ * `security`), so the markdown stays reachable either way.
+ *
+ * The `.md` URL we redirect to is itself cached normally, with no `Vary` at
+ * all, so repeat fetches cost nothing.
+ */
+export const agentRedirect: MiddlewareHandler = async (context, next) => {
+  const { pathname } = context.url;
+
+  // `trailingSlash: 'never'`, so a trailing slash means the homepage.
+  if (pathname.endsWith('/') || pathname.endsWith('.md')) {
+    return next();
+  }
+
+  if (acceptsMarkdown(context.request) || !looksLikeAgent(context.request)) {
+    return next();
+  }
+
+  const response = await next();
+
+  // Only pages have a markdown twin. Assets, API routes and redirects pass through.
+  if (!(response.headers.get('content-type') || '').includes('text/html')) {
+    return response;
+  }
+
+  return new Response(null, {
+    status: 302,
+    headers: {
+      location: `${pathname}.md${context.url.search}`,
+      'cache-control': 'private, no-store',
+      'surrogate-control': 'private, no-store',
+    },
+  });
+};
+
 export const contentNegotiation: MiddlewareHandler = async (context, next) => {
-  const wantsMarkdown = prefersMarkdown(context.request);
+  const wantsMarkdown = acceptsMarkdown(context.request);
 
   const response = await next();
   const contentType = response.headers.get('content-type') || '';
@@ -195,10 +239,8 @@ export const contentNegotiation: MiddlewareHandler = async (context, next) => {
     return response;
   }
 
-  // Tell Fastly to cache separate versions per Accept value, and per user agent
-  // now that the user agent can flip the representation too. See the note in
-  // `prefersMarkdown` about normalising this at the edge.
-  response.headers.append('vary', 'Accept, User-Agent');
+  // Tell Fastly to cache separate versions per Accept value
+  response.headers.append('vary', 'Accept');
 
   if (!wantsMarkdown) {
     return response;
@@ -211,10 +253,7 @@ export const contentNegotiation: MiddlewareHandler = async (context, next) => {
     preserveTables: true,
   });
 
-  const headers = new Headers({
-    'Content-Type': 'text/markdown; charset=utf-8',
-    Vary: 'Accept, User-Agent',
-  });
+  const headers = new Headers({ 'Content-Type': 'text/markdown; charset=utf-8', Vary: 'Accept' });
 
   for (const header of ['cache-control', 'datocms-cache-tags', 'surrogate-control']) {
     const value = response.headers.get(header);
@@ -271,4 +310,5 @@ export const onRequest = sequence(
   basicAuth,
   propagateToken,
   contentNegotiation,
+  agentRedirect,
 );
