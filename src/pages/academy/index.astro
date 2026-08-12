@@ -23,6 +23,10 @@ if (!page || courses.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+function seedFrom(value: string) {
+  return [...value].reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) % 100000, 7);
+}
 ---
 
 <Layout seo={page.seo}>
@@ -39,9 +43,10 @@ if (!page || courses.length === 0) {
         courses
           .filter((course) => course.chapters.length > 0)
           .map((course) => {
-            const size = Math.random() * 1.5 + 2;
-            const x = Math.floor(Math.random() * 30);
-            const y = Math.floor(Math.random() * 30) + 20;
+            const seed = seedFrom(stripStega(course.name));
+            const size = (seed % 15) / 10 + 2;
+            const x = Math.floor(seed / 7) % 30;
+            const y = (Math.floor(seed / 13) % 30) + 20;
 
             return (
               <div class={s.course}>

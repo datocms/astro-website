@@ -407,5 +407,9 @@ export default defineConfig({
     '/docs/remix/[...rest]': '/docs/react-router/[...rest]',
     '/cms/remix': '/docs/react-router',
     '/cms/remix-cms': '/docs/react-router',
+    '/academy/ancillary-concepts': '/academy/frontend-frameworks',
+    '/academy/ancillary-concepts/react-concepts': '/academy/frontend-frameworks/react',
+    '/academy/ancillary-concepts/astro-concepts': '/academy/frontend-frameworks/astro',
+    '/academy/ancillary-concepts/next-js-concepts': '/academy/frontend-frameworks/nextjs',
   },
 });

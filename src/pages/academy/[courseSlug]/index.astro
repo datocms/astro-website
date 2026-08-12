@@ -1,0 +1,113 @@
+---
+import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
+import { InterstitialTitle } from '~/components/InterstitialTitle';
+import { JsonLd } from '~/components/JsonLd';
+import { Space } from '~/components/Space';
+import { Svg } from '~/components/Svg';
+import { Text } from '~/components/structuredText/Text';
+import { Wrapper } from '~/components/Wrapper';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Layout } from '~/layouts/Layout';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+import { extractFromSeoTags } from '~/lib/datocms/seo';
+import { baseUrl } from '~/lib/draftMode';
+import { courseId, publisherRef } from '~/lib/jsonLd';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import s from './_style.module.css';
+import { query } from './_graphql';
+
+const variables = { courseSlug: Astro.params.courseSlug! };
+
+const { course } = await executeQuery(Astro, query, { variables });
+
+if (!course) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const pageUrl = new URL(Astro.url.pathname, baseUrl(Astro)).href;
+---
+
+<Layout seo={course.seo}>
+  <Fragment slot="head">
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'Course',
+        '@id': courseId(baseUrl(Astro), variables.courseSlug),
+        name: course.name,
+        url: pageUrl,
+        description: extractFromSeoTags(course.seo).description,
+        image: extractFromSeoTags(course.seo).image,
+        provider: publisherRef(baseUrl(Astro)),
+        isAccessibleForFree: true,
+        offers: {
+          '@type': 'Offer',
+          price: 0,
+          priceCurrency: 'EUR',
+        },
+        hasCourseInstance: {
+          '@type': 'CourseInstance',
+          courseMode: 'online',
+          courseWorkload: 'PT2H',
+        },
+        hasPart: course.chapters.map((chapter) => ({
+          '@type': 'CreativeWork',
+          name: chapter.title,
+          url: new URL(buildUrlForAcademyChapter(chapter), baseUrl(Astro)).href,
+        })),
+      }}
+    />
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'DatoCMS Academy',
+            item: new URL('/academy', baseUrl(Astro)).href,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: course.name,
+            item: pageUrl,
+          },
+        ],
+      }}
+    />
+  </Fragment>
+  <InterstitialTitle style="one" mainTitleOfPage>
+    <Fragment slot="kicker"><a href="/academy" data-datocms-nomd>DatoCMS Academy</a></Fragment>
+    {course.name}
+    <Fragment slot="subtitle"
+      ><Text {...ensureValidStructuredTextProps({ data: course.introduction })} /></Fragment
+    >
+  </InterstitialTitle>
+  <Wrapper>
+    <Space top={1} bottom={2}>
+      <div class={s.layout}>
+        <div class={s.illustration}>
+          <Svg name={`svg/illustrations/${stripStega(course.illustration)}`} />
+        </div>
+        <ol class={s.chapters}>
+          {
+            course.chapters.map((chapter, index) => (
+              <li class={s.chapter}>
+                <span class={s.chapterNumber}>{String(index + 1).padStart(2, '0')}</span>
+                <a class={s.chapterLink} href={buildUrlForAcademyChapter(chapter)}>
+                  {chapter.title}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </Space>
+  </Wrapper>
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>
