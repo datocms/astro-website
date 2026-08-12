@@ -405,5 +405,7 @@ export default defineConfig({
       '/docs/react-router/setting-up-a-preview-mode',
     '/docs/remix/using-cache-tags': '/docs/content-delivery-api/cache-tags',
     '/docs/remix/[...rest]': '/docs/react-router/[...rest]',
+    '/cms/remix': '/docs/react-router',
+    '/cms/remix-cms': '/docs/react-router',
   },
 });
