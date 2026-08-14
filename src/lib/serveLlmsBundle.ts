@@ -18,10 +18,12 @@ function blobResponse(body: string | null) {
 }
 
 /**
- * The llms.txt bundles are generated nightly by the `llms-full` repo and stored
- * as public files in a Vercel Blob store. We stream them through this endpoint
- * (rather than redirecting) so the public URLs stay under datocms.com, and we
- * cache aggressively at the CDN so blob reads happen ~once per day per bundle.
+ * The llms.txt bundles are generated nightly by the `llms-txt` repo, stored in
+ * a private R2 bucket and served back out by its Cloudflare Worker at
+ * `llms-txt.datocms.com` (read-only, key-allowlisted). We stream them through
+ * this endpoint (rather than redirecting) so the public URLs stay under
+ * datocms.com, and we cache aggressively at the CDN so upstream reads happen
+ * ~once per day per bundle.
  *
  * Pass a single filename to serve one blob; pass multiple filenames to fetch,
  * concatenate, and return them as one response.

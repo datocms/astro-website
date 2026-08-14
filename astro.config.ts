@@ -133,8 +133,11 @@ export default defineConfig({
         access: 'public',
         optional: true,
       }),
-      // Public base URL of the Vercel Blob store that holds the generated
-      // llms.txt bundles (see the `llms-full` repo). No trailing slash.
+      // Base URL of the `llms-txt` Cloudflare Worker that serves the generated
+      // llms.txt bundles out of R2. No trailing slash.
+      //
+      // `access: 'public'` means this is inlined at build time, so changing it
+      // in the environment has no effect until the site is rebuilt.
       LLMS_BLOB_BASE_URL: envField.string({
         context: 'server',
         access: 'public',
