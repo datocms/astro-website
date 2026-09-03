@@ -25,4 +25,24 @@ const unmaskedData = readFragment(VideoPlayerFragment, data);
   */
 }
 
-<VideoPlayer {...rest} data={unmaskedData.video} accentColor="var(--accent-color)" client:visible />
+{
+  /*
+    `preferPlayback="mse"` forces hls.js instead of the browser's native HLS
+    engine. Recent Chromium versions report
+    `canPlayType('application/vnd.apple.mpegurl')` as "maybe" (verified on
+    Chrome 152), so mux-player started handing the .m3u8 straight to <video>: in
+    that mode the browser exposes neither the renditions nor the subtitle tracks
+    of the manifest, and the player silently drops the quality ("…") and CC
+    buttons. Firefox has no native HLS, so it kept using hls.js and kept both
+    buttons. This is only a preference: where MSE is unavailable (iOS Safari)
+    mux-player still falls back to native playback.
+  */
+}
+
+<VideoPlayer
+  {...rest}
+  data={unmaskedData.video}
+  accentColor="var(--accent-color)"
+  preferPlayback="mse"
+  client:visible
+/>
