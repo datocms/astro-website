@@ -4,7 +4,7 @@ import { MAILERLITE_TOKEN } from 'astro:env/server';
 import { z } from 'astro:schema';
 import { format } from 'date-fns';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
-import { isRecaptchaTokenValid } from '~/lib/recaptcha';
+import { isTurnstileTokenValid } from '~/lib/turnstile';
 
 export default defineAction({
   accept: 'form',
@@ -12,16 +12,18 @@ export default defineAction({
     email: z
       .string({ invalid_type_error: 'Please, enter your email! 😊' })
       .email('Please, enter a valid email! 😊'),
-    token: z.string(),
+    // Empty when no Turnstile sitekey is configured for the environment; the
+    // verifier decides whether that is acceptable.
+    token: z.string().optional(),
   }),
   handler: async (input) => {
     const { email, token } = input;
 
     try {
-      if (!(await isRecaptchaTokenValid(token))) {
+      if (!(await isTurnstileTokenValid(token, { action: 'newsletter' }))) {
         throw new ActionError({
           code: 'UNAUTHORIZED',
-          message: 'Invalid recaptcha token',
+          message: 'Invalid anti-bot token',
         });
       }
 

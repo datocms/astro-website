@@ -67,10 +67,6 @@ export default defineConfig({
         context: 'server',
         access: 'secret',
       }),
-      RECAPTCHA_SECRET_KEY: envField.string({
-        context: 'server',
-        access: 'secret',
-      }),
       // Cloudflare Turnstile secret for the forms. Unset → verification is skipped
       // for that environment (see `~/lib/turnstile`).
       TURNSTILE_SECRET_KEY: envField.string({
@@ -113,10 +109,6 @@ export default defineConfig({
       FRONT_CHANNEL_URL_SUPPORT: envField.string({
         context: 'server',
         access: 'secret',
-      }),
-      RECAPTCHA_KEY: envField.string({
-        context: 'client',
-        access: 'public',
       }),
       // Cloudflare Turnstile sitekey for the forms, baked at build time. Unset → no
       // widget is rendered (see `~/lib/loadTurnstile`).

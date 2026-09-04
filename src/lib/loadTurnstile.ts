@@ -106,3 +106,51 @@ export function loadTurnstile(): Promise<TurnstileApi> {
 
   return pendingLoad;
 }
+
+const widgetsByContainer = new WeakMap<HTMLElement, string>();
+
+/**
+ * One-shot helper for the non-React forms: renders an invisible
+ * (`interaction-only`) widget inside `container`, runs the challenge and
+ * resolves with the token. Any widget left in the container by a previous
+ * call is torn down first, since tokens are single-use.
+ *
+ * Resolves with `''` when no sitekey is configured for the environment.
+ */
+export async function solveTurnstile(container: HTMLElement, action: string): Promise<string> {
+  const sitekey = turnstileSiteKey;
+
+  if (!sitekey) {
+    return '';
+  }
+
+  const turnstile = await loadTurnstile();
+
+  return new Promise<string>((resolve, reject) => {
+    const previous = widgetsByContainer.get(container);
+
+    if (previous) {
+      turnstile.remove(previous);
+    }
+
+    const widgetId = turnstile.render(container, {
+      sitekey,
+      action,
+      theme: 'light',
+      size: 'flexible',
+      execution: 'execute',
+      appearance: 'interaction-only',
+      callback: resolve,
+      'error-callback'(errorCode) {
+        reject(new Error(`The anti-bot check failed (${errorCode}). Please reload and try again.`));
+        return true;
+      },
+      'timeout-callback'() {
+        reject(new Error('The anti-bot check timed out. Please try again.'));
+      },
+    });
+
+    widgetsByContainer.set(container, widgetId);
+    turnstile.execute(widgetId);
+  });
+}

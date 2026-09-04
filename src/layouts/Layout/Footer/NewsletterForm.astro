@@ -19,6 +19,7 @@ import { Button } from '~/components/Button';
             <input placeholder="Enter your email" name="email" />
             <Button as="button" p="tiny" fs="small">Subscribe! </Button>
           </form>
+          <div class={s.turnstile} data-turnstile></div>
           <div class={s.formMessage} data-status></div>
         </div>
       </div>
@@ -30,8 +31,7 @@ import { Button } from '~/components/Button';
   import { actions, isActionError } from 'astro:actions';
   import { isInputError } from 'astro:actions';
   import { WebComponent } from '~/lib/WebComponent';
-  import { loadRecaptcha } from '~/lib/loadRecaptcha';
-  import { RECAPTCHA_KEY } from 'astro:env/client';
+  import { solveTurnstile } from '~/lib/loadTurnstile';
 
   window.customElements.define(
     'subscribe-newsletter',
@@ -54,9 +54,16 @@ import { Button } from '~/components/Button';
         this.button.innerText = 'Submitting...';
         this.button.disabled = true;
 
-        const client = await loadRecaptcha();
+        let token: string;
 
-        const token = await client.execute(RECAPTCHA_KEY, { action: 'subscribeToNewsletter' });
+        try {
+          token = await solveTurnstile(this.$('[data-turnstile]'), 'newsletter');
+        } catch (e) {
+          status.innerHTML = e instanceof Error ? e.message : 'Mh! Something went wrong...';
+          this.button.innerText = 'Subscribe!';
+          this.button.disabled = false;
+          return;
+        }
 
         const formData = new FormData(this.form);
         formData.set('token', token);

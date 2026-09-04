@@ -7,7 +7,6 @@
 FROM node:22-alpine AS base
 
 ARG PUBLIC_HOSTNAME
-ARG RECAPTCHA_KEY
 ARG TURNSTILE_SITE_KEY
 ARG KNOWLEDGE_BASE_URL
 ARG LINKEDIN_PARTNER_ID
@@ -59,7 +58,6 @@ RUN --mount=type=secret,id=DATOCMS_API_TOKEN,env=DATOCMS_API_TOKEN \
     npx gql.tada generate schema https://graphql.datocms.com --header "X-Exclude-Invalid: true" --header "Authorization: Bearer $DATOCMS_API_TOKEN"
 
 # Build the actual Astro standalone production server
-ENV RECAPTCHA_KEY=$RECAPTCHA_KEY
 ENV TURNSTILE_SITE_KEY=$TURNSTILE_SITE_KEY
 ENV PUBLIC_HOSTNAME=$PUBLIC_HOSTNAME
 ENV KNOWLEDGE_BASE_URL=$KNOWLEDGE_BASE_URL

@@ -2,7 +2,7 @@ import { ActionError, defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
 import buildBasecampClient from '~/lib/basecamp';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
-import { isRecaptchaTokenValid } from '~/lib/recaptcha';
+import { isTurnstileTokenValid } from '~/lib/turnstile';
 
 const SUPPORT_TEAM = 33592869;
 const TRIAGE_COLUMN = 9255769099;
@@ -15,16 +15,18 @@ export default defineAction({
     reaction: z.enum(['positive', 'negative']),
     notes: z.string().optional(),
     email: z.string().email().optional(),
-    token: z.string(),
+    // Empty when no Turnstile sitekey is configured for the environment; the
+    // verifier decides whether that is acceptable.
+    token: z.string().optional(),
   }),
   handler: async (input) => {
     const { url, reaction, notes, email, token } = input;
 
     try {
-      if (!(await isRecaptchaTokenValid(token))) {
+      if (!(await isTurnstileTokenValid(token, { action: 'docs-feedback' }))) {
         throw new ActionError({
           code: 'UNAUTHORIZED',
-          message: 'Invalid recaptcha token',
+          message: 'Invalid anti-bot token',
         });
       }
 
