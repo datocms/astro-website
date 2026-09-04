@@ -35,6 +35,7 @@ export function Form() {
   return (
     <div className={s.form}>
       <FormReactComponent
+        turnstileAction="partner-program"
         defaultValues={defaultValues}
         submitLabel="Let's have a chat!"
         onSubmit={async (formData) => {

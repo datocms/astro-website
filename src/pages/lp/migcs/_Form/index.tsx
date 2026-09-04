@@ -43,6 +43,7 @@ export function Form() {
   return (
     <div className={s.form}>
       <FormReactComponent
+        turnstileAction="lp-migcs"
         defaultValues={defaultValues}
         submitLabel="Request a migration call"
         onSubmit={async (formData) => {

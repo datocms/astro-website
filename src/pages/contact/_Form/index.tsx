@@ -39,6 +39,7 @@ export function Form({ issueType }: { issueType: 'sales' | 'enterprise' }) {
   return (
     <div className={s.root}>
       <FormReactComponent
+        turnstileAction="contact"
         defaultValues={defaultValues}
         submitLabel="Get in touch"
         onSubmit={async (formData) => {

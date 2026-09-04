@@ -3,7 +3,7 @@ import { z } from 'astro:schema';
 import { hasMarketingConsent } from '~/lib/consent';
 import { trackConversion } from '~/lib/linkedin';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
-import { isRecaptchaTokenValid } from '~/lib/recaptcha';
+import { isTurnstileTokenValid } from '~/lib/turnstile';
 import { isSpam } from '~/lib/spam';
 import {
   createLead,
@@ -25,14 +25,16 @@ export default defineAction({
     currentCms: z.string(),
     country: z.string(),
     body: z.string(),
-    token: z.string(),
+    // Empty when no Turnstile sitekey is configured for the environment; the
+    // verifier decides whether that is acceptable.
+    token: z.string().optional(),
   }),
   handler: async ({ token, ...input }, { request, cookies }) => {
     try {
-      if (!(await isRecaptchaTokenValid(token))) {
+      if (!(await isTurnstileTokenValid(token, { action: 'lp-migcs' }))) {
         throw new ActionError({
           code: 'UNAUTHORIZED',
-          message: 'Invalid recaptcha token',
+          message: 'Invalid anti-bot token',
         });
       }
 

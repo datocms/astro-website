@@ -3,7 +3,7 @@ import { ActionError, defineAction } from 'astro:actions';
 import { SLACK_TOKEN } from 'astro:env/server';
 import { z } from 'astro:schema';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
-import { isRecaptchaTokenValid } from '~/lib/recaptcha';
+import { isTurnstileTokenValid } from '~/lib/turnstile';
 
 interface ErrorResponse {
   data: {
@@ -35,15 +35,17 @@ export default defineAction({
     email: z
       .string({ invalid_type_error: 'Please, enter your email! 😊' })
       .email('Please, enter a valid email! 😊'),
-    token: z.string(),
+    // Empty when no Turnstile sitekey is configured for the environment; the
+    // verifier decides whether that is acceptable.
+    token: z.string().optional(),
   }),
   handler: async (input) => {
     const { email, token } = input;
 
-    if (!(await isRecaptchaTokenValid(token))) {
+    if (!(await isTurnstileTokenValid(token, { action: 'slack-invite' }))) {
       throw new ActionError({
         code: 'UNAUTHORIZED',
-        message: 'Invalid recaptcha token',
+        message: 'Invalid anti-bot token',
       });
     }
 

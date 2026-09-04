@@ -5,7 +5,7 @@ import { hasMarketingConsent } from '~/lib/consent';
 import { sendToFrontChannel } from '~/lib/front';
 import { trackConversion } from '~/lib/linkedin';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
-import { isRecaptchaTokenValid } from '~/lib/recaptcha';
+import { isTurnstileTokenValid } from '~/lib/turnstile';
 import { isSpam } from '~/lib/spam';
 import {
   createLead,
@@ -29,15 +29,17 @@ export default defineAction({
     email: z.string(),
     country: z.string(),
     body: z.string(),
-    token: z.string(),
+    // Empty when no Turnstile sitekey is configured for the environment; the
+    // verifier decides whether that is acceptable.
+    token: z.string().optional(),
   }),
   handler: async ({ token, ...input }, { request, cookies }) => {
     try {
-      // Step 1: Validate reCAPTCHA token
-      if (!(await isRecaptchaTokenValid(token))) {
+      // Step 1: Validate Turnstile token
+      if (!(await isTurnstileTokenValid(token, { action: 'partner-program' }))) {
         throw new ActionError({
           code: 'UNAUTHORIZED',
-          message: 'Invalid recaptcha token',
+          message: 'Invalid anti-bot token',
         });
       }
 
