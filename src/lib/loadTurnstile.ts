@@ -151,6 +151,6 @@ export async function solveTurnstile(container: HTMLElement, action: string): Pr
     });
 
     widgetsByContainer.set(container, widgetId);
-    turnstile.execute(widgetId);
+    turnstile.execute(container);
   });
 }

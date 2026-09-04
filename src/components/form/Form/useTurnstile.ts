@@ -119,8 +119,9 @@ export function useTurnstile(action: string) {
     }
 
     const widgetId = widgetIdRef.current;
+    const container = containerRef.current;
 
-    if (!widgetId) {
+    if (!(widgetId && container)) {
       throw new TurnstileError('The anti-bot check is not ready yet. Please try again.');
     }
 
@@ -129,8 +130,10 @@ export function useTurnstile(action: string) {
       settle({ error: new TurnstileError('Superseded by a newer submission') });
       pendingRef.current = { resolve, reject };
 
+      // Per the Cloudflare docs, `execute` addresses the container while the
+      // other methods take the widget ID.
       turnstile.reset(widgetId);
-      turnstile.execute(widgetId);
+      turnstile.execute(container);
     });
   }, [settle]);
 
