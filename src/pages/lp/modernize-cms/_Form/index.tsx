@@ -43,6 +43,7 @@ export function Form() {
   return (
     <div className={s.form}>
       <FormReactComponent
+        turnstileAction="lp-modernize-cms"
         defaultValues={defaultValues}
         submitLabel="Request your free migration assessment"
         onSubmit={async (formData) => {

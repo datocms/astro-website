@@ -45,6 +45,8 @@ import { Button } from '~/components/Button';
         If you need a reply, <a href="/support">please contact support</a> instead.
       </p>
 
+      <div class={s.turnstile} data-turnstile></div>
+
       <Button as="button" p="small" block type="submit">Submit feedback</Button>
     </div>
   </form>
@@ -53,9 +55,8 @@ import { Button } from '~/components/Button';
     import { actions } from 'astro:actions';
     import { isInputError } from 'astro:actions';
     import { WebComponent } from '~/lib/WebComponent';
-    import { loadRecaptcha } from '~/lib/loadRecaptcha';
+    import { solveTurnstile } from '~/lib/loadTurnstile';
     import { isActionError } from 'astro:actions';
-    import { RECAPTCHA_KEY } from 'astro:env/client';
 
     window.customElements.define(
       'share-feedback',
@@ -76,9 +77,14 @@ import { Button } from '~/components/Button';
           this.button.innerText = 'Submitting...';
           this.button.disabled = true;
 
-          const client = await loadRecaptcha();
+          let token: string;
 
-          const token = await client.execute(RECAPTCHA_KEY, { action: 'sendFeedbackAboutDocPage' });
+          try {
+            token = await solveTurnstile(this.$('[data-turnstile]'), 'docs-feedback');
+          } catch (e) {
+            this.form.innerHTML = e instanceof Error ? e.message : 'Mh! Something went wrong...';
+            return;
+          }
 
           const formData = new FormData(this.form);
           formData.set('token', token);

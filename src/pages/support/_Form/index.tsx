@@ -34,6 +34,7 @@ export function Form({ initialValues = {} }: Props) {
   return (
     <div className={s.root}>
       <FormReactComponent
+        turnstileAction="support"
         defaultValues={defaultValues}
         submitLabel="Get in touch"
         onSubmit={async (formData) => {

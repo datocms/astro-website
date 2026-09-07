@@ -7,18 +7,22 @@ import {
   type FieldValues,
   type SubmitHandler,
 } from 'react-hook-form';
-import { useRecaptcha } from 'react-recaptcha-hook';
 import toast, { Toaster } from 'react-hot-toast';
 import s from './style.module.css';
-import { RECAPTCHA_KEY } from 'astro:env/client';
 import { ButtonReactComponent } from '~/components/Button/ReactComponent';
 import { isActionError, isInputError } from 'astro:actions';
+import { TurnstileError, useTurnstile } from './useTurnstile';
 
 type Props<TFieldValues extends FieldValues = FieldValues> = {
   children: ReactNode;
   defaultValues?: DefaultValues<TFieldValues>;
   submitLabel?: ReactNode;
   onSubmit?: (data: FormData) => Promise<void>;
+  /**
+   * Label of this form in the Cloudflare Turnstile analytics, ie. `contact`.
+   * The action verifying the token must expect the same value.
+   */
+  turnstileAction: string;
 };
 
 export function FormReactComponent<TFieldValues extends FieldValues = FieldValues>({
@@ -26,12 +30,9 @@ export function FormReactComponent<TFieldValues extends FieldValues = FieldValue
   defaultValues,
   submitLabel,
   onSubmit,
+  turnstileAction,
 }: Props<TFieldValues>) {
-  const execute = useRecaptcha({
-    // must be v3 Recaptcha!
-    sitekey: RECAPTCHA_KEY,
-    hideDefaultBadge: true,
-  });
+  const turnstile = useTurnstile(turnstileAction);
 
   const methods = useForm<TFieldValues>({
     defaultValues: defaultValues,
@@ -42,10 +43,10 @@ export function FormReactComponent<TFieldValues extends FieldValues = FieldValue
   const defaultSubmit: SubmitHandler<TFieldValues> = async (_values, event) => {
     event?.preventDefault();
 
-    const token = await execute('form');
-
     if (onSubmit && event?.target) {
       try {
+        const token = await turnstile.getToken();
+
         // Create FormData from the native form element
         const formData = new FormData(event.target as HTMLFormElement);
         formData.append('token', token);
@@ -58,7 +59,7 @@ export function FormReactComponent<TFieldValues extends FieldValues = FieldValue
           }
         }
 
-        if (isActionError(e)) {
+        if (isActionError(e) || e instanceof TurnstileError) {
           toast.error(e.message);
         } else {
           toast.error('Ouch! There was an error submitting the form!');
@@ -78,6 +79,9 @@ export function FormReactComponent<TFieldValues extends FieldValues = FieldValue
       <Toaster position="bottom-right" toastOptions={{ className: s.toastNotification }} />
       <form className={s.form} onSubmit={handleSubmit(defaultSubmit)}>
         {children}
+
+        {/* Invisible unless Cloudflare needs the visitor to click a checkbox */}
+        <div ref={turnstile.containerRef} className={s.turnstile} />
 
         <div className={s.submit}>
           <div className={s.agree}>

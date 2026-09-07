@@ -44,6 +44,7 @@ export function Form() {
   return (
     <div className={s.form}>
       <FormReactComponent
+        turnstileAction="lp-nuxt2eol"
         defaultValues={defaultValues}
         submitLabel="Request your free assessment"
         onSubmit={async (formData) => {

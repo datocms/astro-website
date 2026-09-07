@@ -6,6 +6,7 @@ import { navigate } from 'astro:transitions/client';
 export function Form() {
   return (
     <FormReactComponent
+      turnstileAction="slack-invite"
       defaultValues={{ email: '' }}
       submitLabel="Get my Slack invite!"
       onSubmit={async (values) => {
