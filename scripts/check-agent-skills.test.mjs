@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { test } from 'node:test';
+import { test } from 'vitest';
 import { checkAgentSkills } from './check-agent-skills.mjs';
 
 const revision = '86c533b74c2913e590797eb0b2622d2cdfe5cf68';
