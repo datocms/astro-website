@@ -3,41 +3,30 @@ import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
 const archiveUrl =
-  /^https:\/\/raw\.githubusercontent\.com\/datocms\/agent-skills\/([a-f0-9]{40})\/zips\/(datocms(?:-[a-z0-9]+)*)\.zip$/;
+  /^https:\/\/raw\.githubusercontent\.com\/datocms\/agent-skills\/([a-f0-9]{40})\/zips\/datocms\.zip$/;
 
 export async function checkAgentSkills(index, fetchArchive = fetch) {
-  if (!Array.isArray(index.skills) || index.skills.length === 0) {
-    throw new Error('The skill index must contain at least one archive.');
+  if (
+    !Array.isArray(index.skills) ||
+    index.skills.length !== 1 ||
+    index.skills[0]?.name !== 'datocms'
+  ) {
+    throw new Error('The discovery index must advertise only the datocms skill.');
   }
-  const names = new Set();
-  let revision;
-  for (const entry of index.skills) {
-    const match = typeof entry.url === 'string' && entry.url.match(archiveUrl);
-    if (!match || entry.type !== 'archive' || match[2] !== entry.name) {
-      throw new Error(`Invalid or unpinned archive URL for ${entry.name}.`);
-    }
-    if (names.has(entry.name)) throw new Error(`Duplicate skill: ${entry.name}.`);
-    names.add(entry.name);
-    if (revision && revision !== match[1]) {
-      throw new Error('All skill archives must use the same immutable revision.');
-    }
-    revision = match[1];
-    if (!/^sha256:[a-f0-9]{64}$/.test(entry.digest || '')) {
-      throw new Error(`Invalid digest for ${entry.name}.`);
-    }
-    const response = await fetchArchive(entry.url, {
-      signal: AbortSignal.timeout(30_000),
-    });
-    if (!response.ok) {
-      throw new Error(`Cannot fetch ${entry.name}: HTTP ${response.status}.`);
-    }
-    const bytes = Buffer.from(await response.arrayBuffer());
-    const digest = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
-    if (digest !== entry.digest) {
-      throw new Error(`Archive digest mismatch for ${entry.name}.`);
-    }
+  const entry = index.skills[0];
+  const match = typeof entry.url === 'string' && entry.url.match(archiveUrl);
+  if (!match || entry.type !== 'archive') {
+    throw new Error('Invalid or unpinned datocms archive URL.');
   }
-  return { count: names.size, revision };
+  if (!/^sha256:[a-f0-9]{64}$/.test(entry.digest || '')) {
+    throw new Error('Invalid digest for datocms.');
+  }
+  const response = await fetchArchive(entry.url, { signal: AbortSignal.timeout(30_000) });
+  if (!response.ok) throw new Error(`Cannot fetch datocms: HTTP ${response.status}.`);
+  const bytes = Buffer.from(await response.arrayBuffer());
+  const digest = `sha256:${createHash('sha256').update(bytes).digest('hex')}`;
+  if (digest !== entry.digest) throw new Error('Archive digest mismatch for datocms.');
+  return { count: 1, revision: match[1] };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
