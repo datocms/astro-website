@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { test } from 'vitest';
 import { checkAgentSkills } from './check-agent-skills.mjs';
 
-const revision = 'b22e0f87d52bd1a20f146191ba760ce46616150e';
+const revision = 'cf3d1bd2af63c95d657fa80f7c242827c689db7f';
 const bytes = Buffer.from('fixture archive bytes');
 function entry() {
   return {
