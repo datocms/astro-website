@@ -1,15 +1,16 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import { test } from 'vitest';
 import { checkAgentSkills } from './check-agent-skills.mjs';
 
-const revision = '86c533b74c2913e590797eb0b2622d2cdfe5cf68';
+const revision = '85199280596f8679f4b78d6b48ea7cfa4d15b4ca';
 const bytes = Buffer.from('fixture archive bytes');
-function entry(name = 'datocms-cma') {
+function entry() {
   return {
-    name,
+    name: 'datocms',
     type: 'archive',
-    url: `https://raw.githubusercontent.com/datocms/agent-skills/${revision}/zips/${name}.zip`,
+    url: `https://raw.githubusercontent.com/datocms/agent-skills/${revision}/zips/datocms.zip`,
     digest: `sha256:${createHash('sha256').update(bytes).digest('hex')}`,
   };
 }
@@ -51,15 +52,35 @@ test('rejects failed downloads', async () => {
   );
 });
 
-test('rejects empty and duplicate catalogs', async () => {
-  await assert.rejects(checkAgentSkills({ skills: [] }, ok), /at least one/);
-  await assert.rejects(checkAgentSkills({ skills: [entry(), entry()] }, ok), /Duplicate/);
+test('rejects empty, duplicate, and legacy catalogs', async () => {
+  for (const skills of [[], [entry(), entry()], [{ ...entry(), name: 'datocms-cma' }]]) {
+    await assert.rejects(checkAgentSkills({ skills }, ok), /only the datocms skill/);
+  }
 });
 
-test('rejects mismatched archive names and mixed revisions', async () => {
-  const mismatched = { ...entry(), name: 'datocms-cli' };
-  await assert.rejects(checkAgentSkills({ skills: [mismatched] }, ok), /Invalid/);
-  const another = entry('datocms-cli');
-  another.url = another.url.replace(revision, 'a'.repeat(40));
-  await assert.rejects(checkAgentSkills({ skills: [entry(), another] }, ok), /same immutable/);
+test('rejects old archive names and malformed digests', async () => {
+  const legacy = {
+    ...entry(),
+    url: entry().url.replace('zips/datocms.zip', 'zips/datocms-cma.zip'),
+  };
+  await assert.rejects(checkAgentSkills({ skills: [legacy] }, ok), /Invalid/);
+  await assert.rejects(
+    checkAgentSkills({ skills: [{ ...entry(), digest: 'sha256:bad' }] }, ok),
+    /Invalid digest/,
+  );
+});
+
+test('the checked-in catalog contains one pinned unified archive', async () => {
+  const index = JSON.parse(
+    await readFile(
+      new URL('../src/documents/well-known/agent-skills/index.json', import.meta.url),
+      'utf8',
+    ),
+  );
+  assert.deepEqual(
+    index.skills.map(({ name }) => name),
+    ['datocms'],
+  );
+  assert.match(index.skills[0].url, /\/[a-f0-9]{40}\/zips\/datocms\.zip$/);
+  assert.match(index.skills[0].digest, /^sha256:[a-f0-9]{64}$/);
 });

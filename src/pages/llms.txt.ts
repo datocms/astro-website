@@ -9,7 +9,7 @@ const BLOCKQUOTE =
 
 const AGENTS_SECTION = (url: (path: string) => string) => `## For agents
 
-- [Agent skills](${url('/.well-known/agent-skills/index.json')}): Index of skills for AI coding agents working with DatoCMS projects
+- [DatoCMS skill](${url('/.well-known/agent-skills/index.json')}): One self-contained skill for DatoCMS coding tasks, with selectively loaded topic references
 - [API catalog](${url('/.well-known/api-catalog')}): Machine-readable catalog of DatoCMS APIs for agent discovery
 - [MCP server card](${url('/.well-known/mcp.json')}): JSON card describing the DatoCMS MCP server
 - [MCP server](https://mcp.datocms.com): Let Claude and other AI assistants chat with your DatoCMS projects
