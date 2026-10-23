@@ -149,6 +149,14 @@ export default defineConfig({
         access: 'public',
         optional: true,
       }),
+      // Base URL of the `datocms-ui-fonts` Cloudflare Worker
+      // (`workers/ui-fonts/`) that serves the UI fonts out of R2. No trailing
+      // slash. Inlined at build time, like LLMS_BLOB_BASE_URL.
+      UI_FONTS_BASE_URL: envField.string({
+        context: 'server',
+        access: 'public',
+        optional: true,
+      }),
     },
     validateSecrets: false,
   },
