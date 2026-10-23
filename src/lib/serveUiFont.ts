@@ -3,8 +3,10 @@ import { UI_FONTS_BASE_URL } from 'astro:env/server';
 /**
  * The UI fonts of the DatoCMS product (the cms, the dashboard and the
  * plugins) live in a private R2 bucket, served by the `datocms-ui-fonts`
- * Cloudflare Worker (`workers/ui-fonts/`). The font licences do not allow
- * the files in this public repository.
+ * Cloudflare Worker (`workers/ui-fonts/`). The licence of ABC Oracle does
+ * not allow the file in this public repository. Geist Mono has a free
+ * licence, but it is in the bucket too, thus the plugins get all their
+ * fonts from one place.
  *
  * We stream them through datocms.com, thus the URL stays the same if the
  * storage changes. The file name has no version: a new file in the bucket
@@ -17,7 +19,12 @@ export async function serveUiFont(request: Request, filename: string): Promise<R
     return new Response('Not found', { status: 404 });
   }
 
-  const upstream = await fetch(`${UI_FONTS_BASE_URL}/${filename}`);
+  const upstream = await fetch(`${UI_FONTS_BASE_URL}/${encodeURIComponent(filename)}`);
+
+  if (upstream.status === 404) {
+    await upstream.body?.cancel();
+    return new Response('Not found', { status: 404 });
+  }
 
   if (!upstream.ok || !upstream.body) {
     return new Response('Bad gateway', { status: 502 });

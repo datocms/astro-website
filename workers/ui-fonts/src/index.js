@@ -1,11 +1,9 @@
 // Serves the UI fonts of DatoCMS out of the private `datocms-ui-fonts` R2
-// bucket. The font licences do not allow the files in a public repository,
-// thus they live only in the bucket. www.datocms.com streams them through
-// `src/pages/fonts/` (see `src/lib/serveUiFont.ts`).
+// bucket. The licence of ABC Oracle does not allow the file in a public
+// repository, thus it lives only in the bucket. www.datocms.com streams the
+// files through `src/pages/fonts/` (see `src/lib/serveUiFont.ts`).
 
-// Only these keys are served. A file in the bucket that is not here stays
-// private.
-const FILES = new Set(['ABCOracleVariable.woff2']);
+import { FILES } from './files.js';
 
 export default {
   async fetch(request, env) {
