@@ -41,6 +41,34 @@ function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
+const PING_ENDPOINT = 'https://graphql.datocms.com/geo/ping';
+
+/** The timed requests after the first one. The latency is their median. */
+const PING_SAMPLES = 5;
+
+/**
+ * One request to the endpoint. The edge answers it alone, with its code.
+ * The time is the TTFB from the Resource Timing (the endpoint sends
+ * Timing-Allow-Origin), or the time of the fetch when the browser does
+ * not give it.
+ */
+async function pingEdge(signal, n) {
+  // A new URL for each request: its Resource Timing entry is its own
+  const url = `${PING_ENDPOINT}?n=${n}-${Date.now()}`;
+  const start = performance.now();
+  const response = await fetch(url, { cache: 'no-store', credentials: 'omit', signal });
+  const fetched = performance.now() - start;
+  const data = await response.json();
+  // Without Timing-Allow-Origin, the browser gives 0 for the two times
+  const entry = performance.getEntriesByName(url).at(-1);
+  const ttfb = entry && entry.responseStart > 0 && entry.requestStart > 0;
+
+  return {
+    datacenter: (data.datacenter ?? '').slice(0, 3).toUpperCase(),
+    ms: ttfb ? entry.responseStart - entry.requestStart : fetched,
+  };
+}
+
 const useData = (url) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -104,25 +132,27 @@ export default function CdnMapReactComponent({ children, datacenters }) {
     const abortController = new AbortController();
 
     async function run() {
-      const start = new Date();
-
       const signal = abortController.signal;
-      const data = await ky('https://graphql.staging-datocms.com/geo/ping', { signal }).json();
-
-      const end = new Date();
-      setPing({ ...data, latency: Number.parseInt((end - start) * 0.8) });
-
-      if (!currentDataCenter) {
-        setAndScroll(data.datacenter.slice(0, 3).toUpperCase());
+      // The first request opens the connection: it is not timed
+      await pingEdge(signal, 0);
+      const samples = [];
+      for (let i = 1; i <= PING_SAMPLES; i++) {
+        samples.push(await pingEdge(signal, i));
       }
+      const times = samples.map((sample) => sample.ms).sort((a, b) => a - b);
+      const datacenter = samples.at(-1).datacenter;
+
+      setPing({ datacenter, latency: Math.round(times[Math.floor(times.length / 2)]) });
+      setAndScroll(datacenter);
     }
 
-    run();
+    run().catch(() => {});
 
     return () => {
       abortController.abort();
     };
-  }, [setPing, setAndScroll, currentDataCenter]);
+    // The measure goes one time, when the component mounts
+  }, []);
 
   return (
     <div className={s.root}>
