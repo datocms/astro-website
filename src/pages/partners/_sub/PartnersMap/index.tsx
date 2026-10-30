@@ -1,6 +1,6 @@
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 import worldMap from './world-110m.json';
-import Wrapper from '~/components/Wrapper/ReactComponent';
+import Wrapper from '~/components/legacy/Wrapper/ReactComponent';
 import s from './style.module.css';
 
 export default function PartnersMap({

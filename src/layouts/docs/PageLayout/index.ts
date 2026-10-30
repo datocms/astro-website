@@ -1,7 +1,7 @@
 import type { AstroGlobal } from 'astro';
 import type { FragmentOf } from 'gql.tada';
 import type { ComponentProps } from 'react';
-import type { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import type { DraftModeQueryListener } from '~/components/legacy/DraftModeQueryListener';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import type { GroupLayoutFragment } from '../GroupLayout/_graphql';
 import { docGroupQuery, docPageQuery, PageLayoutFragment } from './_graphql';

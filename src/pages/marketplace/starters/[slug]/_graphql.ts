@@ -1,4 +1,4 @@
-import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {

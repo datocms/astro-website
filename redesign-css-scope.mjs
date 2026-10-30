@@ -9,14 +9,14 @@
  * - npm run lint:css (scripts/lint-css.mjs). It lints only the CSS of
  *   the redesign. The old CSS does not obey the rules of stylelint.config.mjs.
  *
- * Why lists: the components of the prototype keep the same paths here,
- * thus a path does not tell the old family from the new family.
+ * The rule for the components: an old component lives in
+ * src/components/legacy/. Every other directory of src/components/ is
+ * new. Do not add a directory in src/components/legacy/. Delete a
+ * directory there when no page uses it.
  *
- * - LEGACY_COMPONENT_DIRS: the directories of src/components/ that are
- *   NOT from the prototype. This list is frozen. Remove a name when you
- *   delete its directory. Do not add a name: a new old component is a
- *   mistake. Every other directory of src/components/ is from the
- *   prototype, thus a new component of the prototype needs no change here.
+ * Why a list for the pages: a ported page lives in the same directory
+ * as an old page, thus the path does not tell the family.
+ *
  * - REDESIGN_PAGE_DIRS: the directories (and files) of src/pages/ that
  *   are ported pages. Add the directory of each page that you port (step
  *   3 and later of PLAN.md). The CSS modules in them get the layer
@@ -24,59 +24,8 @@
  *   directory: add its files one by one. Never add the root itself.
  */
 
-export const LEGACY_COMPONENT_DIRS = [
-  'blocks',
-  'Bullets',
-  'CalloutCard',
-  'Card',
-  'Carousel',
-  'Checks',
-  'Code',
-  'docs',
-  'DraftModeQueryListener',
-  'Faqs',
-  'featureAnimations',
-  'filtering',
-  'Flag',
-  'form',
-  'Heading',
-  'HeroShader',
-  'inlineRecords',
-  'IntegrationsBanner',
-  'InterstitialTitle',
-  'Journey',
-  'JsonLd',
-  'LegacyButton',
-  'LegacyHero',
-  'LegacyPagination',
-  'LegacyProse',
-  'LegacyQuote',
-  'LegacyResponsiveImage',
-  'LegacyStructuredText',
-  'LegalProse',
-  'Lightbox',
-  'links',
-  'linkToRecords',
-  'LLMDate',
-  'LogosBar',
-  'Markdown',
-  'MarkdownActionsDropdown',
-  'pluginToolkit',
-  'Result',
-  'SameLevelNavigation',
-  'Search',
-  'SidebarPane',
-  'Space',
-  'StripWithContent',
-  'Svg',
-  'Tabs',
-  'TargetToggler',
-  'TitleStripWithContent',
-  'Tooltip',
-  'UiChrome',
-  'VideoPlayer',
-  'Wrapper',
-];
+/** The path prefix of the old components. */
+const LEGACY_COMPONENTS_PREFIX = 'legacy/';
 
 /**
  * Paths relative to src/pages/, without a slash at the end: a directory
@@ -105,8 +54,6 @@ export const REDESIGN_PAGE_DIRS = [
   'features/_graphql.ts',
 ];
 
-const legacyComponents = new Set(LEGACY_COMPONENT_DIRS);
-
 /**
  * Tell if a CSS file is part of the redesign.
  * @param {string} path An absolute path or a path relative to the root of the repository.
@@ -121,8 +68,7 @@ export function redesignCssArea(path) {
   if (!area || rest === undefined) return null;
 
   if (area === 'components') {
-    const dir = rest.split('/')[0] ?? '';
-    return legacyComponents.has(dir) ? null : 'components';
+    return rest.startsWith(LEGACY_COMPONENTS_PREFIX) ? null : 'components';
   }
 
   if (area === 'pages') {
@@ -155,5 +101,5 @@ export function redesignCssGlobs() {
  * @returns {string[]}
  */
 export function legacyCssIgnoreGlobs() {
-  return LEGACY_COMPONENT_DIRS.map((dir) => `src/components/${dir}/**`);
+  return ['src/components/legacy/**'];
 }

@@ -1,0 +1,117 @@
+---
+import { MaybeLink } from '~/components/legacy/links/MaybeLink';
+import s from './style.module.css';
+
+type Props = {
+  badge?: { emoji: string; name: string } | null;
+  background?: 'azure' | 'pink' | 'blue' | 'green' | 'yellow' | 'gray';
+  boxed?: boolean;
+  boxedVisual?: boolean;
+  class?: string;
+  highlight?: string;
+  href?: string;
+  target?: astroHTML.JSX.HTMLAttributeAnchorTarget;
+  label?: string;
+  lineClamp?: number;
+  orientation?: 'horizontal' | 'vertical';
+  size?: 'small' | 'micro' | 'medium' | 'large' | 'xlarge';
+  svgLogo?: { url: string; alt: string | null };
+  title: string;
+  fullTitleLength?: boolean | undefined;
+  noForcedAspectRatio?: boolean;
+};
+
+const {
+  badge,
+  background,
+  boxed = true,
+  boxedVisual = true,
+  class: className,
+  highlight,
+  href,
+  target,
+  label,
+  lineClamp = 10,
+  orientation = 'vertical',
+  size = 'medium',
+  svgLogo,
+  title,
+  fullTitleLength = false,
+  noForcedAspectRatio = false,
+} = Astro.props;
+---
+
+<MaybeLink
+  href={href}
+  target={target}
+  class:list={[s.card, className]}
+  data-size={size}
+  data-orientation={orientation}
+  data-boxed=`${boxed}`
+  data-boxed-visual=`${boxedVisual}`
+  data-no-forced-aspect-ratio=`${noForcedAspectRatio}`
+>
+  {
+    highlight && (
+      <div class={s.highlightBadge}>
+        <span>{highlight}</span>
+      </div>
+    )
+  }
+  <div class={s.visualWrapper}>
+    {
+      Astro.slots.has('image') ? (
+        <slot name="image" />
+      ) : Astro.slots.has('svgLogo') ? (
+        <figure class={s.visualTechnology} data-bkg={background ?? null}>
+          <slot name="svgLogo" />
+        </figure>
+      ) : svgLogo ? (
+        <figure class={s.visualTechnology} data-bkg={background ?? null}>
+          <img loading="lazy" alt={svgLogo.alt} class={s.technology} src={svgLogo.url} />
+        </figure>
+      ) : null
+    }
+  </div>
+  <div class={s.cardContent}>
+    <div class={s.cardTitle} data-full-title-length={fullTitleLength}>
+      {Astro.slots.has('title') ? <slot name="title" /> : <>{title}</>}
+    </div>
+    <div class={s.cardBody}>
+      <p class={s.cardDescription} style=`--lineClamp: ${lineClamp}`>
+        <slot />
+      </p>
+      {
+        Astro.slots.has('below') && (
+          <div class={s.below}>
+            <slot name="below" />
+          </div>
+        )
+      }
+      {
+        Astro.slots.has('image') && svgLogo && (
+          <div class={s.subImageWrapper}>
+            <img loading="lazy" alt={svgLogo.alt} class={s.subImage} src={svgLogo.url} />
+          </div>
+        )
+      }
+    </div>
+    {
+      (badge || label) && (
+        <footer class={s.cardFooter}>
+          {badge && (
+            <div class={s.cardBadge}>
+              <span class={s.cardBadgeEmoji}>{badge.emoji}</span>
+              <span class={s.cardBadgeName}>{badge.name}</span>
+            </div>
+          )}
+          {label && (
+            <div class={s.cardLabel}>
+              <span class={s.cardBadgeName}>{label}</span>
+            </div>
+          )}
+        </footer>
+      )
+    }
+  </div>
+</MaybeLink>

@@ -1,0 +1,14 @@
+import { VideoPlayerFragment } from '~/components/legacy/VideoPlayer/graphql';
+import { graphql } from '~/lib/datocms/graphql';
+
+export const InternalVideoFragment = graphql(
+  /* GraphQL */ `
+    fragment InternalVideoFragment on InternalVideoRecord {
+      video {
+        title
+        ...VideoPlayerFragment
+      }
+    }
+  `,
+  [VideoPlayerFragment],
+);

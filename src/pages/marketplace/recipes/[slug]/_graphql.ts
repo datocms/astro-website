@@ -1,9 +1,9 @@
-import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
-import { MaybeVideoPlayerFragment } from '~/components/VideoPlayer/graphql';
-import { ImageFragment } from '~/components/blocks/Image/graphql';
-import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
-import { defaultInlineRecordFragments } from '~/components/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
+import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
+import { MaybeVideoPlayerFragment } from '~/components/legacy/VideoPlayer/graphql';
+import { ImageFragment } from '~/components/legacy/blocks/Image/graphql';
+import { InternalVideoFragment } from '~/components/legacy/blocks/InternalVideo/graphql';
+import { defaultInlineRecordFragments } from '~/components/legacy/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/legacy/linkToRecords';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { buildUrlForRecipe, RecipeUrlFragment } from '~/lib/datocms/gqlUrlBuilder/recipe';

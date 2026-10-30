@@ -1,5 +1,5 @@
-import { defaultInlineRecordFragments } from '~/components/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
+import { defaultInlineRecordFragments } from '~/components/legacy/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/legacy/linkToRecords';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {

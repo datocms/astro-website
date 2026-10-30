@@ -1,4 +1,4 @@
-import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
 import { PluginUrlFragment } from '~/lib/datocms/gqlUrlBuilder/plugin';
 import { graphql } from '~/lib/datocms/graphql';
 

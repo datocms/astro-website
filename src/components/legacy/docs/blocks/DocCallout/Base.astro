@@ -1,0 +1,46 @@
+---
+import s from './style.module.css';
+import { Svg } from '~/components/legacy/Svg';
+import { Prose } from '~/components/legacy/LegacyProse';
+
+interface Props {
+  calloutType: string;
+  title?: string | null;
+}
+
+const { calloutType, title } = Astro.props;
+---
+
+<figure data-datocms-content-link-boundary>
+  <prose-island>
+    <div
+      class:list={[s.docCallout, s[`docCallout--${calloutType}`]]}
+      data-callout-type={calloutType}
+    >
+      {
+        title && (
+          <div class={s.docCalloutTitle}>
+            {calloutType === 'neutral' ? (
+              <Svg name="icons/regular/circle-info" />
+            ) : calloutType === 'warning' ? (
+              <Svg name="icons/regular/triangle-exclamation" />
+            ) : calloutType === 'positive' ? (
+              <Svg name="icons/regular/face-smile" />
+            ) : calloutType === 'protip' ? (
+              <Svg name="icons/regular/wand-magic" />
+            ) : null}{' '}
+            <span data-callout-title>
+              {calloutType === 'protip' && 'Pro tip: '}
+              {title}
+            </span>
+          </div>
+        )
+      }
+      <div data-callout-content>
+        <Prose class={s.content}>
+          <slot />
+        </Prose>
+      </div>
+    </div>
+  </prose-island>
+</figure>

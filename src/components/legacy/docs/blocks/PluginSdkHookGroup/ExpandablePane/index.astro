@@ -1,0 +1,24 @@
+---
+import { Svg } from '~/components/legacy/Svg';
+import s from './style.module.css';
+
+type Props = {
+  label?: string;
+};
+
+const { label } = Astro.props;
+---
+
+<details class={s.pane}>
+  <summary class={s.expandablePaneButton}>
+    <Svg name="icons/regular/chevron-right" class={s.closedSvg} /><Svg
+      name="icons/regular/chevron-down"
+      class={s.openSvg}
+    />
+    {label}
+  </summary>
+
+  <div class={s.expandablePaneContent}>
+    <slot />
+  </div>
+</details>

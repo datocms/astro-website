@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
 import { SECRET_API_TOKEN } from 'astro:env/server';
-import { maybeInvalidateFetchPluginSdkManifest } from '~/components/docs/blocks/PluginSdkHookGroup';
-import { maybeInvalidateCmaHyperschema } from '~/components/docs/cmaApi/fetchSchema';
-import { maybeInvalidateCloudflareDatacenters } from '~/components/featureAnimations/CdnMap/utils';
+import { maybeInvalidateFetchPluginSdkManifest } from '~/components/legacy/docs/blocks/PluginSdkHookGroup';
+import { maybeInvalidateCmaHyperschema } from '~/components/legacy/docs/cmaApi/fetchSchema';
+import { maybeInvalidateCloudflareDatacenters } from '~/components/legacy/featureAnimations/CdnMap/utils';
 import { maybeInvalidateFavicon } from '~/layouts/BaseLayout/fetchFavicon';
 import { maybeInvalidateNavbar } from '~/layouts/LegacyLayout/Navbar/fetchNavbar';
 import {

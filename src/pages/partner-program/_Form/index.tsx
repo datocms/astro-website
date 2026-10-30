@@ -2,8 +2,8 @@ import { getData } from 'country-list';
 import { navigate } from 'astro:transitions/client';
 import Textarea from 'react-textarea-autosize';
 import s from './style.module.css';
-import { FormReactComponent } from '~/components/form/Form/ReactComponent';
-import { FieldReactComponent } from '~/components/form/Field/ReactComponent';
+import { FormReactComponent } from '~/components/legacy/form/Form/ReactComponent';
+import { FieldReactComponent } from '~/components/legacy/form/Field/ReactComponent';
 import { getCookie } from '~/lib/cookies';
 import { actions } from 'astro:actions';
 

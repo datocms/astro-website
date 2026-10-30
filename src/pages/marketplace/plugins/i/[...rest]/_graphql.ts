@@ -1,5 +1,5 @@
-import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
-import { MaybeVideoPlayerFragment } from '~/components/VideoPlayer/graphql';
+import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
+import { MaybeVideoPlayerFragment } from '~/components/legacy/VideoPlayer/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { PluginUrlFragment, buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';

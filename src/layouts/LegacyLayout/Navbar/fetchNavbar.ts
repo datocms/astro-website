@@ -4,8 +4,8 @@ import type { TadaDocumentNode } from 'gql.tada';
 import {
   PartnerTestimonialQuoteFragment,
   ReviewQuoteFragment,
-} from '~/components/LegacyQuote/graphql';
-import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
+} from '~/components/legacy/LegacyQuote/graphql';
+import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
 import { dataSource } from '~/lib/dataSource';
 import { BlogPostUrlFragment } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { CustomerStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/customerStory';

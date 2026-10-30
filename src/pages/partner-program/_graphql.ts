@@ -1,4 +1,4 @@
-import { PartnerTestimonialQuoteFragment } from '~/components/LegacyQuote/graphql';
+import { PartnerTestimonialQuoteFragment } from '~/components/legacy/LegacyQuote/graphql';
 import { PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { graphql } from '~/lib/datocms/graphql';
 

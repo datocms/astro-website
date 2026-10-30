@@ -1,0 +1,46 @@
+---
+import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
+import s from './style.module.css';
+import { Toc } from './Toc';
+import type { TocGroup } from './types';
+import { MarkdownActionsDropdown } from '~/components/legacy/MarkdownActionsDropdown';
+
+type Props = {
+  tocGroups: TocGroup[];
+};
+
+const { tocGroups } = Astro.props;
+
+const baseUrl = buildBaseUrl(Astro);
+
+const markdownUrl = new URL(
+  Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
+  baseUrl,
+);
+---
+
+<div class={s.articleContainer}>
+  {
+    tocGroups.length > 0 ? (
+      <div class={s.sidebar} data-datocms-noindex>
+        <Toc groups={tocGroups} />
+      </div>
+    ) : (
+      <div class={s.emptySidebar} />
+    )
+  }
+  <article class={s.article} id="main-content">
+    <div class={s.header}>
+      <div class={s.headerTitles}>
+        <div class={s.kicker} data-datocms-noindex>
+          <slot name="kicker" />
+        </div>
+      </div>
+      <MarkdownActionsDropdown className={s.markdownActions} markdownUrl={markdownUrl.href} />
+    </div>
+    <h1 class={s.title}>
+      <slot name="title" />
+    </h1>
+    <slot />
+  </article>
+</div>

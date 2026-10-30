@@ -1,6 +1,6 @@
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
-import { FaqBlockFragment } from '~/components/Faqs/graphql';
+import { FaqBlockFragment } from '~/components/legacy/Faqs/graphql';
 
 export const query = graphql(
   /* GraphQL */ `

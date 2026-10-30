@@ -21,8 +21,8 @@ const MAX_CLIENT_CHUNK_SIZE_IN_KB = 500;
  *
  * This plugin puts a CSS module in a layer only when it is CSS of the
  * redesign (redesignCssArea() in redesign-css-scope.mjs):
- * - the modules of src/components/, except the old directories in
- *   LEGACY_COMPONENT_DIRS;
+ * - the modules of src/components/, except the old components in
+ *   src/components/legacy/;
  * - the modules of src/scenes/;
  * - the modules of the ported pages in REDESIGN_PAGE_DIRS;
  * - the CSS of the scene kit (@datocms/product-scenes).

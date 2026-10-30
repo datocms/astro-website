@@ -3,9 +3,9 @@ import s from './style.module.css';
 import { SupportTopicFragment } from '../_graphql';
 import type { ResultOf } from 'gql.tada';
 import { Form } from '../_Form';
-import { Form as SalesForm } from '~/components/form/SalesForm';
+import { Form as SalesForm } from '~/components/legacy/form/SalesForm';
 import { parseUrlSearchParams, useSearchParams } from './utils';
-import ProseReactComponent from '~/components/LegacyProse/ReactComponent';
+import ProseReactComponent from '~/components/legacy/LegacyProse/ReactComponent';
 import { stripStega } from '@datocms/astro';
 
 type GqlTopic = ResultOf<typeof SupportTopicFragment>;

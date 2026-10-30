@@ -1,5 +1,5 @@
-import { FormReactComponent } from '~/components/form/Form/ReactComponent';
-import { FieldReactComponent } from '~/components/form/Field/ReactComponent';
+import { FormReactComponent } from '~/components/legacy/form/Form/ReactComponent';
+import { FieldReactComponent } from '~/components/legacy/form/Field/ReactComponent';
 import { actions } from 'astro:actions';
 import { navigate } from 'astro:transitions/client';
 

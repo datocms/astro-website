@@ -1,4 +1,4 @@
-import { fetchCmaSchema } from '~/components/docs/cmaApi/fetchSchema';
+import { fetchCmaSchema } from '~/components/legacy/docs/cmaApi/fetchSchema';
 import { invariant } from '~/lib/invariant';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';

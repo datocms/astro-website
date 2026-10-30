@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getSvgFile } from '~/components/Svg/utils';
+import { getSvgFile } from '~/components/legacy/Svg/utils';
 
 export const GET: APIRoute = async ({ params }) => {
   const html = getSvgFile(`icons/${params.rest}`);
