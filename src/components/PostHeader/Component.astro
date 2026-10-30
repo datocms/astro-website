@@ -1,13 +1,18 @@
 ---
+import { MarkdownActions } from '~/components/MarkdownActions';
 import { Section } from '~/components/Section';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { formatLongDate } from '~/lib/format/date';
 import { ChatHeaderFragment, PostHeaderFragment } from './graphql';
 import styles from './style.module.css';
 
-type Props =
+type Props = (
   | { post: FragmentOf<typeof PostHeaderFragment>; chat?: never }
-  | { chat: FragmentOf<typeof ChatHeaderFragment>; post?: never };
+  | { chat: FragmentOf<typeof ChatHeaderFragment>; post?: never }
+) & {
+  /** The address of the Markdown version of the page. With it, the header shows MarkdownActions. */
+  markdownUrl?: string;
+};
 
 const chat = Astro.props.chat ? readFragment(ChatHeaderFragment, Astro.props.chat) : undefined;
 const post = Astro.props.post ? readFragment(PostHeaderFragment, Astro.props.post) : undefined;
@@ -45,8 +50,8 @@ const names = new Intl.ListFormat('en', { type: 'conjunction' }).format(
     </div>
     <p class="subtitleMedium">
       Posted on <time datetime={date}>{formatLongDate(date)}</time><br />
-      {isChat ? 'In conversation with' : 'by'}
-      {names}
+      {isChat ? 'In conversation with' : 'by'}{' '}{names}
     </p>
   </div>
+  {Astro.props.markdownUrl && <MarkdownActions markdownUrl={Astro.props.markdownUrl} />}
 </Section>

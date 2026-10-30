@@ -1,9 +1,6 @@
 ---
-import {
-  render as toPlainText,
-  type StructuredTextDocument,
-} from 'datocms-structured-text-to-plain-text';
 import { MediaCard } from '~/components/MediaCard';
+import { PlainText } from '~/components/StructuredText';
 import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { readFragment } from '~/lib/datocms/graphql';
@@ -23,40 +20,70 @@ const people = chat ? chat.people : post!.author;
 const names = new Intl.ListFormat('en', { type: 'conjunction' }).format(
   people.map((person) => person.name),
 );
-const excerpt = toPlainText(item.excerpt.value as StructuredTextDocument) ?? undefined;
+
+// The CMS keeps the Unsplash username of a photo in its custom data.
+const unsplashUsername = (item.coverImage?.customData as Record<string, string> | null)
+  ?.unsplash_author_username;
+const credit =
+  item.coverImage?.author && unsplashUsername
+    ? {
+        author: item.coverImage.author,
+        href: `https://unsplash.com/@${unsplashUsername}?utm_source=datocms&utm_medium=referral`,
+      }
+    : undefined;
 ---
 
 {
   /*
   The card of the case studies (MediaCard): the excerpt in
   place of the description, a byline in place of the logo.
+  The credit of the photo is a link, thus it cannot be inside
+  the link of the card: it is on top of the card.
 */
 }
-<MediaCard
-  href={href}
-  image={item.coverImage ? { src: item.coverImage.url, alt: item.coverImage.alt ?? '' } : undefined}
-  imageShape="cover"
-  title={item.title}
-  description={excerpt}
->
-  <span class={styles.byline}>
-    <span class={styles.avatars}>
-      {
-        people.map((person) => (
-          <img
-            class={styles.avatar}
-            src={person.avatar.url}
-            alt=""
-            width="30"
-            height="30"
-            loading="lazy"
-          />
-        ))
-      }
+<div class={styles.root}>
+  <MediaCard
+    href={href}
+    image={item.coverImage
+      ? { src: item.coverImage.url, alt: item.coverImage.alt ?? '' }
+      : undefined}
+    imageShape="cover"
+    title={item.title}
+  >
+    <PlainText slot="description" data={item.excerpt} />
+    <span class={styles.byline}>
+      <span class={styles.avatars}>
+        {
+          people.map((person) => (
+            <img
+              class={styles.avatar}
+              src={person.avatar.url}
+              alt=""
+              width="30"
+              height="30"
+              loading="lazy"
+            />
+          ))
+        }
+      </span>
+      <span class:list={[styles.text, 'caption']}>
+        <span class={styles.names}>{chat ? `Casual chat with ${names}` : names}</span>
+        <time class={styles.date} datetime={date}>{formatLongDate(date)}</time>
+      </span>
     </span>
-    <span class:list={[styles.text, 'caption']}>
-      <span class={styles.names}>{chat ? `Casual chat with ${names}` : names}</span>
-      <time class={styles.date} datetime={date}>{formatLongDate(date)}</time>
-    </span>
-  </span>
-</MediaCard>
+  </MediaCard>
+  {
+    credit && (
+      <div class={styles.creditBox}>
+        <a
+          class:list={[styles.credit, 'caption']}
+          href={credit.href}
+          target="_blank"
+          rel="noopener"
+        >
+          Photo by {credit.author}
+        </a>
+      </div>
+    )
+  }
+</div>

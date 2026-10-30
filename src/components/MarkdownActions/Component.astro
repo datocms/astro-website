@@ -1,0 +1,165 @@
+---
+import chevron from '~/assets/icons/chevron.svg?raw';
+import anthropicIcon from '~/icons/brands/anthropic.svg?raw';
+import chatgptIcon from '~/icons/brands/chatgpt.svg?raw';
+import markdownIcon from '~/icons/brands/markdown.svg?raw';
+import checkIcon from '~/icons/regular/check.svg?raw';
+import copyIcon from '~/icons/regular/copy.svg?raw';
+import linkIcon from '~/icons/regular/link.svg?raw';
+import styles from './style.module.css';
+
+interface Props {
+  /** The address of the Markdown version of the page (the page address + ".md"). */
+  markdownUrl: string;
+}
+
+const { markdownUrl } = Astro.props;
+const request = `Read ${markdownUrl} so I can ask questions about it.`;
+const links = [
+  { label: 'View as Markdown', href: markdownUrl, icon: markdownIcon },
+  {
+    label: 'Open in ChatGPT',
+    href: `https://chatgpt.com/?hints=search&q=${encodeURIComponent(request)}`,
+    icon: chatgptIcon,
+  },
+  {
+    label: 'Open in Claude',
+    href: `https://claude.ai/new?q=${encodeURIComponent(request)}`,
+    icon: anthropicIcon,
+  },
+];
+---
+
+{
+  /*
+  A button that copies the page as Markdown, and a menu with more actions
+  on the Markdown version. Without JS the buttons cannot copy, thus the
+  control stays hidden. The search index skips it.
+*/
+}
+<div class={styles.root} data-markdown-actions={markdownUrl} data-datocms-noindex hidden>
+  <div class={styles.pill}>
+    <button type="button" class:list={[styles.part, 'caption']} data-action="copy-page">
+      <span class={styles.icon} aria-hidden="true" data-icon="copy" set:html={copyIcon} />
+      <span class={styles.icon} aria-hidden="true" data-icon="done" hidden set:html={checkIcon} />
+      <span data-label>Copy page</span>
+    </button>
+    <button
+      type="button"
+      class:list={[styles.part, styles.toggle]}
+      aria-label="More actions on the Markdown version"
+      aria-expanded="false"
+      data-action="toggle"
+    >
+      <span class={styles.chevron} aria-hidden="true" set:html={chevron} />
+    </button>
+  </div>
+  <ul class={styles.menu} data-menu hidden>
+    <li>
+      <button type="button" class:list={[styles.item, 'caption']} data-action="copy-link">
+        <span class={styles.icon} aria-hidden="true" set:html={linkIcon} />
+        Copy Markdown link
+      </button>
+    </li>
+    {
+      links.map((link) => (
+        <li>
+          <a
+            class:list={[styles.item, 'caption']}
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class={styles.icon} aria-hidden="true" set:html={link.icon} />
+            {link.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-markdown-actions]')) {
+    const url = root.dataset.markdownActions!;
+    const copyPage = root.querySelector<HTMLButtonElement>('[data-action="copy-page"]')!;
+    const copyLink = root.querySelector<HTMLButtonElement>('[data-action="copy-link"]')!;
+    const toggle = root.querySelector<HTMLButtonElement>('[data-action="toggle"]')!;
+    const menu = root.querySelector<HTMLElement>('[data-menu]')!;
+    const label = copyPage.querySelector<HTMLElement>('[data-label]')!;
+    const copyIcon = copyPage.querySelector<HTMLElement>('[data-icon="copy"]')!;
+    const doneIcon = copyPage.querySelector<HTMLElement>('[data-icon="done"]')!;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    root.hidden = false;
+
+    const setOpen = (open: boolean) => {
+      menu.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+    };
+
+    // For one second, the button shows that the copy is done.
+    const showDone = () => {
+      copyIcon.hidden = true;
+      doneIcon.hidden = false;
+      label.textContent = 'Copied';
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        copyIcon.hidden = false;
+        doneIcon.hidden = true;
+        label.textContent = 'Copy page';
+      }, 1000);
+    };
+
+    const fetchMarkdown = async () => {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`Status ${response.status}`);
+      return response.text();
+    };
+
+    const copyPageText = async () => {
+      // Safari keeps the user gesture only when the promise goes into the ClipboardItem.
+      if (typeof ClipboardItem !== 'undefined') {
+        const blob = fetchMarkdown().then((text) => new Blob([text], { type: 'text/plain' }));
+        await navigator.clipboard.write([new ClipboardItem({ 'text/plain': blob })]);
+      } else {
+        await navigator.clipboard.writeText(await fetchMarkdown());
+      }
+    };
+
+    copyPage.addEventListener('click', async () => {
+      copyPage.setAttribute('aria-busy', 'true');
+      try {
+        await copyPageText();
+        showDone();
+      } catch (error) {
+        console.error('[MarkdownActions] cannot copy the page', error);
+      } finally {
+        copyPage.removeAttribute('aria-busy');
+      }
+    });
+
+    copyLink.addEventListener('click', async () => {
+      setOpen(false);
+      try {
+        await navigator.clipboard.writeText(url);
+        showDone();
+      } catch (error) {
+        console.error('[MarkdownActions] cannot copy the link', error);
+      }
+    });
+
+    toggle.addEventListener('click', () => setOpen(menu.hidden));
+    menu.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('a')) setOpen(false);
+    });
+    document.addEventListener('click', (event) => {
+      if (!root.contains(event.target as Node)) setOpen(false);
+    });
+    root.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !menu.hidden) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>

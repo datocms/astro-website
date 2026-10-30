@@ -1,0 +1,35 @@
+---
+import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
+import { TableOfContents, tableOfContentsHeadings } from '~/components/TableOfContents';
+import styles from './style.module.css';
+
+interface Props {
+  /** The Structured Text field in the slot. The table of contents reads its headings. */
+  content: { value: unknown };
+  /** The title of the table of contents, for example "In this article". */
+  tocTitle: string;
+}
+
+const { content, tocTitle } = Astro.props;
+const headings = tableOfContentsHeadings(content);
+---
+
+{
+  /*
+  The text of a blog post or a casual chat, in the reading column. When
+  the text has many headings, a table of contents comes first. From 1152,
+  the table is in the column at the left, and it stays in view while the
+  text scrolls.
+*/
+}
+<Section as="article" contentClass={styles.content}>
+  {
+    headings.length > 0 && (
+      <TableOfContents title={tocTitle} headings={headings} class={styles.toc} />
+    )
+  }
+  <Prose class={styles.text}>
+    <slot />
+  </Prose>
+</Section>

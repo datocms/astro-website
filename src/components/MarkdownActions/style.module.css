@@ -1,0 +1,103 @@
+/* @layer blocks */
+.root {
+  position: relative;
+}
+
+.root[hidden] {
+  display: none;
+}
+
+.pill {
+  display: inline-flex;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+}
+
+.part {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  height: 32px;
+  padding: 0 var(--space-sm);
+  color: var(--text-primary);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.part[aria-busy='true'] {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.toggle {
+  padding: 0 var(--space-xs);
+  border-left: 1px solid var(--border-strong);
+  border-radius: 0 var(--radius-full) var(--radius-full) 0;
+}
+
+.icon {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+}
+
+.icon[hidden] {
+  display: none;
+}
+
+.icon :global(svg),
+.chevron :global(svg) {
+  width: 100%;
+  height: 100%;
+}
+
+.chevron {
+  display: inline-flex;
+  width: 10px;
+  height: 6px;
+}
+
+.toggle[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+/* The menu opens under the pill, centred on it. */
+.menu {
+  position: absolute;
+  top: calc(100% + var(--space-3xs));
+  left: 50%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  padding: var(--space-3xs);
+  list-style: none;
+  text-align: left;
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  transform: translateX(-50%);
+}
+
+.menu[hidden] {
+  display: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-2xs) var(--space-xs);
+  color: var(--text-primary);
+  white-space: nowrap;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .part:hover,
+  .item:hover {
+    background: var(--surface-inverse-faint);
+  }
+}

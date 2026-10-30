@@ -1,7 +1,6 @@
 ---
-import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import type { Heading } from 'datocms-structured-text-utils';
-import { slugify } from '~/lib/slugify';
+import { headingId } from './headingId';
 
 interface Props {
   node: Heading;
@@ -11,7 +10,7 @@ const { node } = Astro.props;
 const Tag = `h${node.level}` as const;
 
 // Give each heading an id. The links with a hash go to it.
-const id = slugify(toPlainText(node));
+const id = headingId(node);
 ---
 
 <Tag id={id}><slot /></Tag>

@@ -11,6 +11,8 @@ import { graphql } from '~/lib/datocms/graphql';
  * "Cover image (5:3)"). An old cover with a different shape is not
  * cropped: it fits in the box, and a blur of the image fills the rest (as
  * on the old site).
+ *
+ * `author` and `customData` give the credit of an Unsplash photo.
  */
 
 export const PostTeaserFragment = graphql(
@@ -22,6 +24,8 @@ export const PostTeaserFragment = graphql(
       ...BlogPostUrlFragment
       coverImage {
         alt
+        author
+        customData
         url(imgixParams: { w: 1080, h: 648, fit: fill, fill: blur })
       }
       excerpt {
@@ -48,6 +52,8 @@ export const ChatTeaserFragment = graphql(
       ...CustomerStoryUrlFragment
       coverImage {
         alt
+        author
+        customData
         url(imgixParams: { w: 1080, h: 648, fit: fill, fill: blur })
       }
       excerpt {

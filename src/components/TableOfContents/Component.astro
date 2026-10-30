@@ -1,0 +1,46 @@
+---
+import type { Heading } from 'datocms-structured-text-utils';
+import { PlainText } from '~/components/StructuredText';
+import { headingId } from '~/components/StructuredText/headingId';
+import styles from './style.module.css';
+
+interface Props {
+  /** For example "In this article". */
+  title: string;
+  /** The headings of the content, from tableOfContentsHeadings(). */
+  headings: Heading[];
+  class?: string;
+}
+
+const { title, headings, class: className } = Astro.props;
+const topLevel = Math.min(...headings.map((heading) => heading.level));
+---
+
+{
+  /*
+  The links to the headings of an article. The ids come from headingId(),
+  as in HeadingNode. A heading below the top level is indented.
+  The search index and the Markdown version of the page skip this list.
+*/
+}
+<nav
+  class:list={[styles.root, className]}
+  aria-label={title}
+  data-datocms-noindex
+  data-datocms-nomd
+>
+  <p class:list={[styles.title, 'subtitleMedium']}>{title}</p>
+  <ol class={styles.list}>
+    {
+      headings.map((heading) => (
+        <li class={heading.level > topLevel ? styles.nested : undefined}>
+          <a class:list={[styles.link, 'body']} href={`#${headingId(heading)}`}>
+            <PlainText
+              data={{ value: { schema: 'dast', document: { type: 'root', children: [heading] } } }}
+            />
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
