@@ -1,5 +1,13 @@
 ---
-import Posts from './p/[pageIndex]/index.astro';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import FeedPage from './_FeedPage.astro';
+import { loadFeedPage } from './_feed';
+
+const feed = await loadFeedPage(Astro, 1, { kind: 'all' });
+if (!feed) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
 ---
 
-<Posts pageIndex={1} />
+<FeedPage feed={feed} />

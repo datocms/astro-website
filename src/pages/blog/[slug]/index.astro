@@ -1,54 +1,30 @@
 ---
-import {
-  render as toPlainText,
-  type StructuredTextDocument,
-} from 'datocms-structured-text-to-plain-text';
-import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
-import { isHeading } from 'datocms-structured-text-utils';
-import { CopyPromptButton } from '~/components/blocks/CopyPromptButton';
-import { Image } from '~/components/blocks/Image';
-import { ImageCarousel } from '~/components/blocks/ImageCarousel';
-import { InternalVideo } from '~/components/blocks/InternalVideo';
-import { CodesandboxEmbedBlock } from '~/components/blocks/CodesandboxEmbedBlock';
-import { CtaButton } from '~/components/blocks/CtaButton';
-import { Demo } from '~/components/blocks/Demo';
-import { MultipleDemosBlock } from '~/components/blocks/MultipleDemosBlock';
-import { ShowcaseProjectBlock } from '~/components/blocks/ShowcaseProjectBlock';
-import { Table } from '~/components/blocks/Table';
-import { TabsBlock } from '~/components/blocks/TabsBlock';
-import { TutorialVideo } from '~/components/blocks/TutorialVideo';
-import { Video } from '~/components/blocks/Video';
-import { QuestionAnswer } from '~/components/blocks/QuestionAnswer';
-import { InterstitialTitle } from '~/components/InterstitialTitle';
-import { ResponsiveImage } from '~/components/LegacyResponsiveImage';
-import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/LegacyStructuredText/Text';
-import { Wrapper } from '~/components/Wrapper';
-import { Layout } from '~/layouts/LegacyLayout';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { filterNodes } from '~/lib/datocms/filterNodes';
-import LLMDate from '~/components/LLMDate/Component.astro';
-import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
-import { slugify } from '~/lib/slugify';
-import { query, siblingsQuery } from './_graphql';
-import { Prose } from '~/components/LegacyProse';
+// A blog post. The casual chats are at /blog/casual-chats/[slug].
+import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
+import { ArticleBody } from '~/components/ArticleBody';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { JsonLd } from '~/components/JsonLd';
+import { PostHeader } from '~/components/PostHeader';
+import { RelatedPosts } from '~/components/RelatedPosts';
+import { StructuredText } from '~/components/StructuredText';
+import { defaultBlockComponents } from '~/components/StructuredText/blocks';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import * as blog from '~/data/blog';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
 import {
+  extractFromSeoTags,
   overrideSeo,
-  seoTwitterCard,
   seoCanonical,
   seoOgType,
-  extractFromSeoTags,
+  seoTwitterCard,
 } from '~/lib/datocms/seo';
-import { JsonLd } from '~/components/JsonLd';
+import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
 import { publisherRef } from '~/lib/jsonLd';
-import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
-import { defaultInlineRecordComponents } from '~/components/inlineRecords';
-import { SameLevelNavigation } from '~/components/SameLevelNavigation';
-import { Card } from '~/components/Card';
-import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
-import { MarkdownActionsDropdown } from '~/components/MarkdownActionsDropdown';
-import s from './_style.module.css';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { loadRelated } from '../_related';
+import { query } from './_graphql';
 
 const variables = { slug: Astro.params.slug! };
 const { post } = await executeQuery(Astro, query, { variables });
@@ -58,26 +34,10 @@ if (!post) {
   return notFoundResponse();
 }
 
-const tocItems = filterNodes(
-  (post.content.value as StructuredTextDocument).document,
-  isHeading,
-).map((heading) => {
-  const innerText = toPlainText(heading)!;
-
-  return {
-    url: `#${slugify(innerText)}`,
-    label: innerText,
-  };
-});
-
-const dateTime = post._firstPublishedAt ? post._firstPublishedAt : post._createdAt;
-
-const { previous, next } = await executeQuery(Astro, siblingsQuery, {
-  variables: { dateTime, slug: post.slug },
-});
+const related = await loadRelated(Astro, post);
 
 const baseUrl = buildBaseUrl(Astro);
-const { description: seoDescription, image: seoImage } = extractFromSeoTags(post.seo);
+const { description, image } = extractFromSeoTags(post.seo);
 const markdownUrl = new URL(
   Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
   baseUrl,
@@ -91,6 +51,8 @@ const markdownUrl = new URL(
     seoOgType('article'),
     seoTwitterCard('summary_large_image'),
   )}
+  seoAnalysis={post.yoastAnalysis}
+  headerVariant="light"
 >
   <Fragment slot="head">
     {
@@ -109,143 +71,46 @@ const markdownUrl = new URL(
         />
       )
     }
-    {post.author.map((a) => <meta property="article:author" content={a.name} />)}
+    {
+      post.author.map((author) => (
+        <meta property="article:author" content={stripStega(author.name)} />
+      ))
+    }
+    {/* The JSON-LD values are plain strings: they must not contain stega. */}
     <JsonLd
       data={{
         '@context': 'https://schema.org',
         '@type': 'BlogPosting',
-        headline: post.title,
+        headline: stripStega(post.title),
         url: new URL(Astro.url.pathname, baseUrl).href,
-        datePublished: dateTime,
+        datePublished: post._firstPublishedAt ?? post._createdAt,
         dateModified: post._publishedAt ? new Date(post._publishedAt).toISOString() : undefined,
-        author: post.author.map((a) => ({ '@type': 'Person' as const, name: a.name })),
+        author: post.author.map((author) => ({
+          '@type': 'Person' as const,
+          name: stripStega(author.name),
+        })),
         publisher: publisherRef(baseUrl),
-        description: seoDescription,
-        image: seoImage,
+        description,
+        image,
       }}
     />
   </Fragment>
 
+  {/* The Markdown version of the page (markdownProxy) has only this element. */}
   <div id="main-content">
-    <InterstitialTitle seoAnalysis={post.yoastAnalysis} style="two" mainTitleOfPage>
-      {post.title}
-
-      <Fragment slot="kicker"
-        ><span data-datocms-nomd>{post.seoH1 || 'The DatoCMS Blog'}</span></Fragment
-      >
-    </InterstitialTitle>
-    <div class={s.postWrapper}>
-      <Wrapper>
-        <div class={s.info}>
-          <div class={s.avatarWrapper} data-datocms-noindex>
-            {
-              post.author.map((author, i) => (
-                <ResponsiveImage
-                  pictureClass={s.avatar}
-                  data={author.avatar.responsiveImage}
-                  pictureStyle={{ zIndex: 10 - i }}
-                />
-              ))
-            }
-          </div>
-          <p>
-            Posted on{' '}
-            {post._firstPublishedAt ? <LLMDate date={post._firstPublishedAt} /> : '???'}{' '}
-            by{' '}
-            {
-              post.author.map((author, i) => (
-                <span>
-                  {author.name}
-                  {i < post.author.length - 2 ? ', ' : i === post.author.length - 2 ? ' and ' : ''}
-                </span>
-              ))
-            }
-          </p>
-          <MarkdownActionsDropdown markdownUrl={markdownUrl.href} />
-        </div>
-
-        <Prose class={s.body}>
-          <Text
-            {...ensureValidStructuredTextProps({
-              data: post.content,
-              blockComponents: {
-                ImageRecord: Image,
-                ImageCarouselRecord: ImageCarousel,
-                TableRecord: Table,
-                TabsBlockRecord: TabsBlock,
-                DemoRecord: Demo,
-                MultipleDemosBlockRecord: MultipleDemosBlock,
-                InternalVideoRecord: InternalVideo,
-                TutorialVideoRecord: TutorialVideo,
-                VideoRecord: Video,
-                ShowcaseProjectBlockRecord: ShowcaseProjectBlock,
-                CodesandboxEmbedBlockRecord: CodesandboxEmbedBlock,
-                CtaButtonRecord: CtaButton,
-                QuestionAnswerRecord: QuestionAnswer,
-                CopyPromptButtonBlockRecord: CopyPromptButton,
-              },
-              linkToRecordComponents: defaultLinkToRecordComponents,
-              inlineRecordComponents: defaultInlineRecordComponents,
-            })}
-          />
-        </Prose>
-      </Wrapper>
-      {
-        tocItems.length > 4 && (
-          <div class={s.tocWrapper} data-datocms-noindex>
-            <div class={s.toc}>
-              <div class={s.tocTitle}>In this article:</div>
-              <ul>
-                {tocItems.map((item) => (
-                  <li>
-                    <a href={item.url}>{item.label}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        )
-      }
-    </div>
+    <PostHeader post={post} markdownUrl={markdownUrl.href} />
+    <ArticleBody content={post.content} tocTitle="In this article">
+      <StructuredText
+        {...ensureValidStructuredTextProps({
+          data: post.content,
+          blockComponents: defaultBlockComponents,
+          linkToRecordComponents: defaultLinkToRecordComponents,
+          inlineRecordComponents: defaultInlineRecordComponents,
+        })}
+      />
+    </ArticleBody>
   </div>
-
-  {
-    (previous || next) && (
-      <SameLevelNavigation
-        title="Want more?"
-        subtitle="Check out other recent stories we've written on our blog"
-      >
-        {previous && (
-          <Card
-            href={buildUrlForBlogPost(previous)}
-            title={previous.title}
-            orientation="horizontal"
-            size="small"
-            fullTitleLength={true}
-          >
-            <Fragment slot="image">
-              <ResponsiveImage data={previous.coverImage.responsiveImage} />
-            </Fragment>
-            {previous._firstPublishedAt ? <LLMDate date={previous._firstPublishedAt} /> : '???'}
-          </Card>
-        )}
-        {next && (
-          <Card
-            href={buildUrlForBlogPost(next)}
-            title={next.title}
-            orientation="horizontal"
-            size="small"
-            fullTitleLength={true}
-          >
-            <Fragment slot="image">
-              <ResponsiveImage data={next.coverImage.responsiveImage} />
-            </Fragment>
-            {next._firstPublishedAt ? <LLMDate date={next._firstPublishedAt} /> : '???'}
-          </Card>
-        )}
-      </SameLevelNavigation>
-    )
-  }
+  {related.length > 0 && <RelatedPosts {...blog.related} posts={related} />}
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

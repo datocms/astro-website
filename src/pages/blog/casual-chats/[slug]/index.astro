@@ -1,0 +1,116 @@
+---
+// A casual chat: a record of the model CustomerStory.
+import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
+import { ArticleBody } from '~/components/ArticleBody';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { JsonLd } from '~/components/JsonLd';
+import { PostHeader } from '~/components/PostHeader';
+import { RelatedPosts } from '~/components/RelatedPosts';
+import { StructuredText } from '~/components/StructuredText';
+import { defaultBlockComponents } from '~/components/StructuredText/blocks';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import * as blog from '~/data/blog';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import {
+  extractFromSeoTags,
+  overrideSeo,
+  seoCanonical,
+  seoOgType,
+  seoTwitterCard,
+} from '~/lib/datocms/seo';
+import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
+import { publisherRef } from '~/lib/jsonLd';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { loadRelated } from '../../_related';
+import { query } from './_graphql';
+
+const variables = { slug: Astro.params.slug! };
+const { chat: post } = await executeQuery(Astro, query, { variables });
+
+if (!post) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const related = await loadRelated(Astro, post);
+
+const baseUrl = buildBaseUrl(Astro);
+const { description, image } = extractFromSeoTags(post.seo);
+const markdownUrl = new URL(
+  Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
+  baseUrl,
+);
+---
+
+<Layout
+  seo={overrideSeo(
+    post.seo,
+    post.canonicalUrl ? seoCanonical(post.canonicalUrl) : undefined,
+    seoOgType('article'),
+    seoTwitterCard('summary_large_image'),
+  )}
+  seoAnalysis={post.yoastAnalysis}
+  headerVariant="light"
+>
+  <Fragment slot="head">
+    {
+      post._firstPublishedAt && (
+        <meta
+          property="article:published_time"
+          content={new Date(post._firstPublishedAt).toISOString()}
+        />
+      )
+    }
+    {
+      post._publishedAt && (
+        <meta
+          property="article:modified_time"
+          content={new Date(post._publishedAt).toISOString()}
+        />
+      )
+    }
+    {
+      post.people.map((person) => (
+        <meta property="article:author" content={stripStega(person.name)} />
+      ))
+    }
+    {/* The JSON-LD values are plain strings: they must not contain stega. */}
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: stripStega(post.title),
+        url: new URL(Astro.url.pathname, baseUrl).href,
+        datePublished: post._firstPublishedAt ?? post._createdAt,
+        dateModified: post._publishedAt ? new Date(post._publishedAt).toISOString() : undefined,
+        author: post.people.map((author) => ({
+          '@type': 'Person' as const,
+          name: stripStega(author.name),
+        })),
+        publisher: publisherRef(baseUrl),
+        description,
+        image,
+      }}
+    />
+  </Fragment>
+
+  {/* The Markdown version of the page (markdownProxy) has only this element. */}
+  <div id="main-content">
+    <PostHeader chat={post} markdownUrl={markdownUrl.href} />
+    <ArticleBody content={post.content} tocTitle="In this story">
+      <StructuredText
+        {...ensureValidStructuredTextProps({
+          data: post.content,
+          blockComponents: defaultBlockComponents,
+          linkToRecordComponents: defaultLinkToRecordComponents,
+          inlineRecordComponents: defaultInlineRecordComponents,
+        })}
+      />
+    </ArticleBody>
+  </div>
+  {related.length > 0 && <RelatedPosts {...blog.relatedToChat} posts={related} />}
+
+  <DraftModeQueryListener query={query} variables={variables} />
+</Layout>

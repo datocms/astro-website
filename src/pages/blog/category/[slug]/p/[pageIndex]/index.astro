@@ -1,0 +1,18 @@
+---
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import FeedPage from '../../../../_FeedPage.astro';
+import { feedBaseUrl, loadFeedPage, parsePageIndex, type FeedFilter } from '../../../../_feed';
+
+const filter: FeedFilter = { kind: 'category', slug: Astro.params.slug! };
+
+const page = parsePageIndex(Astro.params.pageIndex);
+if (page === 'redirect') return Astro.redirect(feedBaseUrl(filter), 301);
+
+const feed = page ? await loadFeedPage(Astro, page, filter) : null;
+if (!feed) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<FeedPage feed={feed} />

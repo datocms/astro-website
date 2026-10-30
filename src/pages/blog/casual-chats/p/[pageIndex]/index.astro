@@ -1,0 +1,16 @@
+---
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import FeedPage from '../../../_FeedPage.astro';
+import { loadFeedPage, parsePageIndex } from '../../../_feed';
+
+const page = parsePageIndex(Astro.params.pageIndex);
+if (page === 'redirect') return Astro.redirect('/blog/casual-chats', 301);
+
+const feed = page ? await loadFeedPage(Astro, page, { kind: 'chats' }) : null;
+if (!feed) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<FeedPage feed={feed} />

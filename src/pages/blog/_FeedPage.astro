@@ -1,0 +1,34 @@
+---
+// One page of an index of the blog: all the posts and chats, only the
+// chats, or only the posts of one category.
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { PostGrid } from '~/components/PostGrid';
+import * as blog from '~/data/blog';
+import Layout from '~/layouts/Layout.astro';
+import { chatsQuery, feedPageQuery, postsQuery, type FeedPage } from './_feed';
+
+interface Props {
+  feed: FeedPage;
+}
+
+const { feed } = Astro.props;
+---
+
+<Layout seo={feed.seo} headerVariant="light">
+  <Hero {...blog.hero} variant="light" alignment="center" />
+  <PostGrid
+    posts={feed.cards}
+    page={feed.page}
+    totalPages={feed.totalPages}
+    baseUrl={feed.baseUrl}
+    filters={feed.filters}
+  />
+  <DraftModeQueryListener query={feedPageQuery} />
+  {
+    feed.postsVariables && (
+      <DraftModeQueryListener query={postsQuery} variables={feed.postsVariables} />
+    )
+  }
+  {feed.hasChats && <DraftModeQueryListener query={chatsQuery} />}
+</Layout>

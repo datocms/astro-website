@@ -1,0 +1,13 @@
+---
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import FeedPage from '../_FeedPage.astro';
+import { loadFeedPage } from '../_feed';
+
+const feed = await loadFeedPage(Astro, 1, { kind: 'chats' });
+if (!feed) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+---
+
+<FeedPage feed={feed} />

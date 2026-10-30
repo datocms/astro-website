@@ -1,22 +1,18 @@
-import { CodesandboxEmbedBlockFragment } from '~/components/blocks/CodesandboxEmbedBlock/graphql';
-import { CtaButtonFragment } from '~/components/blocks/CtaButton/graphql';
-import { DemoFragment } from '~/components/blocks/Demo/graphql';
-import { ImageFragment } from '~/components/blocks/Image/graphql';
-import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
-import { MultipleDemosBlockFragment } from '~/components/blocks/MultipleDemosBlock/graphql';
-import { QuestionAnswerFragment } from '~/components/blocks/QuestionAnswer/graphql';
-import { ShowcaseProjectBlockFragment } from '~/components/blocks/ShowcaseProjectBlock/graphql';
-import { TableFragment } from '~/components/blocks/Table/graphql';
-import { TabsBlockFragment } from '~/components/blocks/TabsBlock/graphql';
-import { TutorialVideoFragment } from '~/components/blocks/TutorialVideo/graphql';
-import { VideoFragment } from '~/components/blocks/Video/graphql';
-import { defaultInlineRecordFragments } from '~/components/inlineRecords';
-import { BlogPostInlineFragment } from '~/components/inlineRecords/BlogPostInline/graphql';
-import { ChangelogEntryInlineFragment } from '~/components/inlineRecords/ChangelogEntryInline/graphql';
-import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
-import { BlogPostLinkFragment } from '~/components/linkToRecords/BlogPostLink/graphql';
-import { ChangelogEntryLinkFragment } from '~/components/linkToRecords/ChangelogEntryLink/graphql';
-import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
+import { ChatHeaderFragment } from '~/components/PostHeader';
+import { CodesandboxEmbedBlockFragment } from '~/components/StructuredText/blocks/CodesandboxEmbedBlock';
+import { CtaButtonFragment } from '~/components/StructuredText/blocks/CtaButton';
+import { DemoFragment } from '~/components/StructuredText/blocks/Demo';
+import { ImageFragment } from '~/components/StructuredText/blocks/Image';
+import { InternalVideoFragment } from '~/components/StructuredText/blocks/InternalVideo';
+import { MultipleDemosBlockFragment } from '~/components/StructuredText/blocks/MultipleDemosBlock';
+import { QuestionAnswerFragment } from '~/components/StructuredText/blocks/QuestionAnswer';
+import { ShowcaseProjectBlockFragment } from '~/components/StructuredText/blocks/ShowcaseProjectBlock';
+import { TableFragment } from '~/components/StructuredText/blocks/Table';
+import { TabsBlockFragment } from '~/components/StructuredText/blocks/TabsBlock';
+import { TutorialVideoFragment } from '~/components/StructuredText/blocks/TutorialVideo';
+import { VideoFragment } from '~/components/StructuredText/blocks/Video';
+import { defaultInlineRecordFragments } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/StructuredText/linkToRecords';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
@@ -29,18 +25,23 @@ import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
   /* GraphQL */ `
-    query PostQuery($slug: String!) {
-      post: customerStory(filter: { slug: { eq: $slug } }) {
+    query ChatQuery($slug: String!) {
+      chat: customerStory(filter: { slug: { eq: $slug } }) {
+        ...ChatHeaderFragment
         seo: _seoMetaTags {
           ...TagFragment
         }
         title
         slug
-        _firstPublishedAt
-        _createdAt
-        seoH1
         canonicalUrl
         yoastAnalysis
+        _firstPublishedAt
+        _publishedAt
+        _createdAt
+        people {
+          name
+        }
+        # A casual chat has no CopyPromptButton and no ImageCarousel blocks.
         content {
           value
           links {
@@ -48,6 +49,7 @@ export const query = graphql(
               id
               __typename
             }
+
             ...AcademyChapterLinkFragment
             ...AcademyCourseLinkFragment
             ...BlogPostLinkFragment
@@ -97,28 +99,19 @@ export const query = graphql(
               id
               __typename
             }
-            ...DemoFragment
-            ...ImageFragment
-            ...QuestionAnswerFragment
-            ...MultipleDemosBlockFragment
-            ...InternalVideoFragment
-            ...VideoFragment
+
             ...CodesandboxEmbedBlockFragment
             ...CtaButtonFragment
-            ...TutorialVideoFragment
+            ...DemoFragment
+            ...ImageFragment
+            ...InternalVideoFragment
+            ...MultipleDemosBlockFragment
+            ...QuestionAnswerFragment
             ...ShowcaseProjectBlockFragment
             ...TableFragment
             ...TabsBlockFragment
-          }
-        }
-        people {
-          name
-          title
-          company
-          avatar {
-            responsiveImage(imgixParams: { auto: format, w: 50, h: 50, fit: crop, crop: faces }) {
-              ...ResponsiveImageFragment
-            }
+            ...TutorialVideoFragment
+            ...VideoFragment
           }
         }
       }
@@ -126,71 +119,24 @@ export const query = graphql(
   `,
   [
     TagFragment,
-    ResponsiveImageFragment,
-    TableFragment,
-    TabsBlockFragment,
-    InternalVideoFragment,
-    DemoFragment,
-    MultipleDemosBlockFragment,
-    VideoFragment,
-    ImageFragment,
-    TutorialVideoFragment,
-    CodesandboxEmbedBlockFragment,
-    CtaButtonFragment,
-    ShowcaseProjectBlockFragment,
-    QuestionAnswerFragment,
-    BlogPostInlineFragment,
-    ChangelogEntryInlineFragment,
-    BlogPostLinkFragment,
-    ChangelogEntryLinkFragment,
-    CustomerStoryUrlFragment,
+    ChatHeaderFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
+    // The CDA refuses a fragment on a block type that the schema does not
+    // have. Thus this list has only the blocks of a casual chat.
+    CodesandboxEmbedBlockFragment,
+    CtaButtonFragment,
+    DemoFragment,
+    ImageFragment,
+    InternalVideoFragment,
+    MultipleDemosBlockFragment,
+    QuestionAnswerFragment,
+    ShowcaseProjectBlockFragment,
+    TableFragment,
+    TabsBlockFragment,
+    TutorialVideoFragment,
+    VideoFragment,
   ],
-);
-
-const RelatedItemFragment = graphql(
-  /* GraphQL */ `
-    fragment RelatedItemFragment on CustomerStoryRecord @_unmask {
-      title
-      excerpt {
-        value
-      }
-      ...CustomerStoryUrlFragment
-      coverImage {
-        responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-          ...ResponsiveImageFragment
-        }
-      }
-    }
-  `,
-  [ResponsiveImageFragment, CustomerStoryUrlFragment],
-);
-
-export const siblingsQuery = graphql(
-  /* GraphQL */ `
-    query SiblingsQuery($dateTime: DateTime, $slug: String) {
-      previous: customerStory(
-        filter: { _firstPublishedAt: { lt: $dateTime } }
-        orderBy: _firstPublishedAt_DESC
-      ) {
-        ...RelatedItemFragment
-      }
-      next: customerStory(
-        filter: { _firstPublishedAt: { gt: $dateTime }, slug: { neq: $slug } }
-        orderBy: _firstPublishedAt_ASC
-      ) {
-        ...RelatedItemFragment
-      }
-      first: customerStory(orderBy: _firstPublishedAt_ASC) {
-        ...RelatedItemFragment
-      }
-      last: customerStory(orderBy: _firstPublishedAt_DESC) {
-        ...RelatedItemFragment
-      }
-    }
-  `,
-  [RelatedItemFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

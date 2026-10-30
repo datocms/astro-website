@@ -1,9 +1,9 @@
 /*
  * Blog: the index (/blog, /blog/p/[n]), the index of the casual chats
  * (/blog/casual-chats, /blog/casual-chats/p/[n]), the index of a category
- * (/blog/category/[slug], /blog/category/[slug]/p/[n]) and the article
- * (/blog/[slug]). An article is a blog post or a casual chat: the casual
- * chats were at /casual-chats, and /casual-chats/* redirects here.
+ * (/blog/category/[slug], /blog/category/[slug]/p/[n]), the blog post
+ * (/blog/[slug]) and the casual chat (/blog/casual-chats/[slug]). The
+ * casual chats were at /casual-chats, and /casual-chats/* redirects here.
  * The posts come from DatoCMS, project
  * "DatoCMS Website" (id 205): this file has only the copy around them.
  */
@@ -37,4 +37,11 @@ export interface RelatedPostsData {
 export const related: RelatedPostsData = {
   headline: 'Want more?',
   muted: "Check out other recent stories we've written on our blog.",
+};
+
+/** The copy of RelatedPosts under a casual chat. */
+export const relatedToChat: RelatedPostsData = {
+  headline: 'Not all stories are alike.',
+  muted:
+    'Discover how different teams work with DatoCMS in their own unique and unconventional ways.',
 };
