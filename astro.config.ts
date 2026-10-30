@@ -519,8 +519,11 @@ export default defineConfig({
     '/team/content-creators': '/editor-experience',
     '/made-for/marketers': '/editor-experience',
     '/made-for/content-creators': '/editor-experience',
-    '/customer-stories': '/casual-chats',
-    '/customer-stories/[...rest]': '/casual-chats/[...rest]',
+    '/customer-stories': '/blog/casual-chats',
+    '/customer-stories/[...rest]': '/blog/casual-chats/[...rest]',
+    // The casual chats are part of the blog.
+    '/casual-chats': '/blog/casual-chats',
+    '/casual-chats/[...rest]': '/blog/casual-chats/[...rest]',
     '/success-stories': '/customers',
     '/customers/[...rest]': '/case-studies/[...rest]',
     '/use-cases/headless-cms-publishing': '/use-cases/digital-publishing',
