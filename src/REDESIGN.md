@@ -58,7 +58,6 @@ src/components/MyComponent/
 - All imports use the barrel path: `import { MyComponent } from '~/components/MyComponent'`. Inside the directory, relative imports.
 - Sections (a Hero, a Faq, a PageCloser…) get their static copy as a typed object from `src/data/`, and their CMS data from a fragment (see "CMS"). Building blocks (Button, Headline, Section, Typewriter, PixelVideo…) are used inside sections. Chrome (SiteHeader, FooterLinks, SearchPopup, PageNav) is in the layout.
 - `Prose` styles long-form text: its CSS targets the elements of the HTML, inside `@scope (.prose) to (prose-island > *)`. A block with its own design wraps its markup in `<prose-island>`, and Prose does not style it.
-- `Placeholder` is a section that does not exist yet. `Added` is a dashed frame over a section that is not in the Figma design yet, for review. The design phase removes both. Do not put them on a page of production without a decision.
 - A section sets `data-theme="default|orange|green|purple|blue|pink"`; children inherit. Theme comes from the section, never from the component. Breakpoints are media queries, never props. State (hover, active, focus) is CSS/JS, never a prop.
 - React only for the product scenes, rendered on the server (no `client:` directive).
 

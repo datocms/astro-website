@@ -99,7 +99,7 @@ Each was tried the other way first. Do not go back without a reason.
 - **The Delivery frame shows the claim, not the mechanism**: a wall of cached pages, and a loop of events, each of which touches a few pages, which leave; the others close the gap and new pages come in at the end. A diagram of the mechanism (visitor, edge cache with its tags, DatoCMS, webhook) was built first and nobody could follow it; the three code fragments explain the header, the webhook and the CDN side.
 - **The Real-time frame is a stream, not the editor**: the pill of the event, the code of the `useQuerySubscription` hook in a code editor, the live blog of a cup final in a browser, one stream line between them that is always drawn; each event sends a pulse down the line, the hook gets the ring, the post comes in at the top of the blog. The editor beside the page asked the eye to read a form and find the paragraph; a match is the page that changes each minute, and everyone knows it. The chapter has no fragments: one picture tells the event, the code that gets it and the page that changes.
 - **The page closer** is one block: the closing call to action, the pixel video and the "Questions? Ask away" band on one surface, one theme, never a grid.
-- **A pillar hero has no picture**: the first chapter brings it. The home hero has no product scene either (a request of the team, in the differences table of `INVENTORY.md`).
+- **A pillar hero has no picture**: the first chapter brings it. The home hero has no product scene either (a request of the team).
 
 ## Tools
 
