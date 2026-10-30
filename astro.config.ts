@@ -4,16 +4,13 @@ import expressiveCode from 'astro-expressive-code';
 import { defineConfig, envField } from 'astro/config';
 import { writeFile } from 'fs/promises';
 
-import bundlesize from 'vite-plugin-bundlesize';
+const MAX_CLIENT_CHUNK_SIZE_IN_KB = 500;
 
 export default defineConfig({
   base: '/', // Can be any string, but MUST be set or component imports on astro build will fail.
   output: 'server',
   image: {
-    domains: ['image.mux.com'],
-  },
-  experimental: {
-    preserveScriptOrder: true,
+    domains: ['image.mux.com', 'www.datocms-assets.com'],
   },
   trailingSlash: 'never',
   env: {
@@ -238,10 +235,39 @@ export default defineConfig({
   markdown: {},
   vite: {
     plugins: [
-      bundlesize({
-        limits: [{ name: '**/*', limit: '500 kB' }],
-        stats: 'summary',
-      }),
+      // Stop the build when a client JS chunk that a page loads immediately is
+      // larger than the limit. The plugin examines the entry chunks and the
+      // chunks that they import statically. It ignores the chunks that load
+      // only through a dynamic import (for example, Shiki grammars).
+      // This replaces `vite-plugin-bundlesize`, which does not work with Vite 8.
+      {
+        name: 'client-chunk-size-limit',
+        applyToEnvironment: (environment) => environment.name === 'client',
+        generateBundle(_options, bundle) {
+          const chunks = Object.values(bundle).filter((file) => file.type === 'chunk');
+          const chunksToExamine = new Set(chunks.filter((chunk) => chunk.isEntry));
+
+          for (const chunk of chunksToExamine) {
+            for (const importedFileName of chunk.imports) {
+              const importedChunk = bundle[importedFileName];
+              if (importedChunk?.type === 'chunk') chunksToExamine.add(importedChunk);
+            }
+          }
+
+          const chunksOverLimit = [...chunksToExamine].flatMap((file) => {
+            const sizeInKb = Buffer.byteLength(file.code) / 1000;
+            return sizeInKb > MAX_CLIENT_CHUNK_SIZE_IN_KB
+              ? [`${file.fileName} (${sizeInKb.toFixed(1)} kB)`]
+              : [];
+          });
+
+          if (chunksOverLimit.length > 0) {
+            this.error(
+              `These client chunks are larger than ${MAX_CLIENT_CHUNK_SIZE_IN_KB} kB:\n${chunksOverLimit.join('\n')}`,
+            );
+          }
+        },
+      },
     ],
     build: {
       sourcemap: 'hidden',

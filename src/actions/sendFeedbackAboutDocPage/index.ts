@@ -1,5 +1,5 @@
 import { ActionError, defineAction } from 'astro:actions';
-import { z } from 'astro:schema';
+import { z } from 'astro/zod';
 import buildBasecampClient from '~/lib/basecamp';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isTurnstileTokenValid } from '~/lib/turnstile';

@@ -1,6 +1,6 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { FRONT_CHANNEL_URL_SALES } from 'astro:env/server';
-import { z } from 'astro:schema';
+import { z } from 'astro/zod';
 import { hasMarketingConsent } from '~/lib/consent';
 import { sendToFrontChannel } from '~/lib/front';
 import { trackConversion } from '~/lib/linkedin';

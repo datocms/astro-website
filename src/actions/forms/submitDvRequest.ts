@@ -1,5 +1,5 @@
 import { ActionError, defineAction } from 'astro:actions';
-import { z } from 'astro:schema';
+import { z } from 'astro/zod';
 import { hasMarketingConsent } from '~/lib/consent';
 import { trackConversion } from '~/lib/linkedin';
 import { logErrorToRollbar } from '~/lib/logToRollbar';

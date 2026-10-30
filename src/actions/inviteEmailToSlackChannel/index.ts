@@ -1,7 +1,7 @@
 import { WebClient } from '@slack/web-api';
 import { ActionError, defineAction } from 'astro:actions';
 import { SLACK_TOKEN } from 'astro:env/server';
-import { z } from 'astro:schema';
+import { z } from 'astro/zod';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isTurnstileTokenValid } from '~/lib/turnstile';
 
@@ -33,7 +33,7 @@ export default defineAction({
   accept: 'form',
   input: z.object({
     email: z
-      .string({ invalid_type_error: 'Please, enter your email! 😊' })
+      .string({ error: 'Please, enter your email! 😊' })
       .email('Please, enter a valid email! 😊'),
     // Empty when no Turnstile sitekey is configured for the environment; the
     // verifier decides whether that is acceptable.

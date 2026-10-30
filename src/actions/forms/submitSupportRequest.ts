@@ -1,6 +1,6 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { FRONT_CHANNEL_URL_SUPPORT } from 'astro:env/server';
-import { z } from 'astro:schema';
+import { z } from 'astro/zod';
 import { sendToFrontChannel } from '~/lib/front';
 import { logErrorToRollbar } from '~/lib/logToRollbar';
 import { isTurnstileTokenValid } from '~/lib/turnstile';
