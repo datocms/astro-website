@@ -1,7 +1,8 @@
 ---
 // A small menu in the bottom-left corner. It links to all the real pages of
-// the prototype, so that a reviewer can go from page to page quickly. It is
-// not part of the design.
+// the site, so that a reviewer can go from page to page quickly. A dot marks
+// the pages on the new layout, to review. It is not part of the design.
+import { REDESIGN_PAGE_DIRS } from '../../../redesign-css-scope.mjs';
 import styles from './style.module.css';
 
 // Each file in src/pages is a route. The dev pages and the dynamic routes are
@@ -9,39 +10,53 @@ import styles from './style.module.css';
 // starts with "_", thus these are not in the list.
 const files = Object.keys(import.meta.glob('/src/pages/**/*.astro'));
 
+// A page is on the new layout when its path in src/pages is a ported
+// directory or file of REDESIGN_PAGE_DIRS. The home page is the file
+// "index.astro" in that list.
+const isNewLayout = (file: string) => {
+  const path = file.replace(/^\/src\/pages\//, '');
+  return REDESIGN_PAGE_DIRS.some((dir) => path === dir || path.startsWith(`${dir}/`));
+};
+
 const routes = files
   .filter(
     (file) => !file.startsWith('/src/pages/dev/') && !file.includes('[') && !file.includes('/_'),
   )
-  .map(
-    (file) =>
+  .map((file) => ({
+    path:
       file
         .replace(/^\/src\/pages/, '')
         .replace(/\.astro$/, '')
         .replace(/\/index$/, '') || '/',
-  )
-  .sort();
+    isNew: isNewLayout(file),
+  }))
+  .sort((a, b) => a.path.localeCompare(b.path));
 
 const current = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 
 <details class={styles.root} data-theme="default">
   <summary class={styles.toggle}>Pages</summary>
-  <nav class={styles.panel} aria-label="Prototype pages">
+  <nav class={styles.panel} aria-label="Pages">
     <ul class={styles.list}>
       {
         routes.map((route) => (
           <li>
             <a
               class={styles.link}
-              href={route}
-              aria-current={route === current ? 'page' : undefined}
+              href={route.path}
+              aria-current={route.path === current ? 'page' : undefined}
+              data-new={route.isNew ? '' : undefined}
             >
-              {route}
+              {route.path}
+              {route.isNew && <span class={styles.mark} role="img" aria-label="new layout" />}
             </a>
           </li>
         ))
       }
     </ul>
+    <p class={styles.legend}>
+      <span class={styles.mark} aria-hidden="true"></span> new layout, to review
+    </p>
   </nav>
 </details>
