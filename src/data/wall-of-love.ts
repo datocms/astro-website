@@ -1,5 +1,5 @@
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
-import type { CtaBannerData, HeroData } from '~/data/home';
+import type { HeroData } from '~/data/home';
 
 // The SEO tags of the page. The page has no CMS record. The title gets the
 // suffix of the site.
@@ -17,22 +17,6 @@ export const hero: HeroData = {
   buttons: [
     {
       label: 'Get Started',
-      href: dashboardUrl('/signup'),
-      appearance: 'deep-on-light',
-      arrow: false,
-    },
-  ],
-};
-
-// 5 placeholder pictures serve all the people.
-export const ctaStart: CtaBannerData = {
-  variant: 'light',
-  theme: 'purple',
-  headline: 'Start building.',
-  muted: 'Explore DatoCMS and never look back.',
-  buttons: [
-    {
-      label: 'Get Started For Free',
       href: dashboardUrl('/signup'),
       appearance: 'deep-on-light',
       arrow: false,

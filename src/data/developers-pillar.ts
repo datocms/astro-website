@@ -389,7 +389,26 @@ export const closing: QuoteData = {
   role: 'Director of Architecture, November Five',
 };
 
-export { ctaBuild } from '~/data/developers';
+export const ctaBuild: CtaBannerData = {
+  variant: 'light',
+  theme: 'orange',
+  headline: 'The best way to get to know DatoCMS',
+  muted: 'is to build something with it.',
+  buttons: [
+    {
+      label: 'Get Started',
+      href: dashboardUrl('/signup'),
+      appearance: 'deep-on-light',
+      arrow: false,
+    },
+    {
+      label: 'Talk To Sales',
+      href: '/contact',
+      appearance: 'deep-on-light',
+      variant: 'soft',
+    },
+  ],
+};
 
 // After the GraphQL Content Delivery API: the numbers of the API, from the
 // live site.

@@ -11,57 +11,6 @@ import type { CodeTab } from '~/data/home';
  * marked "(check)" next to the line.
  */
 
-// The id of the record Arc floor lamp, as the API would give it
-const ARC_ID = 'Dk2sXz3tR9eQ1mYxPfL0vA';
-
-// The type of the model Products in the GraphQL schema of the API. The
-// names are the ones of the fields in the schema builder; `price` is the
-// one the other tab types.
-// (check) the `!` on name and price: the API gives a non-null type to a
-// required field only with strict mode (`X-Exclude-Invalid`, docs:
-// "Configuring requests"). The scalar is called FloatType in the API.
-// The CLI command of the brief's reference (`schema:generate`) writes types
-// for the Content Management API, not this type: gql.tada reads the schema
-// of the Content Delivery API by introspection.
-export const productType: CodeTab = {
-  label: 'schema.graphql',
-  lang: 'graphql',
-  focus: [4],
-  code: `# The model Products, as the API names it
-type ProductRecord {
-  name: String!
-  price: FloatType!
-  category: CategoryRecord
-  related: [ProductRecord!]!
-  heroImage: FileField
-}`,
-};
-
-// The query of the story in a gql.tada `graphql()` call: the result type
-// comes from the schema, so `price` is a number.
-export const productQuery: CodeTab = {
-  label: 'lamp.ts',
-  lang: 'ts',
-  focus: [7, 15],
-  code: `import { graphql, type ResultOf } from 'gql.tada';
-
-const LAMP_QUERY = graphql(\`
-  query Lamp {
-    product(filter: { slug: { eq: "arc-floor-lamp" } }) {
-      name
-      price
-      category { name }
-      related { name heroImage { url } }
-    }
-  }
-\`);
-
-type Lamp = ResultOf<typeof LAMP_QUERY>;
-// Lamp['product']['price']  ->  number`,
-};
-
-export const schemaCode: CodeTab[] = [productType, productQuery];
-
 // Four tabs, a query each and no response: what the API computes so the
 // frontend does not have to. Each tab has its own site, not the lamps of
 // the story: the feature picks the example.

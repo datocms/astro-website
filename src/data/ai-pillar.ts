@@ -3,7 +3,7 @@ import type { ChapterLayoutData } from '~/components/ChapterLayout';
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
 import type { StatementsSectionData } from '~/components/StatementsSection';
 import type { StatementData } from '~/data/case-studies';
-import type { HeroData } from '~/data/home';
+import type { CtaBannerData, HeroData } from '~/data/home';
 import type { CategoryNavData } from '~/data/features';
 
 /*
@@ -230,7 +230,21 @@ export const seo = {
     'Connect your AI assistant with the MCP server, give your coding agent the Agent Skills, translate content with your own provider, and tag images and caption videos. Every AI feature is opt-in.',
 };
 
-export { ctaBuild } from '~/data/ai';
+export const ctaBuild: CtaBannerData = {
+  variant: 'light',
+  theme: 'blue',
+  headline: 'Bring your AI,',
+  muted: 'we’ll take care of the rest.',
+  buttons: [
+    {
+      label: 'Get Started',
+      href: dashboardUrl('/signup'),
+      appearance: 'deep-on-light',
+      arrow: false,
+    },
+    { label: 'Book a Demo', href: '/contact', appearance: 'deep-on-light', variant: 'soft' },
+  ],
+};
 
 // The section after the last chapter: the stance, in one place. Facts come
 // from the live page /features/ai and the docs of the MCP
