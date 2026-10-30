@@ -10,14 +10,6 @@ import type { HighlightsData } from '~/data/editor-experience-figma';
 import type { ButtonData, CtaBannerData, HeroData, QuestionAnswerData } from '~/data/home';
 import { questionAnswer as homeQuestionAnswer, svgLogo } from '~/data/home';
 
-export interface AgentChatData {
-  status: string;
-  question: string;
-  options: string[];
-  /** The empty input at the end of the list. */
-  placeholder: string;
-}
-
 export interface Language {
   name: string;
   flag: string;
@@ -93,13 +85,6 @@ export const agent: FeatureIntro = {
   tagline:
     'The DatoCMS Agent plugs into our MCP to take care of all the boring (or not) manual work from inside the CMS itself.',
   button: learnMore('/docs/agent'),
-};
-
-export const agentChat: AgentChatData = {
-  status: 'I’ve updated the blog schema and fixed 728 issues.',
-  question: 'What would you like to do next?',
-  options: ['Run a type check', 'Update content', 'Review unresolved tickets'],
-  placeholder: 'Ask a question or describe a task…',
 };
 
 export const llmDocs: FeatureIntro = {
