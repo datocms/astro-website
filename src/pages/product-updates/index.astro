@@ -1,5 +1,11 @@
 ---
-import ProductUpdates from './p/[pageIndex]/index.astro';
+import * as productUpdates from '~/data/product-updates';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import IndexPage from './_IndexPage.astro';
+import { pageQuery } from './p/[pageIndex]/_graphql';
+
+const variables = { first: productUpdates.perPage, skip: 0 };
+const data = await executeQuery(Astro, pageQuery, { variables });
 ---
 
-<ProductUpdates pageIndex={1} />
+<IndexPage page={1} data={data} variables={variables} />

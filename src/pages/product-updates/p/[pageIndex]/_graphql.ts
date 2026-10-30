@@ -1,39 +1,42 @@
-import { range } from 'lodash-es';
-import { ProductUpdateFragment } from '~/components/product-updates/ProductUpdate/graphql';
+import { ProductUpdateListFragment } from '~/components/ProductUpdateList';
+import * as productUpdates from '~/data/product-updates';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { graphql } from '~/lib/datocms/graphql';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
-export const perPage = 10;
+/**
+ * The old site had 10 entries on each page, up to page 30. A page that
+ * existed then and does not exist now redirects to the last page.
+ */
+export const legacyLastPage = 30;
 
-export const query = graphql(
+/** One page of the index: the newest entries first. */
+export const pageQuery = graphql(
   /* GraphQL */ `
-    query ProductUpdates($limit: IntType!, $offset: IntType!) {
-      page: changelog {
-        _seoMetaTags {
+    query ProductUpdatesPage($first: IntType!, $skip: IntType!) {
+      changelog {
+        seo: _seoMetaTags {
           ...TagFragment
         }
       }
-      productUpdates: allChangelogEntries(
-        first: $limit
-        skip: $offset
-        orderBy: _firstPublishedAt_DESC
+      entries: allChangelogEntries(
+        first: $first
+        skip: $skip
+        orderBy: [_firstPublishedAt_DESC, _createdAt_DESC]
       ) {
-        ...ProductUpdateFragment
+        ...ProductUpdateListFragment
       }
-      _allChangelogEntriesMeta {
+      meta: _allChangelogEntriesMeta {
         count
       }
     }
   `,
-  [TagFragment, ProductUpdateFragment],
+  [TagFragment, ProductUpdateListFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
-  const {
-    meta: { count },
-  } = await executeQueryOutsideAstro(
+  const { meta } = await executeQueryOutsideAstro(
     graphql(/* GraphQL */ `
       query BuildSitemapUrls {
         meta: _allChangelogEntriesMeta {
@@ -44,5 +47,6 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/product-updates/p/${i}`);
+  const total = Math.ceil(meta.count / productUpdates.perPage);
+  return Array.from({ length: Math.max(0, total - 1) }, (_, i) => `/product-updates/p/${i + 2}`);
 };

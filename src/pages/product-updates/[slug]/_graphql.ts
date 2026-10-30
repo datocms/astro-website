@@ -1,4 +1,4 @@
-import { ProductUpdateFragment } from '~/components/product-updates/ProductUpdate/graphql';
+import { ProductUpdateFragment } from '~/components/ProductUpdate';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
@@ -12,8 +12,8 @@ import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 export const query = graphql(
   /* GraphQL */ `
     query ProductUpdate($slug: String!) {
-      productUpdate: changelogEntry(filter: { slug: { eq: $slug } }) {
-        _seoMetaTags {
+      entry: changelogEntry(filter: { slug: { eq: $slug } }) {
+        seo: _seoMetaTags {
           ...TagFragment
         }
         ...ProductUpdateFragment

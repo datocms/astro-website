@@ -1,61 +1,36 @@
 ---
-import { Hero } from '~/components/LegacyHero';
-import { Pagination } from '~/components/LegacyPagination';
-import { ProductUpdate } from '~/components/product-updates/ProductUpdate';
-import { Space } from '~/components/Space';
-import { Wrapper } from '~/components/Wrapper';
-import { Layout } from '~/layouts/LegacyLayout';
+import * as productUpdates from '~/data/product-updates';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { perPage, query } from './_graphql';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import IndexPage from '../../_IndexPage.astro';
+import { legacyLastPage, pageQuery } from './_graphql';
 
-export interface Props {
-  pageIndex?: number;
-}
+const param = Astro.params.pageIndex ?? '';
+const page = /^[1-9]\d*$/.test(param) ? Number.parseInt(param, 10) : null;
 
-if (Astro.params.pageIndex === '1') {
+// Page 1 is /product-updates.
+if (page === 1) return Astro.redirect('/product-updates', 301);
+
+if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 
-const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
+const { perPage } = productUpdates;
+const variables = { first: perPage, skip: (page - 1) * perPage };
+const data = await executeQuery(Astro, pageQuery, { variables });
 
-const variables = {
-  limit: perPage,
-  offset: (pageIndex - 1) * perPage,
-};
-
-const { page, productUpdates, _allChangelogEntriesMeta } = await executeQuery(Astro, query, {
-  variables,
-});
-
-const totalEntries = _allChangelogEntriesMeta.count;
-
-if (!page || productUpdates.length === 0) {
+if (data.entries.length === 0) {
+  const lastPage = Math.ceil(data.meta.count / perPage);
+  if (page <= legacyLastPage && lastPage > 0) {
+    return Astro.redirect(
+      lastPage > 1 ? `/product-updates/p/${lastPage}` : '/product-updates',
+      301,
+    );
+  }
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
-  <Hero>
-    <Fragment slot="title"><mark>Product Updates</mark></Fragment>
-    <Fragment slot="subtitle">
-      DatoCMS changelog for new features and general improvements
-    </Fragment>
-  </Hero>
-  <Wrapper>
-    <Space bottom={2}>
-      {productUpdates.map((productUpdate) => <ProductUpdate productUpdate={productUpdate} />)}
-    </Space>
-    <Pagination
-      perPage={perPage}
-      currentPageIndex={pageIndex}
-      totalEntries={totalEntries}
-      baseUrl="/product-updates"
-    />
-  </Wrapper>
-
-  <DraftModeQueryListener query={query} variables={variables} />
-</Layout>
+<IndexPage page={page} data={data} variables={variables} />

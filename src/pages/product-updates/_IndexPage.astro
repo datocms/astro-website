@@ -1,0 +1,29 @@
+---
+// One page of the index of the changelog.
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { ProductUpdateList } from '~/components/ProductUpdateList';
+import * as productUpdates from '~/data/product-updates';
+import Layout from '~/layouts/Layout.astro';
+import type { ResultOf, VariablesOf } from '~/lib/datocms/graphql';
+import { pageQuery } from './p/[pageIndex]/_graphql';
+
+interface Props {
+  page: number;
+  data: ResultOf<typeof pageQuery>;
+  variables: VariablesOf<typeof pageQuery>;
+}
+
+const { page, data, variables } = Astro.props;
+const totalPages = Math.ceil(data.meta.count / productUpdates.perPage);
+---
+
+<Layout seo={data.changelog?.seo ?? []} theme="green" headerVariant="light" footerTheme="green">
+  <Hero {...productUpdates.hero} variant="light" alignment="center" />
+  <ProductUpdateList
+    entries={data.entries}
+    pagination={{ page, totalPages, baseUrl: '/product-updates' }}
+  />
+
+  <DraftModeQueryListener query={pageQuery} variables={variables} />
+</Layout>

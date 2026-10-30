@@ -1,34 +1,26 @@
 ---
-import { Hero } from '~/components/LegacyHero';
-import { Wrapper } from '~/components/Wrapper';
-import { ProductUpdate } from '~/components/product-updates/ProductUpdate';
-import { Layout } from '~/layouts/LegacyLayout';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
+// One entry of the changelog, with its content and a link back to the index.
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { ProductUpdate } from '~/components/ProductUpdate';
+import * as productUpdates from '~/data/product-updates';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
 
 const variables = { slug: Astro.params.slug! };
-const { productUpdate } = await executeQuery(Astro, query, { variables });
+const { entry } = await executeQuery(Astro, query, { variables });
 
-if (!productUpdate) {
+if (!entry) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 ---
 
-<Layout seo={productUpdate._seoMetaTags}>
-  <Hero>
-    <Fragment slot="title"><mark>Product Updates</mark></Fragment>
-    <Fragment slot="subtitle">
-      DatoCMS changelog for new features and general improvements
-    </Fragment>
-  </Hero>
-
+<Layout seo={entry.seo} theme="green" headerVariant="light" footerTheme="green">
+  {/* The Markdown version of the page (markdownProxy) has only this element. */}
   <div id="main-content">
-    <Wrapper>
-      <ProductUpdate productUpdate={productUpdate} mainTitleOfPage />
-    </Wrapper>
+    <ProductUpdate entry={entry} back={productUpdates.back} />
   </div>
 
   <DraftModeQueryListener query={query} variables={variables} />
