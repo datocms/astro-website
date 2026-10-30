@@ -1,0 +1,125 @@
+/*
+ * The frame of the chapter "Image and video components" of /media
+ * (Frame.astro), in a SceneFrame `whole`: two windows (AppWindow), the
+ * editor at left (55%) and the browser at right, side by side from 768px
+ * and stacked on phones. The frame draws nothing: the windows have their
+ * own border and shadow, and the frame has their height. The windows cut
+ * the code and the page at the bottom. The code is in the code tokens of
+ * the theme of the section (tokens.css, "Code"); the page has the look of
+ * the site of the museum (site.module.css).
+ *
+ * The sequence sets `data-step` on the frame (sceneSequence.ts). At the
+ * step "rest" each photo is its placeholder; at the step "load" the photos
+ * come in, as the Image of react-datocms fades them in. Without
+ * `data-step` all the photos show: the still.
+ */
+.frame {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+@media (min-width: 768px) {
+  .frame {
+    grid-template-columns: minmax(0, 55fr) minmax(0, 45fr);
+    height: 480px;
+  }
+}
+
+@media (min-width: 1152px) {
+  .frame {
+    gap: var(--space-md);
+    height: 600px;
+  }
+}
+
+.frame .editor {
+  height: 280px;
+  min-height: 0;
+  color: var(--code-plain);
+  --shiki-foreground: var(--code-plain);
+  --shiki-token-keyword: var(--code-keyword);
+  --shiki-token-string: var(--code-plain);
+  --shiki-token-string-expression: var(--code-string);
+  --shiki-token-link: var(--code-string);
+  --shiki-token-constant: var(--code-constant);
+  --shiki-token-function: var(--code-function);
+  --shiki-token-parameter: var(--code-plain);
+  --shiki-token-comment: var(--code-comment);
+  --shiki-token-punctuation: var(--code-punctuation);
+}
+
+.frame .browser {
+  height: 420px;
+  min-height: 0;
+}
+
+@media (min-width: 768px) {
+  .frame .editor,
+  .frame .browser {
+    height: auto;
+  }
+}
+
+.pre {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: var(--space-sm);
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+@media (min-width: 1152px) {
+  .pre {
+    padding: var(--space-md);
+    font-size: var(--type-code);
+  }
+}
+
+.code {
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+}
+
+/* A line does not wrap: the window cuts it at the right, as a narrow editor */
+.codeLine {
+  display: flex;
+  gap: var(--space-2xs);
+  white-space: pre;
+}
+
+/* The numbers are in the markup: a line scrolled out keeps the count */
+.number {
+  flex: none;
+  min-width: 2ch;
+  text-align: right;
+  color: var(--code-line-number);
+}
+
+.dim > :last-child {
+  opacity: 0.6;
+}
+
+@media (max-width: 767px) {
+  .above {
+    display: none;
+  }
+}
+
+/*
+ * The step "rest": each photo is its placeholder. At the step "load" each
+ * photo fades in over it in 500ms, the default `fadeInDuration` of the
+ * Image of react-datocms, after its `--delay`. Back to "rest", the loop
+ * starts again: the photos go with no fade, as on a new load of the page.
+ */
+.frame[data-step='rest'] img {
+  opacity: 0;
+}
+
+.frame[data-step='load'] img {
+  transition: opacity 0.5s ease-out var(--delay, 0ms);
+}

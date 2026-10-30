@@ -1,0 +1,63 @@
+---
+import { ChapterHeader } from '~/components/ChapterHeader';
+import { ChapterSplit } from '~/components/ChapterSplit';
+import { FeatureFragments } from '~/components/FeatureFragments';
+import { FRAGMENT_WIDTH, SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as media from '~/data/media';
+import {
+  MediaLibraryCollectionsScene,
+  MediaLibraryLinksScene,
+  MediaLibraryLocaleScene,
+  MediaLibraryScene,
+  MediaLibrarySourcesScene,
+} from './MediaLibrary';
+
+const { theme, chapter, fragments } = media.library;
+---
+
+<ChapterSplit theme={theme}>
+  <ChapterHeader {...chapter} theme={theme} background="split" id="library" />
+  {
+    /*
+  The SceneFrame shows all the width of the screen (`fill`): the media
+  area of the museum, with the collection Light and Thread in the grid.
+  The pointer clicks the card of Vessel with dry grasses, and its dialog
+  opens over the grid. The asset has no focal point: the pointer clicks the
+  vase, and the previews of the crops go from the center to the vase
+  (OPEN_ASSET_FOCAL_POINT_SEQUENCE); the still is the dialog. The screen is
+  1180px wide or more, thus the dialog has room for the image and the
+  sidebar: on a narrower box the kit makes the zoom smaller. The frame
+  cuts the dialog at the bottom, under the tags.
+*/
+  }
+  <SceneFrame preset="fill" theme={theme} height={640}>
+    <MediaLibraryScene appearance={{ theme }} />
+  </SceneFrame>
+</ChapterSplit>
+<FeatureFragments items={fragments} theme={theme} columns={2}>
+  {
+    /* The panel Default metadata alone, from its top left corner: the menu of the language open under its button, Italian active. The bottom edge cuts the custom data. On phones the three windows are larger: the text stays readable in a narrow box. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={1.08} phoneZoom={1.4}>
+    <MediaLibraryLocaleScene appearance={{ theme }} width={FRAGMENT_WIDTH} height={420} />
+  </SceneFragment>
+  {
+    /* The media area from its top left corner to the search button: the tree of the collections, and the menu of the saved filters open in the toolbar. The box cuts the screen at the right, thus the upload button is out of it. The screen is 880px wide: on a narrower screen the toolbar has no room, and the saved filters go under the upload button. On phones the box cuts the tree, and the menu stays. */
+  }
+  <SceneFragment slot="visual-1" fit="scale" zoom={0.8} phoneZoom={1.1}>
+    <MediaLibraryCollectionsScene appearance={{ theme }} width={880} height={560} />
+  </SceneFragment>
+  {
+    /* The panel Records using this asset alone, from its top left corner: its title with the count, and the rows of the records, each with its model, its image and its status. The screen is narrower than the box, thus the status at the end of each row shows. */
+  }
+  <SceneFragment slot="visual-2" fit="scale" zoom={1.2} phoneZoom={1.4}>
+    <MediaLibraryLinksScene appearance={{ theme }} width={462} height={440} />
+  </SceneFragment>
+  {
+    /* The toolbar and the grid alone, without the sidebar, from their top right corner: the open menu of the upload button, with the sources of the plugins. The margin is at the right, and the box cuts the left part. The screen is 300px wider than the box, thus the grid shows more cards. */
+  }
+  <SceneFragment slot="visual-3" fit="scale" zoom={1.2} phoneZoom={1.4} align="end">
+    <MediaLibrarySourcesScene appearance={{ theme }} width={FRAGMENT_WIDTH + 300} height={420} />
+  </SceneFragment>
+</FeatureFragments>

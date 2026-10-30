@@ -1,0 +1,47 @@
+---
+import type { HTMLTag } from 'astro/types';
+import type { Step, TypewriterStart } from '~/lib/motion/typewriter';
+
+interface Props {
+  as?: HTMLTag;
+  /** The steps. They must follow the order of the final text in the slot. */
+  script: Step[];
+  /** When the animation starts. `manual` waits for a `typewriter:start` event. */
+  start?: TypewriterStart;
+  /** Delay in ms after the start trigger. */
+  delay?: number;
+  /** IntersectionObserver options for `start="view"`. */
+  threshold?: number;
+  rootMargin?: string;
+  class?: string;
+}
+
+const {
+  as: Tag = 'span',
+  script,
+  start = 'view',
+  delay = 0,
+  threshold = 0,
+  rootMargin = '0px',
+  class: className,
+} = Astro.props;
+
+// A block wrapper keeps block content valid.
+const Inner = Tag === 'span' ? 'span' : 'div';
+---
+
+<Tag
+  class={className}
+  data-typewriter={JSON.stringify(script)}
+  data-tw-start={start}
+  data-tw-delay={delay}
+  data-tw-threshold={threshold}
+  data-tw-root-margin={rootMargin}
+>
+  <Inner data-tw-final><slot /></Inner>
+</Tag>
+
+<script>
+  import { initTypewriters } from '~/lib/motion/typewriter';
+  initTypewriters();
+</script>

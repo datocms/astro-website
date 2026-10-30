@@ -1,0 +1,140 @@
+/*
+ * The layout of the ping of the fragment "From the edge." (Ping.astro).
+ * The parts are the ones of ../diagram/style.module.css. The picture
+ * fills the box of the fragment (`fill`) with the inverse surface: no
+ * margin and no cut. The box is 4:3 and is the container
+ * (SceneFragment), thus its height is 75cqi.
+ */
+.ping {
+  --quiet: color-mix(in srgb, var(--text-on-inverse-strong) 65%, transparent);
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 100%;
+  margin: 0;
+  /* The padding: large in a wide box, small in a narrow one (the container query at the end) */
+  --pad: var(--space-xl);
+  padding: var(--pad);
+  background: var(--surface-inverse);
+}
+
+/*
+ * The globe: at the middle of the box, a little taller than it, thus the
+ * box cuts its top and its bottom. The track goes across it. Its edge
+ * fades into the surface. All the rest is above it.
+ */
+.globe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  width: calc(75cqi * 1.12);
+  translate: -50% -50%;
+  mask-image: radial-gradient(closest-side, black 70%, transparent);
+  pointer-events: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.pill {
+  flex: none;
+}
+
+/* The track goes 2px (--diagram-tuck) under each pill */
+.line {
+  position: relative;
+  flex: 1;
+  min-width: var(--space-lg);
+  height: var(--diagram-pill);
+  margin-inline: calc(-1 * var(--diagram-tuck));
+}
+
+.links {
+  /* The pulses of a measure are shorter than the travel of the grammar: PULSE_MS in Ping.astro */
+  --diagram-travel: 0.45s;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.city {
+  opacity: 0.6;
+}
+
+.city:empty {
+  display: none;
+}
+
+.result {
+  display: grid;
+  place-items: center;
+  margin: 0 0 var(--space-xs);
+}
+
+.value {
+  /* The height of one line of the number, also when it is empty: nothing moves when it comes */
+  min-height: 1lh;
+  white-space: nowrap;
+  color: var(--text-on-inverse-strong);
+  /* The ring of the arrival goes around the number at this radius */
+  padding-inline: var(--space-xs);
+  border-radius: var(--radius-md);
+  --diagram-ping-scale: 1.15;
+}
+
+.value :global(span) {
+  margin-left: 0.15em;
+  font-size: 0.5em;
+  letter-spacing: 0;
+  color: var(--quiet);
+}
+
+.value[data-failed] {
+  font-size: var(--type-h2);
+  line-height: var(--type-display);
+  letter-spacing: 0;
+  color: var(--quiet);
+}
+
+.caption {
+  max-width: 60ch;
+  margin: var(--space-md) auto 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--quiet);
+}
+
+/* The labels of the pills: the long ones in a wide box, the short ones in a narrow box (the box of the fragment is the container) */
+.narrow {
+  display: none;
+}
+
+@container (max-width: 440px) {
+  .wide,
+  .city {
+    display: none;
+  }
+
+  .narrow {
+    display: inline;
+  }
+
+  .ping {
+    --pad: var(--space-sm);
+  }
+}

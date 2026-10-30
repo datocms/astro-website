@@ -1,0 +1,210 @@
+/*
+ * The frame of the chapter Plugins (Plugins.tsx): the parts of the plugin
+ * Trail tools, their tags and the spotlight. The ring of the spotlight
+ * and the tags use the grammar of the diagrams (`.change`, `.pill` of
+ * src/scenes/diagram/style.module.css): this file has only their places,
+ * the dark layer and the parts of the plugin.
+ */
+
+/* The motion of the marks: the values of the grammar, which sets them only on its `.root` */
+.root {
+  --diagram-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --diagram-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --diagram-fade: 0.32s;
+  --diagram-enter: 0.42s;
+  --diagram-travel: 0.6s;
+  --diagram-pill: 22px;
+  --mark-gap: 4px;
+}
+
+/*
+ * The marks keep a size that a person can read when the kit makes the
+ * zoom of the screen smaller (a narrow frame, a phone): the tag is never
+ * smaller than 10px on the page, and the ring is never thinner than 1px.
+ * --product-scenes-screen-zoom is the zoom of the kit.
+ */
+.ring[data-hook],
+.tag,
+.hole {
+  --mark-scale: max(1, calc(10 / 13 / var(--product-scenes-screen-zoom, 1)));
+  --mark-line: calc(1px * max(1, 1 / var(--product-scenes-screen-zoom, 1)));
+  --mark-tag-gap: calc(6px * var(--mark-scale));
+}
+
+.ring[data-hook] {
+  position: absolute;
+  inset: calc(-1 * var(--mark-gap));
+  z-index: 2;
+  pointer-events: none;
+}
+
+.tag {
+  position: absolute;
+  height: calc(var(--diagram-pill) * var(--mark-scale));
+  padding-inline: calc(var(--space-2xs) * var(--mark-scale));
+  font-size: calc(var(--type-code-small) * var(--mark-scale));
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.tag[data-place='belowStart'] {
+  top: calc(100% + var(--mark-tag-gap));
+  left: 0;
+}
+
+.tag[data-place='belowCenter'] {
+  top: calc(100% + var(--mark-tag-gap));
+  left: 50%;
+  translate: -50% 0;
+}
+
+.tag[data-place='belowEnd'] {
+  top: calc(100% + var(--mark-tag-gap));
+  right: 0;
+}
+
+.tag[data-place='aboveStart'] {
+  bottom: calc(100% + var(--mark-tag-gap));
+  left: 0;
+}
+
+.tag[data-place='aboveEnd'] {
+  bottom: calc(100% + var(--mark-tag-gap));
+  right: 0;
+}
+
+/*
+ * The tags of the parts do not show: at load and at the rest step the
+ * screen has no tag, and the spotlight has the tag of the step. With
+ * reduced motion there is no spotlight, thus the still shows all the tags.
+ */
+.ring[data-hook] .tag {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring[data-hook] .tag {
+    opacity: 1;
+  }
+}
+
+/*
+ * The spotlight (the "Spotlight" of the cms): a layer over all the screen,
+ * above the navigation bar. It shows during the step of a hook
+ * (`data-on`, from Chapter.astro), and it is not there in the still.
+ */
+.spotlight {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.spotlight[data-on] {
+  opacity: 1;
+}
+
+/*
+ * The hole: the box of the part of the step, in % of the screen. Its very
+ * large shadow is the dark layer around it. It goes from part to part.
+ * The hole is also a `.change` of the grammar. The base rule of the
+ * grammar has no specificity. The state `.change[data-changed]` has two:
+ * the second selector has three, thus the shadow and the transition of
+ * the hole stay when the hole gets the tint of the state.
+ */
+.hole,
+.spotlight .hole[data-changed] {
+  position: absolute;
+  border-radius: var(--radius-sm);
+  box-shadow:
+    0 0 0 var(--mark-line) var(--text-on-inverse),
+    0 0 0 200vmax color-mix(in srgb, black 75%, transparent);
+  transition:
+    left var(--diagram-travel) var(--diagram-ease-in-out),
+    top var(--diagram-travel) var(--diagram-ease-in-out),
+    width var(--diagram-travel) var(--diagram-ease-in-out),
+    height var(--diagram-travel) var(--diagram-ease-in-out),
+    background-color var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.spotlight:not([data-on]) .hole {
+  transition: none;
+}
+
+.spotlight .tag {
+  opacity: 0;
+}
+
+.spotlight .tag[data-shown] {
+  opacity: 1;
+}
+
+.outlet {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: var(--font-size-m);
+  color: var(--color--ink-subtle);
+}
+
+.outlet strong {
+  font-weight: 500;
+  color: var(--color--ink);
+}
+
+.live {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stat {
+  white-space: nowrap;
+}
+
+.difficulty {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-block: 4px;
+}
+
+.boot {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--color--border-control);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.boot[data-filled] {
+  fill: var(--color--ink-primary);
+  stroke: var(--color--ink-primary);
+}
+
+.level {
+  margin-left: 8px;
+  font-size: var(--font-size-m);
+  color: var(--color--ink-subtle);
+}
+
+.panel {
+  position: relative;
+}
+
+/*
+ * The phone drawing of SceneFrame (below 650px): only the tags of the
+ * hooks with `phone` in story.ts show, in the still and in the
+ * spotlight. The spotlight goes to the other parts too, with no tag.
+ */
+@media (max-width: 649px) {
+  .tag:not([data-phone]) {
+    display: none;
+  }
+}

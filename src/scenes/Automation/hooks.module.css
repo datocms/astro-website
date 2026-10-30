@@ -1,0 +1,252 @@
+/*
+ * The layout of the webhook of the fragment "Webhooks on any event."
+ * (Hooks.astro). The parts are the ones of ../diagram/style.module.css.
+ * The picture fills the box of the fragment (SceneFragment, preset
+ * `fill`) with the inverse surface, and the diagram is at the middle.
+ * The box is the container.
+ *
+ * Three widths of the box. From 520px: the rows in a column, each with
+ * its event type at its right edge, a track from each row to the pill.
+ * From 441px: the same, with no event type (the width is not sufficient
+ * for it). To 440px: the rows wrap, one track goes down from the panel to
+ * the pill, and the event type is next to that track.
+ */
+.hooks {
+  --quiet: color-mix(in srgb, var(--text-on-inverse-strong) 65%, transparent);
+  /* The height of a row of the panel, and the padding of the panel: the tracks start at the middle of each row */
+  --row: 26px;
+  --panel-pad: var(--space-sm);
+  --pad: var(--space-xl);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding: var(--pad);
+  background: var(--surface-inverse);
+}
+
+.board {
+  display: grid;
+  grid-template-columns: auto minmax(var(--space-2xl), 1fr) auto;
+  align-items: end;
+}
+
+.panel {
+  padding: var(--panel-pad);
+  background: var(--diagram-panel);
+  box-shadow: 0 0 0 1px var(--diagram-accent);
+}
+
+.title {
+  font-size: var(--type-code-xsmall);
+}
+
+.list {
+  margin: var(--space-3xs) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3xs);
+  height: var(--row);
+  white-space: nowrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: calc(var(--row) - var(--space-4xs));
+  padding-inline: var(--space-3xs);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 1px var(--border-on-inverse);
+  color: var(--text-on-inverse-strong);
+  --diagram-ping-scale: 1.08 1.3;
+}
+
+.row[data-off] {
+  opacity: 0.3;
+}
+
+.event,
+.downEvent {
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text-on-inverse);
+  opacity: 0;
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.event {
+  text-align: end;
+}
+
+.event[data-on],
+.downEvent[data-on] {
+  opacity: 1;
+}
+
+.lane {
+  position: relative;
+  height: calc(var(--rows) * var(--row));
+  margin-bottom: var(--panel-pad);
+}
+
+/* The tracks go 2px (--diagram-tuck) under the panel and under the pill */
+.fan {
+  margin-inline: calc(-1 * var(--diagram-tuck));
+}
+
+.links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.fan .links g {
+  opacity: 0.6;
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.fan .links g[data-live] {
+  opacity: 1;
+}
+
+.down {
+  display: none;
+}
+
+/* The pill at the middle of the rows; the header above it and the answer under it, out of the flow: they do not move it */
+.target {
+  display: flex;
+  align-items: center;
+}
+
+.call {
+  position: relative;
+}
+
+.pill {
+  margin: 0;
+}
+
+.header,
+.answer {
+  position: absolute;
+  left: 0;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.header {
+  bottom: calc(100% + var(--space-3xs));
+  color: var(--quiet);
+}
+
+.answer {
+  top: calc(100% + var(--space-3xs));
+}
+
+.ok {
+  display: inline-block;
+  padding: var(--space-4xs) var(--space-3xs);
+  border-radius: var(--radius-sm);
+  color: var(--text-on-inverse-strong);
+  --diagram-ping-scale: 1.1 1.4;
+}
+
+/* To 599px: a smaller margin, thus the tracks keep their width */
+@container (max-width: 599px) {
+  .hooks {
+    --pad: var(--space-lg);
+  }
+}
+
+@container (max-width: 519px) {
+  .event {
+    display: none;
+  }
+
+  .hooks {
+    --pad: var(--space-sm);
+    --panel-pad: var(--space-xs);
+  }
+}
+
+@container (max-width: 440px) {
+  .hooks {
+    --row: 22px;
+  }
+
+  .board {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    align-items: start;
+  }
+
+  .panel {
+    width: 100%;
+  }
+
+  .list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4xs) var(--space-3xs);
+  }
+
+  .fan {
+    display: none;
+  }
+
+  .down {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: var(--diagram-link);
+    margin-block: calc(-1 * var(--diagram-tuck));
+  }
+
+  /* The event type at the right of the track, at its middle: out of the flow, the track keeps its height */
+  .downEvent {
+    position: absolute;
+    top: 50%;
+    left: calc(50% + var(--space-3xs));
+    translate: 0 -50%;
+    white-space: nowrap;
+  }
+
+  .lane {
+    height: auto;
+    margin-bottom: 0;
+  }
+
+  .header {
+    display: none;
+  }
+
+  .answer {
+    top: 50%;
+    left: calc(100% + var(--space-3xs));
+    translate: 0 -50%;
+  }
+}

@@ -1,0 +1,89 @@
+/*
+ * The
+ * dividers are on the items and go out of the content column by the side
+ * padding. Up to 1320 they thus go from edge to edge of the page. Above
+ * 1320 they are --frame-max wide and centred. The 1px
+ * divider is inside the item: a closed item is 94px.
+ */
+.faq {
+  overflow: clip;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.item {
+  position: relative;
+  padding-block: var(--space-lg) calc(var(--space-lg) + 1px);
+}
+
+.item::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: calc(-1 * var(--section-padding-x));
+  right: calc(-1 * var(--section-padding-x));
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.question {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  list-style: none;
+  cursor: pointer;
+}
+
+.question::-webkit-details-marker {
+  display: none;
+}
+
+.sign {
+  flex: none;
+  color: var(--text-muted);
+}
+
+/* Closed shows “+”, Open shows “–” (U+2013). The glyph changes instantly. */
+.sign::before {
+  content: '+';
+}
+
+.item[open] .sign::before {
+  content: '\2013';
+}
+
+.answer {
+  max-width: 728px;
+  margin-top: var(--space-2xs);
+  color: var(--text-muted);
+}
+
+/*
+ * The answer from the CMS is HTML that this component does not render,
+ * thus the rules reach its elements with :global().
+ */
+.answerRich > :global(* + *) {
+  margin-top: var(--space-xs);
+}
+
+.answerRich :global(ul),
+.answerRich :global(ol) {
+  padding-left: 1.25em;
+}
+
+.answerRich :global(ul) {
+  list-style: disc;
+}
+
+.answerRich :global(ol) {
+  list-style: decimal;
+}
+
+.answerRich :global(a) {
+  color: var(--text-primary);
+  text-decoration: underline;
+}

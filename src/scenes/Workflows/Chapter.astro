@@ -1,0 +1,42 @@
+---
+import { ChapterHeader } from '~/components/ChapterHeader';
+import { ChapterSplit } from '~/components/ChapterSplit';
+import { FeatureFragments } from '~/components/FeatureFragments';
+import { SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as copy from '~/data/workflows';
+import { WorkflowsRoleScene, WorkflowsScene, WorkflowsScheduleScene } from './Workflows';
+
+const theme = 'orange';
+---
+
+<ChapterSplit theme={theme}>
+  <ChapterHeader {...copy.chapter} theme={theme} background="split" id="workflows" />
+  {
+    /*
+  The SceneFrame shows the record editor with the press release in review,
+  as in chapters 1, 3 and 4: no navigation bar, the menu of the models
+  closed. All the width of the screen shows (`fill`), thus the frame does
+  not cut the aside: the stage of the press release opens in the record
+  info, then the tooltip of Approved shows. The aside is wider than in
+  the kit (WorkflowsScene).
+*/
+  }
+  <SceneFrame preset="fill" theme={theme} height={500}>
+    <WorkflowsScene appearance={{ theme }} />
+  </SceneFrame>
+</ChapterSplit>
+<FeatureFragments {...copy.fragments} theme={theme} columns={2}>
+  {
+    /* The title and the card of rules. The scene is narrow and larger, thus the rules fill the box, and the box cuts the card on the right and below. The zoom is 1.1 in a box of 500px, and a narrower box shows the same part of the rules. On phones the zoom is 1.3 (0.9 in a box of 350px), thus more of each rule shows. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={1.1} phoneZoom={1.3}>
+    <WorkflowsRoleScene appearance={{ theme }} width={520} height={400} />
+  </SceneFragment>
+  {
+    /* The aside of the record editor with the panel "Publishing schedule" open and the panel "Links" closed under it, larger. The box cuts the aside a little on the right, and below the panel "Links". The zoom is 1.1 in a box of 500px, as the rules of the role. On phones the zoom is 1.3 (0.9 in a box of 350px), thus all the schedule shows. */
+  }
+  <SceneFragment slot="visual-1" fit="scale" zoom={1.1} phoneZoom={1.3}>
+    <WorkflowsScheduleScene appearance={{ theme }} width={460} height={400} />
+  </SceneFragment>
+</FeatureFragments>

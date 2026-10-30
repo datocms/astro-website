@@ -1,0 +1,39 @@
+---
+import type { PlaceholderField } from './types';
+import styles from './style.module.css';
+
+interface Props {
+  fields: PlaceholderField[];
+}
+
+const { fields } = Astro.props;
+---
+
+<dl class={styles.fields}>
+  {
+    fields.map((field) => (
+      <div class={styles.field}>
+        <dt class:list={[styles.label, 'caption']}>{field.label}</dt>
+        <dd class={styles.value}>
+          {typeof field.value === 'string' ? (
+            <p class="body">{field.value}</p>
+          ) : field.value.length > 0 && typeof field.value[0] === 'string' ? (
+            <ul class:list={[styles.list, 'body']}>
+              {(field.value as string[]).map((text) => (
+                <li>{text}</li>
+              ))}
+            </ul>
+          ) : (
+            <ol class={styles.items}>
+              {(field.value as PlaceholderField[][]).map((item) => (
+                <li class={styles.item}>
+                  <Astro.self fields={item} />
+                </li>
+              ))}
+            </ol>
+          )}
+        </dd>
+      </div>
+    ))
+  }
+</dl>

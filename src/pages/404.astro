@@ -1,18 +1,23 @@
 ---
-import { Hero } from '~/components/Hero';
-import { Layout } from '~/layouts/Layout';
+import { NotFoundSection } from '~/components/NotFoundSection';
+import { PageCloser } from '~/components/PageCloser';
+import { eyesVideo } from '~/data/videos';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
+
+// The node adapter renders this page for each route that does not match.
+// Set the status also when a request goes to "/404" directly.
+Astro.response.status = 404;
+
+const seo = overrideSeo(
+  [],
+  seoTitle('404 - Page Not Found'),
+  seoDescription('The page you requested could not be found.'),
+);
 ---
 
-<Layout seo={[]} noFinalCta>
-  <Fragment name="head">
-    <title>404 - Page Not Found</title>
-  </Fragment>
-  <Hero>
-    <Fragment slot="kicker">Plot twist!</Fragment>
-    <Fragment slot="title"><mark>Page not found</mark></Fragment>
-    <Fragment slot="subtitle">
-      It appears we took a wrong turn.. the page you requested could not be found. Please verify the
-      URL, or return to <a href="/">our homepage</a>.
-    </Fragment>
-  </Hero>
+{/* Figma 2nEQ2LGxRaWjxWzjuVoXBV: 404 (699:29797). */}
+<Layout seo={seo} footerTheme="orange">
+  <NotFoundSection />
+  <PageCloser theme="orange" video={eyesVideo} />
 </Layout>

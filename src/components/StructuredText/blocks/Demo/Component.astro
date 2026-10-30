@@ -1,0 +1,56 @@
+---
+import { AppWindow } from '~/components/AppWindow';
+import { Button } from '~/components/Button';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { DemoFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof DemoFragment>;
+}
+
+const { demo } = readFragment(DemoFragment, Astro.props.block);
+const { screenshot } = demo;
+
+// Show a screenshot with a ratio from 1 to 2 as it is. Crop the others.
+const ratio = screenshot.width && screenshot.height ? screenshot.width / screenshot.height : 0;
+const image = ratio >= 1 && ratio < 2 ? screenshot.freeFormImage : screenshot.croppedImage;
+---
+
+{
+  /*
+  A starter project: its screenshot in a window, its name, and a button
+  that deploys it from the DatoCMS dashboard.
+*/
+}
+<prose-island>
+  <div class={styles.demo}>
+    <AppWindow address={demo.name} class={styles.window}>
+      {image && <ResponsiveImage data={image} />}
+    </AppWindow>
+    <div class={styles.text}>
+      <p class="h2">{demo.name}</p>
+      <p class:list={[styles.description, 'body']}>
+        Publish this demo online with just three clicks in a matter of minutes.
+      </p>
+      <Button
+        href={`https://dashboard.datocms.com/deploy?repo=${demo.githubRepo}`}
+        appearance="deep-on-white"
+        attrs={{ target: '_blank', rel: 'noreferrer' }}
+      >
+        Deploy the demo project
+      </Button>
+      {
+        demo.technology.logo && (
+          <img
+            class={styles.logo}
+            src={demo.technology.logo.url}
+            alt={demo.technology.logo.alt ?? demo.technology.name}
+            loading="lazy"
+          />
+        )
+      }
+    </div>
+  </div>
+</prose-island>

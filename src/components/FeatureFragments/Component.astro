@@ -1,0 +1,82 @@
+---
+import { Section } from '~/components/Section';
+import { InlineText } from '~/components/InlineText';
+import type { Theme } from '~/lib/theme';
+import type { FeatureFragmentsData } from './types';
+import styles from './style.module.css';
+
+interface Props extends FeatureFragmentsData {
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+  /**
+   * The columns from 1152. Without it, 3 items get 3 columns, and 2 or 4
+   * items get 2 columns (4 items make a 2 × 2 grid).
+   */
+  columns?: 2 | 3;
+  /**
+   * The surface of the section. The default is the pale surface, after the
+   * bold surface of the ChapterHeader and the SceneFrame.
+   */
+  background?: 'default' | 'accent' | 'inverse';
+  /**
+   * Remove the top padding. Use it when the fragments are on the same surface
+   * as the SceneFrame above: the bottom padding of the SceneFrame is then the
+   * full gap. The default is true on the inverse surface.
+   */
+  flushTop?: boolean;
+  /**
+   * The ratio of each picture box, as the CSS `aspect-ratio`, for example
+   * `5 / 3`.
+   * @default '4 / 3'
+   */
+  visualAspect?: string;
+}
+
+const {
+  items,
+  theme,
+  background = 'default',
+  flushTop = background === 'inverse',
+  visualAspect,
+} = Astro.props;
+const columns = Astro.props.columns ?? (items.length === 3 ? 3 : 2);
+
+// Render each named slot `visual-<index>` here. A missing slot gives an empty box.
+const visuals = await Promise.all(
+  items.map((_, i) =>
+    Astro.slots.has(`visual-${i}`) ? Astro.slots.render(`visual-${i}`) : undefined,
+  ),
+);
+---
+
+{/* The sub-features of a chapter: a small picture, a title and one sentence each. */}
+<Section
+  theme={theme}
+  background={background}
+  flushTop={flushTop}
+  class:list={[styles.section, background === 'inverse' && styles.inverse]}
+>
+  <ul
+    class:list={[styles.items, columns === 3 && styles.three]}
+    style={visualAspect ? `--visual-aspect: ${visualAspect}` : undefined}
+  >
+    {
+      items.map((item, i) => (
+        <li class={styles.item}>
+          <div
+            class:list={[styles.visual, !visuals[i] && styles.empty]}
+            data-diagram-surface="light"
+          >
+            {visuals[i] && <Fragment set:html={visuals[i]} />}
+          </div>
+          <h3 class:list={[styles.title, 'bodyMedium']}>
+            <InlineText text={item.title} />
+          </h3>
+          <p class:list={[styles.text, 'subtitle']}>
+            <InlineText text={item.text} />
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

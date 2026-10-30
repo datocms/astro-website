@@ -3,8 +3,88 @@ import react from '@astrojs/react';
 import expressiveCode from 'astro-expressive-code';
 import { defineConfig, envField } from 'astro/config';
 import { writeFile } from 'fs/promises';
+import type { Plugin } from 'vite';
+import { redesignCssArea } from './redesign-css-scope.mjs';
 
 const MAX_CLIENT_CHUNK_SIZE_IN_KB = 500;
+
+/*
+ * Cascade layers by role, for the CSS of the redesign only (the
+ * prototype, see src/REDESIGN.md). Without layers, two rules with the
+ * same specificity win or lose by the order of the CSS in the page, and
+ * the dev server and the build give different orders. With layers, a
+ * rule in a higher layer wins over a rule in a lower layer, in any order.
+ *
+ * The order of the layers is in src/layouts/Layout.astro (the first child
+ * of <head>) and at the top of src/styles/global.css:
+ * reset, tokens, base, vendor, blocks, sections, pages.
+ *
+ * This plugin puts a CSS module in a layer only when it is CSS of the
+ * redesign (redesignCssArea() in redesign-css-scope.mjs):
+ * - the modules of src/components/, except the old directories in
+ *   LEGACY_COMPONENT_DIRS;
+ * - the modules of src/scenes/;
+ * - the modules of the ported pages in REDESIGN_PAGE_DIRS;
+ * - the CSS of the scene kit (@datocms/product-scenes).
+ * The old CSS modules get no layer. Thus the cascade of the old pages
+ * does not change.
+ *
+ * It runs before the CSS plugin of Vite, thus CSS modules and minification
+ * see the @layer block. The layer comes from:
+ * 1. A marker on the first line of the file: "/* @layer <name> *\/".
+ * 2. Else the path: the kit is "vendor", src/pages/ is "pages", all
+ *    other modules are "sections".
+ *
+ * src/scenes/diagram/ stays in "sections", with the scenes. A scene puts
+ * a class of the diagram and its own class on the same element. The
+ * states of the diagram (`.change[data-changed]`) must win over the own
+ * class of the scene, and only the specificity in one layer gives that.
+ */
+const LAYER_MARKER = /^\s*\/\*\s*@layer\s+([\w-]+)\s*\*\//;
+// An @property rule has no nested braces.
+const PROPERTY_RULE = /@property\s+[\w-]+\s*\{[^{}]*\}/g;
+
+function cssLayers(): Plugin {
+  return {
+    name: 'css-layers',
+    enforce: 'pre',
+    transform(code, id) {
+      const path = id.split('?')[0] ?? id;
+      const isKit = path.endsWith('/product-scenes.css') && path.includes('product-scenes');
+      if (!isKit && !path.endsWith('.module.css')) return null;
+
+      const area = isKit ? 'vendor' : redesignCssArea(path);
+      // Old CSS: no layer.
+      if (!area) return null;
+
+      // Do not wrap a file two times.
+      if (/^\s*@layer\s+[\w-]+\s*\{/.test(code)) return null;
+
+      const marker = code.match(LAYER_MARKER);
+      let layer = 'sections';
+      if (marker?.[1]) layer = marker[1];
+      else if (isKit) layer = 'vendor';
+      else if (area === 'pages') layer = 'pages';
+
+      // Keep the @property rules out of the layer. A registered property
+      // is global, and some tools do not accept @property in a block.
+      // Each rule becomes empty lines, thus the line numbers stay the same.
+      const properties: string[] = [];
+      const body = code.replace(PROPERTY_RULE, (rule) => {
+        properties.push(rule);
+        return rule.replace(/[^\n]/g, '');
+      });
+
+      // The opening of the block is on line 1, and the hoisted rules come
+      // after the end. Thus each line keeps its number, and the source map
+      // of the file before this step is still correct (map: null).
+      return {
+        code: `@layer ${layer} {${body}\n}\n${properties.join('\n')}`,
+        map: null,
+      };
+    },
+  };
+}
 
 export default defineConfig({
   base: '/', // Can be any string, but MUST be set or component imports on astro build will fail.
@@ -235,6 +315,7 @@ export default defineConfig({
   markdown: {},
   vite: {
     plugins: [
+      cssLayers(),
       // Stop the build when a client JS chunk that a page loads immediately is
       // larger than the limit. The plugin examines the entry chunks and the
       // chunks that they import statically. It ignores the chunks that load
@@ -283,6 +364,34 @@ export default defineConfig({
     '/cma-ts-schema':
       '/docs/content-management-api/resources/item#type-safe-development-with-typescript',
     '/search': '/docs/site-search',
+    // The old feature pages of the Editing pillar are chapters of /editor-experience.
+    '/features/structured-content-cms': '/editor-experience#structured-content',
+    '/features/visual-editing': '/editor-experience#visual-editing',
+    '/features/dynamic-layouts': '/editor-experience#dynamic-layouts',
+    '/features/headless-cms-multi-language': '/editor-experience#localization',
+    '/features/workflow-cms': '/editor-experience#workflows',
+    '/features/editor-experience': '/editor-experience',
+    // The dark mode page is only an entry in the index of the features.
+    '/features/dark-mode': '/features#editor-experience',
+    // The old feature pages of the Developers pillar are chapters of /developers.
+    '/features/schema-builder': '/developers#schema',
+    '/features/headless-cms-graphql': '/developers#graphql',
+    '/features/real-time-api': '/developers#real-time',
+    '/features/cache-tags': '/developers#delivery',
+    // The numbers section holds the claims of the old CDN page.
+    '/features/worldwide-cdn': '/developers#numbers',
+    '/features/data-integrity': '/developers#environments',
+    '/features/developer-experience': '/developers',
+    '/features/plugins': '/developers#plugins',
+    '/made-for/developers': '/developers',
+    // The old feature pages of the Media pillar are chapters of /media.
+    '/features/images-api': '/media#images',
+    '/features/video-api': '/media#video',
+    // The old AI page is the AI pillar.
+    '/features/ai': '/ai',
+    // The philosophy page and the wall of love replace the old pages.
+    '/company/about': '/philosophy',
+    '/wall': '/wall-of-love',
     '/blog/2': '/blog/p/2',
     '/changelog/2': '/product-updates/p/2',
     '/changelog/3': '/product-updates/p/3',
@@ -355,7 +464,7 @@ export default defineConfig({
     '/docs/deployments/zeit': '/docs',
     '/foo': '/docs',
     // 08.01.2025
-    '/cda-explorer': '/features/headless-cms-graphql',
+    '/cda-explorer': '/developers#graphql',
     '/docs/pro-tips/manage-draft-published-state-by-locale': '/docs/general-concepts/localization',
     '/docs/building-plugins/sdk-reference': '/docs/plugin-sdk/build-your-first-plugin',
     '/docs/general-concepts/environments': '/docs/content-management-api/setting-the-environment',
@@ -397,7 +506,7 @@ export default defineConfig({
       '/docs/content-management-api/resources/item/update',
     '/docs/guides/single-sign-on': '/docs/content-management-api/resources/sso-settings',
     '/partners/locale': '/tech-partners/locale',
-    '/features/graphql-content-api': '/features/headless-cms-graphql',
+    '/features/graphql-content-api': '/developers#graphql',
     '/docs/deployments/netlify': '/docs/hosting-and-deployment/netlify',
     '/docs/plugins/creating-a-new-plugin': '/docs/plugin-sdk/build-your-first-plugin',
     '/docs/visual-editing/how-to-use-visual-editing': '/docs/content-link/how-to-use-content-link',
@@ -406,9 +515,11 @@ export default defineConfig({
       '/docs/content-delivery-api/hierarchical-sorting',
     '/docs/content-modelling/trees': '/docs/content-modelling/hierarchical-sorting',
     '/docs/plugin-sdk': '/docs/plugin-sdk/introduction',
-    '/team/best-cms-for-developers': '/made-for/developers',
-    '/team/cms-digital-marketing': '/made-for/marketers',
-    '/team/content-creators': '/made-for/content-creators',
+    '/team/best-cms-for-developers': '/developers',
+    '/team/cms-digital-marketing': '/editor-experience',
+    '/team/content-creators': '/editor-experience',
+    '/made-for/marketers': '/editor-experience',
+    '/made-for/content-creators': '/editor-experience',
     '/customer-stories': '/casual-chats',
     '/customer-stories/[...rest]': '/casual-chats/[...rest]',
     '/success-stories': '/customers',

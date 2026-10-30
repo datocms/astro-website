@@ -1,60 +1,43 @@
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { CaseStudyGridStoryFragment } from '~/components/CaseStudyGrid';
+import { QuotePartnerTestimonialFragment } from '~/components/Quote';
+import { StatsNumberFragment } from '~/components/Stats';
+import { TextWithImageStoryFragment } from '~/components/TextWithImage';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { SuccessStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/successStory';
 import { graphql } from '~/lib/datocms/graphql';
 
+/* The quote between the two grids is the testimonial of Tim Chesney (Make). */
 export const query = graphql(
   /* GraphQL */ `
-    query CustomersQuery {
+    query SuccessStoriesIndex {
       page: successStoriesIndex {
         seo: _seoMetaTags {
           ...TagFragment
         }
         highlight {
           id
-          name
+          numbers {
+            ...StatsNumberFragment
+          }
+          ...TextWithImageStoryFragment
           ...SuccessStoryUrlFragment
         }
       }
-      posts: allSuccessStories {
+      stories: allSuccessStories(first: 100, orderBy: position_ASC) {
         id
-        name
-        accentColor {
-          hex
-        }
-        duotoneColor1 {
-          hex
-        }
-        duotoneColor2 {
-          hex
-        }
-        title {
-          value
-        }
-        subtitle {
-          value
-        }
-        coverImage {
-          url
-          focalPoint {
-            x
-            y
-          }
-          responsiveImage(imgixParams: { auto: format, ar: "3:2", w: 1200, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-        }
-        logo {
-          url
-          alt
-        }
-        numbers {
-          number
-          label
-        }
-        ...SuccessStoryUrlFragment
+        ...CaseStudyGridStoryFragment
+      }
+      testimonial: partnerTestimonial(filter: { id: { eq: "EsPEhRwGSTOLU19hEPLVhg" } }) {
+        ...QuotePartnerTestimonialFragment
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment, SuccessStoryUrlFragment],
+  [
+    TagFragment,
+    StatsNumberFragment,
+    TextWithImageStoryFragment,
+    SuccessStoryUrlFragment,
+    CaseStudyGridStoryFragment,
+    QuotePartnerTestimonialFragment,
+  ],
 );

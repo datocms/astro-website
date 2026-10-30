@@ -1,0 +1,124 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { Section } from '~/components/Section';
+import { InlineText } from '~/components/InlineText';
+import solved from '~/assets/home/solved.svg?raw';
+import { Typewriter } from '~/components/Typewriter';
+import type { CommunityData } from '~/data/home';
+import type { Step } from '~/lib/motion/typewriter';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends CommunityData {
+  theme?: Theme;
+}
+
+const { headline, muted, paragraph, button, posts, theme = 'green' } = Astro.props;
+
+// Starts when the top of the
+// heading passes 75% of the viewport, one time.
+const script: Step[] = [
+  {
+    type: 'cursor',
+    glyphs: [
+      { text: '•', ms: 200 },
+      { text: '••', ms: 200 },
+      { text: '-•', ms: 100 },
+      { text: '••', ms: 150 },
+    ],
+  },
+  { type: 'text', text: headline, speedCps: 65 },
+  {
+    type: 'face',
+    frames: [
+      { text: '[••]', ms: 300 },
+      ...['[**]', '[~~]', '[•﹏•]', '[•_•]', '[•✓•]', '[•o•]', '[^_^]', '[~ᴗ~]'].map((text) => ({
+        text,
+        ms: 120,
+      })),
+      { text: '[•ᴗ•]', ms: 0 },
+    ],
+  },
+];
+
+// The data is in order from left to right: card3, card-2, card-1, card4. The deck is a
+// queue of 8 cards (stages 0 to 7). Card i starts at stage i:
+//   0, 1, 2   the queue (left to right), closed
+//   3         the top of the pile, open
+//   4, 5, 6   the pile below it, open
+//   7         the card that goes out of the pile, not visible
+// Stage 6 is card4 and stage 3 is card3. The posts
+// come again in the same order, thus the queue does not stop.
+const STAGES = 8;
+const deck = Array.from(
+  { length: STAGES },
+  (_, i) => posts[(((i - 7) % posts.length) + posts.length) % posts.length]!,
+);
+---
+
+<Section theme={theme} padding="headlines" class={styles.community} contentClass={styles.content}>
+  <div class={styles.text}>
+    <h2 class:list={[styles.heading, 'h1']}>
+      <Typewriter script={script} start="view" rootMargin="0px 0px -25% 0px">
+        {headline} [•ᴗ•]
+      </Typewriter>
+      <span class={styles.muted}><InlineText text={muted} /></span>
+    </h2>
+    <p class:list={[styles.paragraph, 'body']}>{paragraph}</p>
+    <ButtonGroup buttons={[button]} />
+  </div>
+
+  <div class={styles.band} aria-hidden="true" data-community-band>
+    <ul class={styles.deck}>
+      {
+        deck.map((post, i) => (
+          <li class={styles.card} style={`--i: ${i}`}>
+            <span class={styles.cardHeader}>
+              <span class={styles.user}>
+                <img src={post.author.avatar} alt="" width="40" height="40" class={styles.avatar} />
+                <span class={styles.name}>{post.author.name}</span>
+                <span class={styles.dot} />
+                <span class={styles.age}>{post.age}</span>
+              </span>
+              {post.tag && <span class={styles.tag}>{post.tag}</span>}
+            </span>
+            <span class={styles.title}>{post.title}</span>
+            <span class={styles.solved}>
+              <span class={styles.user}>
+                <img
+                  src={post.solvedBy.avatar}
+                  alt=""
+                  width="40"
+                  height="40"
+                  class:list={[styles.avatar, styles.solvedAvatar]}
+                />
+                <span class={styles.name}>{post.solvedBy.name}</span>
+                <span class={styles.dot} />
+                <span class={styles.age}>{post.solvedAge}</span>
+              </span>
+              <span class={styles.solvedLabel}>
+                <span>Solved</span>
+                <span class={styles.check} set:html={solved} />
+              </span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Section>
+
+<script>
+  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  // The deck moves only when it is on screen. Without JS and with reduced
+  // motion, the CSS shows the full pile and the queue, and does not move.
+  const bands = prefersReducedMotion()
+    ? []
+    : document.querySelectorAll<HTMLElement>('[data-community-band]');
+  for (const band of bands) {
+    band.dataset.state = 'paused';
+    onVisibilityChange(band, (visible) => {
+      band.dataset.state = visible ? 'running' : 'paused';
+    });
+  }
+</script>

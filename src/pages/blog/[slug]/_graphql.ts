@@ -14,7 +14,7 @@ import { TutorialVideoFragment } from '~/components/blocks/TutorialVideo/graphql
 import { VideoFragment } from '~/components/blocks/Video/graphql';
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { BlogPostUrlFragment, buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';

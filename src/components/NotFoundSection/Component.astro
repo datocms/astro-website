@@ -1,0 +1,107 @@
+---
+import { Button } from '~/components/Button';
+import { Headline } from '~/components/Headline';
+import { Section } from '~/components/Section';
+import type { Step } from '~/lib/motion/typewriter';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props {
+  label?: string;
+  /** The first sentence of the headline, in text/primary. */
+  headline?: string;
+  /** The rest of the headline, muted. */
+  muted?: string;
+  /** The face at the end of the muted text. */
+  face?: string;
+  homeLabel?: string;
+  searchLabel?: string;
+  helpText?: string;
+  helpLink?: { label: string; href: string };
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+}
+
+const {
+  label = 'Error 404',
+  headline = 'Page not found.',
+  muted = 'The link may be broken or the page has moved somewhere new',
+  face = '[x_x]',
+  homeLabel = 'Back to homepage',
+  searchLabel = 'Search the site',
+  helpText = 'Still stuck?',
+  helpLink = { label: 'Contact Support', href: '/contact' },
+  theme,
+} = Astro.props;
+
+// The timeline of the Hero typewriter: the headline, the muted text, then
+// the face. The face first shows the default eyes, then the sad face.
+const script: Step[] = [
+  { type: 'pause', ms: 750 },
+  { type: 'cursor', glyphs: ['•', '~', '-', 'ᴗ', '•'], msPerGlyph: 75 },
+  { type: 'pause', ms: 25 },
+  { type: 'text', text: headline, speedCps: 80 },
+  { type: 'pause', ms: 500 },
+  { type: 'text', text: muted, speedCps: 80 },
+  { type: 'pause', ms: 150 },
+  {
+    type: 'face',
+    frames: [
+      { text: '••', ms: 150 },
+      { text: '[••', ms: 75 },
+      { text: '[••]', ms: 300 },
+      { text: face, ms: 150 },
+    ],
+  },
+];
+---
+
+<Section theme={theme}>
+  <div class={styles.intro} data-not-found>
+    <div class={styles.headlineGroup}>
+      <p class:list={[styles.label, 'subtitle']}>{label}</p>
+      <Headline
+        as="h1"
+        size="h1"
+        muted={`${muted} ${face}`}
+        typewriter={script}
+        typewriterStart="load"
+      >
+        {headline}
+      </Headline>
+    </div>
+    <div class={styles.buttons} data-not-found-after>
+      <Button appearance="deep-on-white" href="/" arrow={false}>{homeLabel}</Button>
+      {/* SearchPopup opens from each element with data-search-open. */}
+      <Button
+        appearance="deep-on-white"
+        variant="soft"
+        attrs={{ 'data-search-open': '', 'aria-haspopup': 'dialog' }}
+      >
+        {searchLabel}
+      </Button>
+    </div>
+    <p class:list={[styles.help, 'subtitleMedium']} data-not-found-after>
+      {helpText}{' '}
+      <a href={helpLink.href} class={styles.helpLink}>
+        <span class={styles.helpLabel}>{helpLink.label}</span>
+        <span aria-hidden="true"> →</span>
+      </a>
+    </p>
+  </div>
+</Section>
+
+<script>
+  // The buttons and the help link fade in 150ms after the typewriter ends.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-not-found]')) {
+    const tw = root.querySelector<HTMLElement>('[data-typewriter]');
+    if (!tw || document.documentElement.dataset.motion !== 'on' || tw.dataset.twState === 'done')
+      continue;
+    tw.addEventListener('typewriter:done', () => {
+      setTimeout(() => {
+        for (const el of root.querySelectorAll<HTMLElement>('[data-not-found-after]'))
+          el.dataset.visible = 'true';
+      }, 150);
+    });
+  }
+</script>

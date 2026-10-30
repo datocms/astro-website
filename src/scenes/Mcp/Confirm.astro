@@ -1,0 +1,25 @@
+---
+import { CONFIRM } from './story';
+import styles from './style.module.css';
+import ToolCall from './ToolCall.astro';
+---
+
+<div class={styles.turn} role="img" aria-label={CONFIRM.description}>
+  <div class={styles.turnRows} aria-hidden="true">
+    <ToolCall summary={CONFIRM.tool.summary} />
+    <p>{CONFIRM.plan}</p>
+    <div class={styles.ask}>
+      <p class={styles.askHead}>
+        <span class={styles.askServer}>{CONFIRM.server}</span>
+        <span class={styles.askScript}>{CONFIRM.script}</span>
+      </p>
+      <p class={styles.askQuestion}>{CONFIRM.question}</p>
+      <pre class={styles.askCode}>{CONFIRM.code.join('\n')}</pre>
+      <p class={styles.askButtons}>
+        <span class={styles.allow}>{CONFIRM.allowOnce}</span>
+        <span class={styles.choice}>{CONFIRM.allowAlways}</span>
+        <span class={styles.choice}>{CONFIRM.deny}</span>
+      </p>
+    </div>
+  </div>
+</div>

@@ -5,7 +5,7 @@ import s from '../style.module.css';
 import searchIcon from '~/icons/regular/magnifying-glass.svg?raw';
 
 type Props = {
-  inputRef: RefObject<HTMLInputElement>;
+  inputRef: RefObject<HTMLInputElement | null>;
   name: string;
   type?: 'text' | 'search';
   placeholder: string;

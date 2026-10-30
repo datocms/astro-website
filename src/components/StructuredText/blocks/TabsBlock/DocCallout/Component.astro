@@ -1,0 +1,43 @@
+---
+import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
+import { StructuredText } from '~/components/StructuredText';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { DocCalloutFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof DocCalloutFragment>;
+}
+
+const { calloutType, title, text } = readFragment(DocCalloutFragment, Astro.props.block);
+const type = stripStega(calloutType);
+---
+
+{
+  /*
+  A note in a tab: an optional title and a short text. The type is
+  "neutral", "protip", "positive" or "warning". Only "warning" has a
+  different colour.
+*/
+}
+<aside class:list={[styles.callout, type === 'warning' && styles.warning]}>
+  {
+    title && (
+      <p class:list={[styles.title, 'bodyMedium']}>
+        {type === 'protip' && 'Pro tip: '}
+        {title}
+      </p>
+    )
+  }
+  <div class={styles.text}>
+    <StructuredText
+      {...ensureValidStructuredTextProps({
+        data: text,
+        linkToRecordComponents: defaultLinkToRecordComponents,
+        inlineRecordComponents: defaultInlineRecordComponents,
+      })}
+    />
+  </div>
+</aside>

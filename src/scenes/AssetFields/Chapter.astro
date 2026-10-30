@@ -1,0 +1,23 @@
+---
+import { ChapterLayout } from '~/components/ChapterLayout';
+import { SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as media from '~/data/media';
+import { AssetFieldsScene, AssetFieldsTrailerScene } from './AssetFields';
+
+const theme = media.fields.theme;
+---
+
+<ChapterLayout {...media.fields}>
+  <Fragment slot="scene">
+    <SceneFrame preset="window" theme={theme} height={690} zoom={1}>
+      <AssetFieldsScene appearance={{ theme }} height={1000} />
+    </SceneFrame>
+  </Fragment>
+  {
+    /* The card is larger than the box (zoom 1.15). The box cuts it at the right and at the bottom, so no card border sits next to the line of the box. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={1.15} phoneZoom={1.15}>
+    <AssetFieldsTrailerScene appearance={{ theme }} width={460} height={400} />
+  </SceneFragment>
+</ChapterLayout>

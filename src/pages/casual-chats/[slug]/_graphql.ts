@@ -16,7 +16,7 @@ import { ChangelogEntryInlineFragment } from '~/components/inlineRecords/Changel
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
 import { BlogPostLinkFragment } from '~/components/linkToRecords/BlogPostLink/graphql';
 import { ChangelogEntryLinkFragment } from '~/components/linkToRecords/ChangelogEntryLink/graphql';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {

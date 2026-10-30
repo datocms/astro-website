@@ -1,0 +1,93 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { Headline } from '~/components/Headline';
+import { LogosLine } from '~/components/LogosLine';
+import { Section } from '~/components/Section';
+import type { HomeHeroData } from '~/data/home';
+import type { Step } from '~/lib/motion/typewriter';
+import styles from './style.module.css';
+
+type Props = HomeHeroData;
+
+const { headline, subheadline, face = '[••]', buttons, logosLabel, logos } = Astro.props;
+
+// The timeline of the Hero component, with a human
+// rhythm: the words come in bursts, a full stop makes a stop, and the
+// writer thinks before the subheadline. The headline and the subheadline
+// are typed, then the face winks. The buttons come with the subheadline.
+const script: Step[] = [
+  { type: 'pause', ms: 750 },
+  { type: 'cursor', glyphs: ['•', '~', '-', 'ᴗ', '•'], msPerGlyph: 75 },
+  { type: 'pause', ms: 120 },
+  { type: 'text', text: headline, speedCps: 42, rhythm: 'human' },
+  { type: 'pause', ms: 600 },
+  // The buttons fade in when the subheadline starts.
+  { type: 'mark', name: 'subheadline' },
+  { type: 'text', text: subheadline, speedCps: 52, rhythm: 'human' },
+  { type: 'pause', ms: 300 },
+  {
+    // The face is drawn one sign at a time, with its eyes closed. Then it
+    // opens its eyes, winks, and looks at you. Each frame stays long
+    // enough to follow.
+    type: 'face',
+    frames: [
+      { text: '[', ms: 220 },
+      { text: '[-', ms: 200 },
+      { text: '[--', ms: 200 },
+      { text: '[--]', ms: 500 },
+      { text: '[••]', ms: 650 },
+      // A different face replaces the default face after the wink.
+      ...(face === '[••]'
+        ? [
+            { text: '[-•]', ms: 170 },
+            { text: '[••]', ms: 400 },
+          ]
+        : [{ text: face, ms: 400 }]),
+    ],
+  },
+];
+---
+
+<Section
+  background="default"
+  theme="orange"
+  class={styles.hero}
+  contentClass={styles.content}
+  flush
+  data-home-hero
+>
+  <div class={styles.text}>
+    <Headline
+      as="h1"
+      size="h1"
+      muted={`${subheadline} ${face}`}
+      breakBeforeMuted
+      typewriter={script}
+      typewriterStart="load"
+      class={styles.headline}
+    >
+      {headline}
+    </Headline>
+    <ButtonGroup buttons={buttons} class={styles.buttons} data-home-hero-buttons="" />
+  </div>
+
+  <div class={styles.trust}>
+    <LogosLine logos={logos} label={logosLabel} size="small" class={styles.logos} />
+  </div>
+</Section>
+
+<script>
+  // The buttons fade in when the script reaches the `subheadline` mark.
+  // If the mark was missed, the end of the typewriter shows them.
+  for (const hero of document.querySelectorAll<HTMLElement>('[data-home-hero]')) {
+    const tw = hero.querySelector<HTMLElement>('[data-typewriter]');
+    const buttons = hero.querySelector<HTMLElement>('[data-home-hero-buttons]');
+    if (!tw || !buttons || document.documentElement.dataset.motion !== 'on') continue;
+    if (tw.dataset.twState === 'done') continue;
+    const show = () => (buttons.dataset.visible = 'true');
+    tw.addEventListener('typewriter:mark', (event) => {
+      if ((event as CustomEvent<string>).detail === 'subheadline') show();
+    });
+    tw.addEventListener('typewriter:done', show);
+  }
+</script>

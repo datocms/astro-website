@@ -1,0 +1,272 @@
+---
+import { Button } from '~/components/Button';
+import { FormField } from '~/components/FormField';
+import { Headline } from '~/components/Headline';
+import type { ContactFormData } from '~/data/contact';
+import styles from './style.module.css';
+
+/*
+ * Without `external`, the submit is a stub (as in the prototype): no
+ * network call. The script validates the fields, shows the submitting
+ * state for 1s, then shows the success state.
+ * To see the submit error, add `?fail` to the URL, or use an e-mail that
+ * starts with `fail@`.
+ * Without JS, the browser validates the `required` fields and the form
+ * posts to the same page, which then shows the success state.
+ *
+ * With `external` (not in the prototype), the page sends the data: see
+ * ./types.ts. The slot `extra` (not in the prototype) goes at the end of
+ * the box, before the submit row: hidden inputs, an anti-bot widget.
+ */
+type Props = ContactFormData & {
+  /** Show the success state (the page sets it after a POST without JS). */
+  submitted?: boolean;
+  /** The page sends the data (see ./types.ts). Not in the prototype. */
+  external?: boolean;
+};
+
+const {
+  rows,
+  legal,
+  submitLabel,
+  sendingMessage,
+  submitErrorMessage,
+  noscriptMessage,
+  success,
+  submitted = false,
+  external = false,
+} = Astro.props;
+
+// Without scripts, an external form cannot send its data: show the message
+// instead of the form.
+const needsScript = external && noscriptMessage !== undefined;
+---
+
+<div
+  class={styles.root}
+  data-contact-form
+  data-sending-message={sendingMessage}
+  data-external={external ? '' : undefined}
+>
+  {
+    needsScript && (
+      <noscript>
+        <p class:list={['subtitleMedium', styles.box, styles.noscript]}>{noscriptMessage}</p>
+      </noscript>
+    )
+  }
+  <form
+    class:list={[styles.form, needsScript && styles.needsScript]}
+    method="post"
+    hidden={submitted}
+    data-form
+  >
+    <div class={styles.box}>
+      {
+        rows.map((row, i) => (
+          <div class:list={[styles.row, i === 0 && styles.firstRow]}>
+            {row.map((field) => (
+              <FormField {...field} class={styles.cell} />
+            ))}
+          </div>
+        ))
+      }
+      <slot name="extra" />
+      <div class={styles.submitRow}>
+        <p class:list={['subtitle', styles.legal]}>
+          {legal.before}<a href={legal.terms.href}>{legal.terms.label}</a>{legal.between}<a
+            href={legal.privacy.href}>{legal.privacy.label}</a
+          >{legal.after}
+        </p>
+        <Button appearance="deep-on-white" type="submit" attrs={{ 'data-submit': '' }}>
+          {submitLabel}
+        </Button>
+      </div>
+    </div>
+    <p
+      class:list={['subtitleMedium', styles.submitError]}
+      role="alert"
+      data-submit-error
+      data-message={submitErrorMessage}
+    >
+    </p>
+  </form>
+
+  <div class:list={[styles.box, styles.success]} tabindex="-1" hidden={!submitted} data-success>
+    <Headline as="h2" size="h2">
+      {success.headline}
+      <Fragment slot="muted">
+        {success.muted}{' '}
+        <span aria-hidden="true">{success.face}</span>
+      </Fragment>
+    </Headline>
+    {success.body && <p class="subtitleMedium">{success.body}</p>}
+    <div>
+      <Button
+        href={success.button.href}
+        appearance={success.button.appearance}
+        variant={success.button.variant}
+      >
+        {success.button.label}
+      </Button>
+    </div>
+  </div>
+
+  {/* Screen readers read the submitting state from here. */}
+  <p class="visuallyHidden" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import {
+    CONTACT_FORM_SEND_EVENT,
+    type ContactFormOutcome,
+    type ContactFormSendDetail,
+  } from './types';
+
+  const SUBMIT_DELAY_MS = 1000;
+
+  function setupContactForm(root: HTMLElement) {
+    const form = root.querySelector<HTMLFormElement>('[data-form]');
+    const success = root.querySelector<HTMLElement>('[data-success]');
+    const submitError = root.querySelector<HTMLElement>('[data-submit-error]');
+    const status = root.querySelector<HTMLElement>('[data-status]');
+    const button = root.querySelector<HTMLButtonElement>('[data-submit]');
+    if (!form || !success || !submitError || !status || !button) return;
+
+    // The script shows the errors, not the browser.
+    form.noValidate = true;
+
+    const fields = [...form.querySelectorAll<HTMLElement>('[data-field]')];
+    type Input = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    const inputOf = (field: HTMLElement) => field.querySelector<Input>('input, textarea, select');
+    // The control that has the focus: the combobox when the script made one.
+    const controlOf = (field: HTMLElement) =>
+      [...field.querySelectorAll<HTMLElement>('[data-control]')].find((el) => !el.hidden);
+
+    const messageOf = (field: HTMLElement) => {
+      const input = inputOf(field);
+      if (!input || input.validity.valid) return '';
+      const { requiredMessage = '', invalidMessage } = field.dataset;
+      return input.validity.valueMissing ? requiredMessage : invalidMessage || requiredMessage;
+    };
+
+    const showError = (field: HTMLElement, message: string) => {
+      const error = field.querySelector<HTMLElement>('[data-error]');
+      const text = field.querySelector<HTMLElement>('[data-error-text]');
+      const control = controlOf(field);
+      if (!error || !text || !control) return;
+      field.toggleAttribute('data-invalid', Boolean(message));
+      error.hidden = !message;
+      text.textContent = message;
+      if (message) {
+        control.setAttribute('aria-invalid', 'true');
+        control.setAttribute('aria-describedby', error.id);
+      } else {
+        control.removeAttribute('aria-invalid');
+        control.removeAttribute('aria-describedby');
+      }
+    };
+
+    // After the first error, the message follows the value. It goes away
+    // when the value is valid.
+    const recheck = (event: Event) => {
+      const field = (event.target as Element).closest<HTMLElement>('[data-field]');
+      if (field?.hasAttribute('data-invalid')) showError(field, messageOf(field));
+    };
+    form.addEventListener('input', recheck);
+    form.addEventListener('change', recheck);
+
+    let busy = false;
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (busy) return;
+
+      submitError.textContent = '';
+      const invalid = fields.filter((field) => {
+        const message = messageOf(field);
+        showError(field, message);
+        return Boolean(message);
+      });
+      if (invalid.length > 0) {
+        controlOf(invalid[0]!)?.focus();
+        return;
+      }
+
+      // Submitting: aria-disabled keeps the focus on the button.
+      busy = true;
+      form.setAttribute('aria-busy', 'true');
+      button.setAttribute('aria-disabled', 'true');
+      status.textContent = root.dataset.sendingMessage ?? '';
+
+      const done = () => {
+        busy = false;
+        form.removeAttribute('aria-busy');
+        button.removeAttribute('aria-disabled');
+        status.textContent = '';
+      };
+
+      // role="alert" reads the message. The values stay in the fields.
+      const showSubmitError = (message = submitError.dataset.message ?? '') => {
+        const face = document.createElement('span');
+        face.setAttribute('aria-hidden', 'true');
+        face.textContent = '[x_x] ';
+        submitError.append(face, message);
+      };
+
+      // Success: the focus goes to the message, so screen readers read it.
+      const showSuccess = () => {
+        form.hidden = true;
+        success.hidden = false;
+        success.focus();
+      };
+
+      if (root.hasAttribute('data-external')) {
+        const outcome = await new Promise<ContactFormOutcome>((resolve) => {
+          const detail: ContactFormSendDetail = { formData: new FormData(form), resolve };
+          root.dispatchEvent(new CustomEvent(CONTACT_FORM_SEND_EVENT, { detail }));
+        });
+
+        if (outcome.ok && outcome.redirect) {
+          // Keep the submitting state while the next page loads.
+          window.location.assign(outcome.redirect);
+          return;
+        }
+
+        done();
+
+        if (outcome.ok) {
+          showSuccess();
+          return;
+        }
+
+        const withErrors = fields.filter((field) => {
+          const name = inputOf(field)?.name;
+          const message = name ? outcome.fieldErrors?.[name] : undefined;
+          if (message) showError(field, message);
+          return Boolean(message);
+        });
+        showSubmitError(outcome.message);
+        if (withErrors.length > 0) controlOf(withErrors[0]!)?.focus();
+        return;
+      }
+
+      await new Promise((resolve) => window.setTimeout(resolve, SUBMIT_DELAY_MS));
+      done();
+
+      const email = form.querySelector<HTMLInputElement>('input[type="email"]')?.value ?? '';
+      const fail =
+        new URLSearchParams(window.location.search).has('fail') ||
+        email.trim().toLowerCase().startsWith('fail@');
+
+      if (fail) {
+        showSubmitError();
+        return;
+      }
+
+      showSuccess();
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-contact-form]').forEach(setupContactForm);
+</script>

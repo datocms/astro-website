@@ -1,0 +1,32 @@
+---
+import { Section } from '~/components/Section';
+import Fields from './Fields.astro';
+import type { PlaceholderData } from './types';
+import styles from './style.module.css';
+
+type Props = PlaceholderData;
+
+const { name, intent, visual, fields, theme } = Astro.props;
+---
+
+<Section
+  theme={theme}
+  class={styles.placeholder}
+  contentClass={styles.content}
+  data-placeholder={name}
+>
+  <header class={styles.header}>
+    <p class:list={[styles.tag, 'caption']}>New section: {name}</p>
+    <p class:list={[styles.intent, 'body']}>{intent}</p>
+  </header>
+  <div class:list={[styles.body, visual && styles.withVisual]}>
+    <Fields fields={fields} />
+    {
+      visual && (
+        <div class={styles.visual} role="img" aria-label={visual}>
+          <span class:list={[styles.visualLabel, 'caption']}>{visual}</span>
+        </div>
+      )
+    }
+  </div>
+</Section>

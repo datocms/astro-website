@@ -1,28 +1,73 @@
 ---
-import { Button } from '~/components/Button';
-import { Heading } from '~/components/Heading';
-import { InterstitialTitle } from '~/components/InterstitialTitle';
-import { Layout } from '~/layouts/Layout';
-import { Prose } from '~/components/Prose';
-import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { ScrollspyNav } from '~/components/ScrollspyNav';
-import { SingleQuote } from '~/components/quote/SingleQuote';
-import { Space } from '~/components/Space';
-import { Svg } from '~/components/Svg';
-import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
-import { Text } from '~/components/structuredText/Text';
-import { Wrapper } from '~/components/Wrapper';
-import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
-import { slugify } from '~/lib/slugify';
-import s from './_style.module.css';
+// The features index of the redesign. The hero, the groups, the buddy and
+// the closer come from src/data/features.ts. The SEO and the features of
+// the groups come from the CMS record `featuresIndex`.
+import type { ResultOf } from 'gql.tada';
+import type { SoftwareApplication, WithContext } from 'schema-dts';
+import { CategoryNav } from '~/components/CategoryNav';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { FeatureCategory } from '~/components/FeatureCategory';
+import { Hero } from '~/components/Hero';
 import { JsonLd } from '~/components/JsonLd';
+import { ListBuddy } from '~/components/ListBuddy';
+import { PageCloser } from '~/components/PageCloser';
+import * as features from '~/data/features';
+import { danceVideo } from '~/data/videos';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
-import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+
+type Page = NonNullable<ResultOf<typeof query>['page']>;
+type GroupField = Exclude<keyof Page, '_seoMetaTags'>;
+
+/**
+ * The 9 groups of the CMS record, in the order of the page. `title` is the
+ * title of the group in src/data/features.ts. `legacyId` is the anchor of
+ * the group on the old page (the slug of its old title).
+ */
+const groups: { field: GroupField; title: string; legacyId: string }[] = [
+  { field: 'coreFeaturesBlocks', title: 'Core Features', legacyId: 'core-features' },
+  { field: 'editorExperienceBlocks', title: 'Editor Experience', legacyId: 'editor-experience' },
+  {
+    field: 'developerExperienceBlocks',
+    title: 'Developer Experience',
+    legacyId: 'developer-experience',
+  },
+  {
+    field: 'imageVideoManagementBlocks',
+    title: 'Image & Video Management',
+    legacyId: 'image-video-management',
+  },
+  { field: 'localizationBlocks', title: 'Localization', legacyId: 'localization' },
+  { field: 'extensibilityBlocks', title: 'Extensibility', legacyId: 'extensibility' },
+  { field: 'contentIntegrityBlocks', title: 'Content Integrity', legacyId: 'content-integrity' },
+  {
+    field: 'governanceAndComplianceBlocks',
+    title: 'Governance & Compliance',
+    legacyId: 'governance-compliance',
+  },
+  {
+    field: 'securityAndInfrastructureBlocks',
+    title: 'Security & Infrastructure',
+    legacyId: 'security-infrastructure',
+  },
+];
+
+function findCategory(title: string) {
+  const category = features.categories.find((c) => c.title === title);
+  if (!category) throw new Error(`No group with the title "${title}"`);
+  return category;
+}
+
+// The old anchors of the groups and their new anchors, when they changed.
+const legacyAnchors: Record<string, string> = {};
+for (const { title, legacyId } of groups) {
+  const { id } = findCategory(title);
+  if (id !== legacyId) legacyAnchors[legacyId] = id;
+}
 
 const { page } = await executeQuery(Astro, query);
 
@@ -31,258 +76,45 @@ if (!page) {
   return notFoundResponse();
 }
 
-const {
-  coreFeaturesBlocks,
-  editorExperienceBlocks,
-  developerExperienceBlocks,
-  imageVideoManagementBlocks,
-  localizationBlocks,
-  extensibilityBlocks,
-  contentIntegrityBlocks,
-  governanceAndComplianceBlocks,
-  securityAndInfrastructureBlocks,
-} = page;
+const categories = groups.map(({ field, title }) => ({
+  ...findCategory(title),
+  entries: page[field].filter((block) => block.__typename === 'FeatureRegularCardRecord'),
+}));
+const last = categories.length - 1;
+// The score of the CategoryNav: the number of features on the page.
+const total = categories.reduce((n, c) => n + c.entries.length, 0);
 
-const featuresGroup = [
-  {
-    title: 'Core Features',
-    subtitle: 'The essential features that you would interact with most often in DatoCMS.',
-    features: coreFeaturesBlocks,
-  },
-  {
-    title: 'Editor Experience',
-    subtitle: 'Features specifically focused on giving content teams and creators the right tools.',
-    features: editorExperienceBlocks,
-  },
-  {
-    title: 'Developer Experience',
-    subtitle: 'From our APIs to the CLI, we put a lot of focus on delivering a solid DX.',
-    features: developerExperienceBlocks,
-  },
-  {
-    title: 'Image & Video Management',
-    subtitle:
-      'DatoCMS offers Digital Asset Management (DAM) out of the box to optimize your media.',
-    features: imageVideoManagementBlocks,
-  },
-  {
-    title: 'Localization',
-    subtitle:
-      'Granular localization options to ensure you connect with your customers wherever they are.',
-    features: localizationBlocks,
-  },
-  {
-    title: 'Extensibility',
-    subtitle: 'Plugins allow you to extend the capabilities of the CMS for specific use-cases.',
-    features: extensibilityBlocks,
-  },
-  {
-    title: 'Content Integrity',
-    subtitle:
-      'We have measures in place to ensure your content is not at risk of loss or inconsistencies.',
-    features: contentIntegrityBlocks,
-  },
-  {
-    title: 'Governance & Compliance',
-    subtitle: 'Robust features to put your mind at ease when using DatoCMS at scale.',
-    features: governanceAndComplianceBlocks,
-  },
-  {
-    title: 'Security & Infrastructure',
-    subtitle: 'Our foundations help companies of all sizes scale without obstacles.',
-    features: securityAndInfrastructureBlocks,
-  },
-];
-
-const linkTitleToLabel: { [key: string]: string } = {
-  docs: 'Docs',
-  guide: 'Guide',
-  learn_more: 'Learn more',
-  watch_demo: 'Watch demo',
+const jsonLd: WithContext<SoftwareApplication> = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'DatoCMS',
+  applicationCategory: 'WebApplication',
+  operatingSystem: 'Web',
+  url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
+  description: extractFromSeoTags(page._seoMetaTags).description,
 };
 ---
 
-<Layout seo={page._seoMetaTags}>
+<Layout seo={page._seoMetaTags} theme="green" footerTheme="blue">
+  <JsonLd slot="head" data={jsonLd} />
   <Fragment slot="head">
-    <JsonLd
-      data={{
-        '@context': 'https://schema.org',
-        '@type': 'SoftwareApplication',
-        name: 'DatoCMS',
-        applicationCategory: 'WebApplication',
-        operatingSystem: 'Web',
-        url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
-        description: extractFromSeoTags(page._seoMetaTags).description,
-      }}
-    />
+    {/* The old page had other anchors for some groups. Send an old link to the new anchor. */}
+    <script is:inline define:vars={{ anchors: legacyAnchors }}>
+      const target = anchors[location.hash.slice(1)];
+      if (target) addEventListener('DOMContentLoaded', () => location.replace(`#${target}`));
+    </script>
   </Fragment>
-  <Wrapper>
-    <div id="main-content">
-      <div class={s.hero}>
-        <div class={s.heroBody}>
-          <h1 class={s.heroKicker}>DatoCMS Features</h1>
-          <div class={s.heroTitle}>
-            <Text {...ensureValidStructuredTextProps({ data: page.title })} />
-          </div>
-          <div class={s.heroSubtitle}>
-            <Text {...ensureValidStructuredTextProps({ data: page.subtitle })} />
-          </div>
-          <div class={s.buttonContainer} data-datocms-nomd>
-            <Button as="a" href={dashboardUrl('/signup')}>Try it for free</Button>
-            <Button as="a" s="invert" href="/contact">Contact sales</Button>
-          </div>
-        </div>
-        <div class={s.heroImageWrapper} data-datocms-nomd>
-          {
-            page.heroImageLeft && page.heroImageRight && (
-              <>
-                <div class={s.heroImage}>
-                  <ResponsiveImage data={page.heroImageLeft.responsiveImage} />
-                </div>
-                <div class={s.heroImage}>
-                  <ResponsiveImage data={page.heroImageRight.responsiveImage} />
-                </div>
-              </>
-            )
-          }
-        </div>
-      </div>
 
-      <div class={s.features}>
-        <div class={s.main}>
-          {
-            featuresGroup.map(({ title, subtitle, features }) => {
-              return (
-                <div id={slugify(title)} class={s.section}>
-                  <Space bottom={1}>
-                    <InterstitialTitle style="one">
-                      {title}
-                      <Fragment slot="below">
-                        <p class={s.sectionSubtitle}>{subtitle}</p>
-                      </Fragment>
-                    </InterstitialTitle>
-                  </Space>
-
-                  <div class={s.blocks}>
-                    {features.map((feature, i) => {
-                      if (feature.__typename === 'FeatureRegularCardRecord') {
-                        return (
-                          <div class={s.feature}>
-                            {feature.badge && (
-                              <div class={s.featureBadge} data-datocms-nomd>
-                                {feature.badge}
-                                {i % 2 === 0 ? (
-                                  <div class={s.arrow}>
-                                    <Svg name="svg/illustrations/arrow-sketch-5" />
-                                  </div>
-                                ) : (
-                                  <div class={s.arrow2}>
-                                    <Svg name="svg/illustrations/arrow-sketch-1" />
-                                  </div>
-                                )}
-                              </div>
-                            )}
-
-                            <Heading as="h3" class={s.featureTitle}>
-                              <span class={s.featureEmoji}>{feature.emoji}</span>
-                              {feature.title}
-                            </Heading>
-
-                            {feature.image?.responsiveImage && (
-                              <figure class={s.featureImage} data-datocms-nomd>
-                                <ResponsiveImage data={feature.image.responsiveImage} />
-                              </figure>
-                            )}
-
-                            <div class={s.featureDescription} data-datocms-content-link-group>
-                              <Prose>
-                                <Text
-                                  {...ensureValidStructuredTextProps({ data: feature.description })}
-                                />
-                              </Prose>
-                            </div>
-
-                            {feature.links && (
-                              <div class={s.featureLinks} data-datocms-nomd>
-                                {feature.links.map((link) => {
-                                  const linkTitle = stripStega(link.linkTitle);
-
-                                  return (
-                                    <a
-                                      href={buildUrlFromGql(link.content)}
-                                      class={s.link}
-                                      data-datocms-content-link-source={link.linkTitle}
-                                    >
-                                      {linkTitleToLabel[linkTitle] || linkTitle}
-                                      <span class={s.linkArrow}>→</span>
-                                    </a>
-                                  );
-                                })}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      }
-                      if (feature.__typename === 'TestimonialCardRecord') {
-                        return (
-                          <Space top={2} bottom={2}>
-                            <div data-datocms-nomd>
-                              <SingleQuote quote={feature.testimonial} fontSize="small" />
-                            </div>
-                          </Space>
-                        );
-                      }
-                    })}
-                  </div>
-                </div>
-              );
-            })
-          }
-        </div>
-        <aside class={s.aside} data-datocms-nomd>
-          <div
-            data-mobile-anchors
-            class={s.asideAnchorsWrapper}
-            role="button"
-            aria-expanded="false"
-          >
-            <ScrollspyNav>
-              <div class={s.currentAnchor}>
-                <span data-current-anchor>Scroll to</span>
-                <div class={s.currentAnchorArrow}>
-                  <Svg name="icons/regular/chevron-down" />
-                </div>
-              </div>
-
-              <div class={s.asideAnchors}>
-                <h3>Quick menu</h3>
-                <ul>
-                  {
-                    featuresGroup.map(({ title }) => (
-                      <li>
-                        <a href={`#${slugify(title)}`}>{title}</a>
-                      </li>
-                    ))
-                  }
-                </ul>
-              </div>
-            </ScrollspyNav>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </Wrapper>
+  <Hero {...features.hero} alignment="center" typewriter />
+  <CategoryNav {...features.categoryNav} theme="blue" total={total} />
+  <ListBuddy {...features.buddy}>
+    {
+      categories.map((category, i) => (
+        <FeatureCategory {...category} open={i === last ? features.openSlot : undefined} />
+      ))
+    }
+  </ListBuddy>
+  <PageCloser theme="blue" cta={features.ctaStart} video={danceVideo} />
 
   <DraftModeQueryListener query={query} />
 </Layout>
-
-<script>
-  const mobileAnchors = document.querySelector('[data-mobile-anchors]');
-
-  mobileAnchors?.addEventListener('click', () => {
-    mobileAnchors.setAttribute(
-      'aria-expanded',
-      mobileAnchors.getAttribute('aria-expanded') === 'true' ? 'false' : 'true',
-    );
-  });
-</script>

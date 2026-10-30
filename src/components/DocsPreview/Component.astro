@@ -1,0 +1,40 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import type { DocsPreviewData } from '~/data/developers';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends DocsPreviewData {
+  /** Without a theme, the stack inherits the theme of its section. */
+  theme?: Theme;
+}
+
+const { items, theme } = Astro.props;
+---
+
+{/* The thin bars suggest more pages above and below. */}
+<div class={styles.stack} data-theme={theme}>
+  <span class:list={[styles.bar, styles.thin]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.wide]} aria-hidden="true"></span>
+  <ul class={styles.list}>
+    {
+      items.map((item) => (
+        <li class={styles.card}>
+          <div class={styles.header}>
+            <span class={styles.headerRow}>
+              <span class="h2">{item.title}</span>
+              {item.tag && <span class:list={[styles.tag, 'subtitleMedium']}>{item.tag}</span>}
+            </span>
+            {item.description && (
+              <p class:list={[styles.description, 'subtitle']}>{item.description}</p>
+            )}
+          </div>
+          {item.code && <code class:list={[styles.code, 'code']}>{item.code}</code>}
+          {item.button && <ButtonGroup buttons={[item.button]} />}
+        </li>
+      ))
+    }
+  </ul>
+  <span class:list={[styles.bar, styles.wide]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.thin]} aria-hidden="true"></span>
+</div>

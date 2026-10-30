@@ -1,0 +1,96 @@
+/*
+ * The sentences that the two people type (Collaboration.tsx,
+ * TypedSentence). The script of Pair.astro sets `data-beat` on the frame,
+ * and `data-typed` tells the beat of each sentence. Inès's sentence is not
+ * there at "rest" and "open", and shows at "type". Tom's sentence shows
+ * only at "write", the last beat: the frame fades out while he types it.
+ * In its beat the characters show one after the other, each with the
+ * caret after it while it is the last one. Without `data-beat` (no JS,
+ * reduced motion) Inès's sentence shows, and Tom's does not: the still.
+ * A hidden character keeps its place, thus the text does not move.
+ */
+.typed {
+  /* The cursor of Inès comes first, then she types: 75 characters end at 2.75s */
+  --type-start: 500ms;
+  --type-speed: 30ms;
+}
+
+.typed[data-typed='write'] {
+  /* The cursor of Tom moves and clicks first, then he types, slower than Inès */
+  --type-start: 1100ms;
+  --type-speed: 45ms;
+}
+
+.character {
+  position: relative;
+}
+
+:global(:is([data-beat='rest'], [data-beat='open'])) [data-typed='type'] .character,
+[data-typed='write'] .character {
+  visibility: hidden;
+}
+
+:global([data-beat='type']) [data-typed='type'] .character,
+:global([data-beat='write']) [data-typed='write'] .character {
+  animation: appear 1ms calc(var(--type-start) + var(--i) * var(--type-speed)) both;
+}
+
+:global([data-beat='type']) [data-typed='type'] .character::after,
+:global([data-beat='write']) [data-typed='write'] .character::after {
+  content: '';
+  position: absolute;
+  top: 0.1em;
+  right: -1px;
+  bottom: 0.1em;
+  border-right: 1.5px solid currentColor;
+  opacity: 0;
+  animation: caret var(--type-speed) calc(var(--type-start) + var(--i) * var(--type-speed));
+}
+
+/* After the last character the caret stays and blinks, until the end of the beat */
+:global([data-beat='type']) [data-typed='type'] .character:last-child::after,
+:global([data-beat='write']) [data-typed='write'] .character:last-child::after {
+  animation:
+    caret var(--type-speed) calc(var(--type-start) + var(--i) * var(--type-speed)),
+    blink 1s steps(1, end) calc(var(--type-start) + (var(--i) + 1) * var(--type-speed)) infinite;
+}
+
+:global([data-paused]) .character::after {
+  animation-play-state: paused;
+}
+
+@keyframes appear {
+  from {
+    visibility: hidden;
+  }
+
+  to {
+    visibility: visible;
+  }
+}
+
+@keyframes caret {
+  from,
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/*
+ * The text of the method (Collaboration.tsx, MethodText): always four
+ * lines tall, on the two screens and at each step
+ */
+.method {
+  display: block;
+  height: 4lh;
+}

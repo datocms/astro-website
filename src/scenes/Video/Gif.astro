@@ -1,0 +1,67 @@
+---
+import diagram from '../diagram/style.module.css';
+import gif from './restoring-tide-line-clip.gif';
+import still from './restoring-tide-line-clip-still.png';
+import { GIF, PLAYBACK_ID, VIDEO } from './story';
+import styles from './gif.module.css';
+
+// The picture of the fragment "A GIF, from the URL.", in the grammar of
+// the diagrams (../diagram/style.module.css), as the two players of
+// Stream.astro. Above, the URL of the GIF at Mux, with no host: the
+// parts that ask for the GIF are bright. Under it, what the URL returns: a real GIF of
+// Restoring Tide Line from 1:30 to 1:34, with fewer frames and colours
+// than the one that Mux makes, thus it looks like a GIF. The script below
+// shows the GIF when the picture is in view and the still when it is not,
+// because a GIF cannot stop (not with reduced motion). Without it the picture is the still:
+// the first frame of the GIF.
+
+const clock = (seconds: number) =>
+  `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+const DESCRIPTION = `The URL of an animated GIF of the video “${VIDEO.title}”, with start=${GIF.start}, end=${GIF.end} and width=${GIF.width}, and under it the GIF that it returns: ${clock(GIF.start)} to ${clock(GIF.end)}, the hands of the weaver that sew, then the hands that smooth the linen.`;
+---
+
+<figure
+  class:list={[diagram.root, styles.gif]}
+  role="img"
+  aria-label={DESCRIPTION}
+  data-gif-picture
+>
+  <p class={styles.url}>
+    /{PLAYBACK_ID}/<span class={styles.key}>animated.gif</span><wbr />?<span class={styles.key}
+      >start={GIF.start}</span
+    >&amp;<span class={styles.key}>end={GIF.end}</span>&amp;<span class={styles.key}
+      >width={GIF.width}</span
+    >
+  </p>
+  <div class:list={[diagram.photo, styles.player]}>
+    <img class={styles.picture} src={still.src} alt="" data-gif={gif.src} />
+    <span class={styles.badge}>GIF {GIF.width} px</span>
+  </div>
+</figure>
+
+<script>
+  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-gif-picture]')) {
+    const picture = root.querySelector<HTMLImageElement>('[data-gif]')!;
+    const still = picture.src;
+    const gif = picture.dataset.gif!;
+    let visible = false;
+
+    if (!prefersReducedMotion()) {
+      onVisibilityChange(root, (inView) => {
+        visible = inView;
+        if (!inView) {
+          picture.src = still;
+          return;
+        }
+        // Show the GIF only when it is loaded, thus the still does not go before the first frame comes
+        const loader = new Image();
+        loader.onload = () => {
+          if (visible) picture.src = gif;
+        };
+        loader.src = gif;
+      });
+    }
+  }
+</script>

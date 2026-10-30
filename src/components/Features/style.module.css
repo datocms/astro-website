@@ -1,0 +1,414 @@
+/*
+ * The section takes the theme of the
+ * active feature. Colour, image and text switch instantly.
+ * The list half is on surface/inverse, the visual half on surface/accent.
+ */
+.features,
+.features * {
+  transition: none;
+}
+
+.split {
+  display: flex;
+  flex-direction: column;
+}
+
+.visualHalf {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: var(--section-padding-y) var(--section-padding-x);
+  background: var(--surface-accent);
+}
+
+.frame {
+  position: relative;
+  width: 100%;
+  max-width: 345px;
+  max-height: 400px;
+  aspect-ratio: 500 / 580;
+  margin-inline: auto;
+}
+
+.stage {
+  width: 100%;
+}
+
+.image {
+  position: absolute;
+  inset: 0;
+  display: none;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image[data-active] {
+  display: block;
+}
+
+/*
+ * One picture for all the rows (the slot `visual`). Under the list, the
+ * half does not stick, and it has a 40px padding at the top, the left and
+ * the right. The frame fills the width at 16:9 and cuts the bottom of the
+ * picture, thus the round corners of a window there do not show.
+ */
+.sharedHalf {
+  position: relative;
+  padding: var(--space-xl) var(--space-xl) 0;
+}
+
+.frame.shared {
+  max-width: none;
+  max-height: none;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.shared .image {
+  position: relative;
+  height: calc(100% + var(--radius-lg));
+}
+
+.shared .image > * {
+  height: 100%;
+}
+
+/* A pane of the shared picture shows only while its row is active */
+.shared :global([data-features-pane]:not([data-active])) {
+  display: none;
+}
+
+/* Placeholder illustration: two translucent cards, as in _features-visual. */
+.placeholderTop,
+.placeholderBottom {
+  position: absolute;
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+  opacity: 0.3;
+}
+
+.placeholderTop {
+  inset: 2.08% 19% 60.16% 0;
+}
+
+.placeholderBottom {
+  inset: 43.95% 0 2.08% 6.4%;
+}
+
+.listHalf {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--section-padding-y) var(--section-padding-x);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+.heading {
+  margin-bottom: var(--space-sm);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+/*
+ * The row is a pill: the text has a padding, and the negative margin keeps
+ * the text on the edge of the column. The pointer on a row gives the pill
+ * a surface (see the end of the file).
+ */
+.row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin-inline: calc(var(--space-sm) * -1);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-lg);
+}
+
+.title {
+  display: flex;
+  gap: var(--space-2xs);
+}
+
+.link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.arrow,
+.description {
+  display: none;
+}
+
+.row[data-active] .arrow {
+  display: inline;
+}
+
+.row[data-active] .description {
+  display: block;
+  color: var(--text-on-inverse-muted);
+}
+
+/*
+ * Bleed, without hover (a touch screen, or the list under the picture):
+ * all the rows show their arrow and their description.
+ */
+@media (max-width: 1151px), (hover: none) {
+  .bleed .arrow {
+    display: inline;
+  }
+
+  .bleed .description {
+    display: block;
+    color: var(--text-on-inverse-muted);
+  }
+
+  .bleed.inverted .description {
+    color: var(--text-muted);
+  }
+}
+
+.inverted .visualHalf {
+  background: var(--surface-inverse);
+}
+
+.inverted .listHalf {
+  background: var(--surface-accent);
+  color: var(--text-primary);
+}
+
+.inverted .row[data-active] .description {
+  color: var(--text-muted);
+}
+
+/* The square is for the placeholder: a picture in a slot keeps the frame of 500×580 */
+.inverted .frame:not(.slotted) {
+  aspect-ratio: 1;
+}
+
+.inverted .placeholderTop,
+.inverted .placeholderBottom {
+  opacity: 0.1;
+}
+
+/* Stacked: a 374×395 card and a 246×87 card, 50% opacity. */
+.stacked .frame {
+  max-width: 160px;
+  aspect-ratio: 374 / 500;
+}
+
+.stacked .placeholderTop,
+.stacked .placeholderBottom {
+  opacity: 0.5;
+}
+
+.stacked .placeholderTop {
+  inset: 0 0 21.02% 0;
+}
+
+.stacked .placeholderBottom {
+  inset: 82.51% 17.11% 0 17.11%;
+}
+
+@media (min-width: 768px) {
+  .frame {
+    max-width: 420px;
+    max-height: none;
+  }
+
+  .stacked .frame {
+    max-width: 299px;
+  }
+}
+
+@media (min-width: 1152px) {
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  /*
+   * The list is on the left. The outer padding of each half puts the list
+   * and the visual in the centred content column, next to the seam.
+   */
+  .listHalf {
+    order: -1;
+    align-items: center;
+    padding-inline: var(--content-inset-half) var(--section-padding-x);
+  }
+
+  /*
+   * Each description is two lines high, not more and not less. Thus the
+   * active row always has the same height, and the list does not move
+   * when the hover changes the active row.
+   */
+  .row[data-active] .description {
+    display: -webkit-box;
+    height: 2lh;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  /* Bleed: the list starts 50px lower than in the other sections. */
+  .bleed .listHalf {
+    padding-top: calc(var(--section-padding-y) + var(--space-xl) + var(--space-2xs));
+  }
+
+  /* Bleed: the description stops 100px before the end of the list. */
+  .bleed .description {
+    margin-right: calc(var(--space-3xl) + var(--space-md));
+  }
+
+  .visualHalf {
+    position: static;
+    display: flex;
+    align-items: center;
+    padding-inline: var(--section-padding-x) var(--content-inset-half);
+  }
+
+  .frame {
+    max-width: 500px;
+    max-height: none;
+    margin-inline: 0 auto;
+  }
+
+  .stacked .frame {
+    max-width: 374px;
+    margin-inline: auto;
+  }
+
+  /* Bleed: the frame fills the visual half. The picture in the slot sets its own margin. */
+  .bleed .visualHalf {
+    align-items: stretch;
+    padding: 0;
+  }
+
+  .bleed .stage {
+    display: grid;
+  }
+
+  .bleed .frame {
+    max-width: none;
+    /* The height of the 580px frame and its padding: the section keeps its height */
+    min-height: 780px;
+    aspect-ratio: auto;
+    margin: 0;
+  }
+
+  /*
+   * One picture for all the rows: the frame fills the visual half, and
+   * the list sets the height of the section. The frame cuts the picture.
+   */
+  .bleed .frame.shared {
+    container-type: size;
+    min-height: 0;
+    overflow: hidden;
+    /* The gap at the left of the picture */
+    --shared-gap: var(--section-padding-y);
+    /* The gap above the picture: the top padding of the list */
+    --shared-gap-top: calc(var(--section-padding-y) + var(--space-xl) + var(--space-2xs));
+    /* The smallest part of the picture that the frame cuts, at the right and at the bottom */
+    --shared-crop: var(--space-xl);
+  }
+
+  /*
+   * The picture is one gap from the top and from the seam, thus the
+   * surface of the half shows above it and at its left. Its ratio is
+   * 16:9. It is wide enough to go at least 40px past the right edge and
+   * tall enough to go at least 40px past the bottom: the larger of the
+   * two sizes sets it.
+   */
+  .bleed .shared .image {
+    position: absolute;
+    inset: var(--shared-gap-top) auto auto var(--shared-gap);
+    width: max(
+      calc(100cqw - var(--shared-gap) + var(--shared-crop)),
+      calc((100cqh - var(--shared-gap-top) + var(--shared-crop)) * 16 / 9)
+    );
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  /* The visual half keeps its colour over the full height. The frame sticks. */
+  .stickyVisual .visualHalf {
+    align-items: flex-start;
+    padding-block: 0;
+  }
+
+  .stickyVisual .stage {
+    position: sticky;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: min(100svh, 740px);
+  }
+
+  .stickyVisual .frame {
+    margin-inline: auto;
+  }
+}
+
+/*
+ * The pill of the row under the pointer: a faint tint of the colour of the
+ * other half (the muted tokens are the colour of the half itself).
+ */
+@media (hover: hover) {
+  .row:hover {
+    background: var(--surface-accent-faint);
+  }
+
+  .inverted .row:hover {
+    background: var(--surface-inverse-faint);
+  }
+}
+
+/*
+ * ≥1152: the row under the pointer shows its arrow and its description at
+ * once. The theme and the picture change 150ms later (the script). While
+ * the pointer is on a different row, the active row hides its description:
+ * thus only one row has a description, and the list does not move.
+ */
+@media (min-width: 1152px) and (hover: hover) {
+  .row:hover .arrow {
+    display: inline;
+  }
+
+  .row:hover .description {
+    display: -webkit-box;
+    height: 2lh;
+    overflow: hidden;
+    color: var(--text-on-inverse-muted);
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
+  .inverted .row:hover .description {
+    color: var(--text-muted);
+  }
+
+  .rows:has(.row:hover) .row[data-active]:not(:hover) :is(.arrow, .description) {
+    display: none;
+  }
+}

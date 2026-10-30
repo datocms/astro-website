@@ -1,0 +1,41 @@
+---
+import { ChapterHeader } from '~/components/ChapterHeader';
+import { ChapterSplit } from '~/components/ChapterSplit';
+import { FeatureFragments } from '~/components/FeatureFragments';
+import { SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as copy from '~/data/collaboration';
+import { CollaborationRoleScene, CollaborationVersionsScene } from './Collaboration';
+import Pair from './Pair.astro';
+
+const theme = 'green';
+---
+
+<ChapterSplit theme={theme}>
+  <ChapterHeader {...copy.chapter} theme={theme} background="split" id="collaboration" />
+  {
+    /*
+  The frame is the recipe on two screens (Pair.astro): Inès edits it at
+  the left, Tom looks at it at the right. It is not one screen of the cms,
+  thus the preset is `whole`: nothing cut, its own height, on the inverse
+  surface under the header.
+*/
+  }
+  <SceneFrame preset="whole" theme={theme}>
+    <Pair theme={theme} />
+  </SceneFrame>
+</ChapterSplit>
+<FeatureFragments {...copy.fragments} theme={theme} columns={2}>
+  {
+    /* The page of a version, with the two columns side by side, larger. The page is 760px wide: below that width the toolbar cuts the date of the version. The box cuts the page on the right, in the column of the current version, and below the body. The zoom is 1.15 in a box of 500px, and a narrower box shows the same part of the page. On phones the zoom is 1.3 (0.9 in a box of 350px), thus more of both columns shows. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={1.15} phoneZoom={1.3}>
+    <CollaborationVersionsScene appearance={{ theme }} width={760} height={560} />
+  </SceneFragment>
+  {
+    /* The title and the card of rules of the role Cooks. The scene is narrow and larger, thus the rules fill the box, and the box cuts the card on the right and below. The zoom is 1.15 in a box of 500px, as the page of the version. On phones the zoom is 1.3 (0.9 in a box of 350px), thus more of each rule shows. */
+  }
+  <SceneFragment slot="visual-1" fit="scale" zoom={1.15} phoneZoom={1.3}>
+    <CollaborationRoleScene appearance={{ theme }} width={520} height={400} />
+  </SceneFragment>
+</FeatureFragments>

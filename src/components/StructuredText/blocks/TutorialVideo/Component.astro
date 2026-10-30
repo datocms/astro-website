@@ -1,0 +1,80 @@
+---
+import { CardCarousel } from '~/components/CardCarousel';
+import { CarouselCard } from '~/components/CarouselCard';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { TutorialVideoFragment } from './graphql';
+import { muxThumbnailUrl } from './muxThumbnailUrl';
+
+interface Props {
+  block: FragmentOf<typeof TutorialVideoFragment>;
+}
+
+const { videoTutorialsOrUserGuidesEpisodes: items } = readFragment(
+  TutorialVideoFragment,
+  Astro.props.block,
+);
+---
+
+{
+  /*
+  A row of video tutorials. An episode of the user guides links to its
+  page. A YouTube video or another video links to its external page.
+*/
+}
+<CardCarousel label="Video tutorials">
+  {
+    items.map((item) => {
+      if (item.__typename === 'UserGuidesEpisodeRecord') {
+        const video = item.asset.video;
+        return (
+          <CarouselCard href={buildUrlForUserGuidesEpisode(item)} title={item.title}>
+            {video && (
+              <img
+                slot="image"
+                src={muxThumbnailUrl(video.thumbnailUrl, {
+                  width: 600,
+                  height: 400,
+                  fit_mode: 'crop',
+                })}
+                alt=""
+                width="600"
+                height="400"
+                loading="lazy"
+                style={
+                  video.blurUpThumb
+                    ? { background: `center / cover url("${video.blurUpThumb}")` }
+                    : undefined
+                }
+              />
+            )}
+            Play video
+          </CarouselCard>
+        );
+      }
+      if (item.__typename === 'VideoTutorialRecord') {
+        const resource = item.resource;
+        if (resource.__typename === 'YoutubeVideoResourceRecord') {
+          return (
+            <CarouselCard href={resource.video.url} title={item.title} external>
+              <img slot="image" src={resource.video.thumbnailUrl} alt="" loading="lazy" />
+              Play video
+            </CarouselCard>
+          );
+        }
+        if (resource.__typename === 'OtherVideoResourceRecord') {
+          return (
+            <CarouselCard href={resource.url} title={item.title} external>
+              {resource.coverImage?.responsiveImage && (
+                <ResponsiveImage slot="image" data={resource.coverImage.responsiveImage} />
+              )}
+              Play video
+            </CarouselCard>
+          );
+        }
+      }
+      return null;
+    })
+  }
+</CardCarousel>

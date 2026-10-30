@@ -1,0 +1,24 @@
+---
+import { ChapterLayout } from '~/components/ChapterLayout';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as dev from '~/data/developers-pillar';
+import Wall from './Wall.astro';
+
+const theme = dev.delivery.theme;
+---
+
+<ChapterLayout {...dev.delivery}>
+  {
+    /*
+    The frame is a wall of pages (Wall.astro), not a screen: the preset
+    `whole` shows all of it, with no fade, and the tiles sit on the lit
+    sheet. The wall has its own height at each breakpoint. The wall is a
+    loop with no steps and tells itself: no caption.
+  */
+  }
+  <Fragment slot="scene">
+    <SceneFrame preset="whole" theme={theme}>
+      <Wall />
+    </SceneFrame>
+  </Fragment>
+</ChapterLayout>

@@ -1,0 +1,64 @@
+---
+import { Pagination } from '~/components/Pagination';
+import { Section } from '~/components/Section';
+import { buildUrlForChangelogEntry } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { formatLongDate } from '~/lib/format/date';
+import { ProductUpdateListFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  entries: FragmentOf<typeof ProductUpdateListFragment>[];
+  /** The links to the other pages of the index. */
+  pagination: { page: number; totalPages: number; baseUrl: string };
+}
+
+const { pagination } = Astro.props;
+const entries = Astro.props.entries.map((entry) => readFragment(ProductUpdateListFragment, entry));
+---
+
+{
+  /*
+  The index of the changelog, as ProductUpdates on the home:
+  the same rows on the default surface of the page (the date and the title at
+  the left, the categories as pills at the right, a line between two rows,
+  the accent fill on hover). Each row links to the page of its entry, which
+  has the content. Pagination is in its own section, under the rows.
+*/
+}
+<Section padding="none" flush>
+  <ol class={styles.list}>
+    {
+      entries.map((entry) => (
+        <li class={styles.item}>
+          <a href={buildUrlForChangelogEntry(entry)} class={styles.row}>
+            <span class:list={[styles.main, 'h2']}>
+              <time class={styles.date} datetime={entry._firstPublishedAt}>
+                {formatLongDate(entry._firstPublishedAt)}
+              </time>
+              <span>{entry.title}</span>
+            </span>
+            {entry.categories.length > 0 && (
+              <span class={styles.tags}>
+                {entry.categories.map((category) => (
+                  <span class:list={[styles.tag, 'subtitleMedium']}>{category.name}</span>
+                ))}
+              </span>
+            )}
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</Section>
+{
+  pagination.totalPages > 1 && (
+    <Section>
+      <Pagination
+        current={pagination.page}
+        total={pagination.totalPages}
+        baseUrl={pagination.baseUrl}
+      />
+    </Section>
+  )
+}

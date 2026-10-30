@@ -1,0 +1,29 @@
+---
+import type { PixelVideoSettings } from '~/lib/pixel-video/settings';
+import styles from './style.module.css';
+
+interface Props {
+  /** URL of a .pxv file (make it with /dev/pixel-encoder). */
+  src: string;
+  /** Settings from /dev/pixel-encoder ("Copy the JSON"). The dimensions are a % of the drawn width. */
+  settings?: Partial<PixelVideoSettings>;
+  /** Accessible name. Without it, the video is decorative. */
+  label?: string;
+  class?: string;
+}
+
+const { src, settings, label, class: className } = Astro.props;
+---
+
+<pixel-video
+  class:list={[styles.pixelVideo, className]}
+  src={src}
+  settings={settings ? JSON.stringify(settings) : undefined}
+  role={label ? 'img' : undefined}
+  aria-label={label}></pixel-video>
+
+<script>
+  import { definePixelVideo } from '~/lib/pixel-video/element';
+
+  definePixelVideo();
+</script>

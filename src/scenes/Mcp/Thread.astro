@@ -1,0 +1,41 @@
+---
+import { ANSWER, CONFIRM, QUESTION, THREAD } from './story';
+import styles from './style.module.css';
+import ToolCall from './ToolCall.astro';
+---
+
+<div class={styles.thread} role="img" aria-label={THREAD.description}>
+  <div class={styles.turnRows} aria-hidden="true">
+    <p class={styles.question}>{QUESTION}</p>
+    <ToolCall summary={THREAD.tool.summary} />
+    <div class={styles.answer}>
+      <p>{ANSWER.lead}</p>
+      <p>
+        {
+          THREAD.pages.map((page) => (
+            <>
+              <span class={styles.link}>{page}</span>,{' '}
+            </>
+          ))
+        }
+        {THREAD.more}.
+      </p>
+      <p>{THREAD.offer}</p>
+    </div>
+    <p class={styles.question}>{THREAD.reply}</p>
+    <ToolCall summary={CONFIRM.tool.summary} />
+    <div class={styles.ask}>
+      <p class={styles.askHead}>
+        <span class={styles.askServer}>{CONFIRM.server}</span>
+        <span class={styles.askScript}>{CONFIRM.script}</span>
+      </p>
+      <p class={styles.askQuestion}>{CONFIRM.question}</p>
+      <pre class={styles.askCode}>{CONFIRM.code.join('\n')}</pre>
+      <p class={styles.askButtons}>
+        <span class={styles.allow}>{CONFIRM.allowOnce}</span>
+        <span class={styles.choice}>{CONFIRM.allowAlways}</span>
+        <span class={styles.choice}>{CONFIRM.deny}</span>
+      </p>
+    </div>
+  </div>
+</div>

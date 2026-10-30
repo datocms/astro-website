@@ -1,0 +1,410 @@
+/*
+ * The image lab of the Images chapter of /media, on the inverse sheet of a
+ * SceneFrame `whole`. The pill, the line, the pulse, the photos and the
+ * switches are the grammar of the diagrams (../diagram/style.module.css);
+ * this file has only the lab: where the parts sit, and how the served
+ * photo follows the parameters.
+ *
+ * From 768px one row: the original, the line with the pill, the served
+ * photo, with the caption of the original under it and the readout of the
+ * served file (a panel) under the served photo. The line forks before the
+ * served photo: a branch goes down and into the readout. On phones the
+ * row goes down: the original, a vertical line with the pill, the served
+ * photo; the branch leaves the line above the photo, goes around it on
+ * the left, and into the readout. Under the row, the switches.
+ *
+ * The state is on the root: `data-params` (the keys, space-separated) and
+ * `data-format`. The served photo follows them in CSS, in a box that does
+ * not change its size: nothing around it moves.
+ */
+.lab {
+  /* On phones the branch goes beside the photo: the card leaves room for it */
+  --card: min(100% - 2 * var(--space-lg), 18rem);
+  --half: var(--space-lg);
+  /* The space between the branch and the served photo, from 768px the horizontal part of the branch */
+  --lab-branch: var(--space-sm);
+  /* On phones, the fork on the main line, above the served photo */
+  --lab-fork: calc(var(--half) / 2);
+  /* The height of the readout: its two lines and its padding. The branch needs it for its geometry. */
+  --lab-readout: calc(var(--type-code) * 1.4 + var(--type-code-small) * 1.86 + 2 * var(--space-xs));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* `data-compact` in a small box: smaller photos, thus the switches show under them */
+.lab[data-compact] {
+  --card: 12rem;
+  --half: var(--space-md);
+  gap: var(--space-md);
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'original'
+    'originalCaption'
+    'link'
+    'result'
+    'resultCaption';
+  justify-items: center;
+}
+
+.trace {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.stage {
+  position: relative;
+  /* Over the end of the line, which goes 2px under it */
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--card);
+  aspect-ratio: 3 / 2;
+}
+
+.original {
+  grid-area: original;
+}
+
+.result {
+  grid-area: result;
+}
+
+.photo {
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border-radius: var(--radius-md);
+}
+
+/* The filters are on the image, not on its box: the box cuts the blur at its edge, as in the real file */
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    filter var(--diagram-swap-time) var(--diagram-ease-out),
+    rotate var(--diagram-swap-time) var(--diagram-ease-out),
+    scale var(--diagram-swap-time) var(--diagram-ease-out);
+}
+
+.stage > .served {
+  transition:
+    width var(--diagram-swap-time) var(--diagram-ease-out),
+    aspect-ratio var(--diagram-swap-time) var(--diagram-ease-out);
+}
+
+/* The script measures the new shape of the photo with no transition */
+.lab[data-instant] .served,
+.lab[data-instant] .served img {
+  transition: none;
+}
+
+.lab[data-params~='w'] .served {
+  width: 70%;
+}
+
+.lab[data-params~='crop'] .served {
+  aspect-ratio: 1;
+  width: calc(100% * 2 / 3);
+}
+
+.lab[data-params~='crop'][data-params~='w'] .served {
+  width: 52%;
+}
+
+/*
+ * rot turns the content, not the file: the photo keeps its box, and the
+ * image in it is larger, thus it fills the corners. 1.2 covers a 3:2 box
+ * at 8deg (cos 8deg + 1.5 × sin 8deg).
+ */
+.lab[data-params~='rot'] .served img {
+  rotate: 8deg;
+  scale: 1.2;
+}
+
+.lab[data-params~='sat'] .served img {
+  filter: grayscale(1);
+}
+
+/* A blur makes the edge of the image transparent: the image is a little larger, thus the box shows no soft edge */
+.lab[data-params~='blur'] .served img {
+  filter: blur(8px);
+  scale: 1.1;
+}
+
+.lab[data-params~='sat'][data-params~='blur'] .served img {
+  filter: grayscale(1) blur(8px);
+}
+
+.lab[data-params~='rot'][data-params~='blur'] .served img {
+  scale: 1.3;
+}
+
+/* A square box needs less: cos 8deg + sin 8deg */
+.lab[data-params~='rot'][data-params~='crop'] .served img {
+  scale: 1.13;
+}
+
+.lab[data-params~='rot'][data-params~='crop'][data-params~='blur'] .served img {
+  scale: 1.23;
+}
+
+/*
+ * The branch of the line to the readout: a box in the stage of the served
+ * photo, with a track on its borders. On phones a `[`: from the fork on
+ * the main line (above the photo) to the left, down beside the photo, and
+ * right into the readout. From 768px an `L`: from the fork on the main
+ * line down, and right into the readout. The corners have the radius of
+ * the readout. The script draws the pulse on the same way.
+ */
+.branch {
+  position: absolute;
+  top: calc(-1 * var(--lab-fork));
+  left: calc(-1 * var(--lab-branch));
+  box-sizing: border-box;
+  width: calc(50% + var(--lab-branch));
+  height: calc(var(--lab-fork) + 100% + var(--space-xs) + var(--lab-readout) / 2);
+  border: solid var(--border-on-inverse-strong);
+  border-width: 1.5px 0 1.5px 1.5px;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  pointer-events: none;
+}
+
+.captionBox {
+  position: relative;
+  width: var(--card);
+  margin-top: var(--space-xs);
+  text-align: center;
+}
+
+/* The caption of the original has the padding of the readout: the two texts are at the same height */
+.originalCaption {
+  grid-area: originalCaption;
+  box-sizing: border-box;
+  height: var(--lab-readout);
+  padding: var(--space-xs);
+}
+
+.resultCaption {
+  grid-area: resultCaption;
+}
+
+/*
+ * The readout of the served file: the panel of the grammar, which a
+ * change can touch (the ring, the ping). Its ping is small: the box is
+ * wide.
+ */
+.resultCaption .readout {
+  --diagram-ping-scale: 1.2;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: var(--lab-readout);
+  /* The padding is on the text: the copy that `swap` makes sits on the text, at the origin of the panel */
+  padding: 0;
+}
+
+.readout .captionText {
+  box-sizing: border-box;
+  padding: var(--space-xs);
+}
+
+.captionText {
+  --diagram-swap-y: var(--space-3xs);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin: 0;
+}
+
+.weight {
+  color: var(--text-on-inverse-strong);
+}
+
+.spec {
+  color: var(--text-on-inverse-muted);
+}
+
+/*
+ * The line, and the pill in its middle. On phones a vertical line from the
+ * caption of the original to the served photo, 2px under each (the tuck).
+ * The pill is over the line, and swaps sideways.
+ */
+.link {
+  position: relative;
+  grid-area: link;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: calc(var(--diagram-pill) + 2 * var(--half));
+}
+
+.links {
+  position: absolute;
+  /* The line goes on under the served photo: a smaller photo in the stage touches it too */
+  inset: calc(-1 * var(--diagram-tuck)) 0 calc(-1 * var(--space-2xl));
+  width: 100%;
+  height: calc(100% + var(--diagram-tuck) + var(--space-2xl));
+  /* The reset gives an svg max-width 100%: this one is wider than its box */
+  max-width: none;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.links [data-axis='x'] {
+  display: none;
+}
+
+/* The pill is the query of the URL. A long query goes on more lines, thus the radius is the one of one line. */
+.link .query {
+  --diagram-swap-x: var(--space-md);
+  height: auto;
+  min-height: var(--diagram-pill);
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.4;
+  border-radius: calc(var(--diagram-pill) / 2);
+}
+
+/* A parameter of the query does not break: a long query breaks between two parameters (an inline block makes the break point) */
+.part {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.switches {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-3xs);
+  padding: 0 var(--space-2xs);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  box-shadow: 0 0 0 1px var(--border-on-inverse);
+  color: var(--text-on-inverse-soft);
+  font: inherit;
+  cursor: pointer;
+}
+
+.chip[aria-pressed='true'] .code {
+  color: var(--text-on-inverse-strong);
+}
+
+.hint {
+  color: var(--text-on-inverse-muted);
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--text-on-inverse);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .chip:not([data-changed]):hover {
+    box-shadow: 0 0 0 1px var(--border-on-inverse-strong);
+  }
+}
+
+/*
+ * From 768px: one row, but not with `data-compact` (the phone layout at
+ * every width). The line is at the height of the middle of the
+ * photos (the captions are in the next row); the pill sits on its middle
+ * and swaps up and down.
+ */
+@media (min-width: 768px) {
+  .lab:not([data-compact]) {
+    --card: 14rem;
+    --lab-branch: var(--space-lg);
+  }
+
+  .lab:not([data-compact]) .row {
+    grid-template-columns: var(--card) minmax(0, 1fr) var(--card);
+    grid-template-areas:
+      'original link result'
+      'originalCaption . resultCaption';
+    align-items: center;
+  }
+
+  .lab:not([data-compact]) .link {
+    align-self: stretch;
+    min-height: 0;
+    /* The pill stops before the fork of the branch, which is left of the served photo */
+    padding-inline: var(--space-sm) calc(var(--lab-branch) + var(--space-sm));
+    box-sizing: border-box;
+  }
+
+  .lab:not([data-compact]) .links {
+    /* To the middle of the served stage, under the photo */
+    inset: 0 calc(-1 * var(--card) / 2) 0 calc(-1 * var(--diagram-tuck));
+    width: calc(100% + var(--diagram-tuck) + var(--card) / 2);
+    height: 100%;
+  }
+
+  .lab:not([data-compact]) .links [data-axis='x'] {
+    display: inline;
+  }
+
+  .lab:not([data-compact]) .links [data-axis='y'] {
+    display: none;
+  }
+
+  .lab:not([data-compact]) .link .query {
+    --diagram-swap-x: 0px;
+    --diagram-swap-y: var(--space-sm);
+  }
+
+  /* The branch forks from the main line at the middle of the stage, and goes down beside it */
+  .lab:not([data-compact]) .branch {
+    top: 50%;
+    width: var(--lab-branch);
+    height: calc(50% + var(--space-xs) + var(--lab-readout) / 2);
+    border-width: 0 0 1.5px 1.5px;
+    border-radius: 0 0 0 var(--radius-md);
+  }
+
+  .lab:not([data-compact]) .captionBox {
+    align-self: start;
+  }
+}
+
+@media (min-width: 1152px) {
+  .lab:not([data-compact]) {
+    --card: 16rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage > .served,
+  .photo img {
+    transition: none;
+  }
+}

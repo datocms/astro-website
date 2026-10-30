@@ -1,5 +1,5 @@
 import { DocGroupItemsFragment } from '~/components/docs/Sidebar';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
 import { TemplateDemoUrlFragment } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 import { graphql } from '~/lib/datocms/graphql';
 

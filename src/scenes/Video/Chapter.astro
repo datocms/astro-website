@@ -1,0 +1,55 @@
+---
+import { ChapterLayout } from '~/components/ChapterLayout';
+import { FRAGMENT_WIDTH, SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as media from '~/data/media';
+import Gif from './Gif.astro';
+import Stream from './Stream.astro';
+import { VideoAudioTrackScene, VideoScene, VideoTracksScene } from './Video';
+
+const theme = media.video.theme;
+---
+
+<ChapterLayout {...media.video}>
+  {
+    /*
+    The frame shows all the width of the screen (`fill`), as the frame of
+    the chapter "Media library": the media area of the museum, with the
+    video Restoring Tide Line first in the grid of Light and Thread, and
+    its dialog over the grid. The player is at 2:40, with the card of the
+    thumbnail above its marker; the sidebar has the tracks. The screen is
+    1180px wide or more, thus the dialog has room for the player and the
+    sidebar: on a narrower box the kit makes the zoom smaller. The frame
+    cuts the dialog at the bottom.
+  */
+  }
+  <Fragment slot="scene">
+    <SceneFrame preset="fill" theme={theme} height={570}>
+      <VideoScene appearance={{ theme }} />
+    </SceneFrame>
+  </Fragment>
+  {
+    /* The sidebar of the dialog, from its top left corner: the panels of the info and of the categorization closed, as in the frame, then the panel of the tracks: the title, the two tracks with their download and delete icons, and the buttons of the slot. The screen is 500px wide, 160px wider than the sidebar of the frame, thus the buttons of the slot are on one line. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={1.15} phoneZoom={1.1}>
+    <VideoTracksScene appearance={{ theme }} width={500} height={660} />
+  </SceneFragment>
+  {
+    /* The dialog that adds a track, alone, from its top left corner: the file of the Italian voice-over, its language and its name. The box cuts it at the bottom. */
+  }
+  <SceneFragment slot="visual-1" fit="scale" zoom={1.15} phoneZoom={1.1}>
+    <VideoAudioTrackScene appearance={{ theme }} width={FRAGMENT_WIDTH} height={560} />
+  </SceneFragment>
+  {
+    /* The two players of Restoring Tide Line on two connections (Stream.astro). It is not a screen: it fills the box, with its own surface. */
+  }
+  <SceneFragment slot="visual-2" fit="fill">
+    <Stream />
+  </SceneFragment>
+  {
+    /* The URL of a GIF of Restoring Tide Line, and the GIF that it returns (Gif.astro). It is not a screen: it fills the box, with its own surface. */
+  }
+  <SceneFragment slot="visual-3" fit="fill">
+    <Gif />
+  </SceneFragment>
+</ChapterLayout>

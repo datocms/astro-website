@@ -1,0 +1,306 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { Headline } from '~/components/Headline';
+import { Section } from '~/components/Section';
+import type { FeaturesData } from '~/data/home';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends FeaturesData {
+  titleSize?: 'h1' | 'h2';
+  /**
+   * ≥1152: the image stays at the top of the screen while the list
+   * scrolls. Use it for a long list.
+   */
+  stickyVisual?: boolean;
+  /**
+   * The list half is on surface/accent and the visual half on
+   * surface/inverse.
+   */
+  inverted?: boolean;
+  /**
+   * The placeholder cards. `stacked`: a tall card above a small centred
+   * card, in a 374×500 frame.
+   */
+  placeholder?: 'default' | 'stacked';
+  /**
+   * A fixed theme for the list half. The visual half keeps the theme of
+   * the active feature.
+   */
+  listTheme?: Theme;
+  /**
+   * ≥1152: the frame fills the visual half, with no padding. Use it for
+   * pictures in the slots: each picture sets its own margin (a window at
+   * the padding, cut at the right and the bottom, or a diagram in the
+   * middle of the half).
+   */
+  bleed?: boolean;
+}
+
+const {
+  title,
+  features,
+  titleSize = 'h1',
+  button,
+  stickyVisual = false,
+  inverted = false,
+  placeholder = 'default',
+  listTheme,
+  bleed = false,
+} = Astro.props;
+const first = features[0];
+
+// The slot `visual` is one picture for all the rows: the theme changes
+// with the active row (a scene in ThemedScene follows it). An element in
+// the slot with `data-features-pane="<index>"` shows only while its row
+// is active: one window, with a different screen for each row.
+// Else render each named slot `visual-<index>` in the frame of its row. A
+// missing slot gives the image of the feature, or the placeholder cards.
+const shared = Astro.slots.has('visual');
+const visuals = await Promise.all(
+  features.map((_, i) =>
+    Astro.slots.has(`visual-${i}`) ? Astro.slots.render(`visual-${i}`) : undefined,
+  ),
+);
+---
+
+<Section
+  theme={first?.theme}
+  padding="none"
+  flush
+  class:list={[
+    styles.features,
+    inverted && styles.inverted,
+    bleed && styles.bleed,
+    placeholder === 'stacked' && styles.stacked,
+  ]}
+  contentClass={[styles.split, stickyVisual && styles.stickyVisual].filter(Boolean).join(' ')}
+  data-features
+>
+  <div class:list={[styles.visualHalf, shared && styles.sharedHalf]} data-features-visual>
+    <div class={styles.stage}>
+      <div
+        class:list={[
+          styles.frame,
+          (shared || visuals.some(Boolean)) && styles.slotted,
+          shared && styles.shared,
+        ]}
+      >
+        {
+          shared ? (
+            <div class={styles.image} data-active>
+              <slot name="visual" />
+            </div>
+          ) : (
+            features.map((feature, i) =>
+              visuals[i] ? (
+                <div
+                  class={styles.image}
+                  data-features-image={i}
+                  data-active={i === 0 ? '' : undefined}
+                >
+                  <Fragment set:html={visuals[i]} />
+                </div>
+              ) : feature.image ? (
+                <img
+                  src={feature.image.src}
+                  alt={feature.image.alt}
+                  width="500"
+                  height="580"
+                  class={styles.image}
+                  data-features-image={i}
+                  data-active={i === 0 ? '' : undefined}
+                  loading="lazy"
+                />
+              ) : (
+                <div
+                  class={styles.image}
+                  data-features-image={i}
+                  data-active={i === 0 ? '' : undefined}
+                  aria-hidden="true"
+                >
+                  <span class={styles.placeholderTop} />
+                  <span class={styles.placeholderBottom} />
+                </div>
+              ),
+            )
+          )
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class={styles.listHalf} data-theme={listTheme}>
+    <div class={styles.list}>
+      {
+        title && (
+          <Headline size="display" class={styles.heading}>
+            {title}
+          </Headline>
+        )
+      }
+      <ul class={styles.rows}>
+        {
+          features.map((feature, i) => (
+            <li
+              class={styles.row}
+              data-features-row={i}
+              data-row-theme={feature.theme}
+              data-active={i === 0 ? '' : undefined}
+            >
+              <h3 class:list={[styles.title, titleSize]}>
+                {feature.href ? (
+                  <a href={feature.href} class={styles.link}>
+                    {feature.title}
+                  </a>
+                ) : (
+                  feature.title
+                )}
+                <span class={styles.arrow} aria-hidden="true">
+                  →
+                </span>
+              </h3>
+              <p class:list={[styles.description, 'body']}>{feature.description}</p>
+            </li>
+          ))
+        }
+      </ul>
+      {button && <ButtonGroup buttons={[button]} />}
+    </div>
+  </div>
+</Section>
+
+<script>
+  import { prefersReducedMotion } from '~/lib/motion/inView';
+
+  // The rows and the pictures change at once.
+  // The colours of the theme go to the new theme in 600ms, in oklch.
+  const DESKTOP = window.matchMedia('(min-width: 1152px)');
+  const FADE_MS = 600;
+
+  // The theme tokens (src/styles/tokens.css) that the fade mixes.
+  const TOKENS = [
+    '--surface-default',
+    '--surface-inverse',
+    '--surface-inverse-muted',
+    '--surface-inverse-subtle',
+    '--surface-inverse-faint',
+    '--surface-accent',
+    '--surface-accent-muted',
+    '--surface-accent-subtle',
+    '--surface-accent-faint',
+    '--surface-pixel-highlight',
+    '--text-primary',
+    '--text-soft',
+    '--text-muted',
+    '--text-subtle',
+    '--text-on-inverse',
+    '--text-on-inverse-soft',
+    '--text-on-inverse-muted',
+    '--text-on-inverse-subtle',
+    '--text-on-inverse-strong',
+    '--border-default',
+    '--border-strong',
+    '--border-on-inverse',
+    '--border-on-inverse-strong',
+  ];
+
+  // A CSS transition mixes colours in oklab, and a custom property that is
+  // not registered does not transition. Thus animate one registered number
+  // from 0 to 1, and mix each token in oklch with that number.
+  try {
+    CSS.registerProperty({
+      name: '--features-mix',
+      syntax: '<number>',
+      inherits: true,
+      initialValue: '0',
+    });
+  } catch {
+    // The property is registered already (a second script run).
+  }
+
+  for (const section of document.querySelectorAll<HTMLElement>('[data-features]')) {
+    // The attributes have the prefix of the section: a picture in a slot can
+    // have its own `data-row`.
+    const rows = [...section.querySelectorAll<HTMLElement>('[data-features-row]')];
+    const images = [...section.querySelectorAll<HTMLElement>('[data-features-image]')];
+    const panes = [...section.querySelectorAll<HTMLElement>('[data-features-pane]')];
+    const visual = section.querySelector<HTMLElement>('[data-features-visual]');
+    let active = 0;
+    let fade: Animation | undefined;
+
+    const clearTokens = () => TOKENS.forEach((token) => section.style.removeProperty(token));
+
+    // Set the new theme. Each token starts at its current value (also a
+    // value in the middle of a fade) and goes to the value of the new theme.
+    const setTheme = (theme: string | undefined) => {
+      if (prefersReducedMotion()) {
+        section.dataset.theme = theme;
+        return;
+      }
+      const current = getComputedStyle(section);
+      const from = TOKENS.map((token) => current.getPropertyValue(token).trim());
+      fade?.cancel();
+      clearTokens();
+      section.dataset.theme = theme;
+      const next = getComputedStyle(section);
+      const to = TOKENS.map((token) => next.getPropertyValue(token).trim());
+      TOKENS.forEach((token, i) => {
+        section.style.setProperty(
+          token,
+          `color-mix(in oklch, ${from[i]}, ${to[i]} calc(var(--features-mix) * 100%))`,
+        );
+      });
+      fade = section.animate(
+        { '--features-mix': [0, 1] },
+        { duration: FADE_MS, easing: 'ease-out' },
+      );
+      fade.onfinish = () => {
+        clearTokens();
+        fade = undefined;
+      };
+    };
+
+    const activate = (index: number) => {
+      if (index === active || !rows[index]) return;
+      active = index;
+      rows.forEach((row, i) => row.toggleAttribute('data-active', i === index));
+      images.forEach((img, i) => img.toggleAttribute('data-active', i === index));
+      panes.forEach((pane) =>
+        pane.toggleAttribute('data-active', pane.dataset.featuresPane === String(index)),
+      );
+      setTheme(rows[index]!.dataset.rowTheme);
+    };
+
+    // ≥1152: only a hover on a row changes the active row. The pointer on
+    // the picture does not change it. The row becomes active after the
+    // pointer stays on it for 150ms. Thus a pointer that only crosses the
+    // list does not change the theme and the scene. The last active row
+    // stays active when the pointer leaves.
+    let hoverTimer = 0;
+    rows.forEach((row, i) => {
+      row.addEventListener('pointerenter', () => {
+        if (!DESKTOP.matches) return;
+        clearTimeout(hoverTimer);
+        hoverTimer = window.setTimeout(() => activate(i), 150);
+      });
+      row.addEventListener('pointerleave', () => clearTimeout(hoverTimer));
+    });
+
+    // <1152: the active row is the topmost row fully visible under the sticky image.
+    let frame = 0;
+    const onScroll = () => {
+      if (DESKTOP.matches || frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const imageBottom = visual?.getBoundingClientRect().bottom ?? 0;
+        const i = rows.findIndex((row) => {
+          const r = row.getBoundingClientRect();
+          return r.top >= imageBottom && r.bottom <= window.innerHeight;
+        });
+        if (i >= 0) activate(i);
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+</script>

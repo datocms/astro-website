@@ -1,0 +1,44 @@
+---
+import { drawings, GRAWLIX_GLYPHS, type DrawingName } from './drawings';
+import { emojiTexts, logos, type EmojiName } from './emojis';
+import styles from './style.module.css';
+
+// An emoji inside a line of text. It takes the size of the text around it.
+// The words of the line stay in the DOM: a crawler and a screen reader read
+// the text of the emoji, or nothing when it only decorates.
+
+interface Props {
+  name: EmojiName;
+}
+
+const { name } = Astro.props;
+const text = emojiTexts[name];
+const logo = name in logos ? logos[name as keyof typeof logos] : undefined;
+const drawing = name in drawings ? drawings[name as DrawingName] : undefined;
+// The ids of the gradients must be unique on the page.
+const id = `emoji-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<span class:list={[styles.emoji, styles[name], logo && styles.logo]} data-emoji={name}>
+  {logo && <span class={styles.mark} aria-hidden="true" set:html={logo} />}
+  {
+    drawing && (
+      <svg
+        class={styles.mark}
+        viewBox={drawing.viewBox}
+        aria-hidden="true"
+        set:html={drawing.body(id)}
+      />
+    )
+  }
+  {
+    // The glyphs of the grawlix come from CSS: they are not text of the page.
+    name === 'bleep' && (
+      <span class={styles.mark} aria-hidden="true">
+        {Array.from({ length: GRAWLIX_GLYPHS }, (_, i) => (
+          <span class={styles.glyph} data-glyph={i + 1} />
+        ))}
+      </span>
+    )
+  }{text && <span class="visuallyHidden">{text}</span>}
+</span>

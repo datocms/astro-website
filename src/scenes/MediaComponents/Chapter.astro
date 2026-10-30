@@ -1,0 +1,25 @@
+---
+import { ChapterLayout } from '~/components/ChapterLayout';
+import { SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as media from '~/data/media';
+import Files from './Files.astro';
+import Frame from './Frame.astro';
+import Player from './Player.astro';
+
+const theme = media.components.theme;
+---
+
+<ChapterLayout {...media.components}>
+  <Fragment slot="scene">
+    <SceneFrame preset="whole" theme={theme}>
+      <Frame />
+    </SceneFrame>
+  </Fragment>
+  <SceneFragment slot="visual-0" fit="fill">
+    <Files />
+  </SceneFragment>
+  <SceneFragment slot="visual-1" fit="fill">
+    <Player />
+  </SceneFragment>
+</ChapterLayout>

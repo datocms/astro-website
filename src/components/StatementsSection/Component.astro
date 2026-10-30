@@ -1,0 +1,70 @@
+---
+import { Headline } from '~/components/Headline';
+import { Section } from '~/components/Section';
+import type { StatementsSectionData } from './types';
+import styles from './style.module.css';
+
+interface Props extends StatementsSectionData {
+  /**
+   * `statement`: a title and a tagline in H2, on surface/default.
+   * `stat`: a value in Display and a label in H2, on surface/accent.
+   * `statLight`: a value in H1 and a label in Body, on surface/accent-faint.
+   * A quieter `stat`.
+   * `text`: one paragraph in Body Medium, on surface/inverse.
+   */
+  variant?: 'statement' | 'stat' | 'statLight' | 'text';
+  /**
+   * 3 or 4. Below 768 the columns are stacked. At 768, 4 columns make a
+   * 2 × 2 grid and 3 columns stay stacked. At 1152 and more, all the
+   * columns are in one row. The default is the number of items.
+   */
+  columns?: 3 | 4;
+  /** The id of the section, an anchor target for a link. */
+  id?: string;
+}
+
+const { items, headline, theme, variant = 'statement', columns, id } = Astro.props;
+const count = columns ?? (items.length >= 4 ? 4 : 3);
+const background = (
+  { statement: 'default', stat: 'accent', statLight: 'accent-faint', text: 'inverse' } as const
+)[variant];
+const titleClass = { statement: 'h2', stat: 'display', statLight: 'h1', text: undefined }[variant];
+const taglineClass = variant === 'statLight' ? 'body' : 'h2';
+---
+
+<Section id={id} theme={theme} background={background} contentClass={styles.content}>
+  {
+    headline && (
+      <Headline as="h2" size={variant === 'statLight' ? 'h2' : 'h1'}>
+        {headline}
+      </Headline>
+    )
+  }
+  <ul
+    class:list={[
+      styles.list,
+      count === 4 ? styles.columns4 : styles.columns3,
+      {
+        statement: styles.statement,
+        stat: styles.stat,
+        statLight: styles.statLight,
+        text: styles.text,
+      }[variant],
+    ]}
+  >
+    {
+      items.map((item) => (
+        <li class={styles.item}>
+          {variant === 'text' ? (
+            <p class="bodyMedium">{item.text}</p>
+          ) : (
+            <p class={styles.pair}>
+              <span class:list={[styles.title, titleClass]}>{item.title}</span>
+              <span class:list={[styles.tagline, taglineClass]}>{item.text}</span>
+            </p>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</Section>

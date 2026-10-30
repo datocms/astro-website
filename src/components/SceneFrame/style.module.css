@@ -1,0 +1,255 @@
+/* @layer blocks */
+/*
+ * The frame of a product scene, on the inverse surface, after a
+ * ChapterHeader. The frame is the content column, with a fixed height,
+ * and cuts the screen at the bottom. The stage of the kit gets the width
+ * of `.stage` and the zoom of --product-scenes-zoom; below the smallest
+ * width of the screen the kit makes the zoom smaller, thus the screen
+ * fills the box. The frame has no surface and no outline: only `window`
+ * and `detailEnd` have a line.
+ */
+.sceneFrame {
+  position: relative;
+  /* The z-index values of the kit stay in the frame: the sticky nav stays above the screen. */
+  isolation: isolate;
+  overflow-x: clip;
+  /*
+   * A line of the inverse surface under the frame: the frame does not touch
+   * the fragments. It is one colour also on the split background of
+   * ChapterLayout.
+   */
+  border-bottom: 1px solid var(--surface-inverse);
+}
+
+.box {
+  position: relative;
+}
+
+/*
+ * The frame has no surface and no outline. Only the top corner on the
+ * side of the screen is round (--frame-corner): the top left, or the top
+ * right for `detailEnd`.
+ * On phones the frame is 70% of the page width high, or less. The height
+ * is a limit, not a size: a screen shorter than the limit gives a shorter
+ * frame, thus the frame never shows empty space below the screen.
+ */
+.frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-height: min(var(--scene-frame-height), var(--scene-frame-phone-height));
+  overflow: hidden;
+  --frame-corner: var(--radius-lg);
+  border-radius: var(--frame-corner) 0 0 0;
+}
+
+/*
+ * `window` and `detailEnd` only: a line in a darker accent goes along the
+ * side where the frame cuts the screen, away from the round corner. There
+ * is no line at the bottom. The line is 1px wide. A shadow of 3px goes
+ * from the line toward the screen. The line and the shadow continue
+ * --frame-line-overshoot above the frame, and on that length they fade
+ * from transparent to the full colour. The line is on a layer of the box, above
+ * the screen and outside the clip of the frame: it does not move the screen.
+ */
+.window::after,
+.detailEnd::after {
+  /* Text-primary is the dark text in light and the pale text in the dark scheme, thus the line shows on both. */
+  --frame-line: color-mix(in srgb, var(--surface-accent) 65%, var(--text-primary));
+  --frame-line-overshoot: var(--space-xl);
+  --frame-shadow: color-mix(in srgb, var(--surface-inverse) 35%, transparent);
+  --frame-shadow-direction: to left;
+
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: calc(-1 * var(--frame-line-overshoot)) 0 0;
+  background:
+    linear-gradient(var(--frame-line), var(--frame-line)) right 0 top 0 / 1px 100% no-repeat,
+    linear-gradient(var(--frame-shadow-direction), var(--frame-shadow), transparent) right 1px top
+      0 / 3px 100% no-repeat;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, black var(--frame-line-overshoot));
+}
+
+/*
+ * The screen has no ring, no border and no shadow. The frame cuts it. The
+ * z-index values of the kit stay in the stage: the line stays above.
+ */
+.stage {
+  isolation: isolate;
+  flex: none;
+  width: 100%;
+  --product-scenes-zoom: var(--scene-frame-zoom);
+  --product-scenes-border: none;
+  --product-scenes-shadow: none;
+}
+
+/*
+ * On phones the screen starts at a corner of the frame, with no margin,
+ * thus the round corner of the frame cuts the screen. A small radius cuts
+ * less of the interface, for example the button at the top right.
+ */
+@media (max-width: 649px) {
+  .frame {
+    --frame-corner: var(--radius-sm);
+  }
+}
+
+@media (min-width: 650px) {
+  .frame {
+    max-height: min(var(--scene-frame-height), var(--scene-frame-tablet-height));
+  }
+}
+
+@media (min-width: 1152px) {
+  .frame {
+    max-height: var(--scene-frame-height);
+  }
+}
+
+/*
+ * `window`
+ *
+ *   desktop                      phone
+ *   ┌────────────────────┐       ┌──────────┐
+ *   │  ╭─────────────────┼──     │──────────┼──
+ *   │  │ screen          │       │ screen   │
+ *   │  │                 │       │          │
+ *   └──┴─────────────────┘       └──────────┘
+ *
+ * The frame has no margin and no surface: the screen starts at the top
+ * left corner. From 650px the box is --scene-frame-cut-end (`cutEnd`,
+ * default 2 × --space-3xl) wider than the frame: the frame cuts the info
+ * aside. On phones the box is 615/330 of the frame (615px at 390px, where
+ * the frame is 330px), thus the kit gives a screen of 1025px the zoom 0.6:
+ * the page shows the form and cuts the aside. The box grows with the
+ * page, as the height of the frame (`phoneHeightVw`, in vw): a wider phone
+ * shows the same picture, larger, and the screen stays as high as the
+ * frame.
+ *
+ * --product-scenes-dialog-clip-end is the width of the screen that the
+ * frame cuts at the right: the kit puts a dialog over the screen in the
+ * center of the part that shows. From 650px it is the --scene-frame-cut-end
+ * of the box. On phones it is the box less the frame.
+ */
+.window .stage {
+  --scene-frame-phone-width: calc(100vw - var(--section-padding-x) * 2);
+
+  width: calc(var(--scene-frame-phone-width) * 615 / 330);
+  --product-scenes-dialog-clip-end: calc(var(--scene-frame-phone-width) * (615 - 330) / 330);
+}
+
+@media (min-width: 650px) {
+  .window .stage {
+    width: calc(100% + var(--scene-frame-cut-end, var(--space-3xl) * 2));
+    --product-scenes-radius: var(--radius-md) 0 0 0;
+    --product-scenes-dialog-clip-end: var(--scene-frame-cut-end, var(--space-3xl) * 2);
+  }
+}
+
+/*
+ * `detailEnd`
+ *
+ *   desktop                      phone
+ *  ─┼─────────────────╮──┐     ──┼──────────┐
+ *   │  screen, larger │  │       │  screen  │
+ *   │                 │  │       │          │
+ *   └─────────────────┴──┘       └──────────┘
+ *
+ * The screen is 1100px wide, at the zoom of the frame: above 1, the frame
+ * shows the info aside as a detail, cut at the left too. Smaller
+ * pages make the zoom smaller (× 0.8, × 0.6 on phones), thus a phone still
+ * shows all the aside.
+ */
+.detailEnd .frame {
+  align-items: flex-end;
+  border-radius: 0 var(--frame-corner) 0 0;
+}
+
+.detailEnd::after {
+  --frame-shadow-direction: to right;
+
+  background-position:
+    left 0 top 0,
+    left 1px top 0;
+}
+
+.detailEnd .stage {
+  width: calc(1100px * var(--product-scenes-zoom));
+  --product-scenes-zoom: calc(var(--scene-frame-zoom) * 0.6);
+}
+
+@media (min-width: 650px) {
+  .detailEnd .frame {
+    padding-right: var(--space-2xl);
+  }
+
+  /* The line goes along the screen, not the frame: it starts --frame-line-overshoot above the screen. */
+  .detailEnd::after {
+    inset: calc(-1 * var(--frame-line-overshoot)) var(--space-2xl) 0 0;
+  }
+
+  .detailEnd .stage {
+    --product-scenes-zoom: calc(var(--scene-frame-zoom) * 0.8);
+    --product-scenes-radius: 0 var(--radius-md) 0 0;
+  }
+}
+
+@media (min-width: 1152px) {
+  .detailEnd .stage {
+    --product-scenes-zoom: var(--scene-frame-zoom);
+  }
+}
+
+/*
+ * `whole`
+ *
+ *   desktop                      phone
+ *   ╭───╮      ╭──────────╮      ╭────────╮
+ *   │   │ ──▶  │          │      │        │
+ *   ╰───╯ ◀──  ╰──────────╯      ╰────────╯
+ *
+ * A picture that is not a screen, for example the diagram of the Delivery
+ * chapter: it has edges of its own, thus a cut would look broken. The
+ * frame draws nothing: the children sit on the section with their own
+ * height, and the section pads them below as any content.
+ * The preset class is on the box. The selectors on the frame have two
+ * classes, thus they win over the heights of `.frame` at each breakpoint.
+ */
+.whole .frame {
+  display: block;
+  max-height: none;
+  overflow: visible;
+  border-radius: 0;
+}
+
+/*
+ * `fill`
+ *
+ *   desktop                      phone
+ *   ╭────────────────────╮       ┌──────────┐
+ *   │ screen             │       │──────────│
+ *   │                    │       │ screen   │
+ *   │                    │       │          │
+ *   └────────────────────┘       └──────────┘
+ *
+ * All the width of the screen shows: the frame cuts it only at the
+ * bottom, thus a margin around it has no function. From 650px the screen
+ * fills the frame, with no margin. On phones the screen starts at the top corners
+ * of the frame, and the kit zooms it down to the width of the box.
+ * The frame makes the round corners, not the content: a screen, a card of
+ * code or a box get the same corners. From 650px the two top corners are
+ * round. The content has square corners, thus a content that is shorter
+ * than the frame has square corners at the bottom.
+ */
+.fill .stage {
+  --product-scenes-radius: 0;
+}
+
+@media (min-width: 650px) {
+  .fill .frame {
+    border-radius: var(--frame-corner) var(--frame-corner) 0 0;
+  }
+}

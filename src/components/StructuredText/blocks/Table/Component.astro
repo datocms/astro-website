@@ -1,0 +1,43 @@
+---
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { TableFragment } from './graphql';
+import styles from './style.module.css';
+import { cellToHtml, parseColumn, toCss } from './utils';
+
+interface Props {
+  block: FragmentOf<typeof TableFragment>;
+}
+
+const block = readFragment(TableFragment, Astro.props.block);
+
+type TableData = { columns: string[]; data: Array<Record<string, string>> };
+const table = block.table as TableData;
+const columns = table.columns.map(parseColumn);
+---
+
+<figure>
+  <div class={styles.scroll}>
+    <table>
+      <thead>
+        <tr>
+          {
+            columns.map((col) => (
+              <th scope="col" style={toCss(col.style)} set:html={cellToHtml(col.content)} />
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {
+          table.data.map((row) => (
+            <tr>
+              {columns.map((col) => (
+                <td style={toCss(col.style)} set:html={cellToHtml(row[col.id])} />
+              ))}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</figure>

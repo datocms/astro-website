@@ -1,0 +1,223 @@
+---
+import diagram from '../diagram/style.module.css';
+import { ANSWER, CALL, CYCLE, curve, DESCRIPTION, ENTITIES, FAN, HEADER, STILL } from './hooks';
+import styles from './hooks.module.css';
+
+// The picture of the fragment "Webhooks on any event.", in the grammar of
+// the diagrams (../diagram/style.module.css). At the left, the panel
+// Events: one row for each entity that a webhook can listen to, with its
+// `entity_type`. At the right, the pill of the URL of the webhook, with
+// its custom header above it and its answer under it. A track goes from
+// each row to the pill. The loop: an event happens (its row gets the
+// ring, and its `event_type` comes next to the entity), a pulse goes
+// along its track, and the URL answers 200 OK with the ring. Then the
+// next event, from CYCLE: the ring of the old row fades, and the ring of
+// the new row comes before the end of that fade. The track of the event
+// is bright while its pulse goes. The answer always shows; it is quiet
+// while the call goes, and gets its ring again when the call arrives. The
+// row sso_user is dim and has no track: the webhook does not listen to
+// it, thus it never fires. In a narrow box the rows wrap, one track goes
+// down from the panel to the pill, and the event type is next to that
+// track. The script below drives the loop (in view only; not with reduced
+// motion). Without it the picture is the still: the first event of
+// CYCLE, answered.
+
+// The first event of each entity in CYCLE: the text of its event type at
+// the start. The widest row (with its event type) sets the width of the
+// panel, thus the panel keeps its width in the loop.
+const first = (entity: string) => CYCLE.find(([e]) => e === entity)?.[1] ?? '';
+---
+
+<figure
+  class:list={[diagram.root, styles.hooks]}
+  role="img"
+  aria-label={DESCRIPTION}
+  style={`--rows: ${ENTITIES.length}`}
+  data-hooks
+>
+  <div class={styles.board}>
+    <div class:list={[diagram.panel, styles.panel]}>
+      <p class:list={[diagram.panelLabel, styles.title]}>Events</p>
+      <ul class={styles.list}>
+        {
+          ENTITIES.map(({ entity, ticked }) => (
+            <li class={styles.row} data-entity={entity} data-off={ticked ? undefined : ''}>
+              <span
+                class:list={[diagram.change, styles.chip]}
+                data-chip
+                data-changed={entity === STILL[0] ? '' : undefined}
+              >
+                {entity}
+              </span>
+              <span class={styles.event} data-event data-on={entity === STILL[0] ? '' : undefined}>
+                {first(entity)}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {
+      /*
+      The tracks of the wide box: a curve from the right edge of the panel
+      at the middle of each row to the middle of the pill. It leaves the
+      row and comes to the pill horizontally. An entity that the webhook
+      does not listen to has no track. The pulse of a row goes
+      along its own track. The markup draws the curves in a box of
+      FAN.width × FAN.height that stretches to the box of the tracks (the
+      still); the script draws them again in px of the box, thus the pulse
+      does not stretch (../diagram/style.module.css).
+    */
+    }
+    <div class:list={[styles.lane, styles.fan]}>
+      <svg
+        class={styles.links}
+        viewBox={`0 0 ${FAN.width} ${FAN.height}`}
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        data-fan
+      >
+        {
+          ENTITIES.map(({ entity, ticked }, i) => {
+            if (!ticked) return null;
+            const d = curve(i, FAN.width, FAN.height);
+            return (
+              <g data-track={entity} data-live={entity === STILL[0] ? '' : undefined}>
+                <path class={diagram.track} d={d} />
+                <path class={diagram.pulse} d={d} pathLength="100" data-pulse-line />
+              </g>
+            );
+          })
+        }
+      </svg>
+    </div>
+
+    <div class={styles.down}>
+      <svg class={styles.links} aria-hidden="true">
+        <line class={diagram.track} x1="50%" y1="0" x2="50%" y2="100%"></line>
+        <line class={diagram.pulse} x1="50%" y1="0" x2="50%" y2="100%" pathLength="100" data-down
+        ></line>
+      </svg>
+      <span class={styles.downEvent} data-down-event data-on>
+        {STILL[1]}
+      </span>
+    </div>
+
+    <div class:list={[styles.lane, styles.target]}>
+      <div class={styles.call}>
+        <p class={styles.header}>{HEADER}</p>
+        <p class:list={[diagram.pill, styles.pill]}>{CALL}</p>
+        <p class={styles.answer}>
+          <span class:list={[diagram.change, styles.ok]} data-answer data-changed>{ANSWER}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<script>
+  import { DIAGRAM_MS, replay, sleep, startDiagramLoop, type Live } from '~/lib/motion/diagramLoop';
+  import { curve, CYCLE, ENTITIES, TRACKED } from './hooks';
+
+  /** Draws the curves of the fan in px of its box, thus the pulses do not stretch. A narrow box has no fan (0 × 0). */
+  function drawFan(svg: SVGSVGElement): void {
+    const { width, height } = svg.getBoundingClientRect();
+    if (!width || !height) return;
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    for (const item of TRACKED) {
+      const i = ENTITIES.indexOf(item);
+      for (const path of svg.querySelectorAll(`[data-track="${item.entity}"] path`)) {
+        path.setAttribute('d', curve(i, width, height));
+      }
+    }
+  }
+
+  class Hooks {
+    root: HTMLElement;
+    answer: HTMLElement;
+    down: SVGElement;
+    downEvent: HTMLElement;
+    /** The index in CYCLE of the next event: the still shows event 0 */
+    next = 1;
+    /** The entity of the event that shows now */
+    current = CYCLE[0]![0];
+
+    constructor(root: HTMLElement) {
+      this.root = root;
+      this.answer = root.querySelector<HTMLElement>('[data-answer]')!;
+      this.down = root.querySelector<SVGElement>('[data-down]')!;
+      this.downEvent = root.querySelector<HTMLElement>('[data-down-event]')!;
+    }
+
+    track(entity: string): SVGElement {
+      return this.root.querySelector<SVGElement>(`[data-track="${entity}"]`)!;
+    }
+
+    row(entity: string): HTMLElement {
+      return this.root.querySelector<HTMLElement>(`[data-entity="${entity}"]`)!;
+    }
+
+    /** The pulse of an entity: its own track in a wide box, the track down in a narrow box */
+    pulse(entity: string): SVGElement {
+      const fan = this.track(entity).querySelector<SVGElement>('[data-pulse-line]')!;
+      return fan.getBoundingClientRect().width > 0 ? fan : this.down;
+    }
+
+    /**
+     * The event that shows now goes: its ring, its event type and its
+     * bright track fade, and the answer becomes quiet. The answer stays.
+     */
+    clear(): void {
+      const row = this.row(this.current);
+      delete row.querySelector<HTMLElement>('[data-chip]')!.dataset.changed;
+      delete row.querySelector<HTMLElement>('[data-event]')!.dataset.on;
+      delete this.track(this.current).dataset.live;
+      delete this.downEvent.dataset.on;
+      delete this.answer.dataset.changed;
+    }
+
+    /**
+     * One event: the row gets the ring and its event type, a pulse goes
+     * to the URL along the bright track, and the URL answers. Then the
+     * still holds.
+     */
+    async event(live: Live): Promise<void> {
+      this.clear();
+      // The new ring comes before the end of the fade of the old ring
+      await sleep(DIAGRAM_MS.fade * 0.6);
+      if (!live()) return;
+
+      const [entity, type] = CYCLE[this.next]!;
+      this.next = (this.next + 1) % CYCLE.length;
+      this.current = entity;
+      const row = this.row(entity);
+      const chip = row.querySelector<HTMLElement>('[data-chip]')!;
+      const label = row.querySelector<HTMLElement>('[data-event]')!;
+      label.textContent = type;
+      this.downEvent.textContent = type;
+      chip.dataset.changed = '';
+      label.dataset.on = '';
+      this.downEvent.dataset.on = '';
+      this.track(entity).dataset.live = '';
+      replay(chip, 'ping');
+      await sleep(DIAGRAM_MS.pop);
+      if (!live()) return;
+
+      replay(this.pulse(entity), 'pulse');
+      await sleep(DIAGRAM_MS.travel);
+      if (!live()) return;
+
+      this.answer.dataset.changed = '';
+      replay(this.answer, 'ping');
+      await sleep(DIAGRAM_MS.ping + DIAGRAM_MS.hold);
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-hooks]')) {
+    const hooks = new Hooks(root);
+    const fan = root.querySelector<SVGSVGElement>('[data-fan]')!;
+    new ResizeObserver(() => drawFan(fan)).observe(fan);
+    startDiagramLoop(root, (live) => hooks.event(live));
+  }
+</script>

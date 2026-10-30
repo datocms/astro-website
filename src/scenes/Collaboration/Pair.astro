@@ -1,0 +1,176 @@
+---
+import type { Theme } from '~/lib/theme';
+import diagram from '../diagram/style.module.css';
+import { CollaborationEditorScene, CollaborationViewerScene } from './Collaboration';
+import inesImage from './ines.jpg';
+import { COLLABORATOR, VIEWER } from './story';
+import styles from './pair.module.css';
+import tomImage from './tom.jpg';
+
+// Two screens of the same recipe. When Inès saves, edgePulse
+// (src/lib/motion/diagramPulse.ts) takes the pulse from her screen around
+// the screen of Tom. The script below plays BEATS, one action in each beat.
+// In each beat the screen that does not act is dim. Below 768px the screens
+// go down. Without JS, and with reduced motion, the frame is the still: her
+// sentence typed, his form locked.
+
+interface Props {
+  theme: Theme;
+}
+
+const { theme } = Astro.props;
+const appearance = { theme, surface: 'inverse' } as const;
+
+// The colour of each person: the accent of a theme that is far from the
+// theme of the chapter. Their pill and their cursor have it.
+const PEOPLE = {
+  ines: { name: COLLABORATOR.name, image: inesImage.src, color: 'blue' },
+  tom: { name: VIEWER.name, image: tomImage.src, color: 'green' },
+} as const;
+const firstName = (name: string) => name.split(' ')[0];
+---
+
+<div class:list={[diagram.root, styles.pair]} data-collaboration-pair>
+  <svg class={styles.trace} aria-hidden="true" data-trace data-pulse-class={diagram.pulse}></svg>
+
+  <div class={styles.person} data-person="ines">
+    <p class:list={[diagram.pill, styles.pill]} data-theme={PEOPLE.ines.color}>
+      <img class={styles.avatar} src={PEOPLE.ines.image} alt="" width="20" height="20" />
+      <span>{PEOPLE.ines.name}</span>
+    </p>
+    <div class={styles.screen} data-screen>
+      <CollaborationEditorScene appearance={appearance} />
+      <span class={styles.cursor} data-theme={PEOPLE.ines.color} aria-hidden="true">
+        <svg class={styles.arrow} viewBox="0 0 16 16"
+          ><path d="M1.5 1.5 15 6.6 8.6 8.6 6.6 15Z"></path></svg
+        >
+        <span class={styles.name}>{firstName(PEOPLE.ines.name)}</span>
+      </span>
+    </div>
+  </div>
+
+  {
+    /*
+    The path of the save, from Inès to Tom: no line is drawn, only the pulse
+    goes along it. edgePulse reads the box of the svg, and the group that
+    shows tells the axis: horizontal from 768px, vertical below.
+  */
+  }
+  <div class={styles.line} data-line>
+    <svg class={styles.links} aria-hidden="true">
+      <g data-axis="x"></g>
+      <g data-axis="y"></g>
+    </svg>
+  </div>
+
+  <div class={styles.person} data-person="tom">
+    <p class:list={[diagram.pill, styles.pill]} data-theme={PEOPLE.tom.color}>
+      <img class={styles.avatar} src={PEOPLE.tom.image} alt="" width="20" height="20" />
+      <span>{PEOPLE.tom.name}</span>
+    </p>
+    <div class={styles.screen} data-screen>
+      <CollaborationViewerScene appearance={appearance} />
+      <span class={styles.cursor} data-theme={PEOPLE.tom.color} aria-hidden="true">
+        <svg class={styles.arrow} viewBox="0 0 16 16"
+          ><path d="M1.5 1.5 15 6.6 8.6 8.6 6.6 15Z"></path></svg
+        >
+        <span class={styles.name}>{firstName(PEOPLE.tom.name)}</span>
+        <svg class={styles.refused} viewBox="0 0 16 16">
+          <circle cx="8" cy="8" r="6"></circle>
+          <path d="M3.8 12.2 12.2 3.8"></path>
+        </svg>
+      </span>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { edgePulse } from '~/lib/motion/diagramPulse';
+  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+
+  /**
+   * One beat of the story: its time in ms, the step of the kit on each
+   * screen, and what the eye must follow (`focus`). Inès's steps are those
+   * of `dirty="after-translations"` ("rest" is the saved record, "dirty"
+   * the unsaved changes), Tom's steps are those of COLLABORATION_SEQUENCE.
+   * The CSS (pair.module.css) moves the two cursors on `data-beat`. The
+   * beat with `pulse` lasts until the pulse is at its end, and `ms` after.
+   */
+  interface Beat {
+    name: string;
+    ms: number;
+    ines: string;
+    tom: string;
+    focus: 'both' | 'ines' | 'tom';
+    pulse?: boolean;
+  }
+
+  const OUT = 6;
+
+  // The time to fade the two screens out at the end of the story, in ms:
+  // a little more than --reset-fade (pair.module.css), thus Tom's cursor
+  // goes back to the title out of view
+  const RESET = 900;
+
+  // Each beat lasts until its action is done and the eye has read it: the
+  // cursors move in 0.8s, the typing ends at 2.75s, the highlight of the
+  // save is 2.4s. The beat "write" stops before Tom's sentence is at its
+  // end: the screens fade out while he types.
+  const BEATS: Beat[] = [
+    { name: 'rest', ms: 1200, ines: 'rest', tom: 'rest', focus: 'both' },
+    { name: 'open', ms: 2000, ines: 'rest', tom: 'looking', focus: 'tom' },
+    { name: 'type', ms: 3400, ines: 'dirty', tom: 'looking', focus: 'ines' },
+    { name: 'lock', ms: 2200, ines: 'dirty', tom: 'editing', focus: 'tom' },
+    // Tom's cursor, on the title, clicks at 0.5s, and nothing happens
+    { name: 'refuse', ms: 2100, ines: 'dirty', tom: 'locked', focus: 'tom' },
+    // Her cursor goes to Save and clicks it at 1s
+    { name: 'save', ms: 1500, ines: 'dirty', tom: 'locked', focus: 'ines' },
+    { name: 'send', ms: 100, ines: 'rest', tom: 'locked', focus: 'tom', pulse: true },
+    { name: 'arrive', ms: 3000, ines: 'rest', tom: 'saved', focus: 'tom' },
+    // Tom's cursor goes to the end of the method and clicks at 0.9s, and he
+    // types from 1.1s (style.module.css)
+    { name: 'write', ms: 2600, ines: 'rest', tom: 'saved', focus: 'tom' },
+  ];
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-collaboration-pair]')) {
+    const ines = root.querySelector<HTMLElement>('[data-person="ines"] .ProductScenesScreen');
+    const tom = root.querySelector<HTMLElement>('[data-person="tom"] .ProductScenesScreen');
+    const links = root.querySelector<HTMLElement>('[data-line]');
+    const trace = root.querySelector<SVGSVGElement>('[data-trace]');
+    const screens = [...root.querySelectorAll<HTMLElement>('[data-screen]')];
+    if (!ines || !tom || !links || !trace || prefersReducedMotion()) continue;
+
+    let index = 0;
+    let timer: number | undefined;
+    // A new number stops the beat that waits for its pulse
+    let run = 0;
+
+    const next = () => {
+      index = (index + 1) % BEATS.length;
+      if (index > 0) return show();
+      root.dataset.reset = '';
+      timer = window.setTimeout(show, RESET);
+    };
+
+    const show = async () => {
+      const beat = BEATS[index]!;
+      const current = ++run;
+      delete root.dataset.reset;
+      root.dataset.beat = beat.name;
+      root.dataset.focus = beat.focus;
+      ines.dataset.step = beat.ines;
+      tom.dataset.step = beat.tom;
+      if (beat.pulse) {
+        await edgePulse({ root, trace, links, parts: screens, out: () => OUT, fromEnd: true });
+        if (current !== run) return;
+      }
+      timer = window.setTimeout(next, beat.ms);
+    };
+
+    onVisibilityChange(root, (visible) => {
+      window.clearTimeout(timer);
+      run++;
+      if (visible) show();
+    });
+  }
+</script>

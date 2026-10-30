@@ -1,4 +1,4 @@
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
 import { ImageFragment } from '~/components/blocks/Image/graphql';
 import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
 import { VideoFragment } from '~/components/blocks/Video/graphql';

@@ -1,0 +1,56 @@
+---
+import { ChapterHeader } from '~/components/ChapterHeader';
+import { ChapterSplit } from '~/components/ChapterSplit';
+import { CodeSnippetPreview } from '~/components/CodeSnippetPreview';
+import { FeatureFragments } from '~/components/FeatureFragments';
+import { SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as copy from '~/data/visual-editing-chapter';
+import { VisualEditingSaveScene, VisualEditingScene } from './VisualEditing';
+
+const theme = 'green';
+---
+
+<ChapterSplit theme={theme}>
+  <ChapterHeader {...copy.chapter} theme={theme} background="split" id="visual-editing" />
+  {
+    /*
+  The SceneFrame shows the tab Visual: the navigation bar with the tab
+  Visual active, the page of the article on the draft site at the left,
+  the sidebar of the visual editing at the right. The frame shows all the width of the screen (`fill`): from
+  768px the screen is the frame, with no margin. The frame cuts it at the
+  bottom. The zoom is 1, but the screen must be 1260px wide or more, thus
+  the page of the site has room for its desktop layout: on a box narrower
+  than that (also at 1440) the kit makes the zoom smaller (see
+  VisualEditingScene).
+  The screen is 1300px high, thus the frame cuts it at its bottom also when
+  the zoom is small. The sidebar lists the records of the page, the user
+  turns on "Edit mode", the outlines of content link flash over the page, a
+  click on the cover opens the article, and a click on the name of the
+  author opens the author. On phones the screen is small, but the page and
+  the sidebar both show.
+*/
+  }
+  <SceneFrame preset="fill" theme={theme} height={640} zoom={1}>
+    <VisualEditingScene appearance={{ theme }} chrome="app" height={1300} />
+  </SceneFrame>
+</ChapterSplit>
+<FeatureFragments {...copy.fragments} theme={theme} columns={2}>
+  {
+    /*
+    The form with the title, and the tab "Website preview" with the page.
+    The screen has no sidebar and no rail. In a box of 500px it is at zoom
+    0.7, thus it is wider than the box (1080px at 0.7 is 756px), and the box
+    cuts the preview at the right. It is higher than the box (820px at 0.7
+    is 574px, the box is 375px high), thus the box cuts it at the bottom.
+    A narrower box shows the same part of the screen. On phones the zoom is
+    1 in a box of 500px, thus 0.7 in a box of 350px, as before.
+  */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={0.7} phoneZoom={1}>
+    <VisualEditingSaveScene appearance={{ theme }} width={1080} height={820} />
+  </SceneFragment>
+  <SceneFragment slot="visual-1" fit="crop">
+    <CodeSnippetPreview tabs={[copy.layout, copy.request]} fill />
+  </SceneFragment>
+</FeatureFragments>

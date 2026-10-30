@@ -1,0 +1,59 @@
+---
+// The Media pillar of the redesign. The copy comes from src/data/. The SEO
+// is static. Only the closing quote comes from the CMS.
+import { CategoryNav } from '~/components/CategoryNav';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { PageCloser } from '~/components/PageCloser';
+import { Quote } from '~/components/Quote';
+import { Statement } from '~/components/Statement';
+import * as media from '~/data/media';
+import { eyesVideo } from '~/data/videos';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
+import AssetFieldsChapter from '~/scenes/AssetFields/Chapter.astro';
+import ImagesChapter from '~/scenes/Images/Chapter.astro';
+import MediaComponentsChapter from '~/scenes/MediaComponents/Chapter.astro';
+import MediaLibraryChapter from '~/scenes/MediaLibrary/Chapter.astro';
+import VideoChapter from '~/scenes/Video/Chapter.astro';
+import { query } from './_graphql';
+
+const { review } = await executeQuery(Astro, query);
+
+const seo = overrideSeo([], seoTitle(media.seo.title), seoDescription(media.seo.description));
+---
+
+{
+  /*
+  The Media pillar (src/data/AGENTS.md). Each chapter
+  is in src/scenes/<Chapter>/Chapter.astro, with its scenes. The rhythm is
+  the one of /editor-experience: the header and the scene of each chapter
+  on the inverse surface, the fragments on the pale surface, the opinion
+  on the accent surface.
+*/
+}
+<Layout seo={seo} footerTheme="green">
+  <Hero {...media.hero} alignment="center" typewriter />
+  {/* The chapters of the pillar. Sticky; no theme, as the hero: it takes the theme of the page. */}
+  <CategoryNav {...media.chapterNav} />
+  <MediaLibraryChapter />
+  <AssetFieldsChapter />
+  <ImagesChapter />
+  <Statement {...media.opinion} theme="green" variant="light" />
+  <VideoChapter />
+  <MediaComponentsChapter />
+  <Quote review={review} fallback={media.closing} theme="default" />
+  <PageCloser theme="green" cta={media.ctaBuild} video={eyesVideo} />
+
+  <DraftModeQueryListener query={query} />
+</Layout>
+
+<script>
+  import { initSceneSequences } from '~/lib/motion/sceneSequence';
+
+  // The scenes with a sequence play it in view: the click on an asset of
+  // the media library, which opens its dialog, and the photos that load
+  // in the page of the exhibition.
+  initSceneSequences();
+</script>

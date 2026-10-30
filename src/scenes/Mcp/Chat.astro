@@ -1,0 +1,100 @@
+---
+import { ANSWER, APP, DESCRIPTION, QUESTION, STEPS, TOOLS } from './story';
+import ServerMark from './ServerMark.astro';
+import ToolCall from './ToolCall.astro';
+import styles from './style.module.css';
+
+// The frame of the MCP chapter of /ai: the window of a chat app, as the
+// desktop apps of the assistants lay it out. No client is drawn: no logo,
+// no avatar, no name. The list of the chats is at the left (only on a wide
+// window), the title of the chat above, the box to write in below. The
+// question is a bubble at the right; the answer is plain text, with no
+// bubble, and each page in it is a link to its record. The tool calls are
+// rows between them: the mark and the name of DatoCMS, then a summary of
+// each call. The cms is not in the picture: the
+// answer comes from the project, and the tool rows say so. The window is a
+// sequence (STEPS): the rows and the lines of the answer show with `data-step`,
+// one after the other (`--i`); the rules are in style.module.css.
+// Without the sequence, and with reduced motion, the window is the still:
+// all of it.
+---
+
+<div
+  class={styles.window}
+  role="img"
+  aria-label={DESCRIPTION}
+  data-scene-steps={STEPS}
+  data-mcp-chat
+>
+  <div class={styles.app} aria-hidden="true">
+    <div class={styles.sidebar}>
+      <p class={styles.newChat}>
+        <span class={styles.newChatIcon}
+          ><svg class={styles.icon} viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"></path></svg></span
+        >{APP.newChat}
+      </p>
+      <p class={styles.recents}>{APP.recents}</p>
+      <ul class={styles.chats}>
+        {
+          APP.chats.map((chat) => (
+            <li class={styles.chat} data-current={chat.current}>
+              {chat.title}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class={styles.main}>
+      <p class={styles.titleBar}>
+        <span class={styles.title}>{APP.title}</span>
+        <svg class={styles.chevron} viewBox="0 0 12 12" aria-hidden="true"
+          ><path d="M3 4.5 6 7.5 9 4.5"></path></svg
+        >
+      </p>
+      <div class={styles.transcript}>
+        <p class={styles.question}>{QUESTION}</p>
+        <p class={styles.toolCall} data-at="tools" style="--i: 0">
+          <ServerMark />
+          <span class={styles.toolsHead}>{APP.server}</span>
+        </p>
+        <ul class={styles.tools}>
+          {
+            TOOLS.map((tool, i) => (
+              <li data-at="tools" style={`--i: ${i}`}>
+                <ToolCall summary={tool.summary} inList />
+              </li>
+            ))
+          }
+        </ul>
+        <div class={styles.answer}>
+          <p data-at="answer" style="--i: 0">{ANSWER.lead}</p>
+          <ul class={styles.pages}>
+            {
+              ANSWER.pages.map((page, i) => (
+                <li data-at="answer" style={`--i: ${i + 1}`}>
+                  <span class={styles.link}>{page}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <p data-at="answer" style={`--i: ${ANSWER.pages.length + 1}`}>{ANSWER.offer}</p>
+        </div>
+      </div>
+      <div class={styles.composer}>
+        <p class={styles.composerText}>{APP.composer}</p>
+        <p class={styles.composerRow}>
+          <span class={styles.composerButton}
+            ><svg class={styles.icon} viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"></path></svg
+            ></span
+          >
+          <span class={styles.server}>{APP.server}</span>
+          <span class={styles.send}
+            ><svg class={styles.icon} viewBox="0 0 16 16"
+              ><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5"></path></svg
+            ></span
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

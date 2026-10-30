@@ -1,225 +1,60 @@
 ---
-import { Image } from '~/components/blocks/Image';
-import { InDepthCtaBlock } from '~/components/blocks/InDepthCtaBlock';
-import { InternalVideo } from '~/components/blocks/InternalVideo';
-import { Layout } from '~/layouts/Layout';
-import { Prose } from '~/components/Prose';
-import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/structuredText/Text';
-import { Video } from '~/components/blocks/Video';
-import { Wrapper } from '~/components/Wrapper';
-import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+// A case study of the redesign, from a SuccessStory record of the CMS.
+import { stripStega } from '@datocms/astro';
+import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import { CaseStudies } from '~/components/CaseStudies';
+import { CaseStudyBody } from '~/components/CaseStudyBody';
+import { ChallengeSolution } from '~/components/ChallengeSolution';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { JsonLd } from '~/components/JsonLd';
-import { publisherRef } from '~/lib/jsonLd';
+import { PageCloser } from '~/components/PageCloser';
+import { Stats } from '~/components/Stats';
+import { TextWithImage } from '~/components/TextWithImage';
+import * as cs from '~/data/case-studies';
+import { victoryVideo } from '~/data/videos';
+import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
-import { query, siblingsQuery } from './_graphql';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { defaultLinkToRecordComponents } from '~/components/linkToRecords';
-import { defaultInlineRecordComponents } from '~/components/inlineRecords';
-import { InlineText } from '~/components/structuredText/InlineText';
-import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { Svg } from '~/components/Svg';
-import { StripWithContent } from '~/components/StripWithContent';
-import { cleanDomain } from '~/lib/cleanDomain';
-import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
-import { buildUrlForFeature } from '~/lib/datocms/gqlUrlBuilder/feature';
-import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
-import { SameLevelNavigation } from '~/components/SameLevelNavigation';
-import { Card } from '~/components/Card';
-import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
-import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
-import s from './_style.module.css';
-import { isDefined } from '~/lib/isDefined';
+import { publisherRef } from '~/lib/jsonLd';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
 
 const variables = { slug: Astro.params.slug! };
-const { page } = await executeQuery(Astro, query, { variables });
+const { page, latest } = await executeQuery(Astro, query, { variables });
 
 if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 
-const { previous, next, first, last } = await executeQuery(Astro, siblingsQuery, {
-  variables: { position: page.position! },
-});
-
-const siblings = [previous ?? last, next ?? first].filter(isDefined);
+// The JSON-LD headline is a plain string: it must not contain stega.
+const headline = stripStega(structuredTextToPlainText(page.title) || page.name);
+const others = latest.filter((story) => story.id !== page.id).slice(0, 3);
 ---
 
-<Layout seo={page.seo}>
+<Layout seo={page.seo} theme="orange" footerTheme="orange">
   <Fragment slot="head">
     <JsonLd
       data={{
         '@context': 'https://schema.org',
         '@type': 'Article',
-        headline: structuredTextToPlainText(page.title) ?? page.name,
+        headline,
         url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
-        datePublished: page._firstPublishedAt,
+        datePublished: page._firstPublishedAt ?? undefined,
         publisher: publisherRef(baseUrl(Astro)),
         description: extractFromSeoTags(page.seo).description,
         image: page.coverImage.url,
       }}
     />
   </Fragment>
-  <div id="main-content">
-    <Wrapper>
-      <div class={s.hero}>
-        <div class={s.heroBody}>
-          <div class={s.headKicker} data-datocms-nomd>
-            <img alt={page.logo.alt} src={page.logo.url} />
-            <span class={s.plus}>+</span>
-            <Svg name="svg/logos/datocms" />
-          </div>
-          <h1 class={s.heroName}>{page.name}</h1>
-          <h2 class={s.heroTitle}>
-            <InlineText {...ensureValidStructuredTextProps({ data: page.title })} />
-          </h2>
-          <div class={s.heroSubtitle}>
-            <InlineText {...ensureValidStructuredTextProps({ data: page.subtitle })} />
-          </div>
-        </div>
-        <div class={s.heroImageWrapper}>
-          <div class={s.heroImage}>
-            <ResponsiveImage data={page.coverImage.responsiveImage} />
-          </div>
-        </div>
-      </div>
-    </Wrapper>
 
-    <StripWithContent stripHeight="partial">
-      <Fragment slot="title">At a glance...</Fragment>
-
-      {
-        page.numbers.length > 0 && (
-          <div class={s.numbers}>
-            {page.numbers.map((item) => (
-              <div class={s.numberBlock}>
-                <h3 class={s.numberTitle}>{item.number}</h3>
-                <p class={s.numberLabel}>{item.label}</p>
-              </div>
-            ))}
-          </div>
-        )
-      }
-
-      <div class={s.glanceWrapper}>
-        <div class={s.challenge}>
-          <h3>The challenge</h3>
-          <Text {...ensureValidStructuredTextProps({ data: page.challenge })} />
-        </div>
-        <div class={s.arrowsWrapper}>
-          <div class={s.arrows}>
-            <Svg name="svg/illustrations/arrow-sketch-3" />
-            <Svg name="svg/illustrations/arrow-sketch-3" />
-          </div>
-        </div>
-        <div class={s.result}>
-          <h3>The result</h3>
-          <Text {...ensureValidStructuredTextProps({ data: page.result })} />
-        </div>
-      </div>
-    </StripWithContent>
-
-    <Wrapper>
-      <div class={s.fullStory}>
-        <Prose class={s.body}>
-          <Text
-            {...ensureValidStructuredTextProps({
-              data: page.content,
-              blockComponents: {
-                ImageRecord: Image,
-                InDepthCtaBlockRecord: InDepthCtaBlock,
-                InternalVideoRecord: InternalVideo,
-                VideoRecord: Video,
-              },
-              linkToRecordComponents: defaultLinkToRecordComponents,
-              inlineRecordComponents: defaultInlineRecordComponents,
-            })}
-          />
-        </Prose>
-
-        <aside class={s.aside}>
-          {
-            page.projectUrl && (
-              <div class={s.asideItem}>
-                <h3>Project</h3>
-                <a href={page.projectUrl} target="_blank" rel="noopener noreferrer">
-                  {cleanDomain(page.projectUrl)}
-                </a>
-              </div>
-            )
-          }
-          {
-            page.useCase && (
-              <div class={s.asideItem}>
-                <h3>Use case</h3>
-                <a href={buildUrlForUseCasePage(page.useCase)}>{page.useCase.navigationBarTitle}</a>
-              </div>
-            )
-          }
-          {
-            page.industry.length > 0 && (
-              <div class={s.asideItem}>
-                <h3>Industry</h3>
-                <ul>
-                  {page.industry.map((item) => (
-                    <li>{item.name}</li>
-                  ))}
-                </ul>
-              </div>
-            )
-          }
-          {
-            page.keyFeatures.length > 0 && (
-              <div class={s.asideItem}>
-                <h3>Key Features</h3>
-                <ul>
-                  {page.keyFeatures.map((item) => (
-                    <li>
-                      <a href={buildUrlForFeature(item)}>{item.seoH1}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )
-          }
-          {
-            page.partner && (
-              <div class={s.asideItem}>
-                <h3>Partner</h3>
-                <a href={buildUrlForPartner(page.partner)}>{page.partner.name}</a>
-              </div>
-            )
-          }
-        </aside>
-      </div>
-    </Wrapper>
-  </div>
-
-  <SameLevelNavigation
-    title="Not all stories are alike"
-    subtitle="Explore more case studies to see how different teams work with DatoCMS at scale"
-  >
-    {
-      siblings.map((item) => (
-        <Card
-          href={buildUrlForSuccessStory(item)}
-          title={item.name}
-          orientation={siblings.length === 3 ? 'vertical' : 'horizontal'}
-          size={siblings.length === 1 ? 'medium' : 'small'}
-          fullTitleLength={true}
-          lineClamp={2}
-        >
-          <Fragment slot="image">
-            <ResponsiveImage data={item.coverImage.responsiveImage} />
-          </Fragment>
-          {structuredTextToPlainText(item.subtitle)}
-        </Card>
-      ))
-    }
-  </SameLevelNavigation>
+  <TextWithImage story={page} media="photo" headingLevel="h1" theme="orange" />
+  {page.numbers.length > 0 && <Stats stats={page.numbers} theme="orange" />}
+  <CaseStudyBody title="The full story" story={page} theme="orange" />
+  <ChallengeSolution story={page} />
+  <CaseStudies {...cs.moreCaseStudies} stories={others} rows={1} theme="orange" />
+  <PageCloser theme="orange" cta={cs.ctaBuildShort} video={victoryVideo} videoLayout="centre" />
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

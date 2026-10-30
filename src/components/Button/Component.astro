@@ -1,31 +1,84 @@
 ---
-import type { HTMLTag, Polymorphic } from 'astro/types';
-import style from './style.module.css';
-import { fsClassNames, pClassNames, sClassNames } from './common';
+import type { HTMLAttributes } from 'astro/types';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+import type { ButtonAppearance, ButtonImage } from './types';
 
-type Props<T extends HTMLTag = 'button'> = Polymorphic<{
-  as: T;
-  fs?: keyof typeof fsClassNames;
-  p?: keyof typeof pClassNames;
-  s?: keyof typeof sClassNames;
-  block?: boolean;
+interface Props {
+  appearance?: ButtonAppearance;
+  variant?: 'solid' | 'soft';
+  /** A 20px userpic or a stack of 20px logos before the label. */
+  leading?: 'userpic' | 'logos';
+  leadingImages?: ButtonImage[];
+  arrow?: boolean;
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
-}>;
+  /** Overrides the theme of the section. Use only for deliberate exceptions. */
+  theme?: Theme;
+  class?: string;
+  attrs?: HTMLAttributes<'a'> & HTMLAttributes<'button'>;
+}
 
-const { as: Tag = 'button' as any, fs, p, s, block, disabled, ...props } = Astro.props;
+const {
+  appearance = 'light-on-white',
+  variant = 'solid',
+  leading,
+  leadingImages = [],
+  arrow = true,
+  href,
+  type = 'button',
+  disabled = false,
+  theme,
+  class: className,
+  attrs,
+} = Astro.props;
+
+const appearanceClass = {
+  'deep-on-white': styles.deepOnWhite,
+  'light-on-white': styles.lightOnWhite,
+  'deep-on-light': styles.deepOnLight,
+  'light-on-deep': styles.lightOnDeep,
+}[appearance];
+
+const classes = [
+  styles.button,
+  'subtitleMedium',
+  appearanceClass,
+  variant === 'soft' && styles.soft,
+  leading && styles.hasLeading,
+  className,
+];
 ---
 
-<Tag
-  {...props}
-  class:list={[
-    style.root,
-    props.class,
-    disabled && style.disabled,
-    block && style.block,
-    s && sClassNames[s],
-    fs && fsClassNames[fs],
-    p && pClassNames[p],
-  ]}
->
-  <slot />
-</Tag>
+{
+  href && !disabled ? (
+    <a href={href} class:list={classes} data-theme={theme} {...attrs}>
+      {leading && (
+        <span class:list={[styles.leading, leading === 'logos' && styles.logos]}>
+          {leadingImages.map((img) => (
+            <img src={img.src} alt={img.alt ?? ''} width="20" height="20" />
+          ))}
+        </span>
+      )}
+      <span class={styles.label}>
+        <slot />
+        {arrow && <span aria-hidden="true"> →</span>}
+      </span>
+    </a>
+  ) : (
+    <button type={type} class:list={classes} data-theme={theme} disabled={disabled} {...attrs}>
+      {leading && (
+        <span class:list={[styles.leading, leading === 'logos' && styles.logos]}>
+          {leadingImages.map((img) => (
+            <img src={img.src} alt={img.alt ?? ''} width="20" height="20" />
+          ))}
+        </span>
+      )}
+      <span class={styles.label}>
+        <slot />
+        {arrow && <span aria-hidden="true"> →</span>}
+      </span>
+    </button>
+  )
+}

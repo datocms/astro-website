@@ -1,0 +1,76 @@
+---
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
+import { StructuredText } from '~/components/StructuredText';
+import { CopyPromptButton } from '~/components/StructuredText/blocks/CopyPromptButton';
+import { Image } from '~/components/StructuredText/blocks/Image';
+import { InternalVideo } from '~/components/StructuredText/blocks/InternalVideo';
+import { TabsBlock } from '~/components/StructuredText/blocks/TabsBlock';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { formatLongDate } from '~/lib/format/date';
+import { ProductUpdateFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  entry: FragmentOf<typeof ProductUpdateFragment>;
+  /** A link above the date, back to the index. */
+  back: { label: string; href: string };
+}
+
+const { back } = Astro.props;
+const entry = readFragment(ProductUpdateFragment, Astro.props.entry);
+
+const blockComponents = {
+  CopyPromptButtonBlockRecord: CopyPromptButton,
+  ImageRecord: Image,
+  InternalVideoRecord: InternalVideo,
+  TabsBlockRecord: TabsBlock,
+};
+---
+
+{
+  /*
+  One entry of the changelog: the title and the full content.
+  The date and the categories are pills, as in the rows of ProductUpdates
+  and ProductUpdateList. On wide screens the back link, the date and the
+  categories are in a column at the left, and they stay in view while the
+  content scrolls.
+*/
+}
+<Section>
+  <article class={styles.article}>
+    <div class={styles.meta}>
+      <a class:list={[styles.back, 'subtitleMedium']} href={back.href}>
+        ← {back.label}
+      </a>
+      <time class:list={[styles.date, 'subtitleMedium']} datetime={entry._firstPublishedAt}>
+        {formatLongDate(entry._firstPublishedAt)}
+      </time>
+      {
+        entry.categories.length > 0 && (
+          <ul class={styles.tags}>
+            {entry.categories.map((category) => (
+              <li class:list={[styles.tag, 'subtitleMedium']}>{category.name}</li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+    <div class={styles.main}>
+      <h1 class="h2">{entry.title}</h1>
+      <Prose>
+        <StructuredText
+          {...ensureValidStructuredTextProps({
+            data: entry.content,
+            blockComponents,
+            linkToRecordComponents: defaultLinkToRecordComponents,
+            inlineRecordComponents: defaultInlineRecordComponents,
+          })}
+        />
+      </Prose>
+    </div>
+  </article>
+</Section>

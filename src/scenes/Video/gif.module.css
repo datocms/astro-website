@@ -1,0 +1,75 @@
+/*
+ * The layout of the fragment "A GIF, from the URL." (Gif.astro): the URL
+ * above the GIF that it returns. The parts are the ones of
+ * ../diagram/style.module.css, and the surface, the font and the badge
+ * are the ones of stream.module.css. The picture fills the box of the
+ * fragment (SceneFragment, preset `fill`). The box is the container.
+ */
+.gif {
+  --pad: var(--space-xl);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-md);
+  box-sizing: border-box;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding: var(--pad);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse-muted);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/*
+ * The URL: the ID is dim, the parts that ask for the GIF
+ * are bright. It breaks before the query (<wbr>), and in a part only
+ * when the part is wider than the box.
+ */
+.url {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.key {
+  color: var(--text-on-inverse-strong);
+}
+
+/* The GIF at 16:9. The browser scales it up to the box, as a mail app or a preview card does. */
+.player {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--surface-inverse-muted);
+}
+
+.picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge {
+  position: absolute;
+  top: var(--space-3xs);
+  right: var(--space-3xs);
+  padding: var(--space-4xs) var(--space-3xs);
+  border-radius: var(--radius-sm);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse-strong);
+  line-height: 1;
+}
+
+@container (max-width: 440px) {
+  .gif {
+    --pad: var(--space-md);
+
+    font-size: var(--type-code-xsmall);
+  }
+}

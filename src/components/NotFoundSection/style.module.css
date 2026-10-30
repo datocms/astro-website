@@ -1,0 +1,60 @@
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.headlineGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  max-width: 760px;
+}
+
+.label {
+  color: var(--text-muted);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+}
+
+.help {
+  padding-top: var(--space-2xs);
+  color: var(--text-muted);
+}
+
+.helpLink {
+  color: var(--text-primary);
+}
+
+.helpLabel {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+@media (hover: hover) {
+  .helpLink:hover .helpLabel {
+    text-decoration-thickness: 2px;
+  }
+}
+
+/* The buttons and the help link wait for the typewriter. Without JS or motion, they show. */
+:global(html[data-motion='on'])
+  .intro:has([data-typewriter])
+  [data-not-found-after]:not([data-visible]) {
+  opacity: 0;
+}
+
+.intro [data-not-found-after][data-visible] {
+  animation: fadeIn 150ms ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}

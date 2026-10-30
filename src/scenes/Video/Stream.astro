@@ -1,0 +1,134 @@
+---
+import diagram from '../diagram/style.module.css';
+import frame from './restoring-tide-line.jpg';
+import frame270 from './restoring-tide-line-270p.jpg';
+import frame480 from './restoring-tide-line-480p.jpg';
+import frame720 from './restoring-tide-line-720p.jpg';
+import { clock, DESCRIPTION, DURATION, FAST, RENDITIONS, START, STILL } from './stream';
+import styles from './stream.module.css';
+
+// The picture of the fragment "No spinning wheel.", in the grammar of the
+// diagrams (../diagram/style.module.css). Two players of Restoring Tide
+// Line at the same second: at the left a slow connection, at the right
+// fibre. Above each player, the connection and its signal; on the
+// player, the rendition. The picture of each rendition is a real smaller
+// copy of the frame, thus a low rendition is soft as on a real player.
+// The loop: the time of the two players goes on together, and the left
+// connection changes (CYCLE of ./stream): its name swaps, then the player
+// picks the rendition for it, and its picture changes. The players never
+// stop. The script below drives the loop (in view only; not with reduced
+// motion). Without it the picture is the still: on a train, 270p.
+
+const PICTURES = { '270p': frame270, '480p': frame480, '720p': frame720 } as const;
+const played = START / DURATION;
+---
+
+<figure class:list={[diagram.root, styles.stream]} role="img" aria-label={DESCRIPTION} data-stream>
+  <div class={styles.pair}>
+    <div class={styles.side} data-slow>
+      <p class={styles.connection}>
+        <span class={styles.bars} data-bars={STILL.bars}
+          ><span></span><span></span><span></span><span></span></span
+        >
+        <span class:list={[diagram.swap, styles.name]} data-name>{STILL.label}</span>
+      </p>
+      <div class:list={[diagram.photo, styles.player]}>
+        {
+          RENDITIONS.map((rendition) => (
+            <img
+              class={styles.picture}
+              src={PICTURES[rendition as keyof typeof PICTURES].src}
+              alt=""
+              data-rendition={rendition}
+              data-on={rendition === STILL.rendition ? '' : undefined}
+            />
+          ))
+        }
+        <span class={styles.badge}
+          ><span class:list={[diagram.swap, styles.value]} data-badge>{STILL.rendition}</span></span
+        >
+      </div>
+      <p class={styles.controls} style={`--played: ${played}`} data-controls>
+        <span class={styles.rail}><span class={styles.played}></span></span>
+        <span class={styles.time} data-time>{clock(START)}</span>
+      </p>
+    </div>
+
+    <div class={styles.side}>
+      <p class={styles.connection}>
+        <span class={styles.bars} data-bars={FAST.bars}
+          ><span></span><span></span><span></span><span></span></span
+        >
+        <span class={styles.name}>{FAST.label}</span>
+      </p>
+      <div class:list={[diagram.photo, styles.player]}>
+        <img class={styles.picture} src={frame.src} alt="" data-on />
+        <span class={styles.badge}><span class={styles.value}>{FAST.rendition}</span></span>
+      </div>
+      <p class={styles.controls} style={`--played: ${played}`} data-controls>
+        <span class={styles.rail}><span class={styles.played}></span></span>
+        <span class={styles.time} data-time>{clock(START)}</span>
+      </p>
+    </div>
+  </div>
+</figure>
+
+<script>
+  import { DIAGRAM_MS, sleep, startDiagramLoop, swap, type Live } from '~/lib/motion/diagramLoop';
+  import { clock, CYCLE, DURATION, START } from './stream';
+
+  const TICKS = 3;
+
+  class Stream {
+    root: HTMLElement;
+    slow: HTMLElement;
+    next = 1;
+    time = START;
+
+    constructor(root: HTMLElement) {
+      this.root = root;
+      this.slow = root.querySelector<HTMLElement>('[data-slow]')!;
+    }
+
+    tick(): void {
+      this.time = this.time + 1 < DURATION ? this.time + 1 : START;
+      for (const controls of this.root.querySelectorAll<HTMLElement>('[data-controls]')) {
+        controls.style.setProperty('--played', String(this.time / DURATION));
+        controls.querySelector<HTMLElement>('[data-time]')!.textContent = clock(this.time);
+      }
+    }
+
+    async change(live: Live): Promise<void> {
+      const connection = CYCLE[this.next]!;
+      this.next = (this.next + 1) % CYCLE.length;
+
+      const name = this.slow.querySelector<HTMLElement>('[data-name]')!;
+      swap(name, () => (name.textContent = connection.label));
+      this.slow.querySelector<HTMLElement>('[data-bars]')!.dataset.bars = String(connection.bars);
+      await sleep(DIAGRAM_MS.swap);
+      if (!live()) return;
+
+      // The player sees the new speed a moment after the connection changes
+      for (const picture of this.slow.querySelectorAll<HTMLElement>('[data-rendition]')) {
+        if (picture.dataset.rendition === connection.rendition) picture.dataset.on = '';
+        else delete picture.dataset.on;
+      }
+      const badge = this.slow.querySelector<HTMLElement>('[data-badge]')!;
+      swap(badge, () => (badge.textContent = connection.rendition));
+    }
+
+    async event(live: Live): Promise<void> {
+      for (let i = 0; i < TICKS; i++) {
+        await sleep(1000);
+        if (!live()) return;
+        this.tick();
+      }
+      await this.change(live);
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-stream]')) {
+    const stream = new Stream(root);
+    startDiagramLoop(root, (live) => stream.event(live));
+  }
+</script>

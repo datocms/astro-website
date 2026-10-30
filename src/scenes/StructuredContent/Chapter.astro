@@ -1,0 +1,59 @@
+---
+import { ChapterHeader } from '~/components/ChapterHeader';
+import { ChapterSplit } from '~/components/ChapterSplit';
+import { CodeSnippetPreview } from '~/components/CodeSnippetPreview';
+import { FeatureFragments } from '~/components/FeatureFragments';
+import { FRAGMENT_WIDTH, SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as copy from '~/data/structured-content';
+import { StructuredContentFragmentScene, StructuredContentScene } from './StructuredContent';
+
+const theme = 'pink';
+
+// The height of the fragment scenes, in px. The box of a fragment shows the
+// part of the scene from its top left corner, and cuts the rest. The scene is
+// taller than the box, thus the text goes past the bottom edge. The scenes
+// are FRAGMENT_WIDTH wide: the inline record gets at most 36% of the line,
+// thus below 560px the name of the record is cut.
+const FRAGMENT_HEIGHT = 760;
+---
+
+<ChapterSplit theme={theme}>
+  <ChapterHeader {...copy.chapter} theme={theme} background="split" id="structured-content" />
+  <SceneFrame preset="window" theme={theme} height={580}>
+    <StructuredContentScene appearance={{ theme }} fields="body" focused height={900} />
+  </SceneFrame>
+</ChapterSplit>
+<FeatureFragments {...copy.fragments} columns={2} visualAspect="5 / 3">
+  {/* Astro needs a static slot name, thus one child for each fragment. */}
+  {
+    /* The scene is the input alone, from its top left corner, with the slash and the top of the menu. The right edge cuts the text. On phones the three windows are 8% larger (1.35): the text of the input stays readable in a narrow box. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={1.25} phoneZoom={1.35}>
+    <StructuredContentFragmentScene
+      appearance={{ theme }}
+      fragment="slash"
+      width={FRAGMENT_WIDTH}
+      height={FRAGMENT_HEIGHT}
+    />
+  </SceneFragment>
+  <SceneFragment slot="visual-1" fit="scale" zoom={1.25} phoneZoom={1.35}>
+    <StructuredContentFragmentScene
+      appearance={{ theme }}
+      fragment="gallery"
+      width={FRAGMENT_WIDTH}
+      height={FRAGMENT_HEIGHT}
+    />
+  </SceneFragment>
+  <SceneFragment slot="visual-2" fit="scale" zoom={1.25} phoneZoom={1.35}>
+    <StructuredContentFragmentScene
+      appearance={{ theme }}
+      fragment="record"
+      width={FRAGMENT_WIDTH}
+      height={FRAGMENT_HEIGHT}
+    />
+  </SceneFragment>
+  <SceneFragment slot="visual-3" fit="crop">
+    <CodeSnippetPreview tabs={[copy.dast, ...copy.renderers]} fill />
+  </SceneFragment>
+</FeatureFragments>

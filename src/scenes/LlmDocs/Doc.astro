@@ -1,0 +1,33 @@
+---
+import { DESCRIPTION, FILE, SECTION } from './story';
+import styles from './style.module.css';
+---
+
+<div class={styles.doc} role="img" aria-label={DESCRIPTION}>
+  <div class={styles.file} aria-hidden="true">
+    <p class={styles.bar}>
+      <svg class={styles.fileIcon} viewBox="0 0 16 16"
+        ><path d="M4 1.75h5.25L12.5 5v9.25h-8.5z M9 1.75V5.25h3.5"></path></svg
+      >
+      <span class={styles.fileName}>{FILE.name}</span>
+      <span class={styles.fileMeta}>{FILE.size}</span>
+      <span class={styles.fileMeta}>{FILE.lines}</span>
+    </p>
+    <div class={styles.fileBody}>
+      <ol class={styles.lines}>
+        {
+          SECTION.map((line) => (
+            <li
+              class={styles.line}
+              data-marked={line.marked || undefined}
+              data-heading={line.text.startsWith('#') || undefined}
+            >
+              <span class={styles.number}>{line.n.toLocaleString('en-US')}</span>
+              <span>{line.text}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</div>

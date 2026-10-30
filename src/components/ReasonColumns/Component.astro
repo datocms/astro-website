@@ -1,0 +1,47 @@
+---
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { Section } from '~/components/Section';
+import { StructuredText } from '~/components/StructuredText';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { Theme } from '~/lib/theme';
+import { ReasonColumnsReasonFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  title: string;
+  /** One column for each reason, at most four in a row. */
+  reasons: FragmentOf<typeof ReasonColumnsReasonFragment>[];
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+}
+
+const { title, theme } = Astro.props;
+const reasons = Astro.props.reasons.map((reason) =>
+  readFragment(ReasonColumnsReasonFragment, reason),
+);
+const columns = Math.min(Math.max(reasons.length, 1), 4);
+---
+
+<Section theme={theme} background="inverse" contentClass={styles.content}>
+  <h2 class="h1">{title}</h2>
+  <ul class={styles.list} style={`--reason-columns: ${columns}`}>
+    {
+      reasons.map((reason) => (
+        <li class={styles.reason}>
+          <h3 class="h2">{reason.title}</h3>
+          <div class:list={[styles.rich, 'bodyMedium']}>
+            <StructuredText
+              {...ensureValidStructuredTextProps({
+                data: reason.content,
+                linkToRecordComponents: defaultLinkToRecordComponents,
+                inlineRecordComponents: defaultInlineRecordComponents,
+              })}
+            />
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

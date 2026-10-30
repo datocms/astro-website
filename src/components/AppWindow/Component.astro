@@ -1,0 +1,33 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import styles from './style.module.css';
+
+type Props = HTMLAttributes<'div'> & {
+  /** The address in the bar, at the centre: a browser or the cms */
+  address?: string;
+  /** The name of the open file in the bar, as a tab: a code editor */
+  file?: string;
+};
+
+const { address, file, class: className, ...rest } = Astro.props;
+---
+
+{
+  /*
+  A window on the inverse surface: a bar with the three lights, and the
+  content under it (the default slot). The bar shows `address` or `file`,
+  or the content of the slot "bar" (the toolbar of a browser). The parent
+  gives the window its place and its size.
+*/
+}
+<div class:list={[styles.window, className]} {...rest}>
+  <div class={styles.bar}>
+    <span class={styles.lights}><span></span><span></span><span></span></span>
+    {address && <span class:list={[styles.address, 'caption']}>{address}</span>}
+    {file && <span class:list={[styles.fileTab, 'caption']}>{file}</span>}
+    <slot name="bar" />
+    {/* The lights have the same width on the right, thus the address is at the centre */}
+    {address && <span class={styles.balance} />}
+  </div>
+  <slot />
+</div>

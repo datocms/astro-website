@@ -1,0 +1,120 @@
+---
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
+import { StructuredText } from '~/components/StructuredText';
+import { Image } from '~/components/StructuredText/blocks/Image';
+import { InDepthCtaBlock } from '~/components/StructuredText/blocks/InDepthCtaBlock';
+import { InternalVideo } from '~/components/StructuredText/blocks/InternalVideo';
+import { Video } from '~/components/StructuredText/blocks/Video';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { cleanDomain } from '~/lib/cleanDomain';
+import { buildUrlForFeature } from '~/lib/datocms/gqlUrlBuilder/feature';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
+import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { Theme } from '~/lib/theme';
+import { CaseStudyBodyStoryFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  title: string;
+  story: FragmentOf<typeof CaseStudyBodyStoryFragment>;
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+}
+
+const { title, theme } = Astro.props;
+const story = readFragment(CaseStudyBodyStoryFragment, Astro.props.story);
+
+type FactValue = { text: string; href?: string; external?: boolean };
+type Fact = { label: string; values: FactValue[] };
+
+const tags = story.tags.map((tag) => tag.name.trim()).filter(Boolean);
+
+const facts: Fact[] = [
+  story.projectUrl
+    ? {
+        label: 'Project',
+        values: [{ text: cleanDomain(story.projectUrl), href: story.projectUrl, external: true }],
+      }
+    : null,
+  story.industry.length > 0
+    ? { label: 'Industry', values: story.industry.map((item) => ({ text: item.name })) }
+    : null,
+  story.useCase
+    ? {
+        label: 'Use case',
+        values: [
+          {
+            text: story.useCase.navigationBarTitle,
+            href: buildUrlForUseCasePage(story.useCase),
+          },
+        ],
+      }
+    : null,
+  tags.length > 0 ? { label: 'Solved', values: tags.map((text) => ({ text })) } : null,
+  story.keyFeatures.length > 0
+    ? {
+        label: 'Key Features',
+        values: story.keyFeatures.flatMap((feature) =>
+          'seoH1' in feature && feature.seoH1
+            ? [{ text: feature.seoH1, href: buildUrlForFeature(feature) }]
+            : [],
+        ),
+      }
+    : null,
+  story.partner
+    ? {
+        label: 'Partner',
+        values: [{ text: story.partner.name, href: buildUrlForPartner(story.partner) }],
+      }
+    : null,
+].filter((fact): fact is Fact => fact !== null && fact.values.length > 0);
+---
+
+<Section theme={theme} contentClass={styles.content}>
+  <h2 class:list={[styles.title, 'display']}>{title}</h2>
+  <div class={styles.slot}>
+    <Prose>
+      <StructuredText
+        {...ensureValidStructuredTextProps({
+          data: story.content,
+          blockComponents: {
+            ImageRecord: Image,
+            VideoRecord: Video,
+            InternalVideoRecord: InternalVideo,
+            InDepthCtaBlockRecord: InDepthCtaBlock,
+          },
+          linkToRecordComponents: defaultLinkToRecordComponents,
+          inlineRecordComponents: defaultInlineRecordComponents,
+        })}
+      />
+    </Prose>
+  </div>
+  <dl class:list={[styles.facts, 'bodyLong']}>
+    {
+      facts.map((fact) => (
+        <div>
+          <dt class={styles.label}>{fact.label}</dt>
+          {fact.values.map((value) => (
+            <dd>
+              {value.href ? (
+                <a
+                  class={styles.link}
+                  href={value.href}
+                  {...(value.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                >
+                  {value.text}
+                </a>
+              ) : (
+                value.text
+              )}
+            </dd>
+          ))}
+        </div>
+      ))
+    }
+  </dl>
+</Section>

@@ -1,0 +1,419 @@
+---
+import diagram from '../diagram/style.module.css';
+import { FEATURE_BLOCKS, FEATURE_GRID, FEATURE_GRID_TITLE } from './story';
+import styles from './nest.module.css';
+
+// An exploded view of the Feature grid block, in the grammar of the diagrams
+// (../diagram/style.module.css). The script below drives the loop (in view
+// only; not with reduced motion): it lifts the Features, then the Buttons,
+// then drops them back. Without it the picture is the still, the exploded
+// view.
+
+/*
+ * The geometry. A plate is a rectangle in its own plane (x to the right,
+ * y down, in px). The camera turns the plane by TURN and tilts it back by
+ * TILT (the CSS rotateZ(TURN), then rotateX(TILT), with no perspective).
+ * For a plane, this is one SVG matrix. A lift of z moves a plate up the
+ * screen by z × sin TILT. The script turns the camera from the view from
+ * above (no turn, no tilt) to this view: CAMERA gives it the angles.
+ */
+const VIEW = { width: 480, height: 360 };
+const SCALE = 0.8;
+const ORIGIN = { x: 12, y: 183 };
+
+const TURN = (-36 * Math.PI) / 180;
+const TILT = (58 * Math.PI) / 180;
+const M = {
+  a: Math.cos(TURN),
+  b: Math.sin(TURN) * Math.cos(TILT),
+  c: -Math.sin(TURN),
+  d: Math.cos(TURN) * Math.cos(TILT),
+};
+const MATRIX = `matrix(${[M.a, M.b, M.c, M.d, 0, 0].map((n) => n.toFixed(4)).join(' ')})`;
+
+/** The lift of a level above its parent, in px of the plane, and on the screen */
+const LIFT = 72;
+const RISE = LIFT * Math.sin(TILT);
+
+type Box = { x: number; y: number; width: number; height: number };
+
+const screen = (x: number, y: number, level = 0) =>
+  [M.a * x + M.c * y, M.b * x + M.d * y - level * RISE] as const;
+
+/** The same point in the units of the viewBox: for the labels, which are not in the svg */
+const view = ([x, y]: readonly [number, number]) =>
+  [ORIGIN.x + x * SCALE, ORIGIN.y + y * SCALE] as const;
+
+const centre = ({ x, y, width, height }: Box) => screen(x + width / 2, y + height / 2);
+
+const post = (box: Box) => {
+  const [x, y] = centre(box);
+  return `M${x.toFixed(1)} ${y.toFixed(1)} V${(y - RISE).toFixed(1)}`;
+};
+
+const GRID: Box = { x: 0, y: 0, width: 360, height: 230 };
+const FEATURES: Box[] = FEATURE_BLOCKS.map((_, i) => ({
+  x: 24 + i * 108,
+  y: 44,
+  width: 96,
+  height: 160,
+}));
+const BUTTONS: Box[] = FEATURES.map(({ x, y, height }) => ({
+  x: x + 12,
+  y: y + height - 36,
+  width: 72,
+  height: 24,
+}));
+const RADIUS = { grid: 8, feature: 8, button: 6 };
+
+const bar = (x: number, y: number, width: number, height: number): Box => ({
+  x,
+  y,
+  width,
+  height,
+});
+const GRID_TITLE = bar(GRID.x + 24, GRID.y + 18, 132, 10);
+const TITLE_WIDTHS = [60, 48, 66];
+const BULLET_WIDTHS = [
+  [58, 44, 52],
+  [50, 60, 38],
+  [46, 54, 60],
+];
+const FEATURE_TEXT = FEATURES.map(({ x, y }, i) => ({
+  title: bar(x + 12, y + 14, TITLE_WIDTHS[i]!, 8),
+  bullets: BULLET_WIDTHS[i]!.map((width, row) => ({
+    dot: bar(x + 12, y + 38 + row * 16, 5, 5),
+    line: bar(x + 22, y + 38 + row * 16, width, 5),
+  })),
+}));
+const BUTTON_LABELS = BUTTONS.map(({ x, y, width, height }, i) => {
+  const labelWidth = [36, 40, 34][i]!;
+  return bar(x + (width - labelWidth) / 2, y + (height - 5) / 2, labelWidth, 5);
+});
+
+/**
+ * The data of the camera for the script. The middle of the grid is the
+ * fixed point of the turn. In the view from above, the grid is in the
+ * middle of the box; in the still, it is where the matrix puts it.
+ */
+const CAMERA = JSON.stringify({
+  turn: TURN,
+  tilt: TILT,
+  centre: [GRID.width / 2, GRID.height / 2],
+  above: [(VIEW.width / 2 - ORIGIN.x) / SCALE, (VIEW.height / 2 - ORIGIN.y) / SCALE],
+  still: centre(GRID),
+});
+
+/*
+ * The labels, at the right of the plates. Each level has a track from the
+ * corner of its last plate that is most to the right (in the exploded
+ * view) to the right edge of the box, less MARGIN. The label is on its
+ * track, at the right: a long label grows to the left, above its track,
+ * where there is no plate.
+ */
+const MARGIN = 12;
+const last = FEATURES.length - 1;
+const far = ({ x, y, width, height }: Box, level: number) => screen(x + width, y + height, level);
+const levels = [
+  { name: FEATURE_GRID.name, level: 'grid', at: far(GRID, 0) },
+  { name: 'Feature', level: 'feature', at: far(FEATURES[last]!, 1) },
+  { name: 'Button', level: 'button', at: far(BUTTONS[last]!, 2) },
+] as const;
+const leader = ([x, y]: readonly [number, number]) =>
+  `M${x.toFixed(1)} ${y.toFixed(1)} H${((VIEW.width - MARGIN - ORIGIN.x) / SCALE).toFixed(1)}`;
+
+const pct = (value: number, of: number) => `${((value / of) * 100).toFixed(2)}%`;
+
+const DESCRIPTION = `An exploded view of blocks inside blocks: the ${FEATURE_GRID.name} block “${FEATURE_GRID_TITLE}” at the bottom, three Feature blocks (${FEATURE_BLOCKS.map(({ title }) => `“${title}”`).join(', ')}) above it, and above each Feature its Button block (${FEATURE_BLOCKS.map(({ button }) => `“${button}”`).join(', ')}).`;
+---
+
+<figure
+  class:list={[diagram.root, styles.nest]}
+  role="img"
+  aria-label={DESCRIPTION}
+  data-nest
+  data-camera={CAMERA}
+>
+  <div class={styles.stage}>
+    <svg class={styles.drawing} viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} aria-hidden="true">
+      <g transform={`translate(${ORIGIN.x} ${ORIGIN.y}) scale(${SCALE})`}>
+        <rect
+          class:list={[styles.plate, styles.grid]}
+          transform={MATRIX}
+          data-plane
+          {...GRID}
+          rx={RADIUS.grid}></rect>
+        <rect
+          class:list={[styles.bar, styles.heading]}
+          transform={MATRIX}
+          data-plane
+          {...GRID_TITLE}
+          rx={GRID_TITLE.height / 2}></rect>
+        {
+          FEATURES.map((box) => (
+            <rect
+              class={styles.outline}
+              transform={MATRIX}
+              data-plane
+              {...box}
+              rx={RADIUS.feature}
+            />
+          ))
+        }
+
+        <g data-tracks="feature">
+          {
+            FEATURES.map((box) => (
+              <path class:list={[diagram.track, diagram.draw]} d={post(box)} pathLength="100" />
+            ))
+          }
+          <path class:list={[diagram.track, diagram.draw]} d={leader(levels[1].at)} pathLength="100"
+          ></path>
+        </g>
+        <path
+          class:list={[diagram.track, diagram.draw]}
+          d={leader(levels[0].at)}
+          pathLength="100"
+          data-tracks="grid"></path>
+        <path
+          class:list={[diagram.track, diagram.draw]}
+          d={leader(levels[2].at)}
+          pathLength="100"
+          data-tracks="button"></path>
+
+        {
+          /* The far Features first: a Feature in front covers the Features behind it, not their Buttons */
+        }
+        {
+          FEATURES.map((box, i) => (
+            <g class={styles.lift} style={`--lift: ${RISE.toFixed(2)}`} data-block="feature">
+              <rect
+                class:list={[styles.plate, styles.feature]}
+                transform={MATRIX}
+                data-plane
+                {...box}
+                rx={RADIUS.feature}
+              />
+              <rect
+                class:list={[styles.bar, styles.heading]}
+                transform={MATRIX}
+                data-plane
+                {...FEATURE_TEXT[i]!.title}
+                rx={FEATURE_TEXT[i]!.title.height / 2}
+              />
+              {FEATURE_TEXT[i]!.bullets.map(({ dot, line }) => (
+                <>
+                  <rect
+                    class={styles.bar}
+                    transform={MATRIX}
+                    data-plane
+                    {...dot}
+                    rx={dot.height / 2}
+                  />
+                  <rect
+                    class={styles.bar}
+                    transform={MATRIX}
+                    data-plane
+                    {...line}
+                    rx={line.height / 2}
+                  />
+                </>
+              ))}
+              <rect
+                class={styles.outline}
+                transform={MATRIX}
+                data-plane
+                {...BUTTONS[i]!}
+                rx={RADIUS.button}
+              />
+              <path
+                class:list={[diagram.track, diagram.draw]}
+                d={post(BUTTONS[i]!)}
+                pathLength="100"
+                data-tracks="button"
+              />
+              <g class={styles.lift} style={`--lift: ${RISE.toFixed(2)}`} data-block="button">
+                <rect
+                  class:list={[styles.plate, styles.button]}
+                  transform={MATRIX}
+                  data-plane
+                  {...BUTTONS[i]!}
+                  rx={RADIUS.button}
+                />
+                <rect
+                  class:list={[styles.bar, styles.buttonText]}
+                  transform={MATRIX}
+                  data-plane
+                  {...BUTTON_LABELS[i]!}
+                  rx={BUTTON_LABELS[i]!.height / 2}
+                />
+              </g>
+            </g>
+          )).reverse()
+        }
+      </g>
+    </svg>
+
+    {
+      levels.map(({ name, level, at }) => (
+        <p
+          class:list={[diagram.change, styles.label]}
+          style={`right: ${pct(MARGIN, VIEW.width)}; top: ${pct(view(at)[1], VIEW.height)}`}
+          data-label={level}
+        >
+          <span class={diagram.panelLabel}>{name}</span>
+        </p>
+      ))
+    }
+  </div>
+</figure>
+
+<script>
+  import {
+    arrive,
+    DIAGRAM_MS,
+    reflow,
+    sleep,
+    startDiagramLoop,
+    type Live,
+  } from '~/lib/motion/diagramLoop';
+
+  const STAGGER = 200;
+  /** The time of the drop and of the lift of a plate: --nest-move in nest.module.css */
+  const MOVE = 900;
+  const FLATTEN = 1200;
+  const LOOK = 3200;
+
+  type Camera = {
+    turn: number;
+    tilt: number;
+    centre: [number, number];
+    above: [number, number];
+    still: [number, number];
+  };
+
+  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+
+  function tween(ms: number, frame: (t: number) => void): Promise<void> {
+    return new Promise((resolve) => {
+      const begin = performance.now();
+      const step = (now: number) => {
+        const t = Math.min((now - begin) / ms, 1);
+        frame(ease(t));
+        if (t < 1) requestAnimationFrame(step);
+        else resolve();
+      };
+      requestAnimationFrame(step);
+    });
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-nest]')) {
+    const camera = JSON.parse(root.dataset.camera!) as Camera;
+    const plates = [...root.querySelectorAll<SVGElement>('[data-plane]')];
+    const blocks = (level: string) => [
+      ...root.querySelectorAll<HTMLElement>(`[data-block="${level}"]`),
+    ];
+    const tracks = (level: string) => [
+      ...root.querySelectorAll<SVGElement>(
+        `path[data-tracks="${level}"], [data-tracks="${level}"] path`,
+      ),
+    ];
+    const label = (level: string) => root.querySelector<HTMLElement>(`[data-label="${level}"]`)!;
+    const levels = ['grid', 'feature', 'button'] as const;
+
+    /**
+     * Puts the camera at `k` of its way from the view from above (0) to
+     * the angle of the still (1). The middle of the grid moves on a
+     * straight line between its two places.
+     */
+    function look(k: number): void {
+      const turn = camera.turn * k;
+      const tilt = camera.tilt * k;
+      const a = Math.cos(turn);
+      const b = Math.sin(turn) * Math.cos(tilt);
+      const c = -Math.sin(turn);
+      const d = Math.cos(turn) * Math.cos(tilt);
+      const [cx, cy] = camera.centre;
+      const x = camera.above[0] + (camera.still[0] - camera.above[0]) * k;
+      const y = camera.above[1] + (camera.still[1] - camera.above[1]) * k;
+      const matrix = `matrix(${[a, b, c, d, x - (a * cx + c * cy), y - (b * cx + d * cy)]
+        .map((n) => n.toFixed(4))
+        .join(' ')})`;
+      for (const plate of plates) plate.setAttribute('transform', matrix);
+    }
+
+    async function build(live: Live): Promise<void> {
+      await sleep(DIAGRAM_MS.hold);
+      if (!live()) return;
+      await tween(LOOK, look);
+      await sleep(DIAGRAM_MS.settle / 2);
+
+      for (const level of levels) {
+        if (!live()) return;
+        if (level !== 'grid') {
+          for (const block of blocks(level)) {
+            delete block.dataset.down;
+            await sleep(STAGGER);
+          }
+          await sleep(MOVE - STAGGER);
+        }
+        for (const track of tracks(level)) delete track.dataset.hidden;
+        await sleep(DIAGRAM_MS.draw);
+        arrive(label(level));
+        await sleep(DIAGRAM_MS.pop);
+      }
+
+      await sleep(DIAGRAM_MS.hold * 2);
+      if (!live()) return;
+
+      for (const level of levels) {
+        label(level).dataset.leave = '';
+        for (const track of tracks(level)) track.dataset.faded = '';
+      }
+      await sleep(DIAGRAM_MS.fade);
+
+      for (const level of ['button', 'feature']) {
+        for (const block of blocks(level)) {
+          if (!live()) return;
+          block.dataset.down = '';
+          await sleep(STAGGER);
+        }
+        await sleep(MOVE - STAGGER);
+      }
+
+      for (const level of levels) {
+        for (const track of tracks(level)) {
+          delete track.dataset.faded;
+          track.dataset.hidden = '';
+        }
+      }
+
+      await tween(FLATTEN, (t) => look(1 - t));
+    }
+
+    startDiagramLoop(root, build, {
+      // Each session starts from the view from above, with no transition:
+      // one block, with no tracks and no labels
+      start: () => {
+        for (const el of root.querySelectorAll<HTMLElement | SVGElement>(
+          '[data-down], [data-faded], [data-hidden], [data-leave], [data-enter], [data-changed], [data-ping]',
+        )) {
+          for (const name of ['down', 'faded', 'hidden', 'leave', 'enter', 'changed', 'ping'])
+            delete el.dataset[name];
+        }
+        const lifts = [...blocks('feature'), ...blocks('button')];
+        for (const block of lifts) {
+          block.style.transition = 'none';
+          block.dataset.down = '';
+        }
+        for (const level of levels) {
+          label(level).dataset.enter = '';
+          for (const track of tracks(level)) track.dataset.hidden = '';
+        }
+        look(0);
+        reflow(root);
+        for (const block of lifts) block.style.transition = '';
+      },
+    });
+  }
+</script>

@@ -1,7 +1,10 @@
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
-import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import {
+  PartnerTestimonialQuoteFragment,
+  ReviewQuoteFragment,
+} from '~/components/LegacyQuote/graphql';
+import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
 import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';

@@ -1,0 +1,47 @@
+---
+// The Philosophy page of the redesign. The copy comes from
+// src/data/philosophy.ts. The SEO, the team row of the hero and the
+// quotes of the slider come from the CMS.
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { PageCloser } from '~/components/PageCloser';
+import { Principles } from '~/components/Principles';
+import { Testimonials } from '~/components/Testimonials';
+import * as philosophy from '~/data/philosophy';
+import { pinchVideo } from '~/data/videos';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+
+const { page, members, review1, review2 } = await executeQuery(Astro, query);
+
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const quotes = [review1, review2].filter((review) => review !== null);
+---
+
+{
+  /*
+  The testimonials slider goes between principles 04 and 05.
+*/
+}
+<Layout seo={page._seoMetaTags} theme="green" headerVariant="light" footerTheme="blue">
+  <Hero
+    {...philosophy.hero}
+    team={members}
+    variant="light"
+    alignment="center"
+    typewriter
+    teamId="the-team"
+  />
+  <Principles principles={philosophy.principles.principles.slice(0, 4)} />
+  {quotes.length > 0 && <Testimonials items={quotes} variant="slider" theme="default" />}
+  <Principles principles={philosophy.principles.principles.slice(4)} start={5} />
+  <PageCloser theme="blue" video={pinchVideo} />
+
+  <DraftModeQueryListener query={query} />
+</Layout>

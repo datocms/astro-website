@@ -1,0 +1,26 @@
+---
+import { Headline } from '~/components/Headline';
+import { PostCard, type PostCardItem } from '~/components/PostCard';
+import { Section } from '~/components/Section';
+import type { RelatedPostsData } from '~/data/blog';
+import styles from './style.module.css';
+
+interface Props extends RelatedPostsData {
+  posts: PostCardItem[];
+}
+
+const { headline, muted, posts } = Astro.props;
+---
+
+<Section contentClass={styles.content}>
+  <Headline as="h2" size="h1" muted={muted} class={styles.headline}>{headline}</Headline>
+  <ul class={styles.grid}>
+    {
+      posts.map((post) => (
+        <li>
+          <PostCard {...post} />
+        </li>
+      ))
+    }
+  </ul>
+</Section>

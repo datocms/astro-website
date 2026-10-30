@@ -1,0 +1,41 @@
+---
+import styles from './style.module.css';
+
+interface Props {
+  /** The name of the component, for example `SceneFrame`. */
+  name: string;
+  /** The props of the component. A prop with no value does not show. */
+  config: Record<string, unknown>;
+}
+
+const { name, config } = Astro.props;
+
+const format = (value: unknown): string =>
+  value && typeof value === 'object'
+    ? `{ ${Object.entries(value)
+        .filter(([, v]) => v !== undefined)
+        .map(([k, v]) => `${k}: ${format(v)}`)
+        .join(', ')} }`
+    : String(value);
+
+const lines = Object.entries(config)
+  .filter(([, value]) => value !== undefined)
+  .map(([key, value]) => `${key}: ${format(value)}`);
+---
+
+{
+  /*
+  Development only: a tag at the top right corner of the parent shows the
+  props of the component. The tag shows when the pointer is on the parent,
+  and the props show when the pointer is on the tag. The parent must have
+  a position.
+*/
+}
+{
+  import.meta.env.DEV && (
+    <div class={styles.devConfig} tabindex="0" data-dev-config>
+      <span class={styles.tag}>{name}</span>
+      <pre class={styles.tooltip}>{lines.join('\n')}</pre>
+    </div>
+  )
+}

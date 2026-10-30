@@ -1,0 +1,221 @@
+/* @layer blocks */
+/*
+ * The fragment fills the box of the FeatureFragments item with the tinted
+ * surface: the accent colour, a little darker, thus the outline of the box
+ * shows. The box is the container of the window. Each picture starts at
+ * the top left corner of the box, with no margin, and the box cuts it at
+ * the right and the bottom.
+ */
+.fragment {
+  position: absolute;
+  inset: 0;
+  /* The z-index values of the kit stay in the fragment: the sticky nav stays above the screen. */
+  isolation: isolate;
+  container-type: inline-size;
+  /* --fragment-surface: a parent can give the box another surface. */
+  background: var(
+    --fragment-surface,
+    color-mix(in srgb, var(--surface-accent) 65%, var(--surface-inverse))
+  );
+  /* --fragment-corner: a parent can make round the top corner on the side of the picture. */
+  border-radius: var(--fragment-corner, 0) 0 0 0;
+
+  /*
+   * The zoom of the breakpoint: `zoom`, and `phoneZoom` on phones (see the
+   * media query below). `fit="scale"` scales the picture by it, in a box of
+   * --fragment-reference (the width of the box from 1280px).
+   */
+  --fragment-current-zoom: var(--fragment-zoom, 1);
+  --fragment-reference: 500px;
+
+  /*
+   * A dialog alone (a scene with no page behind it) has no margin of the
+   * kit: as any other screen, it starts at the top left corner of the
+   * window, and its panel has the corners of the window.
+   */
+  --product-scenes-dialog-margin: 0px;
+  --product-scenes-dialog-radius: var(--radius-sm);
+
+  /* The line of the fragment, see .fragment::after. */
+  --fragment-line-overshoot: var(--space-3xs);
+  --fragment-line-fade: var(--space-md);
+}
+
+/*
+ * "Phones" is below 650px here, not 768px as in the rest of the site (the
+ * same limit as the SceneFrame).
+ */
+@media (max-width: 649px) {
+  .fragment {
+    --fragment-current-zoom: var(--fragment-phone-zoom, var(--fragment-zoom, 1));
+  }
+}
+
+/*
+ * The clip cuts the picture at the edges of the box. The line of the
+ * fragment is outside the clip, thus it can go past the box. The clip has
+ * square corners: the round corner of the box must not cut the corner of
+ * a picture at the top left corner of the box.
+ */
+.clip {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/*
+ * --fragment-line: a parent can give a line of this colour along the two
+ * edges where the box cuts the picture: the bottom and the side away from
+ * the round corner. The lines are 1px wide. At the corner where they meet,
+ * the two lines continue --fragment-line-overshoot past the box, thus they
+ * cross. At the other end, the end toward the round corner, each line
+ * continues --fragment-line-fade past the box, and on that length it fades
+ * from transparent to the full colour, as the line of the SceneFrame.
+ * Without --fragment-line, the line is transparent.
+ *
+ * --fragment-shadow: a parent can give a shadow of this colour along the
+ * side line, as the SceneFrame. The shadow is 3px wide and goes from the
+ * line toward the picture. It stops at the bottom of the box. Without
+ * --fragment-shadow, there is no shadow.
+ */
+.fragment::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: calc(-1 * var(--fragment-line-fade)) calc(-1 * var(--fragment-line-overshoot))
+    calc(-1 * var(--fragment-line-overshoot)) calc(-1 * var(--fragment-line-fade));
+  background:
+    linear-gradient(var(--fragment-line, transparent), var(--fragment-line, transparent)) right
+      var(--fragment-line-overshoot) top 0 / 1px 100% no-repeat,
+    linear-gradient(var(--fragment-line, transparent), var(--fragment-line, transparent)) left 0
+      bottom var(--fragment-line-overshoot) / 100% 1px no-repeat,
+    linear-gradient(
+        var(--fragment-shadow-direction, to left),
+        var(--fragment-shadow, transparent),
+        transparent
+      )
+      right calc(var(--fragment-line-overshoot) + 1px) top 0 / 3px
+      calc(100% - var(--fragment-line-overshoot)) no-repeat;
+  pointer-events: none;
+  mask-image:
+    linear-gradient(to bottom, transparent, black var(--fragment-line-fade)),
+    linear-gradient(to right, transparent, black var(--fragment-line-fade));
+  mask-composite: intersect;
+}
+
+/* `scale`, `crop`: no surface. The picture is on the surface of the parent. */
+.scale,
+.crop {
+  background: none;
+}
+
+/*
+ * `scale`: the window has a border and round corners. The picture in it
+ * has no border, no corners and the zoom 1 of the kit: the window cuts it,
+ * and the top left corner of the picture is at the top left corner of the
+ * window. A box of --fragment-reference shows the picture at
+ * --fragment-current-zoom; a box of another width scales it by its width
+ * divided by --fragment-reference (tan(atan2()) divides two lengths). The
+ * window goes past the right and the bottom edges of the box, thus the box
+ * cuts it there.
+ */
+.window {
+  --product-scenes-border: none;
+  --product-scenes-radius: 0;
+  --product-scenes-zoom: 1;
+
+  position: absolute;
+  inset: 0 -2px -2px 0;
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+}
+
+/*
+ * `border={false}`: the picture draws its own edges, thus the window has no
+ * border and no corners, and the screen keeps the border and the corners
+ * of the kit (`initial` makes the kit use its defaults).
+ */
+.noBorder .window {
+  --product-scenes-border: initial;
+  --product-scenes-radius: initial;
+
+  border: none;
+  border-radius: 0;
+}
+
+.screen {
+  transform: scale(
+    calc(var(--fragment-current-zoom) * tan(atan2(100cqi, var(--fragment-reference))))
+  );
+  transform-origin: 0 0;
+}
+
+/*
+ * `align="end"`: the box cuts the window at the left. The top right corner
+ * of the picture is at the top right corner of the window.
+ */
+.end {
+  border-radius: 0 var(--fragment-corner, 0) 0 0;
+}
+
+.end::after {
+  --fragment-shadow-direction: to right;
+
+  inset: calc(-1 * var(--fragment-line-fade)) calc(-1 * var(--fragment-line-fade))
+    calc(-1 * var(--fragment-line-overshoot)) calc(-1 * var(--fragment-line-overshoot));
+  background-position:
+    left var(--fragment-line-overshoot) top 0,
+    left 0 bottom var(--fragment-line-overshoot),
+    left calc(var(--fragment-line-overshoot) + 1px) top 0;
+  mask-image:
+    linear-gradient(to bottom, transparent, black var(--fragment-line-fade)),
+    linear-gradient(to left, transparent, black var(--fragment-line-fade));
+}
+
+.end .window {
+  inset: 0 0 -2px -2px;
+}
+
+.end .screen {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: max-content;
+  transform-origin: 100% 0;
+}
+
+/* `crop`: the snippet has the corners of the window of `scale`, and no border: on the dark snippet the border does not show */
+.crop {
+  --code-snippet-radius: var(--radius-sm);
+}
+
+/*
+ * `crop`: the picture keeps its size, and goes 2px past the right edge of
+ * the box at every width of the box, thus the box cuts it at the right as
+ * at the bottom. Only the line of the fragment shows on these two edges.
+ */
+.crop .surface {
+  width: calc(100% + 2px);
+}
+
+/*
+ * `fill`: the picture fills the box and the box cuts nothing, thus it has
+ * no line. --fragment-fill-surface: a parent can give these boxes another
+ * surface than the other boxes.
+ */
+.fill {
+  background: var(
+    --fragment-fill-surface,
+    var(--fragment-surface, color-mix(in srgb, var(--surface-accent) 65%, var(--surface-inverse)))
+  );
+}
+
+.fill::after {
+  content: none;
+}
+
+.fill .surface {
+  height: 100%;
+}

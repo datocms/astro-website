@@ -1,0 +1,68 @@
+---
+// The Modeling and delivery pillar of the redesign. The copy comes from
+// src/data/. The SEO is static. Only the closing quote comes from the CMS.
+import { CategoryNav } from '~/components/CategoryNav';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { PageCloser } from '~/components/PageCloser';
+import { Quote } from '~/components/Quote';
+import { Statement } from '~/components/Statement';
+import { StatementsSection } from '~/components/StatementsSection';
+import * as dev from '~/data/developers-pillar';
+import { victoryVideo } from '~/data/videos';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
+import AutomationChapter from '~/scenes/Automation/Chapter.astro';
+import DeliveryChapter from '~/scenes/Delivery/Chapter.astro';
+import EnvironmentsChapter from '~/scenes/Environments/Chapter.astro';
+import GraphqlChapter from '~/scenes/Graphql/Chapter.astro';
+import PluginsChapter from '~/scenes/Plugins/Chapter.astro';
+import RealTimeChapter from '~/scenes/RealTime/Chapter.astro';
+import SchemaChapter from '~/scenes/SchemaBuilder/Chapter.astro';
+import { query } from './_graphql';
+
+const { review } = await executeQuery(Astro, query);
+
+const seo = overrideSeo([], seoTitle(dev.seo.title), seoDescription(dev.seo.description));
+---
+
+{
+  /*
+  The Modeling and delivery pillar (src/data/AGENTS.md), with its
+  seven chapters. Each chapter is in src/scenes/<Chapter>/Chapter.astro,
+  with its scenes.
+  The rhythm is the one of /editor-experience: the header and the scene of
+  each chapter on the inverse surface, the fragments on the pale surface,
+  the opinion on the accent surface.
+*/
+}
+<Layout seo={seo} footerTheme="orange">
+  <Hero {...dev.hero} alignment="center" typewriter />
+  {/* The chapters of the pillar. Sticky; no theme, as the hero: it takes the theme of the page. */}
+  <CategoryNav {...dev.chapterNav} />
+  <SchemaChapter />
+  <GraphqlChapter />
+  {/* The id is an anchor target: /features/worldwide-cdn redirects here. */}
+  <StatementsSection id="numbers" {...dev.numbers} variant="statLight" theme="orange" />
+  <RealTimeChapter />
+  <DeliveryChapter />
+  <EnvironmentsChapter />
+  <Statement {...dev.opinion} theme="orange" variant="light" />
+  <AutomationChapter />
+  <PluginsChapter />
+  <Quote review={review} fallback={dev.closing} theme="default" />
+  <PageCloser theme="orange" cta={dev.ctaBuild} video={victoryVideo} />
+
+  <DraftModeQueryListener query={query} />
+</Layout>
+
+<script>
+  import { initSceneSequences } from '~/lib/motion/sceneSequence';
+
+  // The scenes with a sequence play it in view (the inspector of Plugins
+  // too). The wall of Delivery, the stream of Real-time and the graph of
+  // Environments have their own loops, in Wall.astro, Stream.astro and
+  // Graph.astro.
+  initSceneSequences();
+</script>

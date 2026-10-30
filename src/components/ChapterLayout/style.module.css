@@ -1,0 +1,97 @@
+/*
+ * A picture that does not exist yet: a box with two diagonals, as the
+ * visual of Placeholder, and the description of the picture. The box fills
+ * the fragment box.
+ */
+.picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: var(--space-sm);
+  text-align: center;
+  background:
+    linear-gradient(
+      to top right,
+      transparent calc(50% - 0.5px),
+      var(--border-default) 50%,
+      transparent calc(50% + 0.5px)
+    ),
+    linear-gradient(
+      to bottom right,
+      transparent calc(50% - 0.5px),
+      var(--border-default) 50%,
+      transparent calc(50% + 0.5px)
+    ),
+    var(--surface-accent-faint);
+}
+
+/*
+ * In the SceneFrame the box takes the height of the frame (the variables of
+ * SceneFrame), on the inverse surface: the diagonals are light on dark, and
+ * the label is a light pill with dark text. The diagonals use the strong
+ * border: the default border is too faint for a line of 1px on the dark
+ * surface.
+ */
+.scene {
+  height: min(var(--scene-frame-height), var(--scene-frame-phone-height));
+  background:
+    linear-gradient(
+      to top right,
+      transparent calc(50% - 0.5px),
+      var(--border-on-inverse-strong) 50%,
+      transparent calc(50% + 0.5px)
+    ),
+    linear-gradient(
+      to bottom right,
+      transparent calc(50% - 0.5px),
+      var(--border-on-inverse-strong) 50%,
+      transparent calc(50% + 0.5px)
+    ),
+    var(--surface-inverse-faint);
+}
+
+.label {
+  max-width: 40ch;
+  padding: var(--space-xs);
+  /* The description often runs on two or three lines: 1 is too tight. */
+  line-height: 1.25;
+  font-size: var(--type-body);
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+  color: var(--text-soft);
+}
+
+.scene .label {
+  background: var(--text-on-inverse);
+  color: var(--surface-inverse);
+}
+
+/*
+ * A frame of code: the card fills the frame, which gives it the corners and
+ * the ring, and cuts it at the bottom and at the sides. Thus the notes stay
+ * inside the card.
+ */
+.sceneCode {
+  --code-snippet-radius: 0;
+  --code-snippet-note-right: 0;
+  /* The frame is wide: a wider note wraps on fewer lines. */
+  --code-snippet-note-width: 250px;
+}
+
+/* The code frame: the columns from 768px, the tabs below. */
+.wide {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .wide {
+    display: block;
+  }
+
+  .narrow {
+    display: none;
+  }
+}

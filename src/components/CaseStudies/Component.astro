@@ -1,0 +1,57 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { Headline } from '~/components/Headline';
+import { Logo } from '~/components/Logo';
+import { Section } from '~/components/Section';
+import { PlainText } from '~/components/StructuredText';
+import type { CaseStudiesData } from '~/data/home';
+import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { Theme } from '~/lib/theme';
+import { CaseStudiesStoryFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props extends CaseStudiesData {
+  rows?: 1 | 2;
+  theme?: Theme;
+  /** The success stories of the CMS. Each row shows three of them. */
+  stories: FragmentOf<typeof CaseStudiesStoryFragment>[];
+}
+
+const { headline, subheadline, buttons, rows = 2, theme = 'orange' } = Astro.props;
+const visible = Astro.props.stories
+  .slice(0, rows * 3)
+  .map((story) => readFragment(CaseStudiesStoryFragment, story));
+---
+
+<Section theme={theme} padding="none" flush contentClass={styles.content}>
+  <div class={styles.header}>
+    <Headline as="h2" size="h1" muted={subheadline}>{headline}</Headline>
+    {buttons && <ButtonGroup buttons={buttons} />}
+  </div>
+  <ul class={styles.grid}>
+    {
+      visible.map((story) => (
+        <li>
+          <a href={buildUrlForSuccessStory(story)} class={styles.card}>
+            <span class={styles.logoBox}>
+              {/* The logo is a mask: it takes the colour of the text. */}
+              <Logo
+                logo={{
+                  mask: story.logo.url,
+                  alt: story.logo.alt || story.name,
+                  width: story.logo.width ?? 0,
+                  height: story.logo.height ?? 0,
+                }}
+                class={styles.logo}
+              />
+            </span>
+            <span class:list={[styles.description, 'subtitleMedium']}>
+              {story.title ? <PlainText data={story.title} /> : story.name}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

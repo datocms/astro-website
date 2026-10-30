@@ -1,0 +1,111 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { Section } from '~/components/Section';
+import { Typewriter } from '~/components/Typewriter';
+import type { QuestionAnswerData } from '~/data/home';
+import type { Step } from '~/lib/motion/typewriter';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends QuestionAnswerData {
+  theme?: Theme;
+  /**
+   * `square`: the homepage cards. `landscape`: 570 × 514 at 1320.
+   */
+  cardShape?: 'square' | 'landscape';
+}
+
+const { headline, subline, ask, install, more, theme = 'blue', cardShape = 'square' } = Astro.props;
+const model = ask.models[0] ?? '';
+
+// Card 1 starts at 0.15s.
+const askScript: Step[] = [
+  { type: 'text', text: ask.question, speedCps: 55 },
+  { type: 'pause', ms: 500 },
+  { type: 'shuffle', words: ask.models, ms: 750, every: 100, final: model },
+  { type: 'text', text: `: ${ask.answer} `, speedCps: 55 },
+  {
+    type: 'face',
+    frames: [
+      { text: '[••]', ms: 400 },
+      { text: '[>.<]', ms: 0 },
+    ],
+  },
+];
+
+// Card 2 starts 1.2s after card 1.
+const installScript: Step[] = [
+  { type: 'cursor', glyphs: ['•', '••', '•', '••'], msPerGlyph: 100 },
+  { type: 'face', frames: [{ text: '[••]', ms: 150 }] },
+  { type: 'text', text: ` ${install.command}`, speedCps: 55 },
+  { type: 'text', text: '~/.', speedCps: 55 },
+  { type: 'pause', ms: 350 },
+  { type: 'text', text: 'claude/skills/', speedCps: 55 },
+  ...install.folders.flatMap((folder): Step[] => [
+    { type: 'text', text: '├──', speedCps: 0 },
+    { type: 'text', text: folder, speedCps: 55 },
+  ]),
+  { type: 'hideCursor' },
+];
+
+const tree = install.folders.map((f) => `  ├── ${f}`).join('\n');
+---
+
+<Section theme={theme} background="accent" contentClass={styles.content}>
+  <h2 class:list={[styles.header, 'h1']}>
+    {headline}
+    <span class={styles.subline}>{subline}</span>
+  </h2>
+
+  <div class:list={[styles.cards, cardShape === 'landscape' && styles.landscape]}>
+    <article class={styles.card}>
+      <h3 class:list={[styles.cardHeader, 'h1']}>
+        <a href={ask.href} class={styles.cardLink}>{ask.title}</a>
+        <span class={styles.arrow} aria-hidden="true">→</span>
+      </h3>
+      <div class={styles.body}>
+        <Typewriter
+          as="div"
+          script={askScript}
+          start="view"
+          threshold={0.5}
+          delay={150}
+          class={styles.chat}
+        >
+          <p class:list={[styles.question, 'h1']}>{ask.question}</p>
+          <p class:list={[styles.answer, 'h1']}>{model}: {ask.answer} [&gt;.&lt;]</p>
+        </Typewriter>
+      </div>
+    </article>
+
+    <article class={styles.card}>
+      <h3 class:list={[styles.cardHeader, 'h1']}>
+        <a href={install.href} class={styles.cardLink}>{install.title}</a>
+        <span class={styles.arrow} aria-hidden="true">→</span>
+      </h3>
+      <div class={styles.body}>
+        <Typewriter
+          as="div"
+          script={installScript}
+          start="view"
+          threshold={0.5}
+          delay={1350}
+          class:list={[styles.terminal, 'h1']}
+        >
+          <span class={styles.question}>{`[••] ${install.command}`}</span>{
+            `\n\n~/.claude/skills/\n${tree}`
+          }
+        </Typewriter>
+      </div>
+    </article>
+  </div>
+
+  {
+    more && (
+      <div class={styles.more}>
+        <p class:list={[styles.moreText, 'body']}>{more.text}</p>
+        <ButtonGroup buttons={[more.button]} />
+      </div>
+    )
+  }
+</Section>

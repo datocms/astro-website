@@ -1,0 +1,355 @@
+/*
+ * The pill, the tracks, the ring and the motion are the grammar of the
+ * diagrams (../diagram/style.module.css); this file has only the graph.
+ *
+ * The script of Graph.astro sets `data-dim`, `data-enter`, `data-hidden`,
+ * `--row`, the width of the bar of the migrations and the transform of the
+ * graph. Without the script the frame is the still.
+ */
+.graph {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-md);
+}
+
+.panel {
+  padding: var(--space-md) var(--space-md) var(--space-lg);
+}
+
+@media (min-width: 768px) {
+  .panel {
+    padding: var(--space-lg);
+  }
+}
+
+.panelLabel {
+  position: absolute;
+  line-height: var(--diagram-pill);
+}
+
+/*
+ * The command, at the top right corner of the graph, above the newest
+ * slot. A new one comes in from the right, the old one goes to the left
+ * and out, as the time (the copy of the swap is absolute in this box).
+ */
+.events {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+  max-width: 100%;
+}
+
+.pill {
+  --diagram-swap-y: calc(-1 * var(--space-md));
+}
+
+.prompt {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  line-height: 1;
+}
+
+.pill[data-working] > .prompt,
+.pill[data-done] > .prompt {
+  display: none;
+}
+
+.done {
+  display: none;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pill[data-done] > .done {
+  display: block;
+}
+
+/* The CLI before the command: only from 768px, on a phone the pill is too wide with it */
+.cli {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .cli {
+    display: inline;
+  }
+}
+
+.pill[data-gone] {
+  opacity: 0;
+  translate: 0 var(--diagram-swap-y);
+}
+
+/*
+ * The box of the graph. The past fades out at the left edge: the lanes
+ * come from earlier than the box shows. At the right the lanes stop at
+ * the column of the refs (--refs): the name of each environment is at the
+ * end of its lane. The font is the font of the names, thus `ch` in
+ * --refs is a character of a name.
+ */
+.canvas {
+  position: relative;
+  width: 100%;
+  height: var(--height);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+}
+
+@media (min-width: 768px) {
+  .canvas {
+    font-size: var(--type-code);
+  }
+}
+
+.svg {
+  display: block;
+  width: calc(100% - var(--refs));
+  height: var(--height);
+  mask-image: linear-gradient(to right, transparent, #000 30%);
+}
+
+.now {
+  overflow: visible;
+}
+
+.lane {
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.lane[data-dim] {
+  opacity: 0.4;
+}
+
+.line {
+  stroke: var(--text-on-inverse-muted);
+  stroke-width: 2.5;
+  transition: stroke var(--diagram-travel) var(--diagram-ease-in-out);
+}
+
+/*
+ * The lane of the primary has the accent: it is the environment that the
+ * website reads. A sandbox (`data-sandbox`, from the fork to the
+ * promotion) and an old primary (`data-dim`) do not.
+ */
+.lane:not([data-dim], [data-sandbox]) .line {
+  stroke: var(--text-on-inverse);
+}
+
+.dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity var(--diagram-pop) var(--diagram-ease-out),
+    scale var(--diagram-pop) var(--diagram-ease-out);
+}
+
+.dot[data-enter] {
+  opacity: 0;
+  scale: 0.4;
+  transition: none;
+}
+
+.edit {
+  fill: var(--text-on-inverse-strong);
+}
+
+/*
+ * The bar of the migrations: the ring and the tint of the accent, as a
+ * change of the grammar. It gets longer with the time while they run.
+ */
+.migration {
+  transition:
+    opacity var(--diagram-pop) var(--diagram-ease-out),
+    scale var(--diagram-pop) var(--diagram-ease-out);
+  fill: color-mix(in srgb, var(--text-on-inverse) 20%, var(--surface-inverse));
+  stroke: var(--text-on-inverse);
+  stroke-width: 1.5;
+}
+
+/*
+ * The padlock of maintenance:on, on the lane of the primary. Its disc has
+ * the colour of the band on the sheet, thus it cuts the lane and looks as
+ * a part of the band. It only fades in: a scale on a `use` does not keep
+ * its place.
+ */
+.lock {
+  pointer-events: none;
+  transition: opacity var(--diagram-pop) var(--diagram-ease-out);
+}
+
+.lock[data-enter] {
+  opacity: 0;
+  transition: none;
+}
+
+.lockBack {
+  fill: color-mix(in srgb, var(--text-on-inverse-strong) 7%, var(--surface-inverse));
+}
+
+.lockShackle {
+  fill: none;
+  stroke: var(--text-on-inverse);
+  stroke-width: 1.5;
+}
+
+.lockBody {
+  fill: var(--text-on-inverse);
+}
+
+.band {
+  fill: color-mix(in srgb, var(--text-on-inverse-strong) 7%, transparent);
+}
+
+/* Smaller than the type scale: a quiet label in the graph, as the labels of the other scenes */
+.bandLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  fill: var(--text-on-inverse-muted);
+}
+
+[data-band] {
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+[data-band][data-enter] {
+  opacity: 0;
+  transition: none;
+}
+
+[data-band][data-gone] {
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
+}
+
+/*
+ * The refs: at the right end of each lane, the name of the environment
+ * and, in the row of the primary, the ref "Primary". The column has the
+ * space of a name of 11 characters (release-10) and of the ref, thus the
+ * ref can go to the other row.
+ */
+.canvas {
+  --ref-height: 22px;
+  --ref-gap: var(--space-sm);
+  --primary-width: 66px;
+  --refs: calc(var(--ref-gap) + 11ch + var(--ref-gap) + var(--primary-width));
+}
+
+.ref {
+  position: absolute;
+  left: calc(100% - var(--refs) + var(--ref-gap));
+  height: var(--ref-height);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: inherit;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--text-on-inverse-strong);
+  transition: color var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.ref[data-ref='0'] {
+  top: calc(var(--row-0) - var(--ref-height) / 2);
+}
+
+.ref[data-ref='1'] {
+  top: calc(var(--row-1) - var(--ref-height) / 2);
+}
+
+.ref[data-dim] {
+  color: var(--text-on-inverse-muted);
+}
+
+.name {
+  --diagram-swap-y: var(--space-xs);
+}
+
+/*
+ * The ref "Primary": a small pill after the name of the primary, which
+ * goes to the row of the new primary. The names are in the mono font,
+ * thus a name of --chars characters is --chars ch wide (in the font of
+ * the canvas: the label inside has its own font).
+ */
+.primary {
+  position: absolute;
+  top: calc(var(--row-0) - var(--ref-height) / 2);
+  left: calc(100% - var(--refs) + var(--ref-gap) + var(--chars) * 1ch + var(--ref-gap));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: var(--primary-width);
+  height: var(--ref-height);
+  border-radius: var(--radius-full);
+  background: var(--text-on-inverse);
+  color: var(--surface-inverse);
+  translate: 0 calc(var(--row) * (var(--row-1) - var(--row-0)));
+  transition:
+    translate var(--diagram-travel) var(--diagram-ease-in-out),
+    left var(--diagram-travel) var(--diagram-ease-in-out);
+}
+
+.primaryLabel {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3xs) var(--space-lg);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  color: var(--text-on-inverse-muted);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.key {
+  flex: none;
+  box-sizing: border-box;
+}
+
+.keyEdit {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-on-inverse-muted);
+}
+
+.keyMigration {
+  width: 28px;
+  height: 10px;
+  border: 1.5px solid var(--text-on-inverse);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--text-on-inverse) 20%, var(--surface-inverse));
+}

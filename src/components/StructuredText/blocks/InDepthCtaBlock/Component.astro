@@ -1,0 +1,30 @@
+---
+import { Button } from '~/components/Button';
+import { InlineParagraphs } from '~/components/StructuredText';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { InDepthCtaBlockFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof InDepthCtaBlockFragment>;
+}
+
+const { cta } = readFragment(InDepthCtaBlockFragment, Astro.props.block);
+---
+
+{/* A box with a title, a short text and a button to a page of the site. */}
+<prose-island>
+  <aside class={styles.box} data-datocms-content-link-boundary>
+    <p class:list={[styles.title, 'subtitleMedium']}>{cta.title}</p>
+    {
+      cta.description && (
+        <p class:list={[styles.description, 'body']}>
+          <InlineParagraphs data={cta.description} />
+        </p>
+      )
+    }
+    <p class={styles.action}>
+      <Button href={cta.ctaUrl} appearance="deep-on-light" variant="soft">{cta.ctaLabel}</Button>
+    </p>
+  </aside>
+</prose-island>

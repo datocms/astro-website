@@ -1,0 +1,239 @@
+/*
+ * The layout of the round trip of the fragment "Deploy when editors
+ * publish." (Deploys.astro). The parts are the ones of
+ * ../diagram/style.module.css. The picture fills the box of the fragment
+ * (SceneFragment, preset `fill`) with the inverse surface. A stack at the
+ * middle: the bar of DatoCMS, the two legs, the panel of the pipeline.
+ */
+.deploys {
+  /* The quiet text (the tags, the time): the strong text, a little transparent. The accent stays for the pulse. */
+  --quiet: color-mix(in srgb, var(--text-on-inverse-strong) 65%, transparent);
+  --pad: var(--space-xl);
+  /* The x of each leg, from the side of the stack: under the trigger at the left, under the status at the right */
+  --leg-x: var(--space-2xl);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 100%;
+  margin: 0;
+  padding: var(--pad);
+  background: var(--surface-inverse);
+}
+
+.stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.trace {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.deploys .bar,
+.deploys .pipeline {
+  background: var(--diagram-panel);
+  box-shadow: 0 0 0 1px var(--diagram-accent);
+}
+
+.barLabel,
+.adapter {
+  font-size: var(--type-code-xsmall);
+}
+
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.barRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.slot {
+  position: relative;
+  display: flex;
+  min-width: 0;
+}
+
+.trigger {
+  --diagram-swap-x: calc(-1 * var(--space-sm));
+}
+
+.time {
+  opacity: 0.6;
+}
+
+.ring {
+  display: inline-flex;
+  flex: none;
+  border-radius: var(--radius-full);
+  --diagram-ping-scale: 1.15;
+}
+
+.status {
+  width: calc(9ch + 14px + var(--space-3xs) + 2 * var(--space-xs));
+}
+
+.check {
+  display: none;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.status[data-done] > .check,
+.mark[data-done] > .check {
+  display: block;
+}
+
+/* The two legs between the bar and the panel. Each goes 2px (--diagram-tuck) under the panels. */
+.legs {
+  position: relative;
+  height: var(--space-2xl);
+}
+
+.leg {
+  position: absolute;
+  top: calc(-1 * var(--diagram-tuck));
+  bottom: calc(-1 * var(--diagram-tuck));
+  width: 4px;
+  height: calc(100% + 2 * var(--diagram-tuck));
+  overflow: visible;
+  pointer-events: none;
+}
+
+.out {
+  left: calc(var(--leg-x) - 2px);
+}
+
+.back {
+  right: calc(var(--leg-x) - 2px);
+}
+
+.tag {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--quiet);
+}
+
+.outTag {
+  left: calc(var(--leg-x) + var(--space-3xs));
+}
+
+.backTag {
+  right: calc(var(--leg-x) + var(--space-3xs));
+}
+
+.pipeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.adapter {
+  --diagram-swap-y: calc(-1 * var(--space-sm));
+}
+
+.pipeline .mark {
+  height: 14px;
+  padding: 0;
+  background: none;
+  color: var(--text-on-inverse-strong);
+}
+
+.log {
+  --line: calc(var(--type-code-small) * 1.5);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4xs);
+  min-height: calc(5 * var(--line) + 4 * var(--space-4xs));
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.log[data-faded] {
+  opacity: 0;
+}
+
+/*
+ * A line of the log, in the mono font and quiet. The last line, the step
+ * that runs, is strong. A line comes in from a little below (`arrive`). A
+ * line that is too long for the panel ends with an ellipsis.
+ */
+.line {
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: var(--line);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--quiet);
+  transition:
+    opacity var(--diagram-enter) var(--diagram-ease-out),
+    translate var(--diagram-enter) var(--diagram-ease-out),
+    color var(--diagram-settle) var(--diagram-ease-out);
+}
+
+.line:last-child {
+  color: var(--text-on-inverse-strong);
+}
+
+.line[data-enter] {
+  opacity: 0;
+  translate: 0 var(--space-4xs);
+  transition: none;
+}
+
+/* A narrow box (a phone): the same stack, with no label on the bar, no time, no tags, shorter legs and the last three lines of the log */
+@container (max-width: 440px) {
+  .deploys {
+    --pad: var(--space-sm);
+    --leg-x: var(--space-lg);
+  }
+
+  .barLabel,
+  .time,
+  .tag,
+  .line:nth-last-child(n + 4) {
+    display: none;
+  }
+
+  .legs {
+    height: var(--diagram-link);
+  }
+
+  .log {
+    min-height: calc(3 * var(--line) + 2 * var(--space-4xs));
+  }
+}

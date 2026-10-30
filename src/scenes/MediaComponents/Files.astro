@@ -1,0 +1,79 @@
+---
+import diagram from '../diagram/style.module.css';
+import { FILES_DESCRIPTION, ORIGINAL, SCREENS, SRCSET } from './story';
+import styles from './files.module.css';
+
+// In the grammar of the diagrams (../diagram/style.module.css), as the player
+// of Player.astro. Each file of the srcset is a copy of all the photo at its
+// width. The copies go down and to the right from the smallest, and each
+// covers a part of the next larger one. The original is larger than the box,
+// thus the box cuts it at the right and at the bottom. Only the two files
+// that a phone and a laptop pick have a note, as the notes of
+// CodeSnippetPreview. The notes are in a column at the top right of the
+// chart, with their right edge on the right edge of the label of the
+// original. The picture has no motion.
+
+// The unit of the chart is the width of the largest file of the srcset
+// The picture shows all the files of the srcset but the smallest: six copies are too many
+const FILES = SRCSET.slice(1);
+const MAX = Math.max(...FILES.map((file) => file.width));
+const STEP = 0.22;
+
+const layers = [...FILES, ORIGINAL].reduce<{ width: number; x: number; y: number }[]>(
+  (list, file) => {
+    const last = list.at(-1);
+    const x = last ? last.x + (STEP * last.width) / MAX : 0;
+    const y = last ? last.y + (STEP * last.width * 2) / 3 / MAX : 0;
+    return [...list, { width: file.width, x, y }];
+  },
+  [],
+);
+const LEADER_Y = { phone: 0.07, laptop: 0.2 };
+const place = (width: number) => {
+  const layer = layers.find((item) => item.width === width)!;
+  return `--w: ${layer.width / MAX}; --x: ${layer.x}; --y: ${layer.y}`;
+};
+---
+
+<figure class:list={[diagram.root, styles.files]} role="img" aria-label={FILES_DESCRIPTION}>
+  <p class={styles.code}>
+    &lt;<span class={styles.key}>Image</span> data=&#123;<span class={styles.key}
+      >cover.responsiveImage</span
+    >&#125; /&gt;
+  </p>
+  <div class={styles.chart}>
+    <div class={styles.rest} style={place(ORIGINAL.width)}>
+      <img src={ORIGINAL.src} alt="" />
+    </div>
+    {
+      FILES.toReversed().map((file) => {
+        const screen = SCREENS.find((item) => item.file === file.width);
+        return (
+          <div class={styles.file} style={place(file.width)} data-picked={screen ? '' : undefined}>
+            <img class:list={[diagram.photo, styles.copy]} src={ORIGINAL.src} alt="" />
+          </div>
+        );
+      })
+    }
+    {
+      SCREENS.map((screen) => {
+        const layer = layers.find((item) => item.width === screen.file)!;
+        const file = SRCSET.find((item) => item.width === screen.file)!;
+        const x = layer.x + layer.width / MAX;
+        const y = LEADER_Y[screen.kind];
+        return (
+          <>
+            <span class={styles.leader} style={`--x: ${x}; --y: ${y}`} />
+            <p class={styles.note} style={`--y: ${y}`}>
+              {screen.kind} <span class={styles.key}>{file.weight} KB</span>
+            </p>
+          </>
+        );
+      })
+    }
+  </div>
+  <p class={styles.original}>
+    original {ORIGINAL.width} × {ORIGINAL.height}
+    <span class={styles.key}>{ORIGINAL.label}</span>
+  </p>
+</figure>

@@ -1,0 +1,47 @@
+---
+import { StructuredText as DatoStructuredText } from '@datocms/astro';
+import { isDocument } from 'datocms-structured-text-utils';
+import Span from './plainText/Span.astro';
+import { textOnly, trimEdges } from './plainText/document';
+import TypographicSpan from './plainText/TypographicSpan.astro';
+import Unwrap from './plainText/Unwrap.astro';
+
+interface Props {
+  /** A Structured Text field: the `value` of a DAST document. */
+  data: { value: unknown } | null | undefined;
+  /** Change each straight apostrophe into a curly one. */
+  typographic?: boolean;
+}
+
+const { data, typographic } = Astro.props;
+
+const document = isDocument(data?.value) ? data.value.document : undefined;
+const blocks = trimEdges(textOnly(document?.children ?? []));
+
+const nodeOverrides = {
+  paragraph: Unwrap,
+  heading: Unwrap,
+  list: Unwrap,
+  listItem: Unwrap,
+  blockquote: Unwrap,
+  link: Unwrap,
+  span: typographic ? TypographicSpan : Span,
+};
+---
+
+{
+  /*
+    The text of a Structured Text field, with no HTML elements. The marks
+    and the links give no element. The blocks and the records do not show.
+    A line break separates the top-level blocks. A node override cannot
+    know its position, thus each top-level block renders alone.
+  */
+}
+{
+  blocks.map((block, index) => (
+    <>
+      {index > 0 && '\n'}
+      <DatoStructuredText data={block} nodeOverrides={nodeOverrides} />
+    </>
+  ))
+}

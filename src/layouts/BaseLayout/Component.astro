@@ -1,17 +1,40 @@
 ---
 import { ContentLink, Seo, stripStega, type TitleMetaLinkTag } from '@datocms/astro';
 import { ClientRouter } from 'astro:transitions';
-import './global.css';
+import type { HTMLAttributes } from 'astro/types';
+import KeepCssLayersFirst from './_KeepCssLayersFirst.astro';
 import ProgressBar from './_ProgressBar.astro';
 import { fetchFavicon } from './fetchFavicon';
 import { baseUrl, isDraftModeEnabled } from '~/lib/draftMode';
 import { pipeSeo, replaceSeoPageTitleSuffix, seoCanonicalIfMissing } from '~/lib/datocms/seo';
 
+/*
+ * The head of every page: SEO, favicon, canonical URL, RSS links, cookie
+ * consent, analytics and the content link of the draft mode.
+ * This layout loads no global stylesheet. Each layout family imports its
+ * own (see "Two layout families" in AGENTS.md):
+ * - the old layouts import ./global.css;
+ * - src/layouts/Layout.astro imports src/styles/global.css.
+ */
 type Props = {
   seo: TitleMetaLinkTag[];
+  /**
+   * The names of the cascade layers, lowest first. The layout puts the
+   * statement as the first child of <head>, before all other CSS.
+   * The default is the order of the old pages.
+   */
+  cssLayers?: string[];
+  /**
+   * Set to false for a page that does a full load. Then the layout does not
+   * render the view transitions router and its progress bar.
+   */
+  clientRouter?: boolean;
+  /** Attributes for <body> (for example data-theme). */
+  bodyAttributes?: HTMLAttributes<'body'>;
 };
 
-const { seo } = Astro.props;
+const { seo, cssLayers = ['reset', 'prose'], clientRouter = true, bodyAttributes } = Astro.props;
+const cssLayersStatement = `@layer ${cssLayers.join(', ')};`;
 
 const result = await fetchFavicon(Astro);
 const draftModeEnabled = isDraftModeEnabled(Astro);
@@ -48,9 +71,7 @@ const finalSeo = pipeSeo(
 <!doctype html>
 <html lang="en" transition:animate="none">
   <head>
-    <style id="css-layers" is:inline>
-      @layer reset, prose;
-    </style>
+    <style id="css-layers" is:inline set:html={cssLayersStatement}></style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
@@ -67,10 +88,17 @@ const finalSeo = pipeSeo(
     />
     <script is:inline src="/landing-pages/cookieConsent.js" async></script>
     <slot name="head" />
-    <ClientRouter />
-    <ProgressBar />
+    {
+      clientRouter && (
+        <>
+          <ClientRouter />
+          <ProgressBar />
+          <KeepCssLayersFirst />
+        </>
+      )
+    }
   </head>
-  <body>
+  <body {...bodyAttributes}>
     <slot />
     {draftModeEnabled && <ContentLink />}
   </body>
@@ -94,36 +122,6 @@ const finalSeo = pipeSeo(
       setCookie('datoUtm', cookieContent, 365);
     }
   }
-
-  function ensureCssLayersFirst() {
-    const head = document.head;
-    const cssLayersStyle = head.querySelector('style#css-layers');
-
-    if (cssLayersStyle && head.firstChild !== cssLayersStyle) {
-      // Remove the style tag from its current position
-      head.removeChild(cssLayersStyle);
-
-      // Insert it as the first child of head
-      head.insertBefore(cssLayersStyle, head.firstChild);
-    }
-  }
-
-  // With Astro Transitions, sometimes the new <styles> will be inserted BEFORE our
-  // CSS layers ordering directive, breaking the styles.
-
-  ensureCssLayersFirst();
-
-  const observer = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      if (mutation.type === 'childList' && mutation.target === document.head) {
-        ensureCssLayersFirst();
-      }
-    }
-  });
-
-  observer.observe(document.head, {
-    childList: true,
-  });
 
   document.addEventListener('astro:page-load', () => {
     if ('posthog' in window) {

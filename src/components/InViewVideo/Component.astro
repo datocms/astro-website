@@ -1,0 +1,39 @@
+---
+import styles from './style.module.css';
+
+interface Props {
+  src: string | { src: string; type: string }[];
+  /** Required: it is the image without JS and under reduced motion. */
+  poster: string;
+  width?: number;
+  height?: number;
+  /** Accessible name. Without it, the video is decorative. */
+  label?: string;
+  class?: string;
+}
+
+const { src, poster, width, height, label, class: className } = Astro.props;
+const sources = typeof src === 'string' ? [{ src, type: 'video/mp4' }] : src;
+---
+
+<video
+  class:list={[styles.video, className]}
+  poster={poster}
+  width={width}
+  height={height}
+  muted
+  loop
+  playsinline
+  preload="metadata"
+  disablepictureinpicture
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  data-in-view-video
+>
+  {sources.map((s) => <source src={s.src} type={s.type} />)}
+</video>
+
+<script>
+  import { setupInViewVideo } from '~/lib/motion/inViewVideo';
+  document.querySelectorAll<HTMLVideoElement>('[data-in-view-video]').forEach(setupInViewVideo);
+</script>

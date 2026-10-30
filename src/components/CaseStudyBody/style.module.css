@@ -1,0 +1,51 @@
+/*
+ * A display title, the full story and a
+ * list of facts. From 1152, two equal columns with 160 between them (500
+ * each at 1320): the text on the left, the facts on the right. The facts
+ * start at the top of the text. Below 1152, the text is full width.
+ */
+.content {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.title {
+  color: var(--text-primary);
+}
+
+.slot {
+  min-width: 0;
+}
+
+.facts {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  color: var(--text-primary);
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.label {
+  color: var(--text-muted);
+}
+
+.link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+@media (min-width: 1152px) {
+  .content {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-4xl);
+  }
+
+  .title {
+    grid-column: 1 / -1;
+  }
+}

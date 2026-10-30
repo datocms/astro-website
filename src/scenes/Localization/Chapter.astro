@@ -1,0 +1,32 @@
+---
+import { ChapterHeader } from '~/components/ChapterHeader';
+import { ChapterSplit } from '~/components/ChapterSplit';
+import { FeatureFragments } from '~/components/FeatureFragments';
+import { FRAGMENT_WIDTH, SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as copy from '~/data/localization';
+import { LocalizationPublishScene, LocalizationRoleScene, LocalizationScene } from './Localization';
+
+const theme = 'blue';
+---
+
+<ChapterSplit theme={theme}>
+  <ChapterHeader {...copy.chapter} theme={theme} background="split" id="localization" />
+  <SceneFrame preset="window" theme={theme} height={660} zoom={0.97} cutEnd={40}>
+    <LocalizationScene appearance={{ theme }} />
+  </SceneFrame>
+</ChapterSplit>
+<FeatureFragments {...copy.fragments} theme={theme} columns={2} visualAspect="5 / 3">
+  {
+    /* The screen is as high as the box at 1440 (420px), at zoom 1. The zoom is 1.15, thus the box cuts it at the right and the bottom. The dialog has no page behind it: as a card, it starts at the top left corner of the box, and the box cuts it at the right and the bottom. The zoom is for a box of 500px: a narrower box shows the same part of the screen. On phones the zoom is 1.45 in a box of 500px, thus 1.02 in a box of 350px (11% less than 1.15 at desktop), and more of the locales show. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={1.15} phoneZoom={1.45}>
+    <LocalizationPublishScene appearance={{ theme }} width={FRAGMENT_WIDTH} height={420} />
+  </SceneFragment>
+  {
+    /* The title and the two cards of rules, and space below them. The zoom is 1.15, as the dialog of the first fragment. On phones the zoom is 1.3 (0.9 in a box of 350px), thus the box shows all the rules of the role. */
+  }
+  <SceneFragment slot="visual-1" fit="scale" zoom={1.15} phoneZoom={1.3}>
+    <LocalizationRoleScene appearance={{ theme }} width={FRAGMENT_WIDTH} height={480} />
+  </SceneFragment>
+</FeatureFragments>

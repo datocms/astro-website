@@ -1,0 +1,101 @@
+/* @layer blocks */
+/*
+ * A component can give its section another vertical padding with
+ * --section-padding-top and --section-padding-bottom, on its own class:
+ * the properties do not inherit, thus a section inside it keeps the
+ * default padding, and the component needs no stronger selector.
+ */
+@property --section-padding-top {
+  syntax: '*';
+  inherits: false;
+}
+
+@property --section-padding-bottom {
+  syntax: '*';
+  inherits: false;
+}
+
+/*
+ * The width prop of Section sets --section-content-max on the content.
+ * The property does not inherit, thus a section inside keeps its own width.
+ */
+@property --section-content-max {
+  syntax: '*';
+  inherits: false;
+}
+
+.section {
+  padding-top: var(--section-padding-top, var(--section-padding-y));
+  padding-bottom: var(--section-padding-bottom, var(--section-padding-y));
+  color: var(--text-primary);
+}
+
+.flush,
+.flushTop {
+  padding-top: 0;
+}
+
+.flush,
+.flushBottom {
+  padding-bottom: 0;
+}
+
+.paddingDefault {
+  padding-inline: var(--section-padding-x);
+}
+
+.paddingHeadlines {
+  padding-inline: var(--section-padding-x-headlines);
+}
+
+.paddingDefault > .content,
+.paddingHeadlines > .content {
+  max-width: var(--section-content-max, var(--content-max));
+  margin-inline: auto;
+}
+
+.widthHeadline > .content {
+  --section-content-max: var(--headline-max);
+}
+
+.widthReading > .content {
+  --section-content-max: var(--reading-max);
+}
+
+.bgDefault {
+  background: var(--surface-default);
+}
+
+.bgInverse {
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+  --headline-muted: var(--text-on-inverse-muted);
+}
+
+.bgAccent {
+  background: var(--surface-accent);
+}
+
+.bgAccentSubtle {
+  background: var(--surface-accent-subtle);
+}
+
+.bgAccentFaint {
+  background: var(--surface-accent-faint);
+}
+
+/*
+ * The dark scheme: the accent tints are low-alpha. They lie on the surface
+ * of their own theme, not on the page background of another theme.
+ */
+:global(:root[data-scheme='dark']) .bgAccentSubtle {
+  background:
+    linear-gradient(var(--surface-accent-subtle), var(--surface-accent-subtle)),
+    var(--surface-default);
+}
+
+:global(:root[data-scheme='dark']) .bgAccentFaint {
+  background:
+    linear-gradient(var(--surface-accent-faint), var(--surface-accent-faint)),
+    var(--surface-default);
+}

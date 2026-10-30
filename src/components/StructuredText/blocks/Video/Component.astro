@@ -1,0 +1,26 @@
+---
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { VideoFragment } from './graphql';
+
+interface Props {
+  block: FragmentOf<typeof VideoFragment>;
+}
+
+const { video } = readFragment(VideoFragment, Astro.props.block);
+
+const src =
+  video.provider === 'youtube'
+    ? `https://www.youtube-nocookie.com/embed/${video.providerUid}`
+    : `https://player.vimeo.com/video/${video.providerUid}?title=0&byline=0&portrait=0`;
+---
+
+{/* A YouTube or Vimeo video. Prose styles the figure and the iframe. */}
+<figure>
+  <iframe
+    src={src}
+    title={video.title}
+    loading="lazy"
+    style={{ aspectRatio: `${video.width} / ${video.height}` }}
+    allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+    allowfullscreen></iframe>
+</figure>

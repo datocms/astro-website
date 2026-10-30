@@ -1,0 +1,58 @@
+---
+import { CardGrid } from '~/components/CardGrid';
+import { Logo } from '~/components/Logo';
+import { MediaCard } from '~/components/MediaCard';
+import { Section } from '~/components/Section';
+import { PlainText } from '~/components/StructuredText';
+import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { Theme } from '~/lib/theme';
+import { CaseStudyGridStoryFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  /** The success stories of the CMS, in the order of the grid. */
+  stories: FragmentOf<typeof CaseStudyGridStoryFragment>[];
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+}
+
+const { theme } = Astro.props;
+const stories = Astro.props.stories.map((story) => readFragment(CaseStudyGridStoryFragment, story));
+---
+
+<Section theme={theme}>
+  <CardGrid>
+    {
+      stories.map((story) => (
+        <li>
+          <MediaCard
+            href={buildUrlForSuccessStory(story)}
+            image={{ src: story.coverImage.url, alt: story.coverImage.alt ?? '' }}
+          >
+            <Fragment slot="title">
+              {story.title ? <PlainText data={story.title} /> : story.name}
+            </Fragment>
+            {story.subtitle && (
+              <Fragment slot="description">
+                <PlainText data={story.subtitle} />
+              </Fragment>
+            )}
+            <span class={styles.logoBox}>
+              {/* The logo is a mask: it takes the colour of the text. */}
+              <Logo
+                logo={{
+                  mask: story.logo.url,
+                  alt: story.logo.alt || story.name,
+                  width: story.logo.width ?? 0,
+                  height: story.logo.height ?? 0,
+                }}
+                class={styles.logo}
+              />
+            </span>
+          </MediaCard>
+        </li>
+      ))
+    }
+  </CardGrid>
+</Section>

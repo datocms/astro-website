@@ -1,0 +1,140 @@
+/*
+ * The section is on surface/accent; the cards are square, on
+ * surface/inverse, with all text at H1 size.
+ */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-padding-x);
+}
+
+.header {
+  max-width: 700px;
+}
+
+.subline {
+  display: block;
+  color: var(--text-muted);
+}
+
+.cards {
+  display: grid;
+  gap: var(--space-md);
+}
+
+/* The line under the cards: a sentence and the button to the page of the subject. */
+.more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.moreText {
+  max-width: 560px;
+  color: var(--text-muted);
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 1;
+  overflow: hidden;
+  padding: var(--space-5xs);
+  border-radius: var(--radius-md);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.landscape .card {
+  aspect-ratio: 570 / 514;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4xs);
+  padding: var(--space-md);
+  border-radius: calc(var(--radius-md) - var(--space-5xs)) calc(var(--radius-md) - var(--space-5xs))
+    0 0;
+}
+
+/* The link covers the full card. */
+.cardLink::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md);
+}
+
+.cardLink:focus-visible {
+  outline: none;
+}
+
+.card:has(.cardLink:focus-visible) {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+.arrow {
+  opacity: 0;
+}
+
+.card:has(.cardLink:focus-visible) .cardHeader {
+  background: var(--surface-accent);
+  color: var(--text-primary);
+}
+
+.card:has(.cardLink:focus-visible) .arrow {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .card:hover .cardHeader {
+    background: var(--surface-accent);
+    color: var(--text-primary);
+  }
+
+  .card:hover .arrow {
+    opacity: 1;
+  }
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+/* The typewriter wraps the paragraphs, thus a margin and not a gap. */
+.chat p + p {
+  margin-top: var(--space-lg);
+}
+
+.question {
+  color: var(--text-on-inverse-muted);
+}
+
+.terminal {
+  white-space: pre-wrap;
+}
+
+@media (min-width: 768px) {
+  .cardHeader {
+    padding: var(--space-lg);
+  }
+
+  .body {
+    padding: 0 var(--space-lg) var(--space-lg);
+  }
+}
+
+@media (min-width: 1152px) {
+  .cards {
+    grid-template-columns: 1fr 1fr;
+  }
+}

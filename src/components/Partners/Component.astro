@@ -1,0 +1,64 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { PixelVideo } from '~/components/PixelVideo';
+import { Section } from '~/components/Section';
+import { sortBy } from 'lodash-es';
+import type { PartnersData } from '~/data/home';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { Theme } from '~/lib/theme';
+import { PartnersPartnerFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props extends PartnersData {
+  theme?: Theme;
+  /** All the partners of the CMS. */
+  partners: FragmentOf<typeof PartnersPartnerFragment>[];
+}
+
+const { eyebrow, paragraph, buttons, video, theme = 'blue' } = Astro.props;
+const partners = Astro.props.partners.map((partner) =>
+  readFragment(PartnersPartnerFragment, partner),
+);
+
+// The number of partners on each continent, the largest first. A partner
+// counts once for each continent where it has an office. The old navigation
+// (LegacyLayout/Navbar) counts the same way. The key is the ID of the
+// continent, not its name: in draft mode the name has the stega of Content
+// Link.
+const counts = new Map<string, { name: string; count: number }>();
+for (const partner of partners) {
+  const continents = new Map(
+    partner.locations.map((location) => [location.continent.id, location.continent.name]),
+  );
+  for (const [id, name] of continents) {
+    const region = counts.get(id) ?? { name, count: 0 };
+    region.count += 1;
+    counts.set(id, region);
+  }
+}
+const regions = sortBy([...counts.values()], (region) => -region.count);
+---
+
+<Section theme={theme} padding="none" flush contentClass={styles.split}>
+  <div class={styles.mediaHalf}>
+    <div class={styles.media}>
+      <PixelVideo src={video.src} settings={video.settings} />
+    </div>
+  </div>
+  <div class={styles.textHalf}>
+    <div class={styles.text}>
+      <p class:list={[styles.soft, 'body']}>{eyebrow}</p>
+      <h2 class="h1">
+        {
+          regions.map((region) => (
+            <span class={styles.region}>
+              {region.name} ({region.count})
+            </span>
+          ))
+        }
+      </h2>
+      <p class:list={[styles.soft, 'body']}>{paragraph}</p>
+    </div>
+    <ButtonGroup buttons={buttons} />
+  </div>
+</Section>

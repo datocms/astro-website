@@ -1,0 +1,30 @@
+/*
+ * The background of the header and the frame of a chapter, as VersusSplit. Below 1152px
+ * it is the inverse surface. From 1152px the left half is the accent
+ * surface and the right half is the inverse surface: the line between the
+ * halves is in the gap between the two columns of the header. The sections
+ * inside have no background of their own, thus this background shows.
+ * A diagram (SceneFrame `whole`) is drawn for one surface: its frame keeps
+ * the inverse surface, thus the split stops under the header.
+ */
+.split {
+  background: var(--surface-inverse);
+}
+
+.split > :global([data-scene-frame]:not([data-scene-frame='whole'])) {
+  background: none;
+}
+
+@media (min-width: 1152px) {
+  /*
+   * Under the header a diagram is a band of its own: it has the vertical
+   * padding of a section at its top, as at its bottom.
+   */
+  .split > :global([data-scene-frame='whole']) {
+    padding-top: var(--section-padding-y);
+  }
+
+  .split {
+    background: linear-gradient(to right, var(--surface-accent) 50%, var(--surface-inverse) 50%);
+  }
+}

@@ -1,0 +1,280 @@
+---
+import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import { AppWindow } from '~/components/AppWindow';
+import { liveBlogCode } from '~/data/developers-code';
+import { highlight } from '~/lib/code/highlight';
+import diagram from '../diagram/style.module.css';
+import { ADDRESS, DESCRIPTION, EVENT, STILL, STREAM, TITLE } from './story';
+import styles from './style.module.css';
+
+// In the grammar of the diagrams (../diagram/style.module.css). The two
+// stream lines are always there: the subscription stays open. The frame is a
+// loop, not a sequence of steps: a new event takes the place of the old one
+// on the pill, the hook in the code gets the ring, and the post comes in at
+// the top of the blog. The pill shows only the last event, the blog keeps
+// the history. From 1152px the frame is an L: the pill above the card, and
+// the blog at the right of the card. Below 1152px it goes down. The script
+// below drives the loop (in view only; not with reduced motion). Without it
+// the frame is the still: the posts of STILL, the newest with the ring, and
+// its event on the pill.
+// The pill and the newest post show the same time: that ties them for the
+// eye.
+
+interface Props {
+  /**
+   * The phone layout at every width: the pill, the stream, the card, the
+   * line and the blog go down. For a narrow box on a wide screen.
+   * @default false
+   */
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+
+const lines = await highlight(liveBlogCode.code, liveBlogCode.lang);
+const [first, last] = liveBlogCode.focus![0] as [number, number];
+const code = {
+  before: lines.slice(0, first - 1),
+  hook: lines.slice(first - 1, last),
+  after: lines.slice(last),
+};
+---
+
+<div
+  class:list={[diagram.root, styles.stream]}
+  role="img"
+  aria-label={DESCRIPTION}
+  data-stream
+  data-compact={compact ? '' : undefined}
+>
+  {
+    /*
+    The event: one pill, the newest event and its time. The next event
+    takes its place: the old pill goes down and out, the new one comes in
+    from above. The blog keeps the history, not the pill.
+  */
+  }
+  <div class={styles.events}>
+    <p class:list={[diagram.pill, diagram.swap, styles.pill]} data-pill>
+      <span class={diagram.symbol} set:html={symbol} />
+      <span>{EVENT}</span>
+      <span class={styles.time} data-time>{STILL[0]!.time}</span>
+    </p>
+  </div>
+
+  {
+    /*
+    The stream: a track and a pulse, and its tag next to it. Vertical. No
+    viewBox: the units are px, thus the percentages follow the box and
+    nothing stretches. The pulse has a pathLength of 100 for its dash.
+  */
+  }
+  <div class={styles.line} data-line>
+    <svg class={styles.links} aria-hidden="true">
+      <g data-axis="x">
+        <line class={diagram.track} x1="0" y1="50%" x2="100%" y2="50%"></line>
+        <line class={diagram.pulse} x1="0" y1="50%" x2="100%" y2="50%" pathLength="100"></line>
+      </g>
+      <g data-axis="y">
+        <line class={diagram.track} x1="50%" y1="0" x2="50%" y2="100%"></line>
+        <line class={diagram.pulse} x1="50%" y1="0" x2="50%" y2="100%" pathLength="100"></line>
+      </g>
+    </svg>
+    <span class={styles.tag}>{STREAM}</span>
+  </div>
+
+  {
+    /*
+    The component of the website: its code in the window of a code editor
+    (AppWindow, as on the home page), with the hook in a box
+  */
+  }
+  <AppWindow class={styles.card} file={liveBlogCode.label}>
+    <code class={styles.code}>
+      {
+        code.before.map((tokens) => (
+          <span class={styles.codeLine}>
+            {tokens.map((token) =>
+              token.color ? <span style={`color: ${token.color}`}>{token.text}</span> : token.text,
+            )}
+          </span>
+        ))
+      }
+      <span class:list={[diagram.change, styles.hook]} data-hook>
+        {
+          code.hook.map((tokens) => (
+            <span class={styles.codeLine}>
+              {tokens.map((token) =>
+                token.color ? (
+                  <span style={`color: ${token.color}`}>{token.text}</span>
+                ) : (
+                  token.text
+                ),
+              )}
+            </span>
+          ))
+        }
+      </span>
+      {
+        code.after.map((tokens) => (
+          <span class={styles.codeLine}>
+            {tokens.map((token) =>
+              token.color ? <span style={`color: ${token.color}`}>{token.text}</span> : token.text,
+            )}
+          </span>
+        ))
+      }
+    </code>
+  </AppWindow>
+
+  <div class:list={[styles.line, styles.out]} data-line>
+    <svg class={styles.links} aria-hidden="true">
+      <g data-axis="x">
+        <line class={diagram.track} x1="0" y1="50%" x2="100%" y2="50%"></line>
+        <line class={diagram.pulse} x1="0" y1="50%" x2="100%" y2="50%" pathLength="100"></line>
+      </g>
+      <g data-axis="y">
+        <line class={diagram.track} x1="50%" y1="0" x2="50%" y2="100%"></line>
+        <line class={diagram.pulse} x1="50%" y1="0" x2="50%" y2="100%" pathLength="100"></line>
+      </g>
+    </svg>
+  </div>
+
+  <AppWindow class={styles.panel} address={ADDRESS}>
+    <div class={styles.page}>
+      <p class={styles.title}>{TITLE}</p>
+      <div class={styles.viewport}>
+        <ul class={styles.posts} data-posts>
+          {
+            STILL.map(({ time, variant }, i) => (
+              <li
+                class:list={[diagram.change, styles.post]}
+                data-variant={variant}
+                data-changed={i === 0 ? '' : undefined}
+              >
+                <span class={styles.time} data-time>
+                  {time}
+                </span>
+                <span class={styles.body}>
+                  <span class:list={[styles.skeleton, styles.heading]} />
+                  <span class:list={[styles.skeleton, styles.text]} />
+                </span>
+                <span class={styles.picture} />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </AppWindow>
+</div>
+
+<script>
+  import {
+    between,
+    later,
+    swap,
+    DIAGRAM_MS as MS,
+    reflow,
+    replay,
+    sleep,
+    startDiagramLoop,
+  } from '~/lib/motion/diagramLoop';
+  import type { Live } from '~/lib/motion/diagramLoop';
+  import { VARIANTS } from './story';
+
+  class Stream {
+    lines: HTMLElement[];
+    hook: HTMLElement;
+    pill: HTMLElement;
+    posts: HTMLElement;
+    postTemplate: HTMLElement;
+
+    constructor(root: HTMLElement) {
+      this.lines = Array.from(root.querySelectorAll<HTMLElement>('[data-line]'));
+      this.hook = root.querySelector<HTMLElement>('[data-hook]')!;
+      this.pill = root.querySelector<HTMLElement>('[data-pill]')!;
+      this.posts = root.querySelector<HTMLElement>('[data-posts]')!;
+      this.postTemplate = this.posts.firstElementChild!.cloneNode(true) as HTMLElement;
+      delete this.postTemplate.dataset.changed;
+    }
+
+    /**
+     * One event: the new event on the pill, the pulse down the stream, the
+     * ring on the hook, the pulse along the line to the blog, the post
+     * comes in
+     */
+    async event(live: Live): Promise<void> {
+      await sleep(between(800, 1200));
+      if (!live()) return;
+
+      const last = this.posts.querySelector<HTMLElement>('[data-time]')!.textContent!.trim();
+      const time = later(last, 1 + Math.floor(Math.random() * 4));
+      // The ring of the post before fades (the still has one too). The ring
+      // of the hook goes too: a loop that stopped in the middle leaves it.
+      for (const post of this.posts.querySelectorAll<HTMLElement>('[data-changed]'))
+        delete post.dataset.changed;
+      delete this.hook.dataset.changed;
+
+      swap(this.pill, () => {
+        this.pill.querySelector('[data-time]')!.textContent = time;
+      });
+      await sleep(MS.swap);
+      if (!live()) return;
+
+      const [stream, out] = this.lines as [HTMLElement, HTMLElement];
+      replay(stream, 'pulse');
+      await sleep(MS.travel);
+      if (!live()) return;
+
+      // The hook gets the event: the ring and the ping. The pulse to the
+      // blog goes when the ping has started, and the ring fades.
+      this.hook.dataset.changed = '';
+      replay(this.hook, 'ping');
+      await sleep(MS.pop);
+      if (!live()) return;
+
+      replay(out, 'pulse');
+      delete this.hook.dataset.changed;
+      await sleep(MS.travel);
+      if (!live()) return;
+
+      const post = this.postTemplate.cloneNode(true) as HTMLElement;
+      post.dataset.variant = String(Math.floor(Math.random() * VARIANTS));
+      post.dataset.changed = '';
+      post.querySelector('[data-time]')!.textContent = time;
+      this.push(post);
+      replay(post, 'ping');
+      await sleep(MS.ping);
+    }
+
+    /**
+     * Puts `item` at the top of the posts, in the arrival state. The list
+     * moves up by one row with no transition, then goes back to its place
+     * with one (FLIP): the old posts go down, the last goes out under the
+     * edge, and `item` comes in. The posts after the visible ones go away
+     * after the move.
+     */
+    push(item: HTMLElement): void {
+      const list = this.posts;
+      item.dataset.enter = '';
+      list.prepend(item);
+      const second = item.nextElementSibling as HTMLElement | null;
+      const step = second ? second.offsetTop - item.offsetTop : item.offsetHeight;
+      list.dataset.flip = '';
+      list.style.translate = `0 ${-step}px`;
+      reflow(list);
+      delete list.dataset.flip;
+      list.style.translate = '';
+      delete item.dataset.enter;
+      window.setTimeout(() => {
+        while (list.children.length > 7) list.lastElementChild!.remove();
+      }, MS.enter + 100);
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-stream]')) {
+    const stream = new Stream(root);
+    startDiagramLoop(root, (live) => stream.event(live));
+  }
+</script>

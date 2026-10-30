@@ -1,0 +1,33 @@
+---
+import { CardCarousel } from '~/components/CardCarousel';
+import { CarouselCard } from '~/components/CarouselCard';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { MultipleDemosBlockFragment } from './graphql';
+
+interface Props {
+  block: FragmentOf<typeof MultipleDemosBlockFragment>;
+}
+
+const { demos } = readFragment(MultipleDemosBlockFragment, Astro.props.block);
+---
+
+<prose-island>
+  <CardCarousel label="Starter projects">
+    {
+      demos.map((demo) => (
+        <CarouselCard
+          href={buildUrlForTemplateDemo(demo)}
+          title={demo.name}
+          label={demo.badge ? `${demo.badge.emoji} ${demo.badge.name}` : (demo.label ?? undefined)}
+        >
+          {demo.screenshot.responsiveImage && (
+            <ResponsiveImage slot="image" data={demo.screenshot.responsiveImage} />
+          )}
+          Try this demo
+        </CarouselCard>
+      ))
+    }
+  </CardCarousel>
+</prose-island>

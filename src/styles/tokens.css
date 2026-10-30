@@ -1,0 +1,668 @@
+/*
+ * Design tokens. Components use only the semantic tokens (--surface-*, --text-*,
+ * --border-*). The primitives (--color-*) are only for this file.
+ */
+
+:root {
+  --color-brown-deep-5: #351615;
+  --color-brown-deep-4: #351615cc;
+  --color-brown-deep-3: #351615b2;
+  --color-brown-deep-2: #35161580;
+  --color-brown-deep-1: #3516151c;
+  --color-yellow-light-5: #e7d864;
+  --color-yellow-light-4: #e7d864cc;
+  --color-yellow-light-3: #e7d864b2;
+  --color-yellow-light-2: #e7d86480;
+  --color-yellow-light-1: #e7d86414;
+  --color-yellow-light-0: #fdfff5;
+  --color-orange-deep-5: #42180f;
+  --color-orange-deep-4: #42180fcc;
+  --color-orange-deep-3: #42180fb2;
+  --color-orange-deep-2: #42180f80;
+  --color-orange-deep-1: #42180f1f;
+  /*
+   * The design value is #ff6d00 (OKLCH L 0.70, C 0.20). That is too vivid next to the
+   * other accents (C 0.08 to 0.15). Keep the hue (45 deg), use L 0.72, C 0.185.
+   */
+  --color-orange-light-5: #ff772d;
+  --color-orange-light-4: #ff772de8;
+  --color-orange-light-3: #ff772db2;
+  --color-orange-light-2: #ff772d80;
+  --color-orange-light-1: #ff772d1c;
+  --color-orange-light-0: #fffbf5;
+  --color-green-deep-5: #1a4731;
+  --color-green-deep-4: #1a4731de;
+  --color-green-deep-3: #1a4731b2;
+  --color-green-deep-2: #1a473180;
+  --color-green-deep-1: #1a47311f;
+  --color-green-light-5: #9ad162;
+  --color-green-light-4: #9ad162e5;
+  --color-green-light-3: #9ad162d1;
+  --color-green-light-2: #9ad16280;
+  --color-green-light-1: #9ad1621a;
+  --color-green-light-0: #f5fff5;
+  /* The green of a signal: dark enough for a small icon on a light surface */
+  --color-green-signal: #3f9a4a;
+  --color-purple-deep-5: #1d2229;
+  --color-purple-deep-4: #1d2229d9;
+  --color-purple-deep-3: #1d2229bf;
+  --color-purple-deep-2: #1d222980;
+  --color-purple-deep-1: #1d22291a;
+  --color-purple-light-5: #9e8ef5;
+  --color-purple-light-4: #9e8ef5db;
+  --color-purple-light-3: #9e8ef5b2;
+  --color-purple-light-2: #9e8ef580;
+  --color-purple-light-1: #9e8ef51a;
+  --color-purple-light-0: #f6f5ff;
+  --color-blue-deep-5: #1a3a47;
+  --color-blue-deep-4: #1a3a47d9;
+  --color-blue-deep-3: #1a3a47bf;
+  --color-blue-deep-2: #1a3a4780;
+  --color-blue-deep-1: #1a3a471a;
+  --color-blue-light-5: #7fc4db;
+  --color-blue-light-4: #7fc4dbc9;
+  --color-blue-light-3: #7fc4dbb2;
+  --color-blue-light-2: #7fc4db80;
+  --color-blue-light-1: #7fc4db17;
+  --color-blue-light-0: #edfeff;
+  --color-pink-deep-5: #3f0e16;
+  --color-pink-deep-4: #3f0e16d9;
+  --color-pink-deep-3: #3f0e16bd;
+  --color-pink-deep-2: #3f0e1680;
+  --color-pink-deep-1: #3f0e161a;
+  /*
+   * The design value is #f1a5a7 (OKLCH L 0.80, C 0.09). That is too pale next to the
+   * other accents. Keep the hue (17 deg), use L 0.775, C 0.13.
+   */
+  --color-pink-light-5: #fe9297;
+  --color-pink-light-4: #fe9297cc;
+  --color-pink-light-3: #fe9297b2;
+  --color-pink-light-2: #fe929780;
+  --color-pink-light-1: #fe92971a;
+  --color-pink-light-0: #fff7f8;
+  --color-white: #ffffff;
+  /* The red of a deletion or a purge, on the inverse surface (the wall of Delivery) */
+  --color-red-light-5: #f25f5a;
+
+  /*
+   * Pixel highlights. Each one is the light partner of a theme accent, for
+   * the brightest cells of the pixel hover (PixelImage). The design pair is
+   * orange #ff6d00 with yellow #e7d864. Our orange is softer, but the peach
+   * highlight still fits the rule. The other values follow the same
+   * rule in OKLCH: from the accent, add approximately 0.17 lightness (stop
+   * near 0.94), use less chroma, and move the hue to yellow (at most 55 deg).
+   * The default accent is yellow already, thus its highlight is a pale cream.
+   */
+  --color-cream-pale: #f8f2c2;
+  --color-lime-pale: #eef0a8;
+  --color-orchid-pale: #ffbef1;
+  --color-aqua-pale: #cbf5ee;
+  --color-peach-pale: #ffd6b3;
+
+  /*
+   * Code. The colours of the syntax in CodeSnippetPreview, built in OKLCH
+   * with one rule for the six themes (the levels are the same, the hue
+   * comes from the family: each is the hue of the light-5 primitive of a
+   * theme). The levels, as lightness L and chroma C:
+   *   deep    the card: L 0.23, the hue of the inverse surface, C at most 0.035
+   *   strong  keywords: L 0.84, C 0.15 (never more than the accent's own)
+   *   soft    strings and functions: L 0.85, C 0.10
+   *   pale    constants: L 0.87, C 0.07
+   *   plain   the code: L 0.93, C 0.02
+   *   faded   punctuation: L 0.76, C 0.03
+   *   dim     comments: L 0.66, C 0.04
+   *   faint   line numbers: L 0.57, C 0.03
+   * A chroma out of sRGB is reduced until the colour fits. Contrast with
+   * the deep background: plain 13.7, strong 10.1, soft 10.3, pale 11.1,
+   * faded 7.8, dim 5.4, faint 3.8 (minimums across the themes).
+   */
+  --color-code-brown-deep: #2b1615;
+  --color-code-yellow-strong: #ddcd59;
+  --color-code-yellow-plain: #eae9da;
+  --color-code-yellow-faded: #b4b29d;
+  --color-code-yellow-dim: #979477;
+  --color-code-yellow-faint: #7b7864;
+  --color-code-orange-deep: #2b1712;
+  --color-code-orange-strong: #ffb897;
+  --color-code-orange-soft: #ffbc9e;
+  --color-code-orange-pale: #fcc7ae;
+  --color-code-orange-plain: #f4e4dd;
+  --color-code-orange-faded: #c2aca2;
+  --color-code-orange-dim: #a88b7e;
+  --color-code-orange-faint: #877269;
+  --color-code-green-deep: #0d2217;
+  --color-code-green-strong: #a8de72;
+  --color-code-green-soft: #b7dc96;
+  --color-code-green-plain: #e3ebdd;
+  --color-code-green-faded: #aab5a2;
+  --color-code-green-dim: #8a987e;
+  --color-code-green-faint: #717b69;
+  --color-code-purple-deep: #181d24;
+  --color-code-purple-strong: #c8c2fe;
+  --color-code-purple-soft: #ccc6fe;
+  --color-code-purple-pale: #d2ceff;
+  --color-code-purple-plain: #e7e6f5;
+  --color-code-purple-faded: #b0aec3;
+  --color-code-purple-dim: #918faa;
+  --color-code-purple-faint: #767588;
+  --color-code-blue-deep: #08202a;
+  --color-code-blue-strong: #91d7ee;
+  --color-code-blue-soft: #7eddfc;
+  --color-code-blue-plain: #daebf1;
+  --color-code-blue-faded: #9db6bf;
+  --color-code-blue-dim: #7898a4;
+  --color-code-blue-faint: #647c84;
+  --color-code-pink-deep: #2b1618;
+  --color-code-pink-strong: #ffb4b5;
+  --color-code-pink-soft: #ffb9ba;
+  --color-code-pink-plain: #f5e3e3;
+  --color-code-pink-faded: #c4aaaa;
+  --color-code-pink-dim: #aa8989;
+  --color-code-pink-faint: #887171;
+}
+
+:root {
+  color-scheme: light;
+}
+
+/* The signals do not change with the theme */
+:root {
+  /* Something goes away: a purge, a deletion */
+  --surface-negative: var(--color-red-light-5);
+  /* Something is done: an applied change */
+  --surface-positive: var(--color-green-signal);
+  /* An item that sits on a light surface: the event pill of a diagram */
+  --surface-raised: var(--color-white);
+}
+
+/* The brightest cells of the pixel hover of the image cards (PixelImage): pure white in each theme and scheme */
+:root {
+  --surface-pixel-white: var(--color-white);
+}
+
+:root,
+[data-theme='default'] {
+  --surface-default: var(--color-yellow-light-0);
+  --surface-inverse: var(--color-brown-deep-5);
+  --surface-inverse-muted: var(--color-brown-deep-3);
+  --surface-inverse-subtle: var(--color-brown-deep-2);
+  --surface-inverse-faint: var(--color-brown-deep-1);
+  --surface-accent: var(--color-yellow-light-5);
+  --surface-accent-muted: var(--color-yellow-light-3);
+  --surface-accent-subtle: var(--color-yellow-light-2);
+  --surface-accent-faint: var(--color-yellow-light-1);
+  --surface-pixel-highlight: var(--color-cream-pale);
+  --text-primary: var(--color-brown-deep-5);
+  --text-soft: var(--color-brown-deep-4);
+  --text-muted: var(--color-brown-deep-3);
+  --text-subtle: var(--color-brown-deep-2);
+  --text-on-inverse: var(--color-yellow-light-5);
+  --text-on-inverse-soft: var(--color-yellow-light-4);
+  --text-on-inverse-muted: var(--color-yellow-light-3);
+  --text-on-inverse-subtle: var(--color-yellow-light-2);
+  --text-on-inverse-strong: var(--color-yellow-light-0);
+  --border-default: var(--color-brown-deep-1);
+  --border-strong: var(--color-brown-deep-5);
+  --border-on-inverse: var(--color-yellow-light-1);
+  --border-on-inverse-strong: var(--color-yellow-light-2);
+}
+
+[data-theme='orange'] {
+  --surface-default: var(--color-orange-light-0);
+  --surface-inverse: var(--color-orange-deep-5);
+  --surface-inverse-muted: var(--color-orange-deep-3);
+  --surface-inverse-subtle: var(--color-orange-deep-2);
+  --surface-inverse-faint: var(--color-orange-deep-1);
+  --surface-accent: var(--color-orange-light-5);
+  --surface-accent-muted: var(--color-orange-light-3);
+  --surface-accent-subtle: var(--color-orange-light-2);
+  --surface-accent-faint: var(--color-orange-light-1);
+  --surface-pixel-highlight: var(--color-yellow-light-5);
+  --text-primary: var(--color-orange-deep-5);
+  --text-soft: var(--color-orange-deep-4);
+  --text-muted: var(--color-orange-deep-3);
+  --text-subtle: var(--color-orange-deep-2);
+  --text-on-inverse: var(--color-orange-light-5);
+  --text-on-inverse-soft: var(--color-orange-light-4);
+  --text-on-inverse-muted: var(--color-orange-light-3);
+  --text-on-inverse-subtle: var(--color-orange-light-2);
+  --text-on-inverse-strong: var(--color-orange-light-0);
+  --border-default: var(--color-orange-deep-1);
+  --border-strong: var(--color-orange-deep-5);
+  --border-on-inverse: var(--color-orange-light-1);
+  --border-on-inverse-strong: var(--color-orange-light-2);
+}
+
+[data-theme='green'] {
+  --surface-default: var(--color-green-light-0);
+  --surface-inverse: var(--color-green-deep-5);
+  --surface-inverse-muted: var(--color-green-deep-3);
+  --surface-inverse-subtle: var(--color-green-deep-2);
+  --surface-inverse-faint: var(--color-green-deep-1);
+  --surface-accent: var(--color-green-light-5);
+  --surface-accent-muted: var(--color-green-light-3);
+  --surface-accent-subtle: var(--color-green-light-2);
+  --surface-accent-faint: var(--color-green-light-1);
+  --surface-pixel-highlight: var(--color-lime-pale);
+  --text-primary: var(--color-green-deep-5);
+  --text-soft: var(--color-green-deep-4);
+  --text-muted: var(--color-green-deep-3);
+  --text-subtle: var(--color-green-deep-2);
+  --text-on-inverse: var(--color-green-light-5);
+  --text-on-inverse-soft: var(--color-green-light-4);
+  --text-on-inverse-muted: var(--color-green-light-3);
+  --text-on-inverse-subtle: var(--color-green-light-2);
+  --text-on-inverse-strong: var(--color-green-light-0);
+  --border-default: var(--color-green-deep-1);
+  --border-strong: var(--color-green-deep-5);
+  --border-on-inverse: var(--color-green-light-1);
+  --border-on-inverse-strong: var(--color-green-light-2);
+}
+
+[data-theme='purple'] {
+  --surface-default: var(--color-purple-light-0);
+  --surface-inverse: var(--color-purple-deep-5);
+  --surface-inverse-muted: var(--color-purple-deep-3);
+  --surface-inverse-subtle: var(--color-purple-deep-2);
+  --surface-inverse-faint: var(--color-purple-deep-1);
+  --surface-accent: var(--color-purple-light-5);
+  --surface-accent-muted: var(--color-purple-light-3);
+  --surface-accent-subtle: var(--color-purple-light-2);
+  --surface-accent-faint: var(--color-purple-light-1);
+  --surface-pixel-highlight: var(--color-orchid-pale);
+  --text-primary: var(--color-purple-deep-5);
+  --text-soft: var(--color-purple-deep-4);
+  --text-muted: var(--color-purple-deep-3);
+  --text-subtle: var(--color-purple-deep-2);
+  --text-on-inverse: var(--color-purple-light-5);
+  --text-on-inverse-soft: var(--color-purple-light-4);
+  --text-on-inverse-muted: var(--color-purple-light-3);
+  --text-on-inverse-subtle: var(--color-purple-light-2);
+  --text-on-inverse-strong: var(--color-purple-light-0);
+  --border-default: var(--color-purple-deep-1);
+  --border-strong: var(--color-purple-deep-5);
+  --border-on-inverse: var(--color-purple-light-1);
+  --border-on-inverse-strong: var(--color-purple-light-2);
+}
+
+[data-theme='blue'] {
+  --surface-default: var(--color-blue-light-0);
+  --surface-inverse: var(--color-blue-deep-5);
+  --surface-inverse-muted: var(--color-blue-deep-3);
+  --surface-inverse-subtle: var(--color-blue-deep-2);
+  --surface-inverse-faint: var(--color-blue-deep-1);
+  --surface-accent: var(--color-blue-light-5);
+  --surface-accent-muted: var(--color-blue-light-3);
+  --surface-accent-subtle: var(--color-blue-light-2);
+  --surface-accent-faint: var(--color-blue-light-1);
+  --surface-pixel-highlight: var(--color-aqua-pale);
+  --text-primary: var(--color-blue-deep-5);
+  --text-soft: var(--color-blue-deep-4);
+  --text-muted: var(--color-blue-deep-3);
+  --text-subtle: var(--color-blue-deep-2);
+  --text-on-inverse: var(--color-blue-light-5);
+  --text-on-inverse-soft: var(--color-blue-light-4);
+  --text-on-inverse-muted: var(--color-blue-light-3);
+  --text-on-inverse-subtle: var(--color-blue-light-2);
+  --text-on-inverse-strong: var(--color-blue-light-0);
+  --border-default: var(--color-blue-deep-1);
+  --border-strong: var(--color-blue-deep-5);
+  --border-on-inverse: var(--color-blue-light-1);
+  --border-on-inverse-strong: var(--color-blue-light-2);
+}
+
+[data-theme='pink'] {
+  --surface-default: var(--color-pink-light-0);
+  --surface-inverse: var(--color-pink-deep-5);
+  --surface-inverse-muted: var(--color-pink-deep-3);
+  --surface-inverse-subtle: var(--color-pink-deep-2);
+  --surface-inverse-faint: var(--color-pink-deep-1);
+  --surface-accent: var(--color-pink-light-5);
+  --surface-accent-muted: var(--color-pink-light-3);
+  --surface-accent-subtle: var(--color-pink-light-2);
+  --surface-accent-faint: var(--color-pink-light-1);
+  --surface-pixel-highlight: var(--color-peach-pale);
+  --text-primary: var(--color-pink-deep-5);
+  --text-soft: var(--color-pink-deep-4);
+  --text-muted: var(--color-pink-deep-3);
+  --text-subtle: var(--color-pink-deep-2);
+  --text-on-inverse: var(--color-pink-light-5);
+  --text-on-inverse-soft: var(--color-pink-light-4);
+  --text-on-inverse-muted: var(--color-pink-light-3);
+  --text-on-inverse-subtle: var(--color-pink-light-2);
+  --text-on-inverse-strong: var(--color-pink-light-0);
+  --border-default: var(--color-pink-deep-1);
+  --border-strong: var(--color-pink-deep-5);
+  --border-on-inverse: var(--color-pink-light-1);
+  --border-on-inverse-strong: var(--color-pink-light-2);
+}
+
+/*
+ * Code. The colours of the syntax in CodeSnippetPreview. The card has its
+ * own background: the inverse surface of a theme is too bright (green,
+ * blue) or too saturated (orange, pink) to carry syntax colours, thus the
+ * card takes a deeper and calmer shade of the same hue. The keywords take
+ * the accent hue of the theme; strings, constants and functions take three
+ * other hues of the family, each at least 68 degrees from the others, so
+ * that the roles stay apart: strings are green where the accent allows
+ * it, constants mauve or peach, functions sky or mauve. The plain code,
+ * the punctuation, the comments and the line numbers are tints of the
+ * accent hue. The primitives (--color-code-*) say how the values derive.
+ * Defined on each theme, thus the values follow the theme of the section.
+ */
+:root,
+[data-theme='default'] {
+  --code-background: var(--color-code-brown-deep);
+  --code-plain: var(--color-code-yellow-plain);
+  --code-keyword: var(--color-code-yellow-strong);
+  --code-string: var(--color-code-pink-soft);
+  --code-constant: var(--color-code-purple-pale);
+  --code-function: var(--color-code-blue-soft);
+  --code-punctuation: var(--color-code-yellow-faded);
+  --code-comment: var(--color-code-yellow-dim);
+  --code-line-number: var(--color-code-yellow-faint);
+}
+
+[data-theme='orange'] {
+  --code-background: var(--color-code-orange-deep);
+  --code-plain: var(--color-code-orange-plain);
+  --code-keyword: var(--color-code-orange-strong);
+  --code-string: var(--color-code-green-soft);
+  --code-constant: var(--color-code-purple-pale);
+  --code-function: var(--color-code-blue-soft);
+  --code-punctuation: var(--color-code-orange-faded);
+  --code-comment: var(--color-code-orange-dim);
+  --code-line-number: var(--color-code-orange-faint);
+}
+
+[data-theme='green'] {
+  --code-background: var(--color-code-green-deep);
+  --code-plain: var(--color-code-green-plain);
+  --code-keyword: var(--color-code-green-strong);
+  --code-string: var(--color-code-orange-soft);
+  --code-constant: var(--color-code-purple-pale);
+  --code-function: var(--color-code-blue-soft);
+  --code-punctuation: var(--color-code-green-faded);
+  --code-comment: var(--color-code-green-dim);
+  --code-line-number: var(--color-code-green-faint);
+}
+
+[data-theme='purple'] {
+  --code-background: var(--color-code-purple-deep);
+  --code-plain: var(--color-code-purple-plain);
+  --code-keyword: var(--color-code-purple-strong);
+  --code-string: var(--color-code-green-soft);
+  --code-constant: var(--color-code-orange-pale);
+  --code-function: var(--color-code-blue-soft);
+  --code-punctuation: var(--color-code-purple-faded);
+  --code-comment: var(--color-code-purple-dim);
+  --code-line-number: var(--color-code-purple-faint);
+}
+
+[data-theme='blue'] {
+  --code-background: var(--color-code-blue-deep);
+  --code-plain: var(--color-code-blue-plain);
+  --code-keyword: var(--color-code-blue-strong);
+  --code-string: var(--color-code-green-soft);
+  --code-constant: var(--color-code-orange-pale);
+  --code-function: var(--color-code-purple-soft);
+  --code-punctuation: var(--color-code-blue-faded);
+  --code-comment: var(--color-code-blue-dim);
+  --code-line-number: var(--color-code-blue-faint);
+}
+
+[data-theme='pink'] {
+  --code-background: var(--color-code-pink-deep);
+  --code-plain: var(--color-code-pink-plain);
+  --code-keyword: var(--color-code-pink-strong);
+  --code-string: var(--color-code-green-soft);
+  --code-constant: var(--color-code-purple-pale);
+  --code-function: var(--color-code-blue-soft);
+  --code-punctuation: var(--color-code-pink-faded);
+  --code-comment: var(--color-code-pink-dim);
+  --code-line-number: var(--color-code-pink-faint);
+}
+
+/*
+ * The dark scheme. The layout sets data-scheme="dark" on <html> (see
+ * src/lib/colorScheme.ts). Each block changes only the tokens that follow
+ * the scheme, and only with the colours of its theme:
+ *   default surface   deep-5, the inverse surface of the light scheme
+ *   inverse surface   the deep of the code card, darker and calmer than
+ *                     deep-5, thus the text of the accent still shows on it
+ *   accent surfaces   the hue and the chroma of light-5 at OKLCH lightness
+ *                     0.42 (muted 0.36): a vivid dark tone of the accent
+ *                     that carries the light text (muted text 4.8:1 at
+ *                     least). The chroma stops at the edge of sRGB for that
+ *                     hue and lightness: the browser clips a colour out of
+ *                     sRGB, and the hue moves (the orange goes red). Then
+ *                     light-1 or a thin tint for the faint fills
+ *   text              light-0, with the alphas of the deep text steps
+ *   borders           light-1, the border of the inverse surface
+ * The inverse text and borders, the code and the signals stay: they sit
+ * on a dark surface in both schemes. The faint fills of a default surface
+ * (--surface-inverse-faint, the accent tints) become light tints, because
+ * a dark tint does not show on the dark surface.
+ */
+:root[data-scheme='dark'] {
+  color-scheme: dark;
+}
+
+:root[data-scheme='dark'],
+:root[data-scheme='dark'] [data-theme='default'] {
+  --surface-default: var(--color-brown-deep-5);
+  --surface-inverse: var(--color-code-brown-deep);
+  --surface-inverse-faint: var(--color-yellow-light-1);
+  --surface-accent: oklch(from var(--color-yellow-light-5) 0.42 min(c, 0.088) h);
+  --surface-accent-muted: oklch(from var(--color-yellow-light-5) 0.36 min(c, 0.075) h);
+  --surface-accent-subtle: color-mix(in srgb, var(--color-yellow-light-5) 14%, transparent);
+  --surface-accent-faint: var(--color-yellow-light-1);
+  --text-primary: var(--color-yellow-light-0);
+  --text-soft: color-mix(in srgb, var(--color-yellow-light-0) 80%, transparent);
+  --text-muted: color-mix(in srgb, var(--color-yellow-light-0) 70%, transparent);
+  --text-subtle: color-mix(in srgb, var(--color-yellow-light-0) 50%, transparent);
+  --border-default: var(--color-yellow-light-1);
+  --border-strong: var(--color-yellow-light-0);
+}
+
+:root[data-scheme='dark'] [data-theme='orange'] {
+  --surface-default: var(--color-orange-deep-5);
+  --surface-inverse: var(--color-code-orange-deep);
+  --surface-inverse-faint: var(--color-orange-light-1);
+  --surface-accent: oklch(from var(--color-orange-light-5) 0.42 min(c, 0.119) h);
+  --surface-accent-muted: oklch(from var(--color-orange-light-5) 0.36 min(c, 0.102) h);
+  --surface-accent-subtle: color-mix(in srgb, var(--color-orange-light-5) 14%, transparent);
+  --surface-accent-faint: var(--color-orange-light-1);
+  --text-primary: var(--color-orange-light-0);
+  --text-soft: color-mix(in srgb, var(--color-orange-light-0) 80%, transparent);
+  --text-muted: color-mix(in srgb, var(--color-orange-light-0) 70%, transparent);
+  --text-subtle: color-mix(in srgb, var(--color-orange-light-0) 50%, transparent);
+  --border-default: var(--color-orange-light-1);
+  --border-strong: var(--color-orange-light-0);
+}
+
+:root[data-scheme='dark'] [data-theme='green'] {
+  --surface-default: var(--color-green-deep-5);
+  --surface-inverse: var(--color-code-green-deep);
+  --surface-inverse-faint: var(--color-green-light-1);
+  --surface-accent: oklch(from var(--color-green-light-5) 0.42 min(c, 0.114) h);
+  --surface-accent-muted: oklch(from var(--color-green-light-5) 0.36 min(c, 0.098) h);
+  --surface-accent-subtle: color-mix(in srgb, var(--color-green-light-5) 14%, transparent);
+  --surface-accent-faint: var(--color-green-light-1);
+  --text-primary: var(--color-green-light-0);
+  --text-soft: color-mix(in srgb, var(--color-green-light-0) 80%, transparent);
+  --text-muted: color-mix(in srgb, var(--color-green-light-0) 70%, transparent);
+  --text-subtle: color-mix(in srgb, var(--color-green-light-0) 50%, transparent);
+  --border-default: var(--color-green-light-1);
+  --border-strong: var(--color-green-light-0);
+}
+
+:root[data-scheme='dark'] [data-theme='purple'] {
+  --surface-default: var(--color-purple-deep-5);
+  --surface-inverse: var(--color-code-purple-deep);
+  --surface-inverse-faint: var(--color-purple-light-1);
+  --surface-accent: oklch(from var(--color-purple-light-5) 0.42 min(c, 0.239) h);
+  --surface-accent-muted: oklch(from var(--color-purple-light-5) 0.36 min(c, 0.205) h);
+  --surface-accent-subtle: color-mix(in srgb, var(--color-purple-light-5) 14%, transparent);
+  --surface-accent-faint: var(--color-purple-light-1);
+  --text-primary: var(--color-purple-light-0);
+  --text-soft: color-mix(in srgb, var(--color-purple-light-0) 80%, transparent);
+  --text-muted: color-mix(in srgb, var(--color-purple-light-0) 70%, transparent);
+  --text-subtle: color-mix(in srgb, var(--color-purple-light-0) 50%, transparent);
+  --border-default: var(--color-purple-light-1);
+  --border-strong: var(--color-purple-light-0);
+}
+
+:root[data-scheme='dark'] [data-theme='blue'] {
+  --surface-default: var(--color-blue-deep-5);
+  --surface-inverse: var(--color-code-blue-deep);
+  --surface-inverse-faint: var(--color-blue-light-1);
+  --surface-accent: oklch(from var(--color-blue-light-5) 0.42 min(c, 0.077) h);
+  --surface-accent-muted: oklch(from var(--color-blue-light-5) 0.36 min(c, 0.066) h);
+  --surface-accent-subtle: color-mix(in srgb, var(--color-blue-light-5) 14%, transparent);
+  --surface-accent-faint: var(--color-blue-light-1);
+  --text-primary: var(--color-blue-light-0);
+  --text-soft: color-mix(in srgb, var(--color-blue-light-0) 80%, transparent);
+  --text-muted: color-mix(in srgb, var(--color-blue-light-0) 70%, transparent);
+  --text-subtle: color-mix(in srgb, var(--color-blue-light-0) 50%, transparent);
+  --border-default: var(--color-blue-light-1);
+  --border-strong: var(--color-blue-light-0);
+}
+
+:root[data-scheme='dark'] [data-theme='pink'] {
+  --surface-default: var(--color-pink-deep-5);
+  --surface-inverse: var(--color-code-pink-deep);
+  --surface-inverse-faint: var(--color-pink-light-1);
+  --surface-accent: oklch(from var(--color-pink-light-5) 0.42 min(c, 0.168) h);
+  --surface-accent-muted: oklch(from var(--color-pink-light-5) 0.36 min(c, 0.144) h);
+  --surface-accent-subtle: color-mix(in srgb, var(--color-pink-light-5) 14%, transparent);
+  --surface-accent-faint: var(--color-pink-light-1);
+  --text-primary: var(--color-pink-light-0);
+  --text-soft: color-mix(in srgb, var(--color-pink-light-0) 80%, transparent);
+  --text-muted: color-mix(in srgb, var(--color-pink-light-0) 70%, transparent);
+  --text-subtle: color-mix(in srgb, var(--color-pink-light-0) 50%, transparent);
+  --border-default: var(--color-pink-light-1);
+  --border-strong: var(--color-pink-light-0);
+}
+
+/*
+ * The theme tokens resolve on the element that sets data-theme. Thus
+ * this element must also set the colour and the background again.
+ * :where() gives no specificity, thus a component class on the same
+ * element (for example an inverse background) sets a different colour.
+ */
+:where([data-theme]) {
+  color: var(--text-primary);
+}
+
+/* The base values are for 393 px. 1920 uses the 1320 values. */
+:root {
+  --type-display: 37px;
+  --type-h1: 30px;
+  --type-h2: 17px;
+  --type-body: 14px;
+  --type-subtitle: 14px;
+  --type-code: 14px;
+  --type-code-small: 13px;
+  /* The titles of the panels of the diagrams: smaller than their content. */
+  --type-code-xsmall: 11px;
+  /* A quiet note next to a panel title: the number of records of a diagram. */
+  --type-code-2xsmall: 9px;
+  --type-caption: 9px;
+
+  --section-padding-x: 30px;
+  --section-padding-x-headlines: 60px;
+  --section-padding-y: 50px;
+
+  --space-5xs: 2px;
+  --space-4xs: 4px;
+  --space-3xs: 8px;
+  --space-2xs: 10px;
+  --space-xs: 12px;
+  --space-sm: 16px;
+  --space-md: 20px;
+  --space-lg: 30px;
+  --space-xl: 40px;
+  --space-2xl: 60px;
+  --space-3xl: 80px;
+  --space-4xl: 160px;
+
+  --content-max: 1160px;
+  --headline-max: 900px;
+  /* The text column of an article. */
+  --reading-max: 560px;
+  --header-height: 82px;
+
+  /*
+   * Wide screens (1920 and 2560). The content column stays
+   * at --content-max in the centre, and backgrounds go to the full width.
+   * --frame-max: the content column plus the side padding (1320 at 1320
+   * and up). Use it for an element that the design caps at 1320.
+   * --content-inset: the side padding that puts the content of a
+   * full-width element in the centred column. Use it as padding-inline.
+   * --content-inset-half: the outer padding of one half of a 50/50 split
+   * with full-bleed backgrounds. Use it only as padding on a grid item or
+   * on a child of the half: there, 100% is the width of the half. The text
+   * of the half then starts at the edge of the centred column.
+   */
+  --frame-max: calc(var(--content-max) + 2 * var(--section-padding-x));
+  --content-inset: max(var(--section-padding-x), calc((100% - var(--content-max)) / 2));
+  --content-inset-half: max(var(--section-padding-x), calc(100% - var(--content-max) / 2));
+
+  --slider-dot-size: 8px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --type-display: 50px;
+    --type-h1: 40px;
+    --type-h2: 25px;
+    --type-body: 17px;
+    --type-subtitle: 16px;
+    --type-code: 16px;
+    --type-code-small: 14px;
+    --type-code-xsmall: 12px;
+    --type-code-2xsmall: 10px;
+    --type-caption: 14px;
+
+    --section-padding-x: 60px;
+    --section-padding-x-headlines: 80px;
+    --section-padding-y: 60px;
+
+    --slider-dot-size: 12px;
+  }
+}
+
+@media (min-width: 1152px) {
+  :root {
+    --section-padding-x-headlines: 160px;
+    --section-padding-y: 90px;
+  }
+}
+
+@media (min-width: 1320px) {
+  :root {
+    --type-display: 60px;
+    --type-h1: 45px;
+    --type-h2: 30px;
+    --type-body: 20px;
+
+    --section-padding-x: 80px;
+    --section-padding-x-headlines: 200px;
+    --section-padding-y: 100px;
+  }
+}
+
+:root {
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+}
+
+/* Review chrome: the badge of the component Added, on every theme. */
+:root {
+  --added-surface: var(--color-pink-deep-5);
+  --added-text: var(--color-pink-light-0);
+  --added-accent: var(--color-pink-light-5);
+}

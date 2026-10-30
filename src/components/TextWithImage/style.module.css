@@ -1,0 +1,152 @@
+/* Full-bleed halves from 1152. Below 1152 the media is on top. Each half pads itself. */
+.split {
+  display: flex;
+  flex-direction: column;
+}
+
+.textHalf {
+  display: flex;
+  align-items: center;
+  padding: var(--section-padding-y) var(--section-padding-x);
+  background: var(--surface-default);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  width: 100%;
+}
+
+/* The logo is 20px above the headline, not 30px. */
+.logoBox {
+  margin-bottom: calc(var(--space-md) - var(--space-lg));
+  display: flex;
+  align-items: center;
+  width: 220px;
+  max-width: 100%;
+  height: 30px;
+  color: var(--text-primary);
+}
+
+.logo {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* The SVG has preserveAspectRatio="none": keep its ratio when it shrinks. */
+.logoBox :global(svg) {
+  height: auto;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.twoTone .muted {
+  display: block;
+}
+
+.twoToneText {
+  gap: var(--space-md);
+}
+
+.headlineSubline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.subline {
+  color: var(--text-muted);
+}
+
+.mediaHalf {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  order: -1;
+  padding: var(--section-padding-y) var(--section-padding-x);
+  background: var(--surface-accent);
+}
+
+@media (max-width: 767px) {
+  .mediaHalf {
+    --code-snippet-height: 522px;
+  }
+}
+
+/*
+ * Photo: the photo fills the half, with no padding. Below 1152 the photo
+ * is 320 tall. From 1152 the section hugs the text and the photo covers.
+ */
+.photo {
+  position: relative;
+  height: 320px;
+  padding: 0;
+}
+
+.photo :global(img) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (min-width: 1152px) {
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .mediaHalf {
+    order: 0;
+    justify-content: flex-start;
+  }
+
+  /*
+   * The text and the visual sit in the centred content column,
+   * next to the centre seam. On a wide screen, the free space is at the
+   * outer edges. The outer padding of each half does this.
+   */
+  .textHalf {
+    padding-inline: var(--content-inset-half) var(--section-padding-x);
+  }
+
+  .mediaHalf {
+    padding-inline: var(--section-padding-x) var(--content-inset-half);
+  }
+
+  .imageLeft .textHalf {
+    padding-inline: var(--section-padding-x) var(--content-inset-half);
+  }
+
+  .imageLeft .mediaHalf {
+    padding-inline: var(--content-inset-half) var(--section-padding-x);
+  }
+
+  /* Two classes: the rule must win over `.imageLeft .mediaHalf` above, in this file. */
+  /* stylelint-disable-next-line selector-disallowed-list -- Kept on purpose: see the comment above. */
+  .photo.photo {
+    height: auto;
+    padding: 0;
+  }
+
+  .imageLeft .mediaHalf {
+    order: -1;
+  }
+
+  .evenPadding {
+    padding-block: var(--section-padding-x);
+  }
+}
+
+/* A CMS title can have highlighted words. The design shows them as plain text. */
+.text :where(mark) {
+  background: none;
+  color: inherit;
+}

@@ -1,0 +1,75 @@
+---
+import { AppWindow } from '~/components/AppWindow';
+import { componentsCode } from '~/data/media-code';
+import { highlight } from '~/lib/code/highlight';
+import { ADDRESS, DESCRIPTION, EXHIBITION, GALLERY, SITE, STEPS } from './story';
+import site from './site.module.css';
+import styles from './style.module.css';
+
+// The frame of the chapter "Image and video components" of /media: two
+// windows (AppWindow, as on the home page and in the Real-time frame), a
+// code editor at left and a browser at right, as a developer with the page
+// open beside the code. No product is drawn: no logo, no title bar of an
+// app. The editor has the code of the page, with the two Image components
+// and their `data` in focus. The browser has the page of the exhibition on
+// the website of the museum: each photo is an Image, with its placeholder
+// under it (the photo, blurred), as react-datocms draws it. The frame is a
+// sequence (STEPS): at the step "rest" each photo is its placeholder, at
+// the step "load" the photos come in, each at its time (`--delay`, from
+// story.ts). The rules are in style.module.css. Without the sequence, and
+// with reduced motion, the frame is the still: all the photos.
+
+const lines = await highlight(componentsCode.code, componentsCode.lang);
+// The lines in focus, from 1; the others are dim
+const focus = new Set(
+  componentsCode.focus!.flatMap((item) =>
+    typeof item === 'number'
+      ? [item]
+      : Array.from({ length: item[1] - item[0] + 1 }, (_, i) => item[0] + i),
+  ),
+);
+// On phones the editor is scrolled to this line: the article that the page
+// returns
+const SCROLL = 14;
+// The custom properties of an Image: its placeholder and the time it loads
+const image = (src: string, delay: number) => `--placeholder: url(${src}); --delay: ${delay}ms`;
+---
+
+<div class={styles.frame} role="img" aria-label={DESCRIPTION} data-scene-steps={STEPS}>
+  <AppWindow class={styles.editor} file={componentsCode.label} aria-hidden="true">
+    <pre
+      class={styles.pre}><code class={styles.code}>{lines.map((tokens, i) => (
+      <span class:list={[styles.codeLine, !focus.has(i + 1) && styles.dim, i + 1 < SCROLL && styles.above]}><span class={styles.number}>{i + 1}</span><span>{tokens.map((token) =>
+        token.color ? <span style={`color: ${token.color}`}>{token.text}</span> : token.text
+      )}</span></span>
+    ))}</code></pre>
+  </AppWindow>
+  <AppWindow class={styles.browser} address={ADDRESS} aria-hidden="true">
+    <div class={site.page}>
+      <div class={site.header}>
+        <span class={site.brand}>{SITE.brand}</span>
+        <span class={site.nav}>{SITE.links.map((link) => <span>{link}</span>)}</span>
+      </div>
+      <span
+        class:list={[site.photo, site.cover]}
+        style={image(EXHIBITION.cover.src, EXHIBITION.cover.delay)}
+      >
+        <img src={EXHIBITION.cover.src} alt="" />
+      </span>
+      <div class={site.intro}>
+        <span class={site.label}>{EXHIBITION.label}</span>
+        <span class={site.title}>{EXHIBITION.title}</span>
+        <span class={site.dates}>{EXHIBITION.dates}</span>
+      </div>
+      <ul class={site.gallery}>
+        {
+          GALLERY.map((photo) => (
+            <li class={site.photo} style={image(photo.src, photo.delay)}>
+              <img src={photo.src} alt="" loading="lazy" />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </AppWindow>
+</div>

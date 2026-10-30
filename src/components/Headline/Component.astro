@@ -1,0 +1,52 @@
+---
+import { Typewriter } from '~/components/Typewriter';
+import type { Step, TypewriterStart } from '~/lib/motion/typewriter';
+import styles from './style.module.css';
+
+interface Props {
+  as?: 'h1' | 'h2' | 'h3' | 'p';
+  size?: 'display' | 'h1' | 'h2';
+  /** The muted run after the main text. The `muted` slot can replace it. */
+  muted?: string;
+  breakBeforeMuted?: boolean;
+  /** Animate the full headline (main and muted runs) with these steps. */
+  typewriter?: Step[];
+  typewriterStart?: TypewriterStart;
+  typewriterDelay?: number;
+  class?: string;
+  id?: string;
+}
+
+const {
+  as: Tag = 'h2',
+  size = 'h1',
+  muted,
+  breakBeforeMuted = false,
+  typewriter,
+  typewriterStart,
+  typewriterDelay,
+  class: className,
+  id,
+} = Astro.props;
+
+const hasMuted = Boolean(muted) || Astro.slots.has('muted');
+const Wrapper = typewriter ? Typewriter : Fragment;
+const wrapperProps = typewriter
+  ? { script: typewriter, start: typewriterStart, delay: typewriterDelay }
+  : {};
+---
+
+<Tag class:list={[size, styles.headline, className]} id={id}>
+  <Wrapper {...wrapperProps}>
+    <slot />{
+      hasMuted && (
+        <>
+          {breakBeforeMuted ? <br /> : ' '}
+          <span class={styles.muted}>
+            <slot name="muted">{muted}</slot>
+          </span>
+        </>
+      )
+    }
+  </Wrapper>
+</Tag>

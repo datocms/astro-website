@@ -1,0 +1,88 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* Below 768: the items are stacked, 30 apart. */
+.list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-lg);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  min-width: 0;
+}
+
+.pair {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.title {
+  color: var(--text-primary);
+}
+
+.tagline {
+  color: var(--text-subtle);
+}
+
+/* Style `statLight`: the label under the value. */
+.statLight .pair {
+  gap: var(--space-3xs);
+}
+
+/* Below 1152 the short items of `statLight` make a 2 × 2 grid, also on phones. */
+@media (max-width: 1151px) {
+  .statLight.columns4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-md);
+  }
+}
+
+.text .item {
+  color: var(--text-on-inverse);
+}
+
+.text p {
+  margin: 0;
+}
+
+/* At 768: 4 columns make a 2 × 2 grid. 3 columns stay stacked. */
+@media (min-width: 768px) {
+  .columns4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-xl);
+    row-gap: var(--space-lg);
+  }
+}
+
+/* At 1152 and more: all the columns are in one row, 40 apart. */
+@media (min-width: 1152px) {
+  .list {
+    column-gap: var(--space-xl);
+  }
+
+  .columns3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .columns4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  /* Style `stat`: the items fill the row with space between, on one line. */
+  .stat {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .stat .pair {
+    white-space: nowrap;
+  }
+}

@@ -1,9 +1,17 @@
 ---
-import { FormResultLayout } from '~/layouts/FormResultLayout';
+// The page after a contact sales request. The action
+// forms.submitSalesRequest sends the visitor here. It shows the success
+// state of the contact section and sends the Google Ads conversion.
+import { ContactSection } from '~/components/ContactSection';
+import { contact, thanksSeo } from '~/data/contact';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { GOOGLE_ADS_CONVERSIONS } from '~/lib/googleAds';
+
+const seo = overrideSeo([], seoTitle(thanksSeo.title), seoDescription(thanksSeo.description));
 ---
 
-<FormResultLayout type="success" kicker="Contact our Sales team">
+<Layout seo={seo} headerVariant="light">
   <script is:inline define:vars={{ GADS_CONVERSION: GOOGLE_ADS_CONVERSIONS.contactSubmit }}>
     window.dataLayer = window.dataLayer || [];
     function gtag() {
@@ -11,10 +19,5 @@ import { GOOGLE_ADS_CONVERSIONS } from '~/lib/googleAds';
     }
     gtag('event', 'conversion', { send_to: GADS_CONVERSION });
   </script>
-  <p>
-    We have successfully received your request, and <strong
-      >you will shortly receive an automated confirmation via email</strong
-    >. Our Sales team will contact you soon to assist with your inquiries and provide any support
-    you may need!
-  </p>
-</FormResultLayout>
+  <ContactSection {...contact} submitted />
+</Layout>

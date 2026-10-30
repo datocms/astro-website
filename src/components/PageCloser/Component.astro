@@ -1,0 +1,104 @@
+---
+import type { ButtonAppearance } from '~/components/Button';
+import { CtaBanner } from '~/components/CtaBanner';
+import { PixelVideo } from '~/components/PixelVideo';
+import type { CtaBannerData } from '~/data/home';
+import type { CloserVideo } from '~/data/videos';
+import { tonal } from '~/lib/pixel-video/styles';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props {
+  /**
+   * The theme of all the block: the copy, the video and the band. Without
+   * a theme, the block inherits the theme of its parent.
+   */
+  theme?: Theme;
+  /**
+   * The closing call to action above the video. The closer ignores its
+   * theme. With a video, the closer also sets its surface and the
+   * appearance of its buttons (see below).
+   */
+  cta?: CtaBannerData;
+  /**
+   * Pixel video above the band, from `~/data/videos`. The video sets its
+   * style and the surface. The closer only removes the grid.
+   */
+  video?: CloserVideo;
+  /**
+   * `band`: the video fills the band (default).
+   * `centre`: a square video in the centre.
+   */
+  videoLayout?: 'band' | 'centre';
+  href?: string;
+  text?: string;
+}
+
+const {
+  theme,
+  cta,
+  video,
+  videoLayout = 'band',
+  href = '/contact',
+  text = 'Questions? Ask away',
+} = Astro.props;
+
+// The copy and the video are on one surface. The video sets the surface:
+// the colour of its background. Without a video, the variant of the cta
+// sets it.
+const ctaVariant = video ? (video.surface === 'inverse' ? 'dark' : 'light') : cta?.variant;
+// With a video, the closer also sets the buttons for the surface.
+const buttonAppearance: ButtonAppearance | undefined =
+  video && (video.surface === 'inverse' ? 'light-on-deep' : 'deep-on-light');
+const ctaButtons = buttonAppearance
+  ? cta?.buttons?.map((button) => ({ ...button, appearance: buttonAppearance }))
+  : cta?.buttons;
+// The grid is always off: the copy and the video read as one block. The
+// background fills the band also out of the video, but a video can stop
+// this (see `robotVideo`).
+// A video on the inverse surface has the Tonal style, and its file keeps
+// the old highlights of Tonal (`--surface-default`, dark in the dark
+// scheme). Give it the highlights of Tonal (src/lib/pixel-video/styles.ts).
+const toneSettings = video?.surface === 'inverse' ? { highFill: tonal.highFill } : {};
+const videoSettings = { extend: true, ...toneSettings, ...video?.settings, bgStrokeDisabled: true };
+---
+
+<div class={styles.pageCloser} data-theme={theme}>
+  {
+    cta && ctaVariant && (
+      <CtaBanner
+        {...cta}
+        buttons={ctaButtons}
+        theme={undefined}
+        variant={ctaVariant}
+        class={video && styles.cta}
+      />
+    )
+  }
+  {
+    video && (
+      <div
+        class:list={[
+          styles.video,
+          video.surface === 'inverse' && styles.inverse,
+          video.edge === 'right' && styles.edgeRight,
+          video.settings?.extend === false && styles.noExtend,
+          videoLayout === 'centre' && styles.centre,
+        ]}
+        style={`--video-focus: ${video.focus ?? 0.5}`}
+      >
+        <PixelVideo src={video.src} settings={videoSettings} />
+      </div>
+    )
+  }
+  <a href={href} class={styles.band}>
+    <span class:list={[styles.inner, 'h1']}>
+      <span class={styles.arrow} aria-hidden="true">→</span>
+      <span>
+        {text}{' '}
+        <span class={styles.faceDefault} aria-hidden="true">[••]</span>
+        <span class={styles.faceHover} aria-hidden="true">[•ᴗ•]</span>
+      </span>
+    </span>
+  </a>
+</div>

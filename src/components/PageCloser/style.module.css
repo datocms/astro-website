@@ -1,0 +1,150 @@
+/*
+ * The closing block of a page. The copy, the video and the band have one
+ * theme, the copy and the video are on one surface, there is no grid
+ * and no gap. The full band is one link.
+ * The band is on surface/inverse; the text is right-aligned, in a
+ * column of 1260px at most, in the centre.
+ */
+.pageCloser {
+  color: var(--text-primary);
+}
+
+/*
+ * The copy keeps its top padding. Below the buttons, only a small space
+ * stays, so that the buttons do not touch the video.
+ */
+.cta {
+  padding-bottom: var(--space-md);
+}
+
+/*
+ * The media band is 494px high at all widths. The component
+ * draws the video at this height on wide screens. On narrow screens it
+ * draws the video smaller (75vw high), so that all of the hand shows.
+ * The band is as high as the video, thus there is no empty space above
+ * or below it.
+ */
+.video {
+  --draw-height: min(494px, 75vw);
+  height: var(--draw-height);
+  overflow: hidden;
+  background: var(--surface-accent);
+}
+
+/*
+ * The component fits the video inside the element (contain) and centres
+ * it. Thus make the element as wide as the video at the draw height
+ * (--pixel-video-aspect comes from the file), and let the band cut the
+ * sides (cover). When the video is wider than the band, move it so that
+ * the subject (--video-focus, from the data of the video) stays in the
+ * centre.
+ */
+.video :global(pixel-video) {
+  --draw-width: calc(var(--draw-height) * var(--pixel-video-aspect, 960 / 360));
+  width: max(100%, var(--draw-width));
+  height: 100%;
+  aspect-ratio: auto;
+  margin-left: min(0px, calc(50% - var(--draw-width) * var(--video-focus, 0.5)));
+}
+
+.band {
+  display: block;
+  padding: var(--space-xl) var(--section-padding-x);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+  text-decoration: none;
+}
+
+.inner {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: var(--space-2xs);
+  text-align: right;
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+/*
+ * Below 768 there is no arrow and the headline wraps. From 768 the
+ * arrow keeps its space, so that nothing moves on hover.
+ */
+.arrow {
+  display: none;
+  opacity: 0;
+}
+
+@media (min-width: 768px) {
+  .arrow {
+    display: inline;
+  }
+}
+
+.faceHover {
+  display: none;
+}
+
+.band:focus-visible {
+  outline-offset: -4px;
+}
+
+.band:focus-visible .arrow {
+  opacity: 1;
+}
+
+.band:focus-visible .faceDefault {
+  display: none;
+}
+
+.band:focus-visible .faceHover {
+  display: inline;
+}
+
+@media (hover: hover) {
+  .band:hover .arrow {
+    opacity: 1;
+  }
+
+  .band:hover .faceDefault {
+    display: none;
+  }
+
+  .band:hover .faceHover {
+    display: inline;
+  }
+}
+
+/* The surface of the video, under the edges of the drawing. */
+.video.inverse {
+  background: var(--surface-inverse);
+}
+
+/*
+ * The subject comes in from the right edge of the video (the arm of the
+ * pinch). Keep that edge on the right edge of the band. When the video is
+ * wider than the band, the band cuts the left side first, but the subject
+ * (--video-focus) stays in the band.
+ */
+.edgeRight :global(pixel-video) {
+  width: var(--draw-width);
+  margin-left: max(
+    100% - var(--draw-width),
+    min(0px, 50% - var(--draw-width) * var(--video-focus, 0.5))
+  );
+}
+
+/*
+ * The video does not fill the band (`extend: false`). The renderer paints
+ * all of the element, thus make the element only as wide as the drawing.
+ * The surface of the band shows at the two sides.
+ */
+.noExtend :global(pixel-video) {
+  width: var(--draw-width);
+  margin-left: calc(50% - var(--draw-width) / 2);
+}
+
+.centre :global(pixel-video) {
+  width: auto;
+  aspect-ratio: 1;
+  margin-inline: auto;
+}

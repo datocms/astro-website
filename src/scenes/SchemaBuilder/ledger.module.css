@@ -1,0 +1,230 @@
+/*
+ * The layout of the log of the fragment "Applied, or refused."
+ * (Ledger.astro). The parts are the ones of ../diagram/style.module.css.
+ * The picture fills the box of the fragment (SceneFragment, `fit="fill"`)
+ * with the light surface of the diagrams. The box is the container.
+ *
+ * At the top, the event pill. Under it, the panel of the log: its label,
+ * and the rows (the changes), the newest at the top. The rows go under a
+ * fade at the bottom of the box.
+ *
+ * The script sets the attributes of the grammar (`data-changed`,
+ * `data-ping`, `data-enter`), and these: `data-pending` on the verdict
+ * of a new row, `data-flip`
+ * on a row (the inverse translate, with no transition), `data-live` on
+ * the svg of the track, and `data-instant` on the root while it puts the
+ * log back to the still with no transition.
+ *
+ * Two widths of the box. To 459px, less space around the panel.
+ */
+.ledger {
+  --pad: var(--space-md);
+  --link: var(--space-lg);
+  --panel-pad: var(--space-xs);
+  --fade: var(--space-xl);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding: var(--pad);
+  overflow: hidden;
+  background: var(--surface-inverse);
+}
+
+.ledger[data-instant] *,
+.ledger[data-instant] *::after {
+  /* stylelint-disable-next-line declaration-no-important -- Short state while the script resets the picture. The rule must beat the transition of every child part. */
+  transition: none !important;
+}
+
+.ledger > .pill {
+  --diagram-swap-x: var(--space-xl);
+  z-index: 2;
+}
+
+/*
+ * The pill: white, with a ring, on the light surface. Its text is in the
+ * sans font.
+ */
+.ledger > .pill {
+  font-family: var(--font-sans);
+  background: var(--surface-raised);
+  box-shadow: 0 0 0 1px var(--border-on-inverse-strong);
+  color: var(--text-on-inverse-strong);
+}
+
+/* The dark scheme: the text of the light surface is pale, thus the pill is pale too, with dark text. */
+:global(:root[data-scheme='dark']) .ledger > .pill {
+  background: var(--text-on-inverse-strong);
+  color: var(--surface-inverse);
+}
+
+.ledger :is(.pill, .what) code {
+  padding: 0 var(--space-4xs);
+  font: inherit;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--text-on-inverse) 6%, transparent);
+  box-shadow: 0 0 0 1px var(--border-on-inverse);
+}
+
+.panel {
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  margin-top: var(--link);
+  padding: 0;
+  overflow: hidden;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2xs);
+  padding: var(--panel-pad);
+  border-bottom: 1px solid var(--border-on-inverse-strong);
+  font-size: var(--type-code-xsmall);
+}
+
+.rows {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  mask-image: linear-gradient(to bottom, black calc(100% - var(--fade)), transparent);
+}
+
+/* A change: what changed at the left, and its verdict at the right. To 459px, the verdict goes under it. */
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  padding: var(--space-2xs) var(--panel-pad);
+  border-bottom: 1px solid var(--border-on-inverse);
+  transition:
+    translate 0.45s var(--diagram-ease-out),
+    opacity var(--diagram-enter) var(--diagram-ease-out),
+    scale var(--diagram-enter) var(--diagram-ease-out),
+    box-shadow var(--diagram-settle) var(--diagram-ease-out),
+    background-color var(--diagram-settle) var(--diagram-ease-out);
+  --diagram-ping-scale: 1.02 1.4;
+}
+
+.row[data-flip] {
+  transition: none;
+}
+
+/*
+ * A new row gets the lightest tint of the accent, as the column that
+ * changes in integrity.module.css, and no ring: its border stays the
+ * same. The ping is soft. The root class gives the rule more specificity
+ * than the state `.change[data-changed]` of the grammar (two classes): keep it.
+ */
+.ledger .row[data-changed] {
+  background-color: var(--surface-accent-faint);
+  box-shadow: none;
+}
+
+.ledger .row::after {
+  box-shadow: 0 0 0 1px var(--border-on-inverse-strong);
+}
+
+.what {
+  flex: none;
+  font-family: var(--font-sans);
+  font-size: var(--type-code-small);
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
+  color: var(--text-on-inverse-strong);
+}
+
+.verdict {
+  min-width: 0;
+  text-align: right;
+  font-family: var(--font-sans);
+  font-size: var(--type-code-small);
+  line-height: 1.4;
+  color: var(--text-on-inverse-muted);
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.verdict[data-pending] {
+  opacity: 0;
+}
+
+.verdict b {
+  font-weight: 500;
+  color: var(--text-on-inverse-strong);
+}
+
+/* The check of an applied change: green. The bottom of the viewBox is the bottom of the stroke, thus the check sits on the baseline of the text. */
+.check {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: var(--space-4xs);
+  vertical-align: baseline;
+  fill: none;
+  stroke: var(--surface-positive);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.no {
+  font-weight: 500;
+  color: var(--surface-negative);
+}
+
+/*
+ * The track from the pill to the top of the panel. In the still it is a
+ * band from 2px under the pill to 2px under the top of the panel: its
+ * viewBox of 100 × 100 stretches to it, and its stroke does not. With
+ * `data-live` it covers the root, in px, for the track of the script.
+ */
+.links {
+  position: absolute;
+  z-index: 0;
+  top: calc(var(--pad) + var(--diagram-pill) - var(--diagram-tuck));
+  right: var(--pad);
+  left: var(--pad);
+  width: calc(100% - 2 * var(--pad));
+  height: calc(var(--link) + 2 * var(--diagram-tuck));
+  overflow: visible;
+  pointer-events: none;
+}
+
+.links[data-live] {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+@container (max-width: 459px) {
+  .ledger {
+    --pad: var(--space-xs);
+    --link: var(--space-md);
+    --panel-pad: var(--space-2xs);
+    --fade: var(--space-lg);
+  }
+
+  .row {
+    flex-direction: column;
+    gap: var(--space-5xs);
+  }
+
+  .verdict {
+    text-align: left;
+  }
+}

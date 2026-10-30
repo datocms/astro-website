@@ -1,0 +1,138 @@
+---
+import { FormSelectMenu } from '~/components/FormSelectMenu';
+import type { FormFieldData, FormOption } from '~/data/contact';
+import chevron from './chevron.svg?raw';
+import styles from './style.module.css';
+
+/*
+ * One field of a form: label, value and
+ * an error message. The states (hover, focus, error, open) come from CSS
+ * and from data attributes that the scripts set; they are not props.
+ * The form script (ContactForm) reads data-required-message and
+ * data-invalid-message and shows the error.
+ */
+type Props = FormFieldData & {
+  /** Default: `field-<name>`. */
+  id?: string;
+  class?: string;
+};
+
+const {
+  type,
+  name,
+  label,
+  placeholder,
+  required = true,
+  autocomplete,
+  options = [],
+  pattern,
+  requiredMessage = 'This field is required',
+  invalidMessage,
+  id = `field-${name}`,
+  class: className,
+} = Astro.props;
+
+const labelId = `${id}-label`;
+const errorId = `${id}-error`;
+const listId = `${id}-listbox`;
+
+// A string option is its own value and label.
+const items: FormOption[] = options.map((option) =>
+  typeof option === 'string' ? { value: option, label: option } : option,
+);
+---
+
+<div
+  class:list={[styles.field, className]}
+  data-field
+  data-required-message={requiredMessage}
+  data-invalid-message={invalidMessage}
+>
+  <label class:list={['subtitleMedium', styles.label]} for={id} id={labelId}>
+    {label}
+    {
+      required && (
+        <span class={styles.required} aria-hidden="true">
+          *
+        </span>
+      )
+    }
+  </label>
+
+  {
+    (type === 'text' || type === 'email') && (
+      <input
+        class:list={['body', styles.control]}
+        id={id}
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        required={required}
+        autocomplete={autocomplete}
+        pattern={pattern ?? (type === 'email' ? '[^\\s@]+@[^\\s@]+\\.[^\\s@]+' : undefined)}
+        data-control
+      />
+    )
+  }
+
+  {
+    type === 'textarea' && (
+      <textarea
+        class:list={['body', styles.control, styles.textarea]}
+        id={id}
+        name={name}
+        placeholder={placeholder}
+        required={required}
+        data-control
+      />
+    )
+  }
+
+  {
+    type === 'select' && (
+      <div class={styles.select} data-select>
+        <select
+          class:list={['body', styles.control, styles.nativeSelect]}
+          id={id}
+          name={name}
+          required={required}
+          data-native
+          data-control
+        >
+          <option value="" disabled selected>
+            {placeholder}
+          </option>
+          {items.map((option) => (
+            <option value={option.value}>{option.label}</option>
+          ))}
+        </select>
+        {/* The script shows this combobox and hides the native select. */}
+        <div
+          class:list={['body', styles.control, styles.combobox]}
+          role="combobox"
+          tabindex="0"
+          aria-labelledby={labelId}
+          aria-controls={listId}
+          aria-expanded="false"
+          aria-haspopup="listbox"
+          aria-required={required ? 'true' : undefined}
+          data-combobox
+          data-control
+          data-empty
+          hidden
+        >
+          <span class={styles.comboboxValue} data-combobox-value>
+            {placeholder}
+          </span>
+        </div>
+        <span class={styles.chevron} aria-hidden="true" set:html={chevron} />
+        <FormSelectMenu id={listId} labelId={labelId} options={items} />
+      </div>
+    )
+  }
+
+  <p class:list={['subtitleMedium', styles.error]} id={errorId} data-error hidden>
+    <span aria-hidden="true">[x_x]</span>{' '}
+    <span data-error-text></span>
+  </p>
+</div>

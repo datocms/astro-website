@@ -1,0 +1,52 @@
+---
+import { CardGrid } from '~/components/CardGrid';
+import { Pagination } from '~/components/Pagination';
+import { PostTeaser, type PostTeaserItem } from '~/components/PostTeaser';
+import { Section } from '~/components/Section';
+import styles from './style.module.css';
+
+interface Props {
+  posts: PostTeaserItem[];
+  /** The number of the current page, from 1. */
+  page: number;
+  totalPages: number;
+  /** The address of page 1. */
+  baseUrl: string;
+  /** The links above the grid that show a part of the posts. One is current. */
+  filters?: { label: string; href: string; current: boolean }[];
+}
+
+const { posts, page, totalPages, baseUrl, filters } = Astro.props;
+---
+
+<Section contentClass={styles.content}>
+  {
+    filters && (
+      <nav aria-label="Filter the posts">
+        <ul class={styles.filters}>
+          {filters.map((filter) => (
+            <li>
+              <a
+                class:list={[styles.filter, 'subtitleMedium']}
+                href={filter.href}
+                aria-current={filter.current ? 'page' : undefined}
+              >
+                {filter.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )
+  }
+  <CardGrid>
+    {
+      posts.map((post) => (
+        <li>
+          <PostTeaser {...post} />
+        </li>
+      ))
+    }
+  </CardGrid>
+  <Pagination current={page} total={totalPages} baseUrl={baseUrl} />
+</Section>

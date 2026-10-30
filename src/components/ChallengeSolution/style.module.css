@@ -1,0 +1,61 @@
+/*
+ * Two halves: surface/inverse
+ * on the left, surface/accent on the right. Each half has an H1 label in
+ * the muted colour over an H1 statement. The halves stack below 1152.
+ * From 1152 the backgrounds are full width, but the text stays in the
+ * centred content column: the left text starts at the left edge of the
+ * column, the right text starts at the seam plus the side padding.
+ */
+.challengeSolution {
+  display: flex;
+  flex-direction: column;
+}
+
+.half {
+  flex: 1 1 50%;
+  padding: var(--section-padding-y) var(--section-padding-x);
+}
+
+/* The highlight of the CMS has no special style here. */
+.statement :where(mark) {
+  background: none;
+  color: inherit;
+}
+
+/* The label is on its own line. */
+.label {
+  display: block;
+}
+
+.inverse {
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.inverse .label {
+  color: var(--text-on-inverse-muted);
+}
+
+.accent {
+  background: var(--surface-accent);
+  color: var(--text-primary);
+}
+
+.accent .label {
+  color: var(--text-muted);
+}
+
+@media (min-width: 1152px) {
+  .challengeSolution {
+    flex-direction: row;
+  }
+
+  .statement {
+    max-width: 500px;
+  }
+
+  /* The percentage is of the section width, thus 50% is the seam. */
+  .half:first-child {
+    padding-left: max(var(--section-padding-x), calc(50% - var(--content-max) / 2));
+  }
+}

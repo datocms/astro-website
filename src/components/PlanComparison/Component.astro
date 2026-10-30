@@ -1,0 +1,293 @@
+---
+import { render as renderAsPlainText } from 'datocms-structured-text-to-plain-text';
+import { Button } from '~/components/Button';
+import { InlineParagraphs } from '~/components/StructuredText';
+import type {
+  ComparisonCategory,
+  ComparisonRow,
+  PlanComparisonData,
+  PlanValue,
+} from '~/data/pricing';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { PlanComparisonFeatureGroupFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props extends PlanComparisonData {
+  /** The first categories of the table. */
+  categories?: ComparisonCategory[];
+  /** The groups of features of the CMS, after `categories`. */
+  featureGroups?: FragmentOf<typeof PlanComparisonFeatureGroupFragment>[];
+}
+
+/** A row can have a tooltip from the CMS: a Structured Text field. */
+type Row = ComparisonRow & { infoText?: { value: unknown } };
+
+const { headline, differencesLabel, columns } = Astro.props;
+
+const categories: (Omit<ComparisonCategory, 'rows'> & { rows: Row[] })[] = [
+  ...(Astro.props.categories ?? []),
+  ...(Astro.props.featureGroups ?? []).map((data) => {
+    const group = readFragment(PlanComparisonFeatureGroupFragment, data);
+    return {
+      title: group.name,
+      rows: group.features.map((feature): Row => {
+        // The search needs the description as a string.
+        const description = feature.description
+          ? renderAsPlainText(feature.description as Parameters<typeof renderAsPlainText>[0])
+          : null;
+        const tags = Array.isArray(feature.tags) ? (feature.tags as string[]) : [];
+        return {
+          feature: feature.name,
+          infoText: (description && feature.description) || undefined,
+          // The old page found a feature also by its description, its group and its tags.
+          keywords: [description, group.name, ...tags].filter(Boolean).join(' '),
+          pro: feature.availableOnProfessionalPlan,
+          enterprise: true,
+        };
+      }),
+    };
+  }),
+];
+
+const id = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+---
+
+<section class={styles.planComparison} data-plan-comparison>
+  <h2 class:list={[styles.headline, 'h1']}>{headline}</h2>
+
+  <div data-table-start></div>
+  <div class={styles.header}>
+    <div class={styles.searchCell}>
+      <p class:list={[styles.featureTitle, 'h2']} aria-hidden="true">Feature</p>
+      <label class={styles.search}>
+        <span class="visuallyHidden">Search features</span>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="6" stroke="currentColor" stroke-width="2"></circle>
+          <path d="m15 15 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+        </svg>
+        <input type="search" class="h2" placeholder="Search ..." autocomplete="off" data-search />
+      </label>
+      {
+        differencesLabel && (
+          <label class:list={[styles.differences, 'subtitleMedium']}>
+            <input type="checkbox" role="switch" class={styles.switchInput} data-differences />
+            <span class={styles.switchTrack} aria-hidden="true" />
+            {differencesLabel}
+          </label>
+        )
+      }
+    </div>
+    {
+      columns.map((col) => (
+        <div class={styles.planCell}>
+          <p class="h2">
+            {col.name}
+            <br />
+            <span class={styles.muted}>{col.price}</span>
+          </p>
+          <Button
+            appearance={col.button.appearance}
+            variant={col.button.variant}
+            arrow={col.button.arrow}
+            href={col.button.href}
+          >
+            {col.button.label}
+          </Button>
+        </div>
+      ))
+    }
+  </div>
+
+  {
+    categories.map((cat) => (
+      <details class={styles.category} open={cat.open} data-category>
+        <summary class={styles.categoryHeader}>
+          <span class:list={[styles.categoryTitle, 'bodyMedium']}>
+            {cat.title}
+            <span class={styles.count} data-count>
+              {cat.rows.length}
+            </span>
+          </span>
+          <span class:list={[styles.sign, 'h2']} aria-hidden="true" />
+        </summary>
+        <div role="list">
+          {cat.rows.map((row) => {
+            const hasInfo = Boolean(row.info || row.infoText);
+            const tipId = hasInfo ? `tip-${id(cat.title)}-${id(row.feature)}` : undefined;
+            // The search finds the name and the keywords of the row.
+            const searchText = [row.feature, row.keywords].filter(Boolean).join(' ').toLowerCase();
+            return (
+              <div
+                class={styles.row}
+                role="listitem"
+                data-row
+                data-name={searchText}
+                data-same={row.pro === row.enterprise || undefined}
+              >
+                <div class={styles.feature}>
+                  <span class="bodyMedium">{row.feature}</span>
+                  {hasInfo && (
+                    <span class={styles.info}>
+                      <button
+                        type="button"
+                        class={styles.infoButton}
+                        aria-describedby={tipId}
+                        aria-expanded="false"
+                        data-info-button
+                      >
+                        <span class="visuallyHidden">About {row.feature}</span>
+                        <span aria-hidden="true">i</span>
+                      </button>
+                      <span
+                        id={tipId}
+                        role="tooltip"
+                        class:list={[styles.tooltip, 'subtitleMedium']}
+                      >
+                        {row.infoText ? <InlineParagraphs data={row.infoText} /> : row.info}
+                      </span>
+                    </span>
+                  )}
+                </div>
+                {([row.pro, row.enterprise] as PlanValue[]).map((value, i) => (
+                  <div class:list={[styles.value, i === 1 && styles.enterprise, 'body']}>
+                    <span class="visuallyHidden">{columns[i]!.name}: </span>
+                    {value === true ? (
+                      <span class={styles.check}>
+                        <svg
+                          width="10"
+                          height="10"
+                          viewBox="0 0 10 10"
+                          fill="none"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="m1.5 5.2 2.3 2.3 4.7-5"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                        <span class="visuallyHidden">Included</span>
+                      </span>
+                    ) : value === false ? (
+                      <span class={styles.dash}>
+                        <span class="visuallyHidden">Not included</span>
+                      </span>
+                    ) : (
+                      value.split('\n').map((line, j) => (
+                        <>
+                          {j > 0 && <br />}
+                          <span class:list={[j > 0 && styles.muted]}>{line}</span>
+                        </>
+                      ))
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+      </details>
+    ))
+  }
+  <p class:list={[styles.empty, 'body']} hidden data-empty>No features match your search.</p>
+  {
+    Astro.slots.has('default') && (
+      <div class:list={[styles.footnote, 'body']}>
+        <slot />
+      </div>
+    )
+  }
+</section>
+
+<script>
+  // Tooltips: a click or a tap on the icon opens or closes its bubble.
+  // Only one bubble is open at a time. A click outside or Escape closes it.
+  // Touch screens have no hover, thus they need this.
+  const closeTips = (except?: Element) => {
+    for (const el of document.querySelectorAll('[data-plan-comparison] [data-open]')) {
+      if (el === except) continue;
+      el.removeAttribute('data-open');
+      el.querySelector('[data-info-button]')?.setAttribute('aria-expanded', 'false');
+    }
+  };
+  document.addEventListener('click', (event) => {
+    const button = (event.target as Element).closest?.('[data-info-button]');
+    const info = button?.parentElement;
+    closeTips(info ?? undefined);
+    if (!button || !info) return;
+    const open = !info.hasAttribute('data-open');
+    info.toggleAttribute('data-open', open);
+    button.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeTips();
+  });
+
+  // Search: show only the rows whose name (or keywords) contains the
+  // query. The switch "only show differences" (when the table has one)
+  // hides the rows with the same value on the two plans. The two filters
+  // do not work together: a search turns the switch off, and the switch
+  // clears the search. Categories with no match go away; categories with
+  // a match open. When no filter is active again, the categories get
+  // their open state from before the filter.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-plan-comparison]')) {
+    const input = root.querySelector<HTMLInputElement>('[data-search]');
+    const differences = root.querySelector<HTMLInputElement>('[data-differences]');
+    const empty = root.querySelector<HTMLElement>('[data-empty]');
+    const categories = [...root.querySelectorAll<HTMLDetailsElement>('[data-category]')];
+    if (!input) continue;
+    let saved: boolean[] | null = null;
+
+    const apply = () => {
+      const query = input.value.trim().toLowerCase();
+      const onlyDifferences = differences?.checked ?? false;
+      const filtering = Boolean(query) || onlyDifferences;
+      if (filtering && !saved) saved = categories.map((c) => c.open);
+      let total = 0;
+      for (const cat of categories) {
+        const rows = [...cat.querySelectorAll<HTMLElement>('[data-row]')];
+        let count = 0;
+        for (const row of rows) {
+          const match =
+            (!query || (row.dataset.name ?? '').includes(query)) &&
+            (!onlyDifferences || !row.hasAttribute('data-same'));
+          row.hidden = !match;
+          if (match) count += 1;
+        }
+        total += count;
+        cat.hidden = count === 0;
+        if (filtering) cat.open = count > 0;
+        const countEl = cat.querySelector('[data-count]');
+        if (countEl) countEl.textContent = String(count);
+      }
+      if (!filtering && saved) {
+        categories.forEach((c, i) => (c.open = saved![i]!));
+        saved = null;
+      }
+      if (empty) empty.hidden = total > 0;
+    };
+
+    input.addEventListener('input', () => {
+      if (differences && input.value.trim()) differences.checked = false;
+      apply();
+    });
+
+    differences?.addEventListener('change', () => {
+      if (differences.checked) input.value = '';
+      apply();
+      // The table gets shorter or longer. When the start of the table is
+      // above the viewport, go back to it.
+      const start = root.querySelector<HTMLElement>('[data-table-start]');
+      if (start && start.getBoundingClientRect().top < 0) {
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        start.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      }
+    });
+  }
+</script>

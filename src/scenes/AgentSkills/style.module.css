@@ -1,0 +1,313 @@
+/*
+ * The frame of the Agent Skills chapter of /ai (Terminal.astro), in a
+ * SceneFrame `fill`: one window, the terminal at left (55%) and the
+ * editor at right, side by side from 768px and stacked on phones. The window is
+ * a screen: the frame gives it its corners, its ring and its border (the
+ * CSS properties of the kit), and its height. Everything is in the code
+ * tokens of the theme of the section (tokens.css, "Code").
+ *
+ * The sequence sets `data-step` on the window (sceneSequence.ts). The
+ * script of Terminal.astro gives `data-shown` to each line with `data-at`
+ * from that step on, `data-opened` to each file the agent wrote, and
+ * `data-front` to the file in front; the rules below hide the others. Without `data-step` everything shows, and the
+ * editor shows the last file: the still.
+ */
+.window {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 11fr) minmax(0, 9fr);
+  box-sizing: border-box;
+  width: 100%;
+  height: min(var(--scene-frame-height), var(--scene-frame-phone-height));
+  overflow: hidden;
+  border-radius: var(--product-scenes-radius, 0);
+  background: var(--code-background);
+  box-shadow: var(--product-scenes-shadow, none);
+  color: var(--code-plain);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.55;
+  /*
+   * The browser must not keep a line of the terminal in place: a new line
+   * pushes the lines up, and the browser would scroll the page with them
+   */
+  overflow-anchor: none;
+}
+
+.window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: var(--product-scenes-border, none);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .window {
+    grid-template-rows: none;
+    grid-template-columns: 55fr 45fr;
+    height: min(var(--scene-frame-height), var(--scene-frame-tablet-height));
+  }
+}
+
+@media (min-width: 1152px) {
+  .window {
+    height: var(--scene-frame-height);
+    font-size: var(--type-code);
+  }
+}
+
+.terminal,
+.file {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.file {
+  border-top: 1px solid color-mix(in srgb, var(--code-plain) 12%, transparent);
+  background: color-mix(in srgb, var(--code-plain) 4%, var(--code-background));
+}
+
+@media (min-width: 768px) {
+  .file {
+    border-top: 0;
+    border-left: 1px solid color-mix(in srgb, var(--code-plain) 12%, transparent);
+  }
+}
+
+.bar {
+  flex: none;
+  min-height: 1lh;
+  margin: 0;
+  padding: var(--space-3xs) var(--space-sm);
+  overflow: hidden;
+  border-bottom: 1px solid color-mix(in srgb, var(--code-plain) 12%, transparent);
+  color: var(--code-comment);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* An empty character: with no tab open, the bar is as high as the bar of the terminal */
+.tabs::before {
+  content: '\200b';
+  margin-inline-end: calc(var(--space-sm) * -1);
+}
+
+.tab {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.window[data-step] .tab[data-front],
+.window:not([data-step]) .tab:last-child {
+  color: var(--code-plain);
+}
+
+/*
+ * The terminal keeps its last line at the bottom: while the lines are
+ * fewer than the height, they start at the top; with more, the first
+ * ones go up and out. The lines are at least as high as the pane, and the
+ * pane puts their bottom at its bottom.
+ */
+.scroll {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.lines {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: var(--space-sm);
+}
+
+@media (min-width: 1152px) {
+  .lines,
+  .pre {
+    padding: var(--space-md);
+  }
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 2ch minmax(0, 1fr);
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/*
+ * On phones a line does not wrap: the pane cuts it at the right, as a
+ * terminal narrower than its output. The request and the sentences of
+ * the agent wrap: they are read whole.
+ */
+@media (max-width: 767px) {
+  .line:not(.ask, .say) {
+    white-space: pre;
+  }
+}
+
+.word {
+  white-space: nowrap;
+}
+
+.output {
+  color: var(--code-comment);
+}
+
+.act > :last-child {
+  padding-inline-start: 2ch;
+}
+
+.act.output > :last-child {
+  padding-inline-start: 4ch;
+}
+
+.run > :last-child {
+  padding-inline-start: 4ch;
+  text-indent: -2ch;
+}
+
+.gap {
+  margin-top: var(--space-sm);
+}
+
+.ask {
+  margin-block: var(--space-sm);
+  color: var(--code-keyword);
+}
+
+.glyph {
+  color: var(--code-comment);
+}
+
+.agent {
+  color: var(--code-keyword);
+}
+
+.skill {
+  padding-inline: 0.4ch;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--code-keyword) 18%, transparent);
+  color: var(--code-keyword);
+}
+
+.cursor {
+  justify-self: start;
+  background: var(--code-plain);
+  color: transparent;
+}
+
+.untyped {
+  color: transparent;
+}
+
+.askCursor {
+  visibility: hidden;
+}
+
+.window:is([data-step='rest'], [data-step='prompt']) .askCursor {
+  visibility: visible;
+}
+
+.pre {
+  flex: 1;
+  margin: 0;
+  padding: var(--space-sm);
+  overflow: hidden;
+  --shiki-foreground: var(--code-plain);
+  --shiki-token-keyword: var(--code-keyword);
+  --shiki-token-string: var(--code-plain);
+  --shiki-token-string-expression: var(--code-string);
+  --shiki-token-link: var(--code-string);
+  --shiki-token-constant: var(--code-constant);
+  --shiki-token-function: var(--code-function);
+  --shiki-token-parameter: var(--code-plain);
+  --shiki-token-comment: var(--code-comment);
+  --shiki-token-punctuation: var(--code-punctuation);
+}
+
+.code {
+  display: flex;
+  flex-direction: column;
+  font: inherit;
+}
+
+.codeLine {
+  display: flex;
+  gap: var(--space-2xs);
+  white-space: pre;
+}
+
+/* The numbers are in the markup: a line scrolled out keeps the count */
+.number {
+  flex: none;
+  min-width: 2ch;
+  text-align: right;
+  color: var(--code-line-number);
+}
+
+@media (max-width: 767px) {
+  .above {
+    display: none;
+  }
+}
+
+.dim > :last-child {
+  opacity: 0.6;
+}
+
+.window[data-step] [data-at]:not([data-shown]),
+.window[data-step] [data-file]:not([data-opened]) {
+  display: none;
+}
+
+.window[data-step] .line[data-shown] {
+  animation: lineIn 0.25s ease-out both;
+}
+
+@keyframes lineIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.window[data-step] .pre:not([data-front]),
+.window:not([data-step]) .pre:not(:last-child) {
+  display: none;
+}
+
+.window[data-step] .pre[data-front] {
+  animation: fileIn 0.35s ease-out both;
+}
+
+@keyframes fileIn {
+  from {
+    opacity: 0;
+    translate: calc(var(--space-sm) * -1) 0;
+  }
+}
+
+@media (max-width: 767px) {
+  @keyframes fileIn {
+    from {
+      opacity: 0;
+      translate: 0 calc(var(--space-sm) * -1);
+    }
+  }
+}

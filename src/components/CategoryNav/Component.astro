@@ -1,0 +1,156 @@
+---
+import { Section } from '~/components/Section';
+import type { CategoryNavData } from '~/data/features';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends CategoryNavData {
+  theme?: Theme;
+  /**
+   * With a total, the nav keeps score: how many of the elements
+   * [data-counted] on the page are above the middle of the screen,
+   * out of the total. Without JS the score is full.
+   */
+  total?: number;
+}
+
+const { items, theme, total } = Astro.props;
+---
+
+<Section
+  as="nav"
+  theme={theme}
+  padding="none"
+  flush
+  class={styles.nav}
+  contentClass={styles.content}
+  aria-label="Feature categories"
+  data-category-nav
+>
+  {/* "#top" goes to the top of the page also without JS. */}
+  <a href="#top" class={styles.top} aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path
+        d="M10 16V4M4.5 9.5 10 4l5.5 5.5"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </a>
+  <ul class={styles.items}>
+    <li class={styles.indicator} aria-hidden="true"></li>
+    {
+      items.map((item, i) => (
+        <li>
+          <a
+            href={item.href}
+            class:list={[styles.item, 'subtitleMedium']}
+            aria-current={i === 0 ? 'true' : undefined}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  {
+    total !== undefined && (
+      <p class:list={[styles.score, 'codeSmall']} data-category-nav-score={total}>
+        <output data-category-nav-count aria-live="off">
+          {total}
+        </output>
+        <span class={styles.scoreTotal}> / {total}</span>
+      </p>
+    )
+  }
+</Section>
+
+<script>
+  import { prefersReducedMotion } from '~/lib/motion/inView';
+
+  // The active item is the last section with its top above the nav bottom.
+  for (const nav of document.querySelectorAll<HTMLElement>('[data-category-nav]')) {
+    const links = [...nav.querySelectorAll<HTMLAnchorElement>('li > a[href^="#"]')];
+    const count = nav.querySelector<HTMLOutputElement>('[data-category-nav-count]');
+    const counted = count ? [...document.querySelectorAll<HTMLElement>('[data-counted]')] : [];
+    nav.setAttribute('data-js', '');
+    const sections = links.map((link) => document.getElementById(link.hash.slice(1)));
+    document.documentElement.style.setProperty('--category-nav-height', `${nav.offsetHeight}px`);
+    // The row needs an end padding as wide as the score: the score is on top of the row.
+    const scoreEl = nav.querySelector<HTMLElement>('[data-category-nav-score]');
+    if (scoreEl)
+      new ResizeObserver(() =>
+        nav.style.setProperty('--score-width', `${scoreEl.offsetWidth}px`),
+      ).observe(scoreEl);
+
+    // The indicator slides from the old active item to the new one.
+    const list = nav.querySelector('ul')!;
+    const placeIndicator = () => {
+      const link = links[active]!;
+      list.style.setProperty('--indicator-x', `${link.offsetLeft}px`);
+      list.style.setProperty('--indicator-width', `${link.offsetWidth}px`);
+    };
+
+    let active = 0;
+    const setActive = (index: number) => {
+      if (index === active) return;
+      active = index;
+      placeIndicator();
+      links.forEach((link, i) => {
+        if (i === index) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      });
+      // On narrow screens the row scrolls. Keep the active item visible.
+      const link = links[index]!;
+      // The score is on top of the end of the row. Center the item in the part that shows.
+      const visible = list.clientWidth - (scoreEl?.offsetWidth ?? 0);
+      const left = link.offsetLeft - (visible - link.offsetWidth) / 2;
+      list.scrollTo({ left, behavior: prefersReducedMotion() ? 'instant' : 'smooth' });
+    };
+
+    // The score: the counted elements with their top above the middle of
+    // the screen. The score tells the page how far the list is scrolled
+    // (the event `categorynav:score`, with the share from 0 to 1).
+    let score = -1;
+    const keepScore = () => {
+      if (!count) return;
+      const line = window.innerHeight / 2;
+      let n = 0;
+      for (const el of counted) if (el.getBoundingClientRect().top <= line) n += 1;
+      if (n === score) return;
+      score = n;
+      count.value = String(n);
+      nav.dispatchEvent(
+        new CustomEvent('categorynav:score', { detail: n / counted.length, bubbles: true }),
+      );
+    };
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const line = nav.getBoundingClientRect().bottom + 1;
+      let index = 0;
+      sections.forEach((section, i) => {
+        if (section && section.getBoundingClientRect().top <= line) index = i;
+      });
+      setActive(index);
+      keepScore();
+      // Show the link to the top only when the nav sticks to the top of the screen.
+      nav.toggleAttribute('data-stuck', window.scrollY > 0 && nav.getBoundingClientRect().top <= 0);
+    };
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!frame) frame = requestAnimationFrame(update);
+      },
+      { passive: true },
+    );
+    update();
+    placeIndicator();
+    // The labels change width when the font loads or the window changes size.
+    new ResizeObserver(placeIndicator).observe(list);
+    // Show the indicator after the first placement, thus it does not slide in from the left edge.
+    requestAnimationFrame(() => list.setAttribute('data-indicator', ''));
+  }
+</script>

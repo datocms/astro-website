@@ -1,0 +1,126 @@
+/*
+ * The page of the exhibition "Keepers of the Light" on the website of
+ * Harwick Maritime Museum, in the browser of the frame (Frame.astro). It
+ * is a fake site, not the cms and not this website, thus it has its own
+ * look: a museum on a warm white, with titles in a serif and small caps
+ * for the labels. It uses only the fonts of the system: do not add a web
+ * font for this site.
+ * The frame cuts the page at its bottom. The page is one column, with the
+ * gallery in three columns at each width: its size follows the width of
+ * the browser (container units).
+ */
+.page {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  container-type: inline-size;
+  color: #22201c;
+  font:
+    400 12px / 1.4 system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    sans-serif;
+  background: #f7f4ee;
+}
+
+.header {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 4cqi;
+}
+
+.brand {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.nav {
+  display: flex;
+  gap: 14px;
+  color: #6b655b;
+  white-space: nowrap;
+}
+
+/* In a narrow browser the site has no menu: the name of the museum fills the header */
+@container (max-width: 420px) {
+  .nav {
+    display: none;
+  }
+}
+
+/*
+ * An Image of react-datocms: the placeholder under the photo. The
+ * placeholder is the `base64` of the response, a tiny copy of the photo
+ * that the browser scales up; here it is the photo, blurred.
+ */
+.photo {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: #e6e0d4;
+}
+
+.photo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--placeholder) center / cover;
+  filter: blur(10px);
+  scale: 1.15;
+}
+
+.photo img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The cover, from edge to edge: the size of its photo (960 × 400) */
+.cover {
+  aspect-ratio: 960 / 400;
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 3.5cqi 4cqi 3cqi;
+}
+
+.label {
+  color: #6b655b;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.title {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  font-size: clamp(20px, 6cqi, 32px);
+  line-height: 1.1;
+}
+
+.dates {
+  color: #6b655b;
+}
+
+/* The gallery: three photos on each row, the size of their photos (400 × 300) */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5cqi;
+  margin: 0;
+  padding: 0 4cqi;
+  list-style: none;
+}
+
+.gallery .photo {
+  aspect-ratio: 400 / 300;
+}

@@ -1,0 +1,12 @@
+---
+import { StructuredText as DatoStructuredText } from '@datocms/astro';
+import type { ComponentProps } from 'astro/types';
+import HeadingNode from './HeadingNode.astro';
+
+type Props = ComponentProps<typeof DatoStructuredText>;
+
+const { nodeOverrides, ...props } = Astro.props;
+---
+
+{/* A Structured Text field of DatoCMS. Put it in Prose: Prose styles the HTML. */}
+<DatoStructuredText {...props} nodeOverrides={{ heading: HeadingNode, ...nodeOverrides }} />

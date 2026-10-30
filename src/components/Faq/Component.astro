@@ -1,0 +1,60 @@
+---
+import { stripStega } from '@datocms/astro';
+import { Section } from '~/components/Section';
+import { StructuredText } from '~/components/StructuredText';
+import type { FaqData, FaqItem } from '~/data/pricing';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { FaqQuestionFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props extends Omit<FaqData, 'items'> {
+  /** Static questions, with the answer as plain text. */
+  items?: FaqItem[];
+  /**
+   * The questions of the CMS, after the static questions. The answer is a
+   * Structured Text field, with lists and links.
+   */
+  questions?: FragmentOf<typeof FaqQuestionFragment>[];
+}
+
+const { headline } = Astro.props;
+
+// In draft mode the question ends with the stega of Content Link. Remove
+// the white space before the stega, and keep the stega.
+function trimQuestion(question: string) {
+  const visible = stripStega(question);
+  return visible.trim() + question.slice(visible.length);
+}
+
+const items = [
+  ...(Astro.props.items ?? []).map((item) => ({ ...item, rich: undefined })),
+  ...(Astro.props.questions ?? []).map((data) => {
+    const { question, answer } = readFragment(FaqQuestionFragment, data);
+    return { question: trimQuestion(question ?? ''), answer: undefined, rich: answer };
+  }),
+];
+---
+
+{/* Only one answer is open at a time. The first is open. */}
+<Section class={styles.faq} contentClass={styles.content}>
+  <h2 class="h1">{headline}</h2>
+  <div class={styles.items}>
+    {
+      items.map((item, i) => (
+        <details class={styles.item} name="faq" open={i === 0}>
+          <summary class={styles.question}>
+            <span class="h2">{item.question}</span>
+            <span class:list={[styles.sign, 'h2']} aria-hidden="true" />
+          </summary>
+          {item.rich ? (
+            <div class:list={[styles.answer, styles.answerRich, 'body']}>
+              <StructuredText data={item.rich} />
+            </div>
+          ) : (
+            <p class:list={[styles.answer, 'body']}>{item.answer}</p>
+          )}
+        </details>
+      ))
+    }
+  </div>
+</Section>

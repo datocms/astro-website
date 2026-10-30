@@ -1,0 +1,241 @@
+/*
+ * Below 768: a full-screen sheet. 768+: a 660 x 584 card in the centre of
+ * the viewport, over the page dimmed with surface/inverse-muted at 70%.
+ */
+.dialog {
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--surface-default);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+.dialog::backdrop {
+  /* The token already has 70% alpha. */
+  background: var(--surface-inverse-muted);
+}
+
+/*
+ * The dark scheme: the dimmed page and the card have nearly the same
+ * colour. Dim the page with the inverse surface and ring the card.
+ */
+:global(:root[data-scheme='dark']) .dialog {
+  box-shadow: 0 0 0 1px var(--border-default);
+}
+
+:global(:root[data-scheme='dark']) .dialog::backdrop {
+  background: color-mix(in srgb, var(--surface-inverse) 70%, transparent);
+}
+
+.locked {
+  overflow: hidden;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+@media (min-width: 768px) {
+  .dialog {
+    width: 660px;
+    max-width: calc(100% - 2 * var(--space-lg));
+    height: min(584px, calc(100dvh - 2 * var(--space-lg)));
+    margin: auto;
+    border-radius: var(--radius-md);
+  }
+}
+
+/* An open animation only when the user accepts motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .dialog[open] {
+    animation: popupIn 160ms ease-out;
+  }
+
+  .dialog[open]::backdrop {
+    animation: backdropIn 160ms ease-out;
+  }
+}
+
+@keyframes popupIn {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-2xs) * -1));
+  }
+}
+
+@keyframes backdropIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-2xs);
+  height: 73px;
+  padding-inline: var(--space-md);
+  border-bottom: 1px solid var(--text-subtle);
+}
+
+.barIcon {
+  display: inline-flex;
+  flex: none;
+  color: var(--text-subtle);
+}
+
+.barIcon :global(svg) {
+  width: 21px;
+  height: 21px;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font-family: inherit;
+  outline: none;
+  appearance: none;
+}
+
+.input:focus-visible {
+  /* The caret shows the focus. The popup has only this text field. */
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-subtle);
+  opacity: 1;
+}
+
+.ask {
+  flex: none;
+}
+
+.close {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.close :global(svg) {
+  width: 28px;
+  height: 28px;
+}
+
+.body {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.quickLinks {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+  padding: var(--space-md);
+  padding-top: var(--space-lg);
+}
+
+.quickLinks[hidden],
+.results[hidden],
+.noResults[hidden] {
+  display: none;
+}
+
+.quickHeading {
+  color: var(--text-subtle);
+}
+
+.quickList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quickLink {
+  align-self: flex-start;
+  color: var(--text-muted);
+}
+
+.quickLink[aria-selected='true'] {
+  color: var(--text-primary);
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-primary);
+}
+
+.result[aria-selected='true'] {
+  background: var(--surface-accent);
+}
+
+.breadcrumb {
+  color: var(--text-muted);
+}
+
+.excerpt {
+  color: var(--text-muted);
+}
+
+.match {
+  background: none;
+  color: var(--text-primary);
+}
+
+.noResults {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-2xs);
+  padding: var(--space-md);
+}
+
+.noResultsText {
+  color: var(--text-muted);
+}
+
+@media (hover: hover) {
+  .quickLink:hover {
+    color: var(--text-primary);
+  }
+
+  .close:hover {
+    color: var(--text-primary);
+  }
+}

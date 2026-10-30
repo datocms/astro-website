@@ -1,0 +1,65 @@
+---
+import { ContactForm } from '~/components/ContactForm';
+import { Headline } from '~/components/Headline';
+import { Section } from '~/components/Section';
+import type { ContactSectionData } from '~/data/contact';
+import styles from './style.module.css';
+
+/*
+ * The intro (label, headline, links)
+ * and the contact form. From 1152 they are side by side; below, the
+ * intro is above the form.
+ */
+type Props = ContactSectionData & {
+  submitted?: boolean;
+  /**
+   * The page sends the data (ContactForm `external`). The slot `extra` goes
+   * to the form. Not in the prototype.
+   */
+  external?: boolean;
+};
+
+const {
+  label,
+  headline,
+  muted,
+  face,
+  links,
+  form,
+  submitted = false,
+  external = false,
+} = Astro.props;
+---
+
+<Section contentClass={styles.content}>
+  <div class={styles.intro}>
+    <div class={styles.headlineGroup}>
+      <p class:list={['subtitle', styles.label]}>{label}</p>
+      <Headline as="h1" size="h1">
+        {headline}
+        <Fragment slot="muted">
+          {muted}{' '}
+          <span aria-hidden="true">{face}</span>
+        </Fragment>
+      </Headline>
+    </div>
+    <ul class={styles.links}>
+      {
+        links.map((link) => (
+          <li class="subtitleMedium">
+            <span class={styles.lead}>{link.lead}</span>{' '}
+            <a class={styles.link} href={link.href}>
+              <span class={styles.linkLabel}>{link.label}</span>
+              <span aria-hidden="true"> →</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <div class={styles.form}>
+    <ContactForm {...form} submitted={submitted} external={external}>
+      <slot name="extra" slot="extra" />
+    </ContactForm>
+  </div>
+</Section>

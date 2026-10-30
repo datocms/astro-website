@@ -1,0 +1,40 @@
+---
+import { ChapterLayout } from '~/components/ChapterLayout';
+import { SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as ai from '~/data/ai-pillar';
+import Doc from '../LlmDocs/Doc.astro';
+import Chat from './Chat.astro';
+import Confirm from './Confirm.astro';
+
+const theme = ai.mcp.theme;
+---
+
+<ChapterLayout {...ai.mcp}>
+  {
+    /*
+    The frame is the window of a neutral chat app, alone (Chat.astro): a
+    screen of all its width, thus `fill`.
+    720px high: the eight pages of the answer are above the box to write
+    in. On phones the window is as high as the chat (style.module.css),
+    thus `phoneHeightVw` is only a limit that the chat does not reach.
+  */
+  }
+  <Fragment slot="scene">
+    <SceneFrame preset="fill" theme={theme} height={720} phoneHeightVw={200} tabletHeightVw={96}>
+      <Chat />
+    </SceneFrame>
+  </Fragment>
+  {
+    /* The next turn of the chat, a slice of the window of the frame: 640px wide, larger than the box, thus the box cuts it at the right and at the bottom. A narrower box shows the same part of it. On phones the turn has the width of the box, and the zoom is 1.6 in a box of 500px: from a box of 312px the turn is as wide as the box, or wider, and in a box of 330px the text is a little larger than in the frame (1.06). */
+  }
+  <SceneFragment slot="visual-0" fit="scale" phoneZoom={1.6}>
+    <Confirm />
+  </SceneFragment>
+  {
+    /* The file llms-full.txt open at a section (../LlmDocs/Doc.astro), 560px wide, 480px high, at the top left corner of the box. The lines do not wrap: the box cuts the long ones at the right, and all the retry schedule shows. On phones the zoom is 1.1: the four marked rows of the schedule show in a box of 350px, and the text is still readable. */
+  }
+  <SceneFragment slot="visual-1" fit="scale" phoneZoom={1.1}>
+    <Doc />
+  </SceneFragment>
+</ChapterLayout>

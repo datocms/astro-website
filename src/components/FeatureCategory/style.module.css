@@ -1,0 +1,247 @@
+/*
+ * Header, then a grid of index entries in 2 columns from 768.
+ * Header → entries 80px at all widths.
+ * 393+: one entry per row, 40px apart. 768+: row gap 80px, column gap
+ * 40px. 1152+: column gap 60px. Here the rows are nearer: 20px on
+ * phones, 40px from 768.
+ */
+.category {
+  /* The sticky category nav must not cover the header after a jump. */
+  scroll-margin-top: var(--category-nav-height, 0px);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xl);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.description {
+  max-width: 542px;
+  color: var(--text-muted);
+}
+
+.entries {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  max-width: 550px;
+}
+
+@media (max-width: 1151px) {
+  .entryTitle {
+    font-size: var(--type-h1);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+}
+
+/*
+ * On hover an arrow (H2, text/primary)
+ * shows after the headline, 4px from the text. The arrow box has a width
+ * of 0 and the glyph goes out of it to the right. Thus the arrow does not
+ * move or rewrap the text, in all states. The design puts the arrow at the
+ * right end of the row. Here it follows the last word, because at the
+ * right end it seems to point at the next card.
+ */
+.arrow {
+  position: relative;
+  left: var(--space-4xs);
+  display: inline-block;
+  width: 0;
+  white-space: nowrap;
+  color: var(--text-primary);
+  opacity: 0;
+}
+
+.entryDescription {
+  color: var(--text-soft);
+}
+
+.buttons {
+  display: none;
+  gap: var(--space-2xs);
+}
+
+/*
+ * An arrow and an underlined label in H2, 16px apart,
+ * 10px between the lines when they wrap. They are always visible.
+ */
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-sm);
+}
+
+.links li {
+  display: flex;
+}
+
+.link {
+  display: inline-flex;
+  gap: var(--space-4xs);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.linkLabel {
+  text-decoration: underline;
+}
+
+@media (min-width: 1152px) {
+  .buttons {
+    display: flex;
+  }
+
+  .links {
+    display: none;
+  }
+}
+
+/*
+ * The buttons have opacity 0: they show on hover. Only devices
+ * with hover hide them. A keyboard focus in the entry shows them too.
+ */
+@media (hover: hover) {
+  .buttons {
+    opacity: 0;
+  }
+
+  .entry:hover .buttons,
+  .entry:hover .arrow {
+    opacity: 1;
+  }
+}
+
+/* A keyboard focus in the entry shows the hover state. */
+.entry:focus-within .buttons,
+.entry:focus-within .arrow {
+  opacity: 1;
+}
+
+@media (min-width: 768px) {
+  .entries {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+  }
+}
+
+@media (min-width: 1152px) {
+  .entries {
+    column-gap: var(--space-2xl);
+  }
+}
+
+/*
+ * The open slot: the card of the next feature. A light
+ * frame around an entry, the title muted, the button always visible.
+ * The card has the height of its content, not the height of the row.
+ */
+.open {
+  align-self: start;
+  padding: var(--space-md);
+  margin: calc(-1 * var(--space-md));
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.open .entryTitle {
+  color: var(--text-muted);
+}
+
+.openButton {
+  display: flex;
+  opacity: 1;
+}
+
+/*
+ * The optional extras of an entry: the emoji before the title, a badge
+ * above the title, and a screenshot in a popover under the title.
+ */
+.emoji {
+  margin-inline-end: 0.3em;
+}
+
+.badge {
+  align-self: flex-start;
+  padding: var(--space-4xs) var(--space-2xs);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+}
+
+.shotAnchor {
+  position: relative;
+}
+
+/* A dotted underline tells that the title opens a screenshot. */
+.shotButton {
+  text-align: start;
+  text-decoration: underline dotted;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+/*
+ * The popover floats above the description and the links of the entry.
+ * It takes no pointer events, thus the links under it stay usable.
+ */
+.shot {
+  position: absolute;
+  top: calc(100% + var(--space-3xs));
+  left: 0;
+  z-index: 3;
+  width: min(100%, 440px);
+  padding: var(--space-4xs);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+/* The image of @datocms/astro: the component does not render it. */
+.shot :global(img) {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+
+.shotAnchor[data-open] .shot,
+.shotAnchor:has(.shotButton:focus-visible) .shot {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .shotAnchor:has(.shotButton:hover) .shot {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot {
+    transition: none;
+  }
+}

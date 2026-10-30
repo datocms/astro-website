@@ -1,6 +1,12 @@
-import { defaultInlineRecordFragments } from '~/components/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
-import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
+import {
+  ComparisonTableAlternativeFragment,
+  ComparisonTableComparisonFragment,
+} from '~/components/ComparisonTable';
+import { ReasonColumnsReasonFragment } from '~/components/ReasonColumns';
+import {
+  TestimonialsPartnerTestimonialFragment,
+  TestimonialsReviewFragment,
+} from '~/components/Testimonials';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
@@ -27,143 +33,33 @@ export const query = graphql(
         competitorCharacterization {
           value
         }
-        testimonials {
-          __typename
-          ...PartnerTestimonialQuoteFragment
-          ...ReviewQuoteFragment
-        }
-        topics {
-          id
-          topic
-          differences {
-            id
-            datocmsTake {
-              value
-              links {
-                ... on RecordInterface {
-                  id
-                  __typename
-                }
-                ...AcademyChapterLinkFragment
-                ...AcademyCourseLinkFragment
-                ...BlogPostLinkFragment
-                ...ChangelogEntryLinkFragment
-                ...CustomerStoryLinkFragment
-                ...DocGroupLinkFragment
-                ...DocPageLinkFragment
-                ...EnterpriseAppLinkFragment
-                ...FeatureLinkFragment
-                ...HostingAppLinkFragment
-                ...LandingPageLinkFragment
-                ...PartnerLinkFragment
-                ...PluginLinkFragment
-                ...ProductComparisonLinkFragment
-                ...RecipeLinkFragment
-                ...ShowcaseProjectLinkFragment
-                ...SuccessStoryLinkFragment
-                ...TechPartnerLinkFragment
-                ...TemplateDemoLinkFragment
-                ...UseCasePageLinkFragment
-                ...UserGuidesEpisodeLinkFragment
-
-                ...AcademyChapterInlineFragment
-                ...AcademyCourseInlineFragment
-                ...BlogPostInlineFragment
-                ...ChangelogEntryInlineFragment
-                ...CustomerStoryInlineFragment
-                ...DocGroupInlineFragment
-                ...DocPageInlineFragment
-                ...EnterpriseAppInlineFragment
-                ...FeatureInlineFragment
-                ...HostingAppInlineFragment
-                ...LandingPageInlineFragment
-                ...PartnerInlineFragment
-                ...PluginInlineFragment
-                ...ProductComparisonInlineFragment
-                ...RecipeInlineFragment
-                ...ShowcaseProjectInlineFragment
-                ...SuccessStoryInlineFragment
-                ...TechPartnerInlineFragment
-                ...TemplateDemoInlineFragment
-                ...UseCasePageInlineFragment
-                ...UserGuidesEpisodeInlineFragment
-              }
-            }
-            competitorTake {
-              value
-            }
-          }
-        }
         reasons {
-          id
-          title
-          content {
-            value
-            links {
-              ... on RecordInterface {
-                id
-                __typename
-              }
-              ...AcademyChapterLinkFragment
-              ...AcademyCourseLinkFragment
-              ...BlogPostLinkFragment
-              ...ChangelogEntryLinkFragment
-              ...CustomerStoryLinkFragment
-              ...DocGroupLinkFragment
-              ...DocPageLinkFragment
-              ...EnterpriseAppLinkFragment
-              ...FeatureLinkFragment
-              ...HostingAppLinkFragment
-              ...LandingPageLinkFragment
-              ...PartnerLinkFragment
-              ...PluginLinkFragment
-              ...ProductComparisonLinkFragment
-              ...RecipeLinkFragment
-              ...ShowcaseProjectLinkFragment
-              ...SuccessStoryLinkFragment
-              ...TechPartnerLinkFragment
-              ...TemplateDemoLinkFragment
-              ...UseCasePageLinkFragment
-              ...UserGuidesEpisodeLinkFragment
-
-              ...AcademyChapterInlineFragment
-              ...AcademyCourseInlineFragment
-              ...BlogPostInlineFragment
-              ...ChangelogEntryInlineFragment
-              ...CustomerStoryInlineFragment
-              ...DocGroupInlineFragment
-              ...DocPageInlineFragment
-              ...EnterpriseAppInlineFragment
-              ...FeatureInlineFragment
-              ...HostingAppInlineFragment
-              ...LandingPageInlineFragment
-              ...PartnerInlineFragment
-              ...PluginInlineFragment
-              ...ProductComparisonInlineFragment
-              ...RecipeInlineFragment
-              ...ShowcaseProjectInlineFragment
-              ...SuccessStoryInlineFragment
-              ...TechPartnerInlineFragment
-              ...TemplateDemoInlineFragment
-              ...UseCasePageInlineFragment
-              ...UserGuidesEpisodeInlineFragment
-            }
-          }
+          ...ReasonColumnsReasonFragment
         }
         importer {
           learnMoreSlug
           header
           description
         }
+        testimonials {
+          __typename
+          ...TestimonialsReviewFragment
+          ...TestimonialsPartnerTestimonialFragment
+        }
+        ...ComparisonTableComparisonFragment
+      }
+      alternatives: allProductComparisons(first: 100, orderBy: product_ASC) {
+        ...ComparisonTableAlternativeFragment
       }
     }
   `,
   [
     TagFragment,
-    PartnerTestimonialQuoteFragment,
-    ReviewQuoteFragment,
-    ...defaultLinkToRecordFragments,
-    ...defaultInlineRecordFragments,
+    ReasonColumnsReasonFragment,
+    TestimonialsReviewFragment,
+    TestimonialsPartnerTestimonialFragment,
+    ComparisonTableComparisonFragment,
+    ComparisonTableAlternativeFragment,
   ],
 );
 

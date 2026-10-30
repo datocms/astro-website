@@ -1,0 +1,360 @@
+---
+import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import diagram from '../diagram/style.module.css';
+import { DESCRIPTION, GROUP, STILL, TILE_COUNT, VARIANTS } from './story';
+import styles from './style.module.css';
+
+// The frame of the Delivery chapter, in the grammar of the diagrams
+// (../diagram/style.module.css): a pill with the event and its time on
+// top (as the pill of the Real-time frame), and below
+// it a panel, the CDN of the website, with a wall of cached pages, each a
+// small wireframe of a page. The wall is a loop, not a sequence of steps:
+// an event comes on the pill, tracks curve down to the few pages it
+// touches and a pulse goes down each, those pages get the ring of the
+// accent, and leave. The other pages close the gap, and new pages come in
+// at the end of the wall. The script below drives the loop (in view only; not with
+// reduced motion). The old event goes out to the right and the new one
+// comes in from the left. Without it the wall is the still: the pill of STILL,
+// its two curves drawn, and its two pages with the ring.
+// A tile has a look (`data-variant`, the widths of its bars): a class, not
+// nth-child, thus a new tile can get a new look.
+
+const tiles = Array.from({ length: TILE_COUNT }, (_, i) => ({
+  variant: (i * 5 + Math.floor(i / VARIANTS)) % VARIANTS,
+  hit: STILL.touched.includes(i),
+}));
+
+// The curves of the still, from the middle of the pill to the top of the
+// pages of STILL. The svg of the still covers the band between the pill
+// and the first row of pages (style.module.css), with a viewBox of
+// 100 × 100 that stretches: x is the part of the width of the wall, y of
+// the height of the band. A page of column `c` of `n` has its middle at
+// (2c + 1) / 2n of the width (the gaps between the pages move it by 2px
+// at most). The curves have vertical tangents at the two ends, thus the
+// stretch keeps their shape. They are tracks only, with no `draw` and no
+// pulse: a dash does not work in an svg that stretches (diagram).
+const curve = (column: number, columns: number) => {
+  const x = ((2 * column + 1) / (2 * columns)) * 100;
+  return `M 50 0 C 50 50, ${x} 50, ${x} 100`;
+};
+const STILL_CURVES = {
+  wide: [curve(2, 8), curve(5, 8)],
+  narrow: [curve(1, 4), curve(2, 4)],
+};
+---
+
+<div class:list={[diagram.root, styles.wall]} role="img" aria-label={DESCRIPTION} data-wall>
+  <p class:list={[diagram.pill, diagram.swap, styles.pill]} data-pill>
+    <span class={diagram.symbol} set:html={symbol} />
+    <span data-event>{STILL.event}</span>
+    <span class={styles.time} data-time>{STILL.time}</span>
+  </p>
+  <div class:list={[diagram.panel, styles.group]}>
+    <p class={diagram.panelLabel}>{GROUP}</p>
+    <ul class={styles.tiles} data-tiles>
+      {
+        tiles.map(({ variant, hit }) => (
+          <li class={styles.cell} data-variant={variant} data-still={hit ? '' : undefined}>
+            <span
+              class:list={[diagram.change, styles.tile]}
+              data-tile
+              data-changed={hit ? '' : undefined}
+            >
+              <span class={styles.image} />
+              <span class:list={[styles.bar, styles.title]} />
+              <span class:list={[styles.bar, styles.text]} />
+              <span class:list={[styles.bar, styles.price]} />
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  {
+    /*
+    The curves from the pill to the touched pages. In the markup, the two
+    of the still (one pair for each breakpoint, the CSS shows one). The
+    script replaces them with a track and a pulse for each touched page,
+    in px, and sets `data-live`: the svg then covers the wall.
+  */
+  }
+  <svg
+    class={styles.links}
+    viewBox="0 0 100 100"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+    data-links
+  >
+    {
+      Object.entries(STILL_CURVES).map(([axis, paths]) => (
+        <g data-axis={axis}>
+          {paths.map((d) => (
+            <path class={diagram.track} d={d} />
+          ))}
+        </g>
+      ))
+    }
+  </svg>
+</div>
+
+<script>
+  import {
+    arrive,
+    between,
+    later,
+    swap,
+    DIAGRAM_MS as MS,
+    reflow,
+    replay,
+    sleep,
+    startDiagramLoop,
+  } from '~/lib/motion/diagramLoop';
+  import type { Live } from '~/lib/motion/diagramLoop';
+  import diagram from '../diagram/style.module.css';
+  import { EVENTS, TILE_MAX, TILE_MIN, TOUCH_MAX, TOUCH_MIN, VARIANTS } from './story';
+
+  const SVG = 'http://www.w3.org/2000/svg';
+  const PULSE_STAGGER = 150;
+  const SHIFT = 550;
+  const wide = window.matchMedia('(min-width: 768px)');
+
+  const sample = <T,>(list: T[], count: number): T[] => {
+    const rest = [...list];
+    const out: T[] = [];
+    while (out.length < count && rest.length)
+      out.push(rest.splice(Math.floor(Math.random() * rest.length), 1)[0]!);
+    return out;
+  };
+
+  class Wall {
+    root: HTMLElement;
+    pill: HTMLElement;
+    list: HTMLElement;
+    svg: SVGSVGElement;
+    template: HTMLElement;
+    arriving = new Set<HTMLElement>();
+
+    constructor(root: HTMLElement) {
+      this.root = root;
+      this.pill = root.querySelector<HTMLElement>('[data-pill]')!;
+      this.list = root.querySelector<HTMLElement>('[data-tiles]')!;
+      this.svg = root.querySelector<SVGSVGElement>('[data-links]')!;
+      this.template = this.list.firstElementChild!.cloneNode(true) as HTMLElement;
+      for (const el of [this.template, ...this.template.querySelectorAll<HTMLElement>('*')]) {
+        for (const name of ['still', 'changed', 'leave', 'enter', 'ping']) delete el.dataset[name];
+      }
+    }
+
+    cells(): HTMLElement[] {
+      return Array.from(this.list.children) as HTMLElement[];
+    }
+
+    tiles(): HTMLElement[] {
+      return Array.from(this.list.querySelectorAll<HTMLElement>('[data-tile]')).filter(
+        (tile) => tile.offsetParent !== null,
+      );
+    }
+
+    /**
+     * The start of a session. The first time, the wall is the still: its
+     * pages are purged first. A session that stopped in the middle of an
+     * event leaves its marks: they go. The pages that left go, the others
+     * stop where they go, and the wall gets its pages back.
+     */
+    async start(live: Live): Promise<void> {
+      // The new pages come in on their own time, during the events too
+      void this.arrivals(live);
+      const still = !('live' in this.svg.dataset);
+      const hit = this.tiles().filter((tile) => 'changed' in tile.dataset);
+      if (still && hit.length) {
+        await sleep(MS.hold);
+        if (!live()) return;
+        await this.purge(live, hit);
+        return;
+      }
+      for (const cell of this.cells()) {
+        if (cell.querySelector('[data-leave]')) {
+          cell.remove();
+          continue;
+        }
+        delete cell.dataset.flip;
+        cell.style.translate = '';
+      }
+      for (const tile of this.list.querySelectorAll<HTMLElement>('[data-tile]')) {
+        for (const name of ['changed', 'leave', 'enter', 'ping']) delete tile.dataset[name];
+      }
+      while (this.cells().length < TILE_MIN) this.list.append(this.page());
+      this.svg.replaceChildren();
+    }
+
+    async event(live: Live): Promise<void> {
+      await sleep(between(200, 500));
+      if (!live()) return;
+
+      // Never under TILE_MIN pages: the wall keeps its rows
+      const wanted = wide.matches
+        ? TOUCH_MIN + Math.floor(Math.random() * (TOUCH_MAX - TOUCH_MIN + 1))
+        : TOUCH_MIN;
+      const count = Math.min(wanted, this.cells().length - TILE_MIN);
+      if (count < 1) return;
+      // Any page on screen, in any row, but not a page that comes in: the
+      // curves go over the pages above it
+      const touched = sample(
+        this.tiles().filter((tile) => !this.arriving.has(tile)),
+        count,
+      );
+
+      // The new event on the pill: the old pill goes out sideways, the new one comes in
+      swap(this.pill, () => {
+        const name = this.pill.querySelector<HTMLElement>('[data-event]')!;
+        const time = this.pill.querySelector<HTMLElement>('[data-time]')!;
+        const events = EVENTS.filter((event) => event !== name.textContent);
+        name.textContent = events[Math.floor(Math.random() * events.length)]!;
+        time.textContent = later(time.textContent!.trim(), 1 + Math.floor(Math.random() * 4));
+      });
+
+      // When the pill has settled, the curves come in (they fade and draw),
+      // then a pulse goes down each: one thing after the other
+      await sleep(MS.swap);
+      if (!live()) return;
+      const pulses = this.drawCurves(touched);
+      await sleep(MS.draw);
+      if (!live()) return;
+      pulses.forEach((pulse, i) =>
+        window.setTimeout(() => replay(pulse, 'pulse'), i * PULSE_STAGGER),
+      );
+      await sleep(MS.travel + (pulses.length - 1) * PULSE_STAGGER);
+      if (!live()) return;
+
+      // The hit: the ring and the ping on each touched page
+      for (const tile of touched) {
+        tile.dataset.changed = '';
+        replay(tile, 'ping');
+      }
+      await sleep(MS.ping);
+      if (!live()) return;
+      await this.purge(live, touched);
+    }
+
+    /**
+     * The touched pages fade out and leave the wall, and the other pages
+     * close the gap. The curves fade with the old pages.
+     */
+    async purge(live: Live, touched: HTMLElement[]): Promise<void> {
+      this.svg.dataset.faded = '';
+      for (const tile of touched) tile.dataset.leave = '';
+      await sleep(MS.fade);
+      if (!live()) return;
+
+      this.close(touched.map((tile) => tile.parentElement!));
+      await sleep(SHIFT);
+    }
+
+    /**
+     * New pages come in at the end of the wall, one at a time, at random
+     * times, with no ring. The last row is never full: no page comes in
+     * when the wall has TILE_MAX pages.
+     */
+    async arrivals(live: Live): Promise<void> {
+      while (live()) {
+        await sleep(between(1200, 2600));
+        if (!live()) return;
+        if (this.cells().length >= TILE_MAX) continue;
+        const cell = this.page();
+        const tile = cell.querySelector<HTMLElement>('[data-tile]')!;
+        this.list.append(cell);
+        arrive(tile);
+        this.arriving.add(tile);
+        window.setTimeout(() => this.arriving.delete(tile), MS.enter);
+      }
+    }
+
+    page(): HTMLElement {
+      const cell = this.template.cloneNode(true) as HTMLElement;
+      cell.dataset.variant = String(Math.floor(Math.random() * VARIANTS));
+      return cell;
+    }
+
+    /**
+     * Takes the pages that left out of the grid, and moves the others from
+     * their old place to the new one (FLIP: the inverse translate first,
+     * with no transition, then the transition back to zero). On phones a
+     * page that was hidden after the 11th comes in at the end.
+     */
+    close(gone: HTMLElement[]): void {
+      const before = new Map<HTMLElement, DOMRect | null>();
+      for (const cell of this.cells()) {
+        if (gone.includes(cell)) continue;
+        before.set(cell, cell.offsetParent === null ? null : cell.getBoundingClientRect());
+      }
+      for (const cell of gone) cell.remove();
+
+      for (const [cell, from] of before) {
+        if (cell.offsetParent === null) continue;
+        if (from === null) {
+          arrive(cell.querySelector<HTMLElement>('[data-tile]')!);
+          continue;
+        }
+        const to = cell.getBoundingClientRect();
+        const dx = from.left - to.left;
+        const dy = from.top - to.top;
+        if (!dx && !dy) continue;
+        cell.dataset.flip = '';
+        cell.style.translate = `${dx}px ${dy}px`;
+      }
+      reflow(this.list);
+      for (const cell of before.keys()) {
+        delete cell.dataset.flip;
+        cell.style.translate = '';
+      }
+    }
+
+    /**
+     * Replaces the curves with one track and one pulse for each touched
+     * tile: an S curve from the bottom middle of the pill (2px under it) to
+     * the top middle of the tile, with vertical tangents. The positions
+     * are relative to the wall, which the svg covers (`data-live`), in px:
+     * the offsets of the pill (it moves while it comes in, its offsets do
+     * not), the bounding rects of the tiles. The tracks start hidden and the
+     * function then lets them draw. It returns the pulses.
+     */
+    drawCurves(touched: HTMLElement[]): SVGPathElement[] {
+      this.svg.dataset.live = '';
+      delete this.svg.dataset.faded;
+      this.svg.replaceChildren();
+      const wall = this.root.getBoundingClientRect();
+      this.svg.setAttribute('viewBox', `0 0 ${wall.width} ${wall.height}`);
+      const x0 = this.pill.offsetLeft + this.pill.offsetWidth / 2;
+      const y0 = this.pill.offsetTop + this.pill.offsetHeight - 2;
+
+      const pulses: SVGPathElement[] = [];
+      const tracks: SVGPathElement[] = [];
+      for (const tile of touched) {
+        const rect = tile.getBoundingClientRect();
+        const x1 = rect.left - wall.left + rect.width / 2;
+        const y1 = rect.top - wall.top;
+        const my = (y0 + y1) / 2;
+        const d = `M ${x0} ${y0} C ${x0} ${my}, ${x1} ${my}, ${x1} ${y1}`;
+        for (const className of [`${diagram.track} ${diagram.draw}`, diagram.pulse!]) {
+          const path = document.createElementNS(SVG, 'path');
+          path.setAttribute('class', className);
+          path.setAttribute('d', d);
+          path.setAttribute('pathLength', '100');
+          this.svg.append(path);
+          (className === diagram.pulse ? pulses : tracks).push(path);
+        }
+      }
+      for (const track of tracks) track.dataset.hidden = '';
+      reflow(this.svg);
+      for (const track of tracks) delete track.dataset.hidden;
+      return pulses;
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-wall]')) {
+    const wall = new Wall(root);
+    // The loop plays in view only. Out of view it stops where it is: the
+    // next session cleans up.
+    startDiagramLoop(root, (live) => wall.event(live), { start: (live) => wall.start(live) });
+  }
+</script>

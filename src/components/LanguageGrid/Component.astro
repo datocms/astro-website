@@ -1,0 +1,46 @@
+---
+import type { LanguageGridData } from '~/data/ai';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends LanguageGridData {
+  theme?: Theme;
+}
+
+const { languages, theme = 'default' } = Astro.props;
+const selected = languages.filter((l) => l.selected).map((l) => l.name);
+---
+
+{/* The bars suggest more languages above and below. */}
+<div
+  class={styles.grid}
+  data-theme={theme}
+  role="img"
+  aria-label={`Languages: ${selected.join(', ')} selected.`}
+>
+  <span class:list={[styles.bar, styles.thin]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.thin]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.thin]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.thin]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.wide]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.wide]} aria-hidden="true"></span>
+  {
+    languages.map((language) => (
+      <span class={styles.card} aria-hidden="true">
+        <span class={styles.language}>
+          <span class={styles.flag}>
+            <img src={language.flag} alt="" width="20" height="13" />
+          </span>
+          <span class="bodyMedium">{language.name}</span>
+        </span>
+        <span class:list={[styles.radio, language.selected && styles.selected]} />
+      </span>
+    ))
+  }
+  <span class:list={[styles.bar, styles.wide]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.wide]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.thin]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.thin]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.thin]} aria-hidden="true"></span>
+  <span class:list={[styles.bar, styles.thin]} aria-hidden="true"></span>
+</div>

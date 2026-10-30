@@ -1,0 +1,213 @@
+---
+import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import diagram from '../diagram/style.module.css';
+import { BAR, BUILDS, DESCRIPTION, STATUS, TRACKS } from './story';
+import styles from './style.module.css';
+
+// A round trip: the request goes down to the pipeline, the status comes up.
+// The script below drives the loop (in view only; not with reduced motion).
+// Without it the picture is the still: the first build, deployed.
+
+const still = BUILDS[0]!;
+const dots = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) * 64)}ms`);
+---
+
+<figure
+  class:list={[diagram.root, styles.deploys]}
+  role="img"
+  aria-label={DESCRIPTION}
+  data-deploys
+>
+  <div class={styles.stack} data-stack>
+    <svg class={styles.trace} aria-hidden="true" data-trace data-pulse-class={diagram.pulse}></svg>
+    <div class:list={[diagram.panel, styles.bar]} data-bar>
+      <p class:list={[diagram.panelLabel, styles.barLabel]}>{BAR}</p>
+      <div class={styles.barRow}>
+        <div class={styles.slot}>
+          <p class:list={[diagram.pill, diagram.swap, styles.trigger]} data-trigger>
+            <span class={diagram.symbol} set:html={symbol} />
+            <span data-label>{still.trigger}</span>
+            <span class={styles.time} data-time>{still.time}</span>
+          </p>
+        </div>
+        {
+          /* The ring of a change goes on a box around the pill: the tint of `.change` would take the place of the surface of the pill */
+        }
+        <span class:list={[diagram.change, styles.ring]} data-ring>
+          <p class:list={[diagram.pill, styles.status]} data-status data-done>
+            <span class={diagram.working} aria-hidden="true"
+              >{dots.map((style) => <span style={style} />)}</span
+            >
+            <svg class={styles.check} viewBox="0 0 14 14" aria-hidden="true"
+              ><path d="M3.5 7.25 L6 9.75 L10.5 4.5"></path></svg
+            >
+            <span data-label>{STATUS.done}</span>
+          </p>
+        </span>
+      </div>
+    </div>
+
+    <div class={styles.legs}>
+      <svg class:list={[styles.leg, styles.out]} aria-hidden="true">
+        <line class={diagram.track} x1="50%" y1="0" x2="50%" y2="100%"></line>
+        <line class={diagram.pulse} x1="50%" y1="0" x2="50%" y2="100%" pathLength="100" data-out
+        ></line>
+      </svg>
+      <span class:list={[styles.tag, styles.outTag]}>{TRACKS.out}</span>
+      <svg class:list={[styles.leg, styles.back]} aria-hidden="true" data-back>
+        <line class={diagram.track} x1="50%" y1="100%" x2="50%" y2="0"></line>
+      </svg>
+      <span class:list={[styles.tag, styles.backTag]}>{TRACKS.back}</span>
+    </div>
+
+    <div class:list={[diagram.panel, styles.pipeline]} data-pipeline>
+      <div class={styles.head}>
+        <div class={styles.slot}>
+          <p class:list={[diagram.panelLabel, diagram.swap, styles.adapter]} data-adapter>
+            {still.pipeline}
+          </p>
+        </div>
+        <span class:list={[diagram.pill, styles.mark]} data-mark data-done aria-hidden="true">
+          <span class={diagram.working}>{dots.map((style) => <span style={style} />)}</span>
+          <svg class={styles.check} viewBox="0 0 14 14"
+            ><path d="M3.5 7.25 L6 9.75 L10.5 4.5"></path></svg
+          >
+        </span>
+      </div>
+      <div class={styles.log} data-log>
+        {still.log.map((text) => <span class={styles.line}>{text}</span>)}
+      </div>
+    </div>
+  </div>
+</figure>
+
+<script>
+  import {
+    arrive,
+    between,
+    DIAGRAM_MS as MS,
+    replay,
+    sleep,
+    startDiagramLoop,
+    swap,
+  } from '~/lib/motion/diagramLoop';
+  import type { Live } from '~/lib/motion/diagramLoop';
+  import { edgePulse } from '~/lib/motion/diagramPulse';
+  import { BUILDS, STATUS } from './story';
+
+  const LINE_MS = 500;
+  const OUT = 6;
+
+  class Deploys {
+    trigger: HTMLElement;
+    adapter: HTMLElement;
+    mark: HTMLElement;
+    log: HTMLElement;
+    status: HTMLElement;
+    ring: HTMLElement;
+    out: SVGElement;
+    stack: HTMLElement;
+    trace: SVGSVGElement;
+    back: SVGSVGElement;
+    pipeline: HTMLElement;
+    bar: HTMLElement;
+    lineClass: string;
+    n = 0;
+
+    constructor(root: HTMLElement) {
+      this.trigger = root.querySelector<HTMLElement>('[data-trigger]')!;
+      this.adapter = root.querySelector<HTMLElement>('[data-adapter]')!;
+      this.mark = root.querySelector<HTMLElement>('[data-mark]')!;
+      this.log = root.querySelector<HTMLElement>('[data-log]')!;
+      this.status = root.querySelector<HTMLElement>('[data-status]')!;
+      this.ring = root.querySelector<HTMLElement>('[data-ring]')!;
+      this.out = root.querySelector<SVGElement>('[data-out]')!;
+      this.stack = root.querySelector<HTMLElement>('[data-stack]')!;
+      this.trace = root.querySelector<SVGSVGElement>('[data-trace]')!;
+      this.back = root.querySelector<SVGSVGElement>('[data-back]')!;
+      this.pipeline = root.querySelector<HTMLElement>('[data-pipeline]')!;
+      this.bar = root.querySelector<HTMLElement>('[data-bar]')!;
+      this.lineClass = this.log.firstElementChild!.className;
+    }
+
+    set(el: HTMLElement, key: string, text: string): void {
+      el.querySelector(`[data-${key}]`)!.textContent = text;
+    }
+
+    async event(live: Live): Promise<void> {
+      await sleep(between(800, 1200));
+      if (!live()) return;
+
+      this.n = (this.n + 1) % BUILDS.length;
+      const build = BUILDS[this.n]!;
+      // A loop that stopped in the middle leaves a state: it goes
+      delete this.ring.dataset.changed;
+      this.trace.replaceChildren();
+      delete this.mark.dataset.working;
+
+      swap(this.trigger, () => {
+        this.set(this.trigger, 'label', build.trigger);
+        this.set(this.trigger, 'time', build.time);
+      });
+      await sleep(MS.swap);
+      if (!live()) return;
+
+      swap(this.adapter, () => (this.adapter.textContent = build.pipeline));
+      delete this.mark.dataset.done;
+      this.log.dataset.faded = '';
+      this.ring.dataset.leave = '';
+      await sleep(MS.swap);
+      if (!live()) return;
+      this.log.replaceChildren();
+      delete this.log.dataset.faded;
+
+      replay(this.out, 'pulse');
+      delete this.status.dataset.done;
+      this.status.dataset.working = '';
+      this.set(this.status, 'label', STATUS.working);
+      arrive(this.ring);
+      await sleep(MS.travel);
+      if (!live()) return;
+
+      this.mark.dataset.working = '';
+      for (const text of build.log) {
+        const line = document.createElement('span');
+        line.className = this.lineClass;
+        line.textContent = text;
+        line.dataset.enter = '';
+        this.log.append(line);
+        arrive(line);
+        await sleep(LINE_MS);
+        if (!live()) return;
+      }
+
+      delete this.mark.dataset.working;
+      this.mark.dataset.done = '';
+      await sleep(MS.pop);
+      if (!live()) return;
+      await edgePulse({
+        root: this.stack,
+        trace: this.trace,
+        links: this.back,
+        vertical: true,
+        parts: [this.pipeline, this.bar],
+        out: () => OUT,
+        fromEnd: true,
+        backward: true,
+      });
+      if (!live()) return;
+
+      delete this.status.dataset.working;
+      this.status.dataset.done = '';
+      this.set(this.status, 'label', STATUS.done);
+      this.ring.dataset.changed = '';
+      replay(this.ring, 'ping');
+      await sleep(MS.hold);
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-deploys]')) {
+    const deploys = new Deploys(root);
+    startDiagramLoop(root, (live) => deploys.event(live));
+  }
+</script>

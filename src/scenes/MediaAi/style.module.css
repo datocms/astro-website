@@ -1,0 +1,310 @@
+/*
+ * The pill, the line, the panel and the motion are the grammar of the
+ * diagrams (../diagram/style.module.css); this file has only the pipeline.
+ *
+ * The script of Pipeline.astro sets the attributes of the grammar. The pulse
+ * is not an attribute: the script draws its paths on the edges of the parts,
+ * in the svg of the row. `data-current` tells the item of a stack that shows.
+ * Without the script the frame is the still.
+ */
+.pipeline {
+  --card: 10rem;
+  /* The part of the vertical line on each side of the pill, on phones */
+  --half: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+
+/*
+ * The svg of the pulse, on all the row and over its parts: the pulse goes
+ * on their edges. No viewBox: the units are px of the row.
+ */
+.trace {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.stack {
+  display: grid;
+  min-width: 0;
+}
+
+.stack > * {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+/* The old upload stays in view while it goes out */
+.stack > :not([data-current], [data-swap-out]) {
+  visibility: hidden;
+}
+
+/*
+ * The upload: the picture, and the file name under it. The next upload
+ * takes its place with the swap of the grammar: on phones the old one
+ * goes out to the right, the new one comes in from the left (the row is
+ * a column, the space is at the sides).
+ */
+.card {
+  --diagram-swap-x: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  /* Over the end of the line, which goes 2px under it */
+  z-index: 1;
+  width: var(--card);
+  margin: 0;
+}
+
+.thumb {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-sm);
+}
+
+.row[data-kind='video'] .thumb {
+  aspect-ratio: 16 / 9;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  translate: -50% -50%;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--surface-inverse) 70%, transparent);
+}
+
+.play::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  translate: -50% -50%;
+  border-block: 8px solid transparent;
+  border-left: 13px solid var(--text-on-inverse-strong);
+}
+
+/* The duration of a video: only from 768px, the phone picture is too small for it */
+.duration {
+  position: absolute;
+  display: none;
+  right: 4px;
+  bottom: 4px;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+  background: color-mix(in srgb, var(--surface-inverse) 70%, transparent);
+  color: var(--text-on-inverse-strong);
+}
+
+.filename {
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-on-inverse-muted);
+}
+
+/*
+ * The line, and the pill in its middle. On phones a vertical line from the
+ * file name to the panel, 2px under each (the tuck). The pill is over the
+ * line: the line goes under it.
+ */
+.link {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: calc(var(--diagram-pill) + 2 * var(--half));
+}
+
+.links {
+  position: absolute;
+  inset: calc(-1 * var(--diagram-tuck)) 0;
+  width: 100%;
+  height: calc(100% + 2 * var(--diagram-tuck));
+  overflow: visible;
+  pointer-events: none;
+}
+
+.links [data-axis='x'] {
+  display: none;
+}
+
+.output {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  width: 100%;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: var(--space-3xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag {
+  padding: var(--space-4xs) var(--space-xs);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.4;
+  background: color-mix(in srgb, var(--text-on-inverse) 18%, transparent);
+  color: var(--text-on-inverse-strong);
+}
+
+.tag:not([data-enter], [data-leave]) {
+  transition:
+    opacity var(--diagram-pop) var(--diagram-ease-out),
+    scale var(--diagram-pop) var(--diagram-ease-out);
+}
+
+.tags > .tag[data-enter] {
+  scale: 0.8;
+}
+
+/*
+ * The subtitles come in line by line: each line fades in, in the strong
+ * colour, and goes to the colour of the text in the same time. Nothing
+ * moves.
+ */
+.captions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* On phones the time is above its line, thus the text has all the width */
+.caption {
+  display: grid;
+  gap: 0 var(--space-xs);
+  font-size: var(--type-code-small);
+  line-height: 1.4;
+  transition: opacity 0.5s var(--diagram-ease-out);
+}
+
+.time {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  color: var(--text-on-inverse-muted);
+}
+
+.text {
+  color: var(--text-on-inverse-soft);
+  transition: color 0.5s var(--diagram-ease-in-out);
+}
+
+.caption[data-enter] {
+  opacity: 0;
+  transition: none;
+}
+
+.caption[data-enter] .text {
+  color: var(--text-on-inverse-strong);
+  transition: none;
+}
+
+.caption[data-leave] {
+  opacity: 0;
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+/*
+ * From 768px: three columns. The line is at the height of the middle of
+ * the picture, not of the card (the file name is under the picture); the
+ * pill sits on its middle.
+ */
+@media (min-width: 768px) {
+  .pipeline {
+    --card: 14rem;
+    gap: var(--space-2xl);
+  }
+
+  .row {
+    grid-template-columns: var(--card) minmax(13rem, 1fr) minmax(0, 24rem);
+    align-items: center;
+    justify-items: stretch;
+  }
+
+  /* In a row the space is above and below: the old upload goes down, the new one comes from above */
+  .card {
+    --diagram-swap-x: 0px;
+    --diagram-swap-y: var(--space-md);
+  }
+
+  .link {
+    align-self: stretch;
+    height: auto;
+    margin-bottom: calc(var(--type-code-small) * 1.4 + var(--space-3xs));
+  }
+
+  .output {
+    margin-bottom: calc(var(--type-code-small) * 1.4 + var(--space-3xs));
+  }
+
+  .links {
+    inset: 0 calc(-1 * var(--diagram-tuck));
+    width: calc(100% + 2 * var(--diagram-tuck));
+    height: 100%;
+  }
+
+  .links [data-axis='x'] {
+    display: inline;
+  }
+
+  .links [data-axis='y'] {
+    display: none;
+  }
+
+  .caption {
+    grid-template-columns: max-content minmax(0, 1fr);
+  }
+
+  .duration {
+    display: block;
+  }
+
+  .text {
+    font-size: var(--type-code);
+  }
+}

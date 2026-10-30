@@ -1,0 +1,66 @@
+/* Below 1152 the halves stack. Each half pads itself. */
+.split {
+  display: flex;
+  flex-direction: column;
+}
+
+.half {
+  padding: var(--section-padding-y) var(--section-padding-x);
+}
+
+.inverse {
+  --headline-muted: var(--text-on-inverse-muted);
+  --half-text: var(--text-on-inverse);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.accent {
+  background: var(--surface-accent);
+  color: var(--text-primary);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  max-width: 500px;
+}
+
+.stacked {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.muted {
+  color: var(--headline-muted, var(--text-muted));
+}
+
+/* The strong text of the CMS has the full color of the half. */
+.muted :where(strong) {
+  font-weight: inherit;
+  color: var(--half-text, var(--text-primary));
+}
+
+@media (min-width: 1152px) {
+  /*
+   * The outer padding of each half is
+   * --content-inset-half, so at 1920 and 2560 the two texts stay in the
+   * centred content column. The halves are grid items: there 100% in the
+   * token is the width of the half.
+   */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .half:first-child {
+    padding-inline-start: var(--content-inset-half);
+  }
+
+  .half:last-child {
+    padding-inline-end: var(--content-inset-half);
+  }
+}

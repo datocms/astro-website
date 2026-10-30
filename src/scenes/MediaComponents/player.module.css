@@ -1,0 +1,182 @@
+/*
+ * The surface and the font are the ones of the GIF of ../Video/gif.module.css.
+ * The player draws the controls of the player of Mux over the frame, in white
+ * on a dark shade, as on any video. The box is the container.
+ */
+.player {
+  --pad: var(--space-xl);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-md);
+  box-sizing: border-box;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding: var(--pad);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse-muted);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.code {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.key {
+  color: var(--text-on-inverse-strong);
+}
+
+.video {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--surface-inverse-muted);
+  /* stylelint-disable-next-line scale-unlimited/declaration-strict-value -- Text over a video is white in any scheme. */
+  color: white;
+  font-family: var(--font-sans);
+  --fs: 11px;
+  --menu: calc(13 * var(--fs));
+
+  font-size: var(--fs);
+  line-height: 1.2;
+}
+
+.video::after {
+  content: '';
+  position: absolute;
+  inset: 55% 0 0;
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.6));
+}
+
+.picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.caption {
+  position: absolute;
+  z-index: 1;
+  bottom: 22%;
+  /* The menu is open at the right: the caption is in the middle of the part at its left */
+  right: calc(var(--menu) + 16px);
+  left: 4%;
+  width: fit-content;
+  margin-inline: auto;
+  padding: 2px 6px;
+  background: rgb(0 0 0 / 0.75);
+  font-size: 12px;
+  text-align: center;
+}
+
+.menu {
+  position: absolute;
+  z-index: 2;
+  right: 8px;
+  bottom: 34px;
+  display: flex;
+  flex-direction: column;
+  width: var(--menu);
+  box-sizing: border-box;
+  padding: 4px;
+  border-radius: 6px;
+  background: rgb(20 20 20 / 0.85);
+}
+
+.menuTitle {
+  padding: 4px 8px;
+  opacity: 0.6;
+}
+
+.item {
+  padding: 4px 8px 4px 22px;
+  border-radius: 4px;
+}
+
+.item[data-on] {
+  position: relative;
+  background: rgb(255 255 255 / 0.12);
+}
+
+.item[data-on]::before {
+  content: '✓';
+  position: absolute;
+  left: 8px;
+}
+
+.controls {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+}
+
+.icon {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.time {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.rail {
+  flex: 1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: rgb(255 255 255 / 0.3);
+}
+
+.played {
+  display: block;
+  width: calc(var(--played) * 100%);
+  height: 100%;
+  background: white;
+}
+
+.cc {
+  flex: none;
+  padding: 0 3px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.active {
+  box-shadow: 0 3px 0 -1.5px white;
+}
+
+/* To 440px: a smaller margin, thus the player keeps its width */
+@container (max-width: 440px) {
+  .player {
+    --pad: var(--space-md);
+
+    font-size: var(--type-code-xsmall);
+  }
+
+  .video {
+    --fs: 10px;
+  }
+
+  .caption {
+    font-size: 10px;
+  }
+}

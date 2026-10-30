@@ -1,0 +1,32 @@
+---
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { CodesandboxEmbedBlockFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof CodesandboxEmbedBlockFragment>;
+}
+
+const block = readFragment(CodesandboxEmbedBlockFragment, Astro.props.block);
+---
+
+{
+  /*
+  A preview of a CodeSandbox project. All the preview is a link to the
+  sandbox; a pill at the centre tells what the link does.
+*/
+}
+<prose-island>
+  <figure>
+    <a
+      class={styles.link}
+      href={`https://codesandbox.io/s/${block.slug}`}
+      target="_blank"
+      rel="noreferrer"
+    >
+      {block.preview.responsiveImage && <ResponsiveImage data={block.preview.responsiveImage} />}
+      <span class:list={[styles.pill, 'subtitleMedium']}>Try it on CodeSandbox →</span>
+    </a>
+  </figure>
+</prose-island>

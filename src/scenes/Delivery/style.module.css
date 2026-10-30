@@ -1,0 +1,228 @@
+/*
+ * The wall of pages of the Delivery chapter, on the inverse sheet of a
+ * SceneFrame `whole`. The pill, the curves, the panel, the ring and the
+ * motion are the grammar of the diagrams (../diagram/style.module.css);
+ * this file has only the wall: where the parts sit, the tiles, and the
+ * curves of the still. 4 columns of 11 tiles on phones, 8 columns of up
+ * to 31 from 768px: the last row is never full. Everything is in the
+ * tokens of the theme of the section.
+ *
+ * The loop is in the script of Wall.astro. It sets the attributes of the
+ * grammar (`data-changed`, `data-ping`, `data-leave`, `data-enter` on a
+ * tile; `data-hidden`, `data-pulse`, `data-faded` on the curves),
+ * `data-live` on the svg, when it replaces the curves of the still, and
+ * `data-flip` on a cell, with no transition, for the inverse translate.
+ * Without the script the wall is the still: the pill, two curves, two
+ * tiles with the ring.
+ */
+.wall {
+  --pad: var(--space-xs);
+  --label-gap: var(--space-xs);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--diagram-link);
+}
+
+.time {
+  color: var(--surface-inverse-muted);
+}
+
+/*
+ * The panel of the CDN. No stacking order of its own: the curves go over
+ * it and its tiles. Its label is over the curves, on the surface of the
+ * sheet: a curve that crosses it goes under it.
+ */
+.wall > .group {
+  z-index: auto;
+}
+
+.group > :first-child {
+  position: relative;
+  z-index: 3;
+  align-self: start;
+  background: var(--surface-inverse);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--label-gap);
+  width: 100%;
+  padding: var(--pad);
+}
+
+/*
+ * The wall: 4 columns of the first 11 tiles on phones, 8 columns of up
+ * to 31 from 768px. A purged page leaves, the others close the gap, and
+ * new pages come in at the end.
+ *
+ * On phones the pages of the still (`data-still`) come in the first row,
+ * after the first page: in the second and the third column. The curves of
+ * the still go there (Wall.astro). The order changes only which wireframe
+ * is where; all of the first 11 still show.
+ */
+.tiles {
+  --columns: 4;
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  gap: var(--space-3xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The pages that close the gap move in 0.55s: SHIFT in Wall.astro */
+.cell {
+  order: 1;
+  min-width: 0;
+  transition: translate 0.55s var(--diagram-ease-out);
+}
+
+.cell[data-flip] {
+  transition: none;
+}
+
+.cell:first-child,
+.cell[data-still] {
+  order: 0;
+}
+
+.cell:nth-child(n + 12) {
+  display: none;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6%;
+  box-sizing: border-box;
+  aspect-ratio: 4 / 3;
+  padding: 9%;
+  border-radius: var(--radius-sm);
+  background: var(--surface-inverse);
+  box-shadow: 0 0 0 1px var(--border-on-inverse-strong);
+}
+
+.image,
+.bar {
+  flex: none;
+  border-radius: 2px;
+  background: var(--text-on-inverse-subtle);
+}
+
+.image {
+  height: 42%;
+  background: color-mix(in srgb, var(--text-on-inverse) 14%, transparent);
+}
+
+.bar {
+  height: 7%;
+}
+
+.title {
+  width: 70%;
+  background: var(--text-on-inverse-muted);
+}
+
+.text {
+  width: 55%;
+}
+
+.price {
+  width: 28%;
+}
+
+/* The looks of a tile: the widths of its bars. VARIANTS of story.ts counts them. */
+.cell[data-variant='1'] .title,
+.cell[data-variant='5'] .title {
+  width: 52%;
+}
+
+.cell[data-variant='2'] .text,
+.cell[data-variant='5'] .text {
+  width: 80%;
+}
+
+.cell[data-variant='3'] .price {
+  width: 18%;
+}
+
+.cell[data-variant='4'] .image {
+  height: 50%;
+}
+
+/*
+ * The curves, over the panel and the tiles, under the pill. The svg of
+ * the still is the band from 2px under the pill to the top of the first
+ * row of tiles, as wide as the tiles: its viewBox stretches to it, and the
+ * strokes do not (non-scaling-stroke). With `data-live` it covers the
+ * wall, in px, for the curves of the script.
+ */
+.links {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--diagram-pill) - var(--diagram-tuck));
+  right: var(--pad);
+  left: var(--pad);
+  width: calc(100% - 2 * var(--pad));
+  height: calc(
+    var(--diagram-tuck) + var(--diagram-link) + var(--pad) + var(--type-code-small) * 1.4 +
+      var(--label-gap)
+  );
+  overflow: visible;
+  pointer-events: none;
+}
+
+.links[data-live] {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.links [data-axis='wide'] {
+  display: none;
+}
+
+.wall > .pill {
+  --diagram-swap-x: var(--space-xl);
+  z-index: 3;
+}
+
+@media (min-width: 768px) {
+  .wall {
+    --pad: var(--space-sm);
+    gap: var(--space-2xl);
+  }
+
+  .links {
+    height: calc(
+      var(--diagram-tuck) + var(--space-2xl) + var(--pad) + var(--type-code-small) * 1.4 +
+        var(--label-gap)
+    );
+  }
+
+  .links [data-axis='wide'] {
+    display: inline;
+  }
+
+  .links [data-axis='narrow'] {
+    display: none;
+  }
+
+  .tiles {
+    --columns: 8;
+    gap: var(--space-xs);
+  }
+
+  .cell,
+  .cell:first-child,
+  .cell[data-still] {
+    order: 0;
+  }
+
+  .cell:nth-child(n + 12) {
+    display: block;
+  }
+}

@@ -1,0 +1,18 @@
+---
+import ServerMark from './ServerMark.astro';
+import styles from './style.module.css';
+
+interface Props {
+  summary: string;
+  /** A row of a list, under its header: no mark, no name. @default false */
+  inList?: boolean;
+}
+
+const { summary, inList = false } = Astro.props;
+---
+
+<p class={styles.toolCall}>
+  <ServerMark hidden={inList} />
+  <span class={styles.toolText}>{inList ? summary : `Using DatoCMS: ${summary}`}</span>
+  <svg class={styles.toolOpen} viewBox="0 0 8 8"><path d="M2 1v6l4.5-3z"></path></svg>
+</p>

@@ -1,6 +1,6 @@
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { CustomerStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/customerStory';

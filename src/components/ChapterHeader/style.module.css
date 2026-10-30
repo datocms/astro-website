@@ -1,0 +1,100 @@
+/*
+ * The header of a chapter. Below 1152 the parts are in one column. From
+ * 1152 the label and the headline are in the left column, and the intro
+ * and the link are in the right column, on the same top line.
+ * The bottom padding is smaller than the section padding, thus the
+ * SceneFrame below is near.
+ */
+.header {
+  --section-padding-bottom: var(--space-xl);
+  /* An anchor to the chapter stops under the sticky chapter nav (CategoryNav). */
+  scroll-margin-top: var(--category-nav-height, 0px);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.label {
+  color: var(--text-muted);
+}
+
+/* The headline goes on two lines at most, 18 characters a line, of the same length. */
+.headline {
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.intro {
+  max-width: 560px;
+  color: var(--text-soft);
+}
+
+/* On the inverse surface the text is light. The Section sets the muted part of the headline. */
+.inverse .label {
+  color: var(--text-on-inverse-muted);
+}
+
+.inverse .intro {
+  color: var(--text-on-inverse-soft);
+}
+
+/*
+ * `split`: the section has no background, thus it sets the text colours
+ * of the inverse surface. From 1152px the left column is on the accent
+ * surface: the label and the headline are dark.
+ */
+.header.split {
+  color: var(--text-on-inverse);
+  --headline-muted: var(--text-on-inverse-muted);
+}
+
+@media (min-width: 1152px) {
+  /*
+   * On the split background the header is a band of its own, as a half of
+   * VersusSplit: the bottom padding is the same as the top padding.
+   */
+  .header.split {
+    --section-padding-bottom: var(--section-padding-y);
+  }
+
+  .split .title {
+    color: var(--text-primary);
+    --headline-muted: var(--text-muted);
+  }
+
+  .split .label {
+    color: var(--text-muted);
+  }
+
+  .content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--space-xl);
+  }
+
+  /*
+   * The content is in the centre of the page, thus the line between the
+   * halves is in the centre of the gap. As in VersusSplit, each column is
+   * --section-padding-x from the line.
+   */
+  .split .content {
+    column-gap: calc(var(--section-padding-x) * 2);
+  }
+}

@@ -1,0 +1,107 @@
+/*
+ * A box with 1px lines between the
+ * fields. The box does not clip its content: the menu of the last select
+ * must go out of it. The first row and the submit row round their own
+ * corners (8px box radius minus the 1px line).
+ */
+.root {
+  width: 100%;
+}
+
+.form[hidden],
+.success[hidden] {
+  display: none;
+}
+
+.box {
+  border: 1px solid var(--text-soft);
+  border-radius: var(--radius-md);
+}
+
+.row {
+  display: grid;
+  border-bottom: 1px solid var(--text-soft);
+}
+
+.firstRow {
+  --field-radius: 7px 7px 0 0;
+}
+
+.cell + .cell {
+  border-top: 1px solid var(--text-soft);
+}
+
+@media (min-width: 768px) {
+  .row {
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+  }
+
+  .cell + .cell {
+    border-top: 0;
+    border-left: 1px solid var(--text-soft);
+  }
+}
+
+.submitRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: 0 0 7px 7px;
+  background: var(--surface-accent-faint);
+}
+
+@media (min-width: 768px) {
+  .submitRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.legal {
+  max-width: 300px;
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.legal a {
+  text-decoration: underline;
+}
+
+.submitError {
+  margin: var(--space-md) 0 0;
+  color: var(--text-error, var(--color-orange-light-5));
+  line-height: 1.3;
+}
+
+.submitError:empty {
+  display: none;
+}
+
+.success {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: var(--space-xl);
+}
+
+/* The script moves the focus here after the submit. It is not a control. */
+.success:focus {
+  outline: none;
+}
+
+.noscript {
+  margin: 0;
+  padding: var(--space-xl);
+}
+
+/* An external form cannot send its data without scripts: see .noscript. */
+@media (scripting: none) {
+  .needsScript {
+    display: none;
+  }
+}

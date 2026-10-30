@@ -1,0 +1,96 @@
+/* @layer blocks */
+/*
+ * A window on the inverse surface, with a bar and three lights. The home page draws its
+ * three windows with it (UserExperience), and the Real-time frame of
+ * /developers its code and its live blog. The window is an illustration:
+ * its px sizes are not tokens.
+ *
+ * A parent can set --window-bar-gap: the space between the items of the
+ * bar (less in the toolbar of a browser).
+ */
+.window {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border-on-inverse-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse-soft);
+  box-shadow: 0 var(--space-3xs) var(--space-xl) var(--surface-inverse-subtle);
+}
+
+.bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--window-bar-gap, var(--space-xs));
+  height: 28px;
+  padding-inline: var(--space-xs);
+  border-bottom: 1px solid var(--border-on-inverse);
+}
+
+.lights {
+  flex: none;
+  display: flex;
+  gap: var(--space-4xs);
+}
+
+.lights span {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--text-on-inverse-subtle);
+}
+
+.address,
+.fileTab {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-on-inverse-muted);
+}
+
+.address {
+  flex: 1;
+  min-width: 0;
+  max-width: max-content;
+  margin-inline: auto;
+  padding: var(--space-5xs) var(--space-xs);
+  border-radius: var(--radius-full);
+  background: var(--border-on-inverse);
+}
+
+.balance {
+  flex: none;
+  width: 32px;
+}
+
+.fileTab {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding-inline: var(--space-xs);
+  border-inline: 1px solid var(--border-on-inverse);
+  color: var(--text-on-inverse-strong);
+}
+
+@media (min-width: 768px) {
+  .bar {
+    height: 32px;
+  }
+}
+
+@media (min-width: 1152px) {
+  .bar {
+    height: 36px;
+  }
+
+  .lights span {
+    width: 10px;
+    height: 10px;
+  }
+
+  .balance {
+    width: 38px;
+  }
+}

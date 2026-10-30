@@ -1,0 +1,81 @@
+/*
+ * From 1152: globe half (surface/accent) and text half (surface/inverse).
+ * Below 1152: globe on top, text below. The globe fills the width:
+ * 393 × 456 at 393+, 768 × 560 at 768+.
+ */
+.split {
+  display: flex;
+  flex-direction: column;
+}
+
+.mediaHalf {
+  display: flex;
+  justify-content: flex-end;
+  background: var(--surface-accent);
+}
+
+.media {
+  width: 100%;
+  aspect-ratio: 393 / 456;
+}
+
+.media :global(pixel-video) {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.textHalf {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding: var(--section-padding-y) var(--section-padding-x);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.soft {
+  color: var(--text-on-inverse-soft);
+}
+
+.region {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .media {
+    aspect-ratio: 768 / 560;
+  }
+}
+
+/*
+ * From 1152 the globe is near the centre seam, at most 660 wide. The text
+ * column is 378 wide.
+ */
+@media (min-width: 1152px) {
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .media {
+    max-width: 660px;
+    aspect-ratio: 660 / 703;
+  }
+
+  .text {
+    max-width: 378px;
+  }
+
+  /* The outer padding puts the text in the centred content column. */
+  .textHalf {
+    padding-inline: var(--section-padding-x) var(--content-inset-half);
+  }
+}

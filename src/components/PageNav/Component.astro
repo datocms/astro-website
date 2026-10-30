@@ -1,0 +1,47 @@
+---
+// A small menu in the bottom-left corner. It links to all the real pages of
+// the prototype, so that a reviewer can go from page to page quickly. It is
+// not part of the design.
+import styles from './style.module.css';
+
+// Each file in src/pages is a route. The dev pages and the dynamic routes are
+// not in the list. Astro makes no route from a file or a directory whose name
+// starts with "_", thus these are not in the list.
+const files = Object.keys(import.meta.glob('/src/pages/**/*.astro'));
+
+const routes = files
+  .filter(
+    (file) => !file.startsWith('/src/pages/dev/') && !file.includes('[') && !file.includes('/_'),
+  )
+  .map(
+    (file) =>
+      file
+        .replace(/^\/src\/pages/, '')
+        .replace(/\.astro$/, '')
+        .replace(/\/index$/, '') || '/',
+  )
+  .sort();
+
+const current = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<details class={styles.root} data-theme="default">
+  <summary class={styles.toggle}>Pages</summary>
+  <nav class={styles.panel} aria-label="Prototype pages">
+    <ul class={styles.list}>
+      {
+        routes.map((route) => (
+          <li>
+            <a
+              class={styles.link}
+              href={route}
+              aria-current={route === current ? 'page' : undefined}
+            >
+              {route}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</details>

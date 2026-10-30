@@ -1,0 +1,32 @@
+---
+import { Section } from '~/components/Section';
+import type { HighlightsData } from '~/data/editor-experience-figma';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends HighlightsData {
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+  /**
+   * `4`: a 2 × 2 grid from 768, four columns from 1152 (editor
+   * experience). `3`: stacked until 1152, then three columns (AI page).
+   */
+  columns?: 3 | 4;
+}
+
+const { items, note, theme, columns = 4 } = Astro.props;
+---
+
+<Section theme={theme} contentClass={styles.content}>
+  <ul class:list={[styles.items, columns === 3 && styles.three]}>
+    {
+      items.map((item) => (
+        <li class:list={[styles.item, 'h2']}>
+          <span class={styles.title}>{item.title}</span>
+          <span class={styles.text}>{item.text}</span>
+        </li>
+      ))
+    }
+  </ul>
+  {note && <p class:list={[styles.note, 'bodyLong']}>{note}</p>}
+</Section>

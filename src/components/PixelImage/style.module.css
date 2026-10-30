@@ -1,0 +1,49 @@
+/* @layer blocks */
+/*
+ * The box clips the image and the canvas to its radius. The caller gives
+ * the size, the aspect ratio and the radius (the class prop).
+ */
+/*
+ * --pixel-shadow is a tone of the pixel version between the dark and the
+ * accent: the darkest cells that are not black in the image. It is only
+ * for this component, thus it is here and not in tokens.css. It is a mix
+ * of two theme tokens, thus it follows the theme and the scheme.
+ */
+.pixelImage {
+  --pixel-shadow: color-mix(in oklch, var(--surface-inverse), var(--surface-accent) 35%);
+
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The pixel version is on the image, with the same size. */
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/*
+ * Only a device with hover shows the pixel version, and only when the
+ * script drew it (data-ready). The change is immediate: there is no motion,
+ * thus reduced motion changes nothing. Keyboard focus on the link shows it
+ * too.
+ */
+@media (hover: hover) {
+  :global(a:hover) .pixelImage[data-ready] .canvas,
+  :global(a:focus-visible) .pixelImage[data-ready] .canvas,
+  .pixelImage[data-ready]:hover .canvas {
+    opacity: 1;
+  }
+}

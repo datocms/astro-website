@@ -1,5 +1,5 @@
 import { range } from 'lodash-es';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { graphql } from '~/lib/datocms/graphql';

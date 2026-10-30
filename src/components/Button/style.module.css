@@ -1,68 +1,123 @@
-.root {
-  background: var(--accent-color);
-  border-radius: 3px;
-  border: 1px solid var(--accent-color);
-  color: white !important;
-  cursor: pointer;
-  display: inline-block;
-  font-family: var(--font-sans);
-  font-size: inherit;
-  font-weight: bold;
-  padding: 1em 1.5em;
-  text-decoration: none;
-  transition: opacity 150ms ease-in-out;
+/* @layer blocks */
+/*
+ * The colours come from the theme tokens of
+ * the section. Each appearance sets four local values; the states use them.
+ */
+.button {
+  --btnBg: var(--surface-accent);
+  --btnFg: var(--text-primary);
+  --btnBgHover: var(--surface-inverse);
+  --btnFgHover: var(--text-on-inverse);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  height: 40px;
+  padding: 0 var(--space-2xs);
+  border-radius: var(--radius-full);
+  background: var(--btnBg);
+  color: var(--btnFg);
   white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+}
 
-  &:hover {
-    opacity: 0.8;
+.label {
+  padding: 0 6px;
+}
+
+/*
+ * The solid pill has the text colour as fill and the page surface as text.
+ * In the dark scheme it stays the strongest shape on the page surface.
+ */
+.deepOnWhite {
+  --btnBg: var(--text-primary);
+  --btnFg: var(--surface-default);
+  --btnBgHover: var(--surface-accent);
+  --btnFgHover: var(--text-primary);
+}
+
+.lightOnWhite {
+  --btnBg: var(--surface-accent);
+  --btnFg: var(--text-primary);
+  --btnBgHover: var(--surface-inverse);
+  --btnFgHover: var(--text-on-inverse);
+}
+
+.deepOnLight {
+  --btnBg: var(--surface-inverse);
+  --btnFg: var(--text-on-inverse);
+  --btnBgHover: var(--surface-default);
+  --btnFgHover: var(--text-primary);
+}
+
+.lightOnDeep {
+  --btnBg: var(--surface-accent);
+  --btnFg: var(--text-primary);
+  --btnBgHover: var(--surface-default);
+  --btnFgHover: var(--text-primary);
+}
+
+/* Soft: a tinted background. The hover is the same as solid. */
+.soft.deepOnWhite,
+.soft.deepOnLight {
+  --btnBg: var(--surface-inverse-faint);
+  --btnFg: var(--text-primary);
+}
+
+.soft.lightOnWhite {
+  --btnBg: var(--surface-accent-subtle);
+  --btnFg: var(--text-primary);
+}
+
+.soft.lightOnDeep {
+  --btnBg: var(--border-on-inverse);
+  --btnFg: var(--text-on-inverse);
+}
+
+@media (hover: hover) {
+  .button:hover {
+    background: var(--btnBgHover);
+    color: var(--btnFgHover);
   }
-
-  svg {
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 0.3em;
-  }
 }
 
-.disabled {
-  opacity: 0.7;
+.button:active {
+  background: var(--btnBgHover);
+  color: var(--btnFgHover);
+  opacity: 0.8;
 }
 
-.sInvert {
-  background: white;
-  border: 1px solid var(--accent-color);
-  color: var(--accent-color) !important;
+.button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 
-.sPurple {
-  background: color-mix(in srgb, #b039b8 10%, white);
-  border: 1px solid #de66e6;
-  color: color-mix(in srgb, #200523 40%, #b039b8) !important;
+.button:disabled,
+.button[aria-disabled='true'] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
-.pSmall {
-  padding: 0.7em 1.1em;
+.leading {
+  display: inline-flex;
+  flex-shrink: 0;
 }
 
-.pTiny {
-  padding: 0.4em 0.9em;
+.leading img {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
 }
 
-.pBig {
-  padding: 1.2em 1.5em;
+.logos img + img {
+  margin-left: calc(var(--space-4xs) * -1);
 }
 
-.fsBig {
-  font-size: 1.2em;
-}
-
-.fsSmall {
-  font-size: 0.85em;
-}
-
-.block {
-  display: block;
-  width: 100%;
-  text-align: center;
-  box-sizing: border-box;
+/* With a leading image, the label has no inset on the left. */
+.hasLeading .label {
+  padding-left: 0;
 }

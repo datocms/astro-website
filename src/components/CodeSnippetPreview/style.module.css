@@ -1,0 +1,335 @@
+/* @layer blocks */
+/*
+ * A dark card with tabs, line
+ * numbers and code highlighted by Shiki (src/lib/code/highlight.ts), in
+ * the colours of the theme (tokens.css, "Code").
+ *
+ * The card is at least 580px high at all widths. A parent can set
+ * --code-snippet-height to give the card a fixed height (TextWithImage
+ * uses 522px below 768). Then the code can go
+ * into the bottom padding, and the card cuts it. A parent can set
+ * --code-snippet-radius and --code-snippet-border, for example to match
+ * the frame of a product scene. A parent that cuts the card at its edges
+ * (a SceneFrame) sets --code-snippet-note-right to 0: the notes then stay
+ * inside the card. A parent with space next to the code sets a wider note
+ * in --code-snippet-note-width (default 190px).
+ */
+.snippet {
+  --snippet-padding: var(--space-md);
+
+  display: flex;
+  flex-direction: column;
+  /* The tabs are small: the code gets the space. */
+  gap: var(--space-sm);
+  width: 100%;
+  max-width: 500px;
+  min-height: var(--code-snippet-height, 580px);
+  max-height: var(--code-snippet-height, none);
+  padding: var(--snippet-padding);
+  overflow: hidden;
+  border: var(--code-snippet-border, none);
+  border-radius: var(--code-snippet-radius, var(--radius-lg));
+  background: var(--code-background);
+  color: var(--code-plain);
+}
+
+.fill {
+  max-width: none;
+}
+
+/* On phones the card is narrow: less padding, and the code closer to the tabs. */
+@media (max-width: 767px) {
+  .snippet {
+    --snippet-padding: var(--space-xs);
+    gap: var(--space-3xs);
+  }
+}
+
+/*
+ * The colours of a tab highlighted by Shiki (src/lib/code/highlight.ts):
+ * the variables of its theme, mapped to the code tokens (tokens.css,
+ * "Code"). What Shiki puts in each variable, for our languages:
+ * - keyword: keywords, TS operators (: = ?? |), JSON keys, HTTP methods
+ * - string-expression: quoted strings, JSX tags, HTTP header names
+ * - string: unquoted words (shell arguments, GraphQL argument names, HTTP
+ *   header values): plain, as an editor shows them
+ * - constant: numbers, booleans, null, TS variables and types (string)
+ * - function: function and type names, JSX attributes, shell commands
+ * - punctuation: commas, JSON colons
+ */
+.snippet {
+  --shiki-foreground: var(--code-plain);
+  --shiki-token-keyword: var(--code-keyword);
+  --shiki-token-string: var(--code-plain);
+  --shiki-token-string-expression: var(--code-string);
+  --shiki-token-link: var(--code-string);
+  --shiki-token-constant: var(--code-constant);
+  --shiki-token-function: var(--code-function);
+  --shiki-token-parameter: var(--code-plain);
+  --shiki-token-comment: var(--code-comment);
+  --shiki-token-punctuation: var(--code-punctuation);
+}
+
+/*
+ * No gap between the tabs below 1152, 12px from 1152. When the tabs
+ * are wider than the card (five tabs on a phone), the row scrolls. The row
+ * does not shrink in a card with a fixed height.
+ */
+.tabs {
+  display: flex;
+  flex: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab {
+  flex: none;
+  /* A lower pill gives the code more lines. */
+  padding: var(--space-4xs) var(--space-2xs);
+  border: 0;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--text-on-inverse);
+  /* Only the family: the subtitleMedium class gives the size. */
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.tab[aria-selected='true'] {
+  background: var(--surface-accent);
+  color: var(--text-primary);
+}
+
+/*
+ * All the panels are in the same cell of a grid. Thus the card is as high
+ * as the longest tab, and a click on a tab does not move the page. A
+ * hidden panel keeps its space but is invisible.
+ */
+.panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+}
+
+.panel {
+  position: relative;
+  grid-area: 1 / 1;
+  min-height: 0;
+}
+
+.panel[hidden] {
+  display: block;
+  visibility: hidden;
+}
+
+/*
+ * A long line goes to the right edge of the card, and the card
+ * cuts it. The code can scroll horizontally, with no scroll bar.
+ */
+.pre {
+  margin: 0 calc(var(--snippet-padding) * -1) 0 0;
+  padding-inline-end: var(--snippet-padding);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.pre::-webkit-scrollbar {
+  display: none;
+}
+
+.code {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  /* The design value is 1.86. Lines read as a list, so we use 1.55. */
+  line-height: 1.55;
+  counter-reset: line;
+}
+
+.line {
+  display: flex;
+  gap: var(--space-2xs);
+  white-space: pre;
+  counter-increment: line;
+}
+
+.number {
+  flex: none;
+  min-width: 2ch;
+  text-align: right;
+  color: var(--code-line-number);
+}
+
+/* A counter, thus a comment line that a note takes out leaves no gap. */
+.number::before {
+  content: counter(line);
+}
+
+/*
+ * A line out of the focus of a snippet: dim, thus the lines that carry
+ * the point read first. Not the line number: the count stays even. At 0.7
+ * every role keeps at least 4.5:1 on the card but the comments (3.3:1).
+ */
+.dim > :last-child {
+  opacity: 0.7;
+}
+
+/*
+ * Notes (from 1152px, with JavaScript, see the script of the component):
+ * a comment line leaves the code and shows as a note on the right of the
+ * code. The note goes past the right edge of the card, into the side
+ * padding of the section. A leader goes from the text the note points to,
+ * which gets an outline, to the note. Below 1152px and with no JavaScript
+ * the comment stays in the code.
+ */
+.note,
+.leaders {
+  display: none;
+}
+
+.snippet[data-annotated] {
+  overflow: visible;
+}
+
+.snippet[data-annotated] .noteComment:not([data-inline]) {
+  display: none;
+}
+
+.snippet[data-annotated] .point:not([data-off]) {
+  border-radius: var(--radius-sm);
+  outline: 1px solid var(--text-on-inverse);
+  outline-offset: 1px;
+}
+
+.snippet[data-annotated] .note {
+  display: block;
+  position: absolute;
+  right: var(
+    --code-snippet-note-right,
+    calc(-1 * (var(--snippet-padding) + var(--section-padding-x) - var(--space-lg)))
+  );
+  width: 190px;
+  margin: 0;
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+  color: var(--text-primary);
+  line-height: 1.3;
+  opacity: 0;
+  transform: translateY(var(--space-3xs));
+}
+
+.snippet[data-annotated] .note[hidden],
+.leaders g[hidden] {
+  display: none;
+}
+
+.snippet[data-annotated] .leaders {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.leaders path {
+  fill: none;
+  stroke: var(--text-on-inverse);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.leaders circle {
+  fill: var(--text-on-inverse);
+  opacity: 0;
+}
+
+/* Each note 300ms after the one before: the dot, the leader, the note. */
+.snippet[data-shown] .note {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 300ms ease-out calc(var(--i) * 300ms + 350ms),
+    transform 300ms ease-out calc(var(--i) * 300ms + 350ms);
+}
+
+.snippet[data-shown] .leaders path {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 400ms ease-in-out calc(var(--i) * 300ms + 50ms);
+}
+
+.snippet[data-shown] .leaders circle {
+  opacity: 1;
+  transition: opacity 150ms ease-out calc(var(--i) * 300ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snippet[data-shown] .note,
+  .snippet[data-shown] .leaders path,
+  .snippet[data-shown] .leaders circle {
+    transition: none;
+  }
+}
+
+/*
+ * `columns`: the tabs side by side from 768px, stacked below. Each column
+ * has its label, as a selected tab.
+ */
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.column .pre {
+  align-self: stretch;
+}
+
+.label {
+  margin: 0;
+  background: var(--surface-accent);
+  color: var(--text-primary);
+}
+
+@media (min-width: 768px) {
+  .columns {
+    grid-template-columns: repeat(var(--code-snippet-columns), minmax(0, 1fr));
+    column-gap: var(--space-lg);
+  }
+}
+
+@media (hover: hover) {
+  .tab[aria-selected='false']:hover {
+    background: var(--surface-inverse-subtle);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1151px) {
+  .snippet {
+    --snippet-padding: var(--space-lg);
+  }
+
+  .line {
+    gap: var(--space-md);
+  }
+}
+
+@media (min-width: 1152px) {
+  .tabs {
+    gap: var(--space-xs);
+  }
+}

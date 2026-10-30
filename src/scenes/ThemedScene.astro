@@ -1,0 +1,50 @@
+---
+import { type SceneAppearance, scenePalettes } from './Scene';
+
+interface Props {
+  /**
+   * The appearance of the scene in the slot, without the theme. The
+   * palettes must have the same surface, tint and chroma as the scene.
+   */
+  appearance?: Omit<SceneAppearance, 'theme'>;
+}
+
+const { appearance } = Astro.props;
+---
+
+{
+  /*
+  A scene that follows the theme of its section in the browser. When the
+  `data-theme` of the nearest element with that attribute changes, the
+  screens in the slot get the colours of the new theme. Without JS the
+  scene keeps the theme that the page gives it.
+*/
+}
+<div data-themed-scene={JSON.stringify(scenePalettes(appearance))} style="display: contents">
+  <slot />
+</div>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-themed-scene]')) {
+    const palettes = JSON.parse(root.dataset.themedScene!) as Record<string, string>;
+    const owner = root.parentElement?.closest<HTMLElement>('[data-theme]');
+    if (!owner) continue;
+
+    const apply = () => {
+      const palette = palettes[owner.dataset.theme ?? ''];
+      if (!palette) return;
+      for (const screen of root.querySelectorAll<HTMLElement>('.ProductScenesScreen')) {
+        for (const rule of palette.split(';')) {
+          const [name, value] = rule.split(/:(.*)/);
+          screen.style.setProperty(name!, value!);
+        }
+      }
+    };
+
+    apply();
+    new MutationObserver(apply).observe(owner, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+  }
+</script>

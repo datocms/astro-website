@@ -1,0 +1,190 @@
+---
+import { AppWindow } from '~/components/AppWindow';
+import { Button } from '~/components/Button';
+import { PixelVideo } from '~/components/PixelVideo';
+import { Section } from '~/components/Section';
+import type { UserExperienceData } from '~/data/home';
+import { UserExperienceScene } from '~/scenes/UserExperience/UserExperience';
+import styles from './style.module.css';
+
+type Props = UserExperienceData;
+
+const { developer, editor, record, site, query, video } = Astro.props;
+
+// The screen of the form at each breakpoint: the width of the editor
+// window, and its height under the bar. The window width changes, and
+// the width of a stage is a prop, thus there is one stage for each
+// breakpoint. CSS shows only one. See the CSS of `.form`.
+// Each screen is wider than its window, and CSS zooms it to the window
+// (see `.formWide`, `.formMedium` and `.formPhone`). The zoom of each
+// screen is 0.92 of the zoom that fits the text of the form in the
+// window, thus the form is 8% smaller:
+// - wide: 389px zoomed to 358px (0.92). The height is 362px / 0.92.
+// - medium: 283px zoomed to 198px (0.6996). The height is 316px / 0.6996.
+// - phone: 507px zoomed to 280px (0.5523). The height is 214px / 0.5523.
+const FORM_SCREENS = {
+  wide: { width: 389, height: 393 },
+  medium: { width: 283, height: 452 },
+  phone: { width: 507, height: 387 },
+};
+---
+
+<Section
+  theme="orange"
+  background="accent"
+  class={styles.userExperience}
+  contentClass={styles.content}
+  data-ux
+  data-focus="developer"
+>
+  <div
+    class={styles.mockup}
+    role="img"
+    aria-label={`One record, three views: the GraphQL query of a developer, the case-study page “${record.title}” on the website, and the same record in the DatoCMS editor`}
+  >
+    {/* The site: the shared result. It is behind the two role windows and it does not move. */}
+    <AppWindow class:list={[styles.window, styles.site]} aria-hidden="true">
+      {/* CSS removes some tools of the Safari toolbar on the narrow windows. */}
+      <Fragment slot="bar">
+        <span class:list={[styles.tools, styles.wideTool]}>
+          <span class={styles.pill}>
+            <svg class={styles.icon} viewBox="0 0 16 16"
+              ><rect x="2" y="3" width="12" height="10" rx="2"></rect><path
+                d="M6 3v10M3.5 6h1M3.5 8h1"></path></svg
+            >
+            <svg class={styles.iconSmall} viewBox="0 0 16 16"><path d="m4 6 4 4 4-4"></path></svg>
+          </span>
+          <span class={styles.pill}>
+            <svg class={styles.icon} viewBox="0 0 16 16"><path d="m10 3-5 5 5 5"></path></svg>
+            <span class={styles.pillDivider}></span>
+            <svg class:list={[styles.icon, styles.iconOff]} viewBox="0 0 16 16"
+              ><path d="m6 3 5 5-5 5"></path></svg
+            >
+          </span>
+        </span>
+        <span class={styles.addressField}>
+          <svg class:list={[styles.icon, styles.addressIcon]} viewBox="0 0 16 16"
+            ><rect x="3" y="2.5" width="10" height="7" rx="1.5"></rect><path d="M3 12h10M3 14h7"
+            ></path></svg
+          >
+          <span class:list={[styles.host, 'caption']}>{record.url.split('/')[0]}</span>
+          <svg class:list={[styles.icon, styles.addressIcon]} viewBox="0 0 16 16"
+            ><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2.5v3h-3"></path></svg
+          >
+        </span>
+        <span class={styles.tools}>
+          <svg class:list={[styles.icon, styles.wideTool]} viewBox="0 0 16 16"
+            ><circle cx="8" cy="8" r="6"></circle><path d="M8 4.5v6M5.5 8 8 10.5 10.5 8"
+            ></path></svg
+          >
+          <svg class={styles.icon} viewBox="0 0 16 16"
+            ><path d="M8 1.5v8M5 4.5l3-3 3 3M5.5 7H4v7.5h8V7h-1.5"></path></svg
+          >
+          <svg class:list={[styles.icon, styles.wideTool]} viewBox="0 0 16 16"
+            ><path d="M8 3v10M3 8h10"></path></svg
+          >
+          <svg class={styles.icon} viewBox="0 0 16 16"
+            ><rect x="2" y="5" width="9" height="9" rx="1.5"></rect><path
+              d="M5 2.5h7a1.5 1.5 0 0 1 1.5 1.5v7"></path></svg
+          >
+        </span>
+      </Fragment>
+      <div class={styles.page}>
+        <div class={styles.siteHeader}>
+          <span class:list={[styles.brand, 'caption']}>{site.brand}</span>
+          <span class:list={[styles.siteLinks, 'caption']}
+            >{site.links.map((link) => <span>{link}</span>)}</span
+          >
+        </div>
+        <div class={styles.hero}>
+          <PixelVideo src={video.src} settings={video.settings} class={styles.siteVideo} />
+        </div>
+        <div class={styles.pageText}>
+          <span class:list={[styles.siteTitle, 'h1']}>{record.title}</span>
+          <span class:list={[styles.siteSubtitle, 'subtitle']}>{record.subtitle}</span>
+        </div>
+      </div>
+    </AppWindow>
+
+    <AppWindow
+      class:list={[styles.window, styles.role, styles.code]}
+      file={query.file}
+      aria-hidden="true"
+    >
+      <pre
+        class={styles.pre}><code class:list={[styles.codeText, 'codeSmall']}>{query.lines.map((line, n) => (
+        <span class:list={[styles.line, n === query.thread && styles.threadLine]}><span class={styles.number}>{n + 1}</span><span>{line.map((token) =>
+          typeof token === 'string' ? token : <span class={token.tone === 'strong' ? styles.strong : styles.accent}>{token.text}</span>
+        )}</span></span>
+      ))}</code></pre>
+    </AppWindow>
+
+    <AppWindow
+      class:list={[styles.window, styles.role, styles.form]}
+      address="humaninterface.admin.datocms.com"
+      aria-hidden="true"
+    >
+      <div class={styles.formBody}>
+        <div class={styles.formPhone}>
+          <UserExperienceScene {...FORM_SCREENS.phone} video={video} />
+        </div>
+        <div class={styles.formMedium}>
+          <UserExperienceScene {...FORM_SCREENS.medium} video={video} />
+        </div>
+        <div class={styles.formWide}>
+          <UserExperienceScene {...FORM_SCREENS.wide} video={video} />
+        </div>
+      </div>
+    </AppWindow>
+  </div>
+
+  <div class={styles.text}>
+    <h2 class="h1">
+      <span class={styles.runDeveloper}>{developer.headline}</span>{' '}
+      <span class={styles.runEditor}>{editor.headline}</span>
+    </h2>
+    <div class={styles.buttons}>
+      <span class={styles.buttonDeveloper}>
+        <Button appearance={developer.button.appearance} href={developer.button.href}
+          >{developer.button.label}</Button
+        >
+      </span>
+      <span class={styles.buttonEditor}>
+        <Button appearance={editor.button.appearance} href={editor.button.href}
+          >{editor.button.label}</Button
+        >
+      </span>
+    </div>
+  </div>
+</Section>
+
+<script>
+  // ≥1152 with a pointer: the left half of the section is Developer, the right half is Editor.
+  // Otherwise: Developer while the top half of the section is at the viewport centre.
+  const DESKTOP = window.matchMedia('(min-width: 1152px) and (hover: hover)');
+
+  for (const section of document.querySelectorAll<HTMLElement>('[data-ux]')) {
+    const setFocus = (focus: 'developer' | 'editor') => {
+      if (section.dataset.focus !== focus) section.dataset.focus = focus;
+    };
+
+    section.addEventListener('pointermove', (event) => {
+      if (!DESKTOP.matches) return;
+      const rect = section.getBoundingClientRect();
+      setFocus(event.clientX < rect.left + rect.width / 2 ? 'developer' : 'editor');
+    });
+
+    let frame = 0;
+    const onScroll = () => {
+      if (DESKTOP.matches || frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        const rect = section.getBoundingClientRect();
+        const centre = window.innerHeight / 2;
+        setFocus(centre < rect.top + rect.height / 2 ? 'developer' : 'editor');
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+</script>

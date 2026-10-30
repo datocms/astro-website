@@ -1,0 +1,39 @@
+---
+import { StructuredText as DatoStructuredText } from '@datocms/astro';
+import { isDocument } from 'datocms-structured-text-utils';
+import NoParagraph from './NoParagraph.astro';
+import { textOnly } from './plainText/document';
+
+interface Props {
+  /** A Structured Text field: the `value` of a DAST document. */
+  data: { value: unknown } | null | undefined;
+}
+
+const { data } = Astro.props;
+
+const document = isDocument(data?.value) ? data.value.document : undefined;
+const blocks = textOnly(document?.children ?? []);
+---
+
+{
+  /*
+    A Structured Text field in an element that cannot hold a <p>, for
+    example a <p> or a <span>. The paragraphs have no <p>: two line breaks
+    separate them. The marks and the links stay. The blocks and the records
+    do not show, and a link to a record shows only its text. A node override
+    cannot know its position, thus each top-level node renders alone.
+  */
+}
+{
+  blocks.map((block, index) => (
+    <>
+      {index > 0 && (
+        <>
+          <br />
+          <br />
+        </>
+      )}
+      <DatoStructuredText data={block} nodeOverrides={{ paragraph: NoParagraph }} />
+    </>
+  ))
+}

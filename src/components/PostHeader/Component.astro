@@ -1,0 +1,52 @@
+---
+import { Section } from '~/components/Section';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { formatLongDate } from '~/lib/format/date';
+import { ChatHeaderFragment, PostHeaderFragment } from './graphql';
+import styles from './style.module.css';
+
+type Props =
+  | { post: FragmentOf<typeof PostHeaderFragment>; chat?: never }
+  | { chat: FragmentOf<typeof ChatHeaderFragment>; post?: never };
+
+const chat = Astro.props.chat ? readFragment(ChatHeaderFragment, Astro.props.chat) : undefined;
+const post = Astro.props.post ? readFragment(PostHeaderFragment, Astro.props.post) : undefined;
+const { title, _firstPublishedAt, _createdAt } = (chat ?? post)!;
+const date = _firstPublishedAt ?? _createdAt;
+const isChat = Boolean(chat);
+const people = chat ? chat.people : post!.author;
+// A casual chat gives the role and the company of each person: "Laís Kantor (Founder, goodbase)".
+const names = new Intl.ListFormat('en', { type: 'conjunction' }).format(
+  chat
+    ? chat.people.map((person) => {
+        const about = [person.title, person.company].filter(Boolean).join(', ');
+        return about ? `${person.name} (${about})` : person.name;
+      })
+    : post!.author.map((author) => author.name),
+);
+---
+
+<Section
+  as="header"
+  padding="headlines"
+  width="headline"
+  background="accent"
+  contentClass={styles.content}
+>
+  {isChat && <p class:list={[styles.label, 'subtitleMedium']}>Casual chat</p>}
+  <h1 class:list={[styles.title, 'display']}>{title}</h1>
+  <div class={styles.byline}>
+    <div class={styles.avatars}>
+      {
+        people.map((person) => (
+          <img class={styles.avatar} src={person.avatar.url} alt="" width="40" height="40" />
+        ))
+      }
+    </div>
+    <p class="subtitleMedium">
+      Posted on <time datetime={date}>{formatLongDate(date)}</time><br />
+      {isChat ? 'In conversation with' : 'by'}
+      {names}
+    </p>
+  </div>
+</Section>

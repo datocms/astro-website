@@ -1,0 +1,87 @@
+---
+import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import { Section } from '~/components/Section';
+import type { ContentSourceData } from '~/data/home';
+import styles from './style.module.css';
+
+type Props = ContentSourceData;
+
+const { headline, paragraph, channels, activeChannel } = Astro.props;
+// Three copies of the list. The active item stays in the middle copy,
+// thus there are always items above it and below it.
+const activeIndex = channels.length + Math.max(0, channels.indexOf(activeChannel));
+---
+
+<Section background="inverse" class={styles.contentSource} contentClass={styles.content}>
+  <h2 class:list={[styles.headline, 'h2']}>{headline}</h2>
+  <p class:list={[styles.paragraph, 'body']}>{paragraph}</p>
+
+  <div class={styles.visual} aria-hidden="true">
+    <div class={styles.lockup} data-content-source data-active={activeIndex}>
+      <span class={styles.label}>
+        <span class={styles.labelLong}>Single Source</span>
+        <span class={styles.labelShort}>Source</span>
+      </span>
+      <span class={styles.symbol} set:html={symbol} />
+      <span class={styles.listWindow}>
+        <span class={styles.list} data-list style={`--active-start: ${activeIndex}`}>
+          {
+            [...channels, ...channels, ...channels].map((channel, i) => (
+              <span
+                class:list={[styles.item, i === activeIndex && styles.active]}
+                data-clone={Math.floor(i / channels.length) === 1 ? undefined : ''}
+              >
+                {channel}
+              </span>
+            ))
+          }
+        </span>
+      </span>
+    </div>
+  </div>
+</Section>
+
+<script>
+  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+
+  // Every 0.8s the list moves up one row, with a 416ms spring-like ease.
+  const STEP_MS = 800;
+  const MOVE_MS = 416;
+
+  for (const lockup of document.querySelectorAll<HTMLElement>('[data-content-source]')) {
+    const list = lockup.querySelector<HTMLElement>('[data-list]');
+    if (!list || prefersReducedMotion()) continue;
+    const items = [...list.children] as HTMLElement[];
+    const count = items.length / 3;
+    const start = Number(lockup.dataset.active || 0);
+    let offset = 0;
+    let timer = 0;
+
+    const render = (animate: boolean) => {
+      list.style.transition = animate ? `transform ${MOVE_MS}ms var(--ease-spring)` : 'none';
+      list.style.setProperty('--offset', String(offset));
+      const active = start + offset;
+      items.forEach((item, i) => item.toggleAttribute('data-active', i === active));
+    };
+
+    const tick = () => {
+      // When the active item leaves the middle copy, jump back one copy
+      // with no animation. The two positions look the same.
+      if (start + offset >= 2 * count) {
+        offset -= count;
+        render(false);
+        // Apply the jump before the next move starts.
+        void list.offsetHeight;
+      }
+      offset += 1;
+      render(true);
+    };
+
+    render(false);
+
+    onVisibilityChange(lockup, (visible) => {
+      clearInterval(timer);
+      if (visible) timer = window.setInterval(tick, STEP_MS);
+    });
+  }
+</script>

@@ -1,0 +1,124 @@
+---
+import { DevConfig } from '~/components/DevConfig';
+import styles from './style.module.css';
+
+/** The props of every fit. */
+interface Common {
+  /** The slot of FeatureFragments, for example `visual-0`. */
+  slot?: string;
+}
+
+/**
+ * `scale`: the box scales the picture by the zoom and by its width divided
+ * by 500px, thus each box shows the same part of the picture, and the text
+ * follows the width of the box. The picture is in a window with a border
+ * and round corners, from its top left corner, at the top left corner of
+ * the box, with no margin and no surface. The box cuts the window at the
+ * right and the bottom.
+ */
+interface Scale extends Common {
+  fit: 'scale';
+  /**
+   * The zoom of the picture in a box of 500px (the box from 1280px). A
+   * scene with little in it can be larger.
+   * @default 1
+   */
+  zoom?: number;
+  /**
+   * Replaces `zoom` on phones (below 650px). The box of a phone is narrower
+   * than at desktop, thus a picture that fills the box at desktop shows
+   * only a slice: a smaller zoom shows more of it. It is the zoom in a box
+   * of 500px too, and the box scales it by its width: 1.3 in a box of 350px
+   * is 0.9. Thus `phoneZoom` is usually larger than `zoom`.
+   * @default `zoom`
+   */
+  phoneZoom?: number;
+  /**
+   * The corner of the picture that the window shows. `start`: the window
+   * shows the picture from its top left corner, and the box cuts it at the
+   * right. `end`: the window shows the picture from its top right corner,
+   * and the box cuts it at the left.
+   * @default 'start'
+   */
+  align?: 'start' | 'end';
+  /**
+   * The border and the round corners of the window. `false`: the picture
+   * draws its own edges (a stack of cards, a card in HTML).
+   * @default true
+   */
+  border?: boolean;
+}
+
+/**
+ * `crop`: the picture keeps its size at each width (a CodeSnippetPreview
+ * with `fill`), at the top left corner of the box, with no margin and no
+ * surface. It goes 2px past the right edge of the box, thus the box cuts
+ * it at the right and the bottom, and a narrower box cuts more of it. The
+ * snippet has the corners of the window of `scale`.
+ */
+interface Crop extends Common {
+  fit: 'crop';
+  zoom?: never;
+  phoneZoom?: never;
+  align?: never;
+  border?: never;
+}
+
+/**
+ * `fill`: the picture (a diagram) fills all the box, with no margin, and
+ * the box cuts nothing. The picture has its own surface and padding.
+ */
+interface Fill extends Common {
+  fit: 'fill';
+  zoom?: never;
+  phoneZoom?: never;
+  align?: never;
+  border?: never;
+}
+
+/*
+ * The fragment fills the 4:3 box of a FeatureFragments item with the
+ * tinted surface, and the box cuts the picture at its edges.
+ */
+type Props = Scale | Crop | Fill;
+
+const { fit, zoom, phoneZoom, align, border = true } = Astro.props;
+
+// style.module.css chooses the zoom of the breakpoint (--fragment-current-zoom)
+const vars = [
+  zoom !== undefined && `--fragment-zoom: ${zoom}`,
+  phoneZoom !== undefined && `--fragment-phone-zoom: ${phoneZoom}`,
+]
+  .filter(Boolean)
+  .join('; ');
+---
+
+<div
+  class:list={[
+    styles.fragment,
+    styles[fit],
+    align === 'end' && styles.end,
+    fit === 'scale' && !border && styles.noBorder,
+  ]}
+  style={vars || undefined}
+>
+  <div class={styles.clip}>
+    {
+      fit === 'scale' ? (
+        <div class={styles.window}>
+          <div class={styles.screen}>
+            <slot />
+          </div>
+        </div>
+      ) : (
+        <div class={styles.surface}>
+          <slot />
+        </div>
+      )
+    }
+  </div>
+  <DevConfig
+    name="SceneFragment"
+    config={{ fit, zoom, phoneZoom, align, border: fit === 'scale' && !border ? false : undefined }}
+  />
+</div>

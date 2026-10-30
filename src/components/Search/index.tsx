@@ -33,7 +33,7 @@ function Trigger({
   onOpen,
   variant = 'input',
 }: {
-  triggerRef: React.RefObject<HTMLButtonElement>;
+  triggerRef: React.RefObject<HTMLButtonElement | null>;
   onOpen: () => void;
   variant?: TriggerVariant;
 }) {

@@ -1,0 +1,45 @@
+---
+import { ChapterLayout } from '~/components/ChapterLayout';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as ai from '~/data/ai-pillar';
+import { TranslationsScene } from './Translations';
+
+const theme = ai.translations.theme;
+---
+
+<ChapterLayout {...ai.translations}>
+  {
+    /* The screen is 720px wide at least. On a phone the zoom is about 0.45, so the form and the aside stay side by side. No fragments follow, so the section does not cut the frame (flushBottom). */
+  }
+  <Fragment slot="scene">
+    <SceneFrame preset="fill" theme={theme} height={780} phoneHeightVw={110} flushBottom={false}>
+      <div data-translations-scene>
+        <TranslationsScene appearance={{ theme }} minWidth={720} />
+      </div>
+    </SceneFrame>
+  </Fragment>
+</ChapterLayout>
+
+<script>
+  import { SCENE_STEP_EVENT } from '~/lib/motion/sceneSequence';
+
+  // At each step of the screen, an element with `data-from` gets `data-on`
+  // from its step on, and an element with `data-until` gets `data-off`
+  // from its step on. The rules are in style.module.css.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-translations-scene]')) {
+    root.addEventListener(SCENE_STEP_EVENT, (event) => {
+      const screen = event.target as HTMLElement;
+      const steps = (screen.dataset.sceneSteps ?? '')
+        .split(/\s+/)
+        .map((step) => step.split(':')[0]);
+      const now = steps.indexOf((event as CustomEvent<string>).detail);
+      const reached = (step: string | undefined) => steps.indexOf(step ?? '') <= now;
+      for (const el of screen.querySelectorAll<HTMLElement>('[data-from]')) {
+        el.toggleAttribute('data-on', reached(el.dataset.from));
+      }
+      for (const el of screen.querySelectorAll<HTMLElement>('[data-until]')) {
+        el.toggleAttribute('data-off', reached(el.dataset.until));
+      }
+    });
+  }
+</script>

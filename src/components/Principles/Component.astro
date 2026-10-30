@@ -1,0 +1,45 @@
+---
+import { Section } from '~/components/Section';
+import type { PrinciplesData } from '~/data/philosophy';
+import styles from './style.module.css';
+
+interface Props extends PrinciplesData {
+  /** The number of the first principle. A page can split the list in parts. */
+  start?: number;
+}
+
+const { principles, start = 1 } = Astro.props;
+
+// The cells make a checkerboard. In each row of two, one cell is on
+// surface/default and the other on surface/accent-subtle.
+const isSubtle = (index: number) => (Math.floor(index / 2) + (index % 2)) % 2 === 1;
+---
+
+<Section padding="none" flush contentClass={styles.grid}>
+  <ol class={styles.list} start={start}>
+    {
+      principles.map((principle, index) => (
+        <li
+          class:list={[styles.cell, isSubtle(index) && styles.subtle]}
+          data-theme={principle.theme}
+        >
+          <div class={styles.text}>
+            <span class:list={[styles.number, 'h2']} aria-hidden="true">
+              {String(start + index).padStart(2, '0')}
+            </span>
+            <h2 class="h2">
+              {principle.href ? (
+                <a href={principle.href} class={styles.link}>
+                  {principle.title}
+                </a>
+              ) : (
+                principle.title
+              )}
+            </h2>
+            <p class:list={[styles.body, 'body']}>{principle.text}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</Section>

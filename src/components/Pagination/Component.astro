@@ -1,71 +1,54 @@
 ---
-import { ActiveLink } from '../links/ActiveLink';
-import { createPaginator } from './paginator';
-import s from './style.module.css';
+import styles from './style.module.css';
 
 interface Props {
-  perPage: number;
-  currentPageIndex: number;
-  totalEntries: number;
+  /** The number of the current page, from 1. */
+  current: number;
+  total: number;
+  /** The address of page 1. Page n is at `${baseUrl}/p/${n}`. */
   baseUrl: string;
-  searchParams?: URLSearchParams;
-  maxPagesToBeShown?: number;
+  window?: number;
 }
 
-const {
-  perPage,
-  currentPageIndex,
-  totalEntries,
-  baseUrl,
-  maxPagesToBeShown = 7,
-  searchParams,
-} = Astro.props;
+const { current, total, baseUrl, window = 7 } = Astro.props;
 
-const paginator = createPaginator(perPage, maxPagesToBeShown);
-const {
-  pages: pageCount,
-  firstPage: firstPage,
-  hasPreviousPage: hasPreviousPage,
-  hasNextPage: hasNextPage,
-  previousPage: previousPage,
-  nextPage: nextPage,
-} = paginator(totalEntries, currentPageIndex);
+const href = (page: number) => (page === 1 ? baseUrl : `${baseUrl}/p/${page}`);
 
-const getHref = (index: number) => {
-  const url = new URL(index === 0 ? baseUrl : `${baseUrl}/p/${index + 1}`, 'http://bogus.com');
-
-  if (searchParams) {
-    searchParams.forEach((value, key) => {
-      url.searchParams.append(key, value);
-    });
-  }
-
-  return url.pathname + url.search;
-};
+// Show `window` pages around the current page, and keep them inside 1..total.
+const first = Math.max(1, Math.min(current - Math.floor(window / 2), total - window + 1));
+const pages = Array.from({ length: Math.min(window, total) }, (_, i) => first + i);
 ---
 
 {
-  pageCount > 1 && (
-    <div class={s.pagination}>
-      <a href={getHref(previousPage - 1)} class:list={[s.button, !hasPreviousPage && s.disabled]}>
-        &laquo; Previous
-      </a>
-      <ul class={s.links}>
-        {Array.from({ length: pageCount }, (_, i) => (
+  total > 1 && (
+    <nav class:list={[styles.root, 'bodyMedium']} aria-label="Pages">
+      {current > 1 ? (
+        <a class={styles.step} href={href(current - 1)} rel="prev">
+          Previous
+        </a>
+      ) : (
+        <span class:list={[styles.step, styles.disabled]}>Previous</span>
+      )}
+      <ul class={styles.pages}>
+        {pages.map((page) => (
           <li>
-            <ActiveLink
-              href={getHref(firstPage + i - 1)}
-              class={s.linksItem}
-              activeClass={s.linkActive}
+            <a
+              class={styles.page}
+              href={href(page)}
+              aria-current={page === current ? 'page' : undefined}
             >
-              {firstPage + i}
-            </ActiveLink>
+              {page}
+            </a>
           </li>
         ))}
       </ul>
-      <a href={getHref(nextPage - 1)} class:list={[s.button, !hasNextPage && s.disabled]}>
-        Next &raquo;
-      </a>
-    </div>
+      {current < total ? (
+        <a class={styles.step} href={href(current + 1)} rel="next">
+          Next
+        </a>
+      ) : (
+        <span class:list={[styles.step, styles.disabled]}>Next</span>
+      )}
+    </nav>
   )
 }

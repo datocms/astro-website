@@ -1,0 +1,87 @@
+---
+import type { HTMLAttributes, HTMLTag } from 'astro/types';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends HTMLAttributes<'section'> {
+  as?: HTMLTag;
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+  /**
+   * `default` uses --section-padding-x, `headlines` uses
+   * --section-padding-x-headlines. With `none`, the section has no side
+   * padding and the content has no max width: the children pad themselves.
+   */
+  padding?: 'default' | 'headlines' | 'none';
+  /**
+   * The max width of the content: `content` (--content-max), `headline`
+   * (--headline-max) or `reading` (--reading-max, the text column of an
+   * article). It has no effect with `padding="none"`. `contentClass` must
+   * not set `max-width` or `margin-inline`: use this prop.
+   */
+  width?: 'content' | 'headline' | 'reading';
+  /**
+   * A background that is not `default` or `none` sets `data-tinted`: the
+   * section above can then know that the change of colour separates them
+   * (see FeatureFragments).
+   */
+  background?: 'default' | 'inverse' | 'accent' | 'accent-subtle' | 'accent-faint' | 'none';
+  /** Remove the vertical padding. */
+  flush?: boolean;
+  /** Remove the top padding: the section above gives the gap. */
+  flushTop?: boolean;
+  /** Remove the bottom padding: the section below gives the gap. */
+  flushBottom?: boolean;
+  class?: string;
+  contentClass?: string;
+}
+
+const {
+  as: Tag = 'section',
+  theme,
+  padding = 'default',
+  width = 'content',
+  background = 'default',
+  flush = false,
+  flushTop = false,
+  flushBottom = false,
+  class: className,
+  contentClass,
+  ...rest
+} = Astro.props;
+---
+
+<Tag
+  class:list={[
+    styles.section,
+    {
+      default: styles.paddingDefault,
+      headlines: styles.paddingHeadlines,
+      none: undefined,
+    }[padding],
+    {
+      content: undefined,
+      headline: styles.widthHeadline,
+      reading: styles.widthReading,
+    }[width],
+    {
+      default: styles.bgDefault,
+      inverse: styles.bgInverse,
+      accent: styles.bgAccent,
+      'accent-subtle': styles.bgAccentSubtle,
+      'accent-faint': styles.bgAccentFaint,
+      none: undefined,
+    }[background],
+    flush && styles.flush,
+    flushTop && styles.flushTop,
+    flushBottom && styles.flushBottom,
+    className,
+  ]}
+  data-theme={theme}
+  data-tinted={background !== 'default' && background !== 'none' ? '' : undefined}
+  {...rest}
+>
+  <div class:list={[styles.content, contentClass]}>
+    <slot />
+  </div>
+</Tag>

@@ -1,0 +1,86 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { Headline } from '~/components/Headline';
+import { InlineText } from '~/components/InlineText';
+import { Section } from '~/components/Section';
+import type { Theme } from '~/lib/theme';
+import type { ChapterHeaderData } from './types';
+import styles from './style.module.css';
+
+interface Props extends ChapterHeaderData {
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+  /** Use `h1` when the chapter is the top of a short page. */
+  headingLevel?: 'h1' | 'h2';
+  /**
+   * `default`: the text starts at the edge of the SceneFrame below.
+   * `headlines`: the narrow column of the centred headlines.
+   */
+  padding?: 'default' | 'headlines';
+  /**
+   * Remove the top padding. Use it when the chapter comes after a section
+   * on the same surface, for example the Hero: the bottom padding of that
+   * section is then the full gap.
+   */
+  flushTop?: boolean;
+  /**
+   * The surface of the section. Give the same value to the SceneFrame below,
+   * thus the header and the scene are on one surface. On `inverse` the text
+   * is light, and the link uses the `light-on-deep` appearance.
+   * `split`: the section has no background, and its parent draws the
+   * background of VersusSplit (see ChapterLayout). Below 1152px all the
+   * text is on the inverse surface. From 1152px the label and the headline
+   * are on the accent surface, and the intro and the link stay on the
+   * inverse surface.
+   */
+  background?: 'default' | 'accent' | 'inverse' | 'split';
+  id?: string;
+}
+
+const {
+  label,
+  headline,
+  muted,
+  intro,
+  link,
+  theme,
+  headingLevel = 'h2',
+  padding = 'default',
+  flushTop = false,
+  background = 'default',
+  id,
+} = Astro.props;
+
+// On a dark surface the link must be light. The variant comes from the data.
+// On `split` the link is solid: an accent pill, the colour of the left half.
+const onInverse = background === 'inverse' || background === 'split';
+const button =
+  link && background === 'split'
+    ? { ...link, appearance: 'light-on-deep' as const, variant: 'solid' as const }
+    : link && onInverse
+      ? { ...link, appearance: 'light-on-deep' as const }
+      : link;
+---
+
+{/* The first part of a chapter: label, two-tone headline, intro. A SceneFrame follows it. */}
+<Section
+  theme={theme}
+  padding={padding}
+  background={background === 'split' ? 'none' : background}
+  flushTop={flushTop}
+  class:list={[styles.header, onInverse && styles.inverse, background === 'split' && styles.split]}
+  contentClass={styles.content}
+  id={id}
+>
+  <div class={styles.title}>
+    <p class:list={[styles.label, 'subtitleMedium']}>{label}</p>
+    <Headline as={headingLevel} size="h1" class={styles.headline}>
+      <InlineText text={headline} />
+      {muted && <InlineText slot="muted" text={muted} />}
+    </Headline>
+  </div>
+  <div class={styles.text}>
+    <p class:list={[styles.intro, 'bodyLong']}>{intro}</p>
+    {button && <ButtonGroup buttons={[button]} />}
+  </div>
+</Section>

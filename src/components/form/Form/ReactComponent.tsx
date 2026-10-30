@@ -9,7 +9,7 @@ import {
 } from 'react-hook-form';
 import toast, { Toaster } from 'react-hot-toast';
 import s from './style.module.css';
-import { ButtonReactComponent } from '~/components/Button/ReactComponent';
+import { ButtonReactComponent } from '~/components/LegacyButton/ReactComponent';
 import { isActionError, isInputError } from 'astro:actions';
 import { TurnstileError, useTurnstile } from './useTurnstile';
 

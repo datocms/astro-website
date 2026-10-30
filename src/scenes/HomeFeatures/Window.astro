@@ -1,0 +1,49 @@
+---
+import { AppWindow } from '~/components/AppWindow';
+import * as home from '~/data/home';
+import { HomeHeroScene } from '../HomeHero/HomeHero';
+import { MediaLibraryScene } from '../MediaLibrary/MediaLibrary';
+import Chat from '../Mcp/Chat.astro';
+import { SchemaBuilderScene } from '../SchemaBuilder/SchemaBuilder';
+import styles from './style.module.css';
+
+// The picture of the home Features: one window, with one screen for each
+// pillar. Features shows only the pane of the active row. Each screen is
+// still: the home page plays no sequence.
+//
+// - Editor experience: the record editor of a blog post.
+// - For developers: the tab Schema of Northlight, the fields of Products
+//   (the first step of the frame of Schema builder, on /developers).
+// - Media: the grid of the media area of Saltmarsh Museum (the first step
+//   of the frame of Media library, on /media).
+// - AI: the chat of the frame of MCP (/ai), at its last step.
+//
+// Each screen has the theme of its row: the pane shows only while the
+// section has that theme. The window has no address: a cms and a chat app
+// share it. The chat is dark, as the cms on the inverse surface.
+
+const [editor, developers, media] = home.features.features.map((feature) => feature.theme);
+---
+
+<AppWindow aria-hidden="true">
+  <div class={styles.pane} data-features-pane="0" data-active>
+    <HomeHeroScene appearance={{ theme: editor, surface: 'inverse' }} height={1100} />
+  </div>
+  <div class={styles.pane} data-features-pane="1">
+    <SchemaBuilderScene
+      appearance={{ theme: developers, surface: 'inverse' }}
+      settings={false}
+      height={1100}
+    />
+  </div>
+  <div class={styles.pane} data-features-pane="2">
+    <MediaLibraryScene
+      appearance={{ theme: media, surface: 'inverse' }}
+      detail={false}
+      height={1100}
+    />
+  </div>
+  <div class:list={[styles.pane, styles.chat]} data-features-pane="3">
+    <Chat />
+  </div>
+</AppWindow>

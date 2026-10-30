@@ -1,0 +1,449 @@
+---
+import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import { DESCRIPTION, FORMATS, ORIGINAL, PARAMS, STILL, describe } from './story';
+import fiat from './fiat-500.jpg';
+import diagram from '../diagram/style.module.css';
+import styles from './style.module.css';
+
+// The frame of the Images chapter of /media, in the grammar of the
+// diagrams (../diagram/style.module.css). One row: the original photo on
+// the left, a line with the pill of DatoCMS in its middle, and the photo
+// that the URL makes on the right. The pill is the URL: its query has the
+// parameters that are on. Under the served photo, the readout of the file
+// (its weight, its size and its format) in a panel, on a branch of the
+// line: the line forks before the photo, and the branch goes down to the
+// readout. Under the row, a switch for each parameter and each format. On
+// phones the row goes down, and the branch goes around the photo.
+// A change: the switch lights, the pill swaps to the new query and a
+// pulse goes along the line from the original to the pill. The pill
+// works; then a pulse goes from the pill to each thing that the change
+// touches. The photo, when the picture changes: it changes when the pulse
+// arrives, and the pulse goes around its new edge (edgePulse). The
+// readout, when the file changes (a format, dpr: only the file): a pulse
+// goes along the branch to the readout; it rings, its values swap, and the
+// pulse goes around it. A change that touches both forks at the branch:
+// the second dash leaves the fork when the first one passes it. The
+// weight is the model of story.ts, not a measurement.
+// Without JS the lab is the still (STILL). In view, and not with reduced
+// motion, it plays the demo of story.ts (one change for each step) until
+// a visitor presses a switch.
+
+interface Props {
+  /**
+   * The phone layout at every width: the row goes down. For a narrow box
+   * on a wide screen. @default false
+   */
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+const photo = fiat;
+const still = describe(STILL);
+
+// The dots of the working mark of the pill, as in ../MediaAi/Pipeline.astro:
+// 5 × 5, each blinks from its own delay
+const DOTS = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) * 64)}ms`);
+---
+
+<div
+  class:list={[diagram.root, styles.lab]}
+  role="group"
+  aria-label={DESCRIPTION}
+  data-lab
+  data-compact={compact ? '' : undefined}
+  data-params={STILL.params.join(' ')}
+  data-format={STILL.format}
+>
+  <div class={styles.row} data-row>
+    <svg class={styles.trace} aria-hidden="true" data-trace data-pulse-class={diagram.pulse}></svg>
+
+    <div class:list={[styles.stage, styles.original]}>
+      <span class:list={[styles.photo, diagram.photo]} data-original>
+        <img src={photo.src} alt="" width={photo.width} height={photo.height} />
+      </span>
+    </div>
+    <div class:list={[styles.captionBox, styles.originalCaption]}>
+      <p class={styles.captionText}>
+        <span class:list={[styles.weight, 'code']}>{ORIGINAL.weight}</span>
+        <span class:list={[styles.spec, 'codeSmall']}>{ORIGINAL.spec}</span>
+      </p>
+    </div>
+
+    {
+      /*
+      The line, with the pill in its middle: the track only, the pulse is
+      on the svg of the row. Horizontal from 768px, vertical on phones:
+      the CSS shows one of the two.
+    */
+    }
+    <div class={styles.link}>
+      <svg class={styles.links} aria-hidden="true" data-links>
+        <g data-axis="x"><line class={diagram.track} x1="0" y1="50%" x2="100%" y2="50%"></line></g>
+        <g data-axis="y"><line class={diagram.track} x1="50%" y1="0" x2="50%" y2="100%"></line></g>
+      </svg>
+      <p class:list={[diagram.pill, diagram.swap, styles.query]} data-pill>
+        <span class={diagram.symbol} set:html={symbol} />
+        <span class={diagram.working}>
+          {DOTS.map((style) => <span style={style} />)}
+        </span>
+        <span data-query>
+          {still.parts.map((part) => <span class={styles.part}>{part}</span>)}
+        </span>
+      </p>
+    </div>
+
+    {/* The photo that the URL makes. Its box does not change: the photo changes in it. */}
+    <div class:list={[styles.stage, styles.result]}>
+      <span class:list={[styles.photo, styles.served, diagram.photo, diagram.change]} data-served>
+        <img src={photo.src} alt="" width={photo.width} height={photo.height} />
+      </span>
+      {
+        /* The branch of the line to the readout: the track only, drawn with the borders of the box */
+      }
+      <span class={styles.branch} aria-hidden="true" data-branch></span>
+    </div>
+
+    <div class:list={[styles.captionBox, styles.resultCaption]}>
+      <div class:list={[diagram.panel, diagram.change, styles.readout]} data-readout>
+        <p class:list={[styles.captionText, diagram.swap]} data-caption aria-live="polite">
+          <span class:list={[styles.weight, 'code']} data-weight>{still.weight}</span>
+          <span class:list={[styles.spec, 'codeSmall']} data-spec>{still.spec}</span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class={styles.switches}>
+    <ul class={styles.chips} aria-label="Parameters">
+      {
+        PARAMS.map((p) => {
+          const on = STILL.params.includes(p.key);
+          return (
+            <li>
+              <button
+                type="button"
+                class:list={[diagram.change, styles.chip]}
+                data-param={p.key}
+                aria-pressed={on ? 'true' : 'false'}
+                data-changed={on ? '' : undefined}
+              >
+                <code class:list={[styles.code, 'codeSmall']}>{p.code}</code>
+                <span class:list={[styles.hint, 'caption']}>{p.hint}</span>
+              </button>
+            </li>
+          );
+        })
+      }
+    </ul>
+    <ul class={styles.chips} aria-label="Format">
+      {
+        FORMATS.map((f) => {
+          const on = f.key === STILL.format;
+          return (
+            <li>
+              <button
+                type="button"
+                class:list={[diagram.change, styles.chip]}
+                data-fm={f.key}
+                aria-pressed={on ? 'true' : 'false'}
+                data-changed={on ? '' : undefined}
+              >
+                <code class:list={[styles.code, 'codeSmall']}>{f.label}</code>
+                {f.hint && <span class:list={[styles.hint, 'caption']}>{f.hint}</span>}
+              </button>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</div>
+
+<script>
+  import {
+    DIAGRAM_MS as MS,
+    reflow,
+    replay,
+    sleep,
+    startDiagramLoop,
+    swap,
+  } from '~/lib/motion/diagramLoop';
+  import type { Live } from '~/lib/motion/diagramLoop';
+  import { PULSE_SPEED, edgePulse, linePulse, partBox, pathPulse } from '~/lib/motion/diagramPulse';
+  import { DEMO, describe, next, touches, type Change, type LabState } from './story';
+  import styles from './style.module.css';
+
+  // The space between the pulse and the edge of the served photo or of the readout, in px
+  const OUT = 6;
+
+  /**
+   * The time, in ms of a pulse of `duration` ms, when the dash is at
+   * `fraction` of its path. The easing of a pulse is
+   * cubic-bezier(0.77, 0, 0.175, 1) (--diagram-ease-in-out): x is the
+   * time, y the way. A bisection on the curve finds the point.
+   */
+  function when(fraction: number, duration: number): number {
+    const bezier = (a: number, b: number, u: number) =>
+      3 * (1 - u) ** 2 * u * a + 3 * (1 - u) * u ** 2 * b + u ** 3;
+    let lo = 0;
+    let hi = 1;
+    for (let i = 0; i < 24; i++) {
+      const u = (lo + hi) / 2;
+      if (bezier(0, 1, u) < fraction) lo = u;
+      else hi = u;
+    }
+    return bezier(0.77, 0.175, (lo + hi) / 2) * duration;
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-lab]')) {
+    const $ = <T extends Element = HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
+    const row = $('[data-row]');
+    const trace = $<SVGSVGElement>('[data-trace]');
+    const links = $('[data-links]');
+    const original = $('[data-original]');
+    const pill = $('[data-pill]');
+    const query = $('[data-query]');
+    const served = $('[data-served]');
+    const branch = $('[data-branch]');
+    const readout = $('[data-readout]');
+    const caption = $('[data-caption]');
+    const buttons = Array.from(root.querySelectorAll<HTMLElement>('[data-param], [data-fm]'));
+
+    let state: LabState = {
+      params: root.dataset.params!.split(' ').filter(Boolean),
+      format: root.dataset.format!,
+    };
+    let touched = false;
+    let step = 0;
+
+    const button = (change: Change) =>
+      buttons.find((b) =>
+        'format' in change ? b.dataset.fm === change.format : b.dataset.param === change.param,
+      )!;
+
+    /** The switches show the state: a switch that is on has the ring and the tint of a change */
+    const press = () => {
+      for (const b of buttons) {
+        const on = b.dataset.fm
+          ? b.dataset.fm === state.format
+          : state.params.includes(b.dataset.param!);
+        b.setAttribute('aria-pressed', String(on));
+        if (on) b.dataset.changed = '';
+        else delete b.dataset.changed;
+      }
+    };
+
+    /** The photo shows the state; the attributes of the root drive its CSS */
+    const serve = () => {
+      root.dataset.params = state.params.join(' ');
+      root.dataset.format = state.format;
+    };
+
+    /** The query in the pill: one span for each parameter, which does not break */
+    const ask = (d: ReturnType<typeof describe>) =>
+      query.replaceChildren(
+        ...d.parts.map((part) => {
+          const span = document.createElement('span');
+          span.className = styles.part!;
+          span.textContent = part;
+          return span;
+        }),
+      );
+
+    const write = (d: ReturnType<typeof describe>) => {
+      $('[data-weight]').textContent = d.weight;
+      $('[data-spec]').textContent = d.spec;
+    };
+
+    const sync = () => {
+      trace.replaceChildren();
+      delete pill.dataset.working;
+      delete readout.dataset.changed;
+      delete readout.dataset.ping;
+      const d = describe(state);
+      ask(d);
+      write(d);
+      press();
+      serve();
+    };
+
+    const vertical = () =>
+      getComputedStyle(links.querySelector('[data-axis="x"]')!).display === 'none';
+
+    /**
+     * The path of the pulse along the branch, from the far side of the
+     * pill (or from the fork, `fromFork`) to the readout, in px of the row:
+     * the way of the main line to the fork, then the borders of the branch
+     * box with their round corners. With it, the length of the path and
+     * the way along the main line from the pill to the fork.
+     */
+    const branchPath = (fromFork: boolean) => {
+      const b = partBox(row, branch);
+      const p = partBox(row, pill);
+      const line = partBox(row, links);
+      const r = Math.min(
+        parseFloat(getComputedStyle(branch).borderBottomLeftRadius) || 0,
+        (b.bottom - b.top) / 2,
+      );
+      const stroke = parseFloat(getComputedStyle(branch).borderLeftWidth) || 0;
+      const x = b.left + stroke / 2;
+      const y = b.bottom - stroke / 2;
+      const end = partBox(row, readout).left - OUT;
+      const arc = (Math.PI * r) / 2;
+      // The arc at the bottom left and the way to the readout
+      const tail = `L ${x} ${y - r} A ${r} ${r} 0 0 0 ${x + r} ${y} L ${end} ${y}`;
+      if (!vertical()) {
+        // The fork is on the main line, at the top of the branch box
+        const c = (line.top + line.bottom) / 2;
+        const start = Math.max(p.right, line.left);
+        const main = x - start;
+        const d = `${fromFork ? `M ${x} ${c} ` : `M ${start} ${c} L ${x} ${c} `}${tail}`;
+        return { d, main, length: (fromFork ? 0 : main) + (y - r - c) + arc + (end - x - r) };
+      }
+      // The fork is on the main line, at the top right of the branch box
+      const c = (line.left + line.right) / 2;
+      const start = Math.max(p.bottom, line.top);
+      const top = b.top + stroke / 2;
+      const main = top - start;
+      const bend = `L ${x + r} ${top} A ${r} ${r} 0 0 0 ${x} ${top + r} `;
+      const d = `${fromFork ? `M ${c} ${top} ` : `M ${c} ${start} L ${c} ${top} `}${bend}${tail}`;
+      return {
+        d,
+        main,
+        length: (fromFork ? 0 : main) + (c - x - r) + arc + (y - top - 2 * r) + arc + (end - x - r),
+      };
+    };
+
+    /** The time of a pulse of `length` px at the speed of the grammar, between one and three travels */
+    const time = (length: number) =>
+      Math.min(3 * MS.travel, Math.max(MS.travel, length / PULSE_SPEED));
+
+    /**
+     * The pulse from the pill to the served photo. When it arrives, the
+     * photo changes, and the pulse goes around its new edge. edgePulse
+     * measures the photo when it starts, thus the photo takes its new
+     * shape at once for the measure, goes back, and then changes with its
+     * transition.
+     */
+    async function toPhoto(live: Live): Promise<void> {
+      await linePulse({ root: row, trace, links, from: pill, to: served });
+      if (!live()) return;
+      const [params, format] = [root.dataset.params!, root.dataset.format!];
+      root.dataset.instant = '';
+      serve();
+      reflow(served);
+      const around = edgePulse({ root: row, trace, links, parts: [served], out: () => OUT });
+      Object.assign(root.dataset, { params, format });
+      reflow(served);
+      delete root.dataset.instant;
+      reflow(served);
+      serve();
+      await around;
+    }
+
+    /**
+     * The pulse along the branch to the readout, from the pill, or from
+     * the fork when the pulse to the photo passes it (`withPhoto`). When
+     * it arrives, the readout rings and its values swap, and the pulse
+     * goes around it.
+     */
+    async function toReadout(
+      live: Live,
+      d: ReturnType<typeof describe>,
+      withPhoto: boolean,
+    ): Promise<void> {
+      const path = branchPath(withPhoto);
+      if (withPhoto) {
+        // The pulse to the photo takes a travel to the near side of the photo
+        const p = partBox(row, pill);
+        const s = partBox(row, served);
+        const way = vertical() ? s.top - p.bottom : s.left - p.right;
+        await sleep(when(path.main / way, MS.travel));
+        if (!live()) return;
+      }
+      await pathPulse(trace, path.d, time(path.length));
+      if (!live()) return;
+      const around = edgePulse({
+        root: row,
+        trace,
+        links: readout,
+        parts: [readout],
+        out: () => OUT,
+      });
+      readout.dataset.changed = '';
+      replay(readout, 'ping');
+      swap(caption, () => write(d));
+      await around;
+      delete readout.dataset.changed;
+    }
+
+    /**
+     * Plays one change. The switch lights; the pill swaps to the new query
+     * while a pulse goes from the original to the pill; the pill works; a
+     * pulse goes from the pill to the photo (when the picture changes) and
+     * along the branch to the readout (when the file changes). A click
+     * plays it with no pulse: the photo and the readout ping.
+     */
+    async function play(change: Change, live?: Live): Promise<void> {
+      const before = state;
+      state = next(state, change);
+      const d = describe(state);
+      const { picture, file } = touches(before, state);
+      press();
+      replay(button(change), 'ping');
+      await sleep(MS.pop);
+      if (live && !live()) return;
+      swap(pill, () => ask(d));
+      if (live) {
+        await linePulse({ root: row, trace, links, from: original, to: pill });
+        if (!live()) return;
+        pill.dataset.working = '';
+        await sleep(MS.swap);
+        delete pill.dataset.working;
+        if (!live()) return;
+        const pulses = [];
+        if (picture) pulses.push(toPhoto(live));
+        if (file) pulses.push(toReadout(live, d, picture));
+        await Promise.all(pulses);
+        return;
+      }
+      serve();
+      if (picture) replay(served, 'ping');
+      if (file) {
+        replay(readout, 'ping');
+        swap(caption, () => write(d));
+      }
+    }
+
+    root.addEventListener('click', (event) => {
+      const b = (event.target as Element).closest<HTMLElement>('[data-param], [data-fm]');
+      if (!b) return;
+      touched = true;
+      const change: Change = b.dataset.fm
+        ? { format: b.dataset.fm }
+        : { param: b.dataset.param!, on: !state.params.includes(b.dataset.param!) };
+      void play(change);
+    });
+
+    // The demo plays in view only, one change for each step, and stops for
+    // good when a visitor presses a switch
+    startDiagramLoop(
+      root,
+      async (live) => {
+        // After a click the session waits and does nothing more
+        if (touched) return new Promise<void>(() => {});
+        const playing = () => live() && !touched;
+        await play(DEMO[step % DEMO.length]!, playing);
+        if (!playing()) return;
+        step++;
+        await sleep(MS.swap + MS.hold);
+      },
+      {
+        start: async () => {
+          if (!touched) sync();
+          await sleep(MS.hold);
+        },
+      },
+    );
+  }
+</script>

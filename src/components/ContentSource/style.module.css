@@ -1,0 +1,169 @@
+/*
+ * The lockup sizes follow the container: display size 7.3cqi
+ * (9.9cqi under 768), symbol 0.733×, gaps 0.6×, list gap 0.111×,
+ * list offset 0.067×.
+ * Order: label, symbol, list. The symbol is always at the centre.
+ */
+.content {
+  --visual-height: 250px;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.content .headline {
+  max-width: 361px;
+}
+
+/* The H1 type under 768 (the values of the h1 class), the H2 type above. */
+@media (max-width: 767px) {
+  .content .headline {
+    font-size: var(--type-h1);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+}
+
+.paragraph {
+  max-width: 345px;
+  color: var(--text-on-inverse-soft);
+}
+
+.visual {
+  position: relative;
+  height: var(--visual-height);
+  margin-top: calc(var(--space-md) - var(--space-2xs));
+  margin-inline: calc(var(--section-padding-x) * -1);
+  margin-bottom: calc(var(--section-padding-y) * -1);
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.lockup {
+  --size: 9.9cqi;
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  position: absolute;
+  inset-inline: 0;
+  bottom: calc(var(--visual-height) / 2 - var(--size) / 2);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: calc(var(--size) * 0.6);
+  /* The weight and tracking of .display, with a size from the container. */
+  font-size: var(--size);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+}
+
+.label {
+  justify-self: end;
+}
+
+.symbol {
+  display: block;
+  width: calc(var(--size) * 0.733);
+  margin-top: calc(var(--size) * 0.067);
+}
+
+.symbol :global(svg) {
+  width: 100%;
+  height: auto;
+}
+
+.labelShort {
+  display: inline;
+}
+
+.labelLong {
+  display: none;
+}
+
+.listWindow {
+  position: relative;
+}
+
+.list {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--size) * 0.111);
+  transform: translateY(calc((var(--active-start, 0) + var(--offset, 0)) * var(--size) * -1.111));
+}
+
+.item {
+  opacity: 0.3;
+}
+
+.item.active,
+.item[data-active] {
+  opacity: 1;
+}
+
+/* When JS runs, the data-active attribute replaces the first state. */
+.list:has([data-active]) .item.active:not([data-active]) {
+  opacity: 0.3;
+}
+
+@media (min-width: 768px) {
+  .content {
+    display: grid;
+    grid-template-rows: 1fr auto;
+    gap: var(--space-md);
+    min-height: var(--visual-height);
+  }
+
+  .content {
+    --visual-height: 369px;
+  }
+
+  /* The list goes to the edges of the section. */
+  .visual {
+    position: absolute;
+    inset: calc(var(--section-padding-y) * -1) 0;
+    height: auto;
+    margin: 0;
+  }
+
+  .headline,
+  .paragraph {
+    position: relative;
+    z-index: 1;
+  }
+
+  .paragraph {
+    align-self: end;
+  }
+
+  .lockup {
+    --size: 7.3cqi;
+    bottom: auto;
+    top: calc(50% - var(--size) / 2);
+  }
+
+  .labelShort {
+    display: none;
+  }
+
+  .labelLong {
+    display: inline;
+  }
+}
+
+@media (min-width: 1152px) {
+  .content {
+    --visual-height: 572px;
+  }
+}
+
+@media (min-width: 1320px) {
+  .content {
+    --visual-height: 632px;
+  }
+}

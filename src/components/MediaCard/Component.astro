@@ -1,0 +1,55 @@
+---
+import { PixelImage } from '~/components/PixelImage';
+import styles from './style.module.css';
+
+interface Props {
+  href: string;
+  /** Without an image, the card shows an empty box of the same size. */
+  image?: { src: string; alt: string };
+  /**
+   * The shape of the image box. 'caseStudy' (the default) is
+   * square below 1152, 385 high from 1152. 'cover' is 5:3 at all
+   * widths: the shape of the covers of the blog.
+   */
+  imageShape?: 'caseStudy' | 'cover';
+  /** The `title` slot replaces this text, for example with rich text. */
+  title?: string;
+  /** The `description` slot replaces this text. */
+  description?: string;
+}
+
+const { href, image, imageShape = 'caseStudy', title, description } = Astro.props;
+const hasDescription = Astro.slots.has('description') || Boolean(description);
+const imageClass = imageShape === 'cover' ? `${styles.image} ${styles.cover}` : styles.image;
+---
+
+<a href={href} class={styles.card}>
+  {
+    image ? (
+      <PixelImage
+        class={imageClass}
+        src={image.src}
+        alt={image.alt}
+        width="560"
+        height={imageShape === 'cover' ? '336' : '385'}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <span class={imageClass} />
+    )
+  }
+  <span class={styles.text}>
+    <span class:list={[styles.title, 'h2']}>
+      <slot name="title">{title}</slot>
+    </span>
+    {
+      hasDescription && (
+        <span class:list={[styles.description, 'body']}>
+          <slot name="description">{description}</slot>
+        </span>
+      )
+    }
+  </span>
+  <slot />
+</a>

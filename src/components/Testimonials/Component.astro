@@ -1,0 +1,310 @@
+---
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Section } from '~/components/Section';
+import { PlainText } from '~/components/StructuredText';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { Theme } from '~/lib/theme';
+import { TestimonialsPartnerTestimonialFragment, TestimonialsReviewFragment } from './graphql';
+import styles from './style.module.css';
+
+/**
+ * A review or a partner testimonial. The query selects `__typename` next to
+ * the fragment: the component reads the fragment of that type.
+ */
+export type TestimonialsItem =
+  | ({ __typename: 'ReviewRecord' } & ReviewItem)
+  | ({ __typename: 'PartnerTestimonialRecord' } & PartnerTestimonialItem);
+
+type ReviewItem = FragmentOf<typeof TestimonialsReviewFragment>;
+type PartnerTestimonialItem = FragmentOf<typeof TestimonialsPartnerTestimonialFragment>;
+
+interface Props {
+  /** The reviews and the partner testimonials of the CMS, in their order. */
+  items: TestimonialsItem[];
+  /** `grid` (default) shows rows of quotes. `slider` shows one quote at a time on the accent surface. */
+  variant?: 'grid' | 'slider';
+  /** Slider only. `big` uses the display type. */
+  size?: 'default' | 'big';
+  theme?: Theme;
+  /**
+   * Grid only. For quotes of a few sentences: the text has the size of
+   * `h2` on every screen and uses the full width of the column. Not in the
+   * prototype.
+   */
+  long?: boolean;
+}
+
+const { variant = 'grid', size = 'default', theme, long = false } = Astro.props;
+
+const testimonials = Astro.props.items.map((item) => {
+  if (item.__typename === 'ReviewRecord') {
+    const data = readFragment(TestimonialsReviewFragment, item as ReviewItem);
+    return { ...data, image: data.image.responsiveImage, company: undefined, href: undefined };
+  }
+  // A partner testimonial links to the page of its partner and shows the
+  // name of the partner.
+  const data = readFragment(TestimonialsPartnerTestimonialFragment, item as PartnerTestimonialItem);
+  const { partner } = data;
+  return {
+    ...data,
+    image: data.image.responsiveImage,
+    company: partner?.name,
+    href: partner ? buildUrlForPartner(partner) : undefined,
+  };
+});
+---
+
+{
+  variant === 'grid' ? (
+    <Section theme={theme} class:list={[styles.testimonials, long && styles.long]}>
+      <ul class={styles.grid}>
+        {testimonials.map((t) => {
+          const Wrapper = t.href ? 'a' : 'div';
+          return (
+            <li>
+              <Wrapper class={t.href ? styles.link : styles.item} href={t.href}>
+                <figure class={styles.figure}>
+                  <blockquote class:list={[styles.quote, 'h2']}>
+                    <p>
+                      <PlainText data={t.quote} />
+                    </p>
+                  </blockquote>
+                  <figcaption class={styles.author}>
+                    {t.image && (
+                      <ResponsiveImage
+                        data={t.image}
+                        sizes="28px"
+                        pictureClass={styles.avatarPicture}
+                        imgClass={styles.avatar}
+                      />
+                    )}
+                    <span class={styles.names}>
+                      <span class:list={[styles.name, 'subtitleMedium']}>{t.name}</span>
+                      <span class:list={[styles.role, 'subtitleMedium']}>{t.role}</span>
+                      {t.company && (
+                        <span class:list={[styles.role, 'subtitleMedium']}>{t.company}</span>
+                      )}
+                    </span>
+                  </figcaption>
+                </figure>
+              </Wrapper>
+            </li>
+          );
+        })}
+      </ul>
+    </Section>
+  ) : (
+    <Section
+      theme={theme}
+      background="accent"
+      padding="headlines"
+      class={size === 'big' ? `${styles.slider} ${styles.big}` : styles.slider}
+      contentClass={styles.sliderContent}
+      aria-roledescription="carousel"
+      aria-label="Quotes"
+      data-quote-slider
+    >
+      <ul class={styles.slides} aria-live="polite" data-slides>
+        {testimonials.map((t, i) => (
+          <li
+            class={styles.slide}
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${i + 1} of ${testimonials.length}`}
+            aria-hidden={i === 0 ? undefined : 'true'}
+            data-active={i === 0 ? '' : undefined}
+            data-slide
+          >
+            <figure class={styles.slideFigure}>
+              <blockquote class:list={[styles.slideQuote, size === 'big' ? 'display' : 'h1']}>
+                {/* The word joiner keeps the closing mark on the line of the last word. */}
+                <p>
+                  “<PlainText data={t.quote} typographic />
+                  {'\u2060”'}
+                </p>
+              </blockquote>
+              <figcaption class={styles.slideAuthor}>
+                {t.image && (
+                  <ResponsiveImage
+                    data={t.image}
+                    sizes="40px"
+                    pictureClass={styles.slideAvatarPicture}
+                    imgClass={styles.slideAvatar}
+                  />
+                )}
+                <span class="subtitleMedium">
+                  <span>{t.name}</span> <span class={styles.role}>{t.role}</span>
+                </span>
+              </figcaption>
+            </figure>
+          </li>
+        ))}
+      </ul>
+
+      {testimonials.length > 1 && (
+        <>
+          <span class={styles.dots} aria-hidden="true">
+            {testimonials.map((_, i) => (
+              <span class={styles.dot} data-active={i === 0 ? '' : undefined} data-dot />
+            ))}
+          </span>
+          <button
+            type="button"
+            class:list={[styles.half, styles.prev]}
+            aria-label="Previous quote"
+            hidden
+            data-prev
+          >
+            <span class:list={[styles.arrow, 'h1']} aria-hidden="true">
+              ←
+            </span>
+          </button>
+          <button
+            type="button"
+            class:list={[styles.half, styles.next]}
+            aria-label="Next quote"
+            hidden
+            data-next
+          >
+            <span class:list={[styles.arrow, 'h1']} aria-hidden="true">
+              →
+            </span>
+          </button>
+        </>
+      )}
+    </Section>
+  )
+}
+
+<script>
+  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+
+  const INTERVAL = 6000;
+  // A touch that moves more than this distance on the x axis is a swipe.
+  const SWIPE = 40;
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-quote-slider]')) {
+    const list = root.querySelector<HTMLElement>('[data-slides]');
+    const slides = [...root.querySelectorAll<HTMLElement>('[data-slide]')];
+    const dots = [...root.querySelectorAll<HTMLElement>('[data-dot]')];
+    const prev = root.querySelector<HTMLButtonElement>('[data-prev]');
+    const next = root.querySelector<HTMLButtonElement>('[data-next]');
+    if (!list || !prev || !next || slides.length < 2) continue;
+
+    // Without JS the halves stay hidden, because they do nothing.
+    prev.hidden = false;
+    next.hidden = false;
+
+    // With reduced motion there is no autoplay and no slide animation.
+    const reduced = prefersReducedMotion();
+    let index = 0;
+    let timer: number | undefined;
+    let visible = false;
+    let hovered = false;
+    let focused = false;
+
+    const show = (to: number, direction: 'next' | 'prev') => {
+      const target = (to + slides.length) % slides.length;
+      const from = slides[index]!;
+      from.removeAttribute('data-active');
+      from.removeAttribute('data-enter');
+      from.setAttribute('aria-hidden', 'true');
+      dots[index]?.removeAttribute('data-active');
+
+      index = target;
+      const slide = slides[index]!;
+      slide.setAttribute('data-active', '');
+      slide.removeAttribute('aria-hidden');
+      dots[index]?.setAttribute('data-active', '');
+      if (!reduced) {
+        // Remove the attribute and read the layout, thus the animation starts again.
+        slide.removeAttribute('data-enter');
+        void slide.offsetWidth;
+        slide.dataset.enter = direction;
+      }
+    };
+
+    // The timer runs only when the slider is on screen, and when no
+    // pointer is on it and no half has keyboard focus.
+    const schedule = () => {
+      window.clearTimeout(timer);
+      timer = undefined;
+      const playing = !reduced && visible && !hovered && !focused;
+      // Screen readers announce the change only when the user makes it.
+      list.setAttribute('aria-live', playing ? 'off' : 'polite');
+      if (!playing) return;
+      timer = window.setTimeout(() => {
+        show(index + 1, 'next');
+        schedule();
+      }, INTERVAL);
+    };
+
+    const go = (direction: 'next' | 'prev') => {
+      show(index + (direction === 'next' ? 1 : -1), direction);
+      schedule();
+    };
+
+    prev.addEventListener('click', () => go('prev'));
+    next.addEventListener('click', () => go('next'));
+
+    root.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') go('prev');
+      else if (event.key === 'ArrowRight') go('next');
+      else return;
+      event.preventDefault();
+    });
+
+    root.addEventListener('pointerenter', (event) => {
+      if (event.pointerType !== 'mouse') return;
+      hovered = true;
+      schedule();
+    });
+    root.addEventListener('pointerleave', (event) => {
+      if (event.pointerType !== 'mouse') return;
+      hovered = false;
+      schedule();
+    });
+
+    // A click with the mouse also gives focus to the button. Only keyboard
+    // focus (focus-visible) stops the autoplay.
+    root.addEventListener('focusin', (event) => {
+      focused = event.target instanceof Element && event.target.matches(':focus-visible');
+      schedule();
+    });
+    root.addEventListener('focusout', () => {
+      focused = false;
+      schedule();
+    });
+
+    let startX: number | undefined;
+    let startY = 0;
+    root.addEventListener(
+      'touchstart',
+      (event) => {
+        startX = event.touches[0]!.clientX;
+        startY = event.touches[0]!.clientY;
+      },
+      { passive: true },
+    );
+    root.addEventListener('touchend', (event) => {
+      if (startX === undefined) return;
+      const dx = event.changedTouches[0]!.clientX - startX;
+      const dy = event.changedTouches[0]!.clientY - startY;
+      startX = undefined;
+      if (Math.abs(dx) < SWIPE || Math.abs(dx) < Math.abs(dy)) return;
+      // A swipe to the left shows the next quote. Do not also send the tap.
+      event.preventDefault();
+      go(dx < 0 ? 'next' : 'prev');
+    });
+
+    for (const slide of slides) {
+      slide.addEventListener('animationend', () => slide.removeAttribute('data-enter'));
+    }
+
+    onVisibilityChange(root, (isVisible) => {
+      visible = isVisible;
+      schedule();
+    });
+  }
+</script>

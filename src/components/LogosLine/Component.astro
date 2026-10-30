@@ -1,0 +1,103 @@
+---
+import { Logo } from '~/components/Logo';
+import styles from './style.module.css';
+import type { LogoItem } from './types';
+
+interface Props {
+  logos: LogoItem[];
+  label?: string;
+  /** `small` keeps the logos 28px tall at all widths. */
+  size?: 'default' | 'small';
+  /**
+   * `always` scrolls the logos at all widths. `overflow` scrolls them only
+   * when they do not fit: else they stay static in the centre.
+   */
+  marquee?: 'always' | 'overflow';
+  class?: string;
+}
+
+const {
+  logos,
+  label = 'Trusted by',
+  size = 'default',
+  marquee = 'always',
+  class: className,
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    styles.logosLine,
+    size === 'small' && styles.small,
+    marquee === 'overflow' && styles.overflow,
+    className,
+  ]}
+  data-logos-line
+  data-marquee={marquee}
+>
+  <ul class={styles.track} aria-label={label} data-logos-track>
+    {
+      logos.map((logo) => (
+        <li class={styles.item}>
+          <Logo logo={logo} class={styles.logo} loading="eager" />
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<script>
+  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+
+  const SPEED = 32;
+
+  function setup(root: HTMLElement) {
+    const track = root.querySelector<HTMLElement>('[data-logos-track]');
+    if (!track || prefersReducedMotion()) return;
+    const items = [...track.children] as HTMLElement[];
+
+    const build = () => {
+      for (const clone of track.querySelectorAll('[data-clone]')) clone.remove();
+      delete root.dataset.running;
+      const setWidth = track.scrollWidth;
+      if (setWidth === 0) return;
+      // In the `overflow` mode, logos that fit stay static. The last gap
+      // is not part of the visible width.
+      if (root.dataset.marquee === 'overflow') {
+        const gap = parseFloat(getComputedStyle(items[0]!).paddingRight) || 0;
+        if (setWidth - gap <= root.clientWidth) return;
+      }
+      // Add copies until the track covers the viewport plus one set.
+      const copies = Math.ceil(root.clientWidth / setWidth) + 1;
+      for (let i = 0; i < copies; i += 1) {
+        for (const item of items) {
+          const clone = item.cloneNode(true) as HTMLElement;
+          clone.dataset.clone = '';
+          clone.setAttribute('aria-hidden', 'true');
+          track.appendChild(clone);
+        }
+      }
+      root.style.setProperty('--marquee-distance', `${setWidth}px`);
+      root.style.setProperty('--marquee-duration', `${setWidth / SPEED}s`);
+      root.dataset.running = '';
+    };
+
+    const images = [...track.querySelectorAll('img')];
+    Promise.all(images.map((img) => (img.complete ? null : img.decode().catch(() => null)))).then(
+      build,
+    );
+
+    let width = root.clientWidth;
+    new ResizeObserver(() => {
+      if (root.clientWidth === width) return;
+      width = root.clientWidth;
+      build();
+    }).observe(root);
+
+    onVisibilityChange(root, (visible) => {
+      root.dataset.paused = visible ? 'false' : 'true';
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-logos-line]').forEach(setup);
+</script>

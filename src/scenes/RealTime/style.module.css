@@ -1,0 +1,366 @@
+/*
+ * The pill, the lines, the ring and the motion are the grammar of the
+ * diagrams (../diagram/style.module.css); the two windows are AppWindow, as
+ * on the home page. This file has only the stream: where the parts sit, the
+ * tag next to the stream, the code of the component and the posts.
+ *
+ * The script of Stream.astro sets the attributes of the grammar and
+ * `data-flip` on the posts: no transition, for the move up by one row.
+ * Without the script the frame is the still: the newest post with the ring.
+ */
+.stream {
+  --pad: var(--space-xs);
+  --title-height: 20px;
+  --title-gap: var(--space-xs);
+  --row: 52px;
+  --row-gap: var(--space-3xs);
+  --rows: 4;
+  /* The length of the stream, from the pill to the card: longer than a line of the grammar, the open connection */
+  --stream-link: var(--space-3xl);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+
+@media (max-width: 1151px) {
+  .stream {
+    max-width: 560px;
+  }
+}
+
+.stream[data-compact] {
+  max-width: 560px;
+}
+
+.events {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.pill {
+  --diagram-swap-y: var(--space-md);
+}
+
+.events .time {
+  color: var(--surface-inverse-muted);
+}
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--row-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transition: translate var(--diagram-enter) var(--diagram-ease-out);
+}
+
+.posts[data-flip] {
+  transition: none;
+}
+
+/*
+ * The lines: the stream from the pill to the card, and the line from the
+ * card to the panel (`.out`). Vertical, except `.out` from 1152px. The svg
+ * goes 2px under the parts at its two ends, which are above it. The tag is
+ * next to the stream, not on it: a label on the track would hide the
+ * pulse. It is at the right of the vertical line.
+ */
+.line {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: var(--diagram-link);
+}
+
+.line:not(.out) {
+  height: var(--stream-link);
+}
+
+.links {
+  position: absolute;
+  inset: calc(-1 * var(--diagram-tuck)) 0;
+  width: 100%;
+  height: calc(100% + 2 * var(--diagram-tuck));
+  overflow: visible;
+  pointer-events: none;
+}
+
+.links [data-axis='x'] {
+  display: none;
+}
+
+.tag {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + var(--space-xs));
+  translate: 0 -50%;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  color: var(--text-on-inverse-muted);
+}
+
+/*
+ * The component: the window of a code editor with its code, in the
+ * colours of the code of the site (tokens.css, "Code"). The variables of
+ * the theme of Shiki map to them as in CodeSnippetPreview (its
+ * style.module.css tells what Shiki puts in each). The window is as wide
+ * as its longest line; a narrow box cuts the code at the right. The
+ * windows are above the lines, which go under them.
+ */
+.card {
+  --shiki-foreground: var(--code-plain);
+  --shiki-token-keyword: var(--code-keyword);
+  --shiki-token-string: var(--code-plain);
+  --shiki-token-string-expression: var(--code-string);
+  --shiki-token-link: var(--code-string);
+  --shiki-token-constant: var(--code-constant);
+  --shiki-token-function: var(--code-function);
+  --shiki-token-parameter: var(--code-plain);
+  --shiki-token-comment: var(--code-comment);
+  --shiki-token-punctuation: var(--code-punctuation);
+  position: relative;
+  z-index: 1;
+  width: max-content;
+  max-width: 100%;
+  color: var(--code-plain);
+}
+
+.code {
+  display: block;
+  padding: var(--pad);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.codeLine {
+  display: block;
+  white-space: pre;
+}
+
+/*
+ * The hook: the lines of the focus of the snippet in one box, which gets
+ * the ring when an event comes in. The box goes out of the text by a
+ * small space at each side, thus the ring does not touch the code.
+ */
+.hook {
+  /* The ping grows by about the same px on the four sides of a wide box */
+  --diagram-ping-scale: 1.04 1.08;
+  display: block;
+  margin-inline: calc(-1 * var(--space-3xs));
+  padding-inline: var(--space-3xs);
+  border-radius: var(--radius-sm);
+}
+
+.panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+.page {
+  padding: var(--pad);
+}
+
+.title {
+  height: var(--title-height);
+  margin: 0 0 var(--title-gap);
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: var(--type-code);
+  font-weight: 500;
+  line-height: var(--title-height);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-on-inverse-strong);
+}
+
+.viewport {
+  height: calc(var(--rows) * var(--row) + (var(--rows) - 1) * var(--row-gap));
+  /* Room for the ping of the first post, which the box would cut */
+  margin: calc(-1 * var(--space-3xs));
+  padding: var(--space-3xs);
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--row)), transparent);
+}
+
+.post {
+  /* The ping grows by about the same px on the four sides of a wide row */
+  --diagram-ping-scale: 1.03 1.3;
+  display: grid;
+  flex: none;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-xs);
+  box-sizing: border-box;
+  height: var(--row);
+  padding: 0 var(--space-xs);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 1px var(--border-on-inverse);
+}
+
+.time {
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.post .time {
+  color: var(--text-on-inverse-muted);
+  transition: color var(--diagram-settle) var(--diagram-ease-out);
+}
+
+.post[data-changed] .time {
+  color: var(--text-on-inverse);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.skeleton {
+  height: 6px;
+  border-radius: 2px;
+}
+
+.heading {
+  width: 70%;
+  background: var(--text-on-inverse-muted);
+}
+
+.text {
+  width: 45%;
+  background: var(--text-on-inverse-subtle);
+}
+
+.picture {
+  display: none;
+  width: 44px;
+  height: 32px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--text-on-inverse) 18%, transparent);
+}
+
+.post[data-variant='1'] .heading {
+  width: 55%;
+}
+
+.post[data-variant='1'] .text {
+  width: 80%;
+}
+
+.post[data-variant='2'] .heading {
+  width: 85%;
+}
+
+.post[data-variant='2'] .text {
+  width: 35%;
+}
+
+.post[data-variant='3'] .heading {
+  width: 62%;
+}
+
+.post[data-variant='4'] .heading {
+  width: 75%;
+}
+
+.post[data-variant='4'] .text {
+  width: 50%;
+}
+
+.post[data-variant='1'] .picture,
+.post[data-variant='3'] .picture,
+.post[data-variant='4'] .picture {
+  display: block;
+}
+
+.post[data-variant='4'] .picture {
+  position: relative;
+}
+
+.post[data-variant='4'] .picture::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 54%;
+  translate: -50% -50%;
+  border-block: 5px solid transparent;
+  border-left: 8px solid var(--text-on-inverse-strong);
+}
+
+/*
+ * From 1152px: an L, but not with `data-compact` (the phone layout at
+ * every width). The left column has the pill, the stream and the
+ * card; the panel is at its right. The card and the panel have the same
+ * middle, and the line to the panel is there: under the card, a row as
+ * high as the pill and the stream keeps the card at the middle. The line
+ * is not at the height of the first post.
+ */
+@media (min-width: 1152px) {
+  .stream:not([data-compact]) {
+    --pad: var(--space-sm);
+    --row: 56px;
+    --rows: 5;
+    --title-height: 22px;
+    grid-template-columns: max-content minmax(var(--space-3xl), 0.5fr) minmax(0, 1.5fr);
+    grid-template-rows: 1fr auto auto auto calc(var(--diagram-pill) + var(--stream-link)) 1fr;
+    justify-items: stretch;
+  }
+
+  .stream:not([data-compact]) .events,
+  .stream:not([data-compact]) .line:not(.out),
+  .stream:not([data-compact]) .card {
+    grid-column: 1;
+    justify-self: center;
+  }
+
+  .stream:not([data-compact]) .events {
+    grid-row: 2;
+  }
+
+  .stream:not([data-compact]) .line:not(.out) {
+    grid-row: 3;
+  }
+
+  .stream:not([data-compact]) .card {
+    grid-row: 4;
+    max-width: none;
+  }
+
+  .stream:not([data-compact]) .out {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+    height: var(--space-lg);
+  }
+
+  .stream:not([data-compact]) .panel {
+    grid-column: 3;
+    grid-row: 1 / -1;
+  }
+
+  .stream:not([data-compact]) .out .links {
+    inset: 0 calc(-1 * var(--diagram-tuck));
+    width: calc(100% + 2 * var(--diagram-tuck));
+    height: 100%;
+  }
+
+  .stream:not([data-compact]) .out .links [data-axis='x'] {
+    display: inline;
+  }
+
+  .stream:not([data-compact]) .out .links [data-axis='y'] {
+    display: none;
+  }
+}

@@ -1,0 +1,69 @@
+---
+import type { Thresholds } from '~/lib/pixel-video/format';
+import styles from './style.module.css';
+
+interface Props {
+  src: string;
+  alt: string;
+  width: number | string;
+  height: number | string;
+  loading?: 'lazy' | 'eager';
+  decoding?: 'async' | 'sync' | 'auto';
+  /**
+   * Cell size of the pixel version, in % of the image width. The default
+   * is 160 cells on the width.
+   */
+  cellSize?: number;
+  /** The brightness limits (0–255) of the three layers. */
+  thresholds?: Partial<Thresholds>;
+  /**
+   * The class of the box. Give it the size, the aspect ratio and the
+   * radius: the image and the pixel version fill the box.
+   */
+  class?: string;
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  loading = 'lazy',
+  decoding = 'async',
+  cellSize,
+  thresholds,
+  class: className,
+} = Astro.props;
+---
+
+{
+  /*
+  The pixel version shows when the pointer is on the closest link (all of
+  the card). The canvas is out of the layout, thus the hover causes no
+  layout shift.
+*/
+}
+<pixel-image
+  class:list={[styles.pixelImage, className]}
+  data-cell-size={cellSize}
+  data-t-mid={thresholds?.tMid}
+  data-t-high={thresholds?.tHigh}
+>
+  <img
+    class={styles.image}
+    src={src}
+    alt={alt}
+    width={width}
+    height={height}
+    loading={loading}
+    decoding={decoding}
+    crossorigin="anonymous"
+  />
+  <canvas class={styles.canvas} aria-hidden="true"></canvas>
+</pixel-image>
+
+<script>
+  import { definePixelImage } from './element';
+
+  definePixelImage();
+</script>

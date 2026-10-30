@@ -1,0 +1,137 @@
+---
+import { stripStega } from '@datocms/astro';
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Section } from '~/components/Section';
+import { InlineParagraphs } from '~/components/StructuredText';
+import type { FeatureCategoryData, OpenSlotData } from '~/data/features';
+import type { ButtonData } from '~/data/home';
+import { buildUrlFromGql } from '~/lib/datocms/gqlUrlBuilder';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { FeatureCategoryEntryFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props extends FeatureCategoryData {
+  /** The features of the group, from the CMS. */
+  entries: FragmentOf<typeof FeatureCategoryEntryFragment>[];
+  /** The last card of the group: the slot of the next feature, dashed. */
+  open?: OpenSlotData;
+}
+
+const { id, title, description, theme, open } = Astro.props;
+
+/** The labels of the links of a feature, by the value of `linkTitle`. */
+const linkLabels: Record<string, string> = {
+  docs: 'Docs',
+  guide: 'Guide',
+  learn_more: 'Learn more',
+  watch_demo: 'Watch demo',
+};
+
+// The emoji, the badge and the screenshot of an entry are optional.
+// Without them, the markup is the basic markup of an entry.
+const entries = Astro.props.entries.map((data) => {
+  const entry = readFragment(FeatureCategoryEntryFragment, data);
+  return {
+    ...entry,
+    screenshot: entry.image?.responsiveImage,
+    buttons: entry.links.map((link): ButtonData => {
+      // In draft mode the title carries the invisible marks of the content link.
+      const key = stripStega(link.linkTitle ?? '');
+      return {
+        label: linkLabels[key] ?? key,
+        href: buildUrlFromGql(link.content),
+        appearance: 'deep-on-white',
+        variant: 'soft',
+      };
+    }),
+  };
+});
+---
+
+<Section theme={theme} id={id} class={styles.category} contentClass={styles.content} data-category>
+  <header class={styles.header}>
+    <h2 class="h1">{title}</h2>
+    <p class:list={[styles.description, 'h2']}>{description}</p>
+  </header>
+  <ul class={styles.entries}>
+    {
+      entries.map((entry, i) => (
+        <li class={styles.entry} data-counted>
+          <div class={styles.text}>
+            {/*
+              No space before the arrow: the arrow stays on the line of the
+              last word. The arrow keeps the H2 type, also when the title
+              has the H1 type.
+            */}
+            {entry.badge && <span class:list={[styles.badge, 'caption']}>{entry.badge}</span>}
+            {/*
+              With a screenshot, the title is a button that shows it: on
+              hover, on keyboard focus, and on a click or a tap (touch
+              screens have no hover). The script below opens and closes it.
+            */}
+            {entry.screenshot ? (
+              <div class={styles.shotAnchor} data-feature-shot>
+                <h3 class:list={[styles.entryTitle, 'h2']}>{entry.emoji && <span class={styles.emoji} aria-hidden="true">{entry.emoji}</span>}<button type="button" class={styles.shotButton} aria-expanded="false" aria-controls={`${id}-shot-${i}`} data-feature-shot-button>{entry.title}</button><span class:list={[styles.arrow, 'h2']} aria-hidden="true">→</span></h3>
+                <div id={`${id}-shot-${i}`} class={styles.shot}>
+                  <ResponsiveImage data={entry.screenshot} />
+                </div>
+              </div>
+            ) : (
+              <h3 class:list={[styles.entryTitle, 'h2']}>{entry.emoji && <span class={styles.emoji} aria-hidden="true">{entry.emoji}</span>}{entry.title}<span class:list={[styles.arrow, 'h2']} aria-hidden="true">→</span></h3>
+            )}
+            <p class:list={[styles.entryDescription, 'body']}><InlineParagraphs data={entry.description} /></p>
+          </div>
+          {/* Text links under 1152, buttons from 1152. */}
+          <ButtonGroup buttons={entry.buttons} class={styles.buttons} />
+          <ul class={styles.links}>
+            {entry.buttons.map((b) => (
+              <li>
+                <a class:list={[styles.link, 'h2']} href={b.href}>
+                  <span aria-hidden="true">→</span>
+                  <span class={styles.linkLabel}>{b.label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))
+    }
+    {
+      open && (
+        <li class:list={[styles.entry, styles.open]} data-open-slot>
+          <div class={styles.text}>
+            <h3 class:list={[styles.entryTitle, 'h2']}>{open.title}</h3>
+            <p class:list={[styles.entryDescription, 'body']}>{open.description}</p>
+          </div>
+          <ButtonGroup buttons={[open.button]} class={styles.openButton} />
+        </li>
+      )
+    }
+  </ul>
+</Section>
+
+<script>
+  // The screenshots of the entries. A click or a tap on the title opens or
+  // closes its screenshot. Only one is open at a time. A click outside or
+  // Escape closes it. Hover and keyboard focus show it with CSS only.
+  const closeShots = (except?: Element) => {
+    for (const el of document.querySelectorAll('[data-feature-shot][data-open]')) {
+      if (el === except) continue;
+      el.removeAttribute('data-open');
+      el.querySelector('[data-feature-shot-button]')?.setAttribute('aria-expanded', 'false');
+    }
+  };
+  document.addEventListener('click', (event) => {
+    const button = (event.target as Element).closest?.('[data-feature-shot-button]');
+    const shot = button?.closest('[data-feature-shot]');
+    closeShots(shot ?? undefined);
+    if (!button || !shot) return;
+    const open = !shot.hasAttribute('data-open');
+    shot.toggleAttribute('data-open', open);
+    button.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeShots();
+  });
+</script>

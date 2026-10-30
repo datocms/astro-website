@@ -1,0 +1,29 @@
+---
+import { Section } from '~/components/Section';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { Theme } from '~/lib/theme';
+import { StatsNumberFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  stats: FragmentOf<typeof StatsNumberFragment>[];
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+}
+
+const { theme } = Astro.props;
+const stats = Astro.props.stats.map((stat) => readFragment(StatsNumberFragment, stat));
+---
+
+<Section theme={theme} background="accent">
+  <dl class={styles.stats}>
+    {
+      stats.map((stat) => (
+        <div class={styles.stat}>
+          <dt class:list={[styles.label, 'h2']}>{stat.label}</dt>
+          <dd class:list={[styles.value, 'display']}>{stat.number}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</Section>

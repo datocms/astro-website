@@ -1,0 +1,25 @@
+---
+import { ChapterLayout } from '~/components/ChapterLayout';
+import { SceneFrame } from '~/components/SceneFrame';
+import { SceneFragment } from '~/components/SceneFragment';
+import * as dev from '~/data/developers-pillar';
+import Integrity from './Integrity.astro';
+import Ledger from './Ledger.astro';
+import { SchemaBuilderScene } from './SchemaBuilder';
+
+const theme = dev.schema.theme;
+---
+
+<ChapterLayout {...dev.schema}>
+  <Fragment slot="scene">
+    <SceneFrame preset="window" theme={theme} height={550} phoneHeightVw={70}>
+      <SchemaBuilderScene appearance={{ theme }} />
+    </SceneFrame>
+  </Fragment>
+  <SceneFragment slot="visual-0" fit="fill">
+    <Integrity />
+  </SceneFragment>
+  <SceneFragment slot="visual-1" fit="fill">
+    <Ledger />
+  </SceneFragment>
+</ChapterLayout>

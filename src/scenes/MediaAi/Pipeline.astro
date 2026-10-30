@@ -1,0 +1,316 @@
+---
+import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import diagram from '../diagram/style.module.css';
+import coastalRoad from './coastal-road.jpg';
+import fittingRolltopPannier from './fitting-rolltop-pannier.jpg';
+import gravelSunrise from './gravel-sunrise.jpg';
+import handlebarBag from './handlebar-bag.jpg';
+import loadedTourerStelvio from './loaded-tourer-stelvio.jpg';
+import { CAPTIONS_LABEL, DESCRIPTION, PHOTOS, TAGS_LABEL, VIDEOS, WORK } from './story';
+import styles from './style.module.css';
+
+// A picture of what DatoCMS does with an upload, in the grammar of the
+// diagrams (../diagram/style.module.css). The two rows play in turn and
+// overlap: when the pill of one row starts to work, the other row starts its
+// next upload. The second pulse follows the edges of the panel
+// (src/lib/motion/diagramPulse.ts): one dash on each side, and the two
+// meet at the other side. The script below drives the loop (in view only;
+// not with reduced motion). Without it the frame is the still: the first
+// photo with its tags, the first video with its subtitles.
+// The items of a stack sit in the same grid cell, thus the stack has the
+// size of its largest item and does not move when the item changes.
+
+const IMAGES = {
+  coastalRoad,
+  fittingRolltopPannier,
+  gravelSunrise,
+  handlebarBag,
+  loadedTourerStelvio,
+};
+
+// The dots of the working mark: 5 × 5. Each blinks from its own delay, a
+// fixed scatter in the 1.6s of the blink, thus the mark looks random and
+// is the same at each render.
+const DOTS = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) * 64)}ms`);
+
+const rows = [
+  {
+    kind: 'photo',
+    label: TAGS_LABEL,
+    work: WORK.photo,
+    items: PHOTOS.map((photo) => ({
+      ...photo,
+      src: IMAGES[photo.image],
+      duration: undefined,
+      lines: photo.tags.map((tag) => ({ text: tag, time: undefined as string | undefined })),
+    })),
+  },
+  {
+    kind: 'video',
+    label: CAPTIONS_LABEL,
+    work: WORK.video,
+    items: VIDEOS.map((video) => ({
+      ...video,
+      src: IMAGES[video.image],
+      lines: video.captions.map(([time, text]) => ({ text, time: time as string | undefined })),
+    })),
+  },
+];
+---
+
+<div class:list={[diagram.root, styles.pipeline]} role="img" aria-label={DESCRIPTION} data-pipeline>
+  {
+    rows.map((row) => (
+      <div class={styles.row} data-kind={row.kind} data-row>
+        <svg class={styles.trace} aria-hidden="true" data-trace data-pulse-class={diagram.pulse} />
+        <div class={styles.stack} data-uploads>
+          {row.items.map((item, i) => (
+            <figure
+              class:list={[diagram.swap, styles.card]}
+              data-current={i === 0 ? '' : undefined}
+            >
+              <span class:list={[styles.thumb, diagram.photo]} data-thumb>
+                <img
+                  class={styles.image}
+                  src={item.src.src}
+                  alt=""
+                  width={item.src.width}
+                  height={item.src.height}
+                />
+                {item.duration && (
+                  <>
+                    <span class={styles.play} />
+                    <span class={styles.duration}>{item.duration}</span>
+                  </>
+                )}
+              </span>
+              <figcaption class={styles.filename}>{item.filename}</figcaption>
+            </figure>
+          ))}
+        </div>
+
+        {/*
+          The line, with the pill of DatoCMS in its middle: the track only,
+          the pulse is on the svg of the row. Horizontal from 768px,
+          vertical on phones: the CSS shows one of the two.
+        */}
+        <div class={styles.link}>
+          <svg class={styles.links} aria-hidden="true" data-links>
+            <g data-axis="x">
+              <line class={diagram.track} x1="0" y1="50%" x2="100%" y2="50%" />
+            </g>
+            <g data-axis="y">
+              <line class={diagram.track} x1="50%" y1="0" x2="50%" y2="100%" />
+            </g>
+          </svg>
+          <p class={diagram.pill} data-pill>
+            <span class={diagram.symbol} set:html={symbol} />
+            <span class={diagram.working}>
+              {DOTS.map((style) => (
+                <span style={style} />
+              ))}
+            </span>
+            <span>{row.work}</span>
+          </p>
+        </div>
+
+        <div class:list={[diagram.panel, styles.output]} data-panel>
+          <p class={diagram.panelLabel}>{row.label}</p>
+          <div class={styles.stack} data-outputs>
+            {row.items.map((item, i) =>
+              row.kind === 'photo' ? (
+                <ul class={styles.tags} data-current={i === 0 ? '' : undefined}>
+                  {item.lines.map((line) => (
+                    <li class:list={[diagram.change, styles.tag]} data-line>
+                      {line.text}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <ol class={styles.captions} data-current={i === 0 ? '' : undefined}>
+                  {item.lines.map((line) => (
+                    <li class={styles.caption} data-line>
+                      <span class={styles.time}>{line.time}</span>
+                      <span class={styles.text}>{line.text}</span>
+                    </li>
+                  ))}
+                </ol>
+              ),
+            )}
+          </div>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<script>
+  import {
+    between,
+    DIAGRAM_MS as MS,
+    reflow,
+    sleep,
+    startDiagramLoop,
+  } from '~/lib/motion/diagramLoop';
+  import type { Live } from '~/lib/motion/diagramLoop';
+  import { edgePulse, linePulse } from '~/lib/motion/diagramPulse';
+
+  // The time that the pill works: one turn of the blink of the working mark
+  const WORK_MS = 1600;
+  const LINE_MS = 500;
+  const OUT = 6;
+
+  const items = (stack: HTMLElement) => Array.from(stack.children) as HTMLElement[];
+
+  class Row {
+    kind: string;
+    uploads: HTMLElement[];
+    outputs: HTMLElement[];
+    pill: HTMLElement;
+    root: HTMLElement;
+    trace: SVGSVGElement;
+    links: HTMLElement;
+    panel: HTMLElement;
+    index = 0;
+
+    constructor(root: HTMLElement) {
+      this.kind = root.dataset.kind!;
+      this.uploads = items(root.querySelector<HTMLElement>('[data-uploads]')!);
+      this.outputs = items(root.querySelector<HTMLElement>('[data-outputs]')!);
+      this.pill = root.querySelector<HTMLElement>('[data-pill]')!;
+      this.root = root;
+      this.trace = root.querySelector<SVGSVGElement>('[data-trace]')!;
+      this.links = root.querySelector<HTMLElement>('[data-links]')!;
+      this.panel = root.querySelector<HTMLElement>('[data-panel]')!;
+    }
+
+    toPill(thumb: Element): Promise<void> {
+      return linePulse({
+        root: this.root,
+        trace: this.trace,
+        links: this.links,
+        from: thumb,
+        to: this.pill,
+      });
+    }
+
+    toPanel(): Promise<void> {
+      const parts = [this.pill, this.panel];
+      return edgePulse({
+        root: this.root,
+        trace: this.trace,
+        links: this.links,
+        parts,
+        out: () => OUT,
+        fromEnd: true,
+      });
+    }
+
+    static show(stack: HTMLElement[], index: number): void {
+      stack.forEach((item, i) => {
+        if (i === index) item.dataset.current = '';
+        else delete item.dataset.current;
+      });
+    }
+
+    /**
+     * The start of a session. A session that stopped in the middle of a
+     * play leaves its marks: they go, and the output of the current upload
+     * shows.
+     */
+    clean(): void {
+      delete this.pill.dataset.working;
+      this.trace.replaceChildren();
+      for (const upload of this.uploads) {
+        delete upload.dataset.swapOut;
+        delete upload.dataset.swapIn;
+      }
+      for (const line of this.outputs[this.index]!.querySelectorAll<HTMLElement>('[data-line]')) {
+        delete line.dataset.leave;
+        delete line.dataset.enter;
+      }
+    }
+
+    /**
+     * Plays the next upload. It stops at the first step after `live` is
+     * false; the next play starts from where it stopped. `onWork` runs when
+     * the pill starts to work.
+     */
+    async play(live: Live, onWork?: () => void): Promise<void> {
+      const old = this.uploads[this.index]!;
+      const output = this.outputs[this.index]!;
+      for (const line of output.querySelectorAll<HTMLElement>('[data-line]'))
+        line.dataset.leave = '';
+      this.index = (this.index + 1) % this.uploads.length;
+      const upload = this.uploads[this.index]!;
+      const next = this.outputs[this.index]!;
+      const lines = Array.from(next.querySelectorAll<HTMLElement>('[data-line]'));
+      for (const line of lines) {
+        delete line.dataset.leave;
+        line.dataset.enter = '';
+      }
+      old.dataset.swapOut = '';
+      upload.dataset.swapIn = '';
+      Row.show(this.uploads, this.index);
+      reflow(upload);
+      delete upload.dataset.swapIn;
+      await sleep(MS.swap);
+      if (!live()) return;
+      delete old.dataset.swapOut;
+      Row.show(this.outputs, this.index);
+
+      await this.toPill(upload.querySelector('[data-thumb]')!);
+      if (!live()) return;
+      this.pill.dataset.working = '';
+      onWork?.();
+      await sleep(WORK_MS);
+      delete this.pill.dataset.working;
+      if (!live()) return;
+      await this.toPanel();
+      if (!live()) return;
+
+      const step = this.kind === 'photo' ? MS.stagger : LINE_MS;
+      reflow(next);
+      for (const line of lines) {
+        delete line.dataset.enter;
+        await sleep(step);
+        if (!live()) return;
+      }
+      await sleep(this.kind === 'photo' ? MS.pop : LINE_MS);
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-pipeline]')) {
+    const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-row]')).map(
+      (row) => new Row(row),
+    );
+    let turn = 0;
+    // The play of each row, with the hold after it: a row starts again
+    // only after it
+    let plays: Promise<void>[] = [];
+    // The loop plays in view only. The rows play in turn, and overlap: the
+    // next row starts when the pill of the row before starts to work, or
+    // when that play stops. A row that still plays (or holds) makes the
+    // next start wait. Out of view the loop stops where it is.
+    startDiagramLoop(
+      root,
+      async (live) => {
+        await plays[turn];
+        if (!live()) return;
+        let working = () => {};
+        const started = new Promise<void>((resolve) => (working = resolve));
+        const play = rows[turn]!.play(live, working).then(() => sleep(MS.hold));
+        plays[turn] = play;
+        await Promise.race([started, play]);
+        turn = (turn + 1) % rows.length;
+      },
+      {
+        start: async () => {
+          rows.forEach((row) => row.clean());
+          plays = [];
+          await sleep(between(600, 1000));
+        },
+      },
+    );
+  }
+</script>

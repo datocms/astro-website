@@ -1,0 +1,82 @@
+/*
+ * The rows of ProductUpdates (src/components/ProductUpdates), on the
+ * default surface of the page theme. The section has no side padding: every
+ * row pads itself, thus the hover fills the full width. A line is above and
+ * below each row.
+ */
+.list {
+  border-bottom: 1px solid var(--border-default);
+}
+
+.item {
+  border-top: 1px solid var(--border-default);
+}
+
+.row {
+  max-width: var(--frame-max);
+  margin-inline: auto;
+  padding-inline: var(--section-padding-x);
+  display: flex;
+  flex-direction: column;
+  /* As on the home: 30px from the text to the tags when the row is stacked. */
+  gap: var(--space-lg);
+  padding-block: var(--space-lg);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+}
+
+.date {
+  opacity: 0.7;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4xs);
+}
+
+.tag {
+  padding: calc(var(--space-xs) - 1px);
+  white-space: nowrap;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+}
+
+.row:focus-visible {
+  outline-offset: -4px;
+}
+
+@media (hover: hover) {
+  .item:hover {
+    background: var(--surface-accent);
+    color: var(--text-primary);
+  }
+
+  .item:hover .tag {
+    border-color: var(--border-strong);
+  }
+}
+
+@media (min-width: 768px) {
+  .tag {
+    padding-inline: calc(var(--space-sm) - 1px);
+  }
+}
+
+@media (min-width: 1152px) {
+  .row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xl);
+  }
+
+  /* The title wraps, the tags do not. */
+  .tags {
+    flex-shrink: 0;
+    justify-content: flex-end;
+  }
+}

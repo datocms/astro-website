@@ -1,0 +1,147 @@
+---
+import { ChapterHeader } from '~/components/ChapterHeader';
+import { ChapterSplit } from '~/components/ChapterSplit';
+import { CodeSnippetPreview } from '~/components/CodeSnippetPreview';
+import { FeatureFragments } from '~/components/FeatureFragments';
+import { SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import type { ChapterLayoutData } from './types';
+import styles from './style.module.css';
+
+type Props = ChapterLayoutData;
+
+const { id, theme, chapter, scene, sceneCode, fragments } = Astro.props;
+const pictures = fragments.map((f) => f.picture);
+// A chapter without fragments ends with its frame: the section does not cut it.
+const flushBottom = fragments.length > 0;
+const codes = fragments.map((f) => f.code);
+// A frame of code with notes is one card with tabs at all widths: the
+// columns have no notes. It is a full file, thus the frame is higher:
+// the height of the card (580px at least) and a small margin.
+const annotated = sceneCode?.some((tab) => tab.notes) ?? false;
+---
+
+{
+  /*
+  A chapter whose pictures do not exist yet, with the rhythm of the built
+  chapters: the header and the frame on the split background, the fragments
+  on the pale surface. A box with the description of the picture is in
+  place of each scene. A fragment whose code is written shows it, as the
+  built chapters do. A frame that is built goes in the slot "scene": a
+  SceneFrame with its scene and its caption, in place of the box. A
+  fragment picture that is built goes in the slot "visual-N" (N from 0): a
+  SceneFragment with its scene, in place of the box of fragment N.
+*/
+}
+{
+  /*
+  The header and the frame are on one background, as VersusSplit: from
+  1152px the left half is the accent surface and the right half is the
+  inverse surface. Below 1152px all of it is the inverse surface.
+*/
+}
+{
+  (chapter || scene) && (
+    <ChapterSplit theme={theme}>
+      {chapter && <ChapterHeader {...chapter} theme={theme} background="split" id={id} />}
+      {!chapter && !scene ? null : Astro.slots.has('scene') ? (
+        <slot name="scene" />
+      ) : sceneCode && annotated ? (
+        <SceneFrame
+          preset="fill"
+          theme={theme}
+          height={600}
+          phoneHeightVw={150}
+          flushBottom={flushBottom}
+        >
+          <div class={styles.sceneCode}>
+            <CodeSnippetPreview tabs={sceneCode} fill />
+          </div>
+        </SceneFrame>
+      ) : sceneCode ? (
+        /* A frame of code: the card is the frame, with no margin. The tabs side
+       by side from 768px; on phones the frame is too short for them
+       stacked, thus the card has its tabs to click. */
+        <SceneFrame
+          preset="fill"
+          theme={theme}
+          height={390}
+          phoneHeightVw={55}
+          flushBottom={flushBottom}
+        >
+          <div class:list={[styles.sceneCode, styles.wide]}>
+            <CodeSnippetPreview tabs={sceneCode} columns />
+          </div>
+          <div class:list={[styles.sceneCode, styles.narrow]}>
+            <CodeSnippetPreview tabs={sceneCode} fill />
+          </div>
+        </SceneFrame>
+      ) : (
+        <SceneFrame preset="fill" theme={theme} height={560} flushBottom={flushBottom}>
+          <div class:list={[styles.picture, styles.scene]} role="img" aria-label={scene}>
+            <span class:list={[styles.label, 'caption']}>Scene: {scene}</span>
+          </div>
+        </SceneFrame>
+      )}
+    </ChapterSplit>
+  )
+}
+{
+  fragments.length > 0 && (
+    <FeatureFragments items={fragments} theme={theme}>
+      {/* Astro needs a static slot name, thus one child for each possible fragment (4 at most). */}
+      {Astro.slots.has('visual-0') ? (
+        <slot name="visual-0" slot="visual-0" />
+      ) : codes[0] ? (
+        <SceneFragment slot="visual-0" fit="crop">
+          <CodeSnippetPreview tabs={codes[0]} fill />
+        </SceneFragment>
+      ) : (
+        pictures[0] && (
+          <div slot="visual-0" class={styles.picture} role="img" aria-label={pictures[0]}>
+            <span class:list={[styles.label, 'caption']}>{pictures[0]}</span>
+          </div>
+        )
+      )}
+      {Astro.slots.has('visual-1') ? (
+        <slot name="visual-1" slot="visual-1" />
+      ) : codes[1] ? (
+        <SceneFragment slot="visual-1" fit="crop">
+          <CodeSnippetPreview tabs={codes[1]} fill />
+        </SceneFragment>
+      ) : (
+        pictures[1] && (
+          <div slot="visual-1" class={styles.picture} role="img" aria-label={pictures[1]}>
+            <span class:list={[styles.label, 'caption']}>{pictures[1]}</span>
+          </div>
+        )
+      )}
+      {Astro.slots.has('visual-2') ? (
+        <slot name="visual-2" slot="visual-2" />
+      ) : codes[2] ? (
+        <SceneFragment slot="visual-2" fit="crop">
+          <CodeSnippetPreview tabs={codes[2]} fill />
+        </SceneFragment>
+      ) : (
+        pictures[2] && (
+          <div slot="visual-2" class={styles.picture} role="img" aria-label={pictures[2]}>
+            <span class:list={[styles.label, 'caption']}>{pictures[2]}</span>
+          </div>
+        )
+      )}
+      {Astro.slots.has('visual-3') ? (
+        <slot name="visual-3" slot="visual-3" />
+      ) : codes[3] ? (
+        <SceneFragment slot="visual-3" fit="crop">
+          <CodeSnippetPreview tabs={codes[3]} fill />
+        </SceneFragment>
+      ) : (
+        pictures[3] && (
+          <div slot="visual-3" class={styles.picture} role="img" aria-label={pictures[3]}>
+            <span class:list={[styles.label, 'caption']}>{pictures[3]}</span>
+          </div>
+        )
+      )}
+    </FeatureFragments>
+  )
+}

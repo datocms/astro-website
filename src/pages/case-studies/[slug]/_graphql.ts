@@ -1,224 +1,59 @@
-import { ImageFragment } from '~/components/blocks/Image/graphql';
-import { InDepthCtaBlockFragment } from '~/components/blocks/InDepthCtaBlock/graphql';
-import { InternalVideoFragment } from '~/components/blocks/InternalVideo/graphql';
-import { VideoFragment } from '~/components/blocks/Video/graphql';
-import { defaultInlineRecordFragments } from '~/components/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { CaseStudiesStoryFragment } from '~/components/CaseStudies';
+import { CaseStudyBodyStoryFragment } from '~/components/CaseStudyBody';
+import { ChallengeSolutionStoryFragment } from '~/components/ChallengeSolution';
+import { StatsNumberFragment } from '~/components/Stats';
+import { TextWithImageStoryFragment } from '~/components/TextWithImage';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
-import { FeatureUrlFragment } from '~/lib/datocms/gqlUrlBuilder/feature';
-import { PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
 import {
   buildUrlForSuccessStory,
   SuccessStoryUrlFragment,
 } from '~/lib/datocms/gqlUrlBuilder/successStory';
-import { UseCasePageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
+/*
+ * The page gets the four latest stories: one of them can be the story of
+ * the page, and the page shows three others.
+ */
 export const query = graphql(
   /* GraphQL */ `
-    query PostQuery($slug: String!) {
+    query SuccessStoryPage($slug: String!) {
       page: successStory(filter: { slug: { eq: $slug } }) {
+        id
         seo: _seoMetaTags {
           ...TagFragment
         }
-        accentColor {
-          hex
-        }
-        duotoneColor1 {
-          hex
-        }
-        duotoneColor2 {
-          hex
-        }
         name
-        position
         _firstPublishedAt
         title {
           value
         }
-        subtitle {
-          value
-        }
         coverImage {
           url
-          responsiveImage(imgixParams: { auto: format, ar: "3:2", w: 1200, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-          focalPoint {
-            x
-            y
-          }
-        }
-        logo {
-          url
-          alt
-        }
-        challenge {
-          value
-        }
-        result {
-          value
         }
         numbers {
-          number
-          label
+          ...StatsNumberFragment
         }
-        mainResultsImage {
-          url
-          responsiveImage(imgixParams: { auto: format, w: 1000, h: 660, fit: crop }) {
-            ...ResponsiveImageFragment
-          }
-          focalPoint {
-            x
-            y
-          }
-        }
-        mainResults {
-          title
-          description {
-            value
-          }
-        }
-        projectUrl
-        useCase {
-          navigationBarTitle
-          link
-          ...UseCasePageUrlFragment
-        }
-        industry {
-          name
-        }
-        keyFeatures {
-          ... on FeatureRecord {
-            seoH1
-            ...FeatureUrlFragment
-          }
-        }
-        partner {
-          name
-          ...PartnerUrlFragment
-        }
-        content {
-          value
-          blocks {
-            ... on RecordInterface {
-              id
-              __typename
-            }
-            ...ImageFragment
-            ...VideoFragment
-            ...InternalVideoFragment
-            ...InDepthCtaBlockFragment
-          }
-          links {
-            ... on RecordInterface {
-              id
-              __typename
-            }
-            ...AcademyChapterLinkFragment
-            ...AcademyCourseLinkFragment
-            ...BlogPostLinkFragment
-            ...ChangelogEntryLinkFragment
-            ...CustomerStoryLinkFragment
-            ...DocGroupLinkFragment
-            ...DocPageLinkFragment
-            ...EnterpriseAppLinkFragment
-            ...FeatureLinkFragment
-            ...HostingAppLinkFragment
-            ...LandingPageLinkFragment
-            ...PartnerLinkFragment
-            ...PluginLinkFragment
-            ...ProductComparisonLinkFragment
-            ...RecipeLinkFragment
-            ...ShowcaseProjectLinkFragment
-            ...SuccessStoryLinkFragment
-            ...TechPartnerLinkFragment
-            ...TemplateDemoLinkFragment
-            ...UseCasePageLinkFragment
-            ...UserGuidesEpisodeLinkFragment
-
-            ...AcademyChapterInlineFragment
-            ...AcademyCourseInlineFragment
-            ...BlogPostInlineFragment
-            ...ChangelogEntryInlineFragment
-            ...CustomerStoryInlineFragment
-            ...DocGroupInlineFragment
-            ...DocPageInlineFragment
-            ...EnterpriseAppInlineFragment
-            ...FeatureInlineFragment
-            ...HostingAppInlineFragment
-            ...LandingPageInlineFragment
-            ...PartnerInlineFragment
-            ...PluginInlineFragment
-            ...ProductComparisonInlineFragment
-            ...RecipeInlineFragment
-            ...ShowcaseProjectInlineFragment
-            ...SuccessStoryInlineFragment
-            ...TechPartnerInlineFragment
-            ...TemplateDemoInlineFragment
-            ...UseCasePageInlineFragment
-            ...UserGuidesEpisodeInlineFragment
-          }
-        }
+        ...TextWithImageStoryFragment
+        ...ChallengeSolutionStoryFragment
+        ...CaseStudyBodyStoryFragment
+      }
+      latest: allSuccessStories(first: 4, orderBy: _firstPublishedAt_DESC) {
+        id
+        ...CaseStudiesStoryFragment
       }
     }
   `,
   [
     TagFragment,
-    ResponsiveImageFragment,
-    VideoFragment,
-    ImageFragment,
-    InternalVideoFragment,
-    InDepthCtaBlockFragment,
-    UseCasePageUrlFragment,
-    FeatureUrlFragment,
-    PartnerUrlFragment,
-    SuccessStoryUrlFragment,
-    ...defaultLinkToRecordFragments,
-    ...defaultInlineRecordFragments,
+    StatsNumberFragment,
+    TextWithImageStoryFragment,
+    ChallengeSolutionStoryFragment,
+    CaseStudyBodyStoryFragment,
+    CaseStudiesStoryFragment,
   ],
-);
-
-const RelatedItemFragment = graphql(
-  /* GraphQL */ `
-    fragment RelatedItemFragment on SuccessStoryRecord @_unmask {
-      name
-      ...SuccessStoryUrlFragment
-      subtitle {
-        value
-      }
-      coverImage {
-        responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop }) {
-          ...ResponsiveImageFragment
-        }
-      }
-    }
-  `,
-  [ResponsiveImageFragment, SuccessStoryUrlFragment],
-);
-
-export const siblingsQuery = graphql(
-  /* GraphQL */ `
-    query SiblingsQuery($position: IntType!) {
-      previous: successStory(orderBy: position_DESC, filter: { position: { lt: $position } }) {
-        ...RelatedItemFragment
-      }
-      next: successStory(orderBy: position_ASC, filter: { position: { gt: $position } }) {
-        ...RelatedItemFragment
-      }
-      first: successStory(orderBy: position_ASC) {
-        ...RelatedItemFragment
-      }
-      last: successStory(orderBy: position_DESC) {
-        ...RelatedItemFragment
-      }
-    }
-  `,
-  [RelatedItemFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

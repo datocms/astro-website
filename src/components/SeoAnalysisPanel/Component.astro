@@ -1,0 +1,80 @@
+---
+// The SEO analysis of the CMS record of a page, for the editors in draft
+// mode (not in the prototype). The record keeps a focus keyword, its
+// synonyms and related keywords in the field `yoastAnalysis` (the
+// SEO/Readability plugin of the CMS writes it). The old components
+// (LegacyHero, Flag, TitleStripWithContent) use it to select the level of
+// their headings. This panel shows the keywords, and tells if the title,
+// the meta description, the h1, the h2s and the first paragraph of the
+// page contain one of them. Layout.astro renders it (prop `seoAnalysis`).
+import { allKeywords, isSeoAnalysis } from '~/lib/containsKeyword';
+import styles from './style.module.css';
+
+interface Props {
+  /** The value of the field `yoastAnalysis` of the CMS record. */
+  analysis: unknown;
+}
+
+const { analysis } = Astro.props;
+const valid = isSeoAnalysis(analysis) && Boolean(analysis.keyword);
+const keywords = valid ? allKeywords(analysis) : [];
+---
+
+{
+  valid && (
+    <details class={styles.root} data-datocms-noindex data-seo-analysis>
+      <summary class={styles.toggle}>SEO: {analysis.keyword}</summary>
+      <div class={styles.panel}>
+        <p class={styles.heading}>Keywords (from the CMS)</p>
+        <ul class={styles.keywords}>
+          {keywords.map((keyword) => (
+            <li>{keyword}</li>
+          ))}
+        </ul>
+        <p class={styles.heading}>Where the page uses them</p>
+        <ul class={styles.checks} data-seo-checks />
+        <script
+          type="application/json"
+          data-seo-analysis-data
+          set:html={JSON.stringify(analysis).replaceAll('<', '\\u003c')}
+        />
+      </div>
+    </details>
+  )
+}
+
+<script>
+  import { containsKeywords } from '~/lib/containsKeyword';
+
+  // The checks run in the browser: the text of the page is in the DOM.
+  // The content of the page is in <main>, without the chrome.
+  function check(root: HTMLElement) {
+    const list = root.querySelector('[data-seo-checks]');
+    const json = root.querySelector('[data-seo-analysis-data]')?.textContent;
+    if (!list || !json) return;
+    const analysis: unknown = JSON.parse(json);
+    const main = document.querySelector('main');
+    const text = (el: Element | null | undefined) => el?.textContent?.replace(/\s+/g, ' ').trim();
+
+    const places: [string, (string | undefined)[]][] = [
+      ['Title tag', [document.title]],
+      [
+        'Meta description',
+        [document.querySelector('meta[name="description"]')?.getAttribute('content') ?? undefined],
+      ],
+      ['h1', [...(main?.querySelectorAll('h1') ?? [])].map(text)],
+      ['An h2', [...(main?.querySelectorAll('h2') ?? [])].map(text)],
+      ['First paragraph', [text(main?.querySelector('p'))]],
+    ];
+
+    for (const [label, texts] of places) {
+      const found = texts.some((value) => containsKeywords(value, analysis));
+      const item = document.createElement('li');
+      item.dataset.found = String(found);
+      item.textContent = `${found ? '✓' : '✗'} ${label}`;
+      list.append(item);
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-seo-analysis]')) check(root);
+</script>

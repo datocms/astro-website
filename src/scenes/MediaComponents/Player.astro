@@ -1,0 +1,61 @@
+---
+import diagram from '../diagram/style.module.css';
+import frame from '../Video/restoring-tide-line.jpg';
+import { TRACKS, VIDEO } from '../Video/story';
+import { PLAYER } from './story';
+import styles from './player.module.css';
+
+// In the grammar of the diagrams (../diagram/style.module.css), as the GIF of
+// Video/Gif.astro. The player is the one of Mux, as the VideoPlayer of
+// react-datocms renders it. The captions are on, and the menu of the
+// captions is open on the tracks of the chapter "Video API": no code in the
+// line asks for them. The picture has no motion.
+
+const clock = (seconds: number) =>
+  `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+const DESCRIPTION = `The code <${PLAYER.code.tag} ${PLAYER.code.prop}={${PLAYER.code.value}} />, and under it the player of the video “${VIDEO.title}” at ${clock(VIDEO.time)}, with the caption “${PLAYER.caption}” on the frame. The menu of the captions is open: Off, ${TRACKS.map((track) => track.name).join(', ')}, with ${PLAYER.active} on.`;
+---
+
+<figure class:list={[diagram.root, styles.player]} role="img" aria-label={DESCRIPTION}>
+  <p class={styles.code}>
+    &lt;<span class={styles.key}>{PLAYER.code.tag}</span>
+    {PLAYER.code.prop}=&#123;<span class={styles.key}>{PLAYER.code.value}</span>&#125; /&gt;
+  </p>
+  <div class:list={[diagram.photo, styles.video]}>
+    <img class={styles.picture} src={frame.src} alt="" />
+    <span class={styles.caption}>{PLAYER.caption}</span>
+    <div class={styles.menu}>
+      <span class={styles.menuTitle}>Captions</span>
+      {
+        ['Off', ...TRACKS.map((track) => track.name)].map((name) => (
+          <span class={styles.item} data-on={name === PLAYER.active ? '' : undefined}>
+            {name}
+          </span>
+        ))
+      }
+    </div>
+    <div class={styles.controls} style={`--played: ${VIDEO.time / VIDEO.duration}`}>
+      <svg class={styles.icon} viewBox="0 0 16 16" aria-hidden="true"
+        ><path d="M4 2.5v11l9-5.5z" fill="currentColor"></path></svg
+      >
+      <span class={styles.time}>{clock(VIDEO.time)} / {clock(VIDEO.duration)}</span>
+      <span class={styles.rail}><span class={styles.played}></span></span>
+      <span class:list={[styles.cc, styles.active]}>CC</span>
+      <svg class={styles.icon} viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M3 6v4M6 3.5v9M9 5v6M12 7v2"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          fill="none"></path>
+      </svg>
+      <svg class={styles.icon} viewBox="0 0 16 16" aria-hidden="true">
+        <path
+          d="M2.5 6V2.5H6M10 2.5h3.5V6M13.5 10v3.5H10M6 13.5H2.5V10"
+          stroke="currentColor"
+          stroke-width="1.6"
+          fill="none"></path>
+      </svg>
+    </div>
+  </div>
+</figure>

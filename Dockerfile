@@ -20,6 +20,9 @@ WORKDIR /app
 # Copying these separately from the rest of the code allows better caching
 # If dependencies haven't changed, Docker can reuse cached layers
 COPY package.json package-lock.json ./
+# The scene kit (@datocms/product-scenes) is a "file:" dependency.
+# npm install needs its tarball, thus copy vendor/ before the install.
+COPY vendor ./vendor
 
 # Install base packages
 # They're runtime dependencies needed when your app is running

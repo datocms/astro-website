@@ -1,0 +1,332 @@
+/*
+ * The frame of the Collaboration chapter (Pair.astro), on the inverse sheet
+ * of a SceneFrame `whole`. The pill, the line and the motion are the
+ * grammar of the diagrams (../diagram/style.module.css); this file has only
+ * where the parts sit. Below 768px the parts go down: Inès, the line, Tom.
+ * From 768px they are in a row: Inès, the line, Tom, with the two screens
+ * at the same zoom.
+ */
+.pair {
+  --line-length: var(--space-2xl);
+  --pill-gap: calc(var(--space-xs) + var(--space-2xs));
+  /* The fade out of the screens at the end of the story: Tom still types */
+  --reset-fade: 0.8s;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  /* The two screens take all the width of the section, not the 960px of a diagram */
+  max-width: none;
+  position: relative;
+}
+
+/*
+ * The svg of the pulse of the save, on all the frame and over its parts:
+ * the pulse goes on the edges of the screens (edgePulse). No viewBox: the
+ * units are px of the frame.
+ */
+.trace {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.person {
+  display: grid;
+  justify-items: center;
+  gap: var(--pill-gap);
+  width: 100%;
+  min-width: 0;
+}
+
+.pill {
+  gap: var(--space-2xs);
+  padding-left: var(--space-4xs);
+  /*
+   * A person, not a part of the system: the name is in the text font, at
+   * the size of the other pills of the diagrams
+   */
+  font-family: var(--font-sans);
+  background: var(--surface-accent);
+  color: var(--text-primary);
+}
+
+.avatar {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: var(--radius-full);
+}
+
+/*
+ * The screen fills its column. Its zoom is large, and the kit (`fit`)
+ * makes it smaller to the width of the column, thus the zoom is as large
+ * as the column lets it be.
+ */
+.screen {
+  position: relative;
+  width: 100%;
+  /* The corners of the screen, for the path of the pulse around it */
+  border-radius: var(--radius-md);
+  --product-scenes-zoom: 1.4;
+  --product-scenes-radius: var(--radius-md);
+}
+
+/*
+ * The cursor of a person, above their screen, as in the apps where people
+ * work together: an arrow and the first name in the colour of the person
+ * (`data-theme`). `--x` and `--y` put the tip of the arrow on a point of
+ * the screen, in % of the screen; a new point moves the cursor there. The
+ * screens of the kit have one size (PAIR_SCREEN), thus the points stay on
+ * their buttons at each zoom. Each beat of the script (`data-beat`) gives
+ * the points. Without the beats (no JS, reduced motion) the cursors are at
+ * the still: Inès at the end of her sentence, Tom on the title with the
+ * sign of a refused click.
+ */
+.cursor {
+  --x: 74%;
+  --y: 84%;
+  --cursor-move: 0.8s;
+
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  /* Above the layers of the kit: its inputs go up to z-index 5 */
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  pointer-events: none;
+  /* The bright accent: the accent surface is dark in the dark scheme, and the arrow must show on the screen. */
+  color: var(--text-on-inverse);
+  transition:
+    top var(--cursor-move) var(--diagram-ease-in-out),
+    left var(--cursor-move) var(--diagram-ease-in-out),
+    opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+/* The tip of the arrow is at (1.5, 1.5) of the drawing: 2.4px at 26px */
+.arrow {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin: -2.4px 0 0 -2.4px;
+  fill: currentColor;
+  transform-origin: 2.4px 2.4px;
+  transition: scale 0.12s ease-out;
+}
+
+.name {
+  margin: 20px 0 0 -4px;
+  padding: var(--space-3xs) var(--space-xs);
+  font-family: var(--font-sans);
+  font-size: var(--type-code-small);
+  line-height: 1.2;
+  white-space: nowrap;
+  border-radius: var(--radius-full);
+  /* The colours of the arrow: the bright accent with dark text, in both schemes. */
+  background: var(--text-on-inverse);
+  color: var(--surface-inverse);
+}
+
+.refused {
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  width: 20px;
+  height: 20px;
+  fill: var(--surface-inverse);
+  stroke: var(--text-on-inverse);
+  stroke-width: 2;
+}
+
+/*
+ * Tom: his cursor is on the title until the end of the story. At the still
+ * it is refused.
+ */
+[data-person='tom'] .cursor {
+  --x: 30%;
+  --y: 36%;
+}
+
+.pair:is([data-beat='rest'], [data-beat='open']) [data-person='ines'] .cursor {
+  opacity: 0;
+}
+
+.pair:is([data-beat='save'], [data-beat='send'], [data-beat='arrive'], [data-beat='write'])
+  [data-person='ines']
+  .cursor {
+  --x: 90%;
+  --y: 7%;
+}
+
+.pair[data-beat='save'] [data-person='ines'] .arrow {
+  animation: press 0.2s 1s ease-in-out;
+}
+
+.pair[data-beat] [data-person='tom'] .refused {
+  opacity: 0;
+}
+
+.pair:is([data-beat='refuse'], [data-beat='save'], [data-beat='send'])
+  [data-person='tom']
+  .refused {
+  opacity: 1;
+  scale: 1;
+}
+
+/* At "refuse" the cursor clicks at 0.5s, and the sign pops */
+.pair[data-beat='refuse'] [data-person='tom'] .arrow {
+  animation: press 0.2s 0.5s ease-in-out;
+}
+
+.pair[data-beat='refuse'] [data-person='tom'] .refused {
+  animation: pop var(--diagram-pop) 0.65s var(--diagram-ease-out) both;
+}
+
+/* At "write" the record is free: his cursor goes to the end of the method and clicks at 0.9s */
+.pair[data-beat='write'] [data-person='tom'] .cursor {
+  --x: 74%;
+  --y: 84%;
+}
+
+.pair[data-beat='write'] [data-person='tom'] .arrow {
+  animation: press 0.2s 0.9s ease-in-out;
+}
+
+@keyframes press {
+  50% {
+    scale: 0.8;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/*
+ * The beat of the script (Pair.astro) tells what the eye must follow
+ * (`data-focus`): the person who does not act is dim. The pill and the screen of a person get
+ * the dim: from 768px the person is not a box (display: contents).
+ */
+.person > * {
+  transition: opacity var(--diagram-enter) var(--diagram-ease-out);
+}
+
+.pair[data-focus='tom'] [data-person='ines'] > *,
+.pair[data-focus='ines'] [data-person='tom'] > * {
+  opacity: 0.35;
+}
+
+/*
+ * At the end of the story the screens fade out (`data-reset`), and they
+ * fade in at its start: the records go back to the start out of view.
+ * Tom's cursor goes back to the title after the fade, out of view.
+ */
+.screen > :not(.cursor) {
+  transition: opacity var(--diagram-enter) var(--diagram-ease-out);
+}
+
+.pair[data-reset] .screen > * {
+  opacity: 0;
+  transition: opacity var(--reset-fade) var(--diagram-ease-out);
+}
+
+.pair[data-reset] [data-person='tom'] .cursor {
+  --x: 30%;
+  --y: 36%;
+  transition:
+    opacity var(--reset-fade) var(--diagram-ease-out),
+    top 0s var(--reset-fade),
+    left 0s var(--reset-fade);
+}
+
+/*
+ * The path of the save from Inès to Tom: the space between the screens.
+ * Vertical below 768px, horizontal from 768px. No line is drawn: the pulse
+ * goes along it (edgePulse reads the box of the svg). The svg goes 2px
+ * under the parts at its two ends.
+ */
+.line {
+  position: relative;
+  width: 100%;
+  height: var(--line-length);
+}
+
+.links {
+  position: absolute;
+  inset: calc(-1 * var(--diagram-tuck)) 0;
+  width: 100%;
+  height: calc(100% + 2 * var(--diagram-tuck));
+  overflow: visible;
+  pointer-events: none;
+}
+
+.links [data-axis='x'] {
+  display: none;
+}
+
+/*
+ * From 768px: a grid of two rows, the pills and the screens. The person is
+ * not a box: its pill and its screen are in the grid, thus the line in the
+ * middle column is at the middle of the screens.
+ */
+@media (min-width: 768px) {
+  .pair {
+    grid-template-columns: minmax(0, 1fr) var(--line-length) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    row-gap: var(--pill-gap);
+  }
+
+  .person {
+    display: contents;
+  }
+
+  .pill {
+    grid-row: 1;
+  }
+
+  .screen {
+    grid-row: 2;
+  }
+
+  [data-person='ines'] > * {
+    grid-column: 1;
+  }
+
+  [data-person='tom'] > * {
+    grid-column: 3;
+  }
+
+  .line {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    height: var(--space-lg);
+  }
+
+  .links {
+    inset: 0 calc(-1 * var(--diagram-tuck));
+    width: calc(100% + 2 * var(--diagram-tuck));
+    height: 100%;
+  }
+
+  .links [data-axis='x'] {
+    display: inline;
+  }
+
+  .links [data-axis='y'] {
+    display: none;
+  }
+}

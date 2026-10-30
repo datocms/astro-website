@@ -1,0 +1,195 @@
+---
+import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import { PixelVideo } from '~/components/PixelVideo';
+import diagram from '../diagram/style.module.css';
+import { BROWSER, CAPTION, EDGE, GLOBE } from './story';
+import styles from './style.module.css';
+
+// The picture of the fragment "From the edge.", in the grammar of the
+// diagrams (../diagram/style.module.css): the pill of the browser, a
+// track, the pill of the nearest edge, and above them the TTFB in ms,
+// measured live in the browser of the visitor. Each time the picture
+// comes into view, the script calls the endpoint of story.ts: one
+// warm-up request (it opens the connection, the edge pill has the
+// working mark), then SAMPLES requests. Each timed request is one pulse
+// to the edge and one back: the motion shows the requests that go, and
+// nothing more. The time of each is its TTFB from the Resource Timing of
+// the browser; when the browser does not give it, the time from the call
+// to the headers of the response (a round trip), and the caption says
+// so. The number is their median: it comes in with one ring, and the
+// picture is quiet until the next time in view. The answer gives the
+// edge pill its code and its city. With reduced motion the script
+// measures one time, with no pulse: no motion is not no data. The still
+// (no JS, and before the first answer) is the two pills and the track,
+// with no number and the `still` caption. With no answer, the number is
+// FAILED. Behind them the globe of the home page turns, at the middle
+// of the box, quiet: the track goes across it as an equator. It
+// is decorative.
+---
+
+<figure class:list={[diagram.root, styles.ping]} data-ping-edge>
+  <div class={styles.globe} aria-hidden="true">
+    <PixelVideo src={GLOBE.src} settings={GLOBE.settings} />
+  </div>
+
+  <p class={styles.result} aria-live="polite">
+    <span class:list={[diagram.change, styles.value, 'display']} data-value></span>
+  </p>
+
+  <div class={styles.row}>
+    <p class:list={[diagram.pill, styles.pill]}>
+      <span class={styles.wide}>{BROWSER.wide}</span>
+      <span class={styles.narrow} aria-hidden="true">{BROWSER.narrow}</span>
+    </p>
+
+    {
+      /*
+      The track, and a pulse in each direction. No viewBox: the units are
+      px, thus the percentages follow the box and nothing stretches.
+    */
+    }
+    <div class={styles.line}>
+      <svg class={styles.links} aria-hidden="true">
+        <line class={diagram.track} x1="0" y1="50%" x2="100%" y2="50%"></line>
+        <line class={diagram.pulse} x1="0" y1="50%" x2="100%" y2="50%" pathLength="100" data-out
+        ></line>
+        <line class={diagram.pulse} x1="100%" y1="50%" x2="0" y2="50%" pathLength="100" data-back
+        ></line>
+      </svg>
+    </div>
+
+    <p class:list={[diagram.pill, styles.pill]} data-edge>
+      <span class={diagram.symbol} set:html={symbol} />
+      <span class={diagram.working} aria-hidden="true">
+        {Array.from({ length: 25 }, (_, i) => <span style={`--d: ${-((i * 7) % 16) / 10}s`} />)}
+      </span>
+      <span data-code>{EDGE}</span>
+      <span class={styles.city} data-city></span>
+    </p>
+  </div>
+
+  <figcaption class={styles.caption} data-caption>{CAPTION.still}</figcaption>
+</figure>
+
+<script>
+  import { arrive, replay, sleep } from '~/lib/motion/diagramLoop';
+  import { onEnterViewport, onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  import { CAPTION, CITIES, ENDPOINT, FAILED, SAMPLES, TIMEOUT_MS } from './story';
+
+  interface Measure {
+    code: string;
+    ms: number;
+    ttfb: boolean;
+  }
+
+  async function request(signal: AbortSignal, n: number): Promise<Measure> {
+    // A new URL for each request: its Resource Timing entry is its own
+    const url = `${ENDPOINT}?n=${n}-${Date.now()}`;
+    const start = performance.now();
+    const response = await fetch(url, { cache: 'no-store', credentials: 'omit', signal });
+    const fetched = performance.now() - start;
+    const { datacenter } = (await response.json()) as { datacenter?: string };
+    // Without Timing-Allow-Origin, the browser gives 0 for the two times
+    const entry = performance.getEntriesByName(url).at(-1) as PerformanceResourceTiming | undefined;
+    const ttfb = entry && entry.responseStart > 0 && entry.requestStart > 0;
+    return {
+      code: (datacenter ?? '').slice(0, 3).toUpperCase(),
+      ms: ttfb ? entry.responseStart - entry.requestStart : fetched,
+      ttfb: Boolean(ttfb),
+    };
+  }
+
+  /**
+   * The time of a pulse, one way, in ms: --diagram-travel of `.links` in
+   * style.module.css. Shorter than the travel of the grammar: the five
+   * round trips go one after the other, and the number comes after them.
+   */
+  const PULSE_MS = 450;
+
+  class Ping {
+    out: SVGElement;
+    back: SVGElement;
+    edge: HTMLElement;
+    value: HTMLElement;
+    caption: HTMLElement;
+    running = false;
+
+    constructor(root: HTMLElement) {
+      this.out = root.querySelector<SVGElement>('[data-out]')!;
+      this.back = root.querySelector<SVGElement>('[data-back]')!;
+      this.edge = root.querySelector<HTMLElement>('[data-edge]')!;
+      this.value = root.querySelector<HTMLElement>('[data-value]')!;
+      this.caption = root.querySelector<HTMLElement>('[data-caption]')!;
+    }
+
+    /**
+     * The warm-up request, then SAMPLES requests one after the other, each
+     * with its pulses while `motion()` is true. Then the median, or FAILED
+     * when a request fails or has no answer in TIMEOUT_MS.
+     */
+    async run(motion: () => boolean): Promise<void> {
+      if (this.running) return;
+      this.running = true;
+      this.edge.dataset.working = '';
+      let result: Measure | null = null;
+      try {
+        await request(AbortSignal.timeout(TIMEOUT_MS), 0);
+        const samples: Measure[] = [];
+        for (let i = 1; i <= SAMPLES; i++) {
+          const pulse = motion();
+          if (pulse) replay(this.out, 'pulse');
+          const [sample] = await Promise.all([
+            request(AbortSignal.timeout(TIMEOUT_MS), i),
+            pulse ? sleep(PULSE_MS) : undefined,
+          ]);
+          samples.push(sample);
+          if (pulse) {
+            replay(this.back, 'pulse');
+            await sleep(PULSE_MS);
+          }
+        }
+        const times = samples.map((s) => s.ms).sort((a, b) => a - b);
+        result = {
+          code: samples.at(-1)!.code,
+          ms: Math.round(times[Math.floor(times.length / 2)]!),
+          ttfb: samples.every((s) => s.ttfb),
+        };
+      } catch {
+        result = null;
+      }
+      delete this.edge.dataset.working;
+      this.show(result, motion());
+      this.running = false;
+    }
+
+    show(result: Measure | null, motion: boolean): void {
+      if (result) {
+        this.edge.querySelector('[data-code]')!.textContent = result.code;
+        this.edge.querySelector('[data-city]')!.textContent = CITIES[result.code] ?? '';
+        delete this.value.dataset.failed;
+        this.value.innerHTML = `${result.ms}<span>ms</span>`;
+        this.caption.textContent = result.ttfb ? CAPTION.ttfb : CAPTION.roundTrip;
+      } else {
+        this.value.dataset.failed = '';
+        this.value.textContent = FAILED;
+        this.caption.textContent = CAPTION.failed;
+      }
+      if (!motion) return;
+      arrive(this.value);
+      replay(this.value, 'ping');
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-ping-edge]')) {
+    const ping = new Ping(root);
+    if (prefersReducedMotion()) {
+      onEnterViewport(root, () => void ping.run(() => false));
+      continue;
+    }
+    let visible = false;
+    onVisibilityChange(root, (now) => {
+      visible = now;
+      if (now) void ping.run(() => visible);
+    });
+  }
+</script>

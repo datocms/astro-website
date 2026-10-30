@@ -1,0 +1,53 @@
+---
+import { Section } from '~/components/Section';
+import type { FooterColumn } from '~/data/navigation';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props {
+  columns: FooterColumn[];
+  theme?: Theme;
+}
+
+const { columns, theme } = Astro.props;
+---
+
+<Section
+  as="nav"
+  aria-label="Footer"
+  theme={theme}
+  background="inverse"
+  class={styles.footerLinks}
+  contentClass={styles.grid}
+>
+  {
+    columns.map((column) => (
+      <div class={styles.column}>
+        {column.groups.map((group) => (
+          <div class={styles.group}>
+            {group.title && <p class:list={[styles.title, 'subtitle']}>{group.title}</p>}
+            <ul class={styles.links}>
+              {group.links.map((link) => (
+                <li>
+                  <a href={link.href} class:list={[styles.link, 'subtitleMedium']}>
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+        {column.status && (
+          // The status is always green, whatever the theme of the footer.
+          <div class={styles.group} data-theme="green">
+            <p class:list={[styles.statusLabel, 'subtitle']}>{column.status.label}</p>
+            <a href={column.status.href} class:list={[styles.status, 'subtitleMedium']}>
+              <span class={styles.statusDot} aria-hidden="true" />
+              {column.status.text}
+            </a>
+          </div>
+        )}
+      </div>
+    ))
+  }
+</Section>

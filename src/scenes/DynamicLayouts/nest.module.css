@@ -1,0 +1,98 @@
+/*
+ * The layout of the exploded view of the fragment "Blocks inside blocks."
+ * (Nest.astro). The parts are the ones of ../diagram/style.module.css. The
+ * picture fills the box of the fragment (SceneFragment, preset `fill`)
+ * with the surface of the sheet. The box is 4:3, as the viewBox of the
+ * drawing.
+ *
+ * Each block is a flat plate with the colours of a panel of the grammar.
+ */
+.nest {
+  /* The time of the drop and of the lift of a plate: MOVE in Nest.astro */
+  --nest-move: 0.9s;
+
+  box-sizing: border-box;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  background: var(--surface-inverse);
+}
+
+.stage {
+  position: relative;
+  height: 100%;
+}
+
+.drawing {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.plate {
+  stroke: var(--border-on-inverse-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.grid {
+  fill: color-mix(in srgb, var(--diagram-accent) 8%, var(--diagram-panel));
+  stroke: var(--diagram-accent);
+}
+
+/* A tint of the accent on the panel: no transparency, thus the plates under it do not show */
+.feature {
+  fill: color-mix(in srgb, var(--diagram-accent) 22%, var(--diagram-panel));
+}
+
+.button {
+  fill: var(--diagram-accent);
+  stroke: none;
+}
+
+/* The text of a block: the bars of the tiles of the Wall (../Delivery), the title darker */
+.bar {
+  fill: var(--text-on-inverse-subtle);
+}
+
+.heading {
+  fill: var(--text-on-inverse-muted);
+}
+
+.buttonText {
+  fill: var(--diagram-panel);
+}
+
+.outline {
+  fill: none;
+  stroke: var(--border-on-inverse-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.lift {
+  translate: 0 calc(-1px * var(--lift));
+  transition: translate var(--nest-move) var(--diagram-ease-in-out);
+}
+
+.lift[data-down] {
+  translate: 0 0;
+}
+
+/*
+ * The label of a level: on the end of its track, its right edge at the end
+ * of the track. The label is also a `.change` of the grammar. The rule of
+ * the grammar has no specificity, thus this position wins.
+ */
+.label {
+  position: absolute;
+  margin: 0;
+  padding: var(--space-4xs) 0;
+  translate: 0 -100%;
+}
+
+.label > * {
+  font-size: var(--type-code-xsmall);
+}

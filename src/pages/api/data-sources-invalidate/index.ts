@@ -4,14 +4,14 @@ import { maybeInvalidateFetchPluginSdkManifest } from '~/components/docs/blocks/
 import { maybeInvalidateCmaHyperschema } from '~/components/docs/cmaApi/fetchSchema';
 import { maybeInvalidateCloudflareDatacenters } from '~/components/featureAnimations/CdnMap/utils';
 import { maybeInvalidateFavicon } from '~/layouts/BaseLayout/fetchFavicon';
-import { maybeInvalidateNavbar } from '~/layouts/Layout/Navbar/fetchNavbar';
+import { maybeInvalidateNavbar } from '~/layouts/LegacyLayout/Navbar/fetchNavbar';
 import {
   maybeInvalidateCdaIntrospectionFieldFilters,
   maybeInvalidateCdaIntrospectionUploadFilters,
 } from '~/pages/docs/content-delivery-api/_utils';
 import { maybeInvalidateSiteApiErrorCodes } from '~/pages/docs/content-management-api/_utils';
 import { maybeInvalidateDastSchema } from '~/pages/docs/structured-text/_utils';
-import { maybeInvalidatePerOwnerPricingPlans } from '~/pages/pricing/_sub/perOwnerPricingPlans';
+import { maybeInvalidatePerOwnerPricingPlans } from '~/lib/pricing/perOwnerPricingPlans';
 import { handleUnexpectedError, invalidRequestResponse, json } from '../_utils';
 
 export const POST: APIRoute = async ({ url, request }) => {

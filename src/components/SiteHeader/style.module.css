@@ -1,0 +1,321 @@
+/* 82px tall, not sticky. */
+.header {
+  position: relative;
+  z-index: 10;
+  height: var(--header-height);
+  padding-inline: var(--section-padding-x);
+  background: var(--surface-default);
+  color: var(--text-primary);
+}
+
+.variantLight {
+  background: var(--surface-accent);
+}
+
+.variantDark {
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  height: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.logo {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+/* The nav links sit in the centre of the header, whatever the side widths. */
+.navList {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: none;
+  align-items: center;
+  gap: var(--space-sm);
+  height: var(--header-height);
+  transform: translateX(-50%);
+}
+
+.navItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4xs);
+  padding-block: var(--space-2xs);
+  white-space: nowrap;
+}
+
+.chevron {
+  display: inline-flex;
+  width: 6px;
+}
+
+.chevron :global(svg) {
+  width: 100%;
+  height: auto;
+}
+
+.navItem[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.search,
+.scheme,
+.dots {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  /*
+   * The icon slot is 16px wide. The hit area is 40px, thus the
+   * negative margin keeps the slot at 16px in the row.
+   */
+  margin-inline: calc(var(--space-xs) * -1);
+}
+
+.search :global(svg),
+.scheme :global(svg),
+.dots :global(svg) {
+  width: 16px;
+}
+
+.search,
+.login {
+  display: none;
+}
+
+.login {
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .navItem:hover,
+  .login:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+}
+
+/*
+ * Mega-menu (≥1152). It keeps its own light styling for
+ * every header variant. Fixed height 489, three 300px columns.
+ */
+.mega {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 489px;
+  padding: var(--space-2xs) var(--section-padding-x) var(--space-lg);
+  background: var(--surface-default);
+  color: var(--text-primary);
+  border-top: 1px solid var(--border-default);
+}
+
+.mega[hidden] {
+  display: none;
+}
+
+.megaColumns {
+  display: grid;
+  grid-template-columns: repeat(3, 300px);
+  justify-content: space-between;
+  align-items: start;
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.megaColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* A section: the group, then its "→ All …" link. */
+.megaSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.megaGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.megaHeading {
+  color: var(--text-muted);
+}
+
+.megaLinks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+/* A link with a description: the link, then a muted line under it. */
+.megaLink {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4xs);
+}
+
+/*
+ * The description of a link names the chapters of a pillar. It can wrap,
+ * thus it has a line height in proportion to its size.
+ */
+.description {
+  max-width: 300px;
+  color: var(--text-muted);
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+.allLink {
+  display: inline-flex;
+  gap: var(--space-4xs);
+  color: inherit;
+}
+
+.allLabel {
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+  text-decoration-thickness: 0.06em;
+}
+
+/* Mobile nav (<1152). */
+.mobileNav {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: calc(100dvh - var(--header-height));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-lg) var(--section-padding-x);
+  background: var(--surface-default);
+  color: var(--text-primary);
+  border-top: 1px solid var(--border-default);
+}
+
+.mobileNav[hidden] {
+  display: none;
+}
+
+.mobileList {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobileItem + .mobileItem {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border-default);
+}
+
+.mobileSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: inherit;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mobileSummary::-webkit-details-marker {
+  display: none;
+}
+
+.toggle {
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+}
+
+.toggle svg {
+  width: 100%;
+  height: 100%;
+}
+
+.minus,
+.mobileGroup[open] .plus {
+  display: none;
+}
+
+.mobileGroup[open] .minus {
+  display: block;
+}
+
+.mobileGroupBody {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xl) var(--space-md);
+  padding-top: var(--space-lg);
+}
+
+.mobileSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.mobileLink {
+  text-decoration: none;
+  text-underline-offset: 0.12em;
+  text-decoration-thickness: 0.06em;
+}
+
+@media (hover: hover) {
+  .allLink:hover .allLabel {
+    text-decoration-thickness: 0.12em;
+  }
+
+  .mobileLink:hover {
+    text-decoration: underline;
+  }
+}
+
+@media (min-width: 768px) {
+  .search,
+  .login {
+    display: inline-flex;
+  }
+
+  .mobileLogin {
+    display: none;
+  }
+}
+
+@media (min-width: 1152px) {
+  .navList {
+    display: flex;
+  }
+
+  .dots,
+  .login {
+    display: none;
+  }
+}
+
+@media (min-width: 1320px) {
+  .login {
+    display: inline-flex;
+  }
+}

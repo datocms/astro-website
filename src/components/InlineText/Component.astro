@@ -1,0 +1,45 @@
+---
+import { Emoji, isEmojiName } from '~/components/Emoji';
+import styles from './style.module.css';
+
+// A string of copy with three marks in it:
+//   :heart:      an emoji (src/components/Emoji), by its name
+//   `$ npx`      a piece of code, as a chip
+//   *already*    a word in italics, for stress
+// Any other text renders as it is. Thus the data stays one plain string.
+
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+
+type Part = { type: 'text' | 'emoji' | 'code' | 'em'; value: string };
+
+const parts: Part[] = [];
+let last = 0;
+for (const match of text.matchAll(/:([a-z]+):|`([^`]+)`|\*([^*\s][^*]*)\*/g)) {
+  const [whole, name, code, em] = match;
+  if (name && !isEmojiName(name)) continue;
+  if (match.index > last) parts.push({ type: 'text', value: text.slice(last, match.index) });
+  if (name) parts.push({ type: 'emoji', value: name });
+  else if (code) parts.push({ type: 'code', value: code });
+  else parts.push({ type: 'em', value: em! });
+  last = match.index + whole.length;
+}
+if (last < text.length) parts.push({ type: 'text', value: text.slice(last) });
+---
+
+{
+  parts.map((part) =>
+    part.type === 'emoji' && isEmojiName(part.value) ? (
+      <Emoji name={part.value} />
+    ) : part.type === 'code' ? (
+      <code class={styles.code}>{part.value}</code>
+    ) : part.type === 'em' ? (
+      <em>{part.value}</em>
+    ) : (
+      part.value
+    ),
+  )
+}

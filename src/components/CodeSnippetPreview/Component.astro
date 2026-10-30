@@ -1,0 +1,397 @@
+---
+import type { CodeTab } from '~/data/home';
+import { type HighlightedToken, highlight } from '~/lib/code/highlight';
+import styles from './style.module.css';
+
+interface Props {
+  tabs: CodeTab[];
+  /** The index of the tab that shows first. */
+  active?: number;
+  /** The card takes all the width of its parent, past its usual 500px. */
+  fill?: boolean;
+  /**
+   * All the tabs at once, side by side from 768px and stacked below, each
+   * with its label: a query and its response, read together. No tabs to
+   * click.
+   */
+  columns?: boolean;
+}
+
+const { tabs, active = 0, fill = false, columns = false } = Astro.props;
+const id = `code-${Math.random().toString(36).slice(2, 8)}`;
+
+/** A part of a line: tokens, or the tokens that a note points to. */
+type Part = { tokens: HighlightedToken[]; point?: number };
+type Row = { parts: Part[]; dim: boolean; comment?: number };
+
+const inFocus = (focus: CodeTab['focus'], n: number) =>
+  !focus || focus.some((f) => (typeof f === 'number' ? f === n : n >= f[0] && n <= f[1]));
+
+// Cuts the tokens of a line at a character offset.
+const cut = (tokens: HighlightedToken[], at: number): [HighlightedToken[], HighlightedToken[]] => {
+  const before: HighlightedToken[] = [];
+  const after: HighlightedToken[] = [];
+  let offset = 0;
+  for (const token of tokens) {
+    const end = offset + token.text.length;
+    if (end <= at) before.push(token);
+    else if (offset >= at) after.push(token);
+    else {
+      before.push({ ...token, text: token.text.slice(0, at - offset) });
+      after.push({ ...token, text: token.text.slice(at - offset) });
+    }
+    offset = end;
+  }
+  return [before, after];
+};
+
+// The text of a comment line, with no comment marks.
+const commentText = (line: string) =>
+  line
+    .trim()
+    .replace(/^(\/\/|#|\{\/\*|<!--)\s*/, '')
+    .replace(/\s*(\*\/\}|-->)$/, '');
+
+// Each tab as rows of tokens, highlighted by Shiki. The colours are the
+// variables of the theme (tokens.css, "Code"). The comment line of a note
+// gets the index of the note, and the text that the note points to is a
+// part of its own.
+const rows: Row[][] = await Promise.all(
+  tabs.map(async (tab) => {
+    const lines = tab.code.split('\n');
+    const result: Row[] = (await highlight(tab.code, tab.lang)).map((tokens, i) => ({
+      parts: [{ tokens }],
+      dim: !inFocus(tab.focus, i + 1),
+    }));
+    tab.notes?.forEach((note, k) => {
+      if (!/^\s*(\/\/|#|\{\/\*|<!--)/.test(lines[note.comment - 1] ?? '')) {
+        throw new Error(
+          `CodeSnippetPreview: line ${note.comment} of "${tab.label}" is not a comment`,
+        );
+      }
+      result[note.comment - 1]!.comment = k;
+      const n = lines.findIndex((line, i) => i >= note.comment && line.includes(note.point));
+      if (n < 0)
+        throw new Error(`CodeSnippetPreview: no "${note.point}" after line ${note.comment}`);
+      const [before, rest] = cut(result[n]!.parts[0]!.tokens, lines[n]!.indexOf(note.point));
+      const [inside, after] = cut(rest, note.point.length);
+      result[n]!.parts = [{ tokens: before }, { tokens: inside, point: k }, { tokens: after }];
+    });
+    return result;
+  }),
+);
+
+const notes = tabs.map((tab) =>
+  (tab.notes ?? []).map((note) => commentText(tab.code.split('\n')[note.comment - 1]!)),
+);
+---
+
+{
+  columns ? (
+    <div
+      class:list={[styles.snippet, styles.fill, styles.columns]}
+      style={`--code-snippet-columns: ${tabs.length}`}
+    >
+      {tabs.map((tab, i) => (
+        <div class={styles.column}>
+          <p class:list={[styles.tab, styles.label, 'subtitleMedium']}>{tab.label}</p>
+          <pre class={styles.pre} tabindex="0"><code class={styles.code}>{rows[i]!.map((row) => (
+            <span class:list={[styles.line, row.dim && styles.dim]}><span class={styles.number} aria-hidden="true" /><span>{row.parts.map((part) => part.tokens.map((token) =>
+              token.color ? <span style={`color: ${token.color}`}>{token.text}</span> : token.text
+            ))}</span></span>
+          ))}</code></pre>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <code-snippet-preview class:list={[styles.snippet, fill && styles.fill]}>
+      <div class={styles.tabs} role="tablist">
+        {tabs.map((tab, i) => (
+          <button
+            type="button"
+            role="tab"
+            id={`${id}-tab-${i}`}
+            aria-controls={`${id}-panel-${i}`}
+            aria-selected={i === active ? 'true' : 'false'}
+            tabindex={i === active ? 0 : -1}
+            class:list={[styles.tab, 'subtitleMedium']}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+      <div class={styles.panels}>
+        {tabs.map((tab, i) => (
+          <div
+            role="tabpanel"
+            id={`${id}-panel-${i}`}
+            aria-labelledby={`${id}-tab-${i}`}
+            hidden={i !== active}
+            class={styles.panel}
+          >
+            <pre class={styles.pre} tabindex="0"><code class={styles.code}>{rows[i]!.map((row) => (
+              <span class:list={[styles.line, row.dim && styles.dim, row.comment !== undefined && styles.noteComment]} data-comment={row.comment}><span class={styles.number} aria-hidden="true" /><span>{row.parts.map((part) => {
+                const tokens = part.tokens.map((token) =>
+                  token.color ? <span style={`color: ${token.color}`}>{token.text}</span> : token.text
+                );
+                return part.point === undefined ? tokens : <span class={styles.point} data-point={part.point}>{tokens}</span>;
+              })}</span></span>
+            ))}</code></pre>
+            {notes[i]!.length > 0 && (
+              <svg class={styles.leaders} aria-hidden="true">
+                {notes[i]!.map((_, k) => (
+                  <g style={`--i: ${k}`}>
+                    <path data-leader={k} pathLength="1" />
+                    <circle data-dot={k} r="3" />
+                  </g>
+                ))}
+              </svg>
+            )}
+            {notes[i]!.map((text, k) => (
+              <p class:list={[styles.note, 'subtitle']} data-note={k} style={`--i: ${k}`}>
+                {text}
+              </p>
+            ))}
+          </div>
+        ))}
+      </div>
+    </code-snippet-preview>
+  )
+}
+
+<script>
+  import { onEnterViewport, prefersReducedMotion } from '~/lib/motion/inView';
+
+  // From 1152px the comment lines of the notes leave the code. Each note
+  // goes next to the code, at the nearest place with no code under it.
+  const wide = window.matchMedia('(min-width: 1152px)');
+  // The space from a note to the code, and to the next note.
+  const GAP = 12;
+  // The widths that a note can have, from the widest. A parent with more
+  // space sets a wider first width in --code-snippet-note-width.
+  const widths = (panel: HTMLElement) => {
+    const max =
+      parseFloat(getComputedStyle(panel).getPropertyValue('--code-snippet-note-width')) || 190;
+    return [max, max - 20, max - 40];
+  };
+
+  type Box = { left: number; right: number; top: number; bottom: number };
+
+  type Result = { failed?: string; count: number; cost: number };
+
+  // Places the notes of a panel in the given order. Tells the first note
+  // with no free place, how many notes have a place, and the sum of the
+  // distances from the notes to their points.
+  function placeNotes(panel: HTMLElement, order: HTMLElement[]): Result {
+    const origin = panel.getBoundingClientRect();
+    const box = (el: Element): Box => {
+      const r = el.getBoundingClientRect();
+      return {
+        left: r.left - origin.left,
+        right: r.right - origin.left,
+        top: r.top - origin.top,
+        bottom: r.bottom - origin.top,
+      };
+    };
+    // The text of each line of code that shows.
+    const lines = [...panel.querySelectorAll('code > span')]
+      .map((line) => box(line.lastElementChild!))
+      .filter((line) => line.bottom > line.top);
+    // The right edge of the code between two heights.
+    const codeRight = (from: number, to: number) =>
+      Math.max(0, ...lines.filter((l) => l.bottom > from && l.top < to).map((l) => l.right));
+    const apart = (a: [number, number], b: [number, number]) =>
+      a[1] + GAP / 2 <= b[0] || b[1] + GAP / 2 <= a[0];
+    // Each note that has a place, and the heights of its note and leader.
+    const placed: { note: [number, number]; leader: [number, number] }[] = [];
+    const result: Result = { count: 0, cost: 0 };
+
+    for (const note of order) {
+      const k = note.dataset.note!;
+      const comment = panel.querySelector(`[data-comment="${k}"]`)!;
+      const leader = panel.querySelector(`[data-leader="${k}"]`)!;
+      const off = comment.hasAttribute('data-inline');
+      note.hidden = off;
+      leader.parentElement!.toggleAttribute('hidden', off);
+      if (off) continue;
+
+      const point = box(panel.querySelector(`[data-point="${k}"]`)!);
+      const y = (point.top + point.bottom) / 2;
+      note.style.top = '0px';
+      note.style.width = '';
+      const { right } = box(note);
+
+      // A note can go past the bottom of the code, into the padding of the
+      // card and below the card. It cannot be on the leader of a note, and
+      // its leader cannot go through a note or on another leader. A narrower
+      // note has more lines, but it can be nearer to its point.
+      // The x of the leader when it goes up or down to the note: past the
+      // code between the line of the point and the note.
+      const turn = (top: number, height: number, left: number) =>
+        Math.max(
+          (top > y ? codeRight(point.bottom, top) : codeRight(top + height, point.top)) + GAP,
+          codeRight(point.top + 1, point.bottom - 1) + GAP,
+          left + 16,
+        );
+      let best: { top: number; left: number; height: number; width: number } | undefined;
+      for (const width of widths(panel)) {
+        note.style.width = `${width}px`;
+        const height = box(note).bottom;
+        const left = right - width;
+        const span = (top: number): [number, number] =>
+          top > y ? [y, top] : [Math.min(y, top + height), y];
+        const free = (top: number) =>
+          top >= 0 &&
+          codeRight(top - GAP / 2, top + height + GAP / 2) + GAP <= left &&
+          placed.every(
+            (p) =>
+              apart(p.note, [top, top + height]) &&
+              apart(p.note, span(top)) &&
+              apart(p.leader, [top, top + height]) &&
+              apart(p.leader, span(top)),
+          );
+        // The free place nearest to the line of the point, below or above it.
+        for (let d = 0; d < origin.height; d += 2) {
+          const top = [y - height / 2 + d, y - height / 2 - d].find(free);
+          if (top === undefined) continue;
+          if (!best || d < Math.abs(best.top + best.height / 2 - y))
+            best = { top, left, height, width };
+          break;
+        }
+      }
+      if (!best) {
+        result.failed ??= k;
+        note.hidden = true;
+        leader.parentElement!.toggleAttribute('hidden', true);
+        continue;
+      }
+      const { top, left, height } = best;
+      note.style.width = `${best.width}px`;
+      note.style.top = `${top}px`;
+      placed.push({
+        note: [top, top + height],
+        leader: top > y ? [y, top] : [Math.min(y, top + height), y],
+      });
+      result.count++;
+      result.cost += Math.abs(top + height / 2 - y);
+
+      // The leader starts after the end of the line of the point. When the
+      // note is at the height of the point, it goes to the side of the note,
+      // with a curve when the point is near the top or the bottom of the
+      // note. Else it goes right, past the code between them, and then up or
+      // down to the note, with a round corner.
+      const ax = codeRight(point.top + 1, point.bottom - 1) + GAP / 2;
+      let d: string;
+      if (y >= top && y <= top + height) {
+        const by = Math.min(Math.max(y, top + 14), top + height - 14);
+        const mx = (ax + left) / 2;
+        d = by === y ? `M${ax} ${y}H${left}` : `M${ax} ${y}C${mx} ${y} ${mx} ${by} ${left} ${by}`;
+      } else {
+        const by = top > y ? top : top + height;
+        const x = Math.min(turn(top, height, left), right - 16);
+        const r = Math.min(8, Math.abs(by - y) / 2, (x - ax) / 2);
+        const s = Math.sign(by - y);
+        d = `M${ax} ${y}H${x - r}Q${x} ${y} ${x} ${y + s * r}V${by}`;
+      }
+      leader.setAttribute('d', d);
+      const dot = panel.querySelector(`[data-dot="${k}"]`)!;
+      dot.setAttribute('cx', String(ax));
+      dot.setAttribute('cy', String(y));
+    }
+    return result;
+  }
+
+  const orders = <T,>(items: T[]): T[][] =>
+    items.length <= 1
+      ? [items]
+      : items.flatMap((item, i) => orders(items.toSpliced(i, 1)).map((rest) => [item, ...rest]));
+
+  // A note can take the place that the next note needs, thus all the
+  // orders of the notes are tried (a tab has few notes). The best order
+  // gives a place to the most notes, nearest to their points. A note with
+  // no free place keeps its comment in the code. The lines then move, thus
+  // the notes get their places again.
+  function layoutPanel(panel: HTMLElement) {
+    const notes = [...panel.querySelectorAll<HTMLElement>('[data-note]')];
+    panel.querySelectorAll('[data-inline]').forEach((line) => line.removeAttribute('data-inline'));
+    for (;;) {
+      let best: { order: HTMLElement[]; result: Result } | undefined;
+      for (const order of orders(notes)) {
+        const result = placeNotes(panel, order);
+        if (
+          !best ||
+          result.count > best.result.count ||
+          (result.count === best.result.count && result.cost < best.result.cost)
+        ) {
+          best = { order, result };
+        }
+      }
+      const { failed } = placeNotes(panel, best!.order);
+      if (failed === undefined) {
+        // A point gets its outline only when its note shows.
+        for (const note of notes) {
+          panel
+            .querySelector(`[data-point="${note.dataset.note}"]`)!
+            .toggleAttribute('data-off', note.hidden !== false);
+        }
+        break;
+      }
+      panel.querySelector(`[data-comment="${failed}"]`)!.setAttribute('data-inline', '');
+    }
+  }
+
+  // Tabs: click or arrow keys select a tab and show its panel.
+  class CodeSnippetPreview extends HTMLElement {
+    connectedCallback() {
+      const tabs = [...this.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+      const panels = [...this.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+
+      // A hidden panel keeps its layout, thus all the panels get their notes.
+      const layout = () => {
+        const annotated = wide.matches && this.querySelector('[data-note]') !== null;
+        this.toggleAttribute('data-annotated', annotated);
+        if (annotated) panels.forEach(layoutPanel);
+      };
+      let frame = 0;
+      new ResizeObserver(() => {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(layout);
+      }).observe(this);
+      wide.addEventListener('change', layout);
+      document.fonts.ready.then(layout);
+      layout();
+
+      // The notes come in one after the other when the card is in view, and
+      // again when a tab shows. With reduced motion they show at once.
+      const show = () => {
+        this.removeAttribute('data-shown');
+        void this.offsetWidth;
+        this.setAttribute('data-shown', '');
+      };
+      if (prefersReducedMotion()) this.setAttribute('data-shown', '');
+      else onEnterViewport(this, show, { threshold: 0.4 });
+
+      const select = (next: HTMLButtonElement) => {
+        for (const tab of tabs) {
+          const on = tab === next;
+          tab.setAttribute('aria-selected', String(on));
+          tab.tabIndex = on ? 0 : -1;
+          const panel = this.querySelector<HTMLElement>(`#${tab.getAttribute('aria-controls')}`);
+          if (panel) panel.hidden = !on;
+        }
+        if (!prefersReducedMotion()) show();
+      };
+      tabs.forEach((tab, i) => {
+        tab.addEventListener('click', () => select(tab));
+        tab.addEventListener('keydown', (event) => {
+          const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+          if (!step) return;
+          const next = tabs[(i + step + tabs.length) % tabs.length]!;
+          select(next);
+          next.focus();
+        });
+      });
+    }
+  }
+  customElements.define('code-snippet-preview', CodeSnippetPreview);
+</script>

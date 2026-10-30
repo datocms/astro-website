@@ -1,0 +1,57 @@
+/*
+ * `one`: the lines are in one cell of a grid, one on top of the other: the
+ * box is as high as the longest line, thus a change of line does not move
+ * the page. The line of the step fades in.
+ */
+.caption {
+  display: grid;
+  max-width: var(--headline-max);
+  margin: var(--space-md) auto 0;
+  color: var(--text-on-inverse);
+  text-align: center;
+}
+
+.line {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.line[data-active] {
+  opacity: 1;
+}
+
+/*
+ * `list`: all the lines, numbered, in the centre of the column. The line
+ * of the step is lit, the others are dim: the reader sees the story in
+ * order and where the loop is.
+ */
+.list {
+  display: grid;
+  gap: var(--space-3xs);
+  width: max-content;
+  max-width: 100%;
+  margin: var(--space-md) auto 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 2ch 1fr;
+  gap: var(--space-xs);
+  color: var(--text-on-inverse-subtle);
+  transition: color 0.3s ease-out;
+}
+
+.item::before {
+  content: counter(step);
+  counter-increment: step;
+  font-family: var(--font-mono);
+  text-align: right;
+}
+
+.item[data-active] {
+  color: var(--text-on-inverse);
+}

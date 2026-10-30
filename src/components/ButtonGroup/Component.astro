@@ -1,0 +1,31 @@
+---
+import { Button } from '~/components/Button';
+import type { ButtonData } from '~/data/home';
+import styles from './style.module.css';
+
+interface Props {
+  buttons: ButtonData[];
+  class?: string;
+  [key: `data-${string}`]: string;
+}
+
+const { buttons, class: className, ...rest } = Astro.props;
+---
+
+<div class:list={[styles.buttonGroup, className]} {...rest}>
+  {
+    buttons.map((b) => (
+      <Button
+        appearance={b.appearance}
+        variant={b.variant}
+        arrow={b.arrow}
+        leading={b.leading}
+        leadingImages={b.leadingImages}
+        theme={b.theme}
+        href={b.href}
+      >
+        {b.label}
+      </Button>
+    ))
+  }
+</div>

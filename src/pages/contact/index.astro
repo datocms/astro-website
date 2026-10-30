@@ -1,72 +1,94 @@
 ---
-import { Layout } from '~/layouts/Layout';
+// The contact sales page of the redesign. The copy comes from
+// src/data/contact.ts. The form sends its data to the action
+// forms.submitSalesRequest (Pipedrive and Front), as the old page did, and
+// goes to /contact/thanks after the submit. The SEO is static.
+import { ContactSection } from '~/components/ContactSection';
+import { contact, seo as contactSeo } from '~/data/contact';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import s from './_style.module.css';
-import { Wrapper } from '~/components/Wrapper';
-import { LogosBar } from '~/components/LogosBar';
-import { Form } from './_Form';
-import { Prose } from '~/components/Prose';
-import { Space } from '~/components/Space';
+
+const seo = overrideSeo([], seoTitle(contactSeo.title), seoDescription(contactSeo.description));
 ---
 
-<Layout seo={[]}>
-  <Fragment slot="head">
-    <title>Contact our Sales team</title>
-  </Fragment>
-  <div class={s.root}>
-    <Wrapper>
-      <div class={s.rootInner}>
-        <div class={s.intro}>
-          <div class={s.introKicker}>Get in touch with us</div>
-          <div class={s.introTitle}>
-            Contact our <mark>Sales team</mark>
-          </div>
-          <Prose class={s.introBody}>
-            <p>
-              Whether you’re a potential user with questions about our product, or are already using
-              DatoCMS and have questions about expanding your current package, we’re ready to help.
-            </p>
-
-            <p>
-              Fill out the form below and one of our sales expert we’ll be in touch as soon as
-              possible.
-            </p>
-
-            <p>
-              <b>
-                Filling all the fields helps us giving you a more informed answer with less back and
-                forth.
-              </b>{' '}
-              Also helps you thinking about your project in terms that are useful for us to understand
-              what you are up to.
-            </p>
-          </Prose>
-
-          <Space top={1}>
-            <p class={s.box}>
-              Need support? Please visit our{' '}
-              <a href="/support">Support page</a>.
-            </p>
-
-            <p class={s.box}>
-              Want to learn more about our self-service plans? Visit our{' '}
-              <a href="/pricing">Pricing page</a>.
-            </p>
-          </Space>
-        </div>
-        <div class={s.picker}>
-          <Form client:load issueType="sales" />
-        </div>
-      </div>
-    </Wrapper>
-  </div>
-  <LogosBar
-    title="We power experiences for over half a billion users"
-    clients={[
-      'svg/logos/deutsche-telekom',
-      'svg/logos/hashicorp',
-      'svg/logos/verizon',
-      'svg/logos/polestar',
-      'svg/logos/vercel',
-    ]}
-  />
+<Layout seo={seo} headerVariant="light">
+  <ContactSection {...contact} external>
+    <Fragment slot="extra">
+      <input type="hidden" name="issueType" value="sales" />
+      <div class={s.turnstile} data-turnstile></div>
+    </Fragment>
+  </ContactSection>
 </Layout>
+
+<script>
+  import { actions, isActionError, isInputError } from 'astro:actions';
+  import { CONTACT_FORM_SEND_EVENT, type ContactFormSendDetail } from '~/components/ContactForm';
+  import { getCookie } from '~/lib/cookies';
+  import { solveTurnstile } from '~/lib/loadTurnstile';
+
+  // The same label as the action expects (isTurnstileTokenValid).
+  const TURNSTILE_ACTION = 'contact';
+  const FALLBACK = 'Please try again, or email us at sales@datocms.com.';
+  // The Turnstile messages already tell the user to try again.
+  const TURNSTILE_FALLBACK = 'If the problem continues, email us at sales@datocms.com.';
+
+  const sentence = (text: string) => (/[.!?]$/.test(text) ? text : `${text}.`);
+
+  const root = document.querySelector<HTMLElement>('[data-contact-form]');
+  const turnstileBox = root?.querySelector<HTMLElement>('[data-turnstile]');
+
+  // Show the frame of the box only when the widget has a height.
+  if (turnstileBox) {
+    new ResizeObserver(() => {
+      const widget = turnstileBox.firstElementChild;
+      const height = widget ? widget.getBoundingClientRect().height : 0;
+      turnstileBox.toggleAttribute('data-visible', height > 0);
+    }).observe(turnstileBox, { box: 'content-box' });
+  }
+
+  // The dashboard keeps the e-mail of the account in this cookie.
+  const emailInput = root?.querySelector<HTMLInputElement>('input[name="email"]');
+  const savedEmail = getCookie('datoAccountEmail');
+  if (emailInput && !emailInput.value && savedEmail) {
+    try {
+      emailInput.value = decodeURIComponent(savedEmail);
+    } catch {
+      emailInput.value = savedEmail;
+    }
+  }
+
+  root?.addEventListener(CONTACT_FORM_SEND_EVENT, async (event) => {
+    const { formData, resolve } = (event as CustomEvent<ContactFormSendDetail>).detail;
+
+    let token: string;
+    try {
+      token = turnstileBox ? await solveTurnstile(turnstileBox, TURNSTILE_ACTION) : '';
+    } catch (error) {
+      const text = error instanceof Error ? error.message : 'The anti-bot check failed.';
+      resolve({ ok: false, message: `${sentence(text)} ${TURNSTILE_FALLBACK}` });
+      return;
+    }
+    formData.append('token', token);
+
+    try {
+      const redirect = await actions.forms.submitSalesRequest.orThrow(formData);
+      resolve({ ok: true, redirect });
+    } catch (error) {
+      if (isInputError(error)) {
+        const fieldErrors = Object.fromEntries(
+          Object.entries(error.fields).map(([name, errors]) => [
+            name,
+            (errors as string[]).join(', '),
+          ]),
+        );
+        resolve({ ok: false, fieldErrors });
+      } else if (isActionError(error)) {
+        resolve({ ok: false, message: `${sentence(error.message)} ${FALLBACK}` });
+      } else {
+        // The default message of the form.
+        resolve({ ok: false });
+      }
+    }
+  });
+</script>

@@ -1,0 +1,237 @@
+---
+import { highlight } from '~/lib/code/highlight';
+import { CWD, DESCRIPTION, FILES, INSTALL, PROMPT, STEPS, WORK } from './story';
+import styles from './style.module.css';
+
+// The frame of the Agent Skills chapter of /ai: a neutral terminal at
+// left and an editor at right, in one window, as an editor with its
+// terminal. No product is drawn: no logo, no title bar of an app. The
+// shell lines start with `$`, the request with `›`, the sentences of the
+// agent with `▸`. What the agent does is under its sentence, and the output
+// of a command is under the command. The window is a sequence (STEPS): the lines of each step show
+// with `data-step` (the rules are in style.module.css), and the script
+// below types the request. The terminal keeps its last line at the
+// bottom, thus the first lines go up and out, as in a terminal. Without
+// the sequence, and with reduced motion, the window is the still: all the
+// lines, the last file open.
+
+const files = await Promise.all(
+  FILES.map(async (file) => ({ ...file, lines: await highlight(file.code, 'ts') })),
+);
+// A command wraps between its words, never at the hyphen of `--skill`
+const words = (command: string) => command.split(' ');
+const opensStep = (i: number) => i > 0 && WORK[i - 1]!.at !== WORK[i]!.at;
+const last = WORK[WORK.length - 1]!;
+---
+
+<div
+  class={styles.window}
+  role="img"
+  aria-label={DESCRIPTION}
+  data-scene-steps={STEPS}
+  data-agent-terminal
+>
+  <div class={styles.terminal} aria-hidden="true">
+    <p class={styles.bar}>{CWD}</p>
+    <div class={styles.scroll}>
+      <div class={styles.lines}>
+        <p class={styles.line}>
+          <span class={styles.glyph}>$</span><span
+            >{
+              words(INSTALL.command).map((word, i) => (
+                <Fragment>
+                  {i > 0 && ' '}
+                  <span class={styles.word}>{word}</span>
+                </Fragment>
+              ))
+            }</span
+          >
+        </p>
+        <p class:list={[styles.line, styles.output]}><span></span><span>{INSTALL.output}</span></p>
+        <p class:list={[styles.line, styles.ask]}>
+          <span class={styles.glyph}>›</span><span
+            ><span data-typed>{PROMPT}</span><span
+              class:list={[styles.cursor, styles.askCursor]}
+              data-cursor
+            >
+            </span><span class={styles.untyped} data-untyped></span></span
+          >
+        </p>
+        {
+          WORK.map((line, i) => (
+            <p
+              class:list={[
+                styles.line,
+                line.kind === 'out' && styles.output,
+                line.kind === 'say' && styles.say,
+                line.kind !== 'say' && styles.act,
+                line.kind === 'run' && styles.run,
+                opensStep(i) && styles.gap,
+              ]}
+              data-at={line.at}
+              data-delay={line.delay}
+            >
+              {line.kind === 'say' ? (
+                <span class:list={[styles.glyph, styles.agent]}>▸</span>
+              ) : (
+                <span />
+              )}
+              {line.kind === 'skill' ? (
+                <span>
+                  Loading skill <span class={styles.skill}>{line.text}</span>
+                </span>
+              ) : line.kind === 'run' ? (
+                <span>
+                  <span class={styles.glyph}>$</span>{' '}
+                  {words(line.text).map((word, w) => (
+                    <Fragment>
+                      {w > 0 && ' '}
+                      <span class={styles.word}>{word}</span>
+                    </Fragment>
+                  ))}
+                </span>
+              ) : (
+                <span>{line.text}</span>
+              )}
+            </p>
+          ))
+        }
+        <p class={styles.line} data-at={last.at} data-delay={last.delay + 600}>
+          <span class={styles.glyph}>›</span><span class={styles.cursor}> </span>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class={styles.file} aria-hidden="true">
+    <p class:list={[styles.bar, styles.tabs]}>
+      {
+        files.map((file) => (
+          <span class={styles.tab} data-file={file.at} data-delay={file.delay}>
+            {file.path.split('/').pop()}
+          </span>
+        ))
+      }
+    </p>
+    {
+      files.map((file) => (
+        <pre class={styles.pre} data-file={file.at} data-delay={file.delay}>
+          <code class={styles.code}>
+            {file.lines.map((tokens, i) => (
+              <span
+                class:list={[
+                  styles.codeLine,
+                  (i + 1 < file.focus[0]! || i + 1 > file.focus[1]!) && styles.dim,
+                  i + 1 < file.scroll && styles.above,
+                ]}
+              >
+                <span class={styles.number}>{i + 1}</span>
+                <span>
+                  {tokens.map((token) =>
+                    token.color ? (
+                      <span style={`color: ${token.color}`}>{token.text}</span>
+                    ) : (
+                      token.text
+                    ),
+                  )}
+                </span>
+              </span>
+            ))}
+          </code>
+        </pre>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  import { SCENE_STEP_EVENT } from '~/lib/motion/sceneSequence';
+
+  // The time of each character of the request, and the wait before the
+  // first one, in ms
+  const CHAR_MS = 34;
+  const START_MS = 250;
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-agent-terminal]')) {
+    const steps = (root.dataset.sceneSteps ?? '').split(/\s+/).map((step) => step.split(':')[0]);
+    const timed = [...root.querySelectorAll<HTMLElement>('[data-at]')];
+    const fileParts = [...root.querySelectorAll<HTMLElement>('[data-file]')];
+    let timers: number[] = [];
+
+    // A line shows (`data-shown`) in its step, at its time (`data-delay`):
+    // it pushes the lines before it up only when it comes. The lines of
+    // the steps before show.
+    const showStep = (step: string) => {
+      const now = steps.indexOf(step);
+      for (const el of timed) {
+        const at = steps.indexOf(el.dataset.at ?? '');
+        el.toggleAttribute('data-shown', at < now || (at === now && !el.dataset.delay));
+        if (at === now && el.dataset.delay) {
+          timers.push(
+            window.setTimeout(() => el.setAttribute('data-shown', ''), Number(el.dataset.delay)),
+          );
+        }
+      }
+    };
+
+    // A file opens (`data-opened`) in its step, at the time of the line
+    // that writes it; the files of the steps before are open. The tab and
+    // the code of the last file that is open are in front (`data-front`).
+    const openFiles = (step: string) => {
+      const now = steps.indexOf(step);
+      const front = () => {
+        const opened = fileParts.filter((el) => el.hasAttribute('data-opened')).pop()?.dataset.file;
+        for (const el of fileParts) el.toggleAttribute('data-front', el.dataset.file === opened);
+      };
+      for (const el of fileParts) {
+        const at = steps.indexOf(el.dataset.file ?? '');
+        el.toggleAttribute('data-opened', at < now);
+        if (at === now) {
+          timers.push(
+            window.setTimeout(() => {
+              el.setAttribute('data-opened', '');
+              front();
+            }, Number(el.dataset.delay)),
+          );
+        }
+      }
+      front();
+    };
+
+    // The request types in the step "prompt": the typed characters, then
+    // the cursor on the next one, then the others, transparent. The text
+    // keeps its place, thus the lines do not move. Before the request,
+    // nothing is typed; after it, all.
+    const typed = root.querySelector<HTMLElement>('[data-typed]');
+    const cursor = root.querySelector<HTMLElement>('[data-cursor]');
+    const untyped = root.querySelector<HTMLElement>('[data-untyped]');
+    const text = typed?.textContent ?? '';
+    let timer: number | undefined;
+
+    const type = (count: number) => {
+      if (!typed || !cursor || !untyped) return;
+      typed.textContent = text.slice(0, count);
+      cursor.textContent = text[count] ?? ' ';
+      untyped.textContent = text.slice(count + 1);
+    };
+
+    root.addEventListener(SCENE_STEP_EVENT, (event) => {
+      window.clearTimeout(timer);
+      for (const id of timers) window.clearTimeout(id);
+      timers = [];
+      const step = (event as CustomEvent<string>).detail;
+      showStep(step);
+      openFiles(step);
+      if (step === 'rest') type(0);
+      else if (step !== 'prompt') type(text.length);
+      else {
+        type(0);
+        let count = 0;
+        const next = () => {
+          type(++count);
+          if (count < text.length) timer = window.setTimeout(next, CHAR_MS);
+        };
+        timer = window.setTimeout(next, START_MS);
+      }
+    });
+  }
+</script>

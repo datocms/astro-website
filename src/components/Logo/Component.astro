@@ -1,0 +1,38 @@
+---
+import type { LogoItem } from '~/components/LogosLine';
+import styles from './style.module.css';
+
+interface Props {
+  logo: LogoItem;
+  class?: string;
+  loading?: 'eager' | 'lazy';
+}
+
+const { logo, class: className, loading = 'lazy' } = Astro.props;
+---
+
+{
+  logo.svg ? (
+    <span class={className} role="img" aria-label={logo.alt} set:html={logo.svg} />
+  ) : logo.mask ? (
+    <span
+      class:list={[styles.mask, className]}
+      role="img"
+      aria-label={logo.alt}
+      style={{
+        '--logo-mask': `url(${JSON.stringify(logo.mask)})`,
+        '--logo-ratio': `${logo.width || 1} / ${logo.height || 1}`,
+      }}
+    />
+  ) : (
+    <img
+      src={logo.src}
+      alt={logo.alt}
+      width={logo.width}
+      height={logo.height}
+      class={className}
+      loading={loading}
+      decoding="async"
+    />
+  )
+}

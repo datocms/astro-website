@@ -1,0 +1,33 @@
+---
+import { ChapterLayout } from '~/components/ChapterLayout';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as ai from '~/data/ai-pillar';
+import Terminal from './Terminal.astro';
+
+const theme = ai.skills.theme;
+---
+
+<ChapterLayout {...ai.skills}>
+  {
+    /*
+    The frame is a window, the terminal and the file side by side
+    (Terminal.astro): a screen of all its width, thus `fill`, 600px high.
+    On phones the file is under the terminal, thus the frame is higher
+    than the default 70% of the page width, up to the 600px of the
+    desktop: it shows the terminal and the field in the file above the
+    fade. No fragments follow, thus the section does not cut the frame.
+  */
+  }
+  <Fragment slot="scene">
+    <SceneFrame
+      preset="fill"
+      theme={theme}
+      height={600}
+      phoneHeightVw={220}
+      tabletHeightVw={78}
+      flushBottom={false}
+    >
+      <Terminal />
+    </SceneFrame>
+  </Fragment>
+</ChapterLayout>

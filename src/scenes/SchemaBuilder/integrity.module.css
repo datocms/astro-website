@@ -1,0 +1,395 @@
+/*
+ * The layout of the table of the fragment "Every record follows the
+ * schema." (Integrity.astro). The parts are the ones of
+ * ../diagram/style.module.css. The picture fills the box of the fragment
+ * (SceneFragment, `fit="fill"`) with the light surface of the diagrams.
+ * The box is the container.
+ *
+ * At the top, the event pill. Under it, the panel of the model: its label,
+ * the header (the schema) and the rows (the records). The rows go under a
+ * fade at the bottom of the box: the model has more records.
+ *
+ * The script sets the attributes of the grammar (`data-changed`,
+ * `data-ping`, `data-leave`, `data-enter`), and these: `data-out` on a
+ * chip or a row that is not in the table, `data-flip` on a row (the
+ * inverse translate, with no transition), `data-live` on the svg of the
+ * track, `data-fading` on the rows while the loop starts again,
+ * `data-stage` on the root (stage 0 has no slug column), and
+ * `data-instant` on the root while it puts the table in a stage with no
+ * transition.
+ *
+ * Two widths of the box. From 460px, and to 459px: smaller type and
+ * closer columns.
+ */
+.integrity {
+  --pad: var(--space-md);
+  --link: var(--space-lg);
+  --panel-pad: var(--space-xs);
+  --row: 34px;
+  --fade: var(--space-xl);
+  --name-size: var(--type-code-small);
+  --chip-size: var(--type-code-xsmall);
+  /* The columns: Integrity.astro gives --wide and --narrow from WIDTHS of integrity.ts, and their -closed forms with no slug column */
+  --columns: var(--wide);
+  --columns-closed: var(--wide-closed);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding: var(--pad);
+  overflow: hidden;
+  background: var(--surface-inverse);
+}
+
+.integrity[data-instant] *,
+.integrity[data-instant] *::after {
+  /* stylelint-disable-next-line declaration-no-important -- Short state while the script resets the picture. The rule must beat the transition of every child part. */
+  transition: none !important;
+}
+
+.integrity > .pill {
+  --diagram-swap-x: var(--space-xl);
+  z-index: 2;
+}
+
+/*
+ * The pill: white, with a ring, on the light surface. Its text is in the
+ * sans font. A name of the schema in it (a field, a record) is in the same
+ * font, in a light pill.
+ */
+.integrity > .pill {
+  font-family: var(--font-sans);
+  background: var(--surface-raised);
+  box-shadow: 0 0 0 1px var(--border-on-inverse-strong);
+  color: var(--text-on-inverse-strong);
+}
+
+/* The dark scheme: the text of the light surface is pale, thus the pill is pale too, with dark text. */
+:global(:root[data-scheme='dark']) .integrity > .pill {
+  background: var(--text-on-inverse-strong);
+  color: var(--surface-inverse);
+}
+
+.integrity > .pill code {
+  padding: 0 var(--space-4xs);
+  font: inherit;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--text-on-inverse) 6%, transparent);
+  box-shadow: 0 0 0 1px var(--border-on-inverse);
+}
+
+/*
+ * The panel of the model: under the pill, to the bottom of the box. It
+ * is above the track, thus the end of the track goes under its edge.
+ * The table goes to its edges: no padding.
+ */
+.panel {
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  margin-top: var(--link);
+  padding: 0;
+  overflow: hidden;
+}
+
+/*
+ * The label of the panel: a header with a line under it. The model is at
+ * the left, the number of records at the right. The two are centred
+ * vertically.
+ */
+.title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2xs);
+  padding: var(--panel-pad);
+  border-bottom: 1px solid var(--border-on-inverse-strong);
+  font-size: var(--type-code-xsmall);
+}
+
+.records {
+  font-size: var(--type-code-2xsmall);
+  color: var(--text-on-inverse-subtle);
+}
+
+/*
+ * The header and each row: the same columns, with no gap, thus the middle
+ * of each column is known. A new field opens its column in 0.45s (OPEN in
+ * Integrity.astro).
+ */
+.header,
+.line {
+  display: grid;
+  grid-template-columns: var(--columns);
+  align-items: center;
+  height: var(--row);
+  transition: grid-template-columns 0.45s var(--diagram-ease-out);
+}
+
+.integrity[data-stage='0'] :is(.header, .line) {
+  grid-template-columns: var(--columns-closed);
+}
+
+[data-col='slug'] {
+  transition: opacity var(--diagram-enter) var(--diagram-ease-out);
+}
+
+.integrity[data-stage='0'] [data-col='slug'] {
+  opacity: 0;
+}
+
+.header {
+  height: calc(var(--row) - var(--space-3xs));
+  border-bottom: 1px solid var(--border-on-inverse-strong);
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4xs);
+  box-sizing: border-box;
+  min-width: 0;
+  height: calc(100% - var(--space-4xs));
+  margin-inline: var(--space-5xs);
+  padding-inline: var(--space-4xs);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  --diagram-ping-scale: 1.04 1.3;
+}
+
+.cell:first-child {
+  margin-left: 0;
+  padding-left: var(--panel-pad);
+}
+
+/* The label of a field: its API key, in snake_case as it is */
+.head {
+  font-family: var(--font-mono);
+  font-size: var(--type-code-xsmall);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--text-on-inverse-muted);
+}
+
+.head {
+  position: relative;
+}
+
+.head[data-changed] {
+  color: var(--text-on-inverse-strong);
+}
+
+/*
+ * The tint of the column that changes (the lightest tint of the accent): a band from the line under the
+ * label of the panel to the bottom of the panel, which cuts it. The cell of the header is centred with a
+ * gap of half of --space-4xs above it, thus the band starts that much higher. It has square corners. It is under the cells of the
+ * column (they come after it and have a position), thus their rings show.
+ */
+.head::before {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--space-4xs) / 2);
+  bottom: -100vh;
+  inset-inline: calc(-1 * var(--space-5xs));
+  border-radius: 0;
+  background-color: var(--surface-accent-faint);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--diagram-settle) var(--diagram-ease-out);
+}
+
+.head[data-changed]::before {
+  opacity: 1;
+  transition-duration: var(--diagram-fade);
+}
+
+.name {
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: var(--name-size);
+  font-weight: 400;
+  line-height: 1;
+  text-overflow: ellipsis;
+  color: var(--text-on-inverse-strong);
+}
+
+/*
+ * The rows: they go under the fade at the bottom. A row that goes leaves
+ * a gap, and the rows under it move up into it in 0.45s (SHIFT in
+ * Integrity.astro).
+ */
+.rows {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  mask-image: linear-gradient(to bottom, black calc(100% - var(--fade)), transparent);
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.rows[data-fading] {
+  opacity: 0;
+}
+
+.row {
+  border-bottom: 1px solid var(--border-on-inverse);
+  transition: translate 0.45s var(--diagram-ease-out);
+}
+
+.row[data-flip] {
+  transition: none;
+}
+
+.row[data-out] {
+  display: none;
+}
+
+.line {
+  border-radius: var(--radius-sm);
+}
+
+.chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 20px;
+  padding-inline: var(--space-4xs);
+  font-family: var(--font-sans);
+  font-size: var(--chip-size);
+  font-weight: 400;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 1px var(--border-on-inverse-strong);
+  color: var(--text-on-inverse-strong);
+  --diagram-ping-scale: 1.15 1.4;
+}
+
+.chip[data-out] {
+  display: none;
+}
+
+/* A slug: a value that DatoCMS makes, not a link. It has no border, and it can be cut at the end. */
+.slug {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  box-shadow: none;
+  color: var(--text-on-inverse-muted);
+}
+
+/* A new slug: a soft ring and a soft ping, not the strong ring of the grammar. The root class gives the rule more specificity than the state `.change[data-changed]` of the grammar (two classes): keep it. */
+.integrity .slug[data-changed],
+.integrity .slug::after {
+  box-shadow: 0 0 0 1px var(--border-on-inverse-strong);
+}
+
+.slug:not([data-out]) {
+  display: block;
+  line-height: 20px;
+}
+
+/*
+ * The triangle of an invalid record, next to the name: the solid red
+ * triangle of ItemValidityTriangles in the CMS.
+ */
+.triangle {
+  display: inline-flex;
+  flex: none;
+  border-radius: var(--radius-sm);
+  color: var(--surface-negative);
+  --diagram-ping-scale: 1.4 1.4;
+}
+
+/* The triangle gets the ping when it comes in, but no ring and no tint after it. The root class gives the rule more specificity than the state `.change[data-changed]` of the grammar (two classes): keep it. */
+.integrity .triangle[data-changed] {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.triangle svg {
+  display: block;
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+.triangle[data-out] {
+  display: none;
+}
+
+/*
+ * The track from the pill to the top of the panel, over the header of
+ * the column that changes. In the still it is a band from 2px under the
+ * pill to 2px under the top of the panel, as wide as the table: its
+ * viewBox of 100 × 100 stretches to it, and its stroke does not. With
+ * `data-live` it covers the root, in px, for the track of the script.
+ */
+.links {
+  position: absolute;
+  z-index: 0;
+  top: calc(var(--pad) + var(--diagram-pill) - var(--diagram-tuck));
+  right: var(--pad);
+  left: var(--pad);
+  width: calc(100% - 2 * var(--pad));
+  height: calc(var(--link) + 2 * var(--diagram-tuck));
+  overflow: visible;
+  pointer-events: none;
+}
+
+.links[data-live] {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.links [data-axis='narrow'] {
+  display: none;
+}
+
+@container (max-width: 459px) {
+  .integrity {
+    --pad: var(--space-xs);
+    --link: var(--space-md);
+    --panel-pad: var(--space-2xs);
+    --row: 28px;
+    --fade: var(--space-lg);
+    --name-size: var(--type-code-xsmall);
+    --columns: var(--narrow);
+    --columns-closed: var(--narrow-closed);
+  }
+
+  .links [data-axis='wide'] {
+    display: none;
+  }
+
+  .links [data-axis='narrow'] {
+    display: inline;
+  }
+}
+
+/* To 320px (the box of a tablet, with the larger type of the tablet): closer chips */
+@container (max-width: 320px) {
+  .cell {
+    gap: var(--space-5xs);
+    margin-inline: 0;
+    padding-inline: var(--space-5xs);
+  }
+
+  .chip {
+    padding-inline: var(--space-5xs);
+  }
+}

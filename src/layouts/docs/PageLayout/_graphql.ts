@@ -14,7 +14,7 @@ import { PluginSdkHookGroupFragment } from '~/components/docs/blocks/PluginSdkHo
 import { ReactUiLiveExampleFragment } from '~/components/docs/blocks/ReactUiLiveExample/graphql';
 import { defaultInlineRecordFragments } from '~/components/inlineRecords';
 import { defaultLinkToRecordFragments } from '~/components/linkToRecords';
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/LegacyResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 import { GroupLayoutFragment } from '../GroupLayout/_graphql';

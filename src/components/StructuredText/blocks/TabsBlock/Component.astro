@@ -1,0 +1,121 @@
+---
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { Prose } from '~/components/Prose';
+import { StructuredText } from '~/components/StructuredText';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { Image } from '../Image';
+import { Video } from '../Video';
+import { DocCallout } from './DocCallout';
+import { TabBlockFragment, TabsBlockFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof TabsBlockFragment>;
+}
+
+const block = readFragment(TabsBlockFragment, Astro.props.block);
+const tabs = block.tabs.map((tab) => readFragment(TabBlockFragment, tab));
+const id = `tabs-${block.id}`;
+---
+
+{
+  /*
+  Tabs. The tabs have their own design, thus they are in an island, and
+  each panel has its own Prose. Without JS, the tab list stays hidden and
+  all the panels show, one after the other, each with its title as a
+  heading. The script shows the tab list, hides the headings and shows one
+  panel at a time.
+*/
+}
+<prose-island>
+  <div class={styles.tabs} data-tabs>
+    <div class={styles.tablist} role="tablist" hidden>
+      {
+        tabs.map((tab, index) => (
+          <button
+            type="button"
+            role="tab"
+            id={`${id}-tab-${index}`}
+            aria-controls={`${id}-panel-${index}`}
+            aria-selected={index === 0 ? 'true' : 'false'}
+            tabindex={index === 0 ? 0 : -1}
+            class:list={[styles.tab, 'subtitleMedium']}
+          >
+            {tab.title}
+          </button>
+        ))
+      }
+    </div>
+    {
+      tabs.map((tab, index) => (
+        <div id={`${id}-panel-${index}`} class={styles.panel} data-tab-panel>
+          <p class:list={[styles.heading, 'bodyMedium']} data-tab-heading>
+            {tab.title}
+          </p>
+          <Prose>
+            <StructuredText
+              {...ensureValidStructuredTextProps({
+                data: tab.content,
+                blockComponents: {
+                  DocCalloutRecord: DocCallout,
+                  ImageRecord: Image,
+                  VideoRecord: Video,
+                },
+                linkToRecordComponents: defaultLinkToRecordComponents,
+                inlineRecordComponents: defaultInlineRecordComponents,
+              })}
+            />
+          </Prose>
+        </div>
+      ))
+    }
+  </div>
+</prose-island>
+
+<script>
+  // Turn on the tabs. Show the tab list and one panel at a time.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
+    const tablist = root.querySelector<HTMLElement>('[role="tablist"]')!;
+    const tabs = [...tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-tab-panel]')];
+
+    function select(index: number, focus = false) {
+      tabs.forEach((tab, i) => {
+        tab.setAttribute('aria-selected', String(i === index));
+        tab.tabIndex = i === index ? 0 : -1;
+        panels[i]!.hidden = i !== index;
+      });
+      if (focus) tabs[index]!.focus();
+    }
+
+    panels.forEach((panel, i) => {
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', tabs[i]!.id);
+      panel.tabIndex = 0;
+      panel.querySelector<HTMLElement>('[data-tab-heading]')!.hidden = true;
+    });
+
+    tabs.forEach((tab, i) => tab.addEventListener('click', () => select(i)));
+
+    // The arrow keys, Home and End move between the tabs.
+    tablist.addEventListener('keydown', (event) => {
+      const current = tabs.indexOf(document.activeElement as HTMLButtonElement);
+      if (current < 0) return;
+      const last = tabs.length - 1;
+      const next = {
+        ArrowRight: current === last ? 0 : current + 1,
+        ArrowLeft: current === 0 ? last : current - 1,
+        Home: 0,
+        End: last,
+      }[event.key];
+      if (next === undefined) return;
+      event.preventDefault();
+      select(next, true);
+    });
+
+    tablist.hidden = false;
+    select(0);
+  }
+</script>

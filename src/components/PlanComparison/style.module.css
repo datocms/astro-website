@@ -1,0 +1,410 @@
+/*
+ * The header row stays at the top of the viewport while the table scrolls.
+ * Columns layout (1152+): 550 / 400 / 250 at 1320 (55fr / 40fr / 25fr),
+ * 20px gap. The last column has no padding on the right: it goes to the
+ * --frame-max edge. The enterprise value is 170px wide in it.
+ * Compact layout (768+): 267 / 200 / 200 at 768 (4fr / 3fr / 3fr), also
+ * with no padding on the right.
+ * Above 1320 the grid stays --frame-max wide and centred (the cells start
+ * in the 1260 content column); the backgrounds stay full width.
+ * Stacked layout (393+): the feature name is on its own line, and the
+ * two plan values are in two columns below it.
+ */
+.planComparison {
+  --cmpColumns: minmax(0, 1fr) minmax(0, 1fr);
+  --cmpGap: var(--space-md);
+  /* The end padding. The start padding is --content-inset. */
+  --cmpInsetEnd: var(--content-inset);
+
+  background: var(--surface-default);
+}
+
+@media (min-width: 768px) {
+  .planComparison {
+    --cmpColumns: minmax(0, 4fr) minmax(0, 3fr) minmax(0, 3fr);
+    /* The grid ends at the --frame-max edge: no padding on the right. */
+    --cmpInsetEnd: calc(var(--content-inset) - var(--section-padding-x));
+  }
+}
+
+@media (min-width: 1152px) {
+  .planComparison {
+    --cmpColumns: minmax(0, 55fr) minmax(0, 40fr) minmax(0, 25fr);
+  }
+}
+
+.headline {
+  padding: var(--section-padding-y) var(--section-padding-x);
+  text-align: center;
+}
+
+.header,
+.row {
+  display: grid;
+  grid-template-columns: var(--cmpColumns);
+  column-gap: var(--cmpGap);
+  padding-inline: var(--content-inset) var(--cmpInsetEnd);
+}
+
+@media (min-width: 768px) {
+  .row {
+    align-items: center;
+  }
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  row-gap: var(--space-xl);
+  padding-block: var(--space-md);
+  box-shadow: inset 0 -1px var(--border-default);
+  background: var(--surface-default);
+}
+
+.searchCell {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 768px) {
+  .searchCell {
+    grid-column: auto;
+  }
+
+  .search {
+    margin-right: var(--space-md);
+  }
+}
+
+/* Under 768 the search shows the purpose. The title takes too much space. */
+.featureTitle {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .featureTitle {
+    display: block;
+  }
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5xs);
+  padding-bottom: var(--space-2xs);
+  border-bottom: 1px solid var(--text-subtle);
+  color: var(--text-subtle);
+}
+
+.search svg {
+  flex: none;
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.search input::placeholder {
+  color: var(--text-subtle);
+  opacity: 1;
+}
+
+.search input:focus {
+  outline: none;
+}
+
+.search:focus-within {
+  border-bottom-color: var(--text-primary);
+}
+
+/*
+ * The switch "only show differences". It is below the
+ * search line, in the muted colour of the search. The native checkbox
+ * stays in the DOM for the keyboard and the screen readers; the track
+ * shows its state.
+ */
+.differences {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-top: var(--space-xs);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.switchInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.switchTrack {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background: var(--surface-inverse-faint);
+  transition: background-color 150ms ease-out;
+}
+
+.switchTrack::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  background: var(--text-subtle);
+  transition:
+    transform 150ms ease-out,
+    background-color 150ms ease-out;
+}
+
+.switchInput:checked + .switchTrack {
+  background: var(--text-primary);
+}
+
+.switchInput:checked + .switchTrack::before {
+  background: var(--surface-default);
+  transform: translateX(14px);
+}
+
+.switchInput:focus-visible + .switchTrack {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+.differences:has(.switchInput:checked) {
+  color: var(--text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switchTrack,
+  .switchTrack::before {
+    transition: none;
+  }
+}
+
+.planCell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.category[hidden] {
+  display: none;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--content-inset);
+  /* An inset shadow draws the 1px line inside the header height. */
+  box-shadow: inset 0 -1px var(--border-default);
+  background: var(--surface-accent-subtle);
+  list-style: none;
+  cursor: pointer;
+}
+
+.categoryHeader::-webkit-details-marker {
+  display: none;
+}
+
+.count {
+  margin-left: var(--space-2xs);
+  color: var(--text-muted);
+}
+
+/* Collapsed shows “+”, expanded shows “–” (U+2013). The glyph changes instantly. */
+.sign::before {
+  content: '+';
+}
+
+.category[open] .sign::before {
+  content: '\2013';
+}
+
+/* Stacked layout: 30px padding, 20px from the name to the values. */
+.row {
+  row-gap: var(--space-md);
+  padding-block: var(--space-lg);
+  border-bottom: 1px solid var(--border-default);
+}
+
+@media (min-width: 768px) {
+  .row {
+    padding-block: var(--space-md);
+  }
+}
+
+.row:nth-child(even of :not([hidden])) {
+  background: var(--surface-accent-faint);
+}
+
+.row[hidden] {
+  display: none;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  min-width: 0;
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 768px) {
+  .feature {
+    grid-column: auto;
+  }
+}
+
+.value {
+  color: var(--text-primary);
+}
+
+.enterprise {
+  color: var(--text-muted);
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  /* A solid dot with the check cut out. It stays visible in each scheme. */
+  background: var(--text-primary);
+  color: var(--surface-default);
+  vertical-align: middle;
+}
+
+.dash {
+  display: inline-block;
+  width: 13px;
+  height: 2px;
+  border-radius: 10px;
+  background: var(--text-primary);
+  vertical-align: middle;
+}
+
+/*
+ * Info icon and tooltip. From 768 the bubble opens on hover
+ * or focus, 8px to the right of the icon and top-aligned.
+ */
+.info {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+}
+
+.infoButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  background: var(--surface-inverse-faint);
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  left: calc(100% + var(--space-3xs));
+  z-index: 3;
+  width: max-content;
+  max-width: 333px;
+  padding: var(--space-3xs) var(--space-2xs);
+  border-radius: var(--radius-md);
+  /* An opaque mix of the faint inverse tint on the page surface. */
+  background:
+    linear-gradient(var(--surface-inverse-faint), var(--surface-inverse-faint)),
+    var(--surface-default);
+  color: var(--text-muted);
+  white-space: normal;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+/*
+ * Under 768 the bubble is below the feature name, with the full content
+ * width. It floats above the next rows.
+ */
+@media (max-width: 767px) {
+  .feature {
+    position: relative;
+  }
+
+  .info {
+    position: static;
+  }
+
+  .tooltip {
+    top: calc(100% + var(--space-3xs));
+    left: 0;
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.info[data-open] .tooltip,
+.infoButton:focus-visible + .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .info:hover .tooltip {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tooltip {
+    transition: none;
+  }
+}
+
+.empty {
+  padding: var(--space-md) var(--content-inset);
+  color: var(--text-muted);
+}
+
+/* The content after the table (the slot), for example a short note. */
+.footnote {
+  padding: var(--space-xl) var(--content-inset);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.footnote :global(a) {
+  color: var(--text-primary);
+  text-decoration: underline;
+}

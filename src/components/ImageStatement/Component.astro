@@ -1,0 +1,30 @@
+---
+import { Headline } from '~/components/Headline';
+import { Section } from '~/components/Section';
+import type { ImageStatementData } from '~/data/editor-experience-figma';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends ImageStatementData {
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+  background?: 'accent' | 'accent-subtle';
+}
+
+const { image, headline, muted, body, theme, background = 'accent' } = Astro.props;
+---
+
+<Section theme={theme} background={background} contentClass={styles.content}>
+  <img
+    class:list={[styles.image, image.rounded && styles.rounded]}
+    src={image.src}
+    alt={image.alt}
+    width={image.width}
+    height={image.height}
+    loading="lazy"
+  />
+  <div class={styles.text}>
+    <Headline as="h2" size="h1" muted={muted}>{headline}</Headline>
+    {body && <p class:list={[styles.body, 'body']}>{body}</p>}
+  </div>
+</Section>

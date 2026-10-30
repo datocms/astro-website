@@ -1,0 +1,38 @@
+---
+import { ChapterLayout } from '~/components/ChapterLayout';
+import { FRAGMENT_WIDTH, SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as ai from '~/data/ai-pillar';
+import { MediaAiCaptionsScene, MediaAiTagsScene } from './MediaAi';
+import Pipeline from './Pipeline.astro';
+
+const theme = ai.media.theme;
+---
+
+<ChapterLayout {...ai.media}>
+  {
+    /*
+    The frame is a picture of what DatoCMS does with an upload
+    (Pipeline.astro), not a screen: the preset `whole` shows all of it.
+    A photo goes in and its tags come out; a video goes in and its
+    subtitles come out. The picture tells itself: no caption.
+  */
+  }
+  <Fragment slot="scene">
+    <SceneFrame preset="whole" theme={theme}>
+      <Pipeline />
+    </SceneFrame>
+  </Fragment>
+  {
+    /* The sidebar of the photo, alone, from its top left corner: the asset info with only the row of the smart tags, and under it the categorization with the tags of the editor. The screen is 500px wide: at zoom 1.14 the sidebar fills the width of the box, with the smart tags at the right of their row. The box cuts it at the bottom, under the manual tags. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={1.14} phoneZoom={0.75}>
+    <MediaAiTagsScene appearance={{ theme }} width={500} height={760} />
+  </SceneFragment>
+  {
+    /* The dialog that generates the subtitles, alone, from its top left corner. The box cuts it at the right and the bottom. */
+  }
+  <SceneFragment slot="visual-1" fit="scale" zoom={1.2} phoneZoom={1.1}>
+    <MediaAiCaptionsScene appearance={{ theme }} width={FRAGMENT_WIDTH} height={560} />
+  </SceneFragment>
+</ChapterLayout>

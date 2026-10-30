@@ -1,0 +1,40 @@
+---
+import { Button } from '~/components/Button';
+import type { PricingPlansData } from '~/data/pricing';
+import styles from './style.module.css';
+
+type Props = PricingPlansData;
+
+const { plans } = Astro.props;
+---
+
+<section class={styles.pricingPlans}>
+  {
+    plans.map((plan, i) => (
+      <article class:list={[styles.plan, i === 1 && styles.accent]}>
+        <div class={styles.top}>
+          <h2 class:list={[styles.title, 'h1']}>
+            <span class={styles.name}>{plan.name}</span>
+            <br />
+            {plan.tagline}
+          </h2>
+          <p class:list={[styles.price, 'body']}>{plan.price}</p>
+          <Button
+            appearance={plan.button.appearance}
+            variant={plan.button.variant}
+            arrow={plan.button.arrow}
+            href={plan.button.href}
+            class={styles.button}
+          >
+            {plan.button.label}
+          </Button>
+        </div>
+        <ul class:list={[styles.features, 'body']}>
+          {plan.features.map((f) => (
+            <li>{f}</li>
+          ))}
+        </ul>
+      </article>
+    ))
+  }
+</section>

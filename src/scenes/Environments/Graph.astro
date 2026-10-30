@@ -1,0 +1,736 @@
+---
+import diagram from '../diagram/style.module.css';
+import {
+  AHEAD,
+  BAND,
+  BAR,
+  bandLabelY,
+  CLI,
+  DESCRIPTION,
+  DOT,
+  HEIGHT,
+  LEGEND,
+  MAINTENANCE,
+  PAD,
+  PAST,
+  PRIMARY,
+  PROJECT,
+  ROW_Y,
+  STEP,
+  STILL,
+} from './story';
+import type { Row } from './story';
+import styles from './style.module.css';
+
+// A git graph of the environments of one project, in the grammar of the
+// diagrams (../diagram/style.module.css). Each environment is a lane, each
+// change a dot, and time goes to the right.
+// The frame is a loop of releases, not a sequence of steps: migrations:run
+// forks the primary into a sandbox, environments:promote moves the ref
+// "Primary" to it, and maintenance:off comes UNLOCK_MS after the promotion.
+// The lanes never meet again: a promotion is not a merge. The graph moves to
+// the left without a stop, one slot in SLOT_MS; each event comes in at the
+// next slot that gets to the right edge.
+// The graph is horizontal at all widths, also on phones: the two lanes
+// side by side are the point of the picture, and a narrow box shows only
+// the newest slots. The script below drives the loop (in view only; not
+// with reduced motion). Without it the frame is the still of STILL.
+// The newest slot is at the right edge: the inner svg starts at the right
+// edge of the outer one (x="100%"), thus the slots of the past have a
+// negative x, and a box of any width shows the newest ones.
+
+const x = (slot: number) => slot * STEP;
+const end = x(STILL.head + AHEAD);
+const shift = -x(STILL.head) - PAD;
+const y = ROW_Y;
+const { fork } = STILL;
+
+// Each lane: its row, the path up to its last slot (`prefix`), and the
+// slot of its last change. An open lane goes on to the right edge (the
+// script makes it longer at each step); the fork curve is part of the
+// lane that it starts.
+const lanes = [
+  {
+    row: 0 as Row,
+    prefix: `M ${x(-PAST)} ${y[0]}`,
+    last: Math.max(...STILL.edits.filter((edit) => edit.row === 0).map((edit) => edit.slot)),
+    dim: STILL.primary !== 0,
+  },
+  {
+    row: 1 as Row,
+    prefix: `M ${x(fork.from)} ${y[0]} C ${x(fork.from + 1)} ${y[0]}, ${x(fork.to - 1)} ${y[1]}, ${x(fork.to)} ${y[1]}`,
+    last: STILL.head,
+    dim: STILL.primary !== 1,
+  },
+];
+
+const classes = {
+  lane: styles.lane,
+  line: [diagram.track, diagram.draw, styles.line].join(' '),
+  tail: [diagram.track, styles.line].join(' '),
+  edit: [styles.dot, styles.edit].join(' '),
+  migration: [styles.dot, styles.migration].join(' '),
+  band: styles.band,
+  bandLabel: styles.bandLabel,
+  lock: styles.lock,
+};
+
+const lockSlot = STILL.band.from + 0.5;
+---
+
+<div
+  class:list={[diagram.root, styles.graph]}
+  role="img"
+  aria-label={DESCRIPTION}
+  data-env-graph
+  data-classes={JSON.stringify(classes)}
+  data-head={STILL.head}
+  data-primary={STILL.primary}
+  data-next={STILL.next}
+>
+  <div class:list={[diagram.panel, styles.panel]}>
+    <p class:list={[diagram.panelLabel, styles.panelLabel]}>{PROJECT}</p>
+    <div
+      class={styles.canvas}
+      style={`--height: ${HEIGHT}px; --row-0: ${y[0]}px; --row-1: ${y[1]}px`}
+    >
+      <svg class={styles.svg} height={HEIGHT} aria-hidden="true">
+        {
+          /*
+          The padlock, at 0 0. A disc of the colour of the band under it cuts
+          the lane.
+        */
+        }
+        <defs>
+          <g id="envLock" transform="scale(1.3)">
+            <circle class={styles.lockBack} r="11"></circle>
+            <path class={styles.lockShackle} d="M -3.5 -1 V -4 A 3.5 3.5 0 0 1 3.5 -4 V -1"></path>
+            <rect class={styles.lockBody} x="-5.5" y="-1" width="11" height="8.5" rx="2"></rect>
+          </g>
+        </defs>
+        <svg class={styles.now} x="100%" y="0" height={HEIGHT}>
+          <g class={styles.time} style={`transform: translateX(${shift}px)`} data-time>
+            <g data-bands>
+              <g data-band>
+                <rect
+                  class={styles.band}
+                  x={x(STILL.band.from)}
+                  y={y[0] - BAND}
+                  width={x(STILL.band.to - STILL.band.from)}
+                  height={2 * BAND}
+                  rx="6"></rect>
+                <text class={styles.bandLabel} x={x(STILL.band.from) + 10} y={bandLabelY(0)}
+                  >{MAINTENANCE}</text
+                >
+              </g>
+            </g>
+            <g data-lanes>
+              {
+                lanes.map((lane) => (
+                  <g
+                    class={styles.lane}
+                    data-row={lane.row}
+                    data-last={lane.last}
+                    data-open=""
+                    data-dim={lane.dim ? '' : undefined}
+                  >
+                    <path
+                      class:list={[diagram.track, diagram.draw, styles.line]}
+                      d={`${lane.prefix} L ${end} ${y[lane.row]}`}
+                      pathLength="100"
+                      data-prefix={lane.prefix}
+                      data-y={y[lane.row]}
+                    />
+                    {STILL.edits
+                      .filter((e) => e.row === lane.row)
+                      .map((e) => (
+                        <circle
+                          class:list={[styles.dot, styles.edit]}
+                          cx={x(e.slot)}
+                          cy={y[lane.row]}
+                          r={DOT}
+                        />
+                      ))}
+                    {lane.row === 0 && (
+                      <use class={styles.lock} href="#envLock" x={x(lockSlot)} y={y[0]} />
+                    )}
+                    {lane.row === 1 && (
+                      <rect
+                        class:list={[styles.dot, styles.migration]}
+                        x={x(STILL.migrations.from) - BAR}
+                        y={y[1] - BAR}
+                        width={x(STILL.migrations.to - STILL.migrations.from) + 2 * BAR}
+                        height={2 * BAR}
+                        rx={BAR}
+                      />
+                    )}
+                  </g>
+                ))
+              }
+            </g>
+          </g>
+        </svg>
+      </svg>
+
+      {
+        /*
+        The command that runs, at the top right corner: above the newest
+        slot, where its change comes in. The next one takes its place: the
+        old command goes up and out, as a line of a terminal.
+      */
+      }
+      <div class={styles.events}>
+        <p class:list={[diagram.pill, diagram.swap, styles.pill]} data-pill>
+          {
+            /* The mark before the command: the prompt of a shell, the working mark while the migrations run, the check when they end. All three are a box of 14 × 14 px, thus the pill keeps its width */
+          }
+          <span class={styles.prompt} aria-hidden="true">$</span>
+          <span class={diagram.working}>
+            {
+              Array.from({ length: 25 }, (_, i) => (
+                <span style={`--d: ${-(((i * 11 + 7) % 25) * 64)}ms`} />
+              ))
+            }
+          </span>
+          <svg class={styles.done} viewBox="0 0 14 14" aria-hidden="true">
+            <rect x="0.75" y="0.75" width="12.5" height="12.5" rx="3"></rect>
+            <path d="M4 7.25 L6.25 9.5 L10 4.75"></path>
+          </svg>
+          <span
+            ><span class={styles.cli}>{CLI} </span><span data-command>{STILL.command}</span></span
+          >
+        </p>
+      </div>
+
+      {
+        /*
+        The refs, after the right end of each lane: the name of the
+        environment in the row, and the ref "Primary", which moves to the
+        other row at a promotion.
+      */
+      }
+      {
+        ([0, 1] as Row[]).map((row) => (
+          <p class={styles.ref} data-ref={row} data-dim={STILL.primary !== row ? '' : undefined}>
+            <span class:list={[diagram.swap, styles.name]} data-name>
+              {STILL.names[row]}
+            </span>
+          </p>
+        ))
+      }
+      <span
+        class={styles.primary}
+        style={`--row: ${STILL.primary}; --chars: ${STILL.names[STILL.primary].length}`}
+        data-primary-ref
+      >
+        <span class={styles.primaryLabel}>{PRIMARY}</span>
+      </span>
+    </div>
+  </div>
+
+  <ul class={styles.legend}>
+    <li><span class:list={[styles.key, styles.keyEdit]}></span>{LEGEND.edit}</li>
+    <li><span class:list={[styles.key, styles.keyMigration]}></span>{LEGEND.migration}</li>
+  </ul>
+</div>
+
+<script>
+  import {
+    arrive,
+    DIAGRAM_MS as MS,
+    reflow,
+    sleep,
+    startDiagramLoop,
+    swap,
+  } from '~/lib/motion/diagramLoop';
+  import type { Live } from '~/lib/motion/diagramLoop';
+  import {
+    AHEAD,
+    BAND,
+    BAR,
+    bandLabelY,
+    COMMANDS,
+    DOT,
+    MAINTENANCE,
+    PAD,
+    release,
+    ROW_Y,
+    STEP,
+    STILL,
+  } from './story';
+  import type { Row } from './story';
+
+  const SVG = 'http://www.w3.org/2000/svg';
+  const x = (slot: number) => slot * STEP;
+
+  const KEEP = 40;
+
+  /** The time of one slot, in ms: the graph moves to the left by one step in this time, without a stop */
+  const SLOT_MS = 1400;
+
+  /** The longest frame that the clock counts, in ms: after a pause of the page the graph does not jump */
+  const MAX_FRAME = 100;
+
+  /** The time from the promotion to maintenance:off, in ms */
+  const UNLOCK_MS = 1500;
+
+  /** The time from the pill of maintenance:off in place to the end of the band, in ms */
+  const BAND_END_MS = 1000;
+
+  /** The time from the end of the band to the start of the fade of the band of the old primary, in ms */
+  const RETIRE_MS = 2000;
+
+  /** The time from the fade of the band to the end of the lane and of the name of the old primary, in ms */
+  const END_MS = 1000;
+
+  /** The time from maintenance:off to the end of the pill, in ms */
+  const HIDE_MS = 1500;
+
+  /** The time that the check of the migrations stays before environments:promote, in ms */
+  const DONE_MS = 1500;
+
+  /** The time from the pill of maintenance:on in place to the fork, in ms */
+  const FORK_MS = 1500;
+
+  /** The slots from the start of the fork curve, on the primary, to its end, on the sandbox */
+  const FORK_SLOTS = 2;
+
+  type Step = (wait: (ms: number) => Promise<void>) => Promise<void>;
+
+  class Graph {
+    classes: Record<string, string>;
+    time: SVGGElement;
+    lanes: SVGGElement;
+    bands: SVGGElement;
+    pill: HTMLElement;
+    primaryRef: HTMLElement;
+    refs: Record<Row, HTMLElement>;
+    head: number;
+    primary: Row;
+    next: number;
+    /** The band of the maintenance mode while it is on, and its first slot */
+    band: { el: SVGRectElement; from: number } | null = null;
+    /** The bar of the migrations of the release that plays, its first slot, and true while it gets longer */
+    bar: { el: SVGRectElement; from: number; grows: boolean } | null = null;
+    queue: Step[] = [];
+    /** The slot where the curve of the last fork gets to the lane of the sandbox */
+    forked = STILL.fork.to;
+    hiding = 0;
+    t: number;
+    /** The slot where the open lanes and the band end, under the right edge */
+    reach: number;
+    /** The step that waits for the time to get to a slot */
+    waiter: { slot: number; resolve: () => void } | null = null;
+    /** True until the first step: the band of the still is still there */
+    still = true;
+    live: Live = () => false;
+
+    constructor(root: HTMLElement) {
+      this.classes = JSON.parse(root.dataset.classes!);
+      this.time = root.querySelector<SVGGElement>('[data-time]')!;
+      this.lanes = root.querySelector<SVGGElement>('[data-lanes]')!;
+      this.bands = root.querySelector<SVGGElement>('[data-bands]')!;
+      this.pill = root.querySelector<HTMLElement>('[data-pill]')!;
+      this.primaryRef = root.querySelector<HTMLElement>('[data-primary-ref]')!;
+      this.refs = {
+        0: root.querySelector<HTMLElement>('[data-ref="0"]')!,
+        1: root.querySelector<HTMLElement>('[data-ref="1"]')!,
+      };
+      this.head = Number(root.dataset.head);
+      this.primary = Number(root.dataset.primary) as Row;
+      this.next = Number(root.dataset.next);
+      this.t = this.head;
+      this.reach = this.head + AHEAD;
+    }
+
+    open(row: Row): SVGGElement {
+      return this.lanes.querySelector<SVGGElement>(`[data-row="${row}"][data-open]`)!;
+    }
+
+    stretch(lane: SVGGElement, slot: number): void {
+      const path = lane.querySelector<SVGPathElement>('path')!;
+      path.setAttribute('d', `${path.dataset.prefix} L ${x(slot)} ${path.dataset.y}`);
+    }
+
+    /** Makes the open lanes and the band of the maintenance mode end at `slot`, if they end before it */
+    extend(slot: number): void {
+      if (slot <= this.reach) return;
+      this.reach = slot;
+      for (const lane of this.lanes.querySelectorAll<SVGGElement>('[data-open]'))
+        this.stretch(lane, slot);
+      if (this.band) this.band.el.setAttribute('width', String(x(slot - this.band.from)));
+    }
+
+    /**
+     * Moves the graph to the time `t`. The lanes and the band get longer
+     * under the right edge before they come into view.
+     */
+    render(): void {
+      this.time.style.transform = `translateX(${-x(this.t) - PAD}px)`;
+      this.extend(Math.ceil(this.t) + AHEAD);
+      if (this.bar?.grows)
+        this.bar.el.setAttribute('width', String(x(Math.max(0, this.t - this.bar.from)) + 2 * BAR));
+      if (this.waiter && this.t >= this.waiter.slot) {
+        const { resolve } = this.waiter;
+        this.waiter = null;
+        resolve();
+      }
+    }
+
+    /**
+     * The clock of a session: the time goes on in each frame, at one slot
+     * in SLOT_MS. When the session stops, the clock stops, and a step that
+     * waits for a slot goes on at once.
+     */
+    run(live: Live): void {
+      let last = performance.now();
+      const frame = (now: number) => {
+        if (!live()) {
+          if (this.waiter) {
+            this.t = Math.max(this.t, this.waiter.slot);
+            this.render();
+          }
+          return;
+        }
+        this.t += Math.min(now - last, MAX_FRAME) / SLOT_MS;
+        last = now;
+        this.render();
+        requestAnimationFrame(frame);
+      };
+      requestAnimationFrame(frame);
+    }
+
+    /**
+     * The next slot: waits until the time gets to it. After a long step the
+     * slots that went by stay empty. Out of view the time jumps to it. With
+     * `half`, it waits for that part of the newest slot, and the newest
+     * slot stays the same.
+     */
+    async slot(half = 0): Promise<void> {
+      if (!half) this.head = Math.max(this.head + 1, Math.ceil(this.t));
+      const slot = this.head + half;
+      this.extend(Math.ceil(slot) + AHEAD);
+      if (!this.live()) {
+        this.t = Math.max(this.t, slot);
+        this.render();
+        return;
+      }
+      if (this.t >= slot) return;
+      await new Promise<void>((resolve) => {
+        this.waiter = { slot, resolve };
+      });
+    }
+
+    /**
+     * A new command on the pill: the old command goes up and out.
+     * After a gone pill (after maintenance:off) the new one only comes in.
+     */
+    async command(text: string, wait: (ms: number) => Promise<void>): Promise<void> {
+      window.clearTimeout(this.hiding);
+      const done = 'done' in this.pill.dataset;
+      const update = () => {
+        this.pill.querySelector('[data-command]')!.textContent = text;
+        delete this.pill.dataset.done;
+      };
+      if ('gone' in this.pill.dataset) {
+        update();
+        this.pill.dataset.swapIn = '';
+        reflow(this.pill);
+        delete this.pill.dataset.swapIn;
+        delete this.pill.dataset.gone;
+      } else {
+        // The box of the pill is at the right edge and gets the width of the new command: the copy that goes out keeps its right edge, not its left one, thus it does not move to the side
+        const right =
+          this.pill.offsetParent!.clientWidth - this.pill.offsetLeft - this.pill.offsetWidth;
+        swap(this.pill, update);
+        const old = this.pill.nextElementSibling as HTMLElement;
+        Object.assign(old.style, { left: 'auto', right: `${right}px` });
+        if (done) old.dataset.done = '';
+      }
+      await wait(MS.swap);
+    }
+
+    hide(): void {
+      window.clearTimeout(this.hiding);
+      this.hiding = window.setTimeout(() => {
+        this.pill.dataset.gone = '';
+      }, HIDE_MS);
+    }
+
+    dot(row: Row, slot = this.head): void {
+      const lane = this.open(row);
+      const dot = document.createElementNS(SVG, 'circle');
+      dot.setAttribute('class', this.classes.edit!);
+      dot.setAttribute('cx', String(x(slot)));
+      dot.setAttribute('cy', String(ROW_Y[row]));
+      dot.setAttribute('r', String(DOT));
+      lane.append(dot);
+      lane.dataset.last = String(slot);
+      arrive(dot as unknown as HTMLElement);
+    }
+
+    padlock(): void {
+      const lock = document.createElementNS(SVG, 'use');
+      lock.setAttribute('class', this.classes.lock!);
+      lock.setAttribute('href', '#envLock');
+      lock.setAttribute('x', String(x(this.head)));
+      lock.setAttribute('y', String(ROW_Y[this.primary]));
+      this.open(this.primary).append(lock);
+      arrive(lock as unknown as HTMLElement);
+    }
+
+    plan(): Step[] {
+      const edits = 4 + Math.floor(Math.random() * 2);
+      const migrations = 5 + Math.floor(Math.random() * 3);
+      return [
+        ...Array.from({ length: edits }, () => this.edit()),
+        this.lock(),
+        this.fork(),
+        this.migrations(migrations),
+        this.promote(),
+        this.unlock(),
+      ];
+    }
+
+    edit(): Step {
+      return async () => {
+        await this.slot();
+        if (Math.random() < 0.85) this.dot(this.primary);
+        await this.slot(0.5);
+        if (Math.random() < 0.6) this.dot(this.primary, this.head + 0.5);
+      };
+    }
+
+    lock(): Step {
+      return async (wait) => {
+        await this.slot();
+        const from = this.head - 0.5;
+        const group = document.createElementNS(SVG, 'g');
+        const rect = document.createElementNS(SVG, 'rect');
+        rect.setAttribute('class', this.classes.band!);
+        rect.setAttribute('x', String(x(from)));
+        rect.setAttribute('y', String(ROW_Y[this.primary] - BAND));
+        rect.setAttribute('width', String(x(this.reach - from)));
+        rect.setAttribute('height', String(2 * BAND));
+        rect.setAttribute('rx', '6');
+        const label = document.createElementNS(SVG, 'text');
+        label.setAttribute('class', this.classes.bandLabel!);
+        label.setAttribute('x', String(x(from) + 10));
+        label.setAttribute('y', String(bandLabelY(this.primary)));
+        label.textContent = MAINTENANCE;
+        group.append(rect, label);
+        group.dataset.band = '';
+        this.bands.append(group);
+        arrive(group as unknown as HTMLElement);
+        this.band = { el: rect, from };
+        this.padlock();
+        await this.command(COMMANDS.lock, wait);
+        await wait(FORK_MS);
+      };
+    }
+
+    /**
+     * migrations:run, the fork: the old lane of the other row ends at its
+     * last change (if it did not end after the promotion), the row takes
+     * the name of the new sandbox, and the curve comes in from the
+     * primary at this slot, after the padlock.
+     */
+    fork(): Step {
+      return async (wait) => {
+        await this.slot();
+        const row = (1 - this.primary) as Row;
+        const name = release(this.next);
+        await this.command(COMMANDS.migrate(name), wait);
+        this.pill.dataset.working = '';
+
+        const old = this.open(row);
+        if (old) {
+          const last = Number(old.dataset.last);
+          const path = old.querySelector<SVGPathElement>('path')!;
+          const tail = document.createElementNS(SVG, 'path');
+          tail.setAttribute('class', this.classes.tail!);
+          tail.setAttribute(
+            'd',
+            `M ${x(last)} ${path.dataset.y} L ${x(this.reach)} ${path.dataset.y}`,
+          );
+          old.append(tail);
+          this.stretch(old, last);
+          delete old.dataset.open;
+          reflow(tail);
+          tail.dataset.faded = '';
+          window.setTimeout(() => tail.remove(), MS.fade);
+        }
+        const ref = this.refs[row];
+        const label = ref.querySelector<HTMLElement>('[data-name]')!;
+        swap(label, () => {
+          label.textContent = name;
+        });
+        delete ref.dataset.dim;
+        await wait(MS.swap);
+
+        const from = this.head;
+        const to = from + FORK_SLOTS;
+        this.forked = to;
+        const y0 = ROW_Y[this.primary];
+        const y1 = ROW_Y[row];
+        const lane = document.createElementNS(SVG, 'g');
+        lane.setAttribute('class', this.classes.lane!);
+        lane.dataset.row = String(row);
+        lane.dataset.last = String(this.head);
+        lane.dataset.open = '';
+        // A sandbox until the promotion: its lane does not have the accent of the primary
+        lane.dataset.sandbox = '';
+        const path = document.createElementNS(SVG, 'path');
+        path.setAttribute('class', this.classes.line!);
+        path.setAttribute('pathLength', '100');
+        path.dataset.prefix = `M ${x(from)} ${y0} C ${x(from + 1)} ${y0}, ${x(to - 1)} ${y1}, ${x(to)} ${y1}`;
+        path.dataset.y = String(y1);
+        path.dataset.hidden = '';
+        lane.append(path);
+        this.lanes.append(lane);
+        this.stretch(lane, this.reach);
+        reflow(path);
+        delete path.dataset.hidden;
+      };
+    }
+
+    /**
+     * migrations:run, the migrations in the sandbox: the bar starts at the
+     * next slot and gets longer with the time, for `slots` slots.
+     */
+    migrations(slots: number): Step {
+      return async (wait) => {
+        do await this.slot();
+        while (this.head < this.forked);
+        const row = (1 - this.primary) as Row;
+        const lane = this.open(row);
+        const cy = ROW_Y[row];
+        const bar = document.createElementNS(SVG, 'rect');
+        bar.setAttribute('class', this.classes.migration!);
+        bar.setAttribute('x', String(x(this.head) - BAR));
+        bar.setAttribute('y', String(cy - BAR));
+        bar.setAttribute('width', String(2 * BAR));
+        bar.setAttribute('height', String(2 * BAR));
+        bar.setAttribute('rx', String(BAR));
+        lane.append(bar);
+        this.bar = { el: bar, from: this.head, grows: true };
+        arrive(bar as unknown as HTMLElement);
+        for (let i = 1; i < slots; i++) await this.slot();
+        this.bar.grows = false;
+        bar.setAttribute('width', String(x(this.head - this.bar.from) + 2 * BAR));
+        lane.dataset.last = String(this.head);
+        delete this.pill.dataset.working;
+        this.pill.dataset.done = '';
+        await wait(DONE_MS);
+      };
+    }
+
+    promote(): Step {
+      return async (wait) => {
+        await this.slot();
+        const row = (1 - this.primary) as Row;
+        const name = this.refs[row].querySelector('[data-name]')!.textContent!.trim();
+        await this.command(COMMANDS.promote(name), wait);
+        this.primaryRef.style.setProperty('--row', String(row));
+        this.primaryRef.style.setProperty('--chars', String(name.length));
+        await wait(MS.travel);
+        delete this.open(row).dataset.sandbox;
+        this.open(this.primary).dataset.dim = '';
+        this.refs[this.primary].dataset.dim = '';
+        this.primary = row;
+        this.next += 1;
+      };
+    }
+
+    unlock(): Step {
+      return async (wait) => {
+        await wait(UNLOCK_MS);
+        await this.command(COMMANDS.unlock, wait);
+        this.hide();
+        await wait(BAND_END_MS);
+        // The band of the old primary ends at the right edge of the graph now: it stops there and goes to the left with the graph
+        if (this.band) this.band.el.setAttribute('width', String(x(this.t - this.band.from) + PAD));
+        this.retire((1 - this.primary) as Row, (this.band?.el.parentNode as SVGGElement) ?? null);
+        this.band = null;
+        this.bar = null;
+        this.prune();
+      };
+    }
+
+    prune(): void {
+      const edge = x(this.head - KEEP);
+      for (const lane of this.lanes.querySelectorAll<SVGGElement>('[data-row]')) {
+        if (!('open' in lane.dataset) && x(Number(lane.dataset.last)) < edge) {
+          lane.remove();
+          continue;
+        }
+        for (const dot of lane.querySelectorAll('circle')) {
+          if (Number(dot.getAttribute('cx')) < edge) dot.remove();
+        }
+        for (const lock of lane.querySelectorAll('use')) {
+          if (Number(lock.getAttribute('x')) < edge) lock.remove();
+        }
+        for (const bar of lane.querySelectorAll('rect')) {
+          if (Number(bar.getAttribute('x')) + Number(bar.getAttribute('width')) < edge)
+            bar.remove();
+        }
+      }
+      for (const band of this.bands.querySelectorAll<SVGGElement>('[data-band]')) {
+        const rect = band.querySelector('rect')!;
+        if (Number(rect.getAttribute('x')) + Number(rect.getAttribute('width')) < edge)
+          band.remove();
+      }
+    }
+
+    /**
+     * The environment of `row` is not the primary now. RETIRE_MS later its
+     * band fades out. END_MS after that its lane stops at the right edge,
+     * and its name goes. The next fork into the row gives it a new name.
+     */
+    retire(row: Row, band: SVGGElement | null): void {
+      const lane = this.open(row);
+      const label = this.refs[row].querySelector<HTMLElement>('[data-name]')!;
+      setTimeout(() => {
+        if (!band) return;
+        band.addEventListener('transitionend', () => band.remove(), { once: true });
+        band.dataset.gone = '';
+      }, RETIRE_MS);
+      setTimeout(() => {
+        if (!lane || !('open' in lane.dataset)) return;
+        const end = this.t + PAD / STEP;
+        this.stretch(lane, end);
+        lane.dataset.last = String(end);
+        delete lane.dataset.open;
+        swap(label, () => {
+          label.textContent = '';
+        });
+      }, RETIRE_MS + END_MS);
+    }
+
+    /**
+     * Plays the next step. Out of view a step does not wait: it makes all
+     * its changes at once, thus the graph is whole when the loop goes on.
+     */
+    async step(live: Live): Promise<void> {
+      if (this.still) {
+        this.still = false;
+        this.hide();
+        this.retire(
+          (1 - this.primary) as Row,
+          this.bands.querySelector<SVGGElement>('[data-band]'),
+        );
+      }
+      this.live = live;
+      if (this.queue.length === 0) this.queue = this.plan();
+      const step = this.queue.shift()!;
+      await step(async (ms) => {
+        if (live()) await sleep(ms);
+      });
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-env-graph]')) {
+    const graph = new Graph(root);
+    startDiagramLoop(root, (live) => graph.step(live), { start: (live) => graph.run(live) });
+  }
+</script>

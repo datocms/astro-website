@@ -1,0 +1,34 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { Section } from '~/components/Section';
+import type { AudienceSplitData } from '~/data/developers';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends AudienceSplitData {
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+}
+
+const { inverse, accent, theme } = Astro.props;
+const halves = [
+  { half: inverse, class: styles.inverse },
+  { half: accent, class: styles.accent },
+];
+---
+
+<Section theme={theme} padding="none" flush contentClass={styles.split}>
+  {
+    halves.map(({ half, class: halfClass }) => (
+      <div class:list={[styles.half, halfClass]}>
+        <div class={styles.text}>
+          <div>
+            <h2 class:list={[styles.label, 'h1']}>{half.label}</h2>
+            <p class="h1">{half.text}</p>
+          </div>
+          <ButtonGroup buttons={[half.button]} />
+        </div>
+      </div>
+    ))
+  }
+</Section>

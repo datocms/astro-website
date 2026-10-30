@@ -1,0 +1,197 @@
+/*
+ * The layout of the fragment "Each screen gets its own file."
+ * (Files.astro): the code above the chart. The parts are the ones of
+ * ../diagram/style.module.css (the photo, the pill), and the surface and
+ * the font are the ones of the player (player.module.css). The picture
+ * fills the box of the fragment (SceneFragment, preset `fill`). The box is
+ * the container and cuts the original.
+ */
+.files {
+  --pad: var(--space-xl);
+  /* The space from the right edge and the bottom edge of the box to the label of the original and to the notes */
+  --edge: var(--space-md);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  box-sizing: border-box;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding: var(--pad);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse-muted);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.code {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.key {
+  color: var(--text-on-inverse-strong);
+}
+
+/*
+ * The chart. Each layer has its position and its width in the unit of the
+ * chart (--x, --y, --w). The unit is --scale of the width of the chart: a
+ * length from the width of the box (the container), thus a layer and its
+ * children can use it. The vertical position is a margin: then the bottom
+ * of the original can go to the bottom of the box.
+ */
+.chart {
+  --scale: 0.6;
+  --unit: calc(var(--scale) * (100cqw - 2 * var(--pad)));
+
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.rest,
+.file {
+  position: absolute;
+  top: 0;
+  left: calc(var(--x) * var(--unit));
+  margin-top: calc(var(--y) * var(--unit));
+  border-radius: var(--radius-sm);
+}
+
+/*
+ * The original is larger than the box: it goes past the right edge and the
+ * bottom edge of the box, and the box cuts it there, as a fragment with the
+ * fit `crop`. Only its top left corner is round.
+ */
+.rest {
+  overflow: hidden;
+}
+
+.rest img {
+  display: block;
+  width: calc(var(--w) * var(--unit));
+  max-width: none;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+}
+
+.rest::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--surface-inverse) 70%, transparent);
+}
+
+.file {
+  box-sizing: border-box;
+  width: calc(var(--w) * var(--unit));
+  aspect-ratio: 3 / 2;
+}
+
+/*
+ * A file that a screen picks has a dark line, the colour of the leader of
+ * its note, and a white gap between the line and the photo.
+ */
+.file[data-picked] {
+  --border: 1px;
+  --gap: var(--space-5xs);
+
+  padding: var(--gap);
+  border: var(--border) solid var(--text-on-inverse);
+  background: white;
+}
+
+/* The dark scheme: the gap shows the surface of the box, as the line is pale. */
+:global(:root[data-scheme='dark']) .file[data-picked] {
+  background: var(--surface-inverse);
+}
+
+.copy {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* The photo is inside the line and the gap, if there are: its radius is smaller by their width */
+  border-radius: calc(var(--radius-sm) - var(--border, 0px) - var(--gap, 0px));
+  object-fit: cover;
+}
+
+/*
+ * The note of a file that a screen picks, as the notes of
+ * CodeSnippetPreview: a dot on the right edge of the copy, a leader of 1px
+ * to the note, and the note. --y is the height of the leader, and the note
+ * is in the middle of it. The right edge of the note is on the right edge
+ * of the label of the original. The leader goes under the note to that
+ * edge, and the note, on the colour of the box, covers it.
+ */
+.leader {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: calc(var(--edge) - var(--pad));
+  left: calc(var(--x) * var(--unit) - var(--space-2xs));
+  height: 1px;
+  margin-top: calc(var(--y) * var(--unit));
+  background: var(--text-on-inverse);
+}
+
+.leader::before {
+  content: '';
+  position: absolute;
+  top: -2.5px;
+  left: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-on-inverse);
+}
+
+.note {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: calc(var(--edge) - var(--pad));
+  margin: 0;
+  margin-top: calc(var(--y) * var(--unit));
+  padding: var(--space-4xs) 0 var(--space-4xs) var(--space-2xs);
+  border-radius: var(--radius-md);
+  background: var(--diagram-panel);
+  font-size: var(--type-code-xsmall);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+
+.original {
+  position: absolute;
+  z-index: 1;
+  right: var(--edge);
+  bottom: var(--edge);
+  margin: 0;
+  font-size: var(--type-code-xsmall);
+  white-space: nowrap;
+}
+
+/* To 440px: a smaller margin and smaller copies */
+@container (max-width: 440px) {
+  .files {
+    --pad: var(--space-sm);
+    --edge: var(--space-2xs);
+
+    gap: var(--space-2xs);
+    font-size: var(--type-code-xsmall);
+  }
+
+  .chart {
+    --scale: 0.52;
+  }
+
+  /* A thinner note: the two notes and the largest copy do not touch */
+  .note {
+    padding-block: 0;
+  }
+}

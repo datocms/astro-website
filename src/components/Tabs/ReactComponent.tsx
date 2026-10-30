@@ -9,7 +9,7 @@ export default function TabsReactComponent({ children }: { children: ReactNode }
     <div className={s.root}>
       <div className={s.handles}>
         {React.Children.map(children, (child, index) => {
-          if (!child || typeof child !== 'object' || !('props' in child)) {
+          if (!React.isValidElement<TabProps>(child)) {
             return undefined;
           }
 
@@ -31,7 +31,7 @@ export default function TabsReactComponent({ children }: { children: ReactNode }
           return null;
         }
 
-        if (!child || typeof child !== 'object' || !('props' in child)) {
+        if (!React.isValidElement<TabProps>(child)) {
           return undefined;
         }
 
@@ -45,10 +45,12 @@ export default function TabsReactComponent({ children }: { children: ReactNode }
   );
 }
 
-export const TabReactComponent = (_props: {
+type TabProps = {
   title: string;
   code?: boolean;
   children: ReactNode;
-}) => {
+};
+
+export const TabReactComponent = (_props: TabProps) => {
   return <div />;
 };

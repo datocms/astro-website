@@ -1,0 +1,67 @@
+---
+// The Editing pillar of the redesign. The copy comes from src/data/. The
+// SEO is static. Only the closing quote comes from the CMS.
+import { CategoryNav } from '~/components/CategoryNav';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { PageCloser } from '~/components/PageCloser';
+import { Quote } from '~/components/Quote';
+import { Statement } from '~/components/Statement';
+import * as ee from '~/data/editor-experience';
+import { waveVideo } from '~/data/videos';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
+import CollaborationChapter from '~/scenes/Collaboration/Chapter.astro';
+import DynamicLayoutsChapter from '~/scenes/DynamicLayouts/Chapter.astro';
+import LocalizationChapter from '~/scenes/Localization/Chapter.astro';
+import SeoChapter from '~/scenes/Seo/Chapter.astro';
+import StructuredContentChapter from '~/scenes/StructuredContent/Chapter.astro';
+import VisualEditingChapter from '~/scenes/VisualEditing/Chapter.astro';
+import WorkflowsChapter from '~/scenes/Workflows/Chapter.astro';
+import { query } from './_graphql';
+
+const { review } = await executeQuery(Astro, query);
+
+const seo = overrideSeo([], seoTitle(ee.seo.title), seoDescription(ee.seo.description));
+---
+
+{
+  /*
+  The Editing pillar page (src/data/AGENTS.md), with its seven chapters.
+  The rhythm of a chapter (src/scenes/<Chapter>/Chapter.astro): the header
+  and the scene on the inverse surface, as the home hero, then the
+  fragments on the pale surface. The opinion between the chapters is on
+  the accent surface.
+*/
+}
+<Layout seo={seo} footerTheme="orange">
+  <Hero {...ee.hero} alignment="center" typewriter />
+  {/* The chapters of the pillar. Sticky; no theme, as the hero: it takes the theme of the page. */}
+  <CategoryNav {...ee.chapterNav} />
+  <VisualEditingChapter />
+  <DynamicLayoutsChapter />
+  <LocalizationChapter />
+  <Statement {...ee.opinion} theme="orange" variant="light" />
+  <StructuredContentChapter />
+  <WorkflowsChapter />
+  <CollaborationChapter />
+  <SeoChapter />
+  <Quote review={review} fallback={ee.closing} theme="default" />
+  {/* The closer shows the CtaBanner of ee.ctaDemo above its video. */}
+  <PageCloser theme="orange" cta={ee.ctaDemo} video={waveVideo} />
+
+  <DraftModeQueryListener query={query} />
+</Layout>
+
+<script>
+  import { initSceneSequences } from '~/lib/motion/sceneSequence';
+
+  // The slash fragment, the frames of Dynamic layouts, Workflows and
+  // Collaboration and the previews of SEO play their sequence in view: the
+  // slash typed and deleted, the gap opened and a block chosen, the stage
+  // opened and the tooltip of Approved, Inès's save and her return, the
+  // cards of the previews in turn. The caret of the slash fragment blinks
+  // only in view.
+  initSceneSequences();
+</script>

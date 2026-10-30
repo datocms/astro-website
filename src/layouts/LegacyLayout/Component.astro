@@ -1,0 +1,51 @@
+---
+import type { TitleMetaLinkTag } from 'react-datocms';
+// The stylesheet of the old pages. It must not load on a page of the redesign.
+import '../BaseLayout/global.css';
+import { BaseLayout } from '../BaseLayout';
+import Footer from './Footer/index.astro';
+import Navbar from './Navbar/index.astro';
+import { FinalCta } from './FinalCta';
+import { fetchNavbar } from './Navbar/fetchNavbar';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
+
+type Props = {
+  seo: TitleMetaLinkTag[];
+  noFinalCta?: boolean;
+};
+
+const navbarData = await fetchNavbar(Astro);
+
+const { seo, noFinalCta } = Astro.props;
+---
+
+<BaseLayout seo={seo}>
+  <slot name="head" slot="head" />
+  <Navbar data={navbarData} />
+  <div transition:animate="fade" id="layout-content">
+    <slot />
+  </div>
+  <Footer>
+    {
+      !noFinalCta && (
+        /* https://github.com/withastro/astro/issues/10024#issuecomment-1933483135 */
+        <Fragment slot={!noFinalCta && 'finalCta'}>
+          <FinalCta href={dashboardUrl('/signup')}>
+            <Fragment slot="title">Start using DatoCMS today</Fragment>
+            <Fragment slot="subtitle">
+              According to Gartner 89% of companies plan to compete primarily on the basis of
+              customer experience this year. Don't get caught unprepared.
+            </Fragment>
+            <Fragment slot="buttonText">Try it for free!</Fragment>
+            <Fragment slot="checks">
+              <li>No credit card</li>
+              <li>Easy setup</li>
+            </Fragment>
+          </FinalCta>
+        </Fragment>
+      )
+    }
+  </Footer>
+
+  <slot name="unwrapped" />
+</BaseLayout>

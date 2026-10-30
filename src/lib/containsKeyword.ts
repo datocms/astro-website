@@ -1,10 +1,10 @@
-type SeoAnalysis = {
+export type SeoAnalysis = {
   keyword: string;
   synonyms: string;
   relatedKeywords: Array<{ keyword: string; synonyms: string }>;
 };
 
-function isSeoAnalysis(value: unknown): value is SeoAnalysis {
+export function isSeoAnalysis(value: unknown): value is SeoAnalysis {
   return Boolean(value && typeof value === 'object' && 'keyword' in value);
 }
 
@@ -14,7 +14,7 @@ function containsKeyword(text: string | undefined, keyword: string) {
   );
 }
 
-function allKeywords(seoAnalysis: SeoAnalysis) {
+export function allKeywords(seoAnalysis: SeoAnalysis) {
   const { keyword, synonyms, relatedKeywords } = seoAnalysis;
 
   let allKeywords: string[] = [];

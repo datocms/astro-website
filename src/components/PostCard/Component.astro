@@ -1,0 +1,45 @@
+---
+import { PixelImage } from '~/components/PixelImage';
+import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
+import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
+import { readFragment } from '~/lib/datocms/graphql';
+import { formatLongDate } from '~/lib/format/date';
+import { ChatCardFragment, PostCardFragment } from './graphql';
+import type { PostCardItem } from './types';
+import styles from './style.module.css';
+
+type Props = PostCardItem;
+
+const chat = Astro.props.chat ? readFragment(ChatCardFragment, Astro.props.chat) : undefined;
+const post = Astro.props.post ? readFragment(PostCardFragment, Astro.props.post) : undefined;
+const card = (chat ?? post)!;
+const date = card._firstPublishedAt ?? card._createdAt;
+const href = chat ? buildUrlForCustomerStory(chat) : buildUrlForBlogPost(post!);
+// A casual chat shows a label with the names of the people, above the title.
+const label = chat
+  ? `Casual chat with ${new Intl.ListFormat('en', { type: 'conjunction' }).format(chat.people.map((person) => person.name))}`
+  : undefined;
+---
+
+<a href={href} class={styles.card}>
+  {
+    card.coverImage?.url ? (
+      <PixelImage
+        class={styles.image}
+        src={card.coverImage.url}
+        alt={card.coverImage.alt ?? ''}
+        width="569"
+        height="385"
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <span class={styles.image} />
+    )
+  }
+  <span class={styles.text}>
+    {label && <span class:list={[styles.label, 'caption']}>{label}</span>}
+    <span class:list={[styles.title, 'h2']}>{card.title}</span>
+    <time class:list={[styles.date, 'body']} datetime={date}>{formatLongDate(date)}</time>
+  </span>
+</a>

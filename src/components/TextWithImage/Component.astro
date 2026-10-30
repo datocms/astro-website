@@ -1,0 +1,118 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { InlineText } from '~/components/InlineText';
+import { Logo } from '~/components/Logo';
+import type { LogoItem } from '~/components/LogosLine';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Section } from '~/components/Section';
+import { InlineParagraphs } from '~/components/StructuredText';
+import type { ButtonData } from '~/data/home';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { Theme } from '~/lib/theme';
+import { TextWithImageStoryFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  title?: string;
+  tagline?: string;
+  /**
+   * A success story of the CMS. Its title, subtitle, logo and cover photo
+   * replace `title`, `tagline`, `logo` and the slot. Use it with
+   * `media="photo"`.
+   */
+  story?: FragmentOf<typeof TextWithImageStoryFragment>;
+  headlineStyle?: 'headline-subline' | 'two-tone';
+  panelOrder?: 'image-left' | 'image-right';
+  media?: 'photo' | 'visual';
+  /** `even`: from 1152 the media half has the side padding on all four sides. */
+  mediaPadding?: 'default' | 'even';
+  /** A case-studies-logo above the headline. It fits in 220 × 30. */
+  logo?: LogoItem;
+  button?: ButtonData;
+  /** Use `h1` when the section is the first section of the page. */
+  headingLevel?: 'h1' | 'h2';
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+}
+
+const {
+  title = '',
+  tagline = '',
+  headlineStyle = 'headline-subline',
+  panelOrder = 'image-right',
+  media = 'visual',
+  mediaPadding = 'default',
+  logo,
+  button,
+  headingLevel: Heading = 'h2',
+  theme,
+} = Astro.props;
+
+const story = Astro.props.story && readFragment(TextWithImageStoryFragment, Astro.props.story);
+const storyLogo: LogoItem | undefined = story && {
+  mask: story.logo.url,
+  alt: story.logo.alt || story.name,
+  width: story.logo.width ?? 0,
+  height: story.logo.height ?? 0,
+};
+const shownLogo = storyLogo ?? logo;
+---
+
+<Section
+  theme={theme}
+  padding="none"
+  flush
+  class:list={[styles.textWithImage, panelOrder === 'image-left' && styles.imageLeft]}
+  contentClass={styles.split}
+>
+  <div class={styles.textHalf}>
+    <div class:list={[styles.text, headlineStyle === 'two-tone' && styles.twoToneText]}>
+      {
+        shownLogo && (
+          <span class={styles.logoBox}>
+            <Logo logo={shownLogo} class={styles.logo} />
+          </span>
+        )
+      }
+      {
+        headlineStyle === 'two-tone' ? (
+          <Heading class:list={[styles.twoTone, 'h1']}>
+            {story ? story.title ? <InlineParagraphs data={story.title} /> : story.name : title}{' '}
+            <span class={styles.muted}>
+              {story ? <InlineParagraphs data={story.subtitle} /> : <InlineText text={tagline} />}
+            </span>
+          </Heading>
+        ) : (
+          <div class={styles.headlineSubline}>
+            <Heading class="h1">
+              {story ? story.title ? <InlineParagraphs data={story.title} /> : story.name : title}
+            </Heading>
+            <p class:list={[styles.subline, 'body']}>
+              {story ? <InlineParagraphs data={story.subtitle} /> : <InlineText text={tagline} />}
+            </p>
+          </div>
+        )
+      }
+      {button && <ButtonGroup buttons={[button]} />}
+    </div>
+  </div>
+  <div
+    class:list={[
+      styles.mediaHalf,
+      media === 'photo' && styles.photo,
+      mediaPadding === 'even' && styles.evenPadding,
+    ]}
+  >
+    {
+      story?.coverImage.responsiveImage ? (
+        <ResponsiveImage
+          data={story.coverImage.responsiveImage}
+          sizes="(min-width: 1152px) 50vw, 100vw"
+          imgStyle={{ maxWidth: 'none', height: '100%' }}
+        />
+      ) : (
+        <slot />
+      )
+    }
+  </div>
+</Section>

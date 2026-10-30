@@ -1,0 +1,167 @@
+/*
+ * The layout of the two players of the fragment "No spinning wheel."
+ * (Stream.astro). The parts are the ones of ../diagram/style.module.css.
+ * The picture fills the box of the fragment (SceneFragment, preset
+ * `fill`) with the inverse surface, and the players are at the middle,
+ * side by side at every width. The box is the container.
+ */
+.stream {
+  --pad: var(--space-xl);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding: var(--pad);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse-strong);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+.side {
+  min-width: 0;
+}
+
+.connection {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  margin: 0 0 var(--space-xs);
+  white-space: nowrap;
+  --diagram-swap-y: 6px;
+}
+
+.bars {
+  display: inline-flex;
+  flex: none;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.bars > span {
+  width: 3px;
+  border-radius: 1px;
+  background: currentColor;
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.bars > span:nth-child(1) {
+  height: 25%;
+}
+
+.bars > span:nth-child(2) {
+  height: 50%;
+}
+
+.bars > span:nth-child(3) {
+  height: 75%;
+}
+
+.bars > span:nth-child(4) {
+  height: 100%;
+}
+
+.bars[data-bars='1'] > span:nth-child(n + 2),
+.bars[data-bars='2'] > span:nth-child(n + 3),
+.bars[data-bars='3'] > span:nth-child(n + 4) {
+  opacity: 0.3;
+}
+
+.name {
+  display: inline-block;
+}
+
+/* The player: the frame of the video at 16:9. The pictures of the renditions are on top of each other; the one of the current rendition shows. */
+.player {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--surface-inverse-muted);
+}
+
+/*
+ * The browser scales a small rendition up to the player, smooth, as a
+ * video player does. The player changes the rendition in one frame, with
+ * no fade, as a real player does.
+ */
+.picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  visibility: hidden;
+}
+
+.picture[data-on] {
+  visibility: visible;
+}
+
+.badge {
+  position: absolute;
+  top: var(--space-3xs);
+  right: var(--space-3xs);
+  overflow: hidden;
+  padding: var(--space-4xs) var(--space-3xs);
+  border-radius: var(--radius-sm);
+  background: var(--surface-inverse);
+  --diagram-swap-y: 6px;
+}
+
+.value {
+  display: inline-block;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin: var(--space-xs) 0 0;
+}
+
+.rail {
+  flex: 1;
+  height: 2px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--border-on-inverse-strong);
+}
+
+.played {
+  display: block;
+  width: calc(var(--played) * 100%);
+  height: 100%;
+  background: var(--text-on-inverse);
+  transition: width 1s linear;
+}
+
+.time {
+  font-variant-numeric: tabular-nums;
+}
+
+@container (max-width: 440px) {
+  .stream {
+    --pad: var(--space-md);
+
+    font-size: var(--type-code-xsmall);
+  }
+
+  .pair {
+    gap: var(--space-sm);
+  }
+}

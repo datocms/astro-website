@@ -1,0 +1,263 @@
+/* Grid. The rows are top-aligned: each row is as tall as its tallest quote. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2xl) var(--space-md);
+}
+
+.item,
+.link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* A quote with a link (the page of a partner). The name shows the link on hover. */
+@media (hover: hover) {
+  .link:hover .name {
+    text-decoration: underline;
+  }
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.quote {
+  max-width: 304px;
+  margin: 0;
+  font-size: var(--type-h1);
+  color: var(--text-primary);
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+}
+
+/* A CMS photo is a <picture>. The image sets its own width in a style attribute (100%), thus the picture gives the size. */
+.avatarPicture {
+  display: block;
+  flex: none;
+  width: 28px;
+  height: 28px;
+}
+
+.slideAvatarPicture {
+  display: block;
+  flex: none;
+  width: 40px;
+  height: 40px;
+}
+
+.avatar {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  mix-blend-mode: luminosity;
+}
+
+.names {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.role {
+  color: var(--text-muted);
+}
+
+/*
+ * Long quotes (the wall of love, up to 350 characters). The text has the
+ * size of the body on every screen and uses the whole column.
+ */
+.long .quote {
+  max-width: none;
+  font-size: var(--type-body);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .figure {
+    gap: var(--space-md);
+  }
+
+  .quote {
+    font-size: var(--type-h2);
+  }
+}
+
+@media (min-width: 1152px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: var(--space-xl);
+  }
+}
+
+.slider {
+  position: relative;
+  padding-bottom: var(--space-md);
+  touch-action: pan-y;
+}
+
+.sliderContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3xl);
+}
+
+/* All the slides are in the same cell. The tallest slide sets the height, thus there is no layout shift. */
+.slides {
+  display: grid;
+  width: 100%;
+  max-width: var(--headline-max);
+}
+
+.slide {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+
+.slide[data-active] {
+  visibility: visible;
+}
+
+.slideFigure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  text-align: center;
+}
+
+.big .slideFigure {
+  gap: var(--space-lg);
+}
+
+.slideQuote {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.slideAuthor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.slideAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  mix-blend-mode: multiply;
+}
+
+/* The dark scheme: multiply makes the photo black on the dark accent surface. Luminosity keeps it readable. */
+:global(:root[data-scheme='dark']) .slideAvatar {
+  mix-blend-mode: luminosity;
+}
+
+/* The new quote comes in from the side of the half that the user clicks. */
+.slide[data-enter='next'] {
+  animation: enterNext 400ms cubic-bezier(0.3, 0, 0, 1);
+}
+
+.slide[data-enter='prev'] {
+  animation: enterPrev 400ms cubic-bezier(0.3, 0, 0, 1);
+}
+
+@keyframes enterNext {
+  from {
+    opacity: 0;
+    translate: var(--space-xl) 0;
+  }
+}
+
+@keyframes enterPrev {
+  from {
+    opacity: 0;
+    translate: calc(var(--space-xl) * -1) 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide[data-enter] {
+    animation: none;
+  }
+}
+
+.dots {
+  display: flex;
+  gap: var(--space-4xs);
+}
+
+.dot {
+  width: var(--slider-dot-size);
+  height: var(--slider-dot-size);
+  border-radius: var(--radius-full);
+  background: var(--surface-inverse-faint);
+}
+
+.dot[data-active] {
+  background: var(--text-primary);
+}
+
+.half {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 34.85%;
+}
+
+.half:focus-visible {
+  outline-offset: -2px;
+}
+
+.prev {
+  left: 0;
+}
+
+.next {
+  right: 0;
+}
+
+/* The arrow is 20px from the edge, at the middle of the section. */
+.arrow {
+  position: absolute;
+  top: 50%;
+  color: var(--text-primary);
+  opacity: 0;
+  transform: translateY(-50%);
+  transition: opacity 200ms ease;
+}
+
+.prev .arrow {
+  left: var(--space-md);
+}
+
+.next .arrow {
+  right: var(--space-md);
+}
+
+.half:focus-visible .arrow {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .half:hover .arrow {
+    opacity: 1;
+  }
+}

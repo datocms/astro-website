@@ -1,0 +1,163 @@
+/*
+ * Header cells and category
+ * labels 73px, text cells 20px vertical padding. The DatoCMS column is on
+ * surface/accent-faint, the competitor column on surface/accent-subtle.
+ * Above 1320 the backgrounds are full width, but the texts keep the 1320
+ * layout and stay next to the centre line (see .inner).
+ */
+.content {
+  color: var(--text-primary);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  width: 50%;
+  padding: var(--space-md) var(--space-sm);
+  /* The 1px line is inside the 73px cell. */
+  box-shadow: inset 0 -1px var(--text-on-inverse);
+  text-align: center;
+}
+
+.headDato {
+  background: var(--surface-accent);
+  color: var(--text-primary);
+}
+
+.headOther {
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.chevron {
+  flex: none;
+}
+
+.trigger[aria-expanded='true'] .chevron {
+  rotate: 180deg;
+}
+
+.options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.option {
+  display: block;
+  padding: var(--space-md) var(--space-sm);
+  background: var(--surface-accent);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.option:focus-visible {
+  outline-offset: -4px;
+}
+
+@media (hover: hover) {
+  .option:hover {
+    background: var(--surface-default);
+  }
+}
+
+/* The label keeps the .h2 line height, so the row is 73px. */
+.label {
+  padding: var(--space-md) var(--space-xl);
+  background: var(--surface-default);
+  text-align: center;
+}
+
+.cell {
+  padding: var(--space-md) var(--space-sm);
+  color: var(--text-muted);
+  text-align: center;
+  vertical-align: top;
+}
+
+.cellDato {
+  background: var(--surface-accent-faint);
+}
+
+.cellOther {
+  background: var(--surface-accent-subtle);
+}
+
+/*
+ * The text block is max 500 in a header
+ * cell and max 340 in a text cell. The block touches the seam between
+ * the two columns, and the text is centred in the block.
+ */
+.inner {
+  max-width: 340px;
+}
+
+.head .inner {
+  max-width: 500px;
+}
+
+.headDato .inner,
+.cellDato .inner {
+  margin-left: auto;
+}
+
+.headOther .inner,
+.cellOther .inner {
+  margin-right: auto;
+}
+
+/* The rich text of the CMS: paragraphs, strong text and links. */
+.rich :where(p + p) {
+  margin-top: var(--space-xs);
+}
+
+.rich :where(strong) {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.rich :where(a) {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+@media (min-width: 768px) {
+  .head,
+  .option {
+    padding-inline: var(--section-padding-x);
+  }
+
+  .cell {
+    padding-inline: var(--space-xl);
+  }
+}
+
+@media (min-width: 1152px) {
+  .cell {
+    padding-inline: var(--space-4xl);
+  }
+}

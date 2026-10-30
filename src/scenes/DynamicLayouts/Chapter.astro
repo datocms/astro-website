@@ -1,0 +1,45 @@
+---
+import { ChapterHeader } from '~/components/ChapterHeader';
+import { ChapterSplit } from '~/components/ChapterSplit';
+import { FeatureFragments } from '~/components/FeatureFragments';
+import { FRAGMENT_WIDTH, SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as copy from '~/data/dynamic-layouts';
+import { DynamicLayoutsDragScene, DynamicLayoutsScene } from './DynamicLayouts';
+import Nest from './Nest.astro';
+
+const theme = 'purple';
+---
+
+<ChapterSplit theme={theme}>
+  <ChapterHeader {...copy.chapter} theme={theme} background="split" id="dynamic-layouts" />
+  {
+    /*
+  The SceneFrame shows the record editor with the landing page, as in
+  Structured content: the record info, and the form with the Sections
+  field alone, thus the field starts under the header of the record. No
+  navigation bar, the menu of the models closed. The frame shows the blocks, the gap
+  after the Logo wall open with the menu of the five block models and the
+  card of the Feature grid under the pointer, at zoom 1 (the default of
+  window is 0.9). The fade cuts the bottom of the menu and the open Call
+  to action block.
+*/
+  }
+  <SceneFrame preset="window" theme={theme} height={540} zoom={1}>
+    <DynamicLayoutsScene appearance={{ theme }} fields="sections" />
+  </SceneFrame>
+</ChapterSplit>
+<FeatureFragments {...copy.fragments} theme={theme} columns={2}>
+  {
+    /* The picture of the drag and the drop line in the middle. The box starts at the left edge of the field, the right edge cuts the summaries. The screen is 480px high: the Sections field with its four closed blocks, and space below them for the picture of the drag. In view, the sequence drops the block, drags the Logo wall back below it, and loops. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={1.1}>
+    <DynamicLayoutsDragScene appearance={{ theme }} width={FRAGMENT_WIDTH} height={480} />
+  </SceneFragment>
+  {
+    /* The nested blocks (Nest.astro): the Feature grid, its three Features, a Button in each. It is not a screen: it fills the box, with its own surface. */
+  }
+  <SceneFragment slot="visual-1" fit="fill">
+    <Nest />
+  </SceneFragment>
+</FeatureFragments>

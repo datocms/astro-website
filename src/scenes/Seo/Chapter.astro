@@ -1,0 +1,51 @@
+---
+import { ChapterHeader } from '~/components/ChapterHeader';
+import { ChapterSplit } from '~/components/ChapterSplit';
+import { CodeSnippetPreview } from '~/components/CodeSnippetPreview';
+import { FeatureFragments } from '~/components/FeatureFragments';
+import { SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as copy from '~/data/seo';
+import { SeoPreviewsScene, SeoScene } from './Seo';
+
+const theme = 'purple';
+---
+
+<ChapterSplit theme={theme}>
+  <ChapterHeader {...copy.chapter} theme={theme} background="split" id="seo" />
+  {
+    /*
+  The SceneFrame shows the record editor with the event, as in chapters 1,
+  3, 4 and 5: no navigation bar, the menu of the models closed. The pointer
+  clicks Edit on the SEO field, and the dialog opens over the editor, with
+  the title, the description and the share image (SEO_EDIT_SEQUENCE). The
+  dialog is in the center of the part of the screen that the frame shows.
+  On desktop the frame cuts the dialog in the share image. From 768px to
+  1151px the frame is higher than in the other chapters, but not higher
+  than on desktop. On phones the frame cuts the Edit button: the dialog opens
+  without the pointer, and the frame cuts the dialog in the share image, as
+  on desktop.
+*/
+  }
+  <SceneFrame
+    preset="window"
+    theme={theme}
+    height={572}
+    zoom={0.99}
+    tabletHeightVw={88}
+    phoneHeightVw={79}
+  >
+    <SeoScene appearance={{ theme }} />
+  </SceneFrame>
+</ChapterSplit>
+<FeatureFragments {...copy.fragments} theme={theme} columns={2}>
+  {
+    /* The stack of cards, the two behind peeking out above the front one. The stack is larger than the box: the box cuts the cards at its right edge and at its bottom edge. The zoom is 1.1 in a box of 500px, and a narrower box shows the same part of the stack. On phones the zoom is 1.3 (0.9 in a box of 350px), thus more of the front card shows. The cards draw their own edges, thus the fragment has no border. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" border={false} zoom={1.1} phoneZoom={1.3}>
+    <SeoPreviewsScene appearance={{ theme }} width={555} height={480} />
+  </SceneFragment>
+  <SceneFragment slot="visual-1" fit="crop">
+    <CodeSnippetPreview tabs={[copy.query, copy.response]} fill />
+  </SceneFragment>
+</FeatureFragments>

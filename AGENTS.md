@@ -2,6 +2,16 @@
 
 Astro standalone Node server, deployed via `cubo` to Kubernetes on AWS. Three environments: `production`, `staging1`, `staging2`.
 
+## Two layout families (the redesign)
+
+The branch `redesign` ports the new site from the prototype, page by page (`PLAN.md`). Until the end of the port, two families of pages live side by side. Never mix them on one page.
+
+- **Old pages**: `src/layouts/LegacyLayout` (and the docs layouts, `src/layouts/lp`). They import the old stylesheet `src/layouts/BaseLayout/global.css`, use the view transitions router, and have the layer statement `@layer reset, prose;`.
+- **New pages**: `src/layouts/Layout.astro`. It imports `src/styles/global.css` and the scene kit CSS, has no router (a full load), and has the layer statement `@layer reset, tokens, base, vendor, blocks, sections, pages;`. Its rules are in `src/REDESIGN.md`: read it before you touch the new code.
+- Both use `src/layouts/BaseLayout` for the head (SEO, favicon, canonical, RSS, cookie consent, analytics, draft mode). BaseLayout imports no global stylesheet. Its props `cssLayers`, `clientRouter` and `bodyAttributes` select the family. The layer statement is always the first child of `<head>`.
+- **The `Legacy` prefix**: an old component with the same name as a prototype component (case-insensitive) got the prefix `Legacy` (`LegacyButton`, `LegacyHero`, `LegacyProse`…). The port from the prototype has stopped (`PLAN.md`, principle 1), thus the new components do not need to keep their prototype path. Do not add a new `Legacy*` component, and do not use a `Legacy*` component on a new page.
+- **Cascade layers and their scope**: the Vite plugin `cssLayers` (`astro.config.ts`) wraps each CSS module of the redesign in a layer. The old CSS modules get no layer, thus they render as before. `redesign-css-scope.mjs` holds the scope: `LEGACY_COMPONENT_DIRS` (the old directories of `src/components/`, frozen: only remove names) and `REDESIGN_PAGE_DIRS` (the ported pages under `src/pages/`: add each page that you port). `npm run lint:css` uses the same scope.
+
 ## Environment variables
 
 Three distinct mechanisms — pick the right one by asking: **when is the value needed, and is it secret?**

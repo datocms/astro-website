@@ -1,0 +1,52 @@
+---
+import { Section } from '~/components/Section';
+import type { ProductUpdatesData } from '~/data/home';
+import { buildUrlForChangelogEntry } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { formatRelativeDate } from '~/lib/format/date';
+import type { Theme } from '~/lib/theme';
+import { ProductUpdatesItemFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props extends ProductUpdatesData {
+  theme?: Theme;
+  /** The latest entries of the changelog, the newest first. */
+  entries: FragmentOf<typeof ProductUpdatesItemFragment>[];
+}
+
+const { headline, muted, allHref, theme = 'green' } = Astro.props;
+const entries = Astro.props.entries.map((entry) => readFragment(ProductUpdatesItemFragment, entry));
+---
+
+<Section theme={theme} padding="none" background="inverse" class={styles.productUpdates}>
+  <div class={styles.pad}>
+    <h2 class:list={[styles.headline, 'h1']}>
+      {headline}
+      <span class={styles.muted}>{muted}</span>
+    </h2>
+  </div>
+  <ul class={styles.list}>
+    {
+      entries.map((entry) => (
+        <li class={styles.item}>
+          <a href={buildUrlForChangelogEntry(entry)} class={styles.row}>
+            <span class:list={[styles.main, 'h2']}>
+              <time class={styles.date} datetime={entry._firstPublishedAt}>
+                {formatRelativeDate(entry._firstPublishedAt)}
+              </time>
+              <span>{entry.title}</span>
+            </span>
+            <span class={styles.tags}>
+              {entry.categories.map((category) => (
+                <span class:list={[styles.tag, 'subtitleMedium']}>{category.name}</span>
+              ))}
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <a href={allHref} class={styles.allLink}>
+    <span class:list={[styles.allInner, 'h1']}>Show All Product Updates</span>
+  </a>
+</Section>

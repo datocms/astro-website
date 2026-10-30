@@ -1,0 +1,86 @@
+/*
+ * The hero of the home page: a text and a quiet line of logos, on the
+ * default surface, with the orange theme. The height of the hero does not
+ * change during the animation.
+ */
+.hero {
+  position: relative;
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-xl);
+  /* The logos go to the edges of the page. Clip them there. */
+  overflow-x: clip;
+}
+
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/*
+ * The text: the headline and the muted
+ * subheadline have the same size, at the left of the content column.
+ * The colours come from the section: the main run is
+ * --text-primary, the muted run is --headline-muted.
+ */
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: var(--content-max);
+}
+
+/* The headline keeps a shorter line than the content column. */
+.headline {
+  max-width: 950px;
+}
+
+.buttons {
+  margin-top: var(--space-md);
+}
+
+/* The buttons wait for the typewriter. Without JS or motion, they show. */
+:global(html[data-motion='on']) .hero:has([data-typewriter]) .buttons:not([data-visible]) {
+  opacity: 0;
+}
+
+.buttons[data-visible] {
+  animation: fadeIn 150ms ease-out;
+}
+
+.trust {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  /* The logos go to the edges of the page. */
+  width: 100vw;
+  margin-top: var(--space-2xl);
+}
+
+.logos {
+  color: var(--text-muted);
+}
+
+@media (min-width: 768px) {
+  .hero {
+    padding-top: var(--space-3xl);
+  }
+
+  .trust {
+    margin-top: var(--space-3xl);
+  }
+}
+
+/*
+ * Motion. The typewriter types the headline and the subheadline (see
+ * the script in Component.astro) and the buttons follow it. Without JS
+ * and with reduced motion, the final state shows at once.
+ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}

@@ -1,0 +1,52 @@
+---
+// The AI pillar of the redesign. The copy comes from src/data/. The SEO is
+// static. The page does not read the CMS.
+import { CategoryNav } from '~/components/CategoryNav';
+import { Hero } from '~/components/Hero';
+import { PageCloser } from '~/components/PageCloser';
+import { Statement } from '~/components/Statement';
+import { StatementsSection } from '~/components/StatementsSection';
+import * as ai from '~/data/ai-pillar';
+import { robotVideo } from '~/data/videos';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
+import AgentSkillsChapter from '~/scenes/AgentSkills/Chapter.astro';
+import McpChapter from '~/scenes/Mcp/Chapter.astro';
+import MediaAiChapter from '~/scenes/MediaAi/Chapter.astro';
+import TranslationsChapter from '~/scenes/Translations/Chapter.astro';
+
+const seo = overrideSeo([], seoTitle(ai.seo.title), seoDescription(ai.seo.description));
+---
+
+{
+  /*
+  The AI pillar (src/data/AGENTS.md), with its four chapters. The
+  frames of MCP, Agent Skills, AI translations and AI in the media library
+  are in src/scenes/Mcp/, src/scenes/AgentSkills/, src/scenes/Translations/
+  and src/scenes/MediaAi/. The file of the LLM-ready docs is a fragment of
+  MCP (src/scenes/LlmDocs/). The rhythm is the one of /editor-experience:
+  the header and the scene of each chapter on the inverse surface, the
+  fragments on the pale surface, the opinion on the accent surface.
+*/
+}
+<Layout seo={seo} footerTheme="blue">
+  <Hero {...ai.hero} alignment="center" typewriter />
+  {/* The chapters of the pillar. Sticky; no theme, as the hero: it takes the theme of the page. */}
+  <CategoryNav {...ai.chapterNav} />
+  <McpChapter />
+  <AgentSkillsChapter />
+  <Statement {...ai.opinion} theme="blue" variant="light" />
+  <TranslationsChapter />
+  <MediaAiChapter />
+  <div id="opt-in"><StatementsSection {...ai.optIn} theme="blue" /></div>
+  <PageCloser theme="blue" cta={ai.ctaBuild} video={robotVideo} />
+</Layout>
+
+<script>
+  import { initSceneSequences } from '~/lib/motion/sceneSequence';
+
+  // The scenes with a sequence play it in view: the chat of MCP, the
+  // terminal of Agent Skills, and the generated captions of the media
+  // library.
+  initSceneSequences();
+</script>

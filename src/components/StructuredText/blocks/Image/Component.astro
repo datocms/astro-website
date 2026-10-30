@@ -1,0 +1,85 @@
+---
+import { InViewVideo } from '~/components/InViewVideo';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { ImageFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof ImageFragment>;
+}
+
+const { frameless, asset } = readFragment(ImageFragment, Astro.props.block);
+
+// A large image opens at full size. Without JS, the link opens the image file.
+const zoomUrl = asset.width && asset.width > 1500 ? asset.lightboxImageUrl : null;
+---
+
+{
+  /*
+  An image of the article. A GIF plays as a muted video in view. A large
+  image opens in a dialog. A framed image has a border.
+*/
+}
+<figure class:list={[styles.figure, !frameless && styles.framed]}>
+  {
+    asset.format === 'gif' ? (
+      <InViewVideo
+        src={[
+          { src: `${asset.url}?fm=webm&w=900`, type: 'video/webm' },
+          { src: `${asset.url}?fm=mp4&w=900`, type: 'video/mp4' },
+        ]}
+        poster={`${asset.url}?fm=jpg&fit=max&w=900`}
+        width={asset.width ?? undefined}
+        height={asset.height ?? undefined}
+        label={asset.alt ?? undefined}
+      />
+    ) : (
+      <a
+        href={zoomUrl ?? undefined}
+        class:list={[styles.media, zoomUrl && styles.zoom]}
+        data-image-zoom={zoomUrl ? '' : undefined}
+        aria-label={zoomUrl ? 'Open the image at full size' : undefined}
+      >
+        {asset.responsiveImage ? (
+          <ResponsiveImage data={asset.responsiveImage} />
+        ) : (
+          <img
+            alt={asset.alt ?? ''}
+            src={asset.format === 'svg' ? asset.url : `${asset.url}?fit=max&w=900`}
+            loading="lazy"
+          />
+        )}
+      </a>
+    )
+  }
+  {asset.title && <figcaption>{asset.title}</figcaption>}
+</figure>
+
+<script>
+  // Open the large image in a modal dialog. Make one dialog for the page.
+  function dialog(): HTMLDialogElement {
+    const existing = document.querySelector<HTMLDialogElement>('dialog[data-image-zoom-dialog]');
+    if (existing) return existing;
+    const el = document.createElement('dialog');
+    el.setAttribute('data-image-zoom-dialog', '');
+    el.setAttribute('aria-label', 'Image at full size');
+    el.innerHTML = '<img alt="">';
+    // A click anywhere closes the dialog.
+    el.addEventListener('click', () => el.close());
+    document.body.append(el);
+    return el;
+  }
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-image-zoom]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (event.metaKey || event.ctrlKey || event.shiftKey) return;
+      event.preventDefault();
+      const el = dialog();
+      const img = el.querySelector('img')!;
+      img.src = link.href;
+      img.alt = link.querySelector('img')?.alt ?? '';
+      el.showModal();
+    });
+  });
+</script>

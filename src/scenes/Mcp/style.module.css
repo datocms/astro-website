@@ -1,0 +1,545 @@
+/*
+ * The frame of the MCP chapter of /ai (Chat.astro), in a SceneFrame
+ * `fill`: the window of a chat app, on the default surface of the theme.
+ * The list of the chats is at the left on a wide window; the chat has its
+ * title above, the transcript in a column in its centre, and the box to
+ * write in at the bottom, as the desktop apps of the assistants lay it
+ * out. The window is a screen: the frame gives it its corners, its ring
+ * and its border (the CSS properties of the kit), and its height.
+ *
+ * The sequence sets `data-step` on the window (sceneSequence.ts). A row
+ * or a line with `data-at` shows from that step on, after the ones before
+ * it (`--i`); the rules below hide it in the steps before. Without
+ * `data-step` everything shows: the still.
+ */
+.window {
+  position: relative;
+  container-type: inline-size;
+  box-sizing: border-box;
+  width: 100%;
+  /* On phones the window is as high as the chat: no empty space above the composer, and no cut answer */
+  height: auto;
+  overflow: hidden;
+  border-radius: var(--product-scenes-radius, 0);
+  background: var(--surface-default);
+  box-shadow: var(--product-scenes-shadow, none);
+  color: var(--text-primary);
+  /* The size of the text of chat apps, thus the answer fits above the composer */
+  font-size: var(--type-subtitle);
+  line-height: 1.45;
+}
+
+.window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: var(--product-scenes-border, none);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .window {
+    height: min(var(--scene-frame-height), var(--scene-frame-tablet-height));
+  }
+}
+
+@media (min-width: 1152px) {
+  .window {
+    height: var(--scene-frame-height);
+  }
+}
+
+/* The resets have no class weight: the rules of the parts win over them */
+:where(.window) p,
+:where(.window) ul {
+  margin: 0;
+}
+
+:where(.window) ul {
+  padding: 0;
+  list-style: none;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 1fr;
+  height: 100%;
+}
+
+.sidebar {
+  display: none;
+}
+
+@container (min-width: 820px) {
+  .app {
+    grid-template-columns: 240px 1fr;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+    padding: var(--space-sm) var(--space-xs);
+    border-right: 1px solid var(--border-default);
+    background: var(--surface-accent-faint);
+    font-size: var(--type-code-small);
+  }
+}
+
+.newChat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  padding: var(--space-4xs) var(--space-3xs);
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+.newChatIcon {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--surface-default);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+  line-height: 1;
+}
+
+.recents {
+  margin-top: var(--space-xs);
+  padding-inline: var(--space-3xs);
+  color: var(--text-subtle);
+}
+
+.chats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chat {
+  overflow: hidden;
+  padding: var(--space-4xs) var(--space-3xs);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat[data-current] {
+  background: var(--surface-accent-muted);
+  color: var(--text-primary);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.titleBar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-4xs);
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--text-soft);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A chevron, drawn: a glyph sits low on the line */
+.chevron {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: var(--text-subtle);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.transcript {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 640px;
+  min-height: 0;
+  margin-inline: auto;
+  overflow: hidden;
+  padding: var(--space-xs) var(--space-sm) var(--space-sm);
+}
+
+@media (min-width: 768px) {
+  .transcript {
+    padding: var(--space-sm) var(--space-lg) var(--space-md);
+  }
+}
+
+@media (min-width: 1152px) {
+  .transcript {
+    gap: var(--space-md);
+  }
+}
+
+.question {
+  align-self: flex-end;
+  max-width: 85%;
+  padding: var(--space-3xs) var(--space-sm);
+  border-radius: var(--radius-lg);
+  background: var(--surface-accent-faint);
+}
+
+.tools {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4xs);
+  margin-top: calc(var(--space-sm) * -1 + var(--space-4xs));
+}
+
+@media (min-width: 1152px) {
+  .tools {
+    margin-top: calc(var(--space-md) * -1 + var(--space-4xs));
+  }
+}
+
+.toolsHead {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.toolCall {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  max-width: 100%;
+  color: var(--text-muted);
+}
+
+.toolMark {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: var(--text-primary);
+}
+
+.toolMark[data-hidden] {
+  visibility: hidden;
+}
+
+.toolText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toolOpen {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  fill: var(--text-subtle);
+}
+
+.answer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.pages {
+  display: flex;
+  flex-direction: column;
+}
+
+.pages li {
+  display: flex;
+  gap: var(--space-3xs);
+}
+
+.pages li::before {
+  content: '•';
+  color: var(--text-subtle);
+}
+
+.link {
+  text-decoration: underline;
+  text-decoration-color: var(--text-subtle);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.composer {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: var(--space-xs);
+  box-sizing: border-box;
+  width: calc(100% - 2 * var(--space-sm));
+  max-width: calc(640px - 2 * var(--space-lg));
+  margin: 0 auto var(--space-sm);
+  padding: var(--space-xs) var(--space-xs) var(--space-3xs) var(--space-sm);
+  border-radius: var(--radius-lg);
+  background: var(--surface-default);
+  box-shadow:
+    inset 0 0 0 1px var(--border-default),
+    0 4px 16px -8px color-mix(in srgb, var(--text-primary) 25%, transparent);
+}
+
+@media (min-width: 768px) {
+  .composer {
+    margin-bottom: var(--space-md);
+  }
+}
+
+.composerText {
+  color: var(--text-subtle);
+}
+
+.composerRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  margin-left: calc(var(--space-xs) - var(--space-sm));
+}
+
+.composerButton,
+.send {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  line-height: 1;
+}
+
+.composerButton {
+  box-shadow: inset 0 0 0 1px var(--border-default);
+  color: var(--text-muted);
+}
+
+.server {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4xs);
+  padding: var(--space-5xs) var(--space-3xs);
+  border-radius: var(--radius-full);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+  color: var(--text-soft);
+  font-size: var(--type-code-small);
+}
+
+.server::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--surface-accent);
+}
+
+/* An icon of a button, drawn: a glyph is not in the centre of its box */
+.icon {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.newChatIcon .icon {
+  width: 12px;
+  height: 12px;
+}
+
+.send {
+  margin-left: auto;
+  background: var(--surface-accent-muted);
+  color: var(--text-muted);
+}
+
+[data-at] {
+  transition: opacity 0.3s ease-out;
+}
+
+.window[data-step='tools'] [data-at='tools'] {
+  transition-delay: calc(var(--i) * 450ms + 200ms);
+}
+
+.window[data-step='answer'] [data-at='answer'] {
+  transition-delay: calc(var(--i) * 160ms + 150ms);
+}
+
+.window[data-step='rest'] [data-at],
+.window[data-step='tools'] [data-at='answer'] {
+  opacity: 0;
+  transition-delay: 0s;
+}
+
+/*
+ * The first fragment (Confirm.astro), in a SceneFragment `fit="scale"`: the next
+ * turn of the chat, a slice of the window of the frame, on its surface.
+ * The window is larger than the box: the box cuts it at the right and at
+ * the bottom, with the card of the ask and the script in it. The choices
+ * are at the left, thus they show. On phones the window has the width of
+ * the box, thus the text stays as large as in the frame.
+ */
+.turn {
+  box-sizing: border-box;
+  width: 640px;
+  min-height: 640px;
+  zoom: var(--product-scenes-zoom, 1);
+  padding: var(--space-md) var(--space-md) var(--space-lg);
+  overflow: hidden;
+  border: var(--product-scenes-border, none);
+  border-radius: var(--product-scenes-radius, 0);
+  background: var(--surface-default);
+  color: var(--text-primary);
+  font-size: var(--type-subtitle);
+  line-height: 1.45;
+}
+
+.turnRows {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+@media (max-width: 649px) {
+  .turn {
+    width: 100cqi;
+    min-height: 100cqi;
+    padding: var(--space-sm);
+  }
+}
+
+.turnRows p,
+.turnRows pre {
+  margin: 0;
+}
+
+/*
+ * The thread of the home page (Thread.astro), in a SceneFragment `fit="scale"`:
+ * two turns of the chat in a narrow column, for a portrait
+ * box. The window of the fragment scales it with the box, thus each box
+ * shows the same thread. The rows stretch: the bubbles go to the right.
+ */
+.thread {
+  box-sizing: border-box;
+  width: 600px;
+  min-height: 700px;
+  padding: var(--space-md);
+  background: var(--surface-default);
+  color: var(--text-primary);
+  font-size: var(--type-subtitle);
+  line-height: 1.45;
+}
+
+.thread .turnRows {
+  align-items: stretch;
+}
+
+.thread p {
+  margin: 0;
+}
+
+.ask {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  box-sizing: border-box;
+  width: 100%;
+  padding: var(--space-sm);
+  border-radius: var(--radius-lg);
+  background: var(--surface-default);
+  box-shadow:
+    inset 0 0 0 1px var(--border-default),
+    0 4px 16px -8px color-mix(in srgb, var(--text-primary) 25%, transparent);
+}
+
+.askHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  min-width: 0;
+}
+
+.askServer {
+  flex: none;
+  font-weight: 500;
+}
+
+.askScript {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.askQuestion {
+  font-weight: 500;
+}
+
+.askCode {
+  overflow: hidden;
+  white-space: pre;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: var(--surface-accent-faint);
+  color: var(--text-soft);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.askButtons {
+  display: flex;
+  gap: var(--space-3xs);
+  margin-top: var(--space-3xs);
+}
+
+.allow,
+.choice {
+  padding: var(--space-4xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.choice {
+  box-shadow: inset 0 0 0 1px var(--border-default);
+  color: var(--text-soft);
+}
+
+.allow {
+  background: var(--text-primary);
+  color: var(--surface-default);
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+/* The dark scheme: the shadow of a card is dark. The text colour is pale here, and it would give a glow. */
+:global(:root[data-scheme='dark']) .composer,
+:global(:root[data-scheme='dark']) .ask {
+  box-shadow:
+    inset 0 0 0 1px var(--border-default),
+    0 4px 16px -8px color-mix(in srgb, black 50%, transparent);
+}

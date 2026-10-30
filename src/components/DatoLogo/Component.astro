@@ -1,0 +1,28 @@
+---
+import long from '~/assets/logo/dato-logo-no-space-faded-cms.svg?raw';
+import styles from './style.module.css';
+
+interface Props {
+  version?: 'short' | 'long';
+  /** Height in px. The width follows the aspect ratio. */
+  height?: number;
+  /** Accessible name. Without it, the logo is decorative. */
+  label?: string;
+  class?: string;
+}
+
+const { version = 'long', height = 20, label, class: className } = Astro.props;
+
+// TODO: export the short version (331×80) from the design file.
+// Until then, both versions use the long SVG.
+const svg = { short: long, long }[version];
+---
+
+<span
+  class:list={[styles.logo, className]}
+  style={`--logo-height: ${height}px`}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  set:html={svg}
+/>

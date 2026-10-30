@@ -1,0 +1,151 @@
+---
+import { DevConfig } from '~/components/DevConfig';
+import { Section } from '~/components/Section';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+/** The props of every preset. */
+interface Common {
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+  id?: string;
+}
+
+/** The props of a preset that shows a screen: the frame has a height and cuts the screen. */
+interface Screen {
+  /**
+   * The height of the frame at desktop, in px. Each height is a limit: a
+   * screen shorter than it gives a shorter frame.
+   */
+  height?: number;
+  /**
+   * The height of the frame on phones, in % of the page width. A higher
+   * value shows more of the screen, for example an open menu.
+   * @default 70
+   */
+  phoneHeightVw?: number;
+  /**
+   * The largest height of the frame from 650px to 1151px, in % of the page
+   * width. The frame is not higher than `height`.
+   * @default 64
+   */
+  tabletHeightVw?: number;
+  /**
+   * The zoom of the screen at desktop. `detailEnd` makes it smaller on
+   * smaller pages. On a box narrower than the screen the kit makes the
+   * zoom smaller (see `minWidth` of the stage).
+   * @default 0.9, and 1.3 for `detailEnd`, 1 for `fill`
+   */
+  zoom?: number;
+  /**
+   * True: the section has no padding at the bottom, thus its bottom edge
+   * cuts the frame. False: the section keeps its padding at the bottom,
+   * thus the frame shows whole. Use it for a chapter with no fragments under the frame.
+   * @default true, but false under a caption
+   */
+  flushBottom?: boolean;
+}
+
+/** The props of `whole`, which have no effect on that preset. */
+interface NoScreen {
+  height?: never;
+  phoneHeightVw?: never;
+  tabletHeightVw?: never;
+  zoom?: never;
+  flushBottom?: never;
+  cutEnd?: never;
+}
+
+/**
+ * `window`: the screen starts at the top left corner of the frame, with no
+ * margin, and the frame cuts it at the right and at the bottom. Only this
+ * preset and `detailEnd` have a line, on the side that cuts the screen.
+ */
+interface WindowPreset extends Common, Screen {
+  preset: 'window';
+  /**
+   * From 650px: the width of the screen that the frame cuts at the right,
+   * in px of the page. A smaller value gives a narrower screen, thus more
+   * of the info aside shows.
+   * @default 160 (2 × --space-3xl)
+   */
+  cutEnd?: number;
+}
+
+/**
+ * `detailEnd`: the right side of the screen, larger, from the top of the
+ * frame, with a margin at the right; the frame cuts it at the left.
+ * `fill`: all the width of the screen shows. From 650px the screen is the
+ * frame, with no margin. Use it for a screen of all the app that the frame
+ * does not cut at the sides.
+ */
+interface DetailPreset extends Common, Screen {
+  preset: 'detailEnd' | 'fill';
+  cutEnd?: never;
+}
+
+/**
+ * `whole`: a picture that is not a screen, for example a diagram. The
+ * frame draws nothing and cuts nothing: the children sit on the section,
+ * with their own height.
+ */
+interface WholePreset extends Common, NoScreen {
+  preset: 'whole';
+}
+
+/*
+ * How the frame shows the screen. The drawing of each preset is in
+ * style.module.css. On phones the screen starts at the corner of the
+ * frame, with no margin. The frame cuts the screen at the bottom, but for
+ * `whole`.
+ */
+type Props = WindowPreset | DetailPreset | WholePreset;
+
+const DEFAULT_ZOOM = { window: 0.9, detailEnd: 1.3, fill: 1, whole: 1 };
+
+const {
+  theme,
+  preset,
+  height = 0,
+  phoneHeightVw = 70,
+  tabletHeightVw = 64,
+  zoom = DEFAULT_ZOOM[preset],
+  cutEnd,
+  flushBottom: flushBottomProp = true,
+  id,
+} = Astro.props;
+// The bottom of the section cuts the frame, but under a caption or a `whole` picture.
+const flushBottom = flushBottomProp && preset !== 'whole' && !Astro.slots.has('caption');
+const style = `--scene-frame-height: ${height}px; --scene-frame-phone-height: ${phoneHeightVw}vw; --scene-frame-tablet-height: ${tabletHeightVw}vw; --scene-frame-zoom: ${zoom}${cutEnd !== undefined ? `; --scene-frame-cut-end: ${cutEnd}px` : ''}`;
+---
+
+{
+  /*
+  The second part of a chapter: one product scene, full width, cut at the
+  bottom. The section has no bottom padding, thus its bottom edge cuts the
+  frame. The slot "caption" is under the frame: a SceneCaption follows the
+  steps of the scene. With a caption the section keeps its padding.
+*/
+}
+<Section
+  theme={theme}
+  background="inverse"
+  flushTop
+  flushBottom={flushBottom}
+  class={styles.sceneFrame}
+  id={id}
+  data-scene-frame={preset}
+>
+  <div class:list={[styles.box, styles[preset]]} style={style}>
+    <div class={styles.frame}>
+      <div class={styles.stage}>
+        <slot />
+      </div>
+    </div>
+    <DevConfig
+      name="SceneFrame"
+      config={{ preset, height, phoneHeightVw, tabletHeightVw, zoom, cutEnd }}
+    />
+  </div>
+  <slot name="caption" />
+</Section>

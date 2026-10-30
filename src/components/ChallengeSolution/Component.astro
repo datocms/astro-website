@@ -1,0 +1,31 @@
+---
+import { InlineParagraphs } from '~/components/StructuredText';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { Theme } from '~/lib/theme';
+import { ChallengeSolutionStoryFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  story: FragmentOf<typeof ChallengeSolutionStoryFragment>;
+  theme?: Theme;
+}
+
+const { theme = 'default' } = Astro.props;
+const story = readFragment(ChallengeSolutionStoryFragment, Astro.props.story);
+const halves = [
+  { label: 'Challenge', text: story.challenge },
+  { label: 'Solution', text: story.result },
+];
+---
+
+<section class={styles.challengeSolution} data-theme={theme}>
+  {
+    halves.map((half, i) => (
+      <div class:list={[styles.half, i === 0 ? styles.inverse : styles.accent]}>
+        <h2 class:list={[styles.statement, 'h1']}>
+          <span class={styles.label}>{half.label}</span> <InlineParagraphs data={half.text} />
+        </h2>
+      </div>
+    ))
+  }
+</section>

@@ -1,0 +1,44 @@
+---
+import styles from './style.module.css';
+
+interface Props {
+  href: string;
+  title: string;
+  /** A short text over the title, as "New" or "Free". */
+  label?: string;
+  /** A logo under the image, as the logo of a partner. */
+  logo?: { url: string; alt?: string | null };
+  external?: boolean;
+}
+
+const { href, title, label, logo, external = false } = Astro.props;
+---
+
+{
+  /*
+  A card in a CardCarousel: the image (slot "image"), the title and a
+  short text (the default slot). All the card is one link.
+*/
+}
+<div role="listitem" class={styles.item}>
+  <a
+    href={href}
+    class={styles.card}
+    target={external ? '_blank' : undefined}
+    rel={external ? 'noreferrer' : undefined}
+  >
+    <span class={styles.image}><slot name="image" /></span>
+    <span class={styles.text}>
+      {label && <span class:list={[styles.label, 'caption']}>{label}</span>}
+      {logo && <img class={styles.logo} src={logo.url} alt={logo.alt ?? ''} loading="lazy" />}
+      <span class:list={[styles.title, 'bodyMedium']}>{title}</span>
+      {
+        Astro.slots.has('default') && (
+          <span class:list={[styles.description, 'subtitle']}>
+            <slot />
+          </span>
+        )
+      }
+    </span>
+  </a>
+</div>

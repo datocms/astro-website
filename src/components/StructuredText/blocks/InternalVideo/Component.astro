@@ -1,0 +1,37 @@
+---
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { InternalVideoFragment } from './graphql';
+
+interface Props {
+  block: FragmentOf<typeof InternalVideoFragment>;
+}
+
+const { video: file } = readFragment(InternalVideoFragment, Astro.props.block);
+const { video } = file;
+---
+
+{
+  /*
+  A video of the DatoCMS media area (Mux), in the native player. The
+  browser plays HLS when it can, else the MP4 file. No JS.
+*/
+}
+<figure>
+  <video
+    controls
+    playsinline
+    preload="none"
+    poster={video.thumbnailUrl}
+    width={video.width}
+    height={video.height}
+    aria-label={file.alt ?? file.title ?? undefined}
+    style={{
+      aspectRatio: `${video.width} / ${video.height}`,
+      background: video.blurUpThumb ? `center / cover url("${video.blurUpThumb}")` : undefined,
+    }}
+  >
+    <source src={video.streamingUrl} type="application/vnd.apple.mpegurl" />
+    {video.mp4Url && <source src={video.mp4Url} type="video/mp4" />}
+  </video>
+  {file.title && <figcaption>{file.title}</figcaption>}
+</figure>

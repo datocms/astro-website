@@ -1,0 +1,549 @@
+/*
+ * Always orange.
+ * One record, three views: the code (developer), the site (the result)
+ * and the record form (editor). The site is behind and does not move.
+ * The window of the active role comes to the front. The other goes back.
+ * The mock-up is an illustration: its px sizes are not tokens.
+ */
+.content {
+  display: flex;
+  flex-direction: column;
+  /* The headline needs air under the windows. */
+  gap: var(--space-xl);
+}
+
+@media (min-width: 768px) {
+  .content {
+    gap: var(--space-2xl);
+  }
+}
+
+/* Phone (<768): the site, and in front of it only the active role window. */
+.mockup {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 434px;
+  margin-inline: auto;
+}
+
+/* 1. The windows: AppWindow draws them; here only their place */
+.window {
+  position: absolute;
+}
+
+.site {
+  z-index: 1;
+  top: 0;
+  right: 0;
+  width: calc(100% - var(--space-md));
+  height: 340px;
+}
+
+/*
+ * The Safari toolbar. It has the height of the bars of the other windows,
+ * thus the icons are 1.5 times the size of the design, and the address
+ * field takes the free width. Its items are closer than in the other bars.
+ */
+.site {
+  --window-bar-gap: var(--space-3xs);
+}
+
+.tools {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+}
+
+/* Phone: the window is narrow. Only the address, share and tabs show. */
+.wideTool {
+  display: none;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4xs);
+  height: 20px;
+  padding-inline: var(--space-4xs);
+  border: 1px solid var(--border-on-inverse);
+  border-radius: var(--radius-full);
+}
+
+.pillDivider {
+  align-self: stretch;
+  width: 1px;
+  margin-block: var(--space-4xs);
+  background: var(--border-on-inverse);
+}
+
+.icon,
+.iconSmall {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  color: var(--text-on-inverse-muted);
+}
+
+.iconSmall {
+  width: 10px;
+  height: 10px;
+}
+
+/* The page has no history to go forward to. */
+.iconOff {
+  color: var(--text-on-inverse-subtle);
+}
+
+.addressField {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4xs);
+  height: 20px;
+  padding-inline: var(--space-3xs);
+  border: 1px solid var(--border-on-inverse);
+  border-radius: var(--radius-full);
+  background: var(--surface-inverse-faint);
+}
+
+/* Phone: no icons in the address field, the host needs the width. */
+.addressIcon {
+  display: none;
+}
+
+.host {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: center;
+  color: var(--text-on-inverse-soft);
+}
+
+.page {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/*
+ * The header of the fake site: the brand at the left, the links at the
+ * right. It is on the top of the hero video.
+ */
+.siteHeader {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-2xs) var(--space-sm) var(--space-4xs);
+}
+
+.brand {
+  color: var(--text-on-inverse);
+  white-space: nowrap;
+}
+
+.siteLinks {
+  display: flex;
+  gap: var(--space-sm);
+  color: var(--text-on-inverse-muted);
+}
+
+/*
+ * The hero is the first thing on the page, under the header. The role
+ * windows cover the page below it. The video fills the full width: its
+ * box has the ratio of the source (160 × 80 cells), and the hero shows
+ * only the bottom band of it: the top of the video is cut.
+ */
+.hero {
+  position: relative;
+  flex: none;
+  height: 120px;
+  overflow: hidden;
+}
+
+.siteVideo {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 160 / 80;
+}
+
+.pageText {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  line-height: 0.9;
+}
+
+/*
+ * The thread: the title of the site is always lit. Only its source changes.
+ * The title is large, as on a real case-study page. The role windows can
+ * cover a part of it.
+ */
+.site .siteTitle {
+  max-width: 12em;
+  color: var(--text-on-inverse);
+  font-size: var(--type-display);
+  line-height: 0.9;
+}
+
+.siteSubtitle {
+  color: var(--text-on-inverse-muted);
+  text-wrap: balance;
+}
+
+/* 3. The code. Same look as CodeSnippetPreview. */
+.pre {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding-block: var(--space-xs);
+  overflow: hidden;
+}
+
+.codeText {
+  display: flex;
+  flex-direction: column;
+}
+
+.line {
+  display: flex;
+  gap: var(--space-sm);
+  padding-inline: var(--space-xs);
+  white-space: pre;
+  transition: background-color 300ms ease-out;
+}
+
+.number {
+  flex: none;
+  min-width: 2ch;
+  text-align: right;
+  color: var(--text-on-inverse-muted);
+}
+
+.strong {
+  color: var(--text-on-inverse-strong);
+}
+
+.accent {
+  color: var(--text-on-inverse);
+}
+
+.threadLine .strong {
+  text-decoration: underline 1px transparent;
+  text-underline-offset: 0.2em;
+  transition:
+    color 300ms ease-out,
+    text-decoration-color 300ms ease-out;
+}
+
+/* Developer focus: the thread starts at the title line of the query. */
+[data-focus='developer'] .threadLine {
+  background: var(--surface-accent-faint);
+  box-shadow: inset 2px 0 var(--surface-accent);
+}
+
+[data-focus='developer'] .threadLine .strong {
+  color: var(--text-on-inverse);
+  text-decoration-color: var(--surface-accent);
+}
+
+/* 4. The record form: the scene fills the window under the bar. */
+.formBody {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* The stage of each breakpoint. Only one shows. */
+.formMedium,
+.formWide {
+  display: none;
+}
+
+/* Phone: the screen is 507px wide. 280 / 507 = 0.5523 makes it fit the window. */
+.formPhone {
+  --product-scenes-zoom: 0.5523;
+}
+
+/* The picture does not scroll, thus it shows no scroll bar. */
+/* stylelint-disable-next-line selector-class-pattern -- Classes of the cms: they are not ours. */
+.formBody :global(.Pane__content) {
+  scrollbar-width: none;
+}
+
+/*
+ * Editor focus: the thread starts at the Title field of the form. The
+ * classes of the scene are the plain classes of the cms, not hashed: the
+ * Title field is the first field of the form.
+ */
+/* stylelint-disable-next-line selector-class-pattern -- Classes of the cms: they are not ours. */
+.formBody :global(.SceneForm .form__field:first-child input) {
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+  transition: outline-color 300ms ease-out;
+}
+
+/* stylelint-disable-next-line selector-class-pattern -- Classes of the cms: they are not ours. */
+[data-focus='editor'] .formBody :global(.SceneForm .form__field:first-child input) {
+  outline-color: var(--surface-accent);
+}
+
+/* 5. Focus: the active role window is in front. The other goes back. */
+.role {
+  top: 0;
+  left: 0;
+  width: calc(100% - var(--space-md));
+  height: 244px;
+  transition:
+    transform 300ms ease-out,
+    opacity 300ms ease-out;
+}
+
+/* The frame stays opaque. Only the content fades, thus the site does not show through. */
+.role > * {
+  transition: opacity 300ms ease-out;
+}
+
+.code {
+  transform-origin: left top;
+}
+
+.form {
+  /*
+   * Phone: the screen of the form is 280px wide after the zoom, thus the
+   * window is 282px (with the borders) or less. On a wide phone the site shows at its right.
+   */
+  width: min(calc(100% - var(--space-md)), 282px);
+  transform-origin: left top;
+}
+
+[data-focus='developer'] .code,
+[data-focus='editor'] .form {
+  z-index: 3;
+  opacity: 1;
+  transform: none;
+}
+
+/* Phone: the other role window is not visible. */
+[data-focus='developer'] .form,
+[data-focus='editor'] .code {
+  z-index: 2;
+  opacity: 0;
+  transform: scale(0.96);
+}
+
+/* Phone: the role window is under the text of the site. */
+.role {
+  top: 190px;
+}
+
+/* 768 to 1151: the three windows, smaller. The mock-up is 648×434. */
+@media (min-width: 768px) {
+  .mockup {
+    width: 648px;
+    max-width: 100%;
+    height: 434px;
+  }
+
+  /*
+   * The code starts at y 170 and the form at x 448. The page text is in
+   * the band above the code, at the left of the form: x 0 to 448.
+   */
+  .site {
+    left: 0;
+    right: auto;
+    width: 520px;
+    height: 410px;
+  }
+
+  .wideTool {
+    display: flex;
+  }
+
+  .addressIcon {
+    display: block;
+  }
+
+  .siteHeader,
+  .pageText {
+    padding-inline: var(--space-md);
+  }
+
+  .hero {
+    height: 140px;
+  }
+
+  .site .siteTitle {
+    max-width: 7.5em;
+  }
+
+  .role {
+    left: auto;
+  }
+
+  .code {
+    top: 170px;
+    left: 0;
+    width: 300px;
+    height: 264px;
+    transform-origin: left bottom;
+  }
+
+  .form {
+    top: 40px;
+    right: 0;
+    width: 200px;
+    height: 350px;
+    transform-origin: right top;
+  }
+
+  .formPhone {
+    display: none;
+  }
+
+  /* The screen is 283px wide. 198 / 283 = 0.6996 makes it fit the window. */
+  .formMedium {
+    display: block;
+    --product-scenes-zoom: 0.6996;
+  }
+
+  [data-focus='developer'] .form,
+  [data-focus='editor'] .code {
+    opacity: 1;
+  }
+
+  [data-focus='developer'] .form > *,
+  [data-focus='editor'] .code > * {
+    opacity: 0.6;
+  }
+}
+
+/* ≥1152: the mock-up is 1015×460. */
+@media (min-width: 1152px) {
+  .mockup {
+    width: 1015px;
+    height: 460px;
+  }
+
+  /*
+   * The code covers x 0 to 420 from y 180, the form covers x 655 to 1015
+   * from y 30. The centre of the site is at the centre of the gap between
+   * them (x 537). The role windows cover parts of the site.
+   */
+  .site {
+    left: 227px;
+    width: 620px;
+    height: 420px;
+  }
+
+  .pill,
+  .addressField {
+    height: 24px;
+  }
+
+  .addressField {
+    max-width: 300px;
+    margin-inline: auto;
+  }
+
+  .icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .hero {
+    height: 180px;
+  }
+
+  .code {
+    top: 180px;
+    width: 420px;
+    height: 280px;
+  }
+
+  .form {
+    top: 30px;
+    width: 360px;
+    height: 400px;
+  }
+
+  .formMedium {
+    display: none;
+  }
+
+  /* The screen is 389px wide. 358 / 389 = 0.92 makes it fit the window. */
+  .formWide {
+    display: block;
+    --product-scenes-zoom: 0.92;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .role,
+  .role > *,
+  .line,
+  .threadLine .strong,
+  /* stylelint-disable-next-line selector-class-pattern -- Classes of the cms: they are not ours. */
+  .formBody :global(.SceneForm .form__field:first-child input) {
+    transition: none;
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  max-width: 678px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.runDeveloper,
+.runEditor,
+.buttons :global(a) {
+  transition:
+    color 300ms ease-out,
+    background-color 300ms ease-out;
+}
+
+[data-focus='developer'] .runEditor,
+[data-focus='editor'] .runDeveloper {
+  color: var(--text-muted);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3xs);
+}
+
+[data-focus='developer'] .buttonEditor :global(a),
+[data-focus='editor'] .buttonDeveloper :global(a) {
+  --btnBg: var(--surface-inverse-faint);
+  --btnFg: var(--text-primary);
+}

@@ -1,0 +1,412 @@
+/*
+ * The grammar of the diagrams: the frames that are not a screen of the
+ * cms but a picture of what it does (RealTime/Stream, Delivery/Wall,
+ * MediaAi/Pipeline). Each sits on the inverse sheet of a SceneFrame
+ * `whole`. A new diagram uses these classes and src/lib/motion/diagramLoop.ts,
+ * and keeps in its own stylesheet only what is specific to it.
+ *
+ * A scene imports this file as `diagram` next to its own `styles`, and
+ * adds the classes with `class:list`. The states are data attributes,
+ * which the script of the scene sets.
+ *
+ * The parts:
+ * - `.root`: the box of the diagram, 960px at most, and the custom
+ *   properties of the motion (two curves, the durations, the stagger);
+ * - `.pill`, `.symbol`, `.working`: the actor, a pill with the mark of
+ *   DatoCMS and a label in the mono font. `data-working` on the pill
+ *   shows the working mark in place of the symbol. An event is one pill,
+ *   the event and its time: the next event takes its place. A history
+ *   shows only in a panel;
+ * - `.swap`: a thing that the next one replaces (an event pill, an
+ *   upload): the old one goes out and the new one comes in, by
+ *   --diagram-swap;
+ * - `.track`, `.pulse`, `.draw`: a line. The track is always drawn and
+ *   quiet. The pulse is a short dash in the accent that goes along the
+ *   track one time (`data-pulse`). A track with `.draw` comes in from its
+ *   start (when `data-hidden` goes) and fades out (`data-faded`);
+ * - `.panel`, `.panelLabel`: a container, a ring with a label in capitals;
+ * - `.photo`: a photo or a video thumb in a diagram. It has a soft shadow,
+ *   not a ring: a ring around a photo makes it look like a box;
+ * - `.change`: an item that a change can touch. `data-changed` gives it
+ *   the ring and the tint of the accent, `data-ping` one ring that grows
+ *   and fades, `data-leave` the removal, `data-enter` the start of the
+ *   arrival (src/lib/motion/diagramLoop.ts `arrive`).
+ *
+ * The specificity: the base rules of the parts that a scene changes
+ * (`.root`, `.pill`, `.panel`, `.panelLabel`, `.change`) are in `:where()`,
+ * thus they have no specificity. A rule of a scene on the same element
+ * wins with one class, whatever the order of the CSS (the scenes and this
+ * file are in the same layer). The states (`.change[data-changed]` and the
+ * others) keep their specificity: they win over the base rules of a scene.
+ * A scene that changes a state uses its root class too, for example
+ * `.ledger .row[data-changed]`.
+ *
+ * The colours are the tokens of the theme of the section: the accent of
+ * the inverse surface (--text-on-inverse) is the one colour of a change.
+ * Red is for a failure, and a diagram does not show a failure.
+ *
+ * The rule of the motion: separate things come one after the other, each
+ * with a transition. A script waits for a step to settle before it starts
+ * the next (the pill, then the lines; the pulse, then the ring), and
+ * nothing appears or goes in one frame.
+ */
+
+:where(.root) {
+  --diagram-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --diagram-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --diagram-pop: 0.36s;
+  --diagram-fade: 0.32s;
+  --diagram-enter: 0.42s;
+  --diagram-travel: 1s;
+  --diagram-draw: 0.6s;
+  --diagram-ping: 0.72s;
+  --diagram-settle: 1s;
+  /* The swap of a thing for the next one: slower than an arrival, the eye follows two moves */
+  --diagram-swap-time: 0.8s;
+  --diagram-stagger: 60ms;
+  --diagram-pill: 28px;
+  --diagram-link: var(--space-xl);
+  --diagram-tuck: 2px;
+  /* The surface of a panel: darker than the inverse surface. The theme has no darker surface, thus the surface mixed with black keeps the hue of the theme */
+  --diagram-panel: color-mix(in srgb, var(--surface-inverse), black 35%);
+  --diagram-accent: var(--text-on-inverse);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 960px;
+  margin-inline: auto;
+}
+
+/*
+ * A diagram on a light surface: a parent sets `data-diagram-surface="light"`
+ * (the boxes of FeatureFragments).
+ * The tokens of the inverse surface get the values of the light surface:
+ * the default surface, dark text, and light strokes. The diagram is the
+ * same, in light colours.
+ */
+:global([data-diagram-surface='light']) .root {
+  --surface-inverse: var(--surface-default);
+  --surface-inverse-muted: var(--surface-accent-subtle);
+  --surface-inverse-subtle: var(--surface-accent-subtle);
+  --text-on-inverse: var(--text-primary);
+  --text-on-inverse-strong: var(--text-primary);
+  --text-on-inverse-soft: var(--text-soft);
+  --text-on-inverse-muted: var(--text-muted);
+  --text-on-inverse-subtle: var(--text-subtle);
+  --border-on-inverse: color-mix(in srgb, var(--border-default) 50%, transparent);
+  --border-on-inverse-strong: var(--border-default);
+  --diagram-panel: var(--surface-default);
+  /* On a light surface, the accent is vivid */
+  --diagram-accent: var(--surface-accent);
+}
+
+/*
+ * The actor: a pill with the mark of DatoCMS and a value (an event, an
+ * action) in literal case.
+ */
+:where(.pill) {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-3xs);
+  box-sizing: border-box;
+  height: var(--diagram-pill);
+  margin: 0;
+  padding: var(--space-4xs) var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  border-radius: var(--radius-full);
+  background: var(--text-on-inverse-strong);
+  color: var(--surface-inverse);
+}
+
+/*
+ * The swap: the next thing takes the place of the old one (an event on a
+ * pill, an upload). The old one goes out by --diagram-swap (x y) and
+ * fades (`data-swap-out`); the new one comes in from the other side
+ * (`data-swap-in`, then the attribute goes and it moves). A scene sets
+ * --diagram-swap-x or -y: down where the space is vertical, sideways
+ * where it is horizontal. One element that changes its content swaps with
+ * `swap` of diagramLoop.ts (a copy of it goes out); a stack of items sets
+ * the two attributes on the old and the new item.
+ */
+.swap {
+  transition:
+    opacity var(--diagram-swap-time) var(--diagram-ease-out),
+    translate var(--diagram-swap-time) var(--diagram-ease-out);
+}
+
+.swap[data-swap-in] {
+  opacity: 0;
+  translate: calc(-1 * var(--diagram-swap-x, 0px)) calc(-1 * var(--diagram-swap-y, 0px));
+  transition: none;
+}
+
+.swap[data-swap-out] {
+  opacity: 0;
+  translate: var(--diagram-swap-x, 0px) var(--diagram-swap-y, 0px);
+  transition:
+    opacity var(--diagram-swap-time) var(--diagram-ease-out),
+    translate var(--diagram-swap-time) var(--diagram-ease-out);
+}
+
+.symbol {
+  display: inline-block;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  line-height: 0;
+}
+
+.symbol :global(svg) {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+/*
+ * The working mark: a grid of 5 × 5 dots of 2px in the box of the symbol.
+ * Each dot is on or dim in turn, in steps, from its own delay (`--d`, a
+ * negative time that the markup gives). It shows in place of the symbol
+ * while the pill has `data-working`.
+ */
+.working {
+  display: none;
+  flex: none;
+  grid-template-columns: repeat(5, 2px);
+  grid-auto-rows: 2px;
+  gap: 1px;
+  width: 14px;
+  height: 14px;
+}
+
+.working > * {
+  border-radius: var(--radius-full);
+  background: currentColor;
+  opacity: 0.3;
+}
+
+.pill[data-working] > .symbol {
+  display: none;
+}
+
+.pill[data-working] > .working {
+  display: grid;
+}
+
+.pill[data-working] > .working > * {
+  animation: blink 1.6s steps(1, end) var(--d, 0s) infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+
+  25% {
+    opacity: 0.3;
+  }
+
+  62.5% {
+    opacity: 1;
+  }
+
+  75% {
+    opacity: 0.3;
+  }
+}
+
+/*
+ * A line: the track and the pulse are two copies of the same path (or
+ * line) in one svg. Round caps, no arrows, no dots at the ends. The svg
+ * of a scene goes 2px (--diagram-tuck) under the part at each end, which
+ * has a surface and is above it.
+ */
+/*
+ * The stroke of a track keeps its width when its svg stretches
+ * (non-scaling-stroke). A pulse and a drawn track must not stretch: with
+ * non-scaling-stroke, Chrome measures their dashes in px of the screen,
+ * not on the `pathLength` of the path. Use them in an svg with no
+ * viewBox (lines in % of the box) or with a viewBox in px of the box.
+ */
+.track,
+.pulse {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.track {
+  vector-effect: non-scaling-stroke;
+}
+
+.draw,
+.pulse {
+  vector-effect: none;
+}
+
+.track {
+  stroke: var(--border-on-inverse-strong);
+}
+
+/*
+ * The pulse: one dash of 24 (a quarter of the path) on a path with
+ * `pathLength="100"`. The gap after the dash is longer than the path, thus
+ * only one dash shows. At first the dash is before the start of the path,
+ * out of sight; `data-pulse` (on the pulse or on a parent) moves it to
+ * after the end, one time. Nothing must sit on the track: a label with a
+ * surface hides the pulse (the tag of the stream is above its line).
+ */
+.pulse {
+  stroke: var(--diagram-accent);
+  stroke-width: 2;
+  stroke-dasharray: 24 200;
+  stroke-dashoffset: 24;
+}
+
+.pulse:is([data-pulse], [data-pulse] *) {
+  animation: travel var(--diagram-travel) var(--diagram-ease-in-out) forwards;
+}
+
+@keyframes travel {
+  from {
+    stroke-dashoffset: 24;
+  }
+
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+/*
+ * A track that comes in (the fan-out of the Wall): add `.draw` to a
+ * `.track` path with `pathLength="100"`. It is drawn by default (the
+ * still); `data-hidden` (on the path or on a parent) takes it away with
+ * no transition, and its removal draws the track from its start.
+ * `data-faded` fades it out.
+ */
+.draw {
+  stroke-dasharray: 100 100;
+  stroke-dashoffset: 0;
+  transition:
+    stroke-dashoffset var(--diagram-draw) var(--diagram-ease-in-out),
+    opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.draw:is([data-hidden], [data-hidden] *) {
+  stroke-dashoffset: 100;
+  opacity: 0;
+  transition: none;
+}
+
+.track:is([data-faded], [data-faded] *),
+.pulse:is([data-faded], [data-faded] *) {
+  opacity: 0;
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.photo {
+  box-shadow: 0 8px 24px -4px color-mix(in srgb, black 40%, transparent);
+}
+
+:where(.panel) {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  padding: var(--space-xs);
+  border-radius: var(--radius-md);
+  background: var(--surface-inverse);
+  box-shadow: 0 0 0 1px var(--border-on-inverse-strong);
+}
+
+@media (min-width: 768px) {
+  :where(.panel) {
+    padding: var(--space-sm);
+  }
+}
+
+:where(.panelLabel) {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--text-on-inverse-strong);
+}
+
+/*
+ * An item that a change can touch (a post, a tile, a tag). Its surface,
+ * its ring and its radius are the ones of the scene; the states below
+ * change only the ring and the tint, and its opacity and scale. The ring
+ * comes on fast and fades in --diagram-settle.
+ */
+:where(.change) {
+  position: relative;
+  transition:
+    opacity var(--diagram-enter) var(--diagram-ease-out),
+    scale var(--diagram-enter) var(--diagram-ease-out),
+    box-shadow var(--diagram-settle) var(--diagram-ease-out),
+    background-color var(--diagram-settle) var(--diagram-ease-out);
+}
+
+.change[data-changed] {
+  background-color: color-mix(in srgb, var(--text-on-inverse) 8%, transparent);
+  box-shadow: 0 0 0 1px var(--text-on-inverse);
+  transition:
+    opacity var(--diagram-enter) var(--diagram-ease-out),
+    scale var(--diagram-enter) var(--diagram-ease-out),
+    box-shadow var(--diagram-fade) var(--diagram-ease-out),
+    background-color var(--diagram-fade) var(--diagram-ease-out);
+}
+
+/* A panel is on the tracks: its tint has no transparency, thus the tracks under it do not show */
+.panel.change[data-changed] {
+  background-color: color-mix(in srgb, var(--text-on-inverse) 8%, var(--surface-inverse));
+}
+
+:where(.change)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 1px var(--text-on-inverse);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.change[data-ping]::after {
+  animation: ping var(--diagram-ping) var(--diagram-ease-out);
+}
+
+@keyframes ping {
+  from {
+    opacity: 0.5;
+    scale: 1;
+  }
+
+  to {
+    opacity: 0;
+    scale: var(--diagram-ping-scale, 1.6);
+  }
+}
+
+.change[data-leave] {
+  opacity: 0;
+  scale: 0.92;
+  transition:
+    opacity var(--diagram-fade) var(--diagram-ease-out),
+    scale var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.change[data-enter] {
+  opacity: 0;
+  scale: 0.96;
+  transition: none;
+}

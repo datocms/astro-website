@@ -1,0 +1,172 @@
+---
+// The dialog that compares the limits of the Free plan and of the
+// Professional plan. A link to "#<id>" opens it. When the address of the
+// page has this hash, the dialog opens on load.
+import type { FreeLimitsData } from '~/data/pricing';
+import type { FreeLimitRow } from './limits';
+import styles from './FreeLimitsDialog.module.css';
+
+type Props = FreeLimitsData & { rows: FreeLimitRow[] };
+
+const { id, headline, warning, warningDetail, columns, closeLabel, rows } = Astro.props;
+const titleId = `${id}-title`;
+---
+
+<dialog
+  id={id}
+  class={styles.dialog}
+  data-theme="default"
+  aria-labelledby={titleId}
+  data-free-limits
+>
+  <div class={styles.panel}>
+    <div class={styles.top}>
+      <h2 id={titleId} class="h2">{headline}</h2>
+      <button type="button" class={styles.close} aria-label={closeLabel} data-close>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path
+            d="m5 5 10 10M15 5 5 15"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class={styles.body}>
+      <p class:list={[styles.warning, 'body']}>
+        <strong class={styles.warningTitle}>{warning}</strong>
+        <br />
+        {warningDetail}
+      </p>
+
+      <table class={styles.table}>
+        <thead>
+          <tr class="subtitleMedium">
+            {columns.map((label) => <th scope="col">{label}</th>)}
+          </tr>
+        </thead>
+        <tbody class="body">
+          {
+            rows.map((row, i) => {
+              const tipId = `${id}-tip-${i}`;
+              return (
+                <tr>
+                  <th scope="row">
+                    <span class={styles.name}>
+                      <span class="bodyMedium">{row.name}</span>
+                      {row.description && (
+                        <span class={styles.info} data-free-info>
+                          <button
+                            type="button"
+                            class={styles.infoButton}
+                            aria-describedby={tipId}
+                            aria-expanded="false"
+                            data-free-info-button
+                          >
+                            <span class="visuallyHidden">About {row.name}</span>
+                            <span aria-hidden="true">i</span>
+                          </button>
+                          <span
+                            id={tipId}
+                            role="tooltip"
+                            class:list={[styles.tooltip, 'subtitleMedium']}
+                          >
+                            {row.description}
+                          </span>
+                        </span>
+                      )}
+                    </span>
+                  </th>
+                  {[row.free, row.pro].map((value, j) => (
+                    <td>
+                      <span class="visuallyHidden">{columns[j + 1]}: </span>
+                      {value === true ? (
+                        <span class={styles.check}>
+                          <svg
+                            width="10"
+                            height="10"
+                            viewBox="0 0 10 10"
+                            fill="none"
+                            aria-hidden="true"
+                          >
+                            <path
+                              d="m1.5 5.2 2.3 2.3 4.7-5"
+                              stroke="currentColor"
+                              stroke-width="1.6"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            />
+                          </svg>
+                          <span class="visuallyHidden">Included</span>
+                        </span>
+                      ) : value === false ? (
+                        <span class={styles.dash}>
+                          <span class="visuallyHidden">Not included</span>
+                        </span>
+                      ) : (
+                        value
+                      )}
+                      {j === 1 && row.proExtra && (
+                        <>
+                          <br />
+                          <span class={styles.muted}>{row.proExtra}</span>
+                        </>
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  for (const dialog of document.querySelectorAll<HTMLDialogElement>('dialog[data-free-limits]')) {
+    const hash = `#${dialog.id}`;
+
+    const open = () => {
+      if (!dialog.open) dialog.showModal();
+    };
+
+    // Each link to the hash opens the dialog. The page does not scroll.
+    document.addEventListener('click', (event) => {
+      const link = (event.target as Element).closest?.(`a[href="${hash}"]`);
+      if (!link) return;
+      event.preventDefault();
+      open();
+    });
+
+    dialog.querySelector('[data-close]')?.addEventListener('click', () => dialog.close());
+
+    // A click on the backdrop (outside the panel) closes the dialog.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    // Tooltips: a click or a tap on the icon opens or closes its bubble.
+    // Only one bubble is open at a time.
+    dialog.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest?.('[data-free-info-button]');
+      const info = button?.parentElement;
+      for (const el of dialog.querySelectorAll('[data-free-info][data-open]')) {
+        if (el === info) continue;
+        el.removeAttribute('data-open');
+        el.querySelector('[data-free-info-button]')?.setAttribute('aria-expanded', 'false');
+      }
+      if (!button || !info) return;
+      const isOpen = !info.hasAttribute('data-open');
+      info.toggleAttribute('data-open', isOpen);
+      button.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    if (location.hash === hash) open();
+    window.addEventListener('hashchange', () => {
+      if (location.hash === hash) open();
+    });
+  }
+</script>

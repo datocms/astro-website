@@ -1,5 +1,5 @@
-import { FaqRecordFragment } from '~/components/Faqs/graphql';
-import { ReviewQuoteFragment } from '~/components/quote/graphql';
+import { FaqQuestionFragment } from '~/components/Faq';
+import { PlanComparisonFeatureGroupFragment } from '~/components/PlanComparison';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 
@@ -12,22 +12,6 @@ export const HintFragment = graphql(/* GraphQL */ `
   }
 `);
 
-export const PlanFeatureGroupFragment = graphql(/* GraphQL */ `
-  fragment PlanFeatureGroupFragment on PlanFeatureGroupRecord @_unmask {
-    id
-    name
-    features {
-      id
-      name
-      description {
-        value
-      }
-      tags
-      availableOnProfessionalPlan
-    }
-  }
-`);
-
 export const query = graphql(
   /* GraphQL */ `
     query Pricing {
@@ -37,20 +21,15 @@ export const query = graphql(
         }
       }
       faqs: allFaqs {
-        id
-        ...FaqRecordFragment
+        ...FaqQuestionFragment
       }
       planFeatureGroups: allPlanFeatureGroups(orderBy: position_ASC, first: 100) {
-        ...PlanFeatureGroupFragment
+        ...PlanComparisonFeatureGroupFragment
       }
       hints: allPricingHints(first: 500) {
         ...HintFragment
       }
-      review1: review(filter: { name: { eq: "Tore Heimann" } }) {
-        __typename
-        ...ReviewQuoteFragment
-      }
     }
   `,
-  [ReviewQuoteFragment, TagFragment, HintFragment, PlanFeatureGroupFragment, FaqRecordFragment],
+  [TagFragment, HintFragment, FaqQuestionFragment, PlanComparisonFeatureGroupFragment],
 );

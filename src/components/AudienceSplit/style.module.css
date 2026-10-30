@@ -1,0 +1,64 @@
+/*
+ * Below 1152 the halves stack and the text uses the full
+ * content width. From 1152 the halves are side by side and the text is
+ * 500px wide at most. Above 1320 the backgrounds are full width, but the
+ * texts stay next to the centre line: 80px from it on each side.
+ */
+.split {
+  display: flex;
+  flex-direction: column;
+}
+
+.half {
+  padding: var(--section-padding-y) var(--section-padding-x);
+}
+
+.inverse {
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.accent {
+  background: var(--surface-accent);
+  color: var(--text-primary);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-lg);
+}
+
+.inverse .label {
+  color: var(--text-on-inverse-muted);
+}
+
+.accent .label {
+  color: var(--text-muted);
+}
+
+@media (min-width: 1152px) {
+  /*
+   * The outer padding of each half is
+   * --content-inset-half, so at 1920 and 2560 the two texts stay in the
+   * centred content column. The halves are grid items: there 100% in the
+   * token is the width of the half.
+   */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .half:first-child {
+    padding-inline-start: var(--content-inset-half);
+  }
+
+  .half:last-child {
+    padding-inline-end: var(--content-inset-half);
+  }
+
+  .text {
+    max-width: 500px;
+  }
+}

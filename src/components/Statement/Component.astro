@@ -1,0 +1,35 @@
+---
+import { Section } from '~/components/Section';
+import { InlineText } from '~/components/InlineText';
+import type { StatementData } from '~/data/case-studies';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends StatementData {
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+  /** The surface of the section. On `inverse` the text is light. */
+  background?: 'default' | 'accent' | 'inverse';
+  /**
+   * `light`: a quieter statement on surface/accent-faint. It replaces
+   * `background`. Give it a theme with a hue: the text takes it.
+   */
+  variant?: 'default' | 'light';
+}
+
+const { label, text, theme, variant = 'default' } = Astro.props;
+const background = variant === 'light' ? 'accent-faint' : (Astro.props.background ?? 'default');
+---
+
+<Section
+  theme={theme}
+  padding="headlines"
+  background={background}
+  class={background === 'inverse' ? styles.inverse : undefined}
+  width="headline"
+>
+  <h2 class:list={[styles.statement, 'h1']}>
+    <span class={styles.label}>{label}</span>
+    <InlineText text={text} />
+  </h2>
+</Section>

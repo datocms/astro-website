@@ -1,0 +1,47 @@
+/* Prose styles the figure, the image and the caption. */
+.media {
+  display: block;
+}
+
+.figure .media {
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.zoom {
+  cursor: zoom-in;
+}
+
+.zoom:focus-visible {
+  outline: 2px solid var(--border-strong);
+  outline-offset: var(--space-4xs);
+  border-radius: var(--radius-md);
+}
+
+/* A framed image is a screenshot: a border shows its edge on the page. */
+.framed :global(:is(img, video)) {
+  border: 1px solid var(--border-default);
+}
+
+/* The dialog is outside the figure, thus the rules are global. */
+:global(dialog[data-image-zoom-dialog]) {
+  max-width: calc(100vw - 2 * var(--space-md));
+  max-height: calc(100vh - 2 * var(--space-md));
+  padding: 0;
+  overflow: hidden;
+  background: var(--surface-default);
+  border: 0;
+  border-radius: var(--radius-md);
+  cursor: zoom-out;
+}
+
+:global(dialog[data-image-zoom-dialog])::backdrop {
+  background: color-mix(in srgb, var(--surface-inverse) 80%, transparent);
+}
+
+:global(dialog[data-image-zoom-dialog] img) {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 2 * var(--space-md));
+  object-fit: contain;
+}

@@ -1,0 +1,67 @@
+/* Below 1152 the cells stack. Each cell pads itself. */
+.list {
+  display: grid;
+  grid-template-columns: 1fr;
+  list-style: none;
+}
+
+.cell {
+  padding: var(--section-padding-y) var(--section-padding-x);
+  background: var(--surface-default);
+  color: var(--text-primary);
+}
+
+/* surface/accent-subtle is transparent. It goes on top of surface/default. */
+.subtle {
+  background:
+    linear-gradient(var(--surface-accent-subtle), var(--surface-accent-subtle)),
+    var(--surface-default);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.number {
+  color: var(--text-muted);
+}
+
+.body {
+  color: var(--text-soft);
+}
+
+/* A linked title keeps the colour of the text. The underline shows that it is a link. */
+.link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+@media (hover: hover) {
+  .link:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+/*
+ * At 1152 and more: two halves. The backgrounds are full-bleed, but the
+ * text stays in the centred content column (at 2560 the left text
+ * starts at (2560 - 1160) / 2, the right text at the seam + the side
+ * padding). --content-inset-half gives this outer padding of a half.
+ */
+@media (min-width: 1152px) {
+  .list {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .text {
+    max-width: 500px;
+  }
+
+  .cell:nth-child(odd) {
+    padding-inline-start: var(--content-inset-half);
+  }
+}

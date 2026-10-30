@@ -1,0 +1,40 @@
+---
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { CardCarousel } from '~/components/CardCarousel';
+import { CarouselCard } from '~/components/CarouselCard';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { ShowcaseProjectBlockFragment } from './graphql';
+
+interface Props {
+  block: FragmentOf<typeof ShowcaseProjectBlockFragment>;
+}
+
+const { showcaseProjects } = readFragment(ShowcaseProjectBlockFragment, Astro.props.block);
+
+// Cut the text at a word, with a maximum of 200 characters.
+function truncate(text: string, length = 200) {
+  if (text.length <= length) return text;
+  return `${text.slice(0, length - 1).replace(/\s+\S*$/, '')}…`;
+}
+---
+
+<prose-island>
+  <CardCarousel label="Showcase projects">
+    {
+      showcaseProjects.map((project) => (
+        <CarouselCard
+          href={buildUrlForShowcaseProject(project)}
+          title={project.name}
+          logo={project.partner.logo ?? undefined}
+        >
+          {project.mainImage.responsiveImage && (
+            <ResponsiveImage slot="image" data={project.mainImage.responsiveImage} />
+          )}
+          {truncate(toPlainText(project.headline) ?? '')}
+        </CarouselCard>
+      ))
+    }
+  </CardCarousel>
+</prose-island>

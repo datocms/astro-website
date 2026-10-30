@@ -1,0 +1,148 @@
+---
+// The layout of the pages of the redesign (see "Two layout families" in
+// AGENTS.md and src/REDESIGN.md). It is the layout of the prototype
+// (src/layouts/Layout.astro there), with the head of BaseLayout: the SEO
+// tags, the favicon, the canonical URL, the RSS links, the cookie consent,
+// the analytics and the content link of the draft mode.
+// Do not use it on a page that uses LegacyLayout parts: the two global
+// stylesheets must not load on the same page.
+import type { TitleMetaLinkTag } from '@datocms/astro';
+import { DEPLOYMENT_DESTINATION } from 'astro:env/server';
+import { FooterLegal } from '~/components/FooterLegal';
+import { FooterLinks } from '~/components/FooterLinks';
+import { PageNav } from '~/components/PageNav';
+import { SearchPopup } from '~/components/SearchPopup';
+import { SeoAnalysisPanel } from '~/components/SeoAnalysisPanel';
+import { SiteHeader } from '~/components/SiteHeader';
+import { footerColumns, legal, mainNavigation } from '~/data/navigation';
+import BaseLayout from '~/layouts/BaseLayout/Component.astro';
+import { isDraftModeEnabled } from '~/lib/draftMode';
+import type { Theme } from '~/lib/theme';
+import '@datocms/product-scenes/product-scenes.css';
+import '../styles/global.css';
+
+interface Props {
+  /**
+   * The SEO tags of the page, with the <title>. Use the seo of the CMS
+   * record when the page has one. Else, make the tags from a title and a
+   * description: overrideSeo([], seoTitle(title), seoDescription(text))
+   * (~/lib/datocms/seo).
+   */
+  seo: TitleMetaLinkTag[];
+  theme?: Theme;
+  /** Must match the hero of the page. `false` renders no header. */
+  headerVariant?: 'default' | 'light' | 'dark' | false;
+  /** The theme of the header. Must match the hero of the page. */
+  headerTheme?: Theme;
+  /** The look of the CTA of the header. Without it, the header selects it. */
+  headerCta?: 'solid' | 'soft';
+  /** `false` renders no footer. */
+  footer?: boolean;
+  footerTheme?: Theme;
+  /**
+   * The SEO analysis of the CMS record of the page: its field
+   * `yoastAnalysis` (the focus keyword of the SEO/Readability plugin). In
+   * draft mode, the layout shows a panel for the editors with the
+   * keywords and where the page uses them (SeoAnalysisPanel). Not in the
+   * prototype.
+   */
+  seoAnalysis?: unknown;
+}
+
+const {
+  seo,
+  theme = 'default',
+  headerVariant = 'default',
+  headerTheme,
+  headerCta,
+  footer = true,
+  footerTheme,
+  seoAnalysis,
+} = Astro.props;
+
+// The page menu for the reviewers. It does not show in production.
+const showReviewTools = DEPLOYMENT_DESTINATION !== 'production';
+
+// The endpoint of the SEO/Readability plugin of the CMS
+// (src/pages/api/seo-analysis) reads the content of <main id="layout-content">:
+// the page without the header and the footer. Keep this id.
+
+// The SEO panel shows only in draft mode, for the editors.
+const showSeoAnalysis = seoAnalysis !== undefined && isDraftModeEnabled(Astro);
+
+// The order of the cascade layers (see src/styles/global.css). BaseLayout
+// puts it as the first child of <head>, before all other CSS.
+const cssLayers = ['reset', 'tokens', 'base', 'vendor', 'blocks', 'sections', 'pages'];
+---
+
+<BaseLayout
+  seo={seo}
+  cssLayers={cssLayers}
+  clientRouter={false}
+  bodyAttributes={{ 'data-theme': theme }}
+>
+  <Fragment slot="head">
+    {/* A page can add tags to the head, such as JSON-LD. */}
+    <slot name="head" />
+    {/* The fonts come from this site (src/pages/fonts/[file].ts). */}
+    <link
+      rel="preload"
+      href="/fonts/ABCOracleVariable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        // Animations hide their final state only when this flag is set.
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches) root.dataset.motion = 'on';
+
+        // Color scheme (src/lib/colorScheme.ts): the choice of the visitor,
+        // else the scheme of the system. Set it before the first paint.
+        var scheme = null;
+        try {
+          scheme = localStorage.getItem('color-scheme');
+        } catch (e) {}
+        if (scheme !== 'light' && scheme !== 'dark')
+          scheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        root.dataset.scheme = scheme;
+        root.dataset.productScenesScheme = scheme;
+      })();
+    </script>
+  </Fragment>
+
+  <slot name="header">
+    {
+      headerVariant && (
+        <SiteHeader
+          variant={headerVariant}
+          nav={mainNavigation}
+          theme={headerTheme}
+          ctaVariant={headerCta}
+        />
+      )
+    }
+  </slot>
+  <main id="layout-content">
+    <slot />
+  </main>
+  <slot name="footer">
+    {
+      footer && (
+        <>
+          <FooterLinks columns={footerColumns} theme={footerTheme} />
+          <FooterLegal {...legal} theme={footerTheme} />
+        </>
+      )
+    }
+  </slot>
+  <SearchPopup />
+  {showSeoAnalysis && <SeoAnalysisPanel analysis={seoAnalysis} />}
+  {showReviewTools && <PageNav />}
+  <script>
+    import { followSystemColorScheme } from '~/lib/colorScheme';
+
+    followSystemColorScheme();
+  </script>
+</BaseLayout>

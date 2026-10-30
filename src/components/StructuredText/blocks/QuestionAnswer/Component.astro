@@ -1,0 +1,44 @@
+---
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { StructuredText } from '~/components/StructuredText';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { QuestionAnswerFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof QuestionAnswerFragment>;
+}
+
+const { question, answer } = readFragment(QuestionAnswerFragment, Astro.props.block);
+---
+
+<div class={styles.qa}>
+  {
+    question && (
+      <div class={styles.question}>
+        <StructuredText
+          {...ensureValidStructuredTextProps({
+            data: question,
+            linkToRecordComponents: defaultLinkToRecordComponents,
+            inlineRecordComponents: defaultInlineRecordComponents,
+          })}
+        />
+      </div>
+    )
+  }
+  {
+    answer && (
+      <div class={styles.answer}>
+        <StructuredText
+          {...ensureValidStructuredTextProps({
+            data: answer,
+            linkToRecordComponents: defaultLinkToRecordComponents,
+            inlineRecordComponents: defaultInlineRecordComponents,
+          })}
+        />
+      </div>
+    )
+  }
+</div>

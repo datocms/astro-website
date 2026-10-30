@@ -1,52 +1,210 @@
 ---
-import { containsKeywords } from '~/lib/containsKeyword';
-import { Wrapper } from '../Wrapper';
-import s from './style.module.css';
-import striptags from 'striptags';
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { Headline } from '~/components/Headline';
+import { LogosLine } from '~/components/LogosLine';
+import { stripStega } from '@datocms/astro';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Section } from '~/components/Section';
+import type { HeroData } from '~/data/home';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { Step } from '~/lib/motion/typewriter';
+import { HeroTeamMemberFragment } from './graphql';
+import styles from './style.module.css';
 
-interface Props {
-  seoAnalysis?: unknown;
-  mainTitleOfPage?: boolean;
+interface Props extends HeroData {
+  /** Must match the SiteHeader variant. */
+  variant?: 'default' | 'light' | 'dark';
+  alignment?: 'center' | 'left';
+  typewriter?: boolean;
+  /** Use `h2` when the hero is not the first section of the page. */
+  headingLevel?: 'h1' | 'h2';
+  /** Start the subheadline on a new line: one line for each run, never a last word alone. */
+  breakBeforeMuted?: boolean;
+  /** The team members of the CMS: a row of portraits below the headline. */
+  team?: FragmentOf<typeof HeroTeamMemberFragment>[];
+  /** The `id` of the team row, for an anchor such as `#the-team`. */
+  teamId?: string;
 }
 
-const { seoAnalysis, mainTitleOfPage } = Astro.props;
+const {
+  variant = 'default',
+  alignment = 'left',
+  label,
+  headline,
+  subheadline,
+  face = '[••]',
+  buttons,
+  logos,
+  typewriter = false,
+  headingLevel = 'h1',
+  breakBeforeMuted = false,
+  teamId,
+} = Astro.props;
 
-const kickerContents = striptags(await Astro.slots.render('kicker'));
+const members = (Astro.props.team ?? []).map((member) =>
+  readFragment(HeroTeamMemberFragment, member),
+);
 
-let Title: 'h1' | 'h2' = mainTitleOfPage ? 'h1' : 'h2';
-let Kicker: 'h1' | 'h2' = 'h2';
+// The row shows first names. When two people have the same first name, the
+// name gets the initial of the last name ("Matteo B."). In draft mode, the
+// name ends with the stega of Content Link: the short name keeps it.
+const words = (name: string) => stripStega(name).split(' ');
+const firstName = (name: string) => words(name)[0] ?? name;
+const shortName = (name: string) => {
+  const first = firstName(name);
+  const initial = words(name).at(-1)?.[0];
+  const isShared = members.filter((other) => firstName(other.name) === first).length > 1;
+  const stega = name.slice(stripStega(name).length);
+  return (isShared && initial ? `${first} ${initial}.` : first) + stega;
+};
 
-if (seoAnalysis) {
-  const kickerContainsKeywords = containsKeywords(kickerContents, seoAnalysis);
-  Kicker = kickerContainsKeywords ? 'h1' : 'h2';
-  Title = kickerContainsKeywords ? 'h2' : 'h1';
+// Times are from the start of the page.
+// Without a subheadline, the script ends after the headline.
+const script: Step[] = [
+  { type: 'pause', ms: 750 },
+  { type: 'cursor', glyphs: ['•', '~', '-', 'ᴗ', '•'], msPerGlyph: 75 },
+  { type: 'pause', ms: 25 },
+  { type: 'text', text: headline, speedCps: 80 },
+];
+if (subheadline) {
+  script.push(
+    { type: 'pause', ms: 500 },
+    { type: 'text', text: subheadline, speedCps: 80 },
+    { type: 'pause', ms: 150 },
+    {
+      type: 'face',
+      frames: [
+        { text: '••', ms: 150 },
+        { text: '[••', ms: 75 },
+        { text: '[••]', ms: 300 },
+        // A different face replaces the default face after the wink.
+        ...(face === '[••]'
+          ? [
+              { text: '[-•]', ms: 100 },
+              { text: '[••]', ms: 150 },
+            ]
+          : [{ text: face, ms: 150 }]),
+      ],
+    },
+  );
 }
+
+const background = { default: 'default', light: 'accent', dark: 'inverse' }[variant] as
+  'default' | 'accent' | 'inverse';
 ---
 
-<Wrapper>
-  <div class={s.root}>
+<Section
+  background={background}
+  class:list={[
+    styles.hero,
+    alignment === 'center' && styles.center,
+    variant === 'dark' && styles.dark,
+  ]}
+  contentClass={styles.content}
+  data-hero
+>
+  <div class={styles.text}>
+    {label && <p class:list={[styles.label, 'body']}>{label}</p>}
     {
-      Astro.slots.has('kicker') && (
-        <Kicker class={s.kicker}>
-          <slot name="kicker" />
-        </Kicker>
+      /* A no-break space before the face: the face stays on the line of the last word, never alone on a new line. */
+    }
+    <Headline
+      as={headingLevel}
+      size="h1"
+      muted={subheadline ? `${subheadline}\u00A0${face}` : undefined}
+      breakBeforeMuted={breakBeforeMuted}
+      typewriter={typewriter ? script : undefined}
+      typewriterStart="load"
+      class={styles.headline}
+    >
+      {headline}
+    </Headline>
+    {
+      buttons && buttons.length > 0 && (
+        <ButtonGroup buttons={buttons} class={styles.buttons} data-hero-buttons="" />
       )
     }
-    {
-      Astro.slots.has('title') && (
-        <Title class={s.title}>
-          <slot name="title" />
-        </Title>
-      )
-    }
-    {
-      Astro.slots.has('subtitle') && (
-        <div class={s.subtitle}>
-          <slot name="subtitle" />
-        </div>
-      )
-    }
-
-    <slot />
   </div>
-</Wrapper>
+  {logos && <LogosLine logos={logos} class={styles.logos} />}
+  {
+    members.length > 0 && (
+      <div id={teamId} class={styles.team} data-hero-team>
+        <ul class={styles.teamTrack} aria-label="Team" data-hero-team-track>
+          {members.map((member) => (
+            <li class={styles.member}>
+              {member.avatar.responsiveImage && (
+                <ResponsiveImage
+                  data={member.avatar.responsiveImage}
+                  sizes="81px"
+                  pictureClass={styles.portraitPicture}
+                  imgClass={styles.portrait}
+                />
+              )}
+              <span class="subtitleMedium">{shortName(member.name)}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+</Section>
+
+<script>
+  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+
+  // The buttons fade in 150ms after the typewriter ends.
+  for (const hero of document.querySelectorAll<HTMLElement>('[data-hero]')) {
+    const tw = hero.querySelector<HTMLElement>('[data-typewriter]');
+    const buttons = hero.querySelector<HTMLElement>('[data-hero-buttons]');
+    if (!tw || !buttons || document.documentElement.dataset.motion !== 'on') continue;
+    if (tw.dataset.twState === 'done') continue;
+    tw.addEventListener('typewriter:done', () => {
+      setTimeout(() => (buttons.dataset.visible = 'true'), 150);
+    });
+  }
+
+  // Below 1320 the team is a marquee: one
+  // line that moves to the left in an endless loop, 40s for each cycle.
+  // From 1320 the team wraps and does not move.
+  const WRAP = window.matchMedia('(min-width: 1320px)');
+  const CYCLE_SECONDS = 40;
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-hero-team]')) {
+    const track = root.querySelector<HTMLElement>('[data-hero-team-track]');
+    if (!track || prefersReducedMotion()) continue;
+    const items = [...track.children] as HTMLElement[];
+
+    const build = () => {
+      for (const clone of track.querySelectorAll('[data-clone]')) clone.remove();
+      delete root.dataset.running;
+      if (WRAP.matches) return;
+      const setWidth = track.scrollWidth;
+      if (setWidth === 0) return;
+      // Add copies until the track covers the viewport plus one set.
+      const copies = Math.ceil(root.clientWidth / setWidth) + 1;
+      for (let i = 0; i < copies; i += 1) {
+        for (const item of items) {
+          const clone = item.cloneNode(true) as HTMLElement;
+          clone.dataset.clone = '';
+          clone.setAttribute('aria-hidden', 'true');
+          track.appendChild(clone);
+        }
+      }
+      root.style.setProperty('--marquee-distance', `${setWidth}px`);
+      root.style.setProperty('--marquee-duration', `${CYCLE_SECONDS}s`);
+      root.dataset.running = '';
+    };
+
+    build();
+    let width = root.clientWidth;
+    new ResizeObserver(() => {
+      if (root.clientWidth === width) return;
+      width = root.clientWidth;
+      build();
+    }).observe(root);
+
+    onVisibilityChange(root, (visible) => {
+      root.dataset.paused = visible ? 'false' : 'true';
+    });
+  }
+</script>

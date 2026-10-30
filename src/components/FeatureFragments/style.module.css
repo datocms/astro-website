@@ -1,0 +1,118 @@
+/*
+ * The fragments end a chapter: more space under them separates the
+ * chapters.
+ */
+.section {
+  --section-padding-bottom: calc(var(--section-padding-y) * 1.5);
+}
+
+/*
+ * Below the fragments, a section with its own background and the same theme
+ * continues the chapter: the change of colour separates them. CSS cannot
+ * compare two attributes, thus each theme has its selector.
+ */
+.section[data-theme='default']:has(+ [data-tinted][data-theme='default']),
+.section[data-theme='orange']:has(+ [data-tinted][data-theme='orange']),
+.section[data-theme='green']:has(+ [data-tinted][data-theme='green']),
+.section[data-theme='purple']:has(+ [data-tinted][data-theme='purple']),
+.section[data-theme='blue']:has(+ [data-tinted][data-theme='blue']),
+.section[data-theme='pink']:has(+ [data-tinted][data-theme='pink']) {
+  --section-padding-bottom: var(--section-padding-y);
+}
+
+/*
+ * A grid of 2 to 4 sub-features. One column below 768, two columns from
+ * 768. From 1152, `three` gives three columns.
+ */
+.items {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3xl) var(--space-xl);
+}
+
+@media (min-width: 768px) {
+  .items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1152px) {
+  .items {
+    column-gap: var(--space-4xl);
+  }
+
+  .three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * The box of the picture, ratio 4:3 (--visual-aspect: the `visualAspect`
+ * prop can change it): no outline, and the accent colour as
+ * its surface, as the SceneFrame. A SceneFragment fills it and cuts the
+ * picture at its edges. The SceneFragment makes round only the top corner
+ * on the side of its picture (--fragment-corner), and draws the line along
+ * the edges where it cuts the picture (--fragment-line), with a shadow
+ * along the side line (--fragment-shadow). The diagrams in
+ * the box take the light colours (data-diagram-surface).
+ */
+.visual {
+  position: relative;
+  aspect-ratio: var(--visual-aspect, 4 / 3);
+  margin-bottom: var(--space-md);
+  --fragment-surface: var(--surface-accent);
+  --fragment-corner: var(--radius-md);
+  /* The line is a darker accent. Text-primary is the dark text in light and the pale text in the dark scheme, thus the line shows on both. */
+  --fragment-line: color-mix(in srgb, var(--surface-accent) 65%, var(--text-primary));
+  --fragment-shadow: color-mix(in srgb, var(--surface-inverse) 20%, transparent);
+  /* A diagram that fills its box is on the surface of the page: no box around it */
+  --fragment-fill-surface: var(--surface-default);
+}
+
+/* Without a picture, the box keeps its size and has the line of the SceneFragment, at its bottom and right edges, with the same overshoot and the same fade. */
+.empty {
+  background: var(--surface-accent);
+  border-radius: var(--fragment-corner) 0 0 0;
+}
+
+.empty::after {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--space-md)) calc(-1 * var(--space-3xs)) calc(-1 * var(--space-3xs))
+    calc(-1 * var(--space-md));
+  background:
+    linear-gradient(var(--fragment-line), var(--fragment-line)) right var(--space-3xs) top 0 / 1px
+      100% no-repeat,
+    linear-gradient(var(--fragment-line), var(--fragment-line)) left 0 bottom var(--space-3xs) /
+      100% 1px no-repeat;
+  pointer-events: none;
+  mask-image:
+    linear-gradient(to bottom, transparent, black var(--space-md)),
+    linear-gradient(to right, transparent, black var(--space-md));
+  mask-composite: intersect;
+}
+
+.title {
+  margin-bottom: var(--space-2xs);
+  color: var(--text-primary);
+}
+
+/* The description is smaller than the title. Its lines have the space of body text. */
+.text {
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* On the inverse surface the text is light. The boxes do not change. */
+.inverse .title {
+  color: var(--text-on-inverse);
+}
+
+.inverse .text {
+  color: var(--text-on-inverse-muted);
+}

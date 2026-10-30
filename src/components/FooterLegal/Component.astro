@@ -1,0 +1,27 @@
+---
+import { DatoLogo } from '~/components/DatoLogo';
+import { Section } from '~/components/Section';
+import type { LegalData } from '~/data/navigation';
+import type { Theme } from '~/lib/theme';
+import styles from './style.module.css';
+
+interface Props extends LegalData {
+  theme?: Theme;
+}
+
+const { email, text, theme } = Astro.props;
+---
+
+<Section
+  as="footer"
+  theme={theme}
+  background="inverse"
+  contentClass={styles.bar}
+  class={styles.footerLegal}
+>
+  <DatoLogo version="long" height={20} label="DatoCMS" />
+  <p class:list={[styles.text, 'caption']}>
+    <a href={`mailto:${email}`} class={styles.email}>{email}</a>
+    <span class={styles.rest}>{text}</span>
+  </p>
+</Section>

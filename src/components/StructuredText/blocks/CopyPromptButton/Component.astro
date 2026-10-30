@@ -1,0 +1,62 @@
+---
+import { stripStega } from '@datocms/astro';
+import { Button } from '~/components/Button';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { CopyPromptButtonFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof CopyPromptButtonFragment>;
+}
+
+const { prompt } = readFragment(CopyPromptButtonFragment, Astro.props.block);
+const text = stripStega(prompt).trim();
+const firstLine = text.split('\n').find((line) => line.trim()) ?? '';
+---
+
+{
+  /*
+  A button that copies a prompt for an AI agent. The prompt is in a
+  template, thus it is in the DOM but not on the page. The hint shows the
+  first line of the prompt, then a message when the copy is done. Without
+  JS the button cannot copy, thus the block stays hidden.
+*/
+}
+<prose-island>
+  <div class={styles.copyPrompt} data-copy-prompt hidden>
+    <Button appearance="deep-on-white" arrow={false}> Copy prompt </Button>
+    <p class:list={[styles.hint, 'caption']} aria-live="polite" data-copy-prompt-hint>
+      “{firstLine}”
+    </p>
+    <template data-copy-prompt-text>{text}</template>
+  </div>
+</prose-island>
+
+<script>
+  const DONE = '✓ Copied: now paste that into your preferred AI agent!';
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-copy-prompt]')) {
+    const button = root.querySelector('button')!;
+    const hint = root.querySelector<HTMLElement>('[data-copy-prompt-hint]')!;
+    const template = root.querySelector<HTMLTemplateElement>('[data-copy-prompt-text]')!;
+    const initial = hint.textContent;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    root.hidden = false;
+
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(template.content.textContent ?? '');
+      } catch {
+        return;
+      }
+      hint.textContent = DONE;
+      hint.dataset.copied = '';
+      clearTimeout(timer);
+      // After 3 seconds, show the first line again.
+      timer = setTimeout(() => {
+        hint.textContent = initial;
+        delete hint.dataset.copied;
+      }, 3000);
+    });
+  }
+</script>

@@ -1,0 +1,36 @@
+/*
+ * The frame of the chapter "AI translations" of /ai (Translations.tsx):
+ * the fields of the Italian tab that fill. The panel AI Translations is a
+ * part of the kit, with its own steps.
+ *
+ * The sequence sets `data-step` on the screen (sceneSequence.ts). The
+ * script of Chapter.astro gives `data-on` to each element with
+ * `data-from` from that step on, and `data-off` to each element with
+ * `data-until` from that step on. Without `data-step` the screen shows
+ * the still: the end of the run.
+ */
+
+[data-scene-steps][data-step] [data-from]:not([data-on]),
+[data-scene-steps][data-step] [data-until][data-off],
+[data-scene-steps]:not([data-step]) [data-until] {
+  display: none;
+}
+
+/* A field of the Italian tab, filled by its job: it lights up once */
+[data-scene-steps][data-step] .filled[data-on] {
+  border-radius: var(--radius-m);
+  animation: highlight 1.4s var(--material-ease);
+}
+
+@keyframes highlight {
+  0% {
+    box-shadow: 0 0 0 4px var(--color--primary-soft--border);
+  }
+  100% {
+    box-shadow: 0 0 0 4px transparent;
+  }
+}
+
+[data-scene-steps]:not([data-step]) .filled {
+  animation: none;
+}

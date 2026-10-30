@@ -1,0 +1,81 @@
+/*
+ * Two full-bleed halves. The
+ * left half is on the default surface, the right half on the accent
+ * surface. Under 1152 the halves stack. From 1152 the outer padding of
+ * each half is --content-inset-half, thus the text of each half is 500
+ * wide at 1320 and above, and stays in the centred content column at 1920
+ * and 2560.
+ */
+.pricingPlans {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1152px) {
+  .pricingPlans {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-padding-y);
+  padding: var(--section-padding-y) var(--section-padding-x);
+  background: var(--surface-default);
+}
+
+.accent {
+  background: var(--surface-accent);
+}
+
+@media (min-width: 1152px) {
+  .plan:first-child {
+    padding-inline-start: var(--content-inset-half);
+  }
+
+  .plan:last-child {
+    padding-inline-end: var(--content-inset-half);
+  }
+}
+
+.top {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.name {
+  color: var(--text-muted);
+}
+
+.price {
+  margin-top: var(--space-md);
+  color: var(--text-muted);
+}
+
+.button {
+  margin-top: var(--space-lg);
+}
+
+/*
+ * Each feature is 36px. The text has 10px below it and a 1px line
+ * (text/muted at 70%) on the bottom edge, also below the last feature.
+ * The gap between features is 10px.
+ */
+.features li {
+  position: relative;
+  padding: 0 0 var(--space-2xs) var(--space-md);
+  box-shadow: inset 0 -1px color-mix(in srgb, var(--text-muted) 70%, transparent);
+  color: var(--text-muted);
+}
+
+.features li + li {
+  margin-top: var(--space-2xs);
+}
+
+.features li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+}

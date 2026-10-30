@@ -1,0 +1,97 @@
+/*
+ * Grid: 2 columns, 3 from 1152. The grid
+ * is up to 1320 wide with no gaps: each card pads itself with
+ * section/padding-x. The section has no bottom padding. Below 768 the
+ * logo is 20 high and the description has the Subtitle Medium style;
+ * from 768 the logo is 30 high and the description has the Body style.
+ */
+.content {
+  padding-top: var(--section-padding-y);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--section-padding-y);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+  width: 100%;
+  max-width: var(--frame-max);
+  padding-inline: var(--section-padding-x);
+}
+
+.header > :first-child {
+  max-width: var(--headline-max);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  max-width: var(--frame-max);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  height: 100%;
+  padding: var(--space-xl) var(--section-padding-x);
+}
+
+.logoBox {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  max-width: 220px;
+  color: var(--text-primary);
+}
+
+.logo {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.description {
+  max-width: 280px;
+  color: var(--text-muted);
+}
+
+@media (hover: hover) {
+  .card:hover {
+    background: var(--surface-accent-faint);
+  }
+}
+
+@media (min-width: 768px) {
+  .content {
+    gap: var(--space-2xl);
+  }
+
+  .card {
+    gap: var(--space-lg);
+    padding-block: var(--space-2xl);
+  }
+
+  .logoBox {
+    height: 30px;
+    max-width: 280px;
+  }
+
+  /* From 768 the description has the Body style. */
+  .card .description {
+    font-size: var(--type-body);
+    font-weight: 400;
+    line-height: 1.3;
+  }
+}
+
+@media (min-width: 1152px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

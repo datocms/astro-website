@@ -1,0 +1,65 @@
+/* @layer blocks */
+/* In an article, the card is in a prose-island: Prose does not style it. */
+.item {
+  display: flex;
+}
+
+.card:any-link {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  color: var(--text-primary);
+}
+
+.image {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 3 / 2;
+  background: var(--surface-inverse-faint);
+  border-radius: var(--radius-md);
+}
+
+.image :global(:is(picture, img)) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3xs);
+}
+
+.label {
+  padding: var(--space-5xs) var(--space-3xs);
+  background: var(--surface-accent);
+  border-radius: var(--radius-full);
+}
+
+.card .logo {
+  width: auto;
+  height: 20px;
+  border-radius: 0;
+}
+
+.description {
+  line-height: 1.3;
+  color: var(--text-muted);
+}
+
+@media (hover: hover) {
+  .card:hover .title {
+    text-decoration: underline;
+  }
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--border-strong);
+  outline-offset: var(--space-4xs);
+  border-radius: var(--radius-md);
+}

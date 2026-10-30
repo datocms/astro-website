@@ -1,0 +1,114 @@
+/*
+ * The list, with a column at its right edge as tall as the list. The
+ * face is sticky in the column: in the middle of the screen while the
+ * list scrolls, then away with the end of the list. From 768 only: no
+ * buddy on phones. The face is bare: no box, no background. It is in the
+ * brand sans, as the faces of the heroes (the mono font has no glyph for
+ * the faces), and it is large: a small face is not seen at the edge. The
+ * face takes the default theme, not the theme of the section under it.
+ */
+.list {
+  position: relative;
+}
+
+.column {
+  display: none;
+  position: absolute;
+  inset-block: 0;
+  right: var(--space-md);
+  z-index: 900;
+  pointer-events: none;
+}
+
+.buddy {
+  position: sticky;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  translate: 0 -50%;
+  transition:
+    translate 600ms cubic-bezier(0.3, 1.5, 0.5, 1),
+    opacity 300ms ease;
+}
+
+.buddy[data-hidden] {
+  opacity: 0;
+  translate: 200% -50%;
+  pointer-events: none;
+}
+
+.face {
+  font: 500 var(--type-h1) / 1 var(--font-sans);
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.buddy[data-talk] .face {
+  animation: buddy-hop 500ms ease-out 2;
+}
+
+/* What the face says, to its left, on the inverse surface. */
+.bubble {
+  position: absolute;
+  right: calc(100% + var(--space-sm));
+  top: 50%;
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-md);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+  font: 500 15px/1.2 var(--font-sans);
+  white-space: nowrap;
+  opacity: 0;
+  translate: 8px -50%;
+  scale: 0.8;
+  transition:
+    opacity 200ms ease,
+    translate 300ms cubic-bezier(0.3, 1.5, 0.5, 1),
+    scale 300ms cubic-bezier(0.3, 1.5, 0.5, 1);
+  pointer-events: none;
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  border: 6px solid transparent;
+  border-left-color: var(--surface-inverse);
+  translate: 0 -50%;
+}
+
+.buddy[data-talk] .bubble {
+  opacity: 1;
+  translate: 0 -50%;
+  scale: 1;
+}
+
+@keyframes buddy-hop {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  40% {
+    translate: 0 -6px;
+  }
+}
+
+@media (min-width: 768px) {
+  .column {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buddy,
+  .bubble {
+    transition: none;
+  }
+
+  .buddy[data-talk] .face {
+    animation: none;
+  }
+}

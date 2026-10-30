@@ -1,0 +1,264 @@
+---
+import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import diagram from '../diagram/style.module.css';
+import { pillHtml } from './integrity';
+import { DESCRIPTION, STILL, STILL_ROWS, type Part } from './ledger';
+import styles from './ledger.module.css';
+
+// The picture of the fragment "Applied, or refused.", in the grammar of
+// the diagrams (../diagram/style.module.css). At the top, the event pill:
+// a change to the schema of Articles. Under it, the log of the changes,
+// the newest at the top. For each event: the pill comes in, a pulse goes
+// along the track to the log, a new row comes in at the top with the
+// change (the working mark of the pill replaces the symbol), then its
+// verdict shows next to it, with the ring: what DatoCMS changed, or why
+// DatoCMS refused it ("Refused:" in red). Then the pill goes out with the track, and 1s
+// after it the next event comes (ledger.ts). The script below drives the
+// loop (in view only; not with reduced motion). Without it the picture is
+// the still: the last five events, with the pill of the newest.
+
+// The dots of the working mark of the pill, as in ../Images/Lab.astro:
+// 5 × 5, each blinks from its own delay
+const DOTS = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) * 64)}ms`);
+
+// The HTML of a verdict: "Refused:" in red, or a green check. The script uses the same function for the rows that come in.
+const html = (parts: Part[], refused?: boolean) =>
+  (refused
+    ? `<span class="${styles.no}">Refused:</span> `
+    : `<svg class="${styles.check}" viewBox="0 -3.4 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>`) +
+  parts.map((part) => (typeof part === 'string' ? part : `<b>${part.strong}</b>`)).join('');
+---
+
+<figure class:list={[diagram.root, styles.ledger]} role="img" aria-label={DESCRIPTION} data-ledger>
+  <p class:list={[diagram.pill, diagram.swap, styles.pill]} data-pill>
+    <span class={diagram.symbol} set:html={symbol} />
+    <span class={diagram.working} aria-hidden="true">
+      {DOTS.map((style) => <span style={style} />)}
+    </span>
+    <span data-event set:html={pillHtml(STILL.label)} />
+  </p>
+
+  <div class:list={[diagram.panel, styles.panel]} data-panel>
+    <p class:list={[diagram.panelLabel, styles.title]}>
+      <span>Schema changes</span>
+    </p>
+
+    <ul class={styles.rows} data-rows>
+      {
+        STILL_ROWS.map((event) => (
+          <li class:list={[styles.row, diagram.change]}>
+            <span class={styles.what} set:html={pillHtml(event.label)} />
+            <span class={styles.verdict} set:html={html(event.verdict, event.refused)} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  {
+    /*
+    The track from the pill to the top of the log. In the markup, the
+    track of the still: a vertical line, as the pill is at the middle. The
+    script replaces it with a track and a pulse in px, and sets
+    `data-live`: the svg then covers the root.
+  */
+  }
+  <svg
+    class={styles.links}
+    viewBox="0 0 100 100"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+    data-links
+  >
+    <path class={diagram.track} d="M 50 0 L 50 100"></path>
+  </svg>
+</figure>
+
+<script>
+  import {
+    arrive,
+    DIAGRAM_MS as MS,
+    reflow,
+    replay,
+    sleep,
+    startDiagramLoop,
+  } from '~/lib/motion/diagramLoop';
+  import type { Live } from '~/lib/motion/diagramLoop';
+  import diagram from '../diagram/style.module.css';
+  import { pillHtml } from './integrity';
+  import { EVENTS, KEEP, STILL_ROWS, type LedgerEvent } from './ledger';
+  import styles from './ledger.module.css';
+
+  const SVG = 'http://www.w3.org/2000/svg';
+  const GAP = 200;
+  const WORK = 1200;
+  const READ = 1400;
+  const PAUSE = 1000;
+  // The move of the rows down, when a row comes in at the top: the transition of `.row` in ledger.module.css
+  const SHIFT = 450;
+
+  class Ledger {
+    root: HTMLElement;
+    pill: HTMLElement;
+    panel: HTMLElement;
+    rows: HTMLElement;
+    svg: SVGSVGElement;
+    track: SVGPathElement;
+    pulse: SVGPathElement;
+    index = 0;
+
+    constructor(root: HTMLElement) {
+      this.root = root;
+      this.pill = root.querySelector<HTMLElement>('[data-pill]')!;
+      this.panel = root.querySelector<HTMLElement>('[data-panel]')!;
+      this.rows = root.querySelector<HTMLElement>('[data-rows]')!;
+      this.svg = root.querySelector<SVGSVGElement>('[data-links]')!;
+      this.track = document.createElementNS(SVG, 'path');
+      this.pulse = document.createElementNS(SVG, 'path');
+      this.track.setAttribute('class', `${diagram.track} ${diagram.draw}`);
+      this.pulse.setAttribute('class', diagram.pulse!);
+      for (const path of [this.track, this.pulse]) path.setAttribute('pathLength', '100');
+    }
+
+    verdict(event: LedgerEvent): string {
+      return (
+        (event.refused
+          ? `<span class="${styles.no}">Refused:</span> `
+          : `<svg class="${styles.check}" viewBox="0 -3.4 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>`) +
+        event.verdict
+          .map((part) => (typeof part === 'string' ? part : `<b>${part.strong}</b>`))
+          .join('')
+      );
+    }
+
+    row(event: LedgerEvent, pending = false): HTMLElement {
+      const li = document.createElement('li');
+      li.className = `${styles.row} ${diagram.change}`;
+      const what = document.createElement('span');
+      what.className = styles.what!;
+      what.innerHTML = pillHtml(event.label);
+      const verdict = document.createElement('span');
+      verdict.className = styles.verdict!;
+      verdict.innerHTML = this.verdict(event);
+      if (pending) verdict.dataset.pending = '';
+      li.append(what, verdict);
+      return li;
+    }
+
+    /** The start of a session: the log of the still, no pill and no track, and the first event next */
+    async start(): Promise<void> {
+      this.root.dataset.instant = '';
+      this.rows.replaceChildren(...STILL_ROWS.map((event) => this.row(event)));
+      delete this.pill.dataset.working;
+      this.pill.dataset.swapOut = '';
+      this.svg.dataset.faded = '';
+      reflow(this.root);
+      delete this.root.dataset.instant;
+      this.index = 0;
+      await sleep(PAUSE);
+    }
+
+    showPill(event: LedgerEvent): void {
+      this.pill.querySelector<HTMLElement>('[data-event]')!.innerHTML = pillHtml(event.label);
+      delete this.pill.dataset.swapOut;
+      this.pill.dataset.swapIn = '';
+      reflow(this.pill);
+      delete this.pill.dataset.swapIn;
+    }
+
+    async event(live: Live): Promise<void> {
+      const event = EVENTS[this.index % EVENTS.length]!;
+
+      // The pill comes in with the new event. The track starts GAP after the pill is almost in place.
+      this.showPill(event);
+      await sleep(MS.swap / 2 + GAP);
+      if (!live()) return;
+
+      // The track draws to the top of the log, then the pulse goes along it
+      this.drawTrack();
+      await sleep(MS.draw);
+      if (!live()) return;
+      replay(this.pulse, 'pulse');
+      await sleep(MS.travel);
+      if (!live()) return;
+
+      // The change comes in at the top of the log, and the rows move down. DatoCMS works on it: the working mark replaces the symbol of the pill.
+      this.pill.dataset.working = '';
+      const li = this.row(event, true);
+      this.prepend(li);
+      await sleep(Math.max(SHIFT, WORK));
+      if (!live()) return;
+
+      // The verdict, with the ring. A refusal starts with "Refused:", in red; an applied change with a green check.
+      delete this.pill.dataset.working;
+      delete li.querySelector<HTMLElement>('[data-pending]')!.dataset.pending;
+      li.dataset.changed = '';
+      replay(li, 'ping');
+      await sleep(READ);
+      if (!live()) return;
+
+      // The pill goes out to the right, with the track and the ring; then the gap before the next event
+      this.pill.dataset.swapOut = '';
+      this.svg.dataset.faded = '';
+      delete li.dataset.changed;
+      while (this.rows.children.length > KEEP) this.rows.lastElementChild!.remove();
+      this.index++;
+      await sleep(MS.fade + PAUSE);
+    }
+
+    /**
+     * Puts `li` at the top of the log, and moves the other rows from
+     * their old place to the new one (FLIP: the inverse translate first,
+     * with no transition, then the transition back to zero).
+     */
+    prepend(li: HTMLElement): void {
+      const rows = Array.from(this.rows.children) as HTMLElement[];
+      const before = new Map(rows.map((row) => [row, row.getBoundingClientRect().top]));
+      this.rows.prepend(li);
+      for (const row of rows) {
+        const dy = before.get(row)! - row.getBoundingClientRect().top;
+        row.dataset.flip = '';
+        row.style.translate = `0 ${dy}px`;
+      }
+      reflow(this.rows);
+      for (const row of rows) {
+        delete row.dataset.flip;
+        row.style.translate = '';
+      }
+      arrive(li);
+    }
+
+    /**
+     * Replaces the track of the still with a track and a pulse in px of
+     * the root: from the bottom middle of the pill (2px under it) to the
+     * top middle of the log (2px under its edge). The track starts hidden,
+     * then it draws.
+     */
+    drawTrack(): void {
+      const box = this.root.getBoundingClientRect();
+      const panel = this.panel.getBoundingClientRect();
+      const x0 = this.pill.offsetLeft + this.pill.offsetWidth / 2;
+      const y0 = this.pill.offsetTop + this.pill.offsetHeight - 2;
+      const x1 = panel.left - box.left + panel.width / 2;
+      const y1 = panel.top - box.top + 2;
+      const my = (y0 + y1) / 2;
+      const d = `M ${x0} ${y0} C ${x0} ${my}, ${x1} ${my}, ${x1} ${y1}`;
+
+      this.svg.dataset.live = '';
+      this.svg.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
+      this.svg.replaceChildren(this.track, this.pulse);
+      for (const path of [this.track, this.pulse]) path.setAttribute('d', d);
+      this.track.dataset.hidden = '';
+      delete this.pulse.dataset.pulse;
+      reflow(this.svg);
+      delete this.svg.dataset.faded;
+      delete this.track.dataset.hidden;
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-ledger]')) {
+    const ledger = new Ledger(root);
+    // The loop plays in view only. Out of view it stops where it is: the next session starts from the still.
+    startDiagramLoop(root, (live) => ledger.event(live), { start: () => ledger.start() });
+  }
+</script>

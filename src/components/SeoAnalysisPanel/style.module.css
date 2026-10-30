@@ -1,0 +1,63 @@
+/*
+ * Draft-mode chrome for the editors (not in the prototype). It sits above
+ * the page in the bottom-right corner.
+ */
+.root {
+  position: fixed;
+  right: var(--space-xs);
+  bottom: var(--space-xs);
+  z-index: 10000;
+  font: 500 12px/1.3 var(--font-sans);
+}
+
+.toggle {
+  padding: 6px var(--space-2xs);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-full);
+  background: var(--surface-default);
+  color: var(--text-primary);
+  cursor: pointer;
+  list-style: none;
+}
+
+.toggle::-webkit-details-marker {
+  display: none;
+}
+
+.root[open] .toggle {
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--space-3xs));
+  width: max-content;
+  max-width: min(320px, calc(100vw - 2 * var(--space-xs)));
+  padding: var(--space-2xs);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+  color: var(--text-primary);
+}
+
+.heading {
+  margin: 0 0 var(--space-3xs);
+  color: var(--text-muted);
+}
+
+.keywords,
+.checks {
+  margin: 0 0 var(--space-2xs);
+  padding: 0;
+  list-style: none;
+}
+
+.checks {
+  margin-bottom: 0;
+}
+
+.checks :global(li[data-found='false']) {
+  color: var(--text-muted);
+}

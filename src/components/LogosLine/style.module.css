@@ -1,0 +1,102 @@
+/* @layer blocks */
+.logosLine {
+  --logo-height: 28px;
+  /* Scale of an inline SVG logo, drawn 40px tall. */
+  --logo-zoom: 0.7;
+  --logo-gap: var(--space-xl);
+
+  overflow: hidden;
+  width: 100%;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+}
+
+/*
+ * The current PNGs have a white background. The transform of the
+ * marquee isolates the track, thus the blend is on the track and not
+ * on each image. SVG logos use the text colour and do not need the
+ * blend: on a dark surface, the blend makes them invisible.
+ */
+.track:has(img) {
+  mix-blend-mode: multiply;
+}
+
+.item {
+  flex-shrink: 0;
+  padding-right: var(--logo-gap);
+}
+
+/* Each logo sits in a 40px box (28px under 768) and keeps its proportions. */
+.item {
+  display: flex;
+  align-items: center;
+  height: var(--logo-height);
+}
+
+.logo {
+  display: block;
+  width: auto;
+  height: var(--logo-height);
+}
+
+/* An inline SVG keeps its drawn size, scaled with the box height. */
+/* stylelint-disable-next-line selector-no-qualifying-type -- A real distinction: only the inline SVG logo is a span. */
+span.logo {
+  height: auto;
+  zoom: var(--logo-zoom);
+}
+
+/* The dark scheme: a logo can have a fixed dark stroke. It must follow the text colour. */
+/* stylelint-disable-next-line selector-no-qualifying-type -- Same span as above. */
+:global(:root[data-scheme='dark']) span.logo :global(svg [stroke]:not([stroke='none'])) {
+  stroke: currentColor;
+}
+
+.logosLine[data-running] .track {
+  animation: marquee var(--marquee-duration) linear infinite;
+}
+
+.logosLine[data-paused='true'] .track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(calc(var(--marquee-distance) * -1));
+  }
+}
+
+@media (min-width: 768px) {
+  .logosLine {
+    --logo-height: 40px;
+    --logo-zoom: 1;
+    --logo-gap: var(--space-2xl);
+  }
+}
+
+/* Small: 28px tall at all widths. After the media query, thus it wins. */
+.small {
+  --logo-height: 28px;
+  --logo-zoom: 0.7;
+}
+
+/*
+ * Overflow: the logos that fit stay static in the centre. The last item
+ * has a gap at its right side, thus move the track by half a gap.
+ */
+.overflow .track {
+  margin-inline: auto;
+}
+
+.overflow:not([data-running]) .track {
+  transform: translateX(calc(var(--logo-gap) / 2));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logosLine[data-running] .track {
+    animation: none;
+  }
+}

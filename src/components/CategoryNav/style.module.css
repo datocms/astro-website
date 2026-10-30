@@ -1,0 +1,199 @@
+/*
+ * 80px tall, sticky at the
+ * top; 54px on phones (less space above and below the items). Active item: surface/subtle background and primary text.
+ * Other items: muted text. On narrow screens the row scrolls sideways.
+ * All items have a side padding (16px), thus the labels do not move when the
+ * active item changes.
+ *
+ * At the left the row starts at the content column. At the right it
+ * goes to the edge of the page: the row has more space.
+ *
+ * With JS, one indicator slides behind the active item. Without JS,
+ * the active item has its own background.
+ */
+.nav {
+  /* The space above and below the items. On phones the nav is thinner: it takes less of a small screen. */
+  --nav-padding-y: var(--space-md);
+
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  /* An inset shadow, not a border: the height of the nav must not change. */
+  box-shadow: inset 0 -1px transparent;
+  transition: box-shadow 300ms ease-out;
+}
+
+/* When the nav sticks to the top, a line separates it from the page below. */
+.nav[data-stuck] {
+  box-shadow: inset 0 -1px var(--border-default);
+}
+
+@media (max-width: 767px) {
+  .nav {
+    --nav-padding-y: var(--space-3xs);
+  }
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  /* The items and the link to the top have their own side padding. */
+  gap: var(--space-3xs);
+  position: relative;
+  padding-inline-start: var(--content-inset);
+}
+
+.items {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: var(--space-4xs);
+  padding-block: var(--nav-padding-y);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.items::-webkit-scrollbar {
+  display: none;
+}
+
+.indicator {
+  position: absolute;
+  inset-block: var(--nav-padding-y);
+  left: 0;
+  width: var(--indicator-width, 0);
+  translate: var(--indicator-x, 0) 0;
+  border-radius: var(--radius-full);
+  background: var(--surface-inverse-faint);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.items[data-indicator] .indicator {
+  opacity: 1;
+  transition:
+    translate 300ms cubic-bezier(0.3, 0, 0, 1),
+    width 300ms cubic-bezier(0.3, 0, 0, 1);
+}
+
+.item {
+  position: relative;
+  display: block;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color 300ms ease-out;
+}
+
+.item[aria-current] {
+  background: var(--surface-inverse-faint);
+  color: var(--text-primary);
+}
+
+.items[data-indicator] .item[aria-current] {
+  background: none;
+}
+
+@media (hover: hover) {
+  .item:hover {
+    color: var(--text-primary);
+  }
+}
+
+@media (min-width: 1152px) {
+  .items {
+    gap: 0;
+  }
+}
+
+/*
+ * The score at the right end: "37 / 114", in mono, the numbers in fixed
+ * widths. It is on top of the end of the row, thus the items go to the
+ * edge of the page and scroll below it. A gradient hides the items
+ * below it. The row has an end padding as wide as the score, thus the
+ * last item can scroll out from below the score.
+ */
+.content:has(.score) .items {
+  /* Without JS, a fixed width that is larger than the score. */
+  padding-inline-end: var(--score-width, var(--space-4xl));
+}
+
+.score {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  /* Not flex: flex removes the space before " / 114". */
+  align-content: center;
+  margin: 0;
+  padding-inline: var(--space-xl) var(--space-sm);
+  background: linear-gradient(to right, transparent, var(--surface-default) var(--space-lg));
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.scoreTotal {
+  color: var(--text-muted);
+}
+
+/*
+ * The link to the top, before the items: the eye reads the row from the
+ * left. With JS it shows only when the nav sticks to the top. Without JS
+ * it always shows.
+ *
+ * Below 1152 it is the first element of the row. When it is hidden, a
+ * negative margin moves it out of the row, thus the items start at the
+ * left edge. When the nav sticks, the items move right and the link
+ * comes in.
+ */
+.top {
+  /* The icon (20px), the padding on the two sides and the gap after the link. */
+  --top-width: calc(20px + 2 * var(--space-xs) + var(--space-3xs));
+
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  padding: var(--space-xs);
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  transition:
+    color 300ms ease-out,
+    opacity 300ms ease-out,
+    visibility 300ms,
+    margin 300ms cubic-bezier(0.3, 0, 0, 1);
+}
+
+.nav[data-js]:not([data-stuck]) .top {
+  margin-inline-start: calc(-1 * var(--top-width));
+  visibility: hidden;
+  opacity: 0;
+}
+
+/*
+ * From 1152 the side padding has space for the link. It goes in the
+ * padding, at the left of the first item, and the row does not move.
+ */
+@media (min-width: 1152px) {
+  .top {
+    /* An absolute element shrinks to fit. Without a width, the max width of the icon (100%) makes it 0. */
+    width: calc(20px + 2 * var(--space-xs));
+    position: absolute;
+    top: 50%;
+    left: calc(var(--content-inset) - 20px - 2 * var(--space-xs) - var(--space-3xs));
+    translate: 0 -50%;
+  }
+
+  .nav[data-js]:not([data-stuck]) .top {
+    margin-inline-start: 0;
+  }
+}
+
+@media (hover: hover) {
+  .top:hover {
+    background: var(--surface-inverse-faint);
+    color: var(--text-primary);
+  }
+}

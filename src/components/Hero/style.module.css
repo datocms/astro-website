@@ -1,40 +1,205 @@
-.root {
-  width: 1000px;
-  margin: rfs(80px) auto;
-  max-width: 100%;
+/* The hero height does not change during the animation. */
+
+/*
+ * The headline is one text. The muted run follows the main run on
+ * the same line, in text/muted at 70% opacity. The label is text/primary
+ * at 70% opacity. The sections layer wins over the --headline-muted of
+ * the Section background.
+ */
+.hero {
+  --hero-label: color-mix(in srgb, var(--text-primary) 70%, transparent);
+  --headline-muted: color-mix(in srgb, var(--text-muted) 70%, transparent);
+}
+
+.hero.dark {
+  --hero-label: color-mix(in srgb, var(--text-on-inverse) 70%, transparent);
+  --headline-muted: color-mix(in srgb, var(--text-on-inverse-muted) 70%, transparent);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+  max-width: var(--content-max);
+}
+
+.center .text {
+  align-items: center;
+  max-width: var(--headline-max);
+  margin-inline: auto;
   text-align: center;
 }
 
-.kicker {
-  font-size: rfs(20px);
-  margin-bottom: 30px;
-  font-weight: bold;
-  color: var(--extra-light-body-color);
-  text-transform: uppercase;
+.label {
+  margin-bottom: calc(var(--space-2xs) - var(--space-md));
+  color: var(--hero-label);
 }
 
-.title {
-  margin: 0;
-  font-family: var(--font-headline);
-  font-size: rfs(80px);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  font-weight: bold;
-  text-wrap: balance;
+/* The buttons wait for the typewriter. Without JS or motion, they show. */
+:global(html[data-motion='on']) .hero:has([data-typewriter]) .buttons:not([data-visible]) {
+  opacity: 0;
 }
 
-.subtitle {
-  font-size: rfs(22px);
-  margin: 60px auto 0 auto;
-  max-width: 700px;
-  font-weight: normal;
+.buttons[data-visible] {
+  animation: fadeIn 150ms ease-out;
+}
 
-  a {
-    color: inherit;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
 }
 
-.children {
-  margin-top: 60px;
-  text-align: center;
+/*
+ * The logos line goes to the right edge of the page. In a centred
+ * hero, it also goes to the left edge. The content column is centred,
+ * thus 50% - 50vw is the distance to the edge of the page.
+ */
+.logos {
+  width: auto;
+  margin-right: calc(50% - 50vw);
+}
+
+.center .logos {
+  margin-left: calc(50% - 50vw);
+}
+
+/*
+ * The logos sit near the bottom edge of the hero. The space above
+ * the logos is the section padding, and the space below them is small.
+ */
+.hero:has(.logos) {
+  padding-bottom: var(--space-md);
+  /* 100vw includes the scrollbar. Clip at the edge of the section. */
+  overflow-x: clip;
+}
+
+.content:has(.logos) {
+  gap: var(--section-padding-y);
+}
+
+/*
+ * The portraits sit 80px below the text and near the bottom edge of the
+ * hero. Below 1320 the row is a marquee: one line that goes to the edges
+ * of the page and clips there. Without JS or with reduced motion, the
+ * line does not move and scrolls sideways. From 1320 the row wraps.
+ */
+.hero:has(.team) {
+  padding-bottom: var(--space-md);
+  /* 100vw includes the scrollbar. Clip at the edge of the section. */
+  overflow-x: clip;
+}
+
+.content:has(.team) {
+  gap: var(--space-3xl);
+}
+
+.team {
+  --member-size: 56px;
+  --member-gap: var(--space-sm);
+
+  display: flex;
+  margin: 0 calc(50% - 50vw);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.team[data-running] {
+  overflow-x: hidden;
+}
+
+.teamTrack {
+  display: flex;
+  width: max-content;
+  margin-inline: auto;
+  list-style: none;
+}
+
+/* The gap is padding, thus each set has the same width and the loop has no jump. */
+.member {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2xs);
+  padding-right: var(--member-gap);
+  color: var(--text-primary);
+}
+
+.team:not([data-running]) .member:last-child {
+  padding-right: 0;
+}
+
+/*
+ * A CMS portrait is a <picture>. The image sets its own width in a style
+ * attribute (100%), thus the picture gives the size.
+ */
+.portraitPicture {
+  display: block;
+  flex-shrink: 0;
+  width: var(--member-size);
+  height: var(--member-size);
+}
+
+/* The portraits take the hue of the hero (luminosity blend). */
+.portrait {
+  display: block;
+  width: var(--member-size);
+  height: var(--member-size);
+  border-radius: 50%;
+  mix-blend-mode: luminosity;
+}
+
+.team[data-running] .teamTrack {
+  animation: teamMarquee var(--marquee-duration) linear infinite;
+}
+
+.team[data-paused='true'] .teamTrack {
+  animation-play-state: paused;
+}
+
+@keyframes teamMarquee {
+  to {
+    transform: translateX(calc(var(--marquee-distance) * -1));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team[data-running] .teamTrack {
+    animation: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .team {
+    --member-size: 81px;
+  }
+}
+
+/*
+ * The row is as wide as the page, with centred lines
+ * and 20px between the portraits. At 1320 the team is on one line.
+ */
+@media (min-width: 1320px) {
+  .team {
+    overflow: visible;
+  }
+
+  .teamTrack {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-md);
+    width: auto;
+  }
+
+  .member {
+    padding-right: 0;
+  }
 }

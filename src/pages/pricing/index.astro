@@ -1,447 +1,90 @@
 ---
+// The pricing page of the redesign. The copy of the sections comes from
+// src/data/pricing.ts. The limits come from the pricing plans of the
+// dashboard API. The features, their descriptions and the FAQ come from
+// the CMS.
+import { stripStega } from '@datocms/astro';
+import { render as renderAsPlainText } from 'datocms-structured-text-to-plain-text';
 import { sortBy } from 'lodash-es';
-import { Button } from '~/components/Button';
-import { Hero } from '~/components/Hero';
-import { InterstitialTitle } from '~/components/InterstitialTitle';
-import { LogosBar } from '~/components/LogosBar';
-import { Space } from '~/components/Space';
-import { Svg } from '~/components/Svg';
-import { Wrapper } from '~/components/Wrapper';
-import { Layout } from '~/layouts/Layout';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
-import s from './_style.module.css';
-import Bullet from './_sub/Bullet.astro';
-import FeatureGroup from './_sub/FeatureGroup.astro';
-import FreeLimitsTable from './_sub/FreeLimitsTable.astro';
-import LimitsGroup from './_sub/LimitsGroup.astro';
-import { fetchPerOwnerPricingPlans } from './_sub/perOwnerPricingPlans';
-import { SingleQuote } from '~/components/quote/SingleQuote';
-import { formatNumber } from '~/lib/formatters';
+import type { FAQPage, WithContext } from 'schema-dts';
+import { CtaBanner } from '~/components/CtaBanner';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
-import { Switch } from '~/components/Switch';
-import { Faqs, Faq } from '~/components/Faqs';
+import { Faq, FaqQuestionFragment } from '~/components/Faq';
+import { Hero } from '~/components/Hero';
 import { JsonLd } from '~/components/JsonLd';
-import { faqsToJsonLd } from '~/components/Faqs/jsonLd';
+import { PageCloser } from '~/components/PageCloser';
+import { PlanComparison } from '~/components/PlanComparison';
+import { PricingPlans } from '~/components/PricingPlans';
+import * as pricing from '~/data/pricing';
+import { victoryVideo } from '~/data/videos';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { readFragment } from '~/lib/datocms/graphql';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { fetchPerOwnerPricingPlans } from '~/lib/pricing/perOwnerPricingPlans';
+import { query } from './_graphql';
+import FreeLimitsDialog from './_sub/FreeLimitsDialog.astro';
+import { freeLimitRows, limitCategories } from './_sub/limits';
 
-const { page, faqs, review1, planFeatureGroups, hints } = await executeQuery(Astro, query);
+const { page, faqs, planFeatureGroups, hints } = await executeQuery(Astro, query);
 
-const faqJsonLd = faqsToJsonLd(faqs);
-
-const plans = sortBy(await fetchPerOwnerPricingPlans(Astro), 'attributes.monthly_price');
-
-const [freePlan, proPlan] = plans;
+// The cheapest plan is the Free plan, the next one is the Professional plan.
+const [freePlan, proPlan] = sortBy(
+  await fetchPerOwnerPricingPlans(Astro),
+  'attributes.monthly_price',
+);
 
 if (!page || !freePlan || !proPlan) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+// The questions that have an answer. The FAQPage JSON-LD needs strings:
+// the question and the answer as plain text, without the stega of Content
+// Link.
+const questions = faqs.flatMap((faq) => {
+  const { question, answer } = readFragment(FaqQuestionFragment, faq);
+  const text = answer && renderAsPlainText(answer as Parameters<typeof renderAsPlainText>[0]);
+  return question && text
+    ? [{ faq, question: stripStega(question).trim(), answer: stripStega(text) }]
+    : [];
+});
+
+const jsonLd: WithContext<FAQPage> | null =
+  questions.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: questions.map(({ question, answer }) => ({
+          '@type': 'Question',
+          name: question,
+          acceptedAnswer: { '@type': 'Answer', text: answer },
+        })),
+      }
+    : null;
 ---
 
-<Layout seo={page.seo}>
-  {
-    faqJsonLd && (
-      <Fragment slot="head">
-        <JsonLd data={faqJsonLd} />
-      </Fragment>
-    )
-  }
-  <div id="main-content">
-    <Hero mainTitleOfPage seoAnalysis={{ keyword: 'pricing' }}>
-      <Fragment slot="kicker">DatoCMS Pricing</Fragment>
-      <Fragment slot="title">
-        Flexible pricing, <mark>ready to scale</mark>
-      </Fragment>
-      <Fragment slot="subtitle">
-        Effortless maintenance, seamless operations: unlock substantial savings every year by
-        leveraging DatoCMS headless technology and content infrastructure
-      </Fragment>
-    </Hero>
+<Layout seo={page.seo} headerVariant="dark" footerTheme="orange">
+  {jsonLd && <JsonLd slot="head" data={jsonLd} />}
 
-    <Space top={1}>
-      <Wrapper>
-        <div class={s.freePlan}>
-          <div class={s.freePlanContent}>
-            <h4 class={s.freePlanTitle}>
-              Just getting started? Try DatoCMS out for free, forever (yes really)
-            </h4>
-            <div class={s.freePlanDescription}>
-              Free plan comes with 2 editors and 300 records, with 10GB of traffic and 100k API
-              calls each month. No overages allowed.{' '}
-              <a href="#free-plan-details">
-                See all limits in detail <Svg name="icons/regular/circle-info" />
-              </a>
-            </div>
-          </div>
-          <div class={s.freePlanCta} data-datocms-nomd>
-            <Button block s="invert" as="a" href={dashboardUrl('/signup')}>
-              Sign up for free
-            </Button>
-            <div class={s.freePlanCtaReassurance}>Easy setup, no credit card required</div>
-          </div>
-        </div>
-      </Wrapper>
+  <Hero {...pricing.hero} variant="dark" alignment="center" typewriter />
+  <PricingPlans {...pricing.plans} />
+  <CtaBanner {...pricing.freeBanner} />
+  <CtaBanner {...pricing.partnerBanner} />
+  <PlanComparison
+    {...pricing.comparison}
+    categories={limitCategories(proPlan, hints)}
+    featureGroups={planFeatureGroups}
+  >
+    {pricing.freeReminder.lead}
+    <strong>{pricing.freeReminder.strong}</strong>{pricing.freeReminder.text}{' '}
+    <a href={pricing.freeReminder.link.href}>{pricing.freeReminder.link.label}</a>
+  </PlanComparison>
+  <CtaBanner {...pricing.aiBanner} />
+  <Hero {...pricing.trustedBy} variant="light" alignment="center" headingLevel="h2" />
+  {questions.length > 0 && <Faq {...pricing.faq} questions={questions.map(({ faq }) => faq)} />}
+  <PageCloser theme="orange" cta={pricing.ctaStart} video={victoryVideo} />
 
-      <dialog class={s.modal} id="free-plan-details">
-        <button class={s.modalClose} autofocus aria-label="Close dialog">
-          <Svg name="icons/regular/circle-xmark" />
-        </button>
-        <h6 class={s.modalTitle}>Free vs Professional</h6>
-        <div class={s.modalWarning}>
-          ⚠️{' '}
-          <strong>In the Free plan, you can&apos;t go over the allowed monthly limits.</strong>
-          <br />
-          If you reach these limits, the service will stop responding as expected.
-        </div>
-        <div class={s.fTableScroll}>
-          <FreeLimitsTable hints={hints} freePlan={freePlan} proPlan={proPlan} />
-        </div>
-      </dialog>
-
-      <Wrapper>
-        <a href="/partner-program" class={s.agenciesCta}>
-          <Svg name="svg/illustrations/marketers" />
-          <span>
-            <strong>Working on many client projects?</strong>
-            <mark>Our Agency Partner Program starts at €39/month</mark> &raquo;
-          </span>
-        </a>
-      </Wrapper>
-
-      <div class={s.plansStrip}>
-        <Wrapper>
-          <div class={s.plansContainer}>
-            <div class={s.plan}>
-              <div class={s.planInner}>
-                <h4 class={s.planName}>Professional</h4>
-                <div class={s.planDescription}>
-                  Everything you need — and more – to build professional digital projects
-                </div>
-
-                <div class={s.planPriceContainer}>
-                  <span class={s.planPricePerMonth}>Start at </span>
-                  <span class={s.planPrice}>€{formatNumber(149)}</span>
-                  <span class={s.planPricePerMonth}>/month (billed annually)</span>
-
-                  <span class={s.planYearlyPrice}>
-                    or <strong>€{formatNumber(199)}/month</strong>
-                  </span>
-                </div>
-
-                <div class={s.planAction} data-datocms-nomd>
-                  <Button
-                    block
-                    s="invert"
-                    as="a"
-                    href={dashboardUrl(
-                      '/personal-account/plan-billing/change?plan_id=899&utm_source=datocms&utm_medium=website&utm_campaign=pricing',
-                    )}
-                  >
-                    Purchase now
-                  </Button>
-                </div>
-
-                <ul class={s.planBullets}>
-                  <Bullet>
-                    Generous quota included, with soft limits you can exceed and pay-as-you-go
-                  </Bullet>
-                  <Bullet>
-                    10 collaborators included on each project (you can purchase more if needed)
-                  </Bullet>
-                  <Bullet>Additional projects can be added for as low as €39/month</Bullet>
-                  <Bullet>Expanded authoring roles to support most publishing workflows</Bullet>
-                </ul>
-              </div>
-            </div>
-
-            <div class={s.plan}>
-              <div class={s.planInner}>
-                <h4 class={s.planName}>Enterprise</h4>
-                <div class={s.planDescription}>
-                  Premium features, high-touch support and advanced compliance for scaled
-                  experiences
-                </div>
-
-                <div class={s.planPriceContainer}>
-                  <span class={s.planPrice}>Custom</span>
-
-                  <span class={s.planYearlyPrice}> payable by credit card or wire transfer </span>
-                </div>
-
-                <div class={s.planAction} data-datocms-nomd>
-                  <Button block s="invert" as="a" href="/contact"> Contact us </Button>
-                </div>
-
-                <ul class={s.planBullets}>
-                  <Bullet>Guaranteed support and uptime SLAs</Bullet>
-                  <Bullet>SSO, Audit logs and Static webhook IPs for enhanced security</Bullet>
-                  <Bullet>
-                    Fully customizable roles and tasks for granular workflows, tailored to your
-                    specific needs
-                  </Bullet>
-                  <Bullet>
-                    Support via shared Slack channel, editorial onboarding, plus access to our
-                    solution architects
-                  </Bullet>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </Wrapper>
-      </div>
-
-      <pricing-context-provider>
-        <a id="details"></a>
-
-        <Space top={2}>
-          <InterstitialTitle style="three">
-            Compare plans
-            <Fragment slot="subtitle">
-              Explore our features and choose the best plan for you
-            </Fragment>
-          </InterstitialTitle>
-        </Space>
-
-        <Wrapper>
-          <div class={s.fTableScroll}>
-            <a class={s.fTableAnchor} id="detailsTable"></a>
-            <table class={s.fTable} data-details-table>
-              <thead>
-                <tr>
-                  <th class={s.fTableHead}>
-                    <div class={s.fTableHeadTitle}>Features by plan</div>
-
-                    <div class={s.searchFeatures} data-datocms-nomd>
-                      <Svg name="icons/regular/magnifying-glass" />
-                      <input type="text" name="searchTerm" placeholder="Search something..." />
-
-                      <button type="button" id="clearSearchTerm">
-                        <Svg name="icons/regular/xmark" />
-                      </button>
-                    </div>
-
-                    <span data-datocms-nomd>
-                      <Switch name="onlyShowDifferences">Only show differences</Switch>
-                    </span>
-                  </th>
-                  <th class={s.fTablePlan}>
-                    <div class={s.fTablePlanName}>Professional</div>
-                    <div class={s.fTablePlanPrice}>
-                      From €{formatNumber(149)}/month
-                    </div>
-                    <span data-datocms-nomd>
-                      <Button
-                        block
-                        s="invert"
-                        as="a"
-                        p="tiny"
-                        href={dashboardUrl(
-                          '/personal-account/plan-billing/change?plan_id=899&utm_source=datocms&utm_medium=website&utm_campaign=pricing',
-                        )}
-                      >
-                        Purchase now
-                      </Button>
-                    </span>
-                  </th>
-                  <th class={s.fTablePlan}>
-                    <div class={s.fTablePlanName}>Enterprise</div>
-                    <div class={s.fTablePlanPrice}>Tailored on your needs</div>
-                    <span data-datocms-nomd>
-                      <Button block p="tiny" s="invert" as="a" href="/contact"> Contact us </Button>
-                    </span>
-                  </th>
-                </tr>
-              </thead>
-              <LimitsGroup freePlan={freePlan} proPlan={proPlan} hints={hints} />
-
-              {planFeatureGroups.map((group) => <FeatureGroup startOpen={false} group={group} />)}
-            </table>
-          </div>
-
-          <div class={s.freePlanReminder} data-datocms-nomd>
-            We also offer a <strong>100% free plan</strong>. No overages allowed.{' '}
-            <a href="#free-plan-details">See all limits in detail</a>
-          </div>
-        </Wrapper>
-      </pricing-context-provider>
-
-      <Space top={3}>
-        <InterstitialTitle>Frequently Asked Questions</InterstitialTitle>
-        <Wrapper>
-          <Faqs>
-            {faqs.map((faq) => <Faq block={faq} />)}
-          </Faqs>
-        </Wrapper>
-      </Space>
-
-      <div data-datocms-nomd>
-        <Space top={2}>
-          <LogosBar
-            title="We power experiences for over half a billion users"
-            clients={[
-              'svg/logos/deutsche-telekom',
-              'svg/logos/hashicorp',
-              'svg/logos/verizon',
-              'svg/logos/polestar',
-              'svg/logos/vercel',
-            ]}
-          />
-        </Space>
-      </div>
-
-      {
-        review1 && (
-          <div data-datocms-nomd>
-            <SingleQuote quote={review1} />
-          </div>
-        )
-      }
-    </Space>
-
-    <DraftModeQueryListener query={query} />
-  </div>
-
-  <script>
-    import { WebComponent } from '~/lib/WebComponent';
-
-    window.customElements.define(
-      'pricing-context-provider',
-      class PricingContextProvider extends WebComponent {
-        _searchTerm: string = '';
-        _onlyShowDifferences: boolean = false;
-
-        parsedCallback() {
-          const searchTermEl = this.$<HTMLInputElement>('input[name="searchTerm"]');
-          this.on(searchTermEl, 'input', () => {
-            this.searchTerm = searchTermEl.value;
-            this.onlyShowDifferences = false;
-          });
-
-          const clearSearchTermEl = this.$<HTMLButtonElement>('#clearSearchTerm');
-          this.on(clearSearchTermEl, 'click', () => {
-            searchTermEl.value = '';
-            this.searchTerm = '';
-          });
-
-          const onlyShowDifferencesEl = this.$<HTMLInputElement>(
-            'input[name="onlyShowDifferences"]',
-          );
-          this.on(onlyShowDifferencesEl, 'change', () => {
-            this.onlyShowDifferences = onlyShowDifferencesEl.checked;
-            this.$('#detailsTable').scrollIntoView({ behavior: 'smooth' });
-
-            if (onlyShowDifferencesEl.checked) {
-              searchTermEl.value = '';
-              this.searchTerm = '';
-            }
-          });
-
-          this.on(
-            this.getRootNode()! as HTMLElement,
-            'click',
-            'tr[data-header-for-group]',
-            (event, groupEl) => {
-              event.stopPropagation();
-
-              const isFiltering = this.onlyShowDifferences || Boolean(this.searchTerm);
-              if (isFiltering) {
-                return;
-              }
-
-              groupEl.toggleAttribute('data-open');
-              this.copyGroupVisibilityOnSubElements(groupEl);
-            },
-          );
-
-          this.searchTerm = searchTermEl.value;
-          this.onlyShowDifferences = onlyShowDifferencesEl.checked;
-        }
-
-        get searchTerm() {
-          return this._searchTerm;
-        }
-
-        set searchTerm(newSearchTerm: string) {
-          this._searchTerm = newSearchTerm;
-          this.filterSubElements();
-        }
-
-        get onlyShowDifferences() {
-          return this._onlyShowDifferences;
-        }
-
-        set onlyShowDifferences(newOnlyShowDifferences: boolean) {
-          this._onlyShowDifferences = newOnlyShowDifferences;
-          this.filterSubElements();
-        }
-
-        copyGroupVisibilityOnSubElements(groupEl: HTMLElement) {
-          const groupId = groupEl.getAttribute('data-header-for-group')!;
-
-          for (const subElement of this.$$(`[data-part-of-group="${groupId}"]`)) {
-            subElement.toggleAttribute('data-open', groupEl.hasAttribute('data-open'));
-          }
-        }
-
-        filterSubElements() {
-          const isFiltering = this.onlyShowDifferences || Boolean(this.searchTerm);
-
-          this.$('[data-details-table]').toggleAttribute('data-is-filtering', isFiltering);
-
-          for (const groupEl of this.$$('tr[data-header-for-group]')) {
-            const groupId = groupEl.getAttribute('data-header-for-group')!;
-            const groupIsOpen = groupEl.hasAttribute('data-open');
-
-            let someOpen = false;
-
-            for (const subElement of this.$$(`[data-part-of-group="${groupId}"]`)) {
-              const closedIfOnlyShowDifferences = subElement.hasAttribute(
-                'data-closed-if-only-show-differences',
-              );
-              const innerText = subElement.querySelector('th')!.textContent || '';
-
-              const toOpen = isFiltering
-                ? (!this.onlyShowDifferences || !closedIfOnlyShowDifferences) &&
-                  (!this.searchTerm ||
-                    innerText.toLowerCase().includes(this.searchTerm.toLowerCase()))
-                : groupIsOpen;
-
-              subElement.toggleAttribute('data-open', toOpen);
-
-              someOpen ||= toOpen;
-            }
-
-            groupEl.toggleAttribute('data-hidden', isFiltering && !someOpen);
-          }
-        }
-      },
-    );
-
-    // Handle free plan modal dialog
-    const dialog = document.getElementById('free-plan-details') as HTMLDialogElement;
-    const closeButton = dialog?.querySelector('button[aria-label="Close dialog"]');
-
-    // Open dialog when clicking links to #free-plan-details
-    document.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement;
-      const link = target.closest('a[href="#free-plan-details"]');
-
-      if (link && dialog) {
-        event.preventDefault();
-        dialog.showModal();
-      }
-    });
-
-    // Close dialog when clicking the close button
-    closeButton?.addEventListener('click', () => {
-      dialog?.close();
-    });
-
-    // Open dialog automatically if hash is #free-plan-details on page load
-    if (window.location.hash === '#free-plan-details' && dialog) {
-      dialog.showModal();
-    }
-  </script>
+  <FreeLimitsDialog {...pricing.freeLimits} rows={freeLimitRows(freePlan, proPlan, hints)} />
+  <DraftModeQueryListener query={query} />
 </Layout>

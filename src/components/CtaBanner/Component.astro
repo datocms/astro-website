@@ -1,0 +1,45 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { Headline } from '~/components/Headline';
+import { Section } from '~/components/Section';
+import type { CtaBannerData } from '~/data/home';
+import styles from './style.module.css';
+
+type Props = CtaBannerData & {
+  /** More classes for the section (PageCloser uses this). */
+  class?: string;
+};
+
+const { variant, headline, muted, subline, buttons, theme, class: className } = Astro.props;
+// A "\n" in the headline starts a new line.
+const lines = headline.split('\n');
+---
+
+<Section
+  theme={theme}
+  width="headline"
+  background={(
+    { dark: 'inverse', light: 'accent', subtle: 'accent-subtle', plain: 'default' } as const
+  )[variant]}
+  class:list={[styles.ctaBanner, variant === 'dark' && styles.dark, className]}
+  contentClass={[styles.content, subline && styles.withSubline].filter(Boolean).join(' ')}
+>
+  <div class={styles.text}>
+    <Headline as="h2" size="h1" muted={muted}
+      >{
+        lines.map((line, i) =>
+          i > 0 ? (
+            <>
+              <br />
+              {line}
+            </>
+          ) : (
+            line
+          ),
+        )
+      }</Headline
+    >
+    {subline && <p class:list={[styles.subline, 'body']}>{subline}</p>}
+  </div>
+  {buttons && buttons.length > 0 && <ButtonGroup buttons={buttons} class={styles.buttons} />}
+</Section>

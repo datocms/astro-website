@@ -1,0 +1,48 @@
+---
+import { CardCarousel } from '~/components/CardCarousel';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { ImageCarouselFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof ImageCarouselFragment>;
+}
+
+const { carouselHeight, gallery } = readFragment(ImageCarouselFragment, Astro.props.block);
+---
+
+{
+  /*
+  A row of images that scrolls on the horizontal axis. All the images have
+  the height that the editor sets. On a narrow screen, the height is less.
+*/
+}
+<prose-island>
+  <figure>
+    <CardCarousel label="Images" class={styles.row}>
+      {
+        gallery.map(
+          (asset) =>
+            asset.responsiveImage && (
+              <div role="listitem">
+                <ResponsiveImage
+                  data={asset.responsiveImage}
+                  imgStyle={{
+                    width: 'auto',
+                    maxWidth: 'none',
+                    height: `min(${carouselHeight}px, 60vw)`,
+                  }}
+                  sizes={
+                    asset.width && asset.height
+                      ? `${Math.round((carouselHeight * asset.width) / asset.height)}px`
+                      : undefined
+                  }
+                />
+              </div>
+            ),
+        )
+      }
+    </CardCarousel>
+  </figure>
+</prose-island>

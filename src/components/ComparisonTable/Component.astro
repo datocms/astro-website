@@ -1,0 +1,144 @@
+---
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { Section } from '~/components/Section';
+import { StructuredText } from '~/components/StructuredText';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { buildUrlForProductComparison } from '~/lib/datocms/gqlUrlBuilder/productComparison';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import type { Theme } from '~/lib/theme';
+import { ComparisonTableAlternativeFragment, ComparisonTableComparisonFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  /** The comparison of this page. */
+  comparison: FragmentOf<typeof ComparisonTableComparisonFragment>;
+  /** All the comparisons. The list of the header does not show the comparison of this page. */
+  alternatives: FragmentOf<typeof ComparisonTableAlternativeFragment>[];
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+}
+
+const { theme } = Astro.props;
+const comparison = readFragment(ComparisonTableComparisonFragment, Astro.props.comparison);
+const alternatives = Astro.props.alternatives
+  .map((alternative) => readFragment(ComparisonTableAlternativeFragment, alternative))
+  .filter((alternative) => alternative.id !== comparison.id);
+---
+
+{
+  /*
+   * The header row is sticky. The competitor cell opens a list of
+   * the other comparisons. Click outside or Esc closes the list.
+   * Each topic has a label row, then one row for each difference.
+   * The text of each cell touches the seam, so on
+   * wide screens it stays in the centred content column.
+   */
+}
+<Section theme={theme} padding="none" flush contentClass={styles.content}>
+  <table class={styles.table} data-comparison-table>
+    <thead>
+      <tr>
+        <th scope="col" class:list={[styles.head, styles.headDato, 'h2']}>
+          <div class={styles.inner}>DatoCMS</div>
+        </th>
+        <th scope="col" class:list={[styles.head, styles.headOther]}>
+          <div class={styles.inner}>
+            <button
+              type="button"
+              class:list={[styles.trigger, 'h2']}
+              aria-expanded="false"
+              aria-controls="comparison-alternatives"
+              data-comparison-trigger
+            >
+              {comparison.product}
+              <svg
+                class={styles.chevron}
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                aria-hidden="true"
+              >
+                <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+              </svg>
+            </button>
+          </div>
+          <ul id="comparison-alternatives" class={styles.options} hidden data-comparison-options>
+            {
+              alternatives.map((alternative) => (
+                <li>
+                  <a
+                    class:list={[styles.option, 'h2']}
+                    href={buildUrlForProductComparison(alternative)}
+                  >
+                    {alternative.product}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </th>
+      </tr>
+    </thead>
+    {
+      comparison.topics.map((topic) => (
+        <tbody>
+          <tr>
+            <th scope="colgroup" colspan="2" class:list={[styles.label, 'h2']}>
+              {topic.topic}
+            </th>
+          </tr>
+          {topic.differences.map((difference) => (
+            <tr>
+              <td class:list={[styles.cell, styles.cellDato, 'body']}>
+                <div class:list={[styles.inner, styles.rich]}>
+                  <StructuredText
+                    {...ensureValidStructuredTextProps({
+                      data: difference.datocmsTake,
+                      linkToRecordComponents: defaultLinkToRecordComponents,
+                      inlineRecordComponents: defaultInlineRecordComponents,
+                    })}
+                  />
+                </div>
+              </td>
+              <td class:list={[styles.cell, styles.cellOther, 'body']}>
+                <div class:list={[styles.inner, styles.rich]}>
+                  <StructuredText
+                    {...ensureValidStructuredTextProps({ data: difference.competitorTake })}
+                  />
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      ))
+    }
+  </table>
+</Section>
+
+<script>
+  function setupTable(table: HTMLElement) {
+    const trigger = table.querySelector<HTMLButtonElement>('[data-comparison-trigger]');
+    const options = table.querySelector<HTMLElement>('[data-comparison-options]');
+    if (!trigger || !options) return;
+
+    const setOpen = (open: boolean, returnFocus = false) => {
+      trigger.setAttribute('aria-expanded', String(open));
+      options.hidden = !open;
+      if (!open && returnFocus) trigger.focus();
+    };
+
+    trigger.addEventListener('click', () =>
+      setOpen(trigger.getAttribute('aria-expanded') !== 'true'),
+    );
+    document.addEventListener('click', (event) => {
+      const target = event.target as Node;
+      if (!trigger.contains(target) && !options.contains(target)) setOpen(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !options.hidden) setOpen(false, true);
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-comparison-table]').forEach(setupTable);
+</script>

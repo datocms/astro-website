@@ -1,0 +1,448 @@
+---
+import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import diagram from '../diagram/style.module.css';
+import {
+  COLUMNS,
+  DESCRIPTION,
+  MODEL,
+  middle,
+  pillHtml,
+  RECORDS,
+  ROWS,
+  shows,
+  STILL,
+  STILL_STAGE,
+  WIDTHS,
+  type Chip,
+  type Column,
+} from './integrity';
+import styles from './integrity.module.css';
+
+// In the grammar of the diagrams (../diagram/style.module.css). The model
+// Articles is a small table: the records are the rows, the fields are the
+// columns, and the header is the schema. The loop starts with no pill, from
+// the first state (no slug column). For each event: the pill comes in, a
+// pulse goes along the track to the header of the column, the column gets a
+// tint, then each cell of the column changes, from the top row to the bottom
+// row. When the last cell has changed, the pill goes out and 1s after it the
+// next event comes.
+// After the three events the table goes back to its first state, and the
+// loop starts again (integrity.ts). The script below drives the loop (in
+// view only; not with reduced motion). Without it the picture is the
+// still: the state after the first event, with its pill.
+
+const life = ({ from, until }: { from?: number; until?: number }) => ({
+  'data-from': from,
+  'data-until': until,
+});
+
+const cellsOf = (row: (typeof ROWS)[number]): [Column, Chip[]][] => [
+  ['slug', row.slug],
+  ['tags', row.tags],
+];
+
+const DOTS = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) * 64)}ms`);
+
+const TRIANGLE =
+  'M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z';
+
+// The grid columns. `closed`: the slug column has no width, before
+// event 1. Each column has a minimum of 0, thus the grid can animate to
+// and from 0fr.
+const columns = (widths: Record<Column, number>, closed = false) =>
+  COLUMNS.map(({ id }) => `minmax(0, ${closed && id === 'slug' ? 0 : widths[id]}fr)`).join(' ');
+
+// The track of the still, from the middle of the pill to the top of the
+// panel over the header of the column of STILL. The svg of the still
+// stretches to the band between them (integrity.module.css), with a
+// viewBox of 100 × 100: x is the part of the width of the table. The
+// curve has vertical tangents at the two ends, thus the stretch keeps its
+// shape. It is a track only: a dash does not work in an svg that
+// stretches (diagram).
+const curve = (x: number) => `M 50 0 C 50 50, ${x} 50, ${x} 100`;
+const STILL_CURVES = {
+  wide: curve(middle(WIDTHS.wide, STILL.column)),
+  narrow: curve(middle(WIDTHS.narrow, STILL.column)),
+};
+---
+
+<figure
+  class:list={[diagram.root, styles.integrity]}
+  role="img"
+  aria-label={DESCRIPTION}
+  style={[
+    `--wide: ${columns(WIDTHS.wide)}`,
+    `--narrow: ${columns(WIDTHS.narrow)}`,
+    `--wide-closed: ${columns(WIDTHS.wide, true)}`,
+    `--narrow-closed: ${columns(WIDTHS.narrow, true)}`,
+  ].join('; ')}
+  data-stage={STILL_STAGE}
+  data-integrity
+>
+  <p class:list={[diagram.pill, diagram.swap, styles.pill]} data-pill>
+    <span class={diagram.symbol} set:html={symbol} />
+    <span class={diagram.working} aria-hidden="true">
+      {DOTS.map((style) => <span style={style} />)}
+    </span>
+    <span data-event set:html={pillHtml(STILL.label)} />
+  </p>
+
+  <div class:list={[diagram.panel, styles.panel]} data-panel>
+    <p class:list={[diagram.panelLabel, styles.title]}>
+      <span>{MODEL}</span>
+      <span class={styles.records}>
+        {RECORDS} records
+      </span>
+    </p>
+
+    <div class={styles.header}>
+      {
+        COLUMNS.map(({ id, label }) => (
+          <span
+            class:list={[styles.cell, styles.head]}
+            data-col={id}
+            data-head={id}
+            data-changed={id === STILL.column ? '' : undefined}
+          >
+            {label}
+          </span>
+        ))
+      }
+    </div>
+
+    <ul class={styles.rows} data-rows>
+      {
+        ROWS.map((row) => (
+          <li
+            class={styles.row}
+            data-row={row.id}
+            {...life(row)}
+            data-out={shows(row, STILL_STAGE) ? undefined : ''}
+          >
+            <div class:list={[styles.line, diagram.change]} data-line>
+              <span class={styles.cell} data-col="name">
+                <span class={styles.name}>{row.name}</span>
+                {row.invalid && (
+                  <span
+                    class:list={[styles.triangle, diagram.change]}
+                    data-mark
+                    {...life(row.invalid)}
+                    data-out={shows(row.invalid, STILL_STAGE) ? undefined : ''}
+                  >
+                    <svg viewBox="0 0 512 512" aria-hidden="true">
+                      <path d={TRIANGLE} />
+                    </svg>
+                  </span>
+                )}
+              </span>
+              {cellsOf(row).map(([column, chips]) => (
+                <span class:list={[styles.cell, diagram.change]} data-col={column} data-cell>
+                  {chips.map((chip) => (
+                    <span
+                      class:list={[styles.chip, diagram.change, column === 'slug' && styles.slug]}
+                      data-chip
+                      {...life(chip)}
+                      data-out={shows(chip, STILL_STAGE) ? undefined : ''}
+                    >
+                      {chip.text}
+                    </span>
+                  ))}
+                </span>
+              ))}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  {
+    /*
+    The track to the header of the column that changes. In the markup, the
+    track of the still (one for each width of the box, the CSS shows one).
+    The script replaces it with a track and a pulse in px, and sets
+    `data-live`: the svg then covers the root.
+  */
+  }
+  <svg
+    class={styles.links}
+    viewBox="0 0 100 100"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+    data-links
+  >
+    {
+      Object.entries(STILL_CURVES).map(([axis, d]) => (
+        <g data-axis={axis}>
+          <path class={diagram.track} d={d} />
+        </g>
+      ))
+    }
+  </svg>
+</figure>
+
+<script>
+  import {
+    arrive,
+    DIAGRAM_MS as MS,
+    reflow,
+    replay,
+    sleep,
+    startDiagramLoop,
+  } from '~/lib/motion/diagramLoop';
+  import type { Live } from '~/lib/motion/diagramLoop';
+  import diagram from '../diagram/style.module.css';
+  import { EVENTS, pillHtml, START_STAGE } from './integrity';
+
+  const SVG = 'http://www.w3.org/2000/svg';
+  const ROW_STAGGER = 110;
+  // The time that a new column takes to open: the transition of the grid in integrity.module.css
+  const OPEN = 450;
+  const GAP = 200;
+  const PAUSE = 1000;
+  const MARKS = ['changed', 'ping', 'leave', 'enter'];
+
+  const num = (el: HTMLElement, name: string, fallback: number) =>
+    el.dataset[name] === undefined ? fallback : Number(el.dataset[name]);
+
+  const shows = (el: HTMLElement, stage: number) =>
+    num(el, 'from', 0) <= stage && stage < num(el, 'until', Infinity);
+
+  class Integrity {
+    root: HTMLElement;
+    pill: HTMLElement;
+    panel: HTMLElement;
+    rows: HTMLElement;
+    svg: SVGSVGElement;
+    track: SVGPathElement;
+    pulse: SVGPathElement;
+    stage = START_STAGE;
+
+    constructor(root: HTMLElement) {
+      this.root = root;
+      this.pill = root.querySelector<HTMLElement>('[data-pill]')!;
+      this.panel = root.querySelector<HTMLElement>('[data-panel]')!;
+      this.rows = root.querySelector<HTMLElement>('[data-rows]')!;
+      this.svg = root.querySelector<SVGSVGElement>('[data-links]')!;
+      this.track = document.createElementNS(SVG, 'path');
+      this.pulse = document.createElementNS(SVG, 'path');
+      this.track.setAttribute('class', `${diagram.track} ${diagram.draw}`);
+      this.pulse.setAttribute('class', diagram.pulse!);
+      for (const path of [this.track, this.pulse]) path.setAttribute('pathLength', '100');
+    }
+
+    head(column: string): HTMLElement {
+      return this.root.querySelector<HTMLElement>(`[data-head="${column}"]`)!;
+    }
+
+    rowList(): HTMLElement[] {
+      return Array.from(this.rows.querySelectorAll<HTMLElement>('[data-row]'));
+    }
+
+    /**
+     * Puts the table in `stage`, with no transition: the columns, the
+     * chips and the marks of that stage, no ring, no pill and no track.
+     */
+    apply(stage: number): void {
+      this.root.dataset.instant = '';
+      this.root.dataset.stage = String(stage);
+      for (const el of this.root.querySelectorAll<HTMLElement>('[data-from], [data-until]')) {
+        if (shows(el, stage)) delete el.dataset.out;
+        else el.dataset.out = '';
+      }
+      for (const el of this.root.querySelectorAll<HTMLElement>(
+        '[data-changed], [data-ping], [data-leave], [data-enter]',
+      )) {
+        for (const name of MARKS) delete el.dataset[name];
+      }
+      delete this.pill.dataset.working;
+      this.pill.dataset.swapOut = '';
+      this.svg.dataset.faded = '';
+      reflow(this.root);
+      delete this.root.dataset.instant;
+      this.stage = stage;
+    }
+
+    /**
+     * The start of a session. The table goes to the stage before the next
+     * event, with no pill and no mark: the first time, the first state;
+     * after a session that stopped in the middle of an event, before that
+     * event.
+     */
+    async start(): Promise<void> {
+      delete this.rows.dataset.fading;
+      this.apply(this.stage);
+      await sleep(PAUSE);
+    }
+
+    showPill(label: string): void {
+      this.pill.querySelector<HTMLElement>('[data-event]')!.innerHTML = pillHtml(label);
+      delete this.pill.dataset.swapOut;
+      this.pill.dataset.swapIn = '';
+      reflow(this.pill);
+      delete this.pill.dataset.swapIn;
+    }
+
+    async event(live: Live): Promise<void> {
+      const index = this.stage % EVENTS.length;
+      const event = EVENTS[index]!;
+      const stage = index + 1;
+
+      if (index === 0 && this.stage !== 0) {
+        this.rows.dataset.fading = '';
+        await sleep(MS.swap);
+        if (!live()) return;
+        this.apply(0);
+        delete this.rows.dataset.fading;
+        await sleep(MS.enter);
+        if (!live()) return;
+      }
+
+      this.showPill(event.label);
+      await sleep(MS.swap / 2 + GAP);
+      if (!live()) return;
+
+      // The track draws to the header of the column, then the pulse goes
+      // along it. A new field has no column yet: the track goes to the
+      // place where its column opens.
+      const head = this.head(event.column);
+      this.drawTrack(this.middle(head, event.opens ? stage : this.stage));
+      await sleep(MS.draw);
+      if (!live()) return;
+      replay(this.pulse, 'pulse');
+      await sleep(MS.travel);
+      if (!live()) return;
+
+      if (event.opens) {
+        this.root.dataset.stage = String(stage);
+        await sleep(OPEN);
+        if (!live()) return;
+      }
+
+      head.dataset.changed = '';
+      this.pill.dataset.working = '';
+      await sleep(MS.pop);
+      if (!live()) return;
+
+      // Each cell of the column changes, from the top row down. The rows
+      // under the bottom of the box change with the last row on screen.
+      const bottom = this.rows.getBoundingClientRect().bottom;
+      const rows = this.rowList().filter((row) => !('out' in row.dataset));
+      const shown = Math.max(
+        1,
+        rows.filter((row) => row.getBoundingClientRect().top < bottom).length,
+      );
+      rows.forEach((row, i) => {
+        const cell = row.querySelector<HTMLElement>(`[data-cell][data-col="${event.column}"]`)!;
+        window.setTimeout(
+          () => {
+            if (live()) this.change(row, cell, stage, !!event.validate);
+          },
+          Math.min(i, shown - 1) * ROW_STAGGER,
+        );
+      });
+      await sleep((shown - 1) * ROW_STAGGER + MS.ping);
+      if (!live()) return;
+      delete this.pill.dataset.working;
+      this.stage = stage;
+      this.root.dataset.stage = String(stage);
+
+      this.pill.dataset.swapOut = '';
+      this.svg.dataset.faded = '';
+      this.clear();
+      await sleep(MS.fade + PAUSE);
+    }
+
+    /**
+     * The change of one cell of `row` for the event that takes the table
+     * to `stage`: a chip of that stage comes in with the ring; a chip that
+     * goes at that stage gets the ring, then leaves. A validation checks
+     * each cell: a cell with no change gets one ping. The triangle of an
+     * invalid record (next to the name) comes in with the ring too.
+     */
+    change(row: HTMLElement, cell: HTMLElement, stage: number, validate: boolean): void {
+      const chips = Array.from(cell.querySelectorAll<HTMLElement>('[data-chip]'));
+      const marks = Array.from(row.querySelectorAll<HTMLElement>('[data-mark]'));
+      const coming = [...chips, ...marks].filter((chip) => num(chip, 'from', 0) === stage);
+      const going = chips.filter((chip) => num(chip, 'until', Infinity) === stage);
+      for (const chip of coming) {
+        delete chip.dataset.out;
+        arrive(chip);
+        chip.dataset.changed = '';
+        replay(chip, 'ping');
+      }
+      for (const chip of going) {
+        chip.dataset.changed = '';
+        replay(chip, 'ping');
+        window.setTimeout(() => {
+          chip.dataset.leave = '';
+          window.setTimeout(() => {
+            chip.dataset.out = '';
+          }, MS.fade);
+        }, MS.pop);
+      }
+      if (validate && !chips.some((chip) => coming.includes(chip) || going.includes(chip)))
+        replay(cell, 'ping');
+    }
+
+    clear(): void {
+      for (const el of this.root.querySelectorAll<HTMLElement>('[data-changed]'))
+        delete el.dataset.changed;
+    }
+
+    /**
+     * The middle of `head`, in px from the left of the root, when the
+     * table is in `stage`. For a column that is not open yet, the script
+     * opens it with no transition, measures it, and closes it again.
+     * The browser does not paint between these steps.
+     */
+    middle(head: HTMLElement, stage: number): number {
+      const now = this.root.dataset.stage;
+      const other = String(stage) !== now;
+      if (other) {
+        this.root.dataset.instant = '';
+        this.root.dataset.stage = String(stage);
+      }
+      const rect = head.getBoundingClientRect();
+      const x = rect.left - this.root.getBoundingClientRect().left + rect.width / 2;
+      if (other) {
+        this.root.dataset.stage = now!;
+        reflow(this.root);
+        delete this.root.dataset.instant;
+      }
+      return x;
+    }
+
+    /**
+     * Replaces the track of the still with a track and a pulse in px of
+     * the root: an S curve from the bottom middle of the pill (2px under
+     * it) to the top of the panel (2px under its edge), over the middle of
+     * the header (`x1`, in px of the root). The track starts hidden, then
+     * it draws.
+     */
+    drawTrack(x1: number): void {
+      const box = this.root.getBoundingClientRect();
+      const panel = this.panel.getBoundingClientRect();
+      const x0 = this.pill.offsetLeft + this.pill.offsetWidth / 2;
+      const y0 = this.pill.offsetTop + this.pill.offsetHeight - 2;
+      const y1 = panel.top - box.top + 2;
+      const my = (y0 + y1) / 2;
+      const d = `M ${x0} ${y0} C ${x0} ${my}, ${x1} ${my}, ${x1} ${y1}`;
+
+      this.svg.dataset.live = '';
+      this.svg.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
+      this.svg.replaceChildren(this.track, this.pulse);
+      for (const path of [this.track, this.pulse]) path.setAttribute('d', d);
+      this.track.dataset.hidden = '';
+      delete this.pulse.dataset.pulse;
+      reflow(this.svg);
+      delete this.svg.dataset.faded;
+      delete this.track.dataset.hidden;
+    }
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-integrity]')) {
+    const table = new Integrity(root);
+    startDiagramLoop(root, (live) => table.event(live), { start: () => table.start() });
+  }
+</script>
