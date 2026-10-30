@@ -178,7 +178,7 @@ export const footerColumns: FooterColumn[] = [
         title: 'Customers',
         links: [
           l('Case studies', '/case-studies'),
-          l('Wall of love', '/wall-of-love'),
+          l('Wall of love', '/wall'),
           l('Casual chats', '/blog/casual-chats'),
           l('Compare', '/compare/datocms-vs-contentful'),
         ],

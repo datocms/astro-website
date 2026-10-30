@@ -391,7 +391,6 @@ export default defineConfig({
     '/features/ai': '/ai',
     // The philosophy page and the wall of love replace the old pages.
     '/company/about': '/philosophy',
-    '/wall': '/wall-of-love',
     '/blog/2': '/blog/p/2',
     '/changelog/2': '/product-updates/p/2',
     '/changelog/3': '/product-updates/p/3',

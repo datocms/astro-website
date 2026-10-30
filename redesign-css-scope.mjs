@@ -94,7 +94,7 @@ export const REDESIGN_PAGE_DIRS = [
   'media',
   'ai',
   'philosophy',
-  'wall-of-love',
+  'wall',
   'contact',
   'compare',
   'case-studies',
