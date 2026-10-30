@@ -20,7 +20,7 @@ When you copy code from the prototype, clean its comments. Remove the comments t
 ```
 src/
   components/<Name>/        Component.astro, style.module.css, index.ts (and types.ts when the props are shared)
-                            The old components are here too: see LEGACY_COMPONENT_DIRS in redesign-css-scope.mjs.
+                            The old components are in components/legacy/<Name>/ (never use them on a new page).
   data/                     the copy of every page, one typed file for each route (src/data/AGENTS.md)
   scenes/                   the pictures of the product (src/scenes/AGENTS.md)
   layouts/Layout.astro      the layout of the new pages; imports src/styles/global.css once
@@ -66,9 +66,9 @@ src/components/MyComponent/
 - Styles live in `.module.css` files next to their component (`style.module.css`) or page (`_style.module.css`). Class names are camelCase. `:global()` only to reach a child the component does not render.
 - **Cascade layers**, lowest first: `reset, tokens, base, vendor, blocks, sections, pages`. `Layout.astro` gives this list to `BaseLayout`, which puts the statement as the first child of `<head>`. A rule in a higher layer wins over a lower layer, whatever the specificity and the order of the CSS. The Vite plugin `cssLayers` in `astro.config.ts` puts each CSS module of the redesign in its layer: a ported page under `src/pages/` is `pages`, every other module is `sections`, unless line 1 of the file is a marker such as `/* @layer blocks */`. The stylesheet of the scene kit is `vendor`.
 - **The scope of the plugin** is in `redesign-css-scope.mjs`. The old CSS modules get no layer (they must not change). Thus:
-  - a new component directory needs no change (every directory of `src/components/` that is not in `LEGACY_COMPONENT_DIRS` is the redesign);
+  - a new component directory needs no change (every directory of `src/components/` except `src/components/legacy/` is the redesign);
   - **when you port a page, add its directory (or file) under `src/pages/` to `REDESIGN_PAGE_DIRS`**, else its `_style.module.css` gets no layer and loses to every section;
-  - when you delete an old component directory, remove its name from `LEGACY_COMPONENT_DIRS`. Never add a name.
+  - when you delete an old component directory (in `src/components/legacy/`), just delete it. Never add a directory in `src/components/legacy/`, and never import a component from it on a new page.
 - **Rules of the cascade.**
   - Never repeat a class to win (`.content.content`). Never add an element or an ancestor to a selector to win. Never use `!important` outside `global.css`. If a rule does not win, the file is in the wrong layer, or the block needs an API.
   - A section or a page does not override a longhand of a block. It uses the API of the block: its props and its custom properties, such as `--section-padding-top` and `--section-content-max`.
