@@ -8,7 +8,7 @@ import { buildUrlForPartner, PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuil
 import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
-import { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
+import { PluginCardFragment } from './_sub/PluginCard/_graphql';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(

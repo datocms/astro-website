@@ -413,6 +413,12 @@ export default defineConfig({
     '/marketplace/enterprise/azure-active-directory': '/docs/enterprise-apps/microsoft-entra-id',
     '/marketplace/enterprise/onelogin-sso': '/docs/enterprise-apps/onelogin-sso',
     '/marketplace/enterprise/google-workspace': '/docs/enterprise-apps/google-workspace',
+    // The marketplace has only plugins and starters left.
+    '/marketplace': '/plugins',
+    '/marketplace/plugins': '/plugins',
+    '/marketplace/plugins/[...rest]': '/plugins/[...rest]',
+    '/marketplace/starters': '/starters',
+    '/marketplace/starters/[...rest]': '/starters/[...rest]',
     '/cms/react': '/cms/react-cms',
     '/cms/hugo': '/',
     '/cms/nextjs': '/cms/nextjs-cms',
@@ -436,9 +442,8 @@ export default defineConfig({
     '/docs/hugo': '/docs',
     '/docs/guides': '/docs',
     '/docs/react/managing-images': '/docs',
-    '/marketplace/plugins/i/git@github.com:voorhoede/datocms-plugin-editor-help.git':
-      '/marketplace/plugins',
-    '/marketplace/plugins/i/license': '/marketplace/plugins',
+    '/marketplace/plugins/i/git@github.com:voorhoede/datocms-plugin-editor-help.git': '/plugins',
+    '/marketplace/plugins/i/license': '/plugins',
     '/docs/gatsby/gatsby-cloud': '/docs',
     '/docs/single-page-apps/react': '/docs',
     '/docs/static-generators/gatsbyjs': '/docs',
@@ -449,7 +454,7 @@ export default defineConfig({
     '/product-updates/undefined': '/product-updates',
     '/docs/content-management-api/resources/item/instances/docs/content-management-api/resources/item/instances':
       '/docs/content-management-api',
-    '/marketplace/starters/next-js-multilingual-blog': '/marketplace/starters',
+    '/marketplace/starters/next-js-multilingual-blog': '/starters',
     '/partners/tecnica': '/partners',
     '/docs/hugo/fields': '/docs',
     '/partners/harvey-cameron/showcase/jacuzzi': '/partners',
@@ -470,15 +475,12 @@ export default defineConfig({
     '/docs/guides/building-plugins': '/docs/plugin-sdk/build-your-first-plugin',
     '/docs/general-concepts/images': '/docs/asset-api/images',
     '/docs/content-management-api/rate-limits': '/docs/content-delivery-api/technical-limits',
-    '/marketplace/starters/next-13-company-landing-page-demo':
-      '/marketplace/starters/next-js-starter-kit',
+    '/marketplace/starters/next-13-company-landing-page-demo': '/starters/next-js-starter-kit',
     '/docs/general-concepts/transfer': '/docs/plans-pricing-and-billing/transfer',
-    '/marketplace/starters/nextjs-blog': '/marketplace/starters/next-js-starter-kit',
-    '/plugins/i/datocms-plugin-conditional-fields':
-      '/marketplace/plugins/i/datocms-plugin-conditional-fields',
+    '/marketplace/starters/nextjs-blog': '/starters/next-js-starter-kit',
     '/docs/other-ssgs/accessing-records': '/docs',
     '/docs/content-management-api/ruby-client': '/docs',
-    '/marketplace/starters/react-js-lodging-spa': '/marketplace/starters',
+    '/marketplace/starters/react-js-lodging-spa': '/starters',
     '/docs/jekyll/image-manipulation': '/docs',
     '/docs/guides/installing-site-search/widget': '/docs/site-search',
     '/features/structured-text': '/docs/content-modelling/structured-text',
@@ -489,11 +491,11 @@ export default defineConfig({
     '/docs/building-plugins/using-the-generator': '/docs/plugin-sdk/build-your-first-plugin',
     '/docs/guides/offline-backups': '/docs/import-and-export/export-data',
     '/docs/static-generators/hugo/localization': '/docs',
-    '/marketplace/starters/next-js-multilingual-blog-per-local-publishing': '/marketplace/starters',
+    '/marketplace/starters/next-js-multilingual-blog-per-local-publishing': '/starters',
     '/docs/static-generators/metalsmith': '/docs',
     '/docs/building-plugins': '/docs/plugin-sdk/build-your-first-plugin',
     '/docs/content-delivery-api/endpoint': '/docs/content-delivery-api/api-endpoints',
-    '/marketplace/starters/middleman-portfolio': '/marketplace/starters',
+    '/marketplace/starters/middleman-portfolio': '/starters',
     '/docs/site-search/excluding-text': '/docs/site-search',
     '/docs/plugin-sdk/field-extension': '/docs/plugin-sdk/field-extensions',
     '/product-updates/p/1': '/product-updates',
@@ -542,8 +544,7 @@ export default defineConfig({
     '/docs/building-plugins/creating-a-new-plugin': '/docs/plugin-sdk/build-your-first-plugin',
     '/docs/next-js/setting-up-next-js-preview-mode':
       '/docs/legacy-next-js-documentation/setting-up-next-js-preview-mode',
-    '/blog/static-ecommerce-website-snipcart-gatsbyjs-datocms':
-      '/marketplace/starters/ecommerce-website',
+    '/blog/static-ecommerce-website-snipcart-gatsbyjs-datocms': '/starters/ecommerce-website',
     '/blog/live-preview-changes-on-gatsby-preview': '/docs',
     '/enterprise': '/enterprise-headless-cms',
     '/docs/content-management-api/resources/item/batch_unpublish':
@@ -553,20 +554,16 @@ export default defineConfig({
     '/docs/plugins/install': '/docs/general-concepts/plugins',
     '/docs/content-management-api/resources/item/batch_publish':
       '/docs/content-management-api/resources/item/bulk_publish',
-    '/plugins/i/datocms-plugin-shopify-product':
-      '/marketplace/plugins/i/datocms-plugin-shopify-product',
     '/docs/building-plugins/entry-point': '/docs/plugin-sdk/introduction',
-    '/marketplace/plugins/i/CHANGELOG.md': '/marketplace/plugins',
+    '/marketplace/plugins/i/CHANGELOG.md': '/plugins',
     '/docs/content-management-api/resources/upload/batch_add_tags':
       '/docs/content-management-api/resources/upload/bulk_tag',
     '/docs/content-management-api/resources/sso-token':
       '/docs/content-management-api/resources/sso-settings',
-    '/plugins/i/datocms-plugin-shopify-product-json':
-      '/marketplace/plugins/i/datocms-plugin-shopify-product-json',
     '/marketplace/plugins/i/shopify-product-plugin-datocms':
-      '/marketplace/plugins/i/datocms-plugin-shopify-product',
+      '/plugins/i/datocms-plugin-shopify-product',
     '/marketplace/plugins/i/datocms-plugin-datocms-plugin-next-preview-redux':
-      '/marketplace/plugins/i/datocms-plugin-web-previews',
+      '/plugins/i/datocms-plugin-web-previews',
     '/docs/content-management-api/resources/upload/batch_destroy':
       '/docs/content-management-api/resources/item/bulk_destroy',
     '/docs/remix': '/docs/react-router',

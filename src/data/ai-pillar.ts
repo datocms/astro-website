@@ -170,7 +170,7 @@ export const translations: ChapterLayoutData = {
       'The AI Translations plugin brings OpenAI, Gemini, Claude, or DeepL, straight into the record. Edit each record individually, or go at it in bulk. Editors always review before hitting Publish.',
     link: {
       label: 'See The Plugin',
-      href: '/marketplace/plugins/i/datocms-plugin-ai-translations',
+      href: '/plugins/i/datocms-plugin-ai-translations',
       appearance: 'deep-on-white',
       variant: 'soft',
     },

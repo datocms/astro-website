@@ -9,7 +9,6 @@ import { Svg } from '~/components/legacy/Svg';
 import { TargetToggler } from '~/components/legacy/TargetToggler';
 import { Wrapper } from '~/components/legacy/Wrapper';
 import s from './style.module.css';
-import { ActiveLink } from '~/components/legacy/links/ActiveLink';
 import type { NavbarData } from './fetchNavbar';
 import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
@@ -26,8 +25,6 @@ import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import { muxThumbnailUrl } from '~/lib/muxThumbnailUrl';
 import { Search } from '~/components/legacy/Search';
 import { stripStega } from '@datocms/astro';
-
-const isMarketplace = Astro.url.pathname.startsWith('/marketplace');
 
 type Props = {
   data: NavbarData;
@@ -50,6 +47,13 @@ const sortedContinents = Object.fromEntries(
   sortBy(Object.entries(continentCounters), ([_continent, count]) => -count),
 );
 
+// The CMS links of the plugins group can still point to the old marketplace
+// addresses. Link to the final address at once.
+const marketplaceUrl = (url: string | null | undefined) =>
+  url
+    ?.replace(/^\/marketplace\/?$/, '/plugins')
+    .replace(/^\/marketplace\/(plugins|starters)/, '/$1');
+
 // These pages do not exist now (they redirect to /editor-experience). The
 // navbar record of the CMS still has links to them: do not show these links.
 const REMOVED_PERSONA_URLS = ['/made-for/marketers', '/made-for/content-creators'];
@@ -58,413 +62,342 @@ const REMOVED_PERSONA_URLS = ['/made-for/marketers', '/made-for/content-creators
 {
   navbar && (
     <div class={s.root} data-datocms-noindex>
-      {isMarketplace && (
-        <>
-          <div data-marketplace-notice class={s.marketplaceNotice}>
+      <site-navbar>
+        {false && (
+          <a href="/webinars/how-to-use-structured-text-on-datocms" data-notice class={s.notice}>
             <Wrapper>
-              <strong>🎈 Welcome to the Marketplace</strong> — Explore and discover the ecosystem
-              around DatoCMS, and share your own work with the community!
+              <strong>
+                📅 Want to learn how to use our new Structured Text field with Next.js?
+              </strong>{' '}
+              Follow our webinar on Wednesday,{' '}
+              {new Date('2021-03-10T18:00:00+01:00').toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                timeZoneName: 'short',
+              })}
             </Wrapper>
-          </div>
+          </a>
+        )}
 
-          <nav class={s.nav} id="navbar-marketplace-nav">
-            <div class={s.logoWrapper}>
-              <a href="/" class:list={[s.logo, s.isBlack]}>
-                <Svg name="svg/datocms/icon-text/black/black_full_logo_alt" />
-              </a>
+        <nav class={s.nav} id="navbar-nav">
+          <div class={s.logoWrapper}>
+            <a href="/" class={s.logo}>
+              <Svg name="svg/datocms/icon-text/color/color_full_logo_alt" />
+            </a>
 
-              <TargetToggler targetId="navbar-marketplace-nav">
+            <div class={s.mobileActions}>
+              <div class={s.searchAction}>
+                <Search client:idle variant="icon" />
+              </div>
+
+              <TargetToggler targetId="navbar-nav">
                 <button type="button" class={s.hamburger} aria-controls="navList">
                   <Svg name="icons/regular/bars" />
                 </button>
               </TargetToggler>
             </div>
+          </div>
 
-            <div class={s.navList}>
-              <ActiveLink href="/marketplace" activeClass={s.isActive} class={s.navLink}>
-                <span>Featured</span>
-              </ActiveLink>
-              <ActiveLink
-                href="/marketplace/starters"
-                match={{ alsoMatchChildPathnames: true }}
-                activeClass={s.isActive}
-                class={s.navLink}
+          <div class={s.navList}>
+            <NavItem name="Product">
+              <Group
+                title={navbar.productGroup.title}
+                link={navbar.productGroup.callToAction?.url}
+                finalCta={navbar.productGroup.callToAction?.label}
               >
-                <span>Starters</span>
-              </ActiveLink>
-              <ActiveLink
-                href="/marketplace/plugins"
-                match={{ alsoMatchChildPathnames: true }}
-                activeClass={s.isActive}
-                class={s.navLink}
+                {navbar.productGroup.links.map((item) => (
+                  <GroupItem href={item.url} title={item.label} description={item.description} />
+                ))}
+              </Group>
+              <Group
+                columns={2}
+                contentColumns={2}
+                title={navbar.featuresGroup.title}
+                link={navbar.featuresGroup.callToAction?.url}
+                finalCta={navbar.featuresGroup.callToAction?.label}
               >
-                <span>Plugins</span>
-              </ActiveLink>
-              <ActiveLink
-                href="/docs/hosting-and-deployment"
-                match={{ alsoMatchChildPathnames: true }}
-                activeClass={s.isActive}
-                class={s.navLink}
+                {navbar.featuresGroup.links.map((item) => (
+                  <GroupItem href={item.url} title={item.label} description={item.description} />
+                ))}
+              </Group>
+
+              <Group
+                title={navbar.whoIsItForGroup.title}
+                link={navbar.whoIsItForGroup.callToAction?.url}
+                finalCta={navbar.whoIsItForGroup.callToAction?.label}
               >
-                <span>Hosting</span>
-              </ActiveLink>
-              <ActiveLink
-                href="/docs/enterprise-apps"
-                match={{ alsoMatchChildPathnames: true }}
-                activeClass={s.isActive}
-                class={s.navLink}
+                {navbar.whoIsItForGroup.links
+                  .filter((item) => !REMOVED_PERSONA_URLS.includes(stripStega(item.url)))
+                  .map((item) => (
+                    <GroupItem href={item.url} title={item.label} description={item.description} />
+                  ))}
+              </Group>
+
+              <Group
+                title={navbar.useCasesGroup.title}
+                link={navbar.useCasesGroup.callToAction?.url}
+                finalCta={navbar.useCasesGroup.callToAction?.label}
               >
-                <span>Enterprise</span>
-              </ActiveLink>
+                {navbar.useCases.map((useCase) => (
+                  <GroupItem
+                    href={buildUrlForUseCasePage(useCase)}
+                    title={useCase.navigationBarTitle}
+                  />
+                ))}
+              </Group>
+              <Cta
+                svgName="svg/illustrations/box-things"
+                title={navbar.productCallToAction.title}
+                description={navbar.productCallToAction.description}
+                href={navbar.productCallToAction.callToAction.url}
+                cta={navbar.productCallToAction.callToAction.label}
+              />
+            </NavItem>
+
+            <NavItem name="Customers">
+              <Group
+                columns={2}
+                contentColumns={2}
+                title={navbar.customerChatsGroup.title}
+                link={navbar.customerChatsGroup.callToAction?.url}
+                finalCta={navbar.customerChatsGroup.callToAction?.label}
+              >
+                {navbar.customerChats.map((item) => (
+                  <GroupItem
+                    href={buildUrlForCustomerStory(item)}
+                    title={item.title}
+                    description={structuredTextToPlainText(item.excerpt)}
+                    image={item.coverImage?.responsiveImage}
+                  />
+                ))}
+              </Group>
+              <Group
+                title="Wall of love"
+                link="/wall"
+                contentDirection="center"
+                finalCta={`See what they say about us (+100)`}
+              >
+                <Quote quote={navbar.wallOfLoveQuote} />
+              </Group>
+              <Group
+                columns={2}
+                contentColumns={2}
+                title={navbar.enterpriseStoriesGroup.title}
+                link={navbar.enterpriseStoriesGroup.callToAction?.url}
+                finalCta={navbar.enterpriseStoriesGroup.callToAction?.label}
+              >
+                {navbar.enterpriseStories.map((item) => (
+                  <GroupItem
+                    href={buildUrlForSuccessStory(item)}
+                    description={structuredTextToPlainText(item.title)}
+                    logoUrl={item.logo.url}
+                  />
+                ))}
+              </Group>
+              <Cta
+                svgName="svg/illustrations/bear-bird"
+                title={navbar.customersCallToAction.title}
+                description={navbar.customersCallToAction.description}
+                href={navbar.customersCallToAction.callToAction.url}
+                cta={navbar.customersCallToAction.callToAction.label}
+              />
+            </NavItem>
+
+            <NavItem name="Partners">
+              <Group
+                title={navbar.partnersGroup.title}
+                link={navbar.partnersGroup.callToAction?.url}
+                finalCta={navbar.partnersGroup.callToAction?.label}
+              >
+                <p data-exclude-mobile>{navbar.partnersDescription}</p>
+                {Object.entries(sortedContinents).map(([continent, counter]) => (
+                  <GroupItem
+                    title={`${continent} (${counter})`}
+                    href={`/partners?continent=${encodeURIComponent(continent)}`}
+                  />
+                ))}
+              </Group>
+
+              <Group
+                contentColumns={2}
+                title={navbar.partnerProjectsGroup.title}
+                link={navbar.partnerProjectsGroup.callToAction?.url}
+                finalCta={navbar.partnerProjectsGroup.callToAction?.label}
+              >
+                {navbar.partnerProjects.map((item) => (
+                  <GroupItem
+                    href={buildUrlForShowcaseProject(item)}
+                    title={item.name}
+                    description={item.partner.name}
+                    image={item.mainImage.responsiveImage}
+                  />
+                ))}
+              </Group>
+
+              <Cta
+                svgName="svg/illustrations/faces-2"
+                title={navbar.partnersCallToAction.title}
+                description={navbar.partnersCallToAction.description}
+                href={navbar.partnersCallToAction.callToAction.url}
+                cta={navbar.partnersCallToAction.callToAction.label}
+              />
+            </NavItem>
+
+            <NavItem name="Developers" panelClass={s.developersPanel}>
+              <Group
+                title={navbar.docGroup.title}
+                link={navbar.docGroup.callToAction?.url}
+                finalCta={navbar.docGroup.callToAction?.label}
+              >
+                {navbar.docPages.map((item) => (
+                  <GroupItem href={buildUrlForDocGroup(item)} title={item.name} />
+                ))}
+              </Group>
+
+              <Group
+                title={navbar.helpGroup.title}
+                link={navbar.helpGroup.callToAction?.url}
+                finalCta={navbar.helpGroup.callToAction?.label}
+              >
+                {navbar.helpGroup.links.map((item) => (
+                  <GroupItem href={item.url} title={item.label} description={item.description} />
+                ))}
+              </Group>
+
+              <Group
+                columns={2}
+                contentColumns={4}
+                title="Popular integration guides"
+                class={s.popularIntegrationsGroup}
+              >
+                <a href="/docs/next-js" class={s.integrationsItem}>
+                  <Svg name="svg/logos/next-squared" class={s.integrationsImage} />
+                  <p class={s.techName}>Next.js</p>
+                </a>
+
+                <a href="/docs/svelte" class={s.integrationsItem}>
+                  <Svg name="svg/logos/svelte-squared" class={s.integrationsImage} />
+                  <p class={s.techName}>SvelteKit</p>
+                </a>
+
+                <a href="/docs/astro" class={s.integrationsItem}>
+                  <Svg name="svg/logos/astro-squared" class={s.integrationsImage} />
+                  <p class={s.techName}>Astro</p>
+                </a>
+
+                <a href="/docs/nuxt" class={s.integrationsItem}>
+                  <Svg name="svg/logos/nuxt-squared" class={s.integrationsImage} />
+                  <p class={s.techName}>Nuxt</p>
+                </a>
+              </Group>
+
+              <Group
+                class={s.marketplaceGroup}
+                title={navbar.marketplaceGroup.title}
+                link={marketplaceUrl(navbar.marketplaceGroup.callToAction?.url)}
+                finalCta={navbar.marketplaceGroup.callToAction?.label}
+              >
+                {navbar.marketplaceGroup.links.map((item) => (
+                  <GroupItem
+                    href={marketplaceUrl(item.url)}
+                    title={item.label}
+                    description={item.description}
+                  />
+                ))}
+              </Group>
+            </NavItem>
+
+            <NavItem name="Resources">
+              <Group
+                title={navbar.knowledgeGroup.title}
+                link={navbar.knowledgeGroup.callToAction?.url}
+                finalCta={navbar.knowledgeGroup.callToAction?.label}
+              >
+                {navbar.knowledgeGroup.links.map((item) => (
+                  <GroupItem href={item.url} title={item.label} description={item.description} />
+                ))}
+              </Group>
+
+              <Group
+                contentColumns={2}
+                title={navbar.videoGuidesGroup.title}
+                link={navbar.videoGuidesGroup.callToAction?.url}
+                finalCta={navbar.videoGuidesGroup.callToAction?.label}
+              >
+                {navbar.videoGuides.map((item) => (
+                  <GroupItem
+                    href={buildUrlForUserGuidesChapter(item)}
+                    title={item.title}
+                    description={`${item.chapters.length} episodes, ${formatVideoDuration(sum(item.chapters.map((v) => v.asset.video.duration)))}`}
+                  >
+                    <Fragment slot="image">
+                      <div class={s.videoGuideChapters}>
+                        {item.chapters.slice(0, 1).map((chapter) => (
+                          <Image
+                            src={muxThumbnailUrl(chapter.asset.video.thumbnailUrl, {
+                              width: 300,
+                            })}
+                            inferSize
+                            widths={[300, 100]}
+                            sizes="400px"
+                            alt={chapter.title}
+                            style={{
+                              background: `url(${chapter.asset.video.blurUpThumb})`,
+                              backgroundSize: 'cover',
+                              color: 'transparent',
+                              height: 'auto',
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </Fragment>
+                  </GroupItem>
+                ))}
+              </Group>
+
+              <Group
+                title={navbar.blogGroup.title}
+                link={navbar.blogGroup.callToAction?.url}
+                finalCta={navbar.blogGroup.callToAction?.label}
+              >
+                {data.blogPosts.map((item) => (
+                  <GroupItem
+                    href={buildUrlForBlogPost(item)}
+                    title={item.title}
+                    description={formatDate(item._firstPublishedAt!)}
+                  />
+                ))}
+              </Group>
+            </NavItem>
+
+            <a href="/pricing" class={s.navLink}>
+              <span>Pricing</span>
+            </a>
+          </div>
+
+          <div class={s.navActions}>
+            <div class={s.searchAction} data-exclude-mobile>
+              <Search client:idle variant="icon" />
             </div>
-
-            <div class={s.navActions}>
-              <Button as="a" fs="small" p="tiny" href="/" s="invert">
-                ← Back to datocms.com
+            <a href="/contact" class={s.navLink}>
+              Contact sales
+            </a>
+            <div class={s.authActions} data-signed-in="true">
+              <Button as="a" p="small" href={dashboardUrl()}>
+                Enter dashboard
               </Button>
             </div>
-          </nav>
-        </>
-      )}
-
-      {!isMarketplace && (
-        <site-navbar>
-          {false && (
-            <a href="/webinars/how-to-use-structured-text-on-datocms" data-notice class={s.notice}>
-              <Wrapper>
-                <strong>
-                  📅 Want to learn how to use our new Structured Text field with Next.js?
-                </strong>{' '}
-                Follow our webinar on Wednesday,{' '}
-                {new Date('2021-03-10T18:00:00+01:00').toLocaleTimeString('en-US', {
-                  hour: 'numeric',
-                  minute: '2-digit',
-                  timeZoneName: 'short',
-                })}
-              </Wrapper>
-            </a>
-          )}
-
-          <nav class={s.nav} id="navbar-nav">
-            <div class={s.logoWrapper}>
-              <a href="/" class={s.logo}>
-                <Svg name="svg/datocms/icon-text/color/color_full_logo_alt" />
+            <div class={s.authActions} data-signed-in="false">
+              <a href={dashboardUrl('/login')} class={s.navLink} data-exclude-mobile>
+                <span>Log in</span>
               </a>
-
-              <div class={s.mobileActions}>
-                <div class={s.searchAction}>
-                  <Search client:idle variant="icon" />
-                </div>
-
-                <TargetToggler targetId="navbar-nav">
-                  <button type="button" class={s.hamburger} aria-controls="navList">
-                    <Svg name="icons/regular/bars" />
-                  </button>
-                </TargetToggler>
-              </div>
+              <Button as="a" p="small" href={dashboardUrl('/signup')}>
+                Get started
+              </Button>
             </div>
-
-            <div class={s.navList}>
-              <NavItem name="Product">
-                <Group
-                  title={navbar.productGroup.title}
-                  link={navbar.productGroup.callToAction?.url}
-                  finalCta={navbar.productGroup.callToAction?.label}
-                >
-                  {navbar.productGroup.links.map((item) => (
-                    <GroupItem href={item.url} title={item.label} description={item.description} />
-                  ))}
-                </Group>
-                <Group
-                  columns={2}
-                  contentColumns={2}
-                  title={navbar.featuresGroup.title}
-                  link={navbar.featuresGroup.callToAction?.url}
-                  finalCta={navbar.featuresGroup.callToAction?.label}
-                >
-                  {navbar.featuresGroup.links.map((item) => (
-                    <GroupItem href={item.url} title={item.label} description={item.description} />
-                  ))}
-                </Group>
-
-                <Group
-                  title={navbar.whoIsItForGroup.title}
-                  link={navbar.whoIsItForGroup.callToAction?.url}
-                  finalCta={navbar.whoIsItForGroup.callToAction?.label}
-                >
-                  {navbar.whoIsItForGroup.links
-                    .filter((item) => !REMOVED_PERSONA_URLS.includes(stripStega(item.url)))
-                    .map((item) => (
-                      <GroupItem
-                        href={item.url}
-                        title={item.label}
-                        description={item.description}
-                      />
-                    ))}
-                </Group>
-
-                <Group
-                  title={navbar.useCasesGroup.title}
-                  link={navbar.useCasesGroup.callToAction?.url}
-                  finalCta={navbar.useCasesGroup.callToAction?.label}
-                >
-                  {navbar.useCases.map((useCase) => (
-                    <GroupItem
-                      href={buildUrlForUseCasePage(useCase)}
-                      title={useCase.navigationBarTitle}
-                    />
-                  ))}
-                </Group>
-                <Cta
-                  svgName="svg/illustrations/box-things"
-                  title={navbar.productCallToAction.title}
-                  description={navbar.productCallToAction.description}
-                  href={navbar.productCallToAction.callToAction.url}
-                  cta={navbar.productCallToAction.callToAction.label}
-                />
-              </NavItem>
-
-              <NavItem name="Customers">
-                <Group
-                  columns={2}
-                  contentColumns={2}
-                  title={navbar.customerChatsGroup.title}
-                  link={navbar.customerChatsGroup.callToAction?.url}
-                  finalCta={navbar.customerChatsGroup.callToAction?.label}
-                >
-                  {navbar.customerChats.map((item) => (
-                    <GroupItem
-                      href={buildUrlForCustomerStory(item)}
-                      title={item.title}
-                      description={structuredTextToPlainText(item.excerpt)}
-                      image={item.coverImage?.responsiveImage}
-                    />
-                  ))}
-                </Group>
-                <Group
-                  title="Wall of love"
-                  link="/wall"
-                  contentDirection="center"
-                  finalCta={`See what they say about us (+100)`}
-                >
-                  <Quote quote={navbar.wallOfLoveQuote} />
-                </Group>
-                <Group
-                  columns={2}
-                  contentColumns={2}
-                  title={navbar.enterpriseStoriesGroup.title}
-                  link={navbar.enterpriseStoriesGroup.callToAction?.url}
-                  finalCta={navbar.enterpriseStoriesGroup.callToAction?.label}
-                >
-                  {navbar.enterpriseStories.map((item) => (
-                    <GroupItem
-                      href={buildUrlForSuccessStory(item)}
-                      description={structuredTextToPlainText(item.title)}
-                      logoUrl={item.logo.url}
-                    />
-                  ))}
-                </Group>
-                <Cta
-                  svgName="svg/illustrations/bear-bird"
-                  title={navbar.customersCallToAction.title}
-                  description={navbar.customersCallToAction.description}
-                  href={navbar.customersCallToAction.callToAction.url}
-                  cta={navbar.customersCallToAction.callToAction.label}
-                />
-              </NavItem>
-
-              <NavItem name="Partners">
-                <Group
-                  title={navbar.partnersGroup.title}
-                  link={navbar.partnersGroup.callToAction?.url}
-                  finalCta={navbar.partnersGroup.callToAction?.label}
-                >
-                  <p data-exclude-mobile>{navbar.partnersDescription}</p>
-                  {Object.entries(sortedContinents).map(([continent, counter]) => (
-                    <GroupItem
-                      title={`${continent} (${counter})`}
-                      href={`/partners?continent=${encodeURIComponent(continent)}`}
-                    />
-                  ))}
-                </Group>
-
-                <Group
-                  contentColumns={2}
-                  title={navbar.partnerProjectsGroup.title}
-                  link={navbar.partnerProjectsGroup.callToAction?.url}
-                  finalCta={navbar.partnerProjectsGroup.callToAction?.label}
-                >
-                  {navbar.partnerProjects.map((item) => (
-                    <GroupItem
-                      href={buildUrlForShowcaseProject(item)}
-                      title={item.name}
-                      description={item.partner.name}
-                      image={item.mainImage.responsiveImage}
-                    />
-                  ))}
-                </Group>
-
-                <Cta
-                  svgName="svg/illustrations/faces-2"
-                  title={navbar.partnersCallToAction.title}
-                  description={navbar.partnersCallToAction.description}
-                  href={navbar.partnersCallToAction.callToAction.url}
-                  cta={navbar.partnersCallToAction.callToAction.label}
-                />
-              </NavItem>
-
-              <NavItem name="Developers" panelClass={s.developersPanel}>
-                <Group
-                  title={navbar.docGroup.title}
-                  link={navbar.docGroup.callToAction?.url}
-                  finalCta={navbar.docGroup.callToAction?.label}
-                >
-                  {navbar.docPages.map((item) => (
-                    <GroupItem href={buildUrlForDocGroup(item)} title={item.name} />
-                  ))}
-                </Group>
-
-                <Group
-                  title={navbar.helpGroup.title}
-                  link={navbar.helpGroup.callToAction?.url}
-                  finalCta={navbar.helpGroup.callToAction?.label}
-                >
-                  {navbar.helpGroup.links.map((item) => (
-                    <GroupItem href={item.url} title={item.label} description={item.description} />
-                  ))}
-                </Group>
-
-                <Group
-                  columns={2}
-                  contentColumns={4}
-                  title="Popular integration guides"
-                  class={s.popularIntegrationsGroup}
-                >
-                  <a href="/docs/next-js" class={s.integrationsItem}>
-                    <Svg name="svg/logos/next-squared" class={s.integrationsImage} />
-                    <p class={s.techName}>Next.js</p>
-                  </a>
-
-                  <a href="/docs/svelte" class={s.integrationsItem}>
-                    <Svg name="svg/logos/svelte-squared" class={s.integrationsImage} />
-                    <p class={s.techName}>SvelteKit</p>
-                  </a>
-
-                  <a href="/docs/astro" class={s.integrationsItem}>
-                    <Svg name="svg/logos/astro-squared" class={s.integrationsImage} />
-                    <p class={s.techName}>Astro</p>
-                  </a>
-
-                  <a href="/docs/nuxt" class={s.integrationsItem}>
-                    <Svg name="svg/logos/nuxt-squared" class={s.integrationsImage} />
-                    <p class={s.techName}>Nuxt</p>
-                  </a>
-                </Group>
-
-                <Group
-                  class={s.marketplaceGroup}
-                  title={navbar.marketplaceGroup.title}
-                  link={navbar.marketplaceGroup.callToAction?.url}
-                  finalCta={navbar.marketplaceGroup.callToAction?.label}
-                >
-                  {navbar.marketplaceGroup.links.map((item) => (
-                    <GroupItem href={item.url} title={item.label} description={item.description} />
-                  ))}
-                </Group>
-              </NavItem>
-
-              <NavItem name="Resources">
-                <Group
-                  title={navbar.knowledgeGroup.title}
-                  link={navbar.knowledgeGroup.callToAction?.url}
-                  finalCta={navbar.knowledgeGroup.callToAction?.label}
-                >
-                  {navbar.knowledgeGroup.links.map((item) => (
-                    <GroupItem href={item.url} title={item.label} description={item.description} />
-                  ))}
-                </Group>
-
-                <Group
-                  contentColumns={2}
-                  title={navbar.videoGuidesGroup.title}
-                  link={navbar.videoGuidesGroup.callToAction?.url}
-                  finalCta={navbar.videoGuidesGroup.callToAction?.label}
-                >
-                  {navbar.videoGuides.map((item) => (
-                    <GroupItem
-                      href={buildUrlForUserGuidesChapter(item)}
-                      title={item.title}
-                      description={`${item.chapters.length} episodes, ${formatVideoDuration(sum(item.chapters.map((v) => v.asset.video.duration)))}`}
-                    >
-                      <Fragment slot="image">
-                        <div class={s.videoGuideChapters}>
-                          {item.chapters.slice(0, 1).map((chapter) => (
-                            <Image
-                              src={muxThumbnailUrl(chapter.asset.video.thumbnailUrl, {
-                                width: 300,
-                              })}
-                              inferSize
-                              widths={[300, 100]}
-                              sizes="400px"
-                              alt={chapter.title}
-                              style={{
-                                background: `url(${chapter.asset.video.blurUpThumb})`,
-                                backgroundSize: 'cover',
-                                color: 'transparent',
-                                height: 'auto',
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </Fragment>
-                    </GroupItem>
-                  ))}
-                </Group>
-
-                <Group
-                  title={navbar.blogGroup.title}
-                  link={navbar.blogGroup.callToAction?.url}
-                  finalCta={navbar.blogGroup.callToAction?.label}
-                >
-                  {data.blogPosts.map((item) => (
-                    <GroupItem
-                      href={buildUrlForBlogPost(item)}
-                      title={item.title}
-                      description={formatDate(item._firstPublishedAt!)}
-                    />
-                  ))}
-                </Group>
-              </NavItem>
-
-              <a href="/pricing" class={s.navLink}>
-                <span>Pricing</span>
-              </a>
-            </div>
-
-            <div class={s.navActions}>
-              <div class={s.searchAction} data-exclude-mobile>
-                <Search client:idle variant="icon" />
-              </div>
-              <a href="/contact" class={s.navLink}>
-                Contact sales
-              </a>
-              <div class={s.authActions} data-signed-in="true">
-                <Button as="a" p="small" href={dashboardUrl()}>
-                  Enter dashboard
-                </Button>
-              </div>
-              <div class={s.authActions} data-signed-in="false">
-                <a href={dashboardUrl('/login')} class={s.navLink} data-exclude-mobile>
-                  <span>Log in</span>
-                </a>
-                <Button as="a" p="small" href={dashboardUrl('/signup')}>
-                  Get started
-                </Button>
-              </div>
-            </div>
-          </nav>
-        </site-navbar>
-      )}
+          </div>
+        </nav>
+      </site-navbar>
     </div>
   )
 }

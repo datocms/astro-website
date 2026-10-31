@@ -136,14 +136,8 @@ export const mainNavigation: NavGroup[] = [
       {
         sections: [
           {
-            heading: 'Marketplace',
-            links: [
-              l('Plugins', '/marketplace/plugins'),
-              l('Starters', '/marketplace/starters'),
-              l('Hosting', '/docs/hosting-and-deployment'),
-              l('Enterprise apps', '/docs/enterprise-apps'),
-            ],
-            allLink: l('All the marketplace', '/marketplace'),
+            heading: 'Ecosystem',
+            links: [l('Plugins', '/plugins'), l('Starters', '/starters')],
           },
         ],
       },
@@ -219,7 +213,8 @@ export const footerColumns: FooterColumn[] = [
           l('User guides', '/user-guides'),
           l('How to DatoCMS', '/how-to-datocms'),
           l('Glossary', '/glossary'),
-          l('Marketplace', '/marketplace'),
+          l('Plugins', '/plugins'),
+          l('Starters', '/starters'),
           l('Community', communityHref),
           l('Slack', '/slack'),
           l('Support', '/support'),

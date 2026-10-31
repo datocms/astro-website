@@ -10,14 +10,7 @@ const RAW_DEPLOYMENT_TYPES: Record<RawDeploymentType, DeploymentType[] | undefin
 };
 
 type RawDeploymentType =
-  | 'static'
-  | 'server'
-  | 'serverless'
-  | 'copyRepo'
-  | 'zeit'
-  | 'vercel'
-  | 'netlify'
-  | 'heroku';
+  'static' | 'server' | 'serverless' | 'copyRepo' | 'zeit' | 'vercel' | 'netlify' | 'heroku';
 
 export type DeploymentType = 'netlify' | 'vercel' | 'heroku' | 'github';
 

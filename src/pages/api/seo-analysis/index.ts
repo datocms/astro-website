@@ -23,7 +23,7 @@ type SeoAnalysis = {
  * This route handler implements the Frontend metadata endpoint required for the
  * "SEO/Readability Analysis" plugin:
  *
- * https://www.datocms.com/marketplace/plugins/i/datocms-plugin-seo-readability-analysis#the-frontend-metadata-endpoint
+ * https://www.datocms.com/plugins/i/datocms-plugin-seo-readability-analysis#the-frontend-metadata-endpoint
  */
 
 export const GET: APIRoute = async ({ url, request }) => {

@@ -23,7 +23,7 @@ type WebPreviewsResponse = {
  * This route handler implements the Previews webhook required for the "Web
  * Previews" plugin:
  *
- * https://www.datocms.com/marketplace/plugins/i/datocms-plugin-web-previews#the-previews-webhook
+ * https://www.datocms.com/plugins/i/datocms-plugin-web-previews#the-previews-webhook
  */
 
 export const POST: APIRoute = async ({ url, request }) => {

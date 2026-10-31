@@ -9,5 +9,5 @@ export const PluginUrlFragment = graphql(/* GraphQL */ `
 
 export function buildUrlForPlugin(plugin: FragmentOf<typeof PluginUrlFragment>) {
   const data = readFragment(PluginUrlFragment, plugin);
-  return `/marketplace/plugins/i/${stripStega(data.packageName)}`;
+  return `/plugins/i/${stripStega(data.packageName)}`;
 }

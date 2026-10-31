@@ -8,5 +8,5 @@ export const TemplateDemoUrlFragment = graphql(/* GraphQL */ `
 
 export function buildUrlForTemplateDemo(templateDemo: FragmentOf<typeof TemplateDemoUrlFragment>) {
   const data = readFragment(TemplateDemoUrlFragment, templateDemo);
-  return `/marketplace/starters/${data.code}`;
+  return `/starters/${data.code}`;
 }
