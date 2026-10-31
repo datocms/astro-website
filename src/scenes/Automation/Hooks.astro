@@ -28,7 +28,7 @@ import styles from './hooks.module.css';
 const first = (entity: string) => CYCLE.find(([e]) => e === entity)?.[1] ?? '';
 ---
 
-<figure
+<scene-automation-hooks
   class:list={[diagram.root, styles.hooks]}
   role="img"
   aria-label={DESCRIPTION}
@@ -114,11 +114,12 @@ const first = (entity: string) => CYCLE.find(([e]) => e === entity)?.[1] ?? '';
       </div>
     </div>
   </div>
-</figure>
+</scene-automation-hooks>
 
 <script>
   import { DIAGRAM_MS, replay, sleep, startDiagramLoop, type Live } from '~/lib/motion/diagramLoop';
   import { curve, CYCLE, ENTITIES, TRACKED } from './hooks';
+  import { WebComponent } from '~/lib/WebComponent';
 
   /** Draws the curves of the fan in px of its box, thus the pulses do not stretch. A narrow box has no fan (0 × 0). */
   function drawFan(svg: SVGSVGElement): void {
@@ -133,91 +134,90 @@ const first = (entity: string) => CYCLE.find(([e]) => e === entity)?.[1] ?? '';
     }
   }
 
-  class Hooks {
-    root: HTMLElement;
-    answer: HTMLElement;
-    down: SVGElement;
-    downEvent: HTMLElement;
-    /** The index in CYCLE of the next event: the still shows event 0 */
-    next = 1;
-    /** The entity of the event that shows now */
-    current = CYCLE[0]![0];
+  customElements.define(
+    'scene-automation-hooks',
+    class extends WebComponent {
+      answer!: HTMLElement;
+      down!: SVGElement;
+      downEvent!: HTMLElement;
+      /** The index in CYCLE of the next event: the still shows event 0 */
+      next = 1;
+      /** The entity of the event that shows now */
+      current = CYCLE[0]![0];
 
-    constructor(root: HTMLElement) {
-      this.root = root;
-      this.answer = root.querySelector<HTMLElement>('[data-answer]')!;
-      this.down = root.querySelector<SVGElement>('[data-down]')!;
-      this.downEvent = root.querySelector<HTMLElement>('[data-down-event]')!;
-    }
+      parsedCallback() {
+        this.answer = this.$('[data-answer]');
+        this.down = this.$<SVGElement>('[data-down]');
+        this.downEvent = this.$('[data-down-event]');
+        const fan = this.$<SVGSVGElement>('[data-fan]');
+        new ResizeObserver(() => drawFan(fan)).observe(fan);
+        startDiagramLoop(this, (live) => this.event(live));
+      }
 
-    track(entity: string): SVGElement {
-      return this.root.querySelector<SVGElement>(`[data-track="${entity}"]`)!;
-    }
+      track(entity: string): SVGElement {
+        return this.$<SVGElement>(`[data-track="${entity}"]`);
+      }
 
-    row(entity: string): HTMLElement {
-      return this.root.querySelector<HTMLElement>(`[data-entity="${entity}"]`)!;
-    }
+      /** The chip and the event type of the row of `entity` */
+      row(entity: string): { chip: HTMLElement; label: HTMLElement } {
+        return {
+          chip: this.$(`[data-entity="${entity}"] [data-chip]`),
+          label: this.$(`[data-entity="${entity}"] [data-event]`),
+        };
+      }
 
-    /** The pulse of an entity: its own track in a wide box, the track down in a narrow box */
-    pulse(entity: string): SVGElement {
-      const fan = this.track(entity).querySelector<SVGElement>('[data-pulse-line]')!;
-      return fan.getBoundingClientRect().width > 0 ? fan : this.down;
-    }
+      /** The pulse of an entity: its own track in a wide box, the track down in a narrow box */
+      pulse(entity: string): SVGElement {
+        const fan = this.$<SVGElement>(`[data-track="${entity}"] [data-pulse-line]`);
+        return fan.getBoundingClientRect().width > 0 ? fan : this.down;
+      }
 
-    /**
-     * The event that shows now goes: its ring, its event type and its
-     * bright track fade, and the answer becomes quiet. The answer stays.
-     */
-    clear(): void {
-      const row = this.row(this.current);
-      delete row.querySelector<HTMLElement>('[data-chip]')!.dataset.changed;
-      delete row.querySelector<HTMLElement>('[data-event]')!.dataset.on;
-      delete this.track(this.current).dataset.live;
-      delete this.downEvent.dataset.on;
-      delete this.answer.dataset.changed;
-    }
+      /**
+       * The event that shows now goes: its ring, its event type and its
+       * bright track fade, and the answer becomes quiet. The answer stays.
+       */
+      clear(): void {
+        const row = this.row(this.current);
+        delete row.chip.dataset.changed;
+        delete row.label.dataset.on;
+        delete this.track(this.current).dataset.live;
+        delete this.downEvent.dataset.on;
+        delete this.answer.dataset.changed;
+      }
 
-    /**
-     * One event: the row gets the ring and its event type, a pulse goes
-     * to the URL along the bright track, and the URL answers. Then the
-     * still holds.
-     */
-    async event(live: Live): Promise<void> {
-      this.clear();
-      // The new ring comes before the end of the fade of the old ring
-      await sleep(DIAGRAM_MS.fade * 0.6);
-      if (!live()) return;
+      /**
+       * One event: the row gets the ring and its event type, a pulse goes
+       * to the URL along the bright track, and the URL answers. Then the
+       * still holds.
+       */
+      async event(live: Live): Promise<void> {
+        this.clear();
+        // The new ring comes before the end of the fade of the old ring
+        await sleep(DIAGRAM_MS.fade * 0.6);
+        if (!live()) return;
 
-      const [entity, type] = CYCLE[this.next]!;
-      this.next = (this.next + 1) % CYCLE.length;
-      this.current = entity;
-      const row = this.row(entity);
-      const chip = row.querySelector<HTMLElement>('[data-chip]')!;
-      const label = row.querySelector<HTMLElement>('[data-event]')!;
-      label.textContent = type;
-      this.downEvent.textContent = type;
-      chip.dataset.changed = '';
-      label.dataset.on = '';
-      this.downEvent.dataset.on = '';
-      this.track(entity).dataset.live = '';
-      replay(chip, 'ping');
-      await sleep(DIAGRAM_MS.pop);
-      if (!live()) return;
+        const [entity, type] = CYCLE[this.next]!;
+        this.next = (this.next + 1) % CYCLE.length;
+        this.current = entity;
+        const { chip, label } = this.row(entity);
+        label.textContent = type;
+        this.downEvent.textContent = type;
+        chip.dataset.changed = '';
+        label.dataset.on = '';
+        this.downEvent.dataset.on = '';
+        this.track(entity).dataset.live = '';
+        replay(chip, 'ping');
+        await sleep(DIAGRAM_MS.pop);
+        if (!live()) return;
 
-      replay(this.pulse(entity), 'pulse');
-      await sleep(DIAGRAM_MS.travel);
-      if (!live()) return;
+        replay(this.pulse(entity), 'pulse');
+        await sleep(DIAGRAM_MS.travel);
+        if (!live()) return;
 
-      this.answer.dataset.changed = '';
-      replay(this.answer, 'ping');
-      await sleep(DIAGRAM_MS.ping + DIAGRAM_MS.hold);
-    }
-  }
-
-  for (const root of document.querySelectorAll<HTMLElement>('[data-hooks]')) {
-    const hooks = new Hooks(root);
-    const fan = root.querySelector<SVGSVGElement>('[data-fan]')!;
-    new ResizeObserver(() => drawFan(fan)).observe(fan);
-    startDiagramLoop(root, (live) => hooks.event(live));
-  }
+        this.answer.dataset.changed = '';
+        replay(this.answer, 'ping');
+        await sleep(DIAGRAM_MS.ping + DIAGRAM_MS.hold);
+      }
+    },
+  );
 </script>

@@ -24,10 +24,19 @@ import styles from './style.module.css';
 // with no number and the `still` caption. With no answer, the number is
 // FAILED. Behind them the globe of the home page turns, at the middle
 // of the box, quiet: the track goes across it as an equator. It
-// is decorative.
+// is decorative. The root is a custom element, not a <figure>:
+// role="figure" and the id of the caption give it the name that a
+// <figure> gets from its <figcaption>.
+
+const captionId = `ping-caption-${Math.random().toString(36).slice(2, 8)}`;
 ---
 
-<figure class:list={[diagram.root, styles.ping]} data-ping-edge>
+<scene-graphql-ping
+  class:list={[diagram.root, styles.ping]}
+  role="figure"
+  aria-labelledby={captionId}
+  data-ping-edge
+>
   <div class={styles.globe} aria-hidden="true">
     <PixelVideo src={GLOBE.src} settings={GLOBE.settings} />
   </div>
@@ -68,12 +77,13 @@ import styles from './style.module.css';
     </p>
   </div>
 
-  <figcaption class={styles.caption} data-caption>{CAPTION.still}</figcaption>
-</figure>
+  <p class={styles.caption} id={captionId} data-caption>{CAPTION.still}</p>
+</scene-graphql-ping>
 
 <script>
   import { arrive, replay, sleep } from '~/lib/motion/diagramLoop';
   import { onEnterViewport, onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  import { WebComponent } from '~/lib/WebComponent';
   import { CAPTION, CITIES, ENDPOINT, FAILED, SAMPLES, TIMEOUT_MS } from './story';
 
   interface Measure {
@@ -106,90 +116,90 @@ import styles from './style.module.css';
    */
   const PULSE_MS = 450;
 
-  class Ping {
-    out: SVGElement;
-    back: SVGElement;
-    edge: HTMLElement;
-    value: HTMLElement;
-    caption: HTMLElement;
-    running = false;
+  customElements.define(
+    'scene-graphql-ping',
+    class extends WebComponent {
+      out!: SVGElement;
+      back!: SVGElement;
+      edge!: HTMLElement;
+      value!: HTMLElement;
+      caption!: HTMLElement;
+      running = false;
 
-    constructor(root: HTMLElement) {
-      this.out = root.querySelector<SVGElement>('[data-out]')!;
-      this.back = root.querySelector<SVGElement>('[data-back]')!;
-      this.edge = root.querySelector<HTMLElement>('[data-edge]')!;
-      this.value = root.querySelector<HTMLElement>('[data-value]')!;
-      this.caption = root.querySelector<HTMLElement>('[data-caption]')!;
-    }
+      parsedCallback() {
+        this.out = this.$<SVGElement>('[data-out]');
+        this.back = this.$<SVGElement>('[data-back]');
+        this.edge = this.$('[data-edge]');
+        this.value = this.$('[data-value]');
+        this.caption = this.$('[data-caption]');
 
-    /**
-     * The warm-up request, then SAMPLES requests one after the other, each
-     * with its pulses while `motion()` is true. Then the median, or FAILED
-     * when a request fails or has no answer in TIMEOUT_MS.
-     */
-    async run(motion: () => boolean): Promise<void> {
-      if (this.running) return;
-      this.running = true;
-      this.edge.dataset.working = '';
-      let result: Measure | null = null;
-      try {
-        await request(AbortSignal.timeout(TIMEOUT_MS), 0);
-        const samples: Measure[] = [];
-        for (let i = 1; i <= SAMPLES; i++) {
-          const pulse = motion();
-          if (pulse) replay(this.out, 'pulse');
-          const [sample] = await Promise.all([
-            request(AbortSignal.timeout(TIMEOUT_MS), i),
-            pulse ? sleep(PULSE_MS) : undefined,
-          ]);
-          samples.push(sample);
-          if (pulse) {
-            replay(this.back, 'pulse');
-            await sleep(PULSE_MS);
-          }
+        if (prefersReducedMotion()) {
+          onEnterViewport(this, () => void this.run(() => false));
+          return;
         }
-        const times = samples.map((s) => s.ms).sort((a, b) => a - b);
-        result = {
-          code: samples.at(-1)!.code,
-          ms: Math.round(times[Math.floor(times.length / 2)]!),
-          ttfb: samples.every((s) => s.ttfb),
-        };
-      } catch {
-        result = null;
+        let visible = false;
+        onVisibilityChange(this, (now) => {
+          visible = now;
+          if (now) void this.run(() => visible);
+        });
       }
-      delete this.edge.dataset.working;
-      this.show(result, motion());
-      this.running = false;
-    }
 
-    show(result: Measure | null, motion: boolean): void {
-      if (result) {
-        this.edge.querySelector('[data-code]')!.textContent = result.code;
-        this.edge.querySelector('[data-city]')!.textContent = CITIES[result.code] ?? '';
-        delete this.value.dataset.failed;
-        this.value.innerHTML = `${result.ms}<span>ms</span>`;
-        this.caption.textContent = result.ttfb ? CAPTION.ttfb : CAPTION.roundTrip;
-      } else {
-        this.value.dataset.failed = '';
-        this.value.textContent = FAILED;
-        this.caption.textContent = CAPTION.failed;
+      /**
+       * The warm-up request, then SAMPLES requests one after the other, each
+       * with its pulses while `motion()` is true. Then the median, or FAILED
+       * when a request fails or has no answer in TIMEOUT_MS.
+       */
+      async run(motion: () => boolean): Promise<void> {
+        if (this.running) return;
+        this.running = true;
+        this.edge.dataset.working = '';
+        let result: Measure | null = null;
+        try {
+          await request(AbortSignal.timeout(TIMEOUT_MS), 0);
+          const samples: Measure[] = [];
+          for (let i = 1; i <= SAMPLES; i++) {
+            const pulse = motion();
+            if (pulse) replay(this.out, 'pulse');
+            const [sample] = await Promise.all([
+              request(AbortSignal.timeout(TIMEOUT_MS), i),
+              pulse ? sleep(PULSE_MS) : undefined,
+            ]);
+            samples.push(sample);
+            if (pulse) {
+              replay(this.back, 'pulse');
+              await sleep(PULSE_MS);
+            }
+          }
+          const times = samples.map((s) => s.ms).sort((a, b) => a - b);
+          result = {
+            code: samples.at(-1)!.code,
+            ms: Math.round(times[Math.floor(times.length / 2)]!),
+            ttfb: samples.every((s) => s.ttfb),
+          };
+        } catch {
+          result = null;
+        }
+        delete this.edge.dataset.working;
+        this.show(result, motion());
+        this.running = false;
       }
-      if (!motion) return;
-      arrive(this.value);
-      replay(this.value, 'ping');
-    }
-  }
 
-  for (const root of document.querySelectorAll<HTMLElement>('[data-ping-edge]')) {
-    const ping = new Ping(root);
-    if (prefersReducedMotion()) {
-      onEnterViewport(root, () => void ping.run(() => false));
-      continue;
-    }
-    let visible = false;
-    onVisibilityChange(root, (now) => {
-      visible = now;
-      if (now) void ping.run(() => visible);
-    });
-  }
+      show(result: Measure | null, motion: boolean): void {
+        if (result) {
+          this.$('[data-edge] [data-code]').textContent = result.code;
+          this.$('[data-edge] [data-city]').textContent = CITIES[result.code] ?? '';
+          delete this.value.dataset.failed;
+          this.value.innerHTML = `${result.ms}<span>ms</span>`;
+          this.caption.textContent = result.ttfb ? CAPTION.ttfb : CAPTION.roundTrip;
+        } else {
+          this.value.dataset.failed = '';
+          this.value.textContent = FAILED;
+          this.caption.textContent = CAPTION.failed;
+        }
+        if (!motion) return;
+        arrive(this.value);
+        replay(this.value, 'ping');
+      }
+    },
+  );
 </script>

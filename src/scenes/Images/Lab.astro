@@ -45,7 +45,7 @@ const still = describe(STILL);
 const DOTS = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) * 64)}ms`);
 ---
 
-<div
+<scene-images-lab
   class:list={[diagram.root, styles.lab]}
   role="group"
   aria-label={DESCRIPTION}
@@ -157,7 +157,7 @@ const DOTS = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) 
       }
     </ul>
   </div>
-</div>
+</scene-images-lab>
 
 <script>
   import {
@@ -172,6 +172,7 @@ const DOTS = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) 
   import { PULSE_SPEED, edgePulse, linePulse, partBox, pathPulse } from '~/lib/motion/diagramPulse';
   import { DEMO, describe, next, touches, type Change, type LabState } from './story';
   import styles from './style.module.css';
+  import { WebComponent } from '~/lib/WebComponent';
 
   // The space between the pulse and the edge of the served photo or of the readout, in px
   const OUT = 6;
@@ -195,255 +196,258 @@ const DOTS = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) 
     return bezier(0.77, 0.175, (lo + hi) / 2) * duration;
   }
 
-  for (const root of document.querySelectorAll<HTMLElement>('[data-lab]')) {
-    const $ = <T extends Element = HTMLElement>(sel: string) => root.querySelector<T>(sel)!;
-    const row = $('[data-row]');
-    const trace = $<SVGSVGElement>('[data-trace]');
-    const links = $('[data-links]');
-    const original = $('[data-original]');
-    const pill = $('[data-pill]');
-    const query = $('[data-query]');
-    const served = $('[data-served]');
-    const branch = $('[data-branch]');
-    const readout = $('[data-readout]');
-    const caption = $('[data-caption]');
-    const buttons = Array.from(root.querySelectorAll<HTMLElement>('[data-param], [data-fm]'));
+  customElements.define(
+    'scene-images-lab',
+    class extends WebComponent {
+      parsedCallback() {
+        const row = this.$('[data-row]');
+        const trace = this.$<SVGSVGElement>('[data-trace]');
+        const links = this.$('[data-links]');
+        const original = this.$('[data-original]');
+        const pill = this.$('[data-pill]');
+        const query = this.$('[data-query]');
+        const served = this.$('[data-served]');
+        const branch = this.$('[data-branch]');
+        const readout = this.$('[data-readout]');
+        const caption = this.$('[data-caption]');
+        const buttons = this.$$('[data-param], [data-fm]');
 
-    let state: LabState = {
-      params: root.dataset.params!.split(' ').filter(Boolean),
-      format: root.dataset.format!,
-    };
-    let touched = false;
-    let step = 0;
+        let state: LabState = {
+          params: this.dataset.params!.split(' ').filter(Boolean),
+          format: this.dataset.format!,
+        };
+        let touched = false;
+        let step = 0;
 
-    const button = (change: Change) =>
-      buttons.find((b) =>
-        'format' in change ? b.dataset.fm === change.format : b.dataset.param === change.param,
-      )!;
+        const button = (change: Change) =>
+          buttons.find((b) =>
+            'format' in change ? b.dataset.fm === change.format : b.dataset.param === change.param,
+          )!;
 
-    /** The switches show the state: a switch that is on has the ring and the tint of a change */
-    const press = () => {
-      for (const b of buttons) {
-        const on = b.dataset.fm
-          ? b.dataset.fm === state.format
-          : state.params.includes(b.dataset.param!);
-        b.setAttribute('aria-pressed', String(on));
-        if (on) b.dataset.changed = '';
-        else delete b.dataset.changed;
+        /** The switches show the state: a switch that is on has the ring and the tint of a change */
+        const press = () => {
+          for (const b of buttons) {
+            const on = b.dataset.fm
+              ? b.dataset.fm === state.format
+              : state.params.includes(b.dataset.param!);
+            b.setAttribute('aria-pressed', String(on));
+            if (on) b.dataset.changed = '';
+            else delete b.dataset.changed;
+          }
+        };
+
+        /** The photo shows the state; the attributes of the root drive its CSS */
+        const serve = () => {
+          this.dataset.params = state.params.join(' ');
+          this.dataset.format = state.format;
+        };
+
+        /** The query in the pill: one span for each parameter, which does not break */
+        const ask = (d: ReturnType<typeof describe>) =>
+          query.replaceChildren(
+            ...d.parts.map((part) => {
+              const span = document.createElement('span');
+              span.className = styles.part!;
+              span.textContent = part;
+              return span;
+            }),
+          );
+
+        const write = (d: ReturnType<typeof describe>) => {
+          this.$('[data-weight]').textContent = d.weight;
+          this.$('[data-spec]').textContent = d.spec;
+        };
+
+        const sync = () => {
+          trace.replaceChildren();
+          delete pill.dataset.working;
+          delete readout.dataset.changed;
+          delete readout.dataset.ping;
+          const d = describe(state);
+          ask(d);
+          write(d);
+          press();
+          serve();
+        };
+
+        const vertical = () =>
+          getComputedStyle(this.$('[data-links] [data-axis="x"]')).display === 'none';
+
+        /**
+         * The path of the pulse along the branch, from the far side of the
+         * pill (or from the fork, `fromFork`) to the readout, in px of the row:
+         * the way of the main line to the fork, then the borders of the branch
+         * box with their round corners. With it, the length of the path and
+         * the way along the main line from the pill to the fork.
+         */
+        const branchPath = (fromFork: boolean) => {
+          const b = partBox(row, branch);
+          const p = partBox(row, pill);
+          const line = partBox(row, links);
+          const r = Math.min(
+            parseFloat(getComputedStyle(branch).borderBottomLeftRadius) || 0,
+            (b.bottom - b.top) / 2,
+          );
+          const stroke = parseFloat(getComputedStyle(branch).borderLeftWidth) || 0;
+          const x = b.left + stroke / 2;
+          const y = b.bottom - stroke / 2;
+          const end = partBox(row, readout).left - OUT;
+          const arc = (Math.PI * r) / 2;
+          // The arc at the bottom left and the way to the readout
+          const tail = `L ${x} ${y - r} A ${r} ${r} 0 0 0 ${x + r} ${y} L ${end} ${y}`;
+          if (!vertical()) {
+            // The fork is on the main line, at the top of the branch box
+            const c = (line.top + line.bottom) / 2;
+            const start = Math.max(p.right, line.left);
+            const main = x - start;
+            const d = `${fromFork ? `M ${x} ${c} ` : `M ${start} ${c} L ${x} ${c} `}${tail}`;
+            return { d, main, length: (fromFork ? 0 : main) + (y - r - c) + arc + (end - x - r) };
+          }
+          // The fork is on the main line, at the top right of the branch box
+          const c = (line.left + line.right) / 2;
+          const start = Math.max(p.bottom, line.top);
+          const top = b.top + stroke / 2;
+          const main = top - start;
+          const bend = `L ${x + r} ${top} A ${r} ${r} 0 0 0 ${x} ${top + r} `;
+          const d = `${fromFork ? `M ${c} ${top} ` : `M ${c} ${start} L ${c} ${top} `}${bend}${tail}`;
+          return {
+            d,
+            main,
+            length:
+              (fromFork ? 0 : main) + (c - x - r) + arc + (y - top - 2 * r) + arc + (end - x - r),
+          };
+        };
+
+        /** The time of a pulse of `length` px at the speed of the grammar, between one and three travels */
+        const time = (length: number) =>
+          Math.min(3 * MS.travel, Math.max(MS.travel, length / PULSE_SPEED));
+
+        /**
+         * The pulse from the pill to the served photo. When it arrives, the
+         * photo changes, and the pulse goes around its new edge. edgePulse
+         * measures the photo when it starts, thus the photo takes its new
+         * shape at once for the measure, goes back, and then changes with its
+         * transition.
+         */
+        const toPhoto = async (live: Live): Promise<void> => {
+          await linePulse({ root: row, trace, links, from: pill, to: served });
+          if (!live()) return;
+          const [params, format] = [this.dataset.params!, this.dataset.format!];
+          this.dataset.instant = '';
+          serve();
+          reflow(served);
+          const around = edgePulse({ root: row, trace, links, parts: [served], out: () => OUT });
+          Object.assign(this.dataset, { params, format });
+          reflow(served);
+          delete this.dataset.instant;
+          reflow(served);
+          serve();
+          await around;
+        };
+
+        /**
+         * The pulse along the branch to the readout, from the pill, or from
+         * the fork when the pulse to the photo passes it (`withPhoto`). When
+         * it arrives, the readout rings and its values swap, and the pulse
+         * goes around it.
+         */
+        const toReadout = async (
+          live: Live,
+          d: ReturnType<typeof describe>,
+          withPhoto: boolean,
+        ): Promise<void> => {
+          const path = branchPath(withPhoto);
+          if (withPhoto) {
+            // The pulse to the photo takes a travel to the near side of the photo
+            const p = partBox(row, pill);
+            const s = partBox(row, served);
+            const way = vertical() ? s.top - p.bottom : s.left - p.right;
+            await sleep(when(path.main / way, MS.travel));
+            if (!live()) return;
+          }
+          await pathPulse(trace, path.d, time(path.length));
+          if (!live()) return;
+          const around = edgePulse({
+            root: row,
+            trace,
+            links: readout,
+            parts: [readout],
+            out: () => OUT,
+          });
+          readout.dataset.changed = '';
+          replay(readout, 'ping');
+          swap(caption, () => write(d));
+          await around;
+          delete readout.dataset.changed;
+        };
+
+        /**
+         * Plays one change. The switch lights; the pill swaps to the new query
+         * while a pulse goes from the original to the pill; the pill works; a
+         * pulse goes from the pill to the photo (when the picture changes) and
+         * along the branch to the readout (when the file changes). A click
+         * plays it with no pulse: the photo and the readout ping.
+         */
+        const play = async (change: Change, live?: Live): Promise<void> => {
+          const before = state;
+          state = next(state, change);
+          const d = describe(state);
+          const { picture, file } = touches(before, state);
+          press();
+          replay(button(change), 'ping');
+          await sleep(MS.pop);
+          if (live && !live()) return;
+          swap(pill, () => ask(d));
+          if (live) {
+            await linePulse({ root: row, trace, links, from: original, to: pill });
+            if (!live()) return;
+            pill.dataset.working = '';
+            await sleep(MS.swap);
+            delete pill.dataset.working;
+            if (!live()) return;
+            const pulses = [];
+            if (picture) pulses.push(toPhoto(live));
+            if (file) pulses.push(toReadout(live, d, picture));
+            await Promise.all(pulses);
+            return;
+          }
+          serve();
+          if (picture) replay(served, 'ping');
+          if (file) {
+            replay(readout, 'ping');
+            swap(caption, () => write(d));
+          }
+        };
+
+        this.on(this, 'click', '[data-param], [data-fm]', (_event, b) => {
+          touched = true;
+          const change: Change = b.dataset.fm
+            ? { format: b.dataset.fm }
+            : { param: b.dataset.param!, on: !state.params.includes(b.dataset.param!) };
+          void play(change);
+        });
+
+        // The demo plays in view only, one change for each step, and stops for
+        // good when a visitor presses a switch
+        startDiagramLoop(
+          this,
+          async (live) => {
+            // After a click the session waits and does nothing more
+            if (touched) return new Promise<void>(() => {});
+            const playing = () => live() && !touched;
+            await play(DEMO[step % DEMO.length]!, playing);
+            if (!playing()) return;
+            step++;
+            await sleep(MS.swap + MS.hold);
+          },
+          {
+            start: async () => {
+              if (!touched) sync();
+              await sleep(MS.hold);
+            },
+          },
+        );
       }
-    };
-
-    /** The photo shows the state; the attributes of the root drive its CSS */
-    const serve = () => {
-      root.dataset.params = state.params.join(' ');
-      root.dataset.format = state.format;
-    };
-
-    /** The query in the pill: one span for each parameter, which does not break */
-    const ask = (d: ReturnType<typeof describe>) =>
-      query.replaceChildren(
-        ...d.parts.map((part) => {
-          const span = document.createElement('span');
-          span.className = styles.part!;
-          span.textContent = part;
-          return span;
-        }),
-      );
-
-    const write = (d: ReturnType<typeof describe>) => {
-      $('[data-weight]').textContent = d.weight;
-      $('[data-spec]').textContent = d.spec;
-    };
-
-    const sync = () => {
-      trace.replaceChildren();
-      delete pill.dataset.working;
-      delete readout.dataset.changed;
-      delete readout.dataset.ping;
-      const d = describe(state);
-      ask(d);
-      write(d);
-      press();
-      serve();
-    };
-
-    const vertical = () =>
-      getComputedStyle(links.querySelector('[data-axis="x"]')!).display === 'none';
-
-    /**
-     * The path of the pulse along the branch, from the far side of the
-     * pill (or from the fork, `fromFork`) to the readout, in px of the row:
-     * the way of the main line to the fork, then the borders of the branch
-     * box with their round corners. With it, the length of the path and
-     * the way along the main line from the pill to the fork.
-     */
-    const branchPath = (fromFork: boolean) => {
-      const b = partBox(row, branch);
-      const p = partBox(row, pill);
-      const line = partBox(row, links);
-      const r = Math.min(
-        parseFloat(getComputedStyle(branch).borderBottomLeftRadius) || 0,
-        (b.bottom - b.top) / 2,
-      );
-      const stroke = parseFloat(getComputedStyle(branch).borderLeftWidth) || 0;
-      const x = b.left + stroke / 2;
-      const y = b.bottom - stroke / 2;
-      const end = partBox(row, readout).left - OUT;
-      const arc = (Math.PI * r) / 2;
-      // The arc at the bottom left and the way to the readout
-      const tail = `L ${x} ${y - r} A ${r} ${r} 0 0 0 ${x + r} ${y} L ${end} ${y}`;
-      if (!vertical()) {
-        // The fork is on the main line, at the top of the branch box
-        const c = (line.top + line.bottom) / 2;
-        const start = Math.max(p.right, line.left);
-        const main = x - start;
-        const d = `${fromFork ? `M ${x} ${c} ` : `M ${start} ${c} L ${x} ${c} `}${tail}`;
-        return { d, main, length: (fromFork ? 0 : main) + (y - r - c) + arc + (end - x - r) };
-      }
-      // The fork is on the main line, at the top right of the branch box
-      const c = (line.left + line.right) / 2;
-      const start = Math.max(p.bottom, line.top);
-      const top = b.top + stroke / 2;
-      const main = top - start;
-      const bend = `L ${x + r} ${top} A ${r} ${r} 0 0 0 ${x} ${top + r} `;
-      const d = `${fromFork ? `M ${c} ${top} ` : `M ${c} ${start} L ${c} ${top} `}${bend}${tail}`;
-      return {
-        d,
-        main,
-        length: (fromFork ? 0 : main) + (c - x - r) + arc + (y - top - 2 * r) + arc + (end - x - r),
-      };
-    };
-
-    /** The time of a pulse of `length` px at the speed of the grammar, between one and three travels */
-    const time = (length: number) =>
-      Math.min(3 * MS.travel, Math.max(MS.travel, length / PULSE_SPEED));
-
-    /**
-     * The pulse from the pill to the served photo. When it arrives, the
-     * photo changes, and the pulse goes around its new edge. edgePulse
-     * measures the photo when it starts, thus the photo takes its new
-     * shape at once for the measure, goes back, and then changes with its
-     * transition.
-     */
-    async function toPhoto(live: Live): Promise<void> {
-      await linePulse({ root: row, trace, links, from: pill, to: served });
-      if (!live()) return;
-      const [params, format] = [root.dataset.params!, root.dataset.format!];
-      root.dataset.instant = '';
-      serve();
-      reflow(served);
-      const around = edgePulse({ root: row, trace, links, parts: [served], out: () => OUT });
-      Object.assign(root.dataset, { params, format });
-      reflow(served);
-      delete root.dataset.instant;
-      reflow(served);
-      serve();
-      await around;
-    }
-
-    /**
-     * The pulse along the branch to the readout, from the pill, or from
-     * the fork when the pulse to the photo passes it (`withPhoto`). When
-     * it arrives, the readout rings and its values swap, and the pulse
-     * goes around it.
-     */
-    async function toReadout(
-      live: Live,
-      d: ReturnType<typeof describe>,
-      withPhoto: boolean,
-    ): Promise<void> {
-      const path = branchPath(withPhoto);
-      if (withPhoto) {
-        // The pulse to the photo takes a travel to the near side of the photo
-        const p = partBox(row, pill);
-        const s = partBox(row, served);
-        const way = vertical() ? s.top - p.bottom : s.left - p.right;
-        await sleep(when(path.main / way, MS.travel));
-        if (!live()) return;
-      }
-      await pathPulse(trace, path.d, time(path.length));
-      if (!live()) return;
-      const around = edgePulse({
-        root: row,
-        trace,
-        links: readout,
-        parts: [readout],
-        out: () => OUT,
-      });
-      readout.dataset.changed = '';
-      replay(readout, 'ping');
-      swap(caption, () => write(d));
-      await around;
-      delete readout.dataset.changed;
-    }
-
-    /**
-     * Plays one change. The switch lights; the pill swaps to the new query
-     * while a pulse goes from the original to the pill; the pill works; a
-     * pulse goes from the pill to the photo (when the picture changes) and
-     * along the branch to the readout (when the file changes). A click
-     * plays it with no pulse: the photo and the readout ping.
-     */
-    async function play(change: Change, live?: Live): Promise<void> {
-      const before = state;
-      state = next(state, change);
-      const d = describe(state);
-      const { picture, file } = touches(before, state);
-      press();
-      replay(button(change), 'ping');
-      await sleep(MS.pop);
-      if (live && !live()) return;
-      swap(pill, () => ask(d));
-      if (live) {
-        await linePulse({ root: row, trace, links, from: original, to: pill });
-        if (!live()) return;
-        pill.dataset.working = '';
-        await sleep(MS.swap);
-        delete pill.dataset.working;
-        if (!live()) return;
-        const pulses = [];
-        if (picture) pulses.push(toPhoto(live));
-        if (file) pulses.push(toReadout(live, d, picture));
-        await Promise.all(pulses);
-        return;
-      }
-      serve();
-      if (picture) replay(served, 'ping');
-      if (file) {
-        replay(readout, 'ping');
-        swap(caption, () => write(d));
-      }
-    }
-
-    root.addEventListener('click', (event) => {
-      const b = (event.target as Element).closest<HTMLElement>('[data-param], [data-fm]');
-      if (!b) return;
-      touched = true;
-      const change: Change = b.dataset.fm
-        ? { format: b.dataset.fm }
-        : { param: b.dataset.param!, on: !state.params.includes(b.dataset.param!) };
-      void play(change);
-    });
-
-    // The demo plays in view only, one change for each step, and stops for
-    // good when a visitor presses a switch
-    startDiagramLoop(
-      root,
-      async (live) => {
-        // After a click the session waits and does nothing more
-        if (touched) return new Promise<void>(() => {});
-        const playing = () => live() && !touched;
-        await play(DEMO[step % DEMO.length]!, playing);
-        if (!playing()) return;
-        step++;
-        await sleep(MS.swap + MS.hold);
-      },
-      {
-        start: async () => {
-          if (!touched) sync();
-          await sleep(MS.hold);
-        },
-      },
-    );
-  }
+    },
+  );
 </script>

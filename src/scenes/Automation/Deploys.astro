@@ -12,7 +12,7 @@ const still = BUILDS[0]!;
 const dots = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) * 64)}ms`);
 ---
 
-<figure
+<scene-automation-deploys
   class:list={[diagram.root, styles.deploys]}
   role="img"
   aria-label={DESCRIPTION}
@@ -79,7 +79,7 @@ const dots = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) 
       </div>
     </div>
   </div>
-</figure>
+</scene-automation-deploys>
 
 <script>
   import {
@@ -94,121 +94,121 @@ const dots = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) 
   import type { Live } from '~/lib/motion/diagramLoop';
   import { edgePulse } from '~/lib/motion/diagramPulse';
   import { BUILDS, STATUS } from './story';
+  import { WebComponent } from '~/lib/WebComponent';
 
   const LINE_MS = 500;
   const OUT = 6;
 
-  class Deploys {
-    trigger: HTMLElement;
-    adapter: HTMLElement;
-    mark: HTMLElement;
-    log: HTMLElement;
-    status: HTMLElement;
-    ring: HTMLElement;
-    out: SVGElement;
-    stack: HTMLElement;
-    trace: SVGSVGElement;
-    back: SVGSVGElement;
-    pipeline: HTMLElement;
-    bar: HTMLElement;
-    lineClass: string;
-    n = 0;
+  customElements.define(
+    'scene-automation-deploys',
+    class extends WebComponent {
+      trigger!: HTMLElement;
+      adapter!: HTMLElement;
+      mark!: HTMLElement;
+      log!: HTMLElement;
+      status!: HTMLElement;
+      ring!: HTMLElement;
+      out!: SVGElement;
+      stack!: HTMLElement;
+      trace!: SVGSVGElement;
+      back!: SVGSVGElement;
+      pipeline!: HTMLElement;
+      bar!: HTMLElement;
+      lineClass!: string;
+      n = 0;
 
-    constructor(root: HTMLElement) {
-      this.trigger = root.querySelector<HTMLElement>('[data-trigger]')!;
-      this.adapter = root.querySelector<HTMLElement>('[data-adapter]')!;
-      this.mark = root.querySelector<HTMLElement>('[data-mark]')!;
-      this.log = root.querySelector<HTMLElement>('[data-log]')!;
-      this.status = root.querySelector<HTMLElement>('[data-status]')!;
-      this.ring = root.querySelector<HTMLElement>('[data-ring]')!;
-      this.out = root.querySelector<SVGElement>('[data-out]')!;
-      this.stack = root.querySelector<HTMLElement>('[data-stack]')!;
-      this.trace = root.querySelector<SVGSVGElement>('[data-trace]')!;
-      this.back = root.querySelector<SVGSVGElement>('[data-back]')!;
-      this.pipeline = root.querySelector<HTMLElement>('[data-pipeline]')!;
-      this.bar = root.querySelector<HTMLElement>('[data-bar]')!;
-      this.lineClass = this.log.firstElementChild!.className;
-    }
-
-    set(el: HTMLElement, key: string, text: string): void {
-      const target = el.querySelector(`[data-${key}]`);
-      if (target) target.textContent = text;
-    }
-
-    async event(live: Live): Promise<void> {
-      await sleep(between(800, 1200));
-      if (!live()) return;
-
-      this.n = (this.n + 1) % BUILDS.length;
-      const build = BUILDS[this.n]!;
-      // A loop that stopped in the middle leaves a state: it goes
-      delete this.ring.dataset.changed;
-      this.trace.replaceChildren();
-      delete this.mark.dataset.working;
-
-      swap(this.trigger, () => {
-        this.set(this.trigger, 'label', build.trigger);
-        this.set(this.trigger, 'time', build.time);
-      });
-      await sleep(MS.swap);
-      if (!live()) return;
-
-      swap(this.adapter, () => (this.adapter.textContent = build.pipeline));
-      delete this.mark.dataset.done;
-      this.log.dataset.faded = '';
-      this.ring.dataset.leave = '';
-      await sleep(MS.swap);
-      if (!live()) return;
-      this.log.replaceChildren();
-      delete this.log.dataset.faded;
-
-      replay(this.out, 'pulse');
-      delete this.status.dataset.done;
-      this.status.dataset.working = '';
-      this.set(this.status, 'label', STATUS.working);
-      arrive(this.ring);
-      await sleep(MS.travel);
-      if (!live()) return;
-
-      this.mark.dataset.working = '';
-      for (const text of build.log) {
-        const line = document.createElement('span');
-        line.className = this.lineClass;
-        line.textContent = text;
-        line.dataset.enter = '';
-        this.log.append(line);
-        arrive(line);
-        await sleep(LINE_MS);
-        if (!live()) return;
+      parsedCallback() {
+        this.trigger = this.$('[data-trigger]');
+        this.adapter = this.$('[data-adapter]');
+        this.mark = this.$('[data-mark]');
+        this.log = this.$('[data-log]');
+        this.status = this.$('[data-status]');
+        this.ring = this.$('[data-ring]');
+        this.out = this.$<SVGElement>('[data-out]');
+        this.stack = this.$('[data-stack]');
+        this.trace = this.$<SVGSVGElement>('[data-trace]');
+        this.back = this.$<SVGSVGElement>('[data-back]');
+        this.pipeline = this.$('[data-pipeline]');
+        this.bar = this.$('[data-bar]');
+        this.lineClass = this.log.firstElementChild!.className;
+        startDiagramLoop(this, (live) => this.event(live));
       }
 
-      delete this.mark.dataset.working;
-      this.mark.dataset.done = '';
-      await sleep(MS.pop);
-      if (!live()) return;
-      await edgePulse({
-        root: this.stack,
-        trace: this.trace,
-        links: this.back,
-        vertical: true,
-        parts: [this.pipeline, this.bar],
-        out: () => OUT,
-        fromEnd: true,
-        backward: true,
-      });
-      if (!live()) return;
+      set(el: HTMLElement, key: string, text: string): void {
+        const target = el.querySelector(`[data-${key}]`);
+        if (target) target.textContent = text;
+      }
 
-      delete this.status.dataset.working;
-      this.status.dataset.done = '';
-      this.set(this.status, 'label', STATUS.done);
-      this.ring.dataset.changed = '';
-      replay(this.ring, 'ping');
-      await sleep(MS.hold);
-    }
-  }
+      async event(live: Live): Promise<void> {
+        await sleep(between(800, 1200));
+        if (!live()) return;
 
-  for (const root of document.querySelectorAll<HTMLElement>('[data-deploys]')) {
-    const deploys = new Deploys(root);
-    startDiagramLoop(root, (live) => deploys.event(live));
-  }
+        this.n = (this.n + 1) % BUILDS.length;
+        const build = BUILDS[this.n]!;
+        // A loop that stopped in the middle leaves a state: it goes
+        delete this.ring.dataset.changed;
+        this.trace.replaceChildren();
+        delete this.mark.dataset.working;
+
+        swap(this.trigger, () => {
+          this.set(this.trigger, 'label', build.trigger);
+          this.set(this.trigger, 'time', build.time);
+        });
+        await sleep(MS.swap);
+        if (!live()) return;
+
+        swap(this.adapter, () => (this.adapter.textContent = build.pipeline));
+        delete this.mark.dataset.done;
+        this.log.dataset.faded = '';
+        this.ring.dataset.leave = '';
+        await sleep(MS.swap);
+        if (!live()) return;
+        this.log.replaceChildren();
+        delete this.log.dataset.faded;
+
+        replay(this.out, 'pulse');
+        delete this.status.dataset.done;
+        this.status.dataset.working = '';
+        this.set(this.status, 'label', STATUS.working);
+        arrive(this.ring);
+        await sleep(MS.travel);
+        if (!live()) return;
+
+        this.mark.dataset.working = '';
+        for (const text of build.log) {
+          const line = document.createElement('span');
+          line.className = this.lineClass;
+          line.textContent = text;
+          line.dataset.enter = '';
+          this.log.append(line);
+          arrive(line);
+          await sleep(LINE_MS);
+          if (!live()) return;
+        }
+
+        delete this.mark.dataset.working;
+        this.mark.dataset.done = '';
+        await sleep(MS.pop);
+        if (!live()) return;
+        await edgePulse({
+          root: this.stack,
+          trace: this.trace,
+          links: this.back,
+          vertical: true,
+          parts: [this.pipeline, this.bar],
+          out: () => OUT,
+          fromEnd: true,
+          backward: true,
+        });
+        if (!live()) return;
+
+        delete this.status.dataset.working;
+        this.status.dataset.done = '';
+        this.set(this.status, 'label', STATUS.done);
+        this.ring.dataset.changed = '';
+        replay(this.ring, 'ping');
+        await sleep(MS.hold);
+      }
+    },
+  );
 </script>

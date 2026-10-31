@@ -23,7 +23,12 @@ const PICTURES = { '270p': frame270, '480p': frame480, '720p': frame720 } as con
 const played = START / DURATION;
 ---
 
-<figure class:list={[diagram.root, styles.stream]} role="img" aria-label={DESCRIPTION} data-stream>
+<scene-video-stream
+  class:list={[diagram.root, styles.stream]}
+  role="img"
+  aria-label={DESCRIPTION}
+  data-stream
+>
   <div class={styles.pair}>
     <div class={styles.side} data-slow>
       <p class={styles.connection}>
@@ -71,64 +76,60 @@ const played = START / DURATION;
       </p>
     </div>
   </div>
-</figure>
+</scene-video-stream>
 
 <script>
   import { DIAGRAM_MS, sleep, startDiagramLoop, swap, type Live } from '~/lib/motion/diagramLoop';
+  import { WebComponent } from '~/lib/WebComponent';
   import { clock, CYCLE, DURATION, START } from './stream';
 
   const TICKS = 3;
 
-  class Stream {
-    root: HTMLElement;
-    slow: HTMLElement;
-    next = 1;
-    time = START;
+  customElements.define(
+    'scene-video-stream',
+    class extends WebComponent {
+      next = 1;
+      time = START;
 
-    constructor(root: HTMLElement) {
-      this.root = root;
-      this.slow = root.querySelector<HTMLElement>('[data-slow]')!;
-    }
-
-    tick(): void {
-      this.time = this.time + 1 < DURATION ? this.time + 1 : START;
-      for (const controls of this.root.querySelectorAll<HTMLElement>('[data-controls]')) {
-        controls.style.setProperty('--played', String(this.time / DURATION));
-        controls.querySelector<HTMLElement>('[data-time]')!.textContent = clock(this.time);
+      parsedCallback() {
+        startDiagramLoop(this, (live) => this.event(live));
       }
-    }
 
-    async change(live: Live): Promise<void> {
-      const connection = CYCLE[this.next]!;
-      this.next = (this.next + 1) % CYCLE.length;
-
-      const name = this.slow.querySelector<HTMLElement>('[data-name]')!;
-      swap(name, () => (name.textContent = connection.label));
-      this.slow.querySelector<HTMLElement>('[data-bars]')!.dataset.bars = String(connection.bars);
-      await sleep(DIAGRAM_MS.swap);
-      if (!live()) return;
-
-      // The player sees the new speed a moment after the connection changes
-      for (const picture of this.slow.querySelectorAll<HTMLElement>('[data-rendition]')) {
-        if (picture.dataset.rendition === connection.rendition) picture.dataset.on = '';
-        else delete picture.dataset.on;
+      tick(): void {
+        this.time = this.time + 1 < DURATION ? this.time + 1 : START;
+        for (const controls of this.$$('[data-controls]'))
+          controls.style.setProperty('--played', String(this.time / DURATION));
+        for (const time of this.$$('[data-controls] [data-time]'))
+          time.textContent = clock(this.time);
       }
-      const badge = this.slow.querySelector<HTMLElement>('[data-badge]')!;
-      swap(badge, () => (badge.textContent = connection.rendition));
-    }
 
-    async event(live: Live): Promise<void> {
-      for (let i = 0; i < TICKS; i++) {
-        await sleep(1000);
+      async change(live: Live): Promise<void> {
+        const connection = CYCLE[this.next]!;
+        this.next = (this.next + 1) % CYCLE.length;
+
+        const name = this.$('[data-slow] [data-name]');
+        swap(name, () => (name.textContent = connection.label));
+        this.$('[data-slow] [data-bars]').dataset.bars = String(connection.bars);
+        await sleep(DIAGRAM_MS.swap);
         if (!live()) return;
-        this.tick();
-      }
-      await this.change(live);
-    }
-  }
 
-  for (const root of document.querySelectorAll<HTMLElement>('[data-stream]')) {
-    const stream = new Stream(root);
-    startDiagramLoop(root, (live) => stream.event(live));
-  }
+        // The player sees the new speed a moment after the connection changes
+        for (const picture of this.$$('[data-slow] [data-rendition]')) {
+          if (picture.dataset.rendition === connection.rendition) picture.dataset.on = '';
+          else delete picture.dataset.on;
+        }
+        const badge = this.$('[data-slow] [data-badge]');
+        swap(badge, () => (badge.textContent = connection.rendition));
+      }
+
+      async event(live: Live): Promise<void> {
+        for (let i = 0; i < TICKS; i++) {
+          await sleep(1000);
+          if (!live()) return;
+          this.tick();
+        }
+        await this.change(live);
+      }
+    },
+  );
 </script>

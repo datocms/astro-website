@@ -58,7 +58,12 @@ const rows = [
 ];
 ---
 
-<div class:list={[diagram.root, styles.pipeline]} role="img" aria-label={DESCRIPTION} data-pipeline>
+<scene-media-ai-pipeline
+  class:list={[diagram.root, styles.pipeline]}
+  role="img"
+  aria-label={DESCRIPTION}
+  data-pipeline
+>
   {
     rows.map((row) => (
       <div class={styles.row} data-kind={row.kind} data-row>
@@ -142,7 +147,7 @@ const rows = [
       </div>
     ))
   }
-</div>
+</scene-media-ai-pipeline>
 
 <script>
   import {
@@ -154,6 +159,7 @@ const rows = [
   } from '~/lib/motion/diagramLoop';
   import type { Live } from '~/lib/motion/diagramLoop';
   import { edgePulse, linePulse } from '~/lib/motion/diagramPulse';
+  import { WebComponent } from '~/lib/WebComponent';
 
   // The time that the pill works: one turn of the blink of the working mark
   const WORK_MS = 1600;
@@ -173,15 +179,17 @@ const rows = [
     panel: HTMLElement;
     index = 0;
 
-    constructor(root: HTMLElement) {
+    /** The row `root` of `scene`. The parts come from `scene`, in the row of the kind of `root`. */
+    constructor(scene: WebComponent, root: HTMLElement) {
       this.kind = root.dataset.kind!;
-      this.uploads = items(root.querySelector<HTMLElement>('[data-uploads]')!);
-      this.outputs = items(root.querySelector<HTMLElement>('[data-outputs]')!);
-      this.pill = root.querySelector<HTMLElement>('[data-pill]')!;
+      const at = `[data-row][data-kind="${this.kind}"]`;
+      this.uploads = items(scene.$(`${at} [data-uploads]`));
+      this.outputs = items(scene.$(`${at} [data-outputs]`));
+      this.pill = scene.$(`${at} [data-pill]`);
       this.root = root;
-      this.trace = root.querySelector<SVGSVGElement>('[data-trace]')!;
-      this.links = root.querySelector<HTMLElement>('[data-links]')!;
-      this.panel = root.querySelector<HTMLElement>('[data-panel]')!;
+      this.trace = scene.$<SVGSVGElement>(`${at} [data-trace]`);
+      this.links = scene.$(`${at} [data-links]`);
+      this.panel = scene.$(`${at} [data-panel]`);
     }
 
     toPill(thumb: Element): Promise<void> {
@@ -280,37 +288,40 @@ const rows = [
     }
   }
 
-  for (const root of document.querySelectorAll<HTMLElement>('[data-pipeline]')) {
-    const rows = Array.from(root.querySelectorAll<HTMLElement>('[data-row]')).map(
-      (row) => new Row(row),
-    );
-    let turn = 0;
-    // The play of each row, with the hold after it: a row starts again
-    // only after it
-    let plays: Promise<void>[] = [];
-    // The loop plays in view only. The rows play in turn, and overlap: the
-    // next row starts when the pill of the row before starts to work, or
-    // when that play stops. A row that still plays (or holds) makes the
-    // next start wait. Out of view the loop stops where it is.
-    startDiagramLoop(
-      root,
-      async (live) => {
-        await plays[turn];
-        if (!live()) return;
-        let working = () => {};
-        const started = new Promise<void>((resolve) => (working = resolve));
-        const play = rows[turn]!.play(live, working).then(() => sleep(MS.hold));
-        plays[turn] = play;
-        await Promise.race([started, play]);
-        turn = (turn + 1) % rows.length;
-      },
-      {
-        start: async () => {
-          rows.forEach((row) => row.clean());
-          plays = [];
-          await sleep(between(600, 1000));
-        },
-      },
-    );
-  }
+  customElements.define(
+    'scene-media-ai-pipeline',
+    class extends WebComponent {
+      parsedCallback() {
+        const rows = this.$$('[data-row]').map((row) => new Row(this, row));
+        let turn = 0;
+        // The play of each row, with the hold after it: a row starts again
+        // only after it
+        let plays: Promise<void>[] = [];
+        // The loop plays in view only. The rows play in turn, and overlap: the
+        // next row starts when the pill of the row before starts to work, or
+        // when that play stops. A row that still plays (or holds) makes the
+        // next start wait. Out of view the loop stops where it is.
+        startDiagramLoop(
+          this,
+          async (live) => {
+            await plays[turn];
+            if (!live()) return;
+            let working = () => {};
+            const started = new Promise<void>((resolve) => (working = resolve));
+            const play = rows[turn]!.play(live, working).then(() => sleep(MS.hold));
+            plays[turn] = play;
+            await Promise.race([started, play]);
+            turn = (turn + 1) % rows.length;
+          },
+          {
+            start: async () => {
+              rows.forEach((row) => row.clean());
+              plays = [];
+              await sleep(between(600, 1000));
+            },
+          },
+        );
+      }
+    },
+  );
 </script>

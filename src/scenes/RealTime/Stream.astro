@@ -53,7 +53,7 @@ const code = {
 };
 ---
 
-<div
+<scene-real-time-stream
   class:list={[diagram.root, styles.stream]}
   role="img"
   aria-label={description}
@@ -180,7 +180,7 @@ const code = {
       </div>
     </div>
   </AppWindow>
-</div>
+</scene-real-time-stream>
 
 <script>
   import {
@@ -194,100 +194,99 @@ const code = {
     startDiagramLoop,
   } from '~/lib/motion/diagramLoop';
   import type { Live } from '~/lib/motion/diagramLoop';
+  import { WebComponent } from '~/lib/WebComponent';
   import { VARIANTS } from './story';
 
-  class Stream {
-    lines: HTMLElement[];
-    hook: HTMLElement;
-    pill: HTMLElement;
-    posts: HTMLElement;
-    postTemplate: HTMLElement;
+  customElements.define(
+    'scene-real-time-stream',
+    class extends WebComponent {
+      lines!: HTMLElement[];
+      hook!: HTMLElement;
+      pill!: HTMLElement;
+      posts!: HTMLElement;
+      postTemplate!: HTMLElement;
 
-    constructor(root: HTMLElement) {
-      this.lines = Array.from(root.querySelectorAll<HTMLElement>('[data-line]'));
-      this.hook = root.querySelector<HTMLElement>('[data-hook]')!;
-      this.pill = root.querySelector<HTMLElement>('[data-pill]')!;
-      this.posts = root.querySelector<HTMLElement>('[data-posts]')!;
-      this.postTemplate = this.posts.firstElementChild!.cloneNode(true) as HTMLElement;
-      delete this.postTemplate.dataset.changed;
-    }
+      parsedCallback() {
+        this.lines = this.$$('[data-line]');
+        this.hook = this.$('[data-hook]');
+        this.pill = this.$('[data-pill]');
+        this.posts = this.$('[data-posts]');
+        this.postTemplate = this.posts.firstElementChild!.cloneNode(true) as HTMLElement;
+        delete this.postTemplate.dataset.changed;
+        startDiagramLoop(this, (live) => this.event(live));
+      }
 
-    /**
-     * One event: the new event on the pill, the pulse down the stream, the
-     * ring on the hook, the pulse along the line to the blog, the post
-     * comes in
-     */
-    async event(live: Live): Promise<void> {
-      await sleep(between(800, 1200));
-      if (!live()) return;
+      /**
+       * One event: the new event on the pill, the pulse down the stream, the
+       * ring on the hook, the pulse along the line to the blog, the post
+       * comes in
+       */
+      async event(live: Live): Promise<void> {
+        await sleep(between(800, 1200));
+        if (!live()) return;
 
-      const last = this.posts.querySelector<HTMLElement>('[data-time]')!.textContent!.trim();
-      const time = later(last, 1 + Math.floor(Math.random() * 4));
-      // The ring of the post before fades (the still has one too). The ring
-      // of the hook goes too: a loop that stopped in the middle leaves it.
-      for (const post of this.posts.querySelectorAll<HTMLElement>('[data-changed]'))
-        delete post.dataset.changed;
-      delete this.hook.dataset.changed;
+        const last = this.$('[data-posts] [data-time]').textContent!.trim();
+        const time = later(last, 1 + Math.floor(Math.random() * 4));
+        // The ring of the post before fades (the still has one too). The ring
+        // of the hook goes too: a loop that stopped in the middle leaves it.
+        for (const post of this.$$('[data-posts] [data-changed]')) delete post.dataset.changed;
+        delete this.hook.dataset.changed;
 
-      swap(this.pill, () => {
-        this.pill.querySelector('[data-time]')!.textContent = time;
-      });
-      await sleep(MS.swap);
-      if (!live()) return;
+        swap(this.pill, () => {
+          this.$('[data-pill] [data-time]').textContent = time;
+        });
+        await sleep(MS.swap);
+        if (!live()) return;
 
-      const [stream, out] = this.lines as [HTMLElement, HTMLElement];
-      replay(stream, 'pulse');
-      await sleep(MS.travel);
-      if (!live()) return;
+        const [stream, out] = this.lines as [HTMLElement, HTMLElement];
+        replay(stream, 'pulse');
+        await sleep(MS.travel);
+        if (!live()) return;
 
-      // The hook gets the event: the ring and the ping. The pulse to the
-      // blog goes when the ping has started, and the ring fades.
-      this.hook.dataset.changed = '';
-      replay(this.hook, 'ping');
-      await sleep(MS.pop);
-      if (!live()) return;
+        // The hook gets the event: the ring and the ping. The pulse to the
+        // blog goes when the ping has started, and the ring fades.
+        this.hook.dataset.changed = '';
+        replay(this.hook, 'ping');
+        await sleep(MS.pop);
+        if (!live()) return;
 
-      replay(out, 'pulse');
-      delete this.hook.dataset.changed;
-      await sleep(MS.travel);
-      if (!live()) return;
+        replay(out, 'pulse');
+        delete this.hook.dataset.changed;
+        await sleep(MS.travel);
+        if (!live()) return;
 
-      const post = this.postTemplate.cloneNode(true) as HTMLElement;
-      post.dataset.variant = String(Math.floor(Math.random() * VARIANTS));
-      post.dataset.changed = '';
-      post.querySelector('[data-time]')!.textContent = time;
-      this.push(post);
-      replay(post, 'ping');
-      await sleep(MS.ping);
-    }
+        const post = this.postTemplate.cloneNode(true) as HTMLElement;
+        post.dataset.variant = String(Math.floor(Math.random() * VARIANTS));
+        post.dataset.changed = '';
+        post.querySelector('[data-time]')!.textContent = time;
+        this.push(post);
+        replay(post, 'ping');
+        await sleep(MS.ping);
+      }
 
-    /**
-     * Puts `item` at the top of the posts, in the arrival state. The list
-     * moves up by one row with no transition, then goes back to its place
-     * with one (FLIP): the old posts go down, the last goes out under the
-     * edge, and `item` comes in. The posts after the visible ones go away
-     * after the move.
-     */
-    push(item: HTMLElement): void {
-      const list = this.posts;
-      item.dataset.enter = '';
-      list.prepend(item);
-      const second = item.nextElementSibling as HTMLElement | null;
-      const step = second ? second.offsetTop - item.offsetTop : item.offsetHeight;
-      list.dataset.flip = '';
-      list.style.translate = `0 ${-step}px`;
-      reflow(list);
-      delete list.dataset.flip;
-      list.style.translate = '';
-      delete item.dataset.enter;
-      window.setTimeout(() => {
-        while (list.children.length > 7) list.lastElementChild!.remove();
-      }, MS.enter + 100);
-    }
-  }
-
-  for (const root of document.querySelectorAll<HTMLElement>('[data-stream]')) {
-    const stream = new Stream(root);
-    startDiagramLoop(root, (live) => stream.event(live));
-  }
+      /**
+       * Puts `item` at the top of the posts, in the arrival state. The list
+       * moves up by one row with no transition, then goes back to its place
+       * with one (FLIP): the old posts go down, the last goes out under the
+       * edge, and `item` comes in. The posts after the visible ones go away
+       * after the move.
+       */
+      push(item: HTMLElement): void {
+        const list = this.posts;
+        item.dataset.enter = '';
+        list.prepend(item);
+        const second = item.nextElementSibling as HTMLElement | null;
+        const step = second ? second.offsetTop - item.offsetTop : item.offsetHeight;
+        list.dataset.flip = '';
+        list.style.translate = `0 ${-step}px`;
+        reflow(list);
+        delete list.dataset.flip;
+        list.style.translate = '';
+        delete item.dataset.enter;
+        window.setTimeout(() => {
+          while (list.children.length > 7) list.lastElementChild!.remove();
+        }, MS.enter + 100);
+      }
+    },
+  );
 </script>

@@ -127,7 +127,7 @@ const pct = (value: number, of: number) => `${((value / of) * 100).toFixed(2)}%`
 const DESCRIPTION = `An exploded view of blocks inside blocks: the ${FEATURE_GRID.name} block “${FEATURE_GRID_TITLE}” at the bottom, three Feature blocks (${FEATURE_BLOCKS.map(({ title }) => `“${title}”`).join(', ')}) above it, and above each Feature its Button block (${FEATURE_BLOCKS.map(({ button }) => `“${button}”`).join(', ')}).`;
 ---
 
-<figure
+<scene-dynamic-layouts-nest
   class:list={[diagram.root, styles.nest]}
   role="img"
   aria-label={DESCRIPTION}
@@ -266,7 +266,7 @@ const DESCRIPTION = `An exploded view of blocks inside blocks: the ${FEATURE_GRI
       ))
     }
   </div>
-</figure>
+</scene-dynamic-layouts-nest>
 
 <script>
   import {
@@ -277,6 +277,7 @@ const DESCRIPTION = `An exploded view of blocks inside blocks: the ${FEATURE_GRI
     startDiagramLoop,
     type Live,
   } from '~/lib/motion/diagramLoop';
+  import { WebComponent } from '~/lib/WebComponent';
 
   const STAGGER = 200;
   /** The time of the drop and of the lift of a plate: --nest-move in nest.module.css */
@@ -307,113 +308,113 @@ const DESCRIPTION = `An exploded view of blocks inside blocks: the ${FEATURE_GRI
     });
   }
 
-  for (const root of document.querySelectorAll<HTMLElement>('[data-nest]')) {
-    const camera = JSON.parse(root.dataset.camera!) as Camera;
-    const plates = [...root.querySelectorAll<SVGElement>('[data-plane]')];
-    const blocks = (level: string) => [
-      ...root.querySelectorAll<HTMLElement>(`[data-block="${level}"]`),
-    ];
-    const tracks = (level: string) => [
-      ...root.querySelectorAll<SVGElement>(
-        `path[data-tracks="${level}"], [data-tracks="${level}"] path`,
-      ),
-    ];
-    const label = (level: string) => root.querySelector<HTMLElement>(`[data-label="${level}"]`)!;
-    const levels = ['grid', 'feature', 'button'] as const;
+  customElements.define(
+    'scene-dynamic-layouts-nest',
+    class extends WebComponent {
+      parsedCallback() {
+        const camera = JSON.parse(this.dataset.camera!) as Camera;
+        const plates = this.$$<SVGElement>('[data-plane]');
+        const blocks = (level: string) => this.$$(`[data-block="${level}"]`);
+        const tracks = (level: string) =>
+          this.$$<SVGElement>(`path[data-tracks="${level}"], [data-tracks="${level}"] path`);
+        const label = (level: string) => this.$(`[data-label="${level}"]`);
+        const levels = ['grid', 'feature', 'button'] as const;
 
-    /**
-     * Puts the camera at `k` of its way from the view from above (0) to
-     * the angle of the still (1). The middle of the grid moves on a
-     * straight line between its two places.
-     */
-    function look(k: number): void {
-      const turn = camera.turn * k;
-      const tilt = camera.tilt * k;
-      const a = Math.cos(turn);
-      const b = Math.sin(turn) * Math.cos(tilt);
-      const c = -Math.sin(turn);
-      const d = Math.cos(turn) * Math.cos(tilt);
-      const [cx, cy] = camera.centre;
-      const x = camera.above[0] + (camera.still[0] - camera.above[0]) * k;
-      const y = camera.above[1] + (camera.still[1] - camera.above[1]) * k;
-      const matrix = `matrix(${[a, b, c, d, x - (a * cx + c * cy), y - (b * cx + d * cy)]
-        .map((n) => n.toFixed(4))
-        .join(' ')})`;
-      for (const plate of plates) plate.setAttribute('transform', matrix);
-    }
-
-    async function build(live: Live): Promise<void> {
-      await sleep(DIAGRAM_MS.hold);
-      if (!live()) return;
-      await tween(LOOK, look);
-      await sleep(DIAGRAM_MS.settle / 2);
-
-      for (const level of levels) {
-        if (!live()) return;
-        if (level !== 'grid') {
-          for (const block of blocks(level)) {
-            delete block.dataset.down;
-            await sleep(STAGGER);
-          }
-          await sleep(MOVE - STAGGER);
+        /**
+         * Puts the camera at `k` of its way from the view from above (0) to
+         * the angle of the still (1). The middle of the grid moves on a
+         * straight line between its two places.
+         */
+        function look(k: number): void {
+          const turn = camera.turn * k;
+          const tilt = camera.tilt * k;
+          const a = Math.cos(turn);
+          const b = Math.sin(turn) * Math.cos(tilt);
+          const c = -Math.sin(turn);
+          const d = Math.cos(turn) * Math.cos(tilt);
+          const [cx, cy] = camera.centre;
+          const x = camera.above[0] + (camera.still[0] - camera.above[0]) * k;
+          const y = camera.above[1] + (camera.still[1] - camera.above[1]) * k;
+          const matrix = `matrix(${[a, b, c, d, x - (a * cx + c * cy), y - (b * cx + d * cy)]
+            .map((n) => n.toFixed(4))
+            .join(' ')})`;
+          for (const plate of plates) plate.setAttribute('transform', matrix);
         }
-        for (const track of tracks(level)) delete track.dataset.hidden;
-        await sleep(DIAGRAM_MS.draw);
-        arrive(label(level));
-        await sleep(DIAGRAM_MS.pop);
-      }
 
-      await sleep(DIAGRAM_MS.hold * 2);
-      if (!live()) return;
-
-      for (const level of levels) {
-        label(level).dataset.leave = '';
-        for (const track of tracks(level)) track.dataset.faded = '';
-      }
-      await sleep(DIAGRAM_MS.fade);
-
-      for (const level of ['button', 'feature']) {
-        for (const block of blocks(level)) {
+        async function build(live: Live): Promise<void> {
+          await sleep(DIAGRAM_MS.hold);
           if (!live()) return;
-          block.dataset.down = '';
-          await sleep(STAGGER);
+          await tween(LOOK, look);
+          await sleep(DIAGRAM_MS.settle / 2);
+
+          for (const level of levels) {
+            if (!live()) return;
+            if (level !== 'grid') {
+              for (const block of blocks(level)) {
+                delete block.dataset.down;
+                await sleep(STAGGER);
+              }
+              await sleep(MOVE - STAGGER);
+            }
+            for (const track of tracks(level)) delete track.dataset.hidden;
+            await sleep(DIAGRAM_MS.draw);
+            arrive(label(level));
+            await sleep(DIAGRAM_MS.pop);
+          }
+
+          await sleep(DIAGRAM_MS.hold * 2);
+          if (!live()) return;
+
+          for (const level of levels) {
+            label(level).dataset.leave = '';
+            for (const track of tracks(level)) track.dataset.faded = '';
+          }
+          await sleep(DIAGRAM_MS.fade);
+
+          for (const level of ['button', 'feature']) {
+            for (const block of blocks(level)) {
+              if (!live()) return;
+              block.dataset.down = '';
+              await sleep(STAGGER);
+            }
+            await sleep(MOVE - STAGGER);
+          }
+
+          for (const level of levels) {
+            for (const track of tracks(level)) {
+              delete track.dataset.faded;
+              track.dataset.hidden = '';
+            }
+          }
+
+          await tween(FLATTEN, (t) => look(1 - t));
         }
-        await sleep(MOVE - STAGGER);
+
+        startDiagramLoop(this, build, {
+          // Each session starts from the view from above, with no transition:
+          // one block, with no tracks and no labels
+          start: () => {
+            for (const el of this.$$<HTMLElement | SVGElement>(
+              '[data-down], [data-faded], [data-hidden], [data-leave], [data-enter], [data-changed], [data-ping]',
+            )) {
+              for (const name of ['down', 'faded', 'hidden', 'leave', 'enter', 'changed', 'ping'])
+                delete el.dataset[name];
+            }
+            const lifts = [...blocks('feature'), ...blocks('button')];
+            for (const block of lifts) {
+              block.style.transition = 'none';
+              block.dataset.down = '';
+            }
+            for (const level of levels) {
+              label(level).dataset.enter = '';
+              for (const track of tracks(level)) track.dataset.hidden = '';
+            }
+            look(0);
+            reflow(this);
+            for (const block of lifts) block.style.transition = '';
+          },
+        });
       }
-
-      for (const level of levels) {
-        for (const track of tracks(level)) {
-          delete track.dataset.faded;
-          track.dataset.hidden = '';
-        }
-      }
-
-      await tween(FLATTEN, (t) => look(1 - t));
-    }
-
-    startDiagramLoop(root, build, {
-      // Each session starts from the view from above, with no transition:
-      // one block, with no tracks and no labels
-      start: () => {
-        for (const el of root.querySelectorAll<HTMLElement | SVGElement>(
-          '[data-down], [data-faded], [data-hidden], [data-leave], [data-enter], [data-changed], [data-ping]',
-        )) {
-          for (const name of ['down', 'faded', 'hidden', 'leave', 'enter', 'changed', 'ping'])
-            delete el.dataset[name];
-        }
-        const lifts = [...blocks('feature'), ...blocks('button')];
-        for (const block of lifts) {
-          block.style.transition = 'none';
-          block.dataset.down = '';
-        }
-        for (const level of levels) {
-          label(level).dataset.enter = '';
-          for (const track of tracks(level)) track.dataset.hidden = '';
-        }
-        look(0);
-        reflow(root);
-        for (const block of lifts) block.style.transition = '';
-      },
-    });
-  }
+    },
+  );
 </script>
