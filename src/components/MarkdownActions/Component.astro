@@ -33,7 +33,12 @@ const links = [
   control stays hidden. The search index skips it.
 */
 }
-<div class={styles.root} data-markdown-actions={markdownUrl} data-datocms-noindex hidden>
+<markdown-actions
+  class={styles.root}
+  data-markdown-actions={markdownUrl}
+  data-datocms-noindex
+  hidden
+>
   <div class={styles.pill}>
     <button type="button" class:list={[styles.part, 'caption']} data-action="copy-page">
       <span class={styles.icon} data-icon="copy"><Icon icon={faCopy} /></span>
@@ -75,92 +80,105 @@ const links = [
       ))
     }
   </ul>
-</div>
+</markdown-actions>
 
 <script>
-  for (const root of document.querySelectorAll<HTMLElement>('[data-markdown-actions]')) {
-    const url = root.dataset.markdownActions;
-    const copyPage = root.querySelector<HTMLButtonElement>('[data-action="copy-page"]');
-    const copyLink = root.querySelector<HTMLButtonElement>('[data-action="copy-link"]');
-    const toggle = root.querySelector<HTMLButtonElement>('[data-action="toggle"]');
-    const menu = root.querySelector<HTMLElement>('[data-menu]');
-    const label = copyPage?.querySelector<HTMLElement>('[data-label]');
-    const copyIcon = copyPage?.querySelector<HTMLElement>('[data-icon="copy"]');
-    const doneIcon = copyPage?.querySelector<HTMLElement>('[data-icon="done"]');
-    // A block with a missing part stays hidden: the other blocks still work.
-    if (!url || !copyPage || !copyLink || !toggle || !menu) continue;
-    if (!label || !copyIcon || !doneIcon) continue;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    root.hidden = false;
+  import { WebComponent } from '~/lib/WebComponent';
 
-    const setOpen = (open: boolean) => {
-      menu.hidden = !open;
-      toggle.setAttribute('aria-expanded', String(open));
-    };
+  customElements.define(
+    'markdown-actions',
+    class extends WebComponent {
+      #documentListeners = new AbortController();
 
-    // For one second, the button shows that the copy is done.
-    const showDone = () => {
-      copyIcon.hidden = true;
-      doneIcon.hidden = false;
-      label.textContent = 'Copied';
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        copyIcon.hidden = false;
-        doneIcon.hidden = true;
-        label.textContent = 'Copy page';
-      }, 1000);
-    };
+      parsedCallback() {
+        const url = this.dataset.markdownActions ?? '';
+        const copyPage = this.$<HTMLButtonElement>('[data-action="copy-page"]');
+        const copyLink = this.$<HTMLButtonElement>('[data-action="copy-link"]');
+        const toggle = this.$<HTMLButtonElement>('[data-action="toggle"]');
+        const menu = this.$('[data-menu]');
+        const label = this.$('[data-label]');
+        const copyIcon = this.$('[data-icon="copy"]');
+        const doneIcon = this.$('[data-icon="done"]');
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        this.hidden = false;
 
-    const fetchMarkdown = async () => {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`Status ${response.status}`);
-      return response.text();
-    };
+        const setOpen = (open: boolean) => {
+          menu.hidden = !open;
+          toggle.setAttribute('aria-expanded', String(open));
+        };
 
-    const copyPageText = async () => {
-      // Safari keeps the user gesture only when the promise goes into the ClipboardItem.
-      if (typeof ClipboardItem !== 'undefined') {
-        const blob = fetchMarkdown().then((text) => new Blob([text], { type: 'text/plain' }));
-        await navigator.clipboard.write([new ClipboardItem({ 'text/plain': blob })]);
-      } else {
-        await navigator.clipboard.writeText(await fetchMarkdown());
+        // For one second, the button shows that the copy is done.
+        const showDone = () => {
+          copyIcon.hidden = true;
+          doneIcon.hidden = false;
+          label.textContent = 'Copied';
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+            copyIcon.hidden = false;
+            doneIcon.hidden = true;
+            label.textContent = 'Copy page';
+          }, 1000);
+        };
+
+        const fetchMarkdown = async () => {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`Status ${response.status}`);
+          return response.text();
+        };
+
+        const copyPageText = async () => {
+          // Safari keeps the user gesture only when the promise goes into the ClipboardItem.
+          if (typeof ClipboardItem !== 'undefined') {
+            const blob = fetchMarkdown().then((text) => new Blob([text], { type: 'text/plain' }));
+            await navigator.clipboard.write([new ClipboardItem({ 'text/plain': blob })]);
+          } else {
+            await navigator.clipboard.writeText(await fetchMarkdown());
+          }
+        };
+
+        this.on(copyPage, 'click', async () => {
+          copyPage.setAttribute('aria-busy', 'true');
+          try {
+            await copyPageText();
+            showDone();
+          } catch (error) {
+            console.error('[MarkdownActions] cannot copy the page', error);
+          } finally {
+            copyPage.removeAttribute('aria-busy');
+          }
+        });
+
+        this.on(copyLink, 'click', async () => {
+          setOpen(false);
+          try {
+            await navigator.clipboard.writeText(url);
+            showDone();
+          } catch (error) {
+            console.error('[MarkdownActions] cannot copy the link', error);
+          }
+        });
+
+        this.on(toggle, 'click', () => setOpen(menu.hidden));
+        this.on(menu, 'click', 'a', () => setOpen(false));
+        document.addEventListener(
+          'click',
+          (event) => {
+            if (!this.contains(event.target as Node)) setOpen(false);
+          },
+          { signal: this.#documentListeners.signal },
+        );
+        this.on(this, 'keydown', (event) => {
+          if (event.key === 'Escape' && !menu.hidden) {
+            setOpen(false);
+            toggle.focus();
+          }
+        });
       }
-    };
 
-    copyPage.addEventListener('click', async () => {
-      copyPage.setAttribute('aria-busy', 'true');
-      try {
-        await copyPageText();
-        showDone();
-      } catch (error) {
-        console.error('[MarkdownActions] cannot copy the page', error);
-      } finally {
-        copyPage.removeAttribute('aria-busy');
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.#documentListeners.abort();
       }
-    });
-
-    copyLink.addEventListener('click', async () => {
-      setOpen(false);
-      try {
-        await navigator.clipboard.writeText(url);
-        showDone();
-      } catch (error) {
-        console.error('[MarkdownActions] cannot copy the link', error);
-      }
-    });
-
-    toggle.addEventListener('click', () => setOpen(menu.hidden));
-    menu.addEventListener('click', (event) => {
-      if ((event.target as Element).closest('a')) setOpen(false);
-    });
-    document.addEventListener('click', (event) => {
-      if (!root.contains(event.target as Node)) setOpen(false);
-    });
-    root.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && !menu.hidden) {
-        setOpen(false);
-        toggle.focus();
-      }
-    });
-  }
+    },
+  );
 </script>

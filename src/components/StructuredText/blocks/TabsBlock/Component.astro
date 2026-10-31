@@ -30,7 +30,7 @@ const id = `tabs-${block.id}`;
 */
 }
 <prose-island>
-  <div class={styles.tabs} data-tabs>
+  <tabs-block class={styles.tabs} data-tabs>
     <div class={styles.tablist} role="tablist" hidden>
       {
         tabs.map((tab, index) => (
@@ -71,54 +71,59 @@ const id = `tabs-${block.id}`;
         </div>
       ))
     }
-  </div>
+  </tabs-block>
 </prose-island>
 
 <script>
+  import { WebComponent } from '~/lib/WebComponent';
+
   // Turn on the tabs. Show the tab list and one panel at a time.
-  for (const root of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
-    const tablist = root.querySelector<HTMLElement>('[role="tablist"]');
-    // A block with no tab list stays as it is: the other blocks still work.
-    if (!tablist) continue;
-    const tabs = [...tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-    const panels = [...root.querySelectorAll<HTMLElement>('[data-tab-panel]')];
+  customElements.define(
+    'tabs-block',
+    class extends WebComponent {
+      parsedCallback() {
+        const tablist = this.$(':scope > [role="tablist"]');
+        const tabs = [...tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+        const panels = this.$$(':scope > [data-tab-panel]');
 
-    function select(index: number, focus = false) {
-      tabs.forEach((tab, i) => {
-        tab.setAttribute('aria-selected', String(i === index));
-        tab.tabIndex = i === index ? 0 : -1;
-        panels[i]!.hidden = i !== index;
-      });
-      if (focus) tabs[index]!.focus();
-    }
+        const select = (index: number, focus = false) => {
+          tabs.forEach((tab, i) => {
+            tab.setAttribute('aria-selected', String(i === index));
+            tab.tabIndex = i === index ? 0 : -1;
+            panels[i]!.hidden = i !== index;
+          });
+          if (focus) tabs[index]!.focus();
+        };
 
-    panels.forEach((panel, i) => {
-      panel.setAttribute('role', 'tabpanel');
-      panel.setAttribute('aria-labelledby', tabs[i]!.id);
-      panel.tabIndex = 0;
-      const heading = panel.querySelector<HTMLElement>('[data-tab-heading]');
-      if (heading) heading.hidden = true;
-    });
+        panels.forEach((panel, i) => {
+          panel.setAttribute('role', 'tabpanel');
+          panel.setAttribute('aria-labelledby', tabs[i]!.id);
+          panel.tabIndex = 0;
+          const heading = panel.querySelector<HTMLElement>(':scope > [data-tab-heading]');
+          if (heading) heading.hidden = true;
+        });
 
-    tabs.forEach((tab, i) => tab.addEventListener('click', () => select(i)));
+        tabs.forEach((tab, i) => this.on(tab, 'click', () => select(i)));
 
-    // The arrow keys, Home and End move between the tabs.
-    tablist.addEventListener('keydown', (event) => {
-      const current = tabs.indexOf(document.activeElement as HTMLButtonElement);
-      if (current < 0) return;
-      const last = tabs.length - 1;
-      const next = {
-        ArrowRight: current === last ? 0 : current + 1,
-        ArrowLeft: current === 0 ? last : current - 1,
-        Home: 0,
-        End: last,
-      }[event.key];
-      if (next === undefined) return;
-      event.preventDefault();
-      select(next, true);
-    });
+        // The arrow keys, Home and End move between the tabs.
+        this.on(tablist, 'keydown', (event) => {
+          const current = tabs.indexOf(document.activeElement as HTMLButtonElement);
+          if (current < 0) return;
+          const last = tabs.length - 1;
+          const next = {
+            ArrowRight: current === last ? 0 : current + 1,
+            ArrowLeft: current === 0 ? last : current - 1,
+            Home: 0,
+            End: last,
+          }[event.key];
+          if (next === undefined) return;
+          event.preventDefault();
+          select(next, true);
+        });
 
-    tablist.hidden = false;
-    select(0);
-  }
+        tablist.hidden = false;
+        select(0);
+      }
+    },
+  );
 </script>

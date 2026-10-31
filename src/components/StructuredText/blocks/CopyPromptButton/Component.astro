@@ -23,42 +23,47 @@ const firstLine = text.split('\n').find((line) => line.trim()) ?? '';
 */
 }
 <prose-island>
-  <div class={styles.copyPrompt} data-copy-prompt hidden>
+  <copy-prompt class={styles.copyPrompt} data-copy-prompt hidden>
     <Button appearance="deep-on-white" arrow={false}> Copy prompt </Button>
     <p class:list={[styles.hint, 'caption']} aria-live="polite" data-copy-prompt-hint>
       “{firstLine}”
     </p>
     <template data-copy-prompt-text>{text}</template>
-  </div>
+  </copy-prompt>
 </prose-island>
 
 <script>
+  import { WebComponent } from '~/lib/WebComponent';
+
   const DONE = '✓ Copied: now paste that into your preferred AI agent!';
 
-  for (const root of document.querySelectorAll<HTMLElement>('[data-copy-prompt]')) {
-    const button = root.querySelector('button');
-    const hint = root.querySelector<HTMLElement>('[data-copy-prompt-hint]');
-    const template = root.querySelector<HTMLTemplateElement>('[data-copy-prompt-text]');
-    // A block with a missing part stays hidden: the other blocks still work.
-    if (!button || !hint || !template) continue;
-    const initial = hint.textContent;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    root.hidden = false;
+  customElements.define(
+    'copy-prompt',
+    class extends WebComponent {
+      parsedCallback() {
+        const button = this.$<HTMLButtonElement>('button');
+        const hint = this.$('[data-copy-prompt-hint]');
+        const template = this.$<HTMLTemplateElement>('[data-copy-prompt-text]');
+        const initial = hint.textContent;
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        this.hidden = false;
 
-    button.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(template.content.textContent ?? '');
-      } catch {
-        return;
+        this.on(button, 'click', async () => {
+          try {
+            await navigator.clipboard.writeText(template.content.textContent ?? '');
+          } catch {
+            return;
+          }
+          hint.textContent = DONE;
+          hint.dataset.copied = '';
+          clearTimeout(timer);
+          // After 3 seconds, show the first line again.
+          timer = setTimeout(() => {
+            hint.textContent = initial;
+            delete hint.dataset.copied;
+          }, 3000);
+        });
       }
-      hint.textContent = DONE;
-      hint.dataset.copied = '';
-      clearTimeout(timer);
-      // After 3 seconds, show the first line again.
-      timer = setTimeout(() => {
-        hint.textContent = initial;
-        delete hint.dataset.copied;
-      }, 3000);
-    });
-  }
+    },
+  );
 </script>

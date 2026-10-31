@@ -23,42 +23,58 @@ const { video } = readFragment(VideoPlayerFragment, data);
 }
 {
   video.muxPlaybackId && (
-    <mux-player
-      class:list={[styles.player, className]}
-      stream-type="on-demand"
-      playback-id={video.muxPlaybackId}
-      title={video.title ?? undefined}
-      placeholder={video.blurUpThumb ?? undefined}
-      poster={video.thumbnailUrl}
-      thumbnail-time="0"
-      preload="metadata"
-      prefer-playback="mse"
-      accent-color="var(--surface-accent)"
-      disable-cookies
-      disable-tracking
-      style={
-        video.width && video.height
-          ? { aspectRatio: `${video.width} / ${video.height}` }
-          : undefined
-      }
-    />
+    <video-player class={styles.root}>
+      <mux-player
+        class:list={[styles.player, className]}
+        stream-type="on-demand"
+        playback-id={video.muxPlaybackId}
+        title={video.title ?? undefined}
+        placeholder={video.blurUpThumb ?? undefined}
+        poster={video.thumbnailUrl}
+        thumbnail-time="0"
+        preload="metadata"
+        prefer-playback="mse"
+        accent-color="var(--surface-accent)"
+        disable-cookies
+        disable-tracking
+        style={
+          video.width && video.height
+            ? { aspectRatio: `${video.width} / ${video.height}` }
+            : undefined
+        }
+      />
+    </video-player>
   )
 }
 
 <script>
-  // Load the player when the first element is near the viewport.
-  const players = document.querySelectorAll('mux-player');
+  import { WebComponent } from '~/lib/WebComponent';
 
-  if (players.length > 0) {
-    const load = () => import('@mux/mux-player');
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        observer.disconnect();
-        void load();
-      },
-      { rootMargin: '400px' },
-    );
-    for (const player of players) observer.observe(player);
-  }
+  const load = () => import('@mux/mux-player');
+
+  // Load the player when it comes near the viewport.
+  customElements.define(
+    'video-player',
+    class extends WebComponent {
+      #observer: IntersectionObserver | null = null;
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.#observer?.disconnect();
+      }
+
+      parsedCallback() {
+        const player = this.$(':scope > mux-player');
+        this.#observer = new IntersectionObserver(
+          (entries) => {
+            if (!entries.some((entry) => entry.isIntersecting)) return;
+            this.#observer?.disconnect();
+            void load();
+          },
+          { rootMargin: '400px' },
+        );
+        this.#observer.observe(player);
+      }
+    },
+  );
 </script>

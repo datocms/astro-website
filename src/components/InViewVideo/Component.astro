@@ -16,24 +16,42 @@ const { src, poster, width, height, label, class: className } = Astro.props;
 const sources = typeof src === 'string' ? [{ src, type: 'video/mp4' }] : src;
 ---
 
-<video
-  class:list={[styles.video, className]}
-  poster={poster}
-  width={width}
-  height={height}
-  muted
-  loop
-  playsinline
-  preload="metadata"
-  disablepictureinpicture
-  aria-label={label}
-  aria-hidden={label ? undefined : 'true'}
-  data-in-view-video
->
-  {sources.map((s) => <source src={s.src} type={s.type} />)}
-</video>
+<in-view-video class={styles.root}>
+  <video
+    class:list={[styles.video, className]}
+    poster={poster}
+    width={width}
+    height={height}
+    muted
+    loop
+    playsinline
+    preload="metadata"
+    disablepictureinpicture
+    aria-label={label}
+    aria-hidden={label ? undefined : 'true'}
+    data-in-view-video
+  >
+    {sources.map((s) => <source src={s.src} type={s.type} />)}
+  </video>
+</in-view-video>
 
 <script>
   import { setupInViewVideo } from '~/lib/motion/inViewVideo';
-  document.querySelectorAll<HTMLVideoElement>('[data-in-view-video]').forEach(setupInViewVideo);
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'in-view-video',
+    class extends WebComponent {
+      #stop: (() => void) | undefined;
+
+      parsedCallback() {
+        this.#stop = setupInViewVideo(this.$<HTMLVideoElement>(':scope > video'));
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.#stop?.();
+      }
+    },
+  );
 </script>
