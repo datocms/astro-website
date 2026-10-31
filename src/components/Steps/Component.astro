@@ -1,0 +1,24 @@
+---
+import { Headline } from '~/components/Headline';
+import { Section } from '~/components/Section';
+import styles from './style.module.css';
+
+interface Props {
+  title: string;
+  /** The muted run of the title. */
+  muted?: string;
+  class?: string;
+}
+
+const { title, muted, class: className } = Astro.props;
+---
+
+{
+  /* Numbered steps in a row of cards. The slot takes the `Step` elements. The CSS counter gives the numbers. */
+}
+<Section class={className} contentClass={styles.content}>
+  <Headline as="h2" size="h1" muted={muted}>{title}</Headline>
+  <ol class={styles.list}>
+    <slot />
+  </ol>
+</Section>

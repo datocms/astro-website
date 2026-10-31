@@ -1,12 +1,22 @@
 ---
+import type { Benefit } from '~/data/partner-program';
 import s from './_style.module.css';
 
-type Props = {
-  title: string;
-};
+type Props = Benefit;
+
+const { title, body, link } = Astro.props;
 ---
 
-<div class={s.benefit}>
-  <h4 class={s.benefitTitle}>{Astro.props.title}</h4>
-  <div class={s.benefitContent}><slot /></div>
-</div>
+<li class={s.benefit}>
+  <h3 class="h2">{title}</h3>
+  <p class:list={[s.text, 'body']} set:html={body} />
+  {
+    link && (
+      <p class="bodyMedium">
+        <a class={s.link} href={link.href}>
+          {link.label}
+        </a>
+      </p>
+    )
+  }
+</li>

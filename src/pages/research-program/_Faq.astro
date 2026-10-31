@@ -1,0 +1,40 @@
+---
+import { Section } from '~/components/Section';
+import { PlainText, StructuredText } from '~/components/StructuredText';
+import { Prose } from '~/components/Prose';
+import s from './_faq.module.css';
+
+interface Props {
+  title: string;
+  questions: {
+    question: { value: unknown } | null;
+    answer: { value: unknown } | null;
+  }[];
+}
+
+const { title, questions } = Astro.props;
+---
+
+{/* Only one answer is open at a time. The first is open. */}
+<Section class={s.faq} contentClass={s.content} flushTop>
+  <h2 class="h1">{title}</h2>
+  <div class={s.items}>
+    {
+      questions.map((item, i) => (
+        <details class={s.item} name="faq" open={i === 0}>
+          <summary class={s.question}>
+            <span class="h2">
+              <PlainText data={item.question} />
+            </span>
+            <span class:list={[s.sign, 'h2']} aria-hidden="true" />
+          </summary>
+          {item.answer && (
+            <Prose class={s.answer}>
+              <StructuredText data={item.answer as never} />
+            </Prose>
+          )}
+        </details>
+      ))
+    }
+  </div>
+</Section>

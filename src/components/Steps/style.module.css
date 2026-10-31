@@ -1,0 +1,52 @@
+/* Stacked below 768. One column for each step from 768. */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  background: var(--surface-accent-faint);
+  counter-increment: step;
+}
+
+.step::before {
+  content: counter(step, decimal-leading-zero);
+  font-size: var(--type-h2);
+  line-height: 1;
+  color: var(--text-muted);
+}
+
+.body {
+  color: var(--text-muted);
+}
+
+.body :where(p + p) {
+  margin-top: var(--space-xs);
+}
+
+.body :where(a) {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+@media (min-width: 768px) {
+  .list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

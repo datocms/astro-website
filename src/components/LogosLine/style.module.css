@@ -42,16 +42,19 @@
   height: var(--logo-height);
 }
 
-/* An inline SVG keeps its drawn size, scaled with the box height. */
+/*
+ * An inline SVG keeps its drawn size, scaled with the box height. A logo
+ * with a mask takes the box height, as an image does.
+ */
 /* stylelint-disable-next-line selector-no-qualifying-type -- A real distinction: only the inline SVG logo is a span. */
-span.logo {
+span.inline {
   height: auto;
   zoom: var(--logo-zoom);
 }
 
 /* The dark scheme: a logo can have a fixed dark stroke. It must follow the text colour. */
 /* stylelint-disable-next-line selector-no-qualifying-type -- Same span as above. */
-:global(:root[data-scheme='dark']) span.logo :global(svg [stroke]:not([stroke='none'])) {
+:global(:root[data-scheme='dark']) span.inline :global(svg [stroke]:not([stroke='none'])) {
   stroke: currentColor;
 }
 

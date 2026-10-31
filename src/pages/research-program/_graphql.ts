@@ -1,6 +1,5 @@
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
-import { FaqBlockFragment } from '~/components/legacy/Faqs/graphql';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -23,12 +22,17 @@ export const query = graphql(
         faqs {
           ... on QuestionAnswerRecord {
             id
-            ...FaqBlockFragment
+            question {
+              value
+            }
+            answer {
+              value
+            }
           }
         }
         bottomCtaButtonLabel
       }
     }
   `,
-  [TagFragment, FaqBlockFragment],
+  [TagFragment],
 );

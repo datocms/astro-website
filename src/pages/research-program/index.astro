@@ -1,20 +1,21 @@
 ---
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
-import { Text } from '~/components/legacy/LegacyStructuredText/Text';
+// The research program page. The CMS gives the SEO, the link of the
+// buttons, the steps and the questions. The FAQPage JSON-LD is in the head.
+import { stripStega } from '@datocms/astro';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import type { FAQPage, WithContext } from 'schema-dts';
+import { CtaBanner } from '~/components/CtaBanner';
+import { Hero } from '~/components/Hero';
+import { Step, Steps } from '~/components/Steps';
+import { StructuredText } from '~/components/StructuredText';
 import { DraftModeQueryListener } from '~/components/legacy/DraftModeQueryListener';
-import { query } from './_graphql';
-import { Layout } from '~/layouts/LegacyLayout';
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Space } from '~/components/legacy/Space';
-import { InterstitialTitle } from '~/components/legacy/InterstitialTitle';
-import { Wrapper } from '~/components/legacy/Wrapper';
-import { Button } from '~/components/legacy/LegacyButton';
-import { Journey, Step } from '~/components/legacy/Journey';
-import { Faqs, Faq } from '~/components/legacy/Faqs';
 import { JsonLd } from '~/components/legacy/JsonLd';
-import { faqsToJsonLd } from '~/components/legacy/Faqs/jsonLd';
+import { closing, faqTitle, hero, steps } from '~/data/research-program';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import Faq from './_Faq.astro';
+import { query } from './_graphql';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -23,79 +24,61 @@ if (!page) {
   return notFoundResponse();
 }
 
-const faqJsonLd = faqsToJsonLd(page.faqs);
+const ctaUrl = stripStega(page.ctaUrl);
+
+const faqs = page.faqs.flatMap((faq) => ('question' in faq ? [faq] : []));
+
+// The JSON-LD needs strings: the question and the answer as plain text,
+// without the stega of Content Link.
+const questions = faqs.flatMap((faq) => {
+  const question = toPlainText(faq.question as Parameters<typeof toPlainText>[0]);
+  const answer = toPlainText(faq.answer as Parameters<typeof toPlainText>[0]);
+  return question && answer ? [{ question: stripStega(question), answer: stripStega(answer) }] : [];
+});
+
+const jsonLd: WithContext<FAQPage> | null =
+  questions.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: questions.map(({ question, answer }) => ({
+          '@type': 'Question',
+          name: question,
+          acceptedAnswer: { '@type': 'Answer', text: answer },
+        })),
+      }
+    : null;
 ---
 
-<Layout seo={page.seo} noFinalCta>
-  {
-    faqJsonLd && (
-      <Fragment slot="head">
-        <JsonLd data={faqJsonLd} />
-      </Fragment>
-    )
-  }
-  <Hero seoAnalysis={{ keyword: 'research', synonyms: '', relatedKeywords: [] }}>
-    <Fragment slot="kicker">Research Program</Fragment>
-    <Fragment slot="title">Contribute to the <mark>evolution of DatoCMS</mark></Fragment>
-    <Fragment slot="subtitle">
-      Become a part of the DatoCMS Research Program and be the first to know what we are working on,
-      try out innovative concepts, offer your feedback and help optimize DatoCMS for your needs.
-    </Fragment>
-    <Space top={1}>
-      <Button as="a" href={stripStega(page.ctaUrl)}>{page.heroCtaLabel}</Button>
-    </Space>
-  </Hero>
+<Layout seo={page.seo} theme="blue" headerVariant="light" footerTheme="blue">
+  {jsonLd && <JsonLd slot="head" data={jsonLd} />}
 
-  <Space top={3} bottom={2}>
-    <InterstitialTitle style="two">
-      How does it work?
+  <Hero
+    variant="light"
+    {...hero}
+    buttons={[{ label: page.heroCtaLabel, href: ctaUrl, appearance: 'deep-on-light' }]}
+  />
 
-      <Fragment slot="below">
-        <Space top={1}>
-          Register to our Research Program, participate to our studies, get rewarded!
-        </Space>
-      </Fragment>
-    </InterstitialTitle>
+  <Steps title={steps.title} muted={steps.muted}>
+    {
+      page.steps.flatMap((step) =>
+        'title' in step ? (
+          <Step title={step.title}>
+            <StructuredText data={step.body} />
+          </Step>
+        ) : (
+          []
+        ),
+      )
+    }
+  </Steps>
 
-    <Wrapper>
-      <Journey>
-        {
-          page.steps.map((step, i) => (
-            <Step number={String(i + 1).padStart(2, '0')} title={step.title}>
-              <Text {...ensureValidStructuredTextProps({ data: step.body })} />
-            </Step>
-          ))
-        }
-      </Journey>
-    </Wrapper>
-  </Space>
+  <Faq title={faqTitle} questions={faqs} />
 
-  <Space top={3}>
-    <InterstitialTitle>Frequently Asked Questions</InterstitialTitle>
-    <Wrapper>
-      <Faqs>
-        {page.faqs.map((faq) => <Faq block={faq} />)}
-      </Faqs>
-    </Wrapper>
-  </Space>
-
-  <Space top={2} bottom={2}>
-    <InterstitialTitle style="two">
-      <mark>Have a say</mark> in what we build next!
-
-      <Fragment slot="below">
-        <Space top={1}>
-          Every study shapes our roadmap. Sign up once, join only when it fits your schedule, and
-          get rewarded each time you take part.
-        </Space>
-        <Space top={1}>
-          <Button as="a" href={stripStega(page.ctaUrl)} p="big" fs="big">
-            {page.bottomCtaButtonLabel}
-          </Button>
-        </Space>
-      </Fragment>
-    </InterstitialTitle>
-  </Space>
+  <CtaBanner
+    {...closing}
+    buttons={[{ label: page.bottomCtaButtonLabel, href: ctaUrl, appearance: 'deep-on-light' }]}
+  />
 
   <DraftModeQueryListener query={query} />
 </Layout>
