@@ -59,7 +59,8 @@ Status: `todo`, `doing`, `done`, `blocked`.
 | 21  | `/enterprise-headless-cms`                                | sonnet | done   |
 | 22  | `/partners` (index, showcase, partner, project)           | sonnet | done   |
 | 23  | Docs: new fonts, tokens and dark mode                     | sonnet | doing  |
-| 24  | `/tech-partners` (index, detail), in the style of step 22 | sonnet | doing  |
+| 24  | `/tech-partners` (index, detail), in the style of step 22 | sonnet | done   |
+| 25  | `/glossary`                                               | sonnet | doing  |
 
 ### 1. Legacy renames (mechanical)
 
@@ -213,6 +214,11 @@ The points that wait for a human. Remove a point when it is decided (write the d
   - The `<mark>` highlights in the quotes are plain text now.
   - The intro of `/legal` was an `<h3>`, now a `<p class="lead">`.
   - The legal line of the forms was "By submitting you agree to our TOS and acknowledge our Privacy Policy", now "…agree to our Terms and Privacy Policy".
+- **Tech partners (step 24):**
+  - Dark fix in the shared `PartnerCard`: in dark the card has `--surface-accent-subtle` and the logo a white plate (before, `--surface-raised` stayed white with light text). It also changes `/partners` in dark.
+  - The detail Hero shows the logo on a white plate (the logos are dark artwork); a text-coloured mask is the other option.
+  - The Hero adds the "[••]" face after the muted run, as on `/partners`: keep or remove.
+  - Look at: a detail page with `publicContactEmail`, very wide logos (Nordcraft), the 900px description column, dark cards, draft mode.
 - **Partners (step 22):**
   - Logos keep their colours (plain `<img>`). On the showcase cards, the partner hero and the project "Made by", the logo sits on a small `--surface-raised` chip so that black logos stay visible in dark: keep or drop.
   - The partner detail has a visible h1 with the name (before: only the logo alt); the logo is below the short description.
@@ -261,3 +267,4 @@ Each step adds one line here: the date, the step, the result, and what a human m
 - 2026-10-31, step 20: the orphan legacy components are deleted (commit `Remove the old components that no page uses`), and the content that the ports of steps 15 to 17 lost is back (commit `Redesign: restore the content lost in the ports`): the logos on the three thanks pages, the company name in the partner testimonials, the record links in the research-program FAQ answers. Open points: see "Open decisions".
 - 2026-10-31, step 21: `/enterprise-headless-cms` is on the new layout (commit `Redesign: port /enterprise-headless-cms`). The 4 old strips use the new `SplitPoints` block (kicker, title and text on one side, three points on the other). Hero, `LogosLine`, `Quote`, `ContactSection` (the sales form of `/contact`, hidden `issueType=enterprise`, `#form` kept), `StatementsSection` (`statLight`) and `TextWithImage` (key illustration) for the rest. Copy in `src/data/enterprise.ts`; the submit script of the sales form is in `src/lib/salesForm.ts` (`/contact` still has its inline copy). Shared blocks got optional props: `InlineText` (bold, links), `StatementsSection` (item `description`, `href`, data `label`), `TextWithImage` (`label`), `ContactSection` (`id`, `headingLevel`, `description` slot). Deleted: `_sub/EnterpriseStrip`, `_sub/Point.astro`. `REDESIGN_PAGE_DIRS`: `enterprise-headless-cms`. Checks: `astro check` 0 errors, lint baseline; build not run yet (a dev server was up). Open points: see "Open decisions".
 - 2026-10-31, step 22: `/partners` (index, showcase listing and pages, partner detail, project detail) is on the new layout, theme `pink` (commit `Redesign: port /partners`). Decisions of the review: all 4 templates; the world map stays (page-local `_PartnersMap`, same data, theme tokens); the filters keep the server-side GET logic with faceted counts and fetch-and-replace, in the new `FilterForm` block (native selects; continent resets country; the showcase pagination keeps the query string). New blocks: `FilterForm`, `Lightbox` (native `<dialog>`). Copy in `src/data/partners.ts`. Page-local cards `_PartnerCard`, `_Card`. Deleted: the old partner `PluginCard` copy, and the orphan `legacy/filtering`, `legacy/LegacyPagination`, `legacy/pluginToolkit`, `legacy/SidebarPane`, `legacy/Tooltip`. Checks: `astro check` 0 errors, `lint:css` baseline; build not run yet. Open points: see "Open decisions".
+- 2026-10-31, step 24: `/tech-partners` (index, detail) is on the new layout, theme `pink`, in the style of step 22 (commit `Redesign: port /tech-partners`). The partner card is now the shared `src/components/PartnerCard` (optional flags and pill), used by `/partners` and `/tech-partners`. The detail page has a visible h1 with the name. No content dropped; no legacy component became orphan. Also (commit `Restore the tooltip of the official plugin badge`): the official badge of `PluginCard` has its styled tooltip again, with the new `Tooltip` block (Floating UI); the `<title>` "d_only" of the SVG no longer shows on hover. Checks: `astro check` 0 errors, `lint:css` baseline; build not run yet. Open points: see "Open decisions".
