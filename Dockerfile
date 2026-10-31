@@ -35,8 +35,14 @@ FROM base AS prod-deps
 
 # Flag to indicate we're running in a Docker environment
 ENV INSIDE_DOCKER=true
+# The .npmrc points the @fortawesome scope to the Font Awesome Pro registry.
+# It holds no secret: it reads the token from the environment.
+# The .npmrc is copied only in the install stages, thus the runtime image has none.
+COPY .npmrc ./
 # --omit=dev flag excludes development dependencies not needed in production
-RUN npm install --omit=dev
+# The token comes from a secret mount, thus it stays out of the image layers.
+RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN \
+    npm install --omit=dev
 
 # ==== Build dependencies stage ====
 
@@ -45,7 +51,9 @@ RUN npm install --omit=dev
 
 FROM base AS build-deps
 
-RUN npm install
+COPY .npmrc ./
+RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN \
+    npm install
 
 # ==== Build stage ====
 # This is where the actual application building happens
