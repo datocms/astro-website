@@ -49,71 +49,163 @@ const ctaVariant = ctaVariantProp ?? (variant === 'default' ? 'soft' : 'solid');
 const panelId = (i: number) => `site-header-mega-${i}`;
 ---
 
-<header class:list={[styles.header, variantClass]} data-theme={theme} data-site-header>
-  <div class={styles.bar}>
-    <a href="/" class={styles.logo} aria-label="DatoCMS home">
-      <DatoLogo version="long" height={20} />
-    </a>
+<site-header class={styles.root}>
+  <header class:list={[styles.header, variantClass]} data-theme={theme}>
+    <div class={styles.bar}>
+      <a href="/" class={styles.logo} aria-label="DatoCMS home">
+        <DatoLogo version="long" height={20} />
+      </a>
 
-    <nav aria-label="Main" class={styles.nav}>
-      <ul class={styles.navList}>
+      <nav aria-label="Main" class={styles.nav}>
+        <ul class={styles.navList}>
+          {
+            nav.map((group, i) => (
+              <li>
+                {group.columns ? (
+                  <button
+                    type="button"
+                    class:list={[styles.navItem, 'subtitleMedium']}
+                    aria-expanded="false"
+                    aria-controls={panelId(i)}
+                    data-mega-trigger
+                  >
+                    {group.label}
+                    <span class={styles.chevron}>
+                      <Icon icon={faChevronDown} />
+                    </span>
+                  </button>
+                ) : (
+                  <a
+                    href={group.href}
+                    class:list={[styles.navItem, 'subtitleMedium']}
+                    data-mega-plain
+                  >
+                    {group.label}
+                  </a>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+
         {
-          nav.map((group, i) => (
-            <li>
-              {group.columns ? (
-                <button
-                  type="button"
-                  class:list={[styles.navItem, 'subtitleMedium']}
-                  aria-expanded="false"
-                  aria-controls={panelId(i)}
-                  data-mega-trigger
-                >
-                  {group.label}
-                  <span class={styles.chevron}>
-                    <Icon icon={faChevronDown} />
-                  </span>
-                </button>
-              ) : (
-                <a
-                  href={group.href}
-                  class:list={[styles.navItem, 'subtitleMedium']}
-                  data-mega-plain
-                >
-                  {group.label}
-                </a>
-              )}
-            </li>
-          ))
-        }
-      </ul>
-
-      {
-        nav.map(
-          (group, i) =>
-            group.columns && (
-              <div id={panelId(i)} class={styles.mega} hidden data-mega-panel>
-                <div class={styles.megaColumns}>
-                  {group.columns.map((column) => (
-                    <div class={styles.megaColumn}>
-                      {column.sections.map((section) => (
-                        <div class={styles.megaSection}>
-                          <div class={styles.megaGroup}>
-                            <p class:list={[styles.megaHeading, 'subtitleMedium']}>
-                              {section.heading}
-                            </p>
-                            <ul class={styles.megaLinks}>
-                              {section.links.map((link) => (
-                                <li class={styles.megaLink}>
-                                  <NavLink href={link.href}>{link.label}</NavLink>
-                                  {link.description && (
-                                    <p class:list={[styles.description, 'caption']}>
-                                      {link.description}
-                                    </p>
-                                  )}
-                                </li>
-                              ))}
-                            </ul>
+          nav.map(
+            (group, i) =>
+              group.columns && (
+                <div id={panelId(i)} class={styles.mega} hidden data-mega-panel>
+                  <div class={styles.megaColumns}>
+                    {group.columns.map((column) => (
+                      <div class={styles.megaColumn}>
+                        {column.sections.map((section) => (
+                          <div class={styles.megaSection}>
+                            <div class={styles.megaGroup}>
+                              <p class:list={[styles.megaHeading, 'subtitleMedium']}>
+                                {section.heading}
+                              </p>
+                              <ul class={styles.megaLinks}>
+                                {section.links.map((link) => (
+                                  <li class={styles.megaLink}>
+                                    <NavLink href={link.href}>{link.label}</NavLink>
+                                    {link.description && (
+                                      <p class:list={[styles.description, 'caption']}>
+                                        {link.description}
+                                      </p>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            {section.allLink && (
+                              <a href={section.allLink.href} class:list={[styles.allLink, 'h2']}>
+                                <span aria-hidden="true">→</span>
+                                <span class={styles.allLabel}>{section.allLink.label}</span>
+                              </a>
+                            )}
                           </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ),
+          )
+        }
+      </nav>
+
+      <div class={styles.actions}>
+        <button
+          type="button"
+          class={styles.search}
+          aria-label="Search"
+          aria-haspopup="dialog"
+          aria-keyshortcuts="Meta+K Control+K"
+          data-search-open
+        >
+          <Icon icon={faMagnifyingGlass} />
+        </button>
+        <button
+          type="button"
+          class={styles.scheme}
+          aria-label="Dark mode"
+          aria-pressed="false"
+          data-scheme-toggle
+        >
+          <Icon icon={faCircleHalfStroke} />
+        </button>
+        <a href={dashboardUrl('/login')} class:list={[styles.login, 'subtitleMedium']}>Login</a>
+        <Button
+          appearance={ctaAppearance}
+          variant={ctaVariant}
+          href={dashboardUrl('/signup')}
+          arrow={false}>Get Started</Button
+        >
+        <button
+          type="button"
+          class={styles.dots}
+          aria-label="Menu"
+          aria-expanded="false"
+          aria-controls="site-header-mobile-nav"
+          data-mobile-trigger
+        >
+          <Icon icon={faEllipsisVertical} />
+        </button>
+      </div>
+    </div>
+
+    <div id="site-header-mobile-nav" class={styles.mobileNav} hidden data-mobile-panel>
+      <ul class={styles.mobileList}>
+        {
+          nav.map((group) => (
+            <li class={styles.mobileItem}>
+              {group.columns ? (
+                <details name="site-header-mobile-nav" class={styles.mobileGroup}>
+                  <summary class:list={[styles.mobileSummary, 'h1']}>
+                    {group.label}
+                    <span class={styles.toggle} aria-hidden="true">
+                      <Icon icon={faPlus} class={styles.plus} />
+                      <Icon icon={faMinus} class={styles.minus} />
+                    </span>
+                  </summary>
+                  <div class={styles.mobileGroupBody}>
+                    {group.columns
+                      .flatMap((column) => column.sections)
+                      .map((section) => (
+                        <div class={styles.mobileSection}>
+                          <p class:list={[styles.megaHeading, 'subtitleMedium']}>
+                            {section.heading}
+                          </p>
+                          {section.links.map((link) =>
+                            link.description ? (
+                              <div class={styles.megaLink}>
+                                <NavLink href={link.href}>{link.label}</NavLink>
+                                <p class:list={[styles.description, 'caption']}>
+                                  {link.description}
+                                </p>
+                              </div>
+                            ) : (
+                              <NavLink href={link.href}>{link.label}</NavLink>
+                            ),
+                          )}
                           {section.allLink && (
                             <a href={section.allLink.href} class:list={[styles.allLink, 'h2']}>
                               <span aria-hidden="true">→</span>
@@ -122,208 +214,137 @@ const panelId = (i: number) => `site-header-mega-${i}`;
                           )}
                         </div>
                       ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ),
-        )
-      }
-    </nav>
-
-    <div class={styles.actions}>
-      <button
-        type="button"
-        class={styles.search}
-        aria-label="Search"
-        aria-haspopup="dialog"
-        aria-keyshortcuts="Meta+K Control+K"
-        data-search-open
-      >
-        <Icon icon={faMagnifyingGlass} />
-      </button>
-      <button
-        type="button"
-        class={styles.scheme}
-        aria-label="Dark mode"
-        aria-pressed="false"
-        data-scheme-toggle
-      >
-        <Icon icon={faCircleHalfStroke} />
-      </button>
-      <a href={dashboardUrl('/login')} class:list={[styles.login, 'subtitleMedium']}>Login</a>
-      <Button
-        appearance={ctaAppearance}
-        variant={ctaVariant}
-        href={dashboardUrl('/signup')}
-        arrow={false}>Get Started</Button
-      >
-      <button
-        type="button"
-        class={styles.dots}
-        aria-label="Menu"
-        aria-expanded="false"
-        aria-controls="site-header-mobile-nav"
-        data-mobile-trigger
-      >
-        <Icon icon={faEllipsisVertical} />
-      </button>
-    </div>
-  </div>
-
-  <div id="site-header-mobile-nav" class={styles.mobileNav} hidden data-mobile-panel>
-    <ul class={styles.mobileList}>
-      {
-        nav.map((group) => (
-          <li class={styles.mobileItem}>
-            {group.columns ? (
-              <details name="site-header-mobile-nav" class={styles.mobileGroup}>
-                <summary class:list={[styles.mobileSummary, 'h1']}>
+                  </div>
+                </details>
+              ) : (
+                <a
+                  href={group.href ?? '#'}
+                  class:list={[styles.mobileSummary, styles.mobileLink, 'h1']}
+                >
                   {group.label}
-                  <span class={styles.toggle} aria-hidden="true">
-                    <Icon icon={faPlus} class={styles.plus} />
-                    <Icon icon={faMinus} class={styles.minus} />
-                  </span>
-                </summary>
-                <div class={styles.mobileGroupBody}>
-                  {group.columns
-                    .flatMap((column) => column.sections)
-                    .map((section) => (
-                      <div class={styles.mobileSection}>
-                        <p class:list={[styles.megaHeading, 'subtitleMedium']}>{section.heading}</p>
-                        {section.links.map((link) =>
-                          link.description ? (
-                            <div class={styles.megaLink}>
-                              <NavLink href={link.href}>{link.label}</NavLink>
-                              <p class:list={[styles.description, 'caption']}>{link.description}</p>
-                            </div>
-                          ) : (
-                            <NavLink href={link.href}>{link.label}</NavLink>
-                          ),
-                        )}
-                        {section.allLink && (
-                          <a href={section.allLink.href} class:list={[styles.allLink, 'h2']}>
-                            <span aria-hidden="true">→</span>
-                            <span class={styles.allLabel}>{section.allLink.label}</span>
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                </div>
-              </details>
-            ) : (
-              <a
-                href={group.href ?? '#'}
-                class:list={[styles.mobileSummary, styles.mobileLink, 'h1']}
-              >
-                {group.label}
-              </a>
-            )}
-          </li>
-        ))
-      }
-      <li class:list={[styles.mobileItem, styles.mobileLogin]}>
-        <a
-          href={dashboardUrl('/login')}
-          class:list={[styles.mobileSummary, styles.mobileLink, 'h1']}>Login</a
-        >
-      </li>
-    </ul>
-  </div>
-</header>
+                </a>
+              )}
+            </li>
+          ))
+        }
+        <li class:list={[styles.mobileItem, styles.mobileLogin]}>
+          <a
+            href={dashboardUrl('/login')}
+            class:list={[styles.mobileSummary, styles.mobileLink, 'h1']}>Login</a
+          >
+        </li>
+      </ul>
+    </div>
+  </header>
+</site-header>
 
 <script>
   import { chooseColorScheme, currentColorScheme } from '~/lib/colorScheme';
+  import { WebComponent } from '~/lib/WebComponent';
 
   const DESKTOP = window.matchMedia('(min-width: 1152px)');
   const HOVER = window.matchMedia('(hover: hover)');
 
-  function setupHeader(header: HTMLElement) {
-    const triggers = [...header.querySelectorAll<HTMLButtonElement>('[data-mega-trigger]')];
-    const plains = header.querySelectorAll<HTMLElement>('[data-mega-plain]');
-    const mobileTrigger = header.querySelector<HTMLButtonElement>('[data-mobile-trigger]');
-    const mobilePanel = header.querySelector<HTMLElement>('[data-mobile-panel]');
+  customElements.define(
+    'site-header',
+    class SiteHeader extends WebComponent {
+      openTrigger: HTMLButtonElement | null = null;
+      mobileTrigger!: HTMLButtonElement;
+      mobilePanel!: HTMLElement;
+      schemeToggle!: HTMLButtonElement;
 
-    const panelOf = (trigger: HTMLButtonElement) =>
-      document.getElementById(trigger.getAttribute('aria-controls') ?? '');
+      parsedCallback() {
+        this.mobileTrigger = this.$<HTMLButtonElement>('[data-mobile-trigger]');
+        this.mobilePanel = this.$('[data-mobile-panel]');
+        this.schemeToggle = this.$<HTMLButtonElement>('[data-scheme-toggle]');
 
-    let openTrigger: HTMLButtonElement | null = null;
+        // Mega-menu. No animation: the panels swap at once.
+        for (const trigger of this.$$<HTMLButtonElement>('[data-mega-trigger]')) {
+          this.on(trigger, 'mouseenter', () => {
+            if (DESKTOP.matches && HOVER.matches) this.openMega(trigger);
+          });
+          this.on(trigger, 'click', () => {
+            if (this.openTrigger === trigger) this.closeMega();
+            else this.openMega(trigger);
+          });
+        }
+        for (const plain of this.$$('[data-mega-plain]')) {
+          this.on(plain, 'mouseenter', () => this.closeMega());
+        }
+        this.on(this, 'mouseleave', () => {
+          if (HOVER.matches) this.closeMega();
+        });
 
-    // Mega-menu. No animation: the panels swap at once.
-    const openMega = (trigger: HTMLButtonElement) => {
-      if (openTrigger === trigger) return;
-      closeMega();
-      trigger.setAttribute('aria-expanded', 'true');
-      panelOf(trigger)?.removeAttribute('hidden');
-      openTrigger = trigger;
-    };
+        this.on(this.mobileTrigger, 'click', () => {
+          this.setMobile(this.mobileTrigger.getAttribute('aria-expanded') !== 'true');
+        });
 
-    const closeMega = (returnFocus = false) => {
-      if (!openTrigger) return;
-      const trigger = openTrigger;
-      trigger.setAttribute('aria-expanded', 'false');
-      panelOf(trigger)?.setAttribute('hidden', '');
-      openTrigger = null;
-      if (returnFocus) trigger.focus();
-    };
+        // The switch shows the scheme of the page, also after a change of the system.
+        this.on(this.schemeToggle, 'click', () => {
+          chooseColorScheme(currentColorScheme() === 'dark' ? 'light' : 'dark');
+        });
 
-    for (const trigger of triggers) {
-      trigger.addEventListener('mouseenter', () => {
-        if (DESKTOP.matches && HOVER.matches) openMega(trigger);
-      });
-      trigger.addEventListener('click', () => {
-        if (openTrigger === trigger) closeMega();
-        else openMega(trigger);
-      });
-    }
-    for (const plain of plains) {
-      plain.addEventListener('mouseenter', () => closeMega());
-    }
-    header.addEventListener('mouseleave', () => {
-      if (HOVER.matches) closeMega();
-    });
+        // These listeners are on <html> and on the media queries. Remove
+        // them when the element leaves the page.
+        const root = document.documentElement;
+        this.eventListenerRemovers.push(
+          this.on(root, 'colorschemechange', () => this.showScheme()),
+          this.on(root, 'click', (event) => {
+            if (!this.contains(event.target as Node)) this.closeMega();
+          }),
+          this.on(root, 'keydown', (event) => {
+            if (event.key !== 'Escape') return;
+            if (this.openTrigger) this.closeMega(true);
+            if (this.mobileTrigger.getAttribute('aria-expanded') === 'true') {
+              this.setMobile(false, true);
+            }
+          }),
+        );
 
-    // Mobile nav. The page does not scroll while it is open.
-    const setMobile = (open: boolean, returnFocus = false) => {
-      if (!mobileTrigger || !mobilePanel) return;
-      mobileTrigger.setAttribute('aria-expanded', String(open));
-      mobilePanel.hidden = !open;
-      document.documentElement.style.overflow = open ? 'hidden' : '';
-      if (!open && returnFocus) mobileTrigger.focus();
-    };
-    mobileTrigger?.addEventListener('click', () => {
-      setMobile(mobileTrigger.getAttribute('aria-expanded') !== 'true');
-    });
+        const onDesktopChange = () => {
+          this.closeMega();
+          this.setMobile(false);
+        };
+        DESKTOP.addEventListener('change', onDesktopChange);
+        this.eventListenerRemovers.push(() =>
+          DESKTOP.removeEventListener('change', onDesktopChange),
+        );
 
-    document.addEventListener('click', (event) => {
-      if (!header.contains(event.target as Node)) closeMega();
-    });
+        this.showScheme();
+      }
 
-    document.addEventListener('keydown', (event) => {
-      if (event.key !== 'Escape') return;
-      if (openTrigger) closeMega(true);
-      if (mobileTrigger?.getAttribute('aria-expanded') === 'true') setMobile(false, true);
-    });
+      panelOf(trigger: HTMLButtonElement) {
+        return this.$(`#${trigger.getAttribute('aria-controls')}`);
+      }
 
-    DESKTOP.addEventListener('change', () => {
-      closeMega();
-      setMobile(false);
-    });
-  }
+      openMega(trigger: HTMLButtonElement) {
+        if (this.openTrigger === trigger) return;
+        this.closeMega();
+        trigger.setAttribute('aria-expanded', 'true');
+        this.panelOf(trigger).removeAttribute('hidden');
+        this.openTrigger = trigger;
+      }
 
-  document.querySelectorAll<HTMLElement>('[data-site-header]').forEach(setupHeader);
+      closeMega(returnFocus = false) {
+        const trigger = this.openTrigger;
+        if (!trigger) return;
+        trigger.setAttribute('aria-expanded', 'false');
+        this.panelOf(trigger).setAttribute('hidden', '');
+        this.openTrigger = null;
+        if (returnFocus) trigger.focus();
+      }
 
-  // The switch shows the scheme of the page, also after a change of the system.
-  const schemeToggles = document.querySelectorAll<HTMLButtonElement>('[data-scheme-toggle]');
-  const showScheme = () => {
-    for (const toggle of schemeToggles)
-      toggle.setAttribute('aria-pressed', String(currentColorScheme() === 'dark'));
-  };
-  for (const toggle of schemeToggles) {
-    toggle.addEventListener('click', () =>
-      chooseColorScheme(currentColorScheme() === 'dark' ? 'light' : 'dark'),
-    );
-  }
-  document.documentElement.addEventListener('colorschemechange', showScheme);
-  showScheme();
+      // Mobile nav. The page does not scroll while it is open.
+      setMobile(open: boolean, returnFocus = false) {
+        this.mobileTrigger.setAttribute('aria-expanded', String(open));
+        this.mobilePanel.hidden = !open;
+        document.documentElement.style.overflow = open ? 'hidden' : '';
+        if (!open && returnFocus) this.mobileTrigger.focus();
+      }
+
+      showScheme() {
+        this.schemeToggle.setAttribute('aria-pressed', String(currentColorScheme() === 'dark'));
+      }
+    },
+  );
 </script>

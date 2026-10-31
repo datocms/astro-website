@@ -57,7 +57,7 @@ const script: Step[] = [
 ---
 
 <Section theme={theme}>
-  <div class={styles.intro} data-not-found>
+  <not-found-section class={styles.intro}>
     <div class={styles.headlineGroup}>
       <p class:list={[styles.label, 'subtitle']}>{label}</p>
       <Headline
@@ -88,20 +88,31 @@ const script: Step[] = [
         <span aria-hidden="true"> →</span>
       </a>
     </p>
-  </div>
+  </not-found-section>
 </Section>
 
 <script>
+  import { WebComponent } from '~/lib/WebComponent';
+
   // The buttons and the help link fade in 150ms after the typewriter ends.
-  for (const root of document.querySelectorAll<HTMLElement>('[data-not-found]')) {
-    const tw = root.querySelector<HTMLElement>('[data-typewriter]');
-    if (!tw || document.documentElement.dataset.motion !== 'on' || tw.dataset.twState === 'done')
-      continue;
-    tw.addEventListener('typewriter:done', () => {
-      setTimeout(() => {
-        for (const el of root.querySelectorAll<HTMLElement>('[data-not-found-after]'))
-          el.dataset.visible = 'true';
-      }, 150);
-    });
-  }
+  customElements.define(
+    'not-found-section',
+    class NotFoundSection extends WebComponent {
+      parsedCallback() {
+        const typewriter = this.$('[data-typewriter]');
+        const after = this.$$('[data-not-found-after]');
+
+        // Without motion, the CSS shows them. When the typing is done before
+        // this element starts, the fallback of the CSS shows them after 3s.
+        if (document.documentElement.dataset.motion !== 'on') return;
+        if (typewriter.dataset.twState === 'done') return;
+
+        this.on(typewriter, 'typewriter:done', () => {
+          setTimeout(() => {
+            for (const el of after) el.dataset.visible = 'true';
+          }, 150);
+        });
+      }
+    },
+  );
 </script>
