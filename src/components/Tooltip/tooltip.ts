@@ -3,6 +3,7 @@
 // the window changes size.
 
 import { arrow, autoUpdate, computePosition, flip, hide, offset, shift } from '@floating-ui/dom';
+import { WebComponent } from '~/lib/WebComponent';
 
 export const TAG = 'dato-tooltip';
 
@@ -13,31 +14,39 @@ const STATIC_SIDE: Record<string, string> = {
   left: 'right',
 };
 
-class DatoTooltip extends HTMLElement {
-  private trigger: HTMLElement | null = null;
-  private bubble: HTMLElement | null = null;
-  private arrowElement: HTMLElement | null = null;
+interface Parts {
+  trigger: HTMLElement;
+  bubble: HTMLElement;
+  arrowElement: HTMLElement | null;
+}
+
+class DatoTooltip extends WebComponent {
+  private parts: Parts | null = null;
   private cleanup: (() => void) | null = null;
 
-  connectedCallback() {
-    this.trigger = this.querySelector('[data-trigger]');
-    this.bubble = this.querySelector('[data-bubble]');
-    this.arrowElement = this.querySelector('[data-arrow]');
-    if (!this.trigger || !this.bubble) return;
+  parsedCallback() {
+    const trigger = this.$('[data-trigger]');
+    // The arrow is optional.
+    this.parts = {
+      trigger,
+      bubble: this.$('[data-bubble]'),
+      arrowElement: this.querySelector<HTMLElement>('[data-arrow]'),
+    };
 
-    this.trigger.addEventListener('mouseenter', this.show);
-    this.trigger.addEventListener('mouseleave', this.hide);
-    this.addEventListener('focusin', this.show);
-    this.addEventListener('focusout', this.hide);
+    this.on(trigger, 'mouseenter', this.show);
+    this.on(trigger, 'mouseleave', this.hide);
+    this.on(this, 'focusin', this.show);
+    this.on(this, 'focusout', this.hide);
   }
 
   disconnectedCallback() {
+    super.disconnectedCallback();
     this.hide();
   }
 
   private show = () => {
-    const { trigger, bubble, arrowElement } = this;
-    if (this.cleanup || !trigger || !bubble) return;
+    if (this.cleanup || !this.parts) return;
+    const { trigger, bubble, arrowElement } = this.parts;
 
     this.dataset.open = '';
     this.cleanup = autoUpdate(trigger, bubble, async () => {

@@ -161,6 +161,7 @@ const notes = tabs.map((tab) =>
 
 <script>
   import { onEnterViewport, prefersReducedMotion } from '~/lib/motion/inView';
+  import { WebComponent } from '~/lib/WebComponent';
 
   // From 1152px the comment lines of the notes leave the code. Each note
   // goes next to the code, at the nearest place with no code under it.
@@ -350,10 +351,12 @@ const notes = tabs.map((tab) =>
   }
 
   // Tabs: click or arrow keys select a tab and show its panel.
-  class CodeSnippetPreview extends HTMLElement {
-    connectedCallback() {
-      const tabs = [...this.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
-      const panels = [...this.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+  class CodeSnippetPreview extends WebComponent {
+    #globalListeners = new AbortController();
+
+    parsedCallback() {
+      const tabs = this.$$<HTMLButtonElement>('[role="tab"]');
+      const panels = this.$$('[role="tabpanel"]');
 
       // A hidden panel keeps its layout, thus all the panels get their notes.
       const layout = () => {
@@ -366,7 +369,7 @@ const notes = tabs.map((tab) =>
         cancelAnimationFrame(frame);
         frame = requestAnimationFrame(layout);
       }).observe(this);
-      wide.addEventListener('change', layout);
+      wide.addEventListener('change', layout, { signal: this.#globalListeners.signal });
       document.fonts.ready.then(layout);
       layout();
 
@@ -385,14 +388,13 @@ const notes = tabs.map((tab) =>
           const on = tab === next;
           tab.setAttribute('aria-selected', String(on));
           tab.tabIndex = on ? 0 : -1;
-          const panel = this.querySelector<HTMLElement>(`#${tab.getAttribute('aria-controls')}`);
-          if (panel) panel.hidden = !on;
+          this.$(`#${tab.getAttribute('aria-controls')}`).hidden = !on;
         }
         if (!prefersReducedMotion()) show();
       };
       tabs.forEach((tab, i) => {
-        tab.addEventListener('click', () => select(tab));
-        tab.addEventListener('keydown', (event) => {
+        this.on(tab, 'click', () => select(tab));
+        this.on(tab, 'keydown', (event) => {
           const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
           if (!step) return;
           const next = tabs[(i + step + tabs.length) % tabs.length]!;
@@ -400,6 +402,11 @@ const notes = tabs.map((tab) =>
           next.focus();
         });
       });
+    }
+
+    disconnectedCallback() {
+      super.disconnectedCallback();
+      this.#globalListeners.abort();
     }
   }
   customElements.define('code-snippet-preview', CodeSnippetPreview);

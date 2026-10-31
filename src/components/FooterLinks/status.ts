@@ -13,6 +13,7 @@
 //   to the status page is always there.
 
 import type { Theme } from '~/lib/theme';
+import { WebComponent } from '~/lib/WebComponent';
 
 export const TAG = 'status-badge';
 
@@ -61,18 +62,16 @@ async function fetchStatus(): Promise<string> {
   }
 }
 
-class StatusBadge extends HTMLElement {
-  async connectedCallback() {
+class StatusBadge extends WebComponent {
+  async parsedCallback() {
+    const text = this.$('[data-status-text]');
     const stored = readStored();
     const status = stored?.status ?? (await fetchStatus());
     if (!stored) writeStored(status);
-    this.show(status);
+    this.show(text, status);
   }
 
-  private show(status: string) {
-    const text = this.querySelector('[data-status-text]');
-    if (!text) return;
-
+  private show(text: HTMLElement, status: string) {
     // The text for "up" comes from the footer data (data-up-text).
     const labels: Record<string, string> = {
       up: this.dataset.upText ?? 'All systems normal',

@@ -28,6 +28,7 @@ import { resolveColor } from '~/lib/pixel-video/color';
 import { EMPTY, lumaOf, quantize, type Thresholds } from '~/lib/pixel-video/format';
 import type { Rgba } from '~/lib/pixel-video/renderer';
 import { tintHighlight } from '~/lib/pixel-video/styles';
+import { WebComponent } from '~/lib/WebComponent';
 
 export const TAG = 'pixel-image';
 
@@ -51,9 +52,7 @@ const BREATH_STEP_MS = 125;
 // EMPTY_TONE is a see-through cell.
 const EMPTY_TONE = 255;
 
-const Base = typeof HTMLElement === 'undefined' ? (class {} as typeof HTMLElement) : HTMLElement;
-
-export class PixelImageElement extends Base {
+export class PixelImageElement extends WebComponent {
   #stop: (() => void) | null = null;
   #resize: ResizeObserver | null = null;
   #width = 0;
@@ -76,8 +75,12 @@ export class PixelImageElement extends Base {
   #startTime = 0;
   // The element that the pointer goes on: the card link, else this element.
   #hoverTarget: Element | null = null;
+  #img: HTMLImageElement | null = null;
+  #canvas: HTMLCanvasElement | null = null;
 
-  connectedCallback() {
+  parsedCallback() {
+    this.#img = this.$<HTMLImageElement>('img');
+    this.#canvas = this.$<HTMLCanvasElement>('canvas');
     if (!matchMedia('(hover: hover)').matches) return;
     // Start before the image comes into view, thus the drawing is ready
     // when the pointer comes.
@@ -91,6 +94,7 @@ export class PixelImageElement extends Base {
   }
 
   disconnectedCallback() {
+    super.disconnectedCallback();
     document.documentElement.removeEventListener('colorschemechange', this.#onSchemeChange);
     this.#hoverTarget?.removeEventListener('pointerenter', this.#play);
     this.#hoverTarget?.removeEventListener('pointerleave', this.#pause);
@@ -106,14 +110,14 @@ export class PixelImageElement extends Base {
 
   // The tokens change with the colour scheme: draw again in the new colours.
   #onSchemeChange = () => {
-    const img = this.querySelector('img');
+    const img = this.#img;
     if (!img || !this.#resize) return;
     this.#width = 0;
     this.#draw(img);
   };
 
   async #start() {
-    const img = this.querySelector('img');
+    const img = this.#img;
     if (!img) return;
     try {
       // decode() waits for the load. It fails if the image does not load.
@@ -129,7 +133,7 @@ export class PixelImageElement extends Base {
   }
 
   #draw(img: HTMLImageElement) {
-    const canvas = this.querySelector('canvas');
+    const canvas = this.#canvas;
     if (!canvas || !img.naturalWidth) return;
     const dpr = Math.min(devicePixelRatio, 2);
     const W = Math.round(this.clientWidth * dpr);
@@ -300,6 +304,5 @@ function toneOf(luma: number, limits: number[], offset: number) {
 }
 
 export function definePixelImage() {
-  if (typeof customElements !== 'undefined' && !customElements.get(TAG))
-    customElements.define(TAG, PixelImageElement);
+  if (!customElements.get(TAG)) customElements.define(TAG, PixelImageElement);
 }
