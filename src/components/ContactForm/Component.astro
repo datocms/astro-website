@@ -48,7 +48,7 @@ const {
 const needsScript = external && noscriptMessage !== undefined;
 ---
 
-<div
+<contact-form
   class={styles.root}
   data-contact-form
   data-sending-message={sendingMessage}
@@ -124,7 +124,7 @@ const needsScript = external && noscriptMessage !== undefined;
 
   {/* Screen readers read the submitting state from here. */}
   <p class="visuallyHidden" aria-live="polite" data-status></p>
-</div>
+</contact-form>
 
 <script>
   import {
@@ -132,151 +132,155 @@ const needsScript = external && noscriptMessage !== undefined;
     type ContactFormOutcome,
     type ContactFormSendDetail,
   } from './types';
+  import { WebComponent } from '~/lib/WebComponent';
 
   const SUBMIT_DELAY_MS = 1000;
 
-  function setupContactForm(root: HTMLElement) {
-    const form = root.querySelector<HTMLFormElement>('[data-form]');
-    const success = root.querySelector<HTMLElement>('[data-success]');
-    const submitError = root.querySelector<HTMLElement>('[data-submit-error]');
-    const status = root.querySelector<HTMLElement>('[data-status]');
-    const button = root.querySelector<HTMLButtonElement>('[data-submit]');
-    if (!form || !success || !submitError || !status || !button) return;
+  customElements.define(
+    'contact-form',
+    class extends WebComponent {
+      parsedCallback() {
+        const form = this.$<HTMLFormElement>('[data-form]');
+        const success = this.$('[data-success]');
+        const submitError = this.$('[data-submit-error]');
+        const status = this.$('[data-status]');
+        const button = this.$<HTMLButtonElement>('[data-submit]');
 
-    // The script shows the errors, not the browser.
-    form.noValidate = true;
+        // The script shows the errors, not the browser.
+        form.noValidate = true;
 
-    const fields = [...form.querySelectorAll<HTMLElement>('[data-field]')];
-    type Input = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-    const inputOf = (field: HTMLElement) => field.querySelector<Input>('input, textarea, select');
-    // The control that has the focus: the combobox when the script made one.
-    const controlOf = (field: HTMLElement) =>
-      [...field.querySelectorAll<HTMLElement>('[data-control]')].find((el) => !el.hidden);
+        const fields = [...form.querySelectorAll<HTMLElement>('[data-field]')];
+        type Input = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+        const inputOf = (field: HTMLElement) =>
+          field.querySelector<Input>('input, textarea, select');
+        // The control that has the focus: the combobox when the script made one.
+        const controlOf = (field: HTMLElement) =>
+          [...field.querySelectorAll<HTMLElement>('[data-control]')].find((el) => !el.hidden);
 
-    const messageOf = (field: HTMLElement) => {
-      const input = inputOf(field);
-      if (!input || input.validity.valid) return '';
-      const { requiredMessage = '', invalidMessage } = field.dataset;
-      return input.validity.valueMissing ? requiredMessage : invalidMessage || requiredMessage;
-    };
+        const messageOf = (field: HTMLElement) => {
+          const input = inputOf(field);
+          if (!input || input.validity.valid) return '';
+          const { requiredMessage = '', invalidMessage } = field.dataset;
+          return input.validity.valueMissing ? requiredMessage : invalidMessage || requiredMessage;
+        };
 
-    const showError = (field: HTMLElement, message: string) => {
-      const error = field.querySelector<HTMLElement>('[data-error]');
-      const text = field.querySelector<HTMLElement>('[data-error-text]');
-      const control = controlOf(field);
-      if (!error || !text || !control) return;
-      field.toggleAttribute('data-invalid', Boolean(message));
-      error.hidden = !message;
-      text.textContent = message;
-      if (message) {
-        control.setAttribute('aria-invalid', 'true');
-        control.setAttribute('aria-describedby', error.id);
-      } else {
-        control.removeAttribute('aria-invalid');
-        control.removeAttribute('aria-describedby');
-      }
-    };
+        const showError = (field: HTMLElement, message: string) => {
+          const error = field.querySelector<HTMLElement>('[data-error]');
+          const text = field.querySelector<HTMLElement>('[data-error-text]');
+          const control = controlOf(field);
+          if (!error || !text || !control) return;
+          field.toggleAttribute('data-invalid', Boolean(message));
+          error.hidden = !message;
+          text.textContent = message;
+          if (message) {
+            control.setAttribute('aria-invalid', 'true');
+            control.setAttribute('aria-describedby', error.id);
+          } else {
+            control.removeAttribute('aria-invalid');
+            control.removeAttribute('aria-describedby');
+          }
+        };
 
-    // After the first error, the message follows the value. It goes away
-    // when the value is valid.
-    const recheck = (event: Event) => {
-      const field = (event.target as Element).closest<HTMLElement>('[data-field]');
-      if (field?.hasAttribute('data-invalid')) showError(field, messageOf(field));
-    };
-    form.addEventListener('input', recheck);
-    form.addEventListener('change', recheck);
+        // After the first error, the message follows the value. It goes away
+        // when the value is valid.
+        const recheck = (event: Event) => {
+          const field = (event.target as Element).closest<HTMLElement>('[data-field]');
+          if (field?.hasAttribute('data-invalid')) showError(field, messageOf(field));
+        };
+        this.on(form, 'input', recheck);
+        this.on(form, 'change', recheck);
 
-    let busy = false;
+        let busy = false;
 
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      if (busy) return;
+        this.on(form, 'submit', async (event) => {
+          event.preventDefault();
+          if (busy) return;
 
-      submitError.textContent = '';
-      const invalid = fields.filter((field) => {
-        const message = messageOf(field);
-        showError(field, message);
-        return Boolean(message);
-      });
-      if (invalid.length > 0) {
-        controlOf(invalid[0]!)?.focus();
-        return;
-      }
+          submitError.textContent = '';
+          const invalid = fields.filter((field) => {
+            const message = messageOf(field);
+            showError(field, message);
+            return Boolean(message);
+          });
+          if (invalid.length > 0) {
+            controlOf(invalid[0]!)?.focus();
+            return;
+          }
 
-      // Submitting: aria-disabled keeps the focus on the button.
-      busy = true;
-      form.setAttribute('aria-busy', 'true');
-      button.setAttribute('aria-disabled', 'true');
-      status.textContent = root.dataset.sendingMessage ?? '';
+          // Submitting: aria-disabled keeps the focus on the button.
+          busy = true;
+          form.setAttribute('aria-busy', 'true');
+          button.setAttribute('aria-disabled', 'true');
+          status.textContent = this.dataset.sendingMessage ?? '';
 
-      const done = () => {
-        busy = false;
-        form.removeAttribute('aria-busy');
-        button.removeAttribute('aria-disabled');
-        status.textContent = '';
-      };
+          const done = () => {
+            busy = false;
+            form.removeAttribute('aria-busy');
+            button.removeAttribute('aria-disabled');
+            status.textContent = '';
+          };
 
-      // role="alert" reads the message. The values stay in the fields.
-      const showSubmitError = (message = submitError.dataset.message ?? '') => {
-        const face = document.createElement('span');
-        face.setAttribute('aria-hidden', 'true');
-        face.textContent = '[x_x] ';
-        submitError.append(face, message);
-      };
+          // role="alert" reads the message. The values stay in the fields.
+          const showSubmitError = (message = submitError.dataset.message ?? '') => {
+            const face = document.createElement('span');
+            face.setAttribute('aria-hidden', 'true');
+            face.textContent = '[x_x] ';
+            submitError.append(face, message);
+          };
 
-      // Success: the focus goes to the message, so screen readers read it.
-      const showSuccess = () => {
-        form.hidden = true;
-        success.hidden = false;
-        success.focus();
-      };
+          // Success: the focus goes to the message, so screen readers read it.
+          const showSuccess = () => {
+            form.hidden = true;
+            success.hidden = false;
+            success.focus();
+          };
 
-      if (root.hasAttribute('data-external')) {
-        const outcome = await new Promise<ContactFormOutcome>((resolve) => {
-          const detail: ContactFormSendDetail = { formData: new FormData(form), resolve };
-          root.dispatchEvent(new CustomEvent(CONTACT_FORM_SEND_EVENT, { detail }));
-        });
+          if (this.hasAttribute('data-external')) {
+            const outcome = await new Promise<ContactFormOutcome>((resolve) => {
+              const detail: ContactFormSendDetail = { formData: new FormData(form), resolve };
+              this.dispatchEvent(new CustomEvent(CONTACT_FORM_SEND_EVENT, { detail }));
+            });
 
-        if (outcome.ok && outcome.redirect) {
-          // Keep the submitting state while the next page loads.
-          window.location.assign(outcome.redirect);
-          return;
-        }
+            if (outcome.ok && outcome.redirect) {
+              // Keep the submitting state while the next page loads.
+              window.location.assign(outcome.redirect);
+              return;
+            }
 
-        done();
+            done();
 
-        if (outcome.ok) {
+            if (outcome.ok) {
+              showSuccess();
+              return;
+            }
+
+            const withErrors = fields.filter((field) => {
+              const name = inputOf(field)?.name;
+              const message = name ? outcome.fieldErrors?.[name] : undefined;
+              if (message) showError(field, message);
+              return Boolean(message);
+            });
+            showSubmitError(outcome.message);
+            if (withErrors.length > 0) controlOf(withErrors[0]!)?.focus();
+            return;
+          }
+
+          await new Promise((resolve) => window.setTimeout(resolve, SUBMIT_DELAY_MS));
+          done();
+
+          const email = form.querySelector<HTMLInputElement>('input[type="email"]')?.value ?? '';
+          const fail =
+            new URLSearchParams(window.location.search).has('fail') ||
+            email.trim().toLowerCase().startsWith('fail@');
+
+          if (fail) {
+            showSubmitError();
+            return;
+          }
+
           showSuccess();
-          return;
-        }
-
-        const withErrors = fields.filter((field) => {
-          const name = inputOf(field)?.name;
-          const message = name ? outcome.fieldErrors?.[name] : undefined;
-          if (message) showError(field, message);
-          return Boolean(message);
         });
-        showSubmitError(outcome.message);
-        if (withErrors.length > 0) controlOf(withErrors[0]!)?.focus();
-        return;
       }
-
-      await new Promise((resolve) => window.setTimeout(resolve, SUBMIT_DELAY_MS));
-      done();
-
-      const email = form.querySelector<HTMLInputElement>('input[type="email"]')?.value ?? '';
-      const fail =
-        new URLSearchParams(window.location.search).has('fail') ||
-        email.trim().toLowerCase().startsWith('fail@');
-
-      if (fail) {
-        showSubmitError();
-        return;
-      }
-
-      showSuccess();
-    });
-  }
-
-  document.querySelectorAll<HTMLElement>('[data-contact-form]').forEach(setupContactForm);
+    },
+  );
 </script>

@@ -17,192 +17,228 @@ interface Props {
 const { id, labelId, options } = Astro.props;
 ---
 
-<ul class={styles.menu} id={id} role="listbox" aria-labelledby={labelId} tabindex="-1" hidden>
-  {
-    options.map((option, i) => (
-      <li
-        class:list={['body', styles.option]}
-        id={`${id}-${i}`}
-        role="option"
-        aria-selected="false"
-        data-value={option.value}
-      >
-        {option.label}
-      </li>
-    ))
-  }
-</ul>
+<form-select-menu class={styles.root}>
+  <ul class={styles.menu} id={id} role="listbox" aria-labelledby={labelId} tabindex="-1" hidden>
+    {
+      options.map((option, i) => (
+        <li
+          class:list={['body', styles.option]}
+          id={`${id}-${i}`}
+          role="option"
+          aria-selected="false"
+          data-value={option.value}
+        >
+          {option.label}
+        </li>
+      ))
+    }
+  </ul>
+</form-select-menu>
 
 <script>
+  import { WebComponent } from '~/lib/WebComponent';
+
   const TYPEAHEAD_RESET_MS = 500;
 
-  function setupSelect(root: HTMLElement) {
-    const native = root.querySelector<HTMLSelectElement>('select[data-native]');
-    const box = root.querySelector<HTMLElement>('[data-combobox]');
-    const valueEl = root.querySelector<HTMLElement>('[data-combobox-value]');
-    const list = root.querySelector<HTMLElement>('[role="listbox"]');
-    const field = root.closest<HTMLElement>('[data-field]');
-    if (!native || !box || !valueEl || !list || !field) return;
-
-    const options = [...list.querySelectorAll<HTMLElement>('[role="option"]')];
-    const label = field.querySelector('label');
-    const placeholder = valueEl.textContent ?? '';
-
-    // Show the combobox and hide the native select. The native select
-    // keeps the value: the form sends it and validates it.
-    native.hidden = true;
-    box.hidden = false;
-
-    let active = -1;
-    let typeahead = '';
-    let typeaheadTimer = 0;
-
-    const isOpen = () => !list.hidden;
-    const selectedIndex = () => options.findIndex((o) => o.dataset.value === native.value);
-
-    const render = () => {
-      // Show the label of the option: the value can be a code.
-      const selected = options[selectedIndex()];
-      valueEl.textContent = (native.value && selected?.textContent?.trim()) || placeholder;
-      box.toggleAttribute('data-empty', !native.value);
-      for (const o of options) {
-        o.setAttribute('aria-selected', String(o.dataset.value === native.value));
-      }
-    };
-
-    const setActive = (i: number) => {
-      active = Math.max(0, Math.min(options.length - 1, i));
-      options.forEach((o, j) => o.toggleAttribute('data-active', j === active));
-      box.setAttribute('aria-activedescendant', options[active]!.id);
-      options[active]!.scrollIntoView({ block: 'nearest' });
-    };
-
-    const open = (i = Math.max(0, selectedIndex())) => {
-      list.hidden = false;
-      field.toggleAttribute('data-open', true);
-      box.setAttribute('aria-expanded', 'true');
-      setActive(i);
-    };
-
-    const close = () => {
-      list.hidden = true;
-      field.removeAttribute('data-open');
-      box.setAttribute('aria-expanded', 'false');
-      box.removeAttribute('aria-activedescendant');
-      for (const o of options) o.removeAttribute('data-active');
-    };
-
-    const choose = (i: number) => {
-      const value = options[i]?.dataset.value;
-      if (value === undefined) return;
-      const changed = native.value !== value;
-      native.value = value;
-      render();
-      // The form script listens to these events to clear an error.
-      if (changed) {
-        native.dispatchEvent(new Event('input', { bubbles: true }));
-        native.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    };
-
-    // Find the next option that starts with the typed letters.
-    const findByText = (char: string) => {
-      window.clearTimeout(typeaheadTimer);
-      typeaheadTimer = window.setTimeout(() => (typeahead = ''), TYPEAHEAD_RESET_MS);
-      typeahead += char.toLowerCase();
-      const start = typeahead.length === 1 ? active + 1 : Math.max(active, 0);
-      const ordered = [...options.slice(start), ...options.slice(0, start)];
-      const match = ordered.find((o) =>
-        (o.textContent ?? '').trim().toLowerCase().startsWith(typeahead),
-      );
-      return match ? options.indexOf(match) : -1;
-    };
-
-    box.addEventListener('keydown', (event) => {
-      const { key, altKey } = event;
-      const printable = key.length === 1 && !event.ctrlKey && !event.metaKey;
-
-      if (!isOpen()) {
-        if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(key) && !(key === ' ' && typeahead)) {
-          event.preventDefault();
-          open();
-        } else if (key === 'Home' || key === 'End') {
-          event.preventDefault();
-          open(key === 'Home' ? 0 : options.length - 1);
-        } else if (printable) {
-          const i = findByText(key);
-          if (i >= 0) open(i);
-        }
-        return;
-      }
-
-      if (key === 'ArrowDown') {
-        event.preventDefault();
-        setActive(active + 1);
-      } else if (key === 'ArrowUp' && altKey) {
-        event.preventDefault();
-        choose(active);
-        close();
-      } else if (key === 'ArrowUp') {
-        event.preventDefault();
-        setActive(active - 1);
-      } else if (key === 'Home' || key === 'End') {
-        event.preventDefault();
-        setActive(key === 'Home' ? 0 : options.length - 1);
-      } else if (key === 'Enter' || (key === ' ' && !typeahead)) {
-        event.preventDefault();
-        choose(active);
-        close();
-      } else if (key === 'Escape') {
-        event.preventDefault();
-        close();
-      } else if (key === 'Tab') {
-        // APG: Tab selects the active option and moves the focus on.
-        choose(active);
-        close();
-      } else if (printable) {
-        const i = findByText(key);
-        if (i >= 0) setActive(i);
-      }
-    });
-
-    box.addEventListener('click', () => (isOpen() ? close() : open()));
-
-    // Keep the focus on the combobox when the user clicks an option.
-    list.addEventListener('mousedown', (event) => event.preventDefault());
-    list.addEventListener('click', (event) => {
-      const option = (event.target as Element).closest<HTMLElement>('[role="option"]');
-      if (!option) return;
-      choose(options.indexOf(option));
-      close();
-      box.focus();
-    });
-    list.addEventListener('mousemove', (event) => {
-      const option = (event.target as Element).closest<HTMLElement>('[role="option"]');
-      if (option && options.indexOf(option) !== active) {
-        active = options.indexOf(option);
-        options.forEach((o) => o.toggleAttribute('data-active', o === option));
-        box.setAttribute('aria-activedescendant', option.id);
-      }
-    });
-
-    // The label points to the hidden native select. Move the focus to the
-    // combobox instead.
-    label?.addEventListener('click', (event) => {
-      event.preventDefault();
-      box.focus();
-    });
-
-    box.addEventListener('focusout', (event) => {
-      if (!root.contains(event.relatedTarget as Node | null)) close();
-    });
-    document.addEventListener('pointerdown', (event) => {
-      if (isOpen() && !root.contains(event.target as Node)) close();
-    });
-
-    // The browser can restore a value after a reload.
-    render();
+  // FormField renders the menu in a select field. Find a part of that field.
+  function part<T extends Element>(from: Element, selector: string): T {
+    const el = from.querySelector<T>(selector);
+    if (!el) throw new Error(`form-select-menu: no ${selector} in the field`);
+    return el;
   }
 
-  document.querySelectorAll<HTMLElement>('[data-select]').forEach(setupSelect);
+  function around(from: Element, selector: string): HTMLElement {
+    const el = from.closest<HTMLElement>(selector);
+    if (!el) throw new Error(`form-select-menu: no ${selector} around the menu`);
+    return el;
+  }
+
+  customElements.define(
+    'form-select-menu',
+    class extends WebComponent {
+      #documentListeners = new AbortController();
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.#documentListeners.abort();
+      }
+
+      parsedCallback() {
+        const root = around(this, '[data-select]');
+        const field = around(root, '[data-field]');
+        const native = part<HTMLSelectElement>(root, 'select[data-native]');
+        const box = part<HTMLElement>(root, '[data-combobox]');
+        const valueEl = part<HTMLElement>(root, '[data-combobox-value]');
+        const list = this.$(':scope > [role="listbox"]');
+
+        const options = [...list.querySelectorAll<HTMLElement>('[role="option"]')];
+        const label = field.querySelector('label');
+        const placeholder = valueEl.textContent ?? '';
+
+        // Show the combobox and hide the native select. The native select
+        // keeps the value: the form sends it and validates it.
+        native.hidden = true;
+        box.hidden = false;
+
+        let active = -1;
+        let typeahead = '';
+        let typeaheadTimer = 0;
+
+        const isOpen = () => !list.hidden;
+        const selectedIndex = () => options.findIndex((o) => o.dataset.value === native.value);
+
+        const render = () => {
+          // Show the label of the option: the value can be a code.
+          const selected = options[selectedIndex()];
+          valueEl.textContent = (native.value && selected?.textContent?.trim()) || placeholder;
+          box.toggleAttribute('data-empty', !native.value);
+          for (const o of options) {
+            o.setAttribute('aria-selected', String(o.dataset.value === native.value));
+          }
+        };
+
+        const setActive = (i: number) => {
+          active = Math.max(0, Math.min(options.length - 1, i));
+          options.forEach((o, j) => o.toggleAttribute('data-active', j === active));
+          box.setAttribute('aria-activedescendant', options[active]!.id);
+          options[active]!.scrollIntoView({ block: 'nearest' });
+        };
+
+        const open = (i = Math.max(0, selectedIndex())) => {
+          list.hidden = false;
+          field.toggleAttribute('data-open', true);
+          box.setAttribute('aria-expanded', 'true');
+          setActive(i);
+        };
+
+        const close = () => {
+          list.hidden = true;
+          field.removeAttribute('data-open');
+          box.setAttribute('aria-expanded', 'false');
+          box.removeAttribute('aria-activedescendant');
+          for (const o of options) o.removeAttribute('data-active');
+        };
+
+        const choose = (i: number) => {
+          const value = options[i]?.dataset.value;
+          if (value === undefined) return;
+          const changed = native.value !== value;
+          native.value = value;
+          render();
+          // The form script listens to these events to clear an error.
+          if (changed) {
+            native.dispatchEvent(new Event('input', { bubbles: true }));
+            native.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        };
+
+        // Find the next option that starts with the typed letters.
+        const findByText = (char: string) => {
+          window.clearTimeout(typeaheadTimer);
+          typeaheadTimer = window.setTimeout(() => (typeahead = ''), TYPEAHEAD_RESET_MS);
+          typeahead += char.toLowerCase();
+          const start = typeahead.length === 1 ? active + 1 : Math.max(active, 0);
+          const ordered = [...options.slice(start), ...options.slice(0, start)];
+          const match = ordered.find((o) =>
+            (o.textContent ?? '').trim().toLowerCase().startsWith(typeahead),
+          );
+          return match ? options.indexOf(match) : -1;
+        };
+
+        this.on(box, 'keydown', (event) => {
+          const { key, altKey } = event;
+          const printable = key.length === 1 && !event.ctrlKey && !event.metaKey;
+
+          if (!isOpen()) {
+            if (
+              ['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(key) &&
+              !(key === ' ' && typeahead)
+            ) {
+              event.preventDefault();
+              open();
+            } else if (key === 'Home' || key === 'End') {
+              event.preventDefault();
+              open(key === 'Home' ? 0 : options.length - 1);
+            } else if (printable) {
+              const i = findByText(key);
+              if (i >= 0) open(i);
+            }
+            return;
+          }
+
+          if (key === 'ArrowDown') {
+            event.preventDefault();
+            setActive(active + 1);
+          } else if (key === 'ArrowUp' && altKey) {
+            event.preventDefault();
+            choose(active);
+            close();
+          } else if (key === 'ArrowUp') {
+            event.preventDefault();
+            setActive(active - 1);
+          } else if (key === 'Home' || key === 'End') {
+            event.preventDefault();
+            setActive(key === 'Home' ? 0 : options.length - 1);
+          } else if (key === 'Enter' || (key === ' ' && !typeahead)) {
+            event.preventDefault();
+            choose(active);
+            close();
+          } else if (key === 'Escape') {
+            event.preventDefault();
+            close();
+          } else if (key === 'Tab') {
+            // APG: Tab selects the active option and moves the focus on.
+            choose(active);
+            close();
+          } else if (printable) {
+            const i = findByText(key);
+            if (i >= 0) setActive(i);
+          }
+        });
+
+        this.on(box, 'click', () => (isOpen() ? close() : open()));
+
+        // Keep the focus on the combobox when the user clicks an option.
+        this.on(list, 'mousedown', (event) => event.preventDefault());
+        this.on(list, 'click', (event) => {
+          const option = (event.target as Element).closest<HTMLElement>('[role="option"]');
+          if (!option) return;
+          choose(options.indexOf(option));
+          close();
+          box.focus();
+        });
+        this.on(list, 'mousemove', (event) => {
+          const option = (event.target as Element).closest<HTMLElement>('[role="option"]');
+          if (option && options.indexOf(option) !== active) {
+            active = options.indexOf(option);
+            options.forEach((o) => o.toggleAttribute('data-active', o === option));
+            box.setAttribute('aria-activedescendant', option.id);
+          }
+        });
+
+        // The label points to the hidden native select. Move the focus to the
+        // combobox instead.
+        if (label) {
+          this.on(label, 'click', (event) => {
+            event.preventDefault();
+            box.focus();
+          });
+        }
+
+        this.on(box, 'focusout', (event) => {
+          if (!root.contains(event.relatedTarget as Node | null)) close();
+        });
+        document.addEventListener(
+          'pointerdown',
+          (event) => {
+            if (isOpen() && !root.contains(event.target as Node)) close();
+          },
+          { signal: this.#documentListeners.signal },
+        );
+
+        // The browser can restore a value after a reload.
+        render();
+      }
+    },
+  );
 </script>
