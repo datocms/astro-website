@@ -38,16 +38,23 @@ const { columns, theme } = Astro.props;
           </div>
         ))}
         {column.status && (
-          // The status is always green, whatever the theme of the footer.
-          <div class={styles.group} data-theme="green">
+          // The colour of the status comes from the status, not from the
+          // theme of the footer: status.ts sets data-theme.
+          <status-badge class={styles.group} data-up-text={column.status.text}>
             <p class:list={[styles.statusLabel, 'subtitle']}>{column.status.label}</p>
             <a href={column.status.href} class:list={[styles.status, 'subtitleMedium']}>
               <span class={styles.statusDot} aria-hidden="true" />
-              {column.status.text}
+              <span data-status-text>Checking…</span>
             </a>
-          </div>
+          </status-badge>
         )}
       </div>
     ))
   }
 </Section>
+
+<script>
+  import { defineStatusBadge } from './status';
+
+  defineStatusBadge();
+</script>
