@@ -3,6 +3,7 @@ import type { HTMLTag } from 'astro/types';
 import type { Step, TypewriterStart } from '~/lib/motion/typewriter';
 
 interface Props {
+  /** The tag of the content: `span` for inline content, else a block. */
   as?: HTMLTag;
   /** The steps. They must follow the order of the final text in the slot. */
   script: Step[];
@@ -17,7 +18,7 @@ interface Props {
 }
 
 const {
-  as: Tag = 'span',
+  as = 'span',
   script,
   start = 'view',
   delay = 0,
@@ -27,10 +28,10 @@ const {
 } = Astro.props;
 
 // A block wrapper keeps block content valid.
-const Inner = Tag === 'span' ? 'span' : 'div';
+const Inner = as === 'span' ? 'span' : 'div';
 ---
 
-<Tag
+<type-writer
   class={className}
   data-typewriter={JSON.stringify(script)}
   data-tw-start={start}
@@ -39,9 +40,39 @@ const Inner = Tag === 'span' ? 'span' : 'div';
   data-tw-root-margin={rootMargin}
 >
   <Inner data-tw-final><slot /></Inner>
-</Tag>
+</type-writer>
 
 <script>
-  import { initTypewriters } from '~/lib/motion/typewriter';
-  initTypewriters();
+  import { onEnterViewport } from '~/lib/motion/inView';
+  import { typewrite, type Step, type TypewriterStart } from '~/lib/motion/typewriter';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  // The element types its text once: on load, in view, or on a
+  // `typewriter:start` event. `data-tw-armed` tells the CSS that the
+  // script runs.
+  customElements.define(
+    'type-writer',
+    class extends WebComponent {
+      parsedCallback() {
+        this.dataset.twArmed = '';
+        const steps = JSON.parse(this.dataset.typewriter || '[]') as Step[];
+        const start = (this.dataset.twStart || 'view') as TypewriterStart;
+        const delay = Number(this.dataset.twDelay || 0);
+        let started = false;
+        const play = () => {
+          if (started) return;
+          started = true;
+          setTimeout(() => typewrite(this, steps), delay);
+        };
+        if (start === 'load') play();
+        else if (start === 'view') {
+          onEnterViewport(this, play, {
+            threshold: Number(this.dataset.twThreshold || 0),
+            rootMargin: this.dataset.twRootMargin || '0px',
+          });
+        }
+        this.on(this, 'typewriter:start', play);
+      }
+    },
+  );
 </script>

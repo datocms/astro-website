@@ -92,6 +92,9 @@ if (subheadline) {
   );
 }
 
+// The buttons wait for the typewriter: the text then needs its script.
+const TextTag = typewriter && buttons && buttons.length > 0 ? 'hero-text' : 'div';
+
 const background = { default: 'default', light: 'accent', dark: 'inverse' }[variant] as
   'default' | 'accent' | 'inverse';
 ---
@@ -106,7 +109,7 @@ const background = { default: 'default', light: 'accent', dark: 'inverse' }[vari
   contentClass={styles.content}
   data-hero
 >
-  <div class={styles.text}>
+  <TextTag class={styles.text}>
     {
       label && (
         <p class:list={[styles.label, 'body']}>
@@ -151,11 +154,11 @@ const background = { default: 'default', light: 'accent', dark: 'inverse' }[vari
         />
       )
     }
-  </div>
+  </TextTag>
   {logos && <LogosLine logos={logos} class={styles.logos} />}
   {
     members.length > 0 && (
-      <div id={teamId} class={styles.team} data-hero-team>
+      <hero-team id={teamId} class={styles.team} data-hero-team>
         <ul class={styles.teamTrack} aria-label="Team" data-hero-team-track>
           {members.map((member) => (
             <li class={styles.member}>
@@ -171,24 +174,30 @@ const background = { default: 'default', light: 'accent', dark: 'inverse' }[vari
             </li>
           ))}
         </ul>
-      </div>
+      </hero-team>
     )
   }
 </Section>
 
 <script>
   import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  import { WebComponent } from '~/lib/WebComponent';
 
   // The buttons fade in 150ms after the typewriter ends.
-  for (const hero of document.querySelectorAll<HTMLElement>('[data-hero]')) {
-    const tw = hero.querySelector<HTMLElement>('[data-typewriter]');
-    const buttons = hero.querySelector<HTMLElement>('[data-hero-buttons]');
-    if (!tw || !buttons || document.documentElement.dataset.motion !== 'on') continue;
-    if (tw.dataset.twState === 'done') continue;
-    tw.addEventListener('typewriter:done', () => {
-      setTimeout(() => (buttons.dataset.visible = 'true'), 150);
-    });
-  }
+  customElements.define(
+    'hero-text',
+    class extends WebComponent {
+      parsedCallback() {
+        const tw = this.$('[data-typewriter]');
+        const buttons = this.$('[data-hero-buttons]');
+        if (document.documentElement.dataset.motion !== 'on') return;
+        if (tw.dataset.twState === 'done') return;
+        this.on(tw, 'typewriter:done', () => {
+          setTimeout(() => (buttons.dataset.visible = 'true'), 150);
+        });
+      }
+    },
+  );
 
   // Below 1320 the team is a marquee: one
   // line that moves to the left in an endless loop, 40s for each cycle.
@@ -196,42 +205,47 @@ const background = { default: 'default', light: 'accent', dark: 'inverse' }[vari
   const WRAP = window.matchMedia('(min-width: 1320px)');
   const CYCLE_SECONDS = 40;
 
-  for (const root of document.querySelectorAll<HTMLElement>('[data-hero-team]')) {
-    const track = root.querySelector<HTMLElement>('[data-hero-team-track]');
-    if (!track || prefersReducedMotion()) continue;
-    const items = [...track.children] as HTMLElement[];
+  customElements.define(
+    'hero-team',
+    class extends WebComponent {
+      parsedCallback() {
+        const track = this.$('[data-hero-team-track]');
+        if (prefersReducedMotion()) return;
+        const items = [...track.children] as HTMLElement[];
 
-    const build = () => {
-      for (const clone of track.querySelectorAll('[data-clone]')) clone.remove();
-      delete root.dataset.running;
-      if (WRAP.matches) return;
-      const setWidth = track.scrollWidth;
-      if (setWidth === 0) return;
-      // Add copies until the track covers the viewport plus one set.
-      const copies = Math.ceil(root.clientWidth / setWidth) + 1;
-      for (let i = 0; i < copies; i += 1) {
-        for (const item of items) {
-          const clone = item.cloneNode(true) as HTMLElement;
-          clone.dataset.clone = '';
-          clone.setAttribute('aria-hidden', 'true');
-          track.appendChild(clone);
-        }
+        const build = () => {
+          for (const clone of track.querySelectorAll('[data-clone]')) clone.remove();
+          delete this.dataset.running;
+          if (WRAP.matches) return;
+          const setWidth = track.scrollWidth;
+          if (setWidth === 0) return;
+          // Add copies until the track covers the viewport plus one set.
+          const copies = Math.ceil(this.clientWidth / setWidth) + 1;
+          for (let i = 0; i < copies; i += 1) {
+            for (const item of items) {
+              const clone = item.cloneNode(true) as HTMLElement;
+              clone.dataset.clone = '';
+              clone.setAttribute('aria-hidden', 'true');
+              track.appendChild(clone);
+            }
+          }
+          this.style.setProperty('--marquee-distance', `${setWidth}px`);
+          this.style.setProperty('--marquee-duration', `${CYCLE_SECONDS}s`);
+          this.dataset.running = '';
+        };
+
+        build();
+        let width = this.clientWidth;
+        new ResizeObserver(() => {
+          if (this.clientWidth === width) return;
+          width = this.clientWidth;
+          build();
+        }).observe(this);
+
+        onVisibilityChange(this, (visible) => {
+          this.dataset.paused = visible ? 'false' : 'true';
+        });
       }
-      root.style.setProperty('--marquee-distance', `${setWidth}px`);
-      root.style.setProperty('--marquee-duration', `${CYCLE_SECONDS}s`);
-      root.dataset.running = '';
-    };
-
-    build();
-    let width = root.clientWidth;
-    new ResizeObserver(() => {
-      if (root.clientWidth === width) return;
-      width = root.clientWidth;
-      build();
-    }).observe(root);
-
-    onVisibilityChange(root, (visible) => {
-      root.dataset.paused = visible ? 'false' : 'true';
-    });
-  }
+    },
+  );
 </script>

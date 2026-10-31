@@ -56,7 +56,7 @@ const script: Step[] = [
   flush
   data-home-hero
 >
-  <div class={styles.text}>
+  <home-hero-text class={styles.text}>
     <Headline
       as="h1"
       size="h1"
@@ -74,7 +74,7 @@ const script: Step[] = [
       data-home-hero-buttons=""
       data-await-typewriter=""
     />
-  </div>
+  </home-hero-text>
 
   <div class={styles.trust}>
     <LogosLine logos={logos} label={logosLabel} size="small" class={styles.logos} />
@@ -82,17 +82,24 @@ const script: Step[] = [
 </Section>
 
 <script>
+  import { WebComponent } from '~/lib/WebComponent';
+
   // The buttons fade in when the script reaches the `subheadline` mark.
   // If the mark was missed, the end of the typewriter shows them.
-  for (const hero of document.querySelectorAll<HTMLElement>('[data-home-hero]')) {
-    const tw = hero.querySelector<HTMLElement>('[data-typewriter]');
-    const buttons = hero.querySelector<HTMLElement>('[data-home-hero-buttons]');
-    if (!tw || !buttons || document.documentElement.dataset.motion !== 'on') continue;
-    if (tw.dataset.twState === 'done') continue;
-    const show = () => (buttons.dataset.visible = 'true');
-    tw.addEventListener('typewriter:mark', (event) => {
-      if ((event as CustomEvent<string>).detail === 'subheadline') show();
-    });
-    tw.addEventListener('typewriter:done', show);
-  }
+  customElements.define(
+    'home-hero-text',
+    class extends WebComponent {
+      parsedCallback() {
+        const tw = this.$('[data-typewriter]');
+        const buttons = this.$('[data-home-hero-buttons]');
+        if (document.documentElement.dataset.motion !== 'on') return;
+        if (tw.dataset.twState === 'done') return;
+        const show = () => (buttons.dataset.visible = 'true');
+        this.on<CustomEvent<string>, HTMLElement>(tw, 'typewriter:mark', (event) => {
+          if (event.detail === 'subheadline') show();
+        });
+        this.on(tw, 'typewriter:done', show);
+      }
+    },
+  );
 </script>
