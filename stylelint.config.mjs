@@ -110,6 +110,18 @@ export default {
       rules: { 'scale-unlimited/declaration-strict-value': null },
     },
     {
+      // The layout of the docs has one more breakpoint, 1600, for a wide screen.
+      files: ['src/layouts/docs/BaseLayout/style.module.css'],
+      rules: {
+        'media-feature-name-value-allowed-list': [
+          {
+            'min-width': ['/^(650|768|1152|1320|1600)px$/'],
+            'max-width': ['/^(649|767|1151|1319)px$/'],
+          },
+        ],
+      },
+    },
+    {
       // The docs rules name the classes of expressive-code (ec-line, expressive-code).
       files: ['src/layouts/docs/docs.css'],
       rules: { 'selector-class-pattern': null, 'selector-max-specificity': null },

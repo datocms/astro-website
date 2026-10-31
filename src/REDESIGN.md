@@ -87,7 +87,7 @@ src/components/MyComponent/
   - `--shadow-popover`, `--shadow-card`, `--scrim`: elevation and the backdrop of a drawer.
   - `--type-docs-body`, `--type-docs-small`, `--type-docs-label`, `--type-docs-h2`, `--type-docs-h3`: the type of dense reference content. Only the docs use them. The marketing pages use `--type-body` and the typography classes.
 - Spacing: only `--space-*` tokens. Type: only `--type-*` sizes, through the typography classes (`.display`, `.h1`, `.h2`, `.body`, `.bodyMedium`, `.bodyLong`, `.subtitle`, `.subtitleMedium`, `.caption`, `.code`, `.codeSmall`).
-- Breakpoints (min-width): 768, 1152, 1320. One exception: `SceneFrame` and `SceneFragment` switch from the phone drawing to the desktop drawing at 650. Hover only inside `@media (hover: hover)`.
+- Breakpoints (min-width): 768, 1152, 1320. The layout of the docs (`src/layouts/docs/BaseLayout`) has a fourth, 1600: above it the content is 1210px wide and the sidebar 300px (`stylelint.config.mjs` allows it for that file only). One more exception: `SceneFrame` and `SceneFragment` switch from the phone drawing to the desktop drawing at 650. Hover only inside `@media (hover: hover)`.
 
 ### Design source
 
