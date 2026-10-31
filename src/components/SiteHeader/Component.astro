@@ -284,22 +284,20 @@ const panelId = (i: number) => `site-header-mega-${i}`;
           chooseColorScheme(currentColorScheme() === 'dark' ? 'light' : 'dark');
         });
 
-        // These listeners are on <html> and on the media queries. Remove
-        // them when the element leaves the page.
+        // These listeners are on <html> and on the media query.
+        // disconnectedCallback() removes them.
         const root = document.documentElement;
-        this.eventListenerRemovers.push(
-          this.on(root, 'colorschemechange', () => this.showScheme()),
-          this.on(root, 'click', (event) => {
-            if (!this.contains(event.target as Node)) this.closeMega();
-          }),
-          this.on(root, 'keydown', (event) => {
-            if (event.key !== 'Escape') return;
-            if (this.openTrigger) this.closeMega(true);
-            if (this.mobileTrigger.getAttribute('aria-expanded') === 'true') {
-              this.setMobile(false, true);
-            }
-          }),
-        );
+        this.on(root, 'colorschemechange', () => this.showScheme());
+        this.on(root, 'click', (event) => {
+          if (!this.contains(event.target as Node)) this.closeMega();
+        });
+        this.on(root, 'keydown', (event) => {
+          if (event.key !== 'Escape') return;
+          if (this.openTrigger) this.closeMega(true);
+          if (this.mobileTrigger.getAttribute('aria-expanded') === 'true') {
+            this.setMobile(false, true);
+          }
+        });
 
         const onDesktopChange = () => {
           this.closeMega();
