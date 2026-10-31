@@ -1,241 +1,63 @@
-import { defaultInlineRecordFragments } from '~/components/legacy/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/legacy/linkToRecords';
-import {
-  PartnerTestimonialQuoteFragment,
-  ReviewQuoteFragment,
-} from '~/components/legacy/LegacyQuote/graphql';
-import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
-import { VideoPlayerFragment } from '~/components/legacy/VideoPlayer/graphql';
-import { TagFragment } from '~/lib/datocms/commonFragments';
+import { QuoteReviewFragment } from '~/components/Quote';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
-import {
-  LandingPageUrlFragment,
-  buildUrlForLandingPage,
-} from '~/lib/datocms/gqlUrlBuilder/landingPage';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
+/*
+ * The CMS content of a framework page: the sites of the carousel (the
+ * websites and the showcase projects that reference the integration
+ * records of the framework, newest first) and the review of the quote.
+ * The rest of the page is in src/data/cms-<framework>.ts.
+ */
 export const query = graphql(
   /* GraphQL */ `
-    query Cms($slug: String!) {
-      page: landingPage(filter: { slug: { eq: $slug } }) {
-        seo: _seoMetaTags {
-          ...TagFragment
-        }
-        slug
-        name
-        title {
-          value
-        }
-        subtitle
-        integration {
+    query CmsFramework($integrations: [String], $reviewId: ItemId) {
+      integrations: allIntegrations(filter: { slug: { in: $integrations } }) {
+        websites: _allReferencingWebsites(orderBy: _createdAt_DESC, first: 12) {
           id
-          websites: _allReferencingWebsites {
-            __typename
-            id
-            _createdAt
-            title
-            url
-            image {
-              responsiveImage(imgixParams: { auto: format, w: 400, h: 300, fit: crop, crop: top }) {
-                ...ResponsiveImageFragment
-              }
-            }
-          }
-          showcaseProjects: _allReferencingShowcaseProjects(
-            filter: { projectUrl: { isBlank: false } }
-          ) {
-            __typename
-            id
-            _createdAt
-            title: name
-            url: projectUrl
-            image: mainImage {
-              responsiveImage(imgixParams: { auto: format, w: 400, h: 300, fit: crop, crop: top }) {
-                ...ResponsiveImageFragment
-              }
-            }
-          }
-        }
-        docsUrl
-        demo {
-          code
-          githubRepo
-          screenshot {
+          _createdAt
+          title
+          url
+          image {
             responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop, crop: top }) {
               ...ResponsiveImageFragment
             }
           }
         }
-        content {
-          ... on RecordInterface {
-            id
-            __typename
-          }
-          ... on LandingCdnMapBlockRecord {
-            title {
-              value
-            }
-            description {
-              value
-            }
-          }
-          ... on LandingProgressiveImagesBlockRecord {
-            title {
-              value
-            }
-            content {
-              value
-            }
-            githubRepoTitle
-            githubPackageName
-          }
-          ... on CodeExcerptBlockRecord {
-            title {
-              value
-            }
-            content {
-              value
-            }
-            code
-            language
-            githubRepoTitle
-            githubPackageName
-          }
-          ... on ModularBlocksBlockRecord {
-            title {
-              value
-            }
-            content {
-              value
-            }
-          }
-          ... on QuoteLinkRecord {
-            quote {
-              __typename
-              ...ReviewQuoteFragment
-              ...PartnerTestimonialQuoteFragment
-            }
-          }
-          ... on LandingVideoBlockRecord {
-            title {
-              value
-            }
-            content {
-              value
-            }
-            video {
-              ...VideoPlayerFragment
-            }
-          }
-          ... on ImageTransformationsBlockRecord {
-            title {
-              value
-            }
-            content {
-              value
-            }
-          }
-          ... on ShopifyProductRecord {
-            shopifyProductId
-          }
-          ... on TryDemoBlockRecord {
-            title {
-              value
-            }
-            content {
-              value
-              links {
-                ... on RecordInterface {
-                  id
-                  __typename
-                }
-                ...AcademyChapterLinkFragment
-                ...AcademyCourseLinkFragment
-                ...BlogPostLinkFragment
-                ...ChangelogEntryLinkFragment
-                ...CustomerStoryLinkFragment
-                ...DocGroupLinkFragment
-                ...DocPageLinkFragment
-                ...EnterpriseAppLinkFragment
-                ...FeatureLinkFragment
-                ...HostingAppLinkFragment
-                ...LandingPageLinkFragment
-                ...PartnerLinkFragment
-                ...PluginLinkFragment
-                ...ProductComparisonLinkFragment
-                ...RecipeLinkFragment
-                ...ShowcaseProjectLinkFragment
-                ...SuccessStoryLinkFragment
-                ...TechPartnerLinkFragment
-                ...TemplateDemoLinkFragment
-                ...UseCasePageLinkFragment
-                ...UserGuidesEpisodeLinkFragment
-
-                ...AcademyChapterInlineFragment
-                ...AcademyCourseInlineFragment
-                ...BlogPostInlineFragment
-                ...ChangelogEntryInlineFragment
-                ...CustomerStoryInlineFragment
-                ...DocGroupInlineFragment
-                ...DocPageInlineFragment
-                ...EnterpriseAppInlineFragment
-                ...FeatureInlineFragment
-                ...HostingAppInlineFragment
-                ...LandingPageInlineFragment
-                ...PartnerInlineFragment
-                ...PluginInlineFragment
-                ...ProductComparisonInlineFragment
-                ...RecipeInlineFragment
-                ...ShowcaseProjectInlineFragment
-                ...SuccessStoryInlineFragment
-                ...TechPartnerInlineFragment
-                ...TemplateDemoInlineFragment
-                ...UseCasePageInlineFragment
-                ...UserGuidesEpisodeInlineFragment
-              }
+        showcaseProjects: _allReferencingShowcaseProjects(
+          filter: { projectUrl: { isBlank: false } }
+          orderBy: _createdAt_DESC
+          first: 12
+        ) {
+          id
+          _createdAt
+          title: name
+          url: projectUrl
+          image: mainImage {
+            responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop, crop: top }) {
+              ...ResponsiveImageFragment
             }
           }
         }
-        seoH1
-        yoastAnalysis
+      }
+      review(filter: { id: { eq: $reviewId } }) {
+        ...QuoteReviewFragment
       }
     }
   `,
-  [
-    TagFragment,
-    ResponsiveImageFragment,
-    PartnerTestimonialQuoteFragment,
-    ReviewQuoteFragment,
-    VideoPlayerFragment,
-    ...defaultLinkToRecordFragments,
-    ...defaultInlineRecordFragments,
-  ],
+  [ResponsiveImageFragment, QuoteReviewFragment],
 );
 
-export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
-  const { entries } = await executeQueryOutsideAstro(
-    graphql(
-      /* GraphQL */ `
-        query BuildSitemapUrls {
-          entries: allLandingPages(first: 100) {
-            _publishedAt
-            ...LandingPageUrlFragment
-          }
-        }
-      `,
-      [LandingPageUrlFragment],
-    ),
-    executeQueryOptions,
-  );
+/** The slugs of the framework pages, in the order of the footer. */
+export const slugs = ['nextjs-cms', 'nuxtjs-cms', 'svelte-cms', 'astro-cms'];
 
-  return entries.map((entry) => ({
-    url: buildUrlForLandingPage(entry),
-    lastmod: entry._publishedAt ?? undefined,
-  }));
-};
+export const buildSitemapUrls: BuildSitemapUrlsFn = async () =>
+  slugs.map((slug) => ({ url: `/cms/${slug}` }));
 
+// The landing page records of the CMS keep the links to these pages from
+// Structured Text across the site. The Astro page has no record.
 export const paramsToRecordId: ParamsToRecordIdFn<{ slug: string }> = async ({
   executeQueryOptions,
   params: { slug },

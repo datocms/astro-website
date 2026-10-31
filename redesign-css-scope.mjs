@@ -64,6 +64,7 @@ export const REDESIGN_PAGE_DIRS = [
   'tech-partners',
   'glossary',
   'docs',
+  'cms',
   'index.astro',
   '_graphql.ts',
   'features/index.astro',

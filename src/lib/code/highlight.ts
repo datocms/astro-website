@@ -65,9 +65,10 @@ export async function highlight(code: string, lang: CodeLang): Promise<Highlight
 
   const source = code.replace(/\n$/, '');
   const lines = toLines(source, LANG[lang]);
-  if (lang !== 'ts' && lang !== 'tsx') return lines;
+  if (lang === 'graphql') return lines;
 
-  // Shiki shows a template string as one string. A line that ends with
+  // Shiki shows a template string as one string, in TypeScript and in the
+  // script of a Vue, Svelte or Astro file. A line that ends with
   // "/* GraphQL */ `" starts a GraphQL query, and a line that starts with
   // "`" ends it: the lines between them get the colours of GraphQL.
   const text = source.split('\n');

@@ -2,6 +2,7 @@
 import symbol from '~/assets/logo/dato-symbol.svg?raw';
 import { AppWindow } from '~/components/AppWindow';
 import { liveBlogCode } from '~/data/developers-code';
+import type { CodeTab } from '~/data/home';
 import { highlight } from '~/lib/code/highlight';
 import diagram from '../diagram/style.module.css';
 import { ADDRESS, DESCRIPTION, EVENT, STILL, STREAM, TITLE } from './story';
@@ -27,12 +28,24 @@ interface Props {
    * @default false
    */
   compact?: boolean;
+  /**
+   * The code in the card: five lines of 39 characters at most. The first
+   * range of `focus` is the subscription, and it gets the ring.
+   * @default liveBlogCode
+   */
+  code?: CodeTab;
+  /**
+   * The text alternative of the frame. Change it when the code does not
+   * use the useQuerySubscription hook.
+   * @default DESCRIPTION
+   */
+  description?: string;
 }
 
-const { compact = false } = Astro.props;
+const { compact = false, code: card = liveBlogCode, description = DESCRIPTION } = Astro.props;
 
-const lines = await highlight(liveBlogCode.code, liveBlogCode.lang);
-const [first, last] = liveBlogCode.focus![0] as [number, number];
+const lines = await highlight(card.code, card.lang);
+const [first, last] = card.focus![0] as [number, number];
 const code = {
   before: lines.slice(0, first - 1),
   hook: lines.slice(first - 1, last),
@@ -43,7 +56,7 @@ const code = {
 <div
   class:list={[diagram.root, styles.stream]}
   role="img"
-  aria-label={DESCRIPTION}
+  aria-label={description}
   data-stream
   data-compact={compact ? '' : undefined}
 >
@@ -89,7 +102,7 @@ const code = {
     (AppWindow, as on the home page), with the hook in a box
   */
   }
-  <AppWindow class={styles.card} file={liveBlogCode.label}>
+  <AppWindow class={styles.card} file={card.label}>
     <code class={styles.code}>
       {
         code.before.map((tokens) => (

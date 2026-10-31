@@ -218,6 +218,16 @@ export const footerColumns: FooterColumn[] = [
           l('Support', '/support'),
         ],
       },
+      // The framework pages (/cms/[slug]).
+      {
+        title: 'Frameworks',
+        links: [
+          l('Next.js', '/cms/nextjs-cms'),
+          l('Nuxt', '/cms/nuxtjs-cms'),
+          l('SvelteKit', '/cms/svelte-cms'),
+          l('Astro', '/cms/astro-cms'),
+        ],
+      },
     ],
   },
   {
