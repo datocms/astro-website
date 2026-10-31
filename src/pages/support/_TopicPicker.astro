@@ -1,0 +1,272 @@
+---
+// The picker of the support page: the selects of the topics, the help text
+// of the chosen topic and, when the topic needs it, a form. The URL holds
+// the choice (?topics=a/b). The first render follows the URL, as the script
+// does after a change.
+import { stripStega } from '@datocms/astro';
+import { faChevronDown } from '@fortawesome/pro-regular-svg-icons';
+import { render as renderAsHtmlString } from 'datocms-structured-text-to-html-string';
+import { ContactForm } from '~/components/ContactForm';
+import { FormField } from '~/components/FormField';
+import { Icon } from '~/components/Icon';
+import { Prose } from '~/components/Prose';
+import { contact } from '~/data/contact';
+import { errorIdField, picker, supportForm, talk } from '~/data/support';
+import type { ResultOf } from '~/lib/datocms/graphql';
+import type { SupportTopicFragment } from './_graphql';
+import { computeView, parseTopicSlugs, type FormMode, type TopicMeta } from './_state';
+import s from './_style.module.css';
+
+type Topic = ResultOf<typeof SupportTopicFragment>;
+
+interface Props {
+  topics: Topic[];
+}
+
+const { topics } = Astro.props;
+
+const bySlug = new Map(topics.map((topic) => [topic.slug, topic]));
+const rootTopics = topics.filter((topic) => !topic.parent);
+const childrenOf = (slug: string) =>
+  (bySlug.get(slug)?.children ?? []).flatMap((child) => bySlug.get(child.slug) ?? []);
+const rootsWithChildren = rootTopics.filter((topic) => childrenOf(topic.slug).length > 0);
+
+// The contact form shows when the topic is a leaf. With no guides, it shows
+// at once. With guides, the visitor asks for it (a link, or #form).
+function formModeOf(topic: (typeof topics)[number]): FormMode {
+  if (topic.children.length > 0) return 'none';
+  if (topic.commonQuestions.length === 0) return topic.disableContactForm ? 'none' : 'auto';
+  return 'on-request';
+}
+
+const metas: TopicMeta[] = topics.map((topic) => ({
+  slug: topic.slug,
+  childSlugs: childrenOf(topic.slug).map((child) => child.slug),
+  formMode: formModeOf(topic),
+  formType: stripStega(topic.contactFormType) === 'support' ? 'support' : 'sales',
+  responder: stripStega(topic.autoResponderType ?? ''),
+}));
+
+// The first render follows the URL, as the script does after a change.
+const view = computeView(metas, parseTopicSlugs(Astro.url.search), false);
+const hasHelp = (topic: (typeof topics)[number]) =>
+  topic.commonQuestions.length > 0 || Boolean(topic.description);
+---
+
+<topic-picker class={s.column}>
+  <script type="application/json" id="topics-data" set:html={JSON.stringify(metas)} />
+
+  <div class={s.selects}>
+    <div class={s.topic}>
+      <label class="subtitleMedium" for="topic-0">{picker.topicLabel}</label>
+      <div class={s.selectBox}>
+        <select id="topic-0" class:list={['body', s.select]} autocomplete="off" data-level="0">
+          <option value="empty" disabled selected={!view.rootSlug}>{picker.placeholder}</option>
+          {
+            rootTopics.map((topic) => (
+              <option value={topic.slug} selected={view.rootSlug === topic.slug}>
+                {topic.title}
+              </option>
+            ))
+          }
+        </select>
+        <span class={s.chevron}><Icon icon={faChevronDown} /></span>
+      </div>
+    </div>
+    {
+      rootsWithChildren.map((root) => (
+        <div class={s.topic} data-subtopics={root.slug} hidden={view.subtopicsOf !== root.slug}>
+          <label class="subtitleMedium" for={`topic-1-${root.slug}`}>
+            {root.subtopicQuestion}
+          </label>
+          <div class={s.selectBox}>
+            <select
+              id={`topic-1-${root.slug}`}
+              class:list={['body', s.select]}
+              autocomplete="off"
+              data-level="1"
+            >
+              <option value="empty" disabled selected={!view.subSlug}>
+                {picker.placeholder}
+              </option>
+              {childrenOf(root.slug).map((topic) => (
+                <option value={topic.slug} selected={view.subSlug === topic.slug}>
+                  {topic.title}
+                </option>
+              ))}
+            </select>
+            <span class={s.chevron}>
+              <Icon icon={faChevronDown} />
+            </span>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+
+  {
+    topics.filter(hasHelp).map((topic) => (
+      <div class={s.help} data-topic={topic.slug} hidden={view.leafSlug !== topic.slug}>
+        <Prose>
+          {topic.description && <Fragment set:html={renderAsHtmlString(topic.description) ?? ''} />}
+          {topic.commonQuestions.length > 0 && (
+            <>
+              <h3>{picker.guidesTitle}</h3>
+              <p>{picker.guidesText}</p>
+              <ul>
+                {topic.commonQuestions.map((question) => (
+                  <li id={question.url}>
+                    <a href={question.url}>{question.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {topic.children.length === 0 && !topic.disableContactForm && (
+            <>
+              <h3>{picker.moreTitle}</h3>
+              <ul>
+                <li>
+                  <a href="#form" data-open-form>
+                    {picker.moreLink}
+                  </a>
+                </li>
+              </ul>
+            </>
+          )}
+        </Prose>
+      </div>
+    ))
+  }
+
+  <div class={s.talk} id="form" hidden={!view.form} data-form-region>
+    <div class={s.talkIntro}>
+      <h2 class="h2">{talk.title}</h2>
+      <p class="subtitleMedium">{talk.text}</p>
+    </div>
+
+    <div data-form-kind="support" hidden={view.form !== 'support'}>
+      <ContactForm {...supportForm} external idPrefix="support">
+        <input slot="extra" type="hidden" name="issueType" />
+        <div slot="extra" class={s.errorId} data-error-id hidden>
+          <FormField {...errorIdField} id="support-errorId" />
+        </div>
+        <div slot="extra" class={s.turnstile} data-turnstile></div>
+      </ContactForm>
+    </div>
+
+    <div data-form-kind="sales" hidden={view.form !== 'sales'}>
+      <ContactForm {...contact.form} external idPrefix="sales">
+        <input slot="extra" type="hidden" name="issueType" value="sales" />
+        <div slot="extra" class={s.turnstile} data-turnstile></div>
+      </ContactForm>
+    </div>
+  </div>
+</topic-picker>
+
+<script>
+  import { actions } from 'astro:actions';
+  import { connectExternalForm, savedAccountEmail } from '~/lib/externalForm';
+  import { WebComponent } from '~/lib/WebComponent';
+  import { computeView, parseTopicSlugs, type TopicMeta } from './_state';
+
+  customElements.define(
+    'topic-picker',
+    class TopicPicker extends WebComponent {
+      parsedCallback() {
+        const metas: TopicMeta[] = JSON.parse(this.$('#topics-data').textContent ?? '[]');
+
+        // The visitor asked for the form with the link, or with #form.
+        let formRequested = window.location.hash === '#form';
+
+        const topicSelect = this.$<HTMLSelectElement>('select[data-level="0"]');
+        const groups = this.$$('[data-subtopics]');
+        const helps = this.$$('[data-topic]');
+        const region = this.$('[data-form-region]');
+        const forms = this.$$('[data-form-kind]');
+        const support = this.$('[data-form-kind="support"]');
+        const issueType = this.$<HTMLInputElement>(
+          '[data-form-kind="support"] input[name="issueType"]',
+        );
+
+        const render = (scroll = false) => {
+          const view = computeView(metas, parseTopicSlugs(window.location.search), formRequested);
+          topicSelect.value = view.rootSlug ?? 'empty';
+          for (const group of groups) {
+            const visible = group.dataset.subtopics === view.subtopicsOf;
+            group.hidden = !visible;
+            const select = group.querySelector('select');
+            if (visible && select) select.value = view.subSlug ?? 'empty';
+          }
+          for (const help of helps) help.hidden = help.dataset.topic !== view.leafSlug;
+          region.hidden = !view.form;
+          for (const form of forms) form.hidden = form.dataset.formKind !== view.form;
+
+          // The hidden field gives the auto-responder of the topic to the action.
+          const leaf = metas.find((meta) => meta.slug === view.leafSlug);
+          issueType.value = leaf?.responder ?? '';
+
+          if (scroll && view.form) {
+            region.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+          }
+        };
+
+        // A change of a select keeps the other parameters and the hash of the URL.
+        this.on(this, 'change', 'select[data-level]', (_event, select) => {
+          if (!(select instanceof HTMLSelectElement)) return;
+          formRequested = false;
+          const url = new URL(window.location.href);
+          const current = parseTopicSlugs(url.search);
+          const slugs =
+            select.dataset.level === '0' ? [select.value] : [current[0] ?? '', select.value];
+          url.searchParams.set('topics', slugs.join('/'));
+          window.history.pushState({}, '', url);
+          render();
+        });
+
+        this.on(this, 'click', '[data-open-form]', (event) => {
+          event.preventDefault();
+          formRequested = true;
+          render(true);
+        });
+
+        window.addEventListener('popstate', () => render());
+        render(formRequested);
+
+        // Fill the support form from the URL: a link from the dashboard can
+        // carry the e-mail, the project, the subject, the text and an error ID.
+        const params = new URLSearchParams(window.location.search);
+        const fill = (name: string, value: string | null) => {
+          const input = support.querySelector<HTMLInputElement | HTMLTextAreaElement>(
+            `[name="${name}"]`,
+          );
+          if (input && value) input.value = value;
+        };
+        fill('email', params.get('email') || savedAccountEmail());
+        fill('project', params.get('projectUrl'));
+        fill('subject', params.get('subject'));
+        fill('body', params.get('body'));
+        fill('errorId', params.get('errorId'));
+        if (params.get('errorId')) this.$('[data-error-id]').hidden = false;
+
+        for (const form of forms) {
+          const kind = form.dataset.formKind;
+          const contactForm = form.querySelector<HTMLElement>('[data-contact-form]');
+          if (!contactForm) continue;
+          connectExternalForm(contactForm, {
+            // The same label as the action expects (isTurnstileTokenValid).
+            turnstileAction: kind === 'support' ? 'support' : 'contact',
+            fallback:
+              kind === 'support'
+                ? 'email us at support@datocms.com.'
+                : 'email us at sales@datocms.com.',
+            send: (formData) =>
+              kind === 'support'
+                ? actions.forms.submitSupportRequest.orThrow(formData)
+                : actions.forms.submitSalesRequest.orThrow(formData),
+          });
+        }
+      }
+    },
+  );
+</script>
