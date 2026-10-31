@@ -1,155 +1,159 @@
-@media (width < 600px) {
-  .toc {
-    position: sticky;
-    top: 0px;
-    background: white;
-    z-index: 1;
-    margin-bottom: 30px;
-  }
+/* @layer pages */
 
-  .tocInner {
-    display: flex;
-    justify-content: center;
-  }
+/* A phone: one column, with the letter bar above the groups. */
+.root {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-lg);
+  align-items: start;
+}
 
-  .tocEntry {
-    padding: 10px 3px;
-    text-decoration: none;
-    color: inherit;
-    font-weight: bold;
+.index {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-default);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.indexInner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.letter {
+  padding: var(--space-2xs) var(--space-5xs);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .letter:hover {
+    background: var(--surface-accent);
   }
 }
 
-@media (width >= 600px) {
-  .root {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 80px;
-  }
-
-  .toc {
-    margin-right: rfs(90px);
-  }
-
-  .tocInner {
-    position: sticky;
-    top: 20px;
-    z-index: 1;
-    columns: 2;
-    line-height: 1;
-    text-align: center;
-  }
-
-  .tocEntry {
-    display: block;
-    padding: 8px;
-    text-decoration: none;
-    color: inherit;
-    font-weight: bold;
-  }
+.letter:focus-visible {
+  background: var(--surface-accent);
 }
 
-@media (width >= 1125px) {
-  .tocInner {
-    top: 100px;
-  }
-}
-
-.tocEntry:hover {
-  color: var(--accent-color);
-}
-
-.letterGroups {
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
   margin: 0;
 }
 
-.letterGroup {
-  background: linear-gradient(45deg, #fefae4, #f9ecfe);
-  border-radius: 10px;
-  padding: 20px;
-  margin: rfs(150px) 0 rfs(50px);
+.group {
+  scroll-margin-top: var(--space-4xl);
   position: relative;
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  background: var(--surface-accent-faint);
+}
 
-  &:first-child {
-    margin-top: 0;
-  }
+.groupLetter {
+  margin-bottom: var(--space-md);
+  font-size: 80px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: var(--text-subtle);
+  /* The id is the target of a link: keep the letter clear of the sticky bar. */
+  scroll-margin-top: var(--space-4xl);
+}
 
-  @media (width > 900px) {
-    .letterGroupEntries {
-      padding-left: 50px;
-      padding-right: 50px;
-    }
-  }
+.entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
 
-  @media (width >= 600px) {
-    padding: 120px 20px 40px 20px;
+.term {
+  position: relative;
+  margin-bottom: var(--space-2xs);
+  scroll-margin-top: var(--space-4xl);
+}
+
+.termLink {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--border-default);
+}
+
+@media (hover: hover) {
+  .termLink:hover {
+    text-decoration-color: var(--text-primary);
   }
 }
 
-.letterGroupTitle {
-  font-size: 80px;
-  font-weight: bold;
-  color: var(--accent-color);
-  margin-bottom: 20px;
+.permalink {
+  margin-left: var(--space-xs);
+  color: var(--text-subtle);
+  text-decoration: none;
+  opacity: 0;
+}
 
-  [data-permalink] {
-    display: none;
+.permalink::after {
+  content: '#';
+}
+
+.term:hover > .permalink,
+.permalink:focus-visible {
+  opacity: 1;
+}
+
+.description {
+  margin: 0;
+}
+
+/* From 768: the letter index is a column at the left. */
+@media (min-width: 768px) {
+  .root {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-2xl);
   }
 
-  @media (width >= 600px) {
+  .index {
+    top: var(--space-xl);
+    border-bottom: 0;
+    background: none;
+  }
+
+  .indexInner {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    text-align: center;
+  }
+
+  .letter {
+    padding: var(--space-3xs) var(--space-xs);
+  }
+
+  .group {
+    margin-top: var(--space-3xl);
+    padding: var(--space-3xl) var(--space-md) var(--space-xl);
+  }
+
+  .group:first-child {
+    margin-top: var(--space-2xl);
+  }
+
+  .groupLetter {
     position: absolute;
     top: -90px;
-    left: 20px;
+    left: var(--space-md);
+    margin: 0;
     font-size: 180px;
   }
 }
 
-.entry {
-  margin: rfs(50px) 0;
-
-  &:first-child {
-    margin-top: 0;
+@media (min-width: 1152px) {
+  .entries {
+    padding-inline: var(--space-xl);
   }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.entryTitle {
-  font-weight: bold;
-  font-size: 22px;
-  margin: 0;
-  padding: 0;
-  letter-spacing: -0.03em;
-  line-height: 1;
-  position: relative;
-  margin-bottom: 10px;
-
-  @media (width >= 600px) {
-    [data-permalink] {
-      position: absolute;
-      right: 100%;
-      top: 50%;
-      margin-right: 15px;
-      transform: translate(0, -50%);
-    }
-  }
-
-  a.goto {
-    color: inherit;
-    display: inline-block;
-    text-decoration: none;
-    border-bottom: 2px solid var(--light-body-color);
-
-    &:hover {
-      border-bottom-color: var(--accent-color);
-    }
-  }
-}
-
-.entryDescription {
-  font-size: 17px;
-  margin: 0;
-  padding: 0;
 }

@@ -1,21 +1,20 @@
 ---
-import { Heading } from '~/components/legacy/Heading';
-import s from './_style.module.css';
-import { MaybeLink } from '~/components/legacy/links/MaybeLink';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/legacy/LegacyStructuredText/Text';
-import Wrapper from '~/components/legacy/Wrapper/ReactComponent';
-import { Hero } from '~/components/legacy/LegacyHero';
-import { slugify } from '~/lib/slugify';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
-import { executeQuery } from '~/lib/datocms/executeQuery';
 import { groupBy } from 'lodash-es';
-import { Layout } from '~/layouts/LegacyLayout';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { JsonLd } from '~/components/JsonLd';
-import { baseUrl } from '~/lib/draftMode';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { JsonLd } from '~/components/JsonLd';
+import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
+import { StructuredText } from '~/components/StructuredText';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { baseUrl } from '~/lib/draftMode';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { slugify } from '~/lib/slugify';
+import { query } from './_graphql';
+import s from './_style.module.css';
 
 const { entries, page } = await executeQuery(Astro, query);
 
@@ -26,6 +25,7 @@ if (!page || entries.length === 0) {
 
 const entriesByLetter = groupBy(entries, (entry) => entry.title[0]!.toUpperCase());
 
+// The JSON-LD needs plain strings, not the Structured Text of the field.
 const glossaryUrl = new URL('/glossary', baseUrl(Astro)).href;
 const definedTermSet = {
   '@context': 'https://schema.org',
@@ -41,63 +41,70 @@ const definedTermSet = {
 } as const;
 ---
 
-<Layout seo={page.seo}>
+<Layout seo={page.seo} theme="green" headerVariant="light" footerTheme="green">
   <Fragment slot="head">
     <JsonLd data={definedTermSet} />
   </Fragment>
+  {/* The Markdown export of the page reads #main-content. */}
   <div id="main-content">
-    <Hero mainTitleOfPage>
-      <Fragment slot="title">DatoCMS <mark>Glossary</mark></Fragment>
-      <Fragment slot="subtitle">
+    <Hero variant="light" headline="DatoCMS" subheadline="Glossary">
+      <p slot="intro">
         A comprehensive guide to terms and terminology related to DatoCMS and Headless CMS that you
         may encounter when using our product, reading our docs, or getting started with headless
         content management
-      </Fragment>
+      </p>
     </Hero>
-    <Wrapper>
-      <div class={s.root}>
-        <div class={s.toc} data-datocms-nomd>
-          <div class={s.tocInner}>
-            {
-              Object.keys(entriesByLetter).map((letter) => (
-                <a class={s.tocEntry} href={`#group-${letter}`}>
-                  {letter}
-                </a>
-              ))
-            }
-          </div>
-        </div>
-        <dl class={s.letterGroups}>
+    <Section contentClass={s.root}>
+      <nav class={s.index} aria-label="Letters" data-datocms-nomd>
+        <div class={s.indexInner}>
           {
-            Object.entries(entriesByLetter).map(([letter, entries]) => (
-              <div class={s.letterGroup}>
-                <Heading as="h2" class={s.letterGroupTitle} anchor={`group-${letter}`}>
-                  {letter}
-                </Heading>
-                <div class={s.letterGroupEntries}>
-                  {entries.map((entry) => (
-                    <div class={s.entry}>
-                      <Heading as="dt" class={s.entryTitle} anchor={slugify(entry.title)}>
-                        {entry.url ? (
-                          <MaybeLink class={s.goto} href={entry.url}>
-                            {entry.title}
-                          </MaybeLink>
-                        ) : (
-                          entry.title
-                        )}
-                      </Heading>
-                      <dd class={s.entryDescription}>
-                        <Text {...ensureValidStructuredTextProps({ data: entry.description })} />
-                      </dd>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            Object.keys(entriesByLetter).map((letter) => (
+              <a class:list={[s.letter, 'bodyMedium']} href={`#group-${letter}`}>
+                {letter}
+              </a>
             ))
           }
-        </dl>
-      </div>
-    </Wrapper>
+        </div>
+      </nav>
+      <dl class={s.groups}>
+        {
+          Object.entries(entriesByLetter).map(([letter, group]) => (
+            <div class={s.group}>
+              <h2 class={s.groupLetter} id={`group-${letter}`}>
+                {letter}
+              </h2>
+              <div class={s.entries}>
+                {group.map((entry) => (
+                  <div class={s.entry}>
+                    <dt class:list={[s.term, 'h2']} id={slugify(entry.title)}>
+                      {entry.url ? (
+                        <a class={s.termLink} href={entry.url}>
+                          {entry.title}
+                        </a>
+                      ) : (
+                        entry.title
+                      )}
+                      <a
+                        class={s.permalink}
+                        href={`#${slugify(entry.title)}`}
+                        aria-label={`Link to ${slugify(entry.title)}`}
+                      />
+                    </dt>
+                    <dd class={s.description}>
+                      <Prose>
+                        <StructuredText
+                          {...ensureValidStructuredTextProps({ data: entry.description })}
+                        />
+                      </Prose>
+                    </dd>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </dl>
+    </Section>
   </div>
 
   <DraftModeQueryListener query={query} />
