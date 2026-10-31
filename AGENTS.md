@@ -11,6 +11,18 @@ The site has one layout family. Its rules are in `src/REDESIGN.md`: read it befo
 - Both use `src/layouts/BaseLayout` for the head (SEO, favicon, canonical, RSS, cookie consent, analytics, draft mode). BaseLayout imports no global stylesheet and puts the layer statement as the first child of `<head>`. Its props are `theme` (the `data-theme` of `<body>`) and `clientRouter` (the view transitions router, off by default).
 - **Cascade layers**: the Vite plugin `cssLayers` (`astro.config.ts`) wraps each CSS module of `src/` in a layer: `pages` for `src/pages/`, `sections` for the rest, unless line 1 of the file is a marker such as `/* @layer blocks */`. `css-scope.mjs` holds the scope. `npm run lint:css` uses the same scope.
 
+## Client scripts
+
+Each client `<script>` (not `is:inline`) is a custom element that extends `WebComponent` (`src/lib/WebComponent.ts`). Examples: `src/components/docs/TargetToggler/Component.astro`, `src/components/Lightbox/Component.astro`.
+
+- The root element of the markup is the custom element. Define it with `customElements.define('kebab-name', class extends WebComponent { … })`.
+- Put the setup in `parsedCallback()`, not in `connectedCallback()`: it runs when the children are parsed.
+- Find parts with `this.$(selector)` and lists with `this.$$(selector)`. `this.$` throws `[tag-name]: Could not find <selector>`, so a missing part shows as a clear error. Do not use `querySelector(...)!`, and do not use `if (!el) return` guards for parts that the same file renders.
+- Add listeners with `this.on(element, event, [selector], callback)`. `disconnectedCallback()` removes them.
+- Do not loop over `document.querySelectorAll('[data-x]')` to start a behaviour. Each instance of the element starts itself.
+- A custom element is `display: inline` by default. Set its `display` in the CSS. When the root must be a semantic element (`<form>`, `<nav>`, `<button>`, `<table>`), put the custom element around it.
+- Keep a plain script only when no element owns the behaviour, for example analytics or cookie consent.
+
 ## Environment variables
 
 Three distinct mechanisms — pick the right one by asking: **when is the value needed, and is it secret?**
