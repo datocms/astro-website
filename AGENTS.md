@@ -2,16 +2,14 @@
 
 Astro standalone Node server, deployed via `cubo` to Kubernetes on AWS. Three environments: `production`, `staging1`, `staging2`.
 
-## Two layout families (the redesign)
+## The layout
 
-The branch `redesign` ports the new site from the prototype, page by page (`PLAN.md`). Until the end of the port, two families of pages live side by side. Never mix them on one page.
+The site has one layout family. Its rules are in `src/REDESIGN.md`: read it before you touch the pages or the components.
 
-- **Old pages**: `src/layouts/LegacyLayout`. They import the old stylesheet `src/layouts/BaseLayout/global.css`, use the view transitions router, and have the layer statement `@layer reset, prose;`.
-- **New pages**: `src/layouts/Layout.astro`. It imports `src/styles/global.css` and the scene kit CSS, has no router (a full load), and has the layer statement `@layer reset, tokens, base, vendor, blocks, sections, pages;`. Its rules are in `src/REDESIGN.md`: read it before you touch the new code.
-- **Docs pages** (`src/pages/docs/`): `src/layouts/docs/BaseLayout` is a new-family layout. It imports `src/styles/global.css`, has the new layer statement, and its components are in `src/components/docs/` (no `legacy` prefix, tokens from `src/styles/tokens.css`).
-- Both use `src/layouts/BaseLayout` for the head (SEO, favicon, canonical, RSS, cookie consent, analytics, draft mode). BaseLayout imports no global stylesheet. Its props `cssLayers`, `clientRouter` and `bodyAttributes` select the family. The layer statement is always the first child of `<head>`.
-- **The `Legacy` prefix**: an old component with the same name as a prototype component (case-insensitive) got the prefix `Legacy` (`LegacyButton`, `LegacyHero`, `LegacyQuote`…). The port from the prototype has stopped (`PLAN.md`, principle 1), thus the new components do not need to keep their prototype path. Do not add a new `Legacy*` component, and do not use a `Legacy*` component on a new page. All old components live in `src/components/legacy/`: never import one on a new page, and never add a directory there.
-- **Cascade layers and their scope**: the Vite plugin `cssLayers` (`astro.config.ts`) wraps each CSS module of the redesign in a layer. The old CSS modules get no layer, thus they render as before. `redesign-css-scope.mjs` holds the scope: the old components are the path prefix `src/components/legacy/` (a rule, not a list), and `REDESIGN_PAGE_DIRS` (the ported pages under `src/pages/`: add each page that you port). `npm run lint:css` uses the same scope.
+- **Pages**: `src/layouts/Layout.astro`. It imports `src/styles/global.css` and the scene kit CSS, has no router (a full load), and has the layer statement `@layer reset, tokens, base, vendor, blocks, sections, pages;`.
+- **Docs pages** (`src/pages/docs/`): `src/layouts/docs/BaseLayout` is the layout of the docs. It imports `src/styles/global.css`, has the same layer statement, uses the view transitions router, and its components are in `src/components/docs/` (tokens from `src/styles/tokens.css`).
+- Both use `src/layouts/BaseLayout` for the head (SEO, favicon, canonical, RSS, cookie consent, analytics, draft mode). BaseLayout imports no global stylesheet and puts the layer statement as the first child of `<head>`. Its props are `theme` (the `data-theme` of `<body>`) and `clientRouter` (the view transitions router, off by default).
+- **Cascade layers**: the Vite plugin `cssLayers` (`astro.config.ts`) wraps each CSS module of `src/` in a layer: `pages` for `src/pages/`, `sections` for the rest, unless line 1 of the file is a marker such as `/* @layer blocks */`. `css-scope.mjs` holds the scope. `npm run lint:css` uses the same scope.
 
 ## Environment variables
 

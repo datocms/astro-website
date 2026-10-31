@@ -1,4 +1,4 @@
-# The redesign: rules for the new code
+# The site: rules for the code
 
 The new datocms.com comes from the prototype (repository `datocms/website-prototype`, `../../prototype` next to this repository). The port follows `PLAN.md`. This file holds the rules of the prototype `AGENTS.md` that apply to the new code here, adapted to this stack. Two more files hold rules for their directory, copied from the prototype:
 
@@ -6,8 +6,6 @@ The new datocms.com comes from the prototype (repository `datocms/website-protot
 - `src/scenes/AGENTS.md`: the pictures of the product (scenes, frames, fragments, diagrams, photos).
 
 Read `TONE_OF_VOICE.md` (repository root) before you write or change any text that a visitor sees.
-
-The old site and its rules (the root `AGENTS.md`) stay valid for the old pages. See "Two layout families" there.
 
 ## Code from the prototype
 
@@ -20,17 +18,16 @@ When you copy code from the prototype, clean its comments. Remove the comments t
 ```
 src/
   components/<Name>/        Component.astro, style.module.css, index.ts (and types.ts when the props are shared)
-                            The old components are in components/legacy/<Name>/ (never use them on a new page).
   data/                     the copy of every page, one typed file for each route (src/data/AGENTS.md)
   scenes/                   the pictures of the product (src/scenes/AGENTS.md)
-  layouts/Layout.astro      the layout of the new pages; imports src/styles/global.css once
+  layouts/Layout.astro      the layout of the pages; imports src/styles/global.css once
   lib/motion/               typewriter, inView, inViewVideo, sceneSequence, diagramLoop
   lib/pixel-video/          the player of the .pxv files
   lib/code/, lib/format/, lib/theme.ts, lib/colorScheme.ts
   styles/                   tokens.css (all tokens), typography.css (type classes), global.css (reset + element defaults)
 vendor/                     the tarball of the scene kit (@datocms/product-scenes)
 public/videos/              the .pxv files
-redesign-css-scope.mjs      which CSS is the redesign (cascade layers and lint:css)
+css-scope.mjs               which CSS gets a cascade layer, and which CSS lint:css reads
 ```
 
 Not ported: the Cloudflare adapter, `src/pages/dev/` (the dev pages, with the pixel encoder), the scripts of the prototype (`scripts/`: pixel videos, scene shots, Unsplash photos, vendor-scenes) and `public/images/`. A page port copies the static images that it needs. When the CMS already has the data (team, case studies, reviews, logos), the page reads the CMS and does not copy the images.
@@ -41,7 +38,7 @@ Not ported: the Cloudflare adapter, `src/pages/dev/` (the dev pages, with the pi
 
 - The prop `seo` is required. Use the `seo` / `_seoMetaTags` of the CMS record of the page when it exists. Else build the tags: `overrideSeo([], seoTitle(title), seoDescription(text))` from `~/lib/datocms/seo`. The prototype prop `title` does not exist here.
 - The other props are the prototype ones: `theme`, `headerVariant`, `headerTheme`, `headerCta`, `footer`, `footerTheme`.
-- A new page does a full load: no `ClientRouter`, no progress bar.
+- A page does a full load: no `ClientRouter`, no progress bar. Only the docs layout turns the router on.
 - The optional prop `seoAnalysis` takes the `yoastAnalysis` field (the SEO/Readability plugin) of the CMS record. In draft mode, the layout then shows `SeoAnalysisPanel` at the bottom right: the keywords of the record, and where the page uses them (title, meta description, h1, h2, first paragraph). Not in the prototype.
 - `<main>` has `id="layout-content"`: the endpoint `/api/seo-analysis` reads the content of the page from this element. Do not remove it.
 - `PageNav` (the menu at the bottom left) shows only when `DEPLOYMENT_DESTINATION` is not `production`. It is for reviewers, not part of the design.
@@ -64,17 +61,14 @@ src/components/MyComponent/
 ## Styling
 
 - Styles live in `.module.css` files next to their component (`style.module.css`) or page (`_style.module.css`). Class names are camelCase. `:global()` only to reach a child the component does not render.
-- **Cascade layers**, lowest first: `reset, tokens, base, vendor, blocks, sections, pages`. `Layout.astro` gives this list to `BaseLayout`, which puts the statement as the first child of `<head>`. A rule in a higher layer wins over a lower layer, whatever the specificity and the order of the CSS. The Vite plugin `cssLayers` in `astro.config.ts` puts each CSS module of the redesign in its layer: a ported page under `src/pages/` is `pages`, every other module is `sections`, unless line 1 of the file is a marker such as `/* @layer blocks */`. The stylesheet of the scene kit is `vendor`.
-- **The scope of the plugin** is in `redesign-css-scope.mjs`. The old CSS modules get no layer (they must not change). Thus:
-  - a new component directory needs no change (every directory of `src/components/` except `src/components/legacy/` is the redesign);
-  - **when you port a page, add its directory (or file) under `src/pages/` to `REDESIGN_PAGE_DIRS`**, else its `_style.module.css` gets no layer and loses to every section;
-  - when you delete an old component directory (in `src/components/legacy/`), just delete it. Never add a directory in `src/components/legacy/`, and never import a component from it on a new page.
+- **Cascade layers**, lowest first: `reset, tokens, base, vendor, blocks, sections, pages`. `BaseLayout` puts this list as a statement in the first child of `<head>`. A rule in a higher layer wins over a lower layer, whatever the specificity and the order of the CSS. The Vite plugin `cssLayers` in `astro.config.ts` puts each CSS module of `src/` in its layer: a module under `src/pages/` is `pages`, every other module is `sections`, unless line 1 of the file is a marker such as `/* @layer blocks */`. The stylesheet of the scene kit is `vendor`.
+- **The scope of the plugin** is in `css-scope.mjs`: all CSS of `src/`. A new component or page needs no change.
 - **Rules of the cascade.**
   - Never repeat a class to win (`.content.content`). Never add an element or an ancestor to a selector to win. Never use `!important` outside `global.css`. If a rule does not win, the file is in the wrong layer, or the block needs an API.
   - A section or a page does not override a longhand of a block. It uses the API of the block: its props and its custom properties, such as `--section-padding-top` and `--section-content-max`.
   - `contentClass` of Section is for the layout of the content box. It never sets `max-width` or `margin-inline`. Use `width="headline"` or `width="reading"`.
   - Two rules in the same layer on the same element and property: give one of them more specificity on purpose, or put the base rule in `:where()`. Say why in a comment.
-  - Run `npm run lint:css` (stylelint, only on the CSS of the redesign). A disable comment needs a reason (`/* stylelint-disable-next-line rule -- reason */`).
+  - Run `npm run lint:css` (stylelint, on all CSS of `src/`). A disable comment needs a reason (`/* stylelint-disable-next-line rule -- reason */`).
 - **Never hard-code a hex in a component.** Use the semantic theme tokens `--surface-*`, `--text-*`, `--border-*`. Primitives (`--color-*`) are only for `tokens.css`.
 - **Two schemes, light and dark.** `data-scheme` on `<html>` gives the scheme: the inline script in the head of the layout sets it before the first paint, and `src/lib/colorScheme.ts` changes it. Use a token for its role, not for the colour it has in light. Only when no token fits, a component sets a rule under `:global(:root[data-scheme='dark'])`, with a comment that says why. Check each change in both schemes.
 - Content column max `--content-max` (1160px), side padding `--section-padding-x`, headline column `--section-padding-x-headlines`, vertical padding `--section-padding-y`. Centred statements cap at `--headline-max` (900px).
