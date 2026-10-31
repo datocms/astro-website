@@ -4,30 +4,22 @@ import expressiveCode from 'astro-expressive-code';
 import { defineConfig, envField } from 'astro/config';
 import { writeFile } from 'fs/promises';
 import type { Plugin } from 'vite';
-import { redesignCssArea } from './redesign-css-scope.mjs';
+import { cssLayerArea } from './css-scope.mjs';
 
 const MAX_CLIENT_CHUNK_SIZE_IN_KB = 500;
 
 /*
- * Cascade layers by role, for the CSS of the redesign only (the
- * prototype, see src/REDESIGN.md). Without layers, two rules with the
- * same specificity win or lose by the order of the CSS in the page, and
- * the dev server and the build give different orders. With layers, a
- * rule in a higher layer wins over a rule in a lower layer, in any order.
+ * Cascade layers by role. Without layers, two rules with the same
+ * specificity win or lose by the order of the CSS in the page, and the dev
+ * server and the build give different orders. With layers, a rule in a
+ * higher layer wins over a rule in a lower layer, in any order.
  *
- * The order of the layers is in src/layouts/Layout.astro (the first child
- * of <head>) and at the top of src/styles/global.css:
+ * The order of the layers is in src/layouts/BaseLayout/Component.astro (the
+ * first child of <head>) and at the top of src/styles/global.css:
  * reset, tokens, base, vendor, blocks, sections, pages.
  *
- * This plugin puts a CSS module in a layer only when it is CSS of the
- * redesign (redesignCssArea() in redesign-css-scope.mjs):
- * - the modules of src/components/, except the old components in
- *   src/components/legacy/;
- * - the modules of src/scenes/;
- * - the modules of the ported pages in REDESIGN_PAGE_DIRS;
- * - the CSS of the scene kit (@datocms/product-scenes).
- * The old CSS modules get no layer. Thus the cascade of the old pages
- * does not change.
+ * This plugin puts each CSS module of src/ in a layer, and the CSS of the
+ * scene kit (@datocms/product-scenes) in "vendor".
  *
  * It runs before the CSS plugin of Vite, thus CSS modules and minification
  * see the @layer block. The layer comes from:
@@ -53,8 +45,8 @@ function cssLayers(): Plugin {
       const isKit = path.endsWith('/product-scenes.css') && path.includes('product-scenes');
       if (!isKit && !path.endsWith('.module.css')) return null;
 
-      const area = isKit ? 'vendor' : redesignCssArea(path);
-      // Old CSS: no layer.
+      const area = isKit ? 'vendor' : cssLayerArea(path);
+      // A module outside src/ gets no layer.
       if (!area) return null;
 
       // Do not wrap a file two times.

@@ -1,22 +1,13 @@
 ---
 // A small menu in the bottom-left corner. It links to all the real pages of
-// the site, so that a reviewer can go from page to page quickly. A dot marks
-// the pages on the new layout, to review. It is not part of the design.
-import { REDESIGN_PAGE_DIRS } from '../../../redesign-css-scope.mjs';
+// the site, so that a reviewer can go from page to page quickly. It is not
+// part of the design.
 import styles from './style.module.css';
 
 // Each file in src/pages is a route. The dev pages and the dynamic routes are
 // not in the list. Astro makes no route from a file or a directory whose name
 // starts with "_", thus these are not in the list.
 const files = Object.keys(import.meta.glob('/src/pages/**/*.astro'));
-
-// A page is on the new layout when its path in src/pages is a ported
-// directory or file of REDESIGN_PAGE_DIRS. The home page is the file
-// "index.astro" in that list.
-const isNewLayout = (file: string) => {
-  const path = file.replace(/^\/src\/pages\//, '');
-  return REDESIGN_PAGE_DIRS.some((dir) => path === dir || path.startsWith(`${dir}/`));
-};
 
 const routes = files
   .filter(
@@ -28,7 +19,6 @@ const routes = files
         .replace(/^\/src\/pages/, '')
         .replace(/\.astro$/, '')
         .replace(/\/index$/, '') || '/',
-    isNew: isNewLayout(file),
   }))
   .sort((a, b) => a.path.localeCompare(b.path));
 
@@ -46,17 +36,12 @@ const current = Astro.url.pathname.replace(/\/$/, '') || '/';
               class={styles.link}
               href={route.path}
               aria-current={route.path === current ? 'page' : undefined}
-              data-new={route.isNew ? '' : undefined}
             >
               {route.path}
-              {route.isNew && <span class={styles.mark} role="img" aria-label="new layout" />}
             </a>
           </li>
         ))
       }
     </ul>
-    <p class={styles.legend}>
-      <span class={styles.mark} aria-hidden="true"></span> new layout, to review
-    </p>
   </nav>
 </details>

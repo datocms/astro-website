@@ -1,17 +1,15 @@
 // @ts-check
-// Lint only the CSS of the redesign with stylelint.config.mjs.
-// The old CSS does not obey these rules, thus the script does not lint it.
-// The scope comes from redesign-css-scope.mjs (the same scope as the
-// cssLayers plugin in astro.config.ts).
+// Lint the CSS of src/ with stylelint.config.mjs.
+// The scope comes from css-scope.mjs (the same scope as the cssLayers plugin
+// in astro.config.ts).
 // Usage: npm run lint:css [-- --fix]
 import stylelint from 'stylelint';
-import { legacyCssIgnoreGlobs, redesignCssGlobs } from '../redesign-css-scope.mjs';
+import { cssGlobs } from '../css-scope.mjs';
 
 const fix = process.argv.includes('--fix');
 
 const result = await stylelint.lint({
-  files: redesignCssGlobs(),
-  ignorePattern: legacyCssIgnoreGlobs(),
+  files: cssGlobs(),
   allowEmptyInput: true,
   fix,
   formatter: 'string',
