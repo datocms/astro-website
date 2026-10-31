@@ -15,7 +15,7 @@ export interface FormOption {
 }
 
 export interface FormFieldData {
-  type: 'text' | 'email' | 'select' | 'textarea';
+  type: 'text' | 'email' | 'select' | 'textarea' | 'file';
   name: string;
   label: string;
   placeholder: string;
@@ -23,13 +23,13 @@ export interface FormFieldData {
   required?: boolean;
   autocomplete?: string;
   /**
-   * Only for `select`. The value of a string option is its label. Not in
-   * the prototype: the FormOption options.
+   * Only for `select`. The value of a string option is its label. A
+   * FormOption sets the value and the label.
    */
   options?: (string | FormOption)[];
   /**
    * Only for `text` and `email`: the HTML pattern of the value. Default for
-   * `email`: a simple e-mail pattern. Not in the prototype.
+   * `email`: a simple e-mail pattern.
    */
   pattern?: string;
   /**
@@ -39,6 +39,10 @@ export interface FormFieldData {
   requiredMessage?: string;
   /** Shown when the value has the wrong format (e-mail only). */
   invalidMessage?: string;
+  /** Only for `text`: the visitor cannot change the value. */
+  readonly?: boolean;
+  /** Only for `file`: accept more than one file. */
+  multiple?: boolean;
 }
 
 export interface ContactLink {
@@ -64,14 +68,14 @@ export interface ContactFormData {
   submitErrorMessage: string;
   /**
    * Shown instead of the form when the browser runs no scripts and the
-   * page sends the data (ContactForm `external`). Not in the prototype.
+   * page sends the data (ContactForm `external`).
    */
   noscriptMessage?: string;
   success: {
     headline: string;
     muted: string;
     face: string;
-    /** A line of text under the headline. Not in the prototype. */
+    /** A line of text under the headline. */
     body?: string;
     button: ButtonData;
   };
@@ -163,7 +167,7 @@ export const contact: ContactSectionData = {
           label: 'Work email',
           placeholder: 'name@company.com',
           autocomplete: 'email',
-          // The pattern of the old contact form.
+          // The pattern of the e-mail addresses that the sales team accepts.
           pattern: '[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,20}',
           invalidMessage: 'Enter a valid work email',
         },

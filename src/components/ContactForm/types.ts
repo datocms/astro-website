@@ -1,6 +1,6 @@
 /*
  * The contract between ContactForm and a page that sends the data (the prop
- * `external`). Not in the prototype.
+ * `external`).
  *
  * When the fields are valid, the form fires the event `contactform:send` on
  * its root element ([data-contact-form]). The page sends the data and calls

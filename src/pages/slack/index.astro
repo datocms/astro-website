@@ -1,12 +1,16 @@
 ---
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Wrapper } from '~/components/legacy/Wrapper';
-import { Layout } from '~/layouts/LegacyLayout';
-import s from './_style.module.css';
+// The Slack invite page. The form sends the e-mail to the action
+// inviteEmailToSlackChannel, then goes to /slack/thanks.
 import { WebClient } from '@slack/web-api';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { SLACK_TOKEN } from 'astro:env/server';
-import { Form } from './_Form';
+import { ContactForm } from '~/components/ContactForm';
+import { Hero } from '~/components/Hero';
+import { Section } from '~/components/Section';
+import { form, hero, seo as slackSeo } from '~/data/slack';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import s from './_style.module.css';
 
 const web = new WebClient(SLACK_TOKEN);
 
@@ -19,38 +23,54 @@ if (!info.channel) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const seo = overrideSeo([], seoTitle(slackSeo.title));
 ---
 
-<Layout seo={[]}>
-  <Fragment slot="head">
-    <title>Join the DatoCMS Slack Channel</title>
-  </Fragment>
-  <Hero>
-    <Fragment slot="kicker">DatoCMS Community Slack Channel</Fragment>
-    <Fragment slot="title">Join us on <mark>Slack</mark>!</Fragment>
-    <Fragment slot="subtitle">
-      Try out new product updates before they&apos;re widely released, help us test and improve the
-      product, and connect with other users!
-    </Fragment>
-  </Hero>
-  <Wrapper>
-    <div class={s.notice}>
-      Our Slack is a wonderful place for casual chats and quick questions! If you need official
-      technical support, we kindly suggest checking out the <a
-        href="https://community.datocms.com/"
-        target="_blank">Community Forum</a
-      > or using the <a href="/support">Support Form</a>.
+<Layout seo={seo} theme="blue" headerVariant="light" footerTheme="blue">
+  <Hero
+    variant="light"
+    label={hero.label}
+    headline={hero.headline}
+    subheadline={hero.subheadline}
+  />
+  <Section>
+    <div class={s.column}>
+      <p class:list={['subtitleMedium', s.notice]}>
+        Our Slack is a wonderful place for casual chats and quick questions! If you need official
+        technical support, we kindly suggest checking out the <a
+          href="https://community.datocms.com/"
+          target="_blank"
+          rel="noopener">Community Forum</a
+        > or using the <a href="/support">Support Form</a>.
+      </p>
+      <ContactForm {...form} external>
+        <div slot="extra" class={s.turnstile} data-turnstile></div>
+      </ContactForm>
+      <p class:list={['subtitleMedium', s.stats]}>
+        <strong>{info.channel.num_members}</strong> people are already part of the community!
+      </p>
+      <p class:list={['subtitle', s.info]}>
+        Already a member? Enter the channel from{' '}
+        <a href="https://datocms.slack.com/">datocms.slack.com</a>.
+      </p>
     </div>
-    <div class={s.form}>
-      <Form client:load />
-    </div>
-
-    <div class={s.stats}>
-      <strong>{info.channel.num_members}</strong> people are already part of the community!
-    </div>
-    <div class={s.info}>
-      Already a member? Enter the channel from{' '}
-      <a href="https://datocms.slack.com/">datocms.slack.com</a>.
-    </div>
-  </Wrapper>
+  </Section>
 </Layout>
+
+<script>
+  import { actions } from 'astro:actions';
+  import { connectExternalForm } from '~/lib/externalForm';
+
+  const root = document.querySelector<HTMLElement>('[data-contact-form]');
+  if (root) {
+    connectExternalForm(root, {
+      turnstileAction: 'slack-invite',
+      fallback: 'email us at support@datocms.com.',
+      send: async (formData) => {
+        await actions.inviteEmailToSlackChannel.orThrow(formData);
+        return '/slack/thanks';
+      },
+    });
+  }
+</script>

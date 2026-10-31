@@ -28,6 +28,8 @@ const {
   pattern,
   requiredMessage = 'This field is required',
   invalidMessage,
+  readonly = false,
+  multiple = false,
   id = `field-${name}`,
   class: className,
 } = Astro.props;
@@ -68,8 +70,23 @@ const items: FormOption[] = options.map((option) =>
         type={type}
         placeholder={placeholder}
         required={required}
+        readonly={readonly}
         autocomplete={autocomplete}
         pattern={pattern ?? (type === 'email' ? '[^\\s@]+@[^\\s@]+\\.[^\\s@]+' : undefined)}
+        data-control
+      />
+    )
+  }
+
+  {
+    type === 'file' && (
+      <input
+        class:list={['body', styles.control, styles.file]}
+        id={id}
+        name={name}
+        type="file"
+        multiple={multiple}
+        required={required}
         data-control
       />
     )

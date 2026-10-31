@@ -1,15 +1,36 @@
 ---
-import { Hero } from '~/components/legacy/LegacyHero';
-import { LogosBar } from '~/components/legacy/LogosBar';
-import { Layout } from '~/layouts/LegacyLayout';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { query } from './_graphql';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { Space } from '~/components/legacy/Space';
-import { TopicsPicker, type Topic } from './_TopicsPicker';
+// The support page: a picker of topics, the help text of the topic and,
+// when the topic needs it, a form. The topics come from the CMS. The URL
+// holds the choice (?topics=a/b), thus a link can point to a topic. The
+// forms send their data to the actions forms.submitSupportRequest and
+// forms.submitSalesRequest, which give the next page (/support/thanks).
+import { stripStega } from '@datocms/astro';
 import { render as renderAsHtmlString } from 'datocms-structured-text-to-html-string';
-import { Wrapper } from '~/components/legacy/Wrapper';
+import { ContactForm } from '~/components/ContactForm';
+import { FormField } from '~/components/FormField';
+import chevron from '~/components/FormField/chevron.svg?raw';
+import { Hero } from '~/components/Hero';
+import { LogosLine } from '~/components/LogosLine';
+import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
 import { DraftModeQueryListener } from '~/components/legacy/DraftModeQueryListener';
+import { contact } from '~/data/contact';
+import {
+  errorIdField,
+  hero,
+  logos,
+  picker,
+  seo as supportSeo,
+  supportForm,
+  talk,
+} from '~/data/support';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import { computeView, parseTopicSlugs, type FormMode, type TopicMeta } from './_state';
+import s from './_style.module.css';
 
 const { topics } = await executeQuery(Astro, query);
 
@@ -17,47 +38,279 @@ if (topics.length === 0) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const seo = overrideSeo([], seoTitle(supportSeo.title));
+
+const bySlug = new Map(topics.map((topic) => [topic.slug, topic]));
+const rootTopics = topics.filter((topic) => !topic.parent);
+const childrenOf = (slug: string) =>
+  (bySlug.get(slug)?.children ?? []).flatMap((child) => bySlug.get(child.slug) ?? []);
+const rootsWithChildren = rootTopics.filter((topic) => childrenOf(topic.slug).length > 0);
+
+// The contact form shows when the topic is a leaf. With no guides, it shows
+// at once. With guides, the visitor asks for it (a link, or #form).
+function formModeOf(topic: (typeof topics)[number]): FormMode {
+  if (topic.children.length > 0) return 'none';
+  if (topic.commonQuestions.length === 0) return topic.disableContactForm ? 'none' : 'auto';
+  return 'on-request';
+}
+
+const metas: TopicMeta[] = topics.map((topic) => ({
+  slug: topic.slug,
+  childSlugs: childrenOf(topic.slug).map((child) => child.slug),
+  formMode: formModeOf(topic),
+  formType: stripStega(topic.contactFormType) === 'support' ? 'support' : 'sales',
+  responder: stripStega(topic.autoResponderType ?? ''),
+}));
+
+// The first render follows the URL, as the script does after a change.
+const view = computeView(metas, parseTopicSlugs(Astro.url.search), false);
+const hasHelp = (topic: (typeof topics)[number]) =>
+  topic.commonQuestions.length > 0 || Boolean(topic.description);
 ---
 
-<Layout noFinalCta seo={[]}>
-  <Fragment slot="head">
-    <title>Support page</title>
-  </Fragment>
+<Layout seo={seo} theme="blue" headerVariant="light" footerTheme="blue">
+  <Hero
+    variant="light"
+    label={hero.label}
+    headline={hero.headline}
+    subheadline={hero.subheadline}
+    breakBeforeMuted
+  />
 
-  <Hero>
-    <Fragment slot="kicker">Support page</Fragment>
-    <Fragment slot="title"
-      >Got issues?
-      <br />
-      <mark>We&apos;re here to help!</mark></Fragment
-    >
-  </Hero>
+  <Section>
+    <div class={s.column} data-picker>
+      <script type="application/json" id="topics-data" set:html={JSON.stringify(metas)} />
 
-  <Wrapper>
-    <TopicsPicker
-      topics={topics.map<Topic>((topic) => ({
-        ...topic,
-        description: topic.description
-          ? (renderAsHtmlString(topic.description) ?? undefined)
-          : undefined,
-      }))}
-      initialLocationSearch={Astro.url.search}
-      client:load
-    />
-  </Wrapper>
+      <div class={s.selects}>
+        <div class={s.topic}>
+          <label class="subtitleMedium" for="topic-0">{picker.topicLabel}</label>
+          <div class={s.selectBox}>
+            <select id="topic-0" class:list={['body', s.select]} autocomplete="off" data-level="0">
+              <option value="empty" disabled selected={!view.rootSlug}>{picker.placeholder}</option>
+              {
+                rootTopics.map((topic) => (
+                  <option value={topic.slug} selected={view.rootSlug === topic.slug}>
+                    {topic.title}
+                  </option>
+                ))
+              }
+            </select>
+            <span class={s.chevron} aria-hidden="true" set:html={chevron} />
+          </div>
+        </div>
+        {
+          rootsWithChildren.map((root) => (
+            <div class={s.topic} data-subtopics={root.slug} hidden={view.subtopicsOf !== root.slug}>
+              <label class="subtitleMedium" for={`topic-1-${root.slug}`}>
+                {root.subtopicQuestion}
+              </label>
+              <div class={s.selectBox}>
+                <select
+                  id={`topic-1-${root.slug}`}
+                  class:list={['body', s.select]}
+                  autocomplete="off"
+                  data-level="1"
+                >
+                  <option value="empty" disabled selected={!view.subSlug}>
+                    {picker.placeholder}
+                  </option>
+                  {childrenOf(root.slug).map((topic) => (
+                    <option value={topic.slug} selected={view.subSlug === topic.slug}>
+                      {topic.title}
+                    </option>
+                  ))}
+                </select>
+                <span class={s.chevron} aria-hidden="true" set:html={chevron} />
+              </div>
+            </div>
+          ))
+        }
+      </div>
 
-  <Space top={3}>
-    <LogosBar
-      title="We power experiences for over half a billion users"
-      clients={[
-        'svg/logos/polestar',
-        'svg/logos/hashicorp',
-        'svg/logos/verizon',
-        'svg/logos/harrys',
-        'svg/logos/vercel',
-      ]}
-    />
-  </Space>
+      {
+        topics.filter(hasHelp).map((topic) => (
+          <div class={s.help} data-topic={topic.slug} hidden={view.leafSlug !== topic.slug}>
+            <Prose>
+              {topic.description && (
+                <Fragment set:html={renderAsHtmlString(topic.description) ?? ''} />
+              )}
+              {topic.commonQuestions.length > 0 && (
+                <>
+                  <h3>{picker.guidesTitle}</h3>
+                  <p>{picker.guidesText}</p>
+                  <ul>
+                    {topic.commonQuestions.map((question) => (
+                      <li id={question.url}>
+                        <a href={question.url}>{question.title}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              {topic.children.length === 0 && !topic.disableContactForm && (
+                <>
+                  <h3>{picker.moreTitle}</h3>
+                  <ul>
+                    <li>
+                      <a href="#form" data-open-form>
+                        {picker.moreLink}
+                      </a>
+                    </li>
+                  </ul>
+                </>
+              )}
+            </Prose>
+          </div>
+        ))
+      }
+
+      <div class={s.talk} id="form" hidden={!view.form} data-form-region>
+        <div class={s.talkIntro}>
+          <h2 class="h2">{talk.title}</h2>
+          <p class="subtitleMedium">{talk.text}</p>
+        </div>
+
+        <div data-form-kind="support" hidden={view.form !== 'support'}>
+          <ContactForm {...supportForm} external idPrefix="support">
+            <input slot="extra" type="hidden" name="issueType" />
+            <div slot="extra" class={s.errorId} data-error-id hidden>
+              <FormField {...errorIdField} id="support-errorId" />
+            </div>
+            <div slot="extra" class={s.turnstile} data-turnstile></div>
+          </ContactForm>
+        </div>
+
+        <div data-form-kind="sales" hidden={view.form !== 'sales'}>
+          <ContactForm {...contact.form} external idPrefix="sales">
+            <input slot="extra" type="hidden" name="issueType" value="sales" />
+            <div slot="extra" class={s.turnstile} data-turnstile></div>
+          </ContactForm>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section flushTop>
+    <LogosLine logos={logos.items} label={logos.label} marquee="overflow" />
+  </Section>
 
   <DraftModeQueryListener query={query} />
 </Layout>
+
+<script>
+  import { actions } from 'astro:actions';
+  import { getCookie } from '~/lib/cookies';
+  import { connectExternalForm } from '~/lib/externalForm';
+  import { computeView, parseTopicSlugs, type TopicMeta } from './_state';
+
+  const root = document.querySelector<HTMLElement>('[data-picker]');
+  const metas: TopicMeta[] = JSON.parse(
+    document.getElementById('topics-data')?.textContent ?? '[]',
+  );
+
+  if (root) {
+    // The visitor asked for the form with the link, or with #form.
+    let formRequested = window.location.hash === '#form';
+
+    const topicSelect = root.querySelector<HTMLSelectElement>('select[data-level="0"]');
+    const groups = [...root.querySelectorAll<HTMLElement>('[data-subtopics]')];
+    const helps = [...root.querySelectorAll<HTMLElement>('[data-topic]')];
+    const region = root.querySelector<HTMLElement>('[data-form-region]');
+    const forms = [...root.querySelectorAll<HTMLElement>('[data-form-kind]')];
+
+    const render = (scroll = false) => {
+      const view = computeView(metas, parseTopicSlugs(window.location.search), formRequested);
+      if (topicSelect) topicSelect.value = view.rootSlug ?? 'empty';
+      for (const group of groups) {
+        const visible = group.dataset.subtopics === view.subtopicsOf;
+        group.hidden = !visible;
+        const select = group.querySelector('select');
+        if (visible && select) select.value = view.subSlug ?? 'empty';
+      }
+      for (const help of helps) help.hidden = help.dataset.topic !== view.leafSlug;
+      if (region) region.hidden = !view.form;
+      for (const form of forms) form.hidden = form.dataset.formKind !== view.form;
+
+      // The hidden field gives the auto-responder of the topic to the action.
+      const leaf = metas.find((meta) => meta.slug === view.leafSlug);
+      const issueType = root.querySelector<HTMLInputElement>(
+        '[data-form-kind="support"] input[name="issueType"]',
+      );
+      if (issueType) issueType.value = leaf?.responder ?? '';
+
+      if (scroll && view.form && region) {
+        region.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+      }
+    };
+
+    // A change of a select keeps the other parameters and the hash of the URL.
+    root.addEventListener('change', (event) => {
+      const select = event.target;
+      if (!(select instanceof HTMLSelectElement) || select.dataset.level === undefined) return;
+      formRequested = false;
+      const url = new URL(window.location.href);
+      const current = parseTopicSlugs(url.search);
+      const slugs =
+        select.dataset.level === '0' ? [select.value] : [current[0] ?? '', select.value];
+      url.searchParams.set('topics', slugs.join('/'));
+      window.history.pushState({}, '', url);
+      render();
+    });
+
+    root.addEventListener('click', (event) => {
+      const link = (event.target as Element).closest('[data-open-form]');
+      if (!link) return;
+      event.preventDefault();
+      formRequested = true;
+      render(true);
+    });
+
+    window.addEventListener('popstate', () => render());
+    render(formRequested);
+
+    // Fill the support form from the URL: a link from the dashboard can
+    // carry the e-mail, the project, the subject, the text and an error ID.
+    const params = new URLSearchParams(window.location.search);
+    const support = root.querySelector<HTMLElement>('[data-form-kind="support"]');
+    const fill = (name: string, value: string | null) => {
+      const input = support?.querySelector<HTMLInputElement | HTMLTextAreaElement>(
+        `[name="${name}"]`,
+      );
+      if (input && value) input.value = value;
+    };
+    const savedEmail = getCookie('datoAccountEmail');
+    let cookieEmail: string | null = null;
+    if (savedEmail) {
+      try {
+        cookieEmail = decodeURIComponent(savedEmail);
+      } catch {
+        cookieEmail = savedEmail;
+      }
+    }
+    fill('email', params.get('email') || cookieEmail);
+    fill('project', params.get('projectUrl'));
+    fill('subject', params.get('subject'));
+    fill('body', params.get('body'));
+    fill('errorId', params.get('errorId'));
+    const errorIdBox = support?.querySelector<HTMLElement>('[data-error-id]');
+    if (errorIdBox && params.get('errorId')) errorIdBox.hidden = false;
+
+    for (const form of forms) {
+      const contactForm = form.querySelector<HTMLElement>('[data-contact-form]');
+      if (!contactForm) continue;
+      connectExternalForm(contactForm, {
+        // The same label as the action expects (isTurnstileTokenValid).
+        turnstileAction: form.dataset.formKind === 'support' ? 'support' : 'contact',
+        fallback:
+          form.dataset.formKind === 'support'
+            ? 'email us at support@datocms.com.'
+            : 'email us at sales@datocms.com.',
+        send: (formData) =>
+          form.dataset.formKind === 'support'
+            ? actions.forms.submitSupportRequest.orThrow(formData)
+            : actions.forms.submitSalesRequest.orThrow(formData),
+      });
+    }
+  }
+</script>

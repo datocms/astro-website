@@ -6,7 +6,7 @@ import type { ContactFormData } from '~/data/contact';
 import styles from './style.module.css';
 
 /*
- * Without `external`, the submit is a stub (as in the prototype): no
+ * Without `external`, the submit is a stub: no
  * network call. The script validates the fields, shows the submitting
  * state for 1s, then shows the success state.
  * To see the submit error, add `?fail` to the URL, or use an e-mail that
@@ -14,15 +14,20 @@ import styles from './style.module.css';
  * Without JS, the browser validates the `required` fields and the form
  * posts to the same page, which then shows the success state.
  *
- * With `external` (not in the prototype), the page sends the data: see
- * ./types.ts. The slot `extra` (not in the prototype) goes at the end of
+ * With `external`, the page sends the data: see
+ * ./types.ts. The slot `extra` goes at the end of
  * the box, before the submit row: hidden inputs, an anti-bot widget.
  */
 type Props = ContactFormData & {
   /** Show the success state (the page sets it after a POST without JS). */
   submitted?: boolean;
-  /** The page sends the data (see ./types.ts). Not in the prototype. */
+  /** The page sends the data (see ./types.ts). */
   external?: boolean;
+  /**
+   * A prefix for the ids of the fields: `<prefix>-<name>`. Set it when a
+   * page has more than one form, else the ids repeat.
+   */
+  idPrefix?: string;
 };
 
 const {
@@ -35,6 +40,7 @@ const {
   success,
   submitted = false,
   external = false,
+  idPrefix,
 } = Astro.props;
 
 // Without scripts, an external form cannot send its data: show the message
@@ -66,7 +72,11 @@ const needsScript = external && noscriptMessage !== undefined;
         rows.map((row, i) => (
           <div class:list={[styles.row, i === 0 && styles.firstRow]}>
             {row.map((field) => (
-              <FormField {...field} class={styles.cell} />
+              <FormField
+                {...field}
+                id={idPrefix ? `${idPrefix}-${field.name}` : undefined}
+                class={styles.cell}
+              />
             ))}
           </div>
         ))
