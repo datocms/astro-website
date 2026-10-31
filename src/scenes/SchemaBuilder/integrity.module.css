@@ -22,6 +22,7 @@
  * closer columns.
  */
 .integrity {
+  --slide-time: 0.45s;
   --pad: var(--space-md);
   --link: var(--space-lg);
   --panel-pad: var(--space-xs);
@@ -46,10 +47,14 @@
   background: var(--surface-inverse);
 }
 
-.integrity[data-instant] *,
-.integrity[data-instant] *::after {
-  /* stylelint-disable-next-line declaration-no-important -- Short state while the script resets the picture. The rule must beat the transition of every child part. */
-  transition: none !important;
+.integrity[data-instant] {
+  /* While the script resets the picture, each duration is zero. The durations are variables, thus the rule needs no !important. */
+  --diagram-fade: 0s;
+  --diagram-enter: 0s;
+  --diagram-draw: 0s;
+  --diagram-settle: 0s;
+  --diagram-swap-time: 0s;
+  --slide-time: 0s;
 }
 
 .integrity > .pill {
@@ -132,7 +137,7 @@
   grid-template-columns: var(--columns);
   align-items: center;
   height: var(--row);
-  transition: grid-template-columns 0.45s var(--diagram-ease-out);
+  transition: grid-template-columns var(--slide-time) var(--diagram-ease-out);
 }
 
 .integrity[data-stage='0'] :is(.header, .line) {
@@ -243,7 +248,7 @@
 
 .row {
   border-bottom: 1px solid var(--border-on-inverse);
-  transition: translate 0.45s var(--diagram-ease-out);
+  transition: translate var(--slide-time) var(--diagram-ease-out);
 }
 
 .row[data-flip] {

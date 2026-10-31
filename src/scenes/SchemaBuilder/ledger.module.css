@@ -18,6 +18,7 @@
  * Two widths of the box. To 459px, less space around the panel.
  */
 .ledger {
+  --slide-time: 0.45s;
   --pad: var(--space-md);
   --link: var(--space-lg);
   --panel-pad: var(--space-xs);
@@ -36,10 +37,14 @@
   background: var(--surface-inverse);
 }
 
-.ledger[data-instant] *,
-.ledger[data-instant] *::after {
-  /* stylelint-disable-next-line declaration-no-important -- Short state while the script resets the picture. The rule must beat the transition of every child part. */
-  transition: none !important;
+.ledger[data-instant] {
+  /* While the script resets the picture, each duration is zero. The durations are variables, thus the rule needs no !important. */
+  --diagram-fade: 0s;
+  --diagram-enter: 0s;
+  --diagram-draw: 0s;
+  --diagram-settle: 0s;
+  --diagram-swap-time: 0s;
+  --slide-time: 0s;
 }
 
 .ledger > .pill {
@@ -112,7 +117,7 @@
   padding: var(--space-2xs) var(--panel-pad);
   border-bottom: 1px solid var(--border-on-inverse);
   transition:
-    translate 0.45s var(--diagram-ease-out),
+    translate var(--slide-time) var(--diagram-ease-out),
     opacity var(--diagram-enter) var(--diagram-ease-out),
     scale var(--diagram-enter) var(--diagram-ease-out),
     box-shadow var(--diagram-settle) var(--diagram-ease-out),
