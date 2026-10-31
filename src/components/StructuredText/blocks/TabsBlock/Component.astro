@@ -77,7 +77,9 @@ const id = `tabs-${block.id}`;
 <script>
   // Turn on the tabs. Show the tab list and one panel at a time.
   for (const root of document.querySelectorAll<HTMLElement>('[data-tabs]')) {
-    const tablist = root.querySelector<HTMLElement>('[role="tablist"]')!;
+    const tablist = root.querySelector<HTMLElement>('[role="tablist"]');
+    // A block with no tab list stays as it is: the other blocks still work.
+    if (!tablist) continue;
     const tabs = [...tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
     const panels = [...root.querySelectorAll<HTMLElement>('[data-tab-panel]')];
 
@@ -94,7 +96,8 @@ const id = `tabs-${block.id}`;
       panel.setAttribute('role', 'tabpanel');
       panel.setAttribute('aria-labelledby', tabs[i]!.id);
       panel.tabIndex = 0;
-      panel.querySelector<HTMLElement>('[data-tab-heading]')!.hidden = true;
+      const heading = panel.querySelector<HTMLElement>('[data-tab-heading]');
+      if (heading) heading.hidden = true;
     });
 
     tabs.forEach((tab, i) => tab.addEventListener('click', () => select(i)));

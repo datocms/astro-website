@@ -36,9 +36,11 @@ const firstLine = text.split('\n').find((line) => line.trim()) ?? '';
   const DONE = '✓ Copied: now paste that into your preferred AI agent!';
 
   for (const root of document.querySelectorAll<HTMLElement>('[data-copy-prompt]')) {
-    const button = root.querySelector('button')!;
-    const hint = root.querySelector<HTMLElement>('[data-copy-prompt-hint]')!;
-    const template = root.querySelector<HTMLTemplateElement>('[data-copy-prompt-text]')!;
+    const button = root.querySelector('button');
+    const hint = root.querySelector<HTMLElement>('[data-copy-prompt-hint]');
+    const template = root.querySelector<HTMLTemplateElement>('[data-copy-prompt-text]');
+    // A block with a missing part stays hidden: the other blocks still work.
+    if (!button || !hint || !template) continue;
     const initial = hint.textContent;
     let timer: ReturnType<typeof setTimeout> | undefined;
     root.hidden = false;

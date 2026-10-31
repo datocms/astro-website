@@ -80,7 +80,9 @@ const { items, theme, total } = Astro.props;
       ).observe(scoreEl);
 
     // The indicator slides from the old active item to the new one.
-    const list = nav.querySelector('ul')!;
+    const list = nav.querySelector('ul');
+    // Without the list there is nothing to slide: this nav stays as it is.
+    if (!list) continue;
     const placeIndicator = () => {
       const link = links[active]!;
       list.style.setProperty('--indicator-x', `${link.offsetLeft}px`);

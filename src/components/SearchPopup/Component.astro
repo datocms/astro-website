@@ -102,16 +102,27 @@ import styles from './style.module.css';
   const dialog = document.querySelector<HTMLDialogElement>('[data-search-popup]');
   if (dialog) setup(dialog);
 
+  function findParts(dialog: HTMLDialogElement) {
+    const input = dialog.querySelector<HTMLInputElement>('[data-search-input]');
+    const ask = dialog.querySelector<HTMLElement>('[data-search-ask]');
+    const body = dialog.querySelector<HTMLElement>('[data-search-body]');
+    const empty = dialog.querySelector<HTMLElement>('[data-search-state="empty"]');
+    const results = dialog.querySelector<HTMLElement>('[data-search-state="results"]');
+    const none = dialog.querySelector<HTMLElement>('[data-search-state="none"]');
+    const quickList = empty?.querySelector<HTMLElement>('[data-search-list]');
+    const status = dialog.querySelector<HTMLElement>('[data-search-status]');
+    const row = dialog.querySelector<HTMLTemplateElement>('[data-search-row]');
+    const close = dialog.querySelector<HTMLElement>('[data-search-close]');
+    if (!input || !ask || !body || !empty || !results || !none) return null;
+    if (!quickList || !status || !row || !close) return null;
+    return { input, ask, body, empty, results, none, quickList, status, row, close };
+  }
+
   function setup(dialog: HTMLDialogElement) {
-    const input = dialog.querySelector<HTMLInputElement>('[data-search-input]')!;
-    const ask = dialog.querySelector<HTMLElement>('[data-search-ask]')!;
-    const body = dialog.querySelector<HTMLElement>('[data-search-body]')!;
-    const empty = dialog.querySelector<HTMLElement>('[data-search-state="empty"]')!;
-    const results = dialog.querySelector<HTMLElement>('[data-search-state="results"]')!;
-    const none = dialog.querySelector<HTMLElement>('[data-search-state="none"]')!;
-    const quickList = empty.querySelector<HTMLElement>('[data-search-list]')!;
-    const status = dialog.querySelector<HTMLElement>('[data-search-status]')!;
-    const row = dialog.querySelector<HTMLTemplateElement>('[data-search-row]')!;
+    const parts = findParts(dialog);
+    // A missing part stops this popup only.
+    if (!parts) return;
+    const { input, ask, body, empty, results, none, quickList, status, row, close } = parts;
 
     let trigger: HTMLElement | null = null;
     let active = -1;
@@ -180,10 +191,12 @@ import styles from './style.module.css';
         const link = row.content.firstElementChild!.cloneNode(true) as HTMLAnchorElement;
         link.href = entry.href;
         link.id = `search-popup-result-${i}`;
-        link.querySelector<HTMLElement>('[data-field="breadcrumb"]')!.textContent =
-          entry.breadcrumb;
-        link.querySelector<HTMLElement>('[data-field="title"]')!.textContent = entry.title;
-        highlight(link.querySelector<HTMLElement>('[data-field="excerpt"]')!, entry.excerpt, query);
+        const breadcrumb = link.querySelector<HTMLElement>('[data-field="breadcrumb"]');
+        const title = link.querySelector<HTMLElement>('[data-field="title"]');
+        const excerpt = link.querySelector<HTMLElement>('[data-field="excerpt"]');
+        if (breadcrumb) breadcrumb.textContent = entry.breadcrumb;
+        if (title) title.textContent = entry.title;
+        if (excerpt) highlight(excerpt, entry.excerpt, query);
         results.append(link);
       });
 
@@ -256,7 +269,7 @@ import styles from './style.module.css';
       if (next !== active) setActive(next);
     });
 
-    dialog.querySelector('[data-search-close]')!.addEventListener('click', closePopup);
+    close.addEventListener('click', closePopup);
 
     // A click on the backdrop has the dialog itself as its target.
     dialog.addEventListener('click', (event) => {

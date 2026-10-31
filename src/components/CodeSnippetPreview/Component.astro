@@ -208,14 +208,20 @@ const notes = tabs.map((tab) =>
 
     for (const note of order) {
       const k = note.dataset.note!;
-      const comment = panel.querySelector(`[data-comment="${k}"]`)!;
-      const leader = panel.querySelector(`[data-leader="${k}"]`)!;
+      const comment = panel.querySelector(`[data-comment="${k}"]`);
+      const leader = panel.querySelector(`[data-leader="${k}"]`);
+      const pointElement = panel.querySelector(`[data-point="${k}"]`);
+      // A note with a missing part stays hidden: the other notes still work.
+      if (!comment || !leader || !pointElement) {
+        note.hidden = true;
+        continue;
+      }
       const off = comment.hasAttribute('data-inline');
       note.hidden = off;
       leader.parentElement!.toggleAttribute('hidden', off);
       if (off) continue;
 
-      const point = box(panel.querySelector(`[data-point="${k}"]`)!);
+      const point = box(pointElement);
       const y = (point.top + point.bottom) / 2;
       note.style.top = '0px';
       note.style.width = '';
@@ -294,9 +300,9 @@ const notes = tabs.map((tab) =>
         d = `M${ax} ${y}H${x - r}Q${x} ${y} ${x} ${y + s * r}V${by}`;
       }
       leader.setAttribute('d', d);
-      const dot = panel.querySelector(`[data-dot="${k}"]`)!;
-      dot.setAttribute('cx', String(ax));
-      dot.setAttribute('cy', String(y));
+      const dot = panel.querySelector(`[data-dot="${k}"]`);
+      dot?.setAttribute('cx', String(ax));
+      dot?.setAttribute('cy', String(y));
     }
     return result;
   }
@@ -331,12 +337,15 @@ const notes = tabs.map((tab) =>
         // A point gets its outline only when its note shows.
         for (const note of notes) {
           panel
-            .querySelector(`[data-point="${note.dataset.note}"]`)!
-            .toggleAttribute('data-off', note.hidden !== false);
+            .querySelector(`[data-point="${note.dataset.note}"]`)
+            ?.toggleAttribute('data-off', note.hidden !== false);
         }
         break;
       }
-      panel.querySelector(`[data-comment="${failed}"]`)!.setAttribute('data-inline', '');
+      const failedComment = panel.querySelector(`[data-comment="${failed}"]`);
+      // Without the comment the next pass would fail again: stop the loop.
+      if (!failedComment) break;
+      failedComment.setAttribute('data-inline', '');
     }
   }
 

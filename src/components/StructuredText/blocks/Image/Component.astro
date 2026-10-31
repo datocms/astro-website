@@ -74,9 +74,11 @@ const zoomUrl = asset.width && asset.width > 1500 ? asset.lightboxImageUrl : nul
   document.querySelectorAll<HTMLAnchorElement>('[data-image-zoom]').forEach((link) => {
     link.addEventListener('click', (event) => {
       if (event.metaKey || event.ctrlKey || event.shiftKey) return;
-      event.preventDefault();
       const el = dialog();
-      const img = el.querySelector('img')!;
+      const img = el.querySelector('img');
+      // Without the image the link opens the file, as usual.
+      if (!img) return;
+      event.preventDefault();
       img.src = link.href;
       img.alt = link.querySelector('img')?.alt ?? '';
       el.showModal();

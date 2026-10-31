@@ -79,14 +79,17 @@ const links = [
 
 <script>
   for (const root of document.querySelectorAll<HTMLElement>('[data-markdown-actions]')) {
-    const url = root.dataset.markdownActions!;
-    const copyPage = root.querySelector<HTMLButtonElement>('[data-action="copy-page"]')!;
-    const copyLink = root.querySelector<HTMLButtonElement>('[data-action="copy-link"]')!;
-    const toggle = root.querySelector<HTMLButtonElement>('[data-action="toggle"]')!;
-    const menu = root.querySelector<HTMLElement>('[data-menu]')!;
-    const label = copyPage.querySelector<HTMLElement>('[data-label]')!;
-    const copyIcon = copyPage.querySelector<HTMLElement>('[data-icon="copy"]')!;
-    const doneIcon = copyPage.querySelector<HTMLElement>('[data-icon="done"]')!;
+    const url = root.dataset.markdownActions;
+    const copyPage = root.querySelector<HTMLButtonElement>('[data-action="copy-page"]');
+    const copyLink = root.querySelector<HTMLButtonElement>('[data-action="copy-link"]');
+    const toggle = root.querySelector<HTMLButtonElement>('[data-action="toggle"]');
+    const menu = root.querySelector<HTMLElement>('[data-menu]');
+    const label = copyPage?.querySelector<HTMLElement>('[data-label]');
+    const copyIcon = copyPage?.querySelector<HTMLElement>('[data-icon="copy"]');
+    const doneIcon = copyPage?.querySelector<HTMLElement>('[data-icon="done"]');
+    // A block with a missing part stays hidden: the other blocks still work.
+    if (!url || !copyPage || !copyLink || !toggle || !menu) continue;
+    if (!label || !copyIcon || !doneIcon) continue;
     let timer: ReturnType<typeof setTimeout> | undefined;
     root.hidden = false;
 

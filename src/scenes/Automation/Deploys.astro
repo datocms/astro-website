@@ -131,7 +131,8 @@ const dots = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) 
     }
 
     set(el: HTMLElement, key: string, text: string): void {
-      el.querySelector(`[data-${key}]`)!.textContent = text;
+      const target = el.querySelector(`[data-${key}]`);
+      if (target) target.textContent = text;
     }
 
     async event(live: Live): Promise<void> {
