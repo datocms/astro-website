@@ -1,0 +1,36 @@
+---
+// A card with an image, a title and a short text: a project of the
+// showcase or a chat. The optional logo is the partner of the project (a
+// logo of the agency) or the technology of the project. Both keep their colours.
+import { stripStega } from '@datocms/astro';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import type { FragmentOf } from '~/lib/datocms/graphql';
+import type { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import s from './_Card.module.css';
+
+interface Props {
+  href: string;
+  title: string;
+  image?: FragmentOf<typeof ResponsiveImageFragment> | null;
+  logo?: { url: string; alt: string | null } | null;
+}
+
+const { href, title, image, logo } = Astro.props;
+---
+
+<a href={href} class={s.card}>
+  <span class={s.image}>
+    {image && <ResponsiveImage data={image} sizes="(min-width: 768px) 360px, 100vw" />}
+  </span>
+  <span class={s.text}>
+    <span class:list={[s.title, 'bodyMedium']}>{title}</span>
+    <span class:list={[s.description, 'subtitle']}><slot /></span>
+  </span>
+  {
+    logo && (
+      <span class={s.logo}>
+        <img src={logo.url} alt={stripStega(logo.alt ?? '')} loading="lazy" />
+      </span>
+    )
+  }
+</a>

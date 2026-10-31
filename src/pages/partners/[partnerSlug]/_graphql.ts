@@ -1,6 +1,6 @@
-import { defaultInlineRecordFragments } from '~/components/legacy/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/legacy/linkToRecords';
-import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
+import { defaultInlineRecordFragments } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/StructuredText/linkToRecords';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { CustomerStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/customerStory';
@@ -8,7 +8,7 @@ import { buildUrlForPartner, PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuil
 import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
-import { PluginCardFragment } from './_sub/PluginCard/_graphql';
+import { PluginCardFragment } from '~/components/PluginCard';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
@@ -26,6 +26,8 @@ export const query = graphql(
         logo {
           url
           alt
+          width
+          height
           pngUrl: url(imgixParams: { fm: png, h: 200 })
         }
         description {
@@ -119,7 +121,7 @@ export const query = graphql(
             }
           }
           mainImage {
-            responsiveImage(imgixParams: { auto: format, w: 750, h: 500, fit: crop, crop: top }) {
+            responsiveImage(imgixParams: { w: 750, h: 500, fit: crop, crop: top }) {
               ...ResponsiveImageFragment
             }
           }
@@ -132,7 +134,7 @@ export const query = graphql(
             value
           }
           coverImage {
-            responsiveImage(imgixParams: { auto: format, w: 750, h: 500, fit: crop, crop: top }) {
+            responsiveImage(imgixParams: { w: 750, h: 500, fit: crop, crop: top }) {
               ...ResponsiveImageFragment
             }
           }
@@ -144,7 +146,6 @@ export const query = graphql(
     TagFragment,
     ResponsiveImageFragment,
     ShowcaseProjectUrlFragment,
-    ResponsiveImageFragment,
     CustomerStoryUrlFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
@@ -162,7 +163,7 @@ export const extraQuery = graphql(
       }
     }
   `,
-  [ResponsiveImageFragment, PluginCardFragment],
+  [PluginCardFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

@@ -1,23 +1,23 @@
 ---
-import PartnersMap from './_sub/PartnersMap';
-import s from './_style.module.css';
-import sortBy from 'lodash-es/sortBy';
-import { Announce } from '~/components/legacy/pluginToolkit/Announce';
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Layout } from '~/layouts/LegacyLayout';
-import { Card } from '~/components/legacy/Card';
-import { Space } from '~/components/legacy/Space';
-import { Wrapper } from '~/components/legacy/Wrapper';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
-import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
-import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { countersForDropdown, countersToOptions } from './_facets';
-import { FetchAndReplaceFormOnSubmit } from '~/components/legacy/filtering/FetchAndReplaceFormOnSubmit';
-import { Filter } from '~/components/legacy/filtering/Filter';
+// The list of the partners: the world map, the link to the partner
+// program, the filters and a card for each partner. The highlighted
+// partners come first, then the partners with most showcase projects.
 import { stripStega } from '@datocms/astro';
+import sortBy from 'lodash-es/sortBy';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { FilterForm } from '~/components/FilterForm';
+import { Hero } from '~/components/Hero';
+import { Section } from '~/components/Section';
+import { filterPlaceholder, index } from '~/data/partners';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import PartnersMap from './_PartnersMap';
+import PartnerCard from './_PartnerCard.astro';
+import { countersForDropdown, countersToOptions } from './_facets';
+import { query } from './_graphql';
+import s from './_style.module.css';
 
 const { page, partners } = await executeQuery(Astro, query);
 
@@ -26,178 +26,126 @@ if (!page || partners.length === 0) {
   return notFoundResponse();
 }
 
-const projectsCountByPartner = partners.reduce<Record<string, number>>((acc, partner) => {
-  acc[partner.id] = partner._allReferencingShowcaseProjectsMeta.count;
-  return acc;
-}, {});
+const projectsCountByPartner = new Map(
+  partners.map((partner) => [partner.id, partner._allReferencingShowcaseProjectsMeta.count]),
+);
 
-const highlightedPartnerIds = page.highlightedPartners.map((p) => p.id);
+const highlightedPartnerIds = new Set(page.highlightedPartners.map((p) => p.id));
 
 const orderedPartnersWithStega = [
   ...page.highlightedPartners,
   ...sortBy(
-    partners.filter((p) => !highlightedPartnerIds.includes(p.id)),
-    [(x) => -(projectsCountByPartner[x.id] || 0), 'name'],
+    partners.filter((p) => !highlightedPartnerIds.has(p.id)),
+    [(x) => -(projectsCountByPartner.get(x.id) || 0), 'name'],
   ),
 ];
 
+// The filters compare plain text: the stega of Content Link is not part of it.
 const orderedPartnersWithoutStega = stripStega(orderedPartnersWithStega);
 
-const partnersCountByCountryCode = partners
-  .flatMap((partner) => partner.locations.map((location) => location.code))
-  .reduce<Record<string, number>>((acc, code) => {
-    acc[code] = (acc[code] || 0) + 1;
-    return acc;
-  }, {});
+const partnersCountByCountryCode: Record<string, number> = {};
+for (const partner of partners) {
+  for (const location of partner.locations) {
+    // The country code is a key of the map: it must not hold the stega of Content Link.
+    const code = stripStega(location.code);
+    partnersCountByCountryCode[code] = (partnersCountByCountryCode[code] || 0) + 1;
+  }
+}
 
-const technologyFilter = Astro.url.searchParams.get('technology');
-const areaOfExpertiseFilter = Astro.url.searchParams.get('areaOfExpertise');
-const countryFilter = Astro.url.searchParams.get('country');
-const continentFilter = Astro.url.searchParams.get('continent');
+const activeFilters = {
+  technology: Astro.url.searchParams.get('technology'),
+  areaOfExpertise: Astro.url.searchParams.get('areaOfExpertise'),
+  country: Astro.url.searchParams.get('country'),
+  continent: Astro.url.searchParams.get('continent'),
+};
 
 const filteredPartners = orderedPartnersWithoutStega.filter((partner) => {
-  if (technologyFilter && !partner.technologies.some((t) => t.name === technologyFilter)) {
+  const { technology, areaOfExpertise, country, continent } = activeFilters;
+  if (technology && !partner.technologies.some((t) => t.name === technology)) return false;
+  if (areaOfExpertise && !partner.areasOfExpertise.some((t) => t.name === areaOfExpertise)) {
     return false;
   }
-  if (
-    areaOfExpertiseFilter &&
-    !partner.areasOfExpertise.some((t) => t.name === areaOfExpertiseFilter)
-  ) {
-    return false;
-  }
-  if (countryFilter && !partner.locations.some((t) => `${t.emoji} ${t.name}` === countryFilter)) {
-    return false;
-  }
-  if (continentFilter && !partner.locations.some((t) => t.continent.name === continentFilter)) {
-    return false;
-  }
-
+  if (country && !partner.locations.some((t) => `${t.emoji} ${t.name}` === country)) return false;
+  if (continent && !partner.locations.some((t) => t.continent.name === continent)) return false;
   return true;
 });
 
-// Faceted search: build dropdown options
-const activeFilters = {
-  technology: technologyFilter,
-  areaOfExpertise: areaOfExpertiseFilter,
-  country: countryFilter,
-  continent: continentFilter,
-};
+// Faceted search: the options of a dropdown count the partners that match
+// all the other filters.
+const counters = (key: keyof typeof activeFilters) =>
+  countersForDropdown(orderedPartnersWithoutStega, activeFilters, key);
 
-const techCounters = countersForDropdown(orderedPartnersWithoutStega, activeFilters, 'technology');
-const areaCounters = countersForDropdown(
-  orderedPartnersWithoutStega,
-  activeFilters,
-  'areaOfExpertise',
-);
-const countryCounters = countersForDropdown(orderedPartnersWithoutStega, activeFilters, 'country');
-const continentCounters = countersForDropdown(
-  orderedPartnersWithoutStega,
-  activeFilters,
-  'continent',
-);
-
-const continentOptions = countersToOptions(continentCounters.continents);
-const countryOptions = countersToOptions(countryCounters.countries);
-const technologyOptions = countersToOptions(techCounters.technologies);
-const areaOfExpertiseOptions = countersToOptions(areaCounters.areasOfExpertise);
-
-const getLabel = (count: number) => {
-  if (count === 0) {
-    return false;
-  }
-  if (count === 1) {
-    return '1 showcase project';
-  }
-  return `${count} showcase projects`;
-};
-
-const bkgColors = ['azure', 'pink', 'blue', 'green', 'yellow'] as const;
+const filters = [
+  {
+    name: 'continent',
+    label: index.filters.continent,
+    options: countersToOptions(counters('continent').continents),
+    value: activeFilters.continent,
+    resets: ['country'],
+  },
+  {
+    name: 'country',
+    label: index.filters.country,
+    options: countersToOptions(counters('country').countries),
+    value: activeFilters.country,
+  },
+  {
+    name: 'technology',
+    label: index.filters.technology,
+    options: countersToOptions(counters('technology').technologies),
+    value: activeFilters.technology,
+  },
+  {
+    name: 'areaOfExpertise',
+    label: index.filters.areaOfExpertise,
+    options: countersToOptions(counters('areaOfExpertise').areasOfExpertise),
+    value: activeFilters.areaOfExpertise,
+  },
+];
 ---
 
-<Layout seo={[]}>
-  <Fragment slot="head">
-    <title>DatoCMS Solution Partners</title>
-  </Fragment>
-
-  <Hero>
-    <Fragment slot="kicker">Solution Partners</Fragment>
-    <Fragment slot="title">
-      Find the perfect Partner to meet <mark>your digital needs</mark>
-    </Fragment>
-    <Fragment slot="subtitle">
-      Our most successful customers work with a Solution Partner to accomplish their goals and ship
-      their digital products faster.
-    </Fragment>
+<Layout
+  seo={overrideSeo(page._seoMetaTags, seoTitle(index.seoTitle), seoDescription(index.hero.intro))}
+  theme="pink"
+  headerVariant="light"
+  footerTheme="pink"
+>
+  <Hero
+    variant="light"
+    label={index.hero.label}
+    headline={index.hero.headline}
+    subheadline={index.hero.subheadline}
+  >
+    <p slot="intro">{index.hero.intro}</p>
   </Hero>
 
-  <Wrapper>
-    <PartnersMap partnersCountByCountryCode={partnersCountByCountryCode} client:load />
-    <Space bottom={1}>
-      <Announce href="/partner-program" center>
-        <strong>Want to become a DatoCMS Partner?</strong> Learn more about our Partner Program and its
-        benefits!
-      </Announce>
-    </Space>
-  </Wrapper>
+  <Section>
+    <div class={s.stack}>
+      <PartnersMap
+        partnersCountByCountryCode={partnersCountByCountryCode}
+        label={index.mapLabel}
+        client:visible
+      />
+      <a href={index.announce.href} class:list={[s.announce, 'body']}>
+        <strong>{index.announce.strong}</strong>{' '}{index.announce.text}
+      </a>
+    </div>
+  </Section>
 
-  <Wrapper>
-    <FetchAndReplaceFormOnSubmit>
-      <form class={s.filterGrid} method="GET">
-        <div>
-          <div class={s.filterLabel}>Filter by Continent</div>
-          <Filter
-            options={continentOptions}
-            value={continentFilter}
-            searchParam="continent"
-            resetSearchParams={['country']}
-          />
-        </div>
-        <div>
-          <div class={s.filterLabel}>Filter by Country</div>
-          <Filter options={countryOptions} value={countryFilter} searchParam="country" />
-        </div>
-        <div>
-          <div class={s.filterLabel}>Filter by Technology</div>
-          <Filter options={technologyOptions} value={technologyFilter} searchParam="technology" />
-        </div>
-        <div>
-          <div class={s.filterLabel}>Filter by Area of Expertise</div>
-          <Filter
-            options={areaOfExpertiseOptions}
-            value={areaOfExpertiseFilter}
-            searchParam="areaOfExpertise"
-          />
-        </div>
-      </form>
-      <div class={s.posts} id="filtered-partners">
+  <Section flushTop>
+    <FilterForm filters={filters} action="/partners" placeholder={filterPlaceholder}>
+      <ul class={s.grid} id="filtered-partners">
         {
-          filteredPartners
-            .map((p) => orderedPartnersWithStega.find((op) => op.id === p.id)!)
-            .map((partner, i) => (
-              <Card
-                href={buildUrlForPartner(partner)}
-                background={bkgColors[i % bkgColors.length]}
-                label={getLabel(partner._allReferencingShowcaseProjectsMeta.count) || undefined}
-                lineClamp={3}
-                svgLogo={partner.logo}
-                title={partner.name}
-              >
-                <Fragment slot="title">
-                  <span class={s.cardTitle}>{partner.name}</span>
-                  {partner.locations.slice(0, 5).map((l) => (
-                    <span class={s.cardFlag}>{l.emoji}</span>
-                  ))}
-                  {partner.locations.length > 5 && (
-                    <span class={s.cardMoreLocations}>+ {partner.locations.length - 5} more</span>
-                  )}
-                </Fragment>
-                {toPlainText(partner.shortDescription)}
-              </Card>
-            ))
+          filteredPartners.map((partner) => (
+            <li>
+              <PartnerCard partner={orderedPartnersWithStega.find((p) => p.id === partner.id)!} />
+            </li>
+          ))
         }
-      </div>
-    </FetchAndReplaceFormOnSubmit>
-  </Wrapper>
+      </ul>
+      {filteredPartners.length === 0 && <p class:list={[s.empty, 'h2']}>{index.noResults}</p>}
+    </FilterForm>
+  </Section>
 
   <DraftModeQueryListener query={query} />
 </Layout>

@@ -1,5 +1,5 @@
 import { range } from 'lodash-es';
-import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { graphql } from '~/lib/datocms/graphql';
@@ -21,7 +21,7 @@ export const query = graphql(
           value
         }
         mainImage {
-          responsiveImage(imgixParams: { auto: format, w: 750, h: 500, fit: crop, crop: top }) {
+          responsiveImage(imgixParams: { w: 750, h: 500, fit: crop, crop: top }) {
             ...ResponsiveImageFragment
           }
         }
@@ -30,6 +30,8 @@ export const query = graphql(
           logo {
             url
             alt
+            width
+            height
           }
           areasOfExpertise {
             name

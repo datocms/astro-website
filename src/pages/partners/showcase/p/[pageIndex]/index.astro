@@ -1,23 +1,24 @@
 ---
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Layout } from '~/layouts/LegacyLayout';
-import { Card } from '~/components/legacy/Card';
-import { Pagination } from '~/components/legacy/LegacyPagination';
-import { ResponsiveImage } from '~/components/legacy/LegacyResponsiveImage';
-import { Space } from '~/components/legacy/Space';
-import { Wrapper } from '~/components/legacy/Wrapper';
-import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { perPage, query } from './_graphql';
-import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
-import s from './_style.module.css';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { countersForDropdown } from './_facets';
-import { countersToOptions } from '~/pages/partners/_facets';
-import { FetchAndReplaceFormOnSubmit } from '~/components/legacy/filtering/FetchAndReplaceFormOnSubmit';
-import { Filter } from '~/components/legacy/filtering/Filter';
+// One page of the showcase of the projects of the partners. Page 1 is
+// /partners/showcase. The query string keeps the filters.
 import { stripStega } from '@datocms/astro';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { FilterForm } from '~/components/FilterForm';
+import { Hero } from '~/components/Hero';
+import { Pagination } from '~/components/Pagination';
+import { Section } from '~/components/Section';
+import { PlainText } from '~/components/StructuredText';
+import { filterPlaceholder, showcase } from '~/data/partners';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { countersToOptions } from '~/pages/partners/_facets';
+import Card from '../../../_Card.astro';
+import { countersForDropdown } from './_facets';
+import { perPage, query } from './_graphql';
+import s from './_style.module.css';
 
 export interface Props {
   pageIndex?: number;
@@ -43,33 +44,33 @@ if (!projectsWithStega || projectsWithStega.length === 0) {
   return notFoundResponse();
 }
 
+// The filters compare plain text: the stega of Content Link is not part of it.
 const projectsWithoutStega = stripStega(projectsWithStega);
 
-// Faceted search: build dropdown options
+// Faceted search: the options of a dropdown count the projects that match
+// the other filter.
 const activeFilters = {
   technology: technologyFilter,
   areaOfExpertise: areaOfExpertiseFilter,
 };
 
-const technologyCounters = countersForDropdown(projectsWithoutStega, activeFilters, 'technology');
-const areaCounters = countersForDropdown(projectsWithoutStega, activeFilters, 'areaOfExpertise');
+const technologyOptions = countersToOptions(
+  countersForDropdown(projectsWithoutStega, activeFilters, 'technology').technologies,
+);
+const areaOfExpertiseOptions = countersToOptions(
+  countersForDropdown(projectsWithoutStega, activeFilters, 'areaOfExpertise').areasOfExpertise,
+);
 
-const technologyOptions = countersToOptions(technologyCounters.technologies);
-const areaOfExpertiseOptions = countersToOptions(areaCounters.areasOfExpertise);
-
-// Filter projects based on active filters
 const filteredProjects = projectsWithoutStega.filter((project) => {
   if (technologyFilter && !project.technologies?.some((t) => t?.name === technologyFilter)) {
     return false;
   }
-
   if (
     areaOfExpertiseFilter &&
     !project.partner?.areasOfExpertise?.some((a) => a?.name === areaOfExpertiseFilter)
   ) {
     return false;
   }
-
   return true;
 });
 
@@ -78,75 +79,69 @@ const totalPages = Math.max(1, Math.ceil(totalEntries / perPage));
 const pageIndex = Math.min(Math.max(rawPageIndex, 1), totalPages);
 
 const start = (pageIndex - 1) * perPage;
-const end = start + perPage;
-const pageProjects = filteredProjects.slice(start, end);
+const pageProjects = filteredProjects.slice(start, start + perPage);
+
+const filters = [
+  {
+    name: 'technology',
+    label: showcase.filters.technology,
+    options: technologyOptions,
+    value: technologyFilter,
+  },
+  {
+    name: 'areaOfExpertise',
+    label: showcase.filters.areaOfExpertise,
+    options: areaOfExpertiseOptions,
+    value: areaOfExpertiseFilter,
+  },
+];
 ---
 
-<Layout seo={[]}>
-  <Fragment slot="head">
-    <title>Partner Projects Showcase</title>
-  </Fragment>
-
-  <Hero>
-    <Fragment slot="kicker">Showcase</Fragment>
-    <Fragment slot="title">Projects from Our <mark>Partners</mark></Fragment>
-    <Fragment slot="subtitle">
-      Check out some of the projects our incredible agency partners have brought to life with
-      DatoCMS.
-    </Fragment>
+<Layout
+  seo={overrideSeo([], seoTitle(showcase.seoTitle), seoDescription(showcase.hero.intro))}
+  theme="pink"
+  headerVariant="light"
+  footerTheme="pink"
+>
+  <Hero
+    variant="light"
+    label={showcase.hero.label}
+    headline={showcase.hero.headline}
+    subheadline={showcase.hero.subheadline}
+  >
+    <p slot="intro">{showcase.hero.intro}</p>
   </Hero>
 
-  <Wrapper>
-    <FetchAndReplaceFormOnSubmit>
-      <form class={s.filterGrid} method="GET">
-        <div>
-          <div class={s.filterLabel}>Filter by Technology</div>
-          <Filter options={technologyOptions} value={technologyFilter} searchParam="technology" />
-        </div>
-
-        <div>
-          <div class={s.filterLabel}>Filter by Partner Expertise</div>
-          <Filter
-            options={areaOfExpertiseOptions}
-            value={areaOfExpertiseFilter}
-            searchParam="areaOfExpertise"
-          />
-        </div>
-      </form>
-
-      <Space bottom={2}>
-        <div class={s.grid}>
-          {
-            pageProjects
-              .map((p) => projectsWithStega.find((op) => op.id === p.id)!)
-              .map((project) => (
+  <Section>
+    <FilterForm filters={filters} action="/partners/showcase" placeholder={filterPlaceholder}>
+      <ul class={s.grid}>
+        {
+          pageProjects
+            .map((p) => projectsWithStega.find((op) => op.id === p.id)!)
+            .map((project) => (
+              <li>
                 <Card
-                  title={project.name}
-                  size="small"
-                  lineClamp={3}
-                  svgLogo={project.partner.logo}
                   href={buildUrlForShowcaseProject(project)}
+                  title={project.name}
+                  image={project.mainImage.responsiveImage}
+                  logo={project.partner.logo}
                 >
-                  <Fragment slot="image">
-                    <ResponsiveImage data={project.mainImage.responsiveImage} />
-                  </Fragment>
-                  {structuredTextToPlainText(project.headline)}
+                  <PlainText data={project.headline} />
                 </Card>
-              ))
-          }
-
-          {pageProjects.length === 0 && <p>No projects match your current filters.</p>}
-        </div>
-      </Space>
+              </li>
+            ))
+        }
+      </ul>
+      {pageProjects.length === 0 && <p class:list={[s.empty, 'h2']}>{showcase.noResults}</p>}
 
       <Pagination
-        perPage={perPage}
-        currentPageIndex={pageIndex}
-        totalEntries={totalEntries}
+        current={pageIndex}
+        total={totalPages}
         baseUrl="/partners/showcase"
+        search={Astro.url.search}
       />
-    </FetchAndReplaceFormOnSubmit>
-  </Wrapper>
+    </FilterForm>
+  </Section>
 
   <DraftModeQueryListener query={query} />
 </Layout>

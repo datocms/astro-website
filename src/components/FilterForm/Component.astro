@@ -1,0 +1,129 @@
+---
+import chevron from '~/icons/regular/chevron-down.svg?raw';
+import styles from './style.module.css';
+
+interface Filter {
+  /** The name of the query parameter. */
+  name: string;
+  label: string;
+  options: Array<{ value: string; label: string }>;
+  /** The selected value, or `null` for no filter. */
+  value: string | null;
+  /** The parameters that this filter clears when it changes. */
+  resets?: string[];
+}
+
+interface Props {
+  filters: Filter[];
+  /** The address of the page that reads the query string. It is page 1 of a list. */
+  action: string;
+  /** The text of the empty option. */
+  placeholder?: string;
+}
+
+const { filters, action, placeholder = 'Select...' } = Astro.props;
+---
+
+{
+  /*
+  Server-side filters: a change of a select loads the same page with the new
+  query string. The script replaces the form and the results (the slot) with
+  the same element of the new page, without a full load. Without JS, the
+  visitor uses the button of the form.
+*/
+}
+<fetch-and-replace-form>
+  <form class={styles.form} action={action} method="GET" data-filter-form>
+    {
+      filters.map((filter) => (
+        <div class={styles.field}>
+          <label class:list={[styles.label, 'subtitleMedium']} for={`filter-${filter.name}`}>
+            {filter.label}
+          </label>
+          <div class={styles.select}>
+            <select
+              class:list={[styles.control, 'body']}
+              id={`filter-${filter.name}`}
+              name={filter.name}
+              data-resets={filter.resets?.join(',')}
+            >
+              <option value="">{placeholder}</option>
+              {filter.options.map((option) => (
+                <option value={option.value} selected={filter.value === option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span class={styles.chevron} aria-hidden="true" set:html={chevron} />
+          </div>
+        </div>
+      ))
+    }
+    <noscript>
+      <button class:list={[styles.apply, 'subtitleMedium']} type="submit">Apply filters</button>
+    </noscript>
+  </form>
+  <slot />
+</fetch-and-replace-form>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'fetch-and-replace-form',
+    class FetchAndReplaceForm extends WebComponent {
+      parsedCallback() {
+        const form = this.$<HTMLFormElement>('form[data-filter-form]');
+
+        this.on(form, 'change', (event) => {
+          const select = event.target as HTMLSelectElement;
+          for (const name of select.dataset.resets?.split(',') ?? []) {
+            const other = form.elements.namedItem(name);
+            if (other instanceof HTMLSelectElement) other.value = '';
+          }
+          form.requestSubmit();
+        });
+
+        this.on(form, 'submit', async (event) => {
+          event.preventDefault();
+
+          // An empty filter is not in the query string.
+          const params = new URLSearchParams();
+          for (const [name, value] of new FormData(form)) {
+            if (typeof value === 'string' && value) params.set(name, value);
+          }
+          const search = params.size > 0 ? `?${params}` : '';
+          const url = new URL(form.action).pathname + search;
+          const focusedName =
+            document.activeElement instanceof HTMLSelectElement
+              ? document.activeElement.name
+              : null;
+
+          try {
+            const response = await fetch(url, { headers: { Accept: 'text/html' } });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            const html = new DOMParser().parseFromString(await response.text(), 'text/html');
+            const next = html.querySelector('fetch-and-replace-form');
+            if (!next) throw new Error('The new page has no filters.');
+
+            // The parser has no scripting: it turns the <noscript> content into elements.
+            next.querySelectorAll('noscript').forEach((node) => node.remove());
+            this.replaceWith(next);
+            history.pushState({}, '', url);
+            // The old select is gone: give the focus to the new one.
+            if (focusedName) {
+              document
+                .querySelector<HTMLSelectElement>(
+                  `fetch-and-replace-form select[name="${focusedName}"]`,
+                )
+                ?.focus();
+            }
+          } catch {
+            window.location.assign(url);
+          }
+        });
+      }
+    },
+  );
+</script>

@@ -1,0 +1,52 @@
+---
+// One partner in the list: the logo, the name, the flags of the locations,
+// the number of showcase projects and the short description.
+import { stripStega } from '@datocms/astro';
+import { PlainText } from '~/components/StructuredText';
+import { projectsCountLabel } from '~/data/partners';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
+import type { FragmentOf } from '~/lib/datocms/graphql';
+import type { PartnerFragment } from './_graphql';
+import s from './_PartnerCard.module.css';
+
+interface Props {
+  partner: FragmentOf<typeof PartnerFragment>;
+}
+
+const { partner } = Astro.props;
+
+const flagsMax = 5;
+const label = projectsCountLabel(partner._allReferencingShowcaseProjectsMeta.count);
+---
+
+<a href={buildUrlForPartner(partner)} class={s.card}>
+  <span class={s.logo}>
+    <img
+      class={s.logoImage}
+      src={partner.logo.url}
+      alt={stripStega(partner.logo.alt ?? '') || `${stripStega(partner.name)} logo`}
+      width={partner.logo.width ?? undefined}
+      height={partner.logo.height ?? undefined}
+      loading="lazy"
+    />
+  </span>
+  <span class={s.title}>
+    <span class="bodyMedium">{partner.name}</span>
+    {
+      partner.locations.slice(0, flagsMax).map((location) => (
+        <span class={s.flag} role="img" aria-label={stripStega(location.name)}>
+          {location.emoji}
+        </span>
+      ))
+    }
+    {
+      partner.locations.length > flagsMax && (
+        <span class:list={[s.more, 'subtitle']}>+ {partner.locations.length - flagsMax} more</span>
+      )
+    }
+  </span>
+  <span class:list={[s.description, 'subtitle']}>
+    <PlainText data={partner.shortDescription} />
+  </span>
+  {label && <span class:list={[s.pill, 'caption']}>{label}</span>}
+</a>

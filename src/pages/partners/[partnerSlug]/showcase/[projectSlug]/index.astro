@@ -1,121 +1,117 @@
 ---
-import { Button } from '~/components/legacy/LegacyButton';
-import { InterstitialTitle } from '~/components/legacy/InterstitialTitle';
-import { Layout } from '~/layouts/LegacyLayout';
-import { overrideSeo, seoOgType } from '~/lib/datocms/seo';
-import { Lightbox } from '~/components/legacy/Lightbox';
-import { Prose } from '~/components/legacy/LegacyProse';
-import { ResponsiveImage } from '~/components/legacy/LegacyResponsiveImage';
-import { SidebarPane } from '~/components/legacy/SidebarPane';
-import { Space } from '~/components/legacy/Space';
-import { Svg } from '~/components/legacy/Svg';
+// The page of one project of the showcase: the introduction, the video or
+// the main image, the screenshots (with a lightbox to the large image),
+// the explanation, the partner and the tags.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/legacy/LegacyStructuredText/Text';
-import { VideoPlayer } from '~/components/legacy/VideoPlayer';
-import { Wrapper } from '~/components/legacy/Wrapper';
-import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
-import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
-import s from './_style.module.css';
+import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { defaultLinkToRecordComponents } from '~/components/legacy/linkToRecords';
-import { defaultInlineRecordComponents } from '~/components/legacy/inlineRecords';
+import { Hero } from '~/components/Hero';
+import { Lightbox } from '~/components/Lightbox';
+import { Prose } from '~/components/Prose';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Section } from '~/components/Section';
+import { PlainText, StructuredText } from '~/components/StructuredText';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { VideoPlayer, VideoPlayerFragment } from '~/components/VideoPlayer';
+import { project } from '~/data/partners';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
+import { readFragment } from '~/lib/datocms/graphql';
+import { overrideSeo, seoOgType } from '~/lib/datocms/seo';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
 
-const { projectSlug } = Astro.params;
-const variables = { projectSlug: projectSlug! };
+const variables = { projectSlug: Astro.params.projectSlug! };
 const { page } = await executeQuery(Astro, query, { variables });
 
 if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const video = page.video ? readFragment(VideoPlayerFragment, page.video).video : null;
+const partnerUrl = buildUrlForPartner(page.partner);
+const galleries = [
+  { title: project.projectShots, shots: page.projectScreenshots },
+  { title: project.backendShots, shots: page.datocmsScreenshots },
+].filter((gallery) => gallery.shots.length > 0);
 ---
 
-<Layout seo={overrideSeo(page._seoMetaTags, seoOgType('website'))}>
-  <InterstitialTitle style="one" bigSubtitle={true} kicker="Projects showcase" mainTitleOfPage>
-    {page.name}
-    <Fragment slot="subtitle">
-      <Space top={1}>
-        <Text {...ensureValidStructuredTextProps({ data: page.headline })} />
-      </Space>
-    </Fragment>
-    <Fragment slot="below">
-      <Space top={1}>
-        <div class={s.madeByHead}>
-          Made by
-          <a href={buildUrlForPartner(page.partner)}>{page.partner.name}</a>
-        </div>
-        {
-          page.projectUrl && (
-            <div class={s.action}>
-              <Button as="a" href={page.projectUrl} target="_blank">
-                <Svg name="icons/regular/link" /> Visit project
-              </Button>
-            </div>
-          )
-        }
-      </Space>
-    </Fragment>
-  </InterstitialTitle>
-
-  <Wrapper>
-    <div class={s.mainVisual}>
+<Layout
+  seo={overrideSeo(page._seoMetaTags, seoOgType('website'))}
+  theme="pink"
+  headerVariant="light"
+  footerTheme="pink"
+>
+  <Hero variant="light" label={project.kicker} headline={page.name}>
+    <div slot="intro">
+      <StructuredText {...ensureValidStructuredTextProps({ data: page.headline })} />
+      <p class:list={[s.madeBy, 'body']}>
+        {project.madeBy}{' '}
+        <a href={partnerUrl}>{page.partner.name}</a>
+      </p>
       {
-        page.video ? (
-          <div class={s.mainImage}>
-            <VideoPlayer data={page.video} />
-          </div>
+        page.projectUrl && (
+          <Button href={page.projectUrl} appearance="deep-on-light" attrs={{ target: '_blank' }}>
+            {project.visitProject}
+          </Button>
+        )
+      }
+    </div>
+  </Hero>
+
+  <Section>
+    <div class={s.visual}>
+      {
+        video?.muxPlaybackId && page.video ? (
+          <VideoPlayer data={page.video} />
         ) : (
           <ResponsiveImage data={page.mainImage.responsiveImage} />
         )
       }
     </div>
-  </Wrapper>
+  </Section>
 
-  <Wrapper>
-    <div class={s.contentWrapper}>
+  <Section flushTop>
+    <div class={s.layout}>
       <div class={s.content}>
-        <h3 class={s.blockTitle}>Project shots</h3>
-        <div class={s.gallery}>
-          {
-            page.projectScreenshots.map((screen) => (
-              <figure>
-                <div class={s.shot}>
-                  <Lightbox lightboxUrl={screen.lightboxImageUrl}>
-                    <ResponsiveImage data={screen.responsiveImage} />
-                  </Lightbox>
-                </div>
-                <div class={s.shotTitle}>{screen.title}</div>
-              </figure>
-            ))
-          }
-        </div>
-
-        <Space top={2}>
-          <h3 class={s.blockTitle}>Backend shots</h3>
-          <div class={s.gallery}>
-            {
-              page.datocmsScreenshots.map((screen) => (
-                <figure>
-                  <div class={s.shot}>
-                    <Lightbox lightboxUrl={screen.lightboxImageUrl}>
-                      <ResponsiveImage data={screen.responsiveImage} />
-                    </Lightbox>
-                  </div>
-                  <div class={s.shotTitle}>{screen.title}</div>
-                </figure>
-              ))
-            }
-          </div>
-        </Space>
+        {
+          galleries.map((gallery) => (
+            <section>
+              <h2 class="h2">{gallery.title}</h2>
+              <ul class={s.gallery}>
+                {gallery.shots.map((screen) => (
+                  <li>
+                    <figure>
+                      <div class={s.shot}>
+                        <Lightbox
+                          url={screen.lightboxImageUrl}
+                          label={`Enlarge: ${screen.title ?? gallery.title}`}
+                          alt={screen.title ?? ''}
+                        >
+                          <ResponsiveImage data={screen.responsiveImage} />
+                        </Lightbox>
+                      </div>
+                      {screen.title && (
+                        <figcaption class:list={[s.shotTitle, 'body']}>{screen.title}</figcaption>
+                      )}
+                    </figure>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
       </div>
 
       <aside class={s.aside}>
-        <SidebarPane icon="info" title="About the project">
+        <section class={s.group}>
+          <h2 class="bodyMedium">{project.about}</h2>
           <Prose>
-            <Text
+            <StructuredText
               {...ensureValidStructuredTextProps({
                 data: page.inDepthExplanation,
                 linkToRecordComponents: defaultLinkToRecordComponents,
@@ -123,35 +119,35 @@ if (!page) {
               })}
             />
           </Prose>
-        </SidebarPane>
-        <SidebarPane icon="users" title="Made by">
-          <a href={buildUrlForPartner(page.partner)}>
+        </section>
+        <section class={s.group}>
+          <h2 class="bodyMedium">{project.madeBy}</h2>
+          <a href={partnerUrl}>
             <img
-              loading="lazy"
               class={s.madeByLogo}
-              alt={page.partner.logo.alt || `${page.partner.name} logo`}
               src={page.partner.logo.url}
+              alt={page.partner.logo.alt || `${page.partner.name} logo`}
+              width={page.partner.logo.width ?? undefined}
+              height={page.partner.logo.height ?? undefined}
+              loading="lazy"
             />
           </a>
-          <Prose>
-            <article>
-              {structuredTextToPlainText(page.partner.shortDescription)}
-            </article>
-            <a href={buildUrlForPartner(page.partner)}>View profile &raquo;</a>
-          </Prose>
-        </SidebarPane>
-        <SidebarPane icon="tag" title="Tags">
-          <div class={s.tagList}>
+          <p class="body"><PlainText data={page.partner.shortDescription} /></p>
+          <a href={partnerUrl} class="body">{project.viewProfile}</a>
+        </section>
+        <section class={s.group}>
+          <h2 class="bodyMedium">{project.tags}</h2>
+          <ul class={s.tags}>
             {
               [...page.areasOfExpertise, ...page.technologies].map((item) => (
-                <div class={s.tag}>{item.name}</div>
+                <li class:list={[s.tag, 'body']}>{item.name}</li>
               ))
             }
-          </div>
-        </SidebarPane>
+          </ul>
+        </section>
       </aside>
     </div>
-  </Wrapper>
+  </Section>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

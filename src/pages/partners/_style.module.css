@@ -1,57 +1,49 @@
-.posts {
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.announce:any-link {
+  display: block;
+  padding: var(--space-md) var(--space-lg);
+  color: var(--text-primary);
+  text-align: center;
+  background: var(--surface-accent-faint);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+}
+
+@media (hover: hover) {
+  .announce:hover {
+    border-color: var(--border-strong);
+  }
+}
+
+.announce:focus-visible {
+  outline: 2px solid var(--border-strong);
+  outline-offset: var(--space-4xs);
+}
+
+.grid {
   display: grid;
-  grid-gap: rfs(40px);
-  grid-template-columns: repeat(1, 1fr);
-
-  @media (min-width: 600px) {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (min-width: 1000px) {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-  }
+  gap: var(--space-lg);
+  grid-template-columns: minmax(0, 1fr);
+  list-style: none;
 }
 
-.cardTitle {
-  padding-right: 0.25em;
+.empty {
+  color: var(--text-muted);
 }
 
-.cardFlag {
-  margin-right: 2px;
-
-  & + .cardMoreLocations {
-    margin-left: 0.25em;
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-.cardMoreLocations {
-  align-self: center;
-  color: var(--light-body-color);
-  font-size: 14px;
-  font-weight: normal;
-}
-
-.filterGrid {
-  display: grid;
-  font-size: 16px;
-  grid-gap: 30px;
-  margin-bottom: 100px;
-  margin-top: 80px;
-
-  @media (min-width: 600px) {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+@media (min-width: 1152px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-
-  @media (min-width: 940px) {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.filterLabel {
-  color: var(--light-body-color);
-  margin-bottom: 10px;
 }

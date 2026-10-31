@@ -10,6 +10,8 @@ export const PartnerFragment = graphql(
       logo {
         url
         alt
+        width
+        height
       }
       shortDescription {
         value

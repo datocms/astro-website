@@ -1,7 +1,7 @@
-import { defaultInlineRecordFragments } from '~/components/legacy/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/legacy/linkToRecords';
-import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
-import { VideoPlayerFragment } from '~/components/legacy/VideoPlayer/graphql';
+import { defaultInlineRecordFragments } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/StructuredText/linkToRecords';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { VideoPlayerFragment } from '~/components/VideoPlayer/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
@@ -26,6 +26,8 @@ export const query = graphql(
           logo {
             url
             alt
+            width
+            height
           }
           shortDescription {
             value
@@ -95,7 +97,7 @@ export const query = graphql(
           name
         }
         mainImage {
-          responsiveImage(imgixParams: { auto: format, w: 1600 }) {
+          responsiveImage(imgixParams: { w: 1600 }) {
             ...ResponsiveImageFragment
           }
         }
@@ -106,19 +108,19 @@ export const query = graphql(
           id
           title
           width
-          responsiveImage(imgixParams: { auto: format, w: 1200 }) {
+          responsiveImage(imgixParams: { w: 1200 }) {
             ...ResponsiveImageFragment
           }
-          lightboxImageUrl: url(imgixParams: { auto: format, w: 2000, fit: max })
+          lightboxImageUrl: url(imgixParams: { w: 2000, fit: max })
         }
         datocmsScreenshots {
           id
           title
           width
-          responsiveImage(imgixParams: { auto: format, w: 1200 }) {
+          responsiveImage(imgixParams: { w: 1200 }) {
             ...ResponsiveImageFragment
           }
-          lightboxImageUrl: url(imgixParams: { auto: format, w: 2000, fit: max })
+          lightboxImageUrl: url(imgixParams: { w: 2000, fit: max })
         }
       }
     }

@@ -1,0 +1,65 @@
+---
+import xmark from '~/icons/regular/xmark.svg?raw';
+import styles from './style.module.css';
+
+interface Props {
+  /** The address of the large image. It loads when the visitor opens the lightbox. */
+  url: string;
+  /** The name of the button that opens the lightbox. */
+  label: string;
+  /** The text alternative of the large image. */
+  alt?: string;
+  class?: string;
+}
+
+const { url, label, alt = '', class: className } = Astro.props;
+---
+
+{
+  /*
+  The slot holds the small image. A click on it opens the large image in a
+  modal <dialog>: the browser gives the focus trap and closes it with Escape.
+*/
+}
+<img-lightbox class:list={[styles.lightbox, className]}>
+  <button class={styles.trigger} type="button" aria-haspopup="dialog" aria-label={label}>
+    <slot />
+  </button>
+  <dialog class={styles.dialog} aria-label={label}>
+    <button class:list={[styles.close, 'subtitleMedium']} type="button" data-close>
+      <span aria-hidden="true" set:html={xmark} />
+      Close
+    </button>
+    <img class={styles.image} data-src={url} alt={alt} />
+  </dialog>
+</img-lightbox>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'img-lightbox',
+    class ImgLightbox extends WebComponent {
+      parsedCallback() {
+        const trigger = this.$<HTMLButtonElement>('button[aria-haspopup]');
+        const dialog = this.$<HTMLDialogElement>('dialog');
+        const image = this.$<HTMLImageElement>('img[data-src]');
+
+        this.on(trigger, 'click', () => {
+          // The image loads on the first opening.
+          if (!image.src) image.src = image.dataset.src!;
+          dialog.showModal();
+          document.body.style.overflow = 'hidden';
+        });
+        this.on(this.$('button[data-close]'), 'click', () => dialog.close());
+        // A click outside of the image, on the backdrop, closes the dialog.
+        this.on(dialog, 'click', (event) => {
+          if (event.target === dialog) dialog.close();
+        });
+        this.on(dialog, 'close', () => {
+          document.body.style.overflow = '';
+        });
+      }
+    },
+  );
+</script>

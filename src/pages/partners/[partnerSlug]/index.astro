@@ -1,23 +1,23 @@
 ---
-import { Button } from '~/components/legacy/LegacyButton';
-import { InterstitialTitle } from '~/components/legacy/InterstitialTitle';
-import { Layout } from '~/layouts/LegacyLayout';
-import { Card } from '~/components/legacy/Card';
-import { Prose } from '~/components/legacy/LegacyProse';
-import { ResponsiveImage } from '~/components/legacy/LegacyResponsiveImage';
-import { SidebarPane } from '~/components/legacy/SidebarPane';
-import { Space } from '~/components/legacy/Space';
-import { Svg } from '~/components/legacy/Svg';
+// The page of one partner: the introduction, the description, the
+// locations, the services, the technologies, the chats, the projects of
+// the showcase and the plugins that the partner released.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/legacy/LegacyStructuredText/Text';
-import { Wrapper } from '~/components/legacy/Wrapper';
-import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
+import sortBy from 'lodash-es/sortBy';
+import { Button } from '~/components/Button';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { PluginCard } from '~/components/PluginCard';
+import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
+import { PlainText, StructuredText } from '~/components/StructuredText';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { partner } from '~/data/partners';
+import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query, extraQuery } from './_graphql';
-import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
-import s from './_style.module.css';
-import { PluginCard } from './_sub/PluginCard';
+import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
+import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import {
   overrideSeo,
   seoDescription,
@@ -26,12 +26,11 @@ import {
   seoPageTitle,
   seoShareTitle,
 } from '~/lib/datocms/seo';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { defaultLinkToRecordComponents } from '~/components/legacy/linkToRecords';
-import { defaultInlineRecordComponents } from '~/components/legacy/inlineRecords';
-import { sortBy } from 'lodash-es';
-import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
+import Card from '../_Card.astro';
+import { extraQuery, query } from './_graphql';
+import s from './_style.module.css';
 
 const variables = { partnerSlug: Astro.params.partnerSlug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -45,6 +44,7 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
   variables: { authorId: page.npmUser?.id || '' },
 });
 
+// The featured projects come first, in the order of the CMS.
 const featuredProjectIds = page.featuredProjects.map((p) => p.id);
 
 const sortedProjects = sortBy(page.projects, (project) =>
@@ -59,6 +59,7 @@ const sortedProjects = sortBy(page.projects, (project) =>
     page._seoMetaTags,
     seoPageTitle(page.name, 'DatoCMS Partners'),
     seoShareTitle(`DatoCMS Partner: ${page.name}`),
+    // The meta description is plain text.
     seoDescription(toPlainText(page.shortDescription)!),
     seoGeneratedCard(Astro, {
       kicker: `DatoCMS Agency Partners: ${page.name}`,
@@ -68,156 +69,155 @@ const sortedProjects = sortBy(page.projects, (project) =>
     }),
     seoOgType('website'),
   )}
+  theme="pink"
+  headerVariant="light"
+  footerTheme="pink"
 >
-  <InterstitialTitle style="two" bigSubtitle={true} mainTitleOfPage>
-    <Fragment slot="kicker"><a href="/partner-program">DatoCMS Agency Partner</a></Fragment>
-    <Fragment slot="subtitle">
-      <Text {...ensureValidStructuredTextProps({ data: page.shortDescription })} />
-    </Fragment>
-    <figure class={s.logoWrapper}>
-      <img loading="lazy" class={s.logo} alt={`${page.name} logo`} src={page.logo.url} />
-    </figure>
-  </InterstitialTitle>
+  <Hero variant="light" label={partner.kicker} labelHref={partner.kickerHref} headline={page.name}>
+    <div slot="intro">
+      <StructuredText {...ensureValidStructuredTextProps({ data: page.shortDescription })} />
+      <img
+        class={s.logo}
+        src={page.logo.url}
+        alt={`${page.name} logo`}
+        width={page.logo.width ?? undefined}
+        height={page.logo.height ?? undefined}
+      />
+    </div>
+  </Hero>
 
-  <Wrapper>
-    <div class={s.contentWrapper}>
-      <div class={s.content}>
-        <h3 class={s.blockTitle}>Description</h3>
-        <section>
-          <Prose>
-            <Text
-              {...ensureValidStructuredTextProps({
-                data: page.description,
-                linkToRecordComponents: defaultLinkToRecordComponents,
-                inlineRecordComponents: defaultInlineRecordComponents,
-              })}
-            />
-          </Prose>
-          <div class={s.action}>
-            <div class={s.actionButton}>
-              <Button as="a" href={page.websiteUrl} target="_blank">
-                <Svg name="icons/regular/link" /> Visit website
+  <Section>
+    <div class={s.layout}>
+      <div class={s.main}>
+        <h2 class="h2">{partner.description}</h2>
+        <Prose>
+          <StructuredText
+            {...ensureValidStructuredTextProps({
+              data: page.description,
+              linkToRecordComponents: defaultLinkToRecordComponents,
+              inlineRecordComponents: defaultInlineRecordComponents,
+            })}
+          />
+        </Prose>
+        <div class={s.actions}>
+          <Button href={page.websiteUrl} appearance="deep-on-light" attrs={{ target: '_blank' }}>
+            {partner.visitWebsite}
+          </Button>
+          {
+            page.publicContactEmail && (
+              <Button
+                href={`mailto:${page.publicContactEmail}`}
+                variant="soft"
+                appearance="deep-on-light"
+                attrs={{ target: '_blank' }}
+              >
+                {`${partner.contact} ${page.name}`}
               </Button>
-            </div>
-            {
-              page.publicContactEmail && (
-                <div class={s.actionButton}>
-                  <Button
-                    as="a"
-                    s="invert"
-                    href={`mailto:${page.publicContactEmail}`}
-                    target="_blank"
-                  >
-                    <Svg name="icons/regular/envelope" /> Contact {page.name}
-                  </Button>
-                </div>
-              )
-            }
-          </div>
-        </section>
+            )
+          }
+        </div>
       </div>
 
       <aside class={s.aside}>
-        <SidebarPane icon="map-marker" title={page.locations.length > 1 ? 'Locations' : 'Location'}>
+        <section class={s.facts}>
+          <h2 class="bodyMedium">
+            {page.locations.length > 1 ? partner.locations : partner.location}
+          </h2>
           <ul class={s.list}>
             {
               page.locations.map((area) => (
-                <li>
+                <li class="body">
                   {area.emoji} {area.name}
                 </li>
               ))
             }
           </ul>
-        </SidebarPane>
-        <SidebarPane icon="marker" title="Services offered">
+        </section>
+        <section class={s.facts}>
+          <h2 class="bodyMedium">{partner.services}</h2>
           <ul class={s.list}>
-            {page.areasOfExpertise.map((area) => <li>{area.name}</li>)}
+            {page.areasOfExpertise.map((area) => <li class="body">{area.name}</li>)}
           </ul>
-        </SidebarPane>
-        <SidebarPane icon="laptop-code" title="Covered technologies">
+        </section>
+        <section class={s.facts}>
+          <h2 class="bodyMedium">{partner.technologies}</h2>
           <ul class={s.list}>
-            {page.technologies.map((area) => <li>{area.name}</li>)}
+            {page.technologies.map((technology) => <li class="body">{technology.name}</li>)}
           </ul>
-        </SidebarPane>
+        </section>
       </aside>
     </div>
-  </Wrapper>
+  </Section>
 
   {
     page.chats.length > 0 && (
-      <Wrapper>
-        <Space top={2}>
-          <div>
-            <h3 class={s.blockTitle}>Behind the Scenes</h3>
-            <p>Join us to get familiar with our partners</p>
-
-            <div class={s.projectsGrid}>
-              {page.chats.map((chat) => (
-                <Card
-                  title={chat.title}
-                  size="small"
-                  lineClamp={3}
-                  href={buildUrlForCustomerStory(chat)}
-                >
-                  <Fragment slot="image">
-                    {chat.coverImage?.responsiveImage && (
-                      <ResponsiveImage data={chat.coverImage.responsiveImage} />
-                    )}
-                  </Fragment>
-                  {chat.excerpt ? structuredTextToPlainText(chat.excerpt) : ''}
-                </Card>
-              ))}
-            </div>
-          </div>
-        </Space>
-      </Wrapper>
+      <Section flushTop>
+        <div class={s.header}>
+          <h2 class="h2">{partner.chats}</h2>
+          <p class:list={[s.muted, 'body']}>{partner.chatsIntro}</p>
+        </div>
+        <ul class={s.grid}>
+          {page.chats.map((chat) => (
+            <li>
+              <Card
+                href={buildUrlForCustomerStory(chat)}
+                title={chat.title}
+                image={chat.coverImage?.responsiveImage}
+              >
+                <PlainText data={chat.excerpt} />
+              </Card>
+            </li>
+          ))}
+        </ul>
+      </Section>
     )
   }
 
-  <Wrapper>
-    {
-      sortedProjects.length > 0 && (
-        <Space top={2}>
-          <div>
-            <h3 class={s.blockTitle}>Projects showcase</h3>
-            <div class={s.projectsGrid}>
-              {sortedProjects.map((project) => (
+  {
+    sortedProjects.length > 0 && (
+      <Section flushTop>
+        <div class={s.header}>
+          <h2 class="h2">{partner.projects}</h2>
+        </div>
+        <ul class={s.grid}>
+          {sortedProjects.map((project) => {
+            const framework = project.technologies.find(
+              (t) => t.integrationType.slug === 'framework',
+            )?.logo;
+            return (
+              <li>
                 <Card
-                  title={project.name}
-                  size="small"
-                  lineClamp={3}
-                  svgLogo={
-                    project.technologies.find((t) => t.integrationType.slug === 'framework')?.logo
-                  }
                   href={buildUrlForShowcaseProject(project)}
+                  title={project.name}
+                  image={project.mainImage.responsiveImage}
+                  logo={framework}
                 >
-                  <Fragment slot="image">
-                    <ResponsiveImage data={project.mainImage.responsiveImage} />
-                  </Fragment>
-                  {structuredTextToPlainText(project.headline)}
+                  <PlainText data={project.headline} />
                 </Card>
-              ))}
-            </div>
-          </div>
-        </Space>
-      )
-    }
+              </li>
+            );
+          })}
+        </ul>
+      </Section>
+    )
+  }
 
-    {
-      plugins.length > 0 && (
-        <Space top={2}>
-          <div>
-            <h3 class={s.blockTitle}>Plugins released</h3>
-            <div class={s.pluginsGrid}>
-              {plugins.map((plugin) => (
-                <PluginCard plugin={plugin} size="small" />
-              ))}
-            </div>
-          </div>
-        </Space>
-      )
-    }
-  </Wrapper>
+  {
+    plugins.length > 0 && (
+      <Section flushTop>
+        <div class={s.header}>
+          <h2 class="h2">{partner.plugins}</h2>
+        </div>
+        <ul class:list={[s.grid, s.pluginsGrid]}>
+          {plugins.map((plugin) => (
+            <li>
+              <PluginCard plugin={plugin} />
+            </li>
+          ))}
+        </ul>
+      </Section>
+    )
+  }
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>
