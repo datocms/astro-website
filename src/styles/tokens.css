@@ -424,6 +424,58 @@
 }
 
 /*
+ * Roles that derive from the tokens of a theme. They sit on every element
+ * that sets a theme, thus they follow its accent and its text colour. The
+ * dark scheme changes only the three text roles (see below).
+ *   text-accent       Accent-hued text on the default surface (a link, an
+ *                     icon). The accent surface is a light hue and does not
+ *                     read as text: the text takes a dark tone of the hue.
+ *   text-positive,
+ *   text-negative     A confirmation and an error, as text on the surface.
+ *   surface-status-*,
+ *   text-status-*     A tint of a signal with a text of the same hue: a
+ *                     callout, a pill, a warning. "info" is neutral.
+ *   surface-nav-active,
+ *   text-nav-active   The entry of the page that you read (a sidebar, a TOC).
+ *   surface-field,
+ *   border-field      A control on the page: a field, a picker.
+ *   surface-method-*  The pill of an HTTP method (GET, POST, PUT, DELETE).
+ */
+:root,
+[data-theme] {
+  --text-accent: oklch(from var(--surface-accent) 0.5 min(c, 0.11) h);
+  --text-positive: color-mix(in srgb, var(--surface-positive) 70%, var(--text-primary));
+  --text-negative: color-mix(in srgb, var(--surface-negative) 70%, var(--text-primary));
+  --surface-status-info: var(--surface-inverse-faint);
+  --text-status-info: var(--text-primary);
+  --surface-status-positive: color-mix(in srgb, var(--surface-positive) 18%, transparent);
+  --text-status-positive: var(--text-positive);
+  --surface-status-warning: color-mix(in srgb, var(--surface-accent) 40%, transparent);
+  --text-status-warning: var(--text-accent);
+  --surface-nav-active: var(--surface-accent-faint);
+  --text-nav-active: var(--text-primary);
+  --surface-field: var(--surface-default);
+  --border-field: var(--border-default);
+  --surface-method-get: color-mix(in srgb, var(--color-blue-light-5) 35%, transparent);
+  --surface-method-post: var(--surface-status-positive);
+  --surface-method-put: var(--surface-status-warning);
+  --surface-method-delete: color-mix(in srgb, var(--surface-negative) 30%, transparent);
+}
+
+/*
+ * Elevation and backdrop. A shadow is black with alpha: it works on both
+ * schemes. The scrim dims the page behind a drawer.
+ *   shadow-popover  A popover, a drawer, a dropdown.
+ *   shadow-card     A card on hover, a media frame.
+ */
+:root {
+  --shadow-popover:
+    0 1px 2px rgb(0 0 0 / 0.04), 0 6px 14px rgb(0 0 0 / 0.08), 0 20px 40px rgb(0 0 0 / 0.1);
+  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.1), 0 6px 20px rgb(0 0 0 / 0.1);
+  --scrim: rgb(0 0 0 / 0.4);
+}
+
+/*
  * The dark scheme. The layout sets data-scheme="dark" on <html> (see
  * src/lib/colorScheme.ts). Each block changes only the tokens that follow
  * the scheme, and only with the colours of its theme:
@@ -545,6 +597,14 @@
   --border-strong: var(--color-pink-light-0);
 }
 
+/* On the dark surface, the text roles take the light tone of the signal or of the accent. */
+:root[data-scheme='dark'],
+:root[data-scheme='dark'] [data-theme] {
+  --text-accent: var(--text-on-inverse);
+  --text-positive: var(--surface-positive);
+  --text-negative: var(--surface-negative);
+}
+
 /*
  * The theme tokens resolve on the element that sets data-theme. Thus
  * this element must also set the colour and the background again.
@@ -569,6 +629,16 @@
   /* A quiet note next to a panel title: the number of records of a diagram. */
   --type-code-2xsmall: 9px;
   --type-caption: 9px;
+
+  /*
+   * The type of dense reference content (the docs). --type-body is a
+   * marketing size: a table, a signature or a list reads better smaller.
+   */
+  --type-docs-body: 16px;
+  --type-docs-small: 14px;
+  --type-docs-label: 12px;
+  --type-docs-h2: 24px;
+  --type-docs-h3: 20px;
 
   --section-padding-x: 30px;
   --section-padding-x-headlines: 60px;
@@ -624,6 +694,11 @@
     --type-code-xsmall: 12px;
     --type-code-2xsmall: 10px;
     --type-caption: 14px;
+
+    --type-docs-body: 17px;
+    --type-docs-small: 15px;
+    --type-docs-h2: 28px;
+    --type-docs-h3: 22px;
 
     --section-padding-x: 60px;
     --section-padding-x-headlines: 80px;

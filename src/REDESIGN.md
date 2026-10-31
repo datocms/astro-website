@@ -78,6 +78,14 @@ src/components/MyComponent/
 - **Never hard-code a hex in a component.** Use the semantic theme tokens `--surface-*`, `--text-*`, `--border-*`. Primitives (`--color-*`) are only for `tokens.css`.
 - **Two schemes, light and dark.** `data-scheme` on `<html>` gives the scheme: the inline script in the head of the layout sets it before the first paint, and `src/lib/colorScheme.ts` changes it. Use a token for its role, not for the colour it has in light. Only when no token fits, a component sets a rule under `:global(:root[data-scheme='dark'])`, with a comment that says why. Check each change in both schemes.
 - Content column max `--content-max` (1160px), side padding `--section-padding-x`, headline column `--section-padding-x-headlines`, vertical padding `--section-padding-y`. Centred statements cap at `--headline-max` (900px).
+- Tokens for roles, all in `src/styles/tokens.css`:
+  - `--text-accent`, `--text-positive`, `--text-negative`: accent-hued, confirmation and error text on the page surface.
+  - `--surface-status-info|positive|warning` with `--text-status-*`: callouts, pills and warnings.
+  - `--surface-nav-active`, `--text-nav-active`: the entry of the page you read in a sidebar or a table of contents.
+  - `--surface-field`, `--border-field`: a form field.
+  - `--surface-method-get|post|put|delete`: the pill of an HTTP method.
+  - `--shadow-popover`, `--shadow-card`, `--scrim`: elevation and the backdrop of a drawer.
+  - `--type-docs-body`, `--type-docs-small`, `--type-docs-label`, `--type-docs-h2`, `--type-docs-h3`: the type of dense reference content. Only the docs use them. The marketing pages use `--type-body` and the typography classes.
 - Spacing: only `--space-*` tokens. Type: only `--type-*` sizes, through the typography classes (`.display`, `.h1`, `.h2`, `.body`, `.bodyMedium`, `.bodyLong`, `.subtitle`, `.subtitleMedium`, `.caption`, `.code`, `.codeSmall`).
 - Breakpoints (min-width): 768, 1152, 1320. One exception: `SceneFrame` and `SceneFragment` switch from the phone drawing to the desktop drawing at 650. Hover only inside `@media (hover: hover)`.
 
