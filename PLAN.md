@@ -166,5 +166,4 @@ On staging, in both schemes, at 1320 and 390:
 
 ### Loose ends
 
-- `src/components/legacy/docs/` is an empty directory on disk (not in git): delete it.
 - No importer: `src/scenes/ThemedScene.astro`, `src/assets/logo/dato-logo-{long,no-space,pascal-case}.svg`. Keep or delete.
