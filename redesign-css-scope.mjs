@@ -44,6 +44,7 @@ export const REDESIGN_PAGE_DIRS = [
   'philosophy',
   'wall',
   'contact',
+  'enterprise-headless-cms',
   'compare',
   'case-studies',
   'blog',

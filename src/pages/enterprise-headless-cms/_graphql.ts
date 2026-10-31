@@ -1,4 +1,4 @@
-import { ReviewQuoteFragment } from '~/components/legacy/LegacyQuote/graphql';
+import { QuoteReviewFragment } from '~/components/Quote';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 
@@ -14,18 +14,15 @@ export const query = graphql(
         yoastAnalysis
       }
       review1: review(filter: { name: { eq: "Dan Barak" } }) {
-        __typename
-        ...ReviewQuoteFragment
+        ...QuoteReviewFragment
       }
       review2: review(filter: { name: { eq: "Jeff Escalante" } }) {
-        __typename
-        ...ReviewQuoteFragment
+        ...QuoteReviewFragment
       }
       review3: review(filter: { name: { eq: "Filippo Conforti" } }) {
-        __typename
-        ...ReviewQuoteFragment
+        ...QuoteReviewFragment
       }
     }
   `,
-  [TagFragment, ReviewQuoteFragment],
+  [TagFragment, QuoteReviewFragment],
 );

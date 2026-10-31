@@ -1,0 +1,35 @@
+---
+import { InlineText } from '~/components/InlineText';
+import { Section } from '~/components/Section';
+import type { Theme } from '~/lib/theme';
+import type { SplitPointsData } from './types';
+import styles from './style.module.css';
+
+interface Props extends SplitPointsData {
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+  background?: 'default' | 'accent-faint';
+}
+
+const { kicker, title, description, points, theme, background = 'default' } = Astro.props;
+---
+
+<Section theme={theme} background={background} contentClass={styles.split}>
+  <div class={styles.intro}>
+    <p class:list={['subtitle', styles.kicker]}>{kicker}</p>
+    <h2 class="h1">{title}</h2>
+    <p class:list={['body', styles.description]}><InlineText text={description} /></p>
+  </div>
+  <ul class={styles.points}>
+    {
+      points.map((point) => (
+        <li class={styles.point}>
+          <h3 class="h2">{point.title}</h3>
+          <p class:list={['body', styles.text]}>
+            <InlineText text={point.text} />
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

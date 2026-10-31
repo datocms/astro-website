@@ -12,6 +12,10 @@ import styles from './style.module.css';
  */
 type Props = ContactSectionData & {
   submitted?: boolean;
+  /** The id of the section, an anchor target for a link. */
+  id?: string;
+  /** Use `h2` when the section is not the first of the page. */
+  headingLevel?: 'h1' | 'h2';
   /**
    * The page sends the data (ContactForm `external`). The slot `extra` goes
    * to the form.
@@ -27,35 +31,49 @@ const {
   links,
   form,
   submitted = false,
+  id,
+  headingLevel = 'h1',
   external = false,
 } = Astro.props;
 ---
 
-<Section contentClass={styles.content}>
+<Section id={id} contentClass={styles.content}>
   <div class={styles.intro}>
     <div class={styles.headlineGroup}>
-      <p class:list={['subtitle', styles.label]}>{label}</p>
-      <Headline as="h1" size="h1">
+      {label && <p class:list={['subtitle', styles.label]}>{label}</p>}
+      <Headline as={headingLevel} size="h1">
         {headline}
-        <Fragment slot="muted">
-          {muted}{' '}
-          <span aria-hidden="true">{face}</span>
-        </Fragment>
+        {
+          muted && (
+            <Fragment slot="muted">
+              {muted} <span aria-hidden="true">{face}</span>
+            </Fragment>
+          )
+        }
       </Headline>
-    </div>
-    <ul class={styles.links}>
       {
-        links.map((link) => (
-          <li class="subtitleMedium">
-            <span class={styles.lead}>{link.lead}</span>{' '}
-            <a class={styles.link} href={link.href}>
-              <span class={styles.linkLabel}>{link.label}</span>
-              <span aria-hidden="true"> →</span>
-            </a>
-          </li>
-        ))
+        Astro.slots.has('description') && (
+          <div class:list={['body', styles.description]}>
+            <slot name="description" />
+          </div>
+        )
       }
-    </ul>
+    </div>
+    {
+      links.length > 0 && (
+        <ul class={styles.links}>
+          {links.map((link) => (
+            <li class="subtitleMedium">
+              <span class={styles.lead}>{link.lead}</span>{' '}
+              <a class={styles.link} href={link.href}>
+                <span class={styles.linkLabel}>{link.label}</span>
+                <span aria-hidden="true"> →</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
   </div>
   <div class={styles.form}>
     <ContactForm {...form} submitted={submitted} external={external}>

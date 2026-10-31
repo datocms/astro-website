@@ -2,10 +2,12 @@
 import { Emoji, isEmojiName } from '~/components/Emoji';
 import styles from './style.module.css';
 
-// A string of copy with three marks in it:
+// A string of copy with marks in it:
 //   :heart:      an emoji (src/components/Emoji), by its name
 //   `$ npx`      a piece of code, as a chip
 //   *already*    a word in italics, for stress
+//   **safe**     a word in bold
+//   [text](/url) a link
 // Any other text renders as it is. Thus the data stays one plain string.
 
 interface Props {
@@ -14,16 +16,24 @@ interface Props {
 
 const { text } = Astro.props;
 
-type Part = { type: 'text' | 'emoji' | 'code' | 'em'; value: string };
+type Part = {
+  type: 'text' | 'emoji' | 'code' | 'em' | 'strong' | 'link';
+  value: string;
+  href?: string;
+};
 
 const parts: Part[] = [];
 let last = 0;
-for (const match of text.matchAll(/:([a-z]+):|`([^`]+)`|\*([^*\s][^*]*)\*/g)) {
-  const [whole, name, code, em] = match;
+for (const match of text.matchAll(
+  /:([a-z]+):|`([^`]+)`|\*\*([^*]+)\*\*|\*([^*\s][^*]*)\*|\[([^\]]+)\]\(([^)\s]+)\)/g,
+)) {
+  const [whole, name, code, strong, em, linkText, href] = match;
   if (name && !isEmojiName(name)) continue;
   if (match.index > last) parts.push({ type: 'text', value: text.slice(last, match.index) });
   if (name) parts.push({ type: 'emoji', value: name });
   else if (code) parts.push({ type: 'code', value: code });
+  else if (strong) parts.push({ type: 'strong', value: strong });
+  else if (linkText) parts.push({ type: 'link', value: linkText, href });
   else parts.push({ type: 'em', value: em! });
   last = match.index + whole.length;
 }
@@ -38,6 +48,10 @@ if (last < text.length) parts.push({ type: 'text', value: text.slice(last) });
       <code class={styles.code}>{part.value}</code>
     ) : part.type === 'em' ? (
       <em>{part.value}</em>
+    ) : part.type === 'strong' ? (
+      <strong>{part.value}</strong>
+    ) : part.type === 'link' ? (
+      <a href={part.href}>{part.value}</a>
     ) : (
       part.value
     ),

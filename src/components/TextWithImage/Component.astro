@@ -13,6 +13,8 @@ import { TextWithImageStoryFragment } from './graphql';
 import styles from './style.module.css';
 
 interface Props {
+  /** A small line above the headline. */
+  label?: string;
   title?: string;
   tagline?: string;
   /**
@@ -36,6 +38,7 @@ interface Props {
 }
 
 const {
+  label,
   title = '',
   tagline = '',
   headlineStyle = 'headline-subline',
@@ -74,6 +77,7 @@ const shownLogo = storyLogo ?? logo;
           </span>
         )
       }
+      {label && <p class:list={['subtitle', styles.label]}>{label}</p>}
       {
         headlineStyle === 'two-tone' ? (
           <Heading class:list={[styles.twoTone, 'h1']}>

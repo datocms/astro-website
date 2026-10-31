@@ -1,4 +1,5 @@
 ---
+import { InlineText } from '~/components/InlineText';
 import { Headline } from '~/components/Headline';
 import { Section } from '~/components/Section';
 import type { StatementsSectionData } from './types';
@@ -23,7 +24,7 @@ interface Props extends StatementsSectionData {
   id?: string;
 }
 
-const { items, headline, theme, variant = 'statement', columns, id } = Astro.props;
+const { items, headline, label, theme, variant = 'statement', columns, id } = Astro.props;
 const count = columns ?? (items.length >= 4 ? 4 : 3);
 const background = (
   { statement: 'default', stat: 'accent', statLight: 'accent-faint', text: 'inverse' } as const
@@ -33,6 +34,7 @@ const taglineClass = variant === 'statLight' ? 'body' : 'h2';
 ---
 
 <Section id={id} theme={theme} background={background} contentClass={styles.content}>
+  {label && <p class:list={['subtitle', styles.label]}>{label}</p>}
   {
     headline && (
       <Headline as="h2" size={variant === 'statLight' ? 'h2' : 'h1'}>
@@ -58,10 +60,26 @@ const taglineClass = variant === 'statLight' ? 'body' : 'h2';
           {variant === 'text' ? (
             <p class="bodyMedium">{item.text}</p>
           ) : (
-            <p class={styles.pair}>
-              <span class:list={[styles.title, titleClass]}>{item.title}</span>
-              <span class:list={[styles.tagline, taglineClass]}>{item.text}</span>
-            </p>
+            <>
+              {item.href ? (
+                <a class={styles.pairLink} href={item.href}>
+                  <p class={styles.pair}>
+                    <span class:list={[styles.title, titleClass]}>{item.title}</span>
+                    <span class:list={[styles.tagline, taglineClass]}>{item.text}</span>
+                  </p>
+                </a>
+              ) : (
+                <p class={styles.pair}>
+                  <span class:list={[styles.title, titleClass]}>{item.title}</span>
+                  <span class:list={[styles.tagline, taglineClass]}>{item.text}</span>
+                </p>
+              )}
+              {item.description && (
+                <p class:list={[styles.description, 'body']}>
+                  <InlineText text={item.description} />
+                </p>
+              )}
+            </>
           )}
         </li>
       ))
