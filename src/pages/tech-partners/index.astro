@@ -1,16 +1,18 @@
 ---
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Layout } from '~/layouts/LegacyLayout';
-import { Card } from '~/components/legacy/Card';
-import { Space } from '~/components/legacy/Space';
-import { Wrapper } from '~/components/legacy/Wrapper';
-import { buildUrlForTechPartner } from '~/lib/datocms/gqlUrlBuilder/techPartner';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
-import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
-import s from './_style.module.css';
+// The list of the technology partners. The highlighted partners come
+// first, then the other partners.
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { PartnerCard } from '~/components/PartnerCard';
+import { Section } from '~/components/Section';
+import { PlainText } from '~/components/StructuredText';
+import { techIndex } from '~/data/partners';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { buildUrlForTechPartner } from '~/lib/datocms/gqlUrlBuilder/techPartner';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
 
 const { page, techPartners } = await executeQuery(Astro, query);
 
@@ -19,50 +21,42 @@ if (!page || techPartners.length === 0) {
   return notFoundResponse();
 }
 
-const highlighted = techPartners.filter((partner) =>
-  page.highlightedPartners.some((h) => h.slug === partner.slug),
-);
+const isHighlighted = (partner: { slug: string }) =>
+  page.highlightedPartners.some((h) => h.slug === partner.slug);
 
-const others = techPartners.filter(
-  (partner) => !page.highlightedPartners.some((h) => h.slug === partner.slug),
-);
-
-const sortedTechPartners = [...highlighted, ...others];
-
-const bkgColors = ['azure', 'pink', 'blue', 'green', 'yellow'] as const;
+const sortedTechPartners = [
+  ...techPartners.filter(isHighlighted),
+  ...techPartners.filter((partner) => !isHighlighted(partner)),
+];
 ---
 
-<Layout seo={page.seo}>
-  <Hero>
-    <Fragment slot="kicker">Ecosystem Partners</Fragment>
-    <Fragment slot="title">
-      Find the perfect Tech Partner to supercharge <mark>your DatoCMS projects</mark>
-    </Fragment>
-    <Fragment slot="subtitle">
-      DatoCMS partners with leading technology providers and APIs to ensure your projects are
-      getting the best possible treatment.
-    </Fragment>
+<Layout seo={page.seo} theme="pink" headerVariant="light" footerTheme="pink">
+  <Hero
+    variant="light"
+    label={techIndex.hero.label}
+    headline={techIndex.hero.headline}
+    subheadline={techIndex.hero.subheadline}
+  >
+    <p slot="intro">{techIndex.hero.intro}</p>
   </Hero>
-  <Wrapper>
-    <Space bottom={2}>
-      <div class={s.grid}>
-        {
-          sortedTechPartners.map((partner, i) => (
-            <Card
-              title={partner.name}
-              background={bkgColors[i % bkgColors.length]}
-              size="small"
-              lineClamp={3}
-              svgLogo={partner.logo}
+
+  <Section>
+    <ul class={s.grid}>
+      {
+        sortedTechPartners.map((partner) => (
+          <li>
+            <PartnerCard
               href={buildUrlForTechPartner(partner)}
+              name={partner.name}
+              logo={partner.logo}
             >
-              {structuredTextToPlainText(partner.shortDescription)}
-            </Card>
-          ))
-        }
-      </div>
-    </Space>
-  </Wrapper>
+              <PlainText data={partner.shortDescription} />
+            </PartnerCard>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
 
   <DraftModeQueryListener query={query} />
 </Layout>

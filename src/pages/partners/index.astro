@@ -7,14 +7,16 @@ import sortBy from 'lodash-es/sortBy';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { FilterForm } from '~/components/FilterForm';
 import { Hero } from '~/components/Hero';
+import { PartnerCard } from '~/components/PartnerCard';
 import { Section } from '~/components/Section';
-import { filterPlaceholder, index } from '~/data/partners';
+import { PlainText } from '~/components/StructuredText';
+import { filterPlaceholder, index, projectsCountLabel } from '~/data/partners';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import PartnersMap from './_PartnersMap';
-import PartnerCard from './_PartnerCard.astro';
 import { countersForDropdown, countersToOptions } from './_facets';
 import { query } from './_graphql';
 import s from './_style.module.css';
@@ -136,11 +138,22 @@ const filters = [
     <FilterForm filters={filters} action="/partners" placeholder={filterPlaceholder}>
       <ul class={s.grid} id="filtered-partners">
         {
-          filteredPartners.map((partner) => (
-            <li>
-              <PartnerCard partner={orderedPartnersWithStega.find((p) => p.id === partner.id)!} />
-            </li>
-          ))
+          filteredPartners.map((partner) => {
+            const full = orderedPartnersWithStega.find((p) => p.id === partner.id)!;
+            return (
+              <li>
+                <PartnerCard
+                  href={buildUrlForPartner(full)}
+                  name={full.name}
+                  logo={full.logo}
+                  locations={full.locations}
+                  label={projectsCountLabel(full._allReferencingShowcaseProjectsMeta.count)}
+                >
+                  <PlainText data={full.shortDescription} />
+                </PartnerCard>
+              </li>
+            );
+          })
         }
       </ul>
       {filteredPartners.length === 0 && <p class:list={[s.empty, 'h2']}>{index.noResults}</p>}

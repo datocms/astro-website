@@ -1,16 +1,19 @@
 ---
-import { Button } from '~/components/legacy/LegacyButton';
-import { InterstitialTitle } from '~/components/legacy/InterstitialTitle';
-import { Layout } from '~/layouts/LegacyLayout';
-import { Prose } from '~/components/legacy/LegacyProse';
+// The page of one technology partner: the logo, the short description,
+// the description and the links to the website and to the contact email.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/legacy/LegacyStructuredText/Text';
-import { Wrapper } from '~/components/legacy/Wrapper';
-import { Svg } from '~/components/legacy/Svg';
-import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { Button } from '~/components/Button';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
+import { StructuredText } from '~/components/StructuredText';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { techPartner } from '~/data/partners';
+import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { query } from './_graphql';
-import s from './_style.module.css';
 import {
   overrideSeo,
   seoDescription,
@@ -19,10 +22,9 @@ import {
   seoPageTitle,
   seoShareTitle,
 } from '~/lib/datocms/seo';
-import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { defaultLinkToRecordComponents } from '~/components/legacy/linkToRecords';
-import { defaultInlineRecordComponents } from '~/components/legacy/inlineRecords';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -36,8 +38,9 @@ if (!page) {
 <Layout
   seo={overrideSeo(
     page.seo,
-    seoPageTitle(page.name, 'Ecosystem Partners'),
+    seoPageTitle(page.name, techPartner.seoSuffix),
     seoShareTitle(`DatoCMS Ecosystem Partner: ${page.name}`),
+    // The meta description is plain text.
     seoDescription(toPlainText(page.shortDescription)!),
     seoGeneratedCard(Astro, {
       kicker: `DatoCMS Ecosystem Partners: ${page.name}`,
@@ -46,21 +49,27 @@ if (!page) {
     }),
     seoOgType('website'),
   )}
+  theme="pink"
+  headerVariant="light"
+  footerTheme="pink"
 >
-  <InterstitialTitle style="two" mainTitleOfPage bigSubtitle>
-    <Fragment slot="kicker">DatoCMS Technology Partner</Fragment>
-    <figure class={s.logoContainer}>
-      <img src={page.logo.url} alt={page.logo.alt} class={s.logo} />
-    </figure>
-    <Fragment slot="subtitle"
-      ><Text {...ensureValidStructuredTextProps({ data: page.shortDescription })} /></Fragment
-    >
-  </InterstitialTitle>
+  <Hero variant="light" label={techPartner.kicker} headline={page.name}>
+    <div slot="intro">
+      <StructuredText {...ensureValidStructuredTextProps({ data: page.shortDescription })} />
+      <img
+        class={s.logo}
+        src={page.logo.url}
+        alt={page.logo.alt || `${page.name} logo`}
+        width={page.logo.width ?? undefined}
+        height={page.logo.height ?? undefined}
+      />
+    </div>
+  </Hero>
 
-  <Wrapper>
-    <div class={s.content}>
+  <Section>
+    <div class={s.main}>
       <Prose>
-        <Text
+        <StructuredText
           {...ensureValidStructuredTextProps({
             data: page.description,
             linkToRecordComponents: defaultLinkToRecordComponents,
@@ -68,22 +77,25 @@ if (!page) {
           })}
         />
       </Prose>
-
       <div class={s.actions}>
-        <Button as="a" href={page.websiteUrl} target="_blank">
-          <Svg name="icons/regular/link" />
-          <span>Visit website</span>
+        <Button href={page.websiteUrl} appearance="deep-on-light" attrs={{ target: '_blank' }}>
+          {techPartner.visitWebsite}
         </Button>
         {
           page.publicContactEmail && (
-            <Button as="a" s="invert" href={`mailto:${page.publicContactEmail}`} target="_blank">
-              <Svg name="icons/regular/envelope" /> <span>Contact {page.name}</span>
+            <Button
+              href={`mailto:${page.publicContactEmail}`}
+              variant="soft"
+              appearance="deep-on-light"
+              attrs={{ target: '_blank' }}
+            >
+              {`${techPartner.contact} ${page.name}`}
             </Button>
           )
         }
       </div>
     </div>
-  </Wrapper>
+  </Section>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

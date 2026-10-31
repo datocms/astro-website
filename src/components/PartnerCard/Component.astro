@@ -1,0 +1,52 @@
+---
+// One partner in a list: the logo, the name, the flags of the locations,
+// a label and the short description (the default slot).
+import { stripStega } from '@datocms/astro';
+import styles from './style.module.css';
+
+interface Props {
+  href: string;
+  name: string;
+  logo: { url: string; alt?: string | null; width?: number | null; height?: number | null };
+  /** The locations of the partner: the card shows the first five flags. */
+  locations?: { name: string; emoji: string }[];
+  /** A short text in a pill below the description. */
+  label?: string;
+}
+
+const { href, name, logo, locations = [], label } = Astro.props;
+
+const flagsMax = 5;
+---
+
+<a href={href} class={styles.card}>
+  <span class={styles.logo}>
+    <img
+      class={styles.logoImage}
+      src={logo.url}
+      alt={stripStega(logo.alt ?? '') || `${stripStega(name)} logo`}
+      width={logo.width ?? undefined}
+      height={logo.height ?? undefined}
+      loading="lazy"
+    />
+  </span>
+  <span class={styles.title}>
+    <span class="bodyMedium">{name}</span>
+    {
+      locations.slice(0, flagsMax).map((location) => (
+        <span class={styles.flag} role="img" aria-label={stripStega(location.name)}>
+          {location.emoji}
+        </span>
+      ))
+    }
+    {
+      locations.length > flagsMax && (
+        <span class:list={[styles.more, 'subtitle']}>+ {locations.length - flagsMax} more</span>
+      )
+    }
+  </span>
+  <span class:list={[styles.description, 'subtitle']}>
+    <slot />
+  </span>
+  {label && <span class:list={[styles.pill, 'caption']}>{label}</span>}
+</a>

@@ -2,6 +2,9 @@
  * The partners pages: the index, the showcase of the projects, the page of
  * one partner and the page of one project. The partners and the projects
  * come from the CMS.
+ *
+ * The technology partners have their own list (`techIndex`) and page
+ * (`techPartner`).
  */
 
 export const index = {
@@ -78,3 +81,20 @@ export function projectsCountLabel(count: number) {
   if (count === 0) return undefined;
   return count === 1 ? '1 showcase project' : `${count} showcase projects`;
 }
+
+export const techIndex = {
+  hero: {
+    label: 'Ecosystem Partners',
+    headline: 'Find the perfect Tech Partner to supercharge',
+    subheadline: 'your DatoCMS projects',
+    intro:
+      'DatoCMS partners with leading technology providers and APIs to ensure your projects are getting the best possible treatment.',
+  },
+};
+
+export const techPartner = {
+  kicker: 'DatoCMS Technology Partner',
+  seoSuffix: 'Ecosystem Partners',
+  visitWebsite: 'Visit website',
+  contact: 'Contact',
+};

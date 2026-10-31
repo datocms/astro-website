@@ -61,6 +61,7 @@ export const REDESIGN_PAGE_DIRS = [
   'plugins',
   'starters',
   'partners',
+  'tech-partners',
   'index.astro',
   '_graphql.ts',
   'features/index.astro',
