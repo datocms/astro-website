@@ -1,13 +1,19 @@
 ---
-import type { Heading as HeadingNode } from 'datocms-structured-text-utils';
-import { Heading } from '~/components/legacy/Heading';
+import type { Heading } from 'datocms-structured-text-utils';
 import { headingAnchor } from '~/lib/academyAnchors';
+import s from './_style.module.css';
 
 interface Props {
-  node: HeadingNode;
+  node: Heading;
 }
 
 const { node } = Astro.props;
+const Tag = `h${node.level}` as const;
+const anchor = headingAnchor(node);
 ---
 
-<Heading as={`h${node.level}`} anchor={headingAnchor(node)}><slot /></Heading>
+{/* The anchor is unique in the page: two equal headings get a number. */}
+<Tag id={anchor}>
+  <slot />
+  <a class={s.permalink} href={`#${anchor}`} aria-label="Link to this section"></a>
+</Tag>

@@ -1,15 +1,17 @@
 ---
-import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
-import { InterstitialTitle } from '~/components/legacy/InterstitialTitle';
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { CourseVideo } from '~/components/CourseVideo';
+import { Hero } from '~/components/Hero';
+import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
+import { StructuredText } from '~/components/StructuredText';
 import { JsonLd } from '~/components/JsonLd';
-import { Space } from '~/components/legacy/Space';
-import { Svg } from '~/components/legacy/Svg';
-import { Text } from '~/components/legacy/LegacyStructuredText/Text';
-import { Wrapper } from '~/components/legacy/Wrapper';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { Layout } from '~/layouts/LegacyLayout';
+import Layout from '~/layouts/Layout.astro';
+import { readFragment } from '~/lib/datocms/graphql';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+import { AcademyCourseUrlFragment } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
 import { courseId, publisherRef } from '~/lib/jsonLd';
@@ -26,10 +28,11 @@ if (!course) {
   return notFoundResponse();
 }
 
+const { slug } = readFragment(AcademyCourseUrlFragment, course);
 const pageUrl = new URL(Astro.url.pathname, baseUrl(Astro)).href;
 ---
 
-<Layout seo={course.seo}>
+<Layout seo={course.seo} theme="green" headerVariant="light" footerTheme="green">
   <Fragment slot="head">
     <JsonLd
       data={{
@@ -80,34 +83,28 @@ const pageUrl = new URL(Astro.url.pathname, baseUrl(Astro)).href;
       }}
     />
   </Fragment>
-  <InterstitialTitle style="one" mainTitleOfPage>
-    <Fragment slot="kicker"><a href="/academy" data-datocms-nomd>DatoCMS Academy</a></Fragment>
-    {course.name}
-    <Fragment slot="subtitle"
-      ><Text {...ensureValidStructuredTextProps({ data: course.introduction })} /></Fragment
-    >
-  </InterstitialTitle>
-  <Wrapper>
-    <Space top={1} bottom={2}>
-      <div class={s.layout}>
-        <div class={s.illustration}>
-          <Svg name={`svg/illustrations/${stripStega(course.illustration)}`} />
-        </div>
-        <ol class={s.chapters}>
-          {
-            course.chapters.map((chapter, index) => (
-              <li class={s.chapter}>
-                <span class={s.chapterNumber}>{String(index + 1).padStart(2, '0')}</span>
-                <a class={s.chapterLink} href={buildUrlForAcademyChapter(chapter)}>
-                  {chapter.title}
-                </a>
-              </li>
-            ))
-          }
-        </ol>
-      </div>
-    </Space>
-  </Wrapper>
+  <Hero variant="light" label="DatoCMS Academy" labelHref="/academy" headline={course.name}>
+    <Prose slot="intro">
+      <StructuredText {...ensureValidStructuredTextProps({ data: course.introduction })} />
+    </Prose>
+  </Hero>
+  <Section contentClass={s.layout}>
+    <CourseVideo slug={slug} class={s.video} />
+    <ol class={s.chapters}>
+      {
+        course.chapters.map((chapter, index) => (
+          <li class={s.chapter}>
+            <span class:list={[s.chapterNumber, 'subtitleMedium']}>
+              {String(index + 1).padStart(2, '0')}
+            </span>
+            <a class:list={[s.chapterLink, 'h2']} href={buildUrlForAcademyChapter(chapter)}>
+              {chapter.title}
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </Section>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

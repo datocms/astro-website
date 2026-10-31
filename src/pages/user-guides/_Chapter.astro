@@ -1,58 +1,70 @@
 ---
-import type { FragmentOf } from 'gql.tada';
-import s from './_style.module.css';
-import { ChapterFragment } from './_graphql';
-import { readFragment } from 'gql.tada';
-import { Svg } from '~/components/legacy/Svg';
-import { formatVideoDuration } from '~/lib/formatters';
-import { sum } from 'lodash-es';
-import VideoCard from './_VideoCard.astro';
-import { Carousel } from '~/components/legacy/Carousel';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/legacy/LegacyStructuredText/Text';
+import { sum } from 'lodash-es';
+import { CardCarousel } from '~/components/CardCarousel';
+import { CarouselCard } from '~/components/CarouselCard';
+import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
+import { StructuredText } from '~/components/StructuredText';
+import { muxThumbnailUrl } from '~/components/StructuredText/blocks/TutorialVideo/muxThumbnailUrl';
+import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { formatVideoDuration } from '~/lib/formatters';
+import { ChapterFragment } from './_graphql';
+import { EpisodeFragment } from './[chapterSlug]/[episodeSlug]/_graphql';
+import s from './_style.module.css';
 
-type Props = {
+interface Props {
   chapter: FragmentOf<typeof ChapterFragment>;
   number: number;
-};
+}
 
 const chapter = readFragment(ChapterFragment, Astro.props.chapter);
-
 const { number } = Astro.props;
 
-const allVideosDurations = sum(
-  chapter.episodes.map((episode) => episode.asset.video.duration || 0),
-);
+const episodes = chapter.episodes.map((episode) => readFragment(EpisodeFragment, episode));
+const totalDuration = sum(chapter.episodes.map((episode) => episode.asset.video.duration || 0));
 ---
 
-<div class={s.chapter}>
-  <div class={s.chapterIntroWrapper}>
-    <div class={s.chapterIntro}>
-      <span class={s.chapterNumber}>Chapter #{number}</span>
-      <div class={s.chapterIntroPills}>
-        <div class={s.pill}>
-          {chapter.episodes.length > 1 ? `${chapter.episodes.length} episodes` : '1 episode'}
-        </div>
-        <div class={s.pill}>
-          <Svg name="icons/regular/clock" />
-          <span>{formatVideoDuration(allVideosDurations)}</span>
-        </div>
-      </div>
-    </div>
-    <h2 class={s.chapterIntroHeading}>{chapter.title}</h2>
-    <div class={s.chapterIntroDescription}>
-      <Text {...ensureValidStructuredTextProps({ data: chapter.introduction })} />
-    </div>
+{
+  /* A chapter: the number, the counts, the title and the introduction, then the episodes in a row of cards. */
+}
+<Section class={s.chapter} contentClass={s.content}>
+  <div class={s.intro}>
+    <p class:list={[s.number, 'subtitleMedium']}>Chapter #{number}</p>
+    <ul class={s.pills}>
+      <li class:list={[s.pill, 'caption']}>
+        {chapter.episodes.length > 1 ? `${chapter.episodes.length} episodes` : '1 episode'}
+      </li>
+      <li class:list={[s.pill, 'caption']}>
+        {formatVideoDuration(totalDuration)}
+      </li>
+    </ul>
+    <h2 class="h1">{chapter.title}</h2>
+    <Prose>
+      <StructuredText {...ensureValidStructuredTextProps({ data: chapter.introduction })} />
+    </Prose>
   </div>
-  <section class={s.chapterVideosWrapper}>
-    <div class={s.chapterVideosList}>
-      {chapter.episodes.map((episode) => <VideoCard episode={episode} />)}
-    </div>
-
-    <div class={s.carouselWrapper}>
-      <Carousel buttonsY="40%">
-        {chapter.episodes.map((episode) => <VideoCard episode={episode} />)}
-      </Carousel>
-    </div>
-  </section>
-</div>
+  <CardCarousel label={`Episodes of ${chapter.title}`} wrap>
+    {
+      episodes.map((data) => (
+        <CarouselCard href={buildUrlForUserGuidesEpisode(data)} title={data.title}>
+          <img
+            slot="image"
+            src={muxThumbnailUrl(data.asset.video.thumbnailUrl, {
+              width: 600,
+              height: 400,
+              fit_mode: 'crop',
+            })}
+            alt=""
+            width="600"
+            height="400"
+            loading="lazy"
+            style={{ background: `center / cover url("${data.asset.video.blurUpThumb}")` }}
+          />
+          {formatVideoDuration(data.asset.video.duration)}
+        </CarouselCard>
+      ))
+    }
+  </CardCarousel>
+</Section>

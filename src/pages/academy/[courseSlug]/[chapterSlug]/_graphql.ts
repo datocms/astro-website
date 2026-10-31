@@ -1,10 +1,9 @@
-import { ImageFragment } from '~/components/legacy/blocks/Image/graphql';
-import { InternalVideoFragment } from '~/components/legacy/blocks/InternalVideo/graphql';
-import { TableFragment } from '~/components/legacy/blocks/Table/graphql';
-import { TabsBlockFragment } from '~/components/legacy/blocks/TabsBlock/graphql';
-import { defaultInlineRecordFragments } from '~/components/legacy/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/legacy/linkToRecords';
-import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
+import { ImageFragment } from '~/components/StructuredText/blocks/Image';
+import { InternalVideoFragment } from '~/components/StructuredText/blocks/InternalVideo';
+import { TableFragment } from '~/components/StructuredText/blocks/Table';
+import { TabsBlockFragment } from '~/components/StructuredText/blocks/TabsBlock';
+import { defaultInlineRecordFragments } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/StructuredText/linkToRecords';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
@@ -112,7 +111,6 @@ export const query = graphql(
     TabsBlockFragment,
     AcademyChapterUrlFragment,
     AcademyCourseUrlFragment,
-    ResponsiveImageFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],

@@ -13,7 +13,6 @@ export const query = graphql(
       }
       courses: allAcademyCourses(orderBy: position_ASC) {
         name
-        illustration
         introduction {
           value
         }

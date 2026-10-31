@@ -1,21 +1,24 @@
 ---
-import { Layout } from '~/layouts/LegacyLayout';
-import s from './_style.module.css';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { Wrapper } from '~/components/legacy/Wrapper';
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Space } from '~/components/legacy/Space';
-import { Button } from '~/components/legacy/LegacyButton';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/legacy/LegacyStructuredText/Text';
-import { Svg } from '~/components/legacy/Svg';
-import { query } from './_graphql';
-import { buildUrlForAcademyCourse } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
-import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
-import { intersperse } from '~/lib/intersperse';
+import { Button } from '~/components/Button';
+import { CourseVideo } from '~/components/CourseVideo';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { stripStega } from '@datocms/astro';
+import { Hero } from '~/components/Hero';
+import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
+import { StructuredText } from '~/components/StructuredText';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+import {
+  AcademyCourseUrlFragment,
+  buildUrlForAcademyCourse,
+} from '~/lib/datocms/gqlUrlBuilder/academyCourse';
+import { readFragment } from '~/lib/datocms/graphql';
+import { intersperse } from '~/lib/intersperse';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import s from './_style.module.css';
 
 const { courses, page } = await executeQuery(Astro, query);
 
@@ -24,72 +27,53 @@ if (!page || courses.length === 0) {
   return notFoundResponse();
 }
 
-function seedFrom(value: string) {
-  return [...value].reduce((acc, char) => (acc * 31 + char.charCodeAt(0)) % 100000, 7);
-}
+const listed = courses.filter((course) => course.chapters.length > 0);
 ---
 
-<Layout seo={page.seo}>
-  <Hero>
-    <Fragment slot="title">DatoCMS <mark>Academy</mark></Fragment>
-    <Fragment slot="subtitle"
-      >Browse the DatoCMS Academy for a deep dive into the concepts around Headless CMS. Content
-      APIs, and frontend frameworks, to get up to speed with headless content management</Fragment
-    >
-  </Hero>
-  <Wrapper>
-    <Space top={2} bottom={2}>
+<Layout seo={page.seo} theme="green" headerVariant="light" footerTheme="green">
+  <Hero
+    variant="light"
+    headline="DatoCMS Academy"
+    subheadline="Browse the DatoCMS Academy for a deep dive into the concepts around Headless CMS. Content APIs, and frontend frameworks, to get up to speed with headless content management"
+  />
+  <Section>
+    <ul class={s.courses}>
       {
-        courses
-          .filter((course) => course.chapters.length > 0)
-          .map((course) => {
-            const seed = seedFrom(stripStega(course.name));
-            const size = (seed % 15) / 10 + 2;
-            const x = Math.floor(seed / 7) % 30;
-            const y = (Math.floor(seed / 13) % 30) + 20;
-
-            return (
-              <div class={s.course}>
-                <div class={s.courseImage}>
-                  <div
-                    class={s.dot}
-                    style={{
-                      left: `${x}%`,
-                      top: `${y}%`,
-                      height: `calc(var(--dotBaseUnit) * ${size})`,
-                      width: `calc(var(--dotBaseUnit) * ${size})`,
-                    }}
+        listed.map((course) => {
+          const { slug } = readFragment(AcademyCourseUrlFragment, course);
+          return (
+            <li class={s.course}>
+              <CourseVideo slug={slug} class={s.video} />
+              <div class={s.content}>
+                <h2 class="h2">
+                  <a href={buildUrlForAcademyCourse(course)}>{course.name}</a>
+                </h2>
+                <Prose class={s.intro}>
+                  <StructuredText
+                    {...ensureValidStructuredTextProps({ data: course.introduction })}
                   />
-                  <Svg name={`svg/illustrations/${stripStega(course.illustration)}`} />
+                </Prose>
+                <div>
+                  <Button href={buildUrlForAcademyCourse(course)} appearance="deep-on-white">
+                    Get started
+                  </Button>
                 </div>
-                <div class={s.courseContent}>
-                  <div class={s.courseTitle}>
-                    <a href={buildUrlForAcademyCourse(course)}>{course.name}</a>
-                  </div>
-                  <div class={s.courseIntro}>
-                    <Text {...ensureValidStructuredTextProps({ data: course.introduction })} />
-                  </div>
-                  <div>
-                    <Button as="a" p="small" href={buildUrlForAcademyCourse(course)}>
-                      Get started
-                    </Button>
-                  </div>
-                  <div class={s.courseChapters}>
-                    Chapters:{' '}
-                    {intersperse(
-                      course.chapters.map((chapter) => (
-                        <a href={buildUrlForAcademyChapter(chapter)}>{chapter.title}</a>
-                      )),
-                      ', ',
-                    )}
-                  </div>
-                </div>
+                <p class:list={[s.chapters, 'body']}>
+                  Chapters:{' '}
+                  {intersperse(
+                    course.chapters.map((chapter) => (
+                      <a href={buildUrlForAcademyChapter(chapter)}>{chapter.title}</a>
+                    )),
+                    ', ',
+                  )}
+                </p>
               </div>
-            );
-          })
+            </li>
+          );
+        })
       }
-    </Space>
-  </Wrapper>
+    </ul>
+  </Section>
 
   <DraftModeQueryListener query={query} />
 </Layout>

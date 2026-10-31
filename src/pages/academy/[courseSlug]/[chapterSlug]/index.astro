@@ -1,30 +1,30 @@
 ---
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import findIndex from 'lodash-es/findIndex';
-import s from './_style.module.css';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import { assignHeadingAnchors } from '~/lib/academyAnchors';
 import { type StructuredTextDocument } from 'datocms-structured-text-to-plain-text';
+import { ArticleBody } from '~/components/ArticleBody';
+import { CourseOutline } from '~/components/CourseOutline';
+import { Hero } from '~/components/Hero';
+import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
+import { StructuredText } from '~/components/StructuredText';
+import { Image } from '~/components/StructuredText/blocks/Image';
+import { InternalVideo } from '~/components/StructuredText/blocks/InternalVideo';
+import { Table } from '~/components/StructuredText/blocks/Table';
+import { TabsBlock } from '~/components/StructuredText/blocks/TabsBlock';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import Layout from '~/layouts/Layout.astro';
 import HeadingNode from './_HeadingNode.astro';
-import { Wrapper } from '~/components/legacy/Wrapper';
-import { Layout } from '~/layouts/LegacyLayout';
-import { InterstitialTitle } from '~/components/legacy/InterstitialTitle';
-import { Space } from '~/components/legacy/Space';
-import { ActiveLink } from '~/components/legacy/links/ActiveLink';
+import s from './_style.module.css';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/legacy/LegacyStructuredText/Text';
-import { Prose } from '~/components/legacy/LegacyProse';
-import { Image } from '~/components/legacy/blocks/Image';
-import { Table } from '~/components/legacy/blocks/Table';
-import { TabsBlock } from '~/components/legacy/blocks/TabsBlock';
-import { InternalVideo } from '~/components/legacy/blocks/InternalVideo';
 import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
 import { buildUrlForAcademyCourse } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { defaultLinkToRecordComponents } from '~/components/legacy/linkToRecords';
-import { defaultInlineRecordComponents } from '~/components/legacy/inlineRecords';
 import { JsonLd } from '~/components/JsonLd';
 import { publisherRef } from '~/lib/jsonLd';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
@@ -56,15 +56,20 @@ const prevChapter = chapterIndex > 0 ? allChapters[chapterIndex - 1] : undefined
 const nextChapter =
   chapterIndex < allChapters.length - 1 ? allChapters[chapterIndex + 1] : undefined;
 
+// The sections are the headings up to h3. The anchors are unique in the page.
 const sections = assignHeadingAnchors((chapter.content.value as StructuredTextDocument).document)
   .filter(({ heading }) => heading.level < 4)
-  .map(({ heading, anchor }) => ({
-    url: `#${anchor}`,
-    node: heading,
-  }));
+  .map(({ heading, anchor }) => ({ id: anchor, text: toPlainText(heading) ?? '' }));
+
+const outline = allChapters.map((nthChapter) => ({
+  title: nthChapter.title,
+  href: buildUrlForAcademyChapter(nthChapter),
+  active: nthChapter.id === chapter.id,
+  sections: nthChapter.id === chapter.id ? sections : undefined,
+}));
 ---
 
-<Layout seo={chapter.seo}>
+<Layout seo={chapter.seo} theme="green" headerVariant="light" footerTheme="green">
   <Fragment slot="head">
     <JsonLd
       data={{
@@ -112,103 +117,62 @@ const sections = assignHeadingAnchors((chapter.content.value as StructuredTextDo
     />
   </Fragment>
   <div id="main-content">
-    <InterstitialTitle style="one" mainTitleOfPage>
-      <Fragment slot="kicker"><a href="/academy" data-datocms-nomd>DatoCMS Academy</a></Fragment>
-      {chapter.title}
-      <Fragment slot="subtitle"
-        ><Text {...ensureValidStructuredTextProps({ data: course.introduction })} /></Fragment
-      >
-    </InterstitialTitle>
-    <Space top={1}>
-      <div class={s.contentWrapper}>
-        <div class={s.tocWrapper} data-datocms-nomd>
-          <div class={s.toc}>
-            <div class={s.tocTitle}>Course chapters</div>
-            <ul class={s.tocChapters}>
-              {
-                allChapters.map((nthChapter) => (
-                  <li class={s.tocChapter}>
-                    <ActiveLink
-                      href={buildUrlForAcademyChapter(nthChapter)}
-                      class={s.tocChapterLink}
-                      activeClass={s.activeTocChapter}
-                    >
-                      {nthChapter.title}
-                    </ActiveLink>
-
-                    {nthChapter.id === chapter.id && sections.length > 0 && (
-                      <ul class={s.tocChapterSections}>
-                        {sections.map((section) => (
-                          <li class={s.tocChapterSection}>
-                            <a title={toPlainText(section.node)} href={section.url}>
-                              {toPlainText(section.node)}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                ))
-              }
-            </ul>
-            <div class={s.tocFooter}>
-              <p>
-                This <a href={buildUrlForAcademyCourse(course)}>{course.name}</a> course is part of{
-                  ' '
-                }<a href="/academy">DatoCMS Academy</a>, a deep dive into the concepts around
-                headless.
-              </p>
-            </div>
-          </div>
-        </div>
-        <Prose class={s.body}>
-          <Text
-            {...ensureValidStructuredTextProps({
-              data: chapter.content,
-              blockComponents: {
-                ImageRecord: Image,
-                TableRecord: Table,
-                TabsBlockRecord: TabsBlock,
-                InternalVideoRecord: InternalVideo,
-              },
-              linkToRecordComponents: defaultLinkToRecordComponents,
-              inlineRecordComponents: defaultInlineRecordComponents,
-            })}
-            nodeOverrides={{ heading: HeadingNode }}
-          />
-        </Prose>
-      </div>
-    </Space>
+    <Hero variant="light" label="DatoCMS Academy" labelHref="/academy" headline={chapter.title}>
+      <Prose slot="intro">
+        <StructuredText {...ensureValidStructuredTextProps({ data: course.introduction })} />
+      </Prose>
+    </Hero>
+    <ArticleBody>
+      <CourseOutline slot="aside" title="Course chapters" chapters={outline}>
+        <p>
+          This <a href={buildUrlForAcademyCourse(course)}>{course.name}</a> course is part of{' '}
+          <a href="/academy">DatoCMS Academy</a>, a deep dive into the concepts around headless.
+        </p>
+      </CourseOutline>
+      <StructuredText
+        {...ensureValidStructuredTextProps({
+          data: chapter.content,
+          blockComponents: {
+            ImageRecord: Image,
+            TableRecord: Table,
+            TabsBlockRecord: TabsBlock,
+            InternalVideoRecord: InternalVideo,
+          },
+          linkToRecordComponents: defaultLinkToRecordComponents,
+          inlineRecordComponents: defaultInlineRecordComponents,
+        })}
+        nodeOverrides={{ heading: HeadingNode }}
+      />
+    </ArticleBody>
   </div>
-  <Wrapper>
+  <Section as="nav" aria-label="Previous and next chapter" data-datocms-nomd>
     <div class={s.prevNext}>
       <div class={s.prev}>
         {
           prevChapter && (
             <>
-              <div class={s.prevNextTitle}>Previous chapter</div>
-              <div class={s.prevNextLink}>
-                <a href={buildUrlForAcademyChapter(prevChapter)}>&larr; {prevChapter.title}</a>
-              </div>
+              <p class:list={[s.label, 'caption']}>Previous chapter</p>
+              <a class:list={[s.link, 'h2']} href={buildUrlForAcademyChapter(prevChapter)}>
+                &larr; {prevChapter.title}
+              </a>
             </>
           )
         }
       </div>
-
       <div class={s.next}>
         {
           nextChapter && (
             <>
-              <div class={s.prevNextTitle}>Next chapter</div>
-              <div class={s.prevNextLink}>
-                <a href={buildUrlForAcademyChapter(nextChapter)}>{nextChapter.title} &rarr;</a>
-              </div>
+              <p class:list={[s.label, 'caption']}>Next chapter</p>
+              <a class:list={[s.link, 'h2']} href={buildUrlForAcademyChapter(nextChapter)}>
+                {nextChapter.title} &rarr;
+              </a>
             </>
           )
         }
       </div>
     </div>
-  </Wrapper>
+  </Section>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

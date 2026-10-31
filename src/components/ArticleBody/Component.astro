@@ -13,13 +13,14 @@ interface Props {
   content?: { value: unknown };
   /** For a Markdown or HTML document: the links of the table of contents, from tableOfContentsItems(). */
   items?: TableOfContentsItem[];
-  /** The title of the table of contents, for example "In this article". */
-  tocTitle: string;
+  /** The title of the table of contents, for example "In this article". Not needed with the slot "aside". */
+  tocTitle?: string;
 }
 
 const { content, items = [], tocTitle } = Astro.props;
 const headings = tableOfContentsHeadings(content);
-const hasToc = headings.length > 0 || items.length > 0;
+const hasAside = Astro.slots.has('aside');
+const hasToc = !hasAside && tocTitle !== undefined && (headings.length > 0 || items.length > 0);
 ---
 
 {
@@ -27,13 +28,21 @@ const hasToc = headings.length > 0 || items.length > 0;
   The text of a blog post or a casual chat, in the reading column. When
   the text has many headings, a table of contents comes first. From 1152,
   the table is in the column at the left, and it stays in view while the
-  text scrolls.
+  text scrolls. The slot "aside" takes the place of the table: the column
+  of a course, for example.
 */
 }
 <Section as="article" contentClass={styles.content}>
   {
     hasToc && (
-      <TableOfContents title={tocTitle} headings={headings} items={items} class={styles.toc} />
+      <TableOfContents title={tocTitle!} headings={headings} items={items} class={styles.toc} />
+    )
+  }
+  {
+    hasAside && (
+      <div class={styles.toc}>
+        <slot name="aside" />
+      </div>
     )
   }
   <Prose class={styles.text}>

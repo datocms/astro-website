@@ -1,13 +1,11 @@
 ---
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { query } from './_graphql';
-import { Layout } from '~/layouts/LegacyLayout';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import s from './_style.module.css';
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Space } from '~/components/legacy/Space';
+import { Hero } from '~/components/Hero';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import Chapter from './_Chapter.astro';
+import { query } from './_graphql';
 
 const { page, chapters } = await executeQuery(Astro, query);
 
@@ -17,20 +15,13 @@ if (!page) {
 }
 ---
 
-<Layout seo={page._seoMetaTags}>
-  <Hero>
-    <Fragment slot="title"><mark>User Guides</mark></Fragment>
-    <Fragment slot="subtitle">
-      Editors and content creators, this one’s for you. Join along for a casual and non-technical
-      walkthrough of DatoCMS focusing on content creation and the UI.
-    </Fragment>
-  </Hero>
-
-  <Space top={2} bottom={2}>
-    <div class={s.allChapters}>
-      {chapters.map((chapter, index) => <Chapter chapter={chapter} number={index + 1} />)}
-    </div>
-  </Space>
+<Layout seo={page._seoMetaTags} theme="purple" headerVariant="light" footerTheme="purple">
+  <Hero
+    variant="light"
+    headline="User Guides"
+    subheadline="Editors and content creators, this one’s for you. Join along for a casual and non-technical walkthrough of DatoCMS focusing on content creation and the UI."
+  />
+  {chapters.map((chapter, index) => <Chapter chapter={chapter} number={index + 1} />)}
 
   <DraftModeQueryListener query={query} />
 </Layout>

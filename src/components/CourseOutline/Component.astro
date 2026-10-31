@@ -1,0 +1,96 @@
+---
+import styles from './style.module.css';
+
+interface Chapter {
+  title: string;
+  href: string;
+  /** The chapter of the page. Its sections show under it. */
+  active?: boolean;
+  /** The headings of the chapter: the links go to the anchors of the page. */
+  sections?: { id: string; text: string }[];
+}
+
+interface Props {
+  /** For example "Course chapters". */
+  title: string;
+  chapters: Chapter[];
+  class?: string;
+}
+
+const { title, chapters, class: className } = Astro.props;
+---
+
+{
+  /*
+  The chapters of a course, with the sections of the open chapter under it.
+  The slot takes the text under the list. From 1152, the list is always
+  open. Below 1152, it is a closed box that the visitor opens.
+  The search index and the Markdown version of the page skip this list.
+*/
+}
+<nav
+  class:list={[styles.root, className]}
+  aria-label={title}
+  data-course-outline
+  data-datocms-noindex
+  data-datocms-nomd
+>
+  <details class={styles.details} open>
+    <summary class:list={[styles.title, 'subtitleMedium']}>{title}</summary>
+    <ol class={styles.list}>
+      {
+        chapters.map((chapter) => (
+          <li>
+            <a
+              class:list={[styles.link, 'body', chapter.active && styles.active]}
+              href={chapter.href}
+              aria-current={chapter.active ? 'page' : undefined}
+            >
+              {chapter.title}
+            </a>
+            {chapter.active && chapter.sections && chapter.sections.length > 0 && (
+              <ul class={styles.sections}>
+                {chapter.sections.map((section) => (
+                  <li>
+                    <a
+                      class:list={[styles.section, 'body']}
+                      href={`#${section.id}`}
+                      title={section.text}
+                    >
+                      {section.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))
+      }
+    </ol>
+    {
+      Astro.slots.has('default') && (
+        <div class:list={[styles.footer, 'caption']}>
+          <slot />
+        </div>
+      )
+    }
+  </details>
+</nav>
+
+<script>
+  // From 1152 the box is always open. Below, it starts closed.
+  const wide = window.matchMedia('(min-width: 1152px)');
+  const boxes = document.querySelectorAll<HTMLDetailsElement>('[data-course-outline] > details');
+
+  const sync = () => {
+    for (const box of boxes) box.open = wide.matches;
+  };
+
+  sync();
+  wide.addEventListener('change', sync);
+  for (const box of boxes) {
+    box.addEventListener('toggle', () => {
+      if (wide.matches && !box.open) box.open = true;
+    });
+  }
+</script>

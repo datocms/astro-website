@@ -1,0 +1,19 @@
+---
+import { courseVideos, courseVideoSettings, defaultCourseVideo } from '~/data/academy';
+import { PixelVideo } from '~/components/PixelVideo';
+import styles from './style.module.css';
+
+interface Props {
+  /** The slug of the course. It selects the video. */
+  slug: string;
+  class?: string;
+}
+
+const { slug, class: className } = Astro.props;
+const video = courseVideos[slug] ?? defaultCourseVideo;
+---
+
+{/* The picture of a course: a pixel video on the surface of the theme. */}
+<div class:list={[styles.frame, className]}>
+  <PixelVideo src={video.src} settings={{ ...courseVideoSettings, ...video.settings }} />
+</div>

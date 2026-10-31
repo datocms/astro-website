@@ -24,6 +24,8 @@ interface Props extends HeroData {
   team?: FragmentOf<typeof HeroTeamMemberFragment>[];
   /** The `id` of the team row, for an anchor such as `#the-team`. */
   teamId?: string;
+  /** The label is a link to this URL. */
+  labelHref?: string;
 }
 
 const {
@@ -39,6 +41,7 @@ const {
   headingLevel = 'h1',
   breakBeforeMuted = false,
   teamId,
+  labelHref,
 } = Astro.props;
 
 const members = (Astro.props.team ?? []).map((member) =>
@@ -104,7 +107,19 @@ const background = { default: 'default', light: 'accent', dark: 'inverse' }[vari
   data-hero
 >
   <div class={styles.text}>
-    {label && <p class:list={[styles.label, 'body']}>{label}</p>}
+    {
+      label && (
+        <p class:list={[styles.label, 'body']}>
+          {labelHref ? (
+            <a href={labelHref} data-datocms-nomd>
+              {label}
+            </a>
+          ) : (
+            label
+          )}
+        </p>
+      )
+    }
     {
       /* A no-break space before the face: the face stays on the line of the last word, never alone on a new line. */
     }
@@ -119,6 +134,13 @@ const background = { default: 'default', light: 'accent', dark: 'inverse' }[vari
     >
       {headline}
     </Headline>
+    {
+      Astro.slots.has('intro') && (
+        <div class:list={[styles.intro, 'body']}>
+          <slot name="intro" />
+        </div>
+      )
+    }
     {
       buttons && buttons.length > 0 && (
         <ButtonGroup buttons={buttons} class={styles.buttons} data-hero-buttons="" />

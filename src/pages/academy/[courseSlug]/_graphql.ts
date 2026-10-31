@@ -20,7 +20,6 @@ export const query = graphql(
           ...TagFragment
         }
         name
-        illustration
         introduction {
           value
         }

@@ -3,18 +3,20 @@ import styles from './style.module.css';
 
 interface Props {
   label?: string;
+  /** From 768, the cards wrap into a grid and the row does not scroll. */
+  wrap?: boolean;
   class?: string;
 }
 
-const { label, class: className } = Astro.props;
+const { label, wrap = false, class: className } = Astro.props;
 ---
 
 {
   /*
   A row of cards (CarouselCard) that scrolls on the horizontal axis. The
-  cards snap to the start of the row. Only CSS: no buttons, no JS.
+  cards snap to the start of the row. With `wrap`, the cards form a grid from 768. Only CSS: no buttons, no JS.
 */
 }
-<div class:list={[styles.carousel, className]} role="list" aria-label={label}>
+<div class:list={[styles.carousel, wrap && styles.wrap, className]} role="list" aria-label={label}>
   <slot />
 </div>

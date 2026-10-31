@@ -1,7 +1,7 @@
-import { VideoPlayerFragment } from '~/components/legacy/VideoPlayer/graphql';
-import { InternalVideoFragment } from '~/components/legacy/blocks/InternalVideo/graphql';
-import { defaultInlineRecordFragments } from '~/components/legacy/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/legacy/linkToRecords';
+import { InternalVideoFragment } from '~/components/StructuredText/blocks/InternalVideo';
+import { defaultInlineRecordFragments } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/StructuredText/linkToRecords';
+import { VideoPlayerFragment } from '~/components/VideoPlayer';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {

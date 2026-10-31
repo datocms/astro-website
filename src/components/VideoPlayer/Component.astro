@@ -1,0 +1,64 @@
+---
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { VideoPlayerFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  data: FragmentOf<typeof VideoPlayerFragment>;
+  class?: string;
+}
+
+const { data, class: className } = Astro.props;
+const { video } = readFragment(VideoPlayerFragment, data);
+---
+
+{
+  /*
+  A video of the DatoCMS media area, in the Mux player. The player loads when the
+  video comes near the viewport. `prefer-playback="mse"` makes the player use
+  hls.js: with the HLS engine of the browser, the player has no menu for the
+  quality and no menu for the subtitles. Where MSE does not exist (iOS Safari),
+  the player falls back to the native engine.
+*/
+}
+{
+  video.muxPlaybackId && (
+    <mux-player
+      class:list={[styles.player, className]}
+      stream-type="on-demand"
+      playback-id={video.muxPlaybackId}
+      title={video.title ?? undefined}
+      placeholder={video.blurUpThumb ?? undefined}
+      poster={video.thumbnailUrl}
+      thumbnail-time="0"
+      preload="metadata"
+      prefer-playback="mse"
+      accent-color="var(--surface-accent)"
+      disable-cookies
+      disable-tracking
+      style={
+        video.width && video.height
+          ? { aspectRatio: `${video.width} / ${video.height}` }
+          : undefined
+      }
+    />
+  )
+}
+
+<script>
+  // Load the player when the first element is near the viewport.
+  const players = document.querySelectorAll('mux-player');
+
+  if (players.length > 0) {
+    const load = () => import('@mux/mux-player');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        void load();
+      },
+      { rootMargin: '400px' },
+    );
+    for (const player of players) observer.observe(player);
+  }
+</script>

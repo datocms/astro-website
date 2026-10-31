@@ -1,0 +1,91 @@
+/* @layer blocks */
+.root {
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--border-strong);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.title {
+  color: var(--text-primary);
+  cursor: pointer;
+  list-style: none;
+}
+
+.title::-webkit-details-marker {
+  display: none;
+}
+
+/* A chevron shows that the box opens. From 1152 the box is always open. */
+.title::after {
+  content: '';
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-left: var(--space-xs);
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-0.2em) rotate(45deg);
+}
+
+.details[open] > .title::after {
+  transform: translateY(0.1em) rotate(225deg);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  list-style: none;
+}
+
+.link {
+  color: var(--text-muted);
+}
+
+.active {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin-top: var(--space-2xs);
+  padding-left: var(--space-sm);
+  list-style: none;
+}
+
+.section {
+  color: var(--text-muted);
+}
+
+.footer {
+  color: var(--text-muted);
+}
+
+.footer a {
+  text-decoration: underline;
+}
+
+@media (hover: hover) {
+  .link:hover,
+  .section:hover {
+    color: var(--text-primary);
+  }
+}
+
+@media (min-width: 1152px) {
+  .title {
+    pointer-events: none;
+  }
+
+  .title::after {
+    display: none;
+  }
+}
