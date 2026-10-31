@@ -38,101 +38,121 @@ const alternatives = Astro.props.alternatives
    */
 }
 <Section theme={theme} padding="none" flush contentClass={styles.content}>
-  <table class={styles.table} data-comparison-table>
-    <thead>
-      <tr>
-        <th scope="col" class:list={[styles.head, styles.headDato, 'h2']}>
-          <div class={styles.inner}>DatoCMS</div>
-        </th>
-        <th scope="col" class:list={[styles.head, styles.headOther]}>
-          <div class={styles.inner}>
-            <button
-              type="button"
-              class:list={[styles.trigger, 'h2']}
-              aria-expanded="false"
-              aria-controls="comparison-alternatives"
-              data-comparison-trigger
-            >
-              {comparison.product}
-              <Icon icon={faChevronDown} class={styles.chevron} width="12" height="12" />
-            </button>
-          </div>
-          <ul id="comparison-alternatives" class={styles.options} hidden data-comparison-options>
-            {
-              alternatives.map((alternative) => (
-                <li>
-                  <a
-                    class:list={[styles.option, 'h2']}
-                    href={buildUrlForProductComparison(alternative)}
-                  >
-                    {alternative.product}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </th>
-      </tr>
-    </thead>
-    {
-      comparison.topics.map((topic) => (
-        <tbody>
-          <tr>
-            <th scope="colgroup" colspan="2" class:list={[styles.label, 'h2']}>
-              {topic.topic}
-            </th>
-          </tr>
-          {topic.differences.map((difference) => (
+  <comparison-table class={styles.root}>
+    <table class={styles.table} data-comparison-table>
+      <thead>
+        <tr>
+          <th scope="col" class:list={[styles.head, styles.headDato, 'h2']}>
+            <div class={styles.inner}>DatoCMS</div>
+          </th>
+          <th scope="col" class:list={[styles.head, styles.headOther]}>
+            <div class={styles.inner}>
+              <button
+                type="button"
+                class:list={[styles.trigger, 'h2']}
+                aria-expanded="false"
+                aria-controls="comparison-alternatives"
+                data-comparison-trigger
+              >
+                {comparison.product}
+                <Icon icon={faChevronDown} class={styles.chevron} width="12" height="12" />
+              </button>
+            </div>
+            <ul id="comparison-alternatives" class={styles.options} hidden data-comparison-options>
+              {
+                alternatives.map((alternative) => (
+                  <li>
+                    <a
+                      class:list={[styles.option, 'h2']}
+                      href={buildUrlForProductComparison(alternative)}
+                    >
+                      {alternative.product}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </th>
+        </tr>
+      </thead>
+      {
+        comparison.topics.map((topic) => (
+          <tbody>
             <tr>
-              <td class:list={[styles.cell, styles.cellDato, 'body']}>
-                <div class:list={[styles.inner, styles.rich]}>
-                  <StructuredText
-                    {...ensureValidStructuredTextProps({
-                      data: difference.datocmsTake,
-                      linkToRecordComponents: defaultLinkToRecordComponents,
-                      inlineRecordComponents: defaultInlineRecordComponents,
-                    })}
-                  />
-                </div>
-              </td>
-              <td class:list={[styles.cell, styles.cellOther, 'body']}>
-                <div class:list={[styles.inner, styles.rich]}>
-                  <StructuredText
-                    {...ensureValidStructuredTextProps({ data: difference.competitorTake })}
-                  />
-                </div>
-              </td>
+              <th scope="colgroup" colspan="2" class:list={[styles.label, 'h2']}>
+                {topic.topic}
+              </th>
             </tr>
-          ))}
-        </tbody>
-      ))
-    }
-  </table>
+            {topic.differences.map((difference) => (
+              <tr>
+                <td class:list={[styles.cell, styles.cellDato, 'body']}>
+                  <div class:list={[styles.inner, styles.rich]}>
+                    <StructuredText
+                      {...ensureValidStructuredTextProps({
+                        data: difference.datocmsTake,
+                        linkToRecordComponents: defaultLinkToRecordComponents,
+                        inlineRecordComponents: defaultInlineRecordComponents,
+                      })}
+                    />
+                  </div>
+                </td>
+                <td class:list={[styles.cell, styles.cellOther, 'body']}>
+                  <div class:list={[styles.inner, styles.rich]}>
+                    <StructuredText
+                      {...ensureValidStructuredTextProps({ data: difference.competitorTake })}
+                    />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        ))
+      }
+    </table>
+  </comparison-table>
 </Section>
 
 <script>
-  function setupTable(table: HTMLElement) {
-    const trigger = table.querySelector<HTMLButtonElement>('[data-comparison-trigger]');
-    const options = table.querySelector<HTMLElement>('[data-comparison-options]');
-    if (!trigger || !options) return;
+  import { WebComponent } from '~/lib/WebComponent';
 
-    const setOpen = (open: boolean, returnFocus = false) => {
-      trigger.setAttribute('aria-expanded', String(open));
-      options.hidden = !open;
-      if (!open && returnFocus) trigger.focus();
-    };
+  customElements.define(
+    'comparison-table',
+    class extends WebComponent {
+      #documentListeners = new AbortController();
 
-    trigger.addEventListener('click', () =>
-      setOpen(trigger.getAttribute('aria-expanded') !== 'true'),
-    );
-    document.addEventListener('click', (event) => {
-      const target = event.target as Node;
-      if (!trigger.contains(target) && !options.contains(target)) setOpen(false);
-    });
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && !options.hidden) setOpen(false, true);
-    });
-  }
+      parsedCallback() {
+        const trigger = this.$<HTMLButtonElement>('[data-comparison-trigger]');
+        const options = this.$('[data-comparison-options]');
+        const signal = this.#documentListeners.signal;
 
-  document.querySelectorAll<HTMLElement>('[data-comparison-table]').forEach(setupTable);
+        const setOpen = (open: boolean, returnFocus = false) => {
+          trigger.setAttribute('aria-expanded', String(open));
+          options.hidden = !open;
+          if (!open && returnFocus) trigger.focus();
+        };
+
+        this.on(trigger, 'click', () => setOpen(trigger.getAttribute('aria-expanded') !== 'true'));
+        document.addEventListener(
+          'click',
+          (event) => {
+            const target = event.target as Node;
+            if (!trigger.contains(target) && !options.contains(target)) setOpen(false);
+          },
+          { signal },
+        );
+        document.addEventListener(
+          'keydown',
+          (event) => {
+            if (event.key === 'Escape' && !options.hidden) setOpen(false, true);
+          },
+          { signal },
+        );
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.#documentListeners.abort();
+      }
+    },
+  );
 </script>

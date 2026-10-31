@@ -58,221 +58,258 @@ const id = (s: string) =>
     .replace(/^-|-$/g, '');
 ---
 
-<section class={styles.planComparison} data-plan-comparison>
-  <h2 class:list={[styles.headline, 'h1']}>{headline}</h2>
+<plan-comparison class={styles.root}>
+  <section class={styles.planComparison} data-plan-comparison>
+    <h2 class:list={[styles.headline, 'h1']}>{headline}</h2>
 
-  <div data-table-start></div>
-  <div class={styles.header}>
-    <div class={styles.searchCell}>
-      <p class:list={[styles.featureTitle, 'h2']} aria-hidden="true">Feature</p>
-      <label class={styles.search}>
-        <span class="visuallyHidden">Search features</span>
-        <Icon icon={faMagnifyingGlass} width="24" height="24" />
-        <input type="search" class="h2" placeholder="Search ..." autocomplete="off" data-search />
-      </label>
+    <div data-table-start></div>
+    <div class={styles.header}>
+      <div class={styles.searchCell}>
+        <p class:list={[styles.featureTitle, 'h2']} aria-hidden="true">Feature</p>
+        <label class={styles.search}>
+          <span class="visuallyHidden">Search features</span>
+          <Icon icon={faMagnifyingGlass} width="24" height="24" />
+          <input type="search" class="h2" placeholder="Search ..." autocomplete="off" data-search />
+        </label>
+        {
+          differencesLabel && (
+            <label class:list={[styles.differences, 'subtitleMedium']}>
+              <input type="checkbox" role="switch" class={styles.switchInput} data-differences />
+              <span class={styles.switchTrack} aria-hidden="true" />
+              {differencesLabel}
+            </label>
+          )
+        }
+      </div>
       {
-        differencesLabel && (
-          <label class:list={[styles.differences, 'subtitleMedium']}>
-            <input type="checkbox" role="switch" class={styles.switchInput} data-differences />
-            <span class={styles.switchTrack} aria-hidden="true" />
-            {differencesLabel}
-          </label>
-        )
+        columns.map((col) => (
+          <div class={styles.planCell}>
+            <p class="h2">
+              {col.name}
+              <br />
+              <span class={styles.muted}>{col.price}</span>
+            </p>
+            <Button
+              appearance={col.button.appearance}
+              variant={col.button.variant}
+              arrow={col.button.arrow}
+              href={col.button.href}
+            >
+              {col.button.label}
+            </Button>
+          </div>
+        ))
       }
     </div>
-    {
-      columns.map((col) => (
-        <div class={styles.planCell}>
-          <p class="h2">
-            {col.name}
-            <br />
-            <span class={styles.muted}>{col.price}</span>
-          </p>
-          <Button
-            appearance={col.button.appearance}
-            variant={col.button.variant}
-            arrow={col.button.arrow}
-            href={col.button.href}
-          >
-            {col.button.label}
-          </Button>
-        </div>
-      ))
-    }
-  </div>
 
-  {
-    categories.map((cat) => (
-      <details class={styles.category} open={cat.open} data-category>
-        <summary class={styles.categoryHeader}>
-          <span class:list={[styles.categoryTitle, 'bodyMedium']}>
-            {cat.title}
-            <span class={styles.count} data-count>
-              {cat.rows.length}
+    {
+      categories.map((cat) => (
+        <details class={styles.category} open={cat.open} data-category>
+          <summary class={styles.categoryHeader}>
+            <span class:list={[styles.categoryTitle, 'bodyMedium']}>
+              {cat.title}
+              <span class={styles.count} data-count>
+                {cat.rows.length}
+              </span>
             </span>
-          </span>
-          <span class:list={[styles.sign, 'h2']} aria-hidden="true" />
-        </summary>
-        <div role="list">
-          {cat.rows.map((row) => {
-            const hasInfo = Boolean(row.info || row.infoText);
-            const tipId = hasInfo ? `tip-${id(cat.title)}-${id(row.feature)}` : undefined;
-            // The search finds the name and the keywords of the row.
-            const searchText = [row.feature, row.keywords].filter(Boolean).join(' ').toLowerCase();
-            return (
-              <div
-                class={styles.row}
-                role="listitem"
-                data-row
-                data-name={searchText}
-                data-same={row.pro === row.enterprise || undefined}
-              >
-                <div class={styles.feature}>
-                  <span class="bodyMedium">{row.feature}</span>
-                  {hasInfo && (
-                    <span class={styles.info}>
-                      <button
-                        type="button"
-                        class={styles.infoButton}
-                        aria-describedby={tipId}
-                        aria-expanded="false"
-                        data-info-button
-                      >
-                        <span class="visuallyHidden">About {row.feature}</span>
-                        <span aria-hidden="true">i</span>
-                      </button>
-                      <span
-                        id={tipId}
-                        role="tooltip"
-                        class:list={[styles.tooltip, 'subtitleMedium']}
-                      >
-                        {row.infoText ? <InlineParagraphs data={row.infoText} /> : row.info}
+            <span class:list={[styles.sign, 'h2']} aria-hidden="true" />
+          </summary>
+          <div role="list">
+            {cat.rows.map((row) => {
+              const hasInfo = Boolean(row.info || row.infoText);
+              const tipId = hasInfo ? `tip-${id(cat.title)}-${id(row.feature)}` : undefined;
+              // The search finds the name and the keywords of the row.
+              const searchText = [row.feature, row.keywords]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase();
+              return (
+                <div
+                  class={styles.row}
+                  role="listitem"
+                  data-row
+                  data-name={searchText}
+                  data-same={row.pro === row.enterprise || undefined}
+                >
+                  <div class={styles.feature}>
+                    <span class="bodyMedium">{row.feature}</span>
+                    {hasInfo && (
+                      <span class={styles.info}>
+                        <button
+                          type="button"
+                          class={styles.infoButton}
+                          aria-describedby={tipId}
+                          aria-expanded="false"
+                          data-info-button
+                        >
+                          <span class="visuallyHidden">About {row.feature}</span>
+                          <span aria-hidden="true">i</span>
+                        </button>
+                        <span
+                          id={tipId}
+                          role="tooltip"
+                          class:list={[styles.tooltip, 'subtitleMedium']}
+                        >
+                          {row.infoText ? <InlineParagraphs data={row.infoText} /> : row.info}
+                        </span>
                       </span>
-                    </span>
-                  )}
-                </div>
-                {([row.pro, row.enterprise] as PlanValue[]).map((value, i) => (
-                  <div class:list={[styles.value, i === 1 && styles.enterprise, 'body']}>
-                    <span class="visuallyHidden">{columns[i]!.name}: </span>
-                    {value === true ? (
-                      <span class={styles.check}>
-                        <Icon icon={faCheck} width="10" height="10" />
-                        <span class="visuallyHidden">Included</span>
-                      </span>
-                    ) : value === false ? (
-                      <span class={styles.dash}>
-                        <span class="visuallyHidden">Not included</span>
-                      </span>
-                    ) : (
-                      value.split('\n').map((line, j) => (
-                        <>
-                          {j > 0 && <br />}
-                          <span class:list={[j > 0 && styles.muted]}>{line}</span>
-                        </>
-                      ))
                     )}
                   </div>
-                ))}
-              </div>
-            );
-          })}
+                  {([row.pro, row.enterprise] as PlanValue[]).map((value, i) => (
+                    <div class:list={[styles.value, i === 1 && styles.enterprise, 'body']}>
+                      <span class="visuallyHidden">{columns[i]!.name}: </span>
+                      {value === true ? (
+                        <span class={styles.check}>
+                          <Icon icon={faCheck} width="10" height="10" />
+                          <span class="visuallyHidden">Included</span>
+                        </span>
+                      ) : value === false ? (
+                        <span class={styles.dash}>
+                          <span class="visuallyHidden">Not included</span>
+                        </span>
+                      ) : (
+                        value.split('\n').map((line, j) => (
+                          <>
+                            {j > 0 && <br />}
+                            <span class:list={[j > 0 && styles.muted]}>{line}</span>
+                          </>
+                        ))
+                      )}
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+        </details>
+      ))
+    }
+    <p class:list={[styles.empty, 'body']} hidden data-empty>No features match your search.</p>
+    {
+      Astro.slots.has('default') && (
+        <div class:list={[styles.footnote, 'body']}>
+          <slot />
         </div>
-      </details>
-    ))
-  }
-  <p class:list={[styles.empty, 'body']} hidden data-empty>No features match your search.</p>
-  {
-    Astro.slots.has('default') && (
-      <div class:list={[styles.footnote, 'body']}>
-        <slot />
-      </div>
-    )
-  }
-</section>
+      )
+    }
+  </section>
+</plan-comparison>
 
 <script>
-  // Tooltips: a click or a tap on the icon opens or closes its bubble.
-  // Only one bubble is open at a time. A click outside or Escape closes it.
-  // Touch screens have no hover, thus they need this.
-  const closeTips = (except?: Element) => {
-    for (const el of document.querySelectorAll('[data-plan-comparison] [data-open]')) {
-      if (el === except) continue;
-      el.removeAttribute('data-open');
-      el.querySelector('[data-info-button]')?.setAttribute('aria-expanded', 'false');
-    }
-  };
-  document.addEventListener('click', (event) => {
-    const button = (event.target as Element).closest?.('[data-info-button]');
-    const info = button?.parentElement;
-    closeTips(info ?? undefined);
-    if (!button || !info) return;
-    const open = !info.hasAttribute('data-open');
-    info.toggleAttribute('data-open', open);
-    button.setAttribute('aria-expanded', String(open));
-  });
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeTips();
-  });
+  import { WebComponent } from '~/lib/WebComponent';
 
-  // Search: show only the rows whose name (or keywords) contains the
-  // query. The switch "only show differences" (when the table has one)
-  // hides the rows with the same value on the two plans. The two filters
-  // do not work together: a search turns the switch off, and the switch
-  // clears the search. Categories with no match go away; categories with
-  // a match open. When no filter is active again, the categories get
-  // their open state from before the filter.
-  for (const root of document.querySelectorAll<HTMLElement>('[data-plan-comparison]')) {
-    const input = root.querySelector<HTMLInputElement>('[data-search]');
-    const differences = root.querySelector<HTMLInputElement>('[data-differences]');
-    const empty = root.querySelector<HTMLElement>('[data-empty]');
-    const categories = [...root.querySelectorAll<HTMLDetailsElement>('[data-category]')];
-    if (!input) continue;
-    let saved: boolean[] | null = null;
+  customElements.define(
+    'plan-comparison',
+    class extends WebComponent {
+      #documentListeners = new AbortController();
 
-    const apply = () => {
-      const query = input.value.trim().toLowerCase();
-      const onlyDifferences = differences?.checked ?? false;
-      const filtering = Boolean(query) || onlyDifferences;
-      if (filtering && !saved) saved = categories.map((c) => c.open);
-      let total = 0;
-      for (const cat of categories) {
-        const rows = [...cat.querySelectorAll<HTMLElement>('[data-row]')];
-        let count = 0;
-        for (const row of rows) {
-          const match =
-            (!query || (row.dataset.name ?? '').includes(query)) &&
-            (!onlyDifferences || !row.hasAttribute('data-same'));
-          row.hidden = !match;
-          if (match) count += 1;
+      parsedCallback() {
+        this.setUpTips();
+        this.setUpFilters();
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.#documentListeners.abort();
+      }
+
+      // Tooltips: a click or a tap on the icon opens or closes its bubble.
+      // Only one bubble is open at a time. A click outside or Escape closes it.
+      // Touch screens have no hover, thus they need this.
+      setUpTips() {
+        const signal = this.#documentListeners.signal;
+        const closeTips = (except?: Element) => {
+          for (const el of this.$$('[data-open]')) {
+            if (el === except) continue;
+            el.removeAttribute('data-open');
+            el.querySelector('[data-info-button]')?.setAttribute('aria-expanded', 'false');
+          }
+        };
+        document.addEventListener(
+          'click',
+          (event) => {
+            const button = (event.target as Element).closest?.('[data-info-button]');
+            const info = button && this.contains(button) ? button.parentElement : null;
+            closeTips(info ?? undefined);
+            if (!button || !info) return;
+            const open = !info.hasAttribute('data-open');
+            info.toggleAttribute('data-open', open);
+            button.setAttribute('aria-expanded', String(open));
+          },
+          { signal },
+        );
+        document.addEventListener(
+          'keydown',
+          (event) => {
+            if (event.key === 'Escape') closeTips();
+          },
+          { signal },
+        );
+      }
+
+      // Search: show only the rows whose name (or keywords) contains the
+      // query. The switch "only show differences" (when the table has one)
+      // hides the rows with the same value on the two plans. The two filters
+      // do not work together: a search turns the switch off, and the switch
+      // clears the search. Categories with no match go away; categories with
+      // a match open. When no filter is active again, the categories get
+      // their open state from before the filter.
+      setUpFilters() {
+        const input = this.$<HTMLInputElement>('[data-search]');
+        // The switch shows only when the page gives its label.
+        const differences = this.querySelector<HTMLInputElement>('[data-differences]');
+        const empty = this.$('[data-empty]');
+        const start = this.$('[data-table-start]');
+        const categories = this.$$<HTMLDetailsElement>('[data-category]');
+        let saved: boolean[] | null = null;
+
+        const apply = () => {
+          const query = input.value.trim().toLowerCase();
+          const onlyDifferences = differences?.checked ?? false;
+          const filtering = Boolean(query) || onlyDifferences;
+          if (filtering && !saved) saved = categories.map((c) => c.open);
+          let total = 0;
+          for (const cat of categories) {
+            const rows = [...cat.querySelectorAll<HTMLElement>('[data-row]')];
+            let count = 0;
+            for (const row of rows) {
+              const match =
+                (!query || (row.dataset.name ?? '').includes(query)) &&
+                (!onlyDifferences || !row.hasAttribute('data-same'));
+              row.hidden = !match;
+              if (match) count += 1;
+            }
+            total += count;
+            cat.hidden = count === 0;
+            if (filtering) cat.open = count > 0;
+            const countEl = cat.querySelector('[data-count]');
+            if (countEl) countEl.textContent = String(count);
+          }
+          if (!filtering && saved) {
+            categories.forEach((c, i) => (c.open = saved![i]!));
+            saved = null;
+          }
+          empty.hidden = total > 0;
+        };
+
+        this.on(input, 'input', () => {
+          if (differences && input.value.trim()) differences.checked = false;
+          apply();
+        });
+
+        if (differences) {
+          this.on(differences, 'change', () => {
+            if (differences.checked) input.value = '';
+            apply();
+            // The table gets shorter or longer. When the start of the table is
+            // above the viewport, go back to it.
+            if (start.getBoundingClientRect().top < 0) {
+              const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+              start.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+            }
+          });
         }
-        total += count;
-        cat.hidden = count === 0;
-        if (filtering) cat.open = count > 0;
-        const countEl = cat.querySelector('[data-count]');
-        if (countEl) countEl.textContent = String(count);
       }
-      if (!filtering && saved) {
-        categories.forEach((c, i) => (c.open = saved![i]!));
-        saved = null;
-      }
-      if (empty) empty.hidden = total > 0;
-    };
-
-    input.addEventListener('input', () => {
-      if (differences && input.value.trim()) differences.checked = false;
-      apply();
-    });
-
-    differences?.addEventListener('change', () => {
-      if (differences.checked) input.value = '';
-      apply();
-      // The table gets shorter or longer. When the start of the table is
-      // above the viewport, go back to it.
-      const start = root.querySelector<HTMLElement>('[data-table-start]');
-      if (start && start.getBoundingClientRect().top < 0) {
-        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-        start.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-      }
-    });
-  }
+    },
+  );
 </script>
