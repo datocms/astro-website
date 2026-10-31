@@ -16,7 +16,6 @@ import { MultipleDemosBlock } from '~/components/legacy/blocks/MultipleDemosBloc
 import { PluginSdkHookGroup } from '~/components/legacy/docs/blocks/PluginSdkHookGroup';
 import { buildGroupsFromPluginSdkHooks } from '~/components/legacy/docs/blocks/PluginSdkHookGroup/utils';
 import { ReactUiLiveExample } from '~/components/legacy/docs/blocks/ReactUiLiveExample';
-import { buildGroupsFromReactUiLiveExamples } from '~/components/legacy/docs/blocks/ReactUiLiveExample/utils';
 import { Table } from '~/components/legacy/blocks/Table';
 import { TabsBlock } from '~/components/legacy/blocks/TabsBlock';
 import { TutorialVideo } from '~/components/legacy/blocks/TutorialVideo';
@@ -55,10 +54,7 @@ const page = readFragment(PageLayoutFragment, maskedPage);
 const group = readFragment(GroupLayoutFragment, maskedGroup);
 
 const tocGroupsFromPageContent = (
-  await Promise.all([
-    buildGroupsFromPluginSdkHooks(Astro, page.content),
-    buildGroupsFromReactUiLiveExamples(page.content),
-  ])
+  await Promise.all([buildGroupsFromPluginSdkHooks(Astro, page.content)])
 ).flat();
 
 const tocGroups = [
