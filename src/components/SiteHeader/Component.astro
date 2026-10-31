@@ -227,7 +227,18 @@ const panelId = (i: number) => `site-header-mega-${i}`;
             </li>
           ))
         }
-        <li class:list={[styles.mobileItem, styles.mobileLogin]}>
+        {/* Below 768 the bar has no search button: the menu has it. */}
+        <li class:list={[styles.mobileItem, styles.mobileOnly]}>
+          <button
+            type="button"
+            class:list={[styles.mobileSummary, styles.mobileLink, 'h1']}
+            aria-haspopup="dialog"
+            data-search-open
+          >
+            Search
+          </button>
+        </li>
+        <li class:list={[styles.mobileItem, styles.mobileOnly]}>
           <a
             href={dashboardUrl('/login')}
             class:list={[styles.mobileSummary, styles.mobileLink, 'h1']}>Login</a
@@ -293,6 +304,9 @@ const panelId = (i: number) => `site-header-mega-${i}`;
         });
         this.on(root, 'keydown', (event) => {
           if (event.key !== 'Escape') return;
+          // An open modal (the search) closes on Escape. The menu stays open
+          // under it, thus the focus can go back to the menu.
+          if (document.querySelector('[aria-modal="true"]')) return;
           if (this.openTrigger) this.closeMega(true);
           if (this.mobileTrigger.getAttribute('aria-expanded') === 'true') {
             this.setMobile(false, true);
