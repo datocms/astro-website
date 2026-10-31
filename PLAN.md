@@ -203,7 +203,98 @@ While the port runs, the components of the prototype keep their prototype props 
 
 The points that wait for a human. Remove a point when it is decided (write the decision in the step or the log).
 
-- **CMS pass: use cases.** The `/use-cases/*` pages are deleted (2026-10-31), but the CMS still has the model `use_case_page` (5 records) and the code still reads it: `buildUrlForUseCasePage` and the `UseCasePageLink`/`UseCasePageInline` blocks (in `src/components/StructuredText/` and `src/components/legacy/`). Links to these records go to `/use-cases/<slug>` and the redirect sends them to `/`. Do one pass: find the records that link to a use case, change those links, then remove the blocks, the URL builder and the model from the CMS (a migration in `migrations/`).
+- **CMS pass: use cases.** The `/use-cases/*` pages are deleted (2026-10-31), and `/use-cases/*` redirects to `/`. The CMS still has the model `use_case_page`, and the code still reads it. Do this pass in four steps.
+  1. **Find the references.** Run the scan below (`npx datocms cma:script`, from the repo root, Node 22). It reads all the records (`rawListPagedIterator` with `nested: true`, so the blocks inside Structured Text and Modular Content are in the JSON), walks all the JSON, and prints each string that is the ID of a use case or a URL with `/use-cases`. `cma:script` rejects `any` and `unknown` annotations and `export default`: keep the `Json` type alias.
+     <details><summary>The scan script</summary>
+
+     ```ts
+     type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
+
+     const itemTypes = await client.itemTypes.list();
+     const typeName = new Map(itemTypes.map((t) => [t.id, t.api_key]));
+     const useCaseType = itemTypes.find((t) => t.api_key === 'use_case_page');
+     if (!useCaseType) throw new Error('no use_case_page model');
+
+     const useCases = new Map<string, string>();
+     for await (const uc of client.items.listPagedIterator({
+       filter: { type: useCaseType.id },
+       version: 'current',
+     })) {
+       useCases.set(uc.id, String(uc['slug']));
+     }
+     console.log('use cases:', JSON.stringify([...useCases]));
+
+     const hits: string[] = [];
+
+     function walk(value: Json, path: string, push: (path: string, what: string) => void) {
+       if (typeof value === 'string') {
+         if (useCases.has(value)) push(path, `id ${value} (${useCases.get(value)})`);
+         else if (value.includes('/use-cases'))
+           push(path, `url ${value.match(/[^\s"')]*\/use-cases[^\s"')]*/)?.[0]}`);
+         return;
+       }
+       if (Array.isArray(value)) {
+         value.forEach((v, i) => walk(v, `${path}[${i}]`, push));
+         return;
+       }
+       if (value && typeof value === 'object') {
+         const rel = value['relationships'];
+         let label = path;
+         if (rel && typeof rel === 'object' && !Array.isArray(rel)) {
+           const it = rel['item_type'];
+           if (it && typeof it === 'object' && !Array.isArray(it)) {
+             const data = it['data'];
+             if (
+               data &&
+               typeof data === 'object' &&
+               !Array.isArray(data) &&
+               typeof data['id'] === 'string'
+             ) {
+               label = `${path}<${typeName.get(data['id'])}>`;
+             }
+           }
+         }
+         for (const [k, v] of Object.entries(value)) {
+           if (k === 'relationships' || k === 'meta' || k === 'id' || k === 'type') continue;
+           walk(v, k === 'attributes' ? label : `${label}.${k}`, push);
+         }
+       }
+     }
+
+     let count = 0;
+     for await (const record of client.items.rawListPagedIterator({
+       version: 'current',
+       nested: true,
+     })) {
+       count++;
+       const modelId = record.relationships.item_type.data.id;
+       if (modelId === useCaseType.id) continue;
+       const attrs = JSON.parse(JSON.stringify(record.attributes)) as Json;
+       walk(attrs, '', (path, what) =>
+         hits.push(
+           `${typeName.get(modelId)} ${record.id} [${record.meta.status}] ${path} -> ${what}`,
+         ),
+       );
+     }
+     console.log('records scanned:', count, 'hits:', hits.length);
+     for (const h of hits) console.log(h);
+     ```
+
+     </details>
+
+     The result on 2026-10-31: 6680 records, 24 hits, no URL with `/use-cases` in the text.
+     - **The use cases:** `aDG8B7RkQjy5K7mTLCt55A` knowledge-management, `KAC1JLzvQTuYXMGieFWRoA` ecommerce, `E_EW9kRdTqWZjmUgavUaaA` modern-websites, `BLPuwFNNQBeX4Sca_068dQ` digital-publishing, `FKzat0oFQP6-N-2IhDOuhQ` headless-cms-travel (no references).
+     - **7 links in Structured Text** (`content`, record links inside paragraphs):
+       - `blog_post` `Mydyi8GsRS-mCSg90uz63Q`: 4 links, "modern websites" (modern-websites), "eCommerce sites" (ecommerce), "Headless CMS for editors" (digital-publishing), "Headless CMS that's optimized for knowledge management" (knowledge-management).
+       - `success_story` `PHEWXlVTQiO8--K2tswoZg` (eurac-research): "\"Content Hub\" as a Headless CMS use case" (knowledge-management).
+       - `customer_story` `f3sxrDyQQ7Cjwc6IYR0nyA`: "e-commerce site's brand directory" (ecommerce).
+       - `customer_story` `E_gVe2ztT-ynZnLT0XKMrQ`: "headless CMS like DatoCMS" (modern-websites).
+     - **`success_story.use_case`:** 13 records (`PHEWXlVTQiO8--K2tswoZg`, `IbMGpSSJRMmsXpjaVyWv2Q`, `SmZ0ksbnR6y6lrmTYldS8A` [updated], `QUgOr8B9SSWM7cv4dd5FiQ`, `fYeF2yIDTiqD2JFud3e5pg` [draft], `39832551`, `39832553`, `39832554`, `39832555`, `39832556`, `39832557`, `39832558`, `120368987`). `CaseStudyBody` shows it as the row "Use case" of the facts, with a link to `/use-cases/<slug>`.
+     - **`navigation_bar.use_cases`:** `navigation_bar` `dhVR2HqgRVCTGFi0bWqLqA`, 4 references. The site does not read `navigation_bar`.
+
+  2. **Decide (the user):** for the 7 links, remove the link and keep the text, or point it to a different page. For the row "Use case" of the success stories: remove it, or keep the text without the link.
+  3. **The migration** (`datocms migrations:new removeUseCases --schema=all`, then `--dry-run` first). In this order: change the 7 links (a DAST walk that replaces the `itemLink` node with its children, or changes its `item`); remove the record-link validators on `use_case_page` from the Structured Text fields (the `item_types` of the validators `structured_text_links` and `structured_text_blocks`); destroy the fields `success_story.use_case` and `navigation_bar.use_cases`; destroy the 5 records; destroy the model `use_case_page`. It is destructive: make it idempotent (look up each field and model by `api_key`, skip it if absent) and confirm before the run on primary. A record with status `updated` gets a new published version only if the migration publishes it: check `SmZ0ksbnR6y6lrmTYldS8A`.
+  4. **The code**, after the migration: delete `src/lib/datocms/gqlUrlBuilder/useCasePage*`, `StructuredText/inlineRecords/UseCasePageInline`, `StructuredText/linkToRecords/UseCasePageLink`, `docs/inlineRecords/UseCasePageInline`, `docs/linkToRecords/UseCasePageLink`, and their entries in the `index.ts` files and in the graphql fragments that list them (`git grep -n UseCasePage -- src`). Remove `useCase` from `CaseStudyBody` (`graphql.ts` and `Component.astro`). Then `npm run generate-cma-schema`, `npm run generate-schema`, `npx astro check`. **Do not touch** the field `useCase` of the sales form (`src/data/contact.ts`, `src/actions/forms/submitSalesRequest.ts`, `src/actions/pipedrive/utils.ts`): it is a Pipedrive custom field, not the CMS model.
 - **CMS pass: course illustrations.** The site no longer shows `academy_course.illustration` (3 records: `growing`, `dato-svg-4-02`, `zen`), but the field stays in the CMS. Its editor is the Tile Picker plugin (the only field that uses it), with previews from `https://www.datocms.com/svg/illustrations/*.svg`. `public/svg` is deleted (the build no longer copies `src/svg` into it), thus these previews are broken until this pass. Do one pass: remove the field and the Tile Picker plugin from the CMS (a migration in `migrations/`). No page and no CMS record links to `/svg/`.
 - **Docs (step 23):**
   - Accent text in light is a dark olive derived from `--surface-accent` (`oklch(from … 0.5 …)`); the alternatives are `--text-primary` or a new token.
