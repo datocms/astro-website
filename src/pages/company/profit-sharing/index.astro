@@ -1,24 +1,24 @@
 ---
-import { Layout } from '~/layouts/LegacyLayout';
-import { Hero } from '~/components/legacy/LegacyHero';
-import { LegalProse } from '~/components/legacy/LegalProse';
-import { Markdown } from '~/components/legacy/Markdown';
-import { rawContent } from '~/documents/profit-sharing.md';
+// The profit sharing program: Markdown (src/documents/profit-sharing.md).
+import { ArticleBody } from '~/components/ArticleBody';
+import { Hero } from '~/components/Hero';
+import { tableOfContentsItems } from '~/components/TableOfContents';
+import { Content, getHeadings } from '~/documents/profit-sharing.md';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+
+const seo = overrideSeo([], seoTitle('Profit Sharing Program'));
+// Astro gives each heading an id. The table lists the h2 and h3 headings.
+const items = tableOfContentsItems(
+  getHeadings()
+    .filter((heading) => heading.depth >= 2 && heading.depth <= 3)
+    .map((heading) => ({ id: heading.slug, text: heading.text, level: heading.depth })),
+);
 ---
 
-<Layout seo={[]}>
-  <Fragment slot="head">
-    <title>Profit Sharing Program</title>
-  </Fragment>
-
-  <Hero>
-    <Fragment slot="kicker">Our Company</Fragment>
-    <Fragment slot="title">
-      <mark>Profit Sharing Program</mark>
-    </Fragment>
-  </Hero>
-
-  <LegalProse>
-    <Markdown of={rawContent()} />
-  </LegalProse>
+<Layout seo={seo} theme="blue" headerVariant="light" footerTheme="blue">
+  <Hero variant="light" label="Our Company" headline="Profit Sharing Program" />
+  <ArticleBody items={items} tocTitle="In this document">
+    <Content />
+  </ArticleBody>
 </Layout>

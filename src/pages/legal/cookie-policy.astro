@@ -1,19 +1,24 @@
 ---
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Layout } from '~/layouts/LegacyLayout';
-import { LegalProse } from '~/components/legacy/LegalProse';
+// The cookie policy: HTML that iubenda makes (src/documents/cookie-policy.json).
+// The text is not ours to change. It has only 3 h2 headings, thus no table of contents.
+import { ArticleBody } from '~/components/ArticleBody';
+import { Hero } from '~/components/Hero';
+import { tableOfContentsItems } from '~/components/TableOfContents';
 import policy from '~/documents/cookie-policy.json';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { prepareIubendaHtml } from '~/lib/iubenda';
+import styles from './_iubenda.module.css';
+
+const seo = overrideSeo([], seoTitle('Cookie Policy'));
+const { html, items } = prepareIubendaHtml(policy.content);
 ---
 
-<Layout seo={[]}>
-  <Fragment slot="head">
-    <title>Cookie Policy</title>
-  </Fragment>
-  <Hero>
-    <Fragment slot="kicker">Legal</Fragment>
-    <Fragment slot="title"><mark>Cookie Policy</mark></Fragment>
-  </Hero>
-  <LegalProse>
-    <Fragment set:html={policy.content} />
-  </LegalProse>
+<Layout seo={seo} theme="blue" headerVariant="light" footerTheme="blue">
+  <Hero variant="light" label="Legal" headline="Cookie Policy" />
+  <ArticleBody items={tableOfContentsItems(items)} tocTitle="In this policy">
+    <div class={styles.policy}>
+      <Fragment set:html={html} />
+    </div>
+  </ArticleBody>
 </Layout>

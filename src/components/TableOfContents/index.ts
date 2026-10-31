@@ -1,2 +1,6 @@
 export { default as TableOfContents } from './Component.astro';
-export { tableOfContentsHeadings } from './headings';
+export {
+  tableOfContentsHeadings,
+  tableOfContentsItems,
+  type TableOfContentsItem,
+} from './headings';

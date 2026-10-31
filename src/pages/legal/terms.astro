@@ -1,20 +1,24 @@
 ---
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Layout } from '~/layouts/LegacyLayout';
-import { LegalProse } from '~/components/legacy/LegalProse';
-import { Content } from '~/documents/terms.md';
+// The terms of service: Markdown (src/documents/terms.md).
+import { ArticleBody } from '~/components/ArticleBody';
+import { Hero } from '~/components/Hero';
+import { tableOfContentsItems } from '~/components/TableOfContents';
+import { Content, getHeadings } from '~/documents/terms.md';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+
+const seo = overrideSeo([], seoTitle('Terms of Service'));
+// Astro gives each heading an id. The table lists the h2 and h3 headings.
+const items = tableOfContentsItems(
+  getHeadings()
+    .filter((heading) => heading.depth <= 3)
+    .map((heading) => ({ id: heading.slug, text: heading.text, level: heading.depth })),
+);
 ---
 
-<Layout seo={[]}>
-  <Fragment slot="head">
-    <title>Terms of Service</title>
-  </Fragment>
-  <Hero>
-    <Fragment slot="kicker">Legal</Fragment>
-    <Fragment slot="title"><mark>Terms of Service</mark></Fragment>
-  </Hero>
-
-  <LegalProse>
+<Layout seo={seo} theme="blue" headerVariant="light" footerTheme="blue">
+  <Hero variant="light" label="Legal" headline="Terms of Service" />
+  <ArticleBody items={items} tocTitle="In these terms">
     <Content />
-  </LegalProse>
+  </ArticleBody>
 </Layout>

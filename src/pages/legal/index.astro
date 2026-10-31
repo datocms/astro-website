@@ -1,42 +1,43 @@
 ---
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Layout } from '~/layouts/LegacyLayout';
-import { LegalProse } from '~/components/legacy/LegalProse';
+// The index of the legal pages: a list of links.
+import { ArticleBody } from '~/components/ArticleBody';
+import { Hero } from '~/components/Hero';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+
+const seo = overrideSeo([], seoTitle('Policies'));
 ---
 
-<Layout seo={[]}>
-  <Fragment slot="head">
-    <title>Policies</title>
-  </Fragment>
-  <Hero>
-    <Fragment slot="kicker">Legal</Fragment>
-    <Fragment slot="title"><mark>Policies</mark></Fragment>
-  </Hero>
-  <LegalProse>
-    <h3>The following pages cover our security and policies:</h3>
+<Layout seo={seo} theme="blue" headerVariant="light" footerTheme="blue">
+  <Hero variant="light" label="Legal" headline="Policies" />
+  <ArticleBody tocTitle="On this page">
+    <p class="lead">The following pages cover our security and policies:</p>
     <ul>
       <li>
-        <strong><a href="/legal/cookie-policy" rel="noopener noreferrer"> Cookie Policy</a></strong
-        >:
-        <span>Understand our use of cookies and tracking.</span>
+        <strong><a href="/legal/cookie-policy">Cookie Policy</a></strong>{': '}<span
+          >Understand our use of cookies and tracking.</span
+        >
       </li>
       <li>
-        <strong><a href="/legal/gdpr" rel="noopener noreferrer"> GDPR Compliance</a></strong>:
-        <span>Information on how we handle personally identifiable data.</span>
+        <strong><a href="/legal/gdpr">GDPR Compliance</a></strong>{': '}<span
+          >Information on how we handle personally identifiable data.</span
+        >
       </li>
       <li>
-        <strong><a href="/legal/privacy-policy" rel="noopener noreferrer">Privacy Policy</a></strong
-        >:
-        <span>How we collect and process your data.</span>
+        <strong><a href="/legal/privacy-policy">Privacy Policy</a></strong>{': '}<span
+          >How we collect and process your data.</span
+        >
       </li>
       <li>
-        <strong><a href="/security" rel="noopener noreferrer"> Security</a></strong>:
-        <span>Our internal security policies.</span>
+        <strong><a href="/security">Security</a></strong>{': '}<span
+          >Our internal security policies.</span
+        >
       </li>
       <li>
-        <strong><a href="/legal/terms" rel="noopener noreferrer"> Terms of Service</a></strong>:
-        <span>The terms and conditions for using DatoCMS.</span>
+        <strong><a href="/legal/terms">Terms of Service</a></strong>{': '}<span
+          >The terms and conditions for using DatoCMS.</span
+        >
       </li>
     </ul>
-  </LegalProse>
+  </ArticleBody>
 </Layout>

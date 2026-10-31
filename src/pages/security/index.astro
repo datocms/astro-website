@@ -1,20 +1,24 @@
 ---
-import { Markdown } from '~/components/legacy/Markdown';
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Layout } from '~/layouts/LegacyLayout';
-import { LegalProse } from '~/components/legacy/LegalProse';
-import { rawContent } from '~/documents/security.md';
+// The security page: Markdown (src/documents/security.md).
+import { ArticleBody } from '~/components/ArticleBody';
+import { Hero } from '~/components/Hero';
+import { tableOfContentsItems } from '~/components/TableOfContents';
+import { Content, getHeadings } from '~/documents/security.md';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+
+const seo = overrideSeo([], seoTitle('DatoCMS Security'));
+// Astro gives each heading an id. The table lists the h2 and h3 headings.
+const items = tableOfContentsItems(
+  getHeadings()
+    .filter((heading) => heading.depth <= 3)
+    .map((heading) => ({ id: heading.slug, text: heading.text, level: heading.depth })),
+);
 ---
 
-<Layout seo={[]}>
-  <Fragment slot="head">
-    <title>DatoCMS Security</title>
-  </Fragment>
-  <Hero>
-    <Fragment slot="kicker">Legal</Fragment>
-    <Fragment slot="title"><mark>DatoCMS Security</mark></Fragment>
-  </Hero>
-  <LegalProse>
-    <Markdown of={rawContent()} />
-  </LegalProse>
+<Layout seo={seo} theme="blue" headerVariant="light" footerTheme="blue">
+  <Hero variant="light" label="Legal" headline="DatoCMS Security" />
+  <ArticleBody items={items} tocTitle="In this document">
+    <Content />
+  </ArticleBody>
 </Layout>

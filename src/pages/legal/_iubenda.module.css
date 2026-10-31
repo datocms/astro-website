@@ -1,0 +1,93 @@
+/* stylelint-disable selector-class-pattern -- the :global() classes are the names that iubenda gives. */
+/*
+ * The policies of iubenda (privacy and cookie policy) are HTML with its own
+ * classes. The HTML has many wrapper elements, thus the Prose rules for the
+ * space between blocks do not reach the text. This file gives the space, and
+ * styles the boxes (<details>) of the services.
+ */
+.policy {
+  /* Wrappers: the box of the policy and its columns have no look of their own. */
+  :global(.iub_content),
+  :global(.one_line_col),
+  :global(.iub_header),
+  :global(.iub_footer),
+  :global(.details_body),
+  :global(.wrap) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* The space between blocks. The :where() keeps the specificity low: the heading rule below wins. */
+  :global(
+    :where(p, ul, ol, hr, details, div, h2, h3, h4)
+      + :where(p, ul, ol, hr, details, div, h2, h3, h4)
+  ) {
+    margin-top: var(--space-lg);
+  }
+
+  :global(:is(h2, h3, h4) + *) {
+    margin-top: var(--space-md);
+  }
+
+  /* iubenda separates blocks with a line break after a paragraph. The space above replaces it. */
+  :global(:is(div, li, details) > br) {
+    display: none;
+  }
+
+  /* The policy is long and has many levels: its headings are one step smaller than in Prose. */
+  :global(h2) {
+    font-size: var(--type-h2);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  :global(h3) {
+    font-size: var(--type-subtitle);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  :global(h4) {
+    font-weight: 500;
+  }
+
+  :global(.for_boxes) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding-left: 0;
+    list-style: none;
+  }
+
+  :global(.for_boxes > li + li) {
+    margin-top: 0;
+  }
+
+  /* A service: a box that opens and closes. */
+  :global(details) {
+    padding: var(--space-sm) var(--space-md);
+    background: var(--surface-accent-faint);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+  }
+
+  :global(summary) {
+    cursor: pointer;
+  }
+
+  /* The title of a service is a heading in the summary. It must not look like a section title. */
+  :global(summary h3) {
+    display: inline;
+    padding-top: 0;
+    margin: 0;
+    font-size: var(--type-body);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  :global(.details_body) {
+    margin-top: var(--space-md);
+  }
+}

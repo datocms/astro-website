@@ -2,24 +2,29 @@
 import type { Heading } from 'datocms-structured-text-utils';
 import { PlainText } from '~/components/StructuredText';
 import { headingId } from '~/components/StructuredText/headingId';
+import type { TableOfContentsItem } from './headings';
 import styles from './style.module.css';
 
 interface Props {
   /** For example "In this article". */
   title: string;
-  /** The headings of the content, from tableOfContentsHeadings(). */
-  headings: Heading[];
+  /** The headings of a Structured Text field, from tableOfContentsHeadings(). */
+  headings?: Heading[];
+  /** The links for a Markdown or HTML document, from tableOfContentsItems(). Use this or `headings`. */
+  items?: TableOfContentsItem[];
   class?: string;
 }
 
-const { title, headings, class: className } = Astro.props;
+const { title, headings = [], items = [], class: className } = Astro.props;
 const topLevel = Math.min(...headings.map((heading) => heading.level));
+const topItemLevel = Math.min(...items.map((item) => item.level));
 ---
 
 {
   /*
-  The links to the headings of an article. The ids come from headingId(),
-  as in HeadingNode. A heading below the top level is indented.
+  The links to the headings of an article. The ids of a Structured Text
+  field come from headingId(), as in HeadingNode. The ids of a document
+  come from the document. A heading below the top level is indented.
   The search index and the Markdown version of the page skip this list.
 */
 }
@@ -38,6 +43,15 @@ const topLevel = Math.min(...headings.map((heading) => heading.level));
             <PlainText
               data={{ value: { schema: 'dast', document: { type: 'root', children: [heading] } } }}
             />
+          </a>
+        </li>
+      ))
+    }
+    {
+      items.map((item) => (
+        <li class={item.level > topItemLevel ? styles.nested : undefined}>
+          <a class:list={[styles.link, 'body']} href={`#${item.id}`}>
+            {item.text}
           </a>
         </li>
       ))

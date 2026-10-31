@@ -1,20 +1,24 @@
 ---
-import { Markdown } from '~/components/legacy/Markdown';
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Layout } from '~/layouts/LegacyLayout';
-import { LegalProse } from '~/components/legacy/LegalProse';
-import { rawContent } from '~/documents/gdpr.md';
+// GDPR compliance: Markdown (src/documents/gdpr.md).
+import { ArticleBody } from '~/components/ArticleBody';
+import { Hero } from '~/components/Hero';
+import { tableOfContentsItems } from '~/components/TableOfContents';
+import { Content, getHeadings } from '~/documents/gdpr.md';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+
+const seo = overrideSeo([], seoTitle('GDPR Compliance'));
+// Astro gives each heading an id. The table lists the h2 and h3 headings.
+const items = tableOfContentsItems(
+  getHeadings()
+    .filter((heading) => heading.depth <= 3)
+    .map((heading) => ({ id: heading.slug, text: heading.text, level: heading.depth })),
+);
 ---
 
-<Layout seo={[]}>
-  <Fragment slot="head">
-    <title>GDPR Compliance</title>
-  </Fragment>
-  <Hero>
-    <Fragment slot="kicker">Legal</Fragment>
-    <Fragment slot="title"><mark>GDPR Compliance</mark></Fragment>
-  </Hero>
-  <LegalProse>
-    <Markdown of={rawContent()} />
-  </LegalProse>
+<Layout seo={seo} theme="blue" headerVariant="light" footerTheme="blue">
+  <Hero variant="light" label="Legal" headline="GDPR Compliance" />
+  <ArticleBody items={items} tocTitle="In this document">
+    <Content />
+  </ArticleBody>
 </Layout>

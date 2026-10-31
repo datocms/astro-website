@@ -1,18 +1,25 @@
 ---
 import { Prose } from '~/components/Prose';
 import { Section } from '~/components/Section';
-import { TableOfContents, tableOfContentsHeadings } from '~/components/TableOfContents';
+import {
+  TableOfContents,
+  tableOfContentsHeadings,
+  type TableOfContentsItem,
+} from '~/components/TableOfContents';
 import styles from './style.module.css';
 
 interface Props {
   /** The Structured Text field in the slot. The table of contents reads its headings. */
-  content: { value: unknown };
+  content?: { value: unknown };
+  /** For a Markdown or HTML document: the links of the table of contents, from tableOfContentsItems(). */
+  items?: TableOfContentsItem[];
   /** The title of the table of contents, for example "In this article". */
   tocTitle: string;
 }
 
-const { content, tocTitle } = Astro.props;
+const { content, items = [], tocTitle } = Astro.props;
 const headings = tableOfContentsHeadings(content);
+const hasToc = headings.length > 0 || items.length > 0;
 ---
 
 {
@@ -25,8 +32,8 @@ const headings = tableOfContentsHeadings(content);
 }
 <Section as="article" contentClass={styles.content}>
   {
-    headings.length > 0 && (
-      <TableOfContents title={tocTitle} headings={headings} class={styles.toc} />
+    hasToc && (
+      <TableOfContents title={tocTitle} headings={headings} items={items} class={styles.toc} />
     )
   }
   <Prose class={styles.text}>

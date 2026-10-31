@@ -1,29 +1,36 @@
 ---
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Layout } from '~/layouts/LegacyLayout';
-import { LegalProse } from '~/components/legacy/LegalProse';
+// The privacy policy: HTML that iubenda makes (src/documents/privacy.json).
+// The text is not ours to change. The table of contents lists the h2 headings.
+import { ArticleBody } from '~/components/ArticleBody';
+import { Hero } from '~/components/Hero';
+import { tableOfContentsItems } from '~/components/TableOfContents';
 import privacy from '~/documents/privacy.json';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { prepareIubendaHtml } from '~/lib/iubenda';
+import styles from './_iubenda.module.css';
+
+const seo = overrideSeo([], seoTitle('Privacy Policy'));
+const { html, items } = prepareIubendaHtml(privacy.content);
 ---
 
-<Layout seo={[]}>
-  <Fragment slot="head">
-    <title>Privacy Policy</title>
-  </Fragment>
-  <Hero>
-    <Fragment slot="kicker">Legal</Fragment>
-    <Fragment slot="title"><mark>Privacy Policy</mark></Fragment>
-  </Hero>
-  <LegalProse>
-    <Fragment set:html={privacy.content} />
-  </LegalProse>
+<Layout seo={seo} theme="blue" headerVariant="light" footerTheme="blue">
+  <Hero variant="light" label="Legal" headline="Privacy Policy" />
+  <ArticleBody items={tableOfContentsItems(items)} tocTitle="In this policy">
+    <div class={styles.policy}>
+      <Fragment set:html={html} />
+    </div>
+  </ArticleBody>
 </Layout>
 
 <script>
-  document.querySelectorAll('details').forEach((el) => {
-    el.addEventListener('click', (e) => {
-      if ((e.target as Element).closest('summary, a, button, input, select, textarea')) return;
-      e.preventDefault();
-      el.open = !el.open;
+  // A click on the text of a service opens or closes its box. A click on
+  // the summary or on a control keeps its normal action.
+  for (const details of document.querySelectorAll('details')) {
+    details.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('summary, a, button, input, select, textarea')) return;
+      event.preventDefault();
+      details.open = !details.open;
     });
-  });
+  }
 </script>
