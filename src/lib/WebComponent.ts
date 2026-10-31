@@ -1,7 +1,24 @@
-import HTMLParsedElement from 'html-parsed-element';
-
-export class WebComponent extends HTMLParsedElement {
+/**
+ * The base class of the client custom elements. The site loads each
+ * client script as a module, and a module runs after the parser has
+ * built the page. Thus the children are parsed when the element connects.
+ */
+export class WebComponent extends HTMLElement {
   eventListenerRemovers: Array<() => void> = [];
+  #ready = false;
+
+  /** Subclasses put their setup here. The children are parsed when it runs. */
+  parsedCallback(): void {}
+
+  /**
+   * Run the setup one time, when the element connects for the first time.
+   * If the element moves to a different parent, the setup does not run again.
+   */
+  connectedCallback() {
+    if (this.#ready) return;
+    this.#ready = true;
+    this.parsedCallback();
+  }
 
   /** The elements in this element that match `selector`. `T` can be an SVG element. */
   $$<T extends Element = HTMLElement>(selector: string): T[] {

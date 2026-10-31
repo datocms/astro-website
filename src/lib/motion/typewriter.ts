@@ -1,4 +1,4 @@
-import { onEnterViewport, prefersReducedMotion } from './inView';
+import { prefersReducedMotion } from './inView';
 
 /**
  * Typewriter animation.
@@ -390,31 +390,3 @@ export function typewrite(
 }
 
 export type TypewriterStart = 'load' | 'view' | 'manual';
-
-/**
- * Connects every `[data-typewriter]` element in the page that is not
- * connected yet. The `Typewriter` component calls it.
- * A `manual` element starts on the `typewriter:start` event.
- */
-export function initTypewriters(root: ParentNode = document) {
-  for (const el of root.querySelectorAll<HTMLElement>('[data-typewriter]:not([data-tw-armed])')) {
-    el.dataset.twArmed = '';
-    const steps = JSON.parse(el.dataset.typewriter || '[]') as Step[];
-    const start = (el.dataset.twStart || 'view') as TypewriterStart;
-    const delay = Number(el.dataset.twDelay || 0);
-    let started = false;
-    const play = () => {
-      if (started) return;
-      started = true;
-      setTimeout(() => typewrite(el, steps), delay);
-    };
-    if (start === 'load') play();
-    else if (start === 'view') {
-      onEnterViewport(el, play, {
-        threshold: Number(el.dataset.twThreshold || 0),
-        rootMargin: el.dataset.twRootMargin || '0px',
-      });
-    }
-    el.addEventListener('typewriter:start', play);
-  }
-}

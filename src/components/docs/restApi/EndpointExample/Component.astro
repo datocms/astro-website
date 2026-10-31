@@ -86,11 +86,15 @@ const { id, title, description, tabs, startVisible } = Astro.props;
       }
 
       disconnectedCallback(): void {
+        super.disconnectedCallback();
         window.removeEventListener('hashchange', this.handleHashChange);
         window.removeEventListener('popstate', this.handleHashChange);
       }
 
       handleHashChange = (): void => {
+        // The child target-toggler must have its setup before this call.
+        // The TargetToggler script comes before this script on the page,
+        // thus the child element is defined and ready.
         this.toggler = this.$('target-toggler');
 
         const currentHash = window.location.hash.slice(1);
