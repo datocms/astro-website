@@ -1,17 +1,11 @@
 # The site: rules for the code
 
-The new datocms.com comes from the prototype (repository `datocms/website-prototype`, `../../prototype` next to this repository). The port follows `PLAN.md`. This file holds the rules of the prototype `AGENTS.md` that apply to the new code here, adapted to this stack. Two more files hold rules for their directory, copied from the prototype:
+Two more files hold rules for their directory:
 
 - `src/data/AGENTS.md`: the copy, the pages, the pillars and the chapters.
 - `src/scenes/AGENTS.md`: the pictures of the product (scenes, frames, fragments, diagrams, photos).
 
 Read `TONE_OF_VOICE.md` (repository root) before you write or change any text that a visitor sees.
-
-## Code from the prototype
-
-The port from the prototype stopped at a commit of the prototype (`PLAN.md`, principle 1). The paths of the prototype do not need to stay the same: move, rename or change a component when it helps. To port a later change of the prototype, diff from that commit and adapt the change to the code here.
-
-When you copy code from the prototype, clean its comments. Remove the comments that reference Figma (frame names, node IDs, variant names). Remove the comments that say only what the code says. Keep the comments that explain something that the code does not make clear: a reason, a constraint, a workaround, or a link to another file.
 
 ## Directories
 
@@ -30,16 +24,14 @@ public/videos/              the .pxv files
 css-scope.mjs               which CSS gets a cascade layer, and which CSS lint:css reads
 ```
 
-Not ported: the Cloudflare adapter, `src/pages/dev/` (the dev pages, with the pixel encoder), the scripts of the prototype (`scripts/`: pixel videos, scene shots, Unsplash photos, vendor-scenes) and `public/images/`. A page port copies the static images that it needs. When the CMS already has the data (team, case studies, reviews, logos), the page reads the CMS and does not copy the images.
-
 ## The layout
 
-`src/layouts/Layout.astro` is the prototype layout on top of `BaseLayout` (the head of the site: SEO, favicon, canonical URL, RSS links, cookie consent, analytics, draft-mode content link).
+`src/layouts/Layout.astro` is on top of `BaseLayout` (the head of the site: SEO, favicon, canonical URL, RSS links, cookie consent, analytics, draft-mode content link).
 
-- The prop `seo` is required. Use the `seo` / `_seoMetaTags` of the CMS record of the page when it exists. Else build the tags: `overrideSeo([], seoTitle(title), seoDescription(text))` from `~/lib/datocms/seo`. The prototype prop `title` does not exist here.
-- The other props are the prototype ones: `theme`, `headerVariant`, `headerTheme`, `headerCta`, `footer`, `footerTheme`.
+- The prop `seo` is required. Use the `seo` / `_seoMetaTags` of the CMS record of the page when it exists. Else build the tags: `overrideSeo([], seoTitle(title), seoDescription(text))` from `~/lib/datocms/seo`.
+- The other props: `theme`, `headerVariant`, `headerTheme`, `headerCta`, `footer`, `footerTheme`.
 - A page does a full load: no `ClientRouter`, no progress bar. Only the docs layout turns the router on.
-- The optional prop `seoAnalysis` takes the `yoastAnalysis` field (the SEO/Readability plugin) of the CMS record. In draft mode, the layout then shows `SeoAnalysisPanel` at the bottom right: the keywords of the record, and where the page uses them (title, meta description, h1, h2, first paragraph). Not in the prototype.
+- The optional prop `seoAnalysis` takes the `yoastAnalysis` field (the SEO/Readability plugin) of the CMS record. In draft mode, the layout then shows `SeoAnalysisPanel` at the bottom right: the keywords of the record, and where the page uses them (title, meta description, h1, h2, first paragraph).
 - `<main>` has `id="layout-content"`: the endpoint `/api/seo-analysis` reads the content of the page from this element. Do not remove it.
 - `PageNav` (the menu at the bottom left) shows only when `DEPLOYMENT_DESTINATION` is not `production`. It is for reviewers, not part of the design.
 
@@ -84,7 +76,7 @@ src/components/MyComponent/
 
 ### Design source
 
-Figma file `WnWBSVVcroe5s4tXQGnhSA` (overnice's original), page **Components** (`455:11066`). For the Figma MCP, use overnice's shared copy `2nEQ2LGxRaWjxWzjuVoXBV` (same node IDs). The pages at every breakpoint are on **Designed Pages Responsive** (`699:21450`). The prototype is the reference for a port: compare the new page with the prototype page at 1320 px and 393 px, in light and dark.
+Figma file `WnWBSVVcroe5s4tXQGnhSA` (overnice's original), page **Components** (`455:11066`). For the Figma MCP, use overnice's shared copy `2nEQ2LGxRaWjxWzjuVoXBV` (same node IDs). The pages at every breakpoint are on **Designed Pages Responsive** (`699:21450`).
 
 ### Fonts
 
@@ -97,16 +89,16 @@ Figma file `WnWBSVVcroe5s4tXQGnhSA` (overnice's original), page **Components** (
 
 - Use the shared helpers in `src/lib/motion/`. CSS before JS.
 - `prefers-reduced-motion` shows the final state; animations play in view only and pause off-screen; no layout shift; the final state is in the DOM without JS.
-- No Lottie; no video for anything that CSS can do. The pixel videos are `.pxv` files played by `src/lib/pixel-video/`. The encoder (`/dev/pixel-encoder`) stays in the prototype: make a new `.pxv` there and copy it to `public/videos/`.
+- No Lottie; no video for anything that CSS can do. The pixel videos are `.pxv` files played by `src/lib/pixel-video/`. The encoder (`/dev/pixel-encoder`) is in the prototype repository (`datocms/website-prototype`): make a new `.pxv` there and copy it to `public/videos/`.
 
 ## CMS
 
-- The queries use the query runner of this site: `executeQuery(Astro, query, options?)` from `~/lib/datocms/executeQuery` (draft mode, surrogate keys, content link). A prototype page calls `executeQuery(query)`: add `Astro`.
+- The queries use the query runner of this site: `executeQuery(Astro, query, options?)` from `~/lib/datocms/executeQuery` (draft mode, surrogate keys, content link).
 - A component that shows CMS data gets its data from a fragment. It declares the fragment in `graphql.ts` (`MyComponentFragment`, fields only), and the barrel exports both. Its props are the fragment types (`FragmentOf<typeof MyComponentFragment>`), and it reads them with `readFragment` (both from `~/lib/datocms/graphql`). The page query spreads the fragment, and the page passes the result to the component directly. Do not convert a CMS result into the types of `src/data/` in the page.
 - A prop that takes records of two types: the query selects `__typename` next to the fragment of each type, and the component reads the fragment of that type (see `Testimonials`). Do not use a fragment on `RecordInterface` with `... on XRecord`: the CDA refuses it when no other field of the query returns `XRecord`.
 - A Structured Text field renders with `~/components/StructuredText`: `StructuredText` (the full rendering), `InlineParagraphs` (in a `<p>` or a `<span>`: no `<p>`, two line breaks between the paragraphs) or `PlainText` (only the text, for a quote or a title). In draft mode these keep the stega of Content Link, thus Content Link works. Make a string from a field only when the target needs a string (JSON-LD, a search attribute), and write the reason in a comment. Remove the stega with `stripStega` when the string is not visible text. When you trim visible text, keep the stega at the end.
 - Queries go in `_graphql.ts` files at the page level. A route with parameters must have one (the `routes` integration in `astro.config.ts` expects it).
-- A CMS logo (a black SVG) goes in a `LogoItem` with `mask` (the URL) instead of `src`: `Logo` shows it as a CSS mask in the colour of the text, thus it is correct on each theme. Not in the prototype.
+- A CMS logo (a black SVG) goes in a `LogoItem` with `mask` (the URL) instead of `src`: `Logo` shows it as a CSS mask in the colour of the text, thus it is correct on each theme.
 - Fragments on `ResponsiveImage` do not specify `imgixParams`: callers pass them at query time. Omit `auto: format` (the default of the project).
 - The types of the data files (`HeroData`, `FeaturesData`…) are the first draft of the future modular-content models. Structured content (navigation, changelog, case studies, reviews, customers, partners) comes from the existing models of the project.
 
