@@ -54,15 +54,15 @@
 .kicker {
   font-family: var(--font-mono);
   font-size: 13px;
-  font-weight: 700;
-  color: var(--accent-color);
+  font-weight: var(--weight-bold);
+  color: var(--accent-text-color);
   text-transform: uppercase;
   margin: 0 0 8px;
 }
 
 .heroTitle {
   font-family: var(--font-headline);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   font-size: rfs(58px);
   line-height: 1.04;
   letter-spacing: -0.02em;
@@ -87,7 +87,7 @@
   align-self: end;
   border-radius: 13px;
   padding: 5px;
-  background: rgba(255, 255, 255, 0.8);
+  background: color-mix(in srgb, var(--base-bg-color) 80%, transparent);
   font-size: 21px;
   letter-spacing: -0.02em;
   box-shadow:
@@ -104,6 +104,22 @@
   }
 }
 
+/* The hero has one shader for each colour scheme. */
+.shaderLight,
+.shaderDark {
+  position: absolute;
+  inset: 0;
+}
+
+.shaderDark,
+:global(:root[data-scheme='dark']) .shaderLight {
+  display: none;
+}
+
+:global(:root[data-scheme='dark']) .shaderDark {
+  display: block;
+}
+
 /* ── Quickstart strip ─────────────────────────────────────────────────────── */
 
 .quickstart {
@@ -112,7 +128,7 @@
   display: grid;
   grid-template-columns: auto repeat(4, 1fr) auto;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.8);
+  background: color-mix(in srgb, var(--base-bg-color) 80%, transparent);
   border-radius: 10px;
   padding: 15px;
   align-items: stretch;
@@ -154,8 +170,8 @@
   p:nth-child(1) {
     font-family: var(--font-mono);
     font-size: 12px;
-    font-weight: 700;
-    color: var(--accent-color);
+    font-weight: var(--weight-bold);
+    color: var(--accent-text-color);
     letter-spacing: 0.08em;
     text-transform: uppercase;
     margin-bottom: 4px;
@@ -163,7 +179,7 @@
 
   p:nth-child(2) {
     font-size: 16px;
-    font-weight: 700;
+    font-weight: var(--weight-bold);
     color: var(--base-body-color);
     line-height: 1.2;
   }
@@ -178,7 +194,7 @@
 
 .quickstartTile {
   align-items: center;
-  background-color: #fff;
+  background-color: var(--base-bg-color);
   border-radius: 4px;
   display: flex;
   border: 1px solid var(--border-color);
@@ -198,6 +214,11 @@
     transition: fill 0.1s ease-in-out;
   }
 
+  /* The logos have a square backdrop of their own. It takes the colour of the tile. */
+  svg > rect:first-child {
+    fill: var(--base-bg-color);
+  }
+
   &:hover {
     border-color: var(--extra-light-body-color);
 
@@ -209,7 +230,7 @@
   span {
     color: var(--base-body-color);
     font-size: 14px;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
 
     @media screen and (min-width: 640px) {
       font-size: 17px;
@@ -235,7 +256,7 @@
 
 .sectionTitle {
   font-family: var(--font-sans);
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   font-size: 20px;
   line-height: 1.2;
   letter-spacing: -0.015em;
@@ -284,7 +305,7 @@
 }
 
 .card {
-  background: white;
+  background: var(--base-bg-color);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 14px 16px;
@@ -302,7 +323,7 @@
 
 .cardTitle {
   font-family: var(--font-sans);
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   font-size: 16px;
   line-height: 1.2;
   margin: 0;
@@ -324,7 +345,7 @@
 .pill {
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   letter-spacing: 0.06em;
   padding: 1.5px 5px;
   border-radius: 2px;
@@ -332,18 +353,18 @@
 }
 
 .pillNew {
-  background: #c6ffc2;
-  color: #1b6a30;
+  background: var(--pill-new-bg-color);
+  color: var(--pill-new-fg-color);
 }
 
 .pillSoon {
-  background: #fdf4c2;
-  color: #7a5f00;
+  background: var(--pill-soon-bg-color);
+  color: var(--pill-soon-fg-color);
 }
 
 .pillMoved {
-  background: #fdf4c2;
-  color: #7a5f00;
+  background: var(--pill-soon-bg-color);
+  color: var(--pill-soon-fg-color);
 }
 
 /* ── Two-up Build / Operate ───────────────────────────────────────────────── */
@@ -382,7 +403,7 @@
   justify-content: space-between;
   gap: 28px;
   min-height: 180px;
-  background: white;
+  background: var(--base-bg-color);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 24px 28px;
@@ -411,8 +432,8 @@
   gap: 6px;
   font-family: var(--font-mono);
   font-size: 13px;
-  font-weight: 700;
-  color: var(--accent-color);
+  font-weight: var(--weight-bold);
+  color: var(--accent-text-color);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   transition: gap 120ms ease-out;

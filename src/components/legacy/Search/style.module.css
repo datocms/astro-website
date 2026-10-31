@@ -13,10 +13,10 @@
     0 0 0 1px rgba(0, 0, 0, 0.06), 0 8px 24px -8px rgba(0, 0, 0, 0.15),
     0 24px 56px -12px rgba(0, 0, 0, 0.18);
   --search-scrim: rgba(28, 28, 32, 0.45);
-  --search-warning-bg: #fff8f0;
-  --search-warning-border: #f4dfc4;
-  --search-warning-fg: #8a5a1e;
-  --search-error-fg: #c0392b;
+  --search-warning-bg: var(--search-warning-bg-color);
+  --search-warning-border: var(--search-warning-border-color);
+  --search-warning-fg: var(--search-warning-fg-color);
+  --search-error-fg: var(--search-error-fg-color);
   --search-r-xs: 3px;
   --search-r-sm: 4px;
   --search-r-md: 8px;
@@ -327,7 +327,7 @@
 .cardHeaderTitle {
   font-size: 16px;
   color: var(--body-color);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   text-box: cap alphabetic;
 }
 
@@ -431,7 +431,7 @@
 .sectionLabel {
   padding: 12px 4px 6px;
   font-size: 13px;
-  font-weight: 700;
+  font-weight: var(--weight-bold);
   color: var(--light-body-color);
   text-transform: uppercase;
 }
@@ -474,7 +474,7 @@
   outline: none;
 
   .rowIcon svg {
-    color: var(--accent-color);
+    color: var(--accent-text-color);
   }
 }
 
@@ -588,7 +588,7 @@
   @media (hover: hover) and (pointer: fine) {
     &:hover {
       opacity: 1;
-      background: rgba(138, 90, 30, 0.1);
+      background: color-mix(in srgb, var(--search-warning-fg) 10%, transparent);
     }
   }
 
@@ -653,7 +653,7 @@
 .filterChipActive,
 .filterChipActive:hover {
   background: var(--base-body-color);
-  color: #fff;
+  color: var(--base-bg-color);
 }
 
 .filterChipIcon {
@@ -708,7 +708,7 @@
       border-color: var(--accent-color);
 
       svg {
-        color: var(--accent-color);
+        color: var(--accent-text-color);
       }
     }
   }
@@ -718,7 +718,7 @@
     border-color: var(--accent-color);
 
     svg {
-      color: var(--accent-color);
+      color: var(--accent-text-color);
     }
   }
 
@@ -736,7 +736,7 @@
 
 .resultTitle {
   font-size: 15px;
-  font-weight: bold;
+  font-weight: var(--weight-bold);
   margin-top: 4px;
   margin-right: 8px;
   white-space: nowrap;
@@ -770,19 +770,19 @@
   mark {
     background: transparent;
     color: var(--body-color);
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
   }
 }
 
 .resultArea {
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   color: var(--light-body-color);
   text-transform: uppercase;
   font-size: 12px;
 }
 
 .resultDate {
-  font-weight: 400;
+  font-weight: var(--weight-regular);
   opacity: 0.75;
 }
 
@@ -792,7 +792,7 @@
 
 .areaTitle {
   padding: 8px 0 8px;
-  font-weight: bold;
+  font-weight: var(--weight-bold);
   font-size: 14px;
   color: var(--light-body-color);
   text-transform: uppercase;
@@ -819,7 +819,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 0%, hsla(0, 0%, 0%, 0.04) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--shimmer-color) 50%, transparent 100%);
   transform: translateX(-100%);
   animation: skeletonShimmer 1.4s linear infinite;
   animation-delay: calc(var(--i, 0) * 80ms);
@@ -900,7 +900,7 @@
   padding: 8px 14px;
   border-radius: var(--search-r-lg) var(--search-r-lg) var(--search-r-sm) var(--search-r-lg);
   background: var(--accent-color);
-  color: var(--base-bg-color);
+  color: var(--accent-contrast-color);
   word-break: break-word;
   transform-origin: bottom right;
   animation: questionBubbleIn 220ms var(--ease-out) both;
@@ -943,7 +943,7 @@
 
     /* Apply shiki colors via the inline custom property streamdown sets */
     code span {
-      color: var(--sdm-c, inherit);
+      color: var(--answer-token-color, var(--sdm-c, inherit));
       background: var(--sdm-tbg, transparent);
     }
   }
@@ -968,7 +968,7 @@
 
   strong,
   [data-streamdown='strong'] {
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     color: var(--body-color);
   }
 
@@ -1014,7 +1014,7 @@
 
   th {
     background: var(--light-bg-color);
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
   }
 
   pre {
@@ -1035,7 +1035,7 @@
     text-decoration: underline;
 
     &:hover {
-      color: var(--accent-color);
+      color: var(--accent-text-color);
     }
   }
 
@@ -1044,7 +1044,7 @@
   h3,
   h4 {
     margin: 0.8em 0 0.4em;
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
   }
 
   h1 {
@@ -1127,7 +1127,7 @@ a.linkPill {
 
   strong,
   [data-streamdown='strong'] {
-    font-weight: 600;
+    font-weight: var(--weight-semibold);
     color: var(--body-color);
   }
 

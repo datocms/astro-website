@@ -2,12 +2,17 @@
 import type { TitleMetaLinkTag } from '@datocms/astro';
 // The stylesheet of the old pages. It must not load on a page of the redesign.
 import '~/layouts/BaseLayout/global.css';
+// The fonts, the tokens and the colour scheme of the docs.
+import '../theme.css';
+import { DatoLogo } from '~/components/DatoLogo';
+import symbol from '~/assets/logo/dato-symbol.svg?raw';
 import { BaseLayout } from '~/layouts/BaseLayout';
 import s from './style.module.css';
 import { Svg } from '~/components/legacy/Svg';
 import { Search } from '~/components/legacy/Search';
 import { Feedback } from './Feedback';
 import { OtherResources } from './OtherResources';
+import { SchemeToggle } from './SchemeToggle';
 import { TargetToggler } from '~/components/legacy/TargetToggler';
 import LLMDate from '~/components/legacy/LLMDate/Component.astro';
 
@@ -19,35 +24,76 @@ type Props = {
 
 const { seo, contentWrapperComponent, lastUpdatedAt } = Astro.props;
 const ContentWrapper = contentWrapperComponent || 'div';
+
+// The order of the cascade layers. The tokens come first: they only define
+// custom properties.
+const cssLayers = ['tokens', 'reset', 'prose'];
 ---
 
-<BaseLayout seo={seo}>
-  <slot name="head" slot="head" />
+<BaseLayout
+  seo={seo}
+  cssLayers={cssLayers}
+  bodyAttributes={{ 'data-docs': '', 'data-theme': 'default' }}
+>
+  <Fragment slot="head">
+    <slot name="head" />
+    <link
+      rel="preload"
+      href="/fonts/ABCOracleVariable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+
+        // Colour scheme (src/lib/colorScheme.ts): the choice of the visitor,
+        // else the scheme of the system. Set it before the first paint.
+        var scheme = null;
+        try {
+          scheme = localStorage.getItem('color-scheme');
+        } catch (e) {}
+        if (scheme !== 'light' && scheme !== 'dark')
+          scheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        root.dataset.scheme = scheme;
+        root.dataset.productScenesScheme = scheme;
+
+        // The router replaces the attributes of <html> at each visit. Keep the scheme.
+        document.addEventListener('astro:before-swap', function (event) {
+          var next = event.newDocument.documentElement;
+          next.dataset.scheme = root.dataset.scheme;
+          next.dataset.productScenesScheme = root.dataset.scheme;
+        });
+      })();
+    </script>
+  </Fragment>
 
   <docs-sidebar-drawer>
     <div class={s.root} data-drawer-root>
       <div class={s.sidebar}>
         <div class={s.sidebarHeader}>
           <a href="/" class={s.logo}>
-            <Svg name="svg/datocms/icon-text/color/color_full_logo" height={30} />
+            <DatoLogo version="long" height={24} label="DatoCMS" />
           </a>
           <TargetToggler targetId="sidebar">
             <button type="button" class={s.hamburger} aria-label="Toggle navigation menu">
               <span class={s.iconBars}><Svg name="icons/regular/bars" /></span>
               <span class={s.iconTimes}><Svg name="icons/regular/xmark" /></span>
-              <span class={s.hamburgerBadge} aria-hidden="true">
-                <Svg name="svg/datocms/icon/color/color_d_icon" />
-              </span>
+              <span class={s.hamburgerBadge} aria-hidden="true" set:html={symbol} />
             </button>
           </TargetToggler>
           <div class={s.mobileSearch}>
             <Search client:idle variant="docs" />
           </div>
+          <div class={s.mobileScheme}>
+            <SchemeToggle />
+          </div>
         </div>
         <aside class={s.innerSidebar} data-datocms-noindex id="sidebar">
           <div class={s.drawerHeader}>
             <div class={s.drawerBranding}>
-              <Svg name="svg/datocms/icon/color/color_d_icon" height={24} />
+              <span class={s.drawerSymbol} aria-hidden="true" set:html={symbol} />
               <span class={s.drawerTitle}>DatoCMS Docs</span>
             </div>
             <button
@@ -85,6 +131,9 @@ const ContentWrapper = contentWrapperComponent || 'div';
                 <Svg name="icons/regular/gauge-high" />
                 Status page
               </a>
+            </li>
+            <li class={s.desktopScheme}>
+              <SchemeToggle />
             </li>
           </ul>
         </div>
@@ -129,7 +178,10 @@ const ContentWrapper = contentWrapperComponent || 'div';
   </style>
 
   <script>
+    import { followSystemColorScheme } from '~/lib/colorScheme';
     import { WebComponent } from '~/lib/WebComponent';
+
+    followSystemColorScheme();
 
     window.customElements.define(
       'docs-sidebar-drawer',

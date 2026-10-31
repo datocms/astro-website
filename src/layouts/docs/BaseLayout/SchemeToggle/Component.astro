@@ -1,0 +1,35 @@
+---
+import contrast from '~/assets/icons/contrast.svg?raw';
+import s from './style.module.css';
+---
+
+<button
+  type="button"
+  class={s.toggle}
+  aria-label="Dark mode"
+  aria-pressed="false"
+  data-scheme-toggle
+>
+  <span aria-hidden="true" set:html={contrast} />
+</button>
+
+<script>
+  import { chooseColorScheme, currentColorScheme } from '~/lib/colorScheme';
+
+  // The page can hold more than one toggle, and the router replaces them
+  // at each visit. Thus one listener on the document serves all of them.
+  function showScheme() {
+    const pressed = String(currentColorScheme() === 'dark');
+    document
+      .querySelectorAll('[data-scheme-toggle]')
+      .forEach((toggle) => toggle.setAttribute('aria-pressed', pressed));
+  }
+
+  document.addEventListener('click', (event) => {
+    if (!(event.target as Element).closest('[data-scheme-toggle]')) return;
+    chooseColorScheme(currentColorScheme() === 'dark' ? 'light' : 'dark');
+  });
+  document.documentElement.addEventListener('colorschemechange', showScheme);
+  document.addEventListener('astro:page-load', showScheme);
+  showScheme();
+</script>

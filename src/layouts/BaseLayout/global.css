@@ -25,7 +25,7 @@
     font-family: var(--font-sans);
     font-size: rfs(18px);
     text-rendering: optimizeLegibility;
-    background: white;
+    background: var(--base-bg-color);
     overflow-y: auto;
   }
 
@@ -68,29 +68,41 @@
   }
 
   ::-moz-selection {
-    background: #f4cf58;
+    background: var(--mark-bg-color);
   }
   ::selection {
-    background: #f4cf58;
+    background: var(--mark-bg-color);
   }
 
   mark {
-    background: linear-gradient(120deg, #f4cf58 0%, #f4cf58 100%) no-repeat 0 88%/100% 0.4em
-      transparent;
+    background: linear-gradient(120deg, var(--mark-bg-color) 0%, var(--mark-bg-color) 100%)
+      no-repeat 0 88%/100% 0.4em transparent;
     font-weight: inherit;
     color: inherit;
   }
 
   mark.good {
-    background-image: linear-gradient(120deg, #c6ffc2 0%, #c6ffc2 100%);
+    background-image: linear-gradient(
+      120deg,
+      var(--mark-good-bg-color) 0%,
+      var(--mark-good-bg-color) 100%
+    );
   }
 
   mark.bad {
-    background-image: linear-gradient(120deg, #fac2c2 0%, #fac2c2 100%);
+    background-image: linear-gradient(
+      120deg,
+      var(--mark-bad-bg-color) 0%,
+      var(--mark-bad-bg-color) 100%
+    );
   }
 
   mark.warning {
-    background-image: linear-gradient(120deg, #fdf4c2 0%, #fdf4c2 100%);
+    background-image: linear-gradient(
+      120deg,
+      var(--mark-warning-bg-color) 0%,
+      var(--mark-warning-bg-color) 100%
+    );
   }
 
   :has(> [id][data-anchor]):has(> [data-permalink]) {
@@ -118,7 +130,7 @@
       margin-left: 0.3em;
 
       svg {
-        color: var(--accent-color);
+        color: var(--accent-text-color);
       }
 
       &:hover {
@@ -130,7 +142,7 @@
       content: '';
       position: absolute;
       inset: rfs(-30px);
-      box-shadow: 0 0 0 6px rgba(244, 207, 88, 0.8);
+      box-shadow: 0 0 0 6px var(--anchor-ring-color);
       border-radius: 6px;
       animation: highlightElement 2s 0.5s ease-in-out forwards;
       pointer-events: none;
@@ -146,17 +158,17 @@
 @keyframes highlightElement {
   0% {
     box-shadow:
-      0 0 0 6px rgba(244, 207, 88, 0.8),
-      0 0 0 6px rgba(244, 207, 88, 0.3);
+      0 0 0 6px var(--anchor-ring-color),
+      0 0 0 6px var(--anchor-ring-soft-color);
   }
   20% {
     box-shadow:
-      0 0 0 6px rgba(244, 207, 88, 0.8),
+      0 0 0 6px var(--anchor-ring-color),
       0 0 0 80px transparent;
   }
   60% {
     box-shadow:
-      0 0 0 6px rgba(244, 207, 88, 0.8),
+      0 0 0 6px var(--anchor-ring-color),
       0 0 0 80px transparent;
   }
   100% {

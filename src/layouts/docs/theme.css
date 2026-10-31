@@ -1,0 +1,218 @@
+/*
+ * The theme of the docs: the fonts, the design tokens and the colour scheme
+ * of the new site, mapped onto the variables of the old stylesheet.
+ * The tokens use the default theme. The scheme follows data-scheme on <html>
+ * (src/lib/colorScheme.ts).
+ */
+@import '../../styles/tokens.css' layer(tokens);
+@import '../../styles/fonts.css';
+
+/*
+ * The old variables live on :root, unlayered. The rule below sets them
+ * again on <body>, thus it wins for each element of the docs. The
+ * selector has more specificity than a rule on <body> alone.
+ */
+body[data-docs] {
+  --font-sans: 'ABC Oracle', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-headline: var(--font-sans);
+  --font-serif: var(--font-sans);
+  --font-mono: 'Geist Mono', ui-monospace, Menlo, monospace;
+
+  /*
+   * The weights: 340 for the long prose of the docs, 500 for the emphasis.
+   * No other weight is in use.
+   */
+  --weight-regular: 340;
+  --weight-light: 340;
+  --weight-semibold: 500;
+  --weight-bold: 500;
+  --weight-mono: 500;
+
+  /* Text */
+  --base-body-color: var(--text-primary);
+  --light-body-color: var(--text-muted);
+  --extra-light-body-color: var(--text-subtle);
+  --muted-text-color: var(--text-muted);
+  --muted-icon-color: var(--text-subtle);
+
+  /*
+   * The accent of the default theme is yellow. Yellow text does not read
+   * on the light surface, thus the text takes a dark tone of the same hue.
+   */
+  --accent-color: light-dark(var(--surface-accent), var(--text-on-inverse));
+  --accent-text-color: light-dark(
+    oklch(from var(--surface-accent) 0.5 min(c, 0.11) h),
+    var(--text-on-inverse)
+  );
+  --darker-accent-color: var(--accent-text-color);
+  --azure-color: var(--accent-text-color);
+  --accent-contrast-color: var(--surface-inverse);
+  --error-color: light-dark(
+    color-mix(in srgb, var(--surface-negative) 70%, var(--text-primary)),
+    var(--surface-negative)
+  );
+  --positive-color: light-dark(
+    color-mix(in srgb, var(--surface-positive) 70%, var(--text-primary)),
+    var(--surface-positive)
+  );
+
+  /* Surfaces and borders */
+  --base-bg-color: var(--surface-default);
+  --light-bg-color: var(--surface-accent-faint);
+  --highlight-bg-color: var(--surface-accent-faint);
+  --dark-bg-color: var(--surface-inverse);
+  --soft-bg-color: var(--surface-accent-faint);
+  --banner-bg-color: var(--surface-accent-faint);
+  --border-color: var(--border-default);
+  --control-border-color: var(--border-default);
+  --control-icon-color: var(--text-muted);
+  --hover-bg-color: var(--surface-inverse-faint);
+  --inline-code-bg-color: var(--surface-inverse-faint);
+  --shimmer-color: var(--surface-inverse-faint);
+
+  /* The live examples keep a light canvas: they show the light UI of the CMS. */
+  --preview-canvas-color: var(--surface-raised);
+  --preview-ink-color: var(--surface-inverse);
+
+  /* Callouts */
+  --callout-info-bg-color: var(--surface-inverse-faint);
+  --callout-info-fg-color: var(--text-primary);
+  --callout-positive-bg-color: color-mix(in srgb, var(--surface-positive) 18%, transparent);
+  --callout-positive-fg-color: var(--positive-color);
+  --callout-warning-bg-color: color-mix(in srgb, var(--surface-accent) 40%, transparent);
+  --callout-warning-fg-color: var(--accent-text-color);
+
+  /* Badges */
+  --pill-new-bg-color: color-mix(in srgb, var(--surface-positive) 22%, transparent);
+  --pill-new-fg-color: var(--positive-color);
+  --pill-soon-bg-color: color-mix(in srgb, var(--surface-accent) 40%, transparent);
+  --pill-soon-fg-color: var(--accent-text-color);
+  --pill-protocol-bg-color: var(--surface-inverse-faint);
+  --pill-protocol-fg-color: var(--text-primary);
+  --highlight-badge-bg-color: var(--accent-color);
+  --highlight-badge-border-color: var(--accent-color);
+  --highlight-badge-fg-color: var(--accent-contrast-color);
+  --soft-purple-bg-color: var(--surface-accent-faint);
+  --soft-purple-border-color: var(--border-default);
+  --soft-purple-fg-color: var(--text-primary);
+
+  /* Markers */
+  --mark-bg-color: var(--surface-accent);
+  --mark-good-bg-color: color-mix(in srgb, var(--surface-positive) 35%, transparent);
+  --mark-bad-bg-color: color-mix(in srgb, var(--surface-negative) 35%, transparent);
+  --mark-warning-bg-color: color-mix(in srgb, var(--surface-accent) 40%, transparent);
+  --anchor-ring-color: var(--surface-accent);
+  --anchor-ring-soft-color: var(--surface-accent-subtle);
+
+  /* The tiles behind the logos of the cards. */
+  --tile-pink-bg-color: var(--surface-accent-faint);
+  --tile-azure-bg-color: var(--surface-accent-faint);
+  --tile-blue-bg-color: var(--surface-accent-faint);
+  --tile-green-bg-color: var(--surface-accent-faint);
+  --tile-yellow-bg-color: var(--surface-accent-faint);
+
+  /* The search popup */
+  --search-warning-bg-color: color-mix(in srgb, var(--surface-accent) 30%, transparent);
+  --search-warning-border-color: var(--border-default);
+  --search-warning-fg-color: var(--accent-text-color);
+  --search-error-fg-color: var(--error-color);
+  --answer-token-color: var(--code-plain);
+}
+
+/* The elements that the browser sets bold. A class rule or a rule of the prose layer wins. */
+@layer reset {
+  :where(body[data-docs]) :where(strong, b, th, h1, h2, h3, h4, h5, h6, dt, summary, optgroup) {
+    font-weight: var(--weight-bold);
+  }
+}
+
+body[data-docs] {
+  background: var(--base-bg-color);
+  color: var(--base-body-color);
+  font-weight: var(--weight-regular);
+}
+
+body[data-docs] :is(code, kbd, samp, pre) {
+  font-weight: var(--weight-mono);
+}
+
+/*
+ * Code blocks. The block is a dark card in both schemes, with the code
+ * tokens of the default theme. The expressive-code plugin of ec.config.mjs
+ * puts the role of each syntax colour in data-token. The selectors have
+ * more specificity than the rules of expressive-code, which follow the
+ * scheme of the system.
+ */
+:root body[data-docs] .expressive-code {
+  --ec-codeBg: var(--code-background);
+  --ec-codeFg: var(--code-plain);
+  --ec-codeFontWg: var(--weight-mono);
+  --ec-brdCol: var(--border-on-inverse);
+  --ec-gtrFg: var(--code-line-number);
+  --ec-gtrBrdCol: var(--border-on-inverse);
+  --ec-gtrHlFg: var(--code-comment);
+  --ec-codeSelBg: color-mix(in srgb, var(--code-plain) 20%, transparent);
+  --ec-uiSelBg: color-mix(in srgb, var(--code-plain) 20%, transparent);
+  --ec-uiSelFg: var(--code-plain);
+  --ec-focusBrd: var(--code-keyword);
+  --ec-sbThumbCol: color-mix(in srgb, var(--code-plain) 25%, transparent);
+  --ec-sbThumbHoverCol: color-mix(in srgb, var(--code-plain) 40%, transparent);
+
+  --ec-tm-markBg: color-mix(in srgb, var(--code-keyword) 16%, transparent);
+  --ec-tm-markBrdCol: var(--code-keyword);
+  --ec-tm-insBg: color-mix(in srgb, var(--code-function) 18%, transparent);
+  --ec-tm-insBrdCol: var(--code-function);
+  --ec-tm-insDiffIndCol: var(--code-function);
+  --ec-tm-delBg: color-mix(in srgb, var(--code-string) 18%, transparent);
+  --ec-tm-delBrdCol: var(--code-string);
+  --ec-tm-delDiffIndCol: var(--code-string);
+  --ec-tm-lineMarkerLabelCol: var(--code-background);
+
+  --ec-frm-edBg: var(--code-background);
+  --ec-frm-edTabBarBg: color-mix(in srgb, var(--code-plain) 8%, var(--code-background));
+  --ec-frm-edTabBarBrdCol: var(--border-on-inverse);
+  --ec-frm-edTabBarBrdBtmCol: var(--border-on-inverse);
+  --ec-frm-edActTabBg: var(--code-background);
+  --ec-frm-edActTabFg: var(--code-plain);
+  --ec-frm-edActTabBrdCol: var(--border-on-inverse);
+  --ec-frm-edActTabIndTopCol: var(--code-keyword);
+  --ec-frm-edActTabIndBtmCol: var(--border-on-inverse);
+  --ec-frm-trmBg: var(--code-background);
+  --ec-frm-trmTtbBg: color-mix(in srgb, var(--code-plain) 8%, var(--code-background));
+  --ec-frm-trmTtbFg: var(--code-punctuation);
+  --ec-frm-trmTtbDotsFg: var(--code-punctuation);
+  --ec-frm-trmTtbBrdBtmCol: var(--border-on-inverse);
+  --ec-frm-inlBtnFg: var(--code-plain);
+  --ec-frm-inlBtnBg: var(--code-plain);
+  --ec-frm-inlBtnBrd: var(--code-plain);
+  --ec-frm-tooltipSuccessBg: var(--code-function);
+  --ec-frm-tooltipSuccessFg: var(--code-background);
+}
+
+:root body[data-docs] .expressive-code .ec-line span[data-token] {
+  color: var(--code-plain);
+}
+
+:root body[data-docs] .expressive-code .ec-line span[data-token='punctuation'] {
+  color: var(--code-punctuation);
+}
+
+:root body[data-docs] .expressive-code .ec-line span[data-token='comment'] {
+  color: var(--code-comment);
+}
+
+:root body[data-docs] .expressive-code .ec-line span[data-token='keyword'] {
+  color: var(--code-keyword);
+}
+
+:root body[data-docs] .expressive-code .ec-line span[data-token='string'] {
+  color: var(--code-string);
+}
+
+:root body[data-docs] .expressive-code .ec-line span[data-token='constant'] {
+  color: var(--code-constant);
+}
+
+:root body[data-docs] .expressive-code .ec-line span[data-token='function'] {
+  color: var(--code-function);
+}
