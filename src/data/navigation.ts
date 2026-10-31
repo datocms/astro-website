@@ -85,7 +85,7 @@ export const mainNavigation: NavGroup[] = [
       },
       {
         sections: [
-          { heading: 'Solutions', links: [l('Enterprise', '/enterprise')] },
+          { heading: 'Solutions', links: [l('Enterprise', '/enterprise-headless-cms')] },
           {
             heading: 'Compare',
             links: [
@@ -110,10 +110,10 @@ export const mainNavigation: NavGroup[] = [
             heading: 'Learn',
             links: [
               l('Docs', '/docs'),
-              l('Academy'),
-              l('User guides'),
-              l('How to DatoCMS'),
-              l('Glossary'),
+              l('Academy', '/academy'),
+              l('User guides', '/user-guides'),
+              l('How to DatoCMS', '/how-to-datocms'),
+              l('Glossary', '/glossary'),
             ],
           },
         ],
@@ -122,7 +122,11 @@ export const mainNavigation: NavGroup[] = [
         sections: [
           {
             heading: 'Help',
-            links: [l('Support'), l('Community forum', communityHref), l('Slack')],
+            links: [
+              l('Support', '/support'),
+              l('Community forum', communityHref),
+              l('Slack', '/slack'),
+            ],
           },
           {
             heading: 'News',
@@ -134,14 +138,20 @@ export const mainNavigation: NavGroup[] = [
         sections: [
           {
             heading: 'Marketplace',
-            links: [l('Plugins'), l('Starters'), l('Hosting'), l('Enterprise apps')],
+            links: [
+              l('Plugins', '/marketplace/plugins'),
+              l('Starters', '/marketplace/starters'),
+              l('Hosting', '/docs/hosting-and-deployment'),
+              l('Enterprise apps', '/docs/enterprise-apps'),
+            ],
+            allLink: l('All the marketplace', '/marketplace'),
           },
         ],
       },
     ],
   },
   { label: 'Customers', href: '/case-studies' },
-  { label: 'Partners', href: '#' },
+  { label: 'Partners', href: '/partners' },
   { label: 'Philosophy', href: '/philosophy' },
   { label: 'Pricing', href: '/pricing' },
 ];
@@ -157,17 +167,17 @@ export const footerColumns: FooterColumn[] = [
         links: [
           ...[developers, editorExperience, media, ai].map(footerLink),
           l('All features', '/features'),
-          l('Enterprise', '/enterprise'),
+          l('Enterprise', '/enterprise-headless-cms'),
           l('Pricing', '/pricing'),
         ],
       },
       // The legal pages. They have no column of their own.
       {
         links: [
-          l('Privacy policy'),
-          l('Cookie policy'),
-          l('GDPR Compliance'),
-          l('Terms of Service'),
+          l('Privacy policy', '/legal/privacy-policy'),
+          l('Cookie policy', '/legal/cookie-policy'),
+          l('GDPR Compliance', '/legal/gdpr'),
+          l('Terms of Service', '/legal/terms'),
         ],
       },
     ],
@@ -190,10 +200,10 @@ export const footerColumns: FooterColumn[] = [
       {
         title: 'Partners',
         links: [
-          l('Agency directory'),
-          l('Partner showcase'),
-          l('Become a partner'),
-          l('Tech partners'),
+          l('Agency directory', '/partners'),
+          l('Partner showcase', '/partners/showcase'),
+          l('Become a partner', '/partner-program'),
+          l('Tech partners', '/tech-partners'),
         ],
       },
     ],
@@ -206,12 +216,14 @@ export const footerColumns: FooterColumn[] = [
           l('Docs', '/docs'),
           l('Blog', '/blog'),
           l('Product updates', '/product-updates'),
-          l('Academy'),
-          l('User guides'),
-          l('Glossary'),
-          l('Marketplace'),
+          l('Academy', '/academy'),
+          l('User guides', '/user-guides'),
+          l('How to DatoCMS', '/how-to-datocms'),
+          l('Glossary', '/glossary'),
+          l('Marketplace', '/marketplace'),
           l('Community', communityHref),
-          l('Support'),
+          l('Slack', '/slack'),
+          l('Support', '/support'),
         ],
       },
     ],
@@ -222,9 +234,9 @@ export const footerColumns: FooterColumn[] = [
         title: 'Company',
         links: [
           l('Philosophy', '/philosophy'),
-          l('Security'),
-          l('Brand assets'),
-          l('Research program'),
+          l('Security', '/security'),
+          l('Profit sharing', '/company/profit-sharing'),
+          l('Research program', '/research-program'),
           l('Contact', '/contact'),
         ],
       },
