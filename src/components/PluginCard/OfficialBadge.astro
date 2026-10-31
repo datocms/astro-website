@@ -1,4 +1,5 @@
 ---
+import { Tooltip } from '~/components/Tooltip';
 import dIcon from '~/svg/datocms/icon/color/color_d_icon.svg?raw';
 import styles from './badge.module.css';
 
@@ -9,14 +10,18 @@ interface Props {
 }
 
 const { size = 16, class: className } = Astro.props;
+
+// Remove the <title> of the file: the browser shows it on hover.
+const icon = dIcon.replace(/<title>[\s\S]*?<\/title>/, '');
 ---
 
-{/* The "D" of DatoCMS. The title shows on hover, the hidden text is for screen readers. */}
-<span
-  class:list={[styles.badge, className]}
-  title="DatoCMS Official Plugin"
-  style={`--badge-size: ${size}px`}
->
-  <Fragment set:html={dIcon} />
+{
+  /* The "D" of DatoCMS. The tooltip shows the text on hover, the hidden text is for screen readers. */
+}
+<Tooltip class:list={[styles.badge, className]}>
+  <span class={styles.icon} style={`--badge-size: ${size}px`} aria-hidden="true">
+    <Fragment set:html={icon} />
+  </span>
   <span class="visuallyHidden">DatoCMS Official Plugin</span>
-</span>
+  <Fragment slot="tooltip">DatoCMS Official Plugin</Fragment>
+</Tooltip>

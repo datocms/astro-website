@@ -1,0 +1,34 @@
+---
+import styles from './style.module.css';
+
+interface Props {
+  class?: string;
+  /** Show an arrow from the bubble to the trigger. */
+  arrow?: boolean;
+}
+
+const { class: className, arrow = true } = Astro.props;
+---
+
+{
+  /*
+  The bubble opens when the pointer is on the trigger, or when the focus is
+  in it. It is above the trigger, or on the other side when there is no
+  space. Screen readers do not read it: the trigger must have its own text.
+*/
+}
+<dato-tooltip class:list={[styles.tooltip, className]}>
+  <span class={styles.trigger} data-trigger>
+    <slot />
+  </span>
+  <span class:list={[styles.bubble, 'caption']} data-bubble aria-hidden="true">
+    <slot name="tooltip" />
+    {arrow && <span class={styles.arrow} data-arrow />}
+  </span>
+</dato-tooltip>
+
+<script>
+  import { defineTooltip } from './tooltip';
+
+  defineTooltip();
+</script>
