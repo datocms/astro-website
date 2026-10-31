@@ -1,17 +1,23 @@
 ---
-import { Layout } from '~/layouts/LegacyLayout';
-import { Card } from '~/components/legacy/Card';
-import { ResponsiveImage } from '~/components/legacy/LegacyResponsiveImage';
-import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
-import { Announce } from '~/components/legacy/pluginToolkit/Announce';
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Wrapper } from '~/components/legacy/Wrapper';
-import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
-import s from './_style.module.css';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+// The index of the starters: the demos with all the features, then the
+// starter kits for each framework.
 import { stripStega } from '@datocms/astro';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { Section } from '~/components/Section';
+import {
+  fullyFledged as demosCopy,
+  hero,
+  seo as startersSeo,
+  techStarters as kitsCopy,
+} from '~/data/starters';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { query } from './_graphql';
+import StarterCard from './_StarterCard.astro';
+import s from './_style.module.css';
 
 const { starters } = await executeQuery(Astro, query);
 
@@ -20,126 +26,48 @@ if (!starters) {
   return notFoundResponse();
 }
 
-const fullyFledged = starters.filter(
-  (starter) => stripStega(starter.starterType) === 'fully_fledged',
-);
-const techStarters = starters.filter(
-  (starter) => stripStega(starter.starterType) === 'tech_starter',
-);
-const community = starters.filter((starter) => stripStega(starter.starterType) === 'community');
+const demos = starters.filter((starter) => stripStega(starter.starterType) === 'fully_fledged');
+const kits = starters.filter((starter) => stripStega(starter.starterType) === 'tech_starter');
+
+const seo = overrideSeo([], seoTitle(startersSeo.title));
 ---
 
-<Layout noFinalCta seo={[]}>
-  <Fragment slot="head">
-    <title>Project starters - Free demo projects - Marketplace</title>
-  </Fragment>
+<Layout seo={seo} theme="orange" headerVariant="light" footerTheme="orange">
+  <Hero variant="light" {...hero} />
 
-  <Hero>
-    <Fragment slot="title">Starters</Fragment>
-    <Fragment slot="subtitle">
-      Start with a fully configured DatoCMS project, a best-practice frontend and free hosting
-    </Fragment>
-  </Hero>
-
-  <div class={s.firstPartyStarters}>
-    <div class={s.groupWrapper}>
-      <div class={s.intro}>
-        <h2>Fully fledged demos</h2>
-        <p>
-          Use our pre-built demo projects to see all of DatoCMS&apos;s features in a <strong
-            >realistic production-ready setup</strong
-          >. Includes many example content types, and advanced features.
-        </p>
-      </div>
-      <section class={s.fullyFledged}>
-        {
-          fullyFledged.map((item) => (
-            <Card
-              badge={item.badge}
-              highlight={'Best choice to start!'}
-              href={buildUrlForTemplateDemo(item)}
-              label={item.label ?? undefined}
-              size="large"
-              svgLogo={item.technology.logo}
-              title={item.name}
-              noForcedAspectRatio
-            >
-              <Fragment slot="image">
-                <ResponsiveImage data={item.screenshot.responsiveImage} />
-              </Fragment>
-              {item.cmsDescription}
-            </Card>
-          ))
-        }
-      </section>
-    </div>
-
-    {
-      techStarters.length > 0 && (
-        <div class={s.groupWrapper}>
-          <div class={s.intro}>
-            <h2>Tech starter kits</h2>
-            <p>
-              Kickstart your next project with our <strong>official scaffolds</strong>. They offer
-              all the best practices to integrate DatoCMS with your frontend framework, with minimal
-              content and styling.
-            </p>
-          </div>
-          <section class={s.techStarters}>
-            {techStarters.map((item) => (
-              <Card
-                badge={item?.badge}
-                href={buildUrlForTemplateDemo(item)}
-                label={item.label ?? undefined}
-                title={item.name}
-                svgLogo={item.technology.squareLogo || item.technology.logo}
-              >
-                {item.cmsDescription}
-              </Card>
-            ))}
-          </section>
-        </div>
-      )
-    }
-  </div>
-
-  <!-- <Wrapper>
+  <Section>
     <div class={s.intro}>
-      <h2>Community templates</h2>
-      <p>
-        Discover the projects created by the community. They are not officially supported by
-        DatoCMS, but they can be a great source of inspiration to kickstart your next project.
-      </p>
+      <h2 class="h2">{demosCopy.headline}</h2>
+      <p class="body" set:html={demosCopy.body} />
     </div>
+    <ul class={s.demos}>
+      {
+        demos.map((starter) => (
+          <li>
+            <StarterCard starter={starter} variant="demo" highlight={demosCopy.highlight} />
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
 
-    <Announce
-      href="/docs/general-concepts/project-starters-and-templates#generate-a-project-starter-button"
-      center
-    >
-      <strong>Want to create your own starter project?</strong> Learn how to do that in our documentation!
-    </Announce> -->
+  {
+    kits.length > 0 && (
+      <Section flushTop>
+        <div class={s.intro}>
+          <h2 class="h2">{kitsCopy.headline}</h2>
+          <p class="body" set:html={kitsCopy.body} />
+        </div>
+        <ul class={s.kits}>
+          {kits.map((starter) => (
+            <li>
+              <StarterCard starter={starter} variant="kit" />
+            </li>
+          ))}
+        </ul>
+      </Section>
+    )
+  }
 
-  <!-- <div class={s.community}>
-    {
-      community.map((item) => (
-        <Card
-          badge={item.badge}
-          boxed={false}
-          href={buildUrlForTemplateDemo(item)}
-          label={item.label ?? undefined}
-          orientation="horizontal"
-          size="small"
-          title={item.name}
-          noForcedAspectRatio
-        >
-          <Fragment slot="image">
-            <ResponsiveImage data={item.screenshot.responsiveImage} />
-          </Fragment>
-          {item.cmsDescription}
-        </Card>
-      ))
-    }
-  </div> -->
+  <DraftModeQueryListener query={query} />
 </Layout>
-
-<DraftModeQueryListener query={query} />

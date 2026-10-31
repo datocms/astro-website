@@ -8,11 +8,13 @@ interface Props {
   /** The address of page 1. Page n is at `${baseUrl}/p/${n}`. */
   baseUrl: string;
   window?: number;
+  /** The query string of each link, with the `?` (for example `?s=cms`). */
+  search?: string;
 }
 
-const { current, total, baseUrl, window = 7 } = Astro.props;
+const { current, total, baseUrl, window = 7, search = '' } = Astro.props;
 
-const href = (page: number) => (page === 1 ? baseUrl : `${baseUrl}/p/${page}`);
+const href = (page: number) => (page === 1 ? baseUrl : `${baseUrl}/p/${page}`) + search;
 
 // Show `window` pages around the current page, and keep them inside 1..total.
 const first = Math.max(1, Math.min(current - Math.floor(window / 2), total - window + 1));

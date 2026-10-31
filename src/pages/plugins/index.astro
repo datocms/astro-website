@@ -1,17 +1,20 @@
 ---
-import Wrapper from '~/components/legacy/Wrapper/ReactComponent';
-import { Carousel } from '~/components/legacy/Carousel';
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Layout } from '~/layouts/LegacyLayout';
-import { PluginCard } from '../_sub/PluginCard';
-import { PluginSearchBox } from '../_sub/PluginSearchBox';
-import { Space } from '~/components/legacy/Space';
-import { Svg } from '~/components/legacy/Svg';
+// The index of the plugins: the search, the plugins that the editors
+// picked, the most popular, the official ones, the collections and the
+// newest. The "View all" links go to the list of all plugins.
+import { CardCarousel } from '~/components/CardCarousel';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { PluginCard } from '~/components/PluginCard';
+import { Section } from '~/components/Section';
+import { groups, hero } from '~/data/plugins';
+import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import SearchBox from './_SearchBox.astro';
+import Group from './_Group.astro';
 import { officialPluginsQuery, query } from './_graphql';
 import s from './_style.module.css';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const { page, collections, meta, popular, latest, officialAuthors } = await executeQuery(
   Astro,
@@ -28,94 +31,87 @@ const { official, officialMeta } = await executeQuery(Astro, officialPluginsQuer
 });
 ---
 
-<Layout noFinalCta seo={page.seo}>
-  <Hero>
-    <Fragment slot="title">Community Plugins</Fragment>
-    <Fragment slot="subtitle">
-      Easily expand and customize the capabilities of DatoCMS. Public plugins are free and
-      maintained by us or the community.
-    </Fragment>
-  </Hero>
+<Layout seo={page.seo} theme="orange" headerVariant="light" footerTheme="orange">
+  <Hero variant="light" {...hero} />
 
-  <Wrapper>
-    <PluginSearchBox />
+  <Section>
+    <SearchBox />
+  </Section>
 
-    <h2 class={s.title}>Editors' Choice</h2>
-    <div class={s.highlighted}>
-      {page.highlighted.map((item) => <PluginCard plugin={item} />)}
-    </div>
+  <Group title={groups.highlighted}>
+    <ul class={s.highlighted}>
+      {
+        page.highlighted.map((item) => (
+          <li>
+            <PluginCard plugin={item} />
+          </li>
+        ))
+      }
+    </ul>
+  </Group>
 
-    <Space top={2}>
-      <div class={s.sectionTitleWrapper}>
-        <h2 class={s.title}>Most popular</h2>
-        <a href="/marketplace/plugins/browse?sort=popular" class={s.browseAll}>
-          <span>View all ({meta.count})</span>
-          <Svg name="icons/regular/arrow-right" />
-        </a>
-      </div>
+  <Group title={groups.popular} href="/plugins/browse?sort=popular" count={meta.count}>
+    <ul class={s.list}>
+      {
+        popular.map((item) => (
+          <li>
+            <PluginCard plugin={item} orientation="horizontal" />
+          </li>
+        ))
+      }
+    </ul>
+  </Group>
 
-      <div class={s.popular}>
-        {
-          popular.map((item) => (
-            <PluginCard plugin={item} orientation="horizontal" boxed={false} size="small" />
-          ))
-        }
-      </div>
-    </Space>
+  {
+    official.length > 0 && (
+      <Group
+        title={groups.official}
+        href="/plugins/browse?official=true"
+        count={officialMeta.count}
+      >
+        <ul class={s.list}>
+          {official.map((item) => (
+            <li>
+              <PluginCard plugin={item} orientation="horizontal" />
+            </li>
+          ))}
+        </ul>
+      </Group>
+    )
+  }
 
-    {
-      official.length > 0 && (
-        <Space top={2}>
-          <div class={s.sectionTitleWrapper}>
-            <h2 class={s.title}>DatoCMS Official Plugins</h2>
-            <a href="/marketplace/plugins/browse?official=true" class={s.browseAll}>
-              <span>View all ({officialMeta.count})</span>
-              <Svg name="icons/regular/arrow-right" />
-            </a>
-          </div>
+  {
+    collections.map((collection) => (
+      <Group title={collection.title}>
+        <CardCarousel label={collection.title}>
+          {collection.plugins.map((item) => (
+            <div role="listitem">
+              <PluginCard plugin={item} />
+            </div>
+          ))}
+        </CardCarousel>
+      </Group>
+    ))
+  }
 
-          <div class={s.popular}>
-            {official.map((item) => (
-              <PluginCard plugin={item} orientation="horizontal" boxed={false} size="small" />
-            ))}
-          </div>
-        </Space>
-      )
-    }
-
-    {
-      collections.map((collection) => (
-        <Space top={2}>
-          <h2 class={s.title}>{collection.title}</h2>
-          <div class={s.carouselWrapper}>
-            <Carousel buttonsY="50%" class={s.carousel}>
-              {collection.plugins.map((item) => (
-                <div class={s.cardWrapper}>
-                  <PluginCard plugin={item} />
-                </div>
-              ))}
-            </Carousel>
-          </div>
-        </Space>
-      ))
-    }
-
-    <Space top={2}>
-      <h2 class={s.title}>Just released</h2>
-      <div class={s.latest}>
-        {
-          latest.map((item) => (
-            <PluginCard plugin={item} orientation="horizontal" boxed={false} size="small" />
-          ))
-        }
-      </div>
-    </Space>
-  </Wrapper>
+  <Group title={groups.latest}>
+    <ul class={s.list}>
+      {
+        latest.map((item) => (
+          <li>
+            <PluginCard plugin={item} orientation="horizontal" />
+          </li>
+        ))
+      }
+    </ul>
+  </Group>
 
   <DraftModeQueryListener query={query} />
 </Layout>
 
 <script>
+  // The dashboard can open this page with a project. The plugin pages read
+  // the project from the session, to build the install link.
   const urlParams = new URLSearchParams(window.location.search);
   const projectDomain = urlParams.get('projectDomain');
   const projectEnvironment = urlParams.get('projectEnvironment');

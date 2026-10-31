@@ -1,0 +1,59 @@
+---
+// One starter in the list. A demo shows its screenshot and the logo of
+// its technology. A starter kit shows the logo of its technology.
+import { stripStega } from '@datocms/astro';
+import type { ResultOf } from '~/lib/datocms/graphql';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
+import type { query } from './_graphql';
+import s from './_StarterCard.module.css';
+
+interface Props {
+  starter: ResultOf<typeof query>['starters'][number];
+  variant: 'demo' | 'kit';
+  /** A short text over the card. */
+  highlight?: string;
+}
+
+const { starter, variant, highlight } = Astro.props;
+const logo = variant === 'kit' ? (starter.technology.squareLogo ?? starter.technology.logo) : null;
+---
+
+<a href={buildUrlForTemplateDemo(starter)} class:list={[s.card, variant === 'kit' && s.kit]}>
+  {highlight && <span class:list={[s.highlight, 'caption']}>{highlight}</span>}
+  <span class={s.visual}>
+    {
+      variant === 'demo' ? (
+        <ResponsiveImage data={starter.screenshot.responsiveImage} />
+      ) : (
+        logo && <img src={logo.url} alt={stripStega(logo.alt ?? '')} loading="lazy" />
+      )
+    }
+  </span>
+  <span class={s.text}>
+    <span class:list={[s.title, 'bodyMedium']}>{starter.name}</span>
+    <span class:list={[s.description, 'subtitle']}>{starter.cmsDescription}</span>
+    {
+      variant === 'demo' && (
+        <img
+          class={s.technology}
+          src={starter.technology.logo.url}
+          alt={stripStega(starter.technology.logo.alt ?? '')}
+          loading="lazy"
+        />
+      )
+    }
+  </span>
+  {
+    (starter.badge || starter.label) && (
+      <span class={s.footer}>
+        {starter.badge && (
+          <span class={s.pill}>
+            <span aria-hidden="true">{starter.badge.emoji}</span> {starter.badge.name}
+          </span>
+        )}
+        {starter.label && <span class={s.pill}>{starter.label}</span>}
+      </span>
+    )
+  }
+</a>

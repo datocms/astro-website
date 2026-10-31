@@ -1,5 +1,4 @@
-import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
-import { MaybeVideoPlayerFragment } from '~/components/legacy/VideoPlayer/graphql';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { PluginUrlFragment, buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
@@ -17,14 +16,22 @@ export const query = graphql(
         title
         description
         previewImage {
-          __typename
-          ...MaybeVideoPlayerFragment
-          responsiveImage(imgixParams: { w: 800, auto: format }) {
+          responsiveImage(imgixParams: { w: 800 }) {
             ...ResponsiveImageFragment
+          }
+          video {
+            title
+            alt
+            streamingUrl
+            mp4Url(res: high)
+            thumbnailUrl
+            width
+            height
+            blurUpThumb
           }
         }
         coverImage {
-          responsiveImage(imgixParams: { auto: format, w: 400 }) {
+          responsiveImage(imgixParams: { w: 400 }) {
             ...ResponsiveImageFragment
           }
         }
@@ -50,7 +57,7 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment, MaybeVideoPlayerFragment],
+  [TagFragment, ResponsiveImageFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

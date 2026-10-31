@@ -1,0 +1,77 @@
+/* @layer blocks */
+.card:any-link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  color: var(--text-primary);
+}
+
+.horizontal:any-link {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.image {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 3 / 2;
+  background: var(--surface-inverse-faint);
+  border-radius: var(--radius-md);
+}
+
+.horizontal .image {
+  flex: 0 0 96px;
+}
+
+.image :global(:is(picture, img)) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-subtle);
+}
+
+.placeholder svg {
+  width: 30%;
+  height: auto;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+  min-width: 0;
+}
+
+.title {
+  color: var(--text-primary);
+}
+
+.description {
+  display: -webkit-box;
+  overflow: hidden;
+  line-height: 1.3;
+  color: var(--text-muted);
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+@media (hover: hover) {
+  .card:hover .title {
+    text-decoration: underline;
+  }
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--border-strong);
+  outline-offset: var(--space-4xs);
+  border-radius: var(--radius-md);
+}

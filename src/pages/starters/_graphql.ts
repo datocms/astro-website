@@ -1,4 +1,4 @@
-import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TemplateDemoUrlFragment } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 import { graphql } from '~/lib/datocms/graphql';
 
@@ -30,7 +30,7 @@ export const query = graphql(
           }
         }
         screenshot {
-          responsiveImage(imgixParams: { auto: format, w: 700, h: 400, fit: crop, crop: top }) {
+          responsiveImage(imgixParams: { w: 700, h: 400, fit: crop, crop: top }) {
             ...ResponsiveImageFragment
           }
         }

@@ -1,0 +1,32 @@
+---
+// A group of plugins on the index: a heading, an optional link to the full
+// list, and the plugins in the slot.
+import { Section } from '~/components/Section';
+import arrowRight from '~/icons/regular/arrow-right.svg?raw';
+import s from './_style.module.css';
+
+interface Props {
+  title: string;
+  /** The address of the full list. It shows with `count`. */
+  href?: string;
+  count?: number;
+  flushTop?: boolean;
+}
+
+const { title, href, count, flushTop = true } = Astro.props;
+---
+
+<Section flushTop={flushTop}>
+  <div class={s.groupHeader}>
+    <h2 class="h2">{title}</h2>
+    {
+      href && (
+        <a href={href} class:list={[s.viewAll, 'subtitleMedium']}>
+          <span>View all ({count})</span>
+          <Fragment set:html={arrowRight} />
+        </a>
+      )
+    }
+  </div>
+  <slot />
+</Section>

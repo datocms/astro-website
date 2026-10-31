@@ -49,9 +49,9 @@ const sortedContinents = Object.fromEntries(
 
 // The CMS links of the plugins group can still point to the old marketplace
 // addresses. Link to the final address at once.
-const marketplaceUrl = (url: string | null | undefined) =>
+const marketplaceUrl = (url: string) =>
   url
-    ?.replace(/^\/marketplace\/?$/, '/plugins')
+    .replace(/^\/marketplace\/?$/, '/plugins')
     .replace(/^\/marketplace\/(plugins|starters)/, '/$1');
 
 // These pages do not exist now (they redirect to /editor-experience). The
@@ -294,7 +294,10 @@ const REMOVED_PERSONA_URLS = ['/made-for/marketers', '/made-for/content-creators
               <Group
                 class={s.marketplaceGroup}
                 title={navbar.marketplaceGroup.title}
-                link={marketplaceUrl(navbar.marketplaceGroup.callToAction?.url)}
+                link={
+                  navbar.marketplaceGroup.callToAction?.url &&
+                  marketplaceUrl(navbar.marketplaceGroup.callToAction.url)
+                }
                 finalCta={navbar.marketplaceGroup.callToAction?.label}
               >
                 {navbar.marketplaceGroup.links.map((item) => (

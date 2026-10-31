@@ -1,9 +1,9 @@
 import { range } from 'lodash-es';
-import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
+import { PluginCardFragment } from '~/components/PluginCard';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { graphql } from '~/lib/datocms/graphql';
-import { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const perPage = 36;
@@ -61,5 +61,5 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
     executeQueryOptions,
   );
 
-  return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/marketplace/plugins/browse/p/${i}`);
+  return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/plugins/browse/p/${i}`);
 };

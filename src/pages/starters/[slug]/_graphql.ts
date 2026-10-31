@@ -1,4 +1,4 @@
-import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
@@ -34,12 +34,12 @@ export const query = graphql(
           }
         }
         screenshot {
-          responsiveImage(imgixParams: { auto: format, w: 700, h: 400, fit: crop, crop: top }) {
+          responsiveImage(imgixParams: { w: 700, h: 400, fit: crop, crop: top }) {
             ...ResponsiveImageFragment
           }
         }
         backendScreenshot {
-          responsiveImage(imgixParams: { auto: format, w: 700, h: 400, fit: crop, crop: top }) {
+          responsiveImage(imgixParams: { w: 700, h: 400, fit: crop, crop: top }) {
             ...ResponsiveImageFragment
           }
         }

@@ -1,19 +1,21 @@
 ---
-import Wrapper from '~/components/legacy/Wrapper/ReactComponent';
+// One page of the list of all plugins, or of the search results. The query
+// string selects the search text (?s=), the order (?sort=latest) and the
+// official plugins only (?official=true).
 import ky from 'ky';
-import type { FragmentOf } from 'gql.tada';
-import type { PluginCardFragment } from '~/pages/marketplace/_sub/PluginCard/_graphql';
-import { Hero } from '~/components/legacy/LegacyHero';
-import { Layout } from '~/layouts/LegacyLayout';
-import { Pagination } from '~/components/legacy/LegacyPagination';
-import { PluginCard } from '~/pages/marketplace/_sub/PluginCard';
-import { PluginSearchBox } from '~/pages/marketplace/_sub/PluginSearchBox';
-import { Space } from '~/components/legacy/Space';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Hero } from '~/components/Hero';
+import { Pagination } from '~/components/Pagination';
+import { PluginCard, type PluginCardFragment } from '~/components/PluginCard';
+import { Section } from '~/components/Section';
+import { browse } from '~/data/plugins';
+import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import type { FragmentOf } from '~/lib/datocms/graphql';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import SearchBox from '../../../_SearchBox.astro';
 import { officialAuthorsQuery, perPage, query } from './_graphql';
 import s from './_style.module.css';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 export interface Props {
   pageIndex?: number;
@@ -27,6 +29,7 @@ if (Astro.params.pageIndex === '1') {
 const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
 const officialOnly = Astro.url.searchParams.get('official') === 'true';
 const sort = Astro.url.searchParams.get('sort');
+const searchText = Astro.url.searchParams.get('s');
 
 const authorFilter = officialOnly
   ? { in: (await executeQuery(Astro, officialAuthorsQuery)).officialAuthors.map((a) => a.id) }
@@ -67,54 +70,45 @@ async function fetchSearchResults(query: string, page: number) {
   return [response.hits, response.nbHits] as const;
 }
 
-const [plugins, totalEntries] = Astro.url.searchParams.has('s')
-  ? await fetchSearchResults(Astro.url.searchParams.get('s')!, pageIndex - 1)
-  : [staticResults.plugins, staticResults._allPluginsMeta.count];
+const [plugins, totalEntries] =
+  searchText !== null
+    ? await fetchSearchResults(searchText, pageIndex - 1)
+    : [staticResults.plugins, staticResults._allPluginsMeta.count];
 
 if (!pluginsPage) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const hero =
+  searchText !== null
+    ? { headline: `${browse.searchHeadline} "${searchText}"` }
+    : { headline: browse.headline, subheadline: browse.subheadline };
 ---
 
-<Layout noFinalCta seo={pluginsPage.seo}>
-  <Hero>
-    <Fragment slot="title"
-      >{
-        Astro.url.searchParams.has('s') ? (
-          <>
-            Find Plugins: <mark>"{Astro.url.searchParams.get('s')}"</mark>
-          </>
-        ) : (
-          <>Community Plugins</>
-        )
-      }</Fragment
-    >
-    {
-      !Astro.url.searchParams.has('s') && (
-        <Fragment slot="subtitle">
-          Easily expand and customize the capabilities of DatoCMS with community plugins
-        </Fragment>
-      )
-    }
-  </Hero>
-  <Wrapper>
-    <Space bottom={2}>
-      <PluginSearchBox />
-      {plugins.length === 0 && <div class={s.noResults}>Sorry, no results found!</div>}
-      <div class={s.grid}>
-        {plugins.map((item) => <PluginCard plugin={item} />)}
-      </div>
-    </Space>
-
-    <Pagination
-      perPage={perPage}
-      currentPageIndex={pageIndex}
-      totalEntries={totalEntries}
-      baseUrl="/marketplace/plugins/browse"
-      searchParams={Astro.url.searchParams}
-    />
-  </Wrapper>
+<Layout seo={pluginsPage.seo} theme="orange" headerVariant="light" footerTheme="orange">
+  <Hero variant="light" {...hero} />
+  <Section>
+    <div class={s.stack}>
+      <SearchBox />
+      {plugins.length === 0 && <p class:list={[s.noResults, 'h2']}>{browse.noResults}</p>}
+      <ul class={s.grid}>
+        {
+          plugins.map((item) => (
+            <li>
+              <PluginCard plugin={item} />
+            </li>
+          ))
+        }
+      </ul>
+      <Pagination
+        current={pageIndex}
+        total={Math.ceil(totalEntries / perPage)}
+        baseUrl="/plugins/browse"
+        search={Astro.url.search}
+      />
+    </div>
+  </Section>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

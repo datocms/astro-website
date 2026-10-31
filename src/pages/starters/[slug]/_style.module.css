@@ -1,188 +1,90 @@
 .grid {
-  display: flex;
-  flex-direction: column;
-  gap: rfs(80px);
+  display: grid;
+  gap: var(--space-2xl);
+  grid-template-columns: minmax(0, 1fr);
+}
 
-  @media screen and (min-width: 1024px) {
-    display: grid;
-    grid-template-columns: 1fr 300px;
+@media (min-width: 1152px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: var(--space-3xl);
   }
 }
 
 .content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
   min-width: 0;
-  position: relative;
+}
 
-  .titleWrapper {
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
+.slides {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: minmax(0, 1fr);
+}
 
-    @media screen and (min-width: 1024px) {
-      justify-content: flex-start;
-    }
+@media (min-width: 768px) {
+  .slides {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
 
-  .smallKicker {
-    color: var(--extra-light-body-color);
-    font-size: rfs(16px);
-    font-weight: bold;
-    margin-bottom: 15px;
-    text-align: center;
-    text-transform: uppercase;
+.slide {
+  overflow: hidden;
+  background: var(--surface-inverse-faint);
+  border-radius: var(--radius-md);
+}
 
-    @media screen and (min-width: 1024px) {
-      text-align: left;
-    }
-  }
+.slide :global(:is(picture, img)) {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 
-  .title {
-    font-size: rfs(48px);
-    text-align: center;
+.note {
+  display: block;
+  padding: var(--space-md) var(--space-lg);
+  color: var(--text-primary);
+  background: var(--surface-accent-faint);
+  border-radius: var(--radius-md);
+}
 
-    @media screen and (min-width: 1024px) {
-      text-align: left;
-    }
-  }
-
-  .subtitle {
-    color: var(--light-body-color);
-    font-size: rfs(24px);
-    font-weight: 400;
-    margin-top: 1em;
-    text-align: center;
-
-    @media screen and (min-width: 1024px) {
-      text-align: left;
-    }
-  }
-
-  .ctaMobile {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 40px;
-
-    @media screen and (min-width: 1024px) {
-      display: none;
-    }
-  }
-
-  .slide {
-    border-radius: 6px;
-    box-shadow: var(--smaller-box-shadow);
-    flex-shrink: 0;
-    margin: 30px 0;
-    overflow: hidden;
-  }
-
-  /* Maybe */
-  .documentation {
-    border-radius: 8px;
-    box-shadow: var(--box-shadow);
-    padding: rfs(40px);
-    position: relative;
-    z-index: 10;
-
-    & > *:first-child {
-      margin-top: 5px;
-    }
-
-    &[data-monospace='true'] {
-      font-family: var(--font-mono);
-      font-size: 1rem;
-      line-height: 1.4;
-      margin-top: 40px;
-    }
+@media (hover: hover) {
+  .note:hover {
+    background: var(--surface-accent-subtle);
   }
 }
 
 .aside {
-  .asideContent {
-    display: grid;
-    grid-template-columns: 1fr;
-
-    @media screen and (min-width: 520px) {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    @media screen and (min-width: 800px) {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
-
-    @media screen and (min-width: 1024px) {
-      display: block;
-    }
-
-    & > *:first-child {
-      display: none;
-
-      @media screen and (min-width: 1024px) {
-        display: block;
-      }
-    }
-  }
-
-  .cardCta {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-lg);
 }
 
-.publisher {
-  @media screen and (min-width: 1024px) {
-    margin-top: 40px;
-    padding: 0 20px;
-  }
-
-  h4 {
-    font-size: 1rem;
-  }
-
-  article {
-    align-items: center;
-    display: flex;
-    gap: 10px;
-    margin-top: 8px;
-    transform: translateX(-4px);
-  }
-
-  .publisherIcon {
-    background-color: #fff;
-    border-radius: 50%;
-    border: 1px solid var(--border-color);
-    height: 40px;
-    padding: 10px;
-    width: 40px;
-
-    svg {
-      transform: translateX(2px);
-    }
-  }
-
-  p,
-  a {
-    font-size: 0.875rem;
-  }
+.technology {
+  height: 40px;
+  width: auto;
+  max-width: 100%;
 }
 
-.info {
-  margin-top: 20px;
+.facts {
+  display: grid;
+  gap: var(--space-md);
+  width: 100%;
+}
 
-  @media screen and (min-width: 1024px) {
-    border: none;
-    padding: 0 20px;
-  }
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4xs);
+}
 
-  h4 {
-    font-size: 1rem;
-  }
+.fact dd {
+  color: var(--text-muted);
+}
 
-  p,
-  a {
-    font-size: 0.875rem;
-  }
+.fact a {
+  text-decoration: underline;
 }

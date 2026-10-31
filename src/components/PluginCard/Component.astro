@@ -1,0 +1,45 @@
+---
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import puzzlePiece from '~/icons/regular/puzzle-piece.svg?raw';
+import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { PluginCardFragment } from './graphql';
+import OfficialBadge from './OfficialBadge.astro';
+import styles from './style.module.css';
+
+interface Props {
+  plugin: FragmentOf<typeof PluginCardFragment>;
+  /** `horizontal` puts a small image at the left of the text. */
+  orientation?: 'vertical' | 'horizontal';
+}
+
+const { plugin: maskedPlugin, orientation = 'vertical' } = Astro.props;
+const plugin = readFragment(PluginCardFragment, maskedPlugin);
+---
+
+<a
+  href={buildUrlForPlugin(plugin)}
+  class:list={[styles.card, orientation === 'horizontal' && styles.horizontal]}
+>
+  <span class={styles.image}>
+    {
+      plugin.coverImage ? (
+        <ResponsiveImage
+          data={plugin.coverImage.responsiveImage}
+          sizes="(min-width: 768px) 300px, 100vw"
+        />
+      ) : (
+        <span class={styles.placeholder} aria-hidden="true">
+          <Fragment set:html={puzzlePiece} />
+        </span>
+      )
+    }
+  </span>
+  <span class={styles.text}>
+    <span class:list={[styles.title, 'bodyMedium']}>
+      {plugin.title}
+      {plugin.author?.official && <OfficialBadge />}
+    </span>
+    <span class:list={[styles.description, 'subtitle']}>{plugin.description}</span>
+  </span>
+</a>

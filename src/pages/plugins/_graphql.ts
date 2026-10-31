@@ -1,6 +1,6 @@
+import { PluginCardFragment } from '~/components/PluginCard';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
-import { PluginCardFragment } from '../_sub/PluginCard/_graphql';
 
 export const query = graphql(
   /* GraphQL */ `

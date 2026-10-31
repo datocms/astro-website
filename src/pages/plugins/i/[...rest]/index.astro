@@ -1,27 +1,26 @@
 ---
-import Wrapper from '~/components/legacy/Wrapper/ReactComponent';
-import { Button } from '~/components/legacy/LegacyButton';
-import { Layout } from '~/layouts/LegacyLayout';
-import { overrideSeo, seoOgType } from '~/lib/datocms/seo';
-import { Markdown } from '~/components/legacy/Markdown';
-import { Card } from '~/components/legacy/Card';
-import { Prose } from '~/components/legacy/LegacyProse';
-import { ResponsiveImage } from '~/components/legacy/LegacyResponsiveImage';
-import { Announce } from '~/components/legacy/pluginToolkit/Announce';
-import { Space } from '~/components/legacy/Space';
-import { Svg } from '~/components/legacy/Svg';
-import { Tooltip } from '~/components/legacy/Tooltip';
-import { VideoPlayer } from '~/components/legacy/VideoPlayer';
+// The page of one plugin: the title, the description, the install link, the
+// preview, the README and the facts about the plugin (publisher, homepage,
+// package, version, installs, last update).
+import xss from 'xss';
+import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Button } from '~/components/Button';
+import { Hero } from '~/components/Hero';
+import { Markdown } from '~/components/Markdown';
+import { OfficialBadge } from '~/components/PluginCard';
+import { Prose } from '~/components/Prose';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Section } from '~/components/Section';
+import { detail } from '~/data/plugins';
+import Layout from '~/layouts/Layout.astro';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import LLMDate from '~/components/legacy/LLMDate/Component.astro';
+import { overrideSeo, seoOgType } from '~/lib/datocms/seo';
+import { formatLongDate } from '~/lib/format/date';
 import { getGravatarUrl } from '~/lib/gravatar';
-import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
+import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
-import { isVideo } from '~/components/legacy/VideoPlayer/graphql';
-import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import xss from 'xss';
-import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 const variables = {
   slug: Astro.params.rest!,
@@ -35,167 +34,150 @@ if (!page || !page.readme) {
 }
 
 const avatarUrl = getGravatarUrl(page.author.email);
+const video = page.previewImage?.video;
 ---
 
-<Layout noFinalCta seo={overrideSeo(page.seo, seoOgType('website'))}>
-  <Space top={2}>
-    <Wrapper>
-      <div class={s.grid}>
-        <div class={s.content}>
-          <div class={s.titleWrapper}>
-            <h1 class={s.title}>
-              {page.title}
-              {
-                page.author.official && (
-                  <Tooltip class={s.officialBadge} tooltipClass={s.officialAuthorTooltip}>
-                    <Svg
-                      name="svg/datocms/icon/color/color_d_icon"
-                      aria-label="DatoCMS Official Plugin"
-                      width={28}
-                      height={28}
-                    />
-                    <Fragment slot="tooltip">DatoCMS Official Plugin</Fragment>
-                  </Tooltip>
-                )
-              }
-            </h1>
+<Layout
+  seo={overrideSeo(page.seo, seoOgType('website'))}
+  theme="orange"
+  headerVariant="light"
+  footerTheme="orange"
+>
+  <Hero variant="light" headline={page.title} subheadline={page.description}>
+    <div slot="intro" class={s.intro}>
+      {
+        page.author.official && (
+          <p class:list={[s.officialNote, 'subtitleMedium']}>
+            <OfficialBadge size={20} />
+            {detail.officialBadge}
+          </p>
+        )
+      }
+      <set-plugin-install-url data-package-name={page.packageName}>
+        <Button href={dashboardUrl()} appearance="deep-on-light" attrs={{ target: '_blank' }}>
+          {detail.install}
+        </Button>
+      </set-plugin-install-url>
+    </div>
+  </Hero>
+
+  <Section>
+    <div class={s.grid}>
+      <div class={s.content}>
+        {
+          page.previewImage?.responsiveImage && (
+            <div class={s.preview}>
+              <ResponsiveImage data={page.previewImage.responsiveImage} />
+            </div>
+          )
+        }
+
+        {
+          video && (
+            <figure class={s.preview}>
+              <video
+                controls
+                playsinline
+                preload="none"
+                poster={video.thumbnailUrl}
+                width={video.width}
+                height={video.height}
+                aria-label={video.alt ?? video.title ?? undefined}
+                style={{
+                  aspectRatio: `${video.width} / ${video.height}`,
+                  background: video.blurUpThumb
+                    ? `center / cover url("${video.blurUpThumb}")`
+                    : undefined,
+                }}
+              >
+                <source src={video.streamingUrl} type="application/vnd.apple.mpegurl" />
+                {video.mp4Url && <source src={video.mp4Url} type="video/mp4" />}
+              </video>
+              {video.title && <figcaption class="caption">{video.title}</figcaption>}
+            </figure>
+          )
+        }
+
+        <a href={detail.noteHref} class:list={[s.note, 'body']}>
+          <strong>{page.author.official ? detail.officialNote : detail.communityNote}</strong>{' '}
+          {detail.noteBody}
+        </a>
+
+        <Prose>
+          <Markdown of={xss(page.readme)} />
+        </Prose>
+      </div>
+
+      <aside class={s.aside}>
+        {
+          page.coverImage && (
+            <div class={s.cover}>
+              <ResponsiveImage data={page.coverImage.responsiveImage} />
+            </div>
+          )
+        }
+
+        <set-plugin-install-url data-package-name={page.packageName}>
+          <Button href={dashboardUrl()} appearance="deep-on-light" attrs={{ target: '_blank' }}>
+            {detail.install}
+          </Button>
+        </set-plugin-install-url>
+
+        <dl class={s.facts}>
+          <div class={s.fact}>
+            <dt class="subtitleMedium">Publisher</dt>
+            <dd class={s.publisher}>
+              <img src={avatarUrl} alt="" width="40" height="40" />
+              <span class="body">{page.author.name}</span>
+            </dd>
           </div>
-          <h3 class={s.subtitle}>{page.description}</h3>
-          <Space top={1}>
-            <div class={s.ctaMobile}>
-              <set-plugin-install-url data-package-name={page.packageName}>
-                <Button as="a" href={dashboardUrl()} target="_blank" fs="small" p="small">
-                  Install plugin
-                </Button>
-              </set-plugin-install-url>
-            </div>
-          </Space>
 
           {
-            page.previewImage?.responsiveImage && (
-              <div class={s.previewVisual}>
-                <div class={s.previewVisualImage}>
-                  <ResponsiveImage data={page.previewImage.responsiveImage} />
-                </div>
-              </div>
-            )
-          }
-
-          {
-            page.previewImage && isVideo(page.previewImage) && (
-              <div class={s.previewVisual}>
-                <div class={s.previewVisualVideo}>
-                  <VideoPlayer data={page.previewImage} />
-                </div>
-              </div>
-            )
-          }
-
-          <Announce href="/docs/plugin-sdk/introduction">
-            <strong>
-              {
-                page.author.official
-                  ? 'This is an Official DatoCMS Plugin!'
-                  : 'This is a Community Plugin!'
-              }
-            </strong>{' '}
-            Learn how create your own plugin, or copy and remix existing ones in our documentation
-          </Announce>
-
-          <Prose>
-            <div class={s.documentation} data-monospace="true">
-              <Markdown of={xss(page.readme)} />
-            </div>
-          </Prose>
-        </div>
-
-        <aside class={s.aside}>
-          <div class={s.asideContent}>
-            <Card title={page.title} background="azure">
-              <Fragment slot="title">
-                <span>
-                  {page.title}
-                  {
-                    page.author.official && (
-                      <Tooltip class={s.officialBadge} tooltipClass={s.officialAuthorTooltip}>
-                        <Svg
-                          name="svg/datocms/icon/color/color_d_icon"
-                          aria-label="DatoCMS Official Plugin"
-                          width={16}
-                          height={16}
-                        />
-                        <Fragment slot="tooltip">DatoCMS Official Plugin</Fragment>
-                      </Tooltip>
-                    )
-                  }
-                </span>
-              </Fragment>
-              {
-                page.coverImage && (
-                  <Fragment slot="image">
-                    <ResponsiveImage data={page.coverImage.responsiveImage} />
-                  </Fragment>
-                )
-              }
-              {page.description}
-              <Fragment slot="below">
-                <div class={s.cardCta}>
-                  <set-plugin-install-url data-package-name={page.packageName}>
-                    <Button as="a" block href={dashboardUrl()} target="_blank" fs="small">
-                      Install plugin
-                    </Button>
-                  </set-plugin-install-url>
-                </div>
-              </Fragment>
-            </Card>
-
-            <div class={s.publisher}>
-              <h4>Publisher</h4>
-              <article>
-                <div class={s.publisherIcon}>
-                  <img src={avatarUrl} alt={page.author.name} />
-                </div>
-                <p>{page.author.name}</p>
-              </article>
-            </div>
-
-            {
-              page.homepage && (
-                <div class={s.info}>
-                  <h4>Homepage</h4>
-                  <a href={page.homepage} target="_blank">
+            page.homepage && (
+              <div class={s.fact}>
+                <dt class="subtitleMedium">Homepage</dt>
+                <dd class="body">
+                  <a href={page.homepage} target="_blank" rel="noreferrer">
                     Visit homepage
                   </a>
-                </div>
-              )
-            }
+                </dd>
+              </div>
+            )
+          }
 
-            <div class={s.info}>
-              <h4>Package</h4>
-              <a href=`https://www.npmjs.com/package/${page.packageName}` target="_blank">
+          <div class={s.fact}>
+            <dt class="subtitleMedium">Package</dt>
+            <dd class="body">
+              <a
+                href={`https://www.npmjs.com/package/${page.packageName}`}
+                target="_blank"
+                rel="noreferrer"
+              >
                 Visit npm
               </a>
-            </div>
-
-            <div class={s.info}>
-              <h4>Current version</h4>
-              <p>{page.version}</p>
-            </div>
-
-            <div class={s.info}>
-              <h4>Install count</h4>
-              <p>{page.installs}</p>
-            </div>
-
-            <div class={s.info}>
-              <h4>Last update</h4>
-              <p><LLMDate date={page.lastUpdate} /></p>
-            </div>
+            </dd>
           </div>
-        </aside>
-      </div>
-    </Wrapper>
-  </Space>
+
+          <div class={s.fact}>
+            <dt class="subtitleMedium">Current version</dt>
+            <dd class="body">{page.version}</dd>
+          </div>
+
+          <div class={s.fact}>
+            <dt class="subtitleMedium">Install count</dt>
+            <dd class="body">{page.installs}</dd>
+          </div>
+
+          <div class={s.fact}>
+            <dt class="subtitleMedium">Last update</dt>
+            <dd class="body">
+              <time datetime={page.lastUpdate}>{formatLongDate(page.lastUpdate)}</time>
+            </dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </Section>
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>
@@ -203,6 +185,8 @@ const avatarUrl = getGravatarUrl(page.author.email);
 <script>
   import { WebComponent } from '~/lib/WebComponent';
 
+  // Points the install link to the project of the visitor. The index page
+  // saves the project in the session when the dashboard opens it.
   window.customElements.define(
     'set-plugin-install-url',
     class SetPluginInstallUrl extends WebComponent {
