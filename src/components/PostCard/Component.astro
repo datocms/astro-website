@@ -1,5 +1,7 @@
 ---
+import { MediaCard } from '~/components/MediaCard';
 import { PixelImage } from '~/components/PixelImage';
+import { PlainText } from '~/components/StructuredText';
 import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { readFragment } from '~/lib/datocms/graphql';
@@ -8,38 +10,117 @@ import { ChatCardFragment, PostCardFragment } from './graphql';
 import type { PostCardItem } from './types';
 import styles from './style.module.css';
 
-type Props = PostCardItem;
+type Props = PostCardItem & {
+  /**
+   * "full" (the default) is the card of the blog grid: a 5:3 cover, the
+   * excerpt and a byline. "compact" is the card of RelatedPosts: the
+   * cover, the title and the date.
+   */
+  variant?: 'full' | 'compact';
+};
 
+const { variant = 'full' } = Astro.props;
 const chat = Astro.props.chat ? readFragment(ChatCardFragment, Astro.props.chat) : undefined;
 const post = Astro.props.post ? readFragment(PostCardFragment, Astro.props.post) : undefined;
-const card = (chat ?? post)!;
-const date = card._firstPublishedAt ?? card._createdAt;
+const item = (chat ?? post)!;
 const href = chat ? buildUrlForCustomerStory(chat) : buildUrlForBlogPost(post!);
-// A casual chat shows a label with the names of the people, above the title.
-const label = chat
-  ? `Casual chat with ${new Intl.ListFormat('en', { type: 'conjunction' }).format(chat.people.map((person) => person.name))}`
-  : undefined;
+const date = item._firstPublishedAt ?? item._createdAt;
+const people = chat ? chat.people : post!.author;
+const names = new Intl.ListFormat('en', { type: 'conjunction' }).format(
+  people.map((person) => person.name),
+);
+
+// The CMS keeps the Unsplash username of a photo in its custom data.
+const unsplashUsername = (item.coverImage?.customData as Record<string, string> | null)
+  ?.unsplash_author_username;
+const credit =
+  item.coverImage?.author && unsplashUsername
+    ? {
+        author: item.coverImage.author,
+        href: `https://unsplash.com/@${unsplashUsername}?utm_source=datocms&utm_medium=referral`,
+      }
+    : undefined;
 ---
 
-<a href={href} class={styles.card}>
-  {
-    card.coverImage?.url ? (
-      <PixelImage
-        class={styles.image}
-        src={card.coverImage.url}
-        alt={card.coverImage.alt ?? ''}
-        width="569"
-        height="385"
-        loading="lazy"
-        decoding="async"
-      />
-    ) : (
-      <span class={styles.image} />
-    )
-  }
-  <span class={styles.text}>
-    {label && <span class:list={[styles.label, 'caption']}>{label}</span>}
-    <span class:list={[styles.title, 'h2']}>{card.title}</span>
-    <time class:list={[styles.date, 'body']} datetime={date}>{formatLongDate(date)}</time>
-  </span>
-</a>
+{
+  variant === 'compact' ? (
+    <a href={href} class={styles.compact}>
+      {item.coverImage?.compactUrl ? (
+        <PixelImage
+          class={styles.compactImage}
+          src={item.coverImage.compactUrl}
+          alt={item.coverImage.alt ?? ''}
+          width="569"
+          height="385"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <span class={styles.compactImage} />
+      )}
+      <span class={styles.compactText}>
+        {/* A casual chat shows a label with the names of the people, above the title. */}
+        {chat && (
+          <span class:list={[styles.compactLabel, 'caption']}>Casual chat with {names}</span>
+        )}
+        <span class:list={[styles.compactTitle, 'h2']}>{item.title}</span>
+        <time class:list={[styles.compactDate, 'body']} datetime={date}>
+          {formatLongDate(date)}
+        </time>
+      </span>
+    </a>
+  ) : (
+    /*
+      The card of the case studies (MediaCard): the excerpt in
+      place of the description, a byline in place of the logo.
+      The credit of the photo is a link, thus it cannot be inside
+      the link of the card: it is on top of the card.
+    */
+    <div class={styles.root}>
+      <MediaCard
+        href={href}
+        image={
+          item.coverImage
+            ? { src: item.coverImage.fullUrl, alt: item.coverImage.alt ?? '' }
+            : undefined
+        }
+        imageShape="cover"
+        title={item.title}
+      >
+        <PlainText slot="description" data={item.excerpt} />
+        <span class={styles.byline}>
+          <span class={styles.avatars}>
+            {people.map((person) => (
+              <img
+                class={styles.avatar}
+                src={person.avatar.url}
+                alt=""
+                width="30"
+                height="30"
+                loading="lazy"
+              />
+            ))}
+          </span>
+          <span class:list={[styles.bylineText, 'caption']}>
+            <span class={styles.names}>{chat ? `Casual chat with ${names}` : names}</span>
+            <time class={styles.bylineDate} datetime={date}>
+              {formatLongDate(date)}
+            </time>
+          </span>
+        </span>
+      </MediaCard>
+      {credit && (
+        <div class={styles.creditBox}>
+          <a
+            class:list={[styles.credit, 'caption']}
+            href={credit.href}
+            target="_blank"
+            rel="noopener"
+          >
+            Photo by {credit.author}
+          </a>
+        </div>
+      )}
+    </div>
+  )
+}

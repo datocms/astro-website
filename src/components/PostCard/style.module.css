@@ -1,11 +1,83 @@
 /* @layer blocks */
-.card {
+
+/* The variant "full": a MediaCard with a byline. */
+
+.root {
+  position: relative;
+}
+
+/* In place of the logo of a case study: about as high as the logo box (30). */
+.byline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+/* More than one person: the portraits overlap. */
+.avatars {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.avatar {
+  border-radius: 50%;
+}
+
+.avatar + .avatar {
+  margin-left: calc(-1 * var(--space-2xs));
+}
+
+.bylineText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4xs);
+  min-width: 0;
+}
+
+.names {
+  color: var(--text-primary);
+}
+
+.bylineDate {
+  color: var(--text-muted);
+}
+
+/* The box has the size of the cover (5:3), on top of it. */
+.creditBox {
+  position: absolute;
+  inset: 0 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: var(--space-2xs);
+  aspect-ratio: 5 / 3;
+  pointer-events: none;
+}
+
+.credit {
+  padding: var(--space-5xs) var(--space-2xs);
+  color: var(--text-primary);
+  background: var(--surface-default);
+  border-radius: var(--radius-full);
+  pointer-events: auto;
+}
+
+@media (hover: hover) {
+  .credit:hover {
+    text-decoration: underline;
+  }
+}
+
+/* The variant "compact": the cover, the title and the date. */
+
+.compact {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
 }
 
-.image {
+/* Square below 1152, 385 high from 1152. */
+.compactImage {
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
@@ -13,27 +85,27 @@
   border-radius: var(--radius-md);
 }
 
-.text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs);
-}
-
-.title {
-  color: var(--text-primary);
-}
-
-.date {
-  color: var(--text-muted);
-}
-
 @media (min-width: 1152px) {
-  .image {
+  .compactImage {
     aspect-ratio: auto;
     height: 385px;
   }
 }
 
-.label {
+.compactText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.compactLabel {
+  color: var(--text-muted);
+}
+
+.compactTitle {
+  color: var(--text-primary);
+}
+
+.compactDate {
   color: var(--text-muted);
 }

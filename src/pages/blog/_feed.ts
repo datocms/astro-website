@@ -1,9 +1,5 @@
 import type { AstroGlobal } from 'astro';
-import {
-  ChatTeaserFragment,
-  PostTeaserFragment,
-  type PostTeaserItem,
-} from '~/components/PostTeaser';
+import { ChatCardFragment, PostCardFragment, type PostCardItem } from '~/components/PostCard';
 import * as blog from '~/data/blog';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQuery, executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
@@ -25,11 +21,11 @@ export const postsQuery = graphql(
       items: allBlogPosts(first: 1000, filter: $filter) {
         _firstPublishedAt
         _createdAt
-        ...PostTeaserFragment
+        ...PostCardFragment
       }
     }
   `,
-  [PostTeaserFragment],
+  [PostCardFragment],
 );
 
 export const chatsQuery = graphql(
@@ -38,11 +34,11 @@ export const chatsQuery = graphql(
       items: allCustomerStories(first: 1000) {
         _firstPublishedAt
         _createdAt
-        ...ChatTeaserFragment
+        ...ChatCardFragment
       }
     }
   `,
-  [ChatTeaserFragment],
+  [ChatCardFragment],
 );
 
 /** The SEO of the index pages, and the categories for the links above the grid. */
@@ -137,7 +133,7 @@ export async function loadFeedPage(Astro: AstroGlobal, page: number, filter: Fee
     filter.kind === 'category' ? { items: [] } : executeQuery(Astro, chatsQuery),
   ]);
 
-  const feed: (PostTeaserItem & { date: string })[] = [
+  const feed: (PostCardItem & { date: string })[] = [
     ...posts.items.map((post) => ({ post, date: post._firstPublishedAt ?? post._createdAt })),
     ...chats.items.map((chat) => ({ chat, date: chat._firstPublishedAt ?? chat._createdAt })),
   ];
@@ -146,7 +142,7 @@ export async function loadFeedPage(Astro: AstroGlobal, page: number, filter: Fee
 
   const cards = feed
     .slice((page - 1) * blog.perPage, page * blog.perPage)
-    .map(({ date: _, ...card }) => card as PostTeaserItem);
+    .map(({ date: _, ...card }) => card as PostCardItem);
   if (cards.length === 0) return null;
 
   const seo =
