@@ -1,5 +1,5 @@
 .section {
-  padding: 50px 0 0;
+  padding: var(--space-xl) 0 0;
   position: relative;
 }
 
@@ -13,19 +13,20 @@
 .row {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  gap: 32px;
+  gap: var(--space-lg);
 
-  @media (width < 900px) {
+  @media (max-width: 767px) {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: var(--space-md);
   }
 }
 
 .rowItem {
+  grid-column: 1 / -1;
   min-width: 0;
 
-  @media (width < 900px) {
-    grid-column: 1 / -1 !important;
+  @media (min-width: 768px) {
+    grid-column: span var(--span);
   }
 }
 
@@ -35,43 +36,43 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
-  gap: 14px;
+  margin-bottom: var(--space-sm);
+  padding-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--border-default);
+  gap: var(--space-xs);
 }
 
 .sectionHeaderLeft {
   display: flex;
   align-items: baseline;
-  gap: 14px;
+  gap: var(--space-xs);
   flex-wrap: wrap;
 }
 
 .kicker {
   font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: var(--weight-bold);
-  color: var(--accent-text-color);
+  font-size: var(--type-docs-small);
+  font-weight: 500;
+  color: var(--text-accent);
   text-transform: uppercase;
   margin: 0;
 }
 
 .sectionTitle {
   font-family: var(--font-sans);
-  font-weight: var(--weight-bold);
-  font-size: 20px;
+  font-weight: 500;
+  font-size: var(--type-docs-h3);
   line-height: 1.2;
   letter-spacing: -0.015em;
   margin: 0;
-  color: var(--base-body-color);
+  color: var(--text-primary);
 }
 
 /* Card grid columns */
 
 .cards {
   display: grid;
-  gap: 10px;
+  gap: var(--space-2xs);
 
   &[data-cols='1'] {
     grid-template-columns: 1fr;
@@ -80,7 +81,7 @@
   &[data-cols='2'] {
     grid-template-columns: repeat(2, 1fr);
 
-    @media (width < 600px) {
+    @media (max-width: 649px) {
       grid-template-columns: 1fr;
     }
   }
@@ -88,11 +89,11 @@
   &[data-cols='3'] {
     grid-template-columns: repeat(3, 1fr);
 
-    @media (width < 900px) {
+    @media (max-width: 767px) {
       grid-template-columns: repeat(2, 1fr);
     }
 
-    @media (width < 600px) {
+    @media (max-width: 649px) {
       grid-template-columns: 1fr;
     }
   }
@@ -100,11 +101,11 @@
   &[data-cols='4'] {
     grid-template-columns: repeat(4, 1fr);
 
-    @media (width < 900px) {
+    @media (max-width: 767px) {
       grid-template-columns: repeat(2, 1fr);
     }
 
-    @media (width < 600px) {
+    @media (max-width: 649px) {
       grid-template-columns: 1fr;
     }
   }
@@ -113,37 +114,37 @@
 /* Card */
 
 .card {
-  background: var(--base-bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 14px 16px;
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
   transition: border-color 120ms ease-out;
   text-decoration: none;
   color: inherit;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-4xs);
 
   &:hover {
-    border-color: var(--accent-color);
+    border-color: var(--surface-accent);
   }
 }
 
 .cardTitle {
   font-family: var(--font-sans);
-  font-weight: var(--weight-bold);
-  font-size: 16px;
+  font-weight: 500;
+  font-size: var(--type-docs-body);
   line-height: 1.2;
   margin: 0;
-  color: var(--base-body-color);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-4xs);
 }
 
 .cardDesc {
-  font-size: 14px;
-  color: var(--light-body-color);
+  font-size: var(--type-docs-small);
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.45;
 }
@@ -154,26 +155,26 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 28px;
+  gap: var(--space-lg);
   min-height: 180px;
-  background: var(--base-bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 24px 28px;
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
   text-decoration: none;
   color: inherit;
   transition: border-color 120ms ease-out;
 
   &:hover {
-    border-color: var(--accent-color);
+    border-color: var(--surface-accent);
   }
 }
 
 .panelDesc {
   font-family: var(--font-sans);
-  font-size: 17px;
+  font-size: var(--type-docs-body);
   line-height: 1.45;
-  color: var(--base-body-color);
+  color: var(--text-primary);
   margin: 0;
   max-width: 52ch;
   letter-spacing: -0.005em;
@@ -182,50 +183,50 @@
 .panelCta {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-4xs);
   font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: var(--weight-bold);
-  color: var(--accent-text-color);
+  font-size: var(--type-docs-small);
+  font-weight: 500;
+  color: var(--text-accent);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   transition: gap 120ms ease-out;
 
   span {
     font-family: var(--font-sans);
-    font-size: 16px;
+    font-size: var(--type-docs-body);
     text-transform: none;
     line-height: 1;
   }
 }
 
 .panel:hover .panelCta {
-  gap: 10px;
+  gap: var(--space-2xs);
 }
 
 /* Badges */
 
 .pill {
   font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: var(--weight-bold);
+  font-size: var(--type-docs-label);
+  font-weight: 500;
   letter-spacing: 0.06em;
-  padding: 1.5px 5px;
-  border-radius: 2px;
+  padding: 1.5px var(--space-4xs);
+  border-radius: var(--radius-sm);
   text-transform: uppercase;
 }
 
 .pillNew {
-  background: var(--pill-new-bg-color);
-  color: var(--pill-new-fg-color);
+  background: var(--surface-status-positive);
+  color: var(--text-status-positive);
 }
 
 .pillSoon {
-  background: var(--pill-soon-bg-color);
-  color: var(--pill-soon-fg-color);
+  background: var(--surface-status-warning);
+  color: var(--text-status-warning);
 }
 
 .pillMoved {
-  background: var(--pill-soon-bg-color);
-  color: var(--pill-soon-fg-color);
+  background: var(--surface-status-warning);
+  color: var(--text-status-warning);
 }

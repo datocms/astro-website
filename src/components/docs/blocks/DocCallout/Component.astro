@@ -1,0 +1,31 @@
+---
+import { DocCalloutFragment } from './graphql';
+import type { FragmentOf } from 'gql.tada';
+import { readFragment } from 'gql.tada';
+import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { Text } from '~/components/docs/DocsStructuredText/Text';
+import { defaultLinkToRecordComponents } from '~/components/docs/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/docs/inlineRecords';
+import Base from './Base.astro';
+import { stripStega } from '@datocms/astro';
+
+interface Props {
+  block: FragmentOf<typeof DocCalloutFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+
+const block = readFragment(DocCalloutFragment, maskedBlock);
+
+const { calloutType, title, text } = block;
+---
+
+<Base calloutType={stripStega(calloutType)} title={title}>
+  <Text
+    {...ensureValidStructuredTextProps({
+      data: text,
+      linkToRecordComponents: defaultLinkToRecordComponents,
+      inlineRecordComponents: defaultInlineRecordComponents,
+    })}
+  />
+</Base>

@@ -1,0 +1,22 @@
+---
+import { AcademyChapterLinkFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+import type { TransformedMeta } from 'datocms-structured-text-generic-html-renderer';
+import type { ItemLink } from 'datocms-structured-text-utils';
+import { augmentLinkWithMeta } from '..';
+
+interface Props {
+  node: ItemLink;
+  attrs: TransformedMeta;
+  record: FragmentOf<typeof AcademyChapterLinkFragment>;
+}
+
+const { record, attrs, node } = Astro.props;
+
+const unmaskedRecord = readFragment(AcademyChapterLinkFragment, record);
+---
+
+<a {...attrs} href={augmentLinkWithMeta(node.meta, buildUrlForAcademyChapter(unmaskedRecord))}
+  ><slot /></a
+>

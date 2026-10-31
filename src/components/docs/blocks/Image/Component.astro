@@ -1,0 +1,38 @@
+---
+import type { FragmentOf } from 'gql.tada';
+import { readFragment } from 'gql.tada';
+import { ImageFragment } from './graphql';
+import Media from './Media.astro';
+import { Lightbox } from '~/components/Lightbox';
+import s from './style.module.css';
+
+interface Props {
+  block: FragmentOf<typeof ImageFragment>;
+}
+
+const { block: maskedBlock } = Astro.props;
+
+const { frameless, asset } = readFragment(ImageFragment, maskedBlock);
+
+const imgClass = (frameless ? s.framelessResponsiveImage : s.responsiveImage) ?? '';
+
+const lightboxUrl =
+  asset.width && asset.width > 1500 && asset.lightboxImageUrl ? asset.lightboxImageUrl : null;
+---
+
+<figure data-datocms-content-link-group>
+  <prose-island>
+    {
+      lightboxUrl ? (
+        <Lightbox url={lightboxUrl} label="Enlarge the image" alt={asset.alt ?? ''}>
+          <Media asset={asset} imgClass={imgClass} />
+        </Lightbox>
+      ) : (
+        <div>
+          <Media asset={asset} imgClass={imgClass} />
+        </div>
+      )
+    }
+  </prose-island>
+  {asset.title && <figcaption>{asset.title}</figcaption>}
+</figure>

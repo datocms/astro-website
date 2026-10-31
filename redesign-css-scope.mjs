@@ -63,6 +63,7 @@ export const REDESIGN_PAGE_DIRS = [
   'partners',
   'tech-partners',
   'glossary',
+  'docs',
   'index.astro',
   '_graphql.ts',
   'features/index.astro',
@@ -77,13 +78,20 @@ export const REDESIGN_PAGE_DIRS = [
  */
 export function redesignCssArea(path) {
   const normalized = path.replaceAll('\\', '/');
-  const match = normalized.match(/(?:^|\/)src\/(components|scenes|styles|pages)\/(.+)$/);
-  const area = /** @type {'components' | 'scenes' | 'styles' | 'pages' | undefined} */ (match?.[1]);
+  const match = normalized.match(/(?:^|\/)src\/(components|scenes|styles|pages|layouts)\/(.+)$/);
+  const area = /** @type {'components' | 'scenes' | 'styles' | 'pages' | 'layouts' | undefined} */ (
+    match?.[1]
+  );
   const rest = match?.[2];
   if (!area || rest === undefined) return null;
 
   if (area === 'components') {
     return rest.startsWith(LEGACY_COMPONENTS_PREFIX) ? null : 'components';
+  }
+
+  // The CSS of the docs layout is in the redesign. It is a section.
+  if (area === 'layouts') {
+    return rest.startsWith('docs/') ? 'components' : null;
   }
 
   if (area === 'pages') {
@@ -103,6 +111,7 @@ export function redesignCssGlobs() {
     'src/components/**/*.css',
     'src/scenes/**/*.css',
     'src/styles/**/*.css',
+    'src/layouts/docs/**/*.css',
     ...REDESIGN_PAGE_DIRS.flatMap((dir) => {
       // A file: lint it only when it is a CSS file.
       if (/\.[a-z]+$/.test(dir)) return dir.endsWith('.css') ? [`src/pages/${dir}`] : [];

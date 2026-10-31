@@ -1,0 +1,22 @@
+---
+import { UseCasePageLinkFragment } from './graphql';
+import { readFragment, type FragmentOf } from 'gql.tada';
+import { buildUrlForUseCasePage } from '~/lib/datocms/gqlUrlBuilder/useCasePage';
+import type { TransformedMeta } from 'datocms-structured-text-generic-html-renderer';
+import type { ItemLink } from 'datocms-structured-text-utils';
+import { augmentLinkWithMeta } from '..';
+
+interface Props {
+  node: ItemLink;
+  attrs: TransformedMeta;
+  record: FragmentOf<typeof UseCasePageLinkFragment>;
+}
+
+const { record, attrs, node } = Astro.props;
+
+const unmaskedRecord = readFragment(UseCasePageLinkFragment, record);
+---
+
+<a {...attrs} href={augmentLinkWithMeta(node.meta, buildUrlForUseCasePage(unmaskedRecord))}
+  ><slot /></a
+>

@@ -110,6 +110,11 @@ export default {
       rules: { 'scale-unlimited/declaration-strict-value': null },
     },
     {
+      // The docs rules name the classes of expressive-code (ec-line, expressive-code).
+      files: ['src/layouts/docs/docs.css'],
+      rules: { 'selector-class-pattern': null, 'selector-max-specificity': null },
+    },
+    {
       // Allowed here: the reset must win over everything.
       files: ['src/styles/global.css'],
       rules: { 'declaration-no-important': null },

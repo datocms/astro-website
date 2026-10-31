@@ -1,5 +1,5 @@
-import { fetchDashboardSchema } from '~/components/legacy/docs/dashboardApi/fetchSchema';
-import type { RestApiEntity } from '~/components/legacy/docs/restApi/types';
+import { fetchDashboardSchema } from '~/components/docs/dashboardApi/fetchSchema';
+import type { RestApiEntity } from '~/components/docs/restApi/types';
 import { invariant } from '~/lib/invariant';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';

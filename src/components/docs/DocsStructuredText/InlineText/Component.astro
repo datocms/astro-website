@@ -1,0 +1,13 @@
+---
+import { StructuredText } from '@datocms/astro';
+import NoParagraph from './NoParagraph.astro';
+import type { ComponentProps } from 'astro/types';
+
+type Props = ComponentProps<typeof StructuredText>;
+
+const { nodeOverrides, ...props } = Astro.props;
+---
+
+<span data-datocms-content-link-group>
+  <StructuredText {...props} nodeOverrides={{ paragraph: NoParagraph, ...nodeOverrides }} />
+</span>

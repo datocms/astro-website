@@ -1,0 +1,40 @@
+.button {
+  --expand-icon: svg-load('icons/regular/plus.svg');
+  background: var(--surface-default);
+  color: var(--text-muted);
+  border: 1px solid var(--border-default);
+  margin-top: var(--space-2xs);
+  padding: var(--space-4xs) var(--space-xs);
+  font-family: var(--font-sans);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  font-size: 0.95em;
+  gap: 0.5em;
+
+  &::before {
+    content: '';
+    width: 1em;
+    height: 1em;
+    background: var(--text-subtle);
+    mask: var(--expand-icon) center / contain no-repeat;
+  }
+
+  &[aria-expanded='true']::before {
+    --expand-icon: svg-load('icons/regular/minus.svg');
+  }
+
+  &:hover {
+    color: var(--text-primary);
+  }
+}
+
+.content {
+  display: none;
+
+  &[data-open] {
+    display: contents;
+  }
+}

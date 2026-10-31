@@ -1,4 +1,4 @@
-import { fetchDashboardSchema } from '~/components/legacy/docs/dashboardApi/fetchSchema';
+import { fetchDashboardSchema } from '~/components/docs/dashboardApi/fetchSchema';
 import { invariant } from '~/lib/invariant';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';

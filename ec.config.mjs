@@ -5,7 +5,7 @@ import { defineEcConfig, definePlugin } from 'astro-expressive-code';
  * Give the role of a syntax colour: plain, punctuation, comment, keyword,
  * string, constant or function. The role comes from the hue and the lightness
  * of the colour of the dark theme. The docs map each role to a --code-* token
- * (src/layouts/docs/theme.css).
+ * (src/styles/tokens.css).
  */
 function tokenRole(hex) {
   const [r, g, b] = [1, 3, 5].map((start) => parseInt(hex.slice(start, start + 2), 16) / 255);

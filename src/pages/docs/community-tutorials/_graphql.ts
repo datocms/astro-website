@@ -1,4 +1,4 @@
-import { ResponsiveImageFragment } from '~/components/legacy/LegacyResponsiveImage/graphql';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const query = graphql(

@@ -1,20 +1,20 @@
 ---
 import type { TitleMetaLinkTag } from '@datocms/astro';
-// The stylesheet of the old pages. It must not load on a page of the redesign.
-import '~/layouts/BaseLayout/global.css';
-// The fonts, the tokens and the colour scheme of the docs.
-import '../theme.css';
+// The layers, the tokens, the fonts and the base of the site.
+import '../../../styles/global.css';
+// The rules of the docs that cannot sit in a CSS module (see the file).
+import '../docs.css';
 import { DatoLogo } from '~/components/DatoLogo';
 import symbol from '~/assets/logo/dato-symbol.svg?raw';
 import { BaseLayout } from '~/layouts/BaseLayout';
 import s from './style.module.css';
-import { Svg } from '~/components/legacy/Svg';
-import { Search } from '~/components/legacy/Search';
+import { Svg } from '~/components/docs/Svg';
+import { Search } from '~/components/docs/Search';
 import { Feedback } from './Feedback';
 import { OtherResources } from './OtherResources';
 import { SchemeToggle } from './SchemeToggle';
-import { TargetToggler } from '~/components/legacy/TargetToggler';
-import LLMDate from '~/components/legacy/LLMDate/Component.astro';
+import { TargetToggler } from '~/components/docs/TargetToggler';
+import LLMDate from '~/components/docs/LLMDate/Component.astro';
 
 type Props = {
   seo: TitleMetaLinkTag[];
@@ -25,16 +25,11 @@ type Props = {
 const { seo, contentWrapperComponent, lastUpdatedAt } = Astro.props;
 const ContentWrapper = contentWrapperComponent || 'div';
 
-// The order of the cascade layers. The tokens come first: they only define
-// custom properties.
-const cssLayers = ['tokens', 'reset', 'prose'];
+// The order of the cascade layers (see src/styles/global.css).
+const cssLayers = ['reset', 'tokens', 'base', 'vendor', 'blocks', 'sections', 'pages'];
 ---
 
-<BaseLayout
-  seo={seo}
-  cssLayers={cssLayers}
-  bodyAttributes={{ 'data-docs': '', 'data-theme': 'default' }}
->
+<BaseLayout seo={seo} cssLayers={cssLayers} bodyAttributes={{ 'data-theme': 'default' }}>
   <Fragment slot="head">
     <slot name="head" />
     <link

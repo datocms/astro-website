@@ -1,0 +1,159 @@
+/*
+ * The docs add to Prose (src/components/Prose): the size of the type is
+ * smaller, and a docs page has callouts, details, dense tables and videos.
+ * The scope stops at the children of <prose-island>, as in Prose.
+ */
+.extras {
+  --type-body: var(--type-docs-body);
+}
+
+@scope (.extras) to (prose-island > *) {
+  :scope > * + * {
+    margin-top: var(--space-md);
+  }
+
+  :is(h2, h3, h4, h5, h6) {
+    padding-top: 0;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  :scope > :is(h2, h3, h4, h5, h6) {
+    margin-top: var(--space-xl);
+  }
+
+  :scope > :is(h2, h3, h4, h5, h6) + * {
+    margin-top: var(--space-xs);
+  }
+
+  h2 {
+    font-size: var(--type-docs-h2);
+    letter-spacing: -0.03em;
+  }
+
+  h3 {
+    font-size: var(--type-docs-h3);
+    letter-spacing: -0.02em;
+  }
+
+  h4 {
+    font-size: var(--type-docs-h3);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  :is(h5, h6) {
+    font-size: var(--type-docs-body);
+    font-weight: 500;
+  }
+
+  li + li,
+  li > :is(ul, ol) {
+    margin-top: var(--space-3xs);
+  }
+
+  mark {
+    padding: 0 var(--space-5xs);
+    border-radius: var(--radius-sm);
+  }
+
+  /* The note boxes of the Markdown (callouts). */
+  [data-callout-type] {
+    padding: var(--space-md);
+    background: var(--surface-status-info);
+    border-radius: var(--radius-md);
+  }
+
+  [data-callout-title] {
+    margin-bottom: var(--space-3xs);
+    font-size: var(--type-docs-body);
+    font-weight: 500;
+    line-height: 1.1;
+    color: var(--text-status-info);
+  }
+
+  [data-callout-content] {
+    font-size: var(--type-docs-small);
+    line-height: 1.4;
+  }
+
+  [data-callout-type='warning'] {
+    background: var(--surface-status-warning);
+  }
+
+  [data-callout-type='warning'] [data-callout-title] {
+    color: var(--text-status-warning);
+  }
+
+  [data-callout-type='positive'] {
+    background: var(--surface-status-positive);
+  }
+
+  [data-callout-type='positive'] [data-callout-title] {
+    color: var(--text-status-positive);
+  }
+
+  /* A list of details is one box: the borders join. */
+  details {
+    font-size: var(--type-docs-small);
+    border: 1px solid var(--border-default);
+  }
+
+  :scope > details + details {
+    margin-top: 0;
+    border-top: 0;
+  }
+
+  summary {
+    padding: var(--space-2xs) var(--space-md);
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  summary:hover {
+    background: var(--surface-accent-faint);
+  }
+
+  details[open] {
+    padding-bottom: var(--space-sm);
+  }
+
+  details[open] > :not(summary) {
+    margin-inline: var(--space-md);
+  }
+
+  /* A reference table: dense, with a small header. */
+  table {
+    font-size: var(--type-docs-small);
+    line-height: 1.3;
+  }
+
+  :is(th, td) {
+    padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) 0;
+  }
+
+  @media (min-width: 768px) {
+    :is(th, td):first-child {
+      width: auto;
+    }
+  }
+
+  th {
+    font-size: var(--type-docs-label);
+    letter-spacing: 0;
+  }
+
+  td {
+    font-weight: 400;
+  }
+
+  mux-player {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+  }
+
+  :is(figcaption, blockquote cite) {
+    font-size: var(--type-docs-small);
+  }
+}
