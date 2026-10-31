@@ -29,7 +29,9 @@ const { property, showRequiredOptional = true } = Astro.props;
       JSON.stringify(property.types).length < 20 && (
         <span class={s.inlineTypes}>
           {intersperse(
-            property.types.map((type) => <span class={s.type}>{inlineMarkdown(type)}</span>),
+            property.types.map((type) => (
+              <span class={s.type} set:html={inlineMarkdown(type).then(String)} />
+            )),
             ', ',
           )}
         </span>
@@ -71,7 +73,9 @@ const { property, showRequiredOptional = true } = Astro.props;
         <div>
           Type:
           {intersperse(
-            property.types.map((type) => <span class={s.type}>{inlineMarkdown(type)}</span>),
+            property.types.map((type) => (
+              <span class={s.type} set:html={inlineMarkdown(type).then(String)} />
+            )),
             ', ',
           )}
         </div>
