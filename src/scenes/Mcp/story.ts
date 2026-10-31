@@ -103,10 +103,10 @@ export const CONFIRM = {
 };
 
 /**
- * The thread of the home page (Thread.astro): the chat of the frame and
- * its next turn, in a narrow column for a portrait box. The person asks,
- * the assistant lists the pages with no description, the person says yes
- * to its offer, and the app asks before the read-write script runs (the
+ * The thread of the chapter: the chat of the frame and its next turn, in a
+ * narrow column for a portrait box (the next turn shows in Confirm.astro).
+ * The person asks, the assistant lists the pages with no description, the
+ * person says yes to its offer, and the app asks before the read-write script runs (the
  * card of CONFIRM). The answer gives four pages and the count of the
  * others, thus the thread fits in the box.
  */

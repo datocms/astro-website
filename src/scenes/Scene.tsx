@@ -71,7 +71,7 @@ export function Scene({ theme, appearance = {}, ...stage }: SceneProps) {
  * The colour properties of the screen of a scene (`--pigment-*`, and
  * `--wash-*` or the two ramps of a scene that follows the page) for each theme, as an inline style. The kit computes them
  * on the server only. Thus a page that changes the theme of a scene in
- * the browser gets them from here (see ThemedScene.astro).
+ * the browser gets them from here.
  */
 export function scenePalettes(
   appearance: Omit<SceneAppearance, 'theme'> = {},
