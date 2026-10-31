@@ -195,7 +195,7 @@ While the port runs, the components of the prototype keep their prototype props 
 
 ## Out of scope
 
-- The routes that the prototype marks `todo` (partners, security, support, `/cms/[slug]`, the landing pages…), the docs. They stay on `LegacyLayout`.
+- The routes that the prototype marks `todo` (partners, security, support, `/cms/[slug]`…), the docs. They stay on `LegacyLayout`.
 - The CMS models for the static copy in `src/data/`. That is a later phase.
 
 ## Open decisions
@@ -215,7 +215,7 @@ The points that wait for a human. Remove a point when it is decided (write the d
   - Docs type: `--type-docs-body` 16/17px, `--type-docs-small` 14/15, `--type-docs-label` 12, `--type-docs-h2` 24/28, `--type-docs-h3` 20/22. Pages are 8-10% shorter than before; the marketing `--type-body` (20px) is not used in the docs.
   - Widths: 1320 (1010/270), 1500 (1110/300), 1600 (1210/300), as before. The old 1300 step is now 1320. Fluid `rfs()` spacing is now fixed `--space-*` (`Space top=3` is 160px on all screens).
   - Expressive-code CSS stays unlayered in `src/layouts/docs/docs.css`.
-  - 14 shared components are copied into `src/components/docs/` (Card, Carousel, Code, Search, `DocsStructuredText`, inlineRecords, linkToRecords…): two copies until `/cms` and `/lp` move. Then swap the docs to the new StructuredText blocks and delete the copies.
+  - 14 shared components are copied into `src/components/docs/` (Card, Carousel, Code, Search, `DocsStructuredText`, inlineRecords, linkToRecords…): two copies until `/cms` moves. Then swap the docs to the new StructuredText blocks and delete the copies.
   - The docs `Markdown` (tabs, callouts) is still separate from the new `Markdown` (no tabs parsing).
   - Search: only the card, backdrop, input and radii are restyled; the Ask AI, answer and filter screens need a visual pass.
   - Visual review still to do, component by component, against the shots of the comparison page (dark mode of all blocks, the mobile drawer, the scheme toggle, the Markdown actions menu).
@@ -298,3 +298,4 @@ Each step adds one line here: the date, the step, the result, and what a human m
 - 2026-10-31, step 26: the docs components are out of `legacy/` (`src/components/docs/`), the docs layout has the layer statement of the site and imports `styles/global.css`, and the docs CSS is linted (commits `Add the tokens that the docs need`, `Move the docs to the redesign layers and tokens`, `Keep a wider docs layout on screens of 1600px and more`, `Restore the 1500px docs step`). The bridge `src/layouts/docs/theme.css` is deleted. New tokens in `src/styles/tokens.css`: the docs type sizes, `--text-accent|positive|negative`, `--surface-status-*` and `--text-status-*`, `--surface-nav-active`, `--text-nav-active`, `--surface-field`, `--border-field`, `--shadow-popover`, `--shadow-card`, `--scrim`. Swapped to the new blocks: Prose (as `DocsProse`), MarkdownActions, ResponsiveImage, Lightbox, VideoPlayer, Button. `REDESIGN_PAGE_DIRS`: `docs`. Content parity on 18 docs pages: same visible text and links; the Image block gets an "Enlarge the image" button. Checks: `astro check` 0 errors, `lint:css` 0 errors and 21 warnings, build passes. Open points: see "Open decisions".
 - 2026-10-31: the docs use the theme `purple` (it was `default`).
 - 2026-10-31: `/use-cases/[slug]` is deleted, as `/made-for/*` was (no port). The 5 pages (`knowledge-management`, `ecommerce`, `modern-websites`, `digital-publishing`, `headless-cms-travel`) and the older aliases (`/use-cases/docs`, `/use-cases/headless-cms-*`, `/use-cases/headless-ecommerce`) redirect to `/` (301), as `/use-cases` did. Legacy components with no user left are deleted: `Card`, `LegacyProse`, `SameLevelNavigation`, `StripWithContent`. The CMS records and the StructuredText blocks stay for now (see "CMS pass: use cases" in the open decisions).
+- 2026-10-31: the campaign landing pages are deleted (the marketing lead closed the campaigns): `/lp/migcs` → `/`, `/lp/modernize-cms` and `/lp/nuxt2eol` → `/partners/voorhoede` (301, the `thanks` pages too). Deleted with them: `src/layouts/lp`, the actions `submitMigcsRequest`, `submitDvRequest`, `submitDvLegacyCmsRequest` (and their Turnstile actions) and the legacy `Journey` (no user left). `robots.txt` keeps `Disallow: /lp/`.

@@ -6,7 +6,7 @@ Astro standalone Node server, deployed via `cubo` to Kubernetes on AWS. Three en
 
 The branch `redesign` ports the new site from the prototype, page by page (`PLAN.md`). Until the end of the port, two families of pages live side by side. Never mix them on one page.
 
-- **Old pages**: `src/layouts/LegacyLayout` (and `src/layouts/lp`). They import the old stylesheet `src/layouts/BaseLayout/global.css`, use the view transitions router, and have the layer statement `@layer reset, prose;`.
+- **Old pages**: `src/layouts/LegacyLayout`. They import the old stylesheet `src/layouts/BaseLayout/global.css`, use the view transitions router, and have the layer statement `@layer reset, prose;`.
 - **New pages**: `src/layouts/Layout.astro`. It imports `src/styles/global.css` and the scene kit CSS, has no router (a full load), and has the layer statement `@layer reset, tokens, base, vendor, blocks, sections, pages;`. Its rules are in `src/REDESIGN.md`: read it before you touch the new code.
 - **Docs pages** (`src/pages/docs/`): `src/layouts/docs/BaseLayout` is a new-family layout. It imports `src/styles/global.css`, has the new layer statement, and its components are in `src/components/docs/` (no `legacy` prefix, tokens from `src/styles/tokens.css`).
 - Both use `src/layouts/BaseLayout` for the head (SEO, favicon, canonical, RSS, cookie consent, analytics, draft mode). BaseLayout imports no global stylesheet. Its props `cssLayers`, `clientRouter` and `bodyAttributes` select the family. The layer statement is always the first child of `<head>`.
