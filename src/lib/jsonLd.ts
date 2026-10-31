@@ -13,7 +13,7 @@ export function courseId(base: string | URL, slug: string) {
   return new URL(`/academy/${slug}#course`, base).href;
 }
 
-export function organizationLogoUrl(base: string | URL) {
+function organizationLogoUrl(base: string | URL) {
   return new URL('/brand/main-lockup.svg', base).href;
 }
 
