@@ -23,6 +23,66 @@ Each client `<script>` (not `is:inline`) is a custom element that extends `WebCo
 - A custom element is `display: inline` by default. Set its `display` in the CSS. When the root must be a semantic element (`<form>`, `<nav>`, `<button>`, `<table>`), put the custom element around it.
 - Keep a plain script only when no element owns the behaviour, for example analytics or cookie consent.
 
+## Dev servers, checks and worktrees
+
+Many agents can work on this repo at the same time. Each agent must use its own port and its own processes.
+
+### Dev servers
+
+- Always start `astro dev` with `--ignore-lock` and `--port`. Start it with the Bash tool's `run_in_background`:
+  ```
+  npx dotenv -e .env.development -- npx astro dev --ignore-lock --port 4701
+  ```
+- Do not start `astro dev` without `--ignore-lock`. Astro finds the agent and starts a background server. If a server already runs on the same tree, Astro prints `Dev server already running at <url>`, ignores your `--port`, and exits with 0. Your server does not start.
+- Use a port that is not the default port 4321. Before you start, make sure that the port is free. This command must print nothing:
+  ```
+  lsof -nP -iTCP:4701 -sTCP:LISTEN
+  ```
+- Vite does not stop when the port is busy. It takes the next free port and logs `Port 4701 is in use, trying another one...`. Then your requests go to the server of a different agent. Read the `Local` URL in your log.
+- Wait for the server with `/_astro/status`. It answers when the server is ready:
+  ```
+  curl -sf --retry 60 --retry-connrefused --retry-delay 1 -o /dev/null http://localhost:4701/_astro/status
+  ```
+- Stop only your server. Stop it by its port:
+  ```
+  kill $(lsof -nP -iTCP:4701 -sTCP:LISTEN -t)
+  ```
+- Do not use `astro dev stop`, `pkill` or `killall`. `astro dev stop` stops the background server of the tree, and that server can belong to the user or to a different agent.
+- Two servers on the same tree see the same files. An edit from one agent changes the pages of all the servers on that tree.
+
+### Checks and builds
+
+- You can run `astro check` and `astro build` while a dev server runs on the same tree. The dev server continues to answer.
+- `astro check` takes approximately 45 s. `astro build` takes approximately 5 s.
+- Run them in a worktree, not in the main tree, when a different agent works in the main tree. `astro build` writes `dist/`, and `astro check` and `astro build` write `.astro/`.
+
+### Worktrees
+
+- Use a worktree when you change files that a different agent also changes, or when you want your own `dist/`.
+- Put the worktree outside the main tree. Make it with the script. The script runs `npm ci` (approximately 15 s):
+  ```
+  scripts/agent-worktree.sh /path/to/worktree
+  ```
+- Use `--clone` when you have no network. The script then makes an APFS clone of `node_modules` (approximately 22 s).
+- Do not make `node_modules` a symlink. Vite resolves the symlink to a path outside the worktree. Then every page gives a 500 error (`No cached compile metadata found`), or the React islands do not load (`outside of Vite serving allow list`).
+- Do not put the worktree below a directory that has a `node_modules`, with no `node_modules` in the worktree. The same 403 error occurs.
+- Do not copy `.env.development` into the worktree. Read the file of the main tree with an absolute path:
+  ```
+  cd /path/to/worktree && npx dotenv -e /path/to/main/.env.development -- npx astro dev --ignore-lock --port 4702
+  cd /path/to/worktree && npx dotenv -e /path/to/main/.env.development -- npx astro check
+  cd /path/to/worktree && npx dotenv -e /path/to/main/.env.development -- npx astro build
+  ```
+- When you copy the tree with `rsync` or `cp`, do not copy `.astro/`. It contains `dev.json`, the lock of a server that runs in the main tree.
+- When you finish, stop your servers and remove the worktree:
+  ```
+  git worktree remove --force /path/to/worktree
+  ```
+
+### Browsers
+
+- Give each `agent-browser` call your own session: `agent-browser --session <your-name> ...`. Without `--session`, all agents share the `default` session.
+- Close only your session: `agent-browser --session <your-name> close`. Do not use `close --all`.
+
 ## Environment variables
 
 Three distinct mechanisms — pick the right one by asking: **when is the value needed, and is it secret?**
