@@ -462,12 +462,15 @@
  * schemes. The scrim dims the page behind a drawer.
  *   shadow-popover  A popover, a drawer, a dropdown.
  *   shadow-card     A card on hover, a media frame.
+ *   scrim-modal     The page behind a modal (the search). It dims more
+ *                   than the scrim. The dark scheme has its own value.
  */
 :root {
   --shadow-popover:
     0 1px 2px rgb(0 0 0 / 0.04), 0 6px 14px rgb(0 0 0 / 0.08), 0 20px 40px rgb(0 0 0 / 0.1);
   --shadow-card: 0 1px 3px rgb(0 0 0 / 0.1), 0 6px 20px rgb(0 0 0 / 0.1);
   --scrim: rgb(0 0 0 / 0.4);
+  --scrim-modal: var(--color-brown-deep-3);
 }
 
 /*
@@ -493,6 +496,11 @@
  */
 :root[data-scheme='dark'] {
   color-scheme: dark;
+  /*
+   * The page is dark: a dark brown does not dim it. Black with the alpha
+   * of the light value (70%) dims it as much.
+   */
+  --scrim-modal: rgb(0 0 0 / 0.7);
 }
 
 :root[data-scheme='dark'],

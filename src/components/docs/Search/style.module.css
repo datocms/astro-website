@@ -163,7 +163,7 @@
 
 /*
  * Below 768: a full-screen sheet. 768+: a card in the centre of the
- * viewport, over the page dimmed with surface/inverse-muted. The backdrop
+ * viewport, over the page dimmed with --scrim-modal. The backdrop
  * sets the default theme: the modal must not take the theme of the page.
  */
 .backdrop {
@@ -173,16 +173,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* The token already has 70% alpha. */
-  background: var(--surface-inverse-muted);
-}
-
-/*
- * The dark scheme: the dimmed page and the card have nearly the same
- * colour. Dim the page with the inverse surface and ring the card.
- */
-:global(:root[data-scheme='dark']) .backdrop {
-  background: color-mix(in srgb, var(--surface-inverse) 70%, transparent);
+  background: var(--scrim-modal);
 }
 
 .backdrop[data-state='open'] {
@@ -216,6 +207,10 @@
   transform-origin: center;
 }
 
+/*
+ * The dark scheme: the card and the dimmed page are both dark. A ring
+ * shows the edge of the card.
+ */
 :global(:root[data-scheme='dark']) .card {
   box-shadow: 0 0 0 1px var(--border-default);
 }
