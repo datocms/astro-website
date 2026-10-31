@@ -61,7 +61,7 @@ export function replay(el: HTMLElement | SVGElement, name: string): void {
  * little small, with no transition), then removes it: `el` comes in with
  * the transition of its class.
  */
-export function arrive(el: HTMLElement): void {
+export function arrive(el: HTMLElement | SVGElement): void {
   delete el.dataset.leave;
   el.dataset.enter = '';
   reflow(el);

@@ -33,6 +33,9 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+// The meta description is plain text. A partner with no short description has none.
+const description = toPlainText(page.shortDescription);
 ---
 
 <Layout
@@ -40,11 +43,10 @@ if (!page) {
     page.seo,
     seoPageTitle(page.name, techPartner.seoSuffix),
     seoShareTitle(`DatoCMS Ecosystem Partner: ${page.name}`),
-    // The meta description is plain text.
-    seoDescription(toPlainText(page.shortDescription)!),
+    description && seoDescription(description),
     seoGeneratedCard(Astro, {
       kicker: `DatoCMS Ecosystem Partners: ${page.name}`,
-      excerpt: toPlainText(page.shortDescription),
+      excerpt: description,
       logoPngUrl: page.logo.pngUrl,
     }),
     seoOgType('website'),

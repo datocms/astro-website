@@ -466,7 +466,7 @@ const lockSlot = STILL.band.from + 0.5;
       dot.setAttribute('r', String(DOT));
       lane.append(dot);
       lane.dataset.last = String(slot);
-      arrive(dot as unknown as HTMLElement);
+      arrive(dot);
     }
 
     padlock(): void {
@@ -476,7 +476,7 @@ const lockSlot = STILL.band.from + 0.5;
       lock.setAttribute('x', String(x(this.head)));
       lock.setAttribute('y', String(ROW_Y[this.primary]));
       this.open(this.primary).append(lock);
-      arrive(lock as unknown as HTMLElement);
+      arrive(lock);
     }
 
     plan(): Step[] {
@@ -521,7 +521,7 @@ const lockSlot = STILL.band.from + 0.5;
         group.append(rect, label);
         group.dataset.band = '';
         this.bands.append(group);
-        arrive(group as unknown as HTMLElement);
+        arrive(group);
         this.band = { el: rect, from };
         this.padlock();
         await this.command(COMMANDS.lock, wait);
@@ -614,7 +614,7 @@ const lockSlot = STILL.band.from + 0.5;
         bar.setAttribute('rx', String(BAR));
         lane.append(bar);
         this.bar = { el: bar, from: this.head, grows: true };
-        arrive(bar as unknown as HTMLElement);
+        arrive(bar);
         for (let i = 1; i < slots; i++) await this.slot();
         this.bar.grows = false;
         bar.setAttribute('width', String(x(this.head - this.bar.from) + 2 * BAR));

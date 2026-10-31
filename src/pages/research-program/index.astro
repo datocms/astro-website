@@ -31,8 +31,8 @@ const faqs = page.faqs.flatMap((faq) => ('question' in faq ? [faq] : []));
 // The JSON-LD needs strings: the question and the answer as plain text,
 // without the stega of Content Link.
 const questions = faqs.flatMap((faq) => {
-  const question = toPlainText(faq.question as Parameters<typeof toPlainText>[0]);
-  const answer = toPlainText(faq.answer as Parameters<typeof toPlainText>[0]);
+  const question = toPlainText(faq.question);
+  const answer = toPlainText(faq.answer);
   return question && answer ? [{ question: stripStega(question), answer: stripStega(answer) }] : [];
 });
 

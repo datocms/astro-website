@@ -44,6 +44,9 @@ const { plugins } = await executeQuery(Astro, extraQuery, {
   variables: { authorId: page.npmUser?.id || '' },
 });
 
+// The meta description is plain text. A partner with no short description has none.
+const description = toPlainText(page.shortDescription);
+
 // The featured projects come first, in the order of the CMS.
 const featuredProjectIds = page.featuredProjects.map((p) => p.id);
 
@@ -59,11 +62,10 @@ const sortedProjects = sortBy(page.projects, (project) =>
     page._seoMetaTags,
     seoPageTitle(page.name, 'DatoCMS Partners'),
     seoShareTitle(`DatoCMS Partner: ${page.name}`),
-    // The meta description is plain text.
-    seoDescription(toPlainText(page.shortDescription)!),
+    description && seoDescription(description),
     seoGeneratedCard(Astro, {
       kicker: `DatoCMS Agency Partners: ${page.name}`,
-      excerpt: toPlainText(page.shortDescription),
+      excerpt: description,
       pills: [`${page.projects.length} showcased projects`],
       logoPngUrl: page.logo.pngUrl,
     }),
