@@ -18,7 +18,7 @@ Each client `<script>` (not `is:inline`) is a custom element that extends `WebCo
 - The root element of the markup is the custom element. Define it with `customElements.define('kebab-name', class extends WebComponent { … })`.
 - Put the setup in `parsedCallback()`, not in `connectedCallback()`: it runs when the children are parsed.
 - Find parts with `this.$(selector)` and lists with `this.$$(selector)`. `this.$` throws `[tag-name]: Could not find <selector>`, so a missing part shows as a clear error. Do not use `querySelector(...)!`, and do not use `if (!el) return` guards for parts that the same file renders.
-- Add listeners with `this.on(element, event, [selector], callback)`. `disconnectedCallback()` removes them.
+- Add listeners with `this.on(element, event, [selector], callback)`. It returns a function that removes the listener.
 - Do not loop over `document.querySelectorAll('[data-x]')` to start a behaviour. Each instance of the element starts itself.
 - A custom element is `display: inline` by default. Set its `display` in the CSS. When the root must be a semantic element (`<form>`, `<nav>`, `<button>`, `<table>`), put the custom element around it.
 - Keep a plain script only when no element owns the behaviour, for example analytics or cookie consent.
