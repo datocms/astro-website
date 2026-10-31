@@ -2,9 +2,7 @@ import type { APIRoute } from 'astro';
 import { SECRET_API_TOKEN } from 'astro:env/server';
 import { maybeInvalidateFetchPluginSdkManifest } from '~/components/docs/blocks/PluginSdkHookGroup';
 import { maybeInvalidateCmaHyperschema } from '~/components/docs/cmaApi/fetchSchema';
-import { maybeInvalidateCloudflareDatacenters } from '~/components/legacy/featureAnimations/CdnMap/utils';
 import { maybeInvalidateFavicon } from '~/layouts/BaseLayout/fetchFavicon';
-import { maybeInvalidateNavbar } from '~/layouts/LegacyLayout/Navbar/fetchNavbar';
 import {
   maybeInvalidateCdaIntrospectionFieldFilters,
   maybeInvalidateCdaIntrospectionUploadFilters,
@@ -29,12 +27,10 @@ export const POST: APIRoute = async ({ url, request }) => {
       maybeInvalidateCmaHyperschema(),
       maybeInvalidatePerOwnerPricingPlans(),
       maybeInvalidateDastSchema(),
-      maybeInvalidateCloudflareDatacenters(),
       maybeInvalidateFavicon(),
       maybeInvalidateCdaIntrospectionUploadFilters(),
       maybeInvalidateCdaIntrospectionFieldFilters(),
       maybeInvalidateSiteApiErrorCodes(),
-      maybeInvalidateNavbar(),
     ]);
 
     return json({ invalidatedSurrogateKeys: results.filter(Boolean) });
