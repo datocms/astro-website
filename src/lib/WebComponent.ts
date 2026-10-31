@@ -3,11 +3,16 @@ import HTMLParsedElement from 'html-parsed-element';
 export class WebComponent extends HTMLParsedElement {
   eventListenerRemovers: Array<() => void> = [];
 
-  $$<T extends HTMLElement>(selector: string): T[] {
+  /** The elements in this element that match `selector`. `T` can be an SVG element. */
+  $$<T extends Element = HTMLElement>(selector: string): T[] {
     return Array.from(this.querySelectorAll<T>(selector));
   }
 
-  $<T extends HTMLElement>(selector: string): T {
+  /**
+   * The first element in this element that matches `selector`. It throws
+   * an error when no element matches. `T` can be an SVG element.
+   */
+  $<T extends Element = HTMLElement>(selector: string): T {
     const element = this.querySelector<T>(selector);
 
     if (!element) {
@@ -68,6 +73,7 @@ export class WebComponent extends HTMLParsedElement {
       element.removeEventListener(event, callbackWrapper);
       this.eventListenerRemovers = this.eventListenerRemovers.filter((r) => r !== remover);
     };
+    this.eventListenerRemovers.push(remover);
 
     return remover;
   }
@@ -99,8 +105,11 @@ export class WebComponent extends HTMLParsedElement {
     return null;
   }
 
+  /** Remove each listener that `on()` added or that is in `eventListenerRemovers`. */
   disconnectedCallback() {
-    for (const remover of this.eventListenerRemovers) {
+    const removers = this.eventListenerRemovers;
+    this.eventListenerRemovers = [];
+    for (const remover of removers) {
       remover();
     }
   }
