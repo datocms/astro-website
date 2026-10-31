@@ -71,12 +71,12 @@ const entries = Astro.props.entries.map((data) => {
               screens have no hover). The script below opens and closes it.
             */}
             {entry.screenshot ? (
-              <div class={styles.shotAnchor} data-feature-shot>
+              <feature-shot class={styles.shotAnchor} data-feature-shot>
                 <h3 class:list={[styles.entryTitle, 'h2']}>{entry.emoji && <span class={styles.emoji} aria-hidden="true">{entry.emoji}</span>}<button type="button" class={styles.shotButton} aria-expanded="false" aria-controls={`${id}-shot-${i}`} data-feature-shot-button>{entry.title}</button><span class:list={[styles.arrow, 'h2']} aria-hidden="true">→</span></h3>
                 <div id={`${id}-shot-${i}`} class={styles.shot}>
                   <ResponsiveImage data={entry.screenshot} />
                 </div>
-              </div>
+              </feature-shot>
             ) : (
               <h3 class:list={[styles.entryTitle, 'h2']}>{entry.emoji && <span class={styles.emoji} aria-hidden="true">{entry.emoji}</span>}{entry.title}<span class:list={[styles.arrow, 'h2']} aria-hidden="true">→</span></h3>
             )}
@@ -112,26 +112,48 @@ const entries = Astro.props.entries.map((data) => {
 </Section>
 
 <script>
-  // The screenshots of the entries. A click or a tap on the title opens or
-  // closes its screenshot. Only one is open at a time. A click outside or
-  // Escape closes it. Hover and keyboard focus show it with CSS only.
-  const closeShots = (except?: Element) => {
-    for (const el of document.querySelectorAll('[data-feature-shot][data-open]')) {
-      if (el === except) continue;
-      el.removeAttribute('data-open');
-      el.querySelector('[data-feature-shot-button]')?.setAttribute('aria-expanded', 'false');
-    }
-  };
-  document.addEventListener('click', (event) => {
-    const button = (event.target as Element).closest?.('[data-feature-shot-button]');
-    const shot = button?.closest('[data-feature-shot]');
-    closeShots(shot ?? undefined);
-    if (!button || !shot) return;
-    const open = !shot.hasAttribute('data-open');
-    shot.toggleAttribute('data-open', open);
-    button.setAttribute('aria-expanded', String(open));
-  });
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeShots();
-  });
+  import { WebComponent } from '~/lib/WebComponent';
+
+  // The screenshot of an entry. A click or a tap on the title opens or
+  // closes the screenshot. Only one is open at a time: a click on a
+  // different title or outside closes it. Escape also closes it. Hover and
+  // keyboard focus show it with CSS only.
+  customElements.define(
+    'feature-shot',
+    class extends WebComponent {
+      #documentListeners = new AbortController();
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.#documentListeners.abort();
+      }
+
+      parsedCallback() {
+        const button = this.$('[data-feature-shot-button]');
+        const signal = this.#documentListeners.signal;
+
+        const set = (open: boolean) => {
+          this.toggleAttribute('data-open', open);
+          button.setAttribute('aria-expanded', String(open));
+        };
+
+        document.addEventListener(
+          'click',
+          (event) => {
+            const target = event.target as Node;
+            if (button.contains(target)) set(!this.hasAttribute('data-open'));
+            else if (this.hasAttribute('data-open')) set(false);
+          },
+          { signal },
+        );
+        document.addEventListener(
+          'keydown',
+          (event) => {
+            if (event.key === 'Escape' && this.hasAttribute('data-open')) set(false);
+          },
+          { signal },
+        );
+      }
+    },
+  );
 </script>

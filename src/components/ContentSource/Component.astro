@@ -17,7 +17,7 @@ const activeIndex = channels.length + Math.max(0, channels.indexOf(activeChannel
   <p class:list={[styles.paragraph, 'body']}>{paragraph}</p>
 
   <div class={styles.visual} aria-hidden="true">
-    <div class={styles.lockup} data-content-source data-active={activeIndex}>
+    <content-source class={styles.lockup} data-content-source data-active={activeIndex}>
       <span class={styles.label}>
         <span class={styles.labelLong}>Single Source</span>
         <span class={styles.labelShort}>Source</span>
@@ -37,51 +37,57 @@ const activeIndex = channels.length + Math.max(0, channels.indexOf(activeChannel
           }
         </span>
       </span>
-    </div>
+    </content-source>
   </div>
 </Section>
 
 <script>
   import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  import { WebComponent } from '~/lib/WebComponent';
 
   // Every 0.8s the list moves up one row, with a 416ms spring-like ease.
   const STEP_MS = 800;
   const MOVE_MS = 416;
 
-  for (const lockup of document.querySelectorAll<HTMLElement>('[data-content-source]')) {
-    const list = lockup.querySelector<HTMLElement>('[data-list]');
-    if (!list || prefersReducedMotion()) continue;
-    const items = [...list.children] as HTMLElement[];
-    const count = items.length / 3;
-    const start = Number(lockup.dataset.active || 0);
-    let offset = 0;
-    let timer = 0;
+  customElements.define(
+    'content-source',
+    class extends WebComponent {
+      parsedCallback() {
+        const list = this.$('[data-list]');
+        if (prefersReducedMotion()) return;
+        const items = [...list.children] as HTMLElement[];
+        const count = items.length / 3;
+        const start = Number(this.dataset.active || 0);
+        let offset = 0;
+        let timer = 0;
 
-    const render = (animate: boolean) => {
-      list.style.transition = animate ? `transform ${MOVE_MS}ms var(--ease-spring)` : 'none';
-      list.style.setProperty('--offset', String(offset));
-      const active = start + offset;
-      items.forEach((item, i) => item.toggleAttribute('data-active', i === active));
-    };
+        const render = (animate: boolean) => {
+          list.style.transition = animate ? `transform ${MOVE_MS}ms var(--ease-spring)` : 'none';
+          list.style.setProperty('--offset', String(offset));
+          const active = start + offset;
+          items.forEach((item, i) => item.toggleAttribute('data-active', i === active));
+        };
 
-    const tick = () => {
-      // When the active item leaves the middle copy, jump back one copy
-      // with no animation. The two positions look the same.
-      if (start + offset >= 2 * count) {
-        offset -= count;
+        const tick = () => {
+          // When the active item leaves the middle copy, jump back one copy
+          // with no animation. The two positions look the same.
+          if (start + offset >= 2 * count) {
+            offset -= count;
+            render(false);
+            // Apply the jump before the next move starts.
+            void list.offsetHeight;
+          }
+          offset += 1;
+          render(true);
+        };
+
         render(false);
-        // Apply the jump before the next move starts.
-        void list.offsetHeight;
+
+        onVisibilityChange(this, (visible) => {
+          clearInterval(timer);
+          if (visible) timer = window.setInterval(tick, STEP_MS);
+        });
       }
-      offset += 1;
-      render(true);
-    };
-
-    render(false);
-
-    onVisibilityChange(lockup, (visible) => {
-      clearInterval(timer);
-      if (visible) timer = window.setInterval(tick, STEP_MS);
-    });
-  }
+    },
+  );
 </script>

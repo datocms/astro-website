@@ -18,7 +18,7 @@ type Props = BuddyData;
 const { lines } = Astro.props;
 ---
 
-<div class={styles.list} data-list-buddy-list>
+<list-buddy class={styles.list} data-list-buddy-list>
   <slot />
   <div class={styles.column} aria-hidden="true">
     <aside class={styles.buddy} data-theme="default" data-list-buddy data-hidden>
@@ -27,91 +27,109 @@ const { lines } = Astro.props;
       <script type="application/json" data-buddy-lines set:html={JSON.stringify({ lines })} />
     </aside>
   </div>
-</div>
+</list-buddy>
 
 <script>
+  import { WebComponent } from '~/lib/WebComponent';
+
   interface Line {
     at: number;
     face: string;
     text: string;
   }
 
-  const buddy = document.querySelector<HTMLElement>('[data-list-buddy]');
-  const face = buddy?.querySelector<HTMLElement>('[data-buddy-face]');
-  const bubble = buddy?.querySelector<HTMLElement>('[data-buddy-bubble]');
-  const json = buddy?.querySelector<HTMLScriptElement>('[data-buddy-lines]')?.textContent;
-  const desktop = window.matchMedia('(min-width: 768px)').matches;
+  customElements.define(
+    'list-buddy',
+    class extends WebComponent {
+      #globalListeners = new AbortController();
 
-  if (buddy && face && bubble && json && desktop) {
-    const { lines } = JSON.parse(json) as { lines: Line[] };
-    const start = document.querySelector('[data-list-buddy-list]');
-    let stage = -1;
+      parsedCallback() {
+        const buddy = this.$('[data-list-buddy]');
+        const face = this.$('[data-buddy-face]');
+        const bubble = this.$('[data-buddy-bubble]');
+        const json = this.$('[data-buddy-lines]').textContent ?? '';
+        if (!window.matchMedia('(min-width: 768px)').matches) return;
 
-    // One line on show at a time, and at most one line that waits.
-    type Said = { line: Omit<Line, 'at'>; ms: number };
-    const MIN_MS = 900;
-    let pending: Said | null = null;
-    let busy = false;
-    let shownAt = 0;
-    let timer = 0;
-    const hush = () => {
-      buddy.removeAttribute('data-talk');
-      timer = window.setTimeout(() => {
-        busy = false;
-        if (pending) {
-          const next = pending;
-          pending = null;
-          show(next);
-        }
-      }, 400);
-    };
-    const show = (said: Said) => {
-      busy = true;
-      shownAt = performance.now();
-      face.textContent = said.line.face;
-      bubble.textContent = said.line.text;
-      buddy.setAttribute('data-talk', '');
-      timer = window.setTimeout(hush, said.ms);
-    };
-    const say = (line: Omit<Line, 'at'>, ms = 2200) => {
-      if (!busy) {
-        show({ line, ms });
-        return;
+        const { lines } = JSON.parse(json) as { lines: Line[] };
+        const signal = this.#globalListeners.signal;
+        let stage = -1;
+
+        // One line on show at a time, and at most one line that waits.
+        type Said = { line: Omit<Line, 'at'>; ms: number };
+        const MIN_MS = 900;
+        let pending: Said | null = null;
+        let busy = false;
+        let shownAt = 0;
+        let timer = 0;
+        const hush = () => {
+          buddy.removeAttribute('data-talk');
+          timer = window.setTimeout(() => {
+            busy = false;
+            if (pending) {
+              const next = pending;
+              pending = null;
+              show(next);
+            }
+          }, 400);
+        };
+        const show = (said: Said) => {
+          busy = true;
+          shownAt = performance.now();
+          face.textContent = said.line.face;
+          bubble.textContent = said.line.text;
+          buddy.setAttribute('data-talk', '');
+          timer = window.setTimeout(hush, said.ms);
+        };
+        const say = (line: Omit<Line, 'at'>, ms = 2200) => {
+          if (!busy) {
+            show({ line, ms });
+            return;
+          }
+          pending = { line, ms };
+          if (!buddy.hasAttribute('data-talk')) return;
+          // Cut the line on show short, once it had its minimum time.
+          window.clearTimeout(timer);
+          timer = window.setTimeout(hush, Math.max(0, MIN_MS - (performance.now() - shownAt)));
+        };
+
+        // A line at each quarter, one time, on the way down: the last line
+        // of the lines passed, when it is further than the last line said.
+        document.addEventListener(
+          'categorynav:score',
+          (event) => {
+            const ratio = (event as CustomEvent<number>).detail;
+            const next = lines.findLastIndex((line) => ratio >= line.at);
+            if (next <= stage || buddy.hasAttribute('data-hidden')) return;
+            stage = next;
+            say(lines[next]!, next === lines.length - 1 ? 4000 : 2200);
+          },
+          { signal },
+        );
+
+        // The buddy comes in once the list reaches the top 40% of the screen.
+        let queued = false;
+        const check = () => {
+          queued = false;
+          if (this.getBoundingClientRect().top < window.innerHeight * 0.4) {
+            buddy.removeAttribute('data-hidden');
+          }
+        };
+        window.addEventListener(
+          'scroll',
+          () => {
+            if (queued) return;
+            queued = true;
+            requestAnimationFrame(check);
+          },
+          { passive: true, signal },
+        );
+        check();
       }
-      pending = { line, ms };
-      if (!buddy.hasAttribute('data-talk')) return;
-      // Cut the line on show short, once it had its minimum time.
-      window.clearTimeout(timer);
-      timer = window.setTimeout(hush, Math.max(0, MIN_MS - (performance.now() - shownAt)));
-    };
 
-    // A line at each quarter, one time, on the way down: the last line
-    // of the lines passed, when it is further than the last line said.
-    document.addEventListener('categorynav:score', (event) => {
-      const ratio = (event as CustomEvent<number>).detail;
-      const next = lines.findLastIndex((line) => ratio >= line.at);
-      if (next <= stage || buddy.hasAttribute('data-hidden')) return;
-      stage = next;
-      say(lines[next]!, next === lines.length - 1 ? 4000 : 2200);
-    });
-
-    // The buddy comes in once the list reaches the top 40% of the screen.
-    let queued = false;
-    const check = () => {
-      queued = false;
-      if (!start || start.getBoundingClientRect().top < window.innerHeight * 0.4) {
-        buddy.removeAttribute('data-hidden');
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.#globalListeners.abort();
       }
-    };
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (queued) return;
-        queued = true;
-        requestAnimationFrame(check);
-      },
-      { passive: true },
-    );
-    check();
-  }
+    },
+  );
 </script>

@@ -25,7 +25,7 @@ const {
 } = Astro.props;
 ---
 
-<div
+<logos-line
   class:list={[
     styles.logosLine,
     size === 'small' && styles.small,
@@ -44,60 +44,64 @@ const {
       ))
     }
   </ul>
-</div>
+</logos-line>
 
 <script>
   import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  import { WebComponent } from '~/lib/WebComponent';
 
   const SPEED = 32;
 
-  function setup(root: HTMLElement) {
-    const track = root.querySelector<HTMLElement>('[data-logos-track]');
-    if (!track || prefersReducedMotion()) return;
-    const items = [...track.children] as HTMLElement[];
+  customElements.define(
+    'logos-line',
+    class extends WebComponent {
+      parsedCallback() {
+        const track = this.$('[data-logos-track]');
+        if (prefersReducedMotion()) return;
+        const items = [...track.children] as HTMLElement[];
 
-    const build = () => {
-      for (const clone of track.querySelectorAll('[data-clone]')) clone.remove();
-      delete root.dataset.running;
-      const setWidth = track.scrollWidth;
-      if (setWidth === 0) return;
-      // In the `overflow` mode, logos that fit stay static. The last gap
-      // is not part of the visible width.
-      if (root.dataset.marquee === 'overflow') {
-        const gap = parseFloat(getComputedStyle(items[0]!).paddingRight) || 0;
-        if (setWidth - gap <= root.clientWidth) return;
+        const build = () => {
+          for (const clone of track.querySelectorAll('[data-clone]')) clone.remove();
+          delete this.dataset.running;
+          const setWidth = track.scrollWidth;
+          if (setWidth === 0) return;
+          // In the `overflow` mode, logos that fit stay static. The last gap
+          // is not part of the visible width.
+          if (this.dataset.marquee === 'overflow') {
+            const gap = parseFloat(getComputedStyle(items[0]!).paddingRight) || 0;
+            if (setWidth - gap <= this.clientWidth) return;
+          }
+          // Add copies until the track covers the viewport plus one set.
+          const copies = Math.ceil(this.clientWidth / setWidth) + 1;
+          for (let i = 0; i < copies; i += 1) {
+            for (const item of items) {
+              const clone = item.cloneNode(true) as HTMLElement;
+              clone.dataset.clone = '';
+              clone.setAttribute('aria-hidden', 'true');
+              track.appendChild(clone);
+            }
+          }
+          this.style.setProperty('--marquee-distance', `${setWidth}px`);
+          this.style.setProperty('--marquee-duration', `${setWidth / SPEED}s`);
+          this.dataset.running = '';
+        };
+
+        const images = [...track.querySelectorAll('img')];
+        Promise.all(
+          images.map((img) => (img.complete ? null : img.decode().catch(() => null))),
+        ).then(build);
+
+        let width = this.clientWidth;
+        new ResizeObserver(() => {
+          if (this.clientWidth === width) return;
+          width = this.clientWidth;
+          build();
+        }).observe(this);
+
+        onVisibilityChange(this, (visible) => {
+          this.dataset.paused = visible ? 'false' : 'true';
+        });
       }
-      // Add copies until the track covers the viewport plus one set.
-      const copies = Math.ceil(root.clientWidth / setWidth) + 1;
-      for (let i = 0; i < copies; i += 1) {
-        for (const item of items) {
-          const clone = item.cloneNode(true) as HTMLElement;
-          clone.dataset.clone = '';
-          clone.setAttribute('aria-hidden', 'true');
-          track.appendChild(clone);
-        }
-      }
-      root.style.setProperty('--marquee-distance', `${setWidth}px`);
-      root.style.setProperty('--marquee-duration', `${setWidth / SPEED}s`);
-      root.dataset.running = '';
-    };
-
-    const images = [...track.querySelectorAll('img')];
-    Promise.all(images.map((img) => (img.complete ? null : img.decode().catch(() => null)))).then(
-      build,
-    );
-
-    let width = root.clientWidth;
-    new ResizeObserver(() => {
-      if (root.clientWidth === width) return;
-      width = root.clientWidth;
-      build();
-    }).observe(root);
-
-    onVisibilityChange(root, (visible) => {
-      root.dataset.paused = visible ? 'false' : 'true';
-    });
-  }
-
-  document.querySelectorAll<HTMLElement>('[data-logos-line]').forEach(setup);
+    },
+  );
 </script>
