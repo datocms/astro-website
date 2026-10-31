@@ -1,4 +1,5 @@
 ---
+import { faCode, faLightbulb } from '@fortawesome/pro-regular-svg-icons';
 import { inlineMarkdown } from '~/components/docs/Markdown/utils';
 import { Prose } from '~/components/docs/DocsProse';
 import { intersperse } from '~/lib/intersperse';
@@ -7,7 +8,7 @@ import { ExpandablePane } from '../../ExpandablePane';
 import { JsonSchemaObjectAnalysis } from '..';
 import s from './style.module.css';
 import { Markdown } from '~/components/docs/Markdown';
-import { Svg } from '~/components/docs/Svg';
+import { Icon } from '~/components/Icon';
 
 type Props = {
   property: JsonSchemaPropertyAnalysis;
@@ -69,7 +70,7 @@ const { property, showRequiredOptional = true } = Astro.props;
   {
     JSON.stringify(property.types).length >= 20 && (
       <div class={s.types}>
-        <Svg name="icons/regular/code" />
+        <Icon icon={faCode} />
         <div>
           Type:
           {intersperse(
@@ -86,7 +87,7 @@ const { property, showRequiredOptional = true } = Astro.props;
   {
     property.examples.length > 0 && (
       <div class={s.examples}>
-        <Svg name="icons/regular/lightbulb" />
+        <Icon icon={faLightbulb} />
         <div>
           {property.examples.length > 1 ? <>Examples:</> : <>Example:</>}
 

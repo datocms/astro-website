@@ -2,6 +2,8 @@
 // The dialog that compares the limits of the Free plan and of the
 // Professional plan. A link to "#<id>" opens it. When the address of the
 // page has this hash, the dialog opens on load.
+import { faCheck, faXmark } from '@fortawesome/pro-regular-svg-icons';
+import { Icon } from '~/components/Icon';
 import type { FreeLimitsData } from '~/data/pricing';
 import type { FreeLimitRow } from './limits';
 import styles from './FreeLimitsDialog.module.css';
@@ -23,13 +25,7 @@ const titleId = `${id}-title`;
     <div class={styles.top}>
       <h2 id={titleId} class="h2">{headline}</h2>
       <button type="button" class={styles.close} aria-label={closeLabel} data-close>
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          <path
-            d="m5 5 10 10M15 5 5 15"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"></path>
-        </svg>
+        <Icon icon={faXmark} width="20" height="20" />
       </button>
     </div>
 
@@ -83,21 +79,7 @@ const titleId = `${id}-title`;
                       <span class="visuallyHidden">{columns[j + 1]}: </span>
                       {value === true ? (
                         <span class={styles.check}>
-                          <svg
-                            width="10"
-                            height="10"
-                            viewBox="0 0 10 10"
-                            fill="none"
-                            aria-hidden="true"
-                          >
-                            <path
-                              d="m1.5 5.2 2.3 2.3 4.7-5"
-                              stroke="currentColor"
-                              stroke-width="1.6"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            />
-                          </svg>
+                          <Icon icon={faCheck} width="10" height="10" />
                           <span class="visuallyHidden">Included</span>
                         </span>
                       ) : value === false ? (

@@ -1,5 +1,4 @@
 .button {
-  --expand-icon: svg-load('icons/regular/plus.svg');
   background: var(--surface-default);
   color: var(--text-muted);
   border: 1px solid var(--border-default);
@@ -14,16 +13,17 @@
   font-size: 0.95em;
   gap: 0.5em;
 
-  &::before {
-    content: '';
-    width: 1em;
-    height: 1em;
-    background: var(--text-subtle);
-    mask: var(--expand-icon) center / contain no-repeat;
+  & svg {
+    fill: var(--text-subtle);
   }
 
-  &[aria-expanded='true']::before {
-    --expand-icon: svg-load('icons/regular/minus.svg');
+  & .minus,
+  &[aria-expanded='true'] .plus {
+    display: none;
+  }
+
+  &[aria-expanded='true'] .minus {
+    display: inline-block;
   }
 
   &:hover {

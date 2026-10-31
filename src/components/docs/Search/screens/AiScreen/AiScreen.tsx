@@ -18,9 +18,8 @@ import { ModalDisclaimer } from '../../modal/Disclaimer';
 import { useSearch } from '../../context';
 import { aiStarterPrompts } from '../../constants';
 import type { AskAiHandle } from './AskAi';
-
-import questionIcon from '~/icons/regular/messages.svg?raw';
-import magicIcon from '~/icons/regular/sparkles.svg?raw';
+import { faMessages, faSparkles } from '@fortawesome/pro-regular-svg-icons';
+import { IconReact } from '~/components/Icon/Icon';
 
 const AskAi = lazy(() => import('./AskAi').then((m) => ({ default: m.AskAi })));
 
@@ -122,7 +121,9 @@ export function AiScreen() {
                 onMouseEnter={() => setSelectedIndex(i)}
                 onClick={() => goAi(prompt)}
               >
-                <span className={s.rowIcon} dangerouslySetInnerHTML={{ __html: questionIcon }} />
+                <span className={s.rowIcon}>
+                  <IconReact icon={faMessages} />
+                </span>
                 <span className={s.rowLabel}>{prompt}</span>
               </button>
             ))}
@@ -138,7 +139,7 @@ export function AiScreen() {
         value={searchInput}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        icon={magicIcon}
+        icon={faSparkles}
       />
       <ModalDisclaimer />
     </>

@@ -1,4 +1,12 @@
 ---
+import {
+  faBars,
+  faCaretDown,
+  faGaugeHigh,
+  faHeadset,
+  faLink,
+  faXmark,
+} from '@fortawesome/pro-regular-svg-icons';
 import type { TitleMetaLinkTag } from '@datocms/astro';
 // The layers, the tokens, the fonts and the base of the site.
 import '../../../styles/global.css';
@@ -6,9 +14,10 @@ import '../../../styles/global.css';
 import '../docs.css';
 import { DatoLogo } from '~/components/DatoLogo';
 import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import { iconDataUri } from '~/lib/iconDataUri';
 import { BaseLayout } from '~/layouts/BaseLayout';
 import s from './style.module.css';
-import { Svg } from '~/components/docs/Svg';
+import { Icon } from '~/components/Icon';
 import { Search } from '~/components/docs/Search';
 import { Feedback } from './Feedback';
 import { OtherResources } from './OtherResources';
@@ -73,8 +82,8 @@ const cssLayers = ['reset', 'tokens', 'base', 'vendor', 'blocks', 'sections', 'p
           </a>
           <TargetToggler targetId="sidebar">
             <button type="button" class={s.hamburger} aria-label="Toggle navigation menu">
-              <span class={s.iconBars}><Svg name="icons/regular/bars" /></span>
-              <span class={s.iconTimes}><Svg name="icons/regular/xmark" /></span>
+              <span class={s.iconBars}><Icon icon={faBars} /></span>
+              <span class={s.iconTimes}><Icon icon={faXmark} /></span>
               <span class={s.hamburgerBadge} aria-hidden="true" set:html={symbol} />
             </button>
           </TargetToggler>
@@ -97,7 +106,7 @@ const cssLayers = ['reset', 'tokens', 'base', 'vendor', 'blocks', 'sections', 'p
               data-sidebar-close
               aria-label="Close navigation menu"
             >
-              <Svg name="icons/regular/xmark" />
+              <Icon icon={faXmark} />
             </button>
           </div>
           <div class={s.drawerNav}>
@@ -117,13 +126,13 @@ const cssLayers = ['reset', 'tokens', 'base', 'vendor', 'blocks', 'sections', 'p
           <ul>
             <li>
               <a href="/support">
-                <Svg name="icons/regular/headset" />
+                <Icon icon={faHeadset} />
                 Ask for help!
               </a>
             </li>
             <li>
               <a href="https://status.datocms.com" target="_blank" rel="noreferrer">
-                <Svg name="icons/regular/gauge-high" />
+                <Icon icon={faGaugeHigh} />
                 Status page
               </a>
             </li>
@@ -165,6 +174,12 @@ const cssLayers = ['reset', 'tokens', 'base', 'vendor', 'blocks', 'sections', 'p
       </div>
     </div>
   </docs-sidebar-drawer>
+
+  {/* Icons for CSS masks and backgrounds, which cannot hold inline markup. */}
+  <style
+    is:inline
+    set:html={`:root{--docs-link-icon:${iconDataUri(faLink)};--docs-select-arrow:${iconDataUri(faCaretDown)}}`}
+  ></style>
 
   <style is:global>
     docs-sidebar-drawer {

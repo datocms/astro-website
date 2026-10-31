@@ -1,7 +1,7 @@
 import s from '../style.module.css';
 import { useSearch } from '../context';
-
-import arrowLeftIcon from '~/icons/regular/arrow-left.svg?raw';
+import { faArrowLeft } from '@fortawesome/pro-regular-svg-icons';
+import { IconReact } from '~/components/Icon/Icon';
 
 type Props = {
   title: string;
@@ -14,7 +14,9 @@ export function ModalHeader({ title }: Props) {
   return (
     <div className={s.cardHeader}>
       <button type="button" className={s.backButton} onClick={goHome} aria-label="Back">
-        <span dangerouslySetInnerHTML={{ __html: arrowLeftIcon }} />
+        <span>
+          <IconReact icon={faArrowLeft} />
+        </span>
       </button>
       <span className={s.cardHeaderTitle}>{title}</span>
     </div>

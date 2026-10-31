@@ -13,10 +13,8 @@ import { ModalInputRow } from '../modal/InputRow';
 import { ModalBody } from '../modal/Body';
 import { useSearch } from '../context';
 import { goToEntries } from '../constants';
-
-import bookIcon from '~/icons/regular/book.svg?raw';
-import magicIcon from '~/icons/regular/sparkles.svg?raw';
-import arrowRightIcon from '~/icons/regular/arrow-right.svg?raw';
+import { faArrowRight, faBook, faSparkles } from '@fortawesome/pro-regular-svg-icons';
+import { IconReact } from '~/components/Icon/Icon';
 
 export function HomeScreen() {
   const {
@@ -105,7 +103,9 @@ export function HomeScreen() {
           onMouseEnter={() => setSelectedIndex(0)}
           onClick={goSearch}
         >
-          <span className={s.rowIcon} dangerouslySetInnerHTML={{ __html: bookIcon }} />
+          <span className={s.rowIcon}>
+            <IconReact icon={faBook} />
+          </span>
           <span className={s.rowLabel}>
             {trimmedQuery ? (
               <>
@@ -123,7 +123,9 @@ export function HomeScreen() {
           onMouseEnter={() => setSelectedIndex(1)}
           onClick={() => goAi(searchInput)}
         >
-          <span className={s.rowIcon} dangerouslySetInnerHTML={{ __html: magicIcon }} />
+          <span className={s.rowIcon}>
+            <IconReact icon={faSparkles} />
+          </span>
           <span className={s.rowLabel}>
             {trimmedQuery ? (
               <>
@@ -149,10 +151,9 @@ export function HomeScreen() {
                   onMouseEnter={() => setSelectedIndex(idx)}
                   onClick={closeModal}
                 >
-                  <span
-                    className={s.rowIcon}
-                    dangerouslySetInnerHTML={{ __html: arrowRightIcon }}
-                  />
+                  <span className={s.rowIcon}>
+                    <IconReact icon={faArrowRight} />
+                  </span>
                   <span className={s.rowLabel}>{entry.label}</span>
                 </a>
               );

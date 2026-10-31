@@ -1,10 +1,15 @@
 ---
-import chevron from '~/assets/icons/chevron.svg?raw';
-import contrast from '~/assets/icons/contrast.svg?raw';
-import search from '~/assets/icons/search.svg?raw';
-import dots from '~/assets/icons/three-dots.svg?raw';
+import {
+  faChevronDown,
+  faEllipsisVertical,
+  faMagnifyingGlass,
+  faMinus,
+  faPlus,
+} from '@fortawesome/pro-regular-svg-icons';
+import { faCircleHalfStroke } from '@fortawesome/pro-solid-svg-icons';
 import { Button } from '~/components/Button';
 import { DatoLogo } from '~/components/DatoLogo';
+import { Icon } from '~/components/Icon';
 import { NavLink } from '~/components/NavLink';
 import type { NavGroup } from '~/data/navigation';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
@@ -64,7 +69,9 @@ const panelId = (i: number) => `site-header-mega-${i}`;
                   data-mega-trigger
                 >
                   {group.label}
-                  <span class={styles.chevron} aria-hidden="true" set:html={chevron} />
+                  <span class={styles.chevron}>
+                    <Icon icon={faChevronDown} />
+                  </span>
                 </button>
               ) : (
                 <a
@@ -133,7 +140,7 @@ const panelId = (i: number) => `site-header-mega-${i}`;
         aria-keyshortcuts="Meta+K Control+K"
         data-search-open
       >
-        <span aria-hidden="true" set:html={search} />
+        <Icon icon={faMagnifyingGlass} />
       </button>
       <button
         type="button"
@@ -142,7 +149,7 @@ const panelId = (i: number) => `site-header-mega-${i}`;
         aria-pressed="false"
         data-scheme-toggle
       >
-        <span aria-hidden="true" set:html={contrast} />
+        <Icon icon={faCircleHalfStroke} />
       </button>
       <a href={dashboardUrl('/login')} class:list={[styles.login, 'subtitleMedium']}>Login</a>
       <Button
@@ -159,7 +166,7 @@ const panelId = (i: number) => `site-header-mega-${i}`;
         aria-controls="site-header-mobile-nav"
         data-mobile-trigger
       >
-        <span aria-hidden="true" set:html={dots} />
+        <Icon icon={faEllipsisVertical} />
       </button>
     </div>
   </div>
@@ -174,12 +181,8 @@ const panelId = (i: number) => `site-header-mega-${i}`;
                 <summary class:list={[styles.mobileSummary, 'h1']}>
                   {group.label}
                   <span class={styles.toggle} aria-hidden="true">
-                    <svg class={styles.plus} viewBox="0 0 14 14" fill="none">
-                      <path d="M7 0V14M0 7H14" stroke="currentColor" stroke-width="1.6" />
-                    </svg>
-                    <svg class={styles.minus} viewBox="0 0 14 14" fill="none">
-                      <path d="M3 7H11" stroke="currentColor" stroke-width="1.6" />
-                    </svg>
+                    <Icon icon={faPlus} class={styles.plus} />
+                    <Icon icon={faMinus} class={styles.minus} />
                   </span>
                 </summary>
                 <div class={styles.mobileGroupBody}>

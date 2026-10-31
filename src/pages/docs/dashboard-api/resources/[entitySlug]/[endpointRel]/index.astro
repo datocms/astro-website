@@ -1,4 +1,5 @@
 ---
+import { faCircleInfo } from '@fortawesome/pro-regular-svg-icons';
 import {
   analyzePropertiesOfGenericObject,
   analyzePropertiesOfJsonApiEntity,
@@ -17,7 +18,7 @@ import { JsonSchemaObjectAnalysis } from '~/components/docs/restApi/JsonSchemaOb
 import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
 import { Prose } from '~/components/docs/DocsProse';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { Svg } from '~/components/docs/Svg';
+import { Icon } from '~/components/Icon';
 import { findGroup, GroupLayout } from '~/layouts/docs/GroupLayout';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
 import s from '../_style.module.css';
@@ -159,8 +160,8 @@ const propsForExamples = { entity, endpoint, jsClient, api: 'dashboard-api' as c
             </Heading>
             {Array.isArray(endpoint.schema.type) && endpoint.schema.type.includes('null') && (
               <div class={s.optionalSchema}>
-                <Svg name="icons/regular/circle-info" /> For this endpoint, the body is not required
-                and can be entirely omitted.
+                <Icon icon={faCircleInfo} /> For this endpoint, the body is not required and can be
+                entirely omitted.
               </div>
             )}
             <JsonSchemaObjectAnalysis object={bodyParameters} />

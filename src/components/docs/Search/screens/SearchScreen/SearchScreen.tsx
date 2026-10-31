@@ -20,8 +20,8 @@ import { ResultsList } from './ResultsList';
 import { SkeletonResults } from './SkeletonResults';
 import { fetchResults } from './fetchResults';
 import type { ResultWithArea } from './types';
-
-import searchIcon from '~/icons/regular/magnifying-glass.svg?raw';
+import { faMagnifyingGlass } from '@fortawesome/pro-regular-svg-icons';
+import { IconReact } from '~/components/Icon/Icon';
 
 export function SearchScreen() {
   const {
@@ -167,7 +167,9 @@ export function SearchScreen() {
                 onMouseEnter={() => setSelectedIndex(i)}
                 onClick={() => setSearchInput(prompt)}
               >
-                <span className={s.rowIcon} dangerouslySetInnerHTML={{ __html: searchIcon }} />
+                <span className={s.rowIcon}>
+                  <IconReact icon={faMagnifyingGlass} />
+                </span>
                 <span className={s.rowLabel}>{prompt}</span>
               </button>
             ))}

@@ -4,6 +4,7 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import s from '../../style.module.css';
 import { renderBackticks } from './renderText';
 import type { ResultWithArea } from './types';
+import { IconReact } from '~/components/Icon/Icon';
 
 function relativeDate(date: string): string | null {
   const d = new Date(date);
@@ -30,7 +31,9 @@ export function ResultsList({ results, selectedIndex, onHover }: Props) {
           onMouseEnter={() => onHover(i)}
           style={{ ['--i' as any]: i }}
         >
-          <div dangerouslySetInnerHTML={{ __html: result.area.icon }} />
+          <div>
+            <IconReact icon={result.area.icon} />
+          </div>
           <div className={s.resultBodyWrapper}>
             <div className={s.resultArea}>
               {result.category ? (

@@ -2,8 +2,8 @@ import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } fro
 import { createPortal } from 'react-dom';
 
 import s from './style.module.css';
-
-import searchIcon from '~/icons/regular/magnifying-glass.svg?raw';
+import { faMagnifyingGlass } from '@fortawesome/pro-regular-svg-icons';
+import { IconReact } from '~/components/Icon/Icon';
 
 const LazyModal = lazy(() => import('./LazyModal'));
 
@@ -54,7 +54,9 @@ function Trigger({
       onFocus={prefetchModal}
       aria-label="Open search and AI"
     >
-      <span className={s.triggerIcon} dangerouslySetInnerHTML={{ __html: searchIcon }} />
+      <span className={s.triggerIcon}>
+        <IconReact icon={faMagnifyingGlass} />
+      </span>
       {variant !== 'icon' && (
         <>
           <span className={s.triggerLabel}>Search or Ask AI…</span>

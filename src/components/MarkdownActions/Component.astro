@@ -1,11 +1,7 @@
 ---
-import chevron from '~/assets/icons/chevron.svg?raw';
-import anthropicIcon from '~/icons/brands/anthropic.svg?raw';
-import chatgptIcon from '~/icons/brands/chatgpt.svg?raw';
-import markdownIcon from '~/icons/brands/markdown.svg?raw';
-import checkIcon from '~/icons/regular/check.svg?raw';
-import copyIcon from '~/icons/regular/copy.svg?raw';
-import linkIcon from '~/icons/regular/link.svg?raw';
+import { faClaude, faMarkdown, faOpenai } from '@fortawesome/free-brands-svg-icons';
+import { faCheck, faChevronDown, faCopy, faLink } from '@fortawesome/pro-regular-svg-icons';
+import { Icon } from '~/components/Icon';
 import styles from './style.module.css';
 
 interface Props {
@@ -16,16 +12,16 @@ interface Props {
 const { markdownUrl } = Astro.props;
 const request = `Read ${markdownUrl} so I can ask questions about it.`;
 const links = [
-  { label: 'View as Markdown', href: markdownUrl, icon: markdownIcon },
+  { label: 'View as Markdown', href: markdownUrl, icon: faMarkdown },
   {
     label: 'Open in ChatGPT',
     href: `https://chatgpt.com/?hints=search&q=${encodeURIComponent(request)}`,
-    icon: chatgptIcon,
+    icon: faOpenai,
   },
   {
     label: 'Open in Claude',
     href: `https://claude.ai/new?q=${encodeURIComponent(request)}`,
-    icon: anthropicIcon,
+    icon: faClaude,
   },
 ];
 ---
@@ -40,8 +36,8 @@ const links = [
 <div class={styles.root} data-markdown-actions={markdownUrl} data-datocms-noindex hidden>
   <div class={styles.pill}>
     <button type="button" class:list={[styles.part, 'caption']} data-action="copy-page">
-      <span class={styles.icon} aria-hidden="true" data-icon="copy" set:html={copyIcon} />
-      <span class={styles.icon} aria-hidden="true" data-icon="done" hidden set:html={checkIcon} />
+      <span class={styles.icon} data-icon="copy"><Icon icon={faCopy} /></span>
+      <span class={styles.icon} data-icon="done" hidden><Icon icon={faCheck} /></span>
       <span data-label>Copy page</span>
     </button>
     <button
@@ -51,13 +47,13 @@ const links = [
       aria-expanded="false"
       data-action="toggle"
     >
-      <span class={styles.chevron} aria-hidden="true" set:html={chevron} />
+      <span class={styles.chevron}><Icon icon={faChevronDown} /></span>
     </button>
   </div>
   <ul class={styles.menu} data-menu hidden>
     <li>
       <button type="button" class:list={[styles.item, 'caption']} data-action="copy-link">
-        <span class={styles.icon} aria-hidden="true" set:html={linkIcon} />
+        <span class={styles.icon}><Icon icon={faLink} /></span>
         Copy Markdown link
       </button>
     </li>
@@ -70,7 +66,9 @@ const links = [
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span class={styles.icon} aria-hidden="true" set:html={link.icon} />
+            <span class={styles.icon}>
+              <Icon icon={link.icon} />
+            </span>
             {link.label}
           </a>
         </li>

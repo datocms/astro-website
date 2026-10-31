@@ -2,8 +2,8 @@ import cn from 'classnames';
 
 import s from '../../style.module.css';
 import { COMMUNITY_GROUP_ID, groups } from '../../constants';
-
-import forumIcon from '~/icons/regular/message-lines.svg?raw';
+import { faMessageLines } from '@fortawesome/pro-regular-svg-icons';
+import { IconReact } from '~/components/Icon/Icon';
 
 type Props = {
   selected: string;
@@ -37,7 +37,9 @@ export function FilterChips({ selected, onSelect, showCommunity }: Props) {
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => onSelect(communityGroup.id)}
           >
-            <span className={s.filterChipIcon} dangerouslySetInnerHTML={{ __html: forumIcon }} />
+            <span className={s.filterChipIcon}>
+              <IconReact icon={faMessageLines} />
+            </span>
             Community Forum
           </button>
         </>

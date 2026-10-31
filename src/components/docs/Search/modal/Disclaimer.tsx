@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
 import s from '../style.module.css';
-
-import warningIcon from '~/icons/regular/triangle-exclamation.svg?raw';
-import timesIcon from '~/icons/regular/xmark.svg?raw';
+import { faTriangleExclamation, faXmark } from '@fortawesome/pro-regular-svg-icons';
+import { IconReact } from '~/components/Icon/Icon';
 
 const STORAGE_KEY = 'datocms-search-ai-disclaimer-dismissed';
 const DISMISS_ANIMATION_MS = 220;
@@ -44,7 +43,9 @@ export function ModalDisclaimer() {
 
   return (
     <div className={s.disclaimer} data-state={phase}>
-      <span className={s.disclaimerIcon} dangerouslySetInnerHTML={{ __html: warningIcon }} />
+      <span className={s.disclaimerIcon}>
+        <IconReact icon={faTriangleExclamation} />
+      </span>
       <span className={s.disclaimerText}>
         AI answers are experimental and may be inaccurate. Always double-check before relying on
         them.
@@ -54,8 +55,9 @@ export function ModalDisclaimer() {
         className={s.disclaimerClose}
         onClick={handleDismiss}
         aria-label="Dismiss disclaimer"
-        dangerouslySetInnerHTML={{ __html: timesIcon }}
-      />
+      >
+        <IconReact icon={faXmark} />
+      </button>
     </div>
   );
 }

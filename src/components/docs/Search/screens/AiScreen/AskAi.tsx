@@ -14,9 +14,8 @@ import s from '../../style.module.css';
 import { streamAskAi } from '../../apis/ask';
 import { useSearch } from '../../context';
 import { Thinking } from './Thinking';
-
-import thumbsUpIcon from '~/icons/regular/thumbs-up.svg?raw';
-import thumbsDownIcon from '~/icons/regular/thumbs-down.svg?raw';
+import { faThumbsDown, faThumbsUp } from '@fortawesome/pro-regular-svg-icons';
+import { IconReact } from '~/components/Icon/Icon';
 
 const codePlugin = createCodePlugin({ themes: ['github-light', 'github-light'] });
 
@@ -248,10 +247,9 @@ export const AskAi = forwardRef<AskAiHandle, Props>(function AskAi({ initialQues
                       aria-label="Helpful"
                       onClick={() => submitFeedback(i, 'up')}
                     >
-                      <span
-                        className={s.feedbackButtonIcon}
-                        dangerouslySetInnerHTML={{ __html: thumbsUpIcon }}
-                      />
+                      <span className={s.feedbackButtonIcon}>
+                        <IconReact icon={faThumbsUp} />
+                      </span>
                       Yes
                     </button>
                     <button
@@ -260,10 +258,9 @@ export const AskAi = forwardRef<AskAiHandle, Props>(function AskAi({ initialQues
                       aria-label="Not helpful"
                       onClick={() => submitFeedback(i, 'down')}
                     >
-                      <span
-                        className={s.feedbackButtonIcon}
-                        dangerouslySetInnerHTML={{ __html: thumbsDownIcon }}
-                      />
+                      <span className={s.feedbackButtonIcon}>
+                        <IconReact icon={faThumbsDown} />
+                      </span>
                       No
                     </button>
                   </div>

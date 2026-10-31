@@ -1,8 +1,9 @@
 import type { ChangeEventHandler, KeyboardEventHandler, RefObject } from 'react';
 
 import s from '../style.module.css';
-
-import searchIcon from '~/icons/regular/magnifying-glass.svg?raw';
+import type { IconDefinition } from '@fortawesome/fontawesome-common-types';
+import { faMagnifyingGlass } from '@fortawesome/pro-regular-svg-icons';
+import { IconReact } from '~/components/Icon/Icon';
 
 type Props = {
   inputRef: RefObject<HTMLInputElement | null>;
@@ -13,7 +14,7 @@ type Props = {
   onChange: ChangeEventHandler<HTMLInputElement>;
   onKeyDown: KeyboardEventHandler<HTMLInputElement>;
   placement?: 'top' | 'bottom';
-  icon?: string;
+  icon?: IconDefinition;
 };
 
 export function ModalInputRow({
@@ -25,11 +26,13 @@ export function ModalInputRow({
   onChange,
   onKeyDown,
   placement = 'top',
-  icon = searchIcon,
+  icon = faMagnifyingGlass,
 }: Props) {
   return (
     <div className={placement === 'bottom' ? s.bottomInputRow : s.inputRow}>
-      <span className={s.inputIcon} dangerouslySetInnerHTML={{ __html: icon }} />
+      <span className={s.inputIcon}>
+        <IconReact icon={icon} />
+      </span>
       <input
         ref={inputRef}
         name={name}
