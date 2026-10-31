@@ -58,6 +58,7 @@ Status: `todo`, `doing`, `done`, `blocked`.
 | 20  | Content parity audit of steps 15 to 17                   | sonnet | done   |
 | 21  | `/enterprise-headless-cms`                               | sonnet | done   |
 | 22  | `/partners` (index, showcase, partner, project)          | sonnet | doing  |
+| 23  | Docs: new fonts, tokens and dark mode                    | sonnet | doing  |
 
 ### 1. Legacy renames (mechanical)
 
