@@ -1,9 +1,15 @@
 ---
-import { FormResultLayout } from '~/layouts/FormResultLayout';
+// The page after an agency partner request. It sends the Google Ads conversion.
+import { ArticleBody } from '~/components/ArticleBody';
+import { Hero } from '~/components/Hero';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
 import { GOOGLE_ADS_CONVERSIONS } from '~/lib/googleAds';
+
+const seo = overrideSeo([], seoTitle('Success | Agency Partner Program'));
 ---
 
-<FormResultLayout type="success" kicker="Agency Partner Program">
+<Layout seo={seo} theme="blue" headerVariant="light" footerTheme="blue">
   <script is:inline define:vars={{ GADS_CONVERSION: GOOGLE_ADS_CONVERSIONS.partnerSubmit }}>
     window.dataLayer = window.dataLayer || [];
     function gtag() {
@@ -11,14 +17,17 @@ import { GOOGLE_ADS_CONVERSIONS } from '~/lib/googleAds';
     }
     gtag('event', 'conversion', { send_to: GADS_CONVERSION });
   </script>
-  <p>
-    We have successfully received your request, and <strong
-      >you will soon receive an automated confirmation via email</strong
-    >.
-  </p>
-  <p>
-    We look forward to meeting you soon, learning more about your agency, and sharing the philosophy
-    of our Partner Program.
-  </p>
-  <p>See you very soon!</p>
-</FormResultLayout>
+  <Hero variant="light" label="Agency Partner Program" headline="Thank you for reaching out!" />
+  <ArticleBody tocTitle="On this page">
+    <p>
+      We have successfully received your request, and <strong
+        >you will soon receive an automated confirmation via email</strong
+      >.
+    </p>
+    <p>
+      We look forward to meeting you soon, learning more about your agency, and sharing the
+      philosophy of our Partner Program.
+    </p>
+    <p>See you very soon!</p>
+  </ArticleBody>
+</Layout>
