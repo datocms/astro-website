@@ -14,12 +14,11 @@ import {
 import type { CategoryNavData } from '~/data/features';
 
 /*
- * Route /media: the Media pillar (src/data/AGENTS.md), a new page. Five
+ * Route /media: the Media pillar (src/data/AGENTS.md). Five
  * chapters: Media library, Asset fields, Images, Video, In your frontend.
  * The opinion sits between Images and Video.
  *
- * Every chapter is a ChapterLayout: its real copy, and a box with
- * the description of each picture until its scene exists. The copy is a
+ * Every chapter is a ChapterLayout with its copy. The copy is a
  * draft, for Ronak's pass. A "(check)" comment marks a
  * fact to verify before the copy is final. Asset fields and In your
  * frontend are the thin chapters (src/data/AGENTS.md, "The pillars").
@@ -71,8 +70,7 @@ export const chapterNav: CategoryNavData = {
   ],
 };
 
-// Chapter 1. Old page: the asset management part of
-// /features/editor-experience. Built: src/scenes/MediaLibrary. The copy
+// Chapter 1: the asset management. Built: src/scenes/MediaLibrary. The copy
 // follows the cms: the default metadata has a menu of the language (no
 // locale tabs), the saved filters are a menu of the toolbar, the menu of
 // the upload button lists the sources of the plugins, and fragment 3 is
@@ -128,7 +126,7 @@ export const library = {
   ],
 } satisfies ChapterLayoutData;
 
-// Chapter 2. No old page.
+// Chapter 2: the asset fields.
 export const fields: ChapterLayoutData = {
   id: 'fields',
   theme: 'orange',
@@ -166,8 +164,7 @@ export const fields: ChapterLayoutData = {
   ],
 };
 
-// Chapter 3. Old pages: /features/images-api and the optimization part of
-// it. The Optimization chapter is in it: the frame is the lab of
+// Chapter 3: the Images API and its optimization. The frame is the lab of
 // src/scenes/Images (the parameters, the formats and the weight), thus the
 // fragments keep only what the lab does not show.
 export const images: ChapterLayoutData = {
@@ -207,7 +204,7 @@ export const opinion: StatementData = {
   text: 'imgix and Mux each do one thing, better than we would. Our job is to make them feel like one field in your schema and one library for your editors.',
 };
 
-// Chapter 4. Old page: /features/video-api.
+// Chapter 4: the Video API.
 export const video: ChapterLayoutData = {
   id: 'video',
   theme: 'purple',
@@ -267,7 +264,7 @@ export const video: ChapterLayoutData = {
   ],
 };
 
-// Chapter 5. No old page: the components of the old images and video pages.
+// Chapter 5: the components for images and video.
 // Built: src/scenes/MediaComponents (the exhibition Keepers of the Light
 // of Harwick Maritime Museum, not Saltmarsh Museum): the frame, and the
 // two fragments, Files.astro and Player.astro.

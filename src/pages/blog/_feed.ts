@@ -11,7 +11,7 @@ import { graphql, type ResultOf } from '~/lib/datocms/graphql';
 import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
-/** The SEO texts of the index of the casual chats, as on the old site. */
+/** The SEO texts of the index of the casual chats. */
 const chatsIndex = {
   title: 'Customer Chats',
   description: 'Conversations with customers working on some really cool use cases with DatoCMS',

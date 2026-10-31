@@ -1,5 +1,5 @@
 ---
-// The features index of the redesign. The hero, the groups, the buddy and
+// The features index. The hero, the groups, the buddy and
 // the closer come from src/data/features.ts. The SEO and the features of
 // the groups come from the CMS record `featuresIndex`.
 import type { ResultOf } from 'gql.tada';
@@ -25,8 +25,8 @@ type GroupField = Exclude<keyof Page, '_seoMetaTags'>;
 
 /**
  * The 9 groups of the CMS record, in the order of the page. `title` is the
- * title of the group in src/data/features.ts. `legacyId` is the anchor of
- * the group on the old page (the slug of its old title).
+ * title of the group in src/data/features.ts. `legacyId` is the anchor that
+ * former links use for the group (the slug of its former title).
  */
 const groups: { field: GroupField; title: string; legacyId: string }[] = [
   { field: 'coreFeaturesBlocks', title: 'Core Features', legacyId: 'core-features' },
@@ -62,7 +62,7 @@ function findCategory(title: string) {
   return category;
 }
 
-// The old anchors of the groups and their new anchors, when they changed.
+// The former anchors of the groups that differ from the current anchors.
 const legacyAnchors: Record<string, string> = {};
 for (const { title, legacyId } of groups) {
   const { id } = findCategory(title);
@@ -98,7 +98,7 @@ const jsonLd: WithContext<SoftwareApplication> = {
 <Layout seo={page._seoMetaTags} theme="green" footerTheme="blue">
   <JsonLd slot="head" data={jsonLd} />
   <Fragment slot="head">
-    {/* The old page had other anchors for some groups. Send an old link to the new anchor. */}
+    {/* Some groups had other anchors. Send a link with a former anchor to the current anchor. */}
     <script is:inline define:vars={{ anchors: legacyAnchors }}>
       const target = anchors[location.hash.slice(1)];
       if (target) addEventListener('DOMContentLoaded', () => location.replace(`#${target}`));

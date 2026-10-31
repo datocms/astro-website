@@ -1,5 +1,5 @@
-// Mock data for the homepage. The types have the names of the future
-// CMS fragments, thus step 5 only changes the data source.
+// The data of the home page. The CMS does not hold it: the data is here.
+// The types have the names of CMS fragments.
 
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import type { ButtonAppearance, ButtonImage } from '~/components/Button';
@@ -587,7 +587,7 @@ export const community: CommunityData = {
     appearance: 'deep-on-white',
     variant: 'soft',
   },
-  // Left to right, as in _community-animation step 1.
+  // Left to right.
   posts: [
     {
       author: { name: 'Lee', avatar: forumAvatar(5) },

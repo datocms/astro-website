@@ -84,8 +84,8 @@ export const schema: ChapterLayoutData = {
     label: 'Schema builder',
     headline: 'Model it.',
     muted: 'Query it a second later.',
-    // (check) the old page says "no codegen step"; types are generated
-    // optionally, thus the intro does not claim it.
+    // (check) The intro does not claim "no codegen step": types are
+    // generated optionally.
     intro:
       'Models, blocks, and fields with their validations, built quickly in the UI (or quickly-er via the CLI). Every change is live in the API instantly: no config files to sync, no redeploy, no drama.',
     link: docs('/docs/content-modelling'),
@@ -127,8 +127,8 @@ export const schema: ChapterLayoutData = {
   ],
 };
 
-// Chapter 2. Old pages: /features/headless-cms-graphql, and the map of
-// /features/worldwide-cdn (our edge, not the CDN of the customer's site:
+// Chapter 2: the GraphQL API, and the map of our edge
+// (our edge, not the CDN of the customer's site:
 // that one is chapter 4).
 export const graphql: ChapterLayoutData = {
   id: 'graphql',
@@ -169,7 +169,7 @@ export const graphql: ChapterLayoutData = {
   ],
 };
 
-// Chapter 3. Old page: /features/real-time-api.
+// Chapter 3: the real-time API.
 export const realTime: ChapterLayoutData = {
   id: 'real-time',
   theme: 'purple',
@@ -192,7 +192,7 @@ export const realTime: ChapterLayoutData = {
   fragments: [],
 };
 
-// Chapter 4. Old page: /features/cache-tags. The chapter is about the CDN
+// Chapter 4: the cache tags. The chapter is about the CDN
 // of the customer's site, the one the tags purge; our own edge is the map
 // of chapter 2.
 export const delivery: ChapterLayoutData = {
@@ -241,8 +241,7 @@ export const opinion: StatementData = {
   text: 'So a sandbox behaves like a branch, a migration is a script in your repo, and a promotion is a deploy. A CMS should fit the way you *already* ship, not recreate it. We’re just a piece of your peace of mind.',
 };
 
-// Chapter 5. Old pages: /features/data-integrity (its sandbox part), the
-// staging part of /features/developer-experience.
+// Chapter 5: the sandbox environments and the staging workflow.
 export const environments: ChapterLayoutData = {
   id: 'environments',
   theme: 'pink',
@@ -286,7 +285,7 @@ export const environments: ChapterLayoutData = {
   ],
 };
 
-// Chapter 6. A new chapter: the old site had no page for it.
+// Chapter 6: automation.
 export const automation: ChapterLayoutData = {
   id: 'automation',
   theme: 'orange',
@@ -328,7 +327,7 @@ export const automation: ChapterLayoutData = {
   ],
 };
 
-// Chapter 7. Old page: /features/plugins. Built: src/scenes/Plugins/. The
+// Chapter 7: the plugins. Built: src/scenes/Plugins/. The
 // story is the project Alpine Trails (a site of hikes) and its private
 // plugin Trail tools.
 export const plugins: ChapterLayoutData = {

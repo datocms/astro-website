@@ -8,9 +8,8 @@ import { graphql } from '~/lib/datocms/graphql';
  * gives a CustomerStoryRecord.
  *
  * The cover is 5:3, as the covers in the CMS since 2024 (the field is
- * "Cover image (5:3)"). An old cover with a different shape is not
- * cropped: it fits in the box, and a blur of the image fills the rest (as
- * on the old site).
+ * "Cover image (5:3)"). A cover with a different shape is not
+ * cropped: it fits in the box, and a blur of the image fills the rest.
  *
  * `author` and `customData` give the credit of an Unsplash photo.
  */

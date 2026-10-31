@@ -3,7 +3,7 @@ import type { FeatureFragmentsData } from '~/components/FeatureFragments';
 
 /*
  * The Dynamic layouts chapter of the Editing pillar
- * (`/editor-experience#dynamic-layouts`). Old page: /features/dynamic-layouts.
+ * (`/editor-experience#dynamic-layouts`).
  *
  * All the pictures show one record: the marketing landing page "Plover for
  * agencies" of Plover, a calendar app for teams. The diagram of the nested

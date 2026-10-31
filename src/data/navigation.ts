@@ -1,7 +1,6 @@
-// Mock data. Step 5 replaces it with the `navigation_bar` singleton
-// of the "DatoCMS Website" project. The structure departs on purpose
-// from the design of the mega-menu and the footer: see src/data/AGENTS.md,
-// "Navigation". Every link goes to a page, never to a
+// The data of the mega-menu and the footer. The CMS does not hold it: the
+// lists are here. See src/data/AGENTS.md, "Navigation", for the
+// structure. Every link goes to a page, never to a
 // list of content, and no page has two names. A link without a page on
 // this site goes to '#'.
 

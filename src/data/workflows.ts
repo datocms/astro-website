@@ -3,7 +3,7 @@ import type { FeatureFragmentsData } from '~/components/FeatureFragments';
 
 /*
  * The Workflows chapter of the Editing pillar
- * (`/editor-experience#workflows`). Old page: /features/workflow-cms.
+ * (`/editor-experience#workflows`).
  *
  * The scene shows one record: the press release "Kestrel opens its first
  * factory in Portugal", in legal review (src/scenes/Workflows/story.ts). The

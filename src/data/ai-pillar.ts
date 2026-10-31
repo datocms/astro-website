@@ -71,7 +71,7 @@ export const chapterNav: CategoryNavData = {
   ],
 };
 
-// Chapter 1. Old page: the MCP part of /features/ai.
+// Chapter 1: the MCP server.
 export const mcp: ChapterLayoutData = {
   id: 'mcp',
   theme: 'blue',
@@ -122,7 +122,7 @@ export const mcp: ChapterLayoutData = {
   ],
 };
 
-// Chapter 2. Old page: the skills part of /features/ai.
+// Chapter 2: the agent skills.
 export const skills: ChapterLayoutData = {
   id: 'skills',
   theme: 'pink',
@@ -155,7 +155,7 @@ export const opinion: StatementData = {
   text: 'DatoCMS doesn’t come with any :sparkle:shiny hype‑y:sparkle: AI features enabled out of the box unless you enable them. We’d rather be the boring part of your AI stack that works just right. More on that below.',
 };
 
-// Chapter 3. Old page: the translations part of /features/ai.
+// Chapter 3: the translations.
 // /features/headless-cms-multi-language stays with Editing.
 export const translations: ChapterLayoutData = {
   id: 'translations',
@@ -182,7 +182,7 @@ export const translations: ChapterLayoutData = {
   fragments: [],
 };
 
-// Chapter 4. No old page: the AI of the media library.
+// Chapter 4: the AI of the media library.
 // Built: src/scenes/MediaAi/ (the frame, fragments 1 and 2). The frame is
 // in the grammar of the diagrams (src/scenes/diagram/).
 export const media: ChapterLayoutData = {

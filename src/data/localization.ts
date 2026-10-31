@@ -3,8 +3,7 @@ import type { FeatureFragmentsData } from '~/components/FeatureFragments';
 
 /*
  * The Localization chapter of the Editing pillar
- * (`/editor-experience#localization`). Old page:
- * /features/headless-cms-multi-language.
+ * (`/editor-experience#localization`).
  *
  * The scenes show one record: the product "Cast-iron skillet, 28 cm" of
  * Lume Kitchen.

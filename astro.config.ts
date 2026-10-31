@@ -364,7 +364,7 @@ export default defineConfig({
     '/cma-ts-schema':
       '/docs/content-management-api/resources/item#type-safe-development-with-typescript',
     '/search': '/docs/site-search',
-    // The old feature pages of the Editing pillar are chapters of /editor-experience.
+    // The feature pages of the Editing pillar redirect to chapters of /editor-experience.
     '/features/structured-content-cms': '/editor-experience#structured-content',
     '/features/visual-editing': '/editor-experience#visual-editing',
     '/features/dynamic-layouts': '/editor-experience#dynamic-layouts',
@@ -373,23 +373,23 @@ export default defineConfig({
     '/features/editor-experience': '/editor-experience',
     // The dark mode page is only an entry in the index of the features.
     '/features/dark-mode': '/features#editor-experience',
-    // The old feature pages of the Developers pillar are chapters of /developers.
+    // The feature pages of the Developers pillar redirect to chapters of /developers.
     '/features/schema-builder': '/developers#schema',
     '/features/headless-cms-graphql': '/developers#graphql',
     '/features/real-time-api': '/developers#real-time',
     '/features/cache-tags': '/developers#delivery',
-    // The numbers section holds the claims of the old CDN page.
+    // The numbers section holds the claims of the CDN page.
     '/features/worldwide-cdn': '/developers#numbers',
     '/features/data-integrity': '/developers#environments',
     '/features/developer-experience': '/developers',
     '/features/plugins': '/developers#plugins',
     '/made-for/developers': '/developers',
-    // The old feature pages of the Media pillar are chapters of /media.
+    // The feature pages of the Media pillar redirect to chapters of /media.
     '/features/images-api': '/media#images',
     '/features/video-api': '/media#video',
-    // The old AI page is the AI pillar.
+    // The AI page redirects to the AI pillar.
     '/features/ai': '/ai',
-    // The philosophy page and the wall of love replace the old pages.
+    // The about page redirects to the philosophy page.
     '/company/about': '/philosophy',
     '/blog/2': '/blog/p/2',
     '/changelog/2': '/product-updates/p/2',
@@ -524,7 +524,7 @@ export default defineConfig({
     // The casual chats are part of the blog.
     '/casual-chats': '/blog/casual-chats',
     '/casual-chats/[...rest]': '/blog/casual-chats/[...rest]',
-    // The old customers page and the old product overview are gone.
+    // The customers pages redirect to the case studies. The product overview is gone.
     '/success-stories': '/case-studies',
     '/customers': '/case-studies',
     '/customers/[...rest]': '/case-studies/[...rest]',

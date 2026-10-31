@@ -11,7 +11,7 @@ export interface LogoItem {
   /**
    * An image file of a single-colour logo, such as a logo from the CMS.
    * The logo shows as a CSS mask in the text colour of the theme, as
-   * `svg` does. Use it in place of `src`. (Not in the prototype.)
+   * `svg` does. Use it in place of `src`.
    */
   mask?: string;
 }

@@ -4,8 +4,8 @@ import type { CodeTab } from '~/data/home';
 
 /*
  * The Visual editing chapter of the Editing pillar
- * (`/editor-experience#visual-editing`). New copy. Old page:
- * /features/visual-editing, now a redirect to this chapter.
+ * (`/editor-experience#visual-editing`). The URL /features/visual-editing
+ * redirects to this chapter.
  *
  * The scene shows the page of the article "Night trains are back" of Field
  * Notes, a travel magazine, on its draft site, in the tab Visual of the cms

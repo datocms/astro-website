@@ -5,7 +5,7 @@ export interface Principle {
   title: string;
   text: string;
   theme: Theme;
-  /** Makes the title a link. Not in the prototype. */
+  /** Makes the title a link. */
   href?: string;
 }
 

@@ -6,8 +6,8 @@ import { graphql } from '~/lib/datocms/graphql';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 /**
- * The old site had 10 entries on each page, up to page 30. A page that
- * existed then and does not exist now redirects to the last page.
+ * Former links go to pages up to page 30 (10 entries on each page). A page
+ * in this range that does not exist now redirects to the last page.
  */
 export const legacyLastPage = 30;
 

@@ -1,6 +1,6 @@
-// Fake data for the search popup.
-// The popup filters this static index on the client by substring.
-// A real search service replaces it later.
+// Static data for the search popup.
+// The popup filters this static index on the client by substring. No
+// search service is behind it.
 
 export interface SearchLink {
   label: string;

@@ -3,9 +3,8 @@ import type { FeatureFragmentsData } from '~/components/FeatureFragments';
 
 /*
  * The Collaboration and versions chapter of the Editing pillar
- * (`/editor-experience#collaboration`). New copy. Old page:
- * /features/editor-experience (the sections "Real time collaboration" and
- * "Versions, history, schedules").
+ * (`/editor-experience#collaboration`). It covers real time collaboration,
+ * versions, history and schedules.
  *
  * The frame shows the recipe "Lemon risotto with peas" of Simmer on two
  * screens (src/scenes/Collaboration/Pair.astro): Inès Moreau edits it, and
