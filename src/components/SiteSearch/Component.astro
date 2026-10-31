@@ -1,0 +1,80 @@
+---
+/*
+ * The search of the site (the Search of src/components/docs/Search) for the
+ * layout of the pages. Mount it one time, in the layout. Each element with
+ * `data-search-open` opens it. Cmd/Ctrl+K also opens it.
+ *
+ * Up front, the page loads only the small script below. The first click or
+ * the first Cmd/Ctrl+K loads React and the modal, then the modal opens.
+ */
+---
+
+<script>
+  type SearchModule = typeof import('~/components/docs/Search/mount');
+
+  let module: Promise<SearchModule> | null = null;
+  let mounted = false;
+
+  async function importSearch(): Promise<SearchModule> {
+    // In dev, the React plugin needs its preamble before a React module
+    // runs. Astro puts it in the before-hydration script, which loads only
+    // with an island. This page has no island: load the script here.
+    if (import.meta.env.DEV) {
+      // @ts-expect-error -- A virtual module of Astro, with no types.
+      await import('astro:scripts/before-hydration.js');
+    }
+    return import('~/components/docs/Search/mount');
+  }
+
+  function load(): Promise<SearchModule> {
+    module ??= importSearch();
+    return module;
+  }
+
+  function isEditable(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) return false;
+    return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
+  }
+
+  function opener(target: EventTarget | null): HTMLElement | null {
+    if (!(target instanceof Element)) return null;
+    const el = target.closest('[data-search-open]');
+    return el instanceof HTMLElement ? el : null;
+  }
+
+  // After the mount, the Search handles the clicks and the keys itself.
+  function open(from: HTMLElement | null) {
+    if (mounted) return;
+    mounted = true;
+    document.removeEventListener('click', onClick);
+    document.removeEventListener('keydown', onKeyDown);
+    void load().then((m) => m.mountSearch(from));
+  }
+
+  function onClick(event: MouseEvent) {
+    const el = opener(event.target);
+    if (!el) return;
+    event.preventDefault();
+    open(el);
+  }
+
+  function onKeyDown(event: KeyboardEvent) {
+    if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'k') return;
+    if (isEditable(event.target)) return;
+    event.preventDefault();
+    open(document.activeElement instanceof HTMLElement ? document.activeElement : null);
+  }
+
+  // Load the code when the pointer or the focus comes to a search button.
+  function onIntent(event: Event) {
+    if (!opener(event.target)) return;
+    document.removeEventListener('pointerover', onIntent);
+    document.removeEventListener('focusin', onIntent);
+    void load().then((m) => m.prefetchSearch());
+  }
+
+  document.addEventListener('click', onClick);
+  document.addEventListener('keydown', onKeyDown);
+  document.addEventListener('pointerover', onIntent);
+  document.addEventListener('focusin', onIntent);
+</script>

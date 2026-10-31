@@ -26,7 +26,18 @@ function isMacPlatform(): boolean {
   return /Mac|iPhone|iPad|iPod/i.test(platform);
 }
 
-type TriggerVariant = 'input' | 'docs' | 'icon';
+/*
+ * 'none': no own trigger. Each element with `data-search-open` opens the
+ * modal. The layout of the site uses it with its own search buttons.
+ */
+type TriggerVariant = 'input' | 'docs' | 'icon' | 'none';
+
+/*
+ * Some pages have more than one Search (for example, a trigger in the header
+ * and a trigger in the hero). Only one of them opens on Cmd/Ctrl+K: the
+ * first visible one, or the one that is open.
+ */
+let openOwner: object | null = null;
 
 function Trigger({
   triggerRef,
@@ -35,7 +46,7 @@ function Trigger({
 }: {
   triggerRef: React.RefObject<HTMLButtonElement | null>;
   onOpen: () => void;
-  variant?: TriggerVariant;
+  variant?: Exclude<TriggerVariant, 'none'>;
 }) {
   const isMac = useMemo(isMacPlatform, []);
 
@@ -74,16 +85,27 @@ type Phase = 'closed' | 'open' | 'closing';
 
 const EXIT_ANIMATION_MS = 180;
 
-export function Search({ variant }: { variant?: TriggerVariant } = {}) {
-  const [phase, setPhase] = useState<Phase>('closed');
+type SearchProps = {
+  variant?: TriggerVariant;
+  /** Open the modal on the first render. */
+  defaultOpen?: boolean;
+  /** The element that gets the focus back when the modal closes. */
+  opener?: HTMLElement | null;
+};
+
+export function Search({ variant, defaultOpen = false, opener = null }: SearchProps = {}) {
+  const [phase, setPhase] = useState<Phase>(defaultOpen ? 'open' : 'closed');
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const openerRef = useRef<HTMLElement | null>(opener);
   const closeTimerRef = useRef<number | null>(null);
+  const ownerRef = useRef<object>({});
 
   const openModal = useCallback(() => {
     if (closeTimerRef.current !== null) {
       clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
     }
+    openOwner = ownerRef.current;
     setPhase('open');
   }, []);
 
@@ -95,7 +117,8 @@ export function Search({ variant }: { variant?: TriggerVariant } = {}) {
     if (phase !== 'closing') return;
     closeTimerRef.current = window.setTimeout(() => {
       setPhase('closed');
-      triggerRef.current?.focus();
+      if (openOwner === ownerRef.current) openOwner = null;
+      (openerRef.current ?? triggerRef.current)?.focus();
       closeTimerRef.current = null;
     }, EXIT_ANIMATION_MS);
     return () => {
@@ -109,21 +132,48 @@ export function Search({ variant }: { variant?: TriggerVariant } = {}) {
   const isMounted = phase !== 'closed';
 
   useEffect(() => {
+    if (defaultOpen) openOwner = ownerRef.current;
+    // Run on mount only: defaultOpen is the first state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        if (openOwner && openOwner !== ownerRef.current) return;
+        if (e.defaultPrevented) return;
         if (isEditableTarget(e.target) && !isMounted) return;
-        if (!isMounted && triggerRef.current?.offsetParent === null) return;
+        if (!isMounted && variant !== 'none' && triggerRef.current?.offsetParent === null) return;
         e.preventDefault();
+        if (!isMounted && variant === 'none') {
+          openerRef.current =
+            document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        }
         openModal();
       }
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [isMounted, openModal]);
+  }, [isMounted, openModal, variant]);
+
+  useEffect(() => {
+    if (variant !== 'none') return;
+    const onClick = (e: MouseEvent) => {
+      const target = e.target instanceof Element ? e.target.closest('[data-search-open]') : null;
+      if (!(target instanceof HTMLElement)) return;
+      e.preventDefault();
+      openerRef.current = target;
+      openModal();
+    };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
+  }, [variant, openModal]);
 
   return (
     <>
-      <Trigger triggerRef={triggerRef} onOpen={openModal} variant={variant} />
+      {variant !== 'none' && (
+        <Trigger triggerRef={triggerRef} onOpen={openModal} variant={variant} />
+      )}
       {isMounted &&
         typeof document !== 'undefined' &&
         createPortal(
