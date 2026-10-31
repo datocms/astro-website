@@ -60,7 +60,7 @@ Status: `todo`, `doing`, `done`, `blocked`.
 | 22  | `/partners` (index, showcase, partner, project)           | sonnet | done   |
 | 23  | Docs: new fonts, tokens and dark mode                     | sonnet | doing  |
 | 24  | `/tech-partners` (index, detail), in the style of step 22 | sonnet | done   |
-| 25  | `/glossary`                                               | sonnet | doing  |
+| 25  | `/glossary`                                               | sonnet | done   |
 
 ### 1. Legacy renames (mechanical)
 
@@ -201,6 +201,12 @@ While the port runs, the components of the prototype keep their prototype props 
 
 The points that wait for a human. Remove a point when it is decided (write the decision in the step or the log).
 
+- **Glossary (step 25):**
+  - The side index and the mobile bar switch at 768, not 600 (the `lint:css` breakpoints). Between 600 and 767 the page shows the mobile bar.
+  - The card background was a cream-to-lilac gradient, now a flat `--surface-accent-faint`.
+  - The big group letter is `--text-subtle`, not the accent (the accent was too dark in dark mode).
+  - The h1 reads "DatoCMS Glossary [••]": the `<mark>` run is the Hero muted run, with the face.
+  - The entry permalink is a `#` after the title, not in the left margin; it has a new `aria-label`.
 - **Plugins and starters (step 19):**
   - The heading of the mega-menu column is "Ecosystem" (Plugins, Starters). Keep it or change it.
   - The old pages had `noFinalCta`. The new pages have no closing banner: add a `PageCloser` or not.
@@ -268,3 +274,4 @@ Each step adds one line here: the date, the step, the result, and what a human m
 - 2026-10-31, step 21: `/enterprise-headless-cms` is on the new layout (commit `Redesign: port /enterprise-headless-cms`). The 4 old strips use the new `SplitPoints` block (kicker, title and text on one side, three points on the other). Hero, `LogosLine`, `Quote`, `ContactSection` (the sales form of `/contact`, hidden `issueType=enterprise`, `#form` kept), `StatementsSection` (`statLight`) and `TextWithImage` (key illustration) for the rest. Copy in `src/data/enterprise.ts`; the submit script of the sales form is in `src/lib/salesForm.ts` (`/contact` still has its inline copy). Shared blocks got optional props: `InlineText` (bold, links), `StatementsSection` (item `description`, `href`, data `label`), `TextWithImage` (`label`), `ContactSection` (`id`, `headingLevel`, `description` slot). Deleted: `_sub/EnterpriseStrip`, `_sub/Point.astro`. `REDESIGN_PAGE_DIRS`: `enterprise-headless-cms`. Checks: `astro check` 0 errors, lint baseline; build not run yet (a dev server was up). Open points: see "Open decisions".
 - 2026-10-31, step 22: `/partners` (index, showcase listing and pages, partner detail, project detail) is on the new layout, theme `pink` (commit `Redesign: port /partners`). Decisions of the review: all 4 templates; the world map stays (page-local `_PartnersMap`, same data, theme tokens); the filters keep the server-side GET logic with faceted counts and fetch-and-replace, in the new `FilterForm` block (native selects; continent resets country; the showcase pagination keeps the query string). New blocks: `FilterForm`, `Lightbox` (native `<dialog>`). Copy in `src/data/partners.ts`. Page-local cards `_PartnerCard`, `_Card`. Deleted: the old partner `PluginCard` copy, and the orphan `legacy/filtering`, `legacy/LegacyPagination`, `legacy/pluginToolkit`, `legacy/SidebarPane`, `legacy/Tooltip`. Checks: `astro check` 0 errors, `lint:css` baseline; build not run yet. Open points: see "Open decisions".
 - 2026-10-31, step 24: `/tech-partners` (index, detail) is on the new layout, theme `pink`, in the style of step 22 (commit `Redesign: port /tech-partners`). The partner card is now the shared `src/components/PartnerCard` (optional flags and pill), used by `/partners` and `/tech-partners`. The detail page has a visible h1 with the name. No content dropped; no legacy component became orphan. Also (commit `Restore the tooltip of the official plugin badge`): the official badge of `PluginCard` has its styled tooltip again, with the new `Tooltip` block (Floating UI); the `<title>` "d_only" of the SVG no longer shows on hover. Checks: `astro check` 0 errors, `lint:css` baseline; build not run yet. Open points: see "Open decisions".
+- 2026-10-31, step 25: `/glossary` is on the new layout, theme `green` (commit `Redesign: port /glossary`). Decisions of the review: same structure, restyled (sticky letter index on the side, a top bar on a phone, a big letter per group, entry permalinks on hover). `Hero variant="light"`, `Section`, `Prose` + `StructuredText`, `JsonLd` in the head; the `DefinedTermSet` JSON-LD, `#main-content` (used by the Markdown export) and `DraftModeQueryListener` are kept. The anchors `group-X` and `slugify(title)` are now on the `<h2>` and `<dt>` themselves, same values. No content dropped; no legacy component became orphan. `REDESIGN_PAGE_DIRS`: `glossary`. Checks: `astro check` 0 errors, `lint:css` baseline; build not run yet. Open points: see "Open decisions".
