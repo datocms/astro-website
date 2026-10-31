@@ -33,32 +33,33 @@ Do not run `astro build` or `astro check` while `astro dev` runs (they break the
 
 Status: `todo`, `doing`, `done`, `blocked`.
 
-| #   | Step                                                     | Model  | Status |
-| --- | -------------------------------------------------------- | ------ | ------ |
-| 0   | Branch and this plan                                     | -      | done   |
-| 1   | Legacy renames                                           | haiku  | done   |
-| 2   | Foundation                                               | opus   | done   |
-| 3   | `/404` and `/pricing`                                    | sonnet | done   |
-| 4   | `/` (home)                                               | sonnet | done   |
-| 5   | `/features`                                              | opus   | done   |
-| 6   | `/editor-experience`                                     | sonnet | done   |
-| 7   | `/developers`                                            | sonnet | done   |
-| 8   | `/media`                                                 | sonnet | done   |
-| 9   | `/ai`                                                    | sonnet | done   |
-| 10  | `/philosophy`, `/wall-of-love` (`/enterprise` postponed) | sonnet | done   |
-| 11  | `/contact` (with the real form)                          | opus   | done   |
-| 12  | `/compare/[slug]` and `/case-studies/[slug]` templates   | opus   | done   |
-| 13  | Blog and product updates                                 | sonnet | done   |
-| 14  | Final sweep                                              | sonnet | done   |
-| 15  | Legal and security pages                                 | sonnet | done   |
-| 16  | `/slack`, `/support` and the thanks pages                | sonnet | done   |
-| 17  | `/research-program` and `/partner-program`               | sonnet | done   |
-| 18  | `/academy` and `/user-guides`                            | sonnet | done   |
-| 19  | Remove `/marketplace`, port `/plugins` and `/starters`   | sonnet | done   |
-| 20  | Content parity audit of steps 15 to 17                   | sonnet | done   |
-| 21  | `/enterprise-headless-cms`                               | sonnet | done   |
-| 22  | `/partners` (index, showcase, partner, project)          | sonnet | doing  |
-| 23  | Docs: new fonts, tokens and dark mode                    | sonnet | doing  |
+| #   | Step                                                      | Model  | Status |
+| --- | --------------------------------------------------------- | ------ | ------ |
+| 0   | Branch and this plan                                      | -      | done   |
+| 1   | Legacy renames                                            | haiku  | done   |
+| 2   | Foundation                                                | opus   | done   |
+| 3   | `/404` and `/pricing`                                     | sonnet | done   |
+| 4   | `/` (home)                                                | sonnet | done   |
+| 5   | `/features`                                               | opus   | done   |
+| 6   | `/editor-experience`                                      | sonnet | done   |
+| 7   | `/developers`                                             | sonnet | done   |
+| 8   | `/media`                                                  | sonnet | done   |
+| 9   | `/ai`                                                     | sonnet | done   |
+| 10  | `/philosophy`, `/wall-of-love` (`/enterprise` postponed)  | sonnet | done   |
+| 11  | `/contact` (with the real form)                           | opus   | done   |
+| 12  | `/compare/[slug]` and `/case-studies/[slug]` templates    | opus   | done   |
+| 13  | Blog and product updates                                  | sonnet | done   |
+| 14  | Final sweep                                               | sonnet | done   |
+| 15  | Legal and security pages                                  | sonnet | done   |
+| 16  | `/slack`, `/support` and the thanks pages                 | sonnet | done   |
+| 17  | `/research-program` and `/partner-program`                | sonnet | done   |
+| 18  | `/academy` and `/user-guides`                             | sonnet | done   |
+| 19  | Remove `/marketplace`, port `/plugins` and `/starters`    | sonnet | done   |
+| 20  | Content parity audit of steps 15 to 17                    | sonnet | done   |
+| 21  | `/enterprise-headless-cms`                                | sonnet | done   |
+| 22  | `/partners` (index, showcase, partner, project)           | sonnet | done   |
+| 23  | Docs: new fonts, tokens and dark mode                     | sonnet | doing  |
+| 24  | `/tech-partners` (index, detail), in the style of step 22 | sonnet | doing  |
 
 ### 1. Legacy renames (mechanical)
 
@@ -212,6 +213,17 @@ The points that wait for a human. Remove a point when it is decided (write the d
   - The `<mark>` highlights in the quotes are plain text now.
   - The intro of `/legal` was an `<h3>`, now a `<p class="lead">`.
   - The legal line of the forms was "By submitting you agree to our TOS and acknowledge our Privacy Policy", now "…agree to our Terms and Privacy Policy".
+- **Partners (step 22):**
+  - Logos keep their colours (plain `<img>`). On the showcase cards, the partner hero and the project "Made by", the logo sits on a small `--surface-raised` chip so that black logos stay visible in dark: keep or drop.
+  - The partner detail has a visible h1 with the name (before: only the logo alt); the logo is below the short description.
+  - New empty state on the index: "No partners match your current filters."
+  - "Project shots" / "Backend shots" are hidden when the gallery is empty (before: the heading showed anyway).
+  - The icons of the old buttons are gone (`Button` shows its arrow).
+  - The map hydrates (`client:visible`): an exception to "React is server-only" of `src/REDESIGN.md`.
+  - The rotating colour backgrounds of the old cards are gone.
+  - The index SEO now uses the CMS tags (title "Solution Partners — DatoCMS", description from the intro); before, a static `<title>` only.
+  - The project detail aside is not sticky.
+  - Look at: logos and chips in both schemes, the map on pink, a partner with chats and plugins, a project with a video, the lightbox, the dark scheme and 390px of the detail pages, the filter bar at 768px, the empty states, `/partners/showcase/p/2` with a filter.
 - **Enterprise (step 21):**
   - "security and scalability" lost its `<mark>`: it is the muted run of the Hero headline now.
   - The Oberlo and HashiCorp stats link only the number and label; the old card was a link as a whole.
@@ -248,3 +260,4 @@ Each step adds one line here: the date, the step, the result, and what a human m
 - 2026-10-31, step 19: `/marketplace` and its section navbar are removed (commits `Remove the marketplace section; move plugins and starters to /plugins and /starters`, `Remove /how-to-datocms, with a redirect to /academy`, `Redesign: port /plugins and /starters`). Decisions of the review (2026-10-31): `/marketplace` → `/plugins`; the URLs move to `/plugins/...` and `/starters/...`, with `[...rest]` redirects from `/marketplace/plugins/...` and `/marketplace/starters/...` and the old specific redirects pointed to the final URL; the mega-menu column keeps only Plugins and Starters (no `allLink`), the footer has Plugins and Starters. The 6 templates (plugins index, browse, browse/p/N, detail; starters index, detail) use `theme="orange"`. New `PluginCard` and `Markdown` blocks; `Pagination` got `search`. The CMS singleton `integrationsPage` stays in the schema. `/how-to-datocms` (a hub of links to the user guides, the academy and the docs) is removed, with a redirect to `/academy`; the CMS singleton `howToDatocmsIndex` stays. Open points: see "Open decisions".
 - 2026-10-31, step 20: the orphan legacy components are deleted (commit `Remove the old components that no page uses`), and the content that the ports of steps 15 to 17 lost is back (commit `Redesign: restore the content lost in the ports`): the logos on the three thanks pages, the company name in the partner testimonials, the record links in the research-program FAQ answers. Open points: see "Open decisions".
 - 2026-10-31, step 21: `/enterprise-headless-cms` is on the new layout (commit `Redesign: port /enterprise-headless-cms`). The 4 old strips use the new `SplitPoints` block (kicker, title and text on one side, three points on the other). Hero, `LogosLine`, `Quote`, `ContactSection` (the sales form of `/contact`, hidden `issueType=enterprise`, `#form` kept), `StatementsSection` (`statLight`) and `TextWithImage` (key illustration) for the rest. Copy in `src/data/enterprise.ts`; the submit script of the sales form is in `src/lib/salesForm.ts` (`/contact` still has its inline copy). Shared blocks got optional props: `InlineText` (bold, links), `StatementsSection` (item `description`, `href`, data `label`), `TextWithImage` (`label`), `ContactSection` (`id`, `headingLevel`, `description` slot). Deleted: `_sub/EnterpriseStrip`, `_sub/Point.astro`. `REDESIGN_PAGE_DIRS`: `enterprise-headless-cms`. Checks: `astro check` 0 errors, lint baseline; build not run yet (a dev server was up). Open points: see "Open decisions".
+- 2026-10-31, step 22: `/partners` (index, showcase listing and pages, partner detail, project detail) is on the new layout, theme `pink` (commit `Redesign: port /partners`). Decisions of the review: all 4 templates; the world map stays (page-local `_PartnersMap`, same data, theme tokens); the filters keep the server-side GET logic with faceted counts and fetch-and-replace, in the new `FilterForm` block (native selects; continent resets country; the showcase pagination keeps the query string). New blocks: `FilterForm`, `Lightbox` (native `<dialog>`). Copy in `src/data/partners.ts`. Page-local cards `_PartnerCard`, `_Card`. Deleted: the old partner `PluginCard` copy, and the orphan `legacy/filtering`, `legacy/LegacyPagination`, `legacy/pluginToolkit`, `legacy/SidebarPane`, `legacy/Tooltip`. Checks: `astro check` 0 errors, `lint:css` baseline; build not run yet. Open points: see "Open decisions".
