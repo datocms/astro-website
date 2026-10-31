@@ -21,7 +21,7 @@ type Props = {
 export function ResultsList({ results, selectedIndex, onHover }: Props) {
   const isCommunity = results[0]?.area.id === 'community';
   return (
-    <div className={cn(isCommunity && s.area)}>
+    <div>
       {results.map((result, i) => (
         <a
           href={result.url}
@@ -31,11 +31,9 @@ export function ResultsList({ results, selectedIndex, onHover }: Props) {
           onMouseEnter={() => onHover(i)}
           style={{ ['--i' as any]: i }}
         >
-          <div>
+          <div className={s.resultArea}>
             <IconReact icon={result.area.icon} />
-          </div>
-          <div className={s.resultBodyWrapper}>
-            <div className={s.resultArea}>
+            <span>
               {result.category ? (
                 <>
                   {!isCommunity && (
@@ -51,12 +49,12 @@ export function ResultsList({ results, selectedIndex, onHover }: Props) {
               {result.date && relativeDate(result.date) && (
                 <span className={s.resultDate}> · {relativeDate(result.date)}</span>
               )}
-            </div>
-            <div className={s.resultTitle}>
-              {isCommunity ? result.title : renderBackticks(result.title)}
-            </div>
-            {result.blurb && <div className={s.resultBlurb}>{result.blurb}</div>}
+            </span>
           </div>
+          <div className={s.resultTitle}>
+            {isCommunity ? result.title : renderBackticks(result.title)}
+          </div>
+          {result.blurb && <div className={s.resultBlurb}>{result.blurb}</div>}
         </a>
       ))}
     </div>

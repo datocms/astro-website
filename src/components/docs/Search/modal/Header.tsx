@@ -1,6 +1,6 @@
 import s from '../style.module.css';
 import { useSearch } from '../context';
-import { faArrowLeft } from '@fortawesome/pro-regular-svg-icons';
+import { faArrowLeft, faXmark } from '@fortawesome/pro-regular-svg-icons';
 import { IconReact } from '~/components/Icon/Icon';
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
 
 export function ModalHeader({ title }: Props) {
   const {
-    actions: { goHome },
+    actions: { goHome, closeModal },
   } = useSearch();
   return (
     <div className={s.cardHeader}>
@@ -19,6 +19,14 @@ export function ModalHeader({ title }: Props) {
         </span>
       </button>
       <span className={s.cardHeaderTitle}>{title}</span>
+      <button
+        type="button"
+        className={s.closeButton}
+        onClick={closeModal}
+        aria-label="Close search"
+      >
+        <IconReact icon={faXmark} />
+      </button>
     </div>
   );
 }

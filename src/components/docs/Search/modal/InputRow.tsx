@@ -2,7 +2,7 @@ import type { ChangeEventHandler, KeyboardEventHandler, RefObject } from 'react'
 
 import s from '../style.module.css';
 import type { IconDefinition } from '@fortawesome/fontawesome-common-types';
-import { faMagnifyingGlass } from '@fortawesome/pro-regular-svg-icons';
+import { faMagnifyingGlass, faXmark } from '@fortawesome/pro-regular-svg-icons';
 import { IconReact } from '~/components/Icon/Icon';
 
 type Props = {
@@ -15,6 +15,8 @@ type Props = {
   onKeyDown: KeyboardEventHandler<HTMLInputElement>;
   placement?: 'top' | 'bottom';
   icon?: IconDefinition;
+  /** When set, the row shows a close button. */
+  onClose?: () => void;
 };
 
 export function ModalInputRow({
@@ -27,6 +29,7 @@ export function ModalInputRow({
   onKeyDown,
   placement = 'top',
   icon = faMagnifyingGlass,
+  onClose,
 }: Props) {
   return (
     <div className={placement === 'bottom' ? s.bottomInputRow : s.inputRow}>
@@ -45,6 +48,11 @@ export function ModalInputRow({
         autoCorrect="off"
         spellCheck={false}
       />
+      {onClose && (
+        <button type="button" className={s.closeButton} onClick={onClose} aria-label="Close search">
+          <IconReact icon={faXmark} />
+        </button>
+      )}
     </div>
   );
 }

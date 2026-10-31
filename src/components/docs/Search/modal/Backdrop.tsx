@@ -10,7 +10,8 @@ type Props = {
 
 export function ModalBackdrop({ children, onMouseDown, phase }: Props) {
   return (
-    <div className={s.backdrop} onMouseDown={onMouseDown} data-state={phase}>
+    // The modal always has the default theme, also on a page with a theme.
+    <div className={s.backdrop} onMouseDown={onMouseDown} data-state={phase} data-theme="default">
       {children}
     </div>
   );

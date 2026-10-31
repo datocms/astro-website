@@ -7,13 +7,10 @@ export function SkeletonResults() {
     <>
       {[0, 1, 2].map((i) => (
         <div key={i} className={s.skeleton} style={{ ['--i' as any]: i }} aria-hidden>
-          <div className={s.skeletonIcon} />
-          <div className={s.skeletonBody}>
-            <div className={cn(s.skeletonLine, s.skeletonLineMeta)} />
-            <div className={cn(s.skeletonLine, s.skeletonLineTitle)} />
-            <div className={cn(s.skeletonLine, s.skeletonLineBlurb)} />
-            <div className={cn(s.skeletonLine, s.skeletonLineBlurb, s.skeletonLineBlurbShort)} />
-          </div>
+          <div className={cn(s.skeletonLine, s.skeletonLineMeta)} />
+          <div className={cn(s.skeletonLine, s.skeletonLineTitle)} />
+          <div className={cn(s.skeletonLine, s.skeletonLineBlurb)} />
+          <div className={cn(s.skeletonLine, s.skeletonLineBlurb, s.skeletonLineBlurbShort)} />
         </div>
       ))}
     </>

@@ -93,8 +93,9 @@ export function HomeScreen() {
         value={searchInput}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onClose={closeModal}
       />
-      <ModalBody ref={bodyRef}>
+      <ModalBody ref={bodyRef} className={s.cardBodyEndAligned}>
         <div className={s.sectionLabel}>Search</div>
         <button
           type="button"

@@ -3,29 +3,11 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --search-ease-spring: cubic-bezier(0.2, 0, 0, 1);
-  --search-shadow-border: 0 0 0 1px var(--border-default);
-  --search-shadow-border-hover: 0 0 0 1px var(--border-strong);
-  --search-shadow-card: var(--shadow-popover);
-  --search-scrim: var(--scrim);
-  --search-warning-bg: var(--surface-status-warning);
-  --search-warning-border: var(--border-default);
-  --search-warning-fg: var(--text-status-warning);
-  --search-error-fg: var(--text-negative);
   --search-r-xs: var(--radius-sm);
   --search-r-sm: var(--radius-sm);
   --search-r-md: var(--radius-md);
   --search-r-lg: var(--radius-lg);
   --search-r-pill: var(--radius-full);
-
-  /* Backdrop padding around the modal card. The top padding scales with the
-     viewport so the card sits visually anchored under the page header. */
-  --search-backdrop-padding-top: max(72px, 12vh);
-  --search-backdrop-padding-bottom: 16px;
-
-  /* Vertical space the card can occupy inside the backdrop. */
-  --search-card-available-height: calc(
-    100vh - var(--search-backdrop-padding-top) - var(--search-backdrop-padding-bottom)
-  );
 }
 
 /* === Trigger button === */
@@ -179,16 +161,28 @@
 
 /* === Modal backdrop & card === */
 
+/*
+ * Below 768: a full-screen sheet. 768+: a card in the centre of the
+ * viewport, over the page dimmed with surface/inverse-muted. The backdrop
+ * sets the default theme: the modal must not take the theme of the page.
+ */
 .backdrop {
   position: fixed;
   inset: 0;
-  background: var(--surface-inverse-muted);
   z-index: 11000;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: var(--search-backdrop-padding-bottom);
-  padding-top: var(--search-backdrop-padding-top);
+  /* The token already has 70% alpha. */
+  background: var(--surface-inverse-muted);
+}
+
+/*
+ * The dark scheme: the dimmed page and the card have nearly the same
+ * colour. Dim the page with the inverse surface and ring the card.
+ */
+:global(:root[data-scheme='dark']) .backdrop {
+  background: color-mix(in srgb, var(--surface-inverse) 70%, transparent);
 }
 
 .backdrop[data-state='open'] {
@@ -212,25 +206,30 @@
 }
 
 .card {
-  width: 100%;
-  max-width: var(--search-width);
-  min-height: min(500px, var(--search-card-available-height));
-  max-height: var(--search-card-available-height);
-  background: var(--surface-default);
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-  box-shadow: 0 0 0 1px var(--border-default);
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  transform-origin: top center;
+  background: var(--surface-default);
+  color: var(--text-primary);
+  transform-origin: center;
 }
 
-/* On the AI streaming screen, fix the card to its max height so cardBody has
-   a stable flex-allocated size and the dynamic spacer can size itself in one
-   pass without the card growing with content. */
-.card:has(.conversation) {
-  height: calc(var(--search-card-available-height) - 60px);
+:global(:root[data-scheme='dark']) .card {
+  box-shadow: 0 0 0 1px var(--border-default);
+}
+
+@media (min-width: 768px) {
+  .backdrop {
+    padding: var(--space-lg);
+  }
+
+  .card {
+    max-width: var(--search-width);
+    height: min(584px, 100%);
+    border-radius: var(--radius-md);
+  }
 }
 
 .card[data-state='open'] {
@@ -244,49 +243,59 @@
 @keyframes cardIn {
   from {
     opacity: 0;
-    transform: scale(0.97) translateY(-4px);
+    transform: translateY(calc(var(--space-2xs) * -1));
   }
 }
 
 @keyframes cardOut {
-  from {
-    opacity: 1;
-    transform: none;
-  }
   to {
     opacity: 0;
-    transform: scale(0.97) translateY(-4px);
+    transform: translateY(calc(var(--space-2xs) * -1));
   }
 }
+
+/* === Header (back, title, close) of the search and AI screens === */
 
 .cardHeader {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: var(--space-3xs);
-  padding: var(--space-3xs) var(--space-xs);
+  padding: var(--space-3xs) var(--space-sm) var(--space-3xs) var(--space-3xs);
   border-bottom: 1px solid var(--border-default);
-  flex-shrink: 0;
 }
 
-.backButton {
+.cardHeaderTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--type-subtitle);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.backButton,
+.closeButton {
   position: relative;
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   width: 36px;
   height: 36px;
+  padding: 0;
   border: 0;
-  background: transparent;
   border-radius: var(--search-r-md);
-  cursor: pointer;
+  background: transparent;
   color: var(--text-muted);
   font-family: inherit;
-  flex-shrink: 0;
-  transition-property: background-color, color, scale;
+  cursor: pointer;
+  transition-property: color, scale;
   transition-duration: 150ms;
   transition-timing-function: ease-out;
 
-  /* Expanded hit area for keyboard / touch users */
+  /* A larger hit area for touch. */
   &::after {
     content: '';
     position: absolute;
@@ -298,16 +307,15 @@
   }
 
   svg {
-    width: 16px;
-    height: 16px;
+    display: block;
+    width: 20px;
+    height: 20px;
     color: currentColor;
     fill: currentColor;
-    display: block;
   }
 
-  @media (hover: hover) and (pointer: fine) {
+  @media (hover: hover) {
     &:hover {
-      background: var(--surface-accent-faint);
       color: var(--text-primary);
     }
   }
@@ -317,23 +325,21 @@
   }
 }
 
-.cardHeaderTitle {
-  font-size: var(--type-docs-body);
-  color: var(--text-primary);
-  font-weight: 500;
-  text-box: cap alphabetic;
+/* The close button of the input row aligns with the edge of the text. */
+.inputRow .closeButton {
+  margin-right: calc(var(--space-3xs) * -1);
 }
 
-/* === Input rows (top for home/docs, bottom for ai) === */
+/* === Input rows (top for home and search, bottom for AI) === */
 
 .inputRow,
 .bottomInputRow {
   display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  padding: 0 var(--space-md);
-  height: 73px;
   flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-2xs);
+  height: 73px;
+  padding: 0 var(--space-md);
 }
 
 .inputRow {
@@ -346,37 +352,44 @@
 
 .inputIcon {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  flex-shrink: 0;
+  color: var(--text-subtle);
 
   svg {
-    width: 16px;
-    height: 16px;
-    color: var(--text-muted);
-    fill: currentColor;
     display: block;
+    width: 21px;
+    height: 21px;
+    color: currentColor;
+    fill: currentColor;
   }
 }
 
 .inputRow input,
 .bottomInputRow input {
   flex: 1;
-  color: var(--text-primary);
-  font-size: var(--type-h2);
-  letter-spacing: -0.02em;
-  background: transparent;
-  outline: none;
-  appearance: none;
-  border: 0;
-  font-family: inherit;
+  min-width: 0;
   height: 100%;
   padding: 0;
-  text-box: cap alphabetic;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--type-h2);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  outline: none;
+  appearance: none;
+
+  /* The caret shows the focus. The row has only this text field. */
+  &:focus-visible {
+    outline: none;
+  }
 
   &::placeholder {
-    color: var(--text-muted);
+    color: var(--text-subtle);
     opacity: 1;
   }
 
@@ -385,86 +398,81 @@
   }
 }
 
-/* === Card body (scrollable content area) === */
+/* === Card body (the area that scrolls) === */
 
 .cardBody {
   flex: 1;
   min-height: 0;
+  padding: var(--space-sm) var(--space-md);
   overflow-y: auto;
-  padding: var(--space-3xs) var(--space-sm);
+  overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-gutter: stable;
   scrollbar-color: var(--border-default) transparent;
   mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    black 8px,
-    black calc(100% - 8px),
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    black 8px,
-    black calc(100% - 8px),
+    black var(--space-3xs),
+    black calc(100% - var(--space-3xs)),
     transparent 100%
   );
 }
 
+/* The lists of the empty states sit at the bottom of the card. */
 .cardBodyEndAligned {
   display: flex;
   flex-direction: column;
+  padding-top: var(--space-lg);
 }
 
 .cardBodyEndAligned > :first-child {
   margin-top: auto;
 }
 
-/* === Section label (DOCS, GO TO, EXAMPLES) === */
+/* === Section label (Search, Quick links, Try asking) === */
 
 .sectionLabel {
-  padding: var(--space-xs) var(--space-4xs) var(--space-4xs);
-  font-size: var(--type-docs-small);
+  padding: var(--space-sm) 0 var(--space-5xs);
+  font-size: var(--type-h2);
   font-weight: 500;
-  color: var(--text-muted);
-  text-transform: uppercase;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-subtle);
 }
 
 .sectionLabel:first-child {
-  padding-top: var(--space-4xs);
+  padding-top: 0;
 }
 
-/* === Home / starter / go-to rows === */
+/* === Rows of the home, of the search prompts and of the AI prompts === */
 
 .row {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-3xs);
   width: 100%;
-  padding: var(--space-2xs) var(--space-3xs);
+  padding: var(--space-5xs) 0;
   border: 0;
-  border-radius: var(--search-r-md);
   background: transparent;
-  color: var(--text-primary);
-  font: inherit;
-  font-size: var(--type-docs-small);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: var(--type-h2);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   text-align: left;
   text-decoration: none;
   cursor: pointer;
-  text-box: cap alphabetic;
-  transition:
-    scale 160ms var(--ease-out),
-    background-color 150ms ease,
-    color 150ms ease;
+  transition: color 150ms ease;
 
-  &:active {
-    scale: 0.99;
+  strong {
+    font-weight: inherit;
   }
 }
 
+/* The keys and the pointer set the selected row: the text shows it. */
 .rowSelected,
 .row:focus-visible {
-  background: var(--surface-accent-faint);
+  color: var(--text-primary);
   outline: none;
 
   .rowIcon svg {
@@ -474,44 +482,43 @@
 
 .rowIcon {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  flex-shrink: 0;
+  width: 0.8em;
 
   svg {
-    width: 16px;
-    height: 16px;
-    color: var(--text-muted);
+    display: block;
+    width: 0.8em;
+    height: 0.8em;
+    color: var(--text-subtle);
     fill: currentColor;
     transition: color 150ms ease-out;
-    display: block;
   }
 }
 
 .rowLabel {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-wrap: pretty;
 }
 
-/* === Disclaimer footer (ai screen) === */
+/* === Disclaimer footer (AI screen) === */
 
 .disclaimer {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: var(--space-2xs);
-  padding: var(--space-xs) var(--space-sm);
-  background: var(--search-warning-bg);
-  border-top: 1px solid var(--search-warning-border);
-  color: var(--search-warning-fg);
-  font-size: var(--type-docs-label);
-  line-height: 1.45;
-  flex-shrink: 0;
-  overflow: hidden;
   max-height: 160px;
+  padding: var(--space-xs) var(--space-md);
+  overflow: hidden;
+  border-top: 1px solid var(--border-default);
+  background: var(--surface-status-warning);
+  color: var(--text-status-warning);
+  font-size: var(--type-subtitle);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
   transition:
     max-height 220ms var(--ease-out),
     opacity 180ms var(--ease-out),
@@ -522,29 +529,24 @@
 
 .disclaimer[data-state='dismissing'] {
   max-height: 0;
-  opacity: 0;
   padding-top: 0;
   padding-bottom: 0;
   border-top-color: transparent;
+  opacity: 0;
 }
 
 .disclaimerIcon {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: var(--search-r-sm);
-  background: var(--search-warning-fg);
-  color: var(--surface-default);
-  flex-shrink: 0;
 
   svg {
-    width: 11px;
-    height: 11px;
+    display: block;
+    width: 16px;
+    height: 16px;
     color: currentColor;
     fill: currentColor;
-    display: block;
   }
 }
 
@@ -555,34 +557,33 @@
 
 .disclaimerClose {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
   border: 0;
-  background: transparent;
-  color: var(--search-warning-fg);
   border-radius: var(--search-r-sm);
+  background: transparent;
+  color: var(--text-status-warning);
   cursor: pointer;
-  flex-shrink: 0;
   opacity: 0.6;
   transition:
     opacity 150ms ease,
-    background-color 150ms ease,
     scale 160ms var(--ease-out);
 
   svg {
-    width: 10px;
-    height: 10px;
+    display: block;
+    width: 14px;
+    height: 14px;
     color: currentColor;
     fill: currentColor;
-    display: block;
   }
 
-  @media (hover: hover) and (pointer: fine) {
+  @media (hover: hover) {
     &:hover {
       opacity: 1;
-      background: color-mix(in srgb, var(--search-warning-fg) 10%, transparent);
     }
   }
 
@@ -593,218 +594,195 @@
 
 /* === Source filter chips === */
 
+/*
+ * The chips go to the full width of the card body, with a rule under them
+ * like the rule between the results.
+ */
 .filters {
   display: flex;
   align-items: center;
   gap: var(--space-4xs);
-  padding: var(--space-3xs) 0 var(--space-xs);
+  margin: calc(var(--space-sm) * -1) calc(var(--space-md) * -1) 0;
+  padding: var(--space-sm) var(--space-md);
   overflow-x: auto;
-  scrollbar-width: thin;
+  border-bottom: 1px solid var(--border-default);
+  scrollbar-width: none;
 }
 
 .filterDivider {
   flex-shrink: 0;
   width: 1px;
   height: 16px;
-  background: var(--border-default);
-  margin-left: auto;
   margin-right: var(--space-4xs);
+  margin-left: auto;
+  background: var(--border-default);
 }
 
 .filterChip {
-  flex-shrink: 0;
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   gap: var(--space-4xs);
-  border: 0;
-  background: transparent;
-  padding: var(--space-4xs) var(--space-xs);
+  padding: var(--space-3xs) var(--space-xs);
+  border: 1px solid var(--border-default);
   border-radius: var(--search-r-pill);
-  font-size: var(--type-docs-small);
-  font-weight: 500;
+  background: transparent;
   color: var(--text-muted);
-  cursor: pointer;
   font-family: inherit;
+  font-size: var(--type-subtitle);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
   white-space: nowrap;
-  text-box: cap alphabetic;
+  cursor: pointer;
   transition:
     scale 160ms var(--ease-out),
     background-color 150ms ease,
+    border-color 150ms ease,
     color 150ms ease;
 
-  @media (hover: hover) and (pointer: fine) {
+  @media (hover: hover) {
     &:hover {
-      background: var(--surface-accent-faint);
+      border-color: var(--border-strong);
       color: var(--text-primary);
     }
   }
 
   &:active {
-    scale: 0.94;
+    scale: 0.96;
   }
 }
 
-.filterChipActive,
-.filterChipActive:hover {
+/*
+ * The active chip. Two classes: it wins over the hover rule of
+ * .filterChip, which is in the same layer. The chip swaps the text and
+ * card colours, so it shows clearly in the light and the dark scheme.
+ */
+.filterChip.filterChipActive {
+  border-color: var(--text-primary);
   background: var(--text-primary);
   color: var(--surface-default);
 }
 
 .filterChipIcon {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 
   svg {
+    display: block;
     width: 14px;
     height: 14px;
     fill: currentColor;
-    display: block;
   }
 }
 
-/* === Search result items === */
+/* === Search results === */
 
+/* A result goes to the full width of the card body, as the chips. */
 .result {
   display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  width: 100%;
-  border: 1px solid var(--border-default);
-  border-radius: var(--search-r-md);
-  padding: var(--space-xs) var(--space-sm);
-  margin-bottom: var(--space-3xs);
-  color: inherit;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin-inline: calc(var(--space-md) * -1);
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-primary);
   text-decoration: none;
-  cursor: pointer;
-  font: inherit;
-  text-align: left;
-  background: transparent;
   animation: resultIn 220ms var(--ease-out) backwards;
   animation-delay: calc(min(var(--i, 0), 4) * 32ms);
-  transition:
-    scale 160ms var(--ease-out),
-    background-color 150ms ease,
-    border-color 150ms ease;
+  transition: background-color 150ms ease;
 
-  svg {
-    width: 1em;
-    color: var(--text-muted);
-    fill: currentColor;
-    transition: color 150ms var(--ease-out);
-    display: block;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
+  @media (hover: hover) {
     &:hover {
-      background-color: var(--surface-accent-faint);
-      border-color: var(--surface-accent);
-
-      svg {
-        color: var(--text-accent);
-      }
+      background-color: var(--surface-accent);
     }
   }
 
   &.selected {
-    background-color: var(--surface-accent-faint);
-    border-color: var(--surface-accent);
-
-    svg {
-      color: var(--text-accent);
-    }
-  }
-
-  &:active {
-    scale: 0.97;
+    background-color: var(--surface-accent);
   }
 }
 
 @keyframes resultIn {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(var(--space-4xs));
   }
+}
+
+.resultArea {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: var(--type-subtitle);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+    color: currentColor;
+    fill: currentColor;
+  }
+}
+
+.resultDate {
+  font-weight: 400;
 }
 
 .resultTitle {
-  font-size: var(--type-docs-small);
-  font-weight: 500;
-  margin-top: var(--space-4xs);
-  margin-right: var(--space-3xs);
-  white-space: nowrap;
   overflow: hidden;
+  font-size: var(--type-h2);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
   text-overflow: ellipsis;
 
   code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.9em;
-    background: var(--surface-accent-faint);
+    padding: 0 var(--space-4xs);
     border-radius: var(--search-r-xs);
-    padding: 1px var(--space-4xs);
+    background: var(--surface-accent-faint);
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    letter-spacing: 0;
   }
 }
 
-.resultBodyWrapper {
-  flex: 1;
-  min-width: 0;
-}
-
 .resultBlurb {
-  margin-top: var(--space-4xs);
-  font-size: var(--type-docs-small);
-  color: var(--text-muted);
-  line-height: 1.2;
-  overflow: hidden;
   display: -webkit-box;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--type-body);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 
   mark {
     background: transparent;
     color: var(--text-primary);
-    font-weight: 500;
   }
 }
 
-.resultArea {
-  font-weight: 500;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-size: var(--type-docs-label);
-}
-
-.resultDate {
-  font-weight: 400;
-  opacity: 0.75;
-}
-
-.area {
-  margin-top: var(--space-4xs);
-}
-
-.areaTitle {
-  padding: var(--space-3xs) 0 var(--space-3xs);
-  font-weight: 500;
-  font-size: var(--type-docs-small);
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-/* === Skeleton (loading) rows === */
+/* === Skeleton rows (loading) === */
 
 .skeleton {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  width: 100%;
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  padding: var(--space-xs) var(--space-sm);
-  margin-bottom: var(--space-3xs);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin-inline: calc(var(--space-md) * -1);
+  padding: var(--space-md);
   overflow: hidden;
+  border-bottom: 1px solid var(--border-default);
   animation: skeletonFadeIn 180ms var(--ease-out) backwards;
   animation-delay: calc(var(--i, 0) * 32ms);
 }
@@ -824,43 +802,25 @@
   animation-delay: calc(var(--i, 0) * 80ms);
 }
 
-.skeletonIcon {
-  width: 14px;
-  height: 14px;
-  border-radius: var(--search-r-xs);
-  background: var(--surface-accent-faint);
-  flex-shrink: 0;
-}
-
-.skeletonBody {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4xs);
-  min-width: 0;
-}
-
+/* Each line has the height of the text it stands for. */
 .skeletonLine {
-  height: 11px;
   border-radius: var(--search-r-xs);
   background: var(--surface-accent-faint);
 }
 
 .skeletonLineMeta {
   width: 28%;
-  height: 9px;
-  opacity: 0.6;
+  height: var(--type-subtitle);
 }
 
 .skeletonLineTitle {
   width: 55%;
-  height: 13px;
+  height: var(--type-h2);
 }
 
 .skeletonLineBlurb {
   width: 95%;
-  height: 10px;
-  opacity: 0.7;
+  height: var(--type-body);
 }
 
 .skeletonLineBlurbShort {
@@ -877,26 +837,28 @@
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
 }
 
-/* === Conversation (Q + streamed answer) === */
+/* === Conversation (question and streamed answer) === */
 
 .conversation {
-  padding: var(--space-3xs) var(--space-3xs) var(--space-sm);
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  font-size: var(--type-docs-small);
-  line-height: 1.4;
+  gap: var(--space-md);
+  padding: 0 0 var(--space-sm);
+  font-size: var(--type-body);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
 }
 
 .questionBubble {
   align-self: flex-end;
   max-width: 80%;
-  padding: var(--space-3xs) var(--space-xs);
+  padding: var(--space-2xs) var(--space-sm);
   border-radius: var(--search-r-lg) var(--search-r-lg) var(--search-r-sm) var(--search-r-lg);
   background: var(--surface-accent);
   color: var(--text-primary);
@@ -908,42 +870,38 @@
 @keyframes questionBubbleIn {
   from {
     opacity: 0;
-    transform: translateY(6px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(var(--space-4xs)) scale(0.97);
   }
 }
 
 .answer {
   color: var(--text-primary);
 
-  /* Hide streamdown's language-label header */
+  /* Hide the language label of the code blocks of streamdown. */
   [data-streamdown='code-block-header'] {
     display: none;
   }
 
   [data-streamdown='code-block-body'] {
     margin: 0 0 0.8em;
-    border-radius: var(--search-r-sm);
     overflow: hidden;
+    border-radius: var(--search-r-sm);
 
     pre {
+      margin: 0;
+      overflow-x: hidden;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
-      overflow-x: hidden;
-      margin: 0;
     }
 
     code > span {
       display: block;
     }
 
-    /* Apply shiki colors via the inline custom property streamdown sets */
+    /* Use the code tokens of the site, not the colours of shiki. */
     code span {
-      color: var(--code-plain);
       background: var(--sdm-tbg, transparent);
+      color: var(--code-plain);
     }
   }
 
@@ -972,11 +930,12 @@
   }
 
   code {
-    background: var(--surface-accent-faint);
-    border-radius: var(--search-r-xs);
     padding: 1px var(--space-4xs);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.9em;
+    border-radius: var(--search-r-xs);
+    background: var(--surface-accent-faint);
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    letter-spacing: 0;
   }
 
   blockquote {
@@ -991,22 +950,22 @@
   }
 
   hr {
+    margin: 1.2em 0;
     border: 0;
     border-top: 1px solid var(--border-default);
-    margin: 1.2em 0;
   }
 
   table {
     width: 100%;
-    border-collapse: collapse;
     margin: 0 0 0.8em;
-    font-size: 0.95em;
+    border-collapse: collapse;
+    font-size: 0.9em;
   }
 
   th,
   td {
-    border: 1px solid var(--border-default);
     padding: var(--space-4xs) var(--space-2xs);
+    border: 1px solid var(--border-default);
     text-align: left;
     vertical-align: top;
   }
@@ -1017,15 +976,17 @@
   }
 
   pre {
-    background: var(--surface-accent-faint);
-    border-radius: var(--search-r-sm);
+    margin: 0 0 0.8em;
     padding: var(--space-2xs) var(--space-xs);
     overflow-x: auto;
-    margin: 0 0 0.8em;
+    border-radius: var(--search-r-sm);
+    background: var(--code-background);
+    font-size: 0.85em;
 
     code {
-      background: transparent;
       padding: 0;
+      background: transparent;
+      font-size: inherit;
     }
   }
 
@@ -1033,8 +994,10 @@
     color: inherit;
     text-decoration: underline;
 
-    &:hover {
-      color: var(--text-accent);
+    @media (hover: hover) {
+      &:hover {
+        color: var(--text-accent);
+      }
     }
   }
 
@@ -1049,9 +1012,11 @@
   h1 {
     font-size: 1.2em;
   }
+
   h2 {
     font-size: 1.1em;
   }
+
   h3 {
     font-size: 1em;
   }
@@ -1060,16 +1025,18 @@
 .linkPill {
   display: inline;
   padding: var(--space-5xs) var(--space-4xs);
-  font-size: 0.9em;
+  border: 1px solid var(--border-default);
   border-radius: var(--search-r-pill);
   background: var(--surface-accent-faint);
   color: var(--text-muted);
-  border: 1px solid var(--border-default);
+  font-size: 0.8em;
   font-weight: 500;
   text-decoration: none;
 
-  &:hover {
-    color: var(--text-primary);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--text-primary);
+    }
   }
 }
 
@@ -1077,18 +1044,18 @@
 
 .thinking {
   margin: 0 0 var(--space-xs);
-  border-left: 2px solid var(--border-default);
   padding-left: var(--space-2xs);
+  border-left: 2px solid var(--border-default);
 }
 
+/* Three lines of the reasoning show. */
 .thinkingWindow {
-  font-size: var(--type-docs-small);
-  line-height: 1.5;
-  color: var(--text-muted);
-  max-height: calc(13px * 1.5 * 3);
+  max-height: 4.5em;
   overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--type-subtitle);
+  line-height: 1.5;
   mask-image: linear-gradient(to bottom, transparent, black 50%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, black 50%);
 }
 
 .thinkingInner {
@@ -1117,11 +1084,11 @@
   }
 
   code {
-    background: var(--surface-accent-faint);
-    border-radius: var(--search-r-xs);
     padding: 1px var(--space-4xs);
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 0.9em;
+    border-radius: var(--search-r-xs);
+    background: var(--surface-accent-faint);
+    font-family: var(--font-mono);
+    font-size: 0.85em;
   }
 
   strong,
@@ -1137,38 +1104,38 @@
   }
 
   hr {
+    margin: 0.8em 0;
     border: 0;
     border-top: 1px solid var(--border-default);
-    margin: 0.8em 0;
   }
 
   table {
     width: 100%;
-    border-collapse: collapse;
     margin: 0 0 0.6em;
+    border-collapse: collapse;
   }
 
   th,
   td {
-    border: 1px solid var(--border-default);
     padding: var(--space-5xs) var(--space-4xs);
+    border: 1px solid var(--border-default);
     text-align: left;
   }
 }
 
-/* === AI answer feedback row === */
+/* === Feedback row of the AI answer === */
 
 .feedbackRow {
   position: relative;
-  margin-top: var(--space-sm);
   min-height: 28px;
+  margin-top: var(--space-sm);
   animation: feedbackRowIn 220ms var(--ease-out) both;
 }
 
 @keyframes feedbackRowIn {
   from {
     opacity: 0;
-    transform: translateY(2px);
+    transform: translateY(var(--space-5xs));
   }
 }
 
@@ -1176,10 +1143,10 @@
 .feedbackThanks {
   display: flex;
   align-items: center;
-  gap: var(--space-4xs);
   justify-content: flex-end;
-  font-size: var(--type-docs-small);
+  gap: var(--space-4xs);
   color: var(--text-muted);
+  font-size: var(--type-subtitle);
   transition-property: opacity, transform;
   transition-duration: 200ms;
   transition-timing-function: var(--search-ease-spring);
@@ -1198,12 +1165,12 @@
 
 .feedbackRow[data-state='prompt'] .feedbackThanks {
   opacity: 0;
-  transform: translateY(4px);
+  transform: translateY(var(--space-4xs));
 }
 
 .feedbackRow[data-state='done'] .feedbackPrompt {
   opacity: 0;
-  transform: translateY(-2px);
+  transform: translateY(calc(var(--space-5xs) * -1));
   pointer-events: none;
 }
 
@@ -1222,18 +1189,18 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-4xs);
-  border: 0;
+  padding: var(--space-4xs) var(--space-xs);
+  border: 1px solid var(--border-default);
+  border-radius: var(--search-r-pill);
   background: transparent;
-  padding: var(--space-4xs) var(--space-3xs);
-  border-radius: var(--search-r-sm);
-  cursor: pointer;
-  font: inherit;
-  font-size: var(--type-docs-small);
   color: var(--text-muted);
-  transition-property: background-color, color, scale;
+  font: inherit;
+  cursor: pointer;
+  transition-property: border-color, color, scale;
   transition-duration: 150ms;
   transition-timing-function: ease-out;
 
+  /* A larger hit area for touch. */
   &::after {
     content: '';
     position: absolute;
@@ -1244,9 +1211,9 @@
     transform: translate(-50%, -50%);
   }
 
-  @media (hover: hover) and (pointer: fine) {
+  @media (hover: hover) {
     &:hover {
-      background: var(--surface-accent-faint);
+      border-color: var(--border-strong);
       color: var(--text-primary);
     }
   }
@@ -1264,28 +1231,28 @@
   height: 14px;
 
   svg {
+    display: block;
     width: 14px;
     height: 14px;
     color: currentColor;
     fill: currentColor;
-    display: block;
   }
 }
 
 .ticker {
-  margin-top: var(--space-2xs);
   display: flex;
   align-items: center;
   gap: var(--space-3xs);
-  font-size: var(--type-docs-small);
+  margin-top: var(--space-2xs);
   color: var(--text-muted);
+  font-size: var(--type-subtitle);
 }
 
 .tickerDots {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   gap: var(--space-5xs);
-  flex-shrink: 0;
 }
 
 .tickerDot {
@@ -1312,6 +1279,7 @@
     opacity: 0.3;
     transform: scale(1);
   }
+
   40% {
     opacity: 1;
     transform: scale(1.25);
@@ -1320,10 +1288,10 @@
 
 .tickerViewport {
   display: block;
-  height: 1.5em;
-  overflow: hidden;
   flex: 1;
   min-width: 0;
+  height: 1.5em;
+  overflow: hidden;
 }
 
 .tickerTrack {
@@ -1335,38 +1303,41 @@
 .tickerItem {
   display: block;
   height: 1.5em;
+  overflow: hidden;
   line-height: 1.5em;
   white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .errorLine {
   margin: var(--space-3xs) 0 0;
-  color: var(--search-error-fg);
-  font-size: var(--type-docs-small);
+  color: var(--text-negative);
+  font-size: var(--type-body);
+  line-height: 1.3;
 }
 
 .srOnly {
   position: absolute;
   width: 1px;
   height: 1px;
-  padding: 0;
   margin: -1px;
+  padding: 0;
   overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
   border: 0;
+  white-space: nowrap;
+  clip-path: inset(50%);
 }
 
 .statusLine {
-  padding: var(--space-sm) var(--space-3xs);
   margin: 0;
+  padding: var(--space-md) 0;
   color: var(--text-muted);
-  font-size: var(--type-docs-small);
+  font-size: var(--type-body);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
-/* === Responsive — hide on narrow viewports === */
+/* === Triggers below 1152 === */
 
 @media (max-width: 1151px) {
   .triggerDocs {
@@ -1388,10 +1359,6 @@
 
   .triggerKbd {
     display: none;
-  }
-
-  .backdrop {
-    padding: var(--space-sm);
   }
 }
 

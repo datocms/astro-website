@@ -154,7 +154,7 @@ export function SearchScreen() {
         onChange={handleChange}
         onKeyDown={handleKeyDown}
       />
-      <ModalBody ref={bodyRef}>
+      <ModalBody ref={bodyRef} className={isShowingPrompts ? s.cardBodyEndAligned : undefined}>
         {isShowingPrompts ? (
           <>
             <div className={s.sectionLabel}>Try searching for</div>
