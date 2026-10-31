@@ -59,23 +59,25 @@ const strips = [
     ))
   }
 
-  <ContactSection
-    id="form"
-    headingLevel="h2"
-    external
-    label=""
-    headline={enterprise.contact.headline}
-    muted=""
-    face=""
-    links={[]}
-    form={contactData.form}
-  >
-    <p slot="description"><InlineText text={enterprise.contact.description} /></p>
-    <Fragment slot="extra">
-      <input type="hidden" name="issueType" value="enterprise" />
-      <div class={s.turnstile} data-turnstile></div>
-    </Fragment>
-  </ContactSection>
+  <sales-form class={s.salesForm}>
+    <ContactSection
+      id="form"
+      headingLevel="h2"
+      external
+      label=""
+      headline={enterprise.contact.headline}
+      muted=""
+      face=""
+      links={[]}
+      form={contactData.form}
+    >
+      <p slot="description"><InlineText text={enterprise.contact.description} /></p>
+      <Fragment slot="extra">
+        <input type="hidden" name="issueType" value="enterprise" />
+        <div class={s.turnstile} data-turnstile></div>
+      </Fragment>
+    </ContactSection>
+  </sales-form>
 
   <StatementsSection {...enterprise.results} variant="statLight" />
 
@@ -91,7 +93,5 @@ const strips = [
 </Layout>
 
 <script>
-  import { initSalesForm } from '~/lib/salesForm';
-
-  initSalesForm();
+  import '~/lib/salesForm';
 </script>

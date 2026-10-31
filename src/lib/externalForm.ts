@@ -4,6 +4,7 @@ import {
   type ContactFormOutcome,
   type ContactFormSendDetail,
 } from '~/components/ContactForm';
+import { getCookie } from '~/lib/cookies';
 import { solveTurnstile } from '~/lib/loadTurnstile';
 
 /*
@@ -24,6 +25,26 @@ interface ExternalFormOptions {
 }
 
 const sentence = (text: string) => (/[.!?]$/.test(text) ? text : `${text}.`);
+
+/**
+ * The e-mail of the DatoCMS account of the visitor, or null. The dashboard
+ * keeps it in the cookie datoAccountEmail.
+ */
+export function savedAccountEmail(): string | null {
+  const saved = getCookie('datoAccountEmail');
+  if (!saved) return null;
+  try {
+    return decodeURIComponent(saved);
+  } catch {
+    return saved;
+  }
+}
+
+/** Put the saved account e-mail in an empty e-mail field. */
+export function fillAccountEmail(input: HTMLInputElement) {
+  const email = savedAccountEmail();
+  if (!input.value && email) input.value = email;
+}
 
 export function connectExternalForm(root: HTMLElement, options: ExternalFormOptions) {
   const { turnstileAction, fallback, send } = options;

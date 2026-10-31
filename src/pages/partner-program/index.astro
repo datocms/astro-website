@@ -97,9 +97,11 @@ const partnerLogos: LogoItem[] = page.highlightedPartners.slice(0, 7).map((partn
   <Section id="partner-form">
     <div class={s.talk}>
       <Headline as="h2" size="h1" muted={talk.muted}>{talk.headline}</Headline>
-      <ContactForm {...form} external>
-        <div slot="extra" class={s.turnstile} data-turnstile></div>
-      </ContactForm>
+      <partner-form class={s.form}>
+        <ContactForm {...form} external>
+          <div slot="extra" class={s.turnstile} data-turnstile></div>
+        </ContactForm>
+      </partner-form>
     </div>
   </Section>
 
@@ -108,27 +110,26 @@ const partnerLogos: LogoItem[] = page.highlightedPartners.slice(0, 7).map((partn
 
 <script>
   import { actions } from 'astro:actions';
-  import { getCookie } from '~/lib/cookies';
-  import { connectExternalForm } from '~/lib/externalForm';
+  import { connectExternalForm, fillAccountEmail } from '~/lib/externalForm';
+  import { WebComponent } from '~/lib/WebComponent';
 
-  const root = document.querySelector<HTMLElement>('[data-contact-form]');
-  if (root) {
-    // The dashboard keeps the e-mail of the account in this cookie.
-    const emailInput = root.querySelector<HTMLInputElement>('input[name="email"]');
-    const savedEmail = getCookie('datoAccountEmail');
-    if (emailInput && !emailInput.value && savedEmail) {
-      try {
-        emailInput.value = decodeURIComponent(savedEmail);
-      } catch {
-        emailInput.value = savedEmail;
+  // <partner-form> connects the contact form inside it to the action
+  // forms.submitPartnerProgramRequest.
+  customElements.define(
+    'partner-form',
+    class PartnerForm extends WebComponent {
+      parsedCallback() {
+        const root = this.$('[data-contact-form]');
+
+        fillAccountEmail(this.$<HTMLInputElement>('input[name="email"]'));
+
+        connectExternalForm(root, {
+          // The same label as the action expects (isTurnstileTokenValid).
+          turnstileAction: 'partner-program',
+          fallback: 'email us at support@datocms.com.',
+          send: (formData) => actions.forms.submitPartnerProgramRequest.orThrow(formData),
+        });
       }
-    }
-
-    connectExternalForm(root, {
-      // The same label as the action expects (isTurnstileTokenValid).
-      turnstileAction: 'partner-program',
-      fallback: 'email us at support@datocms.com.',
-      send: (formData) => actions.forms.submitPartnerProgramRequest.orThrow(formData),
-    });
-  }
+    },
+  );
 </script>

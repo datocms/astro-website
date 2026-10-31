@@ -44,9 +44,11 @@ const seo = overrideSeo([], seoTitle(slackSeo.title));
           rel="noopener">Community Forum</a
         > or using the <a href="/support">Support Form</a>.
       </p>
-      <ContactForm {...form} external>
-        <div slot="extra" class={s.turnstile} data-turnstile></div>
-      </ContactForm>
+      <slack-invite-form class={s.form}>
+        <ContactForm {...form} external>
+          <div slot="extra" class={s.turnstile} data-turnstile></div>
+        </ContactForm>
+      </slack-invite-form>
       <p class:list={['subtitleMedium', s.stats]}>
         <strong>{info.channel.num_members}</strong> people are already part of the community!
       </p>
@@ -61,16 +63,23 @@ const seo = overrideSeo([], seoTitle(slackSeo.title));
 <script>
   import { actions } from 'astro:actions';
   import { connectExternalForm } from '~/lib/externalForm';
+  import { WebComponent } from '~/lib/WebComponent';
 
-  const root = document.querySelector<HTMLElement>('[data-contact-form]');
-  if (root) {
-    connectExternalForm(root, {
-      turnstileAction: 'slack-invite',
-      fallback: 'email us at support@datocms.com.',
-      send: async (formData) => {
-        await actions.inviteEmailToSlackChannel.orThrow(formData);
-        return '/slack/thanks';
-      },
-    });
-  }
+  // <slack-invite-form> connects the contact form inside it to the action
+  // inviteEmailToSlackChannel.
+  customElements.define(
+    'slack-invite-form',
+    class SlackInviteForm extends WebComponent {
+      parsedCallback() {
+        connectExternalForm(this.$('[data-contact-form]'), {
+          turnstileAction: 'slack-invite',
+          fallback: 'email us at support@datocms.com.',
+          send: async (formData) => {
+            await actions.inviteEmailToSlackChannel.orThrow(formData);
+            return '/slack/thanks';
+          },
+        });
+      }
+    },
+  );
 </script>
