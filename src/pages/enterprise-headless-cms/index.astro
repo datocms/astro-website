@@ -3,6 +3,7 @@
 // the H1 label and the quotes come from the CMS. The form sends its data
 // to the action forms.submitSalesRequest with the issue type
 // "enterprise".
+import { ChapterHeader } from '~/components/ChapterHeader';
 import { ContactSection } from '~/components/ContactSection';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
@@ -12,13 +13,11 @@ import { Quote } from '~/components/Quote';
 import { Section } from '~/components/Section';
 import { SplitPoints } from '~/components/SplitPoints';
 import { StatementsSection } from '~/components/StatementsSection';
-import { TextWithImage } from '~/components/TextWithImage';
 import { contact as contactData } from '~/data/contact';
 import * as enterprise from '~/data/enterprise';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
-import keyIllustration from '~/svg/illustrations/key.svg?raw';
 import { query } from './_graphql';
 import s from './_style.module.css';
 
@@ -80,16 +79,13 @@ const strips = [
 
   <StatementsSection {...enterprise.results} variant="statLight" />
 
-  <TextWithImage
+  <ChapterHeader
     label={enterprise.closer.label}
-    title={enterprise.closer.title}
-    tagline={enterprise.closer.text}
+    headline={enterprise.closer.title}
+    intro={enterprise.closer.text}
     theme="orange"
-    panelOrder="image-right"
-    media="visual"
-  >
-    <div class={s.illustration} set:html={keyIllustration} />
-  </TextWithImage>
+    background="accent"
+  />
 
   <DraftModeQueryListener query={query} />
 </Layout>
