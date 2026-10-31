@@ -529,6 +529,7 @@ export default defineConfig({
     // The customers pages redirect to the case studies. The product overview is gone.
     '/success-stories': '/case-studies',
     '/customers': '/case-studies',
+    '/how-to-datocms': '/academy',
     '/customers/[...rest]': '/case-studies/[...rest]',
     '/product': '/features',
     '/use-cases/headless-cms-publishing': '/use-cases/digital-publishing',
