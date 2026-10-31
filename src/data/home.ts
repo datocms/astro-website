@@ -310,8 +310,6 @@ export const contentSource: ContentSourceData = {
   activeChannel: 'Chatbot',
 };
 
-// Only the first feature has a description. The other
-// descriptions are placeholders.
 // The four pillars, as in the Product menu. Each row links to its page and
 // shows a fragment of that page (src/pages/index.astro). A description is
 // two lines at most from 1152px: the list keeps its height on hover. Each

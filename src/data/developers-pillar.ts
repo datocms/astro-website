@@ -24,9 +24,8 @@ import type { CategoryNavData } from '~/data/features';
  * and Automation.
  *
  * Every chapter is a ChapterLayout: its real copy, and a box with
- * the description of each picture until its scene exists. The copy is a
- * draft, for Ronak's pass. A "(check)" comment marks a
- * fact to verify before the copy is final.
+ * the description of each picture that has no scene. A "(check)" comment
+ * marks a fact to verify.
  *
  * The pictures of the page tell one story: Northlight, a maker of lamps
  * with a shop and a journal. Its product "Arc floor lamp" runs through the
@@ -43,8 +42,7 @@ const docs = (href: string): ChapterHeaderData['link'] => ({
   variant: 'soft',
 });
 
-// New copy. The line of the voice guide; the hero of the design ("From developers
-// who've seen enough.") is the alternative.
+// New copy. The line of the voice guide.
 export const hero: HeroData = {
   label: 'For developers',
   headline: 'Modular how you like it.',
@@ -74,9 +72,7 @@ export const chapterNav: CategoryNavData = {
   ],
 };
 
-// Chapter 1. Old pages: /features/schema-builder, the modeling part of
-// /features/developer-experience. Validations come here from
-// /features/data-integrity.
+// Chapter 1: the schema builder, the modeling and the validations.
 export const schema: ChapterLayoutData = {
   id: 'schema',
   theme: 'orange',
@@ -263,7 +259,7 @@ export const environments: ChapterLayoutData = {
   // promotion moves the ref of the primary, it does not merge (an edit in
   // main after the fork is not in the sandbox; the maintenance mode is
   // there for that), and editors keep working while you build, but not
-  // during a release. For Ronak's pass.
+  // during a release.
   scene:
     'A git graph of the environments. Editors change content in main; maintenance:on locks it; migrations:run forks it into release-1 and runs the migrations there; environments:promote moves the ref Primary to release-1, and main stays, dim, as the way back; maintenance:off. Then the next release.',
   fragments: [

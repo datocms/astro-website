@@ -21,8 +21,6 @@ export const hero: HeroData = {
   face: '[•✓•]',
 };
 
-// The body of 07 is a copy of the body of 05, and 08 is marked
-// "Needs copy input". Both are placeholders.
 export const principles: PrinciplesData = {
   principles: [
     {

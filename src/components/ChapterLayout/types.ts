@@ -4,10 +4,9 @@ import type { CodeTab } from '~/data/home';
 import type { Theme } from '~/lib/theme';
 
 /**
- * A chapter whose pictures do not exist yet: the three parts of a chapter
+ * A chapter whose pictures do not exist: the three parts of a chapter
  * (ChapterHeader, SceneFrame, FeatureFragments) with their real copy. In
- * place of each picture, the page shows a box with its description. The
- * design phase replaces each box with a scene.
+ * place of each picture, the page shows a box with its description.
  */
 export interface ChapterLayoutData {
   /** The anchor of the chapter on the page. */

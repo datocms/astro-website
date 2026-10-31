@@ -13,9 +13,8 @@ import type { CategoryNavData } from '~/data/features';
  * between Build with an agent and Translate.
  *
  * Every chapter is a ChapterLayout: its real copy, and a box with
- * the description of each picture until its scene exists. The copy is a
- * draft, for Ronak's pass. A "(check)" comment marks a
- * fact to verify before the copy is final. The "DatoCMS Agent" exists
+ * the description of each picture that has no scene. A "(check)" comment
+ * marks a fact to verify. The "DatoCMS Agent" exists
  * today as the official plugin "Dato Agent (Beta)" in the marketplace; it
  * has no chapter until someone decides it is a product to show.
  *

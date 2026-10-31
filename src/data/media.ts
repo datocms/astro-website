@@ -18,9 +18,8 @@ import type { CategoryNavData } from '~/data/features';
  * chapters: Media library, Asset fields, Images, Video, In your frontend.
  * The opinion sits between Images and Video.
  *
- * Every chapter is a ChapterLayout with its copy. The copy is a
- * draft, for Ronak's pass. A "(check)" comment marks a
- * fact to verify before the copy is final. Asset fields and In your
+ * Every chapter is a ChapterLayout with its copy. A "(check)" comment
+ * marks a fact to verify. Asset fields and In your
  * frontend are the thin chapters (src/data/AGENTS.md, "The pillars").
  *
  * The pictures of the page tell one story: Saltmarsh Museum, a museum of
