@@ -1,6 +1,6 @@
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
 import type { FeatureFragmentData } from '~/components/FeatureFragments';
-import type { CodeTab } from '~/data/home';
+import type { CodeTab } from '~/components/CodeSnippetPreview';
 import type { Theme } from '~/lib/theme';
 
 /**

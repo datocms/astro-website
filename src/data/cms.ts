@@ -1,8 +1,10 @@
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
 import type { ChapterLayoutData } from '~/components/ChapterLayout';
-import type { QuoteData, StatementData } from '~/data/case-studies';
-import type { CodeTab, CtaBannerData, HeroData } from '~/data/home';
-import type { CategoryNavData } from '~/data/features';
+import type { QuoteData } from '~/components/Quote';
+import type { StatementData } from '~/components/Statement';
+import type { CtaBannerData, HeroData } from '~/data/home';
+import type { CodeTab } from '~/components/CodeSnippetPreview';
+import type { CategoryNavData } from '~/components/CategoryNav';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 /*

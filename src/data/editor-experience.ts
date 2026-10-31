@@ -1,7 +1,8 @@
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
-import type { QuoteData, StatementData } from '~/data/case-studies';
+import type { QuoteData } from '~/components/Quote';
+import type { StatementData } from '~/components/Statement';
 import type { CtaBannerData, HeroData } from '~/data/home';
-import type { CategoryNavData } from '~/data/features';
+import type { CategoryNavData } from '~/components/CategoryNav';
 
 /*
  * Route /editor-experience: the Editing pillar page (src/data/AGENTS.md, "The pillars").

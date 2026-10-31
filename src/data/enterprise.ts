@@ -5,7 +5,7 @@
 import type { LogoItem } from '~/components/LogosLine';
 import type { SplitPointsData } from '~/components/SplitPoints';
 import type { StatementsSectionData } from '~/components/StatementsSection';
-import type { QuoteData } from '~/data/case-studies';
+import type { QuoteData } from '~/components/Quote';
 import type { Theme } from '~/lib/theme';
 import afspSvg from '~/svg/logos/afsp.svg?raw';
 import telekomSvg from '~/svg/logos/deutsche-telekom.svg?raw';

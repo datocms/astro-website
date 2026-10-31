@@ -1,12 +1,8 @@
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
-import type { ButtonData, CaseStudiesData, CtaBannerData, HeroData } from '~/data/home';
-
-export interface QuoteData {
-  quote: string;
-  name: string;
-  role: string;
-  avatar?: string;
-}
+import type { ButtonData } from '~/components/Button';
+import type { QuoteData } from '~/components/Quote';
+import type { StatementData } from '~/components/Statement';
+import type { CaseStudiesData, CtaBannerData, HeroData } from '~/data/home';
 
 export const hero: HeroData = {
   label: 'Case Studies',
@@ -57,11 +53,6 @@ export const ctaBuild: CtaBannerData = {
     { label: 'Explore Pricing', href: '/pricing', appearance: 'light-on-deep', variant: 'soft' },
   ],
 };
-
-export interface StatementData {
-  label: string;
-  text: string;
-}
 
 export const moreCaseStudies: CaseStudiesData = {
   headline: 'Cool work, alongside cool people.',

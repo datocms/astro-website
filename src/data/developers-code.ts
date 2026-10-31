@@ -1,4 +1,4 @@
-import type { CodeTab } from '~/data/home';
+import type { CodeTab } from '~/components/CodeSnippetPreview';
 
 /*
  * The code of the seven "Code: …" pictures of /developers

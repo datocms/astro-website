@@ -2,9 +2,9 @@ import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import type { ChapterLayoutData } from '~/components/ChapterLayout';
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
 import type { StatementsSectionData } from '~/components/StatementsSection';
-import type { StatementData } from '~/data/case-studies';
+import type { StatementData } from '~/components/Statement';
 import type { CtaBannerData, HeroData } from '~/data/home';
-import type { CategoryNavData } from '~/data/features';
+import type { CategoryNavData } from '~/components/CategoryNav';
 
 /*
  * Route /ai: the AI pillar (src/data/AGENTS.md). Four chapters: Ask your

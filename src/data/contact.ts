@@ -1,5 +1,5 @@
 import { getData } from 'country-list';
-import type { ButtonData } from '~/data/home';
+import type { ButtonData } from '~/components/Button';
 
 /*
  * Contact sales page. The form sends its data to the action

@@ -1,2 +1,2 @@
 export { default as Button } from './Component.astro';
-export type { ButtonAppearance, ButtonImage } from './types';
+export type { ButtonAppearance, ButtonData, ButtonImage } from './types';

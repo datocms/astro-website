@@ -2,7 +2,8 @@
 // questions of the FAQ come from the dashboard API and from the CMS.
 
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
-import type { ButtonData, CtaBannerData, HeroData } from '~/data/home';
+import type { CtaBannerData, HeroData } from '~/data/home';
+import type { ButtonData } from '~/components/Button';
 import { hero as homeHero } from '~/data/home';
 
 /** The plan change in the dashboard: it buys the Professional plan. */

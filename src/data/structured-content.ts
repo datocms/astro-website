@@ -1,6 +1,6 @@
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
 import type { FeatureFragmentsData } from '~/components/FeatureFragments';
-import type { CodeTab } from '~/data/home';
+import type { CodeTab } from '~/components/CodeSnippetPreview';
 
 /*
  * The Structured content chapter of the Editing pillar

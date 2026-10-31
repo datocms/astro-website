@@ -1,4 +1,4 @@
-import type { CodeTab } from '~/data/home';
+import type { CodeTab } from '~/components/CodeSnippetPreview';
 
 /*
  * The code of the "Code:" fragments of /media (src/data/media.ts). The

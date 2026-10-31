@@ -2,7 +2,9 @@
 // The types have the names of CMS fragments.
 
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
-import type { ButtonAppearance, ButtonImage } from '~/components/Button';
+import type { ButtonData } from '~/components/Button';
+import type { CodeTab } from '~/components/CodeSnippetPreview';
+import type { CodeToken } from '~/components/UserExperience';
 import type { LogoItem } from '~/components/LogosLine';
 import type { PixelVideoSettings } from '~/lib/pixel-video/settings';
 import type { Theme } from '~/lib/theme';
@@ -18,19 +20,6 @@ import satispayClient from '~/assets/home/clients/satispay.svg?raw';
 import vercelClient from '~/assets/home/clients/vercel.svg?raw';
 import verizonClient from '~/assets/home/clients/verizon.svg?raw';
 import wildClient from '~/assets/home/clients/wild.svg?raw';
-import type { CodeLang } from '~/lib/code/highlight';
-
-export interface ButtonData {
-  label: string;
-  href: string;
-  appearance: ButtonAppearance;
-  variant?: 'solid' | 'soft';
-  arrow?: boolean;
-  leading?: 'userpic' | 'logos';
-  leadingImages?: ButtonImage[];
-  /** Overrides the theme of the section. */
-  theme?: Theme;
-}
 
 export interface HeroData {
   label?: string;
@@ -81,35 +70,6 @@ export interface FeaturesData {
   features: FeatureItem[];
   button?: ButtonData;
 }
-
-/** A tab of CodeSnippetPreview: the code as text, highlighted by Shiki. */
-export interface CodeTab {
-  label: string;
-  /** The code, as it is written in the file. */
-  code: string;
-  lang: CodeLang;
-  /**
-   * The lines that carry the point of the snippet, from 1: a line, or the
-   * first and the last line of a range. The other lines are dim. Without
-   * it, no line is dim.
-   */
-  focus?: (number | [number, number])[];
-  /**
-   * From 1152px, a comment line of the code shows as a note next to the
-   * card, with a line to the code it tells about. Below 1152px, and with
-   * no JavaScript, the comment stays in the code.
-   */
-  notes?: CodeNote[];
-}
-
-export interface CodeNote {
-  /** The line of the comment, from 1. */
-  comment: number;
-  /** The text that the note points to, on a line after the comment. */
-  point: string;
-}
-
-export type CodeToken = string | { text: string; tone: 'strong' | 'accent' };
 
 export interface TextWithImageData {
   title: string;

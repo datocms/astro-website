@@ -1,6 +1,6 @@
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
 import type { FeatureFragmentsData } from '~/components/FeatureFragments';
-import type { CodeTab } from '~/data/home';
+import type { CodeTab } from '~/components/CodeSnippetPreview';
 import { EVENT, FAVICON_URL, SEO, SHARE_IMAGE_URL, SITE } from '~/scenes/Seo/story';
 
 /*

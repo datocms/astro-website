@@ -1,5 +1,7 @@
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
-import type { ButtonData, CtaBannerData, HeroData } from '~/data/home';
+import type { ButtonData } from '~/components/Button';
+import type { CategoryNavData } from '~/components/CategoryNav';
+import type { CtaBannerData, HeroData } from '~/data/home';
 import type { Theme } from '~/lib/theme';
 
 export interface FeatureCategoryData {
@@ -10,10 +12,6 @@ export interface FeatureCategoryData {
   title: string;
   description: string;
   theme: Theme;
-}
-
-export interface CategoryNavData {
-  items: { label: string; href: string }[];
 }
 
 /** The last card of the list: the slot of the next feature. */

@@ -1,4 +1,4 @@
-import type { ButtonData } from '~/data/home';
+import type { ButtonData } from '~/components/Button';
 
 export interface ChapterHeaderData {
   /** The name of the feature, as a small label above the headline. */

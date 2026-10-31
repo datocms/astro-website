@@ -1,5 +1,5 @@
 import { responseTab, sectionsQueryTab } from '~/data/cms-code';
-import type { CodeTab } from '~/data/home';
+import type { CodeTab } from '~/components/CodeSnippetPreview';
 import { dast, renderers } from '~/data/structured-content';
 
 /*

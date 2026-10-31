@@ -2,7 +2,8 @@ import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import type { ChapterLayoutData } from '~/components/ChapterLayout';
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
 import type { StatementsSectionData } from '~/components/StatementsSection';
-import type { QuoteData, StatementData } from '~/data/case-studies';
+import type { QuoteData } from '~/components/Quote';
+import type { StatementData } from '~/components/Statement';
 import type { CtaBannerData, HeroData } from '~/data/home';
 import {
   apiCode,
@@ -15,7 +16,7 @@ import {
   releaseCode,
   pluginCode,
 } from '~/data/developers-code';
-import type { CategoryNavData } from '~/data/features';
+import type { CategoryNavData } from '~/components/CategoryNav';
 
 /*
  * Route /developers: the Modeling and delivery pillar (src/data/AGENTS.md).
