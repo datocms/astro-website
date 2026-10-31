@@ -4,33 +4,37 @@ import { Icon } from '~/components/Icon';
 import s from './style.module.css';
 ---
 
-<button
-  type="button"
-  class={s.toggle}
-  aria-label="Dark mode"
-  aria-pressed="false"
-  data-scheme-toggle
->
-  <Icon icon={faCircleHalfStroke} />
-</button>
+<scheme-toggle class={s.root}>
+  <button type="button" class={s.toggle} aria-label="Dark mode" aria-pressed="false">
+    <Icon icon={faCircleHalfStroke} />
+  </button>
+</scheme-toggle>
 
 <script>
   import { chooseColorScheme, currentColorScheme } from '~/lib/colorScheme';
+  import { WebComponent } from '~/lib/WebComponent';
 
-  // The page can hold more than one toggle, and the router replaces them
-  // at each visit. Thus one listener on the document serves all of them.
-  function showScheme() {
-    const pressed = String(currentColorScheme() === 'dark');
-    document
-      .querySelectorAll('[data-scheme-toggle]')
-      .forEach((toggle) => toggle.setAttribute('aria-pressed', pressed));
-  }
+  // The page can hold more than one toggle, and the router puts new ones in
+  // the page at each visit. Each toggle follows the scheme of the page. It
+  // stops its listener on <html> when it leaves the page.
+  customElements.define(
+    'scheme-toggle',
+    class SchemeToggle extends WebComponent {
+      parsedCallback() {
+        const button = this.$<HTMLButtonElement>('button');
 
-  document.addEventListener('click', (event) => {
-    if (!(event.target as Element).closest('[data-scheme-toggle]')) return;
-    chooseColorScheme(currentColorScheme() === 'dark' ? 'light' : 'dark');
-  });
-  document.documentElement.addEventListener('colorschemechange', showScheme);
-  document.addEventListener('astro:page-load', showScheme);
-  showScheme();
+        const showScheme = () => {
+          button.setAttribute('aria-pressed', String(currentColorScheme() === 'dark'));
+        };
+
+        this.on(button, 'click', () => {
+          chooseColorScheme(currentColorScheme() === 'dark' ? 'light' : 'dark');
+        });
+        this.eventListenerRemovers.push(
+          this.on(document.documentElement, 'colorschemechange', showScheme),
+        );
+        showScheme();
+      }
+    },
+  );
 </script>
