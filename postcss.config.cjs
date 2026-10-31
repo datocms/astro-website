@@ -26,8 +26,5 @@ module.exports = {
       baseValue: '16px',
       unit: 'px',
     }),
-    require('postcss-inline-svg')({
-      paths: ['src'],
-    }),
   ],
 };

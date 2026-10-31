@@ -31,22 +31,16 @@ https://www.datocms.com/blog/why-we-switched-to-astro
 
 ## SVGs
 
-SVGs are inlined, both in HTML and CSS. For the HTML part, there's a `<Svg />` Astro component:
+SVGs are inlined. A page that needs the markup of an SVG imports it with the `?raw` suffix:
 
-```jsx
-<Svg name="icons/regular/tachometer" />
+```ts
+import keyIllustration from '~/svg/illustrations/key.svg?raw';
 ```
 
-There are two main directories for SVGs: `src/icons/` and `src/svg`. Depending on the directory, `<Svg />` will apply different SVGO settings:
+The docs have a `<Svg />` Astro component (`src/components/docs/Svg`) that reads a file of `src/` by name and optimizes it with SVGO:
 
-- SVGs in `src/icons/` are 1em in size and have their `fill` color inherited from the parent HTML element's color attribute by forcing the fill of every element to `currentColor`.
-- SVGs in `src/svg/` are more flexible: they don’t have a set size, and there’s no automatic fill color.
-
-For the CSS part, we use [`postcss-inline-svg`](https://www.npmjs.com/package/postcss-inline-svg) which let's you inline SVGs like this:
-
-```css
-background: svg-load('icons/regular/check.svg');
-background: svg-load('img/arrow-down.svg', fill=#000, stroke=#fff);
+```jsx
+<Svg name="svg/logos/next-squared" />
 ```
 
 ## `<Prose />`

@@ -64,7 +64,7 @@ const TEST_SITE_KEY = '1x00000000000000000000AA';
  * expected to skip the challenge rather than block submissions on a missing
  * env var. The server side is what actually enforces the check.
  */
-export const turnstileSiteKey: string | undefined =
+const turnstileSiteKey: string | undefined =
   TURNSTILE_SITE_KEY || (import.meta.env.DEV ? TEST_SITE_KEY : undefined);
 
 const SCRIPT_URL =
@@ -72,7 +72,7 @@ const SCRIPT_URL =
 
 let pendingLoad: Promise<TurnstileApi> | undefined;
 
-export function loadTurnstile(): Promise<TurnstileApi> {
+function loadTurnstile(): Promise<TurnstileApi> {
   if (window.turnstile) {
     return Promise.resolve(window.turnstile);
   }
