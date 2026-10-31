@@ -1,11 +1,8 @@
 ---
-// The layout of the pages with the global stylesheet src/styles/global.css
-// (see "Two layout families" in AGENTS.md and src/REDESIGN.md). Its head
-// comes from BaseLayout: the SEO tags, the favicon, the canonical URL, the
-// RSS links, the cookie consent, the analytics and the content link of the
-// draft mode.
-// Do not use it on a page that uses LegacyLayout parts: the two global
-// stylesheets must not load on the same page.
+// The layout of the pages, with the global stylesheet src/styles/global.css
+// (see "The layout" in src/REDESIGN.md). Its head comes from BaseLayout: the
+// SEO tags, the favicon, the canonical URL, the RSS links, the cookie
+// consent, the analytics and the content link of the draft mode.
 import type { TitleMetaLinkTag } from '@datocms/astro';
 import { DEPLOYMENT_DESTINATION } from 'astro:env/server';
 import { FooterLegal } from '~/components/FooterLegal';
@@ -68,18 +65,9 @@ const showReviewTools = DEPLOYMENT_DESTINATION !== 'production';
 
 // The SEO panel shows only in draft mode, for the editors.
 const showSeoAnalysis = seoAnalysis !== undefined && isDraftModeEnabled(Astro);
-
-// The order of the cascade layers (see src/styles/global.css). BaseLayout
-// puts it as the first child of <head>, before all other CSS.
-const cssLayers = ['reset', 'tokens', 'base', 'vendor', 'blocks', 'sections', 'pages'];
 ---
 
-<BaseLayout
-  seo={seo}
-  cssLayers={cssLayers}
-  clientRouter={false}
-  bodyAttributes={{ 'data-theme': theme }}
->
+<BaseLayout seo={seo} theme={theme}>
   <Fragment slot="head">
     {/* A page can add tags to the head, such as JSON-LD. */}
     <slot name="head" />
