@@ -8,6 +8,7 @@ import { DEPLOYMENT_DESTINATION } from 'astro:env/server';
 import { FooterLegal } from '~/components/FooterLegal';
 import { FooterLinks } from '~/components/FooterLinks';
 import { PageNav } from '~/components/PageNav';
+import SchemeScript from '~/components/SchemeScript/Component.astro';
 import { SearchPopup } from '~/components/SearchPopup';
 import { SeoAnalysisPanel } from '~/components/SeoAnalysisPanel';
 import { SiteHeader } from '~/components/SiteHeader';
@@ -84,19 +85,9 @@ const showSeoAnalysis = seoAnalysis !== undefined && isDraftModeEnabled(Astro);
         var root = document.documentElement;
         // Animations hide their final state only when this flag is set.
         if (!matchMedia('(prefers-reduced-motion: reduce)').matches) root.dataset.motion = 'on';
-
-        // Color scheme (src/lib/colorScheme.ts): the choice of the visitor,
-        // else the scheme of the system. Set it before the first paint.
-        var scheme = null;
-        try {
-          scheme = localStorage.getItem('color-scheme');
-        } catch (e) {}
-        if (scheme !== 'light' && scheme !== 'dark')
-          scheme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        root.dataset.scheme = scheme;
-        root.dataset.productScenesScheme = scheme;
       })();
     </script>
+    <SchemeScript />
   </Fragment>
 
   <slot name="header">
