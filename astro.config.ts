@@ -524,8 +524,11 @@ export default defineConfig({
     // The casual chats are part of the blog.
     '/casual-chats': '/blog/casual-chats',
     '/casual-chats/[...rest]': '/blog/casual-chats/[...rest]',
-    '/success-stories': '/customers',
+    // The old customers page and the old product overview are gone.
+    '/success-stories': '/case-studies',
+    '/customers': '/case-studies',
     '/customers/[...rest]': '/case-studies/[...rest]',
+    '/product': '/features',
     '/use-cases/headless-cms-publishing': '/use-cases/digital-publishing',
     '/use-cases/headless-cms-websites': '/use-cases/modern-websites',
     '/use-cases/headless-ecommerce': '/use-cases/ecommerce',
