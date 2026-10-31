@@ -22,7 +22,7 @@ export interface OpenSlotData {
 }
 
 /** What the face at the edge of the page says, at a point of the list. */
-export interface BuddyLine {
+interface BuddyLine {
   /** The share of the list scrolled past, from 0 to 1. */
   at: number;
   face: string;

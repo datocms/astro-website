@@ -45,7 +45,7 @@ export interface FormFieldData {
   multiple?: boolean;
 }
 
-export interface ContactLink {
+interface ContactLink {
   /** The muted text before the link. */
   lead: string;
   label: string;

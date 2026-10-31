@@ -2,7 +2,7 @@ import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import type { CtaBannerData, HeroData } from '~/data/home';
 import type { ButtonData } from '~/components/Button';
 
-export interface VersusHalf {
+interface VersusHalf {
   /** The background of the half: surface/accent or surface/inverse. */
   surface: 'accent' | 'inverse';
   headline: string;

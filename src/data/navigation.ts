@@ -4,7 +4,7 @@
 // list of content, and no page has two names. A link without a page on
 // this site goes to '#'.
 
-export interface LinkItem {
+interface LinkItem {
   label: string;
   href: string;
   /** A muted line under the link, in the menus of the header. */
@@ -12,14 +12,14 @@ export interface LinkItem {
 }
 
 /** A muted heading, its links and an optional "→ All …" link. */
-export interface NavSection {
+interface NavSection {
   heading: string;
   links: LinkItem[];
   allLink?: LinkItem;
 }
 
 /** One column of the mega-menu. It holds one or more sections. */
-export interface NavColumn {
+interface NavColumn {
   sections: NavSection[];
 }
 
@@ -30,7 +30,7 @@ export interface NavGroup {
   columns?: NavColumn[];
 }
 
-export interface FooterGroup {
+interface FooterGroup {
   /** A group without a title is a plain list of links (legal). */
   title?: string;
   links: LinkItem[];

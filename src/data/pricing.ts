@@ -11,7 +11,7 @@ const purchaseHref = dashboardUrl(
   '/personal-account/plan-billing/change?plan_id=899&utm_source=datocms&utm_medium=website&utm_campaign=pricing',
 );
 
-export interface PricingPlan {
+interface PricingPlan {
   name: string;
   tagline: string;
   price: string;
@@ -45,7 +45,7 @@ export interface ComparisonCategory {
   rows: ComparisonRow[];
 }
 
-export interface PlanColumn {
+interface PlanColumn {
   name: string;
   price: string;
   button: ButtonData;

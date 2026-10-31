@@ -1,7 +1,7 @@
 import type { HeroData } from '~/data/home';
 import type { Theme } from '~/lib/theme';
 
-export interface Principle {
+interface Principle {
   title: string;
   text: string;
   theme: Theme;

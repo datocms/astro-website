@@ -3,7 +3,7 @@
 
 import type { PixelVideoSettings } from '~/lib/pixel-video/settings';
 
-export interface CourseVideoData {
+interface CourseVideoData {
   src: string;
   settings?: Partial<PixelVideoSettings>;
 }

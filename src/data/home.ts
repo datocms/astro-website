@@ -56,7 +56,7 @@ export interface ContentSourceData {
   activeChannel: string;
 }
 
-export interface FeatureItem {
+interface FeatureItem {
   title: string;
   description: string;
   theme: Theme;
@@ -71,7 +71,7 @@ export interface FeaturesData {
   button?: ButtonData;
 }
 
-export interface TextWithImageData {
+interface TextWithImageData {
   title: string;
   tagline: string;
   button: ButtonData;
@@ -87,7 +87,7 @@ export interface QuestionAnswerData {
   more?: { text: string; button: ButtonData };
 }
 
-export interface CommunityPost {
+interface CommunityPost {
   author: { name: string; avatar: string };
   age: string;
   title: string;

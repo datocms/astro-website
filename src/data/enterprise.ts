@@ -61,7 +61,7 @@ export const logos = {
   ],
 };
 
-export interface EnterpriseStrip extends SplitPointsData {
+interface EnterpriseStrip extends SplitPointsData {
   theme: Theme;
   background: 'default' | 'accent-faint';
 }
