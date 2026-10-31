@@ -20,7 +20,7 @@ const clock = (seconds: number) =>
 const DESCRIPTION = `The URL of an animated GIF of the video “${VIDEO.title}”, with start=${GIF.start}, end=${GIF.end} and width=${GIF.width}, and under it the GIF that it returns: ${clock(GIF.start)} to ${clock(GIF.end)}, the hands of the weaver that sew, then the hands that smooth the linen.`;
 ---
 
-<figure
+<scene-video-gif
   class:list={[diagram.root, styles.gif]}
   role="img"
   aria-label={DESCRIPTION}
@@ -37,31 +37,36 @@ const DESCRIPTION = `The URL of an animated GIF of the video “${VIDEO.title}�
     <img class={styles.picture} src={still.src} alt="" data-gif={gif.src} />
     <span class={styles.badge}>GIF {GIF.width} px</span>
   </div>
-</figure>
+</scene-video-gif>
 
 <script>
   import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  import { WebComponent } from '~/lib/WebComponent';
 
-  for (const root of document.querySelectorAll<HTMLElement>('[data-gif-picture]')) {
-    const picture = root.querySelector<HTMLImageElement>('[data-gif]')!;
-    const still = picture.src;
-    const gif = picture.dataset.gif!;
-    let visible = false;
+  customElements.define(
+    'scene-video-gif',
+    class extends WebComponent {
+      parsedCallback() {
+        const picture = this.$<HTMLImageElement>('[data-gif]');
+        const still = picture.src;
+        const gif = picture.dataset.gif!;
+        let visible = false;
 
-    if (!prefersReducedMotion()) {
-      onVisibilityChange(root, (inView) => {
-        visible = inView;
-        if (!inView) {
-          picture.src = still;
-          return;
-        }
-        // Show the GIF only when it is loaded, thus the still does not go before the first frame comes
-        const loader = new Image();
-        loader.onload = () => {
-          if (visible) picture.src = gif;
-        };
-        loader.src = gif;
-      });
-    }
-  }
+        if (prefersReducedMotion()) return;
+        onVisibilityChange(this, (inView) => {
+          visible = inView;
+          if (!inView) {
+            picture.src = still;
+            return;
+          }
+          // Show the GIF only when it is loaded, thus the still does not go before the first frame comes
+          const loader = new Image();
+          loader.onload = () => {
+            if (visible) picture.src = gif;
+          };
+          loader.src = gif;
+        });
+      }
+    },
+  );
 </script>

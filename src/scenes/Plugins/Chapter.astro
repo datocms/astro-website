@@ -4,6 +4,7 @@ import { SceneFrame } from '~/components/SceneFrame';
 import { SceneFragment } from '~/components/SceneFragment';
 import * as dev from '~/data/developers-pillar';
 import { PluginListScene, PluginsScene } from './Plugins';
+import styles from './style.module.css';
 
 const theme = dev.plugins.theme;
 ---
@@ -11,9 +12,9 @@ const theme = dev.plugins.theme;
 <ChapterLayout {...dev.plugins}>
   <Fragment slot="scene">
     <SceneFrame preset="fill" theme={theme} height={620} phoneHeightVw={90}>
-      <div data-plugins-scene>
+      <scene-plugins class={styles.scene} data-plugins-scene>
         <PluginsScene appearance={{ theme }} />
-      </div>
+      </scene-plugins>
     </SceneFrame>
   </Fragment>
   <SceneFragment slot="visual-1" fit="scale">
@@ -23,6 +24,7 @@ const theme = dev.plugins.theme;
 
 <script>
   import { SCENE_STEP_EVENT } from '~/lib/motion/sceneSequence';
+  import { WebComponent } from '~/lib/WebComponent';
 
   // The time of the travel of the hole (--diagram-travel): the tag of the
   // spotlight comes in after it.
@@ -33,49 +35,52 @@ const theme = dev.plugins.theme;
   // ring of `.change[data-changed]`. When the hole is at the part, the tag
   // of the spotlight comes in at the place of the tag of the part, with
   // its name. At the rest step the spotlight goes.
-  for (const root of document.querySelectorAll<HTMLElement>('[data-plugins-scene]')) {
-    let timer = 0;
-    root.addEventListener(SCENE_STEP_EVENT, (event) => {
-      const screen = event.target as HTMLElement;
-      const spotlight = screen.querySelector<HTMLElement>('[data-spotlight]');
-      const hole = screen.querySelector<HTMLElement>('[data-spotlight-hole]');
-      const tag = screen.querySelector<HTMLElement>('[data-spotlight-tag]');
-      if (!spotlight || !hole || !tag) return;
-      const part = screen.querySelector<HTMLElement>(
-        `[data-hook="${(event as CustomEvent<string>).detail}"]`,
-      );
-      window.clearTimeout(timer);
-      tag.removeAttribute('data-shown');
-      if (!part) {
-        spotlight.removeAttribute('data-on');
-        hole.removeAttribute('data-changed');
-        delete spotlight.dataset.moved;
-        return;
+  customElements.define(
+    'scene-plugins',
+    class extends WebComponent {
+      parsedCallback() {
+        let timer = 0;
+        this.on(this, SCENE_STEP_EVENT, (event: CustomEvent<string>) => {
+          const screen = event.target as HTMLElement;
+          const spotlight = screen.querySelector<HTMLElement>('[data-spotlight]');
+          const hole = screen.querySelector<HTMLElement>('[data-spotlight-hole]');
+          const tag = screen.querySelector<HTMLElement>('[data-spotlight-tag]');
+          if (!spotlight || !hole || !tag) return;
+          const part = screen.querySelector<HTMLElement>(`[data-hook="${event.detail}"]`);
+          window.clearTimeout(timer);
+          tag.removeAttribute('data-shown');
+          if (!part) {
+            spotlight.removeAttribute('data-on');
+            hole.removeAttribute('data-changed');
+            delete spotlight.dataset.moved;
+            return;
+          }
+          const box = spotlight.getBoundingClientRect();
+          const place = (el: HTMLElement, rect: DOMRect, size: boolean) => {
+            el.style.left = `${((rect.left - box.left) / box.width) * 100}%`;
+            el.style.top = `${((rect.top - box.top) / box.height) * 100}%`;
+            if (size) {
+              el.style.width = `${(rect.width / box.width) * 100}%`;
+              el.style.height = `${(rect.height / box.height) * 100}%`;
+            }
+          };
+          place(hole, part.getBoundingClientRect(), true);
+          // Read the layout before the attribute: the first hole has no travel.
+          hole.getBoundingClientRect();
+          spotlight.setAttribute('data-on', '');
+          hole.setAttribute('data-changed', '');
+          const partTag = part.querySelector<HTMLElement>('[data-place]');
+          if (!partTag) return;
+          const travel = spotlight.dataset.moved ? TRAVEL_MS : 0;
+          spotlight.dataset.moved = '';
+          timer = window.setTimeout(() => {
+            tag.textContent = partTag.textContent;
+            tag.toggleAttribute('data-phone', partTag.hasAttribute('data-phone'));
+            place(tag, partTag.getBoundingClientRect(), false);
+            tag.setAttribute('data-shown', '');
+          }, travel);
+        });
       }
-      const box = spotlight.getBoundingClientRect();
-      const place = (el: HTMLElement, rect: DOMRect, size: boolean) => {
-        el.style.left = `${((rect.left - box.left) / box.width) * 100}%`;
-        el.style.top = `${((rect.top - box.top) / box.height) * 100}%`;
-        if (size) {
-          el.style.width = `${(rect.width / box.width) * 100}%`;
-          el.style.height = `${(rect.height / box.height) * 100}%`;
-        }
-      };
-      place(hole, part.getBoundingClientRect(), true);
-      // Read the layout before the attribute: the first hole has no travel.
-      hole.getBoundingClientRect();
-      spotlight.setAttribute('data-on', '');
-      hole.setAttribute('data-changed', '');
-      const partTag = part.querySelector<HTMLElement>('[data-place]');
-      if (!partTag) return;
-      const travel = spotlight.dataset.moved ? TRAVEL_MS : 0;
-      spotlight.dataset.moved = '';
-      timer = window.setTimeout(() => {
-        tag.textContent = partTag.textContent;
-        tag.toggleAttribute('data-phone', partTag.hasAttribute('data-phone'));
-        place(tag, partTag.getBoundingClientRect(), false);
-        tag.setAttribute('data-shown', '');
-      }, travel);
-    });
-  }
+    },
+  );
 </script>

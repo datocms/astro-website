@@ -30,7 +30,7 @@ const PEOPLE = {
 const firstName = (name: string) => name.split(' ')[0];
 ---
 
-<div class:list={[diagram.root, styles.pair]} data-collaboration-pair>
+<scene-collaboration-pair class:list={[diagram.root, styles.pair]} data-collaboration-pair>
   <svg class={styles.trace} aria-hidden="true" data-trace data-pulse-class={diagram.pulse}></svg>
 
   <div class={styles.person} data-person="ines">
@@ -82,11 +82,12 @@ const firstName = (name: string) => name.split(' ')[0];
       </span>
     </div>
   </div>
-</div>
+</scene-collaboration-pair>
 
 <script>
   import { edgePulse } from '~/lib/motion/diagramPulse';
   import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  import { WebComponent } from '~/lib/WebComponent';
 
   /**
    * One beat of the story: its time in ms, the step of the kit on each
@@ -132,45 +133,57 @@ const firstName = (name: string) => name.split(' ')[0];
     { name: 'write', ms: 2600, ines: 'rest', tom: 'saved', focus: 'tom' },
   ];
 
-  for (const root of document.querySelectorAll<HTMLElement>('[data-collaboration-pair]')) {
-    const ines = root.querySelector<HTMLElement>('[data-person="ines"] .ProductScenesScreen');
-    const tom = root.querySelector<HTMLElement>('[data-person="tom"] .ProductScenesScreen');
-    const links = root.querySelector<HTMLElement>('[data-line]');
-    const trace = root.querySelector<SVGSVGElement>('[data-trace]');
-    const screens = [...root.querySelectorAll<HTMLElement>('[data-screen]')];
-    if (!ines || !tom || !links || !trace || prefersReducedMotion()) continue;
+  customElements.define(
+    'scene-collaboration-pair',
+    class extends WebComponent {
+      parsedCallback() {
+        const ines = this.$('[data-person="ines"] .ProductScenesScreen');
+        const tom = this.$('[data-person="tom"] .ProductScenesScreen');
+        const links = this.$('[data-line]');
+        const trace = this.$<SVGSVGElement>('[data-trace]');
+        const screens = this.$$('[data-screen]');
+        if (prefersReducedMotion()) return;
 
-    let index = 0;
-    let timer: number | undefined;
-    // A new number stops the beat that waits for its pulse
-    let run = 0;
+        let index = 0;
+        let timer: number | undefined;
+        // A new number stops the beat that waits for its pulse
+        let run = 0;
 
-    const next = () => {
-      index = (index + 1) % BEATS.length;
-      if (index > 0) return show();
-      root.dataset.reset = '';
-      timer = window.setTimeout(show, RESET);
-    };
+        const next = () => {
+          index = (index + 1) % BEATS.length;
+          if (index > 0) return show();
+          this.dataset.reset = '';
+          timer = window.setTimeout(show, RESET);
+        };
 
-    const show = async () => {
-      const beat = BEATS[index]!;
-      const current = ++run;
-      delete root.dataset.reset;
-      root.dataset.beat = beat.name;
-      root.dataset.focus = beat.focus;
-      ines.dataset.step = beat.ines;
-      tom.dataset.step = beat.tom;
-      if (beat.pulse) {
-        await edgePulse({ root, trace, links, parts: screens, out: () => OUT, fromEnd: true });
-        if (current !== run) return;
+        const show = async () => {
+          const beat = BEATS[index]!;
+          const current = ++run;
+          delete this.dataset.reset;
+          this.dataset.beat = beat.name;
+          this.dataset.focus = beat.focus;
+          ines.dataset.step = beat.ines;
+          tom.dataset.step = beat.tom;
+          if (beat.pulse) {
+            await edgePulse({
+              root: this,
+              trace,
+              links,
+              parts: screens,
+              out: () => OUT,
+              fromEnd: true,
+            });
+            if (current !== run) return;
+          }
+          timer = window.setTimeout(next, beat.ms);
+        };
+
+        onVisibilityChange(this, (visible) => {
+          window.clearTimeout(timer);
+          run++;
+          if (visible) show();
+        });
       }
-      timer = window.setTimeout(next, beat.ms);
-    };
-
-    onVisibilityChange(root, (visible) => {
-      window.clearTimeout(timer);
-      run++;
-      if (visible) show();
-    });
-  }
+    },
+  );
 </script>

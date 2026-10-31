@@ -2,6 +2,7 @@
 import { ChapterLayout } from '~/components/ChapterLayout';
 import { SceneFrame } from '~/components/SceneFrame';
 import * as ai from '~/data/ai-pillar';
+import styles from './style.module.css';
 import { TranslationsScene } from './Translations';
 
 const theme = ai.translations.theme;
@@ -13,33 +14,39 @@ const theme = ai.translations.theme;
   }
   <Fragment slot="scene">
     <SceneFrame preset="fill" theme={theme} height={780} phoneHeightVw={110} flushBottom={false}>
-      <div data-translations-scene>
+      <scene-translations class={styles.scene} data-translations-scene>
         <TranslationsScene appearance={{ theme }} minWidth={720} />
-      </div>
+      </scene-translations>
     </SceneFrame>
   </Fragment>
 </ChapterLayout>
 
 <script>
   import { SCENE_STEP_EVENT } from '~/lib/motion/sceneSequence';
+  import { WebComponent } from '~/lib/WebComponent';
 
   // At each step of the screen, an element with `data-from` gets `data-on`
   // from its step on, and an element with `data-until` gets `data-off`
   // from its step on. The rules are in style.module.css.
-  for (const root of document.querySelectorAll<HTMLElement>('[data-translations-scene]')) {
-    root.addEventListener(SCENE_STEP_EVENT, (event) => {
-      const screen = event.target as HTMLElement;
-      const steps = (screen.dataset.sceneSteps ?? '')
-        .split(/\s+/)
-        .map((step) => step.split(':')[0]);
-      const now = steps.indexOf((event as CustomEvent<string>).detail);
-      const reached = (step: string | undefined) => steps.indexOf(step ?? '') <= now;
-      for (const el of screen.querySelectorAll<HTMLElement>('[data-from]')) {
-        el.toggleAttribute('data-on', reached(el.dataset.from));
+  customElements.define(
+    'scene-translations',
+    class extends WebComponent {
+      parsedCallback() {
+        this.on(this, SCENE_STEP_EVENT, (event: CustomEvent<string>) => {
+          const screen = event.target as HTMLElement;
+          const steps = (screen.dataset.sceneSteps ?? '')
+            .split(/\s+/)
+            .map((step) => step.split(':')[0]);
+          const now = steps.indexOf(event.detail);
+          const reached = (step: string | undefined) => steps.indexOf(step ?? '') <= now;
+          for (const el of screen.querySelectorAll<HTMLElement>('[data-from]')) {
+            el.toggleAttribute('data-on', reached(el.dataset.from));
+          }
+          for (const el of screen.querySelectorAll<HTMLElement>('[data-until]')) {
+            el.toggleAttribute('data-off', reached(el.dataset.until));
+          }
+        });
       }
-      for (const el of screen.querySelectorAll<HTMLElement>('[data-until]')) {
-        el.toggleAttribute('data-off', reached(el.dataset.until));
-      }
-    });
-  }
+    },
+  );
 </script>

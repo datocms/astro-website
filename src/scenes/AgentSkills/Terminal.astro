@@ -24,7 +24,7 @@ const opensStep = (i: number) => i > 0 && WORK[i - 1]!.at !== WORK[i]!.at;
 const last = WORK[WORK.length - 1]!;
 ---
 
-<div
+<scene-agent-skills-terminal
   class={styles.window}
   role="img"
   aria-label={DESCRIPTION}
@@ -141,97 +141,109 @@ const last = WORK[WORK.length - 1]!;
       ))
     }
   </div>
-</div>
+</scene-agent-skills-terminal>
 
 <script>
   import { SCENE_STEP_EVENT } from '~/lib/motion/sceneSequence';
+  import { WebComponent } from '~/lib/WebComponent';
 
   // The time of each character of the request, and the wait before the
   // first one, in ms
   const CHAR_MS = 34;
   const START_MS = 250;
 
-  for (const root of document.querySelectorAll<HTMLElement>('[data-agent-terminal]')) {
-    const steps = (root.dataset.sceneSteps ?? '').split(/\s+/).map((step) => step.split(':')[0]);
-    const timed = [...root.querySelectorAll<HTMLElement>('[data-at]')];
-    const fileParts = [...root.querySelectorAll<HTMLElement>('[data-file]')];
-    let timers: number[] = [];
+  customElements.define(
+    'scene-agent-skills-terminal',
+    class extends WebComponent {
+      parsedCallback() {
+        const steps = (this.dataset.sceneSteps ?? '')
+          .split(/\s+/)
+          .map((step) => step.split(':')[0]);
+        const timed = this.$$('[data-at]');
+        const fileParts = this.$$('[data-file]');
+        let timers: number[] = [];
 
-    // A line shows (`data-shown`) in its step, at its time (`data-delay`):
-    // it pushes the lines before it up only when it comes. The lines of
-    // the steps before show.
-    const showStep = (step: string) => {
-      const now = steps.indexOf(step);
-      for (const el of timed) {
-        const at = steps.indexOf(el.dataset.at ?? '');
-        el.toggleAttribute('data-shown', at < now || (at === now && !el.dataset.delay));
-        if (at === now && el.dataset.delay) {
-          timers.push(
-            window.setTimeout(() => el.setAttribute('data-shown', ''), Number(el.dataset.delay)),
-          );
-        }
-      }
-    };
-
-    // A file opens (`data-opened`) in its step, at the time of the line
-    // that writes it; the files of the steps before are open. The tab and
-    // the code of the last file that is open are in front (`data-front`).
-    const openFiles = (step: string) => {
-      const now = steps.indexOf(step);
-      const front = () => {
-        const opened = fileParts.filter((el) => el.hasAttribute('data-opened')).pop()?.dataset.file;
-        for (const el of fileParts) el.toggleAttribute('data-front', el.dataset.file === opened);
-      };
-      for (const el of fileParts) {
-        const at = steps.indexOf(el.dataset.file ?? '');
-        el.toggleAttribute('data-opened', at < now);
-        if (at === now) {
-          timers.push(
-            window.setTimeout(() => {
-              el.setAttribute('data-opened', '');
-              front();
-            }, Number(el.dataset.delay)),
-          );
-        }
-      }
-      front();
-    };
-
-    // The request types in the step "prompt": the typed characters, then
-    // the cursor on the next one, then the others, transparent. The text
-    // keeps its place, thus the lines do not move. Before the request,
-    // nothing is typed; after it, all.
-    const typed = root.querySelector<HTMLElement>('[data-typed]');
-    const cursor = root.querySelector<HTMLElement>('[data-cursor]');
-    const untyped = root.querySelector<HTMLElement>('[data-untyped]');
-    const text = typed?.textContent ?? '';
-    let timer: number | undefined;
-
-    const type = (count: number) => {
-      if (!typed || !cursor || !untyped) return;
-      typed.textContent = text.slice(0, count);
-      cursor.textContent = text[count] ?? ' ';
-      untyped.textContent = text.slice(count + 1);
-    };
-
-    root.addEventListener(SCENE_STEP_EVENT, (event) => {
-      window.clearTimeout(timer);
-      for (const id of timers) window.clearTimeout(id);
-      timers = [];
-      const step = (event as CustomEvent<string>).detail;
-      showStep(step);
-      openFiles(step);
-      if (step === 'rest') type(0);
-      else if (step !== 'prompt') type(text.length);
-      else {
-        type(0);
-        let count = 0;
-        const next = () => {
-          type(++count);
-          if (count < text.length) timer = window.setTimeout(next, CHAR_MS);
+        // A line shows (`data-shown`) in its step, at its time (`data-delay`):
+        // it pushes the lines before it up only when it comes. The lines of
+        // the steps before show.
+        const showStep = (step: string) => {
+          const now = steps.indexOf(step);
+          for (const el of timed) {
+            const at = steps.indexOf(el.dataset.at ?? '');
+            el.toggleAttribute('data-shown', at < now || (at === now && !el.dataset.delay));
+            if (at === now && el.dataset.delay) {
+              timers.push(
+                window.setTimeout(
+                  () => el.setAttribute('data-shown', ''),
+                  Number(el.dataset.delay),
+                ),
+              );
+            }
+          }
         };
-        timer = window.setTimeout(next, START_MS);
+
+        // A file opens (`data-opened`) in its step, at the time of the line
+        // that writes it; the files of the steps before are open. The tab and
+        // the code of the last file that is open are in front (`data-front`).
+        const openFiles = (step: string) => {
+          const now = steps.indexOf(step);
+          const front = () => {
+            const opened = fileParts.filter((el) => el.hasAttribute('data-opened')).pop()
+              ?.dataset.file;
+            for (const el of fileParts)
+              el.toggleAttribute('data-front', el.dataset.file === opened);
+          };
+          for (const el of fileParts) {
+            const at = steps.indexOf(el.dataset.file ?? '');
+            el.toggleAttribute('data-opened', at < now);
+            if (at === now) {
+              timers.push(
+                window.setTimeout(() => {
+                  el.setAttribute('data-opened', '');
+                  front();
+                }, Number(el.dataset.delay)),
+              );
+            }
+          }
+          front();
+        };
+
+        // The request types in the step "prompt": the typed characters, then
+        // the cursor on the next one, then the others, transparent. The text
+        // keeps its place, thus the lines do not move. Before the request,
+        // nothing is typed; after it, all.
+        const typed = this.$('[data-typed]');
+        const cursor = this.$('[data-cursor]');
+        const untyped = this.$('[data-untyped]');
+        const text = typed.textContent ?? '';
+        let timer: number | undefined;
+
+        const type = (count: number) => {
+          typed.textContent = text.slice(0, count);
+          cursor.textContent = text[count] ?? ' ';
+          untyped.textContent = text.slice(count + 1);
+        };
+
+        this.on(this, SCENE_STEP_EVENT, (event: CustomEvent<string>) => {
+          window.clearTimeout(timer);
+          for (const id of timers) window.clearTimeout(id);
+          timers = [];
+          const step = event.detail;
+          showStep(step);
+          openFiles(step);
+          if (step === 'rest') type(0);
+          else if (step !== 'prompt') type(text.length);
+          else {
+            type(0);
+            let count = 0;
+            const next = () => {
+              type(++count);
+              if (count < text.length) timer = window.setTimeout(next, CHAR_MS);
+            };
+            timer = window.setTimeout(next, START_MS);
+          }
+        });
       }
-    });
-  }
+    },
+  );
 </script>
