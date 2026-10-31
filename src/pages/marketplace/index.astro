@@ -15,11 +15,9 @@ import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDem
 import { PluginCard } from './_sub/PluginCard';
 import s from './_style.module.css';
 import { DraftModeQueryListener } from '~/components/legacy/DraftModeQueryListener';
-import { RecipeCard } from './_sub/RecipeCard';
 import { stripStega } from '@datocms/astro';
 
-const { page, recipes, pluginsMeta, hostingAppsMeta, enterpriseAppsMeta, recipesMeta } =
-  await executeQuery(Astro, query);
+const { page, pluginsMeta, hostingAppsMeta, enterpriseAppsMeta } = await executeQuery(Astro, query);
 
 if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
@@ -38,7 +36,7 @@ const techStarters = page.demos.filter((item) => stripStega(item.starterType) ==
   <Hero>
     <Fragment slot="title">Marketplace</Fragment>
     <Fragment slot="subtitle">
-      Starters, plugins, recipes, and integrations to get more out of DatoCMS
+      Starters, plugins, and integrations to get more out of DatoCMS
     </Fragment>
   </Hero>
 
@@ -117,31 +115,6 @@ const techStarters = page.demos.filter((item) => stripStega(item.starterType) ==
           page.plugins.map((item) => (
             <div class={s.cardWrapper}>
               <PluginCard plugin={item} size="medium" />
-            </div>
-          ))
-        }
-      </Carousel>
-    </div>
-  </GroupPreview>
-
-  <GroupPreview title="Schema Recipes">
-    <Fragment slot="browse">
-      <a href="/marketplace/recipes" class={s.headerViewAll}>
-        <span>View all ({recipesMeta.count})</span>
-        <Svg name="icons/regular/arrow-right" />
-      </a>
-    </Fragment>
-    <Fragment slot="description">
-      <p>
-        A curated selection of ready-to-use models and blocks that you can import into your projects
-      </p>
-    </Fragment>
-    <div class={s.carouselWrapper}>
-      <Carousel buttonsY="50%">
-        {
-          recipes.map((item) => (
-            <div class={s.cardWrapper}>
-              <RecipeCard recipe={item} size="medium" />
             </div>
           ))
         }

@@ -4,7 +4,6 @@ import { HostingAppUrlFragment } from '~/lib/datocms/gqlUrlBuilder/hostingApp';
 import { TemplateDemoUrlFragment } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 import { graphql } from '~/lib/datocms/graphql';
 import { PluginCardFragment } from './_sub/PluginCard/_graphql';
-import { RecipeCardFragment } from './_sub/RecipeCard/_graphql';
 
 export const query = graphql(
   /* GraphQL */ `
@@ -16,9 +15,6 @@ export const query = graphql(
         count
       }
       enterpriseAppsMeta: _allEnterpriseAppsMeta {
-        count
-      }
-      recipesMeta: _allRecipesMeta {
         count
       }
       page: integrationsPage {
@@ -78,9 +74,6 @@ export const query = graphql(
           }
         }
       }
-      recipes: allRecipes(orderBy: position_ASC, first: 6) {
-        ...RecipeCardFragment
-      }
     }
   `,
   [
@@ -89,6 +82,5 @@ export const query = graphql(
     PluginCardFragment,
     HostingAppUrlFragment,
     EnterpriseAppUrlFragment,
-    RecipeCardFragment,
   ],
 );

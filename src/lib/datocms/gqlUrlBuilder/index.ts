@@ -13,7 +13,6 @@ import { buildUrlForLandingPage, type LandingPageUrlFragment } from './landingPa
 import { buildUrlForPartner, type PartnerUrlFragment } from './partner';
 import { buildUrlForPlugin, type PluginUrlFragment } from './plugin';
 import { buildUrlForProductUpdate, ProductUpdateUrlFragment } from './productUpdate';
-import { buildUrlForRecipe, type RecipeUrlFragment } from './recipe';
 import { buildUrlForShowcaseProject, type ShowcaseProjectUrlFragment } from './showcaseProject';
 import { buildUrlForSuccessStory, type SuccessStoryUrlFragment } from './successStory';
 import { buildUrlForTemplateDemo, type TemplateDemoUrlFragment } from './templateDemo';
@@ -85,9 +84,6 @@ export function buildUrlFromGql(
       })
     | (FragmentOf<typeof LandingPageUrlFragment> & {
         __typename: 'LandingPageRecord';
-      })
-    | (FragmentOf<typeof RecipeUrlFragment> & {
-        __typename: 'RecipeRecord';
       }),
 ) {
   switch (thing.__typename) {
@@ -131,8 +127,6 @@ export function buildUrlFromGql(
       return buildUrlForUseCasePage(thing);
     case 'LandingPageRecord':
       return buildUrlForLandingPage(thing);
-    case 'RecipeRecord':
-      return buildUrlForRecipe(thing);
     default:
       throw new Error(`Invalid type: ${(thing as any).__typename}`);
   }

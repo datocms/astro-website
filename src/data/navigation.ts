@@ -134,7 +134,7 @@ export const mainNavigation: NavGroup[] = [
         sections: [
           {
             heading: 'Marketplace',
-            links: [l('Plugins'), l('Starters'), l('Hosting'), l('Recipes'), l('Enterprise apps')],
+            links: [l('Plugins'), l('Starters'), l('Hosting'), l('Enterprise apps')],
           },
         ],
       },
