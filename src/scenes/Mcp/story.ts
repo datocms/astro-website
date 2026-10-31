@@ -101,21 +101,3 @@ export const CONFIRM = {
   allowAlways: 'Always allow',
   deny: 'Deny',
 };
-
-/**
- * The thread of the chapter: the chat of the frame and its next turn, in a
- * narrow column for a portrait box (the next turn shows in Confirm.astro).
- * The person asks, the assistant lists the pages with no description, the
- * person says yes to its offer, and the app asks before the read-write script runs (the
- * card of CONFIRM). The answer gives four pages and the count of the
- * others, thus the thread fits in the box.
- */
-export const THREAD = {
-  description:
-    'A chat with an assistant connected to DatoCMS. The person asks which pages of the Marram project still miss an SEO description. The assistant runs a read-only script and answers that 8 pages have none, among them Panniers, Handlebar bags, Repairs and Stockists, and offers to write them. The person answers “Yes, from the first paragraph.” The assistant gets the API method items.update, and the app asks “Run this script?” for the tool upsert_and_execute_unsafe_script of DatoCMS, with the start of the script. The button Allow once is highlighted, next to Always allow and Deny.',
-  tool: TOOLS[3]!,
-  pages: ANSWER.pages.slice(0, 4),
-  more: `and ${ANSWER.pages.length - 4} more`,
-  offer: 'Want me to write them?',
-  reply: 'Yes, from the first paragraph.',
-};
