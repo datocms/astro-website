@@ -1,15 +1,20 @@
 ---
+import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { Section } from '~/components/Section';
 import { PlainText, StructuredText } from '~/components/StructuredText';
 import { Prose } from '~/components/Prose';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import type { ResultOf } from '~/lib/datocms/graphql';
+import type { query } from './_graphql';
 import s from './_faq.module.css';
 
 interface Props {
   title: string;
-  questions: {
-    question: { value: unknown } | null;
-    answer: { value: unknown } | null;
-  }[];
+  questions: Extract<
+    NonNullable<ResultOf<typeof query>['page']>['faqs'][number],
+    { question: unknown }
+  >[];
 }
 
 const { title, questions } = Astro.props;
@@ -30,7 +35,13 @@ const { title, questions } = Astro.props;
           </summary>
           {item.answer && (
             <Prose class={s.answer}>
-              <StructuredText data={item.answer as never} />
+              <StructuredText
+                {...ensureValidStructuredTextProps({
+                  data: item.answer,
+                  linkToRecordComponents: defaultLinkToRecordComponents,
+                  inlineRecordComponents: defaultInlineRecordComponents,
+                })}
+              />
             </Prose>
           )}
         </details>

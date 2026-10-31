@@ -1,3 +1,5 @@
+import { defaultInlineRecordFragments } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/StructuredText/linkToRecords';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 
@@ -27,6 +29,56 @@ export const query = graphql(
             }
             answer {
               value
+              links {
+                ... on RecordInterface {
+                  id
+                  __typename
+                }
+
+                ...AcademyChapterLinkFragment
+                ...AcademyCourseLinkFragment
+                ...BlogPostLinkFragment
+                ...ChangelogEntryLinkFragment
+                ...CustomerStoryLinkFragment
+                ...DocGroupLinkFragment
+                ...DocPageLinkFragment
+                ...EnterpriseAppLinkFragment
+                ...FeatureLinkFragment
+                ...HostingAppLinkFragment
+                ...LandingPageLinkFragment
+                ...PartnerLinkFragment
+                ...PluginLinkFragment
+                ...ProductComparisonLinkFragment
+                ...RecipeLinkFragment
+                ...ShowcaseProjectLinkFragment
+                ...SuccessStoryLinkFragment
+                ...TechPartnerLinkFragment
+                ...TemplateDemoLinkFragment
+                ...UseCasePageLinkFragment
+                ...UserGuidesEpisodeLinkFragment
+
+                ...AcademyChapterInlineFragment
+                ...AcademyCourseInlineFragment
+                ...BlogPostInlineFragment
+                ...ChangelogEntryInlineFragment
+                ...CustomerStoryInlineFragment
+                ...DocGroupInlineFragment
+                ...DocPageInlineFragment
+                ...EnterpriseAppInlineFragment
+                ...FeatureInlineFragment
+                ...HostingAppInlineFragment
+                ...LandingPageInlineFragment
+                ...PartnerInlineFragment
+                ...PluginInlineFragment
+                ...ProductComparisonInlineFragment
+                ...RecipeInlineFragment
+                ...ShowcaseProjectInlineFragment
+                ...SuccessStoryInlineFragment
+                ...TechPartnerInlineFragment
+                ...TemplateDemoInlineFragment
+                ...UseCasePageInlineFragment
+                ...UserGuidesEpisodeInlineFragment
+              }
             }
           }
         }
@@ -34,5 +86,5 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment],
+  [TagFragment, ...defaultLinkToRecordFragments, ...defaultInlineRecordFragments],
 );
