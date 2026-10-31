@@ -18,19 +18,32 @@ const { html, items } = prepareIubendaHtml(privacy.content);
   <Hero variant="light" label="Legal" headline="Privacy Policy" />
   <ArticleBody items={tableOfContentsItems(items)} tocTitle="In this policy">
     <div class={styles.policy}>
-      <Fragment set:html={html} />
+      <policy-boxes class={styles.boxes}>
+        <Fragment set:html={html} />
+      </policy-boxes>
     </div>
   </ArticleBody>
 </Layout>
 
 <script>
-  // A click on the text of a service opens or closes its box. A click on
-  // the summary or on a control keeps its normal action.
-  for (const details of document.querySelectorAll('details')) {
-    details.addEventListener('click', (event) => {
-      if ((event.target as Element).closest('summary, a, button, input, select, textarea')) return;
-      event.preventDefault();
-      details.open = !details.open;
-    });
-  }
+  import { WebComponent } from '~/lib/WebComponent';
+
+  // <policy-boxes> holds the HTML of the policy. A click on the text of a
+  // service opens or closes its box. A click on the summary or on a
+  // control keeps its normal action.
+  customElements.define(
+    'policy-boxes',
+    class PolicyBoxes extends WebComponent {
+      parsedCallback() {
+        for (const details of this.$$<HTMLDetailsElement>('details')) {
+          this.on(details, 'click', (event) => {
+            const control = 'summary, a, button, input, select, textarea';
+            if ((event.target as Element).closest(control)) return;
+            event.preventDefault();
+            details.open = !details.open;
+          });
+        }
+      }
+    },
+  );
 </script>
