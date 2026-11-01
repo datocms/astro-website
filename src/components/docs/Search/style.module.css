@@ -689,13 +689,24 @@
   animation-delay: calc(min(var(--i, 0), 4) * 32ms);
   transition: background-color 150ms ease;
 
+  /*
+   * The row on the accent: its parts take the dark text of the accent. The
+   * row sets the page tokens again, thus each part follows. In light they
+   * have the same values.
+   */
   @media (hover: hover) {
     &:hover {
+      --text-primary: var(--text-on-accent);
+      --text-muted: var(--text-on-accent-muted);
+      --border-default: var(--border-on-accent);
       background-color: var(--surface-accent);
     }
   }
 
   &.selected {
+    --text-primary: var(--text-on-accent);
+    --text-muted: var(--text-on-accent-muted);
+    --border-default: var(--border-on-accent);
     background-color: var(--surface-accent);
   }
 }
@@ -856,7 +867,7 @@
   padding: var(--space-2xs) var(--space-sm);
   border-radius: var(--search-r-lg) var(--search-r-lg) var(--search-r-sm) var(--search-r-lg);
   background: var(--surface-accent);
-  color: var(--text-primary);
+  color: var(--text-on-accent);
   overflow-wrap: anywhere;
   transform-origin: bottom right;
   animation: questionBubbleIn 220ms var(--ease-out) both;

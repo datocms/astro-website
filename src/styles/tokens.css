@@ -439,9 +439,17 @@
  *   text-nav-active   The entry of the page that you read (a sidebar, a TOC).
  *   surface-field,
  *   border-field      A control on the page: a field, a picker.
+ *   text-on-accent*,
+ *   border-on-accent* A small foreground on the bright accent: a button
+ *                     label, a pill, a row that turns to the accent on
+ *                     hover. In light they are the page text and borders.
+ *                     In dark they stay dark (see the dark scheme below).
+ * The rule also matches .surfaceLight, thus the roles recompute inside a
+ * light surface of the dark scheme.
  */
 :root,
-[data-theme] {
+[data-theme],
+.surfaceLight {
   --text-accent: oklch(from var(--surface-accent) 0.5 min(c, 0.11) h);
   --text-positive: color-mix(in srgb, var(--surface-positive) 70%, var(--text-primary));
   --text-negative: color-mix(in srgb, var(--surface-negative) 70%, var(--text-primary));
@@ -455,6 +463,11 @@
   --text-nav-active: var(--text-primary);
   --surface-field: var(--surface-default);
   --border-field: var(--border-default);
+  --text-on-accent: var(--text-primary);
+  --text-on-accent-muted: var(--text-muted);
+  --text-on-accent-subtle: var(--text-subtle);
+  --border-on-accent: var(--border-default);
+  --border-on-accent-strong: var(--border-strong);
 }
 
 /*
@@ -475,24 +488,23 @@
 
 /*
  * The dark scheme. The layout sets data-scheme="dark" on <html> (see
- * src/lib/colorScheme.ts). Each block changes only the tokens that follow
- * the scheme, and only with the colours of its theme:
- *   default surface   deep-5, the inverse surface of the light scheme
- *   inverse surface   the deep of the code card, darker and calmer than
- *                     deep-5, thus the text of the accent still shows on it
- *   accent surfaces   the hue and the chroma of light-5 at OKLCH lightness
- *                     0.42 (muted 0.36): a vivid dark tone of the accent
- *                     that carries the light text (muted text 4.8:1 at
- *                     least). The chroma stops at the edge of sRGB for that
- *                     hue and lightness: the browser clips a colour out of
- *                     sRGB, and the hue moves (the orange goes red). Then
- *                     light-1 or a thin tint for the faint fills
+ * src/lib/colorScheme.ts). The look of the site is its contrasts: a near
+ * white page, the bright accent and the deep inverse. The dark scheme keeps
+ * them: only the page flips. Each block changes only the tokens of the
+ * page, and only with the colours of its theme:
+ *   default surface   the deep of the code card mixed with black: a near
+ *                     black of the theme, as light-0 is a near white
  *   text              light-0, with the alphas of the deep text steps
  *   borders           light-1, the border of the inverse surface
- * The inverse text and borders, the code and the signals stay: they sit
- * on a dark surface in both schemes. The faint fills of a default surface
- * (--surface-inverse-faint, the accent tints) become light tints, because
- * a dark tint does not show on the dark surface.
+ *   accent tints      muted, subtle and faint are dark tints of the accent
+ *                     (muted: the accent at OKLCH lightness 0.36, the chroma
+ *                     at most the edge of sRGB, thus the hue does not move),
+ *                     with the light text
+ * The inverse surface, the bright accent, the code and the signals do not
+ * change. The element that has the bright accent as background has the
+ * class surfaceLight (below), thus the text on it stays dark. The faint
+ * fills of a default surface (--surface-inverse-faint) become light tints,
+ * because a dark tint does not show on the dark surface.
  */
 :root[data-scheme='dark'] {
   color-scheme: dark;
@@ -505,10 +517,8 @@
 
 :root[data-scheme='dark'],
 :root[data-scheme='dark'] [data-theme='default'] {
-  --surface-default: var(--color-brown-deep-5);
-  --surface-inverse: var(--color-code-brown-deep);
+  --surface-default: color-mix(in oklch, var(--color-code-brown-deep) 60%, black);
   --surface-inverse-faint: var(--color-yellow-light-1);
-  --surface-accent: oklch(from var(--color-yellow-light-5) 0.42 min(c, 0.088) h);
   --surface-accent-muted: oklch(from var(--color-yellow-light-5) 0.36 min(c, 0.075) h);
   --surface-accent-subtle: color-mix(in srgb, var(--color-yellow-light-5) 14%, transparent);
   --surface-accent-faint: var(--color-yellow-light-1);
@@ -521,10 +531,8 @@
 }
 
 :root[data-scheme='dark'] [data-theme='orange'] {
-  --surface-default: var(--color-orange-deep-5);
-  --surface-inverse: var(--color-code-orange-deep);
+  --surface-default: color-mix(in oklch, var(--color-code-orange-deep) 60%, black);
   --surface-inverse-faint: var(--color-orange-light-1);
-  --surface-accent: oklch(from var(--color-orange-light-5) 0.42 min(c, 0.119) h);
   --surface-accent-muted: oklch(from var(--color-orange-light-5) 0.36 min(c, 0.102) h);
   --surface-accent-subtle: color-mix(in srgb, var(--color-orange-light-5) 14%, transparent);
   --surface-accent-faint: var(--color-orange-light-1);
@@ -537,10 +545,8 @@
 }
 
 :root[data-scheme='dark'] [data-theme='green'] {
-  --surface-default: var(--color-green-deep-5);
-  --surface-inverse: var(--color-code-green-deep);
+  --surface-default: color-mix(in oklch, var(--color-code-green-deep) 60%, black);
   --surface-inverse-faint: var(--color-green-light-1);
-  --surface-accent: oklch(from var(--color-green-light-5) 0.42 min(c, 0.114) h);
   --surface-accent-muted: oklch(from var(--color-green-light-5) 0.36 min(c, 0.098) h);
   --surface-accent-subtle: color-mix(in srgb, var(--color-green-light-5) 14%, transparent);
   --surface-accent-faint: var(--color-green-light-1);
@@ -553,10 +559,8 @@
 }
 
 :root[data-scheme='dark'] [data-theme='purple'] {
-  --surface-default: var(--color-purple-deep-5);
-  --surface-inverse: var(--color-code-purple-deep);
+  --surface-default: color-mix(in oklch, var(--color-code-purple-deep) 60%, black);
   --surface-inverse-faint: var(--color-purple-light-1);
-  --surface-accent: oklch(from var(--color-purple-light-5) 0.42 min(c, 0.239) h);
   --surface-accent-muted: oklch(from var(--color-purple-light-5) 0.36 min(c, 0.205) h);
   --surface-accent-subtle: color-mix(in srgb, var(--color-purple-light-5) 14%, transparent);
   --surface-accent-faint: var(--color-purple-light-1);
@@ -569,10 +573,8 @@
 }
 
 :root[data-scheme='dark'] [data-theme='blue'] {
-  --surface-default: var(--color-blue-deep-5);
-  --surface-inverse: var(--color-code-blue-deep);
+  --surface-default: color-mix(in oklch, var(--color-code-blue-deep) 60%, black);
   --surface-inverse-faint: var(--color-blue-light-1);
-  --surface-accent: oklch(from var(--color-blue-light-5) 0.42 min(c, 0.077) h);
   --surface-accent-muted: oklch(from var(--color-blue-light-5) 0.36 min(c, 0.066) h);
   --surface-accent-subtle: color-mix(in srgb, var(--color-blue-light-5) 14%, transparent);
   --surface-accent-faint: var(--color-blue-light-1);
@@ -585,10 +587,8 @@
 }
 
 :root[data-scheme='dark'] [data-theme='pink'] {
-  --surface-default: var(--color-pink-deep-5);
-  --surface-inverse: var(--color-code-pink-deep);
+  --surface-default: color-mix(in oklch, var(--color-code-pink-deep) 60%, black);
   --surface-inverse-faint: var(--color-pink-light-1);
-  --surface-accent: oklch(from var(--color-pink-light-5) 0.42 min(c, 0.168) h);
   --surface-accent-muted: oklch(from var(--color-pink-light-5) 0.36 min(c, 0.144) h);
   --surface-accent-subtle: color-mix(in srgb, var(--color-pink-light-5) 14%, transparent);
   --surface-accent-faint: var(--color-pink-light-1);
@@ -600,12 +600,52 @@
   --border-strong: var(--color-pink-light-0);
 }
 
-/* On the dark surface, the text roles take the light tone of the signal or of the accent. */
+/*
+ * On the dark surface, the text roles take the light tone of the signal or
+ * of the accent. The foreground of the bright accent stays dark: it is the
+ * deep of the inverse surface, which does not change.
+ */
 :root[data-scheme='dark'],
-:root[data-scheme='dark'] [data-theme] {
+:root[data-scheme='dark'] [data-theme],
+:root[data-scheme='dark'] .surfaceLight {
   --text-accent: var(--text-on-inverse);
   --text-positive: var(--surface-positive);
   --text-negative: var(--surface-negative);
+  --text-on-accent: var(--surface-inverse);
+  --text-on-accent-muted: var(--surface-inverse-muted);
+  --text-on-accent-subtle: var(--surface-inverse-subtle);
+  --border-on-accent: color-mix(in srgb, var(--surface-inverse) 11%, transparent);
+  --border-on-accent-strong: var(--surface-inverse);
+}
+
+/*
+ * A surface that stays light in the dark scheme: an element with the
+ * bright accent as background (a section, the accent half of a split, a
+ * plan). Give it the global class surfaceLight. Inside it, the tokens of
+ * the page take light values, thus the text and the parts in it are dark
+ * on the accent, as in the light scheme. A card on it is white, and the
+ * tints are alphas of the accent and of the inverse. A theme on the same
+ * element does not change that: this rule comes after the dark blocks.
+ * The derived roles follow, because their rule also matches surfaceLight.
+ * The text roles take back their light formulas here.
+ */
+:root[data-scheme='dark'] .surfaceLight {
+  --surface-default: var(--surface-raised);
+  --surface-inverse-faint: color-mix(in srgb, var(--surface-inverse) 11%, transparent);
+  --surface-accent-muted: color-mix(in srgb, var(--surface-accent) 70%, transparent);
+  --surface-accent-subtle: color-mix(in srgb, var(--surface-accent) 50%, transparent);
+  --surface-accent-faint: color-mix(in srgb, var(--surface-accent) 8%, transparent);
+  --text-primary: var(--text-on-accent);
+  --text-soft: color-mix(in srgb, var(--surface-inverse) 80%, transparent);
+  --text-muted: var(--text-on-accent-muted);
+  --text-subtle: var(--text-on-accent-subtle);
+  --border-default: var(--border-on-accent);
+  --border-strong: var(--border-on-accent-strong);
+  --text-accent: oklch(from var(--surface-accent) 0.5 min(c, 0.11) h);
+  --text-positive: color-mix(in srgb, var(--surface-positive) 70%, var(--text-on-accent));
+  --text-negative: color-mix(in srgb, var(--surface-negative) 70%, var(--text-on-accent));
+  color: var(--text-primary);
+  color-scheme: light;
 }
 
 /*
