@@ -106,3 +106,58 @@ export const danceTwoVideo: CloserVideo = {
   settings: silhouette,
   surface: 'accent',
 };
+
+// The hand signs of the green-screen footage of Green Screen Animation, keyed
+// out and encoded with scripts/pixel-videos (see its README). Each file is
+// 80 cells high, thus the squares have the same size on screen, and has the
+// Tonal style. The arm of some signs comes in from an edge of the video.
+export const handSignNames = [
+  'pinch-up',
+  'heart',
+  'ok',
+  'ok-reach',
+  'cross',
+  'index-up',
+  'snap',
+  'snap-both',
+  'ok-side',
+  'point-left',
+  'point-right',
+  'point-right-2',
+  'clap-vertical',
+  'point-up',
+  'point-up-2',
+  'clap',
+  'thumbs-up',
+  'thumbs-up-2',
+  'fists',
+  'fist-up',
+  'rock-1',
+  'rock-2',
+  'rock-3',
+  'thumbs-up-3',
+  'thumbs-up-4',
+  'thumbs-up-5',
+  'ok-sign-1',
+  'ok-sign-2',
+  'ok-sign-3',
+] as const;
+
+export const handSignVideos: { name: string; video: CloserVideo }[] = handSignNames.map((name) => ({
+  name,
+  video: { src: `/videos/hand-${name}.pxv`, surface: 'inverse' },
+}));
+
+// Full-body green-screen clips, keyed out and encoded in the same way, but
+// at 120 cells high. The files keep their own frame rate.
+export const personNames = [
+  'person-dance-1',
+  'person-dance-2',
+  'person-confused',
+  'crowd-dance',
+] as const;
+
+export const personVideos: { name: string; video: CloserVideo }[] = personNames.map((name) => ({
+  name,
+  video: { src: `/videos/${name}.pxv`, surface: 'inverse' },
+}));

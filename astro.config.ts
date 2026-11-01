@@ -269,6 +269,10 @@ export default defineConfig({
             pattern: '/dev/pxv-editor',
             entrypoint: './src/dev/pxv-editor.astro',
           });
+          injectRoute({
+            pattern: '/dev/pxv-gallery',
+            entrypoint: './src/dev/pxv-gallery.astro',
+          });
         },
       },
     },

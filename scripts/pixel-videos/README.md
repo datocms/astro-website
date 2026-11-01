@@ -16,6 +16,30 @@ npm run pixel-videos -- globe       # render one video
 `public/videos/`. The `.mp4` is an intermediate: `.gitignore` ignores it,
 and only the `.pxv` file goes in the repository. You need `ffmpeg` on your `PATH`.
 
+## Encode with no browser
+
+`encode.ts` does what `/dev/pxv-editor` does, in a script. It reads the
+frames with `ffmpeg`, sorts them with the same `format.ts`, and checks the
+round trip.
+
+```bash
+npx tsx scripts/pixel-videos/encode.ts in.mp4 public/videos/name.pxv [--fps 30] [--max-side 160] [--t-mid 105] [--t-high 161] [--auto]
+```
+
+`hand-signs.py` cuts the signs of the green-screen video "Top 20 hand signs"
+(YouTube `TJfYrg8qwhI`, 1080p, downloaded with `yt-dlp`). For each sign it
+takes the whole run of frames, crops to the box that holds the hand in all of
+its frames, keys out the green, and writes a plain mp4 (no loop). Then encode
+it with `--height 80 --same-size`. The footer draws each video at the same
+height, thus the same height in cells gives the same size of square.
+
+```bash
+uv run --with numpy python -I scripts/pixel-videos/hand-signs.py src.mp4 outdir heart:2 ok:3 thumbs-up:17 fists:19
+```
+
+The page `/dev/pxv-gallery` (only in `npm run dev`) shows the hand videos in
+the footer of the site.
+
 ## Add a video
 
 Create `videos/<name>.mjs`:

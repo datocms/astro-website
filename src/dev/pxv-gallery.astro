@@ -1,0 +1,81 @@
+---
+import { PageCloser } from '~/components/PageCloser';
+import { handSignVideos, personVideos } from '~/data/videos';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+
+// Show the hand videos in the footer of the site (`PageCloser`), one under
+// the other. Each one has its name above it.
+//
+// A browser allows approximately 16 WebGL contexts, and each pixel video
+// uses one. Thus a footer is in the page only when it is near the screen:
+// its markup waits in a <template> (see <lazy-footer> below).
+//
+// This page is not in src/pages/. The integration "dev-tools" in
+// astro.config.ts adds its route only in `astro dev`, thus the build does
+// not have it.
+
+const seo = overrideSeo([], seoTitle('pxv gallery'));
+const videos = [...handSignVideos, ...personVideos];
+---
+
+<Layout seo={seo} headerVariant={false} footer={false}>
+  {
+    videos.map(({ name, video }) => (
+      <lazy-footer>
+        <p class="caption label">
+          {name}: {video.src}
+        </p>
+        <div class="slot" data-slot />
+        <template>
+          <PageCloser theme="purple" video={video} text="Questions? Ask away" />
+        </template>
+      </lazy-footer>
+    ))
+  }
+</Layout>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'lazy-footer',
+    class extends WebComponent {
+      parsedCallback() {
+        const slot = this.$('[data-slot]');
+        const template = this.$<HTMLTemplateElement>('template');
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry!.isIntersecting) {
+              slot.style.minHeight = '';
+              slot.replaceChildren(template.content.cloneNode(true));
+            } else {
+              // Keep the height, so that the page does not jump.
+              slot.style.minHeight = `${slot.offsetHeight}px`;
+              slot.replaceChildren();
+            }
+          },
+          { rootMargin: '50% 0px' },
+        );
+        observer.observe(this);
+      }
+    },
+  );
+</script>
+
+<style>
+  /* Without a layer, these rules win over all the layers of the site. */
+  @layer pages {
+    lazy-footer {
+      display: block;
+    }
+    .label {
+      margin: 0;
+      padding: var(--space-xs) var(--section-padding-x);
+    }
+    /* The height of a footer before it mounts: the band and the video. */
+    .slot {
+      min-height: 640px;
+    }
+  }
+</style>
