@@ -266,8 +266,8 @@ export default defineConfig({
         'astro:config:setup': ({ command, injectRoute }) => {
           if (command !== 'dev') return;
           injectRoute({
-            pattern: '/dev/pixel-encoder',
-            entrypoint: './src/dev/pixel-encoder.astro',
+            pattern: '/dev/pxv-editor',
+            entrypoint: './src/dev/pxv-editor.astro',
           });
         },
       },

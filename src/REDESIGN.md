@@ -95,7 +95,7 @@ Figma file `WnWBSVVcroe5s4tXQGnhSA` (overnice's original), page **Components** (
 
 ## Pixel videos
 
-- **The encoder is `/dev/pixel-encoder`** (`src/dev/pixel-encoder.astro`). It is the only tool that makes a `.pxv` file, from a video or a Lottie JSON. Save the file in `public/videos/`.
+- **The encoder is `/dev/pxv-editor`** (`src/dev/pxv-editor.astro`). It is the only tool that makes a `.pxv` file, from a video or a Lottie JSON. Save the file in `public/videos/`.
 - **It is only in `astro dev`.** The page is not in `src/pages/`: the integration `dev-tools` in `astro.config.ts` adds its route when the command is `dev`. Thus the build does not have it, and the production site does not show it. Put a new tool for the developers in `src/dev/`, and add its route in `dev-tools`. Why: the tools use the layout, the tokens and the player of the site, thus the preview is the same as the page, and there is one copy of `format.ts` for the encoder and the player.
 - **The pages in `src/dev/` are not pages of the site.** They can have a plain client script (not a `WebComponent`), and they can use the dev dependencies (`lottie-web`).
 - **The source videos are drawn in code** in `scripts/pixel-videos/` (`npm run pixel-videos`). Their `.mp4` files are intermediates: `.gitignore` ignores them, and only the `.pxv` file goes in the repository. Read `scripts/pixel-videos/README.md` before you add one.

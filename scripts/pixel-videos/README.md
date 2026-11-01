@@ -2,8 +2,8 @@
 
 Source videos for the `PixelVideo` component (`src/lib/pixel-video/`),
 drawn in code and encoded with ffmpeg. The component plays `.pxv` files, not
-`.mp4` files. Make the `.pxv` file of each video in `/dev/pixel-encoder`
-(`src/dev/pixel-encoder.astro`). That page is only in `npm run dev`, not
+`.mp4` files. Make the `.pxv` file of each video in `/dev/pxv-editor`
+(`src/dev/pxv-editor.astro`). That page is only in `npm run dev`, not
 in the build.
 
 ```bash
@@ -12,7 +12,7 @@ npm run pixel-videos -- globe       # render one video
 ```
 
 `pixel-videos` writes `public/videos/<name>.mp4`. Open it in
-`/dev/pixel-encoder`, tune the thresholds, and save the `.pxv` file in
+`/dev/pxv-editor`, tune the thresholds, and save the `.pxv` file in
 `public/videos/`. The `.mp4` is an intermediate: `.gitignore` ignores it,
 and only the `.pxv` file goes in the repository. You need `ffmpeg` on your `PATH`.
 
@@ -53,7 +53,7 @@ Vecteezy preview) into `public/videos/wave.mp4`, the source of
 `hand-waving.pxv` (`waveVideo` in `src/data/videos.ts`). The skin (orange
 on a grey background) becomes the hand: the lit palm in the highlight
 layer, the shaded skin in the midtone layer. Encode the `.mp4` in
-`/dev/pixel-encoder` as above. Get a licence for the clip before you use it
+`/dev/pxv-editor` as above. Get a licence for the clip before you use it
 in production.
 
 ```bash
