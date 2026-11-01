@@ -16,11 +16,13 @@ src/
   scenes/                   the pictures of the product (src/scenes/AGENTS.md)
   layouts/Layout.astro      the layout of the pages; imports src/styles/global.css once
   lib/motion/               typewriter, inView, inViewVideo, sceneSequence, diagramLoop
-  lib/pixel-video/          the player of the .pxv files
+  lib/pixel-video/          the player of the .pxv files, and extract.ts (the frame reader of the encoder)
   lib/code/, lib/format/, lib/theme.ts, lib/colorScheme.ts
   styles/                   tokens.css (all tokens), typography.css (type classes), global.css (reset + element defaults)
+  dev/                      the tools of the developers, only in `astro dev` (see "Pixel videos")
 vendor/                     the tarball of the scene kit (@datocms/product-scenes)
 public/videos/              the .pxv files
+scripts/pixel-videos/       the source videos of the .pxv files, drawn in code
 css-scope.mjs               which CSS gets a cascade layer, and which CSS lint:css reads
 ```
 
@@ -89,7 +91,14 @@ Figma file `WnWBSVVcroe5s4tXQGnhSA` (overnice's original), page **Components** (
 
 - Use the shared helpers in `src/lib/motion/`. CSS before JS.
 - `prefers-reduced-motion` shows the final state; animations play in view only and pause off-screen; no layout shift; the final state is in the DOM without JS.
-- No Lottie; no video for anything that CSS can do. The pixel videos are `.pxv` files played by `src/lib/pixel-video/`. The encoder (`/dev/pixel-encoder`) is in the prototype repository (`datocms/website-prototype`): make a new `.pxv` there and copy it to `public/videos/`.
+- No Lottie; no video for anything that CSS can do. The pixel videos are `.pxv` files played by `src/lib/pixel-video/` (see "Pixel videos").
+
+## Pixel videos
+
+- **The encoder is `/dev/pixel-encoder`** (`src/dev/pixel-encoder.astro`). It is the only tool that makes a `.pxv` file, from a video or a Lottie JSON. Save the file in `public/videos/`.
+- **It is only in `astro dev`.** The page is not in `src/pages/`: the integration `dev-tools` in `astro.config.ts` adds its route when the command is `dev`. Thus the build does not have it, and the production site does not show it. Put a new tool for the developers in `src/dev/`, and add its route in `dev-tools`. Why: the tools use the layout, the tokens and the player of the site, thus the preview is the same as the page, and there is one copy of `format.ts` for the encoder and the player.
+- **The pages in `src/dev/` are not pages of the site.** They can have a plain client script (not a `WebComponent`), and they can use the dev dependencies (`lottie-web`).
+- **The source videos are drawn in code** in `scripts/pixel-videos/` (`npm run pixel-videos`). Their `.mp4` files are intermediates: `.gitignore` ignores them, and only the `.pxv` file goes in the repository. Read `scripts/pixel-videos/README.md` before you add one.
 
 ## CMS
 

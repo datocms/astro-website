@@ -257,6 +257,22 @@ export default defineConfig({
       },
     },
     {
+      // The tools of the developers. They are not in src/pages/, thus they
+      // have no route by default. Add their routes only in `astro dev`: the
+      // build does not have them. An injected route has the origin
+      // "external", thus the integration "routes" ignores it.
+      name: 'dev-tools',
+      hooks: {
+        'astro:config:setup': ({ command, injectRoute }) => {
+          if (command !== 'dev') return;
+          injectRoute({
+            pattern: '/dev/pixel-encoder',
+            entrypoint: './src/dev/pixel-encoder.astro',
+          });
+        },
+      },
+    },
+    {
       name: 'routes',
       hooks: {
         'astro:routes:resolved': async ({ routes }) => {
