@@ -6,7 +6,6 @@ import type { ButtonData } from '~/components/Button';
 import type { CodeTab } from '~/components/CodeSnippetPreview';
 import type { CodeToken } from '~/components/UserExperience';
 import type { LogoItem } from '~/components/LogosLine';
-import type { PixelVideoSettings } from '~/lib/pixel-video/settings';
 import type { Theme } from '~/lib/theme';
 import arduinoClient from '~/assets/home/clients/arduino.svg?raw';
 import telekomClient from '~/assets/home/clients/deutsche-telekom.svg?raw';
@@ -45,8 +44,11 @@ export interface UserExperienceData {
   site: { brand: string; links: string[] };
   /** The query in the code window. `thread` is the index of the line that fetches the title. */
   query: { file: string; lines: CodeToken[][]; thread: number };
-  /** The hero video of the site window. */
-  video: { src: string; settings?: Partial<PixelVideoSettings> };
+  /**
+   * The hero video of the site window. `palette`: a name of `palettes` in
+   * src/lib/pixel-video/styles.ts. `lens: false` removes the lens.
+   */
+  video: { src: string; palette?: string; lens?: boolean };
 }
 
 export interface ContentSourceData {
@@ -132,7 +134,8 @@ export interface PartnersData {
   eyebrow: string;
   paragraph: string;
   buttons: ButtonData[];
-  video: { src: string; settings?: Partial<PixelVideoSettings> };
+  /** `palette`: a name of `palettes` in src/lib/pixel-video/styles.ts. */
+  video: { src: string; palette?: string };
 }
 
 /** Make a logo from SVG markup. The size comes from the root attributes. */
@@ -235,21 +238,9 @@ export const userExperience: UserExperienceData = {
     ],
     thread: 2,
   },
-  video: {
-    src: '/videos/fist-bump.pxv',
-    settings: {
-      // The file gives the mid colour and the cell sizes. These settings
-      // replace only the background, the high colour and the lens.
-      // The background has no grid.
-      extend: true,
-      bgStrokeDisabled: true,
-      hover: false,
-      bgFill: 'var(--surface-inverse)',
-      bgStroke: 'var(--surface-inverse)',
-      // The file gives "yellow". This token is the yellow of the orange theme.
-      highFill: 'var(--surface-pixel-highlight)',
-    },
-  },
+  // No grid on the background, the yellow highlight of the theme, and no
+  // lens.
+  video: { src: '/videos/fist-bump.pxv', palette: 'tonalHighlight', lens: false },
 };
 
 export const contentSource: ContentSourceData = {
@@ -651,18 +642,7 @@ export const partners: PartnersData = {
       variant: 'soft',
     },
   ],
-  // The globe video has black space, a grey ocean and white land. Space
-  // becomes the accent surface, the ocean dark squares with an accent grid,
-  // and the land accent squares with a light grid.
-  video: {
-    src: '/videos/spinning-globe.pxv',
-    settings: {
-      bgFill: 'var(--surface-accent)',
-      bgStroke: 'var(--surface-accent)',
-      midFill: 'var(--surface-inverse)',
-      midStroke: 'var(--surface-accent)',
-      highFill: 'var(--surface-accent)',
-      highStroke: 'var(--surface-default)',
-    },
-  },
+  // Space becomes the accent surface, the ocean dark squares and the land
+  // accent squares.
+  video: { src: '/videos/spinning-globe.pxv', palette: 'globe' },
 };

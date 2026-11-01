@@ -1,11 +1,12 @@
 ---
 import { PageCloser } from '~/components/PageCloser';
-import { handSignVideos, personVideos } from '~/data/videos';
 import Layout from '~/layouts/Layout.astro';
 import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { pxvFiles } from '~/lib/pixel-video/headers';
 
-// Show the hand videos in the footer of the site (`PageCloser`), one under
-// the other. Each one has its name above it.
+// Show all the .pxv files of public/videos in the footer of the site
+// (`PageCloser`), one under the other. Each one has its name above it. The
+// file gives all the look.
 //
 // A browser allows approximately 16 WebGL contexts, and each pixel video
 // uses one. Thus a footer is in the page only when it is near the screen:
@@ -16,19 +17,16 @@ import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
 // not have it.
 
 const seo = overrideSeo([], seoTitle('pxv gallery'));
-const videos = [...handSignVideos, ...personVideos];
 ---
 
 <Layout seo={seo} headerVariant={false} footer={false}>
   {
-    videos.map(({ name, video }) => (
+    pxvFiles.map((src) => (
       <lazy-footer>
-        <p class="caption label">
-          {name}: {video.src}
-        </p>
+        <p class="caption label">{src}</p>
         <div class="slot" data-slot />
         <template>
-          <PageCloser theme="purple" video={video} text="Questions? Ask away" />
+          <PageCloser theme="purple" video={src} text="Questions? Ask away" />
         </template>
       </lazy-footer>
     ))

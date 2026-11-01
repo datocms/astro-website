@@ -1,10 +1,10 @@
 ---
 import type { ButtonAppearance } from '~/components/Button';
 import { CtaBanner } from '~/components/CtaBanner';
+import { DevConfig } from '~/components/DevConfig';
 import { PixelVideo } from '~/components/PixelVideo';
 import type { CtaBannerData } from '~/data/home';
-import type { CloserVideo } from '~/data/videos';
-import { tonal } from '~/lib/pixel-video/styles';
+import { pxvDevConfig, pxvLook } from '~/lib/pixel-video/headers';
 import type { Theme } from '~/lib/theme';
 import styles from './style.module.css';
 
@@ -21,10 +21,11 @@ interface Props {
    */
   cta?: CtaBannerData;
   /**
-   * Pixel video above the band, from `~/data/videos`. The video sets its
-   * style and the surface. The closer only removes the grid.
+   * The URL of a .pxv file of public/videos, above the band. The file
+   * gives all the look: the palette (thus the surface of the copy and of
+   * the video), the focus, the edges.
    */
-  video?: CloserVideo;
+  video?: string;
   /**
    * `band`: the video fills the band (default).
    * `centre`: a square video in the centre.
@@ -43,24 +44,17 @@ const {
   text = 'Questions? Ask away',
 } = Astro.props;
 
-// The copy and the video are on one surface. The video sets the surface:
-// the colour of its background. Without a video, the variant of the cta
-// sets it.
-const ctaVariant = video ? (video.surface === 'inverse' ? 'dark' : 'light') : cta?.variant;
+// The copy and the video are on one surface: the surface of the palette of
+// the file. Without a video, the variant of the cta sets it.
+const look = video ? pxvLook(video) : undefined;
+const surface = look?.palette.surface;
+const ctaVariant = surface ? (surface === 'inverse' ? 'dark' : 'light') : cta?.variant;
 // With a video, the closer also sets the buttons for the surface.
 const buttonAppearance: ButtonAppearance | undefined =
-  video && (video.surface === 'inverse' ? 'light-on-deep' : 'deep-on-light');
+  surface && (surface === 'inverse' ? 'light-on-deep' : 'deep-on-light');
 const ctaButtons = buttonAppearance
   ? cta?.buttons?.map((button) => ({ ...button, appearance: buttonAppearance }))
   : cta?.buttons;
-// The grid is always off: the copy and the video read as one block. The
-// background fills the band also out of the video, but a video can stop
-// this (see `robotVideo`).
-// A video on the inverse surface has the Tonal style, and its file keeps
-// the old highlights of Tonal (`--surface-default`, dark in the dark
-// scheme). Give it the highlights of Tonal (src/lib/pixel-video/styles.ts).
-const toneSettings = video?.surface === 'inverse' ? { highFill: tonal.highFill } : {};
-const videoSettings = { extend: true, ...toneSettings, ...video?.settings, bgStrokeDisabled: true };
 ---
 
 <div class={styles.pageCloser} data-theme={theme}>
@@ -76,18 +70,20 @@ const videoSettings = { extend: true, ...toneSettings, ...video?.settings, bgStr
     )
   }
   {
-    video && (
+    video && look && (
       <div
         class:list={[
           styles.video,
-          video.surface === 'inverse' ? styles.inverse : 'surfaceLight',
-          video.edge === 'right' && styles.edgeRight,
-          video.settings?.extend === false && styles.noExtend,
+          surface === 'inverse' && styles.inverse,
+          surface === 'default' && styles.default,
+          surface !== 'inverse' && 'surfaceLight',
+          look.palette.extend === false && styles.noExtend,
           videoLayout === 'centre' && styles.centre,
         ]}
-        style={`--video-focus: ${video.focus ?? 0.5}`}
       >
-        <PixelVideo src={video.src} settings={videoSettings} />
+        <PixelVideo src={video} devTag={false} />
+        {/* The band can cut the top and the sides of the video, thus the tag is on the band. */}
+        {import.meta.env.DEV && <DevConfig name="PixelVideo" config={pxvDevConfig(video)} />}
       </div>
     )
   }

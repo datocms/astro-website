@@ -3,17 +3,24 @@
 // the source: here each texel is already a layer (0–3), so the shader does
 // not compute the brightness.
 
-import type { PixelVideoSettings } from './settings';
-
 /** A colour as straight RGBA, 0–1. */
 export type Rgba = [number, number, number, number];
 
-export interface DrawSettings extends Omit<
-  PixelVideoSettings,
-  'bgFill' | 'bgStroke' | 'midFill' | 'midStroke' | 'highFill' | 'highStroke'
-> {
-  colors: { fill: [Rgba, Rgba, Rgba]; stroke: [Rgba, Rgba, Rgba] };
+/** What the renderer needs from the palette (see styles.ts). */
+export interface DrawSettings {
+  /** `ground` is null when the ground is the fill of the background layer. */
+  colors: { fill: [Rgba, Rgba, Rgba]; stroke: [Rgba, Rgba, Rgba]; ground: Rgba | null };
+  /** For each layer: the squares have no strokes. */
+  noStroke: [boolean, boolean, boolean];
+  /** The background grid fills the whole canvas. */
+  extend: boolean;
+  /** The lens under the pointer. */
+  hover: boolean;
 }
+
+// The lens, the same for all the videos. The dimensions are in cells of
+// the video, thus the lens has the same size for the squares of each video.
+const LENS = { radius: 20, distortion: 4, falloff: 8, pixelSize: 3, speed: 1 };
 
 const VERT = `#version 300 es
 in vec2 p;
@@ -31,12 +38,14 @@ uniform bool uHasFrame;
 uniform vec2 uOffset;         // contain-fit rect of the source, device px
 uniform vec2 uDraw;
 
-uniform float uSize[3];       // per layer, device px (see settings.ts)
+uniform float uSize[3];       // per layer, device px
 uniform vec4 uFill[3];        // straight (not premultiplied) alpha
 uniform vec4 uStroke[3];
 uniform float uWeight;        // stroke weight, all layers: 1 CSS px, in device px
 uniform bool uNoStroke[3];    // per layer: drawn without strokes
 uniform bool uExtend;         // the background grid fills the whole canvas
+uniform vec4 uGround;         // the colour under the squares
+uniform bool uOwnGround;      // the ground is not the fill of the background layer
 
 uniform bool uHover;
 uniform vec2 uPointer;        // relative to the draw rect, device px
@@ -59,12 +68,25 @@ int bucketAt(vec2 o) {
   return v >= 3u ? -1 : int(v);
 }
 
+// True if local position o is in the source.
+bool inSource(vec2 o) {
+  return o.x >= 0.0 && o.y >= 0.0 && o.x < uDraw.x && o.y < uDraw.y;
+}
+
 // True if the grid cell whose top-left corner is at local position o is in
 // the source and is empty (a transparent pixel of the source).
 bool emptyAt(vec2 o) {
   if (o.x < 0.0 || o.y < 0.0 || o.x >= uDraw.x || o.y >= uDraw.y) return false;
   ivec2 t = min(ivec2(floor(o * vec2(uFrameSize) / uDraw)), uFrameSize - 1);
   return texelFetch(uFrame, t, 0).r >= 3u;
+}
+
+// The stroke colour of layer L at local position o. With an own ground, the
+// background grid out of the source has the colour of the ground: thus a
+// stroke of the background layer that is not the ground colour shows only on
+// the subject, not on all the band.
+vec4 strokeAt(int L, vec2 o) {
+  return (L == 0 && uOwnGround && !inSource(o)) ? uGround : uStroke[L];
 }
 
 // Paint src (straight alpha) over dst (premultiplied).
@@ -75,12 +97,12 @@ vec4 over(vec4 dst, vec4 src) {
 void main() {
   // Top-left origin, like a 2D canvas.
   vec2 p = vec2(gl_FragCoord.x, uRes.y - gl_FragCoord.y);
-  vec4 col = over(vec4(0.0), uFill[0]);
+  vec4 col = over(vec4(0.0), uGround);
 
   if (!uHasFrame) { color = col; return; }
   vec2 local = p - uOffset;
-  // The fill of the background layer is the ground, but not in an empty
-  // cell of the background grid: there the page shows through.
+  // The ground covers all of the canvas, but not an empty cell of the
+  // background grid: there the page shows through.
   if (emptyAt(floor(local / uSize[0]) * uSize[0])) col = vec4(0.0);
 
   // Base mosaics, in a fixed order: later layers paint over earlier ones. A
@@ -92,16 +114,25 @@ void main() {
     float hw = halfWeight(L);
     bool edge = hw > 0.0 && (min(f.x, f.y) < hw || max(f.x, f.y) >= ps - hw);
     if (bucketAt(cell * ps) == L) {
-      // The fill of the background layer is already the ground.
-      if (edge) col = over(col, uStroke[L]);
-      else if (L > 0) col = over(col, uFill[L]);
+      // Without an own ground, the fill of the background layer is already
+      // the ground. Out of the source, the background grid has no fill.
+      if (edge) col = over(col, strokeAt(L, cell * ps));
+      else if (L > 0 || (uOwnGround && inSource(cell * ps))) col = over(col, uFill[L]);
     } else if (edge) {
+      // The stroke of a neighbour cell of layer L. Its colour comes from that
+      // cell: a cell of the background grid out of the source gives the
+      // ground colour, also on an empty cell of the source next to it.
       vec2 d = vec2(f.x < hw ? -1.0 : f.x >= ps - hw ? 1.0 : 0.0,
                     f.y < hw ? -1.0 : f.y >= ps - hw ? 1.0 : 0.0);
-      if ((d.x != 0.0 && bucketAt((cell + vec2(d.x, 0.0)) * ps) == L) ||
-          (d.y != 0.0 && bucketAt((cell + vec2(0.0, d.y)) * ps) == L) ||
-          (d.x != 0.0 && d.y != 0.0 && bucketAt((cell + d) * ps) == L)) {
-        col = over(col, uStroke[L]);
+      vec2 nx = (cell + vec2(d.x, 0.0)) * ps;
+      vec2 ny = (cell + vec2(0.0, d.y)) * ps;
+      vec2 nd = (cell + d) * ps;
+      bool hx = d.x != 0.0 && bucketAt(nx) == L;
+      bool hy = d.y != 0.0 && bucketAt(ny) == L;
+      bool hd = d.x != 0.0 && d.y != 0.0 && bucketAt(nd) == L;
+      if (hx || hy || hd) {
+        bool subject = (hx && inSource(nx)) || (hy && inSource(ny)) || (hd && inSource(nd));
+        col = over(col, subject ? uStroke[L] : strokeAt(L, hx ? nx : hy ? ny : nd));
       }
     }
   }
@@ -127,7 +158,9 @@ void main() {
         float hw = halfWeight(b);
         vec2 q = abs(local - center);
         float m = max(q.x, q.y);
-        if (m < half_ + hw) col = over(col, (hw > 0.0 && m >= half_ - hw) ? uStroke[b] : uFill[b]);
+        // Out of the source, a square of the background grid has the ground colour.
+        vec4 f = (b == 0 && uOwnGround && !inSource(center)) ? uGround : uFill[b];
+        if (m < half_ + hw) col = over(col, (hw > 0.0 && m >= half_ - hw) ? strokeAt(b, center) : f);
       }
     }
   }
@@ -279,9 +312,9 @@ export function createRenderer(
       gl.uniform2f(u('uRes'), W, H);
       const hasFrame = !!cells && frameW > 0 && frameH > 0;
       gl.uniform1i(u('uHasFrame'), hasFrame ? 1 : 0);
-      // Device px for 1% of the drawn width. All the dimensions of the
-      // settings use this unit (see settings.ts).
-      let unit = W / 100;
+      // Device px for one cell of the video. Each square is one cell, and
+      // the lens is in cells (see LENS).
+      let cell = W / 100;
       if (hasFrame) {
         if (uploaded !== cells) {
           gl.texImage2D(
@@ -305,16 +338,14 @@ export function createRenderer(
         const offY = Math.floor((H - drawH) / 2);
         gl.uniform2f(u('uOffset'), offX, offY);
         gl.uniform2f(u('uDraw'), drawW, drawH);
-        unit = drawW / 100;
+        cell = drawW / frameW;
         const lens = v.hover && pointer !== null;
         gl.uniform1i(u('uHover'), lens ? 1 : 0);
         if (lens) gl.uniform2f(u('uPointer'), pointer![0] - offX, pointer![1] - offY);
       }
-      // Cells are whole device px, so that the lines are sharp.
-      const whole = (value: number) => Math.max(1, Math.round(value * unit));
-      size[0] = whole(v.bgSize);
-      size[1] = whole(v.midSize);
-      size[2] = whole(v.highSize);
+      // Squares are whole device px, so that the lines are sharp.
+      const whole = (cells: number) => Math.max(1, Math.round(cells * cell));
+      size.fill(whole(1));
       for (let i = 0; i < 3; i++) {
         fill.set(v.colors.fill[i]!, i * 4);
         stroke.set(v.colors.stroke[i]!, i * 4);
@@ -322,18 +353,19 @@ export function createRenderer(
       gl.uniform1fv(u('uSize'), size);
       gl.uniform4fv(u('uFill'), fill);
       gl.uniform4fv(u('uStroke'), stroke);
+      gl.uniform4fv(u('uGround'), v.colors.ground ?? v.colors.fill[0]);
+      gl.uniform1i(u('uOwnGround'), v.colors.ground ? 1 : 0);
       gl.uniform1f(u('uWeight'), Math.max(1, Math.round(dpr)));
-      gl.uniform1iv(u('uNoStroke'), [
-        v.bgStrokeDisabled ? 1 : 0,
-        v.midStrokeDisabled ? 1 : 0,
-        v.highStrokeDisabled ? 1 : 0,
-      ]);
+      gl.uniform1iv(
+        u('uNoStroke'),
+        v.noStroke.map((off) => (off ? 1 : 0)),
+      );
       gl.uniform1i(u('uExtend'), v.extend ? 1 : 0);
-      gl.uniform1f(u('uTime'), time * v.hoverSpeed);
-      gl.uniform1f(u('uRadius'), v.hoverRadius * unit);
-      gl.uniform1f(u('uDistort'), v.hoverDistortion * unit);
-      gl.uniform1f(u('uFalloff'), v.hoverFalloff * unit);
-      gl.uniform1f(u('uHoverSize'), whole(v.hoverPixelSize));
+      gl.uniform1f(u('uTime'), time * LENS.speed);
+      gl.uniform1f(u('uRadius'), LENS.radius * cell);
+      gl.uniform1f(u('uDistort'), LENS.distortion * cell);
+      gl.uniform1f(u('uFalloff'), LENS.falloff * cell);
+      gl.uniform1f(u('uHoverSize'), whole(LENS.pixelSize));
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     },
     destroy() {

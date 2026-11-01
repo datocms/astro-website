@@ -16,7 +16,7 @@ src/
   scenes/                   the pictures of the product (src/scenes/AGENTS.md)
   layouts/Layout.astro      the layout of the pages; imports src/styles/global.css once
   lib/motion/               typewriter, inView, inViewVideo, sceneSequence, diagramLoop
-  lib/pixel-video/          the player of the .pxv files, and extract.ts (the frame reader of the encoder)
+  lib/pixel-video/          the player of the .pxv files, and format.ts (the file format, for the player and the scripts)
   lib/code/, lib/format/, lib/theme.ts, lib/colorScheme.ts
   styles/                   tokens.css (all tokens), typography.css (type classes), global.css (reset + element defaults)
   dev/                      the tools of the developers, only in `astro dev` (see "Pixel videos")
@@ -95,10 +95,10 @@ Figma file `WnWBSVVcroe5s4tXQGnhSA` (overnice's original), page **Components** (
 
 ## Pixel videos
 
-- **The encoder is `/dev/pxv-editor`** (`src/dev/pxv-editor.astro`). It is the only tool that makes a `.pxv` file, from a video or a Lottie JSON. Save the file in `public/videos/`.
-- **It is only in `astro dev`.** The page is not in `src/pages/`: the integration `dev-tools` in `astro.config.ts` adds its route when the command is `dev`. Thus the build does not have it, and the production site does not show it. Put a new tool for the developers in `src/dev/`, and add its route in `dev-tools`. Why: the tools use the layout, the tokens and the player of the site, thus the preview is the same as the page, and there is one copy of `format.ts` for the encoder and the player.
-- **The pages in `src/dev/` are not pages of the site.** They can have a plain client script (not a `WebComponent`), and they can use the dev dependencies (`lottie-web`).
-- **The source videos are drawn in code** in `scripts/pixel-videos/` (`npm run pixel-videos`). Their `.mp4` files are intermediates: `.gitignore` ignores them, and only the `.pxv` file goes in the repository. Read `scripts/pixel-videos/README.md` before you add one.
+- **The scripts of `scripts/pixel-videos/` make a `.pxv` file**: `key.py` (green screen footage) or `lottie.py` (a Lottie animation) make a transparent video, and `encode.ts` makes the file with `format.ts`, the same module as the player. Save the file in `public/videos/`. `/dev/pxv-gallery` shows all the files.
+- **The gallery is only in `astro dev`.** The page is not in `src/pages/`: the integration `dev-tools` in `astro.config.ts` adds its route when the command is `dev`. Thus the build does not have it, and the production site does not show it. Put a new tool for the developers in `src/dev/`, and add its route in `dev-tools`. Why: the tools use the layout, the tokens and the player of the site, thus the preview is the same as the page, and there is one copy of `format.ts` for the encoder and the player.
+- **The pages in `src/dev/` are not pages of the site.** They can have a plain client script (not a `WebComponent`), and they can use the dev dependencies.
+- **The `.pxv` file is the only copy.** No recipe makes it again: the footage and the keyed videos stay in `tmp/` (Git ignores it), and the file records the URL of its footage (`source`). Read `src/lib/pixel-video/AGENTS.md` and `scripts/pixel-videos/README.md` before you add one.
 
 ## CMS
 

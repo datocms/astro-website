@@ -11,7 +11,6 @@ import { PageCloser } from '~/components/PageCloser';
 import { Stats } from '~/components/Stats';
 import { TextWithImage } from '~/components/TextWithImage';
 import * as cs from '~/data/case-studies';
-import { victoryVideo } from '~/data/videos';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
@@ -54,7 +53,12 @@ const others = latest.filter((story) => story.id !== page.id).slice(0, 3);
   <CaseStudyBody title="The full story" story={page} theme="orange" />
   <ChallengeSolution story={page} />
   <CaseStudies {...cs.moreCaseStudies} stories={others} rows={1} theme="orange" />
-  <PageCloser theme="orange" cta={cs.ctaBuildShort} video={victoryVideo} videoLayout="centre" />
+  <PageCloser
+    theme="orange"
+    cta={cs.ctaBuildShort}
+    video="/videos/hand-clap-vertical.pxv"
+    videoLayout="centre"
+  />
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

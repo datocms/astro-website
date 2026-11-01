@@ -1,24 +1,25 @@
 // The <pixel-video> element: plays a .pxv file (see format.ts) with the
 // pixel effect.
 //
-//   <pixel-video src="/globe.pxv" settings='{"bgFill": "var(--surface-accent)"}'>
+//   <pixel-video src="/videos/globe.pxv" palette="globe">
 //
 // - It loads the file when it is near the viewport, and plays only when it
 //   is on screen and the tab is visible.
 // - Under reduced motion it shows the first frame.
-// - Colours can be `var(--token)` or `var(--token, #hex)`, or a colour
-//   function with tokens in it, for example
-//   `color-mix(in srgb, var(--surface-inverse) 90%, var(--surface-default))`.
-//   Call `refreshColors()` after the page changes its theme.
+// - The .pxv file gives its settings: a palette and a focus (see
+//   settings.ts). The `palette` attribute replaces the palette of the file.
+// - A lens under the pointer makes the squares smaller. The boolean
+//   attribute `no-lens` removes it.
+// - The colours of the palettes are theme tokens. Call `refreshColors()`
+//   after the page changes its theme.
 // - `frames` sets decoded frames directly (for example, an encoder preview).
-// - The .pxv file can have suggested settings. The `settings` attribute (or
-//   property) replaces them, key by key.
 
 import { prefersReducedMotion } from '~/lib/motion/inView';
 import { resolveColor, TRANSPARENT } from './color';
 import { decode, type PixelFrames } from './format';
 import { createRenderer, type DrawSettings, type Renderer, type Rgba } from './renderer';
-import { COLOR_KEYS, resolveSettings, type PixelVideoSettings } from './settings';
+import { resolveSettings, type PixelVideoSettings } from './settings';
+import { findPalette } from './styles';
 
 export const TAG = 'pixel-video';
 
@@ -90,17 +91,18 @@ function load(url: string): Promise<PixelFrames> {
 const Base = typeof HTMLElement === 'undefined' ? (class {} as typeof HTMLElement) : HTMLElement;
 
 export class PixelVideoElement extends Base {
-  static observedAttributes = ['src', 'settings', 'paused'];
+  static observedAttributes = ['src', 'palette', 'paused', 'no-lens'];
 
   #settings: PixelVideoSettings = resolveSettings();
-  // The settings of the attribute or of the property, not resolved.
-  #overrides: Partial<PixelVideoSettings> | null = null;
   #draw: DrawSettings = {
-    ...this.#settings,
     colors: {
       fill: [TRANSPARENT, TRANSPARENT, TRANSPARENT],
       stroke: [TRANSPARENT, TRANSPARENT, TRANSPARENT],
+      ground: null,
     },
+    noStroke: [false, false, false],
+    extend: true,
+    hover: true,
   };
   #canvas: HTMLCanvasElement | null = null;
   #renderer: Renderer | null = null;
@@ -129,14 +131,7 @@ export class PixelVideoElement extends Base {
     this.toggleAttribute('paused', value);
   }
 
-  /**
-   * Partial settings. They replace the `settings` attribute. The getter
-   * gives the settings in use: the defaults, then the settings of the file,
-   * then these.
-   */
-  set settings(value: Partial<PixelVideoSettings> | null) {
-    this.#applySettings(value);
-  }
+  /** The settings in use: the settings of the file, then the `palette` attribute. */
   get settings(): PixelVideoSettings {
     return this.#settings;
   }
@@ -152,7 +147,7 @@ export class PixelVideoElement extends Base {
     this.#canvas = document.createElement('canvas');
     this.#canvas.setAttribute('aria-hidden', 'true');
     this.append(this.#canvas);
-    this.#applySettings(this.#parseAttribute());
+    this.#applySettings();
     try {
       this.#renderer = createRenderer(this.#canvas, () => this.#draw, this.#requestFrame);
       this.#renderer.setFrame(
@@ -194,7 +189,7 @@ export class PixelVideoElement extends Base {
 
   attributeChangedCallback(name: string, old: string | null, value: string | null) {
     if (old === value || !this.isConnected) return;
-    if (name === 'settings') this.#applySettings(this.#parseAttribute());
+    if (name === 'palette' || name === 'no-lens') this.#applySettings();
     else if (name === 'src') this.#load();
     else this.#requestFrame();
   }
@@ -206,36 +201,28 @@ export class PixelVideoElement extends Base {
   refreshColors() {
     const style = this.isConnected ? getComputedStyle(this) : null;
     const resolve = (value: string): Rgba => resolveColor(value, style);
-    const [bgFill, bgStroke, midFill, midStroke, highFill, highStroke] = COLOR_KEYS.map((key) =>
-      resolve(this.#settings[key]),
-    );
+    const palette = findPalette(this.#settings.palette)!;
+    const c = palette.colors;
     this.#draw = {
-      ...this.#settings,
       colors: {
-        fill: [bgFill!, midFill!, highFill!],
-        stroke: [bgStroke!, midStroke!, highStroke!],
+        fill: [resolve(c.bgFill), resolve(c.midFill), resolve(c.highFill)],
+        stroke: [resolve(c.bgStroke), resolve(c.midStroke), resolve(c.highStroke)],
+        ground: c.groundFill ? resolve(c.groundFill) : null,
       },
+      noStroke: [palette.flatBackground ?? false, false, false],
+      extend: palette.extend ?? true,
+      hover: !this.hasAttribute('no-lens'),
     };
     this.#requestFrame();
   }
 
-  #parseAttribute(): Partial<PixelVideoSettings> | null {
-    const json = this.getAttribute('settings');
-    if (!json) return null;
-    try {
-      return JSON.parse(json);
-    } catch {
-      console.warn('[pixel-video] the settings attribute is not valid JSON');
-      return null;
-    }
-  }
-
-  #applySettings(value: Partial<PixelVideoSettings> | null) {
-    this.#overrides = value;
+  #applySettings() {
+    const palette = this.getAttribute('palette');
     this.#settings = resolveSettings({
       ...this.#frames?.settings,
-      ...value,
+      ...(palette ? { palette } : {}),
     });
+    this.style.setProperty('--pixel-video-focus', String(this.#settings.focus));
     this.refreshColors();
   }
 
@@ -272,9 +259,13 @@ export class PixelVideoElement extends Base {
       old.fps === frames.fps;
     this.#frames = frames;
     if (!same) this.#clock = 0;
-    if (old?.settings !== frames?.settings) this.#applySettings(this.#overrides);
+    if (old?.settings !== frames?.settings) this.#applySettings();
     if (frames)
       this.style.setProperty('--pixel-video-aspect', `${frames.width} / ${frames.height}`);
+    // The edges that cut the subject (see `Edge` in format.ts), for the CSS
+    // of the page: `pixel-video[data-edges~='right']`.
+    if (frames?.edges?.length) this.dataset.edges = frames.edges.join(' ');
+    else delete this.dataset.edges;
     const index = frames ? Math.floor(this.#clock * frames.fps) : 0;
     this.#renderer?.setFrame(this.#cellsAt(index), frames?.width ?? 0, frames?.height ?? 0);
     if (frames) this.dispatchEvent(new Event('load'));

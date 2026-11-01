@@ -5,7 +5,7 @@ The copy of every page lives here, one typed file for each route. The general co
 ## Data files
 
 - One file for each route: `/features/visual-editing` → `src/data/visual-editing.ts`. The exported types are named after the future CMS fragments (`HeroData`, `FeaturesData`, `ChapterLayoutData`…). A page file (`src/pages/<route>/index.astro`) only imports the layout, the sections and the data: no copy inline.
-- Shared files: `videos.ts` (the pixel videos of PageCloser), `navigation.ts` (header and footer), `search.ts` (the search popup), `features.ts` (the feature list of `/features`), `*-code.ts` (the code of the "Code:" pictures of a pillar).
+- Shared files: `navigation.ts` (header and footer), `search.ts` (the search popup), `features.ts` (the feature list of `/features`), `*-code.ts` (the code of the "Code:" pictures of a pillar).
 - A pillar page has one file for the hero, the opinion and the closer, and the chapters in it (`developers-pillar.ts`, `media.ts`, `ai-pillar.ts`) or one file for each chapter (`/editor-experience`: `structured-content.ts`, `visual-editing-chapter.ts`, `dynamic-layouts.ts`, `localization.ts`, `workflows.ts`, `collaboration.ts`, `seo.ts`).
 - Before you use a section, read its data type and one page that uses it. Know what each field shows on screen; do not use a field for something else than its purpose.
 - Buttons link to a route of the new site, or of the old site. When the target does not exist yet, `/todo`. The navigation links to `#` when the page is not on this site yet.

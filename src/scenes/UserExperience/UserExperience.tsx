@@ -25,7 +25,8 @@ declare module 'react' {
     interface IntrinsicElements {
       'pixel-video': {
         src: string;
-        settings?: string;
+        palette?: string;
+        'no-lens'?: boolean;
         style?: React.CSSProperties;
       };
     }
@@ -57,19 +58,20 @@ export function UserExperienceScene({ width, height, video }: UserExperienceScen
         <RecordForm.Field label="Subtitle">
           <RecordForm.StringInput value="Brand and Website for Human Interface" />
         </RecordForm.Field>
-        {/* The upload plays the same pixel video as the hero of the site window. The width and the height give the ratio of the file: 160 × 80 cells. */}
+        {/* The upload plays the same pixel video as the hero of the site window. The width and the height give the ratio of the file: 84 × 42 cells. */}
         <RecordForm.Field label="Hero video">
           <RecordForm.FileInput
             media={{
               node: (
                 <pixel-video
                   src={video.src}
-                  settings={video.settings ? JSON.stringify(video.settings) : undefined}
+                  palette={video.palette}
+                  no-lens={video.lens === false || undefined}
                   style={{ width: '100%', height: '100%' }}
                 />
               ),
-              width: 160,
-              height: 80,
+              width: 84,
+              height: 42,
             }}
             caption="fist-bump.pxv"
           />

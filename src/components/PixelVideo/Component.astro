@@ -1,26 +1,44 @@
 ---
-import type { PixelVideoSettings } from '~/lib/pixel-video/settings';
+import { DevConfig } from '~/components/DevConfig';
+import { pxvDevConfig } from '~/lib/pixel-video/headers';
 import styles from './style.module.css';
 
 interface Props {
-  /** URL of a .pxv file (make it with /dev/pxv-editor). */
+  /** URL of a .pxv file of public/videos (see src/lib/pixel-video/AGENTS.md). */
   src: string;
-  /** Settings from /dev/pxv-editor ("Copy the JSON"). The dimensions are a % of the drawn width. */
-  settings?: Partial<PixelVideoSettings>;
+  /**
+   * The name of a palette (`palettes` in src/lib/pixel-video/styles.ts).
+   * Without it, the video uses the palette of the file.
+   */
+  palette?: string;
+  /** The lens under the pointer (default true). */
+  lens?: boolean;
+  /**
+   * In development, a tag at the top right corner of the video shows the
+   * data of the file (default true). A parent that cuts the top or the
+   * sides of the video sets false and shows its own `DevConfig` with
+   * `pxvDevConfig()`.
+   */
+  devTag?: boolean;
   /** Accessible name. Without it, the video is decorative. */
   label?: string;
   class?: string;
 }
 
-const { src, settings, label, class: className } = Astro.props;
+const { src, palette, lens = true, devTag = true, label, class: className } = Astro.props;
+
+// Development only: the data of the file, for the tag of DevConfig.
+const devConfig = import.meta.env.DEV && devTag ? pxvDevConfig(src, { palette, lens }) : undefined;
 ---
 
 <pixel-video
   class:list={[styles.pixelVideo, className]}
   src={src}
-  settings={settings ? JSON.stringify(settings) : undefined}
+  palette={palette}
+  no-lens={lens ? undefined : ''}
   role={label ? 'img' : undefined}
-  aria-label={label}></pixel-video>
+  aria-label={label}>{devConfig && <DevConfig name="PixelVideo" config={devConfig} />}</pixel-video
+>
 
 <script>
   import { definePixelVideo } from '~/lib/pixel-video/element';

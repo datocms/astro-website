@@ -25,24 +25,11 @@ export const SAMPLES = 5;
 export const TIMEOUT_MS = 3000;
 
 /**
- * The globe behind the number: the video of the home page, quiet.
- * The squares of the sea and of the land are the inverse surface with 8%
- * and 22% of the text, with the inverse surface as stroke: the land
- * shows clearly, the sea a little. No lens: the globe is not
- * a thing to touch.
+ * The globe behind the number: the video of the home page, quiet (the
+ * palette `globeDim`: the land shows clearly, the sea a little). No lens:
+ * the globe is not a thing to touch.
  */
-export const GLOBE = {
-  src: '/videos/spinning-globe.pxv',
-  settings: {
-    bgFill: 'var(--surface-inverse)',
-    bgStroke: 'var(--surface-inverse)',
-    midFill: 'color-mix(in srgb, var(--surface-inverse) 92%, var(--text-on-inverse))',
-    midStroke: 'var(--surface-inverse)',
-    highFill: 'color-mix(in srgb, var(--surface-inverse) 78%, var(--text-on-inverse))',
-    highStroke: 'var(--surface-inverse)',
-    hover: false,
-  },
-};
+export const GLOBE = { src: '/videos/spinning-globe.pxv', palette: 'globeDim', lens: false };
 
 export const BROWSER = { wide: 'Your browser', narrow: 'You' };
 

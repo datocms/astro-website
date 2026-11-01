@@ -26,6 +26,7 @@
  */
 .video {
   --draw-height: min(494px, 75vw);
+  position: relative;
   height: var(--draw-height);
   overflow: hidden;
   background: var(--surface-accent);
@@ -36,15 +37,14 @@
  * it. Thus make the element as wide as the video at the draw height
  * (--pixel-video-aspect comes from the file), and let the band cut the
  * sides (cover). When the video is wider than the band, move it so that
- * the subject (--video-focus, from the data of the video) stays in the
- * centre.
+ * the subject (--pixel-video-focus, from the file) stays in the centre.
  */
 .video :global(pixel-video) {
   --draw-width: calc(var(--draw-height) * var(--pixel-video-aspect, 960 / 360));
   width: max(100%, var(--draw-width));
   height: 100%;
   aspect-ratio: auto;
-  margin-left: min(0px, calc(50% - var(--draw-width) * var(--video-focus, 0.5)));
+  margin-left: min(0px, calc(50% - var(--draw-width) * var(--pixel-video-focus, 0.5)));
 }
 
 .band {
@@ -119,18 +119,77 @@
   background: var(--surface-inverse);
 }
 
+.video.default {
+  background: var(--surface-default);
+}
+
 /*
- * The subject comes in from the right edge of the video (the arm of the
- * pinch). Keep that edge on the right edge of the band. When the video is
- * wider than the band, the band cuts the left side first, but the subject
- * (--video-focus) stays in the band.
+ * The edges of the video that cut the subject (`data-edges`, from the
+ * file): for example an arm that comes in from the right. Out of the video
+ * the band shows only the ground, thus a cut edge must be on the edge of
+ * the band. Else the cut shows as a straight line in the ground. The top
+ * and the bottom of the video are always on the edges of the band.
+ * `:where()` keeps the specificity low, thus `.noExtend` and `.centre`
+ * below apply first.
  */
-.edgeRight :global(pixel-video) {
+
+/*
+ * The right edge cuts the subject. Keep that edge on the right edge of the
+ * band. When the video is wider than the band, the band cuts the left side
+ * first, but the subject (--pixel-video-focus) stays in the band.
+ */
+.video :global(pixel-video:where([data-edges~='right']:not([data-edges~='left']))) {
   width: var(--draw-width);
   margin-left: max(
     100% - var(--draw-width),
-    min(0px, 50% - var(--draw-width) * var(--video-focus, 0.5))
+    min(0px, 50% - var(--draw-width) * var(--pixel-video-focus, 0.5))
   );
+}
+
+/* The left edge cuts the subject: the same on the other side. */
+.video :global(pixel-video:where([data-edges~='left']:not([data-edges~='right']))) {
+  width: var(--draw-width);
+  margin-left: min(
+    0px,
+    max(100% - var(--draw-width), 50% - var(--draw-width) * var(--pixel-video-focus, 0.5))
+  );
+}
+
+/*
+ * The two side edges cut the subject (a crowd). When the band is wider
+ * than the video, scale the video up to the width of the band: it is then
+ * higher than the band, and the band cuts it at the top (or at the bottom,
+ * when only the top edge cuts the subject). The squares are larger than in
+ * the other videos.
+ */
+.video:has(:global(pixel-video:where([data-edges~='left'][data-edges~='right']))) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.video:has(
+  :global(pixel-video:where([data-edges~='left'][data-edges~='right'][data-edges~='bottom']))
+) {
+  justify-content: flex-end;
+}
+
+.video:has(
+  :global(
+    pixel-video:where(
+      [data-edges~='left'][data-edges~='right'][data-edges~='top']:not([data-edges~='bottom'])
+    )
+  )
+) {
+  justify-content: flex-start;
+}
+
+.video :global(pixel-video:where([data-edges~='left'][data-edges~='right'])) {
+  flex: none;
+  width: max(100%, var(--draw-width));
+  height: auto;
+  aspect-ratio: var(--pixel-video-aspect);
+  margin-left: min(0px, calc(50% - var(--draw-width) * var(--pixel-video-focus, 0.5)));
 }
 
 /*

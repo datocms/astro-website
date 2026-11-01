@@ -2,9 +2,11 @@ import node from '@astrojs/node';
 import react from '@astrojs/react';
 import expressiveCode from 'astro-expressive-code';
 import { defineConfig, envField } from 'astro/config';
+import { readdirSync, readFileSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import type { Plugin } from 'vite';
 import { cssLayerArea } from './css-scope.mjs';
+import { readHeader } from './src/lib/pixel-video/format';
 
 const MAX_CLIENT_CHUNK_SIZE_IN_KB = 500;
 
@@ -35,6 +37,43 @@ const MAX_CLIENT_CHUNK_SIZE_IN_KB = 500;
 const LAYER_MARKER = /^\s*\/\*\s*@layer\s+([\w-]+)\s*\*\//;
 // An @property rule has no nested braces.
 const PROPERTY_RULE = /@property\s+[\w-]+\s*\{[^{}]*\}/g;
+
+// The module `virtual:pxv-headers` gives the header of each .pxv file of
+// public/videos (size, edges, settings), by URL. The server reads the
+// settings with no fetch: for example, PageCloser selects the surface from
+// the palette of the file. In `astro dev`, a change of a file loads the
+// module again.
+const PXV_DIR = new URL('./public/videos/', import.meta.url);
+const PXV_MODULE = 'virtual:pxv-headers';
+function pxvHeaders(): Plugin {
+  const resolved = `\0${PXV_MODULE}`;
+  return {
+    name: 'pxv-headers',
+    resolveId: (id) => (id === PXV_MODULE ? resolved : null),
+    load(id) {
+      if (id !== resolved) return null;
+      const headers: Record<string, unknown> = {};
+      for (const file of readdirSync(PXV_DIR).sort()) {
+        if (!file.endsWith('.pxv')) continue;
+        const path = new URL(file, PXV_DIR);
+        this.addWatchFile(path.pathname);
+        headers[`/videos/${file}`] = readHeader(new Uint8Array(readFileSync(path)));
+      }
+      return `export default ${JSON.stringify(headers)};`;
+    },
+    configureServer(server) {
+      const dir = PXV_DIR.pathname;
+      server.watcher.add(dir);
+      server.watcher.on('all', (_event, file) => {
+        if (!file.startsWith(dir) || !file.endsWith('.pxv')) return;
+        for (const environment of Object.values(server.environments)) {
+          const module = environment.moduleGraph.getModuleById(resolved);
+          if (module) environment.moduleGraph.invalidateModule(module);
+        }
+      });
+    },
+  };
+}
 
 function cssLayers(): Plugin {
   return {
@@ -266,10 +305,6 @@ export default defineConfig({
         'astro:config:setup': ({ command, injectRoute }) => {
           if (command !== 'dev') return;
           injectRoute({
-            pattern: '/dev/pxv-editor',
-            entrypoint: './src/dev/pxv-editor.astro',
-          });
-          injectRoute({
             pattern: '/dev/pxv-gallery',
             entrypoint: './src/dev/pxv-gallery.astro',
           });
@@ -328,6 +363,7 @@ export default defineConfig({
   vite: {
     plugins: [
       cssLayers(),
+      pxvHeaders(),
       // Stop the build when a client JS chunk that a page loads immediately is
       // larger than the limit. The plugin examines the entry chunks and the
       // chunks that they import statically. It ignores the chunks that load

@@ -6,22 +6,23 @@
 // This module has no imports, so that it runs in the browser and in Node.
 //
 // Layout (little-endian):
-//   0   4 bytes  "PXV2"
+//   0   4 bytes  "PXV3"
 //   4   u16      width, in cells
 //   6   u16      height, in cells
 //   8   u16      number of frames
 //   10  u16      frames per second × 100
-//   12  u32      length of the settings, in bytes (0 = no settings)
-//   16  ...      the suggested player settings, as UTF-8 JSON (see
-//                settings.ts). The `settings` attribute of the element
-//                replaces them, key by key.
+//   12  u32      length of the JSON, in bytes (0 = no JSON)
+//   16  u8       the edges that cut the subject (see `Edge`): bit 0 left,
+//                bit 1 right, bit 2 top, bit 3 bottom
+//   17  ...      UTF-8 JSON: the settings of the video (see settings.ts:
+//                the palette and the focus), and `source`, the URL of the
+//                footage. The `palette` attribute of the element replaces
+//                the palette of the file.
 //   ... ...      gzip data: the frames one after the other, row by row
 //                from the top, 2 bits for each cell (4 cells in a byte,
 //                the first cell in the low bits). Each frame is XOR'd with
 //                the frame before it, so a cell that does not change is 0
 //                and compresses well.
-//
-// A "PXV1" file has no settings: the gzip data starts at byte 12.
 
 /** The layer of a cell. */
 export const BG = 0;
@@ -30,10 +31,17 @@ export const HIGH = 2;
 /** Nothing shows in this cell (a transparent pixel in the source). */
 export const EMPTY = 3;
 
-const MAGIC = 'PXV2';
-const MAGIC_V1 = 'PXV1';
-const HEADER = 16;
-const HEADER_V1 = 12;
+const MAGIC = 'PXV3';
+const HEADER = 17;
+
+/**
+ * An edge of the video that cuts the subject: for example, an arm that comes
+ * in from the right. Out of the video there is no subject, thus a player
+ * that shows a ground around the video (`extend`) must keep this edge on the
+ * edge of its area. Else the cut shows as a straight line in the ground.
+ */
+export type Edge = 'left' | 'right' | 'top' | 'bottom';
+export const EDGES: readonly Edge[] = ['left', 'right', 'top', 'bottom'];
 
 export interface PixelFrames {
   width: number;
@@ -43,8 +51,19 @@ export interface PixelFrames {
   count: number;
   /** All the frames, `width × height` cells each, with no XOR. */
   cells: Uint8Array;
-  /** The suggested player settings (see settings.ts), if the file has them. */
+  /** The settings of the video (see settings.ts), if the file has them. */
   settings?: Record<string, unknown>;
+  /**
+   * The edges that cut the subject. `encode()` finds them with
+   * `findEdges()` when this is not set.
+   */
+  edges?: Edge[];
+  /**
+   * The URL of the footage, to find it again (for example a YouTube video
+   * at the start of the take). It is not a recipe: no tool makes the file
+   * again from it.
+   */
+  source?: string;
 }
 
 /** The thresholds that sort a pixel into a layer, by brightness (0–255). */
@@ -193,6 +212,104 @@ async function pipe(
   return new Uint8Array(await new Response(body).arrayBuffer());
 }
 
+/**
+ * For each edge, the part (0–1) of its cells that are not empty, in all the
+ * frames. A video with no empty cell (an opaque video) gives 1 for each edge.
+ */
+export function edgeShares(frames: PixelFrames): Record<Edge, number> {
+  const { width: w, height: h, count, cells } = frames;
+  const hits = { left: 0, right: 0, top: 0, bottom: 0 };
+  for (let n = 0; n < count; n++) {
+    const o = n * w * h;
+    for (let y = 0; y < h; y++) {
+      if (cells[o + y * w] !== EMPTY) hits.left++;
+      if (cells[o + y * w + w - 1] !== EMPTY) hits.right++;
+    }
+    for (let x = 0; x < w; x++) {
+      if (cells[o + x] !== EMPTY) hits.top++;
+      if (cells[o + (h - 1) * w + x] !== EMPTY) hits.bottom++;
+    }
+  }
+  const n = Math.max(1, count);
+  return {
+    left: hits.left / (h * n),
+    right: hits.right / (h * n),
+    top: hits.top / (w * n),
+    bottom: hits.bottom / (w * n),
+  };
+}
+
+/**
+ * A subject that touches an edge in this part of the cells of the edge, or
+ * more, is cut by the edge. Less is noise (a pixel of the key, a finger tip
+ * for a frame).
+ */
+export const EDGE_LIMIT = 0.005;
+
+/**
+ * Find the edges that cut the subject. An opaque video has no subject
+ * shape (the background is part of the picture): it gives no edges. Set
+ * the edges by hand for it.
+ */
+export function findEdges(frames: PixelFrames): Edge[] {
+  if (!frames.cells.includes(EMPTY)) return [];
+  const shares = edgeShares(frames);
+  return EDGES.filter((e) => shares[e] >= EDGE_LIMIT);
+}
+
+/**
+ * The source cells under each cell of a smaller axis, with the part (0–1)
+ * of each source cell that the cell covers.
+ */
+function boxWeights(from: number, to: number): { index: number; weight: number }[][] {
+  const step = from / to;
+  return Array.from({ length: to }, (_, i) => {
+    const a = i * step;
+    const b = a + step;
+    const out: { index: number; weight: number }[] = [];
+    for (let k = Math.floor(a); k < Math.min(from, Math.ceil(b)); k++)
+      out.push({ index: k, weight: Math.min(b, k + 1) - Math.max(a, k) });
+    return out;
+  });
+}
+
+/**
+ * Give the frames at a lower resolution, as the encoder gives them from a
+ * smaller video. Each cell covers a box of source cells. The layers are in
+ * the order of the brightness, thus a cell gets the mean layer of the cells
+ * of its box that are not empty, rounded. It is empty when more than half
+ * of its box is empty (an alpha of 50% or less, as in `quantize()`).
+ */
+export function downscale(frames: PixelFrames, width: number, height: number): PixelFrames {
+  const { width: w, height: h, count, cells } = frames;
+  if (width > w || height > h || width < 1 || height < 1)
+    throw new Error(`downscale: ${width}×${height} is not smaller than ${w}×${h}`);
+  const xs = boxWeights(w, width);
+  const ys = boxWeights(h, height);
+  const area = (w / width) * (h / height);
+  const out = new Uint8Array(width * height * count);
+  for (let n = 0; n < count; n++) {
+    const src = n * w * h;
+    const dst = n * width * height;
+    for (let y = 0; y < height; y++)
+      for (let x = 0; x < width; x++) {
+        let full = 0;
+        let sum = 0;
+        for (const { index: sy, weight: wy } of ys[y]!)
+          for (const { index: sx, weight: wx } of xs[x]!) {
+            const c = cells[src + sy * w + sx]!;
+            if (c === EMPTY) continue;
+            full += wx * wy;
+            sum += c * wx * wy;
+          }
+        out[dst + y * width + x] = full * 2 <= area ? EMPTY : Math.round(sum / full);
+      }
+  }
+  return { ...frames, width, height, cells: out };
+}
+
+const edgeBits = (edges: Edge[]) => edges.reduce((bits, e) => bits | (1 << EDGES.indexOf(e)), 0);
+
 /** Make a .pxv file from frames. */
 export async function encode(frames: PixelFrames): Promise<Uint8Array> {
   const { width, height, count, cells } = frames;
@@ -204,10 +321,10 @@ export async function encode(frames: PixelFrames): Promise<Uint8Array> {
     packed[i >> 2]! |= (v & 3) << ((i & 3) * 2);
   }
   const body = await pipe(packed, new CompressionStream('gzip'));
-  const json =
-    frames.settings && Object.keys(frames.settings).length
-      ? new TextEncoder().encode(JSON.stringify(frames.settings))
-      : new Uint8Array(0);
+  const fields = { ...frames.settings, ...(frames.source ? { source: frames.source } : {}) };
+  const json = Object.keys(fields).length
+    ? new TextEncoder().encode(JSON.stringify(fields))
+    : new Uint8Array(0);
   const out = new Uint8Array(HEADER + json.length + body.length);
   const view = new DataView(out.buffer);
   for (let i = 0; i < 4; i++) out[i] = MAGIC.charCodeAt(i);
@@ -216,6 +333,7 @@ export async function encode(frames: PixelFrames): Promise<Uint8Array> {
   view.setUint16(8, count, true);
   view.setUint16(10, Math.round(frames.fps * 100), true);
   view.setUint32(12, json.length, true);
+  out[16] = edgeBits(frames.edges ?? findEdges(frames));
   out.set(json, HEADER);
   out.set(body, HEADER + json.length);
   return out;
@@ -223,14 +341,12 @@ export async function encode(frames: PixelFrames): Promise<Uint8Array> {
 
 /** The byte where the gzip data starts. */
 function dataStart(data: Uint8Array): number {
+  if (String.fromCharCode(...data.subarray(0, 4)) !== MAGIC) throw new Error('not a .pxv file');
   const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-  const magic = String.fromCharCode(...data.subarray(0, 4));
-  if (magic === MAGIC_V1) return HEADER_V1;
-  if (magic !== MAGIC) throw new Error('not a .pxv file');
   return HEADER + view.getUint32(12, true);
 }
 
-/** Read the header and the settings of a .pxv file, with no decompression. */
+/** Read the header, the settings and the source of a .pxv file, with no decompression. */
 export function readHeader(data: Uint8Array): Omit<PixelFrames, 'cells'> {
   const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
   const start = dataStart(data);
@@ -239,12 +355,16 @@ export function readHeader(data: Uint8Array): Omit<PixelFrames, 'cells'> {
     height: view.getUint16(6, true),
     count: view.getUint16(8, true),
     fps: view.getUint16(10, true) / 100,
+    edges: EDGES.filter((_, i) => data[16]! & (1 << i)),
   };
   if (start > HEADER) {
     const json = new TextDecoder().decode(data.subarray(HEADER, start));
-    const settings: unknown = JSON.parse(json);
-    if (settings && typeof settings === 'object' && !Array.isArray(settings))
-      header.settings = settings as Record<string, unknown>;
+    const fields: unknown = JSON.parse(json);
+    if (fields && typeof fields === 'object' && !Array.isArray(fields)) {
+      const { source, ...settings } = fields as Record<string, unknown>;
+      if (typeof source === 'string') header.source = source;
+      if (Object.keys(settings).length) header.settings = settings;
+    }
   }
   return header;
 }
