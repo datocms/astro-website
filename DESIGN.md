@@ -185,7 +185,7 @@ Ember and Coral are tuned away from overnice's values (#ff6d00 too vivid, #f1a5a
 
 ### Neutral
 
-There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft 80%, text-muted 70%, text-subtle 50%, and the hairline border at about 11%. **White** (white) is only for a card that sits on a surface that stays light.
+There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft about 87%, text-muted 70 to 80% (each theme sets the alpha that gives 4.5:1 on its surface), and the hairline border at about 11%. There is no lighter text role: text under 4.5:1 is not legible. **White** (white) is only for a card that sits on a surface that stays light.
 
 ### Dark scheme
 
