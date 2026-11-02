@@ -185,6 +185,8 @@
  * a contrast of 4.5:1 or more on --surface-default. The deep colours of the
  * themes are not equally dark, thus the alphas are different. There is no
  * lighter text role: text lighter than --text-muted is not legible.
+ * --text-on-inverse-muted follows the same rule on --surface-inverse: its
+ * alpha also gives 4.5:1 or more.
  */
 :root,
 [data-theme='default'] {
@@ -228,7 +230,7 @@
   --text-muted: var(--color-orange-deep-3);
   --text-on-inverse: var(--color-orange-light-5);
   --text-on-inverse-soft: var(--color-orange-light-4);
-  --text-on-inverse-muted: var(--color-orange-light-3);
+  --text-on-inverse-muted: color-mix(in srgb, var(--color-orange-light-5) 88%, transparent);
   --text-on-inverse-subtle: var(--color-orange-light-2);
   --text-on-inverse-strong: var(--color-orange-light-0);
   --border-default: var(--color-orange-deep-1);
@@ -253,7 +255,7 @@
   --text-muted: color-mix(in srgb, var(--color-green-deep-5) 80%, transparent);
   --text-on-inverse: var(--color-green-light-5);
   --text-on-inverse-soft: var(--color-green-light-4);
-  --text-on-inverse-muted: var(--color-green-light-3);
+  --text-on-inverse-muted: color-mix(in srgb, var(--color-green-light-5) 86%, transparent);
   --text-on-inverse-subtle: var(--color-green-light-2);
   --text-on-inverse-strong: var(--color-green-light-0);
   --border-default: var(--color-green-deep-1);
@@ -278,7 +280,7 @@
   --text-muted: var(--color-purple-deep-3);
   --text-on-inverse: var(--color-purple-light-5);
   --text-on-inverse-soft: var(--color-purple-light-4);
-  --text-on-inverse-muted: var(--color-purple-light-3);
+  --text-on-inverse-muted: color-mix(in srgb, var(--color-purple-light-5) 88%, transparent);
   --text-on-inverse-subtle: var(--color-purple-light-2);
   --text-on-inverse-strong: var(--color-purple-light-0);
   --border-default: var(--color-purple-deep-1);
@@ -303,7 +305,7 @@
   --text-muted: var(--color-blue-deep-3);
   --text-on-inverse: var(--color-blue-light-5);
   --text-on-inverse-soft: var(--color-blue-light-4);
-  --text-on-inverse-muted: var(--color-blue-light-3);
+  --text-on-inverse-muted: color-mix(in srgb, var(--color-blue-light-5) 84%, transparent);
   --text-on-inverse-subtle: var(--color-blue-light-2);
   --text-on-inverse-strong: var(--color-blue-light-0);
   --border-default: var(--color-blue-deep-1);
@@ -328,7 +330,7 @@
   --text-muted: var(--color-pink-deep-3);
   --text-on-inverse: var(--color-pink-light-5);
   --text-on-inverse-soft: var(--color-pink-light-4);
-  --text-on-inverse-muted: var(--color-pink-light-3);
+  --text-on-inverse-muted: color-mix(in srgb, var(--color-pink-light-5) 76%, transparent);
   --text-on-inverse-subtle: var(--color-pink-light-2);
   --text-on-inverse-strong: var(--color-pink-light-0);
   --border-default: var(--color-pink-deep-1);
@@ -464,7 +466,8 @@
   --surface-field: var(--surface-default);
   --border-field: var(--border-default);
   --text-on-accent: var(--text-primary);
-  --text-on-accent-muted: var(--text-muted);
+  /* The accent is darker than the page: 88% gives 4.5:1 or more in all the themes. */
+  --text-on-accent-muted: color-mix(in srgb, var(--surface-inverse) 88%, transparent);
   --border-on-accent: var(--border-default);
   --border-on-accent-strong: var(--border-strong);
 }
@@ -605,7 +608,7 @@
   --text-positive: var(--surface-positive);
   --text-negative: var(--surface-negative);
   --text-on-accent: var(--surface-inverse);
-  --text-on-accent-muted: var(--surface-inverse-muted);
+  --text-on-accent-muted: color-mix(in srgb, var(--surface-inverse) 88%, transparent);
   --border-on-accent: color-mix(in srgb, var(--surface-inverse) 11%, transparent);
   --border-on-accent-strong: var(--surface-inverse);
 }
