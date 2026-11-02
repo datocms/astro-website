@@ -69,7 +69,7 @@ interface EnterpriseStrip extends SplitPointsData {
 export const security: EnterpriseStrip = {
   theme: 'blue',
   background: 'default',
-  kicker: 'Safest enterprise headless CMS',
+  kicker: 'Enterprise-grade security',
   title: 'Robust data security, privacy and compliance',
   description:
     '**Security** and data integrity informs all our decisions. Enterprise headless CMS customers can rely on us to ensure their **data is safe and remains secure**',
@@ -99,11 +99,11 @@ export const performance: EnterpriseStrip = {
   points: [
     {
       title: 'Performance SLA',
-      text: 'Full support with dedicated priority 24/7 guaranteed.',
+      text: 'We tailor solutions to any specific use-case with real-time scaling.',
     },
     {
       title: 'Support SLA',
-      text: 'We tailor solutions to any specific use-case with real-time scaling.',
+      text: 'Full support with dedicated priority 24/7 guaranteed.',
     },
     {
       title: 'Solution Architects',
@@ -130,7 +130,7 @@ export const support: EnterpriseStrip = {
     },
     {
       title: 'Multiple sandbox environments for testing and backups',
-      text: 'DatoCMS has the best solution on the market for managing backups and progress.',
+      text: 'Fork a sandbox to test changes or keep a backup, then promote it when it is ready.',
     },
   ],
 };
@@ -138,7 +138,7 @@ export const support: EnterpriseStrip = {
 export const governance: EnterpriseStrip = {
   theme: 'purple',
   background: 'default',
-  kicker: 'Best CMS for enterprise',
+  kicker: 'Governance',
   title: 'Give your team full accountability and governance control',
   description:
     'DatoCMS enterprise customers can enjoy features and structures that **empower their content business.**',
@@ -175,8 +175,8 @@ export const contact = {
 };
 
 export const results: StatementsSectionData & { label: string } = {
-  label: 'A CMS that empowers all team',
-  headline: 'A technology investment that doubles performance and productivity',
+  label: 'Results',
+  headline: 'What enterprise teams run on DatoCMS',
   theme: 'orange',
   items: [
     {
@@ -205,5 +205,5 @@ export const results: StatementsSectionData & { label: string } = {
 export const closer = {
   label: 'Enterprise headless CMS',
   title: 'A headless CMS that is ready to scale with you',
-  text: 'The best CMS for enterprise is one that can **scale with your company with minimal effort**. DatoCMS offers the services and support that lets your website reach different market segments and grow with your needs.',
+  text: 'An enterprise CMS has to **scale with your company without extra effort**. DatoCMS offers the services and support that lets your website reach different market segments and grow with your needs.',
 };
