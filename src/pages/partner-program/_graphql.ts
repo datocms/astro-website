@@ -17,8 +17,12 @@ export const query = graphql(
           ...PartnerUrlFragment
         }
       }
-      # The featured partner testimonials: three cards.
-      partnerTestimonials: allPartnerTestimonials(filter: { featured: { eq: true } }, first: 3) {
+      # Three featured partner testimonials, the newest first.
+      partnerTestimonials: allPartnerTestimonials(
+        filter: { featured: { eq: true } }
+        orderBy: _createdAt_DESC
+        first: 3
+      ) {
         __typename
         ...QuotePartnerTestimonialFragment
       }

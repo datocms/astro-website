@@ -59,6 +59,7 @@ export const partner = {
   locations: 'Locations',
   services: 'Services offered',
   technologies: 'Covered technologies',
+  testimonials: 'In their words',
   chats: 'Behind the Scenes',
   chatsIntro: 'Join us to get familiar with our partners',
   projects: 'Projects showcase',

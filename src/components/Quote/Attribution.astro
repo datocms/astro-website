@@ -11,8 +11,16 @@ interface Props {
 }
 
 const { quote, size = 'card', class: className } = Astro.props;
-const { name, role, company, companyHref, nameHref, image } = quote;
+const { name, role, company, image } = quote;
 const external = (href: string) => /^https?:/.test(href);
+// A link to the current page is not a link: on the page of a partner, the
+// company is plain text.
+const here = (href: string | null) =>
+  href !== null &&
+  !external(href) &&
+  href.replace(/\/$/, '') === Astro.url.pathname.replace(/\/$/, '');
+const companyHref = here(quote.companyHref) ? null : quote.companyHref;
+const nameHref = here(quote.nameHref) ? null : quote.nameHref;
 const avatar = size === 'statement' ? 48 : 32;
 ---
 
@@ -35,17 +43,19 @@ const avatar = size === 'statement' ? 48 : 32;
     )
   }
   <span class={styles.text}>
-    <span class={styles.name}>
-      {
-        nameHref ? (
-          <a href={nameHref} rel={external(nameHref) ? 'noopener' : undefined}>
-            {name}
-          </a>
-        ) : (
-          name
-        )
-      }
-    </span>
+    {
+      name && (
+        <span class={styles.name}>
+          {nameHref ? (
+            <a href={nameHref} rel={external(nameHref) ? 'noopener' : undefined}>
+              {name}
+            </a>
+          ) : (
+            name
+          )}
+        </span>
+      )
+    }
     {
       (role || company) && (
         <span class={styles.role}>

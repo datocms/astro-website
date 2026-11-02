@@ -34,6 +34,24 @@ export const STATEMENT_MAX = 120;
 /* A website on one of these hosts is the profile of a person, not the site of a company. */
 const PROFILE_HOSTS = ['twitter.com', 'x.com', 'linkedin.com', 'github.com', 'bsky.app'];
 
+/*
+ * The website as an absolute http(s) link. A website without a scheme
+ * ("example.com") gets https. Other values give no link: a relative href
+ * goes to a page of this site, and a javascript: href is not safe.
+ */
+function safeHref(value: string | null | undefined) {
+  const url = stripStega(value ?? '').trim();
+  if (!url) return null;
+  try {
+    const parsed = new URL(/^[a-z][a-z0-9+.-]*:/i.test(url) ? url : `https://${url}`);
+    return ['http:', 'https:'].includes(parsed.protocol) && parsed.hostname.includes('.')
+      ? parsed.href
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 function isProfile(url: string) {
   try {
     const host = new URL(url).hostname.replace(/^www\./, '');
@@ -57,7 +75,8 @@ export function typographic(text: string) {
  * text. The stega of Content Link stays in the string, thus Content Link
  * works in draft mode.
  */
-function quoteText(quote: { value: unknown }) {
+function quoteText(quote: { value: unknown } | null) {
+  if (!quote) return '';
   const text = toPlainText(quote.value as Parameters<typeof toPlainText>[0]) ?? '';
   return typographic(text.trim().replace(/\n{2,}/g, '\n'));
 }
@@ -69,13 +88,13 @@ function quoteText(quote: { value: unknown }) {
 export function readQuote(item: QuoteItem): QuoteData {
   if (item.__typename === 'ReviewRecord') {
     const data = readFragment(QuoteReviewFragment, item as FragmentOf<typeof QuoteReviewFragment>);
-    const website = data.website?.trim() || null;
+    const website = safeHref(data.website);
     const profile = website !== null && isProfile(website);
     const company = data.company?.trim() || null;
     return {
       text: quoteText(data.quote),
       excerpt: data.excerpt ? typographic(data.excerpt) : null,
-      name: data.name ?? '',
+      name: data.name?.trim() ?? '',
       role: data.role?.trim() || null,
       company,
       companyHref: company && website && !profile ? website : null,
@@ -94,13 +113,18 @@ export function readQuote(item: QuoteItem): QuoteData {
   return {
     text: quoteText(data.quote),
     excerpt: data.excerpt ? typographic(data.excerpt) : null,
-    name: data.name,
+    name: data.name.trim(),
     role: data.role?.trim() || null,
     company: partner?.name ?? null,
     companyHref: partner ? buildUrlForPartner(partner) : null,
     nameHref: null,
     image: data.image?.responsiveImage ?? null,
   };
+}
+
+/** A quote shows only with its text. Without stega, the text has at least one letter. */
+export function hasText(quote: QuoteData) {
+  return /\p{L}/u.test(stripStega(quote.text));
 }
 
 /**

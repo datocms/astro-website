@@ -3,12 +3,20 @@ import { graphql } from '~/lib/datocms/graphql';
 
 /*
  * All the reviews and all the partner testimonials. The page shows them
- * together, the newest first.
+ * together, the newest first. 500 is the largest page of the CDA (the
+ * client pages only one list of a query). The counts tell the page when a
+ * list is longer than its page.
  */
 export const query = graphql(
   /* GraphQL */ `
     query WallOfLove {
-      allReviews(first: 100) {
+      reviewsMeta: _allReviewsMeta {
+        count
+      }
+      partnerTestimonialsMeta: _allPartnerTestimonialsMeta {
+        count
+      }
+      allReviews(first: 500) {
         __typename
         _createdAt
         ...QuoteReviewFragment

@@ -15,7 +15,15 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { query } from './_graphql';
 
-const { allReviews, allPartnerTestimonials } = await executeQuery(Astro, query);
+const { allReviews, allPartnerTestimonials, reviewsMeta, partnerTestimonialsMeta } =
+  await executeQuery(Astro, query);
+
+if (
+  reviewsMeta.count > allReviews.length ||
+  partnerTestimonialsMeta.count > allPartnerTestimonials.length
+) {
+  console.warn('[wall] Some quotes do not show: a list is longer than the page of 500 records.');
+}
 
 // The reviews and the partner testimonials in one list, the newest first.
 const items = [...allPartnerTestimonials, ...allReviews].sort((a, b) =>

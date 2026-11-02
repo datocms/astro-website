@@ -3,7 +3,7 @@ import { Section } from '~/components/Section';
 import type { Theme } from '~/lib/theme';
 import Attribution from './Attribution.astro';
 import Card from './Card.astro';
-import { readQuote, statementText, type QuoteItem } from './data';
+import { hasText, readQuote, statementText, type QuoteItem } from './data';
 import styles from './style.module.css';
 
 interface Props {
@@ -20,8 +20,19 @@ interface Props {
 }
 
 const { variant = 'centered', theme } = Astro.props;
-const quote = Astro.props.quote ? readQuote(Astro.props.quote) : null;
+const read = Astro.props.quote ? readQuote(Astro.props.quote) : null;
+const quote = read && hasText(read) ? read : null;
 const text = quote ? statementText(quote) : null;
+
+/*
+ * A page asks for its quote by ID. When the record is deleted or has no
+ * text, the page shows no quote, and the log tells why.
+ */
+if (!quote) {
+  console.warn(
+    `[Quote] ${Astro.url.pathname}: no quote to show (the record is missing or has no text).`,
+  );
+}
 ---
 
 {

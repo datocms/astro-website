@@ -9,6 +9,7 @@ import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcase
 import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import { PluginCardFragment } from '~/components/PluginCard';
+import { QuotePartnerTestimonialFragment } from '~/components/Quote';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 export const query = graphql(
@@ -126,6 +127,11 @@ export const query = graphql(
             }
           }
         }
+        # The testimonials of the people of the partner, the newest first.
+        testimonials: _allReferencingPartnerTestimonials(orderBy: _createdAt_DESC) {
+          __typename
+          ...QuotePartnerTestimonialFragment
+        }
         chats: _allReferencingCustomerStories(first: 100, orderBy: _firstPublishedAt_DESC) {
           ...CustomerStoryUrlFragment
           id
@@ -147,6 +153,7 @@ export const query = graphql(
     ResponsiveImageFragment,
     ShowcaseProjectUrlFragment,
     CustomerStoryUrlFragment,
+    QuotePartnerTestimonialFragment,
     ...defaultLinkToRecordFragments,
     ...defaultInlineRecordFragments,
   ],

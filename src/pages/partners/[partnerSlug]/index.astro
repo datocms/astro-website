@@ -1,7 +1,7 @@
 ---
 // The page of one partner: the introduction, the description, the
-// locations, the services, the technologies, the chats, the projects of
-// the showcase and the plugins that the partner released.
+// locations, the services, the technologies, the testimonials, the chats,
+// the projects of the showcase and the plugins that the partner released.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import sortBy from 'lodash-es/sortBy';
 import { Button } from '~/components/Button';
@@ -9,6 +9,7 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
 import { PluginCard } from '~/components/PluginCard';
 import { Prose } from '~/components/Prose';
+import { hasText, Quote, QuoteCard, readQuote } from '~/components/Quote';
 import { Section } from '~/components/Section';
 import { PlainText, StructuredText } from '~/components/StructuredText';
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
@@ -49,6 +50,11 @@ const description = toPlainText(page.shortDescription);
 
 // The featured projects come first, in the order of the CMS.
 const featuredProjectIds = page.featuredProjects.map((p) => p.id);
+
+// The testimonials with text. One testimonial is a statement on the accent
+// band, more are cards.
+const testimonials = page.testimonials.filter((item) => hasText(readQuote(item)));
+const quoteBand = testimonials.length === 1;
 
 const sortedProjects = sortBy(page.projects, (project) =>
   featuredProjectIds.includes(project.id)
@@ -152,8 +158,32 @@ const sortedProjects = sortBy(page.projects, (project) =>
   </Section>
 
   {
-    page.chats.length > 0 && (
+    /*
+      On this page the company of a testimonial is plain text: its link
+      goes to this page.
+    */
+  }
+  {quoteBand && <Quote quote={testimonials[0]} />}
+  {
+    testimonials.length > 1 && (
       <Section flushTop>
+        <div class={s.header}>
+          <h2 class="h2">{partner.testimonials}</h2>
+        </div>
+        <ul class={s.grid}>
+          {testimonials.map((item) => (
+            <li>
+              <QuoteCard quote={readQuote(item)} />
+            </li>
+          ))}
+        </ul>
+      </Section>
+    )
+  }
+
+  {
+    page.chats.length > 0 && (
+      <Section flushTop={!quoteBand}>
         <div class={s.header}>
           <h2 class="h2">{partner.chats}</h2>
           <p class:list={[s.muted, 'body']}>{partner.chatsIntro}</p>
@@ -177,7 +207,7 @@ const sortedProjects = sortBy(page.projects, (project) =>
 
   {
     sortedProjects.length > 0 && (
-      <Section flushTop>
+      <Section flushTop={!(quoteBand && page.chats.length === 0)}>
         <div class={s.header}>
           <h2 class="h2">{partner.projects}</h2>
         </div>
@@ -206,7 +236,7 @@ const sortedProjects = sortBy(page.projects, (project) =>
 
   {
     plugins.length > 0 && (
-      <Section flushTop>
+      <Section flushTop={!(quoteBand && page.chats.length === 0 && sortedProjects.length === 0)}>
         <div class={s.header}>
           <h2 class="h2">{partner.plugins}</h2>
         </div>
