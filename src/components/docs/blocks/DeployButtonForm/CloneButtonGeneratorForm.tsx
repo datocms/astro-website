@@ -21,7 +21,7 @@ type Manifest = {
       }
     | {
         type: 'datocmsAccessToken';
-        tokenName: string;
+        tokenName?: string;
       }
     | {
         type: 'string';
@@ -72,9 +72,8 @@ export default function CloneButtonGeneratorForm() {
           type: 'datocmsProjectUrl',
         },
         {
-          environmentVariableName: 'DATOCMS_READ_ONLY_API_TOKEN',
+          environmentVariableName: 'DATO_API_TOKEN',
           type: 'datocmsAccessToken',
-          tokenName: 'Read-only API token',
         },
       ],
     },
@@ -110,7 +109,7 @@ export default function CloneButtonGeneratorForm() {
                 entry.type === 'datocmsAccessToken'
                   ? {
                       type: 'datocmsAccessToken',
-                      tokenName: entry.tokenName || mandatory,
+                      tokenName: entry.tokenName || undefined,
                     }
                   : entry.type === 'datocmsProjectUrl'
                     ? { type: 'datocmsProjectUrl' }
@@ -193,7 +192,7 @@ export default function CloneButtonGeneratorForm() {
 
                     return (
                       <div key={field.id} className={s.fieldArrayItem}>
-                        <div className={s.fieldArrayItemField} style={{ width: '35%' }}>
+                        <div className={s.fieldArrayItemField} style={{ width: '30%' }}>
                           <input
                             required
                             type="text"
@@ -213,10 +212,10 @@ export default function CloneButtonGeneratorForm() {
                         {type === 'datocmsAccessToken' && (
                           <div className={s.fieldArrayItemField} style={{ width: '25%' }}>
                             <input
-                              required
                               type="text"
                               {...register(`environmentVariables.${index}.tokenName`)}
-                              placeholder="Read-only API token"
+                              placeholder="Token name (optional)"
+                              title="Name of the API token in your template project. Leave empty to use its read-only token."
                             />
                           </div>
                         )}
