@@ -15,9 +15,11 @@ interface Props extends Omit<FaqData, 'items'> {
    * Structured Text field, with lists and links.
    */
   questions?: FragmentOf<typeof FaqQuestionFragment>[];
+  /** The id of the section, an anchor target for a link. */
+  id?: string;
 }
 
-const { headline } = Astro.props;
+const { headline, id } = Astro.props;
 
 // In draft mode the question ends with the stega of Content Link. Remove
 // the white space before the stega, and keep the stega.
@@ -36,7 +38,7 @@ const items = [
 ---
 
 {/* Only one answer is open at a time. The first is open. */}
-<Section class={styles.faq} contentClass={styles.content}>
+<Section id={id} class={styles.faq} contentClass={styles.content}>
   <h2 class="h1">{headline}</h2>
   <div class={styles.items}>
     {

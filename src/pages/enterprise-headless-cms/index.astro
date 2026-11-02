@@ -3,21 +3,23 @@
 // the H1 label and the quotes come from the CMS. The form sends its data
 // to the action forms.submitSalesRequest with the issue type
 // "enterprise".
-import { ChapterHeader } from '~/components/ChapterHeader';
+import { CategoryNav } from '~/components/CategoryNav';
 import { ContactSection } from '~/components/ContactSection';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Faq } from '~/components/Faq';
 import { Hero } from '~/components/Hero';
 import { InlineText } from '~/components/InlineText';
-import { LogosLine } from '~/components/LogosLine';
+import { PageCloser } from '~/components/PageCloser';
 import { Quote } from '~/components/Quote';
-import { Section } from '~/components/Section';
-import { SplitPoints } from '~/components/SplitPoints';
 import { StatementsSection } from '~/components/StatementsSection';
 import { contact as contactData } from '~/data/contact';
 import * as enterprise from '~/data/enterprise';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import SecurityChapter from '~/scenes/Enterprise/SecurityChapter.astro';
+import GovernanceChapter from '~/scenes/Enterprise/GovernanceChapter.astro';
+import SupportChapter from '~/scenes/Enterprise/SupportChapter.astro';
 import { query } from './_graphql';
 import s from './_style.module.css';
 
@@ -28,36 +30,27 @@ if (!page || !review1 || !review2 || !review3) {
   return notFoundResponse();
 }
 
-const strips = [
-  { strip: enterprise.security, quote: enterprise.quotes.security, review: review2 },
-  { strip: enterprise.performance, quote: enterprise.quotes.performance, review: review1 },
-  { strip: enterprise.support, quote: enterprise.quotes.support, review: review3 },
-  { strip: enterprise.governance },
-];
+const { subtitle, ...hero } = enterprise.hero;
 ---
 
-<Layout seo={page.seo} seoAnalysis={page.yoastAnalysis} headerTheme="orange">
-  <Hero
-    label={page.seoH1 ?? undefined}
-    headline={enterprise.hero.headline}
-    subheadline={enterprise.hero.subheadline}
-  >
-    <p slot="intro"><InlineText text={enterprise.hero.subtitle} /></p>
+<Layout seo={page.seo} seoAnalysis={page.yoastAnalysis} headerTheme="orange" footerTheme="orange">
+  <Hero {...hero} label={page.seoH1 ?? undefined}>
+    <p slot="intro"><InlineText text={subtitle} /></p>
   </Hero>
+  <CategoryNav {...enterprise.chapterNav} />
 
-  <Section flushTop>
-    <p class:list={['subtitleMedium', s.logosTitle]}>{enterprise.logos.title}</p>
-    <LogosLine logos={enterprise.logos.items} label={enterprise.logos.title} />
-  </Section>
+  <SecurityChapter />
+  <Quote review={review2} fallback={enterprise.quotes.security} theme="blue" />
 
-  {
-    strips.map(({ strip, quote, review }) => (
-      <>
-        <SplitPoints {...strip} />
-        {quote && review && <Quote review={review} fallback={quote} theme={strip.theme} />}
-      </>
-    ))
-  }
+  <GovernanceChapter />
+  <Quote review={review1} fallback={enterprise.quotes.governance} theme="purple" />
+
+  <StatementsSection id="scale" {...enterprise.scale} variant="statLight" theme="orange" />
+
+  <SupportChapter />
+  <Quote review={review3} fallback={enterprise.quotes.support} theme="green" />
+
+  <Faq id="faq" {...enterprise.faq} />
 
   <sales-form class={s.salesForm}>
     <ContactSection
@@ -79,15 +72,7 @@ const strips = [
     </ContactSection>
   </sales-form>
 
-  <StatementsSection {...enterprise.results} variant="statLight" />
-
-  <ChapterHeader
-    label={enterprise.closer.label}
-    headline={enterprise.closer.title}
-    intro={enterprise.closer.text}
-    theme="orange"
-    background="accent"
-  />
+  <PageCloser theme="orange" cta={enterprise.ctaClose} video="/videos/hand-ok-sign-1.pxv" />
 
   <DraftModeQueryListener query={query} />
 </Layout>

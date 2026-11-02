@@ -17,6 +17,8 @@
  *   shows the working mark in place of the symbol. An event is one pill,
  *   the event and its time: the next event takes its place. A history
  *   shows only in a panel;
+ * - `.task`: an item of a task (a part of an export). `data-working`
+ *   shows the working mark before its label, as on a pill;
  * - `.swap`: a thing that the next one replaces (an event pill, an
  *   upload): the old one goes out and the new one comes in, by
  *   --diagram-swap;
@@ -171,8 +173,9 @@
 /*
  * The working mark: a grid of 5 × 5 dots of 2px in the box of the symbol.
  * Each dot is on or dim in turn, in steps, from its own delay (`--d`, a
- * negative time that the markup gives). It shows in place of the symbol
- * while the pill has `data-working`.
+ * negative time that the markup gives). It shows while its parent has
+ * `data-working`: in place of the symbol on a pill, or before the label of
+ * an item of a task.
  */
 .working {
   display: none;
@@ -194,11 +197,11 @@
   display: none;
 }
 
-.pill[data-working] > .working {
+:is(.pill, .task)[data-working] > .working {
   display: grid;
 }
 
-.pill[data-working] > .working > * {
+:is(.pill, .task)[data-working] > .working > * {
   animation: blink 1.6s steps(1, end) var(--d, 0s) infinite;
 }
 

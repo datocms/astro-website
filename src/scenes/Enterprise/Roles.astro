@@ -1,0 +1,47 @@
+---
+import { faPenNib } from '@fortawesome/pro-regular-svg-icons/faPenNib';
+import { faScaleBalanced } from '@fortawesome/pro-regular-svg-icons/faScaleBalanced';
+import { Icon } from '~/components/Icon';
+import type { Theme } from '~/lib/theme';
+import diagram from '../diagram/style.module.css';
+import { RoleScene } from './Governance';
+import { ROLES } from './story';
+import styles from './roles.module.css';
+
+// The frame of the Governance chapter: two custom roles side by side, each
+// with a pill for its name over the screen of its record permissions, as
+// the two people of the Collaboration chapter. The same models, a
+// different job for each role. Below 768px the two go down. There is no
+// motion.
+
+interface Props {
+  theme: Theme;
+}
+
+const { theme } = Astro.props;
+const appearance = { theme, surface: 'inverse' } as const;
+
+/** The icon on the pill of each role: the agency writes, the legal team clears the claims. */
+const ICONS = { 'Agency Berlin': faPenNib, 'Legal team': faScaleBalanced } as const;
+
+/** The height of each screen in px: all the rules of the longer role, with the margin of the screen under them. */
+const SCREEN_HEIGHT = 550;
+---
+
+<div class:list={[diagram.root, styles.roles]}>
+  {
+    ROLES.map((role) => (
+      <div class={styles.role}>
+        <p class={diagram.pill}>
+          <span class={diagram.symbol}>
+            <Icon icon={ICONS[role.name]} />
+          </span>
+          <span>{role.name}</span>
+        </p>
+        <div class={styles.screen}>
+          <RoleScene role={role} appearance={appearance} height={SCREEN_HEIGHT} minWidth={600} />
+        </div>
+      </div>
+    ))
+  }
+</div>

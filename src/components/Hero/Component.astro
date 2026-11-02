@@ -26,6 +26,8 @@ interface Props extends HeroData {
   teamId?: string;
   /** The label is a link to this URL. */
   labelHref?: string;
+  /** The accessible name of the logos. It does not show. */
+  logosLabel?: string;
 }
 
 const {
@@ -42,6 +44,7 @@ const {
   breakBeforeMuted = false,
   teamId,
   labelHref,
+  logosLabel,
 } = Astro.props;
 
 const members = (Astro.props.team ?? []).map((member) =>
@@ -155,7 +158,7 @@ const background = { default: 'default', light: 'accent', dark: 'inverse' }[vari
       )
     }
   </TextTag>
-  {logos && <LogosLine logos={logos} class={styles.logos} />}
+  {logos && <LogosLine logos={logos} label={logosLabel} size="small" class={styles.logos} />}
   {
     members.length > 0 && (
       <hero-team id={teamId} class={styles.team} data-hero-team>

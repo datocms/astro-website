@@ -1,0 +1,105 @@
+/*
+ * The layout of the two diagrams of the security chapter (Backups,
+ * Storage): one column, from the top, with a track between the parts. The
+ * grammar (the pill, the track, the pulse, the panel, the ring) is in
+ * src/scenes/diagram/style.module.css.
+ */
+.flow {
+  --diagram-swap-y: 0px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-md) var(--space-sm);
+}
+
+/* The svg of a track goes 2px under the parts at its two ends. */
+.link {
+  display: block;
+  flex: none;
+  width: 4px;
+  height: var(--space-xl);
+  margin-block: calc(-1 * var(--diagram-tuck));
+  overflow: visible;
+}
+
+.panel {
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  justify-content: center;
+  margin: var(--space-xs) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  padding: var(--space-4xs) var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  line-height: 1.4;
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 0 1px var(--border-on-inverse-strong);
+  color: var(--text-on-inverse-soft);
+}
+
+/* A part of the export with its mark: no mark at rest, the working mark while it exports, the check when it is done. */
+.task {
+  display: inline-flex;
+  gap: var(--space-3xs);
+  align-items: center;
+}
+
+.check {
+  display: none;
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* At rest the mark is an empty box, thus the chip keeps its width. */
+.task::before {
+  content: '';
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+.task[data-working]::before,
+.task[data-done]::before {
+  display: none;
+}
+
+.task[data-done] > .check {
+  display: block;
+}
+
+.task:not([data-working], [data-done]) {
+  color: var(--text-on-inverse-muted);
+}
+
+.caption {
+  margin: var(--space-xs) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  line-height: 1.4;
+  text-align: center;
+  text-wrap: balance;
+  max-inline-size: 100%;
+  color: var(--text-on-inverse-muted);
+}
+
+.twoWay {
+  width: 40px;
+}

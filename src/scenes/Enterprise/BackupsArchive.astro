@@ -1,0 +1,63 @@
+---
+import { faBoxArchive } from '@fortawesome/pro-regular-svg-icons/faBoxArchive';
+import { faClock } from '@fortawesome/pro-regular-svg-icons/faClock';
+import { Icon } from '~/components/Icon';
+import diagram from '../diagram/style.module.css';
+import Link from './Link.astro';
+import styles from './flow.module.css';
+import { BACKUP, GROUP_NAME, PROJECT_PARTS } from './story';
+
+// The backups as an archive, in the grammar of the diagrams. The schedule
+// starts the export. Each part of the project shows the working mark, then
+// the check, one after the other. Then the archive goes to the bucket. The
+// still has all the parts done. The script (flow.ts) plays the loop in
+// view only.
+---
+
+<scene-enterprise-backups-archive
+  class:list={[diagram.root, styles.flow]}
+  role="img"
+  aria-label={BACKUP.archiveDescription}
+>
+  <p class={diagram.pill} data-source>
+    <span class={diagram.symbol}><Icon icon={faClock} /></span>
+    <span>{BACKUP.schedule}</span>
+  </p>
+  <Link />
+  <div class:list={[diagram.panel, styles.panel]}>
+    <p class={diagram.panelLabel}>{GROUP_NAME} export</p>
+    <ul class={styles.chips}>
+      {
+        PROJECT_PARTS.map((part, p) => (
+          <li
+            class:list={[styles.chip, styles.task, diagram.task, diagram.change]}
+            data-part
+            data-done
+          >
+            {/* The mark before the part: the working mark while it exports, the check when it is done. Both are a box of 14 × 14 px, thus the chip keeps its width. */}
+            <span class={diagram.working} aria-hidden="true">
+              {Array.from({ length: 25 }, (_, i) => (
+                <span style={`--d: ${-(((i * 11 + 7 + p * 3) % 25) * 64)}ms`} />
+              ))}
+            </span>
+            <svg class={styles.check} viewBox="0 0 14 14" aria-hidden="true">
+              <path d="M3 7.5 L5.75 10.25 L11 4.5" />
+            </svg>
+            <span>{part}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <Link />
+  <p class:list={[diagram.pill, diagram.change]} data-node>
+    <span class={diagram.symbol}><Icon icon={faBoxArchive} /></span>
+    <span>{BACKUP.bucket}</span>
+  </p>
+</scene-enterprise-backups-archive>
+
+<script>
+  import { ArchiveDiagram } from './flow';
+
+  customElements.define('scene-enterprise-backups-archive', class extends ArchiveDiagram {});
+</script>

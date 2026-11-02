@@ -1,0 +1,26 @@
+---
+import { ChapterLayout } from '~/components/ChapterLayout';
+import { SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
+import * as ent from '~/data/enterprise';
+import { BrandWorkflowScene } from './Governance';
+import Roles from './Roles.astro';
+
+const theme = ent.governance.theme;
+---
+
+{/* The fragment of the white-label is a box until its scene exists. */}
+<ChapterLayout {...ent.governance}>
+  {/* The frame: two custom roles side by side, each with its record permissions, whole. */}
+  <Fragment slot="scene">
+    <SceneFrame preset="whole" theme={theme}>
+      <Roles theme={theme} />
+    </SceneFrame>
+  </Fragment>
+  {
+    /* The stages of the workflow of one brand: larger, and the box cuts it at the right and the bottom. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={0.85} phoneZoom={1.1}>
+    <BrandWorkflowScene appearance={{ theme }} width={700} height={520} />
+  </SceneFragment>
+</ChapterLayout>

@@ -1,0 +1,33 @@
+/*
+ * The frame of the Governance chapter (Roles.astro), on the inverse sheet
+ * of a SceneFrame `whole`: two roles, each a pill over its screen. Below
+ * 768px the roles go down. From 768px they are in a row, at the same
+ * zoom.
+ */
+.roles {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-lg);
+  /* The two screens take all the width of the section, not the 960px of a diagram */
+  max-width: none;
+}
+
+.role {
+  display: grid;
+  justify-items: center;
+  gap: calc(var(--space-xs) + var(--space-2xs));
+  min-width: 0;
+}
+
+/* The screen fills its column. The kit (`fit`) makes the zoom smaller to the width of the column. */
+.screen {
+  width: 100%;
+  border-radius: var(--radius-md);
+  --product-scenes-radius: var(--radius-md);
+}
+
+@media (min-width: 768px) {
+  .roles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
