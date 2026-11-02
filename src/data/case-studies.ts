@@ -32,7 +32,7 @@ export const ctaBuild: CtaBannerData = {
   variant: 'dark',
   theme: 'orange',
   headline: 'Want to build faster?',
-  muted: 'Every feature is built around real customer insights and needs [•ᴗ•]',
+  muted: 'Every feature is built around real customer insights and needs',
   buttons: [
     {
       label: 'Get Started',

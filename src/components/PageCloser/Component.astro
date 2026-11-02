@@ -4,6 +4,7 @@ import { CtaBanner } from '~/components/CtaBanner';
 import { DevConfig } from '~/components/DevConfig';
 import { PixelVideo } from '~/components/PixelVideo';
 import type { CtaBannerData } from '~/data/home';
+import type { FaceName } from '~/lib/motion/faces';
 import { pxvDevConfig, pxvLook } from '~/lib/pixel-video/headers';
 import styles from './style.module.css';
 
@@ -16,6 +17,8 @@ interface Props {
    * appearance of its buttons (see below).
    */
   cta?: CtaBannerData;
+  /** The face at the end of the headline of the cta. Each page selects its own. */
+  face?: FaceName;
   /**
    * The URL of a .pxv file of public/videos, above the band. The file
    * gives all the look: the palette (thus the surface of the copy and of
@@ -33,6 +36,7 @@ interface Props {
 
 const {
   cta,
+  face,
   video,
   videoLayout = 'band',
   href = '/contact',
@@ -58,6 +62,7 @@ const ctaButtons = buttonAppearance
       <CtaBanner
         {...cta}
         buttons={ctaButtons}
+        face={face}
         theme={undefined}
         variant={ctaVariant}
         class={video && styles.cta}

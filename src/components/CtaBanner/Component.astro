@@ -2,17 +2,26 @@
 import { ButtonGroup } from '~/components/ButtonGroup';
 import { Headline } from '~/components/Headline';
 import { Section } from '~/components/Section';
+import { Typewriter } from '~/components/Typewriter';
+import { faceStep, faces, type FaceName } from '~/lib/motion/faces';
 import type { CtaBannerData } from '~/data/home';
 import styles from './style.module.css';
 
 type Props = CtaBannerData & {
   /** More classes for the section (PageCloser uses this). */
   class?: string;
+  /**
+   * The face at the end of the headline. It plays when it comes into view.
+   * The page closer always has one (DESIGN.md, "The Text Face Rule").
+   */
+  face?: FaceName;
 };
 
-const { variant, headline, muted, subline, buttons, theme, class: className } = Astro.props;
+const { variant, headline, muted, subline, buttons, theme, face, class: className } = Astro.props;
 // A "\n" in the headline starts a new line.
 const lines = headline.split('\n');
+const last = lines.length - 1;
+const faceScript = face ? [{ type: 'pause' as const, ms: 300 }, faceStep(face)] : undefined;
 ---
 
 <Section
@@ -25,20 +34,36 @@ const lines = headline.split('\n');
   contentClass={[styles.content, subline && styles.withSubline].filter(Boolean).join(' ')}
 >
   <div class={styles.text}>
-    <Headline as="h2" size="h1" muted={muted}
-      >{
-        lines.map((line, i) =>
-          i > 0 ? (
-            <>
-              <br />
-              {line}
-            </>
-          ) : (
-            line
-          ),
+    {/* A no-break space before the face: the face stays on the line of the last word. */}
+    <Headline as="h2" size="h1" muted={muted}>
+      {
+        lines.map((line, i) => (
+          <>
+            {i > 0 && <br />}
+            {line}
+            {i === last && !muted && face && (
+              <>
+                {'\u00A0'}
+                <Typewriter script={faceScript!} class={styles.face}>
+                  {faces[face].face}
+                </Typewriter>
+              </>
+            )}
+          </>
+        ))
+      }
+      {
+        muted && face && (
+          <Fragment slot="muted">
+            {muted}
+            {'\u00A0'}
+            <Typewriter script={faceScript!} class={styles.face}>
+              {faces[face].face}
+            </Typewriter>
+          </Fragment>
         )
-      }</Headline
-    >
+      }
+    </Headline>
     {subline && <p class:list={[styles.subline, 'body']}>{subline}</p>}
   </div>
   {buttons && buttons.length > 0 && <ButtonGroup buttons={buttons} class={styles.buttons} />}

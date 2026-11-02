@@ -29,7 +29,10 @@ const {
   id,
 } = Astro.props;
 
-const hasMuted = Boolean(muted) || Astro.slots.has('muted');
+// A conditional `muted` slot counts as present also when it is empty: thus
+// the check uses the rendered content.
+const mutedHtml = Astro.slots.has('muted') ? (await Astro.slots.render('muted')).trim() : '';
+const hasMuted = Boolean(muted) || mutedHtml !== '';
 const Wrapper = typewriter ? Typewriter : Fragment;
 const wrapperProps = typewriter
   ? { script: typewriter, start: typewriterStart, delay: typewriterDelay }
@@ -43,7 +46,7 @@ const wrapperProps = typewriter
         <>
           {breakBeforeMuted ? <br /> : ' '}
           <span class:list={[styles.muted, size === 'h2' && styles.mutedSmall]}>
-            <slot name="muted">{muted}</slot>
+            {mutedHtml ? <Fragment set:html={mutedHtml} /> : muted}
           </span>
         </>
       )
