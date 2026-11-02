@@ -6,7 +6,7 @@ colors:
   pollen: '#e7d864'
   cream-paper: '#fdfff5'
   ember-deep: '#42180f'
-  ember: '#ff772d'
+  ember: '#f98751'
   ember-paper: '#fffbf5'
   fern-deep: '#1a4731'
   fern: '#9ad162'
@@ -17,9 +17,9 @@ colors:
   harbour-deep: '#1a3a47'
   glacier: '#7fc4db'
   glacier-paper: '#edfeff'
-  claret-deep: '#3f0e16'
-  coral: '#fe9297'
-  coral-paper: '#fff7f8'
+  plum-deep: '#3c0a35'
+  bubblegum: '#ef89cf'
+  bubblegum-paper: '#fff5fc'
   white: '#ffffff'
   signal-green: '#3f9a4a'
   signal-red: '#f25f5a'
@@ -174,9 +174,9 @@ The five other themes have the same three roles. A section picks its theme with 
 - **Fern** (fern) on **Fern Deep** (fern-deep) and **Fern Paper** (fern-paper). Green.
 - **Iris** (iris) on **Slate Deep** (slate-deep) and **Iris Paper** (iris-paper). Purple: the deep is a blue-black slate, not a purple.
 - **Glacier** (glacier) on **Harbour Deep** (harbour-deep) and **Glacier Paper** (glacier-paper). Blue.
-- **Coral** (coral) on **Claret Deep** (claret-deep) and **Coral Paper** (coral-paper). Pink.
+- **Bubblegum** (bubblegum) on **Plum Deep** (plum-deep) and **Bubblegum Paper** (bubblegum-paper). Pink, toward magenta, so that its hue is far from Ember.
 
-Ember and Coral are tuned away from overnice's values (#ff6d00 too vivid, #f1a5a7 too pale) so that all six accents have similar chroma. Keep that balance when you add a hue.
+Ember and Bubblegum are tuned away from overnice's values (#ff6d00 too vivid, #f1a5a7 too pale) so that all six accents have similar chroma: OKLCH C 0.08 to 0.155 (Glacier is the softest; Fern, Iris, Ember and Bubblegum are the strongest, at about 0.15). An accent above that range looks neon next to the others. Keep that balance when you add or change a hue.
 
 ### Tertiary
 

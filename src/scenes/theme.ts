@@ -17,7 +17,7 @@ import type { Theme } from '~/lib/theme';
  *   (249, the HSL hue of #9e8ef5, gives a blue.)
  * - `blue` 225: the hue of --color-blue-light-5 (#7fc4db) and
  *   --color-blue-deep-5 (#1a3a47).
- * - `pink` 340: the hue of --color-pink-light-5 (#ff7ad9).
+ * - `pink` 340: the hue of --color-pink-light-5 (#ef89cf).
  */
 export const SCENE_HUE: Record<Theme, number> = {
   default: 80,
