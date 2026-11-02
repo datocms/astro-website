@@ -13,13 +13,9 @@ export const query = graphql(
         seoH1
         yoastAnalysis
       }
-      review1: review(filter: { name: { eq: "Dan Barak" } }) {
-        ...QuoteReviewFragment
-      }
-      review2: review(filter: { name: { eq: "Jeff Escalante" } }) {
-        ...QuoteReviewFragment
-      }
-      review3: review(filter: { name: { eq: "Filippo Conforti" } }) {
+      # The review of Severin Klaus (DEPT®). The quote closes the chapter on support.
+      review(filter: { id: { eq: "IcdguI91QDOyM_KZs1izcw" } }) {
+        __typename
         ...QuoteReviewFragment
       }
     }

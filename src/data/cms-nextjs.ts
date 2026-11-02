@@ -102,14 +102,8 @@ export const page: FrameworkPage = {
     subline:
       'Next.js 16 and the App Router in TypeScript, with draft mode, click-to-edit overlays, real-time updates, SEO metadata and cache invalidation on publish. Every file is commented.',
   }),
-  // The review of Tore Heimann. The quote shows when the review is gone.
-  reviewId: '39832291',
-  quote: {
-    quote:
-      '“We are so happy with DatoCMS. I’m representing Signifly - an agency currently running 20 projects, and will increase with +10 projects per year.”',
-    name: 'Tore Heimann',
-    role: 'Technical Lead at Signifly',
-  },
+  // The review of Guillermo Rauch (Vercel).
+  reviewId: '42406722',
   docsRoot,
   starterRepo,
 };

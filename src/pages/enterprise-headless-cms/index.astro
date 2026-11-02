@@ -1,6 +1,6 @@
 ---
 // The enterprise page. The copy comes from src/data/enterprise.ts. The SEO,
-// the H1 label and the quotes come from the CMS. The form sends its data
+// the H1 label and the quote come from the CMS. The form sends its data
 // to the action forms.submitSalesRequest with the issue type
 // "enterprise".
 import { CategoryNav } from '~/components/CategoryNav';
@@ -23,9 +23,9 @@ import SupportChapter from '~/scenes/Enterprise/SupportChapter.astro';
 import { query } from './_graphql';
 import s from './_style.module.css';
 
-const { page, review1, review2, review3 } = await executeQuery(Astro, query);
+const { page, review } = await executeQuery(Astro, query);
 
-if (!page || !review1 || !review2 || !review3) {
+if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
@@ -40,15 +40,13 @@ const { subtitle, ...hero } = enterprise.hero;
   <CategoryNav {...enterprise.chapterNav} />
 
   <SecurityChapter />
-  <Quote review={review2} fallback={enterprise.quotes.security} theme="blue" />
 
   <GovernanceChapter />
-  <Quote review={review1} fallback={enterprise.quotes.governance} theme="purple" />
 
   <StatementsSection id="scale" {...enterprise.scale} variant="statLight" theme="orange" />
 
   <SupportChapter />
-  <Quote review={review3} fallback={enterprise.quotes.support} theme="green" />
+  <Quote quote={review} theme="orange" />
 
   <Faq id="faq" {...enterprise.faq} />
 

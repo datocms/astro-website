@@ -9,6 +9,7 @@ export const query = graphql(
   /* GraphQL */ `
     query Developers {
       review(filter: { id: { eq: "adDu814QTBifhlLWVmRAeQ" } }) {
+        __typename
         ...QuoteReviewFragment
       }
     }

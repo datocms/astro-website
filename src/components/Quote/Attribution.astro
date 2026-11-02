@@ -1,0 +1,69 @@
+---
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import type { QuoteData } from './data';
+import styles from './Attribution.module.css';
+
+interface Props {
+  quote: QuoteData;
+  /** `statement` has a larger photo. */
+  size?: 'statement' | 'card';
+  class?: string;
+}
+
+const { quote, size = 'card', class: className } = Astro.props;
+const { name, role, company, companyHref, nameHref, image } = quote;
+const external = (href: string) => /^https?:/.test(href);
+const avatar = size === 'statement' ? 48 : 32;
+---
+
+{
+  /*
+  The person of a quote: the photo, the name, then the role and the
+  company. The company is a <cite>, with the link to its website or to the
+  page of the partner.
+*/
+}
+<figcaption class:list={[styles.attribution, styles[size], className]}>
+  {
+    image && (
+      <ResponsiveImage
+        data={image}
+        sizes={`${avatar}px`}
+        pictureClass={styles.picture}
+        imgClass={styles.avatar}
+      />
+    )
+  }
+  <span class={styles.text}>
+    <span class={styles.name}>
+      {
+        nameHref ? (
+          <a href={nameHref} rel={external(nameHref) ? 'noopener' : undefined}>
+            {name}
+          </a>
+        ) : (
+          name
+        )
+      }
+    </span>
+    {
+      (role || company) && (
+        <span class={styles.role}>
+          {role}
+          {role && company && ', '}
+          {company && (
+            <cite>
+              {companyHref ? (
+                <a href={companyHref} rel={external(companyHref) ? 'noopener' : undefined}>
+                  {company}
+                </a>
+              ) : (
+                company
+              )}
+            </cite>
+          )}
+        </span>
+      )
+    }
+  </span>
+</figcaption>

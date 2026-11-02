@@ -1,7 +1,6 @@
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import type { ChapterLayoutData } from '~/components/ChapterLayout';
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
-import type { QuoteData } from '~/components/Quote';
 import type { StatementData } from '~/components/Statement';
 import type { CtaBannerData, HeroData } from '~/data/home';
 import {
@@ -312,16 +311,6 @@ export const seo = {
   title: 'Media',
   description:
     'One library for every file. Resize, crop and convert images from the URL, stream video with captions, and ship both to the frontend with ready-made components.',
-};
-
-// The closer: the quote of Grace Guzman. The page shows the quote of the CMS
-// review (ID 39832305). This quote is the fallback, for when the review is
-// gone.
-export const closing: QuoteData = {
-  quote:
-    '“Thanks to DatoCMS we are able to serve massive spikes of terabytes of optimized images per day with zero operations and no upfront costs.”',
-  name: 'Grace Guzman',
-  role: 'Head of Web Marketing, Chatelaine Magazine',
 };
 
 // New copy.

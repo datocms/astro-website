@@ -1,6 +1,5 @@
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import type { ButtonData } from '~/components/Button';
-import type { QuoteData } from '~/components/Quote';
 import type { StatementData } from '~/components/Statement';
 import type { CaseStudiesData, CtaBannerData, HeroData } from '~/data/home';
 
@@ -27,15 +26,6 @@ export const featuredButton: Omit<ButtonData, 'href'> = {
   label: 'Learn More',
   appearance: 'deep-on-white',
   variant: 'soft',
-};
-
-/* The quote when the CMS does not give the testimonial. */
-export const quote: QuoteData = {
-  quote:
-    '“DatoCMS is fast, flexible and a pleasure to use – for both our clients and our developers. It’s become an essential tool for us.”',
-  name: 'Tim Chesney',
-  role: 'Director at Make',
-  avatar: '/images/case-studies/tim-chesney.png',
 };
 
 export const ctaBuild: CtaBannerData = {

@@ -28,6 +28,7 @@ export const query = graphql(
         ...CaseStudyGridStoryFragment
       }
       testimonial: partnerTestimonial(filter: { id: { eq: "EsPEhRwGSTOLU19hEPLVhg" } }) {
+        __typename
         ...QuotePartnerTestimonialFragment
       }
     }

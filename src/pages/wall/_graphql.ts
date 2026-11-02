@@ -1,7 +1,4 @@
-import {
-  TestimonialsPartnerTestimonialFragment,
-  TestimonialsReviewFragment,
-} from '~/components/Testimonials';
+import { QuotePartnerTestimonialFragment, QuoteReviewFragment } from '~/components/Quote';
 import { graphql } from '~/lib/datocms/graphql';
 
 /*
@@ -13,15 +10,15 @@ export const query = graphql(
     query WallOfLove {
       allReviews(first: 100) {
         __typename
-        _updatedAt
-        ...TestimonialsReviewFragment
+        _createdAt
+        ...QuoteReviewFragment
       }
       allPartnerTestimonials(first: 500) {
         __typename
-        _updatedAt
-        ...TestimonialsPartnerTestimonialFragment
+        _createdAt
+        ...QuotePartnerTestimonialFragment
       }
     }
   `,
-  [TestimonialsReviewFragment, TestimonialsPartnerTestimonialFragment],
+  [QuoteReviewFragment, QuotePartnerTestimonialFragment],
 );

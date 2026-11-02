@@ -1,5 +1,4 @@
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
-import type { QuoteData } from '~/components/Quote';
 import type { StatementData } from '~/components/Statement';
 import type { CtaBannerData, HeroData } from '~/data/home';
 import type { CategoryNavData } from '~/components/CategoryNav';
@@ -64,15 +63,6 @@ export const seo = {
   title: 'Editor experience',
   description:
     'Editors get a calm place to write, developers get structured content. Visual editing, dynamic layouts, localization, workflows, collaboration and SEO in one editor.',
-};
-
-// The closer: the fallback of the quote of the CMS review (see
-// src/pages/editor-experience/_graphql.ts). The page uses the CMS text.
-export const closing: QuoteData = {
-  quote:
-    '“This is precisely what I want: a CMS that’s been built by an agency because they know what my clients need.”',
-  name: 'Marc Ammann',
-  role: 'CEO, Matter Supply Co.',
 };
 
 export const ctaDemo: CtaBannerData = {

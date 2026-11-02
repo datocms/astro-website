@@ -1,33 +1,72 @@
 /*
- * A centred H1 quote,
- * then the userpic (40, multiply), the name and the role in text/muted.
+ * The statement: a quote of 120 characters at most, in the headline type.
+ * The headline type has a line height of 1.0; a quote of three or four
+ * lines needs more air between the lines.
  */
-.figure {
+.quote {
+  margin: 0;
+  line-height: 1.1;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+/* The opening mark hangs outside the column. */
+.quote p {
+  text-indent: -0.4em;
+}
+
+/* Centered: the quote, then the person, on the accent band. */
+.centered {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-xl);
   text-align: center;
 }
 
-.quote {
+/* Below 1152px the halves stack: the quote on the accent, the person on the inverse. */
+.split {
+  display: flex;
+  flex-direction: column;
+}
+
+.half {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--section-padding-y) var(--section-padding-x);
+}
+
+.accent {
+  background: var(--surface-accent);
   color: var(--text-primary);
 }
 
-.author {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2xs);
+.inverse {
+  --attribution-muted: var(--text-on-inverse-muted);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
 }
 
-.avatar {
-  width: 40px;
-  height: 40px;
-  mix-blend-mode: multiply;
+.split .quote {
+  max-width: 14em;
 }
 
-.role {
-  display: block;
-  color: var(--text-muted);
+@media (min-width: 1152px) {
+  /*
+   * The outer padding of each half is --content-inset-half, thus at 1920
+   * and 2560 the quote and the person stay in the centred content column.
+   */
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .half:first-child {
+    padding-inline-start: var(--content-inset-half);
+  }
+
+  .half:last-child {
+    padding-inline-end: var(--content-inset-half);
+  }
 }

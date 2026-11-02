@@ -4,7 +4,6 @@
 // action forms.submitPartnerProgramRequest, then goes to
 // /partner-program/thanks. The SEO is static: the page has no CMS record.
 import { stripStega } from '@datocms/astro';
-import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { ContactForm } from '~/components/ContactForm';
 import { CtaBanner } from '~/components/CtaBanner';
 import { Headline } from '~/components/Headline';
@@ -12,7 +11,8 @@ import { Hero } from '~/components/Hero';
 import { LogosLine, type LogoItem } from '~/components/LogosLine';
 import { Section } from '~/components/Section';
 import { Step, Steps } from '~/components/Steps';
-import { Testimonials, type TestimonialsItem } from '~/components/Testimonials';
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { QuoteGrid } from '~/components/Quote';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import {
   benefits,
@@ -23,6 +23,7 @@ import {
   seo as partnerSeo,
   steps,
   talk,
+  testimonials,
 } from '~/data/partner-program';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
@@ -40,12 +41,6 @@ if (!page) {
 }
 
 const seo = overrideSeo([], seoTitle(partnerSeo.title));
-
-// The slider shows the short quotes only. In draft mode the text has stega:
-// remove it before the count.
-const shortTestimonials = partnerTestimonials.filter(
-  (testimonial) => stripStega(toPlainText(testimonial.quote)!).length < 230,
-) as TestimonialsItem[];
 
 const partnerLogos: LogoItem[] = page.highlightedPartners.slice(0, 7).map((partner) => ({
   mask: partner.logo.url,
@@ -80,7 +75,13 @@ const partnerLogos: LogoItem[] = page.highlightedPartners.slice(0, 7).map((partn
     </div>
   </Section>
 
-  {shortTestimonials.length > 0 && <Testimonials items={shortTestimonials} variant="slider" />}
+  {
+    partnerTestimonials.length > 0 && (
+      <QuoteGrid items={partnerTestimonials}>
+        <ButtonGroup slot="footer" buttons={[testimonials.button]} />
+      </QuoteGrid>
+    )
+  }
 
   <CtaBanner
     variant={plans.variant}

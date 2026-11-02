@@ -205,11 +205,57 @@ export type BlogPost = ItemTypeDefinition<
     author: {
       type: 'links';
     };
+    category: {
+      type: 'link';
+    };
+    topics: {
+      type: 'links';
+    };
   }
 >;
 export const BlogPost = {
   ID: '810907',
   REF: { type: 'item_type', id: '810907' },
+} as const;
+
+export type BlogPostCategory = ItemTypeDefinition<
+  EnvironmentSettings,
+  'A4pCmYEGQJuva0IMyyMK6A',
+  {
+    name: {
+      type: 'string';
+    };
+    slug: {
+      type: 'slug';
+    };
+    position: {
+      type: 'integer';
+    };
+  }
+>;
+export const BlogPostCategory = {
+  ID: 'A4pCmYEGQJuva0IMyyMK6A',
+  REF: { type: 'item_type', id: 'A4pCmYEGQJuva0IMyyMK6A' },
+} as const;
+
+export type BlogPostTopic = ItemTypeDefinition<
+  EnvironmentSettings,
+  'ZPFH8dPDQcOKOj-cFYXmcA',
+  {
+    name: {
+      type: 'string';
+    };
+    slug: {
+      type: 'slug';
+    };
+    position: {
+      type: 'integer';
+    };
+  }
+>;
+export const BlogPostTopic = {
+  ID: 'ZPFH8dPDQcOKOj-cFYXmcA',
+  REF: { type: 'item_type', id: 'ZPFH8dPDQcOKOj-cFYXmcA' },
 } as const;
 
 export type Changelog = ItemTypeDefinition<
@@ -1406,8 +1452,8 @@ export type LandingPage = ItemTypeDefinition<
   EnvironmentSettings,
   '810906',
   {
-    demo: {
-      type: 'link';
+    docs_url: {
+      type: 'string';
     };
     name: {
       type: 'string';
@@ -1415,23 +1461,23 @@ export type LandingPage = ItemTypeDefinition<
     seo_h1: {
       type: 'string';
     };
-    docs_url: {
-      type: 'string';
-    };
-    integration: {
+    demo: {
       type: 'link';
     };
     slug: {
       type: 'slug';
+    };
+    subtitle: {
+      type: 'text';
+    };
+    integration: {
+      type: 'link';
     };
     seo: {
       type: 'seo';
     };
     title: {
       type: 'structured_text';
-    };
-    subtitle: {
-      type: 'text';
     };
     yoast_analysis: {
       type: 'json';
@@ -1874,8 +1920,14 @@ export type PartnerTestimonial = ItemTypeDefinition<
     role: {
       type: 'string';
     };
+    excerpt: {
+      type: 'string';
+    };
     image: {
       type: 'file';
+    };
+    featured: {
+      type: 'boolean';
     };
   }
 >;
@@ -1994,6 +2046,9 @@ export type Plugin = ItemTypeDefinition<
     };
     preview_image: {
       type: 'file';
+    };
+    internal_notes: {
+      type: 'text';
     };
     plugin_type: {
       type: 'link';
@@ -2512,6 +2567,9 @@ export type Review = ItemTypeDefinition<
     role: {
       type: 'string';
     };
+    company: {
+      type: 'string';
+    };
     quote: {
       type: 'structured_text';
     };
@@ -2519,6 +2577,12 @@ export type Review = ItemTypeDefinition<
       type: 'string';
     };
     use_in_dashboard: {
+      type: 'boolean';
+    };
+    excerpt: {
+      type: 'string';
+    };
+    featured: {
       type: 'boolean';
     };
     position: {
@@ -3480,6 +3544,8 @@ export type AnyModel =
   | Badge
   | Blog
   | BlogPost
+  | BlogPostCategory
+  | BlogPostTopic
   | Changelog
   | ChangelogCategory
   | ChangelogEntry

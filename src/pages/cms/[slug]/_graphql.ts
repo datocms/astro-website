@@ -43,6 +43,7 @@ export const query = graphql(
         }
       }
       review(filter: { id: { eq: $reviewId } }) {
+        __typename
         ...QuoteReviewFragment
       }
     }

@@ -1,62 +1,74 @@
 ---
-import { PlainText } from '~/components/StructuredText';
 import { Section } from '~/components/Section';
-import type { QuoteData } from './types';
-import { type FragmentOf, readFragment } from '~/lib/datocms/graphql';
 import type { Theme } from '~/lib/theme';
-import { QuotePartnerTestimonialFragment, QuoteReviewFragment } from './graphql';
+import Attribution from './Attribution.astro';
+import Card from './Card.astro';
+import { readQuote, statementText, type QuoteItem } from './data';
 import styles from './style.module.css';
 
 interface Props {
-  /** The review of the CMS. Without it, the quote is the fallback. */
-  review?: FragmentOf<typeof QuoteReviewFragment> | null;
+  /** The review or the partner testimonial. Without it, nothing shows. */
+  quote: QuoteItem | null | undefined;
   /**
-   * A testimonial of a partner. It replaces the review. The role shows the
-   * name of the partner, and the photo comes from the CMS.
+   * `centered`: the quote and the person on the accent band. `split`: the
+   * quote on the accent half, the person on the inverse half. Use `split`
+   * on a page with few split bands, and `centered` on a page with many.
    */
-  testimonial?: FragmentOf<typeof QuotePartnerTestimonialFragment> | null;
-  /** The quote of the data file. It also gives a missing name or role. */
-  fallback: QuoteData;
+  variant?: 'centered' | 'split';
   /** Without a theme, the section inherits the theme of its parent. */
   theme?: Theme;
 }
 
-const { fallback, theme } = Astro.props;
-const testimonial = readFragment(QuotePartnerTestimonialFragment, Astro.props.testimonial);
-const review = testimonial ?? readFragment(QuoteReviewFragment, Astro.props.review);
-
-const name = review?.name ?? fallback.name;
-const role = testimonial
-  ? [testimonial.role, testimonial.partner?.name].filter(Boolean).join(' at ')
-  : (review?.role ?? fallback.role);
-const avatar = testimonial ? testimonial.image?.url : fallback.avatar;
+const { variant = 'centered', theme } = Astro.props;
+const quote = Astro.props.quote ? readQuote(Astro.props.quote) : null;
+const text = quote ? statementText(quote) : null;
 ---
 
-<Section theme={theme} background="accent" padding="headlines" width="headline">
-  <figure class={styles.figure}>
-    <blockquote class:list={[styles.quote, 'h1']}>
-      <p>
-        {
-          review ? (
-            <>
-              “<PlainText data={review.quote} typographic />”
-            </>
-          ) : (
-            fallback.quote
-          )
-        }
-      </p>
-    </blockquote>
-    <figcaption class={styles.author}>
-      {
-        avatar && (
-          <img class={styles.avatar} src={avatar} alt="" width="40" height="40" loading="lazy" />
-        )
-      }
-      <span class="subtitleMedium">
-        {name}
-        <span class={styles.role}>{role}</span>
-      </span>
-    </figcaption>
-  </figure>
-</Section>
+{
+  /*
+  The quote that closes a chapter, in the headline type. It shows the
+  excerpt, or the full quote when it is short (see statementText). A quote
+  that is too long for the headline type shows as a card.
+*/
+}
+{
+  quote && !text && (
+    <Section theme={theme} width="reading">
+      <Card quote={quote} />
+    </Section>
+  )
+}
+{
+  quote && text && variant === 'centered' && (
+    <Section theme={theme} background="accent" padding="headlines" width="headline">
+      <figure class={styles.centered}>
+        <blockquote class:list={[styles.quote, 'h1']}>
+          <p>
+            “{text}
+            {'⁠”'}
+          </p>
+        </blockquote>
+        <Attribution quote={quote} size="statement" />
+      </figure>
+    </Section>
+  )
+}
+{
+  quote && text && variant === 'split' && (
+    <Section theme={theme} padding="none" flush>
+      <figure class={styles.split}>
+        <div class:list={[styles.half, styles.accent, 'surfaceLight']}>
+          <blockquote class:list={[styles.quote, 'h1']}>
+            <p>
+              “{text}
+              {'⁠”'}
+            </p>
+          </blockquote>
+        </div>
+        <div class:list={[styles.half, styles.inverse]}>
+          <Attribution quote={quote} size="statement" />
+        </div>
+      </figure>
+    </Section>
+  )
+}

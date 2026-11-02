@@ -3,54 +3,40 @@
 // src/data/wall-of-love.ts. The quotes come from the CMS: all the reviews
 // and all the partner testimonials. The SEO is static.
 import { stripStega } from '@datocms/astro';
-import { render as renderAsPlainText } from 'datocms-structured-text-to-plain-text';
 import type { Review } from 'schema-dts';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
 import { JsonLd } from '~/components/JsonLd';
 import { PageCloser } from '~/components/PageCloser';
-import {
-  Testimonials,
-  TestimonialsPartnerTestimonialFragment,
-  TestimonialsReviewFragment,
-} from '~/components/Testimonials';
+import { QuoteGrid, readQuote } from '~/components/Quote';
 import * as wall from '~/data/wall-of-love';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { query } from './_graphql';
-
-type ReviewItem = FragmentOf<typeof TestimonialsReviewFragment>;
-type PartnerTestimonialItem = FragmentOf<typeof TestimonialsPartnerTestimonialFragment>;
 
 const { allReviews, allPartnerTestimonials } = await executeQuery(Astro, query);
 
 // The reviews and the partner testimonials in one list, the newest first.
 const items = [...allPartnerTestimonials, ...allReviews].sort((a, b) =>
-  b._updatedAt.localeCompare(a._updatedAt),
+  b._createdAt.localeCompare(a._createdAt),
 );
 
-// The Review JSON-LD of the old wall. JSON-LD needs strings: the quote is
-// plain text, without the stega of Content Link.
+// The Review JSON-LD of the old wall. JSON-LD needs strings, without the
+// stega of Content Link.
 const reviews = items.map((item): Review => {
-  const data =
-    item.__typename === 'ReviewRecord'
-      ? { ...readFragment(TestimonialsReviewFragment, item as ReviewItem), partner: null }
-      : readFragment(TestimonialsPartnerTestimonialFragment, item as PartnerTestimonialItem);
-  const { partner } = data;
-  const quote = renderAsPlainText(data.quote as Parameters<typeof renderAsPlainText>[0]);
-  const reviewBody = stripStega(quote ?? '')
-    .replace(/\s+/g, ' ')
-    .trim();
+  const quote = readQuote(item);
+  const reviewBody = stripStega(quote.text).replace(/\s+/g, ' ').trim();
   return {
     '@type': 'Review',
     itemReviewed: { '@type': 'SoftwareApplication', name: 'DatoCMS' },
     author: {
       '@type': 'Person',
-      name: data.name ?? undefined,
-      ...(data.role ? { jobTitle: data.role } : {}),
-      ...(partner ? { worksFor: { '@type': 'Organization', name: partner.name } } : {}),
+      name: stripStega(quote.name),
+      ...(quote.role ? { jobTitle: stripStega(quote.role) } : {}),
+      ...(quote.company
+        ? { worksFor: { '@type': 'Organization', name: stripStega(quote.company) } }
+        : {}),
     },
     reviewBody: reviewBody || undefined,
   };
@@ -59,19 +45,13 @@ const reviews = items.map((item): Review => {
 const seo = overrideSeo([], seoTitle(wall.seo.title), seoDescription(wall.seo.description));
 ---
 
-{
-  /*
-  The quotes of the CMS are longer than the quotes of the design: the grid
-  uses the `long` size of the quotes.
-*/
-}
 <Layout seo={seo} theme="pink" headerVariant="light" footerTheme="purple">
   <Fragment slot="head">
     <JsonLd data={{ '@context': 'https://schema.org', '@graph': reviews }} />
   </Fragment>
 
   <Hero {...wall.hero} variant="light" alignment="center" typewriter />
-  <Testimonials items={items} long />
+  <QuoteGrid items={items} />
   <PageCloser theme="purple" video="/videos/hand-heart.pxv" />
 
   <DraftModeQueryListener query={query} />

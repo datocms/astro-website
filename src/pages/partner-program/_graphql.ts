@@ -1,4 +1,4 @@
-import { TestimonialsPartnerTestimonialFragment } from '~/components/Testimonials';
+import { QuotePartnerTestimonialFragment } from '~/components/Quote';
 import { PartnerUrlFragment } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { graphql } from '~/lib/datocms/graphql';
 
@@ -17,15 +17,12 @@ export const query = graphql(
           ...PartnerUrlFragment
         }
       }
-      partnerTestimonials: allPartnerTestimonials(first: 25) {
+      # The featured partner testimonials: three cards.
+      partnerTestimonials: allPartnerTestimonials(filter: { featured: { eq: true } }, first: 3) {
         __typename
-        ...TestimonialsPartnerTestimonialFragment
-        quote {
-          value
-        }
-        _updatedAt
+        ...QuotePartnerTestimonialFragment
       }
     }
   `,
-  [TestimonialsPartnerTestimonialFragment, PartnerUrlFragment],
+  [QuotePartnerTestimonialFragment, PartnerUrlFragment],
 );

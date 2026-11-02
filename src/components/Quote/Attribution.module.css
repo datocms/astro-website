@@ -1,0 +1,69 @@
+/*
+ * The photo, then the name and the role in two lines. The role uses the
+ * muted text of the surface: a section on the inverse surface sets
+ * --attribution-muted.
+ */
+.attribution {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--type-subtitle);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  text-align: start;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.name {
+  font-weight: 500;
+}
+
+.role {
+  color: var(--attribution-muted, var(--text-muted));
+}
+
+.role cite {
+  font-style: normal;
+}
+
+.attribution a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in oklab, currentcolor 40%, transparent);
+  transition: text-decoration-color 150ms ease-out;
+}
+
+@media (hover: hover) {
+  .attribution a:hover {
+    text-decoration-color: currentcolor;
+  }
+}
+
+/* A CMS photo is a <picture>. The image sets its own width (100%), thus the picture gives the size. */
+.picture {
+  display: block;
+  flex: none;
+  width: 32px;
+  height: 32px;
+}
+
+.statement .picture {
+  width: 48px;
+  height: 48px;
+}
+
+/* The photo takes the hue of the surface: it reads on the light and on the dark surfaces. */
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  mix-blend-mode: luminosity;
+}

@@ -1,5 +1,5 @@
 import { executeQuery } from '@datocms/cda-client';
-import { DATOCMS_API_TOKEN } from 'astro:env/server';
+import { DATOCMS_API_TOKEN, DATOCMS_ENVIRONMENT } from 'astro:env/server';
 import { dataSource } from '~/lib/dataSource';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
@@ -22,5 +22,6 @@ export const [fetchFavicon, maybeInvalidateFavicon] = dataSource('favicon', asyn
     returnCacheTags: true,
     excludeInvalid: true,
     token: DATOCMS_API_TOKEN,
+    environment: DATOCMS_ENVIRONMENT,
   });
 });

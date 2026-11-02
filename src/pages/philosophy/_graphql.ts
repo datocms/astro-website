@@ -1,11 +1,12 @@
 import { HeroTeamMemberFragment } from '~/components/Hero';
-import { TestimonialsReviewFragment } from '~/components/Testimonials';
+import { QuoteReviewFragment } from '~/components/Quote';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 
 /*
- * The slider shows the quotes of the old about page: Jeff Escalante and
- * Marc Ammann. The team row of the hero shows the team members.
+ * The quote between the principles is the review of Jeff Escalante
+ * (HashiCorp) about a small, bootstrapped company that listens. The team row
+ * of the hero shows the team members.
  */
 export const query = graphql(
   /* GraphQL */ `
@@ -18,15 +19,11 @@ export const query = graphql(
       members: allTeamMembers {
         ...HeroTeamMemberFragment
       }
-      review1: review(filter: { name: { eq: "Jeff Escalante" } }) {
+      review(filter: { id: { eq: "39832302" } }) {
         __typename
-        ...TestimonialsReviewFragment
-      }
-      review2: review(filter: { name: { eq: "Marc Ammann" } }) {
-        __typename
-        ...TestimonialsReviewFragment
+        ...QuoteReviewFragment
       }
     }
   `,
-  [TagFragment, HeroTeamMemberFragment, TestimonialsReviewFragment],
+  [TagFragment, HeroTeamMemberFragment, QuoteReviewFragment],
 );

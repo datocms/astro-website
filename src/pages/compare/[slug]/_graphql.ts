@@ -3,10 +3,7 @@ import {
   ComparisonTableComparisonFragment,
 } from '~/components/ComparisonTable';
 import { ReasonColumnsReasonFragment } from '~/components/ReasonColumns';
-import {
-  TestimonialsPartnerTestimonialFragment,
-  TestimonialsReviewFragment,
-} from '~/components/Testimonials';
+import { QuotePartnerTestimonialFragment, QuoteReviewFragment } from '~/components/Quote';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import {
@@ -43,8 +40,8 @@ export const query = graphql(
         }
         testimonials {
           __typename
-          ...TestimonialsReviewFragment
-          ...TestimonialsPartnerTestimonialFragment
+          ...QuoteReviewFragment
+          ...QuotePartnerTestimonialFragment
         }
         ...ComparisonTableComparisonFragment
       }
@@ -56,8 +53,8 @@ export const query = graphql(
   [
     TagFragment,
     ReasonColumnsReasonFragment,
-    TestimonialsReviewFragment,
-    TestimonialsPartnerTestimonialFragment,
+    QuoteReviewFragment,
+    QuotePartnerTestimonialFragment,
     ComparisonTableComparisonFragment,
     ComparisonTableAlternativeFragment,
   ],

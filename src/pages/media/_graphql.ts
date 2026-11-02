@@ -10,6 +10,7 @@ export const query = graphql(
   /* GraphQL */ `
     query Media {
       review(filter: { id: { eq: "39832305" } }) {
+        __typename
         ...QuoteReviewFragment
       }
     }

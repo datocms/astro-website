@@ -87,14 +87,8 @@ export const page: FrameworkPage = {
     subline:
       'SvelteKit 2 and Svelte 5 in TypeScript, with draft mode, click-to-edit overlays, real-time updates and SEO metadata. The Web Previews and SEO plugins come set up. Every file is commented.',
   }),
-  // The review of Matteo Manzo. The quote shows when the review is gone.
+  // The review of Matteo Manzo (Cantiere Creativo).
   reviewId: '39832307',
-  quote: {
-    quote:
-      '“DatoCMS does not force you to speak its language, instead gives you the peace of mind of being able to use the right solution for each project.”',
-    name: 'Matteo Manzo',
-    role: 'Technical Project Manager at Cantiere Creativo',
-  },
   docsRoot,
   starterRepo,
 };

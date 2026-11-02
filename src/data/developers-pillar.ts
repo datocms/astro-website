@@ -2,7 +2,6 @@ import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import type { ChapterLayoutData } from '~/components/ChapterLayout';
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
 import type { StatementsSectionData } from '~/components/StatementsSection';
-import type { QuoteData } from '~/components/Quote';
 import type { StatementData } from '~/components/Statement';
 import type { CtaBannerData, HeroData } from '~/data/home';
 import {
@@ -373,16 +372,6 @@ export const seo = {
   title: 'For developers',
   description:
     'Model it in the schema builder, query it with GraphQL, stream it in real time, purge it with cache tags, fork it with environments, script it with the API and extend it with plugins.',
-};
-
-// The closer: one quote from wall-of-love.ts. November Five built Le Pain
-// Quotidien.
-// The page shows the quote of the CMS review of Stijn Symons. This quote is
-// the fallback, for when the review is gone.
-export const closing: QuoteData = {
-  quote: '“It’s faster than anything we’ve used.”',
-  name: 'Stijn Symons',
-  role: 'Director of Architecture, November Five',
 };
 
 export const ctaBuild: CtaBannerData = {

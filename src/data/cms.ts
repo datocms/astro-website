@@ -1,6 +1,5 @@
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
 import type { ChapterLayoutData } from '~/components/ChapterLayout';
-import type { QuoteData } from '~/components/Quote';
 import type { StatementData } from '~/components/Statement';
 import type { CtaBannerData, HeroData } from '~/data/home';
 import type { CodeTab } from '~/components/CodeSnippetPreview';
@@ -50,9 +49,8 @@ export interface FrameworkPage {
   /** The integration records whose websites and showcase projects the carousel shows. */
   integrations: string[];
   starter: CtaBannerData;
-  /** The ID of the CMS review of the quote, and the quote to show without it. */
+  /** The ID of the CMS review of the quote that closes the page. */
   reviewId: string;
-  quote: QuoteData;
   /** The root of the docs of the framework. */
   docsRoot: string;
   /** The GitHub repository of the starter kit, as owner/name. */

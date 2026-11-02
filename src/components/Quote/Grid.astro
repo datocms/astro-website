@@ -1,0 +1,39 @@
+---
+import { Section } from '~/components/Section';
+import type { Theme } from '~/lib/theme';
+import Card from './Card.astro';
+import { readQuote, type QuoteItem } from './data';
+import styles from './Grid.module.css';
+
+interface Props {
+  /** The reviews and the partner testimonials, in their order. */
+  items: QuoteItem[];
+  /** Without a theme, the section inherits the theme of its parent. */
+  theme?: Theme;
+  /** Remove the top padding: the section above gives the gap. */
+  flushTop?: boolean;
+}
+
+const { items, theme, flushTop } = Astro.props;
+const quotes = items.map(readQuote);
+---
+
+{
+  /*
+  Rows of quote cards: one column on phones, two from 768px, three from
+  1152px. The slot "header" goes above the rows, the slot "footer" below.
+*/
+}
+<Section theme={theme} flushTop={flushTop} contentClass={styles.content}>
+  <slot name="header" />
+  <ul class={styles.grid}>
+    {
+      quotes.map((quote) => (
+        <li>
+          <Card quote={quote} />
+        </li>
+      ))
+    }
+  </ul>
+  <slot name="footer" />
+</Section>

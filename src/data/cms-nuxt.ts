@@ -86,14 +86,8 @@ export const page: FrameworkPage = {
     subline:
       'Nuxt 4 in TypeScript, with draft mode, click-to-edit overlays, real-time updates and SEO metadata. The Web Previews and SEO plugins come set up. Every file is commented.',
   }),
-  // The review of Emil Olsson. The quote shows when the review is gone.
+  // The review of Emil Olsson.
   reviewId: '39832294',
-  quote: {
-    quote:
-      '“Thanks for a brilliant product, I have tried the competition and in my opinion DatoCMS is waaaaaay ahead.”',
-    name: 'Emil Olsson',
-    role: 'Freelance Creative',
-  },
   docsRoot,
   starterRepo,
 };

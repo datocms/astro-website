@@ -103,14 +103,8 @@ export const page: FrameworkPage = {
     subline:
       'Astro in TypeScript, with draft mode, click-to-edit overlays, real-time updates and SEO metadata. The Web Previews and SEO plugins come set up. Every file is commented.',
   }),
-  // The CMS review of Caleb Wise. The quote shows when the review is gone.
+  // The review of Caleb Wise (Elliott Systems).
   reviewId: 'fT4Qn9KQSJCnKqPvVcYoIw',
-  quote: {
-    quote:
-      '“DatoCMS is one of the few content management platforms where its design and use is equally enjoyed by both developers and digital marketers. A rare combo that really helps make a team work well.”',
-    name: 'Caleb Wise',
-    role: 'Founder at Elliott Systems',
-  },
   docsRoot,
   starterRepo,
 };
