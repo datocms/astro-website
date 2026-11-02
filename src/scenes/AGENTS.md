@@ -40,7 +40,7 @@ Each page has one project; the Editing chapters have one each. The names, the re
 - A record editor scene renders `EditorScene` (`src/scenes/editor.tsx`) with its story (project, user, menu of the models, record info) and its form as children. `chrome="editor"` (the default) has no navigation bar and the menu of the models closed; `chrome="app"` has both. `panels` replaces the panels of the aside under the record info.
 - Style a screen only with the CSS properties of the kit (`--product-scenes-zoom`, `-radius`, `-shadow`, `-border`), never with the class names of the kit.
 - Give a scene that must keep a layout a `minWidth` on its stage: on a narrower box the kit makes the zoom smaller.
-- The kit is not on npm for the website: `vendor/` holds the tarball and `package.json` points to it. `npm run vendor-scenes` builds it from `../private/web/packages/product-scenes` (or `KIT_DIR`); the version of the tarball has the short sha of the kit commit, and `.dirty` when the kit has uncommitted changes. Commit the new tarball, `package.json` and `package-lock.json` together, and restart `astro dev`.
+- The kit is not on npm for the website: `vendor/` holds the tarball and `package.json` points to it. `npm run vendor-scenes` builds it from `../../private/web/packages/product-scenes` (or `KIT_DIR`); the version of the tarball has the short sha of the kit commit, and `.dirty` when the kit has uncommitted changes. Commit the new tarball, `package.json` and `package-lock.json` together, and restart `astro dev`.
 
 ## Chapters
 
