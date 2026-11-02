@@ -1,4 +1,5 @@
 ---
+import { PrevNext } from '~/components/PrevNext';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import findIndex from 'lodash-es/findIndex';
 import { executeQuery } from '~/lib/datocms/executeQuery';
@@ -10,7 +11,6 @@ import { ArticleBody } from '~/components/ArticleBody';
 import { CourseOutline } from '~/components/CourseOutline';
 import { Hero } from '~/components/Hero';
 import { Prose } from '~/components/Prose';
-import { Section } from '~/components/Section';
 import { StructuredText } from '~/components/StructuredText';
 import { Image } from '~/components/StructuredText/blocks/Image';
 import { InternalVideo } from '~/components/StructuredText/blocks/InternalVideo';
@@ -20,7 +20,6 @@ import { defaultInlineRecordComponents } from '~/components/StructuredText/inlin
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
 import Layout from '~/layouts/Layout.astro';
 import HeadingNode from './_HeadingNode.astro';
-import s from './_style.module.css';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
 import { buildUrlForAcademyCourse } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
@@ -145,34 +144,19 @@ const outline = allChapters.map((nthChapter) => ({
       />
     </ArticleBody>
   </div>
-  <Section as="nav" aria-label="Previous and next chapter" data-datocms-nomd>
-    <div class={s.prevNext}>
-      <div class={s.prev}>
-        {
-          prevChapter && (
-            <>
-              <p class:list={[s.label, 'caption']}>Previous chapter</p>
-              <a class:list={[s.link, 'h2']} href={buildUrlForAcademyChapter(prevChapter)}>
-                &larr; {prevChapter.title}
-              </a>
-            </>
-          )
-        }
-      </div>
-      <div class={s.next}>
-        {
-          nextChapter && (
-            <>
-              <p class:list={[s.label, 'caption']}>Next chapter</p>
-              <a class:list={[s.link, 'h2']} href={buildUrlForAcademyChapter(nextChapter)}>
-                {nextChapter.title} &rarr;
-              </a>
-            </>
-          )
-        }
-      </div>
-    </div>
-  </Section>
+  <PrevNext
+    ariaLabel="Previous and next chapter"
+    prev={prevChapter && {
+      label: 'Previous chapter',
+      title: prevChapter.title,
+      href: buildUrlForAcademyChapter(prevChapter),
+    }}
+    next={nextChapter && {
+      label: 'Next chapter',
+      title: nextChapter.title,
+      href: buildUrlForAcademyChapter(nextChapter),
+    }}
+  />
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

@@ -1,9 +1,9 @@
 ---
 import { Pagination } from '~/components/Pagination';
 import { Section } from '~/components/Section';
-import { buildUrlForChangelogEntry } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
+import { ProductUpdateRow } from '~/components/ProductUpdateRow';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
-import { formatLongDate } from '~/lib/format/date';
+import { formatMonth } from '~/lib/format/date';
 import { ProductUpdateListFragment } from './graphql';
 import styles from './style.module.css';
 
@@ -15,41 +15,40 @@ interface Props {
 
 const { pagination } = Astro.props;
 const entries = Astro.props.entries.map((entry) => readFragment(ProductUpdateListFragment, entry));
+
+// The entries come newest first: a new group starts at each new month.
+const months: { month: string; entries: typeof entries }[] = [];
+for (const entry of entries) {
+  const month = formatMonth(entry._firstPublishedAt);
+  const last = months.at(-1);
+  if (last?.month === month) last.entries.push(entry);
+  else months.push({ month, entries: [entry] });
+}
 ---
 
 {
   /*
-  The index of the changelog, as ProductUpdates on the home:
-  the same rows on the default surface of the page (the date and the title at
-  the left, the categories as pills at the right, a line between two rows,
-  the accent fill on hover). Each row links to the page of its entry, which
-  has the content. Pagination is in its own section, under the rows.
+  The index of the changelog: the rows of ProductUpdates on the home
+  (ProductUpdateRow), on the default surface of the page, in groups by
+  month. Each group has the month as a large heading, and the rows show
+  only the day. Each row links to the page
+  of its entry, which has the content. Pagination is in its own section,
+  under the rows.
 */
 }
 <Section padding="none" flush>
-  <ol class={styles.list}>
-    {
-      entries.map((entry) => (
-        <li class={styles.item}>
-          <a href={buildUrlForChangelogEntry(entry)} class={styles.row}>
-            <span class:list={[styles.main, 'h2']}>
-              <time class={styles.date} datetime={entry._firstPublishedAt}>
-                {formatLongDate(entry._firstPublishedAt)}
-              </time>
-              <span>{entry.title}</span>
-            </span>
-            {entry.categories.length > 0 && (
-              <span class={styles.tags}>
-                {entry.categories.map((category) => (
-                  <span class:list={[styles.tag, 'subtitleMedium']}>{category.name}</span>
-                ))}
-              </span>
-            )}
-          </a>
-        </li>
-      ))
-    }
-  </ol>
+  {
+    months.map(({ month, entries }) => (
+      <section class={styles.month}>
+        <h2 class:list={[styles.monthHeading, 'h1']}>{month}</h2>
+        <ol class={styles.list}>
+          {entries.map((entry) => (
+            <ProductUpdateRow entry={entry} date="day" />
+          ))}
+        </ol>
+      </section>
+    ))
+  }
 </Section>
 {
   pagination.totalPages > 1 && (

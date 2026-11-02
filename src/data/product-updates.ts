@@ -12,10 +12,21 @@ export const hero: HeroData = {
   label: 'Product updates',
   headline: 'What’s new?',
   subheadline: 'Everything we ship, as soon as we ship it.',
+  buttons: [
+    {
+      label: 'Subscribe via RSS',
+      href: '/product-changelog.xml',
+      appearance: 'deep-on-light',
+      arrow: false,
+    },
+  ],
 };
 
 /** The link from the page of one entry back to the index. */
 export const back = { label: 'All product updates', href: '/product-updates' };
+
+/** The labels of the links to the next and the previous entry, at the end of an entry. */
+export const neighbours = { newer: 'Newer update', older: 'Older update' };
 
 /** The number of entries on each page of the index. The rows have no content, thus a page holds many. */
 export const perPage = 20;

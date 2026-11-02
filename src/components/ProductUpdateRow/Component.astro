@@ -1,0 +1,53 @@
+---
+import { buildUrlForChangelogEntry } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { formatDayOfMonth, formatRelativeDate } from '~/lib/format/date';
+import { ProductUpdateRowFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  entry: FragmentOf<typeof ProductUpdateRowFragment>;
+  /**
+   * `relative` ("A Month Ago") for a page that the server renders for each
+   * request, `day` ("Tuesday 29th") for a list in groups by month.
+   */
+  date: 'relative' | 'day';
+  /**
+   * The title has the h1 size below 1152px, for a short list that must
+   * have impact (the home). A long list under headings keeps the h2 size.
+   */
+  large?: boolean;
+}
+
+const { date, large = false } = Astro.props;
+const entry = readFragment(ProductUpdateRowFragment, Astro.props.entry);
+const formatDate = date === 'relative' ? formatRelativeDate : formatDayOfMonth;
+---
+
+{
+  /*
+  One row of the changelog, for ProductUpdates (the home) and
+  ProductUpdateList (the index). The row is one link: the date (small and
+  muted) above the title at the left, the categories as pills at the right, a line under the
+  row, the accent fill on hover. Put it in a <ul> or an <ol>.
+*/
+}
+<li class:list={[styles.item, large && styles.large]}>
+  <a href={buildUrlForChangelogEntry(entry)} class={styles.row}>
+    <span class={styles.main}>
+      <time class:list={[styles.date, 'subtitleMedium']} datetime={entry._firstPublishedAt}>
+        {formatDate(entry._firstPublishedAt)}
+      </time>
+      <span class:list={[styles.title, 'h2']}>{entry.title}</span>
+    </span>
+    {
+      entry.categories.length > 0 && (
+        <span class={styles.tags}>
+          {entry.categories.map((category) => (
+            <span class:list={[styles.tag, 'subtitleMedium']}>{category.name}</span>
+          ))}
+        </span>
+      )
+    }
+  </a>
+</li>

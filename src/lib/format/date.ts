@@ -11,6 +11,19 @@ export function formatLongDate(iso: string): string {
   return `${month} ${ordinal(date.getUTCDate())}, ${date.getUTCFullYear()}`;
 }
 
+/** Format an ISO date or date-time like "Tuesday 19th", for a list in groups by month. */
+export function formatDayOfMonth(iso: string): string {
+  const date = new Date(iso.length === 10 ? `${iso}T00:00:00Z` : iso);
+  const weekday = date.toLocaleString('en-US', { weekday: 'long', timeZone: 'UTC' });
+  return `${weekday} ${ordinal(date.getUTCDate())}`;
+}
+
+/** Format an ISO date or date-time like "August 2026". */
+export function formatMonth(iso: string): string {
+  const date = new Date(iso.length === 10 ? `${iso}T00:00:00Z` : iso);
+  return date.toLocaleString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+}
+
 const DAY = 24 * 60 * 60 * 1000;
 
 /**

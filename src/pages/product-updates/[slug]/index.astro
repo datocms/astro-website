@@ -1,12 +1,14 @@
 ---
 // One entry of the changelog, with its content and a link back to the index.
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { PrevNext } from '~/components/PrevNext';
 import { ProductUpdate } from '~/components/ProductUpdate';
 import * as productUpdates from '~/data/product-updates';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { buildUrlForChangelogEntry } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
-import { query } from './_graphql';
+import { neighboursQuery, query } from './_graphql';
 
 const variables = { slug: Astro.params.slug! };
 const { entry } = await executeQuery(Astro, query, { variables });
@@ -15,6 +17,20 @@ if (!entry) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+// An entry that is not published yet (draft mode) has no date: it has no neighbours.
+const { newer, older } = entry._firstPublishedAt
+  ? await executeQuery(Astro, neighboursQuery, {
+      variables: { date: entry._firstPublishedAt, slug: variables.slug },
+    })
+  : { newer: [], older: [] };
+
+const toLink = (label: string, neighbour: (typeof newer)[number] | undefined) =>
+  neighbour && { label, title: neighbour.title, href: buildUrlForChangelogEntry(neighbour) };
+const neighbours = {
+  newer: toLink(productUpdates.neighbours.newer, newer[0]),
+  older: toLink(productUpdates.neighbours.older, older[0]),
+};
 ---
 
 <Layout seo={entry.seo} theme="green" headerVariant="light" footerTheme="green">
@@ -22,6 +38,11 @@ if (!entry) {
   <div id="main-content">
     <ProductUpdate entry={entry} back={productUpdates.back} />
   </div>
+  <PrevNext
+    ariaLabel="Newer and older product update"
+    prev={neighbours.newer}
+    next={neighbours.older}
+  />
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

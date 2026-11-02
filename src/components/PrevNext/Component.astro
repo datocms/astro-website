@@ -1,0 +1,58 @@
+---
+import { Section } from '~/components/Section';
+import styles from './style.module.css';
+
+interface Link {
+  /** The small line above the title, such as "Next chapter". */
+  label: string;
+  title: string;
+  href: string;
+}
+
+interface Props {
+  /** The accessible name of the navigation. */
+  ariaLabel: string;
+  /** The link at the left, with an arrow to the left. */
+  prev?: Link;
+  /** The link at the right, with an arrow to the right. */
+  next?: Link;
+}
+
+const { ariaLabel, prev, next } = Astro.props;
+---
+
+{
+  /*
+  The links to the item before and the item after, at the end of a page
+  (an academy chapter, a product update). Each side has a small muted label
+  and the title as a large link. On phones the two links are stacked.
+*/
+}
+<Section as="nav" aria-label={ariaLabel} data-datocms-nomd>
+  <div class={styles.prevNext}>
+    <div>
+      {
+        prev && (
+          <>
+            <p class:list={[styles.label, 'caption']}>{prev.label}</p>
+            <a class:list={[styles.link, 'h2']} href={prev.href}>
+              &larr; {prev.title}
+            </a>
+          </>
+        )
+      }
+    </div>
+    <div class={styles.next}>
+      {
+        next && (
+          <>
+            <p class:list={[styles.label, 'caption']}>{next.label}</p>
+            <a class:list={[styles.link, 'h2']} href={next.href}>
+              {next.title} &rarr;
+            </a>
+          </>
+        )
+      }
+    </div>
+  </div>
+</Section>

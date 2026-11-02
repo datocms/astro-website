@@ -13,6 +13,7 @@ export const query = graphql(
   /* GraphQL */ `
     query ProductUpdate($slug: String!) {
       entry: changelogEntry(filter: { slug: { eq: $slug } }) {
+        _firstPublishedAt
         seo: _seoMetaTags {
           ...TagFragment
         }
@@ -21,6 +22,36 @@ export const query = graphql(
     }
   `,
   [TagFragment, ProductUpdateFragment],
+);
+
+/**
+ * The entries before and after an entry, by date of first publication: the
+ * newer one and the older one. As in the blog (src/pages/blog/_related.ts),
+ * the filters exclude the entry by its slug: a filter on the date can
+ * return the entry itself.
+ */
+export const neighboursQuery = graphql(
+  /* GraphQL */ `
+    query ProductUpdateNeighbours($date: DateTime!, $slug: String!) {
+      newer: allChangelogEntries(
+        first: 1
+        filter: { _firstPublishedAt: { gt: $date }, slug: { neq: $slug } }
+        orderBy: _firstPublishedAt_ASC
+      ) {
+        title
+        ...ChangelogEntryUrlFragment
+      }
+      older: allChangelogEntries(
+        first: 1
+        filter: { _firstPublishedAt: { lt: $date }, slug: { neq: $slug } }
+        orderBy: _firstPublishedAt_DESC
+      ) {
+        title
+        ...ChangelogEntryUrlFragment
+      }
+    }
+  `,
+  [ChangelogEntryUrlFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {
