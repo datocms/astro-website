@@ -1,0 +1,96 @@
+---
+import { SUPPORT_CHAT } from './story';
+import styles from './channel.module.css';
+
+// The frame of the chapter Support: the window of a team chat with the
+// channel that Northwind Group shares with DatoCMS. It is a neutral chat:
+// no app is drawn, no logo, no avatar. A tag after each name tells the
+// company of the person. The channels of the workspace are at the left,
+// the channel in the middle, and the open thread at the right: the
+// question of a developer of Northwind, and the answer of a solution
+// architect of DatoCMS, with the command of the CLI. On a narrow window
+// the list of the channels goes; on phones only the thread shows. There
+// is no motion.
+
+const chat = SUPPORT_CHAT;
+const question = chat.messages.find((message) => 'replies' in message)!;
+const description = `A team chat with the channel #${chat.channel}, which ${chat.workspace} shares with ${chat.sharedWith}. ${question.name} of ${question.org} asks: “${question.text}” In the thread, ${chat.thread.map((reply) => `${reply.name} of ${reply.org} answers: “${reply.text}${'code' in reply ? ` ${reply.code} ${reply.after}` : ''}”`).join(' ')}`;
+---
+
+<div class={styles.window} role="img" aria-label={description}>
+  <div class={styles.app} aria-hidden="true">
+    <div class={styles.sidebar}>
+      <p class={styles.workspace}>{chat.workspace}</p>
+      <ul class={styles.channels}>
+        {
+          chat.channels.map((name) => (
+            <li class={styles.channelItem} data-current={name === chat.channel || undefined}>
+              <span class={styles.hash}>#</span>
+              {name}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class={styles.channel}>
+      <p class={styles.header}>
+        <span><span class={styles.hash}>#</span>{chat.channel}</span>
+        <span class={styles.shared}>Shared with {chat.sharedWith}</span>
+      </p>
+      <ul class={styles.messages}>
+        {
+          chat.messages.map((message) => (
+            <li class={styles.message} data-open={'replies' in message || undefined}>
+              <p class={styles.meta}>
+                <span class={styles.name}>{message.name}</span>
+                <span class={styles.org}>{message.org}</span>
+                <span class={styles.time}>{message.time}</span>
+              </p>
+              <p>{message.text}</p>
+              {'replies' in message && <p class={styles.replies}>{message.replies} replies</p>}
+            </li>
+          ))
+        }
+      </ul>
+      <p class={styles.composer}>Message #{chat.channel}</p>
+    </div>
+    <div class={styles.thread}>
+      <p class={styles.header}>
+        <span>Thread</span>
+        <span class={styles.shared}>#{chat.channel}</span>
+      </p>
+      <ul class={styles.messages}>
+        <li class={styles.message}>
+          <p class={styles.meta}>
+            <span class={styles.name}>{question.name}</span>
+            <span class={styles.org}>{question.org}</span>
+            <span class={styles.time}>{question.time}</span>
+          </p>
+          <p>{question.text}</p>
+        </li>
+        <li class={styles.divider}>{chat.thread.length} replies</li>
+        {
+          chat.thread.map((reply) => (
+            <li class={styles.message}>
+              <p class={styles.meta}>
+                <span class={styles.name}>{reply.name}</span>
+                <span class={styles.org} data-vendor={reply.org === chat.sharedWith || undefined}>
+                  {reply.org}
+                </span>
+                <span class={styles.time}>{reply.time}</span>
+              </p>
+              <p>{reply.text}</p>
+              {'code' in reply && (
+                <>
+                  <pre class={styles.code}>{reply.code}</pre>
+                  <p>{reply.after}</p>
+                </>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+      <p class={styles.composer}>Reply…</p>
+    </div>
+  </div>
+</div>

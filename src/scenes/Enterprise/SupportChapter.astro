@@ -1,12 +1,28 @@
 ---
 import { ChapterLayout } from '~/components/ChapterLayout';
 import { SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
 import * as ent from '~/data/enterprise';
 import Graph from '../Environments/Graph.astro';
+import SharedChannel from './SharedChannel.astro';
+import SlaTable from './SlaTable.astro';
+
+const theme = ent.support.theme;
 ---
 
-{/* The frame and the fragment of the SLAs are boxes until their scenes exist. */}
 <ChapterLayout {...ent.support}>
+  {
+    /* The frame: the window of a neutral team chat with the channel that the group shares with DatoCMS, all its width. */
+  }
+  <Fragment slot="scene">
+    <SceneFrame preset="fill" theme={theme} height={600} phoneHeightVw={200}>
+      <SharedChannel />
+    </SceneFrame>
+  </Fragment>
+  {/* The SLAs of the contract: the uptime and the time of the first answer. */}
+  <SceneFragment slot="visual-0" fit="fill">
+    <SlaTable />
+  </SceneFragment>
   {
     /* The graph of the environments of the developers chapter: a lane for the primary, a lane for the sandbox. */
   }

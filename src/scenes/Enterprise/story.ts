@@ -232,3 +232,75 @@ export const AUDIT_LOG = [
     role: 'Admin',
   },
 ] as const;
+
+/**
+ * The shared channel of Northwind Group and DatoCMS (the frame of the
+ * chapter Support). A developer of Northwind asks how to keep one model the
+ * same in the projects of the twelve brands. A solution architect of
+ * DatoCMS answers in the thread: one folder of migrations, one profile of
+ * the CLI for each project, and `migrations:run` with the profile.
+ */
+export const SUPPORT_CHAT = {
+  workspace: 'Northwind',
+  channels: ['general', 'web-platform', 'northwind-datocms', 'releases'],
+  channel: 'northwind-datocms',
+  sharedWith: 'DatoCMS',
+  messages: [
+    {
+      name: 'Marco Bellini',
+      org: 'Northwind',
+      time: 'Yesterday',
+      text: 'The autumn-launch sandbox is ready. We promote it on Monday.',
+    },
+    {
+      name: 'Elena Ricci',
+      org: 'DatoCMS',
+      time: '09:12',
+      text: 'Editorial onboarding for the Berlin team is on Thursday at 10:00. I’ll share the recording here after.',
+    },
+    {
+      name: 'Marco Bellini',
+      org: 'Northwind',
+      time: '10:02',
+      text: 'Each brand has its own project. How do we keep the Landing page model the same in all twelve?',
+      replies: 3,
+    },
+  ],
+  thread: [
+    {
+      name: 'Elena Ricci',
+      org: 'DatoCMS',
+      time: '10:09',
+      text: 'Keep the schema changes as migrations in one repo, with a profile for each brand project in datocms.config.json. Then run them on each project:',
+      code: 'datocms migrations:run --profile=brand-berlin',
+      after: 'Each brand keeps its own content, roles and workflow: only the models move.',
+    },
+    {
+      name: 'Marco Bellini',
+      org: 'Northwind',
+      time: '10:14',
+      text: 'Perfect, we’ll add it to the CI today.',
+    },
+    {
+      name: 'Elena Ricci',
+      org: 'DatoCMS',
+      time: '10:15',
+      text: 'Send me the first migration and I’ll review it with you.',
+    },
+  ],
+} as const;
+
+/**
+ * The fragment of the SLAs: the two service levels of the contract of the
+ * group. Only the facts of the copy (src/data/enterprise.ts): no other
+ * priority and no other figure.
+ */
+export const SLA = {
+  label: `${GROUP_NAME} contract`,
+  levels: [
+    { name: 'Performance SLA', value: '99.99%', term: 'Uptime' },
+    { name: 'Support SLA', value: '1 hour', term: 'First answer to a priority-one issue, 24/7' },
+  ],
+  description:
+    'The service levels in the contract of Northwind Group: the performance SLA, 99.99% uptime; the support SLA, an answer to a priority-one issue in one hour, around the clock.',
+} as const;

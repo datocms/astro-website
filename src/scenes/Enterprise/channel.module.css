@@ -1,0 +1,251 @@
+/*
+ * The frame of the chapter Support (SharedChannel.astro), in a SceneFrame
+ * `fill`: the window of a neutral team chat, on the default surface of the
+ * theme, as the neutral chat of /ai (Mcp/style.module.css). The frame
+ * gives the window its corners, its ring and its height. Three columns:
+ * the channels, the channel and the thread. From 900px of window all
+ * three show; from 760px the channel and the thread; under 760px only the
+ * thread.
+ */
+.window {
+  position: relative;
+  container-type: inline-size;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  border-radius: var(--product-scenes-radius, 0);
+  background: var(--surface-default);
+  color: var(--text-primary);
+  font-size: var(--type-subtitle);
+  line-height: 1.45;
+}
+
+.window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: var(--product-scenes-border, none);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .window {
+    height: min(var(--scene-frame-height), var(--scene-frame-tablet-height));
+  }
+}
+
+@media (min-width: 1152px) {
+  .window {
+    height: var(--scene-frame-height);
+  }
+}
+
+/* The resets have no class weight: the rules of the parts win over them */
+:where(.window) p,
+:where(.window) ul,
+:where(.window) pre {
+  margin: 0;
+}
+
+:where(.window) ul {
+  padding: 0;
+  list-style: none;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 1fr;
+  height: 100%;
+}
+
+.sidebar,
+.channel {
+  display: none;
+}
+
+.thread {
+  display: flex;
+}
+
+@container (min-width: 760px) {
+  .app {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .channel {
+    display: flex;
+  }
+}
+
+@container (min-width: 900px) {
+  .app {
+    grid-template-columns: 200px 1fr 1.25fr;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-xs);
+    border-right: 1px solid var(--border-default);
+    background: var(--surface-accent-faint);
+    font-size: var(--type-code-small);
+  }
+}
+
+.workspace {
+  padding-inline: var(--space-3xs);
+  font-weight: 500;
+}
+
+.channels {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.channelItem {
+  padding: var(--space-4xs) var(--space-3xs);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+}
+
+.channelItem[data-current] {
+  background: var(--surface-accent-muted);
+  color: var(--text-primary);
+}
+
+.hash {
+  margin-right: var(--space-4xs);
+  color: var(--text-muted);
+}
+
+.channel,
+.thread {
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.thread {
+  border-left: 1px solid var(--border-default);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--border-default);
+  font-weight: 500;
+}
+
+.shared {
+  color: var(--text-muted);
+  font-size: var(--type-code-small);
+  font-weight: 400;
+}
+
+.messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--space-sm);
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4xs);
+}
+
+/* The channel shows its newest messages at the bottom, above the box to write in, as the chat apps do */
+.channel .messages {
+  justify-content: flex-end;
+}
+
+/* The message with the open thread has the tint of the accent, as the chat apps mark it */
+.message[data-open] {
+  margin-inline: calc(-1 * var(--space-3xs));
+  padding: var(--space-3xs);
+  border-radius: var(--radius-sm);
+  background: var(--surface-accent-faint);
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3xs);
+}
+
+.name {
+  font-weight: 500;
+}
+
+.org {
+  padding: 0 var(--space-3xs);
+  border-radius: var(--radius-full);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+}
+
+/* The tag of DatoCMS has the accent: the reader finds the answers of the team at once */
+.org[data-vendor] {
+  background: var(--surface-accent);
+  box-shadow: none;
+  color: var(--text-on-accent);
+}
+
+.time {
+  color: var(--text-muted);
+  font-size: var(--type-code-small);
+}
+
+.replies {
+  color: var(--text-soft);
+  font-size: var(--type-code-small);
+  font-weight: 500;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  color: var(--text-muted);
+  font-size: var(--type-code-small);
+}
+
+.divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--border-default);
+}
+
+.code {
+  overflow: hidden;
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-sm);
+  background: var(--code-background);
+  color: var(--code-plain);
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.composer {
+  margin: var(--space-sm);
+  margin-top: 0;
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+  color: var(--text-muted);
+}

@@ -1,0 +1,38 @@
+---
+import { faHeadset } from '@fortawesome/pro-regular-svg-icons/faHeadset';
+import { faServer } from '@fortawesome/pro-regular-svg-icons/faServer';
+import { Icon } from '~/components/Icon';
+import diagram from '../diagram/style.module.css';
+import { SLA } from './story';
+import styles from './sla.module.css';
+
+// The SLAs of the contract, in the grammar of the diagrams: a panel with
+// the name of the contract and a row for each service level. Each row has
+// the mark and the name of the SLA, the figure in large type and its
+// term. There is no motion.
+
+/** The mark of each SLA: the servers for the uptime, the headset for the support. */
+const ICONS = { 'Performance SLA': faServer, 'Support SLA': faHeadset } as const;
+---
+
+<div class:list={[diagram.root, styles.sla]} role="img" aria-label={SLA.description}>
+  <div class:list={[diagram.panel, styles.panel]}>
+    <p class={diagram.panelLabel}>{SLA.label}</p>
+    <dl class={styles.levels}>
+      {
+        SLA.levels.map((level) => (
+          <div class={styles.level}>
+            <dt class={styles.name}>
+              <span class={styles.mark} aria-hidden="true">
+                <Icon icon={ICONS[level.name]} />
+              </span>
+              {level.name}
+            </dt>
+            <dd class={styles.value}>{level.value}</dd>
+            <dd class={styles.term}>{level.term}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</div>

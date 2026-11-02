@@ -8,7 +8,6 @@ import type { ButtonData } from '~/components/Button';
 import type { CategoryNavData } from '~/components/CategoryNav';
 import type { ChapterLayoutData } from '~/components/ChapterLayout';
 import type { LogoItem } from '~/components/LogosLine';
-import type { QuoteData } from '~/components/Quote';
 import type { StatementsSectionData } from '~/components/StatementsSection';
 import type { CtaBannerData, HeroData } from '~/data/home';
 import { svgLogo } from '~/data/home';
@@ -226,14 +225,14 @@ export const support: ChapterLayoutData = {
   },
   // New copy.
   scene:
-    'A shared Slack channel between Northwind Group and DatoCMS: a developer of Northwind asks about the model of a landing page, and a solution architect of DatoCMS answers in the thread.',
+    'A shared Slack channel between Northwind Group and DatoCMS: a developer of Northwind asks about the model of a landing page, and a solution architect of DatoCMS answers in the thread. (Built.)',
   fragments: [
     {
       // New copy.
       title: 'SLAs, in writing.',
       text: 'A performance SLA with 99.99% uptime, and a support SLA that answers priority-one issues in one hour, around the clock.',
       picture:
-        'The SLA table of a contract: uptime 99.99%, priority one answered in one hour, around the clock.',
+        'The SLA table of a contract: uptime 99.99%, priority one answered in one hour, around the clock. (Built.)',
     },
     {
       title: 'Sandboxes for testing and backups.',
@@ -242,16 +241,6 @@ export const support: ChapterLayoutData = {
         'The graph of the environments of the chapter Environments of /developers: the primary and a sandbox that forks from it and is promoted. (Built, reused.)',
     },
   ],
-};
-
-/**
- * The quotes are reviews of the CMS (by name). The name and the role of
- * the fallback show only when the review has none.
- */
-export const quotes: Record<'security' | 'governance' | 'support', QuoteData> = {
-  security: { quote: '', name: 'Jeff Escalante', role: '' },
-  governance: { quote: '', name: 'Dan Barak', role: '' },
-  support: { quote: '', name: 'Filippo Conforti', role: '' },
 };
 
 // New copy. The questions of the security review. Each answer holds only

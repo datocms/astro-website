@@ -1,0 +1,77 @@
+/*
+ * The SLAs of the contract: one panel, a row for each service level, with
+ * a line between the rows. The panel is fluid, thus it fits a narrow box
+ * at its full type size. It is at the centre of the box.
+ */
+.sla {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 100%;
+  padding: var(--space-sm);
+}
+
+.panel {
+  width: 100%;
+  max-width: 400px;
+}
+
+.levels {
+  margin: var(--space-xs) 0 0;
+}
+
+.level {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: var(--space-sm);
+  align-items: baseline;
+  padding-block: var(--space-xs);
+}
+
+.level + .level {
+  border-top: 1px solid var(--border-on-inverse-strong);
+}
+
+.name {
+  display: flex;
+  gap: var(--space-2xs);
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--type-code-small);
+  color: var(--text-on-inverse-soft);
+}
+
+/* The mark of the SLA: the icon in a circle with the tint of the accent. */
+.mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--surface-inverse-subtle);
+  color: var(--text-on-inverse);
+  font-size: 14px;
+}
+
+.term {
+  grid-column: 1;
+}
+
+.value {
+  grid-row: span 2;
+  margin: 0;
+  font-size: var(--type-h2);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-on-inverse);
+}
+
+.term {
+  margin: var(--space-4xs) 0 0;
+  font-size: var(--type-caption);
+  line-height: 1.4;
+  color: var(--text-on-inverse-muted);
+}
