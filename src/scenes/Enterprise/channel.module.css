@@ -1,7 +1,7 @@
 /*
  * The frame of the chapter Support (SharedChannel.astro), in a SceneFrame
- * `fill`: the window of a neutral team chat, on the default surface of the
- * theme, as the neutral chat of /ai (Mcp/style.module.css). The frame
+ * `fill`: the window of the team chat, in the layout of Slack, with the
+ * colours of the theme. The frame
  * gives the window its corners, its ring and its height. Three columns:
  * the channels, the channel and the thread. From 900px of window all
  * three show; from 760px the channel and the thread; under 760px only the
@@ -88,38 +88,67 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
-    padding: var(--space-sm) var(--space-xs);
+    gap: var(--space-4xs);
+    padding: var(--space-xs);
     border-right: 1px solid var(--border-default);
     background: var(--surface-accent-faint);
-    font-size: var(--type-code-small);
+    font-size: var(--type-caption);
   }
 }
 
 .workspace {
-  padding-inline: var(--space-3xs);
+  display: flex;
+  gap: var(--space-3xs);
+  align-items: center;
+  padding: var(--space-3xs) var(--space-3xs) var(--space-xs);
+  font-size: var(--type-subtitle);
+  font-weight: 600;
+}
+
+.workspace :global(svg) {
+  width: 10px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.navItem {
+  display: flex;
+  gap: var(--space-2xs);
+  align-items: center;
+  padding: var(--space-4xs) var(--space-3xs);
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+
+.navItem :global(svg),
+.hash {
+  flex: none;
+  width: 14px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* The open channel has the full accent, as the chat app marks it */
+.navItem[data-current] {
+  background: var(--surface-accent);
+  color: var(--text-on-accent);
   font-weight: 500;
 }
 
-.channels {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.navItem[data-current] :global(svg) {
+  color: inherit;
 }
 
-.channelItem {
+.section {
+  margin-top: var(--space-xs);
   padding: var(--space-4xs) var(--space-3xs);
-  border-radius: var(--radius-sm);
   color: var(--text-muted);
-}
-
-.channelItem[data-current] {
-  background: var(--surface-accent-muted);
-  color: var(--text-primary);
-}
-
-.hash {
-  margin-right: var(--space-4xs);
-  color: var(--text-muted);
+  font-weight: 500;
 }
 
 .channel,
@@ -133,48 +162,103 @@
   border-left: 1px solid var(--border-default);
 }
 
-.header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-xs);
-  padding: var(--space-xs) var(--space-sm);
+.channelHeader {
+  padding: var(--space-xs) var(--space-sm) 0;
   border-bottom: 1px solid var(--border-default);
+}
+
+.title {
+  display: flex;
+  gap: var(--space-3xs);
+  align-items: center;
+  font-weight: 700;
+}
+
+.title :global(svg) {
+  width: 13px;
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-2xs);
+  font-size: var(--type-caption);
+  color: var(--text-muted);
+}
+
+.tabs li {
+  padding-bottom: var(--space-3xs);
+}
+
+.tabs li[data-current] {
+  box-shadow: inset 0 -2px 0 var(--surface-accent);
+  color: var(--text-primary);
   font-weight: 500;
 }
 
-.shared {
+.threadHeader {
+  display: flex;
+  gap: var(--space-2xs);
+  align-items: center;
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.threadChannel {
+  display: flex;
+  flex: 1;
+  gap: var(--space-4xs);
+  align-items: center;
   color: var(--text-muted);
-  font-size: var(--type-code-small);
-  font-weight: 400;
+  font-size: var(--type-caption);
+}
+
+.threadChannel :global(svg) {
+  width: 10px;
+}
+
+.close {
+  display: flex;
+  color: var(--text-muted);
+}
+
+.close :global(svg) {
+  width: 14px;
 }
 
 .messages {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   min-height: 0;
   overflow: hidden;
-  padding: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
 }
 
-.message {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4xs);
-}
-
-/* The channel shows its newest messages at the bottom, above the box to write in, as the chat apps do */
+/* The channel shows its newest messages at the bottom, above the box to write in, as the chat app does */
 .channel .messages {
   justify-content: flex-end;
 }
 
-/* The message with the open thread has the tint of the accent, as the chat apps mark it */
+.message {
+  display: flex;
+  gap: var(--space-2xs);
+  align-items: flex-start;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* The message with the open thread has a tint, as the chat app marks it */
 .message[data-open] {
-  margin-inline: calc(-1 * var(--space-3xs));
-  padding: var(--space-3xs);
-  border-radius: var(--radius-sm);
+  margin-inline: calc(-1 * var(--space-sm));
+  padding: var(--space-2xs) var(--space-sm);
   background: var(--surface-accent-faint);
 }
 
@@ -185,34 +269,101 @@
 }
 
 .name {
-  font-weight: 500;
-}
-
-.org {
-  padding: 0 var(--space-3xs);
-  border-radius: var(--radius-full);
-  box-shadow: inset 0 0 0 1px var(--border-default);
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: var(--type-code-small);
-}
-
-/* The tag of DatoCMS has the accent: the reader finds the answers of the team at once */
-.org[data-vendor] {
-  background: var(--surface-accent);
-  box-shadow: none;
-  color: var(--text-on-accent);
+  font-weight: 700;
 }
 
 .time {
   color: var(--text-muted);
+  font-size: var(--type-code-xsmall);
+}
+
+.avatar {
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 36px;
+}
+
+.avatar img,
+.initials {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.initials {
+  background: var(--surface-accent-muted);
+  color: var(--text-primary);
   font-size: var(--type-code-small);
+  font-weight: 600;
+}
+
+.avatar[data-small] {
+  width: 22px;
+  height: 22px;
+}
+
+/* The badge of an external person: the symbol of the other company in a small square at the corner of the avatar */
+.badge,
+.bannerMark {
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.badge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  box-sizing: content-box;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--surface-default);
+}
+
+.badge :global(svg),
+.bannerMark :global(svg) {
+  width: 8px;
+  height: 8px;
 }
 
 .replies {
-  color: var(--text-soft);
-  font-size: var(--type-code-small);
-  font-weight: 500;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3xs);
+  align-items: center;
+  margin-top: var(--space-3xs);
+  font-size: var(--type-caption);
+}
+
+.repliesLink {
+  color: var(--text-accent);
+  font-weight: 600;
+}
+
+.day {
+  display: flex;
+  align-items: center;
+  font-size: var(--type-code-xsmall);
+  font-weight: 600;
+}
+
+.day::before,
+.day::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--border-default);
+}
+
+.day span {
+  padding: var(--space-4xs) var(--space-xs);
+  border-radius: var(--radius-full);
+  box-shadow: inset 0 0 0 1px var(--border-default);
 }
 
 .divider {
@@ -220,7 +371,7 @@
   align-items: center;
   gap: var(--space-3xs);
   color: var(--text-muted);
-  font-size: var(--type-code-small);
+  font-size: var(--type-caption);
 }
 
 .divider::after {
@@ -229,23 +380,108 @@
   border-top: 1px solid var(--border-default);
 }
 
+/* A code block as the chat app draws it: light, with a ring, in the mono font */
 .code {
-  overflow: hidden;
+  margin-block: var(--space-3xs);
   padding: var(--space-3xs) var(--space-xs);
   border-radius: var(--radius-sm);
-  background: var(--code-background);
-  color: var(--code-plain);
+  background: var(--surface-accent-faint);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+  color: var(--text-primary);
   font-family: var(--font-mono);
   font-size: var(--type-code-small);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
 
-.composer {
-  margin: var(--space-sm);
-  margin-top: 0;
-  padding: var(--space-3xs) var(--space-xs);
-  border-radius: var(--radius-sm);
+.reactions {
+  display: flex;
+  gap: var(--space-3xs);
+  margin-top: var(--space-3xs);
+}
+
+.reaction {
+  display: inline-flex;
+  gap: var(--space-4xs);
+  align-items: center;
+  padding: 0 var(--space-2xs);
+  border-radius: var(--radius-full);
+  background: var(--surface-accent-faint);
   box-shadow: inset 0 0 0 1px var(--border-default);
+  font-size: var(--type-code-small);
+}
+
+.reaction[data-add] {
   color: var(--text-muted);
+}
+
+.reaction :global(svg) {
+  width: 13px;
+}
+
+.composeArea {
+  padding: 0 var(--space-sm) var(--space-sm);
+}
+
+/* The banner over the box to write in: it tells how many people of the channel are external */
+.banner {
+  display: flex;
+  gap: var(--space-2xs);
+  align-items: center;
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: var(--surface-status-warning);
+  font-size: var(--type-caption);
+}
+
+.bannerMark {
+  flex: none;
+  width: 16px;
+  height: 16px;
+}
+
+.banner + .composer {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.composer {
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+  font-size: var(--type-caption);
+  color: var(--text-muted);
+}
+
+.toolbar,
+.actions {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: center;
+  padding: var(--space-3xs) var(--space-xs);
+}
+
+.toolbar {
+  border-bottom: 1px solid var(--border-default);
+}
+
+.toolbar :global(svg),
+.actions :global(svg) {
+  width: 13px;
+}
+
+.placeholder {
+  padding: var(--space-3xs) var(--space-xs);
+}
+
+.round {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background: var(--surface-accent-faint);
+}
+
+.send {
+  margin-left: auto;
 }

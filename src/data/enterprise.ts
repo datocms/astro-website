@@ -225,7 +225,7 @@ export const support: ChapterLayoutData = {
   },
   // New copy.
   scene:
-    'A shared Slack channel between Northwind Group and DatoCMS: a developer of Northwind asks about the model of a landing page, and a solution architect of DatoCMS answers in the thread. (Built.)',
+    'A shared Slack channel between Northwind Group and DatoCMS: a developer of Northwind asks about the model of a landing page, and Marcelo Finamor of the DatoCMS support answers in the thread. (Built.)',
   fragments: [
     {
       // New copy.

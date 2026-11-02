@@ -193,7 +193,7 @@ export const AUDIT_LOG = [
   },
   {
     occurredAt: '2026-10-15T08:31:40Z',
-    actor: { name: 'Marco Bellini', email: 'marco.bellini@northwind.com' },
+    actor: { name: 'Jonas Weber', email: 'marco.bellini@northwind.com' },
     action: 'item_types.update',
     path: '/item-types/Kz3mQp9sT1aVx7LrBn4HcE',
     environment: 'autumn-launch',
@@ -209,7 +209,7 @@ export const AUDIT_LOG = [
   },
   {
     occurredAt: '2026-10-15T07:58:26Z',
-    actor: { name: 'Marco Bellini', email: 'marco.bellini@northwind.com' },
+    actor: { name: 'Jonas Weber', email: 'marco.bellini@northwind.com' },
     action: 'workflows.update',
     path: '/workflows/Wd5yNf2uR8eJb6GtMq0XoA',
     environment: 'autumn-launch',
@@ -233,34 +233,58 @@ export const AUDIT_LOG = [
   },
 ] as const;
 
+/** The avatar of a member of the DatoCMS team, from the team page of the site, cropped to the face. */
+const teamAvatar = (path: string) =>
+  `https://www.datocms-assets.com/205/${path}?w=96&h=96&fit=crop&crop=faces&auto=format`;
+
+/** The people of the chat. The DatoCMS team is real (the team page); the people of Northwind are not. */
+const JONAS = { name: 'Jonas Weber', org: 'Northwind' } as const;
+const ROGER = {
+  name: 'Roger Tuan',
+  org: 'DatoCMS',
+  avatarUrl: teamAvatar('1751268389-20250623-194630-4825.jpg'),
+} as const;
+const MARCELO = {
+  name: 'Marcelo Finamor',
+  org: 'DatoCMS',
+  avatarUrl: teamAvatar('1751268246-20250623-195038-4832.jpg'),
+} as const;
+const MATTEO = {
+  name: 'Matteo Giaccone',
+  org: 'DatoCMS',
+  avatarUrl: teamAvatar('1751268297-20250624-201757-4893.jpg'),
+} as const;
+
 /**
  * The shared channel of Northwind Group and DatoCMS (the frame of the
  * chapter Support). A developer of Northwind asks how to keep one model the
- * same in the projects of the twelve brands. A solution architect of
- * DatoCMS answers in the thread: one folder of migrations, one profile of
+ * same in the projects of the twelve brands. Marcelo Finamor of the DatoCMS
+ * support answers in the thread: one folder of migrations, one profile of
  * the CLI for each project, and `migrations:run` with the profile.
  */
 export const SUPPORT_CHAT = {
   workspace: 'Northwind',
-  channels: ['general', 'web-platform', 'northwind-datocms', 'releases'],
   channel: 'northwind-datocms',
+  channels: ['general', 'web-platform', 'releases'],
   sharedWith: 'DatoCMS',
-  messages: [
+  /** The people of DatoCMS in the channel: the banner over the box to write in counts them. */
+  externalPeople: 3,
+  earlier: [
     {
-      name: 'Marco Bellini',
-      org: 'Northwind',
-      time: 'Yesterday',
+      ...JONAS,
+      time: '17:40',
       text: 'The autumn-launch sandbox is ready. We promote it on Monday.',
     },
+  ],
+  today: 'Today',
+  messages: [
     {
-      name: 'Elena Ricci',
-      org: 'DatoCMS',
+      ...MATTEO,
       time: '09:12',
       text: 'Editorial onboarding for the Berlin team is on Thursday at 10:00. I’ll share the recording here after.',
     },
     {
-      name: 'Marco Bellini',
-      org: 'Northwind',
+      ...JONAS,
       time: '10:02',
       text: 'Each brand has its own project. How do we keep the Landing page model the same in all twelve?',
       replies: 3,
@@ -268,22 +292,20 @@ export const SUPPORT_CHAT = {
   ],
   thread: [
     {
-      name: 'Elena Ricci',
-      org: 'DatoCMS',
+      ...MARCELO,
       time: '10:09',
       text: 'Keep the schema changes as migrations in one repo, with a profile for each brand project in datocms.config.json. Then run them on each project:',
       code: 'datocms migrations:run --profile=brand-berlin',
       after: 'Each brand keeps its own content, roles and workflow: only the models move.',
+      reaction: { emoji: '🙌', count: 1 },
     },
     {
-      name: 'Marco Bellini',
-      org: 'Northwind',
+      ...JONAS,
       time: '10:14',
       text: 'Perfect, we’ll add it to the CI today.',
     },
     {
-      name: 'Elena Ricci',
-      org: 'DatoCMS',
+      ...ROGER,
       time: '10:15',
       text: 'Send me the first migration and I’ll review it with you.',
     },

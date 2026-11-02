@@ -1,30 +1,80 @@
 ---
+import { faAt } from '@fortawesome/pro-regular-svg-icons/faAt';
+import { faBold } from '@fortawesome/pro-regular-svg-icons/faBold';
+import { faBookmark } from '@fortawesome/pro-regular-svg-icons/faBookmark';
+import { faChevronDown } from '@fortawesome/pro-regular-svg-icons/faChevronDown';
+import { faCode } from '@fortawesome/pro-regular-svg-icons/faCode';
+import { faFaceSmile } from '@fortawesome/pro-regular-svg-icons/faFaceSmile';
+import { faFont } from '@fortawesome/pro-regular-svg-icons/faFont';
+import { faItalic } from '@fortawesome/pro-regular-svg-icons/faItalic';
+import { faLink } from '@fortawesome/pro-regular-svg-icons/faLink';
+import { faListUl } from '@fortawesome/pro-regular-svg-icons/faListUl';
+import { faLock } from '@fortawesome/pro-regular-svg-icons/faLock';
+import { faMessageLines } from '@fortawesome/pro-regular-svg-icons/faMessageLines';
+import { faPaperPlane } from '@fortawesome/pro-regular-svg-icons/faPaperPlane';
+import { faPaperPlaneTop } from '@fortawesome/pro-regular-svg-icons/faPaperPlaneTop';
+import { faPlus } from '@fortawesome/pro-regular-svg-icons/faPlus';
+import { faXmark } from '@fortawesome/pro-regular-svg-icons/faXmark';
+import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import { Icon } from '~/components/Icon';
+import ChatAvatar from './ChatAvatar.astro';
 import { SUPPORT_CHAT } from './story';
 import styles from './channel.module.css';
 
-// The frame of the chapter Support: the window of a team chat with the
-// channel that Northwind Group shares with DatoCMS. It is a neutral chat:
-// no app is drawn, no logo, no avatar. A tag after each name tells the
-// company of the person. The channels of the workspace are at the left,
-// the channel in the middle, and the open thread at the right: the
-// question of a developer of Northwind, and the answer of a solution
-// architect of DatoCMS, with the command of the CLI. On a narrow window
-// the list of the channels goes; on phones only the thread shows. There
-// is no motion.
+// The frame of the chapter Support: the window of the team chat of
+// Northwind with the channel that it shares with DatoCMS, in the layout of
+// Slack. The sections of the workspace are at the left, the channel in the
+// middle, and the open thread at the right: the question of a developer of
+// Northwind, and the answers of the DatoCMS support, with the command of
+// the CLI. The people of DatoCMS are the real team, with the photos of the
+// team page, and a badge marks them as external. On a narrow window the
+// sidebar goes; on phones only the thread shows. There is no motion.
 
 const chat = SUPPORT_CHAT;
 const question = chat.messages.find((message) => 'replies' in message)!;
+const isExternal = (org: string) => org === chat.sharedWith;
+const repliers = [...new Map(chat.thread.map((reply) => [reply.name, reply])).values()];
+const lastReply = chat.thread[chat.thread.length - 1]!;
 const description = `A team chat with the channel #${chat.channel}, which ${chat.workspace} shares with ${chat.sharedWith}. ${question.name} of ${question.org} asks: “${question.text}” In the thread, ${chat.thread.map((reply) => `${reply.name} of ${reply.org} answers: “${reply.text}${'code' in reply ? ` ${reply.code} ${reply.after}` : ''}”`).join(' ')}`;
+
+const SIDEBAR_LINKS = [
+  { icon: faMessageLines, label: 'Threads' },
+  { icon: faPaperPlane, label: 'Drafts & sent' },
+  { icon: faBookmark, label: 'Saved' },
+];
+
+const TOOLBAR = [faBold, faItalic, faLink, faListUl, faCode];
 ---
 
 <div class={styles.window} role="img" aria-label={description}>
   <div class={styles.app} aria-hidden="true">
     <div class={styles.sidebar}>
-      <p class={styles.workspace}>{chat.workspace}</p>
-      <ul class={styles.channels}>
+      <p class={styles.workspace}>
+        {chat.workspace}
+        <Icon icon={faChevronDown} />
+      </p>
+      <ul class={styles.nav}>
+        {
+          SIDEBAR_LINKS.map((link) => (
+            <li class={styles.navItem}>
+              <Icon icon={link.icon} />
+              {link.label}
+            </li>
+          ))
+        }
+      </ul>
+      <p class={styles.section}>External connections</p>
+      <ul class={styles.nav}>
+        <li class={styles.navItem} data-current>
+          <Icon icon={faLock} />
+          {chat.channel}
+        </li>
+      </ul>
+      <p class={styles.section}>Channels</p>
+      <ul class={styles.nav}>
         {
           chat.channels.map((name) => (
-            <li class={styles.channelItem} data-current={name === chat.channel || undefined}>
+            <li class={styles.navItem}>
               <span class={styles.hash}>#</span>
               {name}
             </li>
@@ -32,65 +82,142 @@ const description = `A team chat with the channel #${chat.channel}, which ${chat
         }
       </ul>
     </div>
+
     <div class={styles.channel}>
-      <p class={styles.header}>
-        <span><span class={styles.hash}>#</span>{chat.channel}</span>
-        <span class={styles.shared}>Shared with {chat.sharedWith}</span>
-      </p>
+      <div class={styles.channelHeader}>
+        <p class={styles.title}>
+          <Icon icon={faLock} />
+          {chat.channel}
+        </p>
+        <ul class={styles.tabs}>
+          <li data-current>Messages</li>
+          <li>Files</li>
+        </ul>
+      </div>
       <ul class={styles.messages}>
+        {
+          chat.earlier.map((message) => (
+            <li class={styles.message}>
+              <ChatAvatar {...message} external={isExternal(message.org)} />
+              <div class={styles.body}>
+                <p class={styles.meta}>
+                  <span class={styles.name}>{message.name}</span>
+                  <span class={styles.time}>{message.time}</span>
+                </p>
+                <p>{message.text}</p>
+              </div>
+            </li>
+          ))
+        }
+        <li class={styles.day}><span>{chat.today}</span></li>
         {
           chat.messages.map((message) => (
             <li class={styles.message} data-open={'replies' in message || undefined}>
-              <p class={styles.meta}>
-                <span class={styles.name}>{message.name}</span>
-                <span class={styles.org}>{message.org}</span>
-                <span class={styles.time}>{message.time}</span>
-              </p>
-              <p>{message.text}</p>
-              {'replies' in message && <p class={styles.replies}>{message.replies} replies</p>}
+              <ChatAvatar {...message} external={isExternal(message.org)} />
+              <div class={styles.body}>
+                <p class={styles.meta}>
+                  <span class={styles.name}>{message.name}</span>
+                  <span class={styles.time}>{message.time}</span>
+                </p>
+                <p>{message.text}</p>
+                {'replies' in message && (
+                  <p class={styles.replies}>
+                    {repliers.map((reply) => (
+                      <ChatAvatar {...reply} small />
+                    ))}
+                    <span class={styles.repliesLink}>{message.replies} replies</span>
+                    <span class={styles.time}>Last reply today at {lastReply.time}</span>
+                  </p>
+                )}
+              </div>
             </li>
           ))
         }
       </ul>
-      <p class={styles.composer}>Message #{chat.channel}</p>
+      <div class={styles.composeArea}>
+        <p class={styles.banner}>
+          <span class={styles.bannerMark} set:html={symbol} />
+          <span
+            ><span class={styles.repliesLink}>{chat.externalPeople} external people</span> are from {
+              chat.sharedWith
+            }</span
+          >
+        </p>
+        <div class={styles.composer}>
+          <p class={styles.toolbar}>{TOOLBAR.map((icon) => <Icon icon={icon} />)}</p>
+          <p class={styles.placeholder}>Message {chat.channel}</p>
+          <p class={styles.actions}>
+            <span class={styles.round}><Icon icon={faPlus} /></span>
+            <Icon icon={faFont} />
+            <Icon icon={faFaceSmile} />
+            <Icon icon={faAt} />
+            <span class={styles.send}><Icon icon={faPaperPlaneTop} /></span>
+          </p>
+        </div>
+      </div>
     </div>
+
     <div class={styles.thread}>
-      <p class={styles.header}>
-        <span>Thread</span>
-        <span class={styles.shared}>#{chat.channel}</span>
+      <p class={styles.threadHeader}>
+        <span class={styles.title}>Thread</span>
+        <span class={styles.threadChannel}><Icon icon={faLock} />{chat.channel}</span>
+        <span class={styles.close}><Icon icon={faXmark} /></span>
       </p>
       <ul class={styles.messages}>
         <li class={styles.message}>
-          <p class={styles.meta}>
-            <span class={styles.name}>{question.name}</span>
-            <span class={styles.org}>{question.org}</span>
-            <span class={styles.time}>{question.time}</span>
-          </p>
-          <p>{question.text}</p>
+          <ChatAvatar {...question} external={isExternal(question.org)} />
+          <div class={styles.body}>
+            <p class={styles.meta}>
+              <span class={styles.name}>{question.name}</span>
+              <span class={styles.time}>{question.time}</span>
+            </p>
+            <p>{question.text}</p>
+          </div>
         </li>
         <li class={styles.divider}>{chat.thread.length} replies</li>
         {
           chat.thread.map((reply) => (
             <li class={styles.message}>
-              <p class={styles.meta}>
-                <span class={styles.name}>{reply.name}</span>
-                <span class={styles.org} data-vendor={reply.org === chat.sharedWith || undefined}>
-                  {reply.org}
-                </span>
-                <span class={styles.time}>{reply.time}</span>
-              </p>
-              <p>{reply.text}</p>
-              {'code' in reply && (
-                <>
-                  <pre class={styles.code}>{reply.code}</pre>
-                  <p>{reply.after}</p>
-                </>
-              )}
+              <ChatAvatar {...reply} external={isExternal(reply.org)} />
+              <div class={styles.body}>
+                <p class={styles.meta}>
+                  <span class={styles.name}>{reply.name}</span>
+                  <span class={styles.time}>{reply.time}</span>
+                </p>
+                <p>{reply.text}</p>
+                {'code' in reply && (
+                  <>
+                    <pre class={styles.code}>{reply.code}</pre>
+                    <p>{reply.after}</p>
+                  </>
+                )}
+                {'reaction' in reply && (
+                  <p class={styles.reactions}>
+                    <span class={styles.reaction}>
+                      {reply.reaction.emoji} {reply.reaction.count}
+                    </span>
+                    <span class={styles.reaction} data-add>
+                      <Icon icon={faFaceSmile} />
+                    </span>
+                  </p>
+                )}
+              </div>
             </li>
           ))
         }
       </ul>
-      <p class={styles.composer}>Reply…</p>
+      <div class={styles.composeArea}>
+        <div class={styles.composer}>
+          <p class={styles.placeholder}>Reply…</p>
+          <p class={styles.actions}>
+            <span class={styles.round}><Icon icon={faPlus} /></span>
+            <Icon icon={faFont} />
+            <Icon icon={faFaceSmile} />
+            <Icon icon={faAt} />
+            <span class={styles.send}><Icon icon={faPaperPlaneTop} /></span>
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
