@@ -13,6 +13,7 @@ export const index = {
     label: 'Solution Partners',
     headline: 'Find the perfect Partner to meet',
     subheadline: 'your digital needs',
+    face: '[••]',
     intro:
       'Our most successful customers work with a Solution Partner to accomplish their goals and ship their digital products faster.',
   },
@@ -37,6 +38,7 @@ export const showcase = {
     label: 'Showcase',
     headline: 'Projects from Our',
     subheadline: 'Partners',
+    face: '[••]',
     intro:
       'Check out some of the projects our incredible agency partners have brought to life with DatoCMS.',
   },
@@ -88,6 +90,7 @@ export const techIndex = {
     label: 'Ecosystem Partners',
     headline: 'Find the perfect Tech Partner to supercharge',
     subheadline: 'your DatoCMS projects',
+    face: '[••]',
     intro:
       'DatoCMS partners with leading technology providers and APIs to ensure your projects are getting the best possible treatment.',
   },

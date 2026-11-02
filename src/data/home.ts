@@ -29,8 +29,14 @@ export interface HeroData {
    * in the same text.
    */
   subheadline?: string;
-  /** The face after the subheadline. Default: `[••]`. */
+  /**
+   * The face after the subheadline. Only hand-written copy has a face: text
+   * from the CMS, a title alone and a legal page have none (DESIGN.md,
+   * "The Text Face Rule"). Without a face, the h1 ends with the subheadline.
+   */
   face?: string;
+  /** The body text below the h1: the description that does not go in the h1. */
+  intro?: string;
   buttons?: ButtonData[];
   logos?: LogoItem[];
 }
@@ -147,7 +153,8 @@ export function svgLogo(svg: string, alt: string): LogoItem {
 
 export const hero: HeroData = {
   headline: 'Thoughtfully built and ambitiously used.',
-  subheadline: 'The AI-agnostic headless CMS that’s human on support and transparent in pricing',
+  subheadline: 'The AI-agnostic headless CMS with human support and transparent pricing',
+  face: '[••]',
   buttons: [
     {
       label: 'Get Started',

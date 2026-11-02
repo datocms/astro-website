@@ -21,8 +21,7 @@ import type { CategoryNavData } from '~/components/CategoryNav';
 export const hero: HeroData = {
   label: 'Editor experience',
   headline: 'Familiar to write in. Predictable to build on.',
-  subheadline:
-    'Editors get a calm place to write. Developers get structured content they can build with',
+  subheadline: 'Editors get a calm place to write. Developers get structure',
   face: '[**]',
   buttons: [
     {

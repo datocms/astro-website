@@ -40,8 +40,8 @@ const docs = (href: string): ChapterHeaderData['link'] => ({
 export const hero: HeroData = {
   label: 'Media',
   headline: 'Upload once. Optimized for every size, every screen.',
-  subheadline:
-    'One library for images, video, audio, and documents, served in the size each screen needs',
+  subheadline: 'Images, video, audio and documents, all in one library',
+  face: '[••]',
   buttons: [
     {
       label: 'Get Started',

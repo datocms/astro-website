@@ -5,13 +5,13 @@
 
 export const hero = {
   headline: 'Community Plugins',
-  subheadline:
+  intro:
     'Easily expand and customize the capabilities of DatoCMS. Public plugins are free and maintained by us or the community.',
 };
 
 export const browse = {
   headline: 'Community Plugins',
-  subheadline: 'Easily expand and customize the capabilities of DatoCMS with community plugins',
+  intro: 'Easily expand and customize the capabilities of DatoCMS with community plugins',
   /** The headline of a search: the search text follows. */
   searchHeadline: 'Find Plugins:',
   noResults: 'Sorry, no results found!',

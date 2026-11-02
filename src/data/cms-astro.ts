@@ -37,8 +37,9 @@ export const page: FrameworkPage = {
   hero: {
     label: 'Astro + DatoCMS',
     headline: 'Astro in front, DatoCMS behind.',
-    subheadline:
-      'The frontmatter fetches it, @datocms/astro renders it, cache tags keep the edge fresh. Nothing to host but your app',
+    subheadline: 'The frontmatter fetches it, @datocms/astro renders it, cache tags keep it fresh',
+    face: '[••]',
+    intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
   },
   chapterNav: chapterNav({ label: 'Cache tags', href: '#cache-tags' }),

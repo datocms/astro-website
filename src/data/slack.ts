@@ -13,7 +13,7 @@ export const seo = {
 export const hero = {
   label: 'DatoCMS Community Slack Channel',
   headline: 'Join us on Slack!',
-  subheadline:
+  intro:
     "Try out new product updates before they're widely released, help us test and improve the product, and connect with other users!",
 };
 

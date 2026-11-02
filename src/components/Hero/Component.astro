@@ -6,6 +6,7 @@ import { stripStega } from '@datocms/astro';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Section } from '~/components/Section';
 import type { HeroData } from '~/data/home';
+import { HERO_MAX_CHARS, heroLength } from '~/lib/hero';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import type { Step } from '~/lib/motion/typewriter';
 import { HeroTeamMemberFragment } from './graphql';
@@ -40,7 +41,8 @@ const {
   label,
   headline,
   subheadline,
-  face = '[••]',
+  face,
+  intro,
   buttons,
   logos,
   typewriter = false,
@@ -77,9 +79,10 @@ const script: Step[] = [
   { type: 'text', text: headline, speedCps: 80 },
 ];
 if (subheadline) {
+  script.push({ type: 'pause', ms: 500 }, { type: 'text', text: subheadline, speedCps: 80 });
+}
+if (subheadline && face) {
   script.push(
-    { type: 'pause', ms: 500 },
-    { type: 'text', text: subheadline, speedCps: 80 },
     { type: 'pause', ms: 150 },
     {
       type: 'face',
@@ -101,6 +104,17 @@ if (subheadline) {
 
 // The buttons wait for the typewriter: the text then needs its script.
 const TextTag = typewriter && buttons && buttons.length > 0 ? 'hero-text' : 'div';
+
+// The Hero Length Rule (DESIGN.md): the h1 has HERO_MAX_CHARS characters at
+// most. The dev server tells when a page goes over (text from the CMS too).
+if (import.meta.env.DEV) {
+  const length = heroLength({ headline, subheadline, face });
+  if (length > HERO_MAX_CHARS) {
+    console.warn(
+      `[Hero] ${Astro.url.pathname}: the h1 has ${length} characters, the maximum is ${HERO_MAX_CHARS}. Move the description to \`intro\`.`,
+    );
+  }
+}
 
 const background = ({ page: 'default', accent: 'accent' } as const)[variant];
 ---
@@ -131,7 +145,7 @@ const background = ({ page: 'default', accent: 'accent' } as const)[variant];
     <Headline
       as={headingLevel}
       size="h1"
-      muted={subheadline ? `${subheadline}\u00A0${face}` : undefined}
+      muted={subheadline ? (face ? `${subheadline}\u00A0${face}` : subheadline) : undefined}
       breakBeforeMuted={breakBeforeMuted}
       typewriter={typewriter ? script : undefined}
       typewriterStart="load"
@@ -140,9 +154,11 @@ const background = ({ page: 'default', accent: 'accent' } as const)[variant];
       {headline}
     </Headline>
     {
-      Astro.slots.has('intro') && (
+      (Astro.slots.has('intro') || intro) && (
         <div class:list={[styles.intro, 'body']}>
-          <slot name="intro" />
+          <slot name="intro">
+            <p>{intro}</p>
+          </slot>
         </div>
       )
     }

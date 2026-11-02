@@ -14,6 +14,7 @@ export const hero: HeroData = {
   label: 'Blog',
   headline: 'Welcome to the DatoCMS Blog.',
   subheadline: 'News, tips and highlights from the team at DatoCMS',
+  face: '[••]',
 };
 
 /**

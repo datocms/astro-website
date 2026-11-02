@@ -16,7 +16,7 @@ export const seo = {
 export const hero = {
   label: 'DatoCMS Agency Partner Program',
   headline: 'Become a Partner',
-  subheadline:
+  intro:
     'Agency-specific plans from €39/month. No sales targets. No reselling requirements. No BS. Just real benefits including 30% off for your clients and free access to every project you manage.',
   button: { label: 'Become a Partner', href: '#partner-form' },
 };

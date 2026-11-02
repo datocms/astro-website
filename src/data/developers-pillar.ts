@@ -47,6 +47,7 @@ export const hero: HeroData = {
   label: 'For developers',
   headline: 'Modular how you like it.',
   subheadline: 'And steady how you need it, from the schema to the CDN, with nothing to host',
+  face: '[••]',
   buttons: [
     {
       label: 'Get Started',

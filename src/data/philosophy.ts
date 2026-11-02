@@ -16,8 +16,8 @@ export interface PrinciplesData {
 export const hero: HeroData = {
   label: 'Philosophy',
   headline: 'Built on our terms. Used on yours.',
-  subheadline:
-    'We have strong opinions about what makes a CMS brilliant and reliable for the people using it. Every day, we try to live up to them',
+  subheadline: 'We have strong opinions about what makes a CMS brilliant and reliable',
+  intro: 'Every day, we try to live up to them.',
   face: '[•✓•]',
 };
 

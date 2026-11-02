@@ -35,8 +35,9 @@ export const page: FrameworkPage = {
   hero: {
     label: 'Nuxt + DatoCMS',
     headline: 'Nuxt in front, DatoCMS behind.',
-    subheadline:
-      'One composable fetches it, one subscribes to it, the components of vue-datocms render it. Nothing to host but your app',
+    subheadline: 'A composable fetches it, another subscribes to it, vue-datocms renders it',
+    face: '[••]',
+    intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
   },
   chapterNav: chapterNav({ label: 'Build triggers and cache tags', href: '#build-triggers' }),

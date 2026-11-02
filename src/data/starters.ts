@@ -11,6 +11,7 @@ export const hero = {
   headline: 'Starters',
   subheadline:
     'Start with a fully configured DatoCMS project, a best-practice frontend and free hosting',
+  face: '[••]',
 };
 
 export const fullyFledged = {

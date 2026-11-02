@@ -9,7 +9,7 @@ import type { CtaBannerData } from '~/data/home';
 export const hero = {
   label: 'Research Program',
   headline: 'Contribute to the evolution of DatoCMS',
-  subheadline:
+  intro:
     'Become a part of the DatoCMS Research Program and be the first to know what we are working on, try out innovative concepts, offer your feedback and help optimize DatoCMS for your needs.',
 };
 

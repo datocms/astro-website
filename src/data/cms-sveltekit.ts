@@ -35,8 +35,9 @@ export const page: FrameworkPage = {
   hero: {
     label: 'SvelteKit + DatoCMS',
     headline: 'SvelteKit in front, DatoCMS behind.',
-    subheadline:
-      'A server load function fetches it, @datocms/svelte renders it, a cookie shows the drafts. Nothing to host but your app',
+    subheadline: 'A load function fetches it, @datocms/svelte renders it, a cookie shows drafts',
+    face: '[••]',
+    intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
   },
   chapterNav: chapterNav({ label: 'Build triggers and cache tags', href: '#build-triggers' }),

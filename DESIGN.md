@@ -241,7 +241,9 @@ Headings have no default size. A section picks a typography class.
 
 **The Two Weights Rule.** ABC Oracle at 400 and 500 only. No bold, no italic as decoration, no uppercase tracking labels.
 
-**The Text Face Rule.** A hero headline can end with a text face (`[••]`, `[•ᴥ•]`, `[•*•]`), joined to the last word so that it never wraps alone. The typewriter can type it and make it wink. One face for each headline, at most.
+**The Text Face Rule.** A hero headline can end with a text face (`[••]`, `[•ᴥ•]`, `[•*•]`), joined to the last word so that it never wraps alone. The typewriter can type it and make it wink. One face for each headline, at most. The face is our voice: only hand-written two-tone copy has one, and the copy names it (`face` in `src/data`). The hero adds no face by default. Text from the CMS (a plugin, a starter, a partner), a title alone and a legal page have no face.
+
+**The Hero Length Rule.** The h1 of a hero (the headline, the muted run and the face) has 120 characters at most: 3 lines on a desktop, 6 on a phone. A longer description goes in the `intro`, as body text below the h1, not in the muted run. `src/data/heroes.test.ts` checks the copy of `src/data`; the dev server warns when text from the CMS goes over.
 
 ## Layout
 
@@ -402,7 +404,7 @@ Each kind has one language, used by every picture of that kind: the neutral chat
 
 ### Two-tone headline with typewriter (signature)
 
-Hero headlines can type themselves in at a human rhythm. The cursor is a bar that becomes the text face. The final text is in the DOM, and reduced motion shows it at once. The buttons fade in (150ms) after the typing.
+Only a marketing hero types, and each marketing hero types (a reference page, an article or a legal page never types). The 120 characters of the Hero Length Rule keep the typing under approximately 2.5 s, thus the buttons come soon. Hero headlines type themselves in at a human rhythm. The cursor is a bar that becomes the text face. The final text is in the DOM, and reduced motion shows it at once. The buttons fade in (150ms) after the typing.
 
 ## Do's and Don'ts
 

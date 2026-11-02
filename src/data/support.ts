@@ -22,6 +22,7 @@ export const hero = {
   label: 'Support page',
   headline: 'Got issues?',
   subheadline: "We're here to help!",
+  face: '[••]',
 };
 
 export const picker = {
