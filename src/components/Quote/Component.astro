@@ -1,5 +1,7 @@
 ---
+import { PixelVideo } from '~/components/PixelVideo';
 import { Section } from '~/components/Section';
+import { pxvHeader } from '~/lib/pixel-video/headers';
 import type { Theme } from '~/lib/theme';
 import Attribution from './Attribution.astro';
 import Card from './Card.astro';
@@ -11,15 +13,26 @@ interface Props {
   quote: QuoteItem | null | undefined;
   /**
    * `centered`: the quote and the person on the accent band. `split`: the
-   * quote on the accent half, the person on the inverse half. Use `split`
-   * on a page with few split bands, and `centered` on a page with many.
+   * quote and the person on the accent half, a hand on the inverse half.
+   * Use `split` on a page with few split bands, and `centered` on a page
+   * with many.
    */
   variant?: 'centered' | 'split';
+  /**
+   * The hand of the inverse half (only for `split`). Each hand comes in
+   * from the right edge, toward the quote. Do not use the hand of the
+   * PageCloser of the same page.
+   */
+  hand?: 'point-left' | 'ok-reach' | 'snap';
   /** Without a theme, the section inherits the theme of its parent. */
   theme?: Theme;
 }
 
-const { variant = 'centered', theme } = Astro.props;
+const { variant = 'centered', hand = 'point-left', theme } = Astro.props;
+const handSrc = `/videos/hand-${hand}.pxv`;
+// The ratio of the video, before the player reads the file.
+const handHeader = pxvHeader(handSrc);
+const handAspect = handHeader.width / handHeader.height;
 const read = Astro.props.quote ? readQuote(Astro.props.quote) : null;
 const quote = read && hasText(read) ? read : null;
 const text = quote ? statementText(quote) : null;
@@ -75,9 +88,10 @@ if (!quote) {
               {'⁠”'}
             </p>
           </blockquote>
-        </div>
-        <div class:list={[styles.half, styles.inverse]}>
           <Attribution quote={quote} size="statement" />
+        </div>
+        <div class={styles.inverse} style={`--hand-aspect: ${handAspect}`}>
+          <PixelVideo src={handSrc} class={styles.hand} />
         </div>
       </figure>
     </Section>

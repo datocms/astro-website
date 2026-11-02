@@ -49,8 +49,8 @@ export const chapterNav: CategoryNavData = {
   ],
 };
 
-// New copy. The one opinion of the page, between chapter 3 (Localization)
-// and chapter 4 (Structured Text).
+// New copy. The one opinion of the page, after chapter 4 (Structured Text):
+// "one field" is the Structured Text field. It has the theme of that chapter.
 // The label is the muted lead-in of the statement.
 export const opinion: StatementData = {
   label: 'Same content, two kinds of happy.',

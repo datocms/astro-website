@@ -18,6 +18,7 @@
 
 /* Centered: the quote, then the person, on the accent band. */
 .centered {
+  --attribution-muted: var(--text-on-accent-muted);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -25,7 +26,10 @@
   text-align: center;
 }
 
-/* Below 1152px the halves stack: the quote on the accent, the person on the inverse. */
+/*
+ * Below 1152px the halves stack: the quote and the person on the accent,
+ * then the hand on the inverse.
+ */
 .split {
   display: flex;
   flex-direction: column;
@@ -35,18 +39,39 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
+  gap: var(--space-xl);
   padding: var(--section-padding-y) var(--section-padding-x);
 }
 
 .accent {
+  --attribution-muted: var(--text-on-accent-muted);
   background: var(--surface-accent);
   color: var(--text-primary);
 }
 
+/*
+ * The hand comes in from the right edge (and some from the bottom edge),
+ * thus the video stays in the bottom right corner. It is as large as the
+ * half lets it be, with the ratio of the file (--hand-aspect): there is
+ * no empty band in the video. The half is a size container, thus the
+ * video does not change the height of the band.
+ */
 .inverse {
-  --attribution-muted: var(--text-on-inverse-muted);
+  position: relative;
+  container-type: size;
+  height: min(320px, 60vw);
   background: var(--surface-inverse);
-  color: var(--text-on-inverse);
+}
+
+.hand {
+  --hand-height: min(100cqh, 100cqw / var(--hand-aspect));
+
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: calc(var(--hand-height) * var(--hand-aspect));
+  height: var(--hand-height);
 }
 
 .split .quote {
@@ -55,19 +80,20 @@
 
 @media (min-width: 1152px) {
   /*
-   * The outer padding of each half is --content-inset-half, thus at 1920
-   * and 2560 the quote and the person stay in the centred content column.
+   * The outer padding of the accent half is --content-inset-half, thus at
+   * 1920 and 2560 the quote stays in the centred content column. The
+   * inverse half is as high as the accent half.
    */
   .split {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 
-  .half:first-child {
+  .half {
     padding-inline-start: var(--content-inset-half);
   }
 
-  .half:last-child {
-    padding-inline-end: var(--content-inset-half);
+  .inverse {
+    height: auto;
   }
 }
