@@ -74,6 +74,13 @@
   --fragment-fill-surface: var(--surface-default);
 }
 
+/* On phones a diagram (a SceneFragment `fill`, `phoneHeight="content"`) gives the height of its box: the box has no fixed ratio, thus it has no empty band above and below the diagram. */
+@media (max-width: 649px) {
+  .visual:has(> [data-phone-content]) {
+    aspect-ratio: auto;
+  }
+}
+
 /* Without a picture, the box keeps its size and has the line of the SceneFragment, at its bottom and right edges, with the same overshoot and the same fade. */
 .empty {
   background: var(--surface-accent);

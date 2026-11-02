@@ -18,6 +18,7 @@ interface Common {
  */
 interface Scale extends Common {
   fit: 'scale';
+  phoneHeight?: never;
   /**
    * The zoom of the picture in a box of 500px (the box from 1280px). A
    * scene with little in it can be larger.
@@ -58,6 +59,7 @@ interface Scale extends Common {
  */
 interface Crop extends Common {
   fit: 'crop';
+  phoneHeight?: never;
   zoom?: never;
   phoneZoom?: never;
   align?: never;
@@ -70,6 +72,15 @@ interface Crop extends Common {
  */
 interface Fill extends Common {
   fit: 'fill';
+  /**
+   * The height of the box on phones (below 650px). `content`: the box has
+   * no fixed ratio and takes the height of the picture, thus there is no
+   * empty band above and below it. `box`: the box keeps its ratio, for a
+   * picture that puts its parts against the edges of the box (a map, a
+   * picture with parts at the corners).
+   * @default 'content'
+   */
+  phoneHeight?: 'content' | 'box';
   zoom?: never;
   phoneZoom?: never;
   align?: never;
@@ -82,7 +93,10 @@ interface Fill extends Common {
  */
 type Props = Scale | Crop | Fill;
 
-const { fit, zoom, phoneZoom, align, border = true } = Astro.props;
+const { fit, zoom, phoneZoom, align, border = true, phoneHeight } = Astro.props;
+
+/** A `fill` box that takes the height of its picture on phones (FeatureFragments reads the attribute). */
+const phoneContent = fit === 'fill' && phoneHeight !== 'box';
 
 // style.module.css chooses the zoom of the breakpoint (--fragment-current-zoom)
 const vars = [
@@ -101,6 +115,8 @@ const vars = [
     fit === 'scale' && !border && styles.noBorder,
   ]}
   style={vars || undefined}
+  data-fit={fit}
+  data-phone-content={phoneContent || undefined}
 >
   <div class={styles.clip}>
     {
@@ -119,6 +135,13 @@ const vars = [
   </div>
   <DevConfig
     name="SceneFragment"
-    config={{ fit, zoom, phoneZoom, align, border: fit === 'scale' && !border ? false : undefined }}
+    config={{
+      fit,
+      zoom,
+      phoneZoom,
+      align,
+      border: fit === 'scale' && !border ? false : undefined,
+      phoneHeight,
+    }}
   />
 </div>
