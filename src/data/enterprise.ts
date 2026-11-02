@@ -173,7 +173,7 @@ export const governance: ChapterLayoutData = {
     {
       // New copy.
       title: 'Your brand on the CMS.',
-      text: 'White-label the CMS with your logo, your colours and your domain.',
+      text: 'White-label the CMS with your logo, your colors, and your domain.',
       picture:
         'A browser window at cms.northwind.com: the record editor of the CMS with the logo of Northwind in the navigation bar and the interface in the green of the brand. (Built.)',
     },

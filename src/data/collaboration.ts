@@ -21,7 +21,7 @@ export const chapter: ChapterHeaderData = {
   headline: 'Work together,',
   muted: 'not over each other.',
   intro:
-    'We show who has a record open and lock it while someone edits. Every save is a version you can compare and restore.',
+    'We show who has a record open and lock it while someone edits. Every save is a version you can compare and roll back to.',
   link: {
     label: 'Read The Docs',
     href: '/docs/general-concepts/collaboration-features',
@@ -36,16 +36,16 @@ export const chapter: ChapterHeaderData = {
 export const fragments: FeatureFragmentsData = {
   items: [
     {
-      title: 'Every version, side by side.',
+      title: 'All versions, side by side.',
       // The retention per plan comes from the docs page on versioning.
-      text: 'Open an earlier version, compare it with the current one, and restore it. How far back you go depends on your plan.',
+      text: 'Open an earlier version, compare it with the current one, and restore it.',
     },
     // New copy. Roles and permissions belong to /enterprise
     // (src/data/AGENTS.md, "Who owns a subject"): one picture here, no
     // explanation.
     {
-      title: 'A role for each job.',
-      text: 'Cooks write and edit recipes but can’t delete them. You make the roles and set each rule, model by model and action by action.',
+      title: 'Specific roles for specific jobs.',
+      text: 'Cooks write and edit recipes but can’t delete them. You make the roles, and set the rules model by model, action by action.',
     },
   ],
 };

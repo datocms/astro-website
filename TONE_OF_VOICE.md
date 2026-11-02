@@ -4,9 +4,9 @@
 >
 > Dato is the rare combination of deeply capable and refreshingly down-to-earth.
 >
-> We know our craft, have strong opinions and care deeply about doing things properly. Expertise never creates distance. We share what we've learned, stay grounded and focus on what genuinely helps people build better things.
+> We know our craft, have strong opinions, and care deeply about doing things properly. Expertise never creates distance. We share what we've learned, stay grounded, and focus on what genuinely helps people build better things.
 >
-> 👉 The result is a voice that feels effortless: confident without showing off, opinionated without being preachy and generous with what it knows.
+> 👉 The result is a voice that feels effortless: confident without showing off, opinionated without being preachy, and generous with what it knows.
 
 ---
 
@@ -30,7 +30,7 @@ We have opinions and we're comfortable expressing them. Not because we're contra
 
 ### 🤲 Generous
 
-We share what we've learned. We explain things clearly, help people succeed and never use expertise to create distance.
+We share what we've learned. We explain things clearly, help people succeed, and never use expertise to create distance.
 
 | ✅ We are                           | ⛔ We are not                             |
 | ----------------------------------- | ----------------------------------------- |
@@ -38,7 +38,7 @@ We share what we've learned. We explain things clearly, help people succeed and 
 
 ### 🌱 Thoughtful
 
-We care about the people using the product as much as the product itself. Every decision is designed to make complex work feel simpler, clearer and more approachable.
+We care about the people using the product as much as the product itself. Every decision is designed to make complex work feel simpler, clearer, and more approachable.
 
 | ✅ We are                   | ⛔ We are not                             |
 | --------------------------- | ----------------------------------------- |
@@ -55,7 +55,7 @@ We care about the people using the product as much as the product itself. Every 
 
 ### ✍️ We write with conviction
 
-We don't hedge, soften or hide behind corporate language.
+We don't hedge, soften, or hide behind corporate language.
 
 - ⛔ **Not:** "Designed to help teams..." · "Aims to support..." · "Created to enable..."
 - ✅ **Instead:** "Helps teams..." · "Supports..." · "Works with..."
@@ -138,6 +138,11 @@ Each line lands because it holds both truths at once:
 
 ## Language
 
+### ✍️ Spelling and punctuation
+
+- **US English.** Optimized, color, honor, fiber, catalog. Product names keep their own spelling.
+- **The Oxford comma.** In a list of three or more, a comma goes before the last "and" or "or": "images, video, audio, and documents".
+
 ### ⛔ Language we avoid
 
 - Disruptive
@@ -153,7 +158,7 @@ Each line lands because it holds both truths at once:
 
 ### Developer fluency
 
-We speak the language because we build for the people who use it. We occasionally borrow familiar terminology and cultural references where they add clarity, credibility or personality, but never to prove we belong in the room.
+We speak the language because we build for the people who use it. We occasionally borrow familiar terminology and cultural references where they add clarity, credibility, or personality, but never to prove we belong in the room.
 
 #### 🗣️ Language from our customers
 
@@ -188,7 +193,7 @@ Developer shorthand that technical audiences use.
 
 ## Tone in action
 
-The examples below show how the Dato voice transforms existing website copy, demonstrating how the same product story can feel more human, confident and distinctive through language alone.
+The examples below show how the Dato voice transforms existing website copy, demonstrating how the same product story can feel more human, confident, and distinctive through language alone.
 
 <!-- The "current website" copy is quoted as it is, mistakes included. -->
 
@@ -240,7 +245,7 @@ The examples below show how the Dato voice transforms existing website copy, dem
 > Ask for an **image**. Get an image.
 > Ask for exactly what you need and nothing you don't.
 >
-> That's what makes GraphQL **efficient**, **predictable** and surprisingly **easy to work with**.
+> That's what makes GraphQL **efficient**, **predictable**, and surprisingly **easy to work with**.
 >
 > [See for yourself]
 
@@ -291,4 +296,4 @@ The examples below show how the Dato voice transforms existing website copy, dem
 
 > **Good Dato copy feels like advice from someone who's done this before.**
 
-Think of the cool uncle in the Metallica shirt: deeply knowledgeable, refreshingly down-to-earth and quietly shaped by years of experience. He's seen enough to know what matters, comfortable enough not to prove it and generous enough to share what he's learned. Even the complicated stuff feels effortless when he explains it.
+Think of the cool uncle in the Metallica shirt: deeply knowledgeable, refreshingly down-to-earth, and quietly shaped by years of experience. He's seen enough to know what matters, comfortable enough not to prove it, and generous enough to share what he's learned. Even the complicated stuff feels effortless when he explains it.

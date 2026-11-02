@@ -40,8 +40,8 @@ const docs = (href: string): ChapterHeaderData['link'] => ({
 // Windsurf).
 export const hero: HeroData = {
   label: 'AI',
-  headline: 'Your AI. Your way.',
-  subheadline: 'We’ll make him/her/it feel right at home in the CMS, the CLI, or via MCP',
+  headline: 'Bring your own AI. We’ll make it feel at home.',
+  subheadline: 'Use it in the CMS, the CLI, or over MCP. Or don’t. It’s all opt-in',
   buttons: [
     {
       label: 'Get Started',
@@ -65,7 +65,7 @@ export const chapterNav: CategoryNavData = {
     { label: 'MCP server', href: '#mcp' },
     { label: 'Agent Skills', href: '#skills' },
     { label: 'AI translations', href: '#translations' },
-    { label: 'AI in the media area', href: '#media' },
+    { label: 'AI in the media library', href: '#media' },
     { label: 'Opt-in', href: '#opt-in' },
   ],
 };
@@ -75,11 +75,11 @@ export const mcp: ChapterLayoutData = {
   id: 'mcp',
   theme: 'blue',
   chapter: {
-    label: 'DatoCMS MCP Server',
+    label: 'MCP server',
     headline: 'Your assistant knows',
-    muted: 'your DatoCMS project',
+    muted: 'your project.',
     intro:
-      'Connect our hosted DatoCMS MCP server in Claude, ChatGPT, Cursor, or Codex. It reads your schema, and our docs, and does what you ask for correctly on the first go.',
+      'Connect our hosted MCP server to Claude, ChatGPT, Cursor, or Codex using one URL and your login. You decide what it gets to touch.',
     link: docs('/docs/mcp-server'),
   },
   // The chat is a neutral one: no client's interface is drawn as real.
@@ -99,8 +99,8 @@ export const mcp: ChapterLayoutData = {
       // The docs: discovery and planning first, then a script; the
       // read-write script is confirmed before each run. The next turn of
       // the frame: the plan for its eight pages.
-      title: 'It learns before it does.',
-      text: 'The MCP can do anything you can. But it always looks at your schema and our docs before writing any scripts.',
+      title: 'It reads before it writes.',
+      text: 'It looks at your schema and our docs, writes the changes as one script, and asks you before it runs it.',
       picture:
         'The next turn of the chat: get_api_methods for items.update, the plan in a sentence for the eight pages, then the script and the question Run this script?, Allow highlighted.',
     },
@@ -113,8 +113,8 @@ export const mcp: ChapterLayoutData = {
       // record: they change soon. The single-page Markdown (the Copy page
       // menu, .md on a URL) is a second idea: not here.
       // :bleep: reads "*" (src/components/Emoji).
-      title: 'Hallucinate? We don’t do that here.',
-      text: 'Throw `/docs/llms-full.txt` at your LLM for up-to-date details on everything, so it never makes sh:bleep:t up.',
+      title: 'All our docs, in one file.',
+      text: 'Point your LLM at `/docs/llms-full.txt` for the full docs, always kept up to date, so it doesn’t hallucinate and make sh:bleep:t up.',
       picture:
         'llms-full.txt open, 3.8 MB, its Markdown at the section Automatic Retries of Webhooks, the lines of the retry schedule marked.',
     },
@@ -128,10 +128,10 @@ export const skills: ChapterLayoutData = {
   chapter: {
     label: 'Agent Skills',
     // The backticks make a code chip (src/components/InlineText).
-    headline: 'Teaching your agent DatoCMS',
-    muted: 'means one `$ npx`',
+    headline: 'Make your agent fluent in DatoCMS.',
+    muted: 'It’s one `npx` away.',
     intro:
-      'Skills are DatoCMS playbooks your coding agent loads whenever the task needs them: modeling, queries, migrations, frontends, and plugins. They drive our CLI accurately, in Claude Code, Codex and Cursor.',
+      'Playbooks your coding agent loads when a task needs them: modeling, queries, migrations, frontends, plugins. They drive our CLI in Claude Code, Codex, and Cursor.',
     link: docs('/docs/agent-skills'),
   },
   // The CLI is in the frame: the commands the agent runs are the same ones
@@ -151,7 +151,7 @@ export const opinion: StatementData = {
   label: 'AI will keep changing. Our philosophy won’t.',
   // The sparkles around "shiny hype-y" are the irony (src/components/Emoji).
   // The hyphen of hype-y is a no-break hyphen (U+2011): the y stays on the line.
-  text: 'DatoCMS doesn’t come with any :sparkle:shiny hype‑y:sparkle: AI features enabled out of the box unless you enable them. We’d rather be the boring part of your AI stack that works just right. More on that below.',
+  text: 'We don’t switch on any AI features for you. You pick what runs and on which model, and a human gets the final say. We’re happy to be the :sparkle:boring:sparkle: part of your AI stack.',
 };
 
 // Chapter 3: the translations.
@@ -161,12 +161,12 @@ export const translations: ChapterLayoutData = {
   theme: 'orange',
   chapter: {
     label: 'AI translations',
-    headline: 'Translate a field, a whole model,',
-    muted: 'or everything.',
+    headline: 'Translate a field,',
+    muted: 'or the whole model.',
     // The plugin page: DeepL, OpenAI, Google Gemini, Anthropic Claude or
     // Yandex Translate.
     intro:
-      'The AI Translations plugin brings OpenAI, Gemini, Claude, or DeepL, straight into the record. Edit each record individually, or go at it in bulk. Editors always review before hitting Publish.',
+      'The AI Translations plugin brings OpenAI, Gemini, Claude, or DeepL to one field or a whole model. Nothing goes live until you hit Publish.',
     link: {
       label: 'See The Plugin',
       href: '/plugins/i/datocms-plugin-ai-translations',
@@ -188,12 +188,11 @@ export const media: ChapterLayoutData = {
   id: 'media',
   theme: 'green',
   chapter: {
-    label: 'AI in the media area',
-    headline: 'Automated image tagging.',
-    muted: 'And video captions.',
-    // (check) captions in more than one language.
+    label: 'AI in the media library',
+    headline: 'Images get tags.',
+    muted: 'Videos get captions.',
     intro:
-      'Images get suggested tags generated upon upload, so the library is searchable without the chore of manual tagging. Videos get captions in multiple languages that you can download, correct if needed, and upload again.',
+      'Uploads get suggested tags, so the library is searchable without an afternoon of tagging. Videos get captions you can download, correct, and upload again.',
     link: docs('/docs/asset-api/videos'),
   },
   scene:
@@ -208,13 +207,13 @@ export const media: ChapterLayoutData = {
       // the editor as "Manual tags" in Categorization. The filters of the
       // media area have one for each.
       title: 'Tags we suggest, tags you keep.',
-      text: 'The suggested tags sit beside yours, and the filters of the library take both.',
+      text: 'We suggest tags. Keep them, change them, and filter the library by them.',
       picture:
         'The asset Loaded tourer on the Stelvio: the smart tags bicycle, mountain, road in Asset info, and the manual tags stelvio, tour-2026 that the editor typed, in Categorization.',
     },
     {
       title: 'Captions from the audio.',
-      text: 'Choose the language, and the captions appear as a track of the video.',
+      text: 'Choose the language, and the captions generate as a track for the video.',
       picture:
         'The dialog Generate subtitles from audio of the video Fitting a rolltop pannier, alone, on English.',
     },
@@ -253,21 +252,16 @@ export const optIn: StatementsSectionData = {
   items: [
     {
       title: 'Off by default.',
-      text: 'Nothing with AI runs in your project until you turn it on and permit it to.',
+      text: 'Nothing with AI runs in your project until you turn it on.',
     },
-    // (check) the AI plugins run on the customer's own key.
     {
       title: 'Your keys.',
-      text: 'Translations and captions run on your chosen provider with your own keys.',
+      text: 'Translations and captions run on the provider you choose with your keys.',
     },
     {
       title: 'Your permissions.',
-      text: 'An assistant gets the same permissions as the user. Nothing more. Maybe less.',
+      text: 'An assistant can do what the person who connected it can do. Nothing more. Maybe less.',
     },
-    // (check) with legal, and the terms of each provider.
-    {
-      title: 'Your content.',
-      text: 'We don’t share your content to train models on it, and nor do our tools.',
-    },
+    { title: 'Your content.', text: 'We don’t train any AI models on your content.' },
   ],
 };

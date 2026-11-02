@@ -23,7 +23,7 @@ export const chapter: ChapterHeaderData = {
   headline: 'Click the page.',
   muted: 'Land on the field.',
   intro:
-    'Editors click any text or image on the draft site, and we open the field that holds it. Developers set it up once.',
+    'Editors click any text or image on the draft site, and the CMS opens on the exact field. Developers set it up once.',
   link: {
     label: 'Read The Docs',
     href: '/docs/visual-editing',
@@ -79,12 +79,12 @@ export const request: CodeTab = {
 export const fragments: FeatureFragmentsData = {
   items: [
     {
-      title: 'Save, and see the page.',
-      text: 'When you know which field to change, stay in the form. The Web Previews sidebar keeps the draft page next to it, and can reload it after each save.',
+      title: 'Edit. Save. See. Repeat.',
+      text: 'Stay in the form. The Web Previews sidebar keeps the draft page next to it, and can reload it after each save.',
     },
     {
       title: 'Two headers and one component.',
-      text: 'Add two headers to your queries and <ContentLink /> to your layout. Blocks and linked records work with no mapping, on every plan.',
+      text: 'Add two headers to your queries and `<ContentLink />` to your layout. Blocks and linked records work with no additional mapping.',
     },
   ],
 };

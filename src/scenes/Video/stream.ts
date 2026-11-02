@@ -37,4 +37,4 @@ export const DURATION = VIDEO.duration;
 export const clock = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 
-export const DESCRIPTION = `The video “${VIDEO.title}” in two players at the same second, ${clock(START)}, both playing. The left player is on a train: its picture is softer, 270p. The right player is on fibre: its picture is sharp, 1080p. When the left connection gets better, its picture gets sharper; it never stops to load.`;
+export const DESCRIPTION = `The video “${VIDEO.title}” in two players at the same second, ${clock(START)}, both playing. The left player is on a train: its picture is softer, 270p. The right player is on fiber: its picture is sharp, 1080p. When the left connection gets better, its picture gets sharper; it never stops to load.`;

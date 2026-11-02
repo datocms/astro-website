@@ -21,8 +21,9 @@ import type { CategoryNavData } from '~/components/CategoryNav';
 // New copy. The hero is about the pillar, not about one chapter.
 export const hero: HeroData = {
   label: 'Editor experience',
-  headline: 'Comfortable to write in. Predictable to build on.',
-  subheadline: 'Editors get a calm place to write, developers get structured content',
+  headline: 'Familiar to write in. Predictable to build on.',
+  subheadline:
+    'Editors get a calm place to write. Developers get structured content they can build with',
   face: '[**]',
   buttons: [
     {
@@ -54,7 +55,7 @@ export const chapterNav: CategoryNavData = {
 // The label is the muted lead-in of the statement.
 export const opinion: StatementData = {
   label: 'Same content, two kinds of happy.',
-  text: 'Editors want to write without thinking about structure. Developers want structure without reading prose. We keep both promises in the same field.',
+  text: 'Editors want to write without thinking about structure. Developers want structure without reading prose. One field keeps both of them happy.',
 };
 
 // The SEO tags of the page. The page has no CMS record. The title gets the

@@ -128,7 +128,7 @@ The site does not show `academy_course.illustration` (3 records: `growing`, `dat
 
 ### 5. Copy and facts to confirm
 
-- The `(check)` comments in `src/data/` (`git grep -n '(check)' -- src/data`: `ai-pillar.ts`, `developers-code.ts`, `developers-pillar.ts`, `media.ts`), and the status numbers ("40 ms", "99.99%", "6B", "74").
+- The `(check)` comments in `src/data/` (`git grep -n '(check)' -- src/data`: `ai-pillar.ts`, `developers-code.ts`, `developers-pillar.ts`, `localization.ts`, `media.ts`, `workflows.ts`), and the status numbers ("40 ms", "99.99%", "6B", "74").
 - The copy marked `// New copy.` (`git grep -l 'New copy' -- src/data`); on `/cms/*`, check the snippets against the starters.
 - The copy of `/developers`, `/ai` and `/media` is a draft: Ronak's pass. In `/developers`, the environments chapter, the muted line and the intro do not match the graph: a promotion moves the ref of the primary, it does not merge.
 - `/wall-of-love`: principles 07 (a copy of 05) and 08 ("European.") need copy.

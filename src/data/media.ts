@@ -40,8 +40,9 @@ const docs = (href: string): ChapterHeaderData['link'] => ({
 // New copy.
 export const hero: HeroData = {
   label: 'Media',
-  headline: 'Upload once. Every size, every screen.',
-  subheadline: 'One library for every file, served in the size each page asks for',
+  headline: 'Upload once. Optimized for every size, every screen.',
+  subheadline:
+    'One library for images, video, audio, and documents, served in the size each screen needs',
   buttons: [
     {
       label: 'Get Started',
@@ -80,12 +81,12 @@ export const library = {
   theme: 'pink',
   chapter: {
     label: 'Media library',
-    headline: 'One library.',
-    muted: 'Find it again.',
+    headline: 'One library,',
+    muted: 'organized your way.',
     intro:
       // The docs confirm it: a new version dropped on an asset replaces it
       // in every occurrence.
-      'Images, video, audio and documents in one library that every record links. Replace a file once, and every page that uses it follows.',
+      'Images, video, audio, and documents in one library that every record links to. Replace a file once, and every record that uses it follows.',
     // The route of the docs of the media area, confirmed.
     link: docs('/docs/general-concepts/media-area'),
   },
@@ -95,14 +96,14 @@ export const library = {
     {
       // The default metadata is the fallback: a record that links the
       // asset can give its own alt and title.
-      title: 'Alt text, in each language.',
-      text: 'Write the alt and the title once on the asset, in each language. Every record that links it starts from them.',
+      title: 'Alt text for every language.',
+      text: 'Write the alt text and title of an asset once, in each language. Every record that links it starts from them.',
       picture:
         'The default metadata of Vessel with dry grasses, the menu of the language open, Italian active, its alt text filled.',
     },
     {
       title: 'Collections and saved filters.',
-      text: 'Nest collections for exhibitions, campaigns and clients, and save the filters you open every day, for you or for the team.',
+      text: 'Nest collections by category, campaign, or client, and save the filters you use every day, for yourself or for the team.',
       picture:
         'The tree of the collections, Exhibitions › 2026 › Light and Thread active, and the menu of the saved filters open on Press kit 2026.',
     },
@@ -110,16 +111,15 @@ export const library = {
       // The cms opens the record on the field that holds the asset
       // (LinksToItems, the fieldPath of each row).
       title: 'See where it is used.',
-      text: 'Each asset lists the records that link it. Click one, and the record opens on the field that holds the file.',
+      text: 'Each asset lists the records that link to it. Click one, and the record opens to that specific field.',
       picture:
         'The panel Records using this asset of Vessel with dry grasses: an object, the exhibition Light and Thread, an article and a press release, each with its status.',
     },
     {
-      // (check) which DAM plugins are on /plugins today (Sirv is;
-      // Cloudinary is named on features.md). The source is named by the
+      // The DAM plugins on /plugins: Cloudinary, Bynder, Sirv. The source is named by the
       // plugin, thus the picture draws no third-party interface.
-      title: 'Your DAM, if you have one.',
-      text: 'A plugin adds its source to the upload menu, and brings the assets of Cloudinary or another DAM in without a second upload.',
+      title: 'Bring your own DAM.',
+      text: 'Already using Cloudinary, Bynder, or another DAM? A plugin adds it to the upload menu, so you don’t upload twice.',
       picture:
         'The menu of the upload button open: the sources the plugins add, Museum archive under the pointer, then Unsplash.',
     },
@@ -135,7 +135,7 @@ export const fields: ChapterLayoutData = {
     headline: 'A field for one image,',
     muted: 'a gallery for twenty.',
     intro:
-      'Single asset and gallery fields, with rules on size, format and dimensions, and a required alt text if you want one. Embeds from YouTube or Vimeo have their own field.',
+      'Single asset and gallery fields, with rules for size, format, and dimensions, and required alt text if you want it.',
     link: docs('/docs/content-modelling'),
   },
   // The frame shows the three fields at rest. The picker of the library
@@ -149,14 +149,14 @@ export const fields: ChapterLayoutData = {
     {
       // A zoom on the third field of the frame. With a video, the cms
       // shows the thumbnail and the title that it fetched, not the link.
-      title: 'Video from elsewhere too.',
-      text: 'An external video field takes a YouTube or Vimeo link and shows its preview.',
+      title: 'Already uploaded video elsewhere?',
+      text: 'An external video field takes a YouTube or Vimeo link and generates its preview.',
       picture:
         'The external video field zoomed in: the thumbnail and the title of the trailer, fetched from its YouTube link, with the actions of the card (play, open, remove) and the hint of the field.',
     },
     {
-      title: 'Assets in your query.',
-      text: 'One GraphQL query gets the cover with its focal point, the whole gallery and the trailer, with the alt text in the locale you ask for.',
+      title: 'Assets in your query, optimized.',
+      text: 'One GraphQL query gets your images, video, audio, and documents, with the optimizations, sizes, and formats you ask for.',
       picture:
         'Code: the query of Wadi Rum on foot: the cover with url, alt and focal point, the URLs of the gallery, and the trailer with its provider, title and thumbnail, with the response in Italian.',
       code: [assetQuery, assetResponse],
@@ -172,25 +172,25 @@ export const images: ChapterLayoutData = {
   theme: 'green',
   chapter: {
     label: 'Images API',
-    headline: 'One original.',
-    muted: 'Every size, from the URL.',
+    headline: 'Upload the original.',
+    muted: 'Not every version.',
     intro:
-      'Add parameters to the URL and the image is resized, cropped, compressed and converted on request, with imgix, then cached at the edge. Press the switches: each one is a parameter of the URL.',
+      'Add parameters to the URL, and imgix resizes, crops, compresses, and converts the image on request. The result is cached at the edge.',
     link: docs('/docs/asset-api/images'),
   },
   scene:
     'The image lab: the original photo, the URL of DatoCMS with its parameters, and the photo that the URL makes, with its weight. A switch for each parameter and each format.',
   fragments: [
     {
-      title: 'Responsive in one field.',
-      text: 'Ask for the responsive image in GraphQL, and get the sizes, the srcset and a blurred placeholder in one object.',
+      title: 'Responsive images in one query.',
+      text: 'Query for the responsive image in GraphQL, and get the sizes, the srcset, and a blurred placeholder in one object.',
       picture:
         'Code: the query of responsiveImage of Tide Line, and the response with src, srcSet, sizes and the blurred base64 placeholder.',
       code: [responsiveQuery, responsiveResponse],
     },
     {
-      title: 'Everything we know about it.',
-      text: 'Dimensions, EXIF, dominant colours, a blurhash and the copyright are stored with the asset, and your query can ask for them.',
+      title: 'We keep all the metadata.',
+      text: 'Dimensions, EXIF, dominant colors, a blurhash, and the copyright stay with the asset. Query them with any other custom metadata you add.',
       picture:
         'Code: the metadata of the upload Tide Line in a response: colors, exifInfo, width, height, size, blurhash, copyright.',
       code: [metadataQuery, metadataResponse],
@@ -201,7 +201,7 @@ export const images: ChapterLayoutData = {
 // New copy. The one opinion of the page, between chapter 3 and chapter 4.
 export const opinion: StatementData = {
   label: 'We don’t run our own pipeline.',
-  text: 'imgix and Mux each do one thing, better than we would. Our job is to make them feel like one field in your schema and one library for your editors.',
+  text: 'imgix has done images for years, and Mux has done video. Our job is to make them feel like one field in your schema and one library for your editors.',
 };
 
 // Chapter 4: the Video API.
@@ -215,7 +215,7 @@ export const video: ChapterLayoutData = {
     // The docs do not tell about storyboards, thus the intro does not
     // name them.
     intro:
-      'Every video is transcoded on upload and streamed with adaptive bitrate from Mux. Thumbnails, captions and audio tracks come from the same upload.',
+      'Every video is transcoded on upload and streamed with adaptive bitrate from Mux. Thumbnails, captions, and audio tracks come from the same upload.',
     link: docs('/docs/asset-api/videos'),
   },
   // Built: src/scenes/Video/. The frame and the pictures of the first two
@@ -232,7 +232,7 @@ export const video: ChapterLayoutData = {
       // The docs: captions can be generated only for videos uploaded in the
       // last 7 days, thus the sentence says "within a week".
       title: 'Captions, generated.',
-      text: 'Pick the language within a week of the upload, and we turn the audio into captions. Download them, correct them, upload them again.',
+      text: 'Pick a language within a week of the upload, and we turn the audio into captions. Not perfect? Download them, correct them, upload them again.',
       picture:
         'The sidebar of Restoring Tide Line zoomed in: the panels Info and Categorization closed, then the tracks German and English (generated), each with its icons Download and Delete, and under the tracks the buttons Browse and Generate subtitles from audio.',
     },
@@ -241,7 +241,7 @@ export const video: ChapterLayoutData = {
       // "Additional audio tracks and subtitles"; the video players of
       // DatoCMS show the audio tracks.
       title: 'Add another voice.',
-      text: 'Upload an audio track in M4A, MP3 or WAV: a dub in another language, or an audio description. Viewers pick it in the player.',
+      text: 'Upload an audio track in M4A, MP3, or WAV: a dub in another language, or an audio description. Viewers pick it in the player.',
       picture:
         'The dialog Add new track over Restoring Tide Line: the file restoring-tide-line-it.m4a as it uploads, the language Italian and the track name Italiano (voce).',
     },
@@ -250,9 +250,9 @@ export const video: ChapterLayoutData = {
       // viewer sees it. (check) 270p and 4K: the old chapter had them, and
       // nobody has verified them against the docs of Mux.
       title: 'No spinning wheel.',
-      text: 'The player picks the rendition each connection can carry, from 270p to 4K. On a train the picture gets softer, on fibre it gets sharp again, and it never stops to load.',
+      text: 'The player picks the rendition each connection can carry, from 270p to 4K. On a train? Lighter. Back on fiber? Sharp again.',
       picture:
-        'Restoring Tide Line in two players at the same second, both playing: on a train the picture is soft, 270p; on fibre it is sharp, 1080p. The connection of the left player changes, and its picture with it.',
+        'Restoring Tide Line in two players at the same second, both playing: on a train the picture is soft, 270p; on fiber it is sharp, 1080p. The connection of the left player changes, and its picture with it.',
     },
     {
       // From the chapter Streaming, which went.
@@ -276,7 +276,7 @@ export const components: ChapterLayoutData = {
     headline: 'One component for images.',
     muted: 'One for video.',
     intro:
-      'Our React, Vue and Svelte packages ship an Image and a VideoPlayer that take the API response as it is. Lazy loading, placeholders and captions included.',
+      'Our React, Vue, and Svelte packages ship an Image and a VideoPlayer that take the API response. Lazy loading, placeholders, and captions included.',
     link: docs('/docs/content-delivery-api/images-and-videos'),
   },
   // The frame shows the Image as it loads: the placeholders, no layout
@@ -290,7 +290,7 @@ export const components: ChapterLayoutData = {
       // original is the photo as Unsplash serves it
       // (src/scenes/MediaComponents/story.ts).
       title: 'Each screen gets its own file.',
-      text: 'The Image writes the srcset for you. A phone downloads a small AVIF and a large screen a sharp one, from the same line of code.',
+      text: 'The Image writes the srcset for you. A phone gets a small AVIF, a big screen a sharp one, from the same line of code.',
       picture:
         'The line of the Image, and under it the srcset: five copies of the whole photo of the cover in a cascade, each partly on the next larger one, from 960w and 22 KB to 3840w and 157 KB. The phone picks the file of 39 KB, the laptop the file of 101 KB. After them, in a shade, the original: 6000 × 4000, 3.5 MB, larger than the picture.',
     },
@@ -298,8 +298,8 @@ export const components: ChapterLayoutData = {
       // The tracks are the ones of the chapter "Video API": the payoff of
       // that chapter. The player is the one of Mux, as the component
       // renders it.
-      title: 'The player, in one line.',
-      text: 'Pass the video from the query. The poster, the stream, the captions and the audio tracks come with it.',
+      title: 'Video player. In one line of code.',
+      text: 'Pass the video from the query. The poster, the stream, the captions, and the audio tracks come with it.',
       picture:
         'The line of code with the VideoPlayer, and under it the player of Restoring Tide Line: the English caption on the frame, and the menu of the captions open on the tracks of the Video API chapter, German and English (generated).',
     },

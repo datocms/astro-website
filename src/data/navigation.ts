@@ -135,7 +135,7 @@ export const mainNavigation: NavGroup[] = [
       {
         sections: [
           {
-            heading: 'Ecosystem',
+            heading: 'Catalogs',
             links: [l('Plugins', '/plugins'), l('Starters', '/starters')],
           },
         ],

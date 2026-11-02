@@ -147,7 +147,7 @@ export function svgLogo(svg: string, alt: string): LogoItem {
 
 export const hero: HeroData = {
   headline: 'Thoughtfully built and ambitiously used.',
-  subheadline: "The AI-agnostic Headless CMS that's human on support and transparent in pricing",
+  subheadline: 'The AI-agnostic headless CMS that’s human on support and transparent in pricing',
   buttons: [
     {
       label: 'Get Started',
@@ -207,11 +207,11 @@ export const homeHero: HomeHeroData = {
 
 export const userExperience: UserExperienceData = {
   developer: {
-    headline: 'Fresh tools, predictable workflows, and full control for devs.',
+    headline: 'Fresh tools, predictable workflows, and full control.',
     button: { label: 'Developer Comfort', href: '/developers', appearance: 'deep-on-light' },
   },
   editor: {
-    headline: 'Familiar editing, structured content, and fewer bottlenecks for editors.',
+    headline: 'Familiar editing, structured content, and fewer bottlenecks.',
     button: { label: 'Editor Happiness', href: '/editor-experience', appearance: 'deep-on-light' },
   },
   record: {
@@ -271,29 +271,26 @@ export const features: FeaturesData = {
     {
       title: 'Editor experience',
       href: '/editor-experience',
-      description:
-        'A calm editing environment for editors, and structure for the developers who build on it.',
+      description: 'A calm environment for editors. Structure for the developers who build on it.',
       theme: 'green',
     },
     {
       title: 'For developers',
       href: '/developers',
-      description:
-        'Modular how you like it, and steady how you need it. From the schema to the CDN.',
+      description: 'Modular how you like it. Steady how you need it. From the schema to the CDN.',
       theme: 'orange',
     },
     {
       title: 'Media',
       href: '/media',
       description:
-        'Serve every screen in any size with just the right optimizations. Upload once and query everywhere.',
+        'Upload once, query everywhere. Every file in one library, optimized for the size each screen needs.',
       theme: 'pink',
     },
     {
       title: 'AI',
       href: '/ai',
-      description:
-        'BYO-AI. All AI features are opt-in, so bring the assistants you already use, or none at all.',
+      description: 'Bring the assistant you already use, or none at all.',
       theme: 'blue',
     },
   ],
@@ -434,7 +431,7 @@ export const frameworkIntegration: TextWithImageData = {
   title: 'Integrate with one line of code.',
   // New copy. Each :name: is the mark of the framework (src/components/Emoji).
   tagline:
-    'Keep working with the frameworks you know and love. Integrate DatoCMS seamlessly with :nextjs: Next.js, :nuxt: Nuxt, :sveltekit: SvelteKit, and :astro: Astro, with our official integration guides and SDKs.',
+    'Use the frameworks you prefer. Our official guides and SDKs cover :nextjs: Next.js, :nuxt: Nuxt, :sveltekit: SvelteKit, and :astro: Astro.',
   button: {
     label: 'Explore Integrations',
     href: '/docs',
@@ -502,12 +499,12 @@ export const frameworkIntegration: TextWithImageData = {
 
 export const questionAnswer: QuestionAnswerData = {
   headline: 'Bring your AI [•ᴥ•]',
-  subline: 'Use your fave AI your way. They feel right at home in the CMS, the CLI, or via MCP.',
+  subline: 'Your AI feels right at home in the CMS, the CLI, or over MCP.',
   ask: {
     title: 'Connect your AI',
     href: '/docs/mcp',
     question: 'How many pages are still missing SEO descriptions?',
-    models: ['Claude', 'Chat-GPT', 'Gemini'],
+    models: ['Claude', 'ChatGPT', 'Gemini'],
     answer: '8 pages are missing them',
   },
   install: {
@@ -518,7 +515,7 @@ export const questionAnswer: QuestionAnswerData = {
   },
   // New copy. Leads to the AI pillar.
   more: {
-    text: 'Translations, image tags, video captions and more: every AI feature is opt-in, and runs on the model you choose.',
+    text: 'Translations, image tags, video captions, and whatever ships next. All opt-in.',
     button: { label: 'Explore AI', href: '/ai', appearance: 'deep-on-light', variant: 'soft' },
   },
 };
@@ -529,7 +526,7 @@ export const community: CommunityData = {
   headline: 'Community',
   // New copy. :heart: reads "love" (src/components/Emoji).
   muted: 'Ask us anything. We’d :heart: to help you build.',
-  paragraph: 'Connect with 1,000s of developers actively using DatoCMS in production.',
+  paragraph: 'Connect with developers who already run DatoCMS in production.',
   button: {
     label: 'Visit Community',
     href: 'https://community.datocms.com',
@@ -575,7 +572,7 @@ export const ctaSlack: CtaBannerData = {
   variant: 'light',
   theme: 'green',
   headline: 'Or join us on Slack.',
-  subline: 'Connect with us and 3,000+ developers actively helping one another.',
+  subline: 'Talk to us and to 3,000+ other developers in real time.',
   buttons: [
     {
       label: 'Join Us On Slack',
@@ -590,23 +587,23 @@ export const ctaPricing: CtaBannerData = {
   variant: 'light',
   theme: 'default',
   headline: 'Pricing as it should be.',
-  muted: 'Transparent, fair, and predictable. Without any renewal gotchas.',
+  muted: 'Transparent and predictable (even when renewing).',
   buttons: [
     { label: 'Explore Pricing', href: '/pricing', appearance: 'deep-on-light', variant: 'soft' },
   ],
 };
 
 export const productUpdates: ProductUpdatesData = {
-  headline: 'We ship, ship, ship.',
+  headline: 'We ship and ship and ship.',
   muted: 'Here’s what’s new in DatoCMS.',
   allHref: '/product-updates',
 };
 
 export const caseStudies: CaseStudiesData = {
-  headline: 'Trusted by incredible companies to build ambitious projects we’re both proud of.',
+  headline: 'Trusted by teams who build things we’re both proud of.',
   buttons: [
     {
-      label: 'Lets Talk!',
+      label: 'Let’s Talk',
       href: '/contact',
       appearance: 'deep-on-white',
       arrow: false,
@@ -624,8 +621,7 @@ export const caseStudies: CaseStudiesData = {
 
 export const partners: PartnersData = {
   eyebrow: 'Agency Partners',
-  paragraph:
-    'We’ve helped enable some seriously bold projects with some seriously creative partners across the globe.',
+  paragraph: 'Our partners are seriously creative, and they ship all over the world.',
   buttons: [
     {
       label: 'Become a Partner',

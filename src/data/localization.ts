@@ -15,7 +15,7 @@ export const chapter: ChapterHeaderData = {
   headline: 'Localize each field.',
   muted: 'Or not.',
   intro:
-    'You choose per field what gets translated: the title yes, the price no. Editors switch tabs and publish each locale when it is ready.',
+    'You choose what gets translated per field: the title yes, the price no. A locale that isn’t ready falls back to one you set.',
   link: {
     label: 'Read The Docs',
     href: '/docs/general-concepts/localization',
@@ -31,9 +31,12 @@ export const fragments: FeatureFragmentsData = {
   items: [
     {
       title: 'Publish when each locale is ready.',
-      text: 'Italian is done, German is still with the translator. Editors publish Italian now, and German when it is ready.',
+      text: 'Italian is done, German and Arabic are still with the translator. Editors publish Italian now, and the others when they are ready.',
     },
     {
+      // One language for each word: Each in German, translator in English, in
+      // in Spanish, their in Arabic, language in Italian. (check) the Arabic
+      // word with a native speaker.
       title: 'Each translator in their language.',
       text: 'A role edits only the locales you give it, so the German team works on German and leaves the other locales alone.',
     },

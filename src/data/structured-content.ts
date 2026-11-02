@@ -17,7 +17,7 @@ export const chapter: ChapterHeaderData = {
   headline: 'Rich text,',
   muted: 'stored as JSON.',
   intro:
-    'Headings, links, blocks and references to other records, all in one field. Editors see a document. Your code sees a typed tree.',
+    'Headings, links, quotes, blocks, and references to other records, all in one field. Editors see a document. Your code sees a typed tree, not HTML.',
   link: {
     label: 'Read The Docs',
     href: '/docs/structured-text/dast',
@@ -137,20 +137,20 @@ const blockComponents = { GalleryRecord: Gallery };
 export const fragments: FeatureFragmentsData = {
   items: [
     {
-      title: 'An editor that knows the shortcuts.',
-      text: 'Editors type a slash to add any element, write markdown that turns into formatting, use familiar shortcuts and drag things where they belong.',
+      title: 'The editor knows your shortcuts.',
+      text: 'Editors type a slash to add any element, write markdown that turns into formatting, use familiar shortcuts, and drag things where they belong.',
     },
     {
-      title: 'A gallery between two paragraphs.',
+      title: 'Add blocks between paragraphs.',
       text: 'Galleries, calls to action, polls, embeds: you define the blocks, editors drop them into the text and move them around like any paragraph.',
     },
     {
-      title: 'A record, not a URL.',
-      text: 'Cervejaria Ramiro is a record of its own. Change its name or its slug, and every guide that mentions it is up to date.',
+      title: 'Mention records, not URLs.',
+      text: 'Cervejaria Ramiro is a record of its own. Change its name or its slug, and every record that mentions it picks up the changes.',
     },
     {
       title: 'JSON in, your components out.',
-      text: 'Your code gets the café paragraph as a tree of typed nodes, with nothing to parse. Hand it to one component and say how each record and block looks.',
+      text: 'Your code gets the café paragraph as a tree of typed nodes. Hand it to one component, and say how each record and block looks.',
     },
   ],
 };

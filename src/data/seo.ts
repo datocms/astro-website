@@ -18,7 +18,7 @@ export const chapter: ChapterHeaderData = {
   headline: 'SEO is content.',
   muted: 'Editors write it.',
   intro:
-    'One field holds the title, description and share image, with a preview of the result. Your code gets the meta tags ready to render.',
+    'The SEO field has the title, description, and share image, with fallbacks, validations, and a preview. Your code gets the meta tags ready to render.',
   link: {
     label: 'Read The Docs',
     href: '/docs/content-modelling/seo-fields',
@@ -108,12 +108,12 @@ ${metaTag('property', 'og:image', SHARE_IMAGE_URL)}
 export const fragments: FeatureFragmentsData = {
   items: [
     {
-      title: 'Every link card, before sharing.',
+      title: 'But what will it look like?',
       text: 'The same field previews the link card on social networks and chat apps, image included, so the first share looks right.',
     },
     {
       title: 'Tags, ready to render.',
-      text: 'Your query asks for _seoMetaTags and faviconMetaTags, and gets the title, the description, the Open Graph tags and the favicons, ready for the head of the page.',
+      text: 'Your query asks for `_seoMetaTags` and `faviconMetaTags`, and gets the title, the description, the Open Graph tags, and the favicons.',
     },
   ],
 };

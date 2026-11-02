@@ -11,14 +11,13 @@ import type { FeatureFragmentsData } from '~/components/FeatureFragments';
  * embargo.
  */
 
-// Part 1 of the chapter: the header. New copy. The Enterprise limit comes
-// from the docs page of the feature.
+// Part 1 of the chapter: the header. New copy. Workflows are an Enterprise
+// feature (the docs page of the feature): the intro does not say it.
 export const chapter: ChapterHeaderData = {
   label: 'Workflows',
   headline: 'Your review process,',
-  muted: 'in the record.',
-  intro:
-    'You name the stages and choose which roles move a record from one to the next. Workflows are an Enterprise feature.',
+  muted: 'built into the record.',
+  intro: 'Name the stages, pick which roles can move a record along, and that’s your workflow.',
   link: {
     label: 'Read The Docs',
     href: '/docs/general-concepts/workflows',
@@ -37,8 +36,9 @@ export const fragments: FeatureFragmentsData = {
       text: 'A writer sends a draft to review, and only an editor approves it. Nothing goes live by mistake.',
     },
     {
-      title: 'Publish on Monday at nine.',
-      text: 'Pick a date and a time, and the record publishes or unpublishes itself, with nobody at the keyboard.',
+      // (check) the scheduling of one locale.
+      title: 'Publish de-AT on Monday at 10:15.',
+      text: 'Pick a date and a time, per locale or for all of them, and the record publishes or unpublishes itself, with nobody at the keyboard.',
     },
   ],
 };

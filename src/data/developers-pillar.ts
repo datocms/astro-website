@@ -47,7 +47,7 @@ const docs = (href: string): ChapterHeaderData['link'] => ({
 export const hero: HeroData = {
   label: 'For developers',
   headline: 'Modular how you like it.',
-  subheadline: 'And steady how you need it, from the schema to the CDN. Nothing to host',
+  subheadline: 'And steady how you need it, from the schema to the CDN, with nothing to host',
   buttons: [
     {
       label: 'Get Started',
@@ -84,7 +84,7 @@ export const schema: ChapterLayoutData = {
     // (check) The intro does not claim "no codegen step": types are
     // generated optionally.
     intro:
-      'Models, blocks, and fields with their validations, built quickly in the UI (or quickly-er via the CLI). Every change is live in the API instantly: no config files to sync, no redeploy, no drama.',
+      'Models, blocks, and fields with their validations, built in the UI or the CLI. Change something, and it’s live in the API. No redeploy.',
     link: docs('/docs/content-modelling'),
   },
   // The frame plays a sequence: the field list, a click on the text field
@@ -105,8 +105,8 @@ export const schema: ChapterLayoutData = {
       // it (each links field can choose another behaviour); a new
       // validation checks each record again and marks the ones that break
       // it as invalid. No migration script, no dangling link.
-      title: 'Every record follows the schema.',
-      text: 'Added a field, deleted a record, or made a rule stricter? We update all records affected, and flag the ones that no longer pass validations without you having to write any script.',
+      title: 'Every record follows the schema. No exceptions.',
+      text: 'Added a field, deleted a record, made a validation stricter? We update every record, and flag the ones that no longer meet your rules.',
       // Another point of view on the frame: not the field, but the records under it.
       picture:
         'The articles of Northlight’s journal as a table, the records as rows and the fields as columns: each schema change rings one header and changes every cell under it (a new slug field opens a column, with a slug made from the name of each article; the deleted tag News leaves every article; a new validation marks the article left with no tag invalid).',
@@ -117,7 +117,7 @@ export const schema: ChapterLayoutData = {
       // that a field still allows, an upload that a record still uses, a
       // locale that a record still needs, and says which.
       title: 'Applied, or refused.',
-      text: 'Any change that would leave records broken gets refused and flagged for review. No more broken links, outdated translations, or lost assets because one thing changed.',
+      text: 'Would a change break a record? We refuse it, and tell you which records get in the way.',
       picture:
         'The log of the schema changes of Northlight’s articles: each change comes as a pill and lands at the top with its verdict, how many records it changed, or why we refused it (a block that a field still allows, a locale that an article still needs, an upload that three records still use).',
     },
@@ -135,7 +135,7 @@ export const graphql: ChapterLayoutData = {
     headline: 'Ask for a title.',
     muted: 'Get a title.',
     intro:
-      'One endpoint serves all your content, strongly typed from your schema. Filters, pagination, metadata, SEO, locales, drafts, linked records… all come in one request exactly how you ask for them.',
+      'One endpoint for all your content, typed from your schema. Filters, pagination, locales, drafts, SEO, linked records? Same request.',
     link: docs('/docs/content-delivery-api'),
   },
   scene:
@@ -146,9 +146,9 @@ export const graphql: ChapterLayoutData = {
       // What the API computes, a tab for each: the image, the SEO tags,
       // the inverse relationships, the video. Each tab has its own site.
       title: 'Answers, not just raw data.',
-      text: 'Images cropped at the focal point, SEO tags of a page, links, stream-ready videos, all of it. You ask, we compute.',
+      text: 'Images cropped at the selected focal point, SEO tags of a page, linked records, stream-ready video. You ask, we compute.',
       picture:
-        'Code, four tabs: a magazine cover cropped on its focal point, with its blurred copy in base64 and its colours; the meta tags of a recipe and the favicons of the site; the last three articles that quote a person; the video of a lesson, with its stream, an MP4 and a poster.',
+        'Code, four tabs: a magazine cover cropped on its focal point, with its blurred copy in base64 and its colors; the meta tags of a recipe and the favicons of the site; the last three articles that quote a person; the video of a lesson, with its stream, an MP4 and a poster.',
       code: apiCode,
     },
     {
@@ -158,8 +158,8 @@ export const graphql: ChapterLayoutData = {
       // of five requests; the round trip when the browser does not give
       // the TTFB). It shows no number that it did not measure. The old
       // page counted 74 edges: no count is drawn.
-      title: 'From the edge. Every time. Obviously ☝️',
-      text: 'Every query, file, image, and video is answered or served from the nearest edge node to the visitor.',
+      title: 'From whichever edge is closest.',
+      text: 'Every query, image, and video is served from the edge node nearest to the visitor.',
       picture:
         'Your browser and the nearest edge of the Content Delivery API, with the time between them in ms, measured live.',
     },
@@ -172,10 +172,10 @@ export const realTime: ChapterLayoutData = {
   theme: 'purple',
   chapter: {
     label: 'Real-time Updates API',
-    headline: 'The same query.',
-    muted: 'But make it a stream.',
+    headline: 'The same query,',
+    muted: 'as a stream.',
     intro:
-      'Any query can be a subscription over Server-Sent Events. One hook in React, Vue, or Svelte lets you serve content updates instantly without delays or rebuilds.',
+      'Any query can be a subscription over Server-Sent Events. One hook in React, Vue, or Svelte, and content updates go live. Your components don’t change.',
     link: docs('/docs/real-time-updates-api'),
   },
   // Built: src/scenes/RealTime/, in the grammar of the diagrams
@@ -200,7 +200,7 @@ export const delivery: ChapterLayoutData = {
     headline: 'Purge what changed.',
     muted: 'The rest stays cached.',
     intro:
-      'Get fine-grained cache invalidation with every response listing the records it used as cache tags. No more stale content. No more full rebuilds.',
+      'Every response lists the records it used as cache tags. When content changes, a webhook names the tags to purge.',
     link: docs('/docs/content-delivery-api/cache-tags'),
   },
   // Built: src/scenes/Delivery/, in the grammar of the diagrams
@@ -213,8 +213,8 @@ export const delivery: ChapterLayoutData = {
   // the header in one tab and the webhook payload in the other.
   fragments: [
     {
-      title: '`X-Cache-Tags` out, `X-Cache-Tags` back.',
-      text: 'Ask with one header, and the response names the records, models and assets it used. When one changes, a webhook identifies the tags to purge.',
+      title: '`X-Cache-Tags` out, back by webhooks.',
+      text: 'Ask with one header, and the response lists the records, models, and assets it used. When one changes, a webhook names the tags to purge.',
       picture:
         'Code, two tabs: the response headers of the Arc floor lamp query with the X-Cache-Tags header marked, and the payload of the invalidation webhook with the two tags of the diagram.',
       code: headersCode,
@@ -223,7 +223,7 @@ export const delivery: ChapterLayoutData = {
       // Netlify in place of Next.js: Next.js caps a fetch at 128 tags and
       // needs a mapping layer (docs), which one tab cannot tell honestly.
       title: 'Using Fastly, Cloudflare, or Netlify?',
-      text: 'Surrogate keys or cache-tag headers: the tags map onto what your CDN already honours. Oh, and there’s guides for Astro and Next.js too.',
+      text: 'Surrogate keys or cache-tag headers? The tags map onto whatever your CDN already honors. (There are guides for Astro and Next.js too.)',
       picture:
         'Code: three tabs, Fastly, Cloudflare, Netlify, each with the header its CDN reads for the same tags: Surrogate-Key, Cache-Tag, Netlify-Cache-Tag.',
       code: cdnCode,
@@ -233,9 +233,9 @@ export const delivery: ChapterLayoutData = {
 
 // New copy. The one opinion of the page, between chapter 5 and chapter 6.
 export const opinion: StatementData = {
-  label: 'The “boring” stuff matters.',
+  label: 'The boring stuff matters.',
   // *already* is in italics (src/components/InlineText).
-  text: 'So a sandbox behaves like a branch, a migration is a script in your repo, and a promotion is a deploy. A CMS should fit the way you *already* ship, not recreate it. We’re just a piece of your peace of mind.',
+  text: 'A CMS should fit the way you *already* ship, not reinvent it. So a sandbox behaves like a branch, a migration is a script in your repo, and a promotion is a deploy.',
 };
 
 // Chapter 5: the sandbox environments and the staging workflow.
@@ -247,7 +247,7 @@ export const environments: ChapterLayoutData = {
     headline: 'A sandbox is a branch.',
     muted: 'Promotion is the merge.',
     intro:
-      'Fork the primary environment with its content. Guiltlessly make breaking changes to the schema in the copy, write the migration, promote it, done. Editors keep working in the primary while you get your own environment to play with.',
+      'Fork the primary environment with its content. Break the schema all you want, write the migration, and promote it. Editors keep working the whole time.',
     link: docs('/docs/general-concepts/primary-and-sandbox-environments'),
   },
   // Built: src/scenes/Environments/, in the grammar of the diagrams
@@ -266,7 +266,7 @@ export const environments: ChapterLayoutData = {
   fragments: [
     {
       title: 'The CLI generates migration scripts.',
-      text: 'Compare two environments, and the CLI writes the migration script for it to ensure you can commit and promote without any unresolved issues.',
+      text: 'Compare two environments, and the CLI writes the migration script for you to go into your repo, along with the code that uses it.',
       picture:
         'Code: a terminal: migrations:new with --autogenerate=my-feature:main, then the script it wrote, a field created.',
       code: [migrationTab],
@@ -274,7 +274,7 @@ export const environments: ChapterLayoutData = {
     {
       // The safe deployment sequence of the CLI docs, the commands of the pill of the graph
       title: 'A new release is four steps.',
-      text: 'Lock the primary environment, fork it with its content, run the migrations, promote to main. The old primary stays as a sandbox should you ever need to roll back.',
+      text: 'Lock the primary, fork it, run the migrations, promote the fork. Changed your mind? The old primary is still there to roll back to.',
       picture:
         'Code: the release script of a CI job: maintenance:on, migrations:run, environments:promote, maintenance:off.',
       code: releaseCode,
@@ -291,7 +291,7 @@ export const automation: ChapterLayoutData = {
     headline: 'Everything the UI does,',
     muted: 'the API does too.',
     intro:
-      'The Content Management API, with a typed client and a CLI, writes anything an editor can. Webhooks and build triggers tell your connected systems what changed.',
+      'The Content Management API, with a typed client and a CLI, writes anything an editor can. Webhooks and build triggers tell your systems what changed.',
     link: docs('/docs/content-management-api'),
   },
   // The frame is code, no UI: a script that syncs the catalogue (it lists,
@@ -299,12 +299,12 @@ export const automation: ChapterLayoutData = {
   // ItemTypeDefinition of the model Products, in the second tab. The notes
   // tell what each call gives.
   scene:
-    'Code, no UI: a typed script syncs the catalogue of the shop: it finds each product by SKU, updates its price or creates it, and publishes it. The second tab is the generated type of Products.',
+    'Code, no UI: a typed script syncs the catalog of the shop: it finds each product by SKU, updates its price or creates it, and publishes it. The second tab is the generated type of Products.',
   sceneCode: automationCode,
   fragments: [
     {
       title: 'Webhooks on any event.',
-      text: 'Records, models, uploads, environments, publishing… Pick the events and the models, add your headers, and we call your URL. Didn’t work? We retry too.',
+      text: 'Records, models, uploads, environments, publishing: pick the events and the models, add your headers, and we call your URL. Didn’t work? We auto-retry too.',
       // The entities and the events are the real ones of the webhooks
       // (src/scenes/Automation/hooks.ts). No build triggers: the next
       // fragment is about them.
@@ -317,7 +317,7 @@ export const automation: ChapterLayoutData = {
       // the build are in the top navigation bar; a scheduled publication
       // can start a build by itself (autotrigger_on_scheduled_publications).
       title: 'Deploy when editors publish.',
-      text: 'Connect Vercel, Netlify, or your own pipeline. A new build starts when an editor publishes, or when a scheduled post goes live, and editors can see its status.',
+      text: 'Connect Vercel, Netlify, or your own pipeline. A build starts when an editor publishes or a scheduled post goes live, and editors see the build status.',
       picture:
         'A round trip down and up: the bar of DatoCMS with the trigger (Publish changes, or a scheduled post) and the status; the build goes down to Vercel, Netlify, GitLab or your own CI, the lines of its log come in, and the status comes back up: Deploying, then Deployed.',
     },
@@ -337,7 +337,7 @@ export const plugins: ChapterLayoutData = {
     // The docs say "100+ open-source plugins". (check) the number the day
     // the page ships.
     intro:
-      'Need to give your projects some added capabilities? There’s a plugin for that. A plugin is a tiiiiiny React app. In your project. In a frame. In the CMS. Build one for yourself, or install one of 100+ from our plugin catalog.',
+      'A plugin is a small React app in a frame inside the CMS. Build your own, or install one of 100+ from the plugin directory.',
     link: docs('/docs/plugin-sdk'),
   },
   // Each part of the plugin Trail tools is drawn in the record editor, with
@@ -349,7 +349,7 @@ export const plugins: ChapterLayoutData = {
   fragments: [
     {
       title: 'Hooks for every nook and cranny.',
-      text: 'Field editors, sidebar panels, pages, record actions, sub-menus, checks before publish, they can all be plugin-ized. Declare the hook, render it, and run it.',
+      text: 'Field editors, sidebar panels, pages, record actions, checks before publish. Declare the hook, render it with our React UI kit, and run it from localhost.',
       picture:
         'Code in five tabs, one for each part of Trail tools in the frame (Field, Panel, Page, Outlet, Publish): the hook that declares the part and the hook that renders it in the Canvas of the React UI kit; Publish stops the publish of a trail without its GPX track.',
       code: pluginCode,
@@ -360,7 +360,7 @@ export const plugins: ChapterLayoutData = {
       title: 'Private, or for the community.',
       // "most of the 100+ are open source": the docs say "100+ open-source
       // plugins". (check) with the plugins page the day the page ships.
-      text: 'A private one stays in your projects. A public one is an npm package others can install, and most of the 100+ are open source, so you can fork one to start.',
+      text: 'A private plugin stays in your projects. A published one goes on npm and into the plugin directory. Want a head start? Fork one.',
       picture:
         'The Plugins screen of the project settings: AI Translations, SEO/Readability Analysis, Trail tools with the pill Private, and Web Previews.',
     },
@@ -409,7 +409,7 @@ export const ctaBuild: CtaBannerData = {
 // After the GraphQL Content Delivery API: the numbers of the API, from the
 // live site.
 export const numbers: StatementsSectionData = {
-  headline: 'For fellow nerds who read the status page.',
+  headline: 'For those who read the status page.',
   items: [
     { title: '40 ms', text: 'Average API response' },
     { title: '99.99%', text: 'Uptime' },
