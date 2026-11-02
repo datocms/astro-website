@@ -185,11 +185,23 @@ Ember and Bubblegum are tuned away from overnice's values (#ff6d00 too vivid, #f
 
 ### Neutral
 
-There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft about 87%, text-muted 70 to 80% (each theme sets the alpha that gives 4.5:1 on its surface), and the hairline border at about 11%. There is no lighter text role: text under 4.5:1 is not legible. **White** (white) is only for a card that sits on a surface that stays light.
+There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft at 80% on the page and 92% on the accent, text-muted at 70 to 90% (each theme sets the alpha that gives 4.5:1 on its ground: yellow holds 70%, orange and green need about 90% on the accent), and the hairline border at about 11%. The one lighter role is the quiet run of a two-tone headline or display lockup (3:1, large text only). **White** (white) is only for a card that sits on a surface that stays light.
 
 ### Dark scheme
 
-Only the page flips. The page becomes a near-black of the theme hue (the code deep mixed with black), the text becomes the paper white at the same alpha steps. The bright accent and the inverse surface do not change. An element with the accent as background takes the class `surfaceLight`, so the text on it stays dark.
+Only the page flips. The page becomes a near-black of the theme hue (the code deep mixed with black), the text becomes the paper white at the same alpha steps. The bright accent and the inverse surface do not change: the accent keeps its dark ink, the inverse keeps its light text. The ground classes (below) carry that: an element with the accent as background takes `surfaceAccent`, so the text on it stays dark.
+
+### Colour: grounds and text roles
+
+The rules below are the whole system. `src/styles/tokens.css` states them, `src/styles/tokens.test.ts` computes every pairing (all roles, all surfaces, six themes, two schemes) and fails under AA, and `npm run lint:css` refuses a text colour outside the roles.
+
+1. **Three grounds.** Every element sits on one ground: the **page** (`--surface-default` and its tints: `--surface-accent-faint|subtle|muted`, `--surface-inverse-faint`, `--surface-field`, `--surface-nav-active`, `--surface-status-*`), the **accent** (`--surface-accent`, bright in both schemes, dark text) or the **inverse** (`--surface-inverse`, deep in both schemes, light text). The code card (`--code-background`, `--code-*`) is a fourth, small ground.
+2. **Canonical text roles**, one set for each ground: page `--text-on-page`, `-soft`, `-muted`, `-headline-muted`; accent `--text-on-accent`, `-soft`, `-muted`, `-headline-muted`; inverse `--text-on-inverse-strong`, `--text-on-inverse`, `-soft`, `-muted`, `-headline-muted`. Each role has 4.5:1 or more on every surface of its ground, in the six themes and the two schemes. The one exception is `*-headline-muted`: 3:1 or more, for the quiet run of a two-tone headline or display lockup only (large text, 24px or more: a `display` or `h1` headline, the quiet words of the Single Source lockup; an `h2` is 17px on phones and takes `--text-muted`). Borders: `--border-on-page|accent|inverse` and `-strong`.
+3. **Contextual roles follow the ground, not the theme.** A component that does not paint a ground uses `--text-primary`, `--text-soft`, `--text-muted`, `--text-headline-muted`, `--border-default`, `--border-strong`, `--text-accent`, `--text-positive`, `--text-negative`. They resolve to the canonical roles of the ground that the element sits on. A theme switch (`data-theme`) inside a ground keeps the light or dark text of the ground.
+4. **Ground classes.** The element that paints a ground gets the global class of the ground: `surfacePage` (a window of the page inside another ground: a chat, the mega menu), `surfaceAccent` or `surfaceInverse`. The class sets the contextual roles and `color`. A small shape (a button, a pill, a hovered row) that paints the accent or the inverse sets `color` to a canonical role of that ground in the same rule. A ground that comes with the viewport or a state (the split header, a hovered row that turns to the accent) cannot take a class: the rule sets a contextual role to the canonical role of the same kind (`--text-muted: var(--text-on-accent-muted)`), and nothing else.
+5. **No alpha on text outside `tokens.css`.** A text colour is a token. No `opacity`, no `color-mix()` and no new `--text-*` property on a text colour in a component: every tint of text is a role. `opacity` under 1 is only for an element without text (a picture, a placeholder card), an inactive control or a pressed state, and says so in a disable comment.
+
+A surface as text is a pill: `--surface-default` on a fill of `--text-primary` (the deep button), `--surface-inverse` on `--text-on-inverse-strong` (the actor of a diagram). The lint accepts them only with the fill in the same rule.
 
 ### Named Rules
 
@@ -223,7 +235,7 @@ Headings have no default size. A section picks a typography class.
 
 ### Named Rules
 
-**The Two-Tone Rule.** A headline says the claim in the text colour, then continues in a muted tone (70% of the deep, or `--text-on-inverse-muted` on the inverse). "Modular how you like it. _And steady how you need it._" The muted half never gets its own size or weight. This is the main voice of the site.
+**The Two-Tone Rule.** A headline says the claim in the text colour, then continues in the quiet run: `--text-headline-muted`, the headline-muted role of the ground (the muted text on the page, a lighter step on the accent and the inverse, at 3:1 or more because the headline is large text). "Modular how you like it. _And steady how you need it._" The muted half never gets its own size or weight. This is the main voice of the site.
 
 **The Two Weights Rule.** ABC Oracle at 400 and 500 only. No bold, no italic as decoration, no uppercase tracking labels.
 
@@ -275,7 +287,7 @@ Friendly and direct: a pill that says where it goes.
 - **Deep on white:** the deep as fill, paper text. A strong secondary, or the main action on a light accent band.
 - **Deep on light / light on deep:** the same pair, for inverse and accent bands.
 - **Soft:** a faint tint of the deep (or of the accent) as fill, deep text. The secondary in a group.
-- **Hover / Focus:** the two colours swap instantly, without a transition. Active adds 80% opacity. Focus is a 2px outline in the current colour, 2px offset. Disabled is 40% opacity.
+- **Hover / Focus:** the two colours swap instantly, without a transition. A hover to the page surface takes `--text-on-page`, the canonical role: the contextual `--text-primary` is light on an inverse band. Active adds 80% opacity. Focus is a 2px outline in the current colour, 2px offset. Disabled is 40% opacity.
 - **Leading items:** a 20px round avatar or a row of overlapping logos can lead the label ("Lets Talk!", "Explore Integrations").
 
 ### Chips (category nav, tabs)
@@ -358,6 +370,7 @@ Hero headlines can type themselves in at a human rhythm. The cursor is a bar tha
 - **Do** use the split (accent half | inverse half) to put a claim next to its proof.
 - **Do** show the product as a code-rendered scene, cut by the edge of the band, with only its top-left corner rounded.
 - **Do** use only the semantic tokens and the `--space-*` and `--type-*` scales, and check every change in both schemes.
+- **Do** give the element that paints a band its ground class (`surfaceAccent`, `surfaceInverse`, `surfacePage`), and set `color` to a role of that ground in the same rule as the background.
 - **Do** keep motion short and in view only: 150 to 400ms, ease-out or cubic-bezier(0.3, 0, 0, 1), and the final state without JS. Diagrams use their own two curves and step one thing at a time.
 - **Do** draw a new diagram with the shared grammar (`src/scenes/diagram/`): pill, track, pulse, panel, ring, one accent.
 - **Do** put a pixel video only in the page closer, with a palette from `src/lib/pixel-video/styles.ts`.
@@ -366,6 +379,7 @@ Hero headlines can type themselves in at a human rhythm. The cursor is a bar tha
 
 - **Don't** use a shadow of any kind, also on popovers and product windows.
 - **Don't** use grey. Every neutral is the deep of the theme at an alpha.
+- **Don't** dim text with `opacity` or `color-mix()`. The quiet text is `--text-muted`; the quiet run of a headline is `--text-headline-muted`.
 - **Don't** round a band, a cell or a half, or float a coloured box with margins inside the column.
 - **Don't** put light text on an accent: all six accents take the deep text.
 - **Don't** add a third font weight, a bold, a tracked uppercase label or a second typeface for display.

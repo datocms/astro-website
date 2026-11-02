@@ -1,6 +1,51 @@
 /*
- * Design tokens. Components use only the semantic tokens (--surface-*, --text-*,
- * --border-*). The primitives (--color-*) are only for this file.
+ * Design tokens.
+ *
+ * THE COLOUR RULES (src/styles/tokens.test.ts checks them, npm run lint:css
+ * enforces the use; DESIGN.md "Colour: grounds and text roles" explains them)
+ *
+ * 1. Three grounds. Every element sits on one ground:
+ *      page     --surface-default and its tints (accent-faint, accent-subtle,
+ *               accent-muted, inverse-faint, raised, field, nav-active,
+ *               status-*). Light in the light scheme, dark in the dark scheme.
+ *      accent   --surface-accent. Bright in both schemes: the text is dark.
+ *      inverse  --surface-inverse. Deep in both schemes: the text is light.
+ *    The code card (--code-background) is a fourth, small ground with its
+ *    own --code-* colours.
+ *
+ * 2. Text roles. Each ground has its canonical text roles:
+ *      page     --text-on-page, -soft, -muted, -headline-muted
+ *      accent   --text-on-accent, -soft, -muted, -headline-muted
+ *      inverse  --text-on-inverse-strong, --text-on-inverse, -soft, -muted,
+ *               -headline-muted
+ *    Each role has a contrast of 4.5:1 or more on every surface of its ground,
+ *    in the six themes and the two schemes. The one exception is
+ *    *-headline-muted: 3:1 or more, for the quiet run of a two-tone headline
+ *    or display lockup only (large text: 24 px or more).
+ *
+ * 3. Contextual roles. A component that does not paint a ground uses the
+ *    contextual roles: --text-primary, --text-soft, --text-muted,
+ *    --text-headline-muted, --border-default, --border-strong, --text-accent,
+ *    --text-positive, --text-negative. They are the roles of the ground that
+ *    the element sits on, and they follow the ground, not the theme: a theme
+ *    switch inside a ground keeps the light or dark text of the ground.
+ *
+ * 4. Ground classes. The element that paints a ground gets the global class
+ *    of the ground: surfacePage, surfaceAccent or surfaceInverse. The class
+ *    sets the contextual roles and `color`. A small shape (a button, a pill)
+ *    that paints the accent or the inverse sets `color` to a canonical role
+ *    of that ground in the same rule. A ground that comes with a viewport or
+ *    a state (the split header, a hovered row) cannot take a class: the rule
+ *    sets a contextual role to the canonical role of the same kind
+ *    (`--text-muted: var(--text-on-accent-muted)`), and nothing else.
+ *
+ * 5. No alpha on text outside this file. A text colour is a token. No
+ *    `opacity`, no `color-mix()` and no new `--text-*` property on a text
+ *    colour in a component: every tint of text is a role of this file.
+ *
+ * The primitives (--color-*) and the theme data (--theme-*) are for this
+ * file only. Components use the roles (--surface-*, --text-*, --border-*,
+ * --code-*).
  */
 
 :root {
@@ -114,17 +159,18 @@
    *   plain   the code: L 0.93, C 0.02
    *   faded   punctuation: L 0.76, C 0.03
    *   dim     comments: L 0.66, C 0.04
-   *   faint   line numbers: L 0.57, C 0.03
+   *   faint   line numbers: L 0.62, C 0.03
    * A chroma out of sRGB is reduced until the colour fits. Contrast with
    * the deep background: plain 13.7, strong 10.1, soft 10.3, pale 11.1,
-   * faded 7.8, dim 5.4, faint 3.8 (minimums across the themes).
+   * faded 7.8, dim 5.4, faint 4.6 (minimums across the themes). Each level
+   * is text on the card, thus each one has 4.5:1 or more.
    */
   --color-code-brown-deep: #2b1615;
   --color-code-yellow-strong: #ddcd59;
   --color-code-yellow-plain: #eae9da;
   --color-code-yellow-faded: #b4b29d;
   --color-code-yellow-dim: #979477;
-  --color-code-yellow-faint: #7b7864;
+  --color-code-yellow-faint: #898773;
   --color-code-orange-deep: #2b1712;
   --color-code-orange-strong: #ffb897;
   --color-code-orange-soft: #ffbc9e;
@@ -132,14 +178,14 @@
   --color-code-orange-plain: #f4e4dd;
   --color-code-orange-faded: #c2aca2;
   --color-code-orange-dim: #a88b7e;
-  --color-code-orange-faint: #877269;
+  --color-code-orange-faint: #968177;
   --color-code-green-deep: #0d2217;
   --color-code-green-strong: #a8de72;
   --color-code-green-soft: #b7dc96;
   --color-code-green-plain: #e3ebdd;
   --color-code-green-faded: #aab5a2;
   --color-code-green-dim: #8a987e;
-  --color-code-green-faint: #717b69;
+  --color-code-green-faint: #808a77;
   --color-code-purple-deep: #181d24;
   --color-code-purple-strong: #c8c2fe;
   --color-code-purple-soft: #ccc6fe;
@@ -147,21 +193,21 @@
   --color-code-purple-plain: #e7e6f5;
   --color-code-purple-faded: #b0aec3;
   --color-code-purple-dim: #918faa;
-  --color-code-purple-faint: #767588;
+  --color-code-purple-faint: #858498;
   --color-code-blue-deep: #08202a;
   --color-code-blue-strong: #91d7ee;
   --color-code-blue-soft: #7eddfc;
   --color-code-blue-plain: #daebf1;
   --color-code-blue-faded: #9db6bf;
   --color-code-blue-dim: #7898a4;
-  --color-code-blue-faint: #647c84;
+  --color-code-blue-faint: #738b93;
   --color-code-pink-deep: #271724;
   --color-code-pink-strong: #feace3;
   --color-code-pink-soft: #fbb4e2;
   --color-code-pink-plain: #f2e3ec;
   --color-code-pink-faded: #bfaab7;
   --color-code-pink-dim: #a4899a;
-  --color-code-pink-faint: #84717d;
+  --color-code-pink-faint: #93808c;
 }
 
 :root {
@@ -184,179 +230,51 @@
 }
 
 /*
- * Each theme sets the alpha of --text-muted. With this value, the text has
- * a contrast of 4.5:1 or more on --surface-default. The deep colours of the
- * themes are not equally dark, thus the alphas are different. There is no
- * lighter text role: text lighter than --text-muted is not legible.
- * --text-on-inverse-muted follows the same rule on --surface-inverse: its
- * alpha also gives 4.5:1 or more.
+ * The data of a theme. A theme block gives colours and numbers only; the
+ * roles below derive from them, once for all the themes.
+ *   paper, ink, accent         the near white, the deep and the bright colour
+ *   ink-muted/-subtle/-faint   tints of the ink for the fills of the inverse
+ *                              family and the borders of the page
+ *   accent-muted/-subtle/-faint tints of the accent for its fills
+ *   alpha-*                    the alpha of each tinted text role. The themes
+ *                              do not have the same contrast between ink and
+ *                              accent (yellow 11:1, orange 5.8:1), thus each
+ *                              theme sets the alphas that give the role its
+ *                              contrast: 4.8:1 or more for a text role, 3.3:1
+ *                              or more for a headline-muted role (the test
+ *                              requires 4.5 and 3.0). Measured on the darkest
+ *                              surface of the ground: accent-subtle for the
+ *                              page, the accent, the inverse.
+ *   dark-accent-chroma         the chroma of the accent at OKLCH lightness
+ *                              0.36 that stays in sRGB, for the dark tints
+ *   code-*                     the syntax colours of the code card. The
+ *                              keywords take the accent hue; strings,
+ *                              constants and functions take three other hues
+ *                              of the family, each at least 68 degrees from
+ *                              the others. The plain code, the punctuation,
+ *                              the comments and the line numbers are tints of
+ *                              the accent hue.
  */
 :root,
 [data-theme='default'] {
-  --surface-default: var(--color-yellow-light-0);
-  --surface-inverse: var(--color-brown-deep-5);
-  --surface-inverse-muted: var(--color-brown-deep-3);
-  --surface-inverse-subtle: var(--color-brown-deep-2);
-  --surface-inverse-faint: var(--color-brown-deep-1);
-  --surface-accent: var(--color-yellow-light-5);
-  --surface-accent-muted: var(--color-yellow-light-3);
-  --surface-accent-subtle: var(--color-yellow-light-2);
-  --surface-accent-faint: var(--color-yellow-light-1);
-  --surface-pixel-highlight: var(--color-cream-pale);
-  --text-primary: var(--color-brown-deep-5);
-  --text-soft: var(--color-brown-deep-4);
-  --text-muted: var(--color-brown-deep-3);
-  --text-on-inverse: var(--color-yellow-light-5);
-  --text-on-inverse-soft: var(--color-yellow-light-4);
-  --text-on-inverse-muted: var(--color-yellow-light-3);
-  --text-on-inverse-subtle: var(--color-yellow-light-2);
-  --text-on-inverse-strong: var(--color-yellow-light-0);
-  --border-default: var(--color-brown-deep-1);
-  --border-strong: var(--color-brown-deep-5);
-  --border-on-inverse: var(--color-yellow-light-1);
-  --border-on-inverse-strong: var(--color-yellow-light-2);
-}
-
-[data-theme='orange'] {
-  --surface-default: var(--color-orange-light-0);
-  --surface-inverse: var(--color-orange-deep-5);
-  --surface-inverse-muted: var(--color-orange-deep-3);
-  --surface-inverse-subtle: var(--color-orange-deep-2);
-  --surface-inverse-faint: var(--color-orange-deep-1);
-  --surface-accent: var(--color-orange-light-5);
-  --surface-accent-muted: var(--color-orange-light-3);
-  --surface-accent-subtle: var(--color-orange-light-2);
-  --surface-accent-faint: var(--color-orange-light-1);
-  --surface-pixel-highlight: var(--color-yellow-light-5);
-  --text-primary: var(--color-orange-deep-5);
-  --text-soft: var(--color-orange-deep-4);
-  --text-muted: var(--color-orange-deep-3);
-  --text-on-inverse: var(--color-orange-light-5);
-  --text-on-inverse-soft: var(--color-orange-light-4);
-  --text-on-inverse-muted: color-mix(in srgb, var(--color-orange-light-5) 88%, transparent);
-  --text-on-inverse-subtle: var(--color-orange-light-2);
-  --text-on-inverse-strong: var(--color-orange-light-0);
-  --border-default: var(--color-orange-deep-1);
-  --border-strong: var(--color-orange-deep-5);
-  --border-on-inverse: var(--color-orange-light-1);
-  --border-on-inverse-strong: var(--color-orange-light-2);
-}
-
-[data-theme='green'] {
-  --surface-default: var(--color-green-light-0);
-  --surface-inverse: var(--color-green-deep-5);
-  --surface-inverse-muted: var(--color-green-deep-3);
-  --surface-inverse-subtle: var(--color-green-deep-2);
-  --surface-inverse-faint: var(--color-green-deep-1);
-  --surface-accent: var(--color-green-light-5);
-  --surface-accent-muted: var(--color-green-light-3);
-  --surface-accent-subtle: var(--color-green-light-2);
-  --surface-accent-faint: var(--color-green-light-1);
-  --surface-pixel-highlight: var(--color-lime-pale);
-  --text-primary: var(--color-green-deep-5);
-  --text-soft: var(--color-green-deep-4);
-  --text-muted: color-mix(in srgb, var(--color-green-deep-5) 80%, transparent);
-  --text-on-inverse: var(--color-green-light-5);
-  --text-on-inverse-soft: var(--color-green-light-4);
-  --text-on-inverse-muted: color-mix(in srgb, var(--color-green-light-5) 86%, transparent);
-  --text-on-inverse-subtle: var(--color-green-light-2);
-  --text-on-inverse-strong: var(--color-green-light-0);
-  --border-default: var(--color-green-deep-1);
-  --border-strong: var(--color-green-deep-5);
-  --border-on-inverse: var(--color-green-light-1);
-  --border-on-inverse-strong: var(--color-green-light-2);
-}
-
-[data-theme='purple'] {
-  --surface-default: var(--color-purple-light-0);
-  --surface-inverse: var(--color-purple-deep-5);
-  --surface-inverse-muted: var(--color-purple-deep-3);
-  --surface-inverse-subtle: var(--color-purple-deep-2);
-  --surface-inverse-faint: var(--color-purple-deep-1);
-  --surface-accent: var(--color-purple-light-5);
-  --surface-accent-muted: var(--color-purple-light-3);
-  --surface-accent-subtle: var(--color-purple-light-2);
-  --surface-accent-faint: var(--color-purple-light-1);
-  --surface-pixel-highlight: var(--color-orchid-pale);
-  --text-primary: var(--color-purple-deep-5);
-  --text-soft: var(--color-purple-deep-4);
-  --text-muted: var(--color-purple-deep-3);
-  --text-on-inverse: var(--color-purple-light-5);
-  --text-on-inverse-soft: var(--color-purple-light-4);
-  --text-on-inverse-muted: color-mix(in srgb, var(--color-purple-light-5) 88%, transparent);
-  --text-on-inverse-subtle: var(--color-purple-light-2);
-  --text-on-inverse-strong: var(--color-purple-light-0);
-  --border-default: var(--color-purple-deep-1);
-  --border-strong: var(--color-purple-deep-5);
-  --border-on-inverse: var(--color-purple-light-1);
-  --border-on-inverse-strong: var(--color-purple-light-2);
-}
-
-[data-theme='blue'] {
-  --surface-default: var(--color-blue-light-0);
-  --surface-inverse: var(--color-blue-deep-5);
-  --surface-inverse-muted: var(--color-blue-deep-3);
-  --surface-inverse-subtle: var(--color-blue-deep-2);
-  --surface-inverse-faint: var(--color-blue-deep-1);
-  --surface-accent: var(--color-blue-light-5);
-  --surface-accent-muted: var(--color-blue-light-3);
-  --surface-accent-subtle: var(--color-blue-light-2);
-  --surface-accent-faint: var(--color-blue-light-1);
-  --surface-pixel-highlight: var(--color-aqua-pale);
-  --text-primary: var(--color-blue-deep-5);
-  --text-soft: var(--color-blue-deep-4);
-  --text-muted: var(--color-blue-deep-3);
-  --text-on-inverse: var(--color-blue-light-5);
-  --text-on-inverse-soft: var(--color-blue-light-4);
-  --text-on-inverse-muted: color-mix(in srgb, var(--color-blue-light-5) 84%, transparent);
-  --text-on-inverse-subtle: var(--color-blue-light-2);
-  --text-on-inverse-strong: var(--color-blue-light-0);
-  --border-default: var(--color-blue-deep-1);
-  --border-strong: var(--color-blue-deep-5);
-  --border-on-inverse: var(--color-blue-light-1);
-  --border-on-inverse-strong: var(--color-blue-light-2);
-}
-
-[data-theme='pink'] {
-  --surface-default: var(--color-pink-light-0);
-  --surface-inverse: var(--color-pink-deep-5);
-  --surface-inverse-muted: var(--color-pink-deep-3);
-  --surface-inverse-subtle: var(--color-pink-deep-2);
-  --surface-inverse-faint: var(--color-pink-deep-1);
-  --surface-accent: var(--color-pink-light-5);
-  --surface-accent-muted: var(--color-pink-light-3);
-  --surface-accent-subtle: var(--color-pink-light-2);
-  --surface-accent-faint: var(--color-pink-light-1);
-  --surface-pixel-highlight: var(--color-peach-pale);
-  --text-primary: var(--color-pink-deep-5);
-  --text-soft: var(--color-pink-deep-4);
-  --text-muted: var(--color-pink-deep-3);
-  --text-on-inverse: var(--color-pink-light-5);
-  --text-on-inverse-soft: var(--color-pink-light-4);
-  --text-on-inverse-muted: color-mix(in srgb, var(--color-pink-light-5) 80%, transparent);
-  --text-on-inverse-subtle: var(--color-pink-light-2);
-  --text-on-inverse-strong: var(--color-pink-light-0);
-  --border-default: var(--color-pink-deep-1);
-  --border-strong: var(--color-pink-deep-5);
-  --border-on-inverse: var(--color-pink-light-1);
-  --border-on-inverse-strong: var(--color-pink-light-2);
-}
-
-/*
- * Code. The colours of the syntax in CodeSnippetPreview. The card has its
- * own background: the inverse surface of a theme is too bright (green,
- * blue) or too saturated (orange, pink) to carry syntax colours, thus the
- * card takes a deeper and calmer shade of the same hue. The keywords take
- * the accent hue of the theme; strings, constants and functions take three
- * other hues of the family, each at least 68 degrees from the others, so
- * that the roles stay apart: strings are green where the accent allows
- * it, constants mauve or peach, functions sky or mauve. The plain code,
- * the punctuation, the comments and the line numbers are tints of the
- * accent hue. The primitives (--color-code-*) say how the values derive.
- * Defined on each theme, thus the values follow the theme of the section.
- */
-:root,
-[data-theme='default'] {
+  --theme-paper: var(--color-yellow-light-0);
+  --theme-ink: var(--color-brown-deep-5);
+  --theme-ink-muted: var(--color-brown-deep-3);
+  --theme-ink-subtle: var(--color-brown-deep-2);
+  --theme-ink-faint: var(--color-brown-deep-1);
+  --theme-accent: var(--color-yellow-light-5);
+  --theme-accent-muted: var(--color-yellow-light-3);
+  --theme-accent-subtle: var(--color-yellow-light-2);
+  --theme-accent-faint: var(--color-yellow-light-1);
+  --theme-pixel-highlight: var(--color-cream-pale);
+  --theme-alpha-page-muted: 70%;
+  --theme-alpha-page-headline-muted: 55%;
+  --theme-alpha-on-accent-muted: 70%;
+  --theme-alpha-on-accent-headline-muted: 55%;
+  --theme-alpha-on-inverse-soft: 80%;
+  --theme-alpha-on-inverse-muted: 70%;
+  --theme-alpha-on-inverse-headline-muted: 48%;
+  --theme-dark-accent-chroma: 0.075;
   --code-background: var(--color-code-brown-deep);
   --code-plain: var(--color-code-yellow-plain);
   --code-keyword: var(--color-code-yellow-strong);
@@ -369,6 +287,24 @@
 }
 
 [data-theme='orange'] {
+  --theme-paper: var(--color-orange-light-0);
+  --theme-ink: var(--color-orange-deep-5);
+  --theme-ink-muted: var(--color-orange-deep-3);
+  --theme-ink-subtle: var(--color-orange-deep-2);
+  --theme-ink-faint: var(--color-orange-deep-1);
+  --theme-accent: var(--color-orange-light-5);
+  --theme-accent-muted: var(--color-orange-light-3);
+  --theme-accent-subtle: var(--color-orange-light-2);
+  --theme-accent-faint: var(--color-orange-light-1);
+  --theme-pixel-highlight: var(--color-yellow-light-5);
+  --theme-alpha-page-muted: 74%;
+  --theme-alpha-page-headline-muted: 60%;
+  --theme-alpha-on-accent-muted: 89%;
+  --theme-alpha-on-accent-headline-muted: 67%;
+  --theme-alpha-on-inverse-soft: 91%;
+  --theme-alpha-on-inverse-muted: 88%;
+  --theme-alpha-on-inverse-headline-muted: 64%;
+  --theme-dark-accent-chroma: 0.102;
   --code-background: var(--color-code-orange-deep);
   --code-plain: var(--color-code-orange-plain);
   --code-keyword: var(--color-code-orange-strong);
@@ -381,6 +317,24 @@
 }
 
 [data-theme='green'] {
+  --theme-paper: var(--color-green-light-0);
+  --theme-ink: var(--color-green-deep-5);
+  --theme-ink-muted: var(--color-green-deep-3);
+  --theme-ink-subtle: var(--color-green-deep-2);
+  --theme-ink-faint: var(--color-green-deep-1);
+  --theme-accent: var(--color-green-light-5);
+  --theme-accent-muted: var(--color-green-light-3);
+  --theme-accent-subtle: var(--color-green-light-2);
+  --theme-accent-faint: var(--color-green-light-1);
+  --theme-pixel-highlight: var(--color-lime-pale);
+  --theme-alpha-page-muted: 81%;
+  --theme-alpha-page-headline-muted: 66%;
+  --theme-alpha-on-accent-muted: 90%;
+  --theme-alpha-on-accent-headline-muted: 70%;
+  --theme-alpha-on-inverse-soft: 90%;
+  --theme-alpha-on-inverse-muted: 86%;
+  --theme-alpha-on-inverse-headline-muted: 61%;
+  --theme-dark-accent-chroma: 0.098;
   --code-background: var(--color-code-green-deep);
   --code-plain: var(--color-code-green-plain);
   --code-keyword: var(--color-code-green-strong);
@@ -393,6 +347,24 @@
 }
 
 [data-theme='purple'] {
+  --theme-paper: var(--color-purple-light-0);
+  --theme-ink: var(--color-purple-deep-5);
+  --theme-ink-muted: var(--color-purple-deep-3);
+  --theme-ink-subtle: var(--color-purple-deep-2);
+  --theme-ink-faint: var(--color-purple-deep-1);
+  --theme-accent: var(--color-purple-light-5);
+  --theme-accent-muted: var(--color-purple-light-3);
+  --theme-accent-subtle: var(--color-purple-light-2);
+  --theme-accent-faint: var(--color-purple-light-1);
+  --theme-pixel-highlight: var(--color-orchid-pale);
+  --theme-alpha-page-muted: 73%;
+  --theme-alpha-page-headline-muted: 60%;
+  --theme-alpha-on-accent-muted: 88%;
+  --theme-alpha-on-accent-headline-muted: 66%;
+  --theme-alpha-on-inverse-soft: 86%;
+  --theme-alpha-on-inverse-muted: 88%;
+  --theme-alpha-on-inverse-headline-muted: 65%;
+  --theme-dark-accent-chroma: 0.205;
   --code-background: var(--color-code-purple-deep);
   --code-plain: var(--color-code-purple-plain);
   --code-keyword: var(--color-code-purple-strong);
@@ -405,6 +377,24 @@
 }
 
 [data-theme='blue'] {
+  --theme-paper: var(--color-blue-light-0);
+  --theme-ink: var(--color-blue-deep-5);
+  --theme-ink-muted: var(--color-blue-deep-3);
+  --theme-ink-subtle: var(--color-blue-deep-2);
+  --theme-ink-faint: var(--color-blue-deep-1);
+  --theme-accent: var(--color-blue-light-5);
+  --theme-accent-muted: var(--color-blue-light-3);
+  --theme-accent-subtle: var(--color-blue-light-2);
+  --theme-accent-faint: var(--color-blue-light-1);
+  --theme-pixel-highlight: var(--color-aqua-pale);
+  --theme-alpha-page-muted: 78%;
+  --theme-alpha-page-headline-muted: 64%;
+  --theme-alpha-on-accent-muted: 88%;
+  --theme-alpha-on-accent-headline-muted: 68%;
+  --theme-alpha-on-inverse-soft: 84%;
+  --theme-alpha-on-inverse-muted: 84%;
+  --theme-alpha-on-inverse-headline-muted: 60%;
+  --theme-dark-accent-chroma: 0.066;
   --code-background: var(--color-code-blue-deep);
   --code-plain: var(--color-code-blue-plain);
   --code-keyword: var(--color-code-blue-strong);
@@ -417,6 +407,24 @@
 }
 
 [data-theme='pink'] {
+  --theme-paper: var(--color-pink-light-0);
+  --theme-ink: var(--color-pink-deep-5);
+  --theme-ink-muted: var(--color-pink-deep-3);
+  --theme-ink-subtle: var(--color-pink-deep-2);
+  --theme-ink-faint: var(--color-pink-deep-1);
+  --theme-accent: var(--color-pink-light-5);
+  --theme-accent-muted: var(--color-pink-light-3);
+  --theme-accent-subtle: var(--color-pink-light-2);
+  --theme-accent-faint: var(--color-pink-light-1);
+  --theme-pixel-highlight: var(--color-peach-pale);
+  --theme-alpha-page-muted: 70%;
+  --theme-alpha-page-headline-muted: 57%;
+  --theme-alpha-on-accent-muted: 78%;
+  --theme-alpha-on-accent-headline-muted: 60%;
+  --theme-alpha-on-inverse-soft: 80%;
+  --theme-alpha-on-inverse-muted: 76%;
+  --theme-alpha-on-inverse-headline-muted: 56%;
+  --theme-dark-accent-chroma: 0.144;
   --code-background: var(--color-code-pink-deep);
   --code-plain: var(--color-code-pink-plain);
   --code-keyword: var(--color-code-pink-strong);
@@ -429,50 +437,135 @@
 }
 
 /*
- * Roles that derive from the tokens of a theme. They sit on every element
- * that sets a theme, thus they follow its accent and its text colour. The
- * dark scheme changes only the three text roles (see below).
- *   text-accent       Accent-hued text on the default surface (a link, an
- *                     icon). The accent surface is a light hue and does not
- *                     read as text: the text takes a dark tone of the hue.
- *   text-positive,
- *   text-negative     A confirmation and an error, as text on the surface.
- *   surface-status-*,
- *   text-status-*     A tint of a signal with a text of the same hue: a
- *                     callout, a pill, a warning. "info" is neutral.
- *   surface-nav-active,
- *   text-nav-active   The entry of the page that you read (a sidebar, a TOC).
- *   surface-field,
- *   border-field      A control on the page: a field, a picker.
- *   text-on-accent*,
- *   border-on-accent* A small foreground on the bright accent: a button
- *                     label, a pill, a row that turns to the accent on
- *                     hover. In light they are the page text and borders.
- *                     In dark they stay dark (see the dark scheme below).
- * The rule also matches .surfaceLight, thus the roles recompute inside a
- * light surface of the dark scheme.
+ * The roles, derived from the theme data. The rule sits on every element
+ * that sets a theme, thus the roles follow the theme of the section.
+ *
+ * Surfaces and canonical text roles (rule 2). The light scheme: the page is
+ * the paper, the page text is the ink.
+ *
+ * Contextual roles (rule 3) read a slot of the ground, `--_ground-*`, and
+ * fall back to the page role. A ground class (rule 4) fills the slots on its
+ * element; the slots inherit, thus a theme switch inside the ground keeps
+ * the text of the ground. The slots are for this file only. The rule also
+ * sits on the ground classes: the roles resolve on the ground element, with
+ * the theme data that it inherits.
  */
 :root,
 [data-theme],
-.surfaceLight {
-  --text-accent: oklch(from var(--surface-accent) 0.5 min(c, 0.11) h);
-  --text-positive: color-mix(in oklab, var(--surface-positive) 65%, var(--text-primary));
-  --text-negative: color-mix(in oklab, var(--surface-negative) 65%, var(--text-primary));
+.surfacePage,
+.surfaceAccent,
+.surfaceInverse {
+  --surface-default: var(--_ground-surface-default, var(--theme-paper));
+  --surface-inverse: var(--theme-ink);
+  --surface-inverse-muted: var(--theme-ink-muted);
+  --surface-inverse-subtle: var(--theme-ink-subtle);
+  --surface-inverse-faint: var(--_ground-surface-inverse-faint, var(--theme-ink-faint));
+  --surface-accent: var(--theme-accent);
+  --surface-accent-muted: var(--_ground-surface-accent-muted, var(--theme-accent-muted));
+  --surface-accent-subtle: var(--_ground-surface-accent-subtle, var(--theme-accent-subtle));
+  --surface-accent-faint: var(--_ground-surface-accent-faint, var(--theme-accent-faint));
+  --surface-pixel-highlight: var(--theme-pixel-highlight);
+
+  /* The page: the ink and its tints */
+  --text-on-page: var(--theme-ink);
+  --text-on-page-soft: color-mix(in srgb, var(--theme-ink) 80%, transparent);
+  --text-on-page-muted: color-mix(
+    in srgb,
+    var(--theme-ink) var(--theme-alpha-page-muted),
+    transparent
+  );
+  --text-on-page-headline-muted: color-mix(
+    in srgb,
+    var(--theme-ink) var(--theme-alpha-page-headline-muted),
+    transparent
+  );
+  --border-on-page: var(--theme-ink-faint);
+  --border-on-page-strong: var(--theme-ink);
+
+  /* The accent: the ink and its tints, in both schemes */
+  --text-on-accent: var(--theme-ink);
+  --text-on-accent-soft: color-mix(in srgb, var(--theme-ink) 92%, transparent);
+  --text-on-accent-muted: color-mix(
+    in srgb,
+    var(--theme-ink) var(--theme-alpha-on-accent-muted),
+    transparent
+  );
+  --text-on-accent-headline-muted: color-mix(
+    in srgb,
+    var(--theme-ink) var(--theme-alpha-on-accent-headline-muted),
+    transparent
+  );
+  --border-on-accent: var(--theme-ink-faint);
+  --border-on-accent-strong: var(--theme-ink);
+
+  /* The inverse: the paper for the strongest text, the accent and its tints, in both schemes */
+  --text-on-inverse-strong: var(--theme-paper);
+  --text-on-inverse: var(--theme-accent);
+  --text-on-inverse-soft: color-mix(
+    in srgb,
+    var(--theme-accent) var(--theme-alpha-on-inverse-soft),
+    transparent
+  );
+  --text-on-inverse-muted: color-mix(
+    in srgb,
+    var(--theme-accent) var(--theme-alpha-on-inverse-muted),
+    transparent
+  );
+  --text-on-inverse-headline-muted: color-mix(
+    in srgb,
+    var(--theme-accent) var(--theme-alpha-on-inverse-headline-muted),
+    transparent
+  );
+  --border-on-inverse: var(--theme-accent-faint);
+  --border-on-inverse-strong: var(--theme-accent-subtle);
+
+  /* The contextual roles: the ground, else the page */
+  --text-primary: var(--_ground-text, var(--text-on-page));
+  --text-soft: var(--_ground-text-soft, var(--text-on-page-soft));
+  --text-muted: var(--_ground-text-muted, var(--text-on-page-muted));
+  --text-headline-muted: var(--_ground-text-headline-muted, var(--text-on-page-headline-muted));
+  --border-default: var(--_ground-border, var(--border-on-page));
+  --border-strong: var(--_ground-border-strong, var(--border-on-page-strong));
+
+  /*
+   * Accent-hued text (a link, an icon) and the signals, as text. The accent
+   * surface is a light hue and does not read as text on the page: the text
+   * takes a dark tone of the hue (OKLCH lightness 0.44 reads on the
+   * accent-subtle tint too). A signal mixed with the ink is dark enough on
+   * the page and on its tints.
+   */
+  --text-accent: var(--_ground-text-accent, oklch(from var(--theme-accent) 0.44 min(c, 0.11) h));
+  --text-positive: var(
+    --_ground-text-positive,
+    color-mix(in oklab, var(--surface-positive) 40%, var(--theme-ink))
+  );
+  --text-negative: var(
+    --_ground-text-negative,
+    color-mix(in oklab, var(--surface-negative) 40%, var(--theme-ink))
+  );
+
+  /*
+   * A tint of a signal with a text of the same hue: a callout, a pill, a
+   * warning. "info" is neutral. The warning text is a deeper tone of the
+   * accent than --text-accent: its tint is the accent itself.
+   */
   --surface-status-info: var(--surface-inverse-faint);
   --text-status-info: var(--text-primary);
   --surface-status-positive: color-mix(in srgb, var(--surface-positive) 18%, transparent);
   --text-status-positive: var(--text-positive);
   --surface-status-warning: color-mix(in srgb, var(--surface-accent) 40%, transparent);
-  --text-status-warning: var(--text-accent);
+  --text-status-warning: var(
+    --_ground-text-status-warning,
+    oklch(from var(--theme-accent) 0.42 min(c, 0.11) h)
+  );
+
+  /* The entry of the page that you read (a sidebar, a TOC) */
   --surface-nav-active: var(--surface-accent-faint);
   --text-nav-active: var(--text-primary);
+
+  /* A control on the page: a field, a picker */
   --surface-field: var(--surface-default);
   --border-field: var(--border-default);
-  --text-on-accent: var(--text-primary);
-  /* The accent is darker than the page: 88% gives 4.5:1 or more in all the themes. */
-  --text-on-accent-muted: color-mix(in srgb, var(--surface-inverse) 88%, transparent);
-  --border-on-accent: var(--border-default);
-  --border-on-accent-strong: var(--border-strong);
 }
 
 /*
@@ -495,21 +588,20 @@
  * The dark scheme. The layout sets data-scheme="dark" on <html> (see
  * src/lib/colorScheme.ts). The look of the site is its contrasts: a near
  * white page, the bright accent and the deep inverse. The dark scheme keeps
- * them: only the page flips. Each block changes only the tokens of the
- * page, and only with the colours of its theme:
+ * them: only the page flips. The block changes only the tokens of the page
+ * ground, with the colours of the theme:
  *   default surface   the deep of the code card mixed with black: a near
- *                     black of the theme, as light-0 is a near white
- *   text              light-0, with the alphas of the deep text steps
- *   borders           light-1, the border of the inverse surface
+ *                     black of the theme, as the paper is a near white
+ *   text              the paper, with the alphas of the page text roles
+ *   borders           the faint accent, the border of the inverse surface
  *   accent tints      muted, subtle and faint are dark tints of the accent
  *                     (muted: the accent at OKLCH lightness 0.36, the chroma
- *                     at most the edge of sRGB, thus the hue does not move),
- *                     with the light text
+ *                     at most the edge of sRGB, thus the hue does not move)
+ *   inverse-faint     a light tint, because a dark tint does not show on
+ *                     the dark surface
+ *   accent text       the accent itself, and the signals as they are
  * The inverse surface, the bright accent, the code and the signals do not
- * change. The element that has the bright accent as background has the
- * class surfaceLight (below), thus the text on it stays dark. The faint
- * fills of a default surface (--surface-inverse-faint) become light tints,
- * because a dark tint does not show on the dark surface.
+ * change, and neither do the canonical roles of the accent and the inverse.
  */
 :root[data-scheme='dark'] {
   color-scheme: dark;
@@ -521,135 +613,144 @@
 }
 
 :root[data-scheme='dark'],
-:root[data-scheme='dark'] [data-theme='default'] {
-  --surface-default: color-mix(in oklch, var(--color-code-brown-deep) 60%, black);
-  --surface-inverse-faint: var(--color-yellow-light-1);
-  --surface-accent-muted: oklch(from var(--color-yellow-light-5) 0.36 min(c, 0.075) h);
-  --surface-accent-subtle: color-mix(in srgb, var(--color-yellow-light-5) 14%, transparent);
-  --surface-accent-faint: var(--color-yellow-light-1);
-  --text-primary: var(--color-yellow-light-0);
-  --text-soft: color-mix(in srgb, var(--color-yellow-light-0) 80%, transparent);
-  --text-muted: color-mix(in srgb, var(--color-yellow-light-0) 70%, transparent);
-  --border-default: var(--color-yellow-light-1);
-  --border-strong: var(--color-yellow-light-0);
-}
-
-:root[data-scheme='dark'] [data-theme='orange'] {
-  --surface-default: color-mix(in oklch, var(--color-code-orange-deep) 60%, black);
-  --surface-inverse-faint: var(--color-orange-light-1);
-  --surface-accent-muted: oklch(from var(--color-orange-light-5) 0.36 min(c, 0.102) h);
-  --surface-accent-subtle: color-mix(in srgb, var(--color-orange-light-5) 14%, transparent);
-  --surface-accent-faint: var(--color-orange-light-1);
-  --text-primary: var(--color-orange-light-0);
-  --text-soft: color-mix(in srgb, var(--color-orange-light-0) 80%, transparent);
-  --text-muted: color-mix(in srgb, var(--color-orange-light-0) 70%, transparent);
-  --border-default: var(--color-orange-light-1);
-  --border-strong: var(--color-orange-light-0);
-}
-
-:root[data-scheme='dark'] [data-theme='green'] {
-  --surface-default: color-mix(in oklch, var(--color-code-green-deep) 60%, black);
-  --surface-inverse-faint: var(--color-green-light-1);
-  --surface-accent-muted: oklch(from var(--color-green-light-5) 0.36 min(c, 0.098) h);
-  --surface-accent-subtle: color-mix(in srgb, var(--color-green-light-5) 14%, transparent);
-  --surface-accent-faint: var(--color-green-light-1);
-  --text-primary: var(--color-green-light-0);
-  --text-soft: color-mix(in srgb, var(--color-green-light-0) 80%, transparent);
-  --text-muted: color-mix(in srgb, var(--color-green-light-0) 70%, transparent);
-  --border-default: var(--color-green-light-1);
-  --border-strong: var(--color-green-light-0);
-}
-
-:root[data-scheme='dark'] [data-theme='purple'] {
-  --surface-default: color-mix(in oklch, var(--color-code-purple-deep) 60%, black);
-  --surface-inverse-faint: var(--color-purple-light-1);
-  --surface-accent-muted: oklch(from var(--color-purple-light-5) 0.36 min(c, 0.205) h);
-  --surface-accent-subtle: color-mix(in srgb, var(--color-purple-light-5) 14%, transparent);
-  --surface-accent-faint: var(--color-purple-light-1);
-  --text-primary: var(--color-purple-light-0);
-  --text-soft: color-mix(in srgb, var(--color-purple-light-0) 80%, transparent);
-  --text-muted: color-mix(in srgb, var(--color-purple-light-0) 70%, transparent);
-  --border-default: var(--color-purple-light-1);
-  --border-strong: var(--color-purple-light-0);
-}
-
-:root[data-scheme='dark'] [data-theme='blue'] {
-  --surface-default: color-mix(in oklch, var(--color-code-blue-deep) 60%, black);
-  --surface-inverse-faint: var(--color-blue-light-1);
-  --surface-accent-muted: oklch(from var(--color-blue-light-5) 0.36 min(c, 0.066) h);
-  --surface-accent-subtle: color-mix(in srgb, var(--color-blue-light-5) 14%, transparent);
-  --surface-accent-faint: var(--color-blue-light-1);
-  --text-primary: var(--color-blue-light-0);
-  --text-soft: color-mix(in srgb, var(--color-blue-light-0) 80%, transparent);
-  --text-muted: color-mix(in srgb, var(--color-blue-light-0) 70%, transparent);
-  --border-default: var(--color-blue-light-1);
-  --border-strong: var(--color-blue-light-0);
-}
-
-:root[data-scheme='dark'] [data-theme='pink'] {
-  --surface-default: color-mix(in oklch, var(--color-code-pink-deep) 60%, black);
-  --surface-inverse-faint: var(--color-pink-light-1);
-  --surface-accent-muted: oklch(from var(--color-pink-light-5) 0.36 min(c, 0.144) h);
-  --surface-accent-subtle: color-mix(in srgb, var(--color-pink-light-5) 14%, transparent);
-  --surface-accent-faint: var(--color-pink-light-1);
-  --text-primary: var(--color-pink-light-0);
-  --text-soft: color-mix(in srgb, var(--color-pink-light-0) 80%, transparent);
-  --text-muted: color-mix(in srgb, var(--color-pink-light-0) 70%, transparent);
-  --border-default: var(--color-pink-light-1);
-  --border-strong: var(--color-pink-light-0);
-}
-
-/*
- * On the dark surface, the text roles take the light tone of the signal or
- * of the accent. The foreground of the bright accent stays dark: it is the
- * deep of the inverse surface, which does not change.
- */
-:root[data-scheme='dark'],
 :root[data-scheme='dark'] [data-theme],
-:root[data-scheme='dark'] .surfaceLight {
-  --text-accent: var(--text-on-inverse);
-  --text-positive: var(--surface-positive);
-  --text-negative: var(--surface-negative);
-  --text-on-accent: var(--surface-inverse);
-  --text-on-accent-muted: color-mix(in srgb, var(--surface-inverse) 88%, transparent);
-  --border-on-accent: color-mix(in srgb, var(--surface-inverse) 11%, transparent);
-  --border-on-accent-strong: var(--surface-inverse);
+:root[data-scheme='dark'] .surfacePage,
+:root[data-scheme='dark'] .surfaceAccent,
+:root[data-scheme='dark'] .surfaceInverse {
+  --surface-default: var(
+    --_ground-surface-default,
+    color-mix(in oklch, var(--code-background) 60%, black)
+  );
+  --surface-inverse-faint: var(--_ground-surface-inverse-faint, var(--theme-accent-faint));
+  --surface-accent-muted: var(
+    --_ground-surface-accent-muted,
+    oklch(from var(--theme-accent) 0.36 min(c, var(--theme-dark-accent-chroma)) h)
+  );
+  --surface-accent-subtle: var(
+    --_ground-surface-accent-subtle,
+    color-mix(in srgb, var(--theme-accent) 14%, transparent)
+  );
+  --surface-accent-faint: var(--_ground-surface-accent-faint, var(--theme-accent-faint));
+  --text-on-page: var(--theme-paper);
+  --text-on-page-soft: color-mix(in srgb, var(--theme-paper) 80%, transparent);
+  --text-on-page-muted: color-mix(in srgb, var(--theme-paper) 70%, transparent);
+  --text-on-page-headline-muted: color-mix(
+    in srgb,
+    var(--theme-paper) var(--theme-alpha-page-headline-muted),
+    transparent
+  );
+  --border-on-page: var(--theme-accent-faint);
+  --border-on-page-strong: var(--theme-paper);
+  --text-accent: var(--_ground-text-accent, var(--theme-accent));
+  /* The signals, a little paler: the dark accent tints are not black */
+  --text-positive: var(
+    --_ground-text-positive,
+    color-mix(in oklab, var(--surface-positive) 75%, var(--theme-paper))
+  );
+  --text-negative: var(
+    --_ground-text-negative,
+    color-mix(in oklab, var(--surface-negative) 75%, var(--theme-paper))
+  );
+  /* The warning tint is dark: a pale tone of the accent reads on it */
+  --text-status-warning: var(
+    --_ground-text-status-warning,
+    color-mix(in oklab, var(--theme-accent), var(--theme-paper))
+  );
 }
 
 /*
- * A surface that stays light in the dark scheme: an element with the
- * bright accent as background (a section, the accent half of a split, a
- * plan). Give it the global class surfaceLight. Inside it, the tokens of
- * the page take light values, thus the text and the parts in it are dark
- * on the accent, as in the light scheme. A card on it is white, and the
- * tints are alphas of the accent and of the inverse. A theme on the same
- * element does not change that: this rule comes after the dark blocks.
- * The derived roles follow, because their rule also matches surfaceLight.
- * The text roles take back their light formulas here.
+ * The ground classes (rule 4). Each fills the slots of the contextual roles
+ * and sets the colour of the text.
+ *
+ * surfacePage: a window of the page inside another ground (a chat window
+ * in an inverse band, the mega menu under a coloured header). The slots go
+ * back to their initial state, thus the contextual roles are the page roles
+ * again, in the scheme of the page.
  */
-:root[data-scheme='dark'] .surfaceLight {
-  --surface-default: var(--surface-raised);
-  --surface-inverse-faint: color-mix(in srgb, var(--surface-inverse) 11%, transparent);
-  --surface-accent-muted: color-mix(in srgb, var(--surface-accent) 70%, transparent);
-  --surface-accent-subtle: color-mix(in srgb, var(--surface-accent) 50%, transparent);
-  --surface-accent-faint: color-mix(in srgb, var(--surface-accent) 8%, transparent);
-  --text-primary: var(--text-on-accent);
-  --text-soft: color-mix(in srgb, var(--surface-inverse) 80%, transparent);
-  --text-muted: var(--text-on-accent-muted);
-  --border-default: var(--border-on-accent);
-  --border-strong: var(--border-on-accent-strong);
-  --text-accent: oklch(from var(--surface-accent) 0.5 min(c, 0.11) h);
-  --text-positive: color-mix(in oklab, var(--surface-positive) 65%, var(--text-on-accent));
-  --text-negative: color-mix(in oklab, var(--surface-negative) 65%, var(--text-on-accent));
+.surfacePage {
+  --_ground-surface-default: initial;
+  --_ground-surface-inverse-faint: initial;
+  --_ground-surface-accent-muted: initial;
+  --_ground-surface-accent-subtle: initial;
+  --_ground-surface-accent-faint: initial;
+  --_ground-text: initial;
+  --_ground-text-soft: initial;
+  --_ground-text-muted: initial;
+  --_ground-text-headline-muted: initial;
+  --_ground-border: initial;
+  --_ground-border-strong: initial;
+  --_ground-text-accent: initial;
+  --_ground-text-positive: initial;
+  --_ground-text-negative: initial;
+  --_ground-text-status-warning: initial;
+  color: var(--text-primary);
+  color-scheme: light;
+}
+
+:root[data-scheme='dark'] .surfacePage {
+  color-scheme: dark;
+}
+
+/*
+ * surfaceAccent: an element with the bright accent as background (a
+ * section, the accent half of a split, a plan, a pill). The text is dark in
+ * both schemes. The accent is itself a colour: accent-hued text and the
+ * signals are the ink on it (a tint of a signal does not reach 4.5:1).
+ */
+.surfaceAccent {
+  --_ground-text: var(--text-on-accent);
+  --_ground-text-soft: var(--text-on-accent-soft);
+  --_ground-text-muted: var(--text-on-accent-muted);
+  --_ground-text-headline-muted: var(--text-on-accent-headline-muted);
+  --_ground-border: var(--border-on-accent);
+  --_ground-border-strong: var(--border-on-accent-strong);
+  --_ground-text-accent: var(--text-on-accent);
+  --_ground-text-positive: var(--text-on-accent);
+  --_ground-text-negative: var(--text-on-accent);
+  --_ground-text-status-warning: var(--text-on-accent);
   color: var(--text-primary);
   color-scheme: light;
 }
 
 /*
+ * In the dark scheme the accent surface is a light island. The surfaces of
+ * the page take light values inside it: a card on it is white, and the
+ * tints are alphas of the accent and of the ink, as in the light scheme.
+ */
+:root[data-scheme='dark'] .surfaceAccent {
+  --_ground-surface-default: var(--surface-raised);
+  --_ground-surface-inverse-faint: color-mix(in srgb, var(--theme-ink) 11%, transparent);
+  --_ground-surface-accent-muted: color-mix(in srgb, var(--theme-accent) 70%, transparent);
+  --_ground-surface-accent-subtle: color-mix(in srgb, var(--theme-accent) 50%, transparent);
+  --_ground-surface-accent-faint: color-mix(in srgb, var(--theme-accent) 8%, transparent);
+}
+
+/*
+ * surfaceInverse: an element with the deep inverse as background (a
+ * section, a dark half, a footer). The text is light in both schemes. A
+ * link is the accent, as the text; the signals mix with the paper, because
+ * the pure signal is too dark on the deep.
+ */
+.surfaceInverse {
+  --_ground-text: var(--text-on-inverse);
+  --_ground-text-soft: var(--text-on-inverse-soft);
+  --_ground-text-muted: var(--text-on-inverse-muted);
+  --_ground-text-headline-muted: var(--text-on-inverse-headline-muted);
+  --_ground-border: var(--border-on-inverse);
+  --_ground-border-strong: var(--border-on-inverse-strong);
+  --_ground-text-accent: var(--text-on-inverse);
+  --_ground-text-positive: color-mix(in oklab, var(--surface-positive) 60%, var(--theme-paper));
+  --_ground-text-negative: color-mix(in oklab, var(--surface-negative) 60%, var(--theme-paper));
+  --_ground-text-status-warning: var(--text-on-inverse-strong);
+  color: var(--text-primary);
+  color-scheme: dark;
+}
+
+/*
  * The theme tokens resolve on the element that sets data-theme. Thus
- * this element must also set the colour and the background again.
+ * this element must also set the colour again.
  * :where() gives no specificity, thus a component class on the same
- * element (for example an inverse background) sets a different colour.
+ * element sets a different colour.
  */
 :where([data-theme]) {
   color: var(--text-primary);

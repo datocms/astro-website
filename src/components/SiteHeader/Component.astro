@@ -33,8 +33,8 @@ const { variant = 'default', nav, theme, ctaVariant: ctaVariantProp } = Astro.pr
 
 const variantClass = {
   default: styles.variantDefault,
-  light: styles.variantLight,
-  dark: styles.variantDark,
+  light: [styles.variantLight, 'surfaceAccent'],
+  dark: [styles.variantDark, 'surfaceInverse'],
 }[variant];
 
 const ctaAppearance = {
@@ -92,7 +92,12 @@ const panelId = (i: number) => `site-header-mega-${i}`;
           nav.map(
             (group, i) =>
               group.columns && (
-                <div id={panelId(i)} class={styles.mega} hidden data-mega-panel>
+                <div
+                  id={panelId(i)}
+                  class:list={[styles.mega, 'surfacePage']}
+                  hidden
+                  data-mega-panel
+                >
                   <div class={styles.megaColumns}>
                     {group.columns.map((column) => (
                       <div class={styles.megaColumn}>
@@ -172,7 +177,12 @@ const panelId = (i: number) => `site-header-mega-${i}`;
       </div>
     </div>
 
-    <div id="site-header-mobile-nav" class={styles.mobileNav} hidden data-mobile-panel>
+    <div
+      id="site-header-mobile-nav"
+      class:list={[styles.mobileNav, 'surfacePage']}
+      hidden
+      data-mobile-panel
+    >
       <ul class={styles.mobileList}>
         {
           nav.map((group) => (

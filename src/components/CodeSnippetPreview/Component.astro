@@ -97,7 +97,7 @@ const notes = tabs.map((tab) =>
           <p class:list={[styles.tab, styles.label, 'subtitleMedium']}>{tab.label}</p>
           <pre class={styles.pre} tabindex="0"><code class={styles.code}>{rows[i]!.map((row) => (
             <span class:list={[styles.line, row.dim && styles.dim]}><span class={styles.number} aria-hidden="true" /><span>{row.parts.map((part) => part.tokens.map((token) =>
-              token.color ? <span style={`color: ${token.color}`}>{token.text}</span> : token.text
+              token.color && !row.dim ? <span style={`color: ${token.color}`}>{token.text}</span> : token.text
             ))}</span></span>
           ))}</code></pre>
         </div>
@@ -132,7 +132,7 @@ const notes = tabs.map((tab) =>
             <pre class={styles.pre} tabindex="0"><code class={styles.code}>{rows[i]!.map((row) => (
               <span class:list={[styles.line, row.dim && styles.dim, row.comment !== undefined && styles.noteComment]} data-comment={row.comment}><span class={styles.number} aria-hidden="true" /><span>{row.parts.map((part) => {
                 const tokens = part.tokens.map((token) =>
-                  token.color ? <span style={`color: ${token.color}`}>{token.text}</span> : token.text
+                  token.color && !row.dim ? <span style={`color: ${token.color}`}>{token.text}</span> : token.text
                 );
                 return part.point === undefined ? tokens : <span class={styles.point} data-point={part.point}>{tokens}</span>;
               })}</span></span>
@@ -148,7 +148,7 @@ const notes = tabs.map((tab) =>
               </svg>
             )}
             {notes[i]!.map((text, k) => (
-              <p class:list={[styles.note, 'subtitle']} data-note={k} style={`--i: ${k}`}>
+              <p class:list={[styles.note, 'surfacePage', 'subtitle']} data-note={k} style={`--i: ${k}`}>
                 {text}
               </p>
             ))}

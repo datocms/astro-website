@@ -1,11 +1,18 @@
-// Stylelint rules for the CSS of the prototype.
-// The rules keep the cascade layers honest (see "Cascade layers" in AGENTS.md).
+// Stylelint rules for the CSS of the site.
+// The rules keep the cascade layers honest (see "Cascade layers" in AGENTS.md)
+// and the text colours in the roles of src/styles/tokens.css
+// (scripts/stylelint/text-roles.mjs).
 /** @type {import('stylelint').Config} */
 export default {
   extends: ['stylelint-config-standard'],
-  plugins: ['stylelint-declaration-strict-value'],
+  plugins: ['stylelint-declaration-strict-value', './scripts/stylelint/text-roles.mjs'],
   ignoreFiles: ['node_modules/**', 'dist/**', '.astro/**', 'vendor/**'],
+  // A disable comment names its reason: `/* stylelint-disable-next-line datocms/text-roles -- why */`.
+  reportDescriptionlessDisables: true,
   rules: {
+    // The text colours are the roles of the grounds (src/styles/tokens.css, rules 3 to 5).
+    'datocms/text-roles': true,
+
     // Rules of the standard config that only fight the style of the project.
     'selector-class-pattern': [
       '^[a-z][a-zA-Z0-9]*$',
@@ -100,14 +107,20 @@ export default {
       },
     },
     {
+      // The scenes are diagrams: no text to read, only shapes with labels. They
+      // remap the roles of a surface and dim shapes with opacity.
+      files: ['src/scenes/**/*.css'],
+      rules: { 'datocms/text-roles': [true, { scenes: true }] },
+    },
+    {
       // The fake sites in the scenes may hard-code colours.
       files: ['src/scenes/**/site.module.css'],
-      rules: { 'scale-unlimited/declaration-strict-value': null },
+      rules: { 'scale-unlimited/declaration-strict-value': null, 'datocms/text-roles': null },
     },
     {
       // The tokens define the colours.
       files: ['src/styles/tokens.css'],
-      rules: { 'scale-unlimited/declaration-strict-value': null },
+      rules: { 'scale-unlimited/declaration-strict-value': null, 'datocms/text-roles': null },
     },
     {
       // The layout of the docs has two more breakpoints, 1500 and 1600, for a wide screen.
