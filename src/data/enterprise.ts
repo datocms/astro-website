@@ -160,7 +160,7 @@ export const governance: ChapterLayoutData = {
   // The frame is two custom roles, each with its record permissions
   // (built: src/scenes/Enterprise/Roles.astro).
   scene:
-    'Two custom roles side by side: Agency Berlin (edits in German, sends to Legal, cannot publish) and Legal team (moves records from Legal to Brand, cannot edit content).',
+    'Two custom roles side by side: Agency Berlin (edits in German, sends to Legal, cannot publish) and Legal team (moves records from Legal to Brand, cannot edit content). (Built.)',
   fragments: [
     {
       // New copy.
