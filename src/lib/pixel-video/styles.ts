@@ -194,9 +194,9 @@ export const globe: Style = {
 export const globeDim: Style = {
   bgFill: INVERSE,
   bgStroke: INVERSE,
-  midFill: 'color-mix(in srgb, var(--surface-inverse) 92%, var(--text-on-inverse))',
+  midFill: 'color-mix(in oklab, var(--surface-inverse) 92%, var(--text-on-inverse))',
   midStroke: INVERSE,
-  highFill: 'color-mix(in srgb, var(--surface-inverse) 78%, var(--text-on-inverse))',
+  highFill: 'color-mix(in oklab, var(--surface-inverse) 78%, var(--text-on-inverse))',
   highStroke: INVERSE,
 };
 
