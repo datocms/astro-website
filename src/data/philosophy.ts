@@ -18,7 +18,7 @@ export const hero: HeroData = {
   headline: 'Built on our terms. Used on yours.',
   subheadline: 'We have strong opinions about what makes a CMS brilliant and reliable',
   intro: 'Every day, we try to live up to them.',
-  face: '[•✓•]',
+  face: 'approved',
 };
 
 export const principles: PrinciplesData = {

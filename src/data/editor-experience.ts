@@ -22,7 +22,7 @@ export const hero: HeroData = {
   label: 'Editor experience',
   headline: 'Familiar to write in. Predictable to build on.',
   subheadline: 'Editors get a calm place to write. Developers get structure',
-  face: '[**]',
+  face: 'starry',
   buttons: [
     {
       label: 'Get Started',

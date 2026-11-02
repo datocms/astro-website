@@ -42,7 +42,7 @@ export const hero: HeroData = {
   label: 'AI',
   headline: 'Bring your own AI. We’ll make it feel at home.',
   subheadline: 'Use it in the CMS, the CLI, or over MCP. Or don’t. It’s all opt-in',
-  face: '[••]',
+  face: 'wink',
   buttons: [
     {
       label: 'Get Started',

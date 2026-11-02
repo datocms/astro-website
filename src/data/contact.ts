@@ -1,3 +1,4 @@
+import type { FaceName } from '~/lib/motion/faces';
 import { getData } from 'country-list';
 import type { ButtonData } from '~/components/Button';
 
@@ -74,7 +75,8 @@ export interface ContactFormData {
   success: {
     headline: string;
     muted: string;
-    face: string;
+    /** The face after the muted run (src/lib/motion/faces.ts). */
+    face?: FaceName;
     /** A line of text under the headline. */
     body?: string;
     button: ButtonData;
@@ -85,7 +87,8 @@ export interface ContactSectionData {
   label: string;
   headline: string;
   muted: string;
-  face: string;
+  /** The face after the muted run (src/lib/motion/faces.ts). */
+  face?: FaceName;
   links: ContactLink[];
   form: ContactFormData;
 }
@@ -99,7 +102,7 @@ export const contact: ContactSectionData = {
   label: 'Contact sales',
   headline: "Let's talk about your project.",
   muted: "Tell us what you're building and we'll get back to you",
-  face: '[•ᴗ•]',
+  face: 'happy',
   links: [
     { lead: 'Need support?', label: 'Visit Support', href: '/support' },
     { lead: 'Self-service plans?', label: 'See Pricing', href: '/pricing' },
@@ -243,7 +246,7 @@ export const contact: ContactSectionData = {
     success: {
       headline: "Thanks, we've got it.",
       muted: 'Our sales team will reply to your work email soon',
-      face: '[•ᴗ•]',
+      face: 'happy',
       body: 'You will soon get an automated confirmation by email.',
       button: {
         label: 'Back to homepage',

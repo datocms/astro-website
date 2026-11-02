@@ -2,16 +2,17 @@
  * The starters pages: the index and the page of one starter. The starters
  * come from the CMS.
  */
+import type { HeroData } from '~/data/home';
 
 export const seo = {
   title: 'Project starters - Free demo projects',
 };
 
-export const hero = {
+export const hero: HeroData = {
   headline: 'Starters',
   subheadline:
     'Start with a fully configured DatoCMS project, a best-practice frontend and free hosting',
-  face: '[••]',
+  face: 'wink',
 };
 
 export const fullyFledged = {

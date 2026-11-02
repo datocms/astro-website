@@ -200,7 +200,7 @@ export const form: ContactFormData = {
   success: {
     headline: 'Thank you for reaching out!',
     muted: 'We will be in touch soon',
-    face: '[•ᴗ•]',
+    face: 'happy',
     button: { label: 'Back to homepage', href: '/', appearance: 'deep-on-white', variant: 'soft' },
   },
 };

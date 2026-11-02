@@ -49,7 +49,7 @@ export const form: ContactFormData = {
   success: {
     headline: 'Welcome on board!',
     muted: 'Check your email for the invite',
-    face: '[•ᴗ•]',
+    face: 'happy',
     button: { label: 'Back to homepage', href: '/', appearance: 'deep-on-white', variant: 'soft' },
   },
 };

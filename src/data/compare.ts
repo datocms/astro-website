@@ -29,7 +29,7 @@ export interface VersusSplitData {
  */
 export const hero: HeroData = {
   headline: 'We’re rooting for DatoCMS.',
-  face: '[•~•]',
+  face: 'thinking',
   buttons: [
     {
       label: 'Get Started',

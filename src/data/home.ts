@@ -1,6 +1,7 @@
 // The data of the home page. The CMS does not hold it: the data is here.
 // The types have the names of CMS fragments.
 
+import type { FaceName } from '~/lib/motion/faces';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import type { ButtonData } from '~/components/Button';
 import type { CodeTab } from '~/components/CodeSnippetPreview';
@@ -34,7 +35,7 @@ export interface HeroData {
    * from the CMS, a title alone and a legal page have none (DESIGN.md,
    * "The Text Face Rule"). Without a face, the h1 ends with the subheadline.
    */
-  face?: string;
+  face?: FaceName;
   /** The body text below the h1: the description that does not go in the h1. */
   intro?: string;
   buttons?: ButtonData[];
@@ -154,7 +155,7 @@ export function svgLogo(svg: string, alt: string): LogoItem {
 export const hero: HeroData = {
   headline: 'Thoughtfully built and ambitiously used.',
   subheadline: 'The AI-agnostic headless CMS with human support and transparent pricing',
-  face: '[••]',
+  face: 'wink',
   buttons: [
     {
       label: 'Get Started',
@@ -180,8 +181,8 @@ export const hero: HeroData = {
 export interface HomeHeroData {
   headline: string;
   subheadline: string;
-  /** The face after the subheadline. Default: `[••]`. */
-  face?: string;
+  /** The face after the subheadline (src/lib/motion/faces.ts). */
+  face?: FaceName;
   buttons: ButtonData[];
   /** The accessible name of the logos. It does not show. */
   logosLabel: string;
@@ -191,6 +192,7 @@ export interface HomeHeroData {
 export const homeHero: HomeHeroData = {
   headline: hero.headline,
   subheadline: hero.subheadline ?? '',
+  face: hero.face,
   buttons: [
     {
       label: 'Get Started',

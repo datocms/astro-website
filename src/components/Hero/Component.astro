@@ -8,6 +8,7 @@ import { Section } from '~/components/Section';
 import type { HeroData } from '~/data/home';
 import { HERO_MAX_CHARS, heroLength } from '~/lib/hero';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { faceStep, faces } from '~/lib/motion/faces';
 import type { Step } from '~/lib/motion/typewriter';
 import { HeroTeamMemberFragment } from './graphql';
 import styles from './style.module.css';
@@ -81,25 +82,9 @@ const script: Step[] = [
 if (subheadline) {
   script.push({ type: 'pause', ms: 500 }, { type: 'text', text: subheadline, speedCps: 80 });
 }
+// The face comes after a short stop, as in the home hero.
 if (subheadline && face) {
-  script.push(
-    { type: 'pause', ms: 150 },
-    {
-      type: 'face',
-      frames: [
-        { text: '••', ms: 150 },
-        { text: '[••', ms: 75 },
-        { text: '[••]', ms: 300 },
-        // A different face replaces the default face after the wink.
-        ...(face === '[••]'
-          ? [
-              { text: '[-•]', ms: 100 },
-              { text: '[••]', ms: 150 },
-            ]
-          : [{ text: face, ms: 150 }]),
-      ],
-    },
-  );
+  script.push({ type: 'pause', ms: 300 }, faceStep(face));
 }
 
 // The buttons wait for the typewriter: the text then needs its script.
@@ -145,7 +130,11 @@ const background = ({ page: 'default', accent: 'accent' } as const)[variant];
     <Headline
       as={headingLevel}
       size="h1"
-      muted={subheadline ? (face ? `${subheadline}\u00A0${face}` : subheadline) : undefined}
+      muted={subheadline
+        ? face
+          ? `${subheadline}\u00A0${faces[face].face}`
+          : subheadline
+        : undefined}
       breakBeforeMuted={breakBeforeMuted}
       typewriter={typewriter ? script : undefined}
       typewriterStart="load"

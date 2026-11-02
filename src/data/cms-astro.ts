@@ -38,7 +38,7 @@ export const page: FrameworkPage = {
     label: 'Astro + DatoCMS',
     headline: 'Astro in front, DatoCMS behind.',
     subheadline: 'The frontmatter fetches it, @datocms/astro renders it, cache tags keep it fresh',
-    face: '[••]',
+    face: 'wink',
     intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
   },

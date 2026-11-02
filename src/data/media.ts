@@ -41,7 +41,7 @@ export const hero: HeroData = {
   label: 'Media',
   headline: 'Upload once. Optimized for every size, every screen.',
   subheadline: 'Images, video, audio and documents, all in one library',
-  face: '[••]',
+  face: 'wink',
   buttons: [
     {
       label: 'Get Started',

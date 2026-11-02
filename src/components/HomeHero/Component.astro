@@ -4,17 +4,18 @@ import { Headline } from '~/components/Headline';
 import { LogosLine } from '~/components/LogosLine';
 import { Section } from '~/components/Section';
 import type { HomeHeroData } from '~/data/home';
+import { faceStep, faces } from '~/lib/motion/faces';
 import type { Step } from '~/lib/motion/typewriter';
 import styles from './style.module.css';
 
 type Props = HomeHeroData;
 
-const { headline, subheadline, face = '[••]', buttons, logosLabel, logos } = Astro.props;
+const { headline, subheadline, face, buttons, logosLabel, logos } = Astro.props;
 
 // The timeline of the Hero component, with a human
 // rhythm: the words come in bursts, a full stop makes a stop, and the
 // writer thinks before the subheadline. The headline and the subheadline
-// are typed, then the face winks. The buttons come with the subheadline.
+// are typed, then the face plays. The buttons come with the subheadline.
 const script: Step[] = [
   { type: 'pause', ms: 750 },
   { type: 'cursor', glyphs: ['•', '~', '-', 'ᴗ', '•'], msPerGlyph: 75 },
@@ -24,28 +25,11 @@ const script: Step[] = [
   // The buttons fade in when the subheadline starts.
   { type: 'mark', name: 'subheadline' },
   { type: 'text', text: subheadline, speedCps: 52, rhythm: 'human' },
-  { type: 'pause', ms: 300 },
-  {
-    // The face is drawn one sign at a time, with its eyes closed. Then it
-    // opens its eyes, winks, and looks at you. Each frame stays long
-    // enough to follow.
-    type: 'face',
-    frames: [
-      { text: '[', ms: 220 },
-      { text: '[-', ms: 200 },
-      { text: '[--', ms: 200 },
-      { text: '[--]', ms: 500 },
-      { text: '[••]', ms: 650 },
-      // A different face replaces the default face after the wink.
-      ...(face === '[••]'
-        ? [
-            { text: '[-•]', ms: 170 },
-            { text: '[••]', ms: 400 },
-          ]
-        : [{ text: face, ms: 400 }]),
-    ],
-  },
 ];
+// The face (src/lib/motion/faces.ts) comes after a short stop.
+if (face) {
+  script.push({ type: 'pause', ms: 300 }, faceStep(face));
+}
 ---
 
 <Section
@@ -60,7 +44,7 @@ const script: Step[] = [
     <Headline
       as="h1"
       size="h1"
-      muted={`${subheadline} ${face}`}
+      muted={face ? `${subheadline}\u00A0${faces[face].face}` : subheadline}
       breakBeforeMuted
       typewriter={script}
       typewriterStart="load"

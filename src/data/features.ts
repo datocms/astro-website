@@ -37,7 +37,7 @@ export const hero: HeroData = {
   label: 'Features',
   headline: 'A list that keeps on growing.',
   subheadline: 'Everything DatoCMS does, in one list. Most of it exists because someone asked.',
-  face: '[•﹏•]',
+  face: 'worried',
   buttons: [
     {
       label: 'Get Started',

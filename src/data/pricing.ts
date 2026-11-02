@@ -77,7 +77,7 @@ export const hero: HeroData = {
   label: 'Pricing',
   headline: 'Honest pricing for ambitious products.',
   subheadline: 'Count on us for flexible pricing that meets you halfway',
-  face: '[••]',
+  face: 'wink',
 };
 
 export const plans: PricingPlansData = {

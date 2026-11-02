@@ -6,10 +6,11 @@
  */
 import { describe, expect, it } from 'vitest';
 import { HERO_MAX_CHARS, heroLength } from '~/lib/hero';
+import type { FaceName } from '~/lib/motion/faces';
 
 const modules = import.meta.glob<Record<string, unknown>>('./*.ts', { eager: true });
 
-type H1 = { headline: string; subheadline?: string; face?: string };
+type H1 = { headline: string; subheadline?: string; face?: FaceName };
 
 /** Each value named `hero` in the module, at any depth. */
 function heroes(value: unknown, path: string, out: [string, H1][], seen = new Set<unknown>()) {

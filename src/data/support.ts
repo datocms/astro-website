@@ -5,7 +5,7 @@ import harrysClient from '~/assets/support/harrys.svg?raw';
 import hashicorpClient from '~/assets/support/hashicorp.svg?raw';
 import type { LogoItem } from '~/components/LogosLine';
 import type { ContactFormData } from '~/data/contact';
-import { svgLogo } from '~/data/home';
+import { svgLogo, type HeroData } from '~/data/home';
 
 /*
  * The support page. The support form sends its data to the action
@@ -18,11 +18,11 @@ export const seo = {
   title: 'Support page',
 };
 
-export const hero = {
+export const hero: HeroData = {
   label: 'Support page',
   headline: 'Got issues?',
   subheadline: "We're here to help!",
-  face: '[••]',
+  face: 'wink',
 };
 
 export const picker = {
@@ -121,7 +121,7 @@ export const supportForm: ContactFormData = {
   success: {
     headline: "Thanks, we've got it.",
     muted: 'Our support team will be in touch shortly',
-    face: '[•ᴗ•]',
+    face: 'happy',
     button: { label: 'Back to homepage', href: '/', appearance: 'deep-on-white', variant: 'soft' },
   },
 };

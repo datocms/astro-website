@@ -3,6 +3,7 @@ import { Button } from '~/components/Button';
 import { FormField } from '~/components/FormField';
 import { Headline } from '~/components/Headline';
 import type { ContactFormData } from '~/data/contact';
+import { faces } from '~/lib/motion/faces';
 import styles from './style.module.css';
 
 /*
@@ -106,8 +107,8 @@ const needsScript = external && noscriptMessage !== undefined;
     <Headline as="h2" size="h2">
       {success.headline}
       <Fragment slot="muted">
-        {success.muted}{' '}
-        <span aria-hidden="true">{success.face}</span>
+        {success.muted}
+        {success.face && <span aria-hidden="true">{'\u00A0' + faces[success.face].face}</span>}
       </Fragment>
     </Headline>
     {success.body && <p class="subtitleMedium">{success.body}</p>}

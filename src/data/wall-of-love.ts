@@ -13,7 +13,7 @@ export const hero: HeroData = {
   label: 'Wall Of Love',
   headline: 'Don’t take our word for it.',
   subheadline: 'Take theirs.',
-  face: '[~ᴗ~]',
+  face: 'relaxed',
 };
 
 // The banner of the closer, above its video.

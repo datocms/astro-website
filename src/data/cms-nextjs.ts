@@ -34,7 +34,7 @@ export const page: FrameworkPage = {
     label: 'Next.js + DatoCMS',
     headline: 'Next.js in front, DatoCMS behind.',
     subheadline: 'Server Components fetch it, Draft Mode previews it, cache tags keep it fresh',
-    face: '[••]',
+    face: 'wink',
     intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
   },
