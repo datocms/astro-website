@@ -1,0 +1,35 @@
+---
+import diagram from '../diagram/style.module.css';
+import ChatAvatar from './ChatAvatar.astro';
+import { ONBOARDING } from './story';
+import styles from './onboarding.module.css';
+
+// The onboarding plan of the group, in the grammar of the diagrams, as
+// the panel of the SLAs: a panel with the name of the plan and a row for
+// each session. Each row has the photo of the person of DatoCMS who runs
+// it, the session, its audience, and its status. There is no motion.
+---
+
+<div class:list={[diagram.root, styles.plan]} role="img" aria-label={ONBOARDING.description}>
+  <div class:list={[diagram.panel, styles.panel]}>
+    <p class={diagram.panelLabel}>{ONBOARDING.label}</p>
+    <ul class={styles.sessions}>
+      {
+        ONBOARDING.sessions.map((session) => (
+          <li class={styles.session}>
+            <ChatAvatar {...session.person} />
+            <div class={styles.body}>
+              <p class={styles.title}>{session.title}</p>
+              <p class={styles.meta}>
+                {session.audience} · {session.person.name}
+              </p>
+            </div>
+            <span class={styles.status} data-status={session.status}>
+              {session.when}
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</div>

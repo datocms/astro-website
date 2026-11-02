@@ -85,8 +85,6 @@ export const mcp: ChapterLayoutData = {
   // The chat is a neutral one: no client's interface is drawn as real.
   // The chat is alone: the cms would not be beside it, the tool rows show
   // where the answer comes from.
-  scene:
-    'A neutral chat: “Which pages of the Marram project on DatoCMS still miss an SEO description?”, four tool rows of the MCP server, and the answer lists eight.',
   // One chapter for the MCP server: the chapter "MCP, in depth" is merged
   // in, and the chapter "LLM-ready docs" is its last fragment. Its script
   // and the tasks of the docs are here; the count of tools and the grid of
@@ -101,8 +99,6 @@ export const mcp: ChapterLayoutData = {
       // the frame: the plan for its eight pages.
       title: 'It reads before it writes.',
       text: 'It looks at your schema and our docs, writes the changes as one script, and asks you before it runs it.',
-      picture:
-        'The next turn of the chat: get_api_methods for items.update, the plan in a sentence for the eight pages, then the script and the question Run this script?, Allow highlighted.',
     },
     {
       // Old chapter "LLM-ready docs" (/docs/llm-ready-docs). What the file
@@ -115,8 +111,6 @@ export const mcp: ChapterLayoutData = {
       // :bleep: reads "*" (src/components/Emoji).
       title: 'All our docs, in one file.',
       text: 'Point your LLM at `/docs/llms-full.txt` for the full docs, always kept up to date, so it doesn’t hallucinate and make sh:bleep:t up.',
-      picture:
-        'llms-full.txt open, 3.8 MB, its Markdown at the section Automatic Retries of Webhooks, the lines of the retry schedule marked.',
     },
   ],
 };
@@ -138,8 +132,6 @@ export const skills: ChapterLayoutData = {
   // you would type. The terminal is a neutral one. One task from start to
   // end: the schema, a migration on a fork, a script for the content, a
   // check with an API call.
-  scene:
-    'A neutral terminal: the install line, then the agent reads the schema, writes and runs a migration for the field Weight on a sandbox, fills it from a CSV with a script, and checks it with an API call; the migration and the script open beside it.',
   fragments: [],
 };
 
@@ -174,16 +166,13 @@ export const translations: ChapterLayoutData = {
       variant: 'soft',
     },
   },
-  scene:
-    'Rolltop pannier 20 L on the Italian tab, the panel AI Translations in the aside: one click on Translate all fields, nine jobs (Name, Slug and Body to Italian, German and French), the Italian fields fill one by one, the banner asks to review and save.',
   // The frame shows the whole record in one run, the sidebar panel of the
   // plugin: it says the headline, thus no fragments follow.
   fragments: [],
 };
 
 // Chapter 4: the AI of the media library.
-// Built: src/scenes/MediaAi/ (the frame, fragments 1 and 2). The frame is
-// in the grammar of the diagrams (src/scenes/diagram/).
+// The frame is in the grammar of the diagrams (src/scenes/diagram/).
 export const media: ChapterLayoutData = {
   id: 'media',
   theme: 'green',
@@ -195,8 +184,6 @@ export const media: ChapterLayoutData = {
       'Uploads get suggested tags, so the library is searchable without an afternoon of tagging. Videos get captions you can download, correct, and upload again.',
     link: docs('/docs/asset-api/videos'),
   },
-  scene:
-    'Two rows. A photo of Marram goes in, a line goes through DatoCMS, and its tags come out; a video goes in, and its subtitles come out line by line.',
   // The frame is the headline as a picture: a photo gives tags, a video
   // gives subtitles. The first fragment shows where the tags are in the
   // cms, the second the dialog that makes the subtitles. The captions of
@@ -208,14 +195,10 @@ export const media: ChapterLayoutData = {
       // media area have one for each.
       title: 'Tags we suggest, tags you keep.',
       text: 'We suggest tags. Keep them, change them, and filter the library by them.',
-      picture:
-        'The asset Loaded tourer on the Stelvio: the smart tags bicycle, mountain, road in Asset info, and the manual tags stelvio, tour-2026 that the editor typed, in Categorization.',
     },
     {
       title: 'Captions from the audio.',
       text: 'Choose the language, and the captions generate as a track for the video.',
-      picture:
-        'The dialog Generate subtitles from audio of the video Fitting a rolltop pannier, alone, on English.',
     },
   ],
 };

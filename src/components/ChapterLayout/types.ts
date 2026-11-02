@@ -4,9 +4,10 @@ import type { CodeTab } from '~/components/CodeSnippetPreview';
 import type { Theme } from '~/lib/theme';
 
 /**
- * A chapter whose pictures do not exist: the three parts of a chapter
- * (ChapterHeader, SceneFrame, FeatureFragments) with their real copy. In
- * place of each picture, the page shows a box with its description.
+ * A chapter: the three parts of a chapter (ChapterHeader, SceneFrame,
+ * FeatureFragments) with their real copy. In place of each picture that
+ * does not exist yet, the page shows a box with its description. When the
+ * picture is built, its description is removed.
  */
 export interface ChapterLayoutData {
   /** The anchor of the chapter on the page. */
@@ -18,9 +19,9 @@ export interface ChapterLayoutData {
    */
   chapter?: ChapterHeaderData;
   /**
-   * The SceneFrame: the description of the scene to make. A frame that is
-   * built goes in the slot "scene" of the component, and this is its
-   * summary.
+   * The SceneFrame: the description of the scene to make. When the frame is
+   * built, it goes in the slot "scene" of the component (or `sceneCode` is
+   * set), and this description is removed.
    */
   scene?: string;
   /**
@@ -32,13 +33,14 @@ export interface ChapterLayoutData {
   sceneCode?: CodeTab[];
   /**
    * 0, 2 or 4 fragments, each with a picture that adds a nuance or a point
-   * of view to the frame. The sentence may overlap the intro. `picture` describes the picture to make; "Code: …"
-   * is a CodeSnippetPreview. A picture that is built goes in the slot
-   * "visual-N" of the component (N is the index of the fragment), and
-   * `picture` is its summary.
+   * of view to the frame. The sentence may overlap the intro. `picture` describes
+   * a picture that does not exist yet; "Code: …" is a CodeSnippetPreview.
+   * When the picture is built, it goes in the slot "visual-N" of the
+   * component (N is the index of the fragment) (or `code` is set), and
+   * `picture` is removed.
    */
   fragments: (FeatureFragmentData & {
-    picture: string;
+    picture?: string;
     /**
      * The code of a "Code: …" picture, once it is written: the fragment
      * shows a CodeSnippetPreview with these tabs in place of the box.

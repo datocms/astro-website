@@ -249,6 +249,11 @@ const MARCELO = {
   org: 'DatoCMS',
   avatarUrl: teamAvatar('1751268246-20250623-195038-4832.jpg'),
 } as const;
+const PAPADOPOULOS = {
+  name: 'Matteo Papadopoulos',
+  org: 'DatoCMS',
+  avatarUrl: teamAvatar('1751268529-20250623-203221-4862.jpg'),
+} as const;
 const MATTEO = {
   name: 'Matteo Giaccone',
   org: 'DatoCMS',
@@ -281,7 +286,7 @@ export const SUPPORT_CHAT = {
     {
       ...MATTEO,
       time: '09:12',
-      text: 'Editorial onboarding for the Berlin team is on Thursday at 10:00. I’ll share the recording here after.',
+      text: 'Thanks for the list of feature requests, Jonas. Can we go through it together next week?',
     },
     {
       ...JONAS,
@@ -325,4 +330,40 @@ export const SLA = {
   ],
   description:
     'The service levels in the contract of Northwind Group: the performance SLA, 99.99% uptime; the support SLA, an answer to a priority-one issue in one hour, around the clock.',
+} as const;
+
+/**
+ * The fragment of the onboarding: the plan of Northwind Group, one row for
+ * each session, with the person of DatoCMS who runs it. Technical
+ * onboarding is with the developers (Marcelo Finamor), editorial
+ * onboarding is with the team of each brand (Matteo Papadopoulos). The
+ * topics stay general: the copy says only that the sessions exist.
+ */
+export const ONBOARDING = {
+  label: `${GROUP_NAME} onboarding`,
+  sessions: [
+    {
+      title: 'Technical onboarding',
+      audience: 'The developers',
+      person: MARCELO,
+      status: 'done',
+      when: 'Done',
+    },
+    {
+      title: 'Editorial onboarding',
+      audience: 'The Berlin team',
+      person: PAPADOPOULOS,
+      status: 'next',
+      when: 'Thu 10:00',
+    },
+    {
+      title: 'Editorial onboarding',
+      audience: 'The other 11 brands',
+      person: PAPADOPOULOS,
+      status: 'later',
+      when: 'Next',
+    },
+  ],
+  description:
+    'The onboarding plan of Northwind Group: technical onboarding with the developers, run by Marcelo Finamor, is done; editorial onboarding with the Berlin team, run by Matteo Papadopoulos, is on Thursday at 10:00; the other eleven brands are next.',
 } as const;

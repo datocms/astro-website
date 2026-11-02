@@ -94,8 +94,6 @@ export const schema: ChapterLayoutData = {
   // record, a new validation) is in the fragment "Every record follows the
   // schema."; the changes that DatoCMS refuses are in "Applied, or
   // refused.".
-  scene:
-    'Northlight’s Schema tab: the models at left, the fields of Products at right, the text field Care instructions open on Presentation: the Markdown editor with its toolbar buttons, and the menu of its editors open: Markdown, HTML or a simple textarea.',
   fragments: [
     {
       // Data integrity: a schema change reaches every existing record at
@@ -107,8 +105,6 @@ export const schema: ChapterLayoutData = {
       title: 'Every record follows the schema. No exceptions.',
       text: 'Added a field, deleted a record, made a validation stricter? We update every record, and flag the ones that no longer meet your rules.',
       // Another point of view on the frame: not the field, but the records under it.
-      picture:
-        'The articles of Northlight’s journal as a table, the records as rows and the fields as columns: each schema change rings one header and changes every cell under it (a new slug field opens a column, with a slug made from the name of each article; the deleted tag News leaves every article; a new validation marks the article left with no tag invalid).',
     },
     {
       // The other side of data integrity: a change that would leave a
@@ -117,8 +113,6 @@ export const schema: ChapterLayoutData = {
       // locale that a record still needs, and says which.
       title: 'Applied, or refused.',
       text: 'Would a change break a record? We refuse it, and tell you which records get in the way.',
-      picture:
-        'The log of the schema changes of Northlight’s articles: each change comes as a pill and lands at the top with its verdict, how many records it changed, or why we refused it (a block that a field still allows, a locale that an article still needs, an upload that three records still use).',
     },
   ],
 };
@@ -137,8 +131,6 @@ export const graphql: ChapterLayoutData = {
       'One endpoint for all your content, typed from your schema. Filters, pagination, locales, drafts, SEO, linked records? Same request.',
     link: docs('/docs/content-delivery-api'),
   },
-  scene:
-    'Code, no UI: the query of Arc floor lamp (name, price, category, three related lamps with their hero image) and its response, side by side.',
   sceneCode: [lampQuery, lampResponse],
   fragments: [
     {
@@ -146,12 +138,10 @@ export const graphql: ChapterLayoutData = {
       // the inverse relationships, the video. Each tab has its own site.
       title: 'Answers, not just raw data.',
       text: 'Images cropped at the selected focal point, SEO tags of a page, linked records, stream-ready video. You ask, we compute.',
-      picture:
-        'Code, four tabs: a magazine cover cropped on its focal point, with its blurred copy in base64 and its colors; the meta tags of a recipe and the favicons of the site; the last three articles that quote a person; the video of a lesson, with its stream, an MP4 and a poster.',
       code: apiCode,
     },
     {
-      // Built: src/scenes/Graphql/Ping.astro. Not a map: the number that
+      // Not a map: the number that
       // counts is the time, thus the picture measures it, live, in the
       // browser of the visitor (the TTFB at the nearest edge, the median
       // of five requests; the round trip when the browser does not give
@@ -159,8 +149,6 @@ export const graphql: ChapterLayoutData = {
       // page counted 74 edges: no count is drawn.
       title: 'From whichever edge is closest.',
       text: 'Every query, image, and video is served from the edge node nearest to the visitor.',
-      picture:
-        'Your browser and the nearest edge of the Content Delivery API, with the time between them in ms, measured live.',
     },
   ],
 };
@@ -177,14 +165,12 @@ export const realTime: ChapterLayoutData = {
       'Any query can be a subscription over Server-Sent Events. One hook in React, Vue, or Svelte, and content updates go live. Your components don’t change.',
     link: docs('/docs/real-time-updates-api'),
   },
-  // Built: src/scenes/RealTime/, in the grammar of the diagrams
+  // In the grammar of the diagrams
   // (src/scenes/diagram/). A loop of events, no caption, no screen of the
   // cms: the stream stays open, each new record goes down it, through the
   // hook in the component, and comes in at the top of the live blog of a
   // cup final. The frame says the chapter, thus no fragments follow.
   // (check) the names of the hooks of vue-datocms and @datocms/svelte.
-  scene:
-    'Events Record created on the left, the component with its useQuerySubscription hook under it, the live blog Cup final: live on the right. Each event goes down the stream into the hook, and its post comes in at the top of the blog, with no refresh.',
   fragments: [],
 };
 
@@ -202,20 +188,16 @@ export const delivery: ChapterLayoutData = {
       'Every response lists the records it used as cache tags. When content changes, a webhook names the tags to purge.',
     link: docs('/docs/content-delivery-api/cache-tags'),
   },
-  // Built: src/scenes/Delivery/, in the grammar of the diagrams
+  // In the grammar of the diagrams
   // (src/scenes/diagram/). The wall is a loop of events, no caption.
   // It shows the claim, not the mechanism: the fragments have the header,
   // the webhook and the CDN side.
-  scene:
-    'A wall of cached pages. Events arrive one after the other: each purges the few pages that used it, the other pages close the gap, and new pages join the wall at the end.',
   // The frame is a diagram: the first fragment is its two arrows as bytes,
   // the header in one tab and the webhook payload in the other.
   fragments: [
     {
       title: '`X-Cache-Tags` out, back by webhooks.',
       text: 'Ask with one header, and the response lists the records, models, and assets it used. When one changes, a webhook names the tags to purge.',
-      picture:
-        'Code, two tabs: the response headers of the Arc floor lamp query with the X-Cache-Tags header marked, and the payload of the invalidation webhook with the two tags of the diagram.',
       code: headersCode,
     },
     {
@@ -223,8 +205,6 @@ export const delivery: ChapterLayoutData = {
       // needs a mapping layer (docs), which one tab cannot tell honestly.
       title: 'Using Fastly, Cloudflare, or Netlify?',
       text: 'Surrogate keys or cache-tag headers? The tags map onto whatever your CDN already honors. (There are guides for Astro and Next.js too.)',
-      picture:
-        'Code: three tabs, Fastly, Cloudflare, Netlify, each with the header its CDN reads for the same tags: Surrogate-Key, Cache-Tag, Netlify-Cache-Tag.',
       code: cdnCode,
     },
   ],
@@ -249,7 +229,7 @@ export const environments: ChapterLayoutData = {
       'Fork the primary environment with its content. Break the schema all you want, write the migration, and promote it. Editors keep working the whole time.',
     link: docs('/docs/general-concepts/primary-and-sandbox-environments'),
   },
-  // Built: src/scenes/Environments/, in the grammar of the diagrams
+  // In the grammar of the diagrams
   // (src/scenes/diagram/). A git graph of the environments, a loop of
   // releases, no caption and no use case: the frame tells the workflow,
   // not a change of a schema. The dialogs of the fork and of the
@@ -260,22 +240,16 @@ export const environments: ChapterLayoutData = {
   // main after the fork is not in the sandbox; the maintenance mode is
   // there for that), and editors keep working while you build, but not
   // during a release.
-  scene:
-    'A git graph of the environments. Editors change content in main; maintenance:on locks it; migrations:run forks it into release-1 and runs the migrations there; environments:promote moves the ref Primary to release-1, and main stays, dim, as the way back; maintenance:off. Then the next release.',
   fragments: [
     {
       title: 'The CLI generates migration scripts.',
       text: 'Compare two environments, and the CLI writes the migration script for you to go into your repo, along with the code that uses it.',
-      picture:
-        'Code: a terminal: migrations:new with --autogenerate=my-feature:main, then the script it wrote, a field created.',
       code: [migrationTab],
     },
     {
       // The safe deployment sequence of the CLI docs, the commands of the pill of the graph
       title: 'A new release is four steps.',
       text: 'Lock the primary, fork it, run the migrations, promote the fork. Changed your mind? The old primary is still there to roll back to.',
-      picture:
-        'Code: the release script of a CI job: maintenance:on, migrations:run, environments:promote, maintenance:off.',
       code: releaseCode,
     },
   ],
@@ -297,8 +271,6 @@ export const automation: ChapterLayoutData = {
   // updates, creates and publishes products), typed by the generated
   // ItemTypeDefinition of the model Products, in the second tab. The notes
   // tell what each call gives.
-  scene:
-    'Code, no UI: a typed script syncs the catalog of the shop: it finds each product by SKU, updates its price or creates it, and publishes it. The second tab is the generated type of Products.',
   sceneCode: automationCode,
   fragments: [
     {
@@ -307,23 +279,18 @@ export const automation: ChapterLayoutData = {
       // The entities and the events are the real ones of the webhooks
       // (src/scenes/Automation/hooks.ts). No build triggers: the next
       // fragment is about them.
-      picture:
-        'A diagram: the panel Events lists the entities of a webhook (item, item_type, upload, environment, maintenance_mode, cda_cache_tags; sso_user dim, not ticked). One event at a time (item publish, upload create, environment promote…) sends a pulse to POST /webhooks, with its custom header, and the URL answers 200 OK.',
     },
     {
-      // Built: src/scenes/Automation/Deploys.astro, in the grammar of the
-      // diagrams. The docs: the button "Publish changes" and the status of
+      // In the grammar of the diagrams. The docs: the button "Publish changes" and the status of
       // the build are in the top navigation bar; a scheduled publication
       // can start a build by itself (autotrigger_on_scheduled_publications).
       title: 'Deploy when editors publish.',
       text: 'Connect Vercel, Netlify, or your own pipeline. A build starts when an editor publishes or a scheduled post goes live, and editors see the build status.',
-      picture:
-        'A round trip down and up: the bar of DatoCMS with the trigger (Publish changes, or a scheduled post) and the status; the build goes down to Vercel, Netlify, GitLab or your own CI, the lines of its log come in, and the status comes back up: Deploying, then Deployed.',
     },
   ],
 };
 
-// Chapter 7: the plugins. Built: src/scenes/Plugins/. The
+// Chapter 7: the plugins. The
 // story is the project Alpine Trails (a site of hikes) and its private
 // plugin Trail tools.
 export const plugins: ChapterLayoutData = {
@@ -343,14 +310,10 @@ export const plugins: ChapterLayoutData = {
   // the name of its hook on a tag. The hooks are the real ones of
   // datocms-plugin-sdk. The frame plays a sequence: the spotlight goes from
   // part to part, in the order of this text. At load no tag shows.
-  scene:
-    'The record editor of Alpine Trails on the trail Lac Blanc loop, with the parts of the plugin Trail tools, each with the name of its hook: the tab Reports in the navigation bar (mainNavigationTabs), the button Publish (onBeforeItemsPublish), a strip above the fields with the live page and two stats (renderItemFormOutlet), the field Difficulty with five boot marks (renderFieldExtension) and the panel Trail conditions in the aside (renderItemFormSidebarPanel).',
   fragments: [
     {
       title: 'Hooks for every nook and cranny.',
       text: 'Field editors, sidebar panels, pages, record actions, checks before publish. Declare the hook, render it with our React UI kit, and run it from localhost.',
-      picture:
-        'Code in five tabs, one for each part of Trail tools in the frame (Field, Panel, Page, Outlet, Publish): the hook that declares the part and the hook that renders it in the Canvas of the React UI kit; Publish stops the publish of a trail without its GPX track.',
       code: pluginCode,
     },
     {
@@ -360,8 +323,6 @@ export const plugins: ChapterLayoutData = {
       // "most of the 100+ are open source": the docs say "100+ open-source
       // plugins". (check) with the plugins page the day the page ships.
       text: 'A private plugin stays in your projects. A published one goes on npm and into the plugin directory. Want a head start? Fork one.',
-      picture:
-        'The Plugins screen of the project settings: AI Translations, SEO/Readability Analysis, Trail tools with the pill Private, and Web Previews.',
     },
   ],
 };

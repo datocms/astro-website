@@ -136,21 +136,16 @@ export function fetchChapter(args: {
         '@datocms/cda-client wraps fetch. Ask for a post with its cover and its body, and get exactly that back, from the nearest edge.',
       link: docs(args.docsRoot),
     },
-    scene:
-      'Code, no UI: the page file of a Tidewater post, with its query, and the response of the query, side by side.',
     sceneCode: args.code,
     fragments: [
       {
         title: 'Drafts, validation, tags: one option each.',
         text: 'Pass includeDrafts, excludeInvalid or returnCacheTags to the same call. The client sets the headers; the query does not change.',
-        picture: 'Code: the helper that all the pages call, with the token and excludeInvalid.',
         code: args.client,
       },
       {
         title: 'From the edge. Every time.',
         text: 'Every query is answered from the edge node nearest to the visitor. This one is measured from your browser, right now.',
-        picture:
-          'Your browser and the nearest edge of the Content Delivery API, with the time between them in ms, measured live.',
       },
     ],
   };
@@ -175,20 +170,15 @@ export function mediaChapter(args: {
         'Query responsiveImage or video, give the result to one component. Srcset, blur-up placeholder, lazy loading and HLS streaming come with it. No image pipeline.',
       link: docs(`${args.docsRoot}/managing-images`),
     },
-    scene:
-      'The photo with the parameters of its URL as switches: crop, focal point, format, dpr. The pill of DatoCMS in the middle, the served photo on the right with its weight and format. The switches work.',
     fragments: [
       {
         title: 'One prop: the query result.',
         text: 'The component reads src, srcSet, sizes and the base64 placeholder from the API. The browser picks the file for its width.',
-        picture:
-          'Code: the cover of a post, the responsiveImage of the query given to one component.',
         code: args.image,
       },
       {
         title: 'Video without a video stack.',
         text: 'Upload an MP4 and the API returns a Mux playback id. The player streams it in HLS, with a blurred poster while it starts.',
-        picture: 'Code: the video of a post, the video field of the query given to the player.',
         code: args.video,
       },
     ],
@@ -214,21 +204,15 @@ export function blocksChapter(args: {
         'A landing page is a list of blocks, each with a __typename. A body is a DAST tree. Both map onto your components.',
       link: docs(args.docsHref),
     },
-    scene:
-      'The record editor on a landing page, the Sections field alone: the blocks in order, the menu of the block models open at the gap after one of them.',
     fragments: [
       {
         title: 'A switch on __typename.',
         text: 'Each block type is one component. Editors order the list; you render it in order.',
-        picture:
-          'Code, two tabs: the component that picks a component for each block by its __typename, and the query of the field Sections.',
         code: args.sections,
       },
       {
         title: 'Structured Text, rendered.',
         text: 'Headings and paragraphs render by default. A record or a block in the text gets your component.',
-        picture:
-          'Code, two tabs: the StructuredText component with a component for a record in the text and one for a block, and the DAST of the paragraph.',
         code: args.body,
       },
     ],
@@ -253,21 +237,15 @@ export function draftsChapter(args: {
       intro: args.intro,
       link: docs(`${args.docsRoot}/visual-editing`),
     },
-    scene:
-      'The tab Visual of the cms: the draft site at the left, the sidebar of the visual editing at the right; "Edit mode" on, the outlines of Content Link over the page, a click on the cover opens the article.',
     fragments: [
       {
         title: 'A cookie decides.',
         text: 'One route sets the cookie, one removes it. The Web Previews plugin opens the draft of a record from the cms, cookie included.',
-        picture:
-          'Code: the route that checks the token, sets the cookie of draft mode and redirects, then the request that passes includeDrafts from the cookie.',
         code: args.draft,
       },
       {
         title: 'Click the text, edit the field.',
         text: 'With contentLink on, the API wraps each text in invisible metadata. The ContentLink component reads it and draws the outlines. Off in production.',
-        picture:
-          'Code: the layout that renders ContentLink in draft mode only, and the two options of the request.',
         code: args.contentLink,
       },
     ],
@@ -317,18 +295,12 @@ export function cacheTagsChapter(args: {
       intro: args.intro,
       link: docs(args.docsHref),
     },
-    scene:
-      'A wall of cached pages. Each event purges the few pages that used the record, the others close the gap, new pages join at the end.',
     fragments: [
       {
         ...args.tags,
-        picture:
-          'Code: the helper that asks for the cache tags with the query and tags the cached page with them.',
       },
       {
         ...args.webhook,
-        picture:
-          'Code: the route of the invalidation webhook, which checks the secret and invalidates the tags that changed.',
       },
     ],
   };
@@ -350,21 +322,15 @@ export function buildTriggersChapter(args: { headersCode: CodeTab[] }): ChapterL
         'A build trigger redeploys the site when an editor publishes. Cache tags go finer: every response names its records, and a webhook purges only those.',
       link: docs('/docs/content-delivery-api/cache-tags'),
     },
-    scene:
-      'Code, two columns: the response headers of a query, with the X-Cache-Tags header that names its records, and the payload of the webhook that sends the tags of what changed, for the CDN to purge.',
     sceneCode: args.headersCode,
     fragments: [
       {
         title: 'Webhooks on any event.',
         text: 'Records, uploads, publishing… pick the events and we call your URL, with the cache tags of what changed. Your CDN purges those pages, nothing else.',
-        picture:
-          'The road of the purge: the panel Events lists the entities of a webhook; one event at a time sends a pulse to your URL with its custom header, and the URL answers 200 OK.',
       },
       {
         title: 'Deploy when editors publish.',
         text: 'The simple road: a full build on every publish. Connect Vercel, Netlify or your own pipeline, and editors see the build status in the cms.',
-        picture:
-          'The road of the build: the bar of DatoCMS with "Publish changes" and the status; the build goes down to the pipeline, the log comes in, and the status comes back: Deploying, then Deployed.',
       },
     ],
   };

@@ -108,38 +108,27 @@ export const security: ChapterLayoutData = {
       'ISO 27001 certified, with a GDPR data processing agreement. Data is encrypted in transit and at rest, in multiple shards on servers in the EU (Ireland). An audit log records who made each change, and when.',
     link: docs('Read Our Security Page', '/security'),
   },
-  // New copy.
-  scene:
-    'The audit log of Northwind Group: ten events of one morning, each with its time, its author, the action, the path, the environment and the role of the author: stage moves, a role change, publishes, an environment promoted, a model change, the single sign-on settings, a workflow, an API token and the white-label settings.',
   fragments: [
     {
       // New copy.
       title: 'Your login, your rules.',
       text: 'Your team signs in to the CMS with the company account, through your identity provider.',
-      picture:
-        'The sign-in page of the CMS of Northwind Group, with its logo: the email and the password, then the button "Log in with single sign-on".',
     },
     {
       // New copy.
       title: 'Connect your identity provider.',
       text: 'SSO with SAML through Okta, OneLogin, Azure AD or any SAML provider, and SCIM provisioning to add and remove people from your directory.',
-      picture:
-        'The single sign-on settings of Northwind Group: the SAML values of DatoCMS, the metadata URL of the Okta app, the SCIM base URL with its new API token, and Editor as the default role.',
     },
     {
       // New copy. A full export of the project on a cron schedule, to the
       // S3 bucket of the customer: the scheduled exports of the old page.
       title: 'Backups you don’t think about.',
       text: 'A full export of your project on the schedule you choose, to your own AWS S3 bucket: models, records, assets, menus, plugins and workflows.',
-      picture:
-        'A diagram: the schedule (every night at 02:00) starts the export, each part of the project of Northwind Group (models, records, assets, menus, plugins, workflows) is exported and gets a check, then the archive goes along a track to the bucket s3://northwind-backups.',
     },
     {
       // New copy.
       title: 'Your domain, your storage.',
       text: 'Assets in your own bucket on AWS S3, Cloudflare R2, Google Cloud Storage or Azure Blob Storage, on your own domain. Static IPs for webhooks.',
-      picture:
-        'A diagram: the assets of Northwind Group go along a track to the bucket northwind-media, and the file is served from assets.northwind.com.',
     },
   ],
 };
@@ -157,21 +146,16 @@ export const governance: ChapterLayoutData = {
       'Roles decide who can do what, down to the field and the locale. Workflows decide who approves it before it goes live.',
     link: docs('Read The Docs', '/docs/general-concepts/roles-and-permission-system'),
   },
-  scene:
-    'Two custom roles side by side: Agency Berlin (edits in German, sends to Legal, cannot publish) and Legal team (moves records from Legal to Brand, cannot edit content).',
   fragments: [
     {
       // New copy.
       title: 'A workflow for each brand.',
       text: 'Each brand sets its own steps, from draft to published, with an approval at each step that needs one.',
-      picture: 'The stages of the workflow of one brand: Draft, Legal, Brand and Approved.',
     },
     {
       // New copy.
       title: 'Your brand on the CMS.',
       text: 'White-label the CMS with your logo, your colors, and your domain.',
-      picture:
-        'A browser window at cms.northwind.com: the record editor of the CMS with the logo of Northwind in the navigation bar and the interface in the green of the brand.',
     },
   ],
 };
@@ -220,22 +204,16 @@ export const support: ChapterLayoutData = {
       'A shared Slack channel, solution architects for your build, and dedicated technical and editorial onboarding. With the SLAs in your contract.',
     link: docs('Talk To Sales', '#form'),
   },
-  // New copy.
-  scene:
-    'A shared Slack channel between Northwind Group and DatoCMS: a developer of Northwind asks about the model of a landing page, and Marcelo Finamor of the DatoCMS support answers in the thread.',
   fragments: [
     {
       // New copy.
       title: 'SLAs, in writing.',
       text: 'A performance SLA with 99.99% uptime, and a support SLA that answers priority-one issues in one hour, around the clock.',
-      picture:
-        'The SLA table of a contract: uptime 99.99%, priority one answered in one hour, around the clock.',
     },
     {
-      title: 'Sandboxes for testing and backups.',
-      text: 'Fork a sandbox to test changes or keep a backup, then promote it when it is ready.',
-      picture:
-        'The graph of the environments of the chapter Environments of /developers: the primary and a sandbox that forks from it and is promoted.',
+      // New copy. The onboarding of the old page: technical and editorial.
+      title: 'Onboarding, for each team.',
+      text: 'Technical onboarding for your developers, and editorial onboarding for your editors, with the people of DatoCMS.',
     },
   ],
 };

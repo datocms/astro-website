@@ -55,6 +55,8 @@ The unit of a pillar page. Three parts, always the same: a visitor who read one 
 | The thing itself | The feature at rest, full width                                                          | `SceneFrame`       |
 | Sub-features     | None, two or four facets, two per row, each with a small picture, a title and a sentence | `FeatureFragments` |
 
+A chapter data object has a `scene` string for its frame and a `picture` string for each fragment. They describe a picture that does not exist yet. When the picture is built, remove the string.
+
 What a chapter does not have: a text-and-image section, a statement, a how-it-works grid, a quote. Everything it wants to say fits in the intro, the fragment sentences and the pictures, or it goes to the docs. Why: the first exemplar had all of those and read as a page for one feature; with eight of them a pillar would be forty screens.
 
 **Budgets.** A budget leaves no room for the second adjective and the third joke.

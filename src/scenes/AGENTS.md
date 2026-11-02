@@ -44,7 +44,7 @@ Each page has one project; the Editing chapters have one each. The names, the re
 
 ## Chapters
 
-- A chapter is `src/scenes/<Chapter>/Chapter.astro`: the `ChapterHeader` (`background="split"`) and one `SceneFrame` in a `ChapterSplit` (the background of VersusSplit: accent at the left, inverse at the right, from 1152px; a `whole` frame stays on the inverse surface), then the `FeatureFragments` with a `SceneFragment` for each picture. `ChapterLayout` does the same from data alone, with a box for each picture that has no scene yet. The sizes of the screens are inline props in that file, each with a comment that tells what the box shows. The page is the list of the chapters; the copy stays in `src/data/`.
+- A chapter is `src/scenes/<Chapter>/Chapter.astro`: the `ChapterHeader` (`background="split"`) and one `SceneFrame` in a `ChapterSplit` (the background of VersusSplit: accent at the left, inverse at the right, from 1152px; a `whole` frame stays on the inverse surface), then the `FeatureFragments` with a `SceneFragment` for each picture. `ChapterLayout` does the same from data alone, with a box for each picture that has no scene yet. The box shows the `scene` or `picture` string of the data; when you build the picture, remove its string. The sizes of the screens are inline props in that file, each with a comment that tells what the box shows. The page is the list of the chapters; the copy stays in `src/data/`.
 - A new chapter: `story.ts`, `<Name>.tsx` (the forms, on `EditorScene`), `Chapter.astro`, one line in the page, and its copy.
 - Photos of a scene are imported in the scene (`import cover from './cover.jpg'`, then `cover.src`).
 
