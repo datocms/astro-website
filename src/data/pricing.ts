@@ -224,7 +224,7 @@ export const faq: Omit<FaqData, 'items'> = {
 
 export const ctaStart: CtaBannerData = {
   variant: 'light',
-  theme: 'orange',
+  theme: 'blue',
   headline: 'Start building.',
   muted: 'Explore DatoCMS and never look back.',
   buttons: [
