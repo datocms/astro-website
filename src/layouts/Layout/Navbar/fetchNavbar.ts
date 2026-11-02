@@ -1,5 +1,5 @@
 import { executeQueryWithAutoPagination } from '@datocms/cda-client';
-import { DATOCMS_API_TOKEN } from 'astro:env/server';
+import { DATOCMS_API_TOKEN, DATOCMS_ENVIRONMENT } from 'astro:env/server';
 import type { TadaDocumentNode } from 'gql.tada';
 import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
@@ -223,5 +223,6 @@ export const [fetchNavbar, maybeInvalidateNavbar] = dataSource('navbar', async (
     returnCacheTags: true,
     excludeInvalid: true,
     token: DATOCMS_API_TOKEN,
+    environment: DATOCMS_ENVIRONMENT,
   });
 });

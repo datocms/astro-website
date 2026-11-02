@@ -8,6 +8,7 @@ import { MaybeLink } from '~/components/links/MaybeLink';
 import { InlineText } from '~/components/structuredText/InlineText';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { reviewRole } from '../role';
 
 interface Props {
   quote:
@@ -58,7 +59,7 @@ const quote =
           <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
           <div class={s.authorRole}>
             <div class={s.name}>{quote.name}</div>
-            <div class={s.role}>{quote.role}</div>
+            <div class={s.role}>{reviewRole(quote.role, quote.company)}</div>
           </div>
         </div>
       </article>

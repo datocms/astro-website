@@ -6,6 +6,7 @@ import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { InlineText } from '~/components/structuredText/InlineText';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { PartnerTestimonialQuoteFragment, ReviewQuoteFragment } from '~/components/quote/graphql';
+import { reviewRole } from '~/components/quote/role';
 
 interface Props {
   quote:
@@ -53,7 +54,7 @@ const quote =
           <ResponsiveImage pictureClass={s.image} data={quote.image.responsiveImage} />
           <div class={s.authorRole}>
             <div class={s.name}>{quote.name}</div>
-            <div class={s.role}>{quote.role}</div>
+            <div class={s.role}>{reviewRole(quote.role, quote.company)}</div>
           </div>
         </div>
       </>

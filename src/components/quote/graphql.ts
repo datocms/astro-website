@@ -39,8 +39,7 @@ export const ReviewQuoteFragment = graphql(
           ...ResponsiveImageFragment
         }
       }
-      name
-      role
+      company
     }
   `,
   [ResponsiveImageFragment],

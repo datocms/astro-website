@@ -1,6 +1,6 @@
 import { executeQuery } from '@datocms/cda-client';
 import type { Client, RawApiTypes } from '@datocms/cma-client';
-import { DATOCMS_API_TOKEN } from 'astro:env/server';
+import { DATOCMS_API_TOKEN, DATOCMS_ENVIRONMENT } from 'astro:env/server';
 import type { TadaDocumentNode } from 'gql.tada';
 import type { FragmentDefinitionNode } from 'graphql';
 import { camelCase, upperFirst } from 'lodash-es';
@@ -54,6 +54,7 @@ export async function recordToWebsiteRoute({
 
   const { thing } = await executeQuery<any, any>(query, {
     token: DATOCMS_API_TOKEN,
+    environment: DATOCMS_ENVIRONMENT,
     includeDrafts: true,
     variables: { id: item.id },
   });

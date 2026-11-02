@@ -7,9 +7,10 @@ export const query = graphql(
       allReviews(first: 100) {
         __typename
         ...ReviewQuoteFragment
-        _updatedAt
+        _createdAt
         name
         role
+        company
         quote {
           value
         }
@@ -17,7 +18,7 @@ export const query = graphql(
       allPartnerTestimonials(first: 500) {
         __typename
         ...PartnerTestimonialQuoteFragment
-        _updatedAt
+        _createdAt
         name
         role
         quote {

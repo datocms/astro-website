@@ -12,8 +12,10 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 
 const { allPartnerTestimonials, allReviews } = await executeQuery(Astro, query);
 
+// The newest quotes come first. The sort uses the creation date: a bulk
+// edit of the records changes the update date of all of them.
 const quotes = [...allPartnerTestimonials, ...allReviews].sort((a, b) =>
-  b._updatedAt.localeCompare(a._updatedAt),
+  b._createdAt.localeCompare(a._createdAt),
 );
 
 const reviewsData: Review[] = quotes.map((item) => ({
@@ -25,6 +27,9 @@ const reviewsData: Review[] = quotes.map((item) => ({
     ...(item.role ? { jobTitle: item.role } : {}),
     ...(item.__typename === 'PartnerTestimonialRecord' && item.partner
       ? { worksFor: { '@type': 'Organization' as const, name: item.partner.name } }
+      : {}),
+    ...(item.__typename === 'ReviewRecord' && item.company
+      ? { worksFor: { '@type': 'Organization' as const, name: item.company } }
       : {}),
   },
   reviewBody: toPlainText(item.quote) || undefined,
