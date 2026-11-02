@@ -6,37 +6,114 @@ import { hasText, readQuote, type QuoteItem } from './data';
 import styles from './Grid.module.css';
 
 interface Props {
-  /** The reviews and the partner testimonials, in their order. */
-  items: QuoteItem[];
+  /**
+   * The reviews and the partner testimonials, in their order. With the
+   * masonry layout, a featured item is a large quote as wide as the grid.
+   */
+  items: (QuoteItem & { featured?: boolean | null })[];
   /** Without a theme, the section inherits the theme of its parent. */
   theme?: Theme;
   /** Remove the top padding: the section above gives the gap. */
   flushTop?: boolean;
+  /**
+   * `rows`: each row is as tall as its tallest quote (default). For a few
+   * quotes. `masonry`: each quote goes below the quote above it in its
+   * column, without a gap. For many quotes of different lengths.
+   */
+  layout?: 'rows' | 'masonry';
 }
 
-const { items, theme, flushTop } = Astro.props;
+const { items, theme, flushTop, layout = 'rows' } = Astro.props;
 // A quote with no text does not show. With no quotes, the section does not show.
-const quotes = items.map(readQuote).filter(hasText);
+const quotes = items
+  .map((item) => ({ quote: readQuote(item), featured: layout === 'masonry' && !!item.featured }))
+  .filter(({ quote }) => hasText(quote));
 ---
 
 {
   /*
   Rows of quote cards: one column on phones, two from 768px, three from
-  1152px. The slot "header" goes above the rows, the slot "footer" below.
+  1152px (the masonry stays at two). The slot "header" goes above the
+  rows, the slot "footer" below.
+  With the masonry layout, the order stays the order of the rows: the
+  first quotes are at the top, from left to right.
 */
 }
 {
   quotes.length > 0 && (
     <Section theme={theme} flushTop={flushTop} contentClass={styles.content}>
       <slot name="header" />
-      <ul class={styles.grid}>
-        {quotes.map((quote) => (
-          <li>
-            <Card quote={quote} />
-          </li>
-        ))}
-      </ul>
+      {layout === 'rows' ? (
+        <ul class={styles.grid}>
+          {quotes.map(({ quote }) => (
+            <li>
+              <Card quote={quote} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <quote-masonry class={styles.masonry}>
+          <ul class={styles.grid}>
+            {quotes.map(({ quote, featured }) => (
+              <li class={featured ? styles.wide : undefined}>
+                <Card quote={quote} size={featured ? 'large' : 'default'} />
+              </li>
+            ))}
+          </ul>
+        </quote-masonry>
+      )}
       <slot name="footer" />
     </Section>
   )
 }
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  // The height of one row of the masonry grid, in px.
+  const ROW = 8;
+
+  /*
+   * Masonry: the grid has rows of 8px, and each item spans the rows of its
+   * height plus the gap. The grid puts each item in the first free place
+   * in the order of the list, thus the order of the rows stays. With one
+   * column the grid does not change. Without the script the rows stay.
+   * A wide quote leaves a gap below the shorter column: the
+   * grid is dense, thus a later quote can fill the gap.
+   */
+  customElements.define(
+    'quote-masonry',
+    class extends WebComponent {
+      #frame = 0;
+
+      parsedCallback() {
+        const list = this.$('ul');
+        const items = this.$$<HTMLLIElement>(':scope > ul > li');
+        this.style.setProperty('--masonry-row', `${ROW}px`);
+
+        const layout = () => {
+          this.#frame = 0;
+          const columns = getComputedStyle(list).gridTemplateColumns.split(' ').length;
+          this.toggleAttribute('data-masonry', columns > 1);
+          for (const item of items) {
+            if (columns === 1) {
+              item.style.gridRowEnd = '';
+              continue;
+            }
+            const card = item.firstElementChild as HTMLElement;
+            const gap = parseFloat(getComputedStyle(item).paddingBottom);
+            const rows = Math.ceil((card.getBoundingClientRect().height + gap) / ROW);
+            item.style.gridRowEnd = `span ${rows}`;
+          }
+        };
+
+        // A change of the width changes the columns and the height of the cards.
+        const observer = new ResizeObserver(() => {
+          this.#frame ||= requestAnimationFrame(layout);
+        });
+        observer.observe(list);
+        for (const item of items) observer.observe(item.firstElementChild as HTMLElement);
+      }
+    },
+  );
+</script>

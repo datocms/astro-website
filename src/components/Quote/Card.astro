@@ -5,24 +5,30 @@ import styles from './Card.module.css';
 
 interface Props {
   quote: QuoteData;
+  /** `large`: a featured quote, one type step larger, with the larger photo. */
+  size?: 'default' | 'large';
   class?: string;
 }
 
-const { quote, class: className } = Astro.props;
-const lines = quote.text.split('\n');
+const { quote, size = 'default', class: className } = Astro.props;
 ---
 
 {
   /*
-  The full quote, then the person. The word joiner keeps the closing mark on
-  the line of the last word.
+  The full quote, then the person. The highlight of the CMS is a <mark>. The
+  word joiner keeps the closing mark on the line of the last word.
 */
 }
-<figure class:list={[styles.card, className]}>
+<figure class:list={[styles.card, size === 'large' && styles.large, className]}>
   <blockquote class={styles.quote}>
     <p>
-      “{lines.map((line, i) => (i === 0 ? line : [<br />, line]))}{'⁠”'}
+      “{
+        quote.lines.map((line, i) => [
+          i > 0 && <br />,
+          line.map((run) => (run.highlight ? <mark>{run.text}</mark> : run.text)),
+        ])
+      }{'⁠”'}
     </p>
   </blockquote>
-  <Attribution quote={quote} />
+  <Attribution quote={quote} size={size === 'large' ? 'statement' : 'card'} />
 </figure>

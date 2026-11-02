@@ -5,6 +5,7 @@ import { stripStega } from '@datocms/astro';
 import { ComparisonTable } from '~/components/ComparisonTable';
 import { CtaBanner } from '~/components/CtaBanner';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Headline } from '~/components/Headline';
 import { Hero } from '~/components/Hero';
 import { JsonLd } from '~/components/JsonLd';
 import { PageCloser } from '~/components/PageCloser';
@@ -95,7 +96,15 @@ const product = stripStega(page.product);
       />
     )
   }
-  {page.testimonials.length > 0 && <QuoteGrid items={page.testimonials} theme="blue" />}
+  {
+    page.testimonials.length > 0 && (
+      <QuoteGrid items={page.testimonials} theme="blue">
+        <Headline slot="header" as="h2" size="h1" muted={compare.testimonials.muted}>
+          {compare.testimonials.headline}
+        </Headline>
+      </QuoteGrid>
+    )
+  }
   <VersusSplit
     halves={[
       {

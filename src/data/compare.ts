@@ -65,6 +65,12 @@ export const introButtons: { datocms: ButtonData; competitor: ButtonData } = {
 
 export const reasonsTitle = 'Three reasons to consider DatoCMS';
 
+/** The heading above the quotes that the CMS picks for the compare page. */
+export const testimonials = {
+  headline: 'Why teams pick DatoCMS.',
+  muted: 'In their own words.',
+};
+
 export const ctaSwitch: CtaBannerData = {
   variant: 'light',
   theme: 'blue',

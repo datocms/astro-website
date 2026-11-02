@@ -1,5 +1,4 @@
 import { stripStega } from '@datocms/astro';
-import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import type { ResponsiveImageFragment } from '~/components/ResponsiveImage';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
@@ -12,10 +11,18 @@ export type QuoteItem =
       typeof QuotePartnerTestimonialFragment
     >);
 
+/** A part of a line of the quote. `highlight` is the highlight mark of the CMS. */
+export interface QuoteRun {
+  text: string;
+  highlight: boolean;
+}
+
 /** The data of a quote that every size of quote shows. */
 export interface QuoteData {
   /** The full quote, with typographic marks. A line break separates the paragraphs. */
   text: string;
+  /** The same text as `text`, one item for each line, with the highlights. */
+  lines: QuoteRun[][];
   /** The excerpt, with typographic marks. */
   excerpt: string | null;
   name: string;
@@ -70,15 +77,64 @@ export function typographic(text: string) {
   return text.replace(/"([^"]*)"/g, '‘$1’').replaceAll("'", '’');
 }
 
+/* The nodes of the Structured Text of a quote that give its text. */
+interface TextNode {
+  type: string;
+  value?: string;
+  marks?: string[];
+  children?: TextNode[];
+}
+
 /*
- * The quote becomes a string, because the typographic pass changes the
- * text. The stega of Content Link stays in the string, thus Content Link
+ * The lines of the quote: one line for each paragraph (and for each line
+ * break in a span), with the highlighted parts. The typographic pass runs
+ * on all the text, because a pair of quote marks can be in two parts. It
+ * changes one character into one character, thus the parts keep their
+ * places. The stega of Content Link stays in the text, thus Content Link
  * works in draft mode.
  */
+function quoteLines(quote: { value: unknown } | null): QuoteRun[][] {
+  if (!quote) return [];
+  const runs: QuoteRun[] = [];
+  const walk = (node: TextNode) => {
+    if (node.type === 'span') {
+      runs.push({ text: node.value ?? '', highlight: node.marks?.includes('highlight') ?? false });
+      return;
+    }
+    if ((node.type === 'paragraph' || node.type === 'heading') && runs.length > 0) {
+      runs.push({ text: '\n', highlight: false });
+    }
+    node.children?.forEach(walk);
+  };
+  walk((quote.value as { document: TextNode }).document);
+
+  const all = typographic(runs.map((run) => run.text).join(''));
+  const lines: QuoteRun[][] = [[]];
+  let at = 0;
+  for (const run of runs) {
+    const text = all.slice(at, (at += run.text.length));
+    text.split('\n').forEach((part, i) => {
+      if (i > 0) lines.push([]);
+      if (part) lines.at(-1)!.push({ text: part, highlight: run.highlight });
+    });
+  }
+  return lines.map(trimLine).filter((line) => line.length > 0);
+}
+
+/* Remove the spaces at the start and at the end of a line, and the empty parts. */
+function trimLine(line: QuoteRun[]) {
+  const runs = line.map((run) => ({ ...run }));
+  const first = runs.at(0);
+  const last = runs.at(-1);
+  if (first) first.text = first.text.trimStart();
+  if (last) last.text = last.text.trimEnd();
+  return runs.filter((run) => run.text);
+}
+
+/* The data of the text of a quote: the lines, and the lines as one string. */
 function quoteText(quote: { value: unknown } | null) {
-  if (!quote) return '';
-  const text = toPlainText(quote.value as Parameters<typeof toPlainText>[0]) ?? '';
-  return typographic(text.trim().replace(/\n{2,}/g, '\n'));
+  const lines = quoteLines(quote);
+  return { lines, text: lines.map((line) => line.map((run) => run.text).join('')).join('\n') };
 }
 
 /*
@@ -92,7 +148,7 @@ export function readQuote(item: QuoteItem): QuoteData {
     const profile = website !== null && isProfile(website);
     const company = data.company?.trim() || null;
     return {
-      text: quoteText(data.quote),
+      ...quoteText(data.quote),
       excerpt: data.excerpt ? typographic(data.excerpt) : null,
       name: data.name?.trim() ?? '',
       role: data.role?.trim() || null,
@@ -111,7 +167,7 @@ export function readQuote(item: QuoteItem): QuoteData {
   );
   const { partner } = data;
   return {
-    text: quoteText(data.quote),
+    ...quoteText(data.quote),
     excerpt: data.excerpt ? typographic(data.excerpt) : null,
     name: data.name.trim(),
     role: data.role?.trim() || null,

@@ -26,9 +26,17 @@ if (
 }
 
 // The reviews and the partner testimonials in one list, the newest first.
-const items = [...allPartnerTestimonials, ...allReviews].sort((a, b) =>
+// The featured quotes are large and wide: they go at equal distances in
+// the list, from the top, thus the wall has one from time to time.
+const newest = [...allPartnerTestimonials, ...allReviews].sort((a, b) =>
   b._createdAt.localeCompare(a._createdAt),
 );
+const featured = newest.filter((item) => item.featured);
+const others = newest.filter((item) => !item.featured);
+const step = featured.length > 0 ? Math.ceil(others.length / featured.length) : 0;
+const items = featured.length
+  ? featured.flatMap((item, i) => [item, ...others.slice(i * step, (i + 1) * step)])
+  : others;
 
 // The Review JSON-LD of the old wall. JSON-LD needs strings, without the
 // stega of Content Link.
@@ -59,7 +67,7 @@ const seo = overrideSeo([], seoTitle(wall.seo.title), seoDescription(wall.seo.de
   </Fragment>
 
   <Hero {...wall.hero} variant="light" alignment="center" typewriter />
-  <QuoteGrid items={items} />
+  <QuoteGrid items={items} layout="masonry" />
   <PageCloser theme="purple" video="/videos/hand-heart.pxv" />
 
   <DraftModeQueryListener query={query} />

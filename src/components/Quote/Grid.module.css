@@ -23,3 +23,51 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+/*
+ * Masonry (the script of Grid.astro). The element fills the width of the
+ * section. When the grid has two columns or more, the script sets
+ * data-masonry and the span of each item: the rows are 8px high, and the
+ * padding of each item is the gap between two quotes of a column.
+ */
+.masonry {
+  display: block;
+  align-self: stretch;
+}
+
+/* The negative margin removes the padding of the last quotes. */
+.masonry[data-masonry] .grid {
+  grid-auto-flow: row dense;
+  grid-auto-rows: var(--masonry-row);
+  row-gap: 0;
+  margin-bottom: calc(-1 * var(--space-2xl));
+}
+
+.masonry[data-masonry] .grid > li {
+  align-self: start;
+  padding-bottom: var(--space-2xl);
+}
+
+/*
+ * The masonry has at most two columns: the quotes are long, and three
+ * columns are too narrow for them. A featured quote is as wide as the
+ * grid. On phones it is one column, as the other quotes.
+ */
+@media (min-width: 768px) {
+  .masonry .grid {
+    column-gap: var(--space-2xl);
+  }
+}
+
+@media (min-width: 1152px) {
+  .masonry .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-3xl);
+  }
+}
+
+@media (min-width: 768px) {
+  .wide {
+    grid-column: 1 / -1;
+  }
+}

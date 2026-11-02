@@ -60,6 +60,62 @@ describe('readQuote()', () => {
   });
 });
 
+describe('the lines of the quote', () => {
+  const spans = (...children: Array<{ value: string; marks?: string[] }>) => ({
+    value: {
+      schema: 'dast',
+      document: {
+        type: 'root',
+        children: [{ type: 'paragraph', children: children.map((c) => ({ type: 'span', ...c })) }],
+      },
+    },
+  });
+
+  it('keeps the highlight of the CMS', () => {
+    const quote = review({
+      quote: spans(
+        { value: 'It is ' },
+        { value: 'very fast', marks: ['highlight'] },
+        { value: '.' },
+      ),
+    });
+    expect(quote.lines).toEqual([
+      [
+        { text: 'It is ', highlight: false },
+        { text: 'very fast', highlight: true },
+        { text: '.', highlight: false },
+      ],
+    ]);
+    expect(quote.text).toBe('It is very fast.');
+  });
+
+  it('changes a pair of quote marks across two parts', () => {
+    const quote = review({
+      quote: spans({ value: 'We said "it is ' }, { value: 'fast"', marks: ['highlight'] }),
+    });
+    expect(quote.text).toBe('We said ‘it is fast’');
+    expect(quote.lines[0]?.[1]).toEqual({ text: 'fast’', highlight: true });
+  });
+
+  it('gives one line for each paragraph, without the spaces at the ends', () => {
+    const quote = review({
+      quote: {
+        value: {
+          schema: 'dast',
+          document: {
+            type: 'root',
+            children: [
+              { type: 'paragraph', children: [{ type: 'span', value: ' One. ' }] },
+              { type: 'paragraph', children: [{ type: 'span', value: 'Two.\n' }] },
+            ],
+          },
+        },
+      },
+    });
+    expect(quote.text).toBe('One.\nTwo.');
+  });
+});
+
 describe('hasText()', () => {
   it('is false for an empty or a missing quote', () => {
     expect(hasText(review({ quote: dast('') }))).toBe(false);
