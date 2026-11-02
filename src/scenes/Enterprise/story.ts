@@ -108,3 +108,19 @@ export const STORAGE = {
   url: 'assets.northwind.com/hero.jpg',
   description: `A diagram of the storage of the assets of ${GROUP_NAME}. The assets of the project, such as hero.jpg, catalogue.pdf and intro.mp4, are stored in the bucket northwind-media, which belongs to the customer. The bucket can be on AWS S3, Cloudflare R2, Google Cloud Storage or Azure Blob Storage. The files are served from the domain of the customer, assets.northwind.com.`,
 } as const;
+
+/**
+ * The white-label CMS of the group: its address, its logo in the
+ * navigation bar, and its brand colour (the hue of the theme `green`) on
+ * the interface. A landing page of the German market is open.
+ */
+export const WHITE_LABEL = {
+  address: 'cms.northwind.com',
+  brandTheme: 'green',
+  landingPage: {
+    title: 'Autumn collection 2026',
+    slugPrefix: 'northwind.com/de/',
+    slug: 'autumn-collection-2026',
+    intro: 'Twelve brands, one season: the coats, the boots and the bags of the new collection.',
+  },
+} as const;

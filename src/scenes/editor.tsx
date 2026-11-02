@@ -32,6 +32,8 @@ export type EditorMenu = {
 
 export type EditorStory = {
   project: string;
+  /** The URL of the logo of the project, in the navigation bar of `app`. Without it, the bar shows the name. */
+  logoUrl?: string;
   user: string;
   menu: EditorMenu;
   record: Omit<InfoAsideRecordInfoProps, 'createdBy'> & { createdBy: string };
@@ -144,7 +146,7 @@ export function EditorScene({
           chrome === 'app' && (
             <NavigationBar
               user={{ name: story.user }}
-              project={{ name: story.project }}
+              project={{ name: story.project, logoUrl: story.logoUrl }}
               pluginTabs={pluginTabs}
             />
           )

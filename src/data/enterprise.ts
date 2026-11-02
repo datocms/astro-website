@@ -103,7 +103,7 @@ export const security: ChapterLayoutData = {
     label: 'Security',
     // New copy.
     headline: 'Pass the security review.',
-    muted: 'On the first try.',
+    muted: 'With the answers ready.',
     // New copy.
     intro:
       'ISO 27001 certified, with a GDPR data processing agreement. Data is encrypted in transit and at rest, in multiple shards on servers in the EU (Ireland).',
@@ -133,7 +133,7 @@ export const security: ChapterLayoutData = {
       title: 'Backups you don’t think about.',
       text: 'A full export of your project on the schedule you choose, to your own AWS S3 bucket: models, records, assets, menus, plugins and workflows.',
       picture:
-        'A diagram: a cron schedule (0 2 * * *) starts the export, the project of Northwind Group (models, records, assets, menus, plugins, workflows) goes along a track to the bucket s3://northwind-backups, and the bucket gets a ring. (Built.)',
+        'A diagram: the schedule (every night at 02:00) starts the export, each part of the project of Northwind Group (models, records, assets, menus, plugins, workflows) is exported and gets a check, then the archive goes along a track to the bucket s3://northwind-backups. (Built.)',
     },
     {
       // New copy.
@@ -175,7 +175,7 @@ export const governance: ChapterLayoutData = {
       title: 'Your brand on the CMS.',
       text: 'White-label the CMS with your logo, your colours and your domain.',
       picture:
-        'The sign-in page of the CMS in the colours and the logo of Northwind, at cms.northwind.com.',
+        'A browser window at cms.northwind.com: the record editor of the CMS with the logo of Northwind in the navigation bar and the interface in the green of the brand. (Built.)',
     },
   ],
 };

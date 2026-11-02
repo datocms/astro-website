@@ -5,11 +5,11 @@ import { SceneFrame } from '~/components/SceneFrame';
 import * as ent from '~/data/enterprise';
 import { BrandWorkflowScene } from './Governance';
 import Roles from './Roles.astro';
+import WhiteLabel from './WhiteLabel.astro';
 
 const theme = ent.governance.theme;
 ---
 
-{/* The fragment of the white-label is a box until its scene exists. */}
 <ChapterLayout {...ent.governance}>
   {/* The frame: two custom roles side by side, each with its record permissions, whole. */}
   <Fragment slot="scene">
@@ -22,5 +22,11 @@ const theme = ent.governance.theme;
   }
   <SceneFragment slot="visual-0" fit="scale" zoom={0.85} phoneZoom={1.1}>
     <BrandWorkflowScene appearance={{ theme }} width={700} height={520} />
+  </SceneFragment>
+  {
+    /* The white-label cms in a browser window, which draws its own edges. The box cuts it at the right and the bottom. */
+  }
+  <SceneFragment slot="visual-1" fit="scale" border={false} zoom={0.95} phoneZoom={1}>
+    <WhiteLabel />
   </SceneFragment>
 </ChapterLayout>
