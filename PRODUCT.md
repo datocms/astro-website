@@ -48,7 +48,7 @@ Home page line, today: "Thoughtfully built and ambitiously used. The AI-agnostic
 
 ## Operating Context
 
-- The site has two kinds of surface. **Marketing**: home, four pillar pages (`/editor-experience`, `/developers`, `/media`, `/ai`), the feature index (`/features`), enterprise, pricing, compare, philosophy, partners, case studies, contact. **Reference**: docs, blog, academy, glossary, user guides, product updates, plugins, starters.
+- The site has two kinds of surface. **Marketing**: home, four pillar pages (`/editor-experience`, `/developers`, `/media`, `/ai`), the feature index (`/features`), the framework pages (`/cms/*`), enterprise, pricing, compare, philosophy, the wall of love, case studies, contact. **Reference**: docs, blog, academy, glossary, user guides, product updates, plugins, starters, partners and tech partners.
 - The content comes from DatoCMS itself, read through the Content Delivery API. Editors preview drafts on the site. The site is the origin behind a CDN that uses cache tags.
 - Pillar pages tell one story each, in five to eight chapters. The rules for chapters, budgets and subject ownership are in `src/data/AGENTS.md`.
 - Pictures of the product are drawn as code-rendered scenes (`@datocms/product-scenes`, `src/scenes/`), not screenshots. Show the product early: real UI defuses doubts about how viable and powerful DatoCMS is. The product UI is behind where the brand is going, so the scenes may lead the product a little, but never misrepresent what it does.

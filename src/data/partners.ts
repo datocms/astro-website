@@ -14,7 +14,6 @@ export const index = {
     label: 'Solution Partners',
     headline: 'Find the perfect Partner to meet',
     subheadline: 'your digital needs',
-    face: 'wink',
     intro:
       'Our most successful customers work with a Solution Partner to accomplish their goals and ship their digital products faster.',
   } satisfies HeroData,
@@ -39,7 +38,6 @@ export const showcase = {
     label: 'Showcase',
     headline: 'Projects from Our',
     subheadline: 'Partners',
-    face: 'wink',
     intro:
       'Check out some of the projects our incredible agency partners have brought to life with DatoCMS.',
   } satisfies HeroData,
@@ -91,7 +89,6 @@ export const techIndex = {
     label: 'Ecosystem Partners',
     headline: 'Find the perfect Tech Partner to supercharge',
     subheadline: 'your DatoCMS projects',
-    face: 'wink',
     intro:
       'DatoCMS partners with leading technology providers and APIs to ensure your projects are getting the best possible treatment.',
   } satisfies HeroData,

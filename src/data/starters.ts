@@ -10,9 +10,7 @@ export const seo = {
 
 export const hero: HeroData = {
   headline: 'Starters',
-  subheadline:
-    'Start with a fully configured DatoCMS project, a best-practice frontend and free hosting',
-  face: 'wink',
+  intro: 'Start with a fully configured DatoCMS project, a best-practice frontend and free hosting',
 };
 
 export const fullyFledged = {

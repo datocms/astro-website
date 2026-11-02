@@ -1,6 +1,7 @@
 /*
- * The rules of the hero h1 (DESIGN.md, "Heroes"). The Hero component warns
- * on the dev server, and src/data/heroes.test.ts checks the copy of src/data.
+ * The rules of the hero h1 (DESIGN.md, "The Text Face Rule" and "The Hero
+ * Length Rule"). The Hero component warns on the dev server, and
+ * src/lib/hero.test.ts checks the copy of src/data and src/pages.
  */
 import { faces, type FaceName } from '~/lib/motion/faces';
 
@@ -22,4 +23,13 @@ export function heroLength(h1: {
 }): number {
   const face = h1.face && faces[h1.face].face;
   return [h1.headline, h1.subheadline, face].filter(Boolean).join(' ').replace(STEGA, '').length;
+}
+
+/**
+ * A face follows an aside: the headline is a full sentence, and the muted
+ * run adds to it ("Got issues? We're here to help! [••]"). A title in two
+ * tones ("Projects from Our / Partners") has no face.
+ */
+export function faceFollowsSentence(headline: string): boolean {
+  return /[.?!…]["”’)]?$/.test(headline.replace(STEGA, '').trim());
 }

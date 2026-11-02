@@ -10,15 +10,23 @@ import styles from './style.module.css';
 
 // The block (the copy, the video and the band) takes the theme of the page,
 // the same as the footer below it (DESIGN.md, "Page themes").
-interface Props {
-  /**
-   * The closing call to action above the video. The closer ignores its
-   * theme. With a video, the closer also sets its surface and the
-   * appearance of its buttons (see below).
-   */
-  cta?: CtaBannerData;
-  /** The face at the end of the headline of the cta. Each page selects its own. */
-  face?: FaceName;
+type Cta =
+  | {
+      /**
+       * The closing call to action above the video. The closer ignores its
+       * theme. With a video, the closer also sets its surface and the
+       * appearance of its buttons (see below).
+       */
+      cta: CtaBannerData;
+      /**
+       * The face at the end of the headline of the cta. It is necessary with
+       * a cta. Each page selects its own, not the face of its hero.
+       */
+      face: FaceName;
+    }
+  | { cta?: undefined; face?: undefined };
+
+type Props = Cta & {
   /**
    * The URL of a .pxv file of public/videos, above the band. The file
    * gives all the look: the palette (thus the surface of the copy and of
@@ -32,7 +40,7 @@ interface Props {
   videoLayout?: 'band' | 'centre';
   href?: string;
   text?: string;
-}
+};
 
 const {
   cta,

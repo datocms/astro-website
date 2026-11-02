@@ -6,7 +6,7 @@ import { stripStega } from '@datocms/astro';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Section } from '~/components/Section';
 import type { HeroData } from '~/data/home';
-import { HERO_MAX_CHARS, heroLength } from '~/lib/hero';
+import { HERO_MAX_CHARS, faceFollowsSentence, heroLength } from '~/lib/hero';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { faceStep, faces } from '~/lib/motion/faces';
 import type { Step } from '~/lib/motion/typewriter';
@@ -97,6 +97,11 @@ if (import.meta.env.DEV) {
   if (length > HERO_MAX_CHARS) {
     console.warn(
       `[Hero] ${Astro.url.pathname}: the h1 has ${length} characters, the maximum is ${HERO_MAX_CHARS}. Move the description to \`intro\`.`,
+    );
+  }
+  if (face && !faceFollowsSentence(headline)) {
+    console.warn(
+      `[Hero] ${Astro.url.pathname}: a face follows a headline that is a full sentence. "${headline}" is a title: remove the face.`,
     );
   }
 }
