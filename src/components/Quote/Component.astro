@@ -4,8 +4,7 @@ import { Section } from '~/components/Section';
 import { pxvHeader } from '~/lib/pixel-video/headers';
 import type { Theme } from '~/lib/theme';
 import Attribution from './Attribution.astro';
-import Card from './Card.astro';
-import { hasText, readQuote, statementText, type QuoteItem } from './data';
+import { hasText, readQuote, type QuoteItem } from './data';
 import styles from './style.module.css';
 
 interface Props {
@@ -35,7 +34,6 @@ const handHeader = pxvHeader(handSrc);
 const handAspect = handHeader.width / handHeader.height;
 const read = Astro.props.quote ? readQuote(Astro.props.quote) : null;
 const quote = read && hasText(read) ? read : null;
-const text = quote ? statementText(quote) : null;
 
 /*
  * A page asks for its quote by ID. When the record is deleted or has no
@@ -48,28 +46,16 @@ if (!quote) {
 }
 ---
 
+{/* The quote that closes a chapter: the full quote, in the headline type. */}
 {
-  /*
-  The quote that closes a chapter, in the headline type. It shows the
-  excerpt, or the full quote when it is short (see statementText). A quote
-  that is too long for the headline type shows as a card.
-*/
-}
-{
-  quote && !text && (
-    <Section theme={theme} width="reading">
-      <Card quote={quote} />
-    </Section>
-  )
-}
-{
-  quote && text && variant === 'centered' && (
+  quote && variant === 'centered' && (
     <Section theme={theme} background="accent" padding="headlines" width="headline">
       <figure class={styles.centered}>
         <blockquote class:list={[styles.quote, 'h1']}>
           <p>
-            “{text}
+            “{quote.text}
             {'⁠”'}
+            {quote.stega}
           </p>
         </blockquote>
         <Attribution quote={quote} size="statement" />
@@ -78,14 +64,15 @@ if (!quote) {
   )
 }
 {
-  quote && text && variant === 'split' && (
+  quote && variant === 'split' && (
     <Section theme={theme} padding="none" flush>
       <figure class={styles.split}>
         <div class:list={[styles.half, styles.accent, 'surfaceLight']}>
           <blockquote class:list={[styles.quote, 'h1']}>
             <p>
-              “{text}
+              “{quote.text}
               {'⁠”'}
+              {quote.stega}
             </p>
           </blockquote>
           <Attribution quote={quote} size="statement" />

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hasText, readQuote, statementText, type QuoteItem } from './data.ts';
+import { hasText, readQuote, type QuoteItem } from './data.ts';
 
 /* A quote in the shape of the CDA: a root with one paragraph. */
 function dast(text: string) {
@@ -21,7 +21,6 @@ function review(fields: Record<string, unknown> = {}) {
     role: 'CTO',
     company: 'Acme',
     website: null,
-    excerpt: null,
     quote: dast('It is "fast", and it\'s simple.'),
     image: { responsiveImage: null },
     ...fields,
@@ -127,16 +126,19 @@ describe('hasText()', () => {
   });
 });
 
-describe('statementText()', () => {
-  it('gives the excerpt when there is one', () => {
-    expect(statementText(review({ excerpt: 'Short.' }))).toBe('Short.');
+describe('the stega of the quote', () => {
+  // Invisible characters of the stega alphabet. The CDA puts them at the end
+  // of the last span in draft mode.
+  const stega = '​‌‍‌​';
+
+  it('takes the stega out of the text', () => {
+    const quote = review({ quote: dast(`It is fast. ${stega}`) });
+    expect(quote.stega).toBe(stega);
+    expect(quote.text).toBe('It is fast.');
+    expect(quote.lines.at(-1)?.at(-1)?.text).toBe('It is fast.');
   });
 
-  it('gives the full quote when it is short', () => {
-    expect(statementText(review())).toBe('It is ‘fast’, and it’s simple.');
-  });
-
-  it('gives nothing for a long quote without an excerpt', () => {
-    expect(statementText(review({ quote: dast('word '.repeat(40)) }))).toBeNull();
+  it('is empty without stega', () => {
+    expect(review().stega).toBe('');
   });
 });

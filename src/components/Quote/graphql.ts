@@ -16,7 +16,6 @@ export const QuoteReviewFragment = graphql(
       role
       company
       website
-      excerpt
       quote {
         value
       }
@@ -36,7 +35,6 @@ export const QuotePartnerTestimonialFragment = graphql(
     fragment QuotePartnerTestimonialFragment on PartnerTestimonialRecord {
       name
       role
-      excerpt
       quote {
         value
       }

@@ -23,8 +23,11 @@ export interface QuoteData {
   text: string;
   /** The same text as `text`, one item for each line, with the highlights. */
   lines: QuoteRun[][];
-  /** The excerpt, with typographic marks. */
-  excerpt: string | null;
+  /**
+   * The stega of Content Link (draft mode only, else empty). Show it after
+   * the closing mark: a character after the stega stops Content Link.
+   */
+  stega: string;
   name: string;
   role: string | null;
   company: string | null;
@@ -34,9 +37,6 @@ export interface QuoteData {
   nameHref: string | null;
   image: FragmentOf<typeof ResponsiveImageFragment> | null;
 }
-
-/** The longest quote that a statement shows in full. A longer quote needs an excerpt. */
-export const STATEMENT_MAX = 120;
 
 /* A website on one of these hosts is the profile of a person, not the site of a company. */
 const PROFILE_HOSTS = ['twitter.com', 'x.com', 'linkedin.com', 'github.com', 'bsky.app'];
@@ -131,10 +131,27 @@ function trimLine(line: QuoteRun[]) {
   return runs.filter((run) => run.text);
 }
 
-/* The data of the text of a quote: the lines, and the lines as one string. */
+/*
+ * The data of the text of a quote: the lines, the lines as one string, and
+ * the stega. In draft mode the CDA puts the stega of Content Link at the end
+ * of the last span. This function removes the stega from the last run, thus
+ * the component can put the stega after the closing mark. When a character
+ * that is not stega (the word joiner of the closing mark) follows the stega,
+ * Content Link cannot decode it.
+ */
 function quoteText(quote: { value: unknown } | null) {
   const lines = quoteLines(quote);
-  return { lines, text: lines.map((line) => line.map((run) => run.text).join('')).join('\n') };
+  let stega = '';
+  const last = lines.at(-1)?.at(-1);
+  if (last) {
+    const visible = stripStega(last.text);
+    // The stega characters are a suffix of the text.
+    stega = last.text.startsWith(visible) ? last.text.slice(visible.length) : '';
+    last.text = stega ? visible.trimEnd() : last.text;
+  }
+  const clean = lines.map((line) => line.filter((run) => run.text)).filter((line) => line.length);
+  const text = clean.map((line) => line.map((run) => run.text).join('')).join('\n');
+  return { lines: clean, text, stega };
 }
 
 /*
@@ -149,7 +166,6 @@ export function readQuote(item: QuoteItem): QuoteData {
     const company = data.company?.trim() || null;
     return {
       ...quoteText(data.quote),
-      excerpt: data.excerpt ? typographic(data.excerpt) : null,
       name: data.name?.trim() ?? '',
       role: data.role?.trim() || null,
       company,
@@ -168,7 +184,6 @@ export function readQuote(item: QuoteItem): QuoteData {
   const { partner } = data;
   return {
     ...quoteText(data.quote),
-    excerpt: data.excerpt ? typographic(data.excerpt) : null,
     name: data.name.trim(),
     role: data.role?.trim() || null,
     company: partner?.name ?? null,
@@ -181,14 +196,4 @@ export function readQuote(item: QuoteItem): QuoteData {
 /** A quote shows only with its text. Without stega, the text has at least one letter. */
 export function hasText(quote: QuoteData) {
   return /\p{L}/u.test(stripStega(quote.text));
-}
-
-/**
- * The text of a statement: the excerpt, or the full quote when it is
- * short. Without one of them the quote is too long for a statement.
- */
-export function statementText(quote: QuoteData) {
-  if (quote.excerpt) return quote.excerpt;
-  // In draft mode the text has stega: remove it before the count.
-  return stripStega(quote.text).length <= STATEMENT_MAX ? quote.text : null;
 }

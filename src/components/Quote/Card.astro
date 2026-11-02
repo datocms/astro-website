@@ -16,7 +16,8 @@ const { quote, size = 'default', class: className } = Astro.props;
 {
   /*
   The full quote, then the person. The highlight of the CMS is a <mark>. The
-  word joiner keeps the closing mark on the line of the last word.
+  word joiner keeps the closing mark on the line of the last word. The
+  stega of Content Link comes after the closing mark (see quoteText).
 */
 }
 <figure class:list={[styles.card, size === 'large' && styles.large, className]}>
@@ -27,7 +28,7 @@ const { quote, size = 'default', class: className } = Astro.props;
           i > 0 && <br />,
           line.map((run) => (run.highlight ? <mark>{run.text}</mark> : run.text)),
         ])
-      }{'⁠”'}
+      }{'⁠”'}{quote.stega}
     </p>
   </blockquote>
   <Attribution quote={quote} size={size === 'large' ? 'statement' : 'card'} />
