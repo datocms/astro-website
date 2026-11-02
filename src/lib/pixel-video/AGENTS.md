@@ -41,5 +41,5 @@ Keep `tmp/` (Git ignores it): the downloaded sources, the .mov files and the she
 
 - A browser has approximately 16 WebGL contexts, and each `<pixel-video>` uses one. A page with many videos must mount them only when near the screen (see `<lazy-footer>` in `src/dev/pxv-gallery.astro`). The warning is "Too many active WebGL contexts".
 - A ProRes 4444 .mov is large (approximately 30-100 MB for a hand, 550 MB for the 23 s crowd). `key.py` limits its height to 1080 px.
-- Dark subjects (a crowd in the dark) have few highlights. For them, look at the `silhouette` palette (`loving-robot.pxv`, `crazy-dance-1.pxv`): a dark subject on a light background. The palette has `extend: false`: the grid does not fill the band.
+- Dark subjects (a crowd in the dark) have few highlights. For them, look at the `silhouette` palette (`crazy-dance-1.pxv`, `crazy-dance-2.pxv`): a dark subject on a light background. The palette has `extend: false`: the grid does not fill the band.
 - Get a licence for the footage before you use it in production. The footage of Green Screen Animation has its own terms.

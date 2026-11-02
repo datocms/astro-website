@@ -214,8 +214,8 @@ export const seo = {
 export const ctaBuild: CtaBannerData = {
   variant: 'light',
   theme: 'blue',
-  headline: 'Bring your AI,',
-  muted: 'we’ll take care of the rest.',
+  headline: 'The robots do the busy work.',
+  muted: 'You keep the rhythm.',
   buttons: [
     {
       label: 'Get Started',
