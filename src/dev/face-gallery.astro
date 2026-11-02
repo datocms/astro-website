@@ -1,0 +1,312 @@
+---
+import { Headline } from '~/components/Headline';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { faceNames, faceStep, faces } from '~/lib/motion/faces';
+import type { Step } from '~/lib/motion/typewriter';
+import { isOracleGlyph } from './oracle-glyphs';
+
+// Show every face of src/lib/motion/faces.ts as it plays at the end of a
+// hero headline: the name is the strong run, the description is the muted
+// run, and the face comes after it. Each demo plays in a loop while it is
+// on the screen, and its button plays it again at once. Under the headline,
+// the frames of the animation with their times, and the glyphs that ABC
+// Oracle does not have (the browser takes them from a system font).
+//
+// This page is not in src/pages/. The integration "dev-tools" in
+// astro.config.ts adds its route only in `astro dev`, thus the build does
+// not have it.
+
+const seo = overrideSeo([], seoTitle('face gallery'));
+
+const capitalize = (name: string) => name[0]!.toUpperCase() + name.slice(1);
+
+const demos = faceNames.map((name) => {
+  const { face, description, frames } = faces[name];
+  const script: Step[] = [
+    { type: 'pause', ms: 400 },
+    { type: 'cursor', glyphs: ['•', '~', '-', 'ᴗ', '•'], msPerGlyph: 75 },
+    { type: 'text', text: capitalize(name), speedCps: 60 },
+    { type: 'pause', ms: 400 },
+    { type: 'text', text: description, speedCps: 110 },
+    { type: 'pause', ms: 300 },
+    faceStep(name),
+  ];
+  const texts = frames.map((frame) => (typeof frame === 'string' ? frame : frame.text));
+  const fallback = [...new Set(texts.join(''))].filter((ch) => !isOracleGlyph(ch));
+  const duration = frames.reduce(
+    (sum, frame) => sum + (typeof frame === 'string' ? 120 : frame.ms),
+    0,
+  );
+  return { name, face, description, frames, script, fallback, duration };
+});
+
+// The glyphs that make a face, to try new ones at the size of a hero.
+const parts = {
+  Eyes: '• ° º ○ ● ^ - ~ * + x X > < ¬ @ 0 o O ; . ˙ ˘ ˆ $ € ♥ ♡ ■ □ ◆ ◇ ▲ △ ← → ↑ ↓ ᴗ ◡ ʘ ʊ ◉',
+  Mouths: '_ - ~ o O ▽ △ v u w n 3 ˘ ˇ ˆ ¨ ´ ` · ∙ . , ᴗ ◡ ﹏ ✓ ω ε ︵ ︶ ⌒',
+  Props: "/ | \\ ' , ? ! ‼ ‽ * + z Z … · ♥ ♡ ★ ☆ ✦ ✧ ~ ∞ § ¶",
+};
+---
+
+<Layout seo={seo} theme="default" headerVariant={false} footer={false}>
+  <header class="intro">
+    <p class="caption label">
+      {demos.length} faces in src/lib/motion/faces.ts. Each one plays while it is on the screen.
+    </p>
+    <nav class="overview" aria-label="Faces">
+      {
+        demos.map(({ name, face, fallback }) => (
+          <a
+            href={`#face-${name}`}
+            class="tile"
+            data-fallback={fallback.length > 0 ? '' : undefined}
+          >
+            <span class="h2 tileFace" aria-hidden="true">
+              {face}
+            </span>
+            <span class="caption">{name}</span>
+          </a>
+        ))
+      }
+    </nav>
+  </header>
+
+  {
+    demos.map(({ name, face, description, frames, script, fallback, duration }) => (
+      <face-demo id={`face-${name}`} class="demo">
+        <div class="meta">
+          <p class="caption label">
+            <strong>{name}</strong> <span class="mono">{face}</span>
+            {' · '}
+            {(duration / 1000).toFixed(1)}s
+            {fallback.length > 0 && (
+              <>
+                {' · '}
+                <span class="warn">not in ABC Oracle: {fallback.join(' ')}</span>
+              </>
+            )}
+          </p>
+          <button type="button" class="caption replay" data-replay>
+            Play again
+          </button>
+        </div>
+        <div>
+          <Headline
+            as="h2"
+            size="h1"
+            muted={`${description} ${face}`}
+            breakBeforeMuted
+            typewriter={script}
+            typewriterStart="manual"
+          >
+            {capitalize(name)}
+          </Headline>
+        </div>
+        <ol class="frames caption" aria-label="Frames">
+          {frames.map((frame) => {
+            const { text, ms } = typeof frame === 'string' ? { text: frame, ms: 120 } : frame;
+            return (
+              <li>
+                <span class="mono">{text}</span>
+                <span class="ms">{ms}</span>
+              </li>
+            );
+          })}
+        </ol>
+      </face-demo>
+    ))
+  }
+
+  <section class="parts">
+    <p class="caption label">
+      The glyphs of a face, at the size of a hero. A glyph with a mark is not in ABC Oracle: the
+      browser takes it from a system font.
+    </p>
+    {
+      Object.entries(parts).map(([group, glyphs]) => (
+        <div class="partsRow">
+          <p class="caption partsLabel">{group}</p>
+          <p class="h1 partsGlyphs" aria-label={`${group}: ${glyphs}`}>
+            {glyphs.split(' ').map((glyph) => (
+              <span class="glyph" data-fallback={isOracleGlyph(glyph) ? undefined : ''}>
+                {glyph}
+              </span>
+            ))}
+          </p>
+        </div>
+      ))
+    }
+  </section>
+</Layout>
+
+<script>
+  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  import { typewrite, type Step } from '~/lib/motion/typewriter';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  // The demo plays its script in a loop while half of it is on the screen,
+  // with a rest between two plays. The button plays it again at once. The
+  // <type-writer> inside waits for a `typewriter:start` event that never
+  // comes: this element runs the script itself, thus it can run it again.
+  customElements.define(
+    'face-demo',
+    class extends WebComponent {
+      parsedCallback() {
+        const tw = this.$('[data-typewriter]');
+        const button = this.$('[data-replay]');
+        if (prefersReducedMotion()) return;
+        const steps = JSON.parse(tw.dataset.typewriter || '[]') as Step[];
+        const REST_MS = 1500;
+        let visible = false;
+        let running = false;
+        let timer = 0;
+
+        const play = async () => {
+          if (running) return;
+          window.clearTimeout(timer);
+          running = true;
+          await typewrite(tw, steps);
+          running = false;
+          if (visible) timer = window.setTimeout(play, REST_MS);
+        };
+
+        onVisibilityChange(
+          this,
+          (isVisible) => {
+            visible = isVisible;
+            if (isVisible) play();
+            else window.clearTimeout(timer);
+          },
+          { threshold: 0.5 },
+        );
+        this.on(button, 'click', () => play());
+      }
+    },
+  );
+</script>
+
+<style>
+  @layer pages {
+    face-demo {
+      display: block;
+    }
+
+    .intro,
+    .demo,
+    .parts {
+      padding: var(--space-lg) var(--section-padding-x);
+      border-bottom: 1px solid var(--border-default);
+    }
+
+    .label {
+      margin: 0;
+    }
+
+    .overview {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      margin-top: var(--space-md);
+    }
+
+    .tile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4xs);
+      min-width: 7em;
+      padding: var(--space-xs) var(--space-sm);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .tile[data-fallback] {
+      border-style: dashed;
+    }
+
+    .tileFace {
+      white-space: pre;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-md);
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      white-space: pre;
+    }
+
+    .warn {
+      color: var(--text-accent);
+    }
+
+    .replay {
+      padding: var(--space-4xs) var(--space-xs);
+      border: 1px solid currentColor;
+      border-radius: var(--radius-full);
+      background: none;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .frames {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3xs);
+      margin: var(--space-md) 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .frames li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-5xs);
+      padding: var(--space-4xs) var(--space-3xs);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+    }
+
+    .ms {
+      color: var(--text-muted);
+    }
+
+    .partsRow {
+      margin-top: var(--space-md);
+    }
+
+    .partsLabel {
+      margin: 0 0 var(--space-3xs);
+      color: var(--text-muted);
+    }
+
+    .partsGlyphs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin: 0;
+    }
+
+    .glyph {
+      position: relative;
+    }
+
+    .glyph[data-fallback]::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 -0.1em;
+      height: 0.06em;
+      background: var(--text-accent);
+    }
+  }
+</style>

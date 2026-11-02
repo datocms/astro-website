@@ -308,6 +308,10 @@ export default defineConfig({
             pattern: '/dev/pxv-gallery',
             entrypoint: './src/dev/pxv-gallery.astro',
           });
+          injectRoute({
+            pattern: '/dev/face-gallery',
+            entrypoint: './src/dev/face-gallery.astro',
+          });
         },
       },
     },
