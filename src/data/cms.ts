@@ -38,6 +38,11 @@ export interface FrameworkPage {
   /** The card of the code in the frame of the Real-time chapter. */
   liveCode: CodeTab;
   /**
+   * What a screen reader hears for the frame of the Real-time chapter (the
+   * Stream), with the name of the hook or of the component.
+   */
+  liveDescription: string;
+  /**
    * The last chapter. `cache-tags`: the frame is the wall of cached pages,
    * the fragments are code. `build-triggers`: the frame is code, the
    * fragments are the diagrams of the webhooks and of the deploys.
@@ -258,8 +263,6 @@ export function realTimeChapter(args: {
   docsRoot: string;
   muted: string;
   intro: string;
-  /** The description of the frame, with the name of the hook or of the component. */
-  scene: string;
 }): ChapterLayoutData {
   return {
     id: 'real-time',
@@ -271,7 +274,6 @@ export function realTimeChapter(args: {
       intro: args.intro,
       link: docs(`${args.docsRoot}/real-time-updates`),
     },
-    scene: args.scene,
     fragments: [],
   };
 }

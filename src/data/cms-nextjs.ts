@@ -64,10 +64,10 @@ export const page: FrameworkPage = {
     muted: 'Posts land without a reload.',
     intro:
       'useQuerySubscription from react-datocms keeps a Client Component in sync over Server-Sent Events. For editors in Draft Mode, or for every visitor of a live page.',
-    scene:
-      'Events Record created on the left, the component with its useQuerySubscription hook under it, the live blog Cup final: live on the right. Each event goes down the stream into the hook, and its post comes in at the top of the blog, with no reload.',
   }),
   liveCode: code.liveCode,
+  liveDescription:
+    'Events Record created on the left, the component with its useQuerySubscription hook under it, the live blog Cup final: live on the right. Each event goes down the stream into the hook, and its post comes in at the top of the blog, with no reload.',
   publishKind: 'cache-tags',
   publish: cacheTagsChapter({
     docsHref: `${docsRoot}/using-cache-tags`,

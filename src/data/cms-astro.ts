@@ -68,10 +68,10 @@ export const page: FrameworkPage = {
     muted: 'The page reloads itself.',
     intro:
       '<QueryListener /> from @datocms/astro listens to the query over Server-Sent Events and reloads the page when its result changes. For editors in draft mode, mostly.',
-    scene:
-      'Events Record created on the left, the page with its QueryListener component under it, the live blog Cup final: live on the right. Each event goes down the stream into the listener, the page reloads, and the post comes in at the top of the blog.',
   }),
   liveCode: code.liveCode,
+  liveDescription:
+    'Events Record created on the left, the page with its QueryListener component under it, the live blog Cup final: live on the right. Each event goes down the stream into the listener, the page reloads, and the post comes in at the top of the blog.',
   publishKind: 'cache-tags',
   publish: cacheTagsChapter({
     docsHref: `${docsRoot}/using-cache-tags`,

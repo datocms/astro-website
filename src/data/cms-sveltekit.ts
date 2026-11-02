@@ -66,10 +66,10 @@ export const page: FrameworkPage = {
     muted: 'Posts land without a reload.',
     intro:
       'querySubscription from @datocms/svelte keeps the page in sync over Server-Sent Events. For editors in draft mode, or for every visitor of a live page.',
-    scene:
-      'Events Record created on the left, the component with its querySubscription store under it, the live blog Cup final: live on the right. Each event goes down the stream into the store, and its post comes in at the top of the blog, with no reload.',
   }),
   liveCode: code.liveCode,
+  liveDescription:
+    'Events Record created on the left, the component with its querySubscription store under it, the live blog Cup final: live on the right. Each event goes down the stream into the store, and its post comes in at the top of the blog, with no reload.',
   publishKind: 'build-triggers',
   publish: buildTriggersChapter({ headersCode }),
   // New copy.
