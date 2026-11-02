@@ -106,26 +106,26 @@ export const security: ChapterLayoutData = {
     muted: 'With the answers ready.',
     // New copy.
     intro:
-      'ISO 27001 certified, with a GDPR data processing agreement. Data is encrypted in transit and at rest, in multiple shards on servers in the EU (Ireland).',
+      'ISO 27001 certified, with a GDPR data processing agreement. Data is encrypted in transit and at rest, in multiple shards on servers in the EU (Ireland). An audit log records who made each change, and when.',
     link: docs('Read Our Security Page', '/security'),
   },
   // New copy.
   scene:
-    'The Single Sign-On settings of Northwind Group: SAML with Okta chosen from the list of providers (Okta, OneLogin, Azure AD, other SAML), the sign-in URL and the certificate filled, and the switch Provision with SCIM turned on.',
+    'The audit log of Northwind Group: ten events of one morning, each with its time, its author, the action, the path, the environment and the role of the author: stage moves, a role change, publishes, an environment promoted, a model change, the single sign-on settings, a workflow, an API token and the white-label settings. (Built.)',
   fragments: [
     {
       // New copy.
       title: 'Your login, your rules.',
-      text: 'SSO with SAML through Okta, OneLogin, Azure AD or any SAML provider, and SCIM provisioning to add and remove people from your directory.',
+      text: 'Your team signs in to the CMS with the company account, through your identity provider.',
       picture:
-        'The people of Northwind Group in the project: two added and one removed by the directory, each with a SCIM mark and the time of the change.',
+        'The sign-in page of the CMS of Northwind Group, with its logo: the email and the password, then the button "Log in with single sign-on". (Built.)',
     },
     {
       // New copy.
-      title: 'Who did what, and when.',
-      text: 'The audit log shows who made each change, and when.',
+      title: 'Connect your identity provider.',
+      text: 'SSO with SAML through Okta, OneLogin, Azure AD or any SAML provider, and SCIM provisioning to add and remove people from your directory.',
       picture:
-        'The audit log: five rows, a schema change, a role change, two publishes and an API token created, each with a person and a time.',
+        'The single sign-on settings of Northwind Group: the SAML values of DatoCMS, the metadata URL of the Okta app, the SCIM base URL with its new API token, and Editor as the default role. (Built.)',
     },
     {
       // New copy. A full export of the project on a cron schedule, to the

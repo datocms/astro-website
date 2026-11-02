@@ -1,15 +1,33 @@
 ---
 import { ChapterLayout } from '~/components/ChapterLayout';
 import { SceneFragment } from '~/components/SceneFragment';
+import { SceneFrame } from '~/components/SceneFrame';
 import * as ent from '~/data/enterprise';
 import BackupsArchive from './BackupsArchive.astro';
+import { AuditLogScene, SignInScene, SsoScene } from './Security';
 import StoragePipeline from './StoragePipeline.astro';
+
+const theme = ent.security.theme;
 ---
 
-{
-  /* The frame and the first two fragments are boxes until their scenes exist. The two last fragments are diagrams: these features have no screen in the cms. */
-}
+{/* The two last fragments are diagrams: these features have no screen in the cms. */}
 <ChapterLayout {...ent.security}>
+  {/* The frame: the audit log of the group, with all its columns. */}
+  <Fragment slot="scene">
+    <SceneFrame preset="window" theme={theme} height={560}>
+      <AuditLogScene appearance={{ theme }} height={640} />
+    </SceneFrame>
+  </Fragment>
+  {
+    /* The sign-in page with its single sign-on button. All the card shows: the button is at its bottom. */
+  }
+  <SceneFragment slot="visual-0" fit="scale" zoom={0.75}>
+    <SignInScene appearance={{ theme }} width={680} height={500} />
+  </SceneFragment>
+  {/* The single sign-on settings, larger: the box cuts the form at the right and the bottom. */}
+  <SceneFragment slot="visual-1" fit="scale" zoom={0.85} phoneZoom={1.1}>
+    <SsoScene appearance={{ theme }} width={900} height={700} />
+  </SceneFragment>
   <SceneFragment slot="visual-2" fit="fill">
     <BackupsArchive />
   </SceneFragment>

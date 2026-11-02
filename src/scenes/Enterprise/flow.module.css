@@ -11,6 +11,14 @@
   flex-direction: column;
   align-items: center;
   padding: var(--space-md) var(--space-sm);
+
+  /*
+   * The box of the fragment keeps its ratio (4:3). In a box narrower than
+   * 500px, the diagram becomes smaller by the same ratio, thus all of it
+   * stays in the box. tan(atan2()) divides two lengths.
+   */
+  transform: scale(min(1, tan(atan2(100cqi, 500px))));
+  transform-origin: 50% 0;
 }
 
 /* The svg of a track goes 2px under the parts at its two ends. */

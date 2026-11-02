@@ -124,3 +124,111 @@ export const WHITE_LABEL = {
     intro: 'Twelve brands, one season: the coats, the boots and the bags of the new collection.',
   },
 } as const;
+
+/** The email in the sign-in page of the cms of the group */
+export const SIGN_IN_EMAIL = 'lena.vogel@northwind.com';
+
+/**
+ * The single sign-on of the group: SAML with an Okta app, and SCIM with the
+ * API token that the cms just made. The values of DatoCMS have the shapes
+ * of the cms.
+ */
+export const SSO = {
+  serviceProvider: {
+    metadataUrl: 'https://sso.datocms.com/saml/northwind/metadata',
+    acsUrl: 'https://sso.datocms.com/saml/northwind/acs',
+    samlToken: 'a7c41e9d2b6f8035',
+    scimBaseUrl: 'https://sso.datocms.com/scim/northwind/v2',
+  },
+  identityProviderMetadataUrl: 'https://northwind.okta.com/app/exk4n7w2d/sso/saml/metadata',
+  scimToken: 'scim_2c8e5a17f9b04d6e9a3c',
+  defaultRole: 'Editor',
+} as const;
+
+/**
+ * The audit log of the group, newest first. The events touch the other
+ * chapters: the roles, the workflow, the single sign-on and the white
+ * label. Each event has its environment and the role of its author.
+ */
+export const AUDIT_LOG = [
+  {
+    occurredAt: '2026-10-15T09:41:12Z',
+    actor: { name: 'Lena Vogel', email: 'lena.vogel@northwind.com' },
+    action: 'items.bulk_move_to_stage',
+    path: '/items/bulk/move-to-stage',
+    environment: 'main',
+    role: 'Agency Berlin',
+  },
+  {
+    occurredAt: '2026-10-15T09:32:05Z',
+    actor: { name: 'Tomás Herrera', email: 'tomas.herrera@northwind.com' },
+    action: 'roles.update',
+    path: '/roles/38211',
+    environment: 'main',
+    role: 'Admin',
+  },
+  {
+    occurredAt: '2026-10-15T09:18:47Z',
+    actor: { name: 'Aiko Tanaka', email: 'aiko.tanaka@northwind.com' },
+    action: 'items.publish',
+    path: '/items/Gd8Qnm7pRUKPjnCVhCYOZw/publish',
+    environment: 'main',
+    role: 'Brand lead',
+  },
+  {
+    occurredAt: '2026-10-15T09:02:31Z',
+    actor: { name: 'Claire Dubois', email: 'claire.dubois@northwind.com' },
+    action: 'items.update',
+    path: '/items/T4kR9vXbQ0yLm2pZcW8sAa',
+    environment: 'main',
+    role: 'Legal team',
+  },
+  {
+    occurredAt: '2026-10-15T08:47:59Z',
+    actor: { name: 'Tomás Herrera', email: 'tomas.herrera@northwind.com' },
+    action: 'environments.promote',
+    path: '/environments/autumn-launch/promote',
+    environment: 'autumn-launch',
+    role: 'Admin',
+  },
+  {
+    occurredAt: '2026-10-15T08:31:40Z',
+    actor: { name: 'Marco Bellini', email: 'marco.bellini@northwind.com' },
+    action: 'item_types.update',
+    path: '/item-types/Kz3mQp9sT1aVx7LrBn4HcE',
+    environment: 'autumn-launch',
+    role: 'Developer',
+  },
+  {
+    occurredAt: '2026-10-15T08:12:03Z',
+    actor: { name: 'Tomás Herrera', email: 'tomas.herrera@northwind.com' },
+    action: 'sso_settings.update',
+    path: '/sso-settings',
+    environment: 'main',
+    role: 'Admin',
+  },
+  {
+    occurredAt: '2026-10-15T07:58:26Z',
+    actor: { name: 'Marco Bellini', email: 'marco.bellini@northwind.com' },
+    action: 'workflows.update',
+    path: '/workflows/Wd5yNf2uR8eJb6GtMq0XoA',
+    environment: 'autumn-launch',
+    role: 'Developer',
+  },
+  {
+    occurredAt: '2026-10-15T07:44:51Z',
+    actor: { name: 'Tomás Herrera', email: 'tomas.herrera@northwind.com' },
+    action: 'access_tokens.create',
+    path: '/access_tokens',
+    environment: 'main',
+    role: 'Admin',
+  },
+  {
+    occurredAt: '2026-10-15T07:30:18Z',
+    actor: { name: 'Tomás Herrera', email: 'tomas.herrera@northwind.com' },
+    action: 'white_label_settings.update',
+    path: '/white-label-settings',
+    environment: 'main',
+    role: 'Admin',
+  },
+] as const;
