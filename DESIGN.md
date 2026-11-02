@@ -170,11 +170,13 @@ Six monochrome families. In each family a deep tone, a bright accent and a paper
 
 The five other themes have the same three roles. A section picks its theme with `data-theme`; the children inherit.
 
-- **Ember** (ember) on **Ember Deep** (ember-deep) and **Ember Paper** (ember-paper). Orange: the home hero, Editing.
-- **Fern** (fern) on **Fern Deep** (fern-deep) and **Fern Paper** (fern-paper). Green.
-- **Iris** (iris) on **Slate Deep** (slate-deep) and **Iris Paper** (iris-paper). Purple: the deep is a blue-black slate, not a purple.
-- **Glacier** (glacier) on **Harbour Deep** (harbour-deep) and **Glacier Paper** (glacier-paper). Blue.
-- **Bubblegum** (bubblegum) on **Plum Deep** (plum-deep) and **Bubblegum Paper** (bubblegum-paper). Pink, toward magenta, so that its hue is far from Ember.
+- **Ember** (ember) on **Ember Deep** (ember-deep) and **Ember Paper** (ember-paper). Orange: the home page, Help, the Developers pillar.
+- **Fern** (fern) on **Fern Deep** (fern-deep) and **Fern Paper** (fern-paper). Green: News, the Editing pillar.
+- **Iris** (iris) on **Slate Deep** (slate-deep) and **Iris Paper** (iris-paper). Purple: Ecosystem. The deep is a blue-black slate, not a purple.
+- **Glacier** (glacier) on **Harbour Deep** (harbour-deep) and **Glacier Paper** (glacier-paper). Blue: Company and support, the pages for buyers (pricing, enterprise, compare), the AI pillar.
+- **Bubblegum** (bubblegum) on **Plum Deep** (plum-deep) and **Bubblegum Paper** (bubblegum-paper). Pink, toward magenta, so that its hue is far from Ember: Partners, the Media pillar.
+
+The theme of each page is in "Page themes" (Layout).
 
 Ember and Bubblegum are tuned away from overnice's values (#ff6d00 too vivid, #f1a5a7 too pale) so that all six accents have similar chroma: OKLCH C 0.08 to 0.155 (Glacier is the softest; Fern, Iris, Ember and Bubblegum are the strongest, at about 0.15). An accent above that range looks neon next to the others. Keep that balance when you add or change a hue.
 
@@ -256,7 +258,48 @@ Recurring structures:
 
 Breakpoints (min-width): 768, 1152, 1320. The scenes switch from the phone drawing to the desktop drawing at 650. Hover effects only inside `@media (hover: hover)`.
 
+### Page themes
+
+Each page has one theme: the theme of the layout (a necessary prop). The header, the hero, the page closer and the footer take it, thus a page starts and ends in the same hue. The chapters between them can take other themes (The One Hue Rule applies to each band).
+
+**A reference page takes the hue of its area.** The colour tells the visitor where they are.
+
+| Area                | Theme  | Pages                                                                                                        |
+| ------------------- | ------ | ------------------------------------------------------------------------------------------------------------ |
+| Help                | orange | `/docs`, `/user-guides`, `/academy`, `/glossary`                                                             |
+| News                | green  | `/product-updates`, `/blog`                                                                                  |
+| Ecosystem           | purple | `/plugins`, `/starters`                                                                                      |
+| Partners            | pink   | `/partners`, `/tech-partners`                                                                                |
+| Company and support | blue   | `/support`, `/slack`, `/security`, `/legal`, `/contact`, `/company`, `/partner-program`, `/research-program` |
+
+**A marketing page takes the hue of its first chapter**, or of its hero when it has no chapters. The page reads the theme from the data of the first chapter, not from a literal, thus the page and its row in the product list of the home page change together (`src/data/home.ts`).
+
+| Page                                    | Theme   | From               |
+| --------------------------------------- | ------- | ------------------ |
+| `/`                                     | orange  | the home hero      |
+| `/editor-experience`                    | green   | Visual editing     |
+| `/developers`                           | orange  | Schema             |
+| `/media`                                | pink    | Media library      |
+| `/ai`                                   | blue    | MCP                |
+| `/cms/[slug]`                           | green   | Fetch              |
+| `/features`                             | blue    | the first category |
+| `/enterprise-headless-cms`              | blue    | Security           |
+| `/compare/[slug]`                       | blue    | the versus split   |
+| `/pricing`                              | blue    | the hero           |
+| `/case-studies`, `/case-studies/[slug]` | orange  | the hero           |
+| `/philosophy`                           | green   | the hero           |
+| `/wall`                                 | pink    | the hero           |
+| `/404`                                  | default | the hero           |
+
+The same six hues serve the areas and the pillars. On a reference page the hue is the area; on a marketing page it is the pillar. They meet only through links, never on one page.
+
+**The ground of the hero.** A marketing page has its hero on the page ground: the scene or the typewriter carries it. A reference page has its hero on the accent: the band of colour marks the area. An article (a post, an entry of the changelog) has the header on the accent, above the header of the article on the page ground. No hero is on the inverse: the footer holds the inverse at the end of the page. The header always takes the ground and the theme of the hero.
+
+**The ground of the closer.** The page closer is on the inverse (the `tonal` palette). The footer, with the "Questions? Ask away [••]" band, is on `--surface-inverse-deep`: the inverse of the same hue, 0.06 darker in OKLCH lightness. Thus the closer and the footer are two deep blocks in one hue, and the end of the closer stays visible. Only the footer and that band use `--surface-inverse-deep` (the lint enforces it). An accent palette (`silhouette`, `onAccent`) is only for a page whose last band above the closer is on the inverse, thus three deep blocks never stack.
+
 ### Named Rules
+
+**The Same Hue At Both Ends Rule.** The header, the hero, the page closer and the footer have the theme of the page. Two inverse surfaces of different hues never touch.
 
 **The Full Bleed Rule.** A coloured surface reaches the edges of the viewport. A coloured box that floats in the column with page margins around it is not part of this system.
 
@@ -316,7 +359,7 @@ There are few cards. Content sits in bands, cells and halves.
 
 - **Header:** 82px, not sticky, on the surface of the page or of the hero band. The links (Label weight 500) are centred and get an underline on hover. "Get Started" is a pill button.
 - **Mega menu:** on the paper surface, three columns of 300px, muted descriptions, with a hairline on top. It opens without animation.
-- **Footer:** on the inverse of the page theme. It has a Headline-size closing line with a text face, columns of links in the on-inverse colours, and a status line with a dot.
+- **Footer:** on `--surface-inverse-deep` of the page theme: a little darker than the page closer above it. It has a Headline-size closing line with a text face, columns of links in the on-inverse colours, and a status line with a dot.
 
 ### Code card (signature)
 
@@ -330,7 +373,7 @@ The product UI drawn in code (`@datocms/product-scenes`) inside a frame cut by t
 
 The human, playful moment of each page: a hand that waves, a thumbs-up, a dancer, drawn as big flat squares in the colours of the theme. Real footage (or an animated emoji), keyed and reduced to three tones of cells. It is never a photo or an `.mp4`.
 
-- **Where:** only in the page closer: the closing call to action, then the video band (494px tall at most, `min(494px, 75vw)`), then the "Questions? Ask away [••]" band. One surface, one theme, one block, never a grid.
+- **Where:** only in the page closer: the closing call to action, then the video band (494px tall at most, `min(494px, 75vw)`), then the "Questions? Ask away [••]" band. The band is part of the footer and has its deeper surface. One theme, never a grid. The theme is the theme of the page, the same as the footer; the ground is in "Page themes".
 - **Cells:** every video has the same square size on screen. Hands are 80 cells tall, full bodies 120. Each cell is one square with a thin stroke; no blur, no anti-aliasing, no tone curve on the footage.
 - **Colour:** a palette gives the full look, always from the theme tokens, never a colour of its own. Three layers (dark, midtone, highlight) take the inverse, the accent and the paper tones. The usual palettes are `tonal` (on the inverse), `onAccent` (dark squares on the accent) and `silhouette` (a dark figure on the accent, for dark subjects). A video that needs a different look gets a new palette, not a setting.
 - **Edges:** the ground of the palette fills the band beyond the video. A subject that the frame cuts (an arm from the right) stays on that edge of the band.
@@ -366,6 +409,7 @@ Hero headlines can type themselves in at a human rhythm. The cursor is a bar tha
 ### Do:
 
 - **Do** give each section one theme and one surface, full bleed, and change the theme only between bands.
+- **Do** give each page the theme of its area (a reference page) or of its first chapter (a marketing page), and let the header, the hero, the closer and the footer take it.
 - **Do** write headlines in two tones: the claim, then the muted aside.
 - **Do** use the split (accent half | inverse half) to put a claim next to its proof.
 - **Do** show the product as a code-rendered scene, cut by the edge of the band, with only its top-left corner rounded.
@@ -385,6 +429,7 @@ Hero headlines can type themselves in at a human rhythm. The cursor is a bar tha
 - **Don't** add a third font weight, a bold, a tracked uppercase label or a second typeface for display.
 - **Don't** use screenshots, stock photos or AI imagery where a scene, pixel art or a real customer photo can go.
 - **Don't** mix two accents of different themes inside one section.
+- **Don't** give the header, the closer or the footer a theme that is not the theme of the page, and don't put a hero on the inverse.
 - **Don't** use arrows, dashed lines, red or a second accent in a diagram.
 - **Don't** give a pixel video colours of its own, a blur or a tone curve: a new look is a new palette.
 - **Don't** take a pattern from a page that is not in the reference list (see the comment at the top) without asking.

@@ -1,6 +1,7 @@
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
 import type { FeatureFragmentsData } from '~/components/FeatureFragments';
 import type { CodeTab } from '~/components/CodeSnippetPreview';
+import type { Theme } from '~/lib/theme';
 
 /*
  * The Visual editing chapter of the Editing pillar
@@ -17,6 +18,10 @@ import type { CodeTab } from '~/components/CodeSnippetPreview';
  * the stega metadata with two headers, and the root layout mounts the
  * component.
  */
+
+// The theme of the chapter, and thus of the Editing pillar: it is the first
+// chapter of the page (DESIGN.md, "Page themes").
+export const theme: Theme = 'green';
 
 export const chapter: ChapterHeaderData = {
   label: 'Visual editing',

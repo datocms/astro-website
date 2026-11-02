@@ -8,6 +8,7 @@ import { PageCloser } from '~/components/PageCloser';
 import { Quote } from '~/components/Quote';
 import { Statement } from '~/components/Statement';
 import * as ee from '~/data/editor-experience';
+import * as visualEditing from '~/data/visual-editing-chapter';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
@@ -34,7 +35,7 @@ const seo = overrideSeo([], seoTitle(ee.seo.title), seoDescription(ee.seo.descri
   the accent surface.
 */
 }
-<Layout seo={seo} footerTheme="orange">
+<Layout theme={visualEditing.theme} seo={seo}>
   <Hero {...ee.hero} alignment="center" typewriter />
   {/* The chapters of the pillar. Sticky; no theme, as the hero: it takes the theme of the page. */}
   <CategoryNav {...ee.chapterNav} />
@@ -48,7 +49,7 @@ const seo = overrideSeo([], seoTitle(ee.seo.title), seoDescription(ee.seo.descri
   <SeoChapter />
   <Quote quote={review} theme="default" />
   {/* The closer shows the CtaBanner of ee.ctaDemo above its video. */}
-  <PageCloser theme="orange" cta={ee.ctaDemo} video="/videos/hand-ok-sign-1.pxv" />
+  <PageCloser cta={ee.ctaDemo} video="/videos/hand-ok-sign-1.pxv" />
 
   <DraftModeQueryListener query={query} />
 </Layout>

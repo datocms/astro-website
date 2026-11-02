@@ -16,6 +16,7 @@
  * - A rule with `background: var(--surface-accent | --surface-inverse)`
  *   sets `color` to a role of that ground in the same rule.
  * - A `*headline-muted` role only in HEADLINE_MUTED_FILES.
+ * - A surface with one job (the footer) only in its files (SURFACE_FILES).
  *
  * Option { scenes: true } (src/scenes): no opacity check, a `--text-*`
  * declaration may take any text token, and a `--border-*` declaration is
@@ -27,6 +28,7 @@ import {
   GROUND_PAINT,
   HEADLINE_MUTED_FILES,
   PILL_TEXT,
+  SURFACE_FILES,
   TEXT_COLOR_KEYWORDS,
   TEXT_COLOR_TOKEN,
   canonicalFor,
@@ -47,6 +49,8 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
     `"opacity: ${value}" dims the text below AA. Use a text role. For an element without text, disable this rule on the line with the reason (rule 5).`,
   groundPaint: (surface, roles) =>
     `A rule with "background: var(${surface})" must set "color" to ${roles} in the same rule (rule 4).`,
+  surfaceFile: (surface, files) =>
+    `"${surface}" has one job. Use it only in ${files.join(', ')} (SURFACE_FILES in src/lib/tokens/contract.ts).`,
   headlineMuted: (value) =>
     `"${value}" is for the quiet run of a two-tone headline or display lockup only (3:1, large text). Use it in the files of HEADLINE_MUTED_FILES (src/lib/tokens/contract.ts).`,
 });
@@ -61,6 +65,7 @@ const PAINT_PROPS = new Set(['background', 'background-color']);
 const GROUND_PAINT_ROLES = {
   '--surface-accent': 'var(--text-on-accent*)',
   '--surface-inverse': 'var(--text-on-inverse*)',
+  '--surface-inverse-deep': 'var(--text-on-inverse*)',
   '--code-background': 'var(--code-*)',
 };
 
@@ -152,6 +157,12 @@ const rule = (primary, secondary) => (root, result) => {
     const prop = decl.prop.toLowerCase();
     const value = normalize(decl.value);
     const parent = /** @type {import('postcss').Rule} */ (decl.parent);
+
+    for (const [surface, files] of Object.entries(SURFACE_FILES)) {
+      if (!files.includes(relative) && new RegExp(`var\\(${surface}\\b(?!-)`).test(value)) {
+        report(decl, messages.surfaceFile(surface, files));
+      }
+    }
 
     if (prop === 'color') {
       const reason = check(value, parent, 0);

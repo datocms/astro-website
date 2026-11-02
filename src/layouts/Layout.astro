@@ -27,16 +27,19 @@ interface Props {
    * (~/lib/datocms/seo).
    */
   seo: TitleMetaLinkTag[];
-  theme?: Theme;
-  /** Must match the hero of the page. `false` renders no header. */
-  headerVariant?: 'default' | 'light' | 'dark' | false;
-  /** The theme of the header. Must match the hero of the page. */
-  headerTheme?: Theme;
+  /**
+   * The theme of the page: the hue of its area (a reference page) or of
+   * its first chapter (a marketing page). The header, the page closer and
+   * the footer take it (DESIGN.md, "Page themes"). It is necessary: each
+   * page selects its hue.
+   */
+  theme: Theme;
+  /** The ground of the hero of the page. `false` renders no header. */
+  headerVariant?: 'page' | 'accent' | false;
   /** The look of the CTA of the header. Without it, the header selects it. */
   headerCta?: 'solid' | 'soft';
   /** `false` renders no footer. */
   footer?: boolean;
-  footerTheme?: Theme;
   /**
    * The SEO analysis of the CMS record of the page: its field
    * `yoastAnalysis` (the focus keyword of the SEO/Readability plugin). In
@@ -46,16 +49,7 @@ interface Props {
   seoAnalysis?: unknown;
 }
 
-const {
-  seo,
-  theme = 'default',
-  headerVariant = 'default',
-  headerTheme,
-  headerCta,
-  footer = true,
-  footerTheme,
-  seoAnalysis,
-} = Astro.props;
+const { seo, theme, headerVariant = 'page', headerCta, footer = true, seoAnalysis } = Astro.props;
 
 // The page menu for the reviewers. It does not show in production.
 const showReviewTools = DEPLOYMENT_DESTINATION !== 'production';
@@ -93,12 +87,7 @@ const showSeoAnalysis = seoAnalysis !== undefined && isDraftModeEnabled(Astro);
   <slot name="header">
     {
       headerVariant && (
-        <SiteHeader
-          variant={headerVariant}
-          nav={mainNavigation}
-          theme={headerTheme}
-          ctaVariant={headerCta}
-        />
+        <SiteHeader variant={headerVariant} nav={mainNavigation} ctaVariant={headerCta} />
       )
     }
   </slot>
@@ -109,8 +98,8 @@ const showSeoAnalysis = seoAnalysis !== undefined && isDraftModeEnabled(Astro);
     {
       footer && (
         <>
-          <FooterLinks columns={footerColumns} theme={footerTheme} />
-          <FooterLegal {...legal} theme={footerTheme} />
+          <FooterLinks columns={footerColumns} />
+          <FooterLegal {...legal} />
         </>
       )
     }

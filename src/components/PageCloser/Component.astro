@@ -5,15 +5,11 @@ import { DevConfig } from '~/components/DevConfig';
 import { PixelVideo } from '~/components/PixelVideo';
 import type { CtaBannerData } from '~/data/home';
 import { pxvDevConfig, pxvLook } from '~/lib/pixel-video/headers';
-import type { Theme } from '~/lib/theme';
 import styles from './style.module.css';
 
+// The block (the copy, the video and the band) takes the theme of the page,
+// the same as the footer below it (DESIGN.md, "Page themes").
 interface Props {
-  /**
-   * The theme of all the block: the copy, the video and the band. Without
-   * a theme, the block inherits the theme of its parent.
-   */
-  theme?: Theme;
   /**
    * The closing call to action above the video. The closer ignores its
    * theme. With a video, the closer also sets its surface and the
@@ -36,7 +32,6 @@ interface Props {
 }
 
 const {
-  theme,
   cta,
   video,
   videoLayout = 'band',
@@ -57,7 +52,7 @@ const ctaButtons = buttonAppearance
   : cta?.buttons;
 ---
 
-<div class={styles.pageCloser} data-theme={theme}>
+<div class={styles.pageCloser}>
   {
     cta && ctaVariant && (
       <CtaBanner

@@ -45,6 +45,25 @@ export const PAGE_TINTS = [
 
 export const PAGE_STRONG_TINTS = ['--surface-accent-muted'] as const;
 
+/**
+ * The other surfaces of the inverse ground. Every text role of the inverse
+ * ground must also read on each of them.
+ */
+export const INVERSE_SURFACES = ['--surface-inverse-deep'] as const;
+
+/**
+ * The surfaces that have one job. Only the listed files may use them.
+ * `--surface-inverse-deep` is the footer: the page closer above it stays on
+ * `--surface-inverse`, thus the end of the closer is visible.
+ */
+export const SURFACE_FILES: Record<string, string[]> = {
+  '--surface-inverse-deep': [
+    'src/components/FooterLinks/style.module.css',
+    'src/components/FooterLegal/style.module.css',
+    'src/components/PageCloser/style.module.css',
+  ],
+};
+
 /** The canonical text roles of each ground, with the contrast that each must have. */
 export const CANONICAL_ROLES: Record<Ground, Record<string, number>> = {
   page: {
@@ -163,6 +182,7 @@ export const TEXT_COLOR_KEYWORDS = [
 export const GROUND_PAINT: Record<string, RegExp> = {
   '--surface-accent': /^var\(--text-on-accent(-[\w-]+)?\)$/,
   '--surface-inverse': /^var\(--text-on-inverse(-[\w-]+)?\)$/,
+  '--surface-inverse-deep': /^var\(--text-on-inverse(-[\w-]+)?\)$/,
   '--code-background': /^var\(--code-[\w-]+\)$/,
 };
 

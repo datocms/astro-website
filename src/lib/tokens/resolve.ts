@@ -413,11 +413,16 @@ function evaluateNumber(
   if (node.type === 'function' && node.value === 'calc') {
     const text = valueParser.stringify(node.nodes);
     const simple = text.replace(/\s+/g, '');
-    const m = simple.match(/^([\d.]+)([-+*/])([\d.]+)$/);
+    // An operand is a number or a channel of the base colour (`l - 0.04`).
+    const m = simple.match(/^([\d.]+|[lch])([-+*/])([\d.]+|[lch])$/);
     if (!m) throw new Error(`Unsupported calc in tokens.css: ${text}`);
     const [, a, op, b] = m;
-    const x = parseFloat(a!);
-    const y = parseFloat(b!);
+    const operand = (v: string) =>
+      /^[lch]$/.test(v)
+        ? evaluateNumber({ type: 'word', value: v } as ValueNode, base)
+        : parseFloat(v);
+    const x = operand(a!);
+    const y = operand(b!);
     return op === '+' ? x + y : op === '-' ? x - y : op === '*' ? x * y : x / y;
   }
   throw new Error(`Unsupported channel value: ${valueParser.stringify(node)}`);

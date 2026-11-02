@@ -31,7 +31,9 @@ css-scope.mjs               which CSS gets a cascade layer, and which CSS lint:c
 `src/layouts/Layout.astro` is on top of `BaseLayout` (the head of the site: SEO, favicon, canonical URL, RSS links, cookie consent, analytics, draft-mode content link).
 
 - The prop `seo` is required. Use the `seo` / `_seoMetaTags` of the CMS record of the page when it exists. Else build the tags: `overrideSeo([], seoTitle(title), seoDescription(text))` from `~/lib/datocms/seo`.
-- The other props: `theme`, `headerVariant`, `headerTheme`, `headerCta`, `footer`, `footerTheme`.
+- The other props: `theme`, `headerVariant`, `headerCta`, `footer`.
+- `theme` is the theme of the page: the hue of its area (a reference page) or of its first chapter (a marketing page). The table of all the pages is in DESIGN.md, "Page themes". On a marketing page, read the theme from the data of the first chapter (`theme={dev.schema.theme}`), not from a literal. The header, the `PageCloser` and the footer have no theme prop: they take the theme of the page.
+- `headerVariant` is the ground of the hero, and the `variant` of the `Hero` is the same value: `page` on a marketing page, `accent` on a reference page.
 - A page does a full load: no `ClientRouter`, no progress bar. Only the docs layout turns the router on.
 - The optional prop `seoAnalysis` takes the `yoastAnalysis` field (the SEO/Readability plugin) of the CMS record. In draft mode, the layout then shows `SeoAnalysisPanel` at the bottom right: the keywords of the record, and where the page uses them (title, meta description, h1, h2, first paragraph).
 - `<main>` has `id="layout-content"`: the endpoint `/api/seo-analysis` reads the content of the page from this element. Do not remove it.

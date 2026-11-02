@@ -63,10 +63,10 @@ const jsonLd: WithContext<FAQPage> | null =
     : null;
 ---
 
-<Layout seo={page.seo} theme="blue" headerVariant="default" footerTheme="blue">
+<Layout theme="blue" seo={page.seo} headerVariant="page">
   {jsonLd && <JsonLd slot="head" data={jsonLd} />}
 
-  <Hero {...pricing.hero} variant="default" alignment="center" typewriter />
+  <Hero {...pricing.hero} variant="page" alignment="center" typewriter />
   <PricingPlans {...pricing.plans} />
   <CtaBanner {...pricing.freeBanner} />
   <CtaBanner {...pricing.partnerBanner} />
@@ -80,9 +80,9 @@ const jsonLd: WithContext<FAQPage> | null =
     <a href={pricing.freeReminder.link.href}>{pricing.freeReminder.link.label}</a>
   </PlanComparison>
   <CtaBanner {...pricing.aiBanner} />
-  <Hero {...pricing.trustedBy} variant="light" alignment="center" headingLevel="h2" />
+  <Hero {...pricing.trustedBy} variant="accent" alignment="center" headingLevel="h2" />
   {questions.length > 0 && <Faq {...pricing.faq} questions={questions.map(({ faq }) => faq)} />}
-  <PageCloser theme="blue" cta={pricing.ctaStart} video="/videos/hand-thumbs-up-2.pxv" />
+  <PageCloser cta={pricing.ctaStart} video="/videos/hand-thumbs-up-2.pxv" />
 
   <FreeLimitsDialog {...pricing.freeLimits} rows={freeLimitRows(freePlan, proPlan, hints)} />
   <DraftModeQueryListener query={query} />

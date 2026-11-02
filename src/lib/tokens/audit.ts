@@ -11,6 +11,7 @@ import {
   DERIVED_TEXT_ROLES,
   GROUND_CLASS,
   GROUND_SURFACE,
+  INVERSE_SURFACES,
   AA_LARGE_TEXT,
   AA_TEXT,
   PAGE_STRONG_TINTS,
@@ -128,6 +129,19 @@ export function audit(sheet: TokenSheet): Audit {
         // The derived text roles, on the main surface.
         for (const role of DERIVED_TEXT_ROLES) {
           pair(theme, scheme, context, box, role, GROUND_SURFACE[ground], main, AA_TEXT);
+        }
+
+        // The other surfaces of the inverse ground: the same roles.
+        if (ground === 'inverse') {
+          for (const surface of INVERSE_SURFACES) {
+            const surfaceColor = opaque(sheet, box, surface, pageColor);
+            for (const [role, minimum] of Object.entries(CANONICAL_ROLES.inverse)) {
+              pair(theme, scheme, context, box, role, surface, surfaceColor, minimum);
+            }
+            for (const role of DERIVED_TEXT_ROLES) {
+              pair(theme, scheme, context, box, role, surface, surfaceColor, AA_TEXT);
+            }
+          }
         }
 
         // The page family inside the ground: the page and the accent grounds

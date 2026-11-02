@@ -12,8 +12,12 @@ import { HeroTeamMemberFragment } from './graphql';
 import styles from './style.module.css';
 
 interface Props extends HeroData {
-  /** Must match the SiteHeader variant. */
-  variant?: 'default' | 'light' | 'dark';
+  /**
+   * The ground of the hero: `page` on a marketing page, `accent` on a
+   * reference page (DESIGN.md, "Page themes"). Must match the SiteHeader
+   * variant.
+   */
+  variant?: 'page' | 'accent';
   alignment?: 'center' | 'left';
   typewriter?: boolean;
   /** Use `h2` when the hero is not the first section of the page. */
@@ -31,7 +35,7 @@ interface Props extends HeroData {
 }
 
 const {
-  variant = 'default',
+  variant = 'page',
   alignment = 'left',
   label,
   headline,
@@ -98,8 +102,7 @@ if (subheadline) {
 // The buttons wait for the typewriter: the text then needs its script.
 const TextTag = typewriter && buttons && buttons.length > 0 ? 'hero-text' : 'div';
 
-const background = { default: 'default', light: 'accent', dark: 'inverse' }[variant] as
-  'default' | 'accent' | 'inverse';
+const background = ({ page: 'default', accent: 'accent' } as const)[variant];
 ---
 
 <Section

@@ -2,17 +2,26 @@
 import symbol from '~/assets/logo/dato-symbol.svg?raw';
 import { Section } from '~/components/Section';
 import type { ContentSourceData } from '~/data/home';
+import type { Theme } from '~/lib/theme';
 import styles from './style.module.css';
 
-type Props = ContentSourceData;
+interface Props extends ContentSourceData {
+  /** Without a theme, the section takes the theme of its parent. */
+  theme?: Theme;
+}
 
-const { headline, paragraph, channels, activeChannel } = Astro.props;
+const { headline, paragraph, channels, activeChannel, theme } = Astro.props;
 // Three copies of the list. The active item stays in the middle copy,
 // thus there are always items above it and below it.
 const activeIndex = channels.length + Math.max(0, channels.indexOf(activeChannel));
 ---
 
-<Section background="inverse" class={styles.contentSource} contentClass={styles.content}>
+<Section
+  theme={theme}
+  background="inverse"
+  class={styles.contentSource}
+  contentClass={styles.content}
+>
   <h2 class:list={[styles.headline, 'h2']}>{headline}</h2>
   <p class:list={[styles.paragraph, 'body']}>{paragraph}</p>
 

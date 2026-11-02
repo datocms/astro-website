@@ -2,23 +2,15 @@
 import { DatoLogo } from '~/components/DatoLogo';
 import { Section } from '~/components/Section';
 import type { LegalData } from '~/data/navigation';
-import type { Theme } from '~/lib/theme';
 import styles from './style.module.css';
 
-interface Props extends LegalData {
-  theme?: Theme;
-}
+type Props = LegalData;
 
-const { email, text, theme } = Astro.props;
+// The footer takes the theme of the page (DESIGN.md, "Page themes").
+const { email, text } = Astro.props;
 ---
 
-<Section
-  as="footer"
-  theme={theme}
-  background="inverse"
-  contentClass={styles.bar}
-  class={styles.footerLegal}
->
+<Section as="footer" background="inverse" contentClass={styles.bar} class={styles.footerLegal}>
   <DatoLogo version="long" height={20} label="DatoCMS" />
   <p class:list={[styles.text, 'caption']}>
     <a href={`mailto:${email}`} class={styles.email}>{email}</a>

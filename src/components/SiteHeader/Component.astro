@@ -13,44 +13,39 @@ import { Icon } from '~/components/Icon';
 import { NavLink } from '~/components/NavLink';
 import type { NavGroup } from '~/data/navigation';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
-import type { Theme } from '~/lib/theme';
 import styles from './style.module.css';
 
 interface Props {
-  /** Must match the hero of the page. */
-  variant?: 'default' | 'light' | 'dark';
+  /** The ground of the hero of the page: `page` or `accent`. The header takes the theme of the page. */
+  variant?: 'page' | 'accent';
   nav: NavGroup[];
-  /** Must match the hero of the page. Without a theme, the header inherits the theme of the page. */
-  theme?: Theme;
   /**
-   * The look of the CTA. Without it, the CTA is soft on the default header
+   * The look of the CTA. Without it, the CTA is soft on the header on the page ground
    * and solid on the other headers.
    */
   ctaVariant?: 'solid' | 'soft';
 }
 
-const { variant = 'default', nav, theme, ctaVariant: ctaVariantProp } = Astro.props;
+const { variant = 'page', nav, ctaVariant: ctaVariantProp } = Astro.props;
 
 const variantClass = {
-  default: styles.variantDefault,
-  light: [styles.variantLight, 'surfaceAccent'],
-  dark: [styles.variantDark, 'surfaceInverse'],
+  page: undefined,
+  accent: [styles.variantAccent, 'surfaceAccent'],
 }[variant];
 
 const ctaAppearance = {
-  default: 'deep-on-white',
-  light: 'deep-on-light',
-  dark: 'light-on-deep',
-}[variant] as 'deep-on-white' | 'deep-on-light' | 'light-on-deep';
+  page: 'deep-on-white',
+  accent: 'deep-on-light',
+}[variant] as 'deep-on-white' | 'deep-on-light';
 
-// On the default header the CTA is a soft pill.
-const ctaVariant = ctaVariantProp ?? (variant === 'default' ? 'soft' : 'solid');
+// On the page ground the CTA is a soft pill.
+const ctaVariant = ctaVariantProp ?? (variant === 'page' ? 'soft' : 'solid');
 
 const panelId = (i: number) => `site-header-mega-${i}`;
 ---
 
 <site-header class={styles.root}>
-  <header class:list={[styles.header, variantClass]} data-theme={theme}>
+  <header class:list={[styles.header, variantClass]}>
     <div class={styles.bar}>
       <a href="/" class={styles.logo} aria-label="DatoCMS home">
         <DatoLogo version="long" height={20} />
