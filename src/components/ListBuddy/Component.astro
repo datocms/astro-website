@@ -8,33 +8,57 @@
 // event `categorynav:score`). Each quarter is said one time, on
 // the way down. A new line cuts the line on show short (after 0.9s) and
 // replaces the line that waits: a fast scroll does not play all the lines.
-// From 768px only: on phones there is no buddy. With reduced motion the
-// face does not hop, the lines still show.
+// With each line the face plays the reaction of its face (src/lib/motion/
+// faces.ts): it is on the page already, thus it is not drawn again. A ghost
+// of the final face gives the width, thus the bubble does not move with the
+// frames. From 768px only: on phones there is no buddy. With reduced motion
+// the face does not hop and shows its final face, the lines still show.
 import type { BuddyData } from '~/data/features';
+import { faceReaction, faces } from '~/lib/motion/faces';
 import styles from './style.module.css';
 
 type Props = BuddyData;
 
 const { lines } = Astro.props;
+
+const script = lines.map(({ at, face, text }) => ({
+  at,
+  text,
+  face: faces[face].face,
+  frames: faceReaction(face),
+}));
+const first = script[0]?.face ?? faces.wink.face;
 ---
 
 <list-buddy class={styles.list} data-list-buddy-list>
   <slot />
   <div class={styles.column} aria-hidden="true">
     <aside class={styles.buddy} data-theme="default" data-list-buddy data-hidden>
-      <span class={styles.face} data-buddy-face>{lines[0]?.face ?? '[••]'}</span>
+      <span class={styles.face}>
+        <span class={styles.ghost} data-buddy-ghost>{first}</span>
+        <span data-buddy-face>{first}</span>
+      </span>
       <span class={styles.bubble} data-buddy-bubble></span>
-      <script type="application/json" data-buddy-lines set:html={JSON.stringify({ lines })} />
+      <script
+        type="application/json"
+        data-buddy-lines
+        set:html={JSON.stringify({ lines: script })}
+      />
     </aside>
   </div>
 </list-buddy>
 
 <script>
+  import { prefersReducedMotion } from '~/lib/motion/inView';
+  import type { Frame } from '~/lib/motion/typewriter';
   import { WebComponent } from '~/lib/WebComponent';
 
   interface Line {
     at: number;
+    /** The final face. */
     face: string;
+    /** The frames of the reaction, up to the final face. */
+    frames: Frame[];
     text: string;
   }
 
@@ -42,10 +66,12 @@ const { lines } = Astro.props;
     'list-buddy',
     class extends WebComponent {
       #globalListeners = new AbortController();
+      #frameTimer = 0;
 
       parsedCallback() {
         const buddy = this.$('[data-list-buddy]');
         const face = this.$('[data-buddy-face]');
+        const ghost = this.$('[data-buddy-ghost]');
         const bubble = this.$('[data-buddy-bubble]');
         const json = this.$('[data-buddy-lines]').textContent ?? '';
         if (!window.matchMedia('(min-width: 768px)').matches) return;
@@ -53,6 +79,28 @@ const { lines } = Astro.props;
         const { lines } = JSON.parse(json) as { lines: Line[] };
         const signal = this.#globalListeners.signal;
         let stage = -1;
+
+        // The face plays its frames one after the other. A new line stops
+        // the frames of the line before it.
+        const reduced = prefersReducedMotion();
+        const play = ({ face: final, frames }: Pick<Line, 'face' | 'frames'>) => {
+          window.clearTimeout(this.#frameTimer);
+          ghost.textContent = final;
+          if (reduced) {
+            face.textContent = final;
+            return;
+          }
+          let i = 0;
+          const next = () => {
+            const frame = frames[i];
+            if (!frame) return;
+            const { text, ms } = typeof frame === 'string' ? { text: frame, ms: 120 } : frame;
+            face.textContent = text;
+            i += 1;
+            this.#frameTimer = window.setTimeout(next, ms);
+          };
+          next();
+        };
 
         // One line on show at a time, and at most one line that waits.
         type Said = { line: Omit<Line, 'at'>; ms: number };
@@ -75,7 +123,7 @@ const { lines } = Astro.props;
         const show = (said: Said) => {
           busy = true;
           shownAt = performance.now();
-          face.textContent = said.line.face;
+          play(said.line);
           bubble.textContent = said.line.text;
           buddy.setAttribute('data-talk', '');
           timer = window.setTimeout(hush, said.ms);
@@ -129,6 +177,7 @@ const { lines } = Astro.props;
       disconnectedCallback() {
         super.disconnectedCallback();
         this.#globalListeners.abort();
+        window.clearTimeout(this.#frameTimer);
       }
     },
   );

@@ -1,3 +1,4 @@
+import type { FaceName } from '~/lib/motion/faces';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import type { ButtonData } from '~/components/Button';
 import type { CategoryNavData } from '~/components/CategoryNav';
@@ -25,7 +26,8 @@ export interface OpenSlotData {
 interface BuddyLine {
   /** The share of the list scrolled past, from 0 to 1. */
   at: number;
-  face: string;
+  /** The face plays its reaction (src/lib/motion/faces.ts) when the line shows. */
+  face: FaceName;
   text: string;
 }
 
@@ -165,15 +167,15 @@ export const openSlot: OpenSlotData = {
   },
 };
 
-// The face at the edge of the page, and what it says along the list.
-// Only glyphs that render well in ABC Oracle at a large size: • ^ ◡ _ -
-// and ᴗ (as in the heroes). Not: combining accents, ★, ≧, ≦, ω, ʘ.
+// The face at the edge of the page, and what it says along the list. The
+// mood follows the list: a wink to start, a smile, a deadpan halfway, eyes
+// that shine near the end, and arms up at the end.
 export const buddy: BuddyData = {
   lines: [
-    { at: 0, face: '[••]', text: 'Here we go.' },
-    { at: 0.25, face: '[•ᴗ•]', text: 'Still going.' },
-    { at: 0.5, face: '[•_•]', text: 'Halfway. Really.' },
-    { at: 0.75, face: '[^ᴗ^]', text: 'Nearly there.' },
-    { at: 1, face: '[•◡•]', text: 'Made it!' },
+    { at: 0, face: 'wink', text: 'Here we go.' },
+    { at: 0.25, face: 'happy', text: 'Still going.' },
+    { at: 0.5, face: 'serious', text: 'Halfway. Really.' },
+    { at: 0.75, face: 'starry', text: 'Nearly there.' },
+    { at: 1, face: 'cheer', text: 'Made it!' },
   ],
 };

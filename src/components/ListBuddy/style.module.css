@@ -6,6 +6,8 @@
  * brand sans, as the faces of the heroes (the mono font has no glyph for
  * the faces), and it is large: a small face is not seen at the edge. The
  * face takes the default theme, not the theme of the section under it.
+ * The face has two layers: a hidden ghost with the final face gives the
+ * width, and the frames of the reaction play over it, from the left.
  */
 .list {
   /* The list is a custom element: it is inline by default. */
@@ -40,10 +42,20 @@
 }
 
 .face {
+  display: grid;
   font: 500 var(--type-h1) / 1 var(--font-sans);
   letter-spacing: -0.04em;
   color: var(--text-primary);
   white-space: nowrap;
+}
+
+.face > * {
+  grid-area: 1 / 1;
+  justify-self: start;
+}
+
+.ghost {
+  visibility: hidden;
 }
 
 .buddy[data-talk] .face {

@@ -38,7 +38,8 @@ const f = (text: string, ms: number): Frame => ({ text, ms });
 
 /**
  * The face comes in one sign at a time, with its eyes closed, and holds.
- * `mouth` is drawn between the eyes; `arms` is put around the face.
+ * `mouth` is drawn between the eyes; `arms` is put around the face. Every
+ * animation starts with these frames: `faceReaction` cuts them.
  */
 const draw = (mouth = '', arms: [string, string] = ['', '']): Frame[] => {
   const [left, right] = arms;
@@ -404,4 +405,15 @@ export const faceNames = Object.keys(faces) as FaceName[];
 /** The typewriter step that plays the face `name`. */
 export function faceStep(name: FaceName): Step {
   return { type: 'face', frames: faces[name].frames };
+}
+
+const DRAWN = draw().length;
+
+/**
+ * The frames of the face `name` without the drawing: the face opens its
+ * eyes, does one thing and settles. For a face that is on the page
+ * already, as the buddy of the features list.
+ */
+export function faceReaction(name: FaceName): Frame[] {
+  return faces[name].frames.slice(DRAWN);
 }
