@@ -115,7 +115,7 @@ export const library = {
         'The panel Records using this asset of Vessel with dry grasses: an object, the exhibition Light and Thread, an article and a press release, each with its status.',
     },
     {
-      // (check) which DAM plugins are in the marketplace today (Sirv is;
+      // (check) which DAM plugins are on /plugins today (Sirv is;
       // Cloudinary is named on features.md). The source is named by the
       // plugin, thus the picture draws no third-party interface.
       title: 'Your DAM, if you have one.',

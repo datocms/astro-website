@@ -22,7 +22,7 @@ The copy of every page lives here, one typed file for each route. The general co
 Every route of the old site (https://www.datocms.com; the code is in `src/pages/`) is one of:
 
 - **marketing**: needs copy and structure.
-- **templated**: the copy is CMS content (blog, docs, marketplace, academy, glossary, partner pages…). What they need is a template, in the design phase.
+- **templated**: the copy is CMS content (blog, docs, plugins, starters, academy, glossary, partner pages…). What they need is a template, in the design phase.
 - **utility**: legal, thank-you pages, 404. Ported as they are.
 
 Why: copywriting time goes where words are decided by hand; a template is a design task.

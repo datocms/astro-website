@@ -15,7 +15,7 @@ import type { CategoryNavData } from '~/components/CategoryNav';
  * Every chapter is a ChapterLayout: its real copy, and a box with
  * the description of each picture that has no scene. A "(check)" comment
  * marks a fact to verify. The "DatoCMS Agent" exists
- * today as the official plugin "Dato Agent (Beta)" in the marketplace; it
+ * today as the official plugin "Dato Agent (Beta)" on /plugins; it
  * has no chapter until someone decides it is a product to show.
  *
  * The pictures of the page tell one story: Marram, a maker of bike bags

@@ -359,7 +359,7 @@ export const plugins: ChapterLayoutData = {
       // the cms sorts it: by name.
       title: 'Private, or for the community.',
       // "most of the 100+ are open source": the docs say "100+ open-source
-      // plugins". (check) with the marketplace the day the page ships.
+      // plugins". (check) with the plugins page the day the page ships.
       text: 'A private one stays in your projects. A public one is an npm package others can install, and most of the 100+ are open source, so you can fork one to start.',
       picture:
         'The Plugins screen of the project settings: AI Translations, SEO/Readability Analysis, Trail tools with the pill Private, and Web Previews.',

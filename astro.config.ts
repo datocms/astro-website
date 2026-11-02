@@ -461,7 +461,7 @@ export default defineConfig({
     '/marketplace/enterprise/azure-active-directory': '/docs/enterprise-apps/microsoft-entra-id',
     '/marketplace/enterprise/onelogin-sso': '/docs/enterprise-apps/onelogin-sso',
     '/marketplace/enterprise/google-workspace': '/docs/enterprise-apps/google-workspace',
-    // The marketplace has only plugins and starters left.
+    // The old marketplace URLs. Plugins and starters are now two separate pages.
     '/marketplace': '/plugins',
     '/marketplace/plugins': '/plugins',
     '/marketplace/plugins/[...rest]': '/plugins/[...rest]',

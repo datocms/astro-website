@@ -37,7 +37,8 @@ const MENU: ContentSidebarItem[] = [
   folder('academy', 'Academy'),
   folder('updates', 'Product updates'),
   folder('partners', 'Partners'),
-  folder('marketplace', 'Marketplace'),
+  folder('plugins', 'Plugins'),
+  folder('starters', 'Starters'),
   folder('support', 'Support'),
   folder('legal', 'Legal'),
 ];
