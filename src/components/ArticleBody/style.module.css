@@ -1,4 +1,10 @@
+/*
+ * --bleed: the distance that a figure or a block goes past each side of
+ * the text. From 1152 there is space for it.
+ */
 .content {
+  --bleed: 0px;
+
   display: grid;
   grid-template-columns: minmax(0, var(--reading-max));
   gap: var(--space-xl);
@@ -6,13 +12,30 @@
 }
 
 /*
+ * A figure (an image, a video, a table) and a block in a <prose-island>
+ * are wider than the text. A block that is only a button has the
+ * attribute data-text-width: it stays in line with the text.
+ */
+.text > :is(figure, prose-island:not([data-text-width])) {
+  margin-inline: calc(-1 * var(--bleed));
+}
+
+@media (min-width: 1152px) {
+  .content {
+    --bleed: var(--space-2xl);
+  }
+}
+
+/*
  * From 1320, the table of contents is in the column at the left of the
  * text. Its cell is as tall as the text, so that the table can stay in
- * view while the text scrolls.
+ * view while the text scrolls. The gap holds the bleed of the wide
+ * blocks, plus space between them and the table.
  */
 @media (min-width: 1320px) {
   .content {
     grid-template-columns: minmax(0, 1fr) minmax(0, var(--reading-max)) minmax(0, 1fr);
+    column-gap: calc(var(--bleed) + var(--space-xl));
   }
 
   .toc {
