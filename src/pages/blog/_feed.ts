@@ -175,7 +175,11 @@ export async function loadFeedPage(Astro: AstroGlobal, page: number, filter: Fee
           customerStoriesIndex?.seo ?? [],
           seoTitle(chatsIndex.title),
           seoDescription(chatsIndex.description),
-          seoGeneratedCard(Astro, { title: chatsIndex.title, excerpt: chatsIndex.description }),
+          seoGeneratedCard(Astro, {
+            title: chatsIndex.title,
+            excerpt: chatsIndex.description,
+            theme: 'green',
+          }),
         )
       : filter.kind === 'category'
         ? category!.seo

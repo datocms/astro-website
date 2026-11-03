@@ -440,6 +440,10 @@ The human, playful moment of each page: a hand that waves, a thumbs-up, a dancer
 
 The same language on photos: the image of a card (a post card, a media card) shows its pixel version on hover. 160 cells wide, five tones (deep, shadow, accent, highlight, white), and it "breathes" in 125ms steps (a period of 4s), so it moves like pixel art, not like a video. Portraits and avatars take the theme hue with `mix-blend-mode: luminosity` or `multiply`.
 
+### OG card
+
+The page of the site at the scale of a social feed: a PNG of 1200×700 (`src/pages/og-card/`, drawn with satori and sharp), on the paper of the theme of the page (the hue of its area). The top row holds the wordmark and the kicker of the page, as the header holds the logo and the path. The headline is in two tones: the title in the ink, then the excerpt in the quiet run; when the two go over the length of a hero headline, the excerpt is the intro below the title. The chips of the page are at the bottom, with a `+N` chip for the rest. The card is a split: the text on the paper at the left, the picture as a band of the accent on the full height at the right. The band shows the DatoCMS symbol as a pixel video (16px cells with the grid), or the logo of a partner as a pixel image (8px cells, no grid, three tones). The sizes are the sizes of the site at 1320px, times two. The colours come from `tokens.css` through `_resources/palette.ts`, which a test keeps equal to the tokens. No face: the text is from the CMS.
+
 ### Diagrams (signature)
 
 A picture of what DatoCMS does when the subject is not a screen of the cms: the real-time stream, the wall of cached pages, the media pipeline, the integrity of the schema. All diagrams speak one grammar, so the eye learns it once: **a pill does the work, a pulse is data that moves, a ring is what changed.**
