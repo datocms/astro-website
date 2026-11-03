@@ -71,7 +71,7 @@
 
 /*
  * The large button: 48px tall, the body size. The side inset is 12px, thus
- * a 24px leading image has 12px on its three sides, as the 20px image has
+ * the 24px logos have 12px on their three sides, as the 20px logos have
  * 10px in the 40px button. The label adds 8px: 20px of air at each side.
  */
 .large {
@@ -85,28 +85,70 @@
   padding: 0 var(--space-3xs);
 }
 
-.leading {
+/*
+ * The marks of the frameworks, each on a black disc on all grounds. The
+ * discs overlap a little. The mark of Next.js is a disc with a cut-out N:
+ * it fills the disc, and the white ground under it shows through the N.
+ */
+.logos {
   display: inline-flex;
   flex-shrink: 0;
 }
 
-.leading img {
+.logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 20px;
   height: 20px;
   border-radius: var(--radius-full);
-  object-fit: cover;
+  background: black;
 }
 
-.large .leading img {
+.logo + .logo {
+  margin-left: calc(var(--space-4xs) * -1);
+  /* A ring of the colour of the button cuts each disc from the disc before it. */
+  box-shadow: 0 0 0 1.5px var(--btnBg);
+}
+
+.logo svg {
+  max-width: 60%;
+  max-height: 60%;
+}
+
+.logo[data-logo='nextjs'] {
+  background: white;
+  /* The black ring under the edge of the mark stops a white hairline. */
+  box-shadow: inset 0 0 0 1px black;
+}
+
+.logo[data-logo='nextjs'] svg {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.logo[data-logo='nextjs'] path {
+  /* stylelint-disable-next-line scale-unlimited/declaration-strict-value -- The disc is black on all grounds, as the brand mark. */
+  fill: black;
+}
+
+/* The A of Astro is the colour of the text: on the black disc it is white. */
+.logo[data-logo='astro'] path[fill='currentColor'] {
+  /* stylelint-disable-next-line scale-unlimited/declaration-strict-value -- The disc is black on all grounds, thus the A is white on all grounds. */
+  fill: white;
+}
+
+.large .logo {
   width: 24px;
   height: 24px;
 }
 
-.logos img + img {
-  margin-left: calc(var(--space-4xs) * -1);
-}
-
-/* With a leading image, the label has no inset on the left. */
+/* With logos, the label has no inset on the left. */
 .hasLeading .label {
   padding-left: 0;
+}
+
+/* The contact card (ContactCard) rises above the button. */
+.hasContact {
+  position: relative;
 }

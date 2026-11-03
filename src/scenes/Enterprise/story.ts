@@ -233,31 +233,31 @@ export const AUDIT_LOG = [
   },
 ] as const;
 
-/** The avatar of a member of the DatoCMS team, from the team page of the site, cropped to the face. */
-const teamAvatar = (path: string) =>
-  `https://www.datocms-assets.com/205/${path}?w=96&h=96&fit=crop&crop=faces&auto=format`;
-
-/** The people of the chat. The DatoCMS team is real (the team page); the people of Northwind are not. */
+/**
+ * The people of the chat. The DatoCMS team is real: `teamMember` is the ID
+ * of the TeamMember record, which gives the photo. The people of Northwind
+ * are not real.
+ */
 const JONAS = { name: 'Jonas Weber', org: 'Northwind' } as const;
 const ROGER = {
   name: 'Roger Tuan',
   org: 'DatoCMS',
-  avatarUrl: teamAvatar('1751268389-20250623-194630-4825.jpg'),
+  teamMember: 'V_7KMMRtTCGmue1QqTZZ_Q',
 } as const;
 const MARCELO = {
   name: 'Marcelo Finamor',
   org: 'DatoCMS',
-  avatarUrl: teamAvatar('1751268246-20250623-195038-4832.jpg'),
+  teamMember: '79766956',
 } as const;
 const PAPADOPOULOS = {
   name: 'Matteo Papadopoulos',
   org: 'DatoCMS',
-  avatarUrl: teamAvatar('1751268529-20250623-203221-4862.jpg'),
+  teamMember: '142812727',
 } as const;
 const MATTEO = {
   name: 'Matteo Giaccone',
   org: 'DatoCMS',
-  avatarUrl: teamAvatar('1751268297-20250624-201757-4893.jpg'),
+  teamMember: '39830610',
 } as const;
 
 /**

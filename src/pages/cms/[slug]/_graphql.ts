@@ -52,7 +52,7 @@ export const query = graphql(
 );
 
 /** The slugs of the framework pages, in the order of the footer. */
-export const slugs = ['nextjs-cms', 'nuxtjs-cms', 'svelte-cms', 'astro-cms'];
+export const slugs = ['astro-cms', 'nextjs-cms', 'nuxtjs-cms', 'svelte-cms'];
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async () =>
   slugs.map((slug) => ({ url: `/cms/${slug}` }));

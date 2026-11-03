@@ -98,7 +98,7 @@ export const plans: PricingPlansData = {
       name: 'Enterprise',
       tagline: 'Premium features, high-touch support and advanced compliance.',
       price: 'Custom Pricing',
-      button: { label: 'Contact', href: '/contact' },
+      button: { label: 'Contact', href: '/contact', contact: 'sales' },
       features: [
         'Guaranteed support and uptime SLAs',
         'SSO, Audit logs and Static webhook IPs',
@@ -167,6 +167,7 @@ export const partnerBanner: CtaBannerData = {
     {
       label: 'Discover the program',
       href: '/partner-program',
+      contact: 'partners',
       variant: 'soft',
     },
   ],

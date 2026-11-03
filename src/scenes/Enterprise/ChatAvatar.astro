@@ -1,34 +1,26 @@
 ---
 import symbol from '~/assets/logo/dato-symbol.svg?raw';
+import { Avatar } from '~/components/Avatar';
 import styles from './channel.module.css';
 
 // The avatar of a person in the shared channel: a square with round
-// corners. A person of the DatoCMS team has the photo of the team page;
-// a person of Northwind has the initials. A person from the other company
+// corners. A person of the DatoCMS team has the photo of the TeamMember
+// record; a person of Northwind has the initials. A person from the other company
 // of the channel, DatoCMS, has a badge at the corner with the symbol of
 // DatoCMS, as the chat app marks the external people.
 
 interface Props {
   name: string;
-  avatarUrl?: string;
+  /** The ID of the TeamMember record of a person of the DatoCMS team. */
+  teamMember?: string;
   external?: boolean;
   small?: boolean;
 }
 
-const { name, avatarUrl, external, small } = Astro.props;
-const initials = name
-  .split(' ')
-  .map((part) => part[0])
-  .join('');
+const { name, teamMember, external, small } = Astro.props;
 ---
 
-<span class={styles.avatar} data-small={small || undefined}>
-  {
-    avatarUrl ? (
-      <img src={avatarUrl} alt="" width="36" height="36" loading="lazy" decoding="async" />
-    ) : (
-      <span class={styles.initials}>{initials}</span>
-    )
-  }
+<span class={styles.avatar}>
+  <Avatar name={name} teamMember={teamMember} size={small ? 22 : 36} shape="square" />
   {external && <span class={styles.badge} set:html={symbol} />}
 </span>

@@ -1,15 +1,21 @@
 ---
 import type { HTMLAttributes } from 'astro/types';
 import type { Theme } from '~/lib/theme';
+import { ContactCard } from '~/components/ContactCard';
 import styles from './style.module.css';
-import type { ButtonImage, ButtonSize, ButtonVariant } from './types';
+import { logos as logoMarks } from '~/components/Emoji/emojis';
+import type { ButtonSize, ButtonVariant, ContactPoint, FrameworkLogo } from './types';
 
 interface Props {
   variant?: ButtonVariant;
   size?: ButtonSize;
-  /** A 20px userpic or a stack of 20px logos before the label. */
-  leading?: 'userpic' | 'logos';
-  leadingImages?: ButtonImage[];
+  /** The marks of frameworks before the label, 20px tall (24px in size l). */
+  logos?: FrameworkLogo[];
+  /**
+   * The team that answers this button. On hover and on focus, a card above
+   * the button shows the faces, the names and the role of the people.
+   */
+  contact?: ContactPoint;
   arrow?: boolean;
   href?: string;
   type?: 'button' | 'submit' | 'reset';
@@ -28,8 +34,8 @@ interface Props {
 const {
   variant = 'solid',
   size = 'm',
-  leading,
-  leadingImages = [],
+  logos = [],
+  contact,
   arrow = true,
   href,
   type = 'button',
@@ -40,33 +46,41 @@ const {
   attrs,
 } = Astro.props;
 
+// A button inside a link has no card: the link is the control.
+const card = contact && !as && !disabled ? contact : undefined;
+
 const classes = [
   styles.button,
   'labelMedium',
   variant === 'accent' && styles.accent,
   variant === 'soft' && styles.soft,
   size === 'l' && styles.large,
-  leading && styles.hasLeading,
+  logos.length > 0 && styles.hasLeading,
+  card && styles.hasContact,
   className,
 ];
-
-// The leading images keep the same inset from the top, the side and the bottom.
-const imageSize = size === 'l' ? 24 : 20;
 
 const Tag = as ?? (href && !disabled ? 'a' : 'button');
 const tagProps = Tag === 'a' ? { href } : Tag === 'button' ? { type, disabled } : {};
 ---
 
-<Tag class:list={classes} data-theme={theme} {...tagProps} {...attrs}>
+<Tag
+  class:list={classes}
+  data-theme={theme}
+  data-contact-host={card ? '' : undefined}
+  {...tagProps}
+  {...attrs}
+>
   {
-    leading && (
-      <span class:list={[styles.leading, leading === 'logos' && styles.logos]}>
-        {leadingImages.map((img) => (
-          <img src={img.src} alt={img.alt ?? ''} width={imageSize} height={imageSize} />
+    logos.length > 0 && (
+      <span class={styles.logos} aria-hidden="true">
+        {logos.map((name) => (
+          <span class={styles.logo} data-logo={name} set:html={logoMarks[name]} />
         ))}
       </span>
     )
   }
+  {card && <ContactCard contact={card} />}
   <span class={styles.label}>
     <slot />
     {arrow && <span aria-hidden="true"> →</span>}

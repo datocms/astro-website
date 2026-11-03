@@ -102,14 +102,16 @@ export interface QuestionAnswerData {
 
 /** A thread of community.datocms.com. The page shows the dates as a time before now. */
 interface CommunityPost {
-  author: { name: string; avatar: string };
+  /** A user of the forum: the avatar shows the initials of the name. */
+  author: { name: string };
   /** The ISO date-time of the first post. */
   askedAt: string;
   title: string;
   tag?: string;
   /** shipped: a feature request that we launched. solved: a question with an accepted answer. */
   outcome: 'shipped' | 'solved';
-  closedBy: { name: string; avatar: string };
+  /** A person of the DatoCMS team: `teamMember` is the ID of a TeamMember record, which gives the photo. */
+  closedBy: { name: string; teamMember: string };
   /** The ISO date-time of the post that closed the thread. */
   closedAt: string;
 }
@@ -449,21 +451,25 @@ export const frameworkIntegration: TextWithImageData = {
   title: 'Integrate with one line of code.',
   // New copy. Each :name: is the mark of the framework (src/components/Emoji).
   tagline:
-    'Use the frameworks you prefer. Our official guides and SDKs cover :nextjs: Next.js, :nuxt: Nuxt, :sveltekit: SvelteKit, and :astro: Astro.',
+    'Use the frameworks you prefer. Our official guides and SDKs cover :astro: Astro, :nextjs: Next.js, :nuxt: Nuxt, and :sveltekit: SvelteKit.',
   button: {
     label: 'Explore Integrations',
     href: '/docs',
     variant: 'soft',
-    leading: 'logos',
-    leadingImages: [
-      { src: '/images/home/frameworks/react.png' },
-      { src: '/images/home/frameworks/nuxt.png' },
-      { src: '/images/home/frameworks/svelte.png' },
-    ],
+    logos: ['astro', 'nextjs', 'nuxt', 'sveltekit'],
   },
   code: {
     active: 0,
     tabs: [
+      {
+        label: 'Astro',
+        lang: 'astro',
+        code: astroCode,
+        notes: [
+          { comment: 15, point: 'Seo' },
+          { comment: 19, point: 'Image' },
+        ],
+      },
       {
         label: 'Next.js',
         lang: 'tsx',
@@ -489,15 +495,6 @@ export const frameworkIntegration: TextWithImageData = {
         notes: [
           { comment: 12, point: 'Head' },
           { comment: 16, point: 'Image' },
-        ],
-      },
-      {
-        label: 'Astro',
-        lang: 'astro',
-        code: astroCode,
-        notes: [
-          { comment: 15, point: 'Seo' },
-          { comment: 19, point: 'Image' },
         ],
       },
       {
@@ -538,7 +535,10 @@ export const questionAnswer: QuestionAnswerData = {
   },
 };
 
-const forumAvatar = (n: number) => `/images/home/community/avatar-${n}.png`;
+// The TeamMember records of the people of the team who close the threads.
+const MATTEO_GIACCONE = '39830610';
+const STEFANO_VERNA = '39830606';
+const MARCELO_FINAMOR = '79766956';
 
 export const community: CommunityData = {
   headline: 'Community',
@@ -554,38 +554,38 @@ export const community: CommunityData = {
   // Mostly feature requests that we shipped, from community.datocms.com.
   posts: [
     {
-      author: { name: 'Flumi', avatar: forumAvatar(5) },
+      author: { name: 'Flumi' },
       askedAt: '2025-05-01T20:00:27Z',
       title: 'Support MCP?',
       tag: 'Feature Request',
       outcome: 'shipped',
-      closedBy: { name: 'mat_jack1', avatar: forumAvatar(6) },
+      closedBy: { name: 'mat_jack1', teamMember: MATTEO_GIACCONE },
       closedAt: '2025-12-11T00:00:00Z',
     },
     {
-      author: { name: 'kalle.laakso', avatar: forumAvatar(1) },
+      author: { name: 'kalle.laakso' },
       askedAt: '2026-06-16T00:00:00Z',
       title: 'Allow disabling automatic bullet list generation',
       tag: 'Feature Request',
       outcome: 'shipped',
-      closedBy: { name: 's.verna', avatar: forumAvatar(2) },
+      closedBy: { name: 's.verna', teamMember: STEFANO_VERNA },
       closedAt: '2026-06-25T00:00:00Z',
     },
     {
-      author: { name: 'yiying.lim', avatar: forumAvatar(3) },
+      author: { name: 'yiying.lim' },
       askedAt: '2026-07-20T08:03:29Z',
       title: 'Hitting MODULAR_BLOCK_IN_USE when performing migration',
       outcome: 'solved',
-      closedBy: { name: 'm.finamor', avatar: forumAvatar(4) },
+      closedBy: { name: 'm.finamor', teamMember: MARCELO_FINAMOR },
       closedAt: '2026-07-21T11:17:57Z',
     },
     {
-      author: { name: 'Lee', avatar: forumAvatar(1) },
+      author: { name: 'Lee' },
       askedAt: '2020-10-27T20:47:47Z',
       title: 'Control Video Thumbnail/Poster',
       tag: 'Feature Request',
       outcome: 'shipped',
-      closedBy: { name: 'mat_jack1', avatar: forumAvatar(6) },
+      closedBy: { name: 'mat_jack1', teamMember: MATTEO_GIACCONE },
       closedAt: '2026-07-20T00:00:00Z',
     },
   ],
@@ -626,8 +626,7 @@ export const caseStudies: CaseStudiesData = {
       label: 'Let’s Talk',
       href: '/contact',
       arrow: false,
-      leading: 'userpic',
-      leadingImages: [{ src: '/images/home/userpic-talk.png' }],
+      contact: 'sales',
     },
     {
       label: 'All Case Studies',
@@ -645,8 +644,7 @@ export const partners: PartnersData = {
       label: 'Become a Partner',
       href: '/partner-program',
       arrow: false,
-      leading: 'userpic',
-      leadingImages: [{ src: '/images/home/userpic-partner.png' }],
+      contact: 'partners',
     },
     {
       label: 'Explore All Partners',

@@ -63,10 +63,10 @@ const ai = l('AI', '/ai', 'MCP, agent skills, LLM-ready docs');
 
 // The framework pages (/cms/[slug]).
 const frameworks = [
+  l('Astro', '/cms/astro-cms'),
   l('Next.js', '/cms/nextjs-cms'),
   l('Nuxt', '/cms/nuxtjs-cms'),
   l('SvelteKit', '/cms/svelte-cms'),
-  l('Astro', '/cms/astro-cms'),
 ];
 
 // The compare pages. They are in the footer only: a visitor who compares

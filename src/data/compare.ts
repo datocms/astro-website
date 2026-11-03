@@ -40,8 +40,7 @@ export const hero: HeroData = {
       label: 'Talk To Sales',
       href: '/contact',
       variant: 'soft',
-      leading: 'userpic',
-      leadingImages: [{ src: '/images/home/userpic-talk.png' }],
+      contact: 'sales',
     },
   ],
 };
@@ -55,6 +54,7 @@ export const introButtons: { datocms: ButtonData; competitor: ButtonData } = {
   competitor: {
     label: 'Talk About Migration',
     href: '/contact',
+    contact: 'sales',
     variant: 'soft',
   },
 };

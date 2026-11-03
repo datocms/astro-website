@@ -1,3 +1,5 @@
+import type { ContactPoint } from '~/components/ContactCard';
+import type { logos } from '~/components/Emoji/emojis';
 import type { Theme } from '~/lib/theme';
 
 /**
@@ -17,10 +19,10 @@ export type ButtonVariant = 'accent' | 'solid' | 'soft';
  */
 export type ButtonSize = 'm' | 'l';
 
-export interface ButtonImage {
-  src: string;
-  alt?: string;
-}
+export type { ContactPoint };
+
+/** The mark of a framework (src/assets/frameworks). */
+export type FrameworkLogo = keyof typeof logos;
 
 export interface ButtonData {
   label: string;
@@ -28,8 +30,8 @@ export interface ButtonData {
   variant?: ButtonVariant;
   size?: ButtonSize;
   arrow?: boolean;
-  leading?: 'userpic' | 'logos';
-  leadingImages?: ButtonImage[];
+  logos?: FrameworkLogo[];
+  contact?: ContactPoint;
   /** Overrides the theme of the section. */
   theme?: Theme;
 }

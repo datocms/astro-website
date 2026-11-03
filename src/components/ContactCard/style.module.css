@@ -1,0 +1,79 @@
+/* @layer blocks */
+/*
+ * The contact card: the people who answer a link. It rises above the link
+ * on hover and on keyboard focus, never on touch (there is no hover). It is
+ * on the deep inverse surface (the footer) on all grounds. The photos are
+ * not in the link: the people appear when the visitor reaches for it.
+ *
+ * The position is fixed: contactCard.ts sets `left` and `top`, thus a
+ * parent with `overflow: hidden` does not cut the card.
+ */
+.card {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  /* The host can be narrower than the card: size the card to its content. */
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--space-sm));
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md) var(--space-xs) var(--space-xs);
+  border-radius: var(--radius-md);
+  /* The footer surface: the inverse, a little darker. */
+  background: var(--surface-inverse-deep);
+  color: var(--text-on-inverse);
+  box-shadow: var(--shadow-popover);
+  text-align: start;
+  white-space: nowrap;
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  translate: 0 var(--space-3xs);
+  transition:
+    opacity 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    translate 260ms cubic-bezier(0.23, 1, 0.32, 1),
+    visibility 0s linear 260ms;
+}
+
+/* Below its anchor, the card comes down from above. */
+.card[data-side='bottom'] {
+  translate: 0 calc(var(--space-3xs) * -1);
+}
+
+/* A short delay: a cursor that only crosses the host shows no card. */
+.card[data-open] {
+  visibility: visible;
+  opacity: 1;
+  translate: 0 0;
+  transition-delay: 80ms, 80ms, 0s;
+}
+
+.faces {
+  display: flex;
+  flex-shrink: 0;
+}
+
+/* Two people: the second face overlaps the first, with a ring in the card colour. */
+.faces > * + * {
+  margin-left: calc(var(--space-3xs) * -1);
+  box-shadow: 0 0 0 2px var(--surface-inverse-deep);
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4xs);
+}
+
+.role {
+  color: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    translate: none;
+    transition: none;
+  }
+}

@@ -1,4 +1,5 @@
 ---
+import { ContactCard, type ContactPoint } from '~/components/ContactCard';
 import { CtaBanner } from '~/components/CtaBanner';
 import { DevConfig } from '~/components/DevConfig';
 import { PixelVideo } from '~/components/PixelVideo';
@@ -37,8 +38,14 @@ type Props = Cta & {
    * `centre`: a square video in the centre.
    */
   videoLayout?: 'band' | 'centre';
+  /** The link of the band. The default is the support form. */
   href?: string;
   text?: string;
+  /**
+   * The team that answers the link of the band: on hover, a card shows its
+   * people. Give it again when `href` goes to another form.
+   */
+  contact?: ContactPoint;
 };
 
 const {
@@ -46,8 +53,9 @@ const {
   face,
   video,
   videoLayout = 'band',
-  href = '/contact',
+  href = '/support',
   text = 'Questions? Ask away',
+  contact = 'support',
 } = Astro.props;
 
 // The copy and the video are on one surface: the surface of the palette of
@@ -88,8 +96,9 @@ const ctaVariant = surface ? (surface === 'inverse' ? 'dark' : 'light') : cta?.v
       </div>
     )
   }
-  <a href={href} class:list={[styles.band, 'surfaceInverse']}>
+  <a href={href} class:list={[styles.band, 'surfaceInverse']} data-contact-host>
     <span class:list={[styles.inner, 'headline']}>
+      <ContactCard contact={contact} placement="top-end" />
       <span class={styles.arrow} aria-hidden="true">→</span>
       <span>
         {text}{' '}

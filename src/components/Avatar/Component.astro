@@ -1,0 +1,63 @@
+---
+import styles from './style.module.css';
+import { teamMemberPhoto } from './team';
+
+// The picture of a person: a circle, or a square with round corners. A
+// person of the DatoCMS team (`teamMember`, the ID of a TeamMember record)
+// has the photo of the record. When there is no photo, it shows the
+// initials of the name on a flat surface. The size is in px, and the
+// parent can change it with the class.
+// With `tint`, the photo takes the hue of the surface below it (luminosity
+// blend), as the portraits of the hero and the quotes.
+
+interface Props {
+  name: string;
+  src?: string | null;
+  teamMember?: string;
+  size?: number;
+  shape?: 'circle' | 'square';
+  tint?: boolean;
+  class?: string;
+}
+
+const {
+  name,
+  teamMember,
+  size = 40,
+  shape = 'circle',
+  tint = false,
+  class: className,
+} = Astro.props;
+const src = Astro.props.src ?? (teamMember ? await teamMemberPhoto(Astro, teamMember) : undefined);
+
+// "kalle.laakso" and "Kalle Laakso" both give "KL". "Flumi" gives "F".
+const initials = name
+  .split(/[\s._-]+/)
+  .filter(Boolean)
+  .slice(0, 2)
+  .map((part) => part[0]!.toUpperCase())
+  .join('');
+---
+
+{
+  src ? (
+    <img
+      class:list={[styles.avatar, styles[shape], tint && styles.tint, className]}
+      src={src}
+      alt=""
+      width={size}
+      height={size}
+      style={`--avatar-size: ${size}px`}
+      loading="lazy"
+      decoding="async"
+    />
+  ) : (
+    <span
+      class:list={[styles.avatar, styles[shape], styles.initials, className]}
+      style={`--avatar-size: ${size}px`}
+      aria-hidden="true"
+    >
+      {initials}
+    </span>
+  )
+}

@@ -1,12 +1,12 @@
 ---
-import { Button, type ButtonVariant } from '~/components/Button';
+import { Button, type ButtonVariant, type FrameworkLogo } from '~/components/Button';
 import { Section } from '~/components/Section';
 import Layout from '~/layouts/Layout.astro';
 import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
 import { THEMES, type Theme } from '~/lib/theme';
 
 // Show every button on every ground: each variant at rest, in the hover
-// state, with the focus ring and disabled, then the leading images, the
+// state, with the focus ring and disabled, then the leading logos, the contact cards (hover them), the
 // button without the arrow, and a button drawn inside a link. The ground
 // sets the colours (the button roles in src/styles/tokens.css). Choose
 // the theme with ?theme=, and the scheme with the switch at the top.
@@ -37,12 +37,7 @@ const variants: { variant: ButtonVariant; note: string }[] = [
 const hover = { style: '--btnBg: var(--btnBgHover); --btnFg: var(--btnFgHover);' };
 const focus = { style: 'outline: 2px solid currentColor; outline-offset: 2px;' };
 
-const userpic = [{ src: '/images/home/userpic-talk.png' }];
-const logos = [
-  { src: '/images/home/frameworks/react.png' },
-  { src: '/images/home/frameworks/nuxt.png' },
-  { src: '/images/home/frameworks/svelte.png' },
-];
+const logos: FrameworkLogo[] = ['astro', 'nextjs', 'nuxt', 'sveltekit'];
 ---
 
 <Layout seo={seo} theme={theme} headerVariant={false} footer={false}>
@@ -117,10 +112,10 @@ const logos = [
           <Button href="#" size="l" variant="soft">
             Read The Docs
           </Button>
-          <Button href="#" size="l" leading="userpic" leadingImages={userpic}>
+          <Button href="#" size="l" contact="sales">
             Let’s Talk
           </Button>
-          <Button href="#" size="l" variant="soft" leading="logos" leadingImages={logos}>
+          <Button href="#" size="l" variant="soft" logos={logos}>
             Explore Integrations
           </Button>
         </div>
@@ -129,13 +124,13 @@ const logos = [
           <Button href="#" arrow={false}>
             No arrow
           </Button>
-          <Button href="#" leading="userpic" leadingImages={userpic} arrow={false}>
-            Let’s Talk
+          <Button href="#" contact="partners" arrow={false}>
+            Become a Partner
           </Button>
-          <Button href="#" variant="soft" leading="userpic" leadingImages={userpic}>
-            Talk To Sales
+          <Button href="#" variant="soft" contact="support">
+            Contact Support
           </Button>
-          <Button href="#" variant="soft" leading="logos" leadingImages={logos}>
+          <Button href="#" variant="soft" logos={logos}>
             Explore Integrations
           </Button>
           <a href="#" class="card">

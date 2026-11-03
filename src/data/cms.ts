@@ -93,6 +93,7 @@ export const closer: CtaBannerData = {
     {
       label: 'Talk To Sales',
       href: '/contact',
+      contact: 'sales',
       variant: 'soft',
     },
   ],

@@ -8,7 +8,7 @@ import { drawings, type DrawingName } from './drawings';
  * The marks of the frameworks, in their brand colours. The black of Next.js
  * and of the A of Astro is the colour of the text, thus they show in dark too.
  */
-export const logos = { nextjs, nuxt, sveltekit, astro };
+export const logos = { astro, nextjs, nuxt, sveltekit };
 
 export type EmojiName = DrawingName | 'bleep' | keyof typeof logos;
 

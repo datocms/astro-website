@@ -219,7 +219,7 @@ export const ctaBuild: CtaBannerData = {
       href: dashboardUrl('/signup'),
       arrow: false,
     },
-    { label: 'Book a Demo', href: '/contact', variant: 'soft' },
+    { label: 'Book a Demo', href: '/contact', variant: 'soft', contact: 'sales' },
   ],
 };
 

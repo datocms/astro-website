@@ -1,0 +1,50 @@
+---
+import { Avatar } from '~/components/Avatar';
+import { fetchContact } from './contacts';
+import styles from './style.module.css';
+import type { ContactPoint } from './types';
+
+interface Props {
+  /** The team that answers the link. */
+  contact: ContactPoint;
+  /** The side of the parent element where the card starts. */
+  placement?: 'top-start' | 'top-end';
+  class?: string;
+}
+
+/*
+ * The card of the people who answer a link. Put it inside the link, and
+ * give the link the attribute `data-contact-host`. On hover and on keyboard
+ * focus of the link, the card rises above its parent element (contactCard.ts
+ * sets its place). The link keeps its accessible name: the card is
+ * aria-hidden.
+ */
+const { contact, placement = 'top-start', class: className } = Astro.props;
+const person = await fetchContact(Astro, contact);
+---
+
+{
+  person && (
+    <contact-card
+      class:list={[styles.card, 'surfaceInverse', className]}
+      data-placement={placement}
+      aria-hidden="true"
+    >
+      <span class={styles.faces}>
+        {person.people.map((p) => (
+          <Avatar name={p.name} src={p.portrait} size={40} tint />
+        ))}
+      </span>
+      <span class={styles.who}>
+        <span class="labelMedium">{person.names}</span>
+        <span class:list={[styles.role, 'label']}>{person.role}</span>
+      </span>
+    </contact-card>
+  )
+}
+
+<script>
+  import { defineContactCard } from './contactCard';
+
+  defineContactCard();
+</script>

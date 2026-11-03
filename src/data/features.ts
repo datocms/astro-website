@@ -49,6 +49,7 @@ export const hero: HeroData = {
     {
       label: 'Talk To Sales',
       href: '/contact',
+      contact: 'sales',
       variant: 'soft',
     },
   ],

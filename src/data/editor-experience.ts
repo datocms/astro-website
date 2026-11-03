@@ -29,7 +29,7 @@ export const hero: HeroData = {
       href: dashboardUrl('/signup'),
       arrow: false,
     },
-    { label: 'Talk To Sales', href: '/contact', variant: 'soft' },
+    { label: 'Talk To Sales', href: '/contact', variant: 'soft', contact: 'sales' },
   ],
 };
 

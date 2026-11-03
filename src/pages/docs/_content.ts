@@ -6,10 +6,10 @@ export type Framework = {
 };
 
 export const FRAMEWORKS: Framework[] = [
+  { id: 'astro', name: 'Astro', logo: 'svg/logos/astro-squared', href: '/docs/astro' },
   { id: 'next', name: 'Next.js', logo: 'svg/logos/next-squared', href: '/docs/next-js' },
   { id: 'nuxt', name: 'Nuxt', logo: 'svg/logos/nuxt-squared', href: '/docs/nuxt' },
   { id: 'sveltekit', name: 'SvelteKit', logo: 'svg/logos/svelte-squared', href: '/docs/svelte' },
-  { id: 'astro', name: 'Astro', logo: 'svg/logos/astro-squared', href: '/docs/astro' },
 ];
 
 export type Api = {

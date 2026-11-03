@@ -58,7 +58,7 @@ export const hero: HeroData & { subtitle: string; logosLabel: string } = {
   subtitle:
     'A complete headless CMS with the **governance, service and features to ensure you take your content machine to scale**. Dedicated onboarding service, premium technical support, private cloud and custom SLAs',
   buttons: [
-    { label: 'Talk To Sales', href: '#form', arrow: false },
+    { label: 'Talk To Sales', href: '#form', arrow: false, contact: 'sales' },
     {
       label: 'Read Our Security Page',
       href: '/security',
@@ -201,7 +201,7 @@ export const support: ChapterLayoutData = {
     // New copy.
     intro:
       'A shared Slack channel, solution architects for your build, and dedicated technical and editorial onboarding. With the SLAs in your contract.',
-    link: docs('Talk To Sales', '#form'),
+    link: { ...docs('Talk To Sales', '#form'), contact: 'sales' },
   },
   fragments: [
     {
@@ -269,7 +269,7 @@ export const ctaClose: CtaBannerData = {
   // CtaBanner prints the subline as plain text: it has no marks.
   subline: 'An enterprise CMS has to scale with your company without extra effort.',
   buttons: [
-    { label: 'Talk To Sales', href: '#form', arrow: false },
+    { label: 'Talk To Sales', href: '#form', arrow: false, contact: 'sales' },
     { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
   ],
 };

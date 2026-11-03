@@ -1,5 +1,6 @@
 ---
 import { faCircleCheck } from '@fortawesome/pro-solid-svg-icons';
+import { Avatar } from '~/components/Avatar';
 import { ButtonGroup } from '~/components/ButtonGroup';
 import { Icon } from '~/components/Icon';
 import { Section } from '~/components/Section';
@@ -77,7 +78,7 @@ const deck = Array.from(
           <li class={styles.card} style={`--i: ${i}`}>
             <span class={styles.cardHeader}>
               <span class={styles.user}>
-                <img src={post.author.avatar} alt="" width="40" height="40" class={styles.avatar} />
+                <Avatar name={post.author.name} />
                 <span class={styles.name}>{post.author.name}</span>
                 <span class={styles.dot} />
                 <span class={styles.age}>{formatRelativeDate(post.askedAt)}</span>
@@ -87,12 +88,10 @@ const deck = Array.from(
             <span class={styles.title}>{post.title}</span>
             <span class:list={[styles.solved, 'surfaceAccent']}>
               <span class={styles.user}>
-                <img
-                  src={post.closedBy.avatar}
-                  alt=""
-                  width="40"
-                  height="40"
-                  class:list={[styles.avatar, styles.solvedAvatar]}
+                <Avatar
+                  name={post.closedBy.name}
+                  teamMember={post.closedBy.teamMember}
+                  class={styles.solvedAvatar}
                 />
                 <span class={styles.name}>{post.closedBy.name}</span>
                 <span class={styles.dot} />
