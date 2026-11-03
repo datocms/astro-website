@@ -7,7 +7,7 @@ export const hero: HeroData = {
   label: 'Case Studies',
   headline: 'Cream of the crop.',
   subheadline: 'See how teams have used DatoCMS to build successful digital experiences',
-  face: 'happy',
+  face: 'starry',
   buttons: [
     {
       label: 'Let’s Talk!',

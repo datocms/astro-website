@@ -60,6 +60,8 @@ export interface UserExperienceData {
 
 export interface ContentSourceData {
   headline: string;
+  /** The face at the end of the headline. It plays when it comes into view. */
+  face?: FaceName;
   paragraph: string;
   channels: string[];
   activeChannel: string;
@@ -89,6 +91,8 @@ interface TextWithImageData {
 
 export interface QuestionAnswerData {
   headline: string;
+  /** The face at the end of the headline. It plays when it comes into view. */
+  face?: FaceName;
   subline: string;
   ask: { title: string; href: string; question: string; models: string[]; answer: string };
   install: { title: string; href: string; command: string; folders: string[] };
@@ -253,7 +257,8 @@ export const userExperience: UserExperienceData = {
 };
 
 export const contentSource: ContentSourceData = {
-  headline: 'Give your content a long, healthy life [•*•]',
+  headline: 'Give your content a long, healthy life',
+  face: 'magic',
   paragraph:
     'Website, chatbot, mobile, a smart fridge? One place for every role to manage content across every output.',
   channels: [
@@ -507,7 +512,8 @@ export const frameworkIntegration: TextWithImageData = {
 };
 
 export const questionAnswer: QuestionAnswerData = {
-  headline: 'Bring your AI [•ᴥ•]',
+  headline: 'Bring your AI',
+  face: 'robot',
   subline: 'Your AI feels right at home in the CMS, the CLI, or over MCP.',
   ask: {
     title: 'Connect your AI',

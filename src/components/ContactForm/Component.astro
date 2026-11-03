@@ -3,7 +3,7 @@ import { Button } from '~/components/Button';
 import { FormField } from '~/components/FormField';
 import { Headline } from '~/components/Headline';
 import type { ContactFormData } from '~/data/contact';
-import { faces } from '~/lib/motion/faces';
+import { Face } from '~/components/Face';
 import styles from './style.module.css';
 
 /*
@@ -99,7 +99,10 @@ const needsScript = external && noscriptMessage !== undefined;
       role="alert"
       data-submit-error
       data-message={submitErrorMessage}
+      hidden
     >
+      <Face name="error" start="manual" pause={0} />{' '}
+      <span data-submit-error-text></span>
     </p>
   </form>
 
@@ -108,7 +111,14 @@ const needsScript = external && noscriptMessage !== undefined;
       {success.headline}
       <Fragment slot="muted">
         {success.muted}
-        {success.face && <span aria-hidden="true">{'\u00A0' + faces[success.face].face}</span>}
+        {
+          success.face && (
+            <>
+              {'\u00A0'}
+              <Face name={success.face} />
+            </>
+          )
+        }
       </Fragment>
     </Headline>
     {success.body && <p class="subtitleMedium">{success.body}</p>}
@@ -144,6 +154,11 @@ const needsScript = external && noscriptMessage !== undefined;
         const form = this.$<HTMLFormElement>('[data-form]');
         const success = this.$('[data-success]');
         const submitError = this.$('[data-submit-error]');
+        const submitErrorText = this.$('[data-submit-error-text]');
+
+        // The face of an error plays each time the error shows.
+        const playFace = (error: HTMLElement) =>
+          error.querySelector('type-writer')?.dispatchEvent(new Event('typewriter:replay'));
         const status = this.$('[data-status]');
         const button = this.$<HTMLButtonElement>('[data-submit]');
 
@@ -171,7 +186,9 @@ const needsScript = external && noscriptMessage !== undefined;
           const control = controlOf(field);
           if (!error || !text || !control) return;
           field.toggleAttribute('data-invalid', Boolean(message));
+          const appears = error.hidden && Boolean(message);
           error.hidden = !message;
+          if (appears) playFace(error);
           text.textContent = message;
           if (message) {
             control.setAttribute('aria-invalid', 'true');
@@ -197,7 +214,8 @@ const needsScript = external && noscriptMessage !== undefined;
           event.preventDefault();
           if (busy) return;
 
-          submitError.textContent = '';
+          submitError.hidden = true;
+          submitErrorText.textContent = '';
           const invalid = fields.filter((field) => {
             const message = messageOf(field);
             showError(field, message);
@@ -223,10 +241,9 @@ const needsScript = external && noscriptMessage !== undefined;
 
           // role="alert" reads the message. The values stay in the fields.
           const showSubmitError = (message = submitError.dataset.message ?? '') => {
-            const face = document.createElement('span');
-            face.setAttribute('aria-hidden', 'true');
-            face.textContent = '[x_x] ';
-            submitError.append(face, message);
+            submitErrorText.textContent = message;
+            submitError.hidden = false;
+            playFace(submitError);
           };
 
           // Success: the focus goes to the message, so screen readers read it.

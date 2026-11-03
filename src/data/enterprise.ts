@@ -55,7 +55,7 @@ const docs = (label: string, href: string): ButtonData => ({
 export const hero: HeroData & { subtitle: string; logosLabel: string } = {
   headline: 'Big teams, many brands, one CMS.',
   subheadline: 'With the security reviews, the contracts and the people to back it',
-  face: 'wink',
+  face: 'serious',
   subtitle:
     'A complete headless CMS with the **governance, service and features to ensure you take your content machine to scale**. Dedicated onboarding service, premium technical support, private cloud and custom SLAs',
   buttons: [

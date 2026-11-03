@@ -1,5 +1,6 @@
 ---
 import { ButtonGroup } from '~/components/ButtonGroup';
+import { Face } from '~/components/Face';
 import { Headline } from '~/components/Headline';
 import { LogosLine } from '~/components/LogosLine';
 import { stripStega } from '@datocms/astro';
@@ -135,7 +136,7 @@ const background = ({ page: 'default', accent: 'accent' } as const)[variant];
     <Headline
       as={headingLevel}
       size="h1"
-      muted={subheadline
+      muted={subheadline && !(face && !typewriter)
         ? face
           ? `${subheadline}\u00A0${faces[face].face}`
           : subheadline
@@ -146,6 +147,16 @@ const background = ({ page: 'default', accent: 'accent' } as const)[variant];
       class={styles.headline}
     >
       {headline}
+      {
+        /* Without the typewriter, the face plays alone, after the page loads. */
+        subheadline && face && !typewriter && (
+          <Fragment slot="muted">
+            {subheadline}
+            {'\u00A0'}
+            <Face name={face} start="load" pause={750} />
+          </Fragment>
+        )
+      }
     </Headline>
     {
       (Astro.slots.has('intro') || intro) && (

@@ -3,7 +3,7 @@ import { ContactForm } from '~/components/ContactForm';
 import { Headline } from '~/components/Headline';
 import { Section } from '~/components/Section';
 import type { ContactSectionData } from '~/data/contact';
-import { faces } from '~/lib/motion/faces';
+import { Face } from '~/components/Face';
 import styles from './style.module.css';
 
 /*
@@ -48,7 +48,12 @@ const {
           muted && (
             <Fragment slot="muted">
               {muted}
-              {face && <span aria-hidden="true">{'\u00A0' + faces[face].face}</span>}
+              {face && (
+                <>
+                  {'\u00A0'}
+                  <Face name={face} start="load" pause={750} />
+                </>
+              )}
             </Fragment>
           )
         }

@@ -48,8 +48,9 @@ const Inner = as === 'span' ? 'span' : 'div';
   import { WebComponent } from '~/lib/WebComponent';
 
   // The element types its text once: on load, in view, or on a
-  // `typewriter:start` event. `data-tw-armed` tells the CSS that the
-  // script runs.
+  // `typewriter:start` event. A `typewriter:replay` event types it again,
+  // each time (for example, a form error that comes back). `data-tw-armed`
+  // tells the CSS that the script runs.
   customElements.define(
     'type-writer',
     class extends WebComponent {
@@ -59,10 +60,17 @@ const Inner = as === 'span' ? 'span' : 'div';
         const start = (this.dataset.twStart || 'view') as TypewriterStart;
         const delay = Number(this.dataset.twDelay || 0);
         let started = false;
+        let running = false;
+        const run = async () => {
+          if (running) return;
+          running = true;
+          await typewrite(this, steps);
+          running = false;
+        };
         const play = () => {
           if (started) return;
           started = true;
-          setTimeout(() => typewrite(this, steps), delay);
+          setTimeout(run, delay);
         };
         if (start === 'load') play();
         else if (start === 'view') {
@@ -72,6 +80,10 @@ const Inner = as === 'span' ? 'span' : 'div';
           });
         }
         this.on(this, 'typewriter:start', play);
+        this.on(this, 'typewriter:replay', () => {
+          started = true;
+          run();
+        });
       }
     },
   );

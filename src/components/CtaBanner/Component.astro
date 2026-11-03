@@ -2,8 +2,8 @@
 import { ButtonGroup } from '~/components/ButtonGroup';
 import { Headline } from '~/components/Headline';
 import { Section } from '~/components/Section';
-import { Typewriter } from '~/components/Typewriter';
-import { faceStep, faces, type FaceName } from '~/lib/motion/faces';
+import { Face } from '~/components/Face';
+import type { FaceName } from '~/lib/motion/faces';
 import type { CtaBannerData } from '~/data/home';
 import styles from './style.module.css';
 
@@ -21,7 +21,6 @@ const { variant, headline, muted, subline, buttons, theme, face, class: classNam
 // A "\n" in the headline starts a new line.
 const lines = headline.split('\n');
 const last = lines.length - 1;
-const faceScript = face ? [{ type: 'pause' as const, ms: 300 }, faceStep(face)] : undefined;
 ---
 
 <Section
@@ -44,9 +43,7 @@ const faceScript = face ? [{ type: 'pause' as const, ms: 300 }, faceStep(face)] 
             {i === last && !muted && face && (
               <>
                 {'\u00A0'}
-                <Typewriter script={faceScript!} class={styles.face}>
-                  {faces[face].face}
-                </Typewriter>
+                <Face name={face} />
               </>
             )}
           </>
@@ -57,9 +54,7 @@ const faceScript = face ? [{ type: 'pause' as const, ms: 300 }, faceStep(face)] 
           <Fragment slot="muted">
             {muted}
             {'\u00A0'}
-            <Typewriter script={faceScript!} class={styles.face}>
-              {faces[face].face}
-            </Typewriter>
+            <Face name={face} />
           </Fragment>
         )
       }

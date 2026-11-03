@@ -36,7 +36,7 @@ export const page: FrameworkPage = {
     label: 'Nuxt + DatoCMS',
     headline: 'Nuxt in front, DatoCMS behind.',
     subheadline: 'A composable fetches it, another subscribes to it, vue-datocms renders it',
-    face: 'wink',
+    face: 'cool',
     intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
   },

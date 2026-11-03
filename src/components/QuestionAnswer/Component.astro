@@ -1,4 +1,5 @@
 ---
+import { Face } from '~/components/Face';
 import { ButtonGroup } from '~/components/ButtonGroup';
 import { Section } from '~/components/Section';
 import { Typewriter } from '~/components/Typewriter';
@@ -15,7 +16,16 @@ interface Props extends QuestionAnswerData {
   cardShape?: 'square' | 'landscape';
 }
 
-const { headline, subline, ask, install, more, theme = 'blue', cardShape = 'square' } = Astro.props;
+const {
+  headline,
+  face,
+  subline,
+  ask,
+  install,
+  more,
+  theme = 'blue',
+  cardShape = 'square',
+} = Astro.props;
 const model = ask.models[0] ?? '';
 
 // Card 1 starts at 0.15s.
@@ -54,6 +64,14 @@ const tree = install.folders.map((f) => `  ├── ${f}`).join('\n');
 <Section theme={theme} background="accent" contentClass={styles.content}>
   <h2 class:list={[styles.header, 'h1']}>
     {headline}
+    {
+      face && (
+        <>
+          {'\u00A0'}
+          <Face name={face} />
+        </>
+      )
+    }
     <span class={styles.subline}>{subline}</span>
   </h2>
 

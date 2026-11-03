@@ -12,7 +12,7 @@ export const hero: HeroData = {
   label: 'Product updates',
   headline: 'What’s new?',
   subheadline: 'Everything we ship, as soon as we ship it.',
-  face: 'wink',
+  face: 'cheer',
   buttons: [
     {
       label: 'Subscribe via RSS',

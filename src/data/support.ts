@@ -22,7 +22,7 @@ export const hero: HeroData = {
   label: 'Support page',
   headline: 'Got issues?',
   subheadline: "We're here to help!",
-  face: 'wink',
+  face: 'calm',
 };
 
 export const picker = {
@@ -121,7 +121,7 @@ export const supportForm: ContactFormData = {
   success: {
     headline: "Thanks, we've got it.",
     muted: 'Our support team will be in touch shortly',
-    face: 'happy',
+    face: 'approved',
     button: { label: 'Back to homepage', href: '/', appearance: 'deep-on-white', variant: 'soft' },
   },
 };

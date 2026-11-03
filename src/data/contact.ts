@@ -35,7 +35,7 @@ export interface FormFieldData {
   pattern?: string;
   /**
    * Shown when the field is empty. Default: "This field is required".
-   * The component adds the [x_x] face.
+   * The component adds the `error` face, and plays it each time the error shows.
    */
   requiredMessage?: string;
   /** Shown when the value has the wrong format (e-mail only). */
@@ -246,7 +246,7 @@ export const contact: ContactSectionData = {
     success: {
       headline: "Thanks, we've got it.",
       muted: 'Our sales team will reply to your work email soon',
-      face: 'happy',
+      face: 'grateful',
       body: 'You will soon get an automated confirmation by email.',
       button: {
         label: 'Back to homepage',

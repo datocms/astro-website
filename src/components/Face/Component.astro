@@ -1,0 +1,30 @@
+---
+import { Typewriter } from '~/components/Typewriter';
+import { faceStep, faces, type FaceName } from '~/lib/motion/faces';
+import type { TypewriterStart } from '~/lib/motion/typewriter';
+import styles from './style.module.css';
+
+// A text face of src/lib/motion/faces.ts that plays its animation (DESIGN.md,
+// "The Text Face Rule"). Each face on the page plays: use this component
+// when the face is not a step of a typewriter script. The face is inline and
+// stays on the line of the word before it (the caller puts a no-break space
+// before it).
+interface Props {
+  name: FaceName;
+  /**
+   * When the face plays. `view`: when it comes into view (default).
+   * `manual`: on a `typewriter:replay` event on its `type-writer`, each time.
+   */
+  start?: TypewriterStart;
+  /** The time in ms before the face draws in. */
+  pause?: number;
+}
+
+const { name, start = 'view', pause = 300 } = Astro.props;
+---
+
+<span class={styles.face} aria-hidden="true">
+  <Typewriter script={[{ type: 'pause', ms: pause }, faceStep(name)]} start={start}>
+    {faces[name].face}
+  </Typewriter>
+</span>
