@@ -1,16 +1,58 @@
 /* @layer blocks */
 
-/* The variant "full": a MediaCard with a byline. */
+/*
+ * One cell is one link. The label line, the title and the byline are the
+ * same in both variants. The featured cell adds a tint, an excerpt and
+ * room. The dense cell has a hairline under it.
+ */
 
-.root {
-  position: relative;
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  color: var(--text-primary);
 }
 
-/* In place of the logo of a case study: about as high as the logo box (30). */
+.label {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-xs);
+}
+
+.date {
+  color: var(--text-primary);
+}
+
+.kind {
+  color: var(--text-muted);
+}
+
+.title {
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+.excerpt {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: auto;
+  padding-top: var(--space-md);
+  color: var(--text-soft);
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
 .byline {
   display: flex;
   align-items: center;
   gap: var(--space-2xs);
+  margin-top: auto;
+  padding-top: var(--space-sm);
+}
+
+/* The excerpt already takes the free space: the byline follows it. */
+.excerpt + .byline {
+  margin-top: 0;
 }
 
 /* More than one person: the portraits overlap. */
@@ -20,92 +62,64 @@
 }
 
 .avatar {
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
 }
 
 .avatar + .avatar {
-  margin-left: calc(-1 * var(--space-2xs));
-}
-
-.bylineText {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4xs);
-  min-width: 0;
+  margin-left: calc(-1 * var(--space-4xs));
 }
 
 .names {
-  color: var(--text-primary);
-}
-
-.bylineDate {
+  min-width: 0;
   color: var(--text-muted);
 }
 
-/* The box has the size of the cover (5:3), on top of it. */
-.creditBox {
-  position: absolute;
-  inset: 0 0 auto;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
-  padding: var(--space-2xs);
-  aspect-ratio: 5 / 3;
-  pointer-events: none;
+/* The variant "featured": a square cell on a tint. */
+
+.featured {
+  gap: var(--space-md);
+  padding: var(--space-xl);
 }
 
-.credit {
-  padding: var(--space-5xs) var(--space-2xs);
-  color: var(--text-primary);
-  background: var(--surface-default);
-  border-radius: var(--radius-full);
-  pointer-events: auto;
+/* The tints are transparent: they go on top of the ground of the page. */
+.faint {
+  background:
+    linear-gradient(var(--surface-accent-faint), var(--surface-accent-faint)),
+    var(--surface-default);
+}
+
+.subtle {
+  background:
+    linear-gradient(var(--surface-accent-subtle), var(--surface-accent-subtle)),
+    var(--surface-default);
 }
 
 @media (hover: hover) {
-  .credit:hover {
-    text-decoration: underline;
+  .featured:hover {
+    background:
+      linear-gradient(var(--surface-accent-subtle), var(--surface-accent-subtle)),
+      linear-gradient(var(--surface-accent-subtle), var(--surface-accent-subtle)),
+      var(--surface-default);
   }
 }
 
-/* The variant "compact": the cover, the title and the date. */
+/* The variant "dense": text on the page, with a rule under it. */
 
-.compact {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
+.dense {
+  padding: var(--space-md) var(--space-md) var(--space-lg);
+  /* An inset shadow draws the 1px rule inside the cell. */
+  box-shadow: inset 0 -1px var(--border-default);
 }
 
-/* Square below 1152, 385 high from 1152. */
-.compactImage {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  background: var(--surface-inverse-faint);
-  border-radius: var(--radius-md);
-}
-
-@media (min-width: 1152px) {
-  .compactImage {
-    aspect-ratio: auto;
-    height: 385px;
+@media (hover: hover) {
+  .dense:hover {
+    background: var(--surface-accent-faint);
   }
 }
 
-.compactText {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs);
-}
-
-.compactLabel {
-  color: var(--text-muted);
-}
-
-.compactTitle {
-  color: var(--text-primary);
-}
-
-.compactDate {
-  color: var(--text-muted);
+.cell:focus-visible {
+  outline: 2px solid var(--border-strong);
+  outline-offset: calc(-1 * var(--space-5xs));
 }

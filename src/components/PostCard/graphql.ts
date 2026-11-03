@@ -7,14 +7,8 @@ import { graphql } from '~/lib/datocms/graphql';
  * "... on CustomerStoryRecord { title }" when no root field of the query
  * gives a CustomerStoryRecord.
  *
- * The two variants of PostCard read the same fragments. Each variant has
- * its crop of the cover:
- * - `fullUrl` (variant "full"): 5:3, as the covers in the CMS since 2024
- *   (the field is "Cover image (5:3)"). A cover with a different shape is
- *   not cropped: it fits in the box, and a blur of the image fills the rest.
- * - `compactUrl` (variant "compact"): a crop that fills the box.
- *
- * `author` and `customData` give the credit of an Unsplash photo.
+ * Both variants of PostCard read the same fragments. A card has no cover
+ * image.
  */
 
 export const PostCardFragment = graphql(
@@ -24,12 +18,8 @@ export const PostCardFragment = graphql(
       _firstPublishedAt
       _createdAt
       ...BlogPostUrlFragment
-      coverImage {
-        alt
-        author
-        customData
-        fullUrl: url(imgixParams: { w: 1080, h: 648, fit: fill, fill: blur })
-        compactUrl: url(imgixParams: { w: 1140, h: 770, fit: crop })
+      category {
+        name
       }
       excerpt {
         value
@@ -53,13 +43,6 @@ export const ChatCardFragment = graphql(
       _firstPublishedAt
       _createdAt
       ...CustomerStoryUrlFragment
-      coverImage {
-        alt
-        author
-        customData
-        fullUrl: url(imgixParams: { w: 1080, h: 648, fit: fill, fill: blur })
-        compactUrl: url(imgixParams: { w: 1140, h: 770, fit: crop })
-      }
       excerpt {
         value
       }

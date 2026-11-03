@@ -26,8 +26,14 @@ export const filters = {
   chats: { label: 'Casual chats', href: '/blog/casual-chats' },
 };
 
-/** The number of posts on each page of the index. Even: the grid has two columns. */
-export const perPage = 16;
+/**
+ * The cards on a page of an index. The grid shows `perPage` cards: 18 fill
+ * the rows of 1, 2 and 3 columns. Page 1 of each index (all the posts, the
+ * casual chats, a category) also has `featuredCount` cards in the featured
+ * row, above the grid.
+ */
+export const perPage = 18;
+export const featuredCount = 3;
 
 /** The copy of RelatedPosts. The posts come from DatoCMS. */
 export interface RelatedPostsData {

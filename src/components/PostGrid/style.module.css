@@ -32,3 +32,67 @@
     color: var(--text-primary);
   }
 }
+
+/* Square cells in one joined row. Below 1152 they stack. */
+.featured {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  list-style: none;
+}
+
+@media (min-width: 1152px) {
+  .featured {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.featuredItem {
+  display: grid;
+  min-height: 320px;
+}
+
+/*
+ * From 1152 a cell is at least square: a sizer of full width sits in the
+ * same grid area as the link. A taller cell makes the whole row taller, and
+ * the other cells stretch to it.
+ */
+@media (min-width: 1152px) {
+  .featuredItem {
+    min-height: 0;
+  }
+
+  .featuredItem::before {
+    content: '';
+    grid-area: 1 / 1;
+    padding-top: 100%;
+  }
+
+  .featuredItem > * {
+    grid-area: 1 / 1;
+  }
+}
+
+/* The text grid: a hairline on top, and one under each cell. */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  border-top: 1px solid var(--border-default);
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1152px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The cell stretches to the tallest cell of its row. */
+.item {
+  display: grid;
+}

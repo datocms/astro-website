@@ -106,6 +106,28 @@ export function parsePageIndex(param: string | undefined) {
   return page === 1 ? 'redirect' : page;
 }
 
+/** The cards in the featured row of a page: only page 1 of each index has one. */
+function featuredOn(page: number) {
+  return page === 1 ? blog.featuredCount : 0;
+}
+
+/**
+ * The range of the feed that a page shows. Page 1 of an index has the featured
+ * row and one page of the grid. From page 2, the offset is
+ * featuredCount + (page - 1) * perPage: the featured cards count once.
+ */
+function pageRange(page: number): [number, number] {
+  if (page === 1) return [0, featuredOn(1) + blog.perPage];
+  const start = blog.featuredCount + (page - 1) * blog.perPage;
+  return [start, start + blog.perPage];
+}
+
+/** The number of pages of an index with this number of cards. */
+export function totalPages(count: number) {
+  const [, firstPageEnd] = pageRange(1);
+  return 1 + Math.max(0, Math.ceil((count - firstPageEnd) / blog.perPage));
+}
+
 /**
  * The cards of one page of the index: the posts and the casual chats (the
  * model CustomerStory), the newest first. A category shows only its posts,
@@ -140,10 +162,12 @@ export async function loadFeedPage(Astro: AstroGlobal, page: number, filter: Fee
   // The newest first. ISO dates in UTC sort as text.
   feed.sort((a, b) => b.date.localeCompare(a.date));
 
-  const cards = feed
-    .slice((page - 1) * blog.perPage, page * blog.perPage)
-    .map(({ date: _, ...card }) => card as PostCardItem);
-  if (cards.length === 0) return null;
+  const [start, end] = pageRange(page);
+  const all = feed.slice(start, end).map(({ date: _, ...card }) => card as PostCardItem);
+  if (all.length === 0) return null;
+  const featuredOnPage = featuredOn(page);
+  const featured = all.slice(0, featuredOnPage);
+  const cards = all.slice(featuredOnPage);
 
   const seo =
     filter.kind === 'chats'
@@ -158,9 +182,10 @@ export async function loadFeedPage(Astro: AstroGlobal, page: number, filter: Fee
         : blogPage?.seo;
 
   return {
+    featured,
     cards,
     page,
-    totalPages: Math.ceil(feed.length / blog.perPage),
+    totalPages: totalPages(feed.length),
     baseUrl: feedBaseUrl(filter),
     category,
     filters: filterLinks(categories, filter),
@@ -198,8 +223,8 @@ const categoryCountQuery = graphql(/* GraphQL */ `
 
 /** The addresses of the pages 2 and up of an index with this number of cards. */
 function laterPages(baseUrl: string, count: number) {
-  const total = Math.ceil(count / blog.perPage);
-  return Array.from({ length: Math.max(0, total - 1) }, (_, i) => `${baseUrl}/p/${i + 2}`);
+  const total = totalPages(count);
+  return Array.from({ length: total - 1 }, (_, i) => `${baseUrl}/p/${i + 2}`);
 }
 
 /** The sitemap of the pages 2 and up of each index of the blog. */

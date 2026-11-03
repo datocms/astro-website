@@ -1,11 +1,13 @@
 ---
-import { CardGrid } from '~/components/CardGrid';
 import { Pagination } from '~/components/Pagination';
 import { PostCard, type PostCardItem } from '~/components/PostCard';
 import { Section } from '~/components/Section';
 import styles from './style.module.css';
 
 interface Props {
+  /** The cards of the featured row. Only page 1 of an index has them. */
+  featured?: PostCardItem[];
+  /** The cards of the text grid. */
   posts: PostCardItem[];
   /** The number of the current page, from 1. */
   page: number;
@@ -16,7 +18,7 @@ interface Props {
   filters?: { label: string; href: string; current: boolean }[];
 }
 
-const { posts, page, totalPages, baseUrl, filters } = Astro.props;
+const { featured = [], posts, page, totalPages, baseUrl, filters } = Astro.props;
 ---
 
 <Section contentClass={styles.content}>
@@ -39,14 +41,33 @@ const { posts, page, totalPages, baseUrl, filters } = Astro.props;
       </nav>
     )
   }
-  <CardGrid>
-    {
-      posts.map((post) => (
-        <li>
-          <PostCard {...post} />
-        </li>
-      ))
-    }
-  </CardGrid>
+  {
+    featured.length > 0 && (
+      <section aria-labelledby="featured-posts">
+        <h2 id="featured-posts" class="visuallyHidden">
+          Latest posts
+        </h2>
+        <ul class={styles.featured}>
+          {featured.map((post, index) => (
+            <li class={styles.featuredItem}>
+              <PostCard {...post} variant="featured" tint={index % 2 === 0 ? 'faint' : 'subtle'} />
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  <section aria-labelledby="all-posts">
+    <h2 id="all-posts" class="visuallyHidden">All posts</h2>
+    <ul class={styles.grid}>
+      {
+        posts.map((post) => (
+          <li class={styles.item}>
+            <PostCard {...post} variant="dense" />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
   <Pagination current={page} total={totalPages} baseUrl={baseUrl} />
 </Section>
