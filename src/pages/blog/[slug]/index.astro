@@ -6,6 +6,7 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { JsonLd } from '~/components/JsonLd';
 import { PostHeader } from '~/components/PostHeader';
 import { RelatedPosts } from '~/components/RelatedPosts';
+import { tableOfContentsHeadings } from '~/components/TableOfContents';
 import { StructuredText } from '~/components/StructuredText';
 import { defaultBlockComponents } from '~/components/StructuredText/blocks';
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
@@ -42,6 +43,8 @@ const markdownUrl = new URL(
   Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
   baseUrl,
 );
+// MarkdownActions is in the table of contents. A post with too few headings has no table: then the header shows it.
+const hasToc = tableOfContentsHeadings(post.content).length > 0;
 ---
 
 <Layout
@@ -99,8 +102,8 @@ const markdownUrl = new URL(
 
   {/* The Markdown version of the page (markdownProxy) has only this element. */}
   <div id="main-content">
-    <PostHeader post={post} markdownUrl={markdownUrl.href} />
-    <ArticleBody content={post.content} tocTitle="In this article">
+    <PostHeader post={post} markdownUrl={hasToc ? undefined : markdownUrl.href} />
+    <ArticleBody content={post.content} tocTitle="In this article" markdownUrl={markdownUrl.href}>
       <StructuredText
         {...ensureValidStructuredTextProps({
           data: post.content,

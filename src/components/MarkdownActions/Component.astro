@@ -7,9 +7,15 @@ import styles from './style.module.css';
 interface Props {
   /** The address of the Markdown version of the page (the page address + ".md"). */
   markdownUrl: string;
+  /**
+   * "soft" (default): a soft button of 40px, with the menu centred under it.
+   * "quiet": a smaller pill with no fill and a hairline, with the menu at its
+   * left edge. For a narrow column, for example the table of contents.
+   */
+  variant?: 'soft' | 'quiet';
 }
 
-const { markdownUrl } = Astro.props;
+const { markdownUrl, variant = 'soft' } = Astro.props;
 const request = `Read ${markdownUrl} so I can ask questions about it.`;
 const links = [
   { label: 'View as Markdown', href: markdownUrl, icon: faMarkdown },
@@ -34,7 +40,7 @@ const links = [
 */
 }
 <markdown-actions
-  class={styles.root}
+  class:list={[styles.root, variant === 'quiet' && styles.quiet]}
   data-markdown-actions={markdownUrl}
   data-datocms-noindex
   hidden
