@@ -1,0 +1,231 @@
+---
+import { Button, type ButtonVariant } from '~/components/Button';
+import { Section } from '~/components/Section';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { THEMES, type Theme } from '~/lib/theme';
+
+// Show every button on every ground: each variant at rest, in the hover
+// state, with the focus ring and disabled, then the leading images, the
+// button without the arrow, and a button drawn inside a link. The ground
+// sets the colours (the button roles in src/styles/tokens.css). Choose
+// the theme with ?theme=, and the scheme with the switch at the top.
+//
+// This page is not in src/pages/. The integration "dev-tools" in
+// astro.config.ts adds its route only in `astro dev`, thus the build does
+// not have it.
+
+const seo = overrideSeo([], seoTitle('button gallery'));
+
+const param = Astro.url.searchParams.get('theme');
+const theme: Theme = THEMES.includes(param as Theme) ? (param as Theme) : 'default';
+
+const grounds = [
+  { background: 'default', name: 'Page' },
+  { background: 'accent-subtle', name: 'Page, accent tint (no ground class)' },
+  { background: 'accent', name: 'Accent' },
+  { background: 'inverse', name: 'Inverse' },
+] as const;
+
+const variants: { variant: ButtonVariant; note: string }[] = [
+  { variant: 'accent', note: 'The loudest. The same as solid off the page.' },
+  { variant: 'solid', note: 'The main action (the default).' },
+  { variant: 'soft', note: 'The secondary action.' },
+];
+
+// The hover state, drawn at rest: the local values of the hover.
+const hover = { style: '--btnBg: var(--btnBgHover); --btnFg: var(--btnFgHover);' };
+const focus = { style: 'outline: 2px solid currentColor; outline-offset: 2px;' };
+
+const userpic = [{ src: '/images/home/userpic-talk.png' }];
+const logos = [
+  { src: '/images/home/frameworks/react.png' },
+  { src: '/images/home/frameworks/nuxt.png' },
+  { src: '/images/home/frameworks/svelte.png' },
+];
+---
+
+<Layout seo={seo} theme={theme} headerVariant={false} footer={false}>
+  <header class="intro">
+    <p class="label">
+      Buttons on each ground. Theme:
+      {
+        THEMES.map((t) => (
+          <a href={`?theme=${t}`} aria-current={t === theme ? 'page' : undefined}>
+            {t}
+          </a>
+        ))
+      }
+    </p>
+    <button type="button" class="label schemeSwitch" data-scheme-switch>Switch scheme</button>
+  </header>
+
+  {
+    grounds.map(({ background, name }) => (
+      <Section background={background}>
+        <h2 class="title">{name}</h2>
+        <table class="grid">
+          <thead>
+            <tr class="caption">
+              <th />
+              <th>Rest</th>
+              <th>Hover</th>
+              <th>Focus</th>
+              <th>Disabled</th>
+            </tr>
+          </thead>
+          <tbody>
+            {variants.map(({ variant, note }) => (
+              <tr>
+                <th class="caption">
+                  {variant}
+                  <br />
+                  <span class="note">{note}</span>
+                </th>
+                <td>
+                  <Button variant={variant} href="#">
+                    Get Started
+                  </Button>
+                </td>
+                <td>
+                  <Button variant={variant} href="#" attrs={hover}>
+                    Get Started
+                  </Button>
+                </td>
+                <td>
+                  <Button variant={variant} href="#" attrs={focus}>
+                    Get Started
+                  </Button>
+                </td>
+                <td>
+                  <Button variant={variant} disabled>
+                    Get Started
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div class="extras">
+          <span class="caption">Size l</span>
+          <Button href="#" size="l" variant="accent" arrow={false}>
+            Get Started
+          </Button>
+          <Button href="#" size="l">
+            Get Started
+          </Button>
+          <Button href="#" size="l" variant="soft">
+            Read The Docs
+          </Button>
+          <Button href="#" size="l" leading="userpic" leadingImages={userpic}>
+            Let’s Talk
+          </Button>
+          <Button href="#" size="l" variant="soft" leading="logos" leadingImages={logos}>
+            Explore Integrations
+          </Button>
+        </div>
+        <div class="extras">
+          <span class="caption">Size m</span>
+          <Button href="#" arrow={false}>
+            No arrow
+          </Button>
+          <Button href="#" leading="userpic" leadingImages={userpic} arrow={false}>
+            Let’s Talk
+          </Button>
+          <Button href="#" variant="soft" leading="userpic" leadingImages={userpic}>
+            Talk To Sales
+          </Button>
+          <Button href="#" variant="soft" leading="logos" leadingImages={logos}>
+            Explore Integrations
+          </Button>
+          <a href="#" class="card">
+            <span class="caption">A link with a button inside</span>
+            <Button as="span">Try it on CodeSandbox</Button>
+          </a>
+        </div>
+      </Section>
+    ))
+  }
+</Layout>
+
+<script is:inline>
+  document.querySelector('[data-scheme-switch]').addEventListener('click', () => {
+    const root = document.documentElement;
+    root.dataset.scheme = root.dataset.scheme === 'dark' ? 'light' : 'dark';
+  });
+</script>
+
+<style>
+  @layer pages {
+    .intro {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-lg) var(--section-padding-x);
+    }
+
+    .intro a {
+      margin-inline-start: var(--space-3xs);
+      color: var(--text-muted);
+    }
+
+    .intro a[aria-current='page'] {
+      color: var(--text-primary);
+      text-decoration: underline;
+    }
+
+    .schemeSwitch {
+      padding: var(--space-3xs) var(--space-sm);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+    }
+
+    .title {
+      margin-bottom: var(--space-md);
+    }
+
+    .grid {
+      border-collapse: collapse;
+    }
+
+    .grid th,
+    .grid td {
+      padding: var(--space-3xs) var(--space-md) var(--space-3xs) 0;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .note {
+      color: var(--text-muted);
+    }
+
+    .extras {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      align-items: center;
+      margin-top: var(--space-lg);
+    }
+
+    .card {
+      display: inline-flex;
+      gap: var(--space-sm);
+      align-items: center;
+      padding: var(--space-xs) var(--space-xs) var(--space-xs) var(--space-sm);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      color: inherit;
+      text-decoration: none;
+    }
+
+    @media (hover: hover) {
+      .card:hover > :global(span:last-child) {
+        background: var(--surface-button-hover);
+        color: var(--text-button-hover);
+      }
+    }
+  }
+</style>

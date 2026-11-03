@@ -136,6 +136,19 @@ export const STATUS_PAIRS: [surface: string, text: string][] = [
 ];
 
 /**
+ * The button: each state is a fill with its text. The ground under the
+ * button fills the slots, thus the pairs sit on the three grounds. The
+ * soft hover is the solid hover.
+ */
+export const BUTTON_PAIRS: [surface: string, text: string][] = [
+  ['--surface-button', '--text-button'],
+  ['--surface-button-hover', '--text-button-hover'],
+  ['--surface-button-soft', '--text-button-soft'],
+  ['--surface-button-accent', '--text-button-accent'],
+  ['--surface-button-accent-hover', '--text-button-accent-hover'],
+];
+
+/**
  * The roles that a headline-muted token may colour: the quiet run of a
  * two-tone headline. Only these files may use a *headline-muted token.
  */

@@ -201,7 +201,7 @@ export const form: ContactFormData = {
     headline: 'Thank you for reaching out!',
     muted: 'We will be in touch soon',
     face: 'laugh',
-    button: { label: 'Back to homepage', href: '/', appearance: 'deep-on-white', variant: 'soft' },
+    button: { label: 'Back to homepage', href: '/', variant: 'soft' },
   },
 };
 
@@ -211,7 +211,6 @@ export const testimonials: { button: ButtonData } = {
   button: {
     label: 'Read the wall of love',
     href: '/wall',
-    appearance: 'deep-on-white',
     variant: 'soft',
     arrow: true,
   },

@@ -122,26 +122,34 @@ spacing:
   3xl: '80px'
   4xl: '160px'
 components:
-  button-light-on-white:
-    backgroundColor: '{colors.pollen}'
-    textColor: '{colors.espresso}'
-    typography: '{typography.label-medium}'
-    rounded: '{rounded.full}'
-    height: '40px'
-    padding: '0 10px'
-  button-light-on-white-hover:
-    backgroundColor: '{colors.espresso}'
-    textColor: '{colors.pollen}'
-  button-deep-on-white:
+  button-solid-on-page:
     backgroundColor: '{colors.espresso}'
     textColor: '{colors.cream-paper}'
     typography: '{typography.label-medium}'
     rounded: '{rounded.full}'
     height: '40px'
-    padding: '0 10px'
-  button-deep-on-white-hover:
+    padding: '0 16px'
+  button-solid-on-page-hover:
     backgroundColor: '{colors.pollen}'
     textColor: '{colors.espresso}'
+  button-solid-on-accent:
+    backgroundColor: '{colors.espresso}'
+    textColor: '{colors.pollen}'
+  button-solid-on-accent-hover:
+    backgroundColor: '{colors.cream-paper}'
+    textColor: '{colors.espresso}'
+  button-solid-on-inverse:
+    backgroundColor: '{colors.pollen}'
+    textColor: '{colors.espresso}'
+  button-solid-on-inverse-hover:
+    backgroundColor: '{colors.cream-paper}'
+    textColor: '{colors.espresso}'
+  button-accent-on-page:
+    backgroundColor: '{colors.pollen}'
+    textColor: '{colors.espresso}'
+  button-accent-on-page-hover:
+    backgroundColor: '{colors.espresso}'
+    textColor: '{colors.pollen}'
   tab-pill:
     textColor: '{colors.espresso}'
     typography: '{typography.label-medium}'
@@ -230,10 +238,10 @@ The rules below are the whole system. `src/styles/tokens.css` states them, `src/
 1. **Three grounds.** Every element sits on one ground: the **page** (`--surface-default` and its tints: `--surface-accent-faint|subtle|muted`, `--surface-inverse-faint`, `--surface-field`, `--surface-nav-active`, `--surface-status-*`), the **accent** (`--surface-accent`, bright in both schemes, dark text) or the **inverse** (`--surface-inverse`, deep in both schemes, light text). The code card (`--code-background`, `--code-*`) is a fourth, small ground.
 2. **Canonical text roles**, one set for each ground: page `--text-on-page`, `-soft`, `-muted`, `-headline-muted`; accent `--text-on-accent`, `-soft`, `-muted`, `-headline-muted`; inverse `--text-on-inverse-strong`, `--text-on-inverse`, `-soft`, `-muted`, `-headline-muted`. Each role has 4.5:1 or more on every surface of its ground, in the six themes and the two schemes. The one exception is `*-headline-muted`: 3:1 or more, for the quiet run of a two-tone headline or display lockup only (large text, 24px or more: a `.display` or `.headline` heading, the quiet words of the Single Source lockup; a `.title` is 20px on phones and takes `--text-muted`). Borders: `--border-on-page|accent|inverse` and `-strong`.
 3. **Contextual roles follow the ground, not the theme.** A component that does not paint a ground uses `--text-primary`, `--text-soft`, `--text-muted`, `--text-headline-muted`, `--border-default`, `--border-strong`, `--text-accent`, `--text-positive`, `--text-negative`. They resolve to the canonical roles of the ground that the element sits on. A theme switch (`data-theme`) inside a ground keeps the light or dark text of the ground.
-4. **Ground classes.** The element that paints a ground gets the global class of the ground: `surfacePage` (a window of the page inside another ground: a chat, the mega menu), `surfaceAccent` or `surfaceInverse`. The class sets the contextual roles and `color`. A small shape (a button, a pill, a hovered row) that paints the accent or the inverse sets `color` to a canonical role of that ground in the same rule. A ground that comes with the viewport or a state (the split header, a hovered row that turns to the accent) cannot take a class: the rule sets a contextual role to the canonical role of the same kind (`--text-muted: var(--text-on-accent-muted)`), and nothing else.
+4. **Ground classes.** The element that paints a ground gets the global class of the ground: `surfacePage` (a window of the page inside another ground: a chat, the mega menu), `surfaceAccent` or `surfaceInverse`. The class sets the contextual roles and `color`. A small shape (a pill, a hovered row) that paints the accent or the inverse sets `color` to a canonical role of that ground in the same rule. A button takes its colours from the button roles (`--surface-button*`, `--text-button*`), which the ground class fills: see Buttons. A ground that comes with the viewport or a state (the split header, a hovered row that turns to the accent) cannot take a class: the rule sets a contextual role to the canonical role of the same kind (`--text-muted: var(--text-on-accent-muted)`), and nothing else.
 5. **No alpha on text outside `tokens.css`.** A text colour is a token. No `opacity`, no `color-mix()` and no new `--text-*` property on a text colour in a component: every tint of text is a role. `opacity` under 1 is only for an element without text (a picture, a placeholder card), an inactive control or a pressed state, and says so in a disable comment.
 
-A surface as text is a pill: `--surface-default` on a fill of `--text-primary` (the deep button), `--surface-inverse` on `--text-on-inverse-strong` (the actor of a diagram). The lint accepts them only with the fill in the same rule.
+A surface as text is a pill: `--surface-default` on a fill of `--text-primary` (an ink pill), `--surface-inverse` on `--text-on-inverse-strong` (the actor of a diagram). The lint accepts them only with the fill in the same rule.
 
 ### Named Rules
 
@@ -350,7 +358,7 @@ Each page has one theme: the theme of the layout (a necessary prop). The header,
 
 The same six hues serve the areas and the pillars. On a reference page the hue is the area; on a marketing page it is the pillar. They meet only through links, never on one page.
 
-**The ground of the hero.** A marketing page has its hero on the page ground: the scene or the typewriter carries it. A reference page has its hero on the accent: the band of colour marks the area. An article (a post, an entry of the changelog) has the header on the accent, above the header of the article on the page ground. No hero is on the inverse: the footer holds the inverse at the end of the page. The header always takes the ground and the theme of the hero.
+**The ground of the hero.** A marketing page has its hero on the page ground: the scene or the typewriter carries it. A reference page has its hero on the accent: the band of colour marks the area. The Partners area is the exception: its heroes are on the page ground, because the logo of a partner keeps its own colours there. On `/partners` the accent marks the area one band lower, in the band with the counts and the map. An article (a post, an entry of the changelog) has the header on the accent, above the header of the article on the page ground. No hero is on the inverse: the footer holds the inverse at the end of the page. The header always takes the ground and the theme of the hero.
 
 **The ground of the closer.** The page closer is on the inverse (the `tonal` palette). The footer, with the "Questions? Ask away [••]" band, is on `--surface-inverse-deep`: the inverse of the same hue, 0.06 darker in OKLCH lightness. Thus the closer and the footer are two deep blocks in one hue, and the end of the closer stays visible. Only the footer and that band use `--surface-inverse-deep` (the lint enforces it). An accent palette (`silhouette`, `onAccent`) is only for a page whose last band above the closer is on the inverse, thus three deep blocks never stack.
 
@@ -380,15 +388,20 @@ Signs are typographic, not icons: `→` at the end of a button or a link, `+` an
 
 ### Buttons
 
-Friendly and direct: a pill that says where it goes.
+Friendly and direct: a pill that says where it goes. The ground under the button sets its colours, thus a button has no colour prop: the `Button` component (`src/components/Button/`) takes a `variant`, and the button roles of `src/styles/tokens.css` resolve on the ground. `src/styles/tokens.test.ts` checks every state on every ground, theme and scheme. `/dev/button-gallery` (dev only) shows them all.
 
-- **Shape:** full pill (9999px), 40px tall, 10px side padding, `.labelMedium` (500). An arrow `→` follows the label by default.
-- **Light on white** (the default): the accent as fill, the deep text. The main call to action on a paper band.
-- **Deep on white:** the deep as fill, paper text. A strong secondary, or the main action on a light accent band.
-- **Deep on light / light on deep:** the same pair, for inverse and accent bands.
-- **Soft:** a faint tint of the deep (or of the accent) as fill, deep text. The secondary in a group.
-- **Hover / Focus:** the two colours swap instantly, without a transition. A hover to the page surface takes `--text-on-page`, the canonical role: the contextual `--text-primary` is light on an inverse band. Active adds 80% opacity. Focus is a 2px outline in the current colour, 2px offset. Disabled is 40% opacity.
-- **Leading items:** a 20px round avatar or a row of overlapping logos can lead the label ("Lets Talk!", "Explore Integrations").
+- **Shape:** full pill (9999px). An arrow `→` follows the label by default; `arrow={false}` drops it.
+- **Sizes** (`size`):
+  - **m** (the default): 40px tall, 16px of air at each side, `.labelMedium` (500). A control that sits next to a button (a split action, an icon button, a page number) is 40px too.
+  - **l:** 48px tall, 20px of air at each side, `--type-m` at 500, 24px leading images. For a moment that asks for one action: a hero, a page closer. The buttons of a group have one size.
+- **Variants:**
+  - **Solid** (the default): the main action. The colour that contrasts most with the ground, with the colour of the ground as text: the deep on the page and on the accent, the accent on the inverse.
+  - **Soft:** the secondary action, next to a solid or an accent. A faint tint of the deep (of the accent on the inverse), with the primary text.
+  - **Accent:** the loudest action, on the page only: the accent as fill, the deep as text (the hero "Get Started"). On the accent and on the inverse it is the same as solid.
+- **Hover:** the colours swap instantly, without a transition. Solid and soft go to the accent on the page, and to the page surface on the accent and on the inverse. Accent goes to the deep. Active keeps the hover and adds 80% opacity. Focus is a 2px outline in the current colour, 2px offset. Disabled is 40% opacity.
+- **Leading items:** a round userpic or a row of up to three overlapping logos (20px, 24px in size l) leads the label ("Let’s Talk", "Explore Integrations"). The arrow stays optional.
+- **A button inside a link** (a preview that links): `<Button as="span">`, and the link sets the hover of the span with `--surface-button-hover` and `--text-button-hover`.
+- **A tint without a ground class** (an accent-subtle cell) is part of the page: its buttons take the page values.
 
 ### Chips (category nav, tabs)
 

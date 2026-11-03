@@ -29,7 +29,6 @@ import type { CategoryNavData } from '~/components/CategoryNav';
 const docs = (href: string): ChapterHeaderData['link'] => ({
   label: 'Read The Docs',
   href,
-  appearance: 'deep-on-white',
   variant: 'soft',
 });
 
@@ -47,13 +46,11 @@ export const hero: HeroData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-white',
       arrow: false,
     },
     {
       label: 'Connect Your AI',
       href: '/docs/mcp-server',
-      appearance: 'deep-on-white',
       variant: 'soft',
     },
   ],
@@ -163,7 +160,6 @@ export const translations: ChapterLayoutData = {
     link: {
       label: 'See The Plugin',
       href: '/plugins/i/datocms-plugin-ai-translations',
-      appearance: 'deep-on-white',
       variant: 'soft',
     },
   },
@@ -221,10 +217,9 @@ export const ctaBuild: CtaBannerData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-light',
       arrow: false,
     },
-    { label: 'Book a Demo', href: '/contact', appearance: 'deep-on-light', variant: 'soft' },
+    { label: 'Book a Demo', href: '/contact', variant: 'soft' },
   ],
 };
 

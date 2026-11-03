@@ -32,7 +32,6 @@ import type { CategoryNavData } from '~/components/CategoryNav';
 const docs = (href: string): ChapterHeaderData['link'] => ({
   label: 'Read The Docs',
   href,
-  appearance: 'deep-on-white',
   variant: 'soft',
 });
 
@@ -46,13 +45,11 @@ export const hero: HeroData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-white',
       arrow: false,
     },
     {
       label: 'Read The Docs',
       href: '/docs/asset-api/images',
-      appearance: 'deep-on-white',
       variant: 'soft',
     },
   ],
@@ -284,13 +281,11 @@ export const ctaBuild: CtaBannerData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-light',
       arrow: false,
     },
     {
       label: 'Try The Demo',
       href: 'https://try.datocms.com',
-      appearance: 'deep-on-light',
       variant: 'soft',
     },
   ],

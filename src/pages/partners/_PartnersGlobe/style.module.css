@@ -1,0 +1,89 @@
+/*
+ * The globe sits on the accent band. The canvas is a pixel video with the
+ * `partnersGlobe` palette (src/lib/pixel-video/styles.ts). The still SVG
+ * of the server has the same fills, with no grid.
+ *
+ * The stage goes from edge to edge of the band, and is low: the globe is
+ * higher than the stage, thus the stage cuts its top and bottom with a
+ * hard edge.
+ */
+.globe {
+  display: block;
+}
+
+.stage {
+  position: relative;
+  margin-inline: calc(50% - 50vw);
+  height: clamp(240px, 36vw, 420px);
+  overflow: hidden;
+}
+
+.still,
+.canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.land {
+  fill: color-mix(in oklab, var(--surface-inverse) 28%, var(--surface-accent));
+}
+
+.partner {
+  fill: var(--surface-inverse);
+}
+
+/* The canvas takes the place of the SVG when the element is ready. */
+.canvas {
+  visibility: hidden;
+}
+
+.globe[data-ready] .canvas {
+  visibility: visible;
+}
+
+.globe[data-ready] .still {
+  visibility: hidden;
+}
+
+/*
+ * The readout: a pill of the deep over the country at the centre of the
+ * stage, with the flag and the name, then the number of partners. The
+ * element sets --readout-lift from the size of the country on the screen.
+ */
+.readout {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  gap: var(--space-xs);
+  align-items: baseline;
+  margin: 0;
+  padding: var(--space-xs) var(--space-sm);
+  color: var(--text-on-inverse-strong);
+  white-space: nowrap;
+  background: var(--surface-inverse);
+  border-radius: 999px;
+  opacity: 0;
+  translate: -50% calc(-100% - var(--readout-lift, 0px) - var(--space-md));
+  transition:
+    opacity 150ms cubic-bezier(0.23, 1, 0.32, 1),
+    translate 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.readout[data-visible] {
+  opacity: 1;
+  translate: -50% calc(-100% - var(--readout-lift, 0px) - var(--space-sm));
+}
+
+.readoutCount {
+  color: var(--text-on-inverse);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .readout {
+    transition: none;
+  }
+}

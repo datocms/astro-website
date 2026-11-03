@@ -9,9 +9,14 @@
   display: none;
 }
 
+/*
+ * A soft button in two parts: the action and the menu. The button roles
+ * of src/styles/tokens.css give the colours, as for the Button component.
+ */
 .pill {
   display: inline-flex;
-  border: 1px solid var(--border-strong);
+  background: var(--surface-button-soft);
+  color: var(--text-button-soft);
   border-radius: var(--radius-full);
 }
 
@@ -19,9 +24,9 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2xs);
-  height: 32px;
+  height: 40px;
   padding: 0 var(--space-sm);
-  color: var(--text-primary);
+  color: inherit;
   border-radius: var(--radius-full);
   cursor: pointer;
 }
@@ -32,9 +37,14 @@
   opacity: 0.6;
 }
 
+/* The action: round on the left, square at the line. */
+.part:first-child {
+  border-radius: var(--radius-full) 0 0 var(--radius-full);
+}
+
 .toggle {
   padding: 0 var(--space-xs);
-  border-left: 1px solid var(--border-strong);
+  border-left: 1px solid var(--border-default);
   border-radius: 0 var(--radius-full) var(--radius-full) 0;
 }
 
@@ -99,7 +109,11 @@
 }
 
 @media (hover: hover) {
-  .part:hover,
+  .part:hover {
+    background: var(--surface-button-hover);
+    color: var(--text-button-hover);
+  }
+
   .item:hover {
     background: var(--surface-inverse-faint);
   }

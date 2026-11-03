@@ -12,19 +12,17 @@ export const hero: HeroData = {
     {
       label: 'Let’s Talk!',
       href: '/contact',
-      appearance: 'deep-on-light',
       arrow: false,
       leading: 'userpic',
       leadingImages: [{ src: '/images/home/userpic-talk.png' }],
     },
-    { label: 'Explore Pricing', href: '/pricing', appearance: 'deep-on-light', variant: 'soft' },
+    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
   ],
 };
 
 /* The button of the highlight story. The page gives the link. */
 export const featuredButton: Omit<ButtonData, 'href'> = {
   label: 'Learn More',
-  appearance: 'deep-on-white',
   variant: 'soft',
 };
 
@@ -37,10 +35,9 @@ export const ctaBuild: CtaBannerData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'light-on-deep',
       arrow: false,
     },
-    { label: 'Explore Pricing', href: '/pricing', appearance: 'light-on-deep', variant: 'soft' },
+    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
   ],
 };
 

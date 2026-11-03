@@ -164,11 +164,11 @@ export const hero: HeroData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'light-on-white',
+      variant: 'accent',
       arrow: false,
       theme: 'orange',
     },
-    { label: 'Docs', href: '/docs', appearance: 'deep-on-white', variant: 'soft', arrow: false },
+    { label: 'Docs', href: '/docs', variant: 'soft', arrow: false },
   ],
   logos: [
     svgLogo(polestarClient, 'Polestar'),
@@ -201,10 +201,10 @@ export const homeHero: HomeHeroData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'light-on-white',
+      variant: 'accent',
       arrow: false,
     },
-    { label: 'Docs', href: '/docs', appearance: 'deep-on-white', variant: 'soft', arrow: false },
+    { label: 'Docs', href: '/docs', variant: 'soft', arrow: false },
   ],
   logosLabel: 'Trusted by teams at',
   logos: [
@@ -221,11 +221,11 @@ export const homeHero: HomeHeroData = {
 export const userExperience: UserExperienceData = {
   developer: {
     headline: 'Fresh tools, predictable workflows, and full control.',
-    button: { label: 'Developer Comfort', href: '/developers', appearance: 'deep-on-light' },
+    button: { label: 'Developer Comfort', href: '/developers' },
   },
   editor: {
     headline: 'Familiar editing, structured content, and fewer bottlenecks.',
-    button: { label: 'Editor Happiness', href: '/editor-experience', appearance: 'deep-on-light' },
+    button: { label: 'Editor Happiness', href: '/editor-experience' },
   },
   record: {
     title: 'Infrastructure with human skills',
@@ -311,7 +311,6 @@ export const features: FeaturesData = {
   button: {
     label: 'See All Features',
     href: '/features',
-    appearance: 'deep-on-light',
     variant: 'soft',
   },
 };
@@ -449,7 +448,6 @@ export const frameworkIntegration: TextWithImageData = {
   button: {
     label: 'Explore Integrations',
     href: '/docs',
-    appearance: 'deep-on-white',
     variant: 'soft',
     leading: 'logos',
     leadingImages: [
@@ -531,7 +529,7 @@ export const questionAnswer: QuestionAnswerData = {
   // New copy. Leads to the AI pillar.
   more: {
     text: 'Translations, image tags, video captions, and whatever ships next. All opt-in.',
-    button: { label: 'Explore AI', href: '/ai', appearance: 'deep-on-light', variant: 'soft' },
+    button: { label: 'Explore AI', href: '/ai', variant: 'soft' },
   },
 };
 
@@ -545,7 +543,6 @@ export const community: CommunityData = {
   button: {
     label: 'Visit Community',
     href: 'https://community.datocms.com',
-    appearance: 'deep-on-white',
     variant: 'soft',
   },
   // Left to right.
@@ -592,7 +589,6 @@ export const ctaSlack: CtaBannerData = {
     {
       label: 'Join Us On Slack',
       href: 'https://datocms.com/slack',
-      appearance: 'deep-on-light',
       variant: 'soft',
     },
   ],
@@ -603,9 +599,7 @@ export const ctaPricing: CtaBannerData = {
   theme: 'default',
   headline: 'Pricing as it should be.',
   muted: 'Transparent and predictable (even when renewing).',
-  buttons: [
-    { label: 'Explore Pricing', href: '/pricing', appearance: 'deep-on-light', variant: 'soft' },
-  ],
+  buttons: [{ label: 'Explore Pricing', href: '/pricing', variant: 'soft' }],
 };
 
 export const productUpdates: ProductUpdatesData = {
@@ -620,7 +614,6 @@ export const caseStudies: CaseStudiesData = {
     {
       label: 'Let’s Talk',
       href: '/contact',
-      appearance: 'deep-on-white',
       arrow: false,
       leading: 'userpic',
       leadingImages: [{ src: '/images/home/userpic-talk.png' }],
@@ -628,7 +621,6 @@ export const caseStudies: CaseStudiesData = {
     {
       label: 'All Case Studies',
       href: '/case-studies',
-      appearance: 'deep-on-white',
       variant: 'soft',
     },
   ],
@@ -641,7 +633,6 @@ export const partners: PartnersData = {
     {
       label: 'Become a Partner',
       href: '/partner-program',
-      appearance: 'light-on-deep',
       arrow: false,
       leading: 'userpic',
       leadingImages: [{ src: '/images/home/userpic-partner.png' }],
@@ -649,7 +640,6 @@ export const partners: PartnersData = {
     {
       label: 'Explore All Partners',
       href: '/partners',
-      appearance: 'light-on-deep',
       variant: 'soft',
     },
   ],

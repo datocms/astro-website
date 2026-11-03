@@ -44,13 +44,11 @@ export const hero: HeroData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-white',
       arrow: false,
     },
     {
       label: 'Talk To Sales',
       href: '/contact',
-      appearance: 'deep-on-white',
       variant: 'soft',
     },
   ],
@@ -148,7 +146,6 @@ export const ctaStart: CtaBannerData = {
     {
       label: 'Get Started For Free',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-light',
       arrow: false,
     },
   ],
@@ -162,7 +159,6 @@ export const openSlot: OpenSlotData = {
   button: {
     label: 'Suggest a feature',
     href: 'https://community.datocms.com/c/feature-requests/22',
-    appearance: 'deep-on-white',
     variant: 'soft',
   },
 };

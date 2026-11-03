@@ -26,7 +26,7 @@ interface Props extends ChapterHeaderData {
   /**
    * The surface of the section. Give the same value to the SceneFrame below,
    * thus the header and the scene are on one surface. On `inverse` the text
-   * is light, and the link uses the `light-on-deep` appearance.
+   * is light.
    * `split`: the section has no background, and its parent draws the
    * background of VersusSplit (see ChapterLayout). Below 1152px all the
    * text is on the inverse surface. From 1152px the label and the headline
@@ -51,15 +51,9 @@ const {
   id,
 } = Astro.props;
 
-// On a dark surface the link must be light. The variant comes from the data.
+// The ground sets the colours of the link. The variant comes from the data.
 // On `split` the link is solid: an accent pill, the colour of the left half.
-const onInverse = background === 'inverse' || background === 'split';
-const button =
-  link && background === 'split'
-    ? { ...link, appearance: 'light-on-deep' as const, variant: 'solid' as const }
-    : link && onInverse
-      ? { ...link, appearance: 'light-on-deep' as const }
-      : link;
+const button = link && background === 'split' ? { ...link, variant: 'solid' as const } : link;
 ---
 
 {/* The first part of a chapter: label, two-tone headline, intro. A SceneFrame follows it. */}

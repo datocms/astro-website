@@ -1,0 +1,95 @@
+---
+// The globe of the countries of the partners, on the accent band of
+// /partners: a live pixel video. The sea is a quiet grid of squares, the
+// land is a quarter of the deep, a country with partners is the deep. The
+// globe is higher than the stage: the stage cuts its top and bottom.
+//
+// - The server draws the still globe as an SVG (the wide view, the cells
+//   of the land with no grid), thus the globe shows without JS. The
+//   element (element.ts) then draws it into a canvas with the renderer of
+//   the pixel videos, and tours the countries with the most partners: it
+//   flies to each one, zooms in, and shows its name and its number of
+//   partners.
+// - The globe is a thing to watch: no pointer, no focus. The list of the
+//   countries is for screen readers, as text.
+import { index } from '~/data/partners';
+import { HIGH, MID } from '~/lib/pixel-video/format';
+import { countries as mapCountries, createFrame, rasterize, WIDE } from './globe';
+import s from './style.module.css';
+
+export type GlobeCountry = {
+  /** The ISO 3166-1 alpha-2 code. */
+  code: string;
+  /** The flag and the name. */
+  label: string;
+  count: number;
+};
+
+interface Props {
+  /** The countries with partners, the most partners first. */
+  countries: GlobeCountry[];
+}
+
+const { countries } = Astro.props;
+
+const partnerCodes = new Set(countries.map((c) => c.code));
+
+// The still globe at the size of the stage on a wide screen (1440 × 420 px,
+// cells of 6 px). The SVG covers the stage, and a narrow stage cuts its sides.
+const frame = createFrame(240, 70);
+rasterize(WIDE, (i) => partnerCodes.has(mapCountries[i]!.code), -1, frame);
+
+// For each row of cells, the runs of land and of the countries with
+// partners. One unit of the SVG is one cell.
+const paths: Record<number, string> = { [MID]: '', [HIGH]: '' };
+for (let j = 0; j < frame.rows; j++) {
+  let i = 0;
+  while (i < frame.cols) {
+    const layer = frame.cells[j * frame.cols + i]!;
+    let end = i + 1;
+    while (end < frame.cols && frame.cells[j * frame.cols + end] === layer) end++;
+    if (layer in paths) paths[layer] += `M${i} ${j}h${end - i}v1h${i - end}z`;
+    i = end;
+  }
+}
+---
+
+<partners-globe class={s.globe}>
+  <div class={s.stage} data-stage>
+    <svg
+      class={s.still}
+      viewBox={`0 0 ${frame.cols} ${frame.rows}`}
+      preserveAspectRatio="xMidYMid slice"
+      shape-rendering="crispEdges"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path class={s.land} d={paths[MID]}></path>
+      <path class={s.partner} d={paths[HIGH]}></path>
+    </svg>
+    <canvas class={s.canvas} aria-hidden="true"></canvas>
+    <p class:list={[s.readout, 'labelMedium']} aria-hidden="true" data-readout>
+      <span data-readout-label></span>
+      <span class={s.readoutCount} data-readout-count></span>
+    </p>
+  </div>
+  <ul class="visuallyHidden" aria-label={index.globe.label}>
+    {
+      countries.map((country) => (
+        <li
+          data-code={country.code}
+          data-label={country.label}
+          data-count={index.globe.count(country.count)}
+        >
+          {country.label}: {index.globe.count(country.count)}
+        </li>
+      ))
+    }
+  </ul>
+</partners-globe>
+
+<script>
+  import { PartnersGlobeElement } from './element';
+
+  customElements.define('partners-globe', PartnersGlobeElement);
+</script>

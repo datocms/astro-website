@@ -1,22 +1,24 @@
 ---
-import { Button, type ButtonData } from '~/components/Button';
+import { Button, type ButtonData, type ButtonSize } from '~/components/Button';
 import styles from './style.module.css';
 
 interface Props {
   buttons: ButtonData[];
+  /** The size of all the buttons: the buttons of a group have one size. */
+  size?: ButtonSize;
   class?: string;
   [key: `data-${string}`]: string;
 }
 
-const { buttons, class: className, ...rest } = Astro.props;
+const { buttons, size, class: className, ...rest } = Astro.props;
 ---
 
 <div class:list={[styles.buttonGroup, className]} {...rest}>
   {
     buttons.map((b) => (
       <Button
-        appearance={b.appearance}
         variant={b.variant}
+        size={size ?? b.size}
         arrow={b.arrow}
         leading={b.leading}
         leadingImages={b.leadingImages}

@@ -1,49 +1,55 @@
-.stack {
+/*
+ * The band of the globe and the partner program, on the accent (bright in
+ * both schemes). The globe goes to the edges of the page and starts at the
+ * top edge of the band. 100vw includes the scrollbar: clip at the edge of
+ * the band. Under the globe, the partner program sits in the middle of a
+ * strip: the gap above it and the padding below it are the same.
+ */
+.reachBand {
+  --reach-gap: var(--space-2xl);
+
+  padding-top: 0;
+  padding-bottom: var(--reach-gap);
+  overflow-x: clip;
+}
+
+.reach {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xl);
+  gap: var(--reach-gap);
 }
 
-.announce:any-link {
-  display: block;
-  padding: var(--space-md) var(--space-lg);
+/*
+ * The partner program: a row under the globe, the text at the left and the
+ * button at the right. The hard bottom edge of the globe divides it from
+ * the globe: it has no hairline.
+ */
+.announce {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  align-items: flex-start;
+  color: var(--text-soft);
+}
+
+.announce strong {
   color: var(--text-primary);
-  text-align: center;
-  background: var(--surface-accent-faint);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-}
-
-@media (hover: hover) {
-  .announce:hover {
-    border-color: var(--border-strong);
-  }
-}
-
-.announce:focus-visible {
-  outline: 2px solid var(--border-strong);
-  outline-offset: var(--space-4xs);
-}
-
-.grid {
-  display: grid;
-  gap: var(--space-lg);
-  grid-template-columns: minmax(0, 1fr);
-  list-style: none;
 }
 
 .empty {
+  padding-top: var(--space-xl);
   color: var(--text-muted);
 }
 
 @media (min-width: 768px) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .announce {
+    flex-direction: row;
+    gap: var(--space-xl);
+    align-items: center;
+    justify-content: space-between;
   }
-}
 
-@media (min-width: 1152px) {
-  .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .announce p {
+    max-width: var(--reading-max);
   }
 }

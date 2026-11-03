@@ -2,11 +2,11 @@
 import type { HTMLAttributes } from 'astro/types';
 import type { Theme } from '~/lib/theme';
 import styles from './style.module.css';
-import type { ButtonAppearance, ButtonImage } from './types';
+import type { ButtonImage, ButtonSize, ButtonVariant } from './types';
 
 interface Props {
-  appearance?: ButtonAppearance;
-  variant?: 'solid' | 'soft';
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   /** A 20px userpic or a stack of 20px logos before the label. */
   leading?: 'userpic' | 'logos';
   leadingImages?: ButtonImage[];
@@ -14,6 +14,11 @@ interface Props {
   href?: string;
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
+  /**
+   * `span` draws the button inside a control that already is a link or a
+   * button (a card that links). It has no behaviour of its own.
+   */
+  as?: 'span';
   /** Overrides the theme of the section. Use only for deliberate exceptions. */
   theme?: Theme;
   class?: string;
@@ -21,64 +26,49 @@ interface Props {
 }
 
 const {
-  appearance = 'light-on-white',
   variant = 'solid',
+  size = 'm',
   leading,
   leadingImages = [],
   arrow = true,
   href,
   type = 'button',
   disabled = false,
+  as,
   theme,
   class: className,
   attrs,
 } = Astro.props;
 
-const appearanceClass = {
-  'deep-on-white': styles.deepOnWhite,
-  'light-on-white': styles.lightOnWhite,
-  'deep-on-light': styles.deepOnLight,
-  'light-on-deep': styles.lightOnDeep,
-}[appearance];
-
 const classes = [
   styles.button,
   'labelMedium',
-  appearanceClass,
+  variant === 'accent' && styles.accent,
   variant === 'soft' && styles.soft,
+  size === 'l' && styles.large,
   leading && styles.hasLeading,
   className,
 ];
+
+// The leading images keep the same inset from the top, the side and the bottom.
+const imageSize = size === 'l' ? 24 : 20;
+
+const Tag = as ?? (href && !disabled ? 'a' : 'button');
+const tagProps = Tag === 'a' ? { href } : Tag === 'button' ? { type, disabled } : {};
 ---
 
-{
-  href && !disabled ? (
-    <a href={href} class:list={classes} data-theme={theme} {...attrs}>
-      {leading && (
-        <span class:list={[styles.leading, leading === 'logos' && styles.logos]}>
-          {leadingImages.map((img) => (
-            <img src={img.src} alt={img.alt ?? ''} width="20" height="20" />
-          ))}
-        </span>
-      )}
-      <span class={styles.label}>
-        <slot />
-        {arrow && <span aria-hidden="true"> →</span>}
+<Tag class:list={classes} data-theme={theme} {...tagProps} {...attrs}>
+  {
+    leading && (
+      <span class:list={[styles.leading, leading === 'logos' && styles.logos]}>
+        {leadingImages.map((img) => (
+          <img src={img.src} alt={img.alt ?? ''} width={imageSize} height={imageSize} />
+        ))}
       </span>
-    </a>
-  ) : (
-    <button type={type} class:list={classes} data-theme={theme} disabled={disabled} {...attrs}>
-      {leading && (
-        <span class:list={[styles.leading, leading === 'logos' && styles.logos]}>
-          {leadingImages.map((img) => (
-            <img src={img.src} alt={img.alt ?? ''} width="20" height="20" />
-          ))}
-        </span>
-      )}
-      <span class={styles.label}>
-        <slot />
-        {arrow && <span aria-hidden="true"> →</span>}
-      </span>
-    </button>
-  )
-}
+    )
+  }
+  <span class={styles.label}>
+    <slot />
+    {arrow && <span aria-hidden="true"> →</span>}
+  </span>
+</Tag>

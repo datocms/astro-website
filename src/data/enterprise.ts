@@ -47,7 +47,6 @@ function logo(svg: string, alt: string): LogoItem {
 const docs = (label: string, href: string): ButtonData => ({
   label,
   href,
-  appearance: 'deep-on-white',
   variant: 'soft',
 });
 
@@ -59,11 +58,10 @@ export const hero: HeroData & { subtitle: string; logosLabel: string } = {
   subtitle:
     'A complete headless CMS with the **governance, service and features to ensure you take your content machine to scale**. Dedicated onboarding service, premium technical support, private cloud and custom SLAs',
   buttons: [
-    { label: 'Talk To Sales', href: '#form', appearance: 'deep-on-white', arrow: false },
+    { label: 'Talk To Sales', href: '#form', arrow: false },
     {
       label: 'Read Our Security Page',
       href: '/security',
-      appearance: 'deep-on-white',
       variant: 'soft',
     },
   ],
@@ -271,7 +269,7 @@ export const ctaClose: CtaBannerData = {
   // CtaBanner prints the subline as plain text: it has no marks.
   subline: 'An enterprise CMS has to scale with your company without extra effort.',
   buttons: [
-    { label: 'Talk To Sales', href: '#form', appearance: 'deep-on-light', arrow: false },
-    { label: 'Explore Pricing', href: '/pricing', appearance: 'deep-on-light', variant: 'soft' },
+    { label: 'Talk To Sales', href: '#form', arrow: false },
+    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
   ],
 };

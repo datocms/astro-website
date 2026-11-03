@@ -1,13 +1,15 @@
 ---
-// The list of the partners: the world map, the link to the partner
-// program, the filters and a card for each partner. The highlighted
+// The list of the partners: a band with the globe of the countries of the
+// partners and the link to the partner program, then the filters and a
+// cell for each partner. The highlighted
 // partners come first, then the partners with most showcase projects.
 import { stripStega } from '@datocms/astro';
 import sortBy from 'lodash-es/sortBy';
+import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { FilterForm } from '~/components/FilterForm';
 import { Hero } from '~/components/Hero';
-import { PartnerCard } from '~/components/PartnerCard';
+import { PartnerCard, PartnerGrid } from '~/components/PartnerCard';
 import { Section } from '~/components/Section';
 import { PlainText } from '~/components/StructuredText';
 import { filterPlaceholder, index, projectsCountLabel } from '~/data/partners';
@@ -16,7 +18,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { buildUrlForPartner } from '~/lib/datocms/gqlUrlBuilder/partner';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
-import PartnersMap from './_PartnersMap';
+import PartnersGlobe, { type GlobeCountry } from './_PartnersGlobe/Component.astro';
 import { countersForDropdown, countersToOptions } from './_facets';
 import { query } from './_graphql';
 import s from './_style.module.css';
@@ -45,14 +47,22 @@ const orderedPartnersWithStega = [
 // The filters compare plain text: the stega of Content Link is not part of it.
 const orderedPartnersWithoutStega = stripStega(orderedPartnersWithStega);
 
-const partnersCountByCountryCode: Record<string, number> = {};
-for (const partner of partners) {
+// The countries of the globe. The code is a key of the globe: it must not
+// hold the stega of Content Link.
+const globeCountriesByCode = new Map<string, GlobeCountry>();
+for (const partner of stripStega(partners)) {
   for (const location of partner.locations) {
-    // The country code is a key of the map: it must not hold the stega of Content Link.
-    const code = stripStega(location.code);
-    partnersCountByCountryCode[code] = (partnersCountByCountryCode[code] || 0) + 1;
+    const label = `${location.emoji} ${location.name}`;
+    const country = globeCountriesByCode.get(location.code) ?? {
+      code: location.code,
+      label,
+      count: 0,
+    };
+    country.count += 1;
+    globeCountriesByCode.set(location.code, country);
   }
 }
+const globeCountries = sortBy([...globeCountriesByCode.values()], [(c) => -c.count, 'label']);
 
 const activeFilters = {
   technology: Astro.url.searchParams.get('technology'),
@@ -109,10 +119,10 @@ const filters = [
 <Layout
   theme="pink"
   seo={overrideSeo(page._seoMetaTags, seoTitle(index.seoTitle), seoDescription(index.hero.intro))}
-  headerVariant="accent"
+  headerVariant="page"
 >
   <Hero
-    variant="accent"
+    variant="page"
     label={index.hero.label}
     headline={index.hero.headline}
     subheadline={index.hero.subheadline}
@@ -120,22 +130,23 @@ const filters = [
     <p slot="intro">{index.hero.intro}</p>
   </Hero>
 
-  <Section>
-    <div class={s.stack}>
-      <PartnersMap
-        partnersCountByCountryCode={partnersCountByCountryCode}
-        label={index.mapLabel}
-        client:visible
-      />
-      <a href={index.announce.href} class:list={[s.announce, 'body']}>
-        <strong>{index.announce.strong}</strong>{' '}{index.announce.text}
-      </a>
+  <Section background="accent" class={s.reachBand}>
+    <div class={s.reach}>
+      <PartnersGlobe countries={globeCountries} />
+      <div class={s.announce}>
+        <p class="bodyLong">
+          <strong>{index.announce.strong}</strong>{' '}{index.announce.text}
+        </p>
+        <Button href={index.announce.href} size="l">
+          {index.announce.button}
+        </Button>
+      </div>
     </div>
   </Section>
 
-  <Section flushTop>
+  <Section>
     <FilterForm filters={filters} action="/partners" placeholder={filterPlaceholder}>
-      <ul class={s.grid} id="filtered-partners">
+      <PartnerGrid id="filtered-partners">
         {
           filteredPartners.map((partner) => {
             const full = orderedPartnersWithStega.find((p) => p.id === partner.id)!;
@@ -144,7 +155,6 @@ const filters = [
                 <PartnerCard
                   href={buildUrlForPartner(full)}
                   name={full.name}
-                  logo={full.logo}
                   locations={full.locations}
                   label={projectsCountLabel(full._allReferencingShowcaseProjectsMeta.count)}
                 >
@@ -154,7 +164,7 @@ const filters = [
             );
           })
         }
-      </ul>
+      </PartnerGrid>
       {filteredPartners.length === 0 && <p class:list={[s.empty, 'title']}>{index.noResults}</p>}
     </FilterForm>
   </Section>

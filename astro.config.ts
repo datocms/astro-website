@@ -312,6 +312,10 @@ export default defineConfig({
             pattern: '/dev/face-gallery',
             entrypoint: './src/dev/face-gallery.astro',
           });
+          injectRoute({
+            pattern: '/dev/button-gallery',
+            entrypoint: './src/dev/button-gallery.astro',
+          });
         },
       },
     },

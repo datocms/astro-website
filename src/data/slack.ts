@@ -50,6 +50,6 @@ export const form: ContactFormData = {
     headline: 'Welcome on board!',
     muted: 'Check your email for the invite',
     face: 'wave',
-    button: { label: 'Back to homepage', href: '/', appearance: 'deep-on-white', variant: 'soft' },
+    button: { label: 'Back to homepage', href: '/', variant: 'soft' },
   },
 };

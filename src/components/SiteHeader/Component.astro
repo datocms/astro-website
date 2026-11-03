@@ -8,7 +8,6 @@ import {
 } from '@fortawesome/pro-regular-svg-icons';
 import { faCircleHalfStroke } from '@fortawesome/pro-solid-svg-icons';
 import { Button } from '~/components/Button';
-import type { ButtonAppearance } from '~/components/Button/types';
 import { DatoLogo } from '~/components/DatoLogo';
 import { Icon } from '~/components/Icon';
 import { NavLink } from '~/components/NavLink';
@@ -33,11 +32,6 @@ const variantClass = {
   page: undefined,
   accent: [styles.variantAccent, 'surfaceAccent'],
 }[variant];
-
-const ctaAppearance = {
-  page: 'deep-on-white',
-  accent: 'deep-on-light',
-} as const satisfies Record<typeof variant, ButtonAppearance>;
 
 // On the page ground the CTA is a soft pill.
 const ctaVariant = ctaVariantProp ?? (variant === 'page' ? 'soft' : 'solid');
@@ -174,11 +168,8 @@ const cardId = (i: number) => `site-header-card-${i}`;
           <Icon icon={faCircleHalfStroke} />
         </button>
         <a href={dashboardUrl('/login')} class:list={[styles.login, 'labelMedium']}>Login</a>
-        <Button
-          appearance={ctaAppearance[variant]}
-          variant={ctaVariant}
-          href={dashboardUrl('/signup')}
-          arrow={false}>Get Started</Button
+        <Button variant={ctaVariant} href={dashboardUrl('/signup')} arrow={false}
+          >Get Started</Button
         >
         <button
           type="button"

@@ -23,6 +23,12 @@ export interface Style {
    * background layer has its own squares: a dark subject on a light ground.
    */
   groundFill?: string;
+  /**
+   * The colours of the TOP layer (format.ts), for a live frame that has
+   * it. Without them, the renderer draws TOP cells as the highlight.
+   */
+  topFill?: string;
+  topStroke?: string;
 }
 
 const INVERSE = 'var(--surface-inverse)';
@@ -200,6 +206,22 @@ export const globeDim: Style = {
   highStroke: INVERSE,
 };
 
+// The globe of /partners, drawn live from the map (not from footage) on the
+// accent surface. The sea is the accent with a quiet grid, thus the globe
+// shows as a grid of squares; the land is a quarter of the deep, and a
+// country with partners is the deep. The country of the tour (the TOP
+// layer) is the pixel highlight, the light partner of the accent.
+export const partnersGlobe: Style = {
+  bgFill: ACCENT,
+  bgStroke: `color-mix(in oklab, ${INVERSE} 16%, ${ACCENT})`,
+  midFill: `color-mix(in oklab, ${INVERSE} 28%, ${ACCENT})`,
+  midStroke: ACCENT,
+  highFill: INVERSE,
+  highStroke: ACCENT,
+  topFill: 'var(--surface-pixel-highlight)',
+  topStroke: ACCENT,
+};
+
 /**
  * A palette: a style with a name, and the switches that go with it. A .pxv
  * file gives the name in its settings (`palette`), never the colours. Thus
@@ -265,6 +287,13 @@ export const palettes: readonly Palette[] = [
     label: 'Globe, dim',
     surface: 'inverse',
     colors: globeDim,
+  },
+  {
+    name: 'partnersGlobe',
+    label: 'Partners globe',
+    surface: 'accent',
+    colors: partnersGlobe,
+    extend: false,
   },
 ];
 

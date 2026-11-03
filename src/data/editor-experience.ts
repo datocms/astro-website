@@ -27,10 +27,9 @@ export const hero: HeroData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-white',
       arrow: false,
     },
-    { label: 'Talk To Sales', href: '/contact', appearance: 'deep-on-white', variant: 'soft' },
+    { label: 'Talk To Sales', href: '/contact', variant: 'soft' },
   ],
 };
 
@@ -73,13 +72,11 @@ export const ctaDemo: CtaBannerData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-light',
       arrow: false,
     },
     {
       label: 'Try The Demo',
       href: 'https://try.datocms.com',
-      appearance: 'deep-on-light',
       variant: 'soft',
     },
   ],

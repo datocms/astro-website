@@ -22,7 +22,6 @@ export const chapter: ChapterHeaderData = {
   link: {
     label: 'Read The Docs',
     href: '/docs/content-modelling/seo-fields',
-    appearance: 'deep-on-white',
     variant: 'soft',
   },
 };

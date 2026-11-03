@@ -1,5 +1,4 @@
 ---
-import type { ButtonAppearance } from '~/components/Button';
 import { CtaBanner } from '~/components/CtaBanner';
 import { DevConfig } from '~/components/DevConfig';
 import { PixelVideo } from '~/components/PixelVideo';
@@ -56,12 +55,6 @@ const {
 const look = video ? pxvLook(video) : undefined;
 const surface = look?.palette.surface;
 const ctaVariant = surface ? (surface === 'inverse' ? 'dark' : 'light') : cta?.variant;
-// With a video, the closer also sets the buttons for the surface.
-const buttonAppearance: ButtonAppearance | undefined =
-  surface && (surface === 'inverse' ? 'light-on-deep' : 'deep-on-light');
-const ctaButtons = buttonAppearance
-  ? cta?.buttons?.map((button) => ({ ...button, appearance: buttonAppearance }))
-  : cta?.buttons;
 ---
 
 <div class={styles.pageCloser}>
@@ -69,7 +62,7 @@ const ctaButtons = buttonAppearance
     cta && ctaVariant && (
       <CtaBanner
         {...cta}
-        buttons={ctaButtons}
+        buttons={cta?.buttons}
         face={face}
         theme={undefined}
         variant={ctaVariant}

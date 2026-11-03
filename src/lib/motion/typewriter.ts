@@ -120,7 +120,9 @@ export function typewrite(
 
   const highlight = hiddenHighlight();
   if (prefersReducedMotion() || !highlight) {
+    // Send the event also here: the parts that wait for the typing then show.
     el.dataset.twState = 'done';
+    el.dispatchEvent(new CustomEvent('typewriter:done', { bubbles: true }));
     return Promise.resolve();
   }
 

@@ -251,7 +251,6 @@ export const contact: ContactSectionData = {
       button: {
         label: 'Back to homepage',
         href: '/',
-        appearance: 'deep-on-white',
         variant: 'soft',
       },
     },

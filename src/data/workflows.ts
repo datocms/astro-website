@@ -21,7 +21,6 @@ export const chapter: ChapterHeaderData = {
   link: {
     label: 'Read The Docs',
     href: '/docs/general-concepts/workflows',
-    appearance: 'deep-on-white',
     variant: 'soft',
   },
 };

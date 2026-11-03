@@ -17,10 +17,15 @@ export const index = {
     intro:
       'Our most successful customers work with a Solution Partner to accomplish their goals and ship their digital products faster.',
   } satisfies HeroData,
-  mapLabel: 'Map of the countries where our partners are based',
+  /** The globe of the countries of the partners, and its list for screen readers. */
+  globe: {
+    label: 'Countries where our partners are based',
+    count: (n: number) => (n === 1 ? '1 partner' : `${n} partners`),
+  },
   announce: {
     strong: 'Want to become a DatoCMS Partner?',
     text: 'Learn more about our Partner Program and its benefits!',
+    button: 'Partner Program',
     href: '/partner-program',
   },
   filters: {

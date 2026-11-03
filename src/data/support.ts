@@ -122,7 +122,7 @@ export const supportForm: ContactFormData = {
     headline: "Thanks, we've got it.",
     muted: 'Our support team will be in touch shortly',
     face: 'approved',
-    button: { label: 'Back to homepage', href: '/', appearance: 'deep-on-white', variant: 'soft' },
+    button: { label: 'Back to homepage', href: '/', variant: 'soft' },
   },
 };
 

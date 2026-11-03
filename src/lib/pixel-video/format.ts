@@ -30,6 +30,12 @@ export const MID = 1;
 export const HIGH = 2;
 /** Nothing shows in this cell (a transparent pixel in the source). */
 export const EMPTY = 3;
+/**
+ * A fourth layer over the highlight, only for frames that a page makes
+ * live (a file has 2 bits for each cell, thus no TOP). The renderer draws
+ * it in the `top` colours of the settings, or as HIGH without them.
+ */
+export const TOP = 4;
 
 const MAGIC = 'PXV3';
 const HEADER = 17;

@@ -1,16 +1,14 @@
 /* @layer blocks */
 /*
- * The colours come from the tokens of the section. Each appearance sets
- * four local values; the states use them. A pill paints a ground of its
- * own, thus its text is a canonical role of that ground: the page roles
- * for the page surface, not the contextual --text-primary (on the inverse
- * ground that is light text).
+ * The ground under the button sets the colours: the button roles of
+ * src/styles/tokens.css. Each variant sets four local values; the states
+ * use them.
  */
 .button {
-  --btnBg: var(--surface-accent);
-  --btnFg: var(--text-on-accent);
-  --btnBgHover: var(--surface-inverse);
-  --btnFgHover: var(--text-on-inverse);
+  --btnBg: var(--surface-button);
+  --btnFg: var(--text-button);
+  --btnBgHover: var(--surface-button-hover);
+  --btnFgHover: var(--text-button-hover);
 
   display: inline-flex;
   align-items: center;
@@ -30,53 +28,18 @@
   padding: 0 6px;
 }
 
-/*
- * The solid pill has the text colour as fill and the page surface as text.
- * In the dark scheme it stays the strongest shape on the page surface.
- */
-.deepOnWhite {
-  --btnBg: var(--text-primary);
-  --btnFg: var(--surface-default);
-  --btnBgHover: var(--surface-accent);
-  --btnFgHover: var(--text-on-accent);
+/* The loudest pill. Off the page ground it is the same as solid. */
+.accent {
+  --btnBg: var(--surface-button-accent);
+  --btnFg: var(--text-button-accent);
+  --btnBgHover: var(--surface-button-accent-hover);
+  --btnFgHover: var(--text-button-accent-hover);
 }
 
-.lightOnWhite {
-  --btnBg: var(--surface-accent);
-  --btnFg: var(--text-on-accent);
-  --btnBgHover: var(--surface-inverse);
-  --btnFgHover: var(--text-on-inverse);
-}
-
-.deepOnLight {
-  --btnBg: var(--surface-inverse);
-  --btnFg: var(--text-on-inverse);
-  --btnBgHover: var(--surface-default);
-  --btnFgHover: var(--text-on-page);
-}
-
-.lightOnDeep {
-  --btnBg: var(--surface-accent);
-  --btnFg: var(--text-on-accent);
-  --btnBgHover: var(--surface-default);
-  --btnFgHover: var(--text-on-page);
-}
-
-/* Soft: a tinted background. The hover is the same as solid. */
-.soft.deepOnWhite,
-.soft.deepOnLight {
-  --btnBg: var(--surface-inverse-faint);
-  --btnFg: var(--text-primary);
-}
-
-.soft.lightOnWhite {
-  --btnBg: var(--surface-accent-subtle);
-  --btnFg: var(--text-primary);
-}
-
-.soft.lightOnDeep {
-  --btnBg: var(--border-on-inverse);
-  --btnFg: var(--text-on-inverse);
+/* A tinted background. The hover is the same as solid. */
+.soft {
+  --btnBg: var(--surface-button-soft);
+  --btnFg: var(--text-button-soft);
 }
 
 @media (hover: hover) {
@@ -106,6 +69,22 @@
   pointer-events: none;
 }
 
+/*
+ * The large button: 48px tall, the body size. The side inset is 12px, thus
+ * a 24px leading image has 12px on its three sides, as the 20px image has
+ * 10px in the 40px button. The label adds 8px: 20px of air at each side.
+ */
+.large {
+  gap: var(--space-xs);
+  height: 48px;
+  padding: 0 var(--space-xs);
+  font-size: var(--type-m);
+}
+
+.large .label {
+  padding: 0 var(--space-3xs);
+}
+
 .leading {
   display: inline-flex;
   flex-shrink: 0;
@@ -116,6 +95,11 @@
   height: 20px;
   border-radius: var(--radius-full);
   object-fit: cover;
+}
+
+.large .leading img {
+  width: 24px;
+  height: 24px;
 }
 
 .logos img + img {

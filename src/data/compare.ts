@@ -34,13 +34,11 @@ export const hero: HeroData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-white',
       arrow: false,
     },
     {
       label: 'Talk To Sales',
       href: '/contact',
-      appearance: 'deep-on-white',
       variant: 'soft',
       leading: 'userpic',
       leadingImages: [{ src: '/images/home/userpic-talk.png' }],
@@ -53,12 +51,10 @@ export const introButtons: { datocms: ButtonData; competitor: ButtonData } = {
   datocms: {
     label: 'Sign Up For Free',
     href: dashboardUrl('/signup'),
-    appearance: 'deep-on-light',
   },
   competitor: {
     label: 'Talk About Migration',
     href: '/contact',
-    appearance: 'light-on-deep',
     variant: 'soft',
   },
 };
@@ -80,9 +76,8 @@ export const ctaSwitch: CtaBannerData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-light',
       arrow: false,
     },
-    { label: 'Explore Pricing', href: '/pricing', appearance: 'deep-on-light', variant: 'soft' },
+    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
   ],
 };

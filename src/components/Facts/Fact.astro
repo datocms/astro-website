@@ -2,10 +2,11 @@
 /*
  * One fact of a Facts list. It has two forms:
  *
- * - One value (the slot, or `values` with one item): the label and the
- *   value are on one row, the label on the left, the value on the right.
- * - A list (`values` with two or more items): the label is above, and each
- *   value is on a line of its own.
+ * - One value (the slot): the label and the value are on one row, the
+ *   label on the left, the value on the right.
+ * - A list (`values`): the label is above, and each value is on a line of
+ *   its own. A list with one item also has this form, thus all the lists
+ *   of a page look the same.
  *
  * Without a value, the fact does not show.
  */
@@ -23,7 +24,7 @@ const { label, values, tabular = false } = Astro.props;
 
 const slotted = values ? undefined : await Astro.slots.render('default');
 const items = values ?? (slotted?.trim() ? [slotted] : []);
-const isList = items.length > 1;
+const isList = values !== undefined;
 ---
 
 {

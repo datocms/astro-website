@@ -239,9 +239,15 @@
   /*
    * Elements with data-await-typewriter wait for the end of the typing: the
    * script sets data-visible. If the script does not run, show them after 3s.
+   * The script sets data-tw-armed when it waits for the typewriter. Then the
+   * fallback does not apply, thus a long typing does not show them too early.
    */
   html[data-motion='on'] [data-await-typewriter]:not([data-visible]) {
     opacity: 0;
+  }
+
+  /* stylelint-disable-next-line selector-max-specificity -- The state attributes must match on the root and the element. */
+  html[data-motion='on'] [data-await-typewriter]:not([data-visible], [data-tw-armed]) {
     animation: twFallback 0s 3s forwards;
   }
 

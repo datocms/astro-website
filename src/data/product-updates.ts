@@ -17,7 +17,6 @@ export const hero: HeroData = {
     {
       label: 'Subscribe via RSS',
       href: '/product-changelog.xml',
-      appearance: 'deep-on-light',
       arrow: false,
     },
   ],

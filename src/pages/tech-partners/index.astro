@@ -3,7 +3,7 @@
 // first, then the other partners.
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
-import { PartnerCard } from '~/components/PartnerCard';
+import { PartnerCard, PartnerGrid } from '~/components/PartnerCard';
 import { Section } from '~/components/Section';
 import { PlainText } from '~/components/StructuredText';
 import { techIndex } from '~/data/partners';
@@ -12,7 +12,6 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { buildUrlForTechPartner } from '~/lib/datocms/gqlUrlBuilder/techPartner';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
-import s from './_style.module.css';
 
 const { page, techPartners } = await executeQuery(Astro, query);
 
@@ -30,9 +29,9 @@ const sortedTechPartners = [
 ];
 ---
 
-<Layout theme="pink" seo={page.seo} headerVariant="accent">
+<Layout theme="pink" seo={page.seo} headerVariant="page">
   <Hero
-    variant="accent"
+    variant="page"
     label={techIndex.hero.label}
     headline={techIndex.hero.headline}
     subheadline={techIndex.hero.subheadline}
@@ -41,21 +40,17 @@ const sortedTechPartners = [
   </Hero>
 
   <Section>
-    <ul class={s.grid}>
+    <PartnerGrid>
       {
         sortedTechPartners.map((partner) => (
           <li>
-            <PartnerCard
-              href={buildUrlForTechPartner(partner)}
-              name={partner.name}
-              logo={partner.logo}
-            >
+            <PartnerCard href={buildUrlForTechPartner(partner)} name={partner.name}>
               <PlainText data={partner.shortDescription} />
             </PartnerCard>
           </li>
         ))
       }
-    </ul>
+    </PartnerGrid>
   </Section>
 
   <DraftModeQueryListener query={query} />

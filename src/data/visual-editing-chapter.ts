@@ -32,7 +32,6 @@ export const chapter: ChapterHeaderData = {
   link: {
     label: 'Read The Docs',
     href: '/docs/visual-editing',
-    appearance: 'deep-on-white',
     variant: 'soft',
   },
 };

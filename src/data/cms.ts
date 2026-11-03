@@ -64,7 +64,7 @@ export interface FrameworkPage {
 
 /** The docs link of a chapter header. */
 export function docs(href: string): ChapterHeaderData['link'] {
-  return { label: 'Read The Docs', href, appearance: 'deep-on-white', variant: 'soft' };
+  return { label: 'Read The Docs', href, variant: 'soft' };
 }
 
 /** The dashboard link that deploys the starter kit of a repository. */
@@ -88,13 +88,11 @@ export const closer: CtaBannerData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-light',
       arrow: false,
     },
     {
       label: 'Talk To Sales',
       href: '/contact',
-      appearance: 'deep-on-light',
       variant: 'soft',
     },
   ],
@@ -351,7 +349,6 @@ export function starter(args: { repo: string; subline: string }): CtaBannerData 
       {
         label: 'Deploy The Starter',
         href: deployUrl(args.repo),
-        appearance: 'deep-on-light',
         arrow: false,
       },
     ],
@@ -364,9 +361,8 @@ export function heroButtons(args: { repo: string; docsRoot: string }): HeroData[
     {
       label: 'Deploy The Starter',
       href: deployUrl(args.repo),
-      appearance: 'deep-on-white',
       arrow: false,
     },
-    { label: 'Read The Docs', href: args.docsRoot, appearance: 'deep-on-white', variant: 'soft' },
+    { label: 'Read The Docs', href: args.docsRoot, variant: 'soft' },
   ];
 }

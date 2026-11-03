@@ -64,13 +64,9 @@ const script: Step[] = [
       </Headline>
     </div>
     <div class={styles.buttons} data-not-found-after data-await-typewriter>
-      <Button appearance="deep-on-white" href="/" arrow={false}>{homeLabel}</Button>
+      <Button href="/" size="l" arrow={false}>{homeLabel}</Button>
       {/* The search of the site opens from each element with data-search-open. */}
-      <Button
-        appearance="deep-on-white"
-        variant="soft"
-        attrs={{ 'data-search-open': '', 'aria-haspopup': 'dialog' }}
-      >
+      <Button size="l" variant="soft" attrs={{ 'data-search-open': '', 'aria-haspopup': 'dialog' }}>
         {searchLabel}
       </Button>
     </div>
@@ -100,6 +96,7 @@ const script: Step[] = [
         if (document.documentElement.dataset.motion !== 'on') return;
         if (typewriter.dataset.twState === 'done') return;
 
+        for (const el of after) el.dataset.twArmed = '';
         this.on(typewriter, 'typewriter:done', () => {
           setTimeout(() => {
             for (const el of after) el.dataset.visible = 'true';

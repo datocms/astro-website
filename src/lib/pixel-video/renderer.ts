@@ -1,7 +1,8 @@
 // Draw a frame of cells (see format.ts) as the pixel effect, with WebGL2.
 // The shader is the one of @overnice/datocms-pixel-video. The difference is
 // the source: here each texel is already a layer (0–3), so the shader does
-// not compute the brightness.
+// not compute the brightness. A live frame can also have the TOP layer
+// (4, see format.ts), with its own colours.
 
 /** A colour as straight RGBA, 0–1. */
 export type Rgba = [number, number, number, number];
@@ -9,7 +10,13 @@ export type Rgba = [number, number, number, number];
 /** What the renderer needs from the palette (see styles.ts). */
 export interface DrawSettings {
   /** `ground` is null when the ground is the fill of the background layer. */
-  colors: { fill: [Rgba, Rgba, Rgba]; stroke: [Rgba, Rgba, Rgba]; ground: Rgba | null };
+  colors: {
+    fill: [Rgba, Rgba, Rgba];
+    stroke: [Rgba, Rgba, Rgba];
+    ground: Rgba | null;
+    /** The colours of the TOP layer. Without them, TOP cells are HIGH. */
+    top?: { fill: Rgba; stroke: Rgba };
+  };
   /** For each layer: the squares have no strokes. */
   noStroke: [boolean, boolean, boolean];
   /** The background grid fills the whole canvas. */
@@ -32,17 +39,18 @@ precision highp int;
 precision highp usampler2D;
 
 uniform vec2 uRes;            // canvas, device px
-uniform usampler2D uFrame;    // one layer (0-3) for each cell
+uniform usampler2D uFrame;    // one layer (0-4) for each cell
 uniform ivec2 uFrameSize;
 uniform bool uHasFrame;
 uniform vec2 uOffset;         // contain-fit rect of the source, device px
 uniform vec2 uDraw;
 
-uniform float uSize[3];       // per layer, device px
-uniform vec4 uFill[3];        // straight (not premultiplied) alpha
-uniform vec4 uStroke[3];
+uniform int uLayers;          // 4 with the TOP layer, else 3
+uniform float uSize[4];       // per layer, device px
+uniform vec4 uFill[4];        // straight (not premultiplied) alpha
+uniform vec4 uStroke[4];
 uniform float uWeight;        // stroke weight, all layers: 1 CSS px, in device px
-uniform bool uNoStroke[3];    // per layer: drawn without strokes
+uniform bool uNoStroke[4];    // per layer: drawn without strokes
 uniform bool uExtend;         // the background grid fills the whole canvas
 uniform vec4 uGround;         // the colour under the squares
 uniform bool uOwnGround;      // the ground is not the fill of the background layer
@@ -60,12 +68,15 @@ float halfWeight(int L) {
 }
 
 // Layer of the grid cell whose top-left corner is at local position o, or -1
-// if nothing is drawn there.
+// if nothing is drawn there. A TOP cell (4) is layer 3, or the highlight
+// layer when there are no TOP colours.
 int bucketAt(vec2 o) {
   if (o.x < 0.0 || o.y < 0.0 || o.x >= uDraw.x || o.y >= uDraw.y) return uExtend ? 0 : -1;
   ivec2 t = min(ivec2(floor(o * vec2(uFrameSize) / uDraw)), uFrameSize - 1);
   uint v = texelFetch(uFrame, t, 0).r;
-  return v >= 3u ? -1 : int(v);
+  if (v == 3u) return -1;
+  if (v >= 4u) return uLayers > 3 ? 3 : 2;
+  return int(v);
 }
 
 // True if local position o is in the source.
@@ -78,7 +89,7 @@ bool inSource(vec2 o) {
 bool emptyAt(vec2 o) {
   if (o.x < 0.0 || o.y < 0.0 || o.x >= uDraw.x || o.y >= uDraw.y) return false;
   ivec2 t = min(ivec2(floor(o * vec2(uFrameSize) / uDraw)), uFrameSize - 1);
-  return texelFetch(uFrame, t, 0).r >= 3u;
+  return texelFetch(uFrame, t, 0).r == 3u;
 }
 
 // The stroke colour of layer L at local position o. With an own ground, the
@@ -107,7 +118,8 @@ void main() {
 
   // Base mosaics, in a fixed order: later layers paint over earlier ones. A
   // stroke is half in the square and half in the cell next to it.
-  for (int L = 0; L < 3; L++) {
+  for (int L = 0; L < 4; L++) {
+    if (L >= uLayers) break;
     float ps = uSize[L];
     vec2 cell = floor(local / ps);
     vec2 f = local - cell * ps;
@@ -291,9 +303,9 @@ export function createRenderer(
   setup();
   resize();
 
-  const size = new Float32Array(3);
-  const fill = new Float32Array(12);
-  const stroke = new Float32Array(12);
+  const size = new Float32Array(4);
+  const fill = new Float32Array(16);
+  const stroke = new Float32Array(16);
 
   return {
     setFrame(next, width, height) {
@@ -350,6 +362,10 @@ export function createRenderer(
         fill.set(v.colors.fill[i]!, i * 4);
         stroke.set(v.colors.stroke[i]!, i * 4);
       }
+      const top = v.colors.top;
+      fill.set(top ? top.fill : v.colors.fill[2], 12);
+      stroke.set(top ? top.stroke : v.colors.stroke[2], 12);
+      gl.uniform1i(u('uLayers'), top ? 4 : 3);
       gl.uniform1fv(u('uSize'), size);
       gl.uniform4fv(u('uFill'), fill);
       gl.uniform4fv(u('uStroke'), stroke);
@@ -358,7 +374,7 @@ export function createRenderer(
       gl.uniform1f(u('uWeight'), Math.max(1, Math.round(dpr)));
       gl.uniform1iv(
         u('uNoStroke'),
-        v.noStroke.map((off) => (off ? 1 : 0)),
+        [...v.noStroke, v.noStroke[2]].map((off) => (off ? 1 : 0)),
       );
       gl.uniform1i(u('uExtend'), v.extend ? 1 : 0);
       gl.uniform1f(u('uTime'), time * LENS.speed);

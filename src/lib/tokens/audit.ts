@@ -14,6 +14,7 @@ import {
   INVERSE_SURFACES,
   AA_LARGE_TEXT,
   AA_TEXT,
+  BUTTON_PAIRS,
   PAGE_STRONG_TINTS,
   PAGE_TINTS,
   STATUS_PAIRS,
@@ -129,6 +130,12 @@ export function audit(sheet: TokenSheet): Audit {
         // The derived text roles, on the main surface.
         for (const role of DERIVED_TEXT_ROLES) {
           pair(theme, scheme, context, box, role, GROUND_SURFACE[ground], main, AA_TEXT);
+        }
+
+        // The button in each state: its fill over the main surface, its text on the fill.
+        for (const [surface, text] of BUTTON_PAIRS) {
+          const fill = opaque(sheet, box, surface, main);
+          pair(theme, scheme, context, box, text, surface, fill, AA_TEXT);
         }
 
         // The other surfaces of the inverse ground: the same roles.

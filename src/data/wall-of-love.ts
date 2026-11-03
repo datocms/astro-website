@@ -26,9 +26,8 @@ export const ctaStart: CtaBannerData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-light',
       arrow: false,
     },
-    { label: 'Explore Pricing', href: '/pricing', appearance: 'deep-on-light', variant: 'soft' },
+    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
   ],
 };

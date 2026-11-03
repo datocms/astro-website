@@ -86,7 +86,7 @@ export const plans: PricingPlansData = {
       name: 'Professional',
       tagline: 'Everything you need – and more – to build great digital projects.',
       price: 'From €149/month billed yearly or €199/monthly',
-      button: { label: 'Purchase', href: purchaseHref, appearance: 'deep-on-white' },
+      button: { label: 'Purchase', href: purchaseHref },
       features: [
         'Generous quota with soft limits',
         '10 collaborators / project',
@@ -98,7 +98,7 @@ export const plans: PricingPlansData = {
       name: 'Enterprise',
       tagline: 'Premium features, high-touch support and advanced compliance.',
       price: 'Custom Pricing',
-      button: { label: 'Contact', href: '/contact', appearance: 'deep-on-light' },
+      button: { label: 'Contact', href: '/contact' },
       features: [
         'Guaranteed support and uptime SLAs',
         'SSO, Audit logs and Static webhook IPs',
@@ -119,14 +119,12 @@ export const freeBanner: CtaBannerData = {
     {
       label: 'Sign up for free',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-light',
       arrow: false,
     },
     // The page opens the dialog of the free limits for each link to this hash.
     {
       label: 'See the free limits',
       href: '#free-plan-details',
-      appearance: 'deep-on-light',
       variant: 'soft',
       arrow: false,
     },
@@ -169,7 +167,6 @@ export const partnerBanner: CtaBannerData = {
     {
       label: 'Discover the program',
       href: '/partner-program',
-      appearance: 'deep-on-light',
       variant: 'soft',
     },
   ],
@@ -185,14 +182,13 @@ export const comparison: PlanComparisonData = {
       button: {
         label: 'Purchase',
         href: purchaseHref,
-        appearance: 'deep-on-white',
         variant: 'soft',
       },
     },
     {
       name: 'Enterprise',
       price: 'Custom',
-      button: { label: 'Contact', href: '/contact', appearance: 'deep-on-white', variant: 'soft' },
+      button: { label: 'Contact', href: '/contact', variant: 'soft' },
     },
   ],
 };
@@ -211,7 +207,6 @@ export const trustedBy: HeroData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-light',
       arrow: false,
     },
   ],
@@ -232,9 +227,8 @@ export const ctaStart: CtaBannerData = {
     {
       label: 'Get Started',
       href: dashboardUrl('/signup'),
-      appearance: 'deep-on-light',
       arrow: false,
     },
-    { label: 'Explore Pricing', href: '/pricing', appearance: 'deep-on-light', variant: 'soft' },
+    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
   ],
 };

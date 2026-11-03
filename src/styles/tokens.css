@@ -573,6 +573,32 @@
   /* A control on the page: a field, a picker */
   --surface-field: var(--surface-default);
   --border-field: var(--border-default);
+
+  /*
+   * The button: a pill that paints a ground of its own. The ground under
+   * the button sets its colours, thus a button has no colour prop. The
+   * values here are the page values. surfaceAccent and surfaceInverse
+   * fill the slots.
+   *   solid    the strong pill: the colour that contrasts most with the
+   *            ground (the deep on the page and on the accent, the accent
+   *            on the inverse). Its text is the colour of the ground.
+   *   hover    the two colours swap: the accent on the page, the page on
+   *            the accent and on the inverse.
+   *   soft     a faint tint of the deep (of the accent on the inverse),
+   *            with the primary text. Its hover is the solid hover.
+   *   accent   the loudest pill on the page: the accent, with the deep as
+   *            hover. On the accent and on the inverse it is the solid.
+   */
+  --surface-button: var(--_ground-surface-button, var(--text-on-page));
+  --text-button: var(--_ground-text-button, var(--surface-default));
+  --surface-button-hover: var(--_ground-surface-button-hover, var(--surface-accent));
+  --text-button-hover: var(--_ground-text-button-hover, var(--text-on-accent));
+  --surface-button-soft: var(--_ground-surface-button-soft, var(--surface-inverse-faint));
+  --text-button-soft: var(--text-primary);
+  --surface-button-accent: var(--_ground-surface-button, var(--surface-accent));
+  --text-button-accent: var(--_ground-text-button, var(--text-on-accent));
+  --surface-button-accent-hover: var(--_ground-surface-button-hover, var(--surface-inverse));
+  --text-button-accent-hover: var(--_ground-text-button-hover, var(--text-on-inverse));
 }
 
 /*
@@ -696,6 +722,11 @@
   --_ground-text-positive: initial;
   --_ground-text-negative: initial;
   --_ground-text-status-warning: initial;
+  --_ground-surface-button: initial;
+  --_ground-text-button: initial;
+  --_ground-surface-button-hover: initial;
+  --_ground-text-button-hover: initial;
+  --_ground-surface-button-soft: initial;
   --type-leading-dark: 0;
   --type-tracking-dark: 0em;
   --type-mono-weight: 400;
@@ -727,6 +758,20 @@
   --_ground-text-positive: var(--text-on-accent);
   --_ground-text-negative: var(--text-on-accent);
   --_ground-text-status-warning: var(--text-on-accent);
+  /*
+   * The deep pill with the accent as text. The hover is the page surface
+   * (white in the dark scheme) with the text of the accent: dark in both
+   * schemes.
+   */
+  --_ground-surface-button: var(--surface-inverse);
+  --_ground-text-button: var(--text-on-inverse);
+  --_ground-surface-button-hover: var(--surface-default);
+  --_ground-text-button-hover: var(--text-on-accent);
+  /*
+   * The soft fill: the ink at 10% in each theme. The faint ink of a theme
+   * (up to 12%) is too dark for the text on the orange accent.
+   */
+  --_ground-surface-button-soft: color-mix(in srgb, var(--theme-ink) 10%, transparent);
   /* The text is dark in both schemes: the type has the light values. */
   --type-leading-dark: 0;
   --type-tracking-dark: 0em;
@@ -765,6 +810,12 @@
   --_ground-text-positive: color-mix(in oklab, var(--surface-positive) 60%, var(--theme-paper));
   --_ground-text-negative: color-mix(in oklab, var(--surface-negative) 60%, var(--theme-paper));
   --_ground-text-status-warning: var(--text-on-inverse-strong);
+  /* The accent pill with the deep as text. The hover is the page surface. */
+  --_ground-surface-button: var(--surface-accent);
+  --_ground-text-button: var(--text-on-accent);
+  --_ground-surface-button-hover: var(--surface-default);
+  --_ground-text-button-hover: var(--text-on-page);
+  --_ground-surface-button-soft: var(--border-on-inverse);
   /* The text is light in both schemes: the type adjusts for light text. */
   --type-leading-dark: 0.05;
   --type-tracking-dark: 0.01em;

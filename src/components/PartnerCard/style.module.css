@@ -1,54 +1,65 @@
 /* @layer blocks */
+
+/*
+ * The grid of cells. A hairline is at the right and at the bottom of each
+ * cell. The frame clips the lines at the right edge and at the bottom
+ * edge of the grid, thus a line shows only between two cells. The frame
+ * goes out by the padding of a cell on the two sides: the text of the
+ * cells then aligns with the content column.
+ */
+.gridFrame {
+  margin-inline: calc(-1 * var(--space-lg));
+  overflow: clip;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0 -1px -1px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grid > li {
+  border-right: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1152px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* A square cell on the ground of the band. The hover fills it with the faint accent, at once. */
 .card:any-link {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
   height: 100%;
   padding: var(--space-lg);
   color: var(--text-primary);
-  background: var(--surface-raised);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
 }
 
-.logo {
-  display: flex;
-  align-items: center;
-  height: 48px;
-}
-
-/*
- * The raised surface is white in both schemes, and the logos are dark
- * artwork. In the dark scheme the card uses a tint of the theme (so the
- * light text shows) and the logo sits on a white plate.
- */
-:global(:root[data-scheme='dark']) .card:any-link {
-  background: var(--surface-accent-subtle);
-}
-
-:global(:root[data-scheme='dark']) .logo {
-  align-self: flex-start;
-  padding: var(--space-3xs) var(--space-xs);
-  background: var(--surface-raised);
-  border-radius: var(--radius-md);
-}
-
-.logoImage {
-  width: auto;
-  max-width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
+/* The name, then the flags of the locations on a row of their own. */
 .title {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-4xs);
-  align-items: baseline;
+  flex-direction: column;
+  gap: var(--space-3xs);
 }
 
-.title > :first-child {
-  margin-right: var(--space-3xs);
+/* One line: at most five flags, then the count of the other locations. */
+.flags {
+  display: flex;
+  gap: var(--space-4xs);
+  align-items: center;
+  white-space: nowrap;
 }
 
 .more {
@@ -56,9 +67,9 @@
   color: var(--text-muted);
 }
 
+/* The description does not grow: a box taller than three lines shows the lines after the clamp. */
 .description {
   display: -webkit-box;
-  flex: 1;
   overflow: hidden;
   line-height: 1.3;
   color: var(--text-muted);
@@ -66,21 +77,20 @@
   -webkit-box-orient: vertical;
 }
 
-.pill {
-  align-self: flex-start;
-  padding: var(--space-5xs) var(--space-2xs);
+/* The label goes to the bottom of the cell, thus the labels of a row align. */
+.label {
+  margin-top: auto;
+  padding-top: var(--space-3xs);
   color: var(--text-muted);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-full);
 }
 
 @media (hover: hover) {
   .card:hover {
-    border-color: var(--border-strong);
+    background: var(--surface-accent-faint);
   }
 }
 
 .card:focus-visible {
   outline: 2px solid var(--border-strong);
-  outline-offset: var(--space-4xs);
+  outline-offset: -2px;
 }

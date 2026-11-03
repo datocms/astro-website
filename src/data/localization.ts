@@ -19,7 +19,6 @@ export const chapter: ChapterHeaderData = {
   link: {
     label: 'Read The Docs',
     href: '/docs/general-concepts/localization',
-    appearance: 'deep-on-white',
     variant: 'soft',
   },
 };
