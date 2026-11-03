@@ -302,6 +302,8 @@ const cardId = (i: number) => `site-header-card-${i}`;
     'site-header',
     class SiteHeader extends WebComponent {
       openTrigger: HTMLButtonElement | null = null;
+      // The card that the shell shows, also during a close.
+      shownCard: HTMLElement | null = null;
       // The item under the cursor or with the focus. The pill rests elsewhere only when there is none.
       pointed: HTMLElement | null = null;
       list!: HTMLElement;
@@ -461,25 +463,30 @@ const cardId = (i: number) => `site-header-card-${i}`;
       openCard(trigger: HTMLButtonElement) {
         if (this.openTrigger === trigger) return;
         const previous = this.openTrigger;
-        const previousCard = previous && this.cardOf(previous);
         const card = this.cardOf(trigger);
         const shell = this.shell;
+        // The card on screen now: of the open item, or of a close in
+        // progress. Only that card and the new one stay active.
+        const shownCard = this.shownCard;
+        this.shownCard = card;
+        for (const other of this.$$('[data-card]')) {
+          if (other !== card && other !== shownCard) other.removeAttribute('data-active');
+        }
 
-        this.closing?.cancel();
-        this.closing = null;
         previous?.setAttribute('aria-expanded', 'false');
         trigger.setAttribute('aria-expanded', 'true');
         this.openTrigger = trigger;
 
+        // The shape on screen now, under the animations in progress. Then
+        // the animations stop: a running one overrides the layout, and the
+        // target must be measured from the plain layout.
         const from = {
           left: shell.offsetLeft,
           width: shell.offsetWidth,
           height: shell.offsetHeight,
         };
-        // A card of a cancelled close can still be active: only the two of the morph stay.
-        for (const other of this.$$('[data-card]')) {
-          if (other !== card && other !== previousCard) other.removeAttribute('data-active');
-        }
+        for (const animation of shell.getAnimations()) animation.cancel();
+        this.closing = null;
         // The fade-out of an earlier morph fills forwards: it must not hide the card now.
         for (const animation of card.getAnimations()) animation.cancel();
         card.setAttribute('data-active', '');
@@ -488,14 +495,22 @@ const cardId = (i: number) => `site-header-card-${i}`;
         shell.style.setProperty('--card-height', `${card.offsetHeight}px`);
         shell.setAttribute('data-open', '');
         const to = { left: shell.offsetLeft, width: shell.offsetWidth, height: shell.offsetHeight };
+        this.restIndicator();
 
-        if (previousCard) {
-          previousCard
+        // The shell already shows this card: a close in progress stopped.
+        if (shownCard === card) return;
+
+        if (shownCard) {
+          for (const animation of shownCard.getAnimations()) animation.cancel();
+          shownCard
             .animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms(120), fill: 'forwards' })
-            .finished.then(() => {
-              // The card can be open again by now.
-              if (previous !== this.openTrigger) previousCard.removeAttribute('data-active');
-            });
+            .finished.then(
+              () => {
+                // The card can be open again by now.
+                if (this.shownCard !== shownCard) shownCard.removeAttribute('data-active');
+              },
+              () => {},
+            );
           card.animate([{ opacity: 0 }, { opacity: 1 }], {
             duration: ms(200),
             delay: ms(60),
@@ -523,7 +538,6 @@ const cardId = (i: number) => `site-header-card-${i}`;
             );
           });
         }
-        this.restIndicator();
       }
 
       closeCard(returnFocus = false) {
@@ -539,6 +553,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
           () => {
             shell.removeAttribute('data-open');
             card.removeAttribute('data-active');
+            this.shownCard = null;
             this.closing = null;
           },
           // A new open cancelled the close: the shell stays.
