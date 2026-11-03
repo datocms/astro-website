@@ -28,9 +28,19 @@ function filterPills(pills: string[]): string[] {
 
 export const GET: APIRoute = async ({ request, url }) => {
   try {
-    const [colfaxRegular, colfaxBold] = await Promise.all([
-      fetch(new URL('/fonts/colfax-web-bold.woff', url)).then((res) => res.arrayBuffer()),
-      fetch(new URL('/fonts/colfax-web-700.woff', url)).then((res) => res.arrayBuffer()),
+    // satori reads static TTF and OTF files only, thus the card uses the two
+    // static instances of ABC Oracle in the font bucket, not the variable font.
+    const loadFont = (file: string) =>
+      fetch(new URL(`/fonts/${file}`, url)).then((res) => {
+        if (!res.ok) {
+          throw new Error(`Could not load ${file} for the OG card: HTTP ${res.status}`);
+        }
+        return res.arrayBuffer();
+      });
+
+    const [oracleRegular, oracleMedium] = await Promise.all([
+      loadFont('ABCOracle-Regular.otf'),
+      loadFont('ABCOracle-Medium.otf'),
     ]);
 
     const rawData = url.searchParams.get('data');
@@ -57,7 +67,7 @@ export const GET: APIRoute = async ({ request, url }) => {
           width: '100%',
           height: '100%',
           textAlign: 'center',
-          fontFamily: 'colfax',
+          fontFamily: 'ABC Oracle',
           flexDirection: 'column',
           justifyContent: 'space-around',
           alignItems: 'center',
@@ -74,64 +84,72 @@ export const GET: APIRoute = async ({ request, url }) => {
             gap: '20px',
           })}"
         >
-          ${kicker
-            ? /* HTML */ `<div
-                style="${css({
-                  fontSize: '30px',
-                  color: '#71788a',
-                  letterSpacing: '-0.04em',
-                  textTransform: 'uppercase',
-                  display: 'flex',
-                  fontWeight: 'bold',
-                })}"
-              >
-                ${kicker}
-              </div>`
-            : ''}
-          ${logoPngUrl
-            ? /* HTML */ `
-              <img
-                src="${logoPngUrl}"
-                style"${css({
-                  height: '110px',
-                  width: '700px',
-                  objectFit: 'contain',
-                  margin: '30px 0',
-                })}"
-              />
-            `
-            : ''}
-          ${title
-            ? /* HTML */ `
-                <div
+          ${
+            kicker
+              ? /* HTML */ `<div
                   style="${css({
-                    fontSize: `${title.length < 40 ? 90 : 70}px`,
-                    letterSpacing: '-0.06em',
-                    lineHeight: '0.9',
+                    fontSize: '30px',
+                    color: '#71788a',
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
                     display: 'flex',
-                    fontWeight: 'bold',
                   })}"
                 >
-                  ${title}
-                </div>
-              `
-            : ''}
-          ${excerpt
-            ? `
+                  ${kicker}
+                </div>`
+              : ''
+          }
+          ${
+            logoPngUrl
+              ? /* HTML */ `
+                  <img
+                    src="${logoPngUrl}"
+                    style="${css({
+                      height: '110px',
+                      width: '700px',
+                      objectFit: 'contain',
+                      margin: '30px 0',
+                    })}"
+                  />
+                `
+              : ''
+          }
+          ${
+            title
+              ? /* HTML */ `
+                  <div
+                    style="${css({
+                      fontSize: `${title.length < 40 ? 90 : 70}px`,
+                      letterSpacing: '-0.04em',
+                      lineHeight: '1',
+                      display: 'flex',
+                      fontWeight: 500,
+                    })}"
+                  >
+                    ${title}
+                  </div>
+                `
+              : ''
+          }
+          ${
+            excerpt
+              ? `
               <div
                 style="${css({
                   fontSize: '28px',
                   color: '#71788a',
-                  letterSpacing: '-0.04em',
+                  letterSpacing: '-0.01em',
                 })}"
               >
                 ${truncate(excerpt, { length: 200 })}
               </div>
             `
-            : ''}
+              : ''
+          }
         </div>
-        ${pills && pills.length > 0
-          ? `
+        ${
+          pills && pills.length > 0
+            ? `
           <div
             style="${css({
               display: 'flex',
@@ -148,8 +166,7 @@ export const GET: APIRoute = async ({ request, url }) => {
                       background: '#f6f4f7',
                       padding: '5px 15px',
                       borderRadius: '100px',
-                      fontWeight: 'bold',
-                      letterSpacing: '-0.04em',
+                      letterSpacing: '-0.01em',
                       fontSize: '20px',
                       color: '#71788a',
                     })}"
@@ -160,7 +177,8 @@ export const GET: APIRoute = async ({ request, url }) => {
               )
               .join('')}
           </div>`
-          : ''}
+            : ''
+        }
         <div
           style="${css({
             display: 'flex',
@@ -178,18 +196,8 @@ export const GET: APIRoute = async ({ request, url }) => {
       width: ogCardWidth,
       height: ogCardHeight,
       fonts: [
-        {
-          name: 'colfax',
-          data: colfaxRegular,
-          style: 'normal',
-          weight: 500,
-        },
-        {
-          name: 'colfax',
-          data: colfaxBold,
-          style: 'normal',
-          weight: 700,
-        },
+        { name: 'ABC Oracle', data: oracleRegular, style: 'normal', weight: 400 },
+        { name: 'ABC Oracle', data: oracleMedium, style: 'normal', weight: 500 },
       ],
     });
 

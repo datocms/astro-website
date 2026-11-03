@@ -1,33 +1,45 @@
-/* Typography classes. The size of each class comes from a --type-* token. */
+/* Typography classes. Each class is a role. Its size comes from a --type-* token. */
 
 .display {
-  font-size: var(--type-display);
+  font-size: var(--type-3xl);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.05em;
 }
 
-.h1 {
-  font-size: var(--type-h1);
+.headline {
+  font-size: var(--type-2xl);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.04em;
 }
 
-.h2 {
-  font-size: var(--type-h2);
+.title {
+  font-size: var(--type-l);
   font-weight: 500;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
+/* Dense content has smaller titles. They need more space between the lines. */
+[data-density='dense'] .title {
+  line-height: 1.2;
+}
+
+.section {
+  font-size: var(--type-xl);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
 .body,
 .bodyMedium,
 .bodyLong {
-  font-size: var(--type-body);
+  font-size: var(--type-m);
   font-weight: 400;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
+  line-height: calc(1.3 + var(--type-leading-dark));
+  letter-spacing: calc(-0.01em + var(--type-tracking-dark));
 }
 
 .bodyMedium {
@@ -35,38 +47,84 @@
 }
 
 .bodyLong {
-  line-height: 1.5;
+  line-height: calc(1.5 + var(--type-leading-dark));
 }
 
-.subtitle,
-.subtitleMedium {
-  font-size: var(--type-subtitle);
+/* A label is one line. A text that wraps takes .body. */
+.label,
+.labelMedium {
+  font-size: var(--type-s);
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.01em;
 }
 
-.subtitleMedium {
+.labelMedium {
   font-weight: 500;
 }
 
 .caption {
-  font-size: var(--type-caption);
+  font-size: var(--type-xs);
   font-weight: 500;
-  line-height: 1.35;
-  letter-spacing: -0.02em;
+  line-height: calc(1.35 + var(--type-leading-dark));
+  letter-spacing: calc(-0.01em + var(--type-tracking-dark));
 }
 
+/*
+ * Code blocks sit on the code ground (--code-background), which is deep in
+ * both schemes: the text is always light, thus the weight is always 500.
+ * Mono text on the other grounds (.codeInline, .monoCaps, .pictureLabel)
+ * follows the ground through --type-mono-weight.
+ */
 .code,
 .codeSmall {
   font-family: var(--font-mono);
-  font-size: var(--type-code);
+  font-size: var(--type-s);
+  font-weight: 500;
+  line-height: 1.55;
+  letter-spacing: 0;
+}
+
+.codeSmall {
+  font-size: var(--type-xs);
+}
+
+/*
+ * Inline code in running text. The mono has a taller x-height and wider
+ * letters than ABC Oracle: --type-inline-code (0.9em) gives the two the same
+ * visual size.
+ */
+.codeInline {
+  font-family: var(--font-mono);
+  font-size: var(--type-inline-code);
+  font-weight: var(--type-mono-weight);
+  line-height: inherit;
+  letter-spacing: 0;
+}
+
+/*
+ * The titles of the diagram panels and the group names of the docs
+ * sidebar. This is the only role in uppercase with tracking.
+ */
+.monoCaps {
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Text inside a drawn picture only. */
+.pictureLabel {
+  font-family: var(--font-mono);
+  font-size: var(--type-2xs);
   font-weight: 500;
   line-height: 1.4;
   letter-spacing: 0;
 }
 
-.codeSmall {
-  font-size: var(--type-code-small);
-  line-height: 1.86;
+/* A treatment for numbers. Add it to a role: prices, counts, dates, stats. */
+.tabular {
+  font-variant-numeric: tabular-nums;
 }

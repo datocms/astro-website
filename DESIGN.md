@@ -43,6 +43,12 @@ typography:
     fontWeight: 500
     lineHeight: 1.1
     letterSpacing: '-0.02em'
+  section:
+    fontFamily: 'ABC Oracle, Helvetica Neue, Helvetica, Arial, sans-serif'
+    fontSize: '36px'
+    fontWeight: 500
+    lineHeight: 1.2
+    letterSpacing: '-0.03em'
   body:
     fontFamily: 'ABC Oracle, Helvetica Neue, Helvetica, Arial, sans-serif'
     fontSize: '20px'
@@ -58,6 +64,12 @@ typography:
   label:
     fontFamily: 'ABC Oracle, Helvetica Neue, Helvetica, Arial, sans-serif'
     fontSize: '16px'
+    fontWeight: 400
+    lineHeight: 1
+    letterSpacing: '-0.01em'
+  label-medium:
+    fontFamily: 'ABC Oracle, Helvetica Neue, Helvetica, Arial, sans-serif'
+    fontSize: '16px'
     fontWeight: 500
     lineHeight: 1
     letterSpacing: '-0.01em'
@@ -65,11 +77,29 @@ typography:
     fontFamily: 'ABC Oracle, Helvetica Neue, Helvetica, Arial, sans-serif'
     fontSize: '14px'
     fontWeight: 500
-    lineHeight: '12px'
-    letterSpacing: '-0.05em'
+    lineHeight: 1.35
+    letterSpacing: '-0.01em'
   code:
     fontFamily: 'Geist Mono, ui-monospace, Menlo, monospace'
     fontSize: '16px'
+    fontWeight: 400
+    lineHeight: 1.55
+    letterSpacing: '0em'
+  code-inline:
+    fontFamily: 'Geist Mono, ui-monospace, Menlo, monospace'
+    fontSize: '0.9em'
+    fontWeight: 400
+    lineHeight: inherit
+    letterSpacing: '0em'
+  mono-caps:
+    fontFamily: 'Geist Mono, ui-monospace, Menlo, monospace'
+    fontSize: '14px'
+    fontWeight: 500
+    lineHeight: 1.3
+    letterSpacing: '0.06em'
+  picture-label:
+    fontFamily: 'Geist Mono, ui-monospace, Menlo, monospace'
+    fontSize: '12px'
     fontWeight: 500
     lineHeight: 1.4
     letterSpacing: '0em'
@@ -95,7 +125,7 @@ components:
   button-light-on-white:
     backgroundColor: '{colors.pollen}'
     textColor: '{colors.espresso}'
-    typography: '{typography.label}'
+    typography: '{typography.label-medium}'
     rounded: '{rounded.full}'
     height: '40px'
     padding: '0 10px'
@@ -105,7 +135,7 @@ components:
   button-deep-on-white:
     backgroundColor: '{colors.espresso}'
     textColor: '{colors.cream-paper}'
-    typography: '{typography.label}'
+    typography: '{typography.label-medium}'
     rounded: '{rounded.full}'
     height: '40px'
     padding: '0 10px'
@@ -114,7 +144,7 @@ components:
     textColor: '{colors.espresso}'
   tab-pill:
     textColor: '{colors.espresso}'
-    typography: '{typography.label}'
+    typography: '{typography.label-medium}'
     rounded: '{rounded.full}'
     padding: '12px 16px'
   code-card:
@@ -149,7 +179,7 @@ This system came from overnice's work ("Warm Logic" is their name for the route)
 - Six themes (default, orange, green, purple, blue, pink). Each is a set of three surfaces: a near-white paper, a bright accent and a deep inverse, all of one hue.
 - Full-bleed bands of flat colour; a theme changes from section to section, never inside a component.
 - Two-tone headlines: the claim in the text colour, then the aside in a muted tone of the same hue.
-- One sans (ABC Oracle) at two weights, tight negative tracking; Geist Mono for code and product chrome.
+- One sans (ABC Oracle) at two weights, tight negative tracking; Geist Mono for code and product chrome: 500 in code blocks, and on the page 400 on light grounds and 500 on dark grounds.
 - Pill buttons with an arrow; instant hover that swaps the two colours.
 - The product as code-rendered scenes, cut off by the edge of the band, with a top-left corner radius only.
 - Pixel art as the playful signature: pixel videos of hands and people in the page closer, a pixel hover on photos.
@@ -187,7 +217,7 @@ Ember and Bubblegum are tuned away from overnice's values (#ff6d00 too vivid, #f
 
 ### Neutral
 
-There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft at 80% on the page and 92% on the accent, text-muted at 70 to 90% (each theme sets the alpha that gives 4.5:1 on its ground: yellow holds 70%, orange and green need about 90% on the accent), and the hairline border at about 11%. The one lighter role is the quiet run of a two-tone headline or display lockup (3:1, large text only). **White** (white) is only for a card that sits on a surface that stays light.
+There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft at 80% on the page and 92% on the accent, text-muted at 70 to 90% (each theme sets the alpha that gives 4.5:1 on its ground: yellow holds 70%, orange and green need about 90% on the accent), and the hairline border at about 11% (in the dark scheme, the accent at 25%: a light line on a dark page needs more alpha). The one lighter role is the quiet run of a two-tone headline or display lockup (3:1, large text only). **White** (white) is only for a card that sits on a surface that stays light.
 
 ### Dark scheme
 
@@ -198,7 +228,7 @@ Only the page flips. The page becomes a near-black of the theme hue (the code de
 The rules below are the whole system. `src/styles/tokens.css` states them, `src/styles/tokens.test.ts` computes every pairing (all roles, all surfaces, six themes, two schemes) and fails under AA, and `npm run lint:css` refuses a text colour outside the roles.
 
 1. **Three grounds.** Every element sits on one ground: the **page** (`--surface-default` and its tints: `--surface-accent-faint|subtle|muted`, `--surface-inverse-faint`, `--surface-field`, `--surface-nav-active`, `--surface-status-*`), the **accent** (`--surface-accent`, bright in both schemes, dark text) or the **inverse** (`--surface-inverse`, deep in both schemes, light text). The code card (`--code-background`, `--code-*`) is a fourth, small ground.
-2. **Canonical text roles**, one set for each ground: page `--text-on-page`, `-soft`, `-muted`, `-headline-muted`; accent `--text-on-accent`, `-soft`, `-muted`, `-headline-muted`; inverse `--text-on-inverse-strong`, `--text-on-inverse`, `-soft`, `-muted`, `-headline-muted`. Each role has 4.5:1 or more on every surface of its ground, in the six themes and the two schemes. The one exception is `*-headline-muted`: 3:1 or more, for the quiet run of a two-tone headline or display lockup only (large text, 24px or more: a `display` or `h1` headline, the quiet words of the Single Source lockup; an `h2` is 17px on phones and takes `--text-muted`). Borders: `--border-on-page|accent|inverse` and `-strong`.
+2. **Canonical text roles**, one set for each ground: page `--text-on-page`, `-soft`, `-muted`, `-headline-muted`; accent `--text-on-accent`, `-soft`, `-muted`, `-headline-muted`; inverse `--text-on-inverse-strong`, `--text-on-inverse`, `-soft`, `-muted`, `-headline-muted`. Each role has 4.5:1 or more on every surface of its ground, in the six themes and the two schemes. The one exception is `*-headline-muted`: 3:1 or more, for the quiet run of a two-tone headline or display lockup only (large text, 24px or more: a `.display` or `.headline` heading, the quiet words of the Single Source lockup; a `.title` is 20px on phones and takes `--text-muted`). Borders: `--border-on-page|accent|inverse` and `-strong`.
 3. **Contextual roles follow the ground, not the theme.** A component that does not paint a ground uses `--text-primary`, `--text-soft`, `--text-muted`, `--text-headline-muted`, `--border-default`, `--border-strong`, `--text-accent`, `--text-positive`, `--text-negative`. They resolve to the canonical roles of the ground that the element sits on. A theme switch (`data-theme`) inside a ground keeps the light or dark text of the ground.
 4. **Ground classes.** The element that paints a ground gets the global class of the ground: `surfacePage` (a window of the page inside another ground: a chat, the mega menu), `surfaceAccent` or `surfaceInverse`. The class sets the contextual roles and `color`. A small shape (a button, a pill, a hovered row) that paints the accent or the inverse sets `color` to a canonical role of that ground in the same rule. A ground that comes with the viewport or a state (the split header, a hovered row that turns to the accent) cannot take a class: the rule sets a contextual role to the canonical role of the same kind (`--text-muted: var(--text-on-accent-muted)`), and nothing else.
 5. **No alpha on text outside `tokens.css`.** A text colour is a token. No `opacity`, no `color-mix()` and no new `--text-*` property on a text colour in a component: every tint of text is a role. `opacity` under 1 is only for an element without text (a picture, a placeholder card), an inactive control or a pressed state, and says so in a disable comment.
@@ -215,31 +245,56 @@ A surface as text is a pill: `--surface-default` on a fill of `--text-primary` (
 
 ## Typography
 
-**Display Font:** ABC Oracle (with Helvetica Neue, Helvetica, Arial)
-**Body Font:** ABC Oracle
-**Label/Mono Font:** Geist Mono 500 (with ui-monospace, Menlo)
+**Display and Body Font:** ABC Oracle, with three metric fallback faces (Helvetica Neue, Arial, Roboto). `src/styles/fonts.css` defines them with `size-adjust` and ascent and descent overrides, so that the swap to ABC Oracle does not move the text.
+**Mono Font:** Geist Mono (with ui-monospace, Menlo). Code blocks are always 500: the code ground is deep in both schemes. Mono text on the other grounds is 400 on light and 500 on dark (`--type-mono-weight`). The product scenes use it.
 
 **Character:** One grotesque at two weights (400, 500) with tight negative tracking. It reads as engineered and calm, and the two-tone headlines give it a voice. The mono is for code and for the chrome of the product.
 
+### The ladder
+
+One size ladder, in t-shirt steps, in rem (the zoom of the browser enlarges the text). The `--type-*` tokens in `src/styles/tokens.css` hold it. The 1320 values hold at 1920. The fluid steps are two linear segments through the three Figma frames (393, 768, 1320).
+
+| Step  | 393      | 768 | 1320 | Dense    | Roles                                       |
+| ----- | -------- | --- | ---- | -------- | ------------------------------------------- |
+| `2xs` | 11       | 12  | 12   |          | picture label (only inside a drawn picture) |
+| `xs`  | 13       | 14  | 14   |          | caption, mono caps, small code              |
+| `s`   | 14       | 15  | 16   | 14/15/15 | label, code                                 |
+| `m`   | 16       | 17  | 20   | 16/17/17 | body, long body                             |
+| `l`   | fluid 20 | 25  | 30   | 20/22/22 | title                                       |
+| `xl`  | fluid 24 | 30  | 36   | 24/28/28 | section (the docs h2)                       |
+| `2xl` | fluid 30 | 40  | 45   |          | headline                                    |
+| `3xl` | fluid 37 | 50  | 60   |          | display                                     |
+
+Dense: the docs layout sets `data-density="dense"` on `<body>`, and the `s`, `m`, `l` and `xl` steps take the dense values.
+
 ### Hierarchy
 
-The sizes in the frontmatter are the 1320px values. Each role has three steps (393 / 768 / 1320) through the `--type-*` tokens.
+The sizes in the frontmatter are the 1320px values. Each role has a class in `src/styles/typography.css`.
 
-- **Display** (500, 37 / 50 / 60px, 1.0, -0.05em): stats, the biggest statements.
-- **Headline** (500, 30 / 40 / 45px, 1.0, -0.04em): heroes, chapter headers, statements, quotes. The `.h1` class.
-- **Title** (500, 17 / 25 / 30px, 1.1, -0.02em): sub-headlines, FAQ questions, footer titles. The `.h2` class.
-- **Body** (400 or 500, 14 / 17 / 20px, 1.3, -0.01em): running text. `.bodyLong` (line height 1.5) for intros, max 560px.
-- **Label** (400 or 500, 14 / 16px, 1.0, -0.01em): buttons, nav, small labels. The `.subtitle` and `.subtitleMedium` classes.
-- **Caption** (500, 9 / 14px, 12px line, -0.05em): tooltips, notes.
-- **Code** (Geist Mono 500, 13 to 16px, 1.4): code cards, product chrome.
+- **Display** (500, 1.0, -0.05em): stats, the biggest statements. The `.display` class.
+- **Headline** (500, 1.0, -0.04em): heroes, chapter headers, statements, quotes. The `.headline` class.
+- **Title** (500, 1.1, -0.02em; 1.2 in dense): sub-headlines, FAQ questions, footer titles. The `.title` class.
+- **Section** (500, 1.2, -0.03em): the docs h2. The `.section` class.
+- **Body** (400, 1.3, -0.01em): running text. The `.body` and `.bodyMedium` (500) classes. `.bodyLong` (line height 1.5) is for intros and for any text over two lines, max 560px.
+- **Label** (400, 1.0, -0.01em): buttons, nav. The `.label` and `.labelMedium` (500) classes. A label is one line: a text that wraps takes Body.
+- **Caption** (500, 1.35, -0.01em): tooltips, notes, dates, metadata. The `.caption` class.
+- **Code** (Geist Mono, 1.55, 0): code cards, product chrome. The `.code` and `.codeSmall` classes.
+- **Inline code** (Geist Mono, 0.9em of the running text): the mono has a larger x-height and wider letters than ABC Oracle, so 0.9em gives the two the same visual size. The `.codeInline` class.
+- **Mono caps** (Geist Mono 500, 1.3, +0.06em, uppercase): diagram panel titles, docs sidebar group names. The one tracked uppercase role. The `.monoCaps` class.
+- **Picture label** (Geist Mono 500, 1.4): text inside drawn pictures only. The `.pictureLabel` class.
+- **Tabular**: a treatment, not a role. `.tabular` goes on a role: prices, counts, dates, stats.
 
-Headings have no default size. A section picks a typography class.
+**Dark grounds.** On `.surfaceInverse` and in the dark scheme, body, long body and caption get +0.05 line height and +0.01em tracking, and mono text on the page is 500 (`--type-leading-dark`, `--type-tracking-dark` and `--type-mono-weight` in `tokens.css`).
+
+**Floors.** Outside a picture, no text is under 13px on phones and 14px on desktop. Inside a picture, 11px and 12px.
+
+**Headings** have `overflow-wrap: break-word` and `text-wrap: balance`. Paragraphs have `text-wrap: pretty`. `strong` and `b` render at 500. Headings have no default size. A section picks a typography class.
 
 ### Named Rules
 
 **The Two-Tone Rule.** A headline says the claim in the text colour, then continues in the quiet run: `--text-headline-muted`, the headline-muted role of the ground (the muted text on the page, a lighter step on the accent and the inverse, at 3:1 or more because the headline is large text). "Modular how you like it. _And steady how you need it._" The muted half never gets its own size or weight. This is the main voice of the site.
 
-**The Two Weights Rule.** ABC Oracle at 400 and 500 only. No bold, no italic as decoration, no uppercase tracking labels.
+**The Two Weights Rule.** ABC Oracle at 400 and 500 only. `strong` is 500. No bold, no italic as decoration, no uppercase tracking except the mono caps role. The product scenes kit renders at the weight 340 of the cms, inside the pictures only.
 
 **The Text Face Rule.** A hero headline can end with a text face (`[••]`, `[•ᴥ•]`, `[•*•]`), joined to the last word so that it never wraps alone. The typewriter can type it and make it wink. One face for each headline, at most. The face is our voice, and it follows an aside: the headline is a full sentence (it ends with `.`, `?` or `!`), and the muted run adds to it ("Got issues? We're here to help! [••]"). A title in two tones ("Projects from Our / Partners") has no face. The copy names the face (`face` in `src/data`). The hero adds no face by default. Text from the CMS (a plugin, a starter, a partner), a title alone and a legal page have no face. Each page closer with a call to action ends its headline with a face: the page selects it (`<PageCloser face="…">`, a name from `src/lib/motion/faces.ts`) to fit its subject, and the face plays when it comes into view. The closer face is not the face of the hero of the same page. Each face plays its animation, always: in a typewriter script (`faceStep`), or with the `Face` component (`<Face name="…">`), which plays it when it comes into view, on load, or each time a form error shows. A hero without the typewriter, a section headline, a form message: all use `Face`. No component writes the glyphs of a face, and no copy has them. The library has more than 30 faces, thus the faces do not repeat: each face is on 2 heroes or closers at most, on different pages, and each one fits its copy (its `description` in `faces.ts` tells where). The pages of one template (the `/cms` pages) count as one. The 404 has `confused`. `/dev/face-gallery` shows them all.
 
@@ -327,7 +382,7 @@ Signs are typographic, not icons: `→` at the end of a button or a link, `+` an
 
 Friendly and direct: a pill that says where it goes.
 
-- **Shape:** full pill (9999px), 40px tall, 10px side padding, Label weight 500. An arrow `→` follows the label by default.
+- **Shape:** full pill (9999px), 40px tall, 10px side padding, `.labelMedium` (500). An arrow `→` follows the label by default.
 - **Light on white** (the default): the accent as fill, the deep text. The main call to action on a paper band.
 - **Deep on white:** the deep as fill, paper text. A strong secondary, or the main action on a light accent band.
 - **Deep on light / light on deep:** the same pair, for inverse and accent bands.
@@ -337,7 +392,7 @@ Friendly and direct: a pill that says where it goes.
 
 ### Chips (category nav, tabs)
 
-- **Style:** pill, Label weight 500, muted text. The current item gets a faint tint of the deep and the full text colour. A tint pill slides to the current item (300ms, cubic-bezier(0.3, 0, 0, 1)).
+- **Style:** pill, `.labelMedium` (500), muted text. The current item gets a faint tint of the deep and the full text colour. A tint pill slides to the current item (300ms, cubic-bezier(0.3, 0, 0, 1)).
 - **State:** the nav sticks to the top. A hairline appears under it only when it is stuck.
 
 ### Cards / Containers
@@ -359,9 +414,9 @@ There are few cards. Content sits in bands, cells and halves.
 
 ### Navigation
 
-- **Header:** 82px, not sticky, on the surface of the page or of the hero band. The links (Label weight 500) are centred and get an underline on hover. "Get Started" is a pill button.
-- **Mega menu:** on the paper surface, three columns of 300px, muted descriptions, with a hairline on top. It opens without animation.
-- **Footer:** on `--surface-inverse-deep` of the page theme: a little darker than the page closer above it. It has a Headline-size closing line with a text face, columns of links in the on-inverse colours, and a status line with a dot.
+- **Header:** 82px, not sticky, on the surface of the page or of the hero band, with a hairline (`--border-default`) at the bottom that tells where it ends. The logo is at the left, the links start 40px after it, the actions are at the right. The links (`.labelMedium`) are 40px pills like the chips. One tint pill (`--surface-inverse-faint`) slides between the items (300ms, `cubic-bezier(0.3, 0, 0, 1)`): to the item under the cursor or with the focus, else it rests on the open item or on the group of the page that the visitor reads. "Get Started" is a pill button.
+- **Dropdown cards:** a card hangs from the hairline under its item, with a width that comes from its columns (one for Customers, two for Product and Resources). The card is a field of colour, as a band, with no border: the accent of the page theme (dark text) under a page header, the deep (light text) under an accent header. While a card is open, the tint pill and the label of its item take the ground of the card: the item is the tab of its card. Padding 30px above and below, 40px at the sides. Muted headings, `.title` links, muted descriptions. One shell holds every card: from closed it grows down from the hairline (260ms) and the rows arrive 20ms apart; from another card it glides to the new place and size (300ms, the same curve) while the two contents cross-fade. With reduced motion, the swaps are instant. The groups with cards are Product, Resources and Customers; Partners, Philosophy and Pricing are plain links.
+- **Footer:** on `--surface-inverse-deep` of the page theme: a little darker than the page closer above it. It has a `.headline` closing line with a text face, five columns of links in the on-inverse colours (seven to nine links each; below 1152 the groups flow in balanced text columns), a status line with a dot, and a last bar with the logo, the legal links and the company line. On touch, each link is a row of 44px.
 
 ### Code card (signature)
 
@@ -390,10 +445,10 @@ The same language on photos: the image of a card (a post card, a media card) sho
 A picture of what DatoCMS does when the subject is not a screen of the cms: the real-time stream, the wall of cached pages, the media pipeline, the integrity of the schema. All diagrams speak one grammar, so the eye learns it once: **a pill does the work, a pulse is data that moves, a ring is what changed.**
 
 - **Surface:** the inverse sheet of the band, inside a `whole` frame (no frame drawn, nothing cut), 960px at most, top-down on phones. A diagram in a fragment sits on the surface of the page, in the scheme of the page (`data-diagram-surface="page"`, and the ground `surfacePage` on the `fill` fragment): light in the light scheme, dark in the dark scheme.
-- **Pill:** the actor or the event. 28px tall, full radius, Geist Mono at code-small size, the DatoCMS mark at 14px. Light on the inverse (`--text-on-inverse-strong`). An event pill shows one event and its time; the next one replaces it.
+- **Pill:** the actor or the event. 28px tall, full radius, Geist Mono at `.codeSmall` size, the DatoCMS mark at 14px. Light on the inverse (`--text-on-inverse-strong`). An event pill shows one event and its time; the next one replaces it.
 - **Track:** a line, 1.5px, quiet (`--border-on-inverse-strong`) and always drawn. No arrows, no dashes.
 - **Pulse:** a short 2px dash of the accent that runs along the track once: data on the move.
-- **Panel:** a container, 8px radius, a surface darker than the inverse (the inverse mixed with 35% black), a 1px ring and a label in capitals in the mono font.
+- **Panel:** a container, 8px radius, a surface darker than the inverse (the inverse mixed with 35% black), a 1px ring and a title in the `.monoCaps` role.
 - **Change:** the ring and the tint of the accent. One accent only (`--text-on-inverse`). Never red: a purge or a deletion is the product at work, not a failure.
 - **Motion:** two curves, a strong ease-out `cubic-bezier(0.23, 1, 0.32, 1)` for enter, exit and ping, and a strong ease-in-out `cubic-bezier(0.77, 0, 0.175, 1)` for travel and draw. Durations from 0.32s (fade) to 1s (travel, settle). Each step waits for the one before: the pill, then the lines, then the pulse, then the ring. Nothing appears in one frame. The still (the last step) is the markup.
 - **Show the claim, not the mechanism.** A wall of pages that change beats a boxes-and-arrows chart of the CDN.
@@ -428,7 +483,7 @@ Only a marketing hero types, and each marketing hero types (a reference page, an
 - **Don't** dim text with `opacity` or `color-mix()`. The quiet text is `--text-muted`; the quiet run of a headline is `--text-headline-muted`.
 - **Don't** round a band, a cell or a half, or float a coloured box with margins inside the column.
 - **Don't** put light text on an accent: all six accents take the deep text.
-- **Don't** add a third font weight, a bold, a tracked uppercase label or a second typeface for display.
+- **Don't** add a third font weight, a bold, a tracked uppercase text outside the mono caps role or a second typeface for display.
 - **Don't** use screenshots, stock photos or AI imagery where a scene, pixel art or a real customer photo can go.
 - **Don't** mix two accents of different themes inside one section.
 - **Don't** give the header, the closer or the footer a theme that is not the theme of the page, and don't put a hero on the inverse.

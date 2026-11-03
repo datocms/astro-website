@@ -1,8 +1,7 @@
-// The data of the mega-menu and the footer. The CMS does not hold it: the
-// lists are here. See src/data/AGENTS.md, "Navigation", for the
-// structure. Every link goes to a page, never to a
-// list of content, and no page has two names. A link without a page on
-// this site goes to '#'.
+// The data of the header menus and the footer. The CMS does not hold it:
+// the lists are here. See src/data/AGENTS.md, "Navigation", for the
+// structure. Every link goes to a page, never to a list of content, and
+// no page has two names. A link without a page on this site goes to '#'.
 
 interface LinkItem {
   label: string;
@@ -18,21 +17,21 @@ interface NavSection {
   allLink?: LinkItem;
 }
 
-/** One column of the mega-menu. It holds one or more sections. */
+/** One column of a dropdown card. It holds one or more sections. */
 interface NavColumn {
   sections: NavSection[];
 }
 
 export interface NavGroup {
   label: string;
-  /** A group without columns is a plain link (Philosophy, Pricing). */
+  /** A group without columns is a plain link (Partners, Philosophy, Pricing). */
   href?: string;
+  /** The columns of the dropdown card of the group. */
   columns?: NavColumn[];
 }
 
-interface FooterGroup {
-  /** A group without a title is a plain list of links (legal). */
-  title?: string;
+export interface FooterGroup {
+  title: string;
   links: LinkItem[];
 }
 
@@ -45,6 +44,8 @@ export interface FooterColumn {
 export interface LegalData {
   email: string;
   text: string;
+  /** The legal pages, in the bar at the end of the footer. */
+  links: LinkItem[];
 }
 
 const l = (label: string, href = '#', description?: string): LinkItem =>
@@ -69,6 +70,29 @@ const editorExperience = l(
 const media = l('Media', '/media', 'Media library, asset fields, images, video, components');
 const ai = l('AI', '/ai', 'MCP, agent skills, LLM-ready docs, translations, tags and captions');
 
+// The framework pages (/cms/[slug]).
+const frameworks = [
+  l('Next.js', '/cms/nextjs-cms'),
+  l('Nuxt', '/cms/nuxtjs-cms'),
+  l('SvelteKit', '/cms/svelte-cms'),
+  l('Astro', '/cms/astro-cms'),
+];
+
+// The compare pages. They are in the footer only: a visitor who compares
+// has decided to look, and the header stays a map of the product.
+const compare = [
+  l('Contentful', '/compare/datocms-vs-contentful'),
+  l('Sanity', '/compare/datocms-vs-sanity'),
+  l('Storyblok', '/compare/datocms-vs-storyblok'),
+  l('Strapi', '/compare/datocms-vs-strapi'),
+  l('WordPress', '/compare/datocms-vs-wordpress'),
+];
+
+// The customer pages. The header gives each a line that says what it holds.
+const caseStudies = l('Case studies', '/case-studies', 'Projects that teams built on DatoCMS');
+const wallOfLove = l('Wall of love', '/wall', 'What customers say about us');
+const casualChats = l('Casual chats', '/blog/casual-chats', 'Conversations with customers');
+
 export const mainNavigation: NavGroup[] = [
   {
     label: 'Product',
@@ -85,21 +109,11 @@ export const mainNavigation: NavGroup[] = [
       {
         sections: [
           { heading: 'Solutions', links: [l('Enterprise', '/enterprise-headless-cms')] },
-          {
-            heading: 'Compare',
-            links: [
-              l('Contentful', '/compare/datocms-vs-contentful'),
-              l('Sanity', '/compare/datocms-vs-sanity'),
-              l('Storyblok', '/compare/datocms-vs-storyblok'),
-              l('Strapi', '/compare/datocms-vs-strapi'),
-              l('WordPress', '/compare/datocms-vs-wordpress'),
-            ],
-          },
+          { heading: 'Frameworks', links: frameworks },
         ],
       },
     ],
   },
-  // The one customers page. It becomes /customers, and /case-studies merges into it.
   {
     label: 'Resources',
     columns: [
@@ -113,6 +127,10 @@ export const mainNavigation: NavGroup[] = [
               l('User guides', '/user-guides'),
               l('Glossary', '/glossary'),
             ],
+          },
+          {
+            heading: 'Catalogs',
+            links: [l('Plugins', '/plugins'), l('Starters', '/starters')],
           },
         ],
       },
@@ -132,17 +150,16 @@ export const mainNavigation: NavGroup[] = [
           },
         ],
       },
+    ],
+  },
+  {
+    label: 'Customers',
+    columns: [
       {
-        sections: [
-          {
-            heading: 'Catalogs',
-            links: [l('Plugins', '/plugins'), l('Starters', '/starters')],
-          },
-        ],
+        sections: [{ heading: 'Customers', links: [caseStudies, wallOfLove, casualChats] }],
       },
     ],
   },
-  { label: 'Customers', href: '/case-studies' },
   { label: 'Partners', href: '/partners' },
   { label: 'Philosophy', href: '/philosophy' },
   { label: 'Pricing', href: '/pricing' },
@@ -151,6 +168,8 @@ export const mainNavigation: NavGroup[] = [
 // The footer has no description: only the label of each link shows.
 const footerLink = ({ label, href }: LinkItem): LinkItem => ({ label, href });
 
+// Five columns of seven to nine links. The legal pages are in the bar at
+// the end (`legal.links`), not in a column.
 export const footerColumns: FooterColumn[] = [
   {
     groups: [
@@ -163,14 +182,30 @@ export const footerColumns: FooterColumn[] = [
           l('Pricing', '/pricing'),
         ],
       },
-      // The legal pages. They have no column of their own.
+    ],
+  },
+  {
+    groups: [
+      { title: 'Frameworks', links: frameworks },
+      { title: 'Compare', links: compare },
+    ],
+  },
+  {
+    groups: [
       {
+        title: 'Learn',
         links: [
-          l('Privacy policy', '/legal/privacy-policy'),
-          l('Cookie policy', '/legal/cookie-policy'),
-          l('GDPR Compliance', '/legal/gdpr'),
-          l('Terms of Service', '/legal/terms'),
+          l('Docs', '/docs'),
+          l('Academy', '/academy'),
+          l('User guides', '/user-guides'),
+          l('Glossary', '/glossary'),
+          l('Plugins', '/plugins'),
+          l('Starters', '/starters'),
         ],
+      },
+      {
+        title: 'News',
+        links: [l('Blog', '/blog'), l('Product updates', '/product-updates')],
       },
     ],
   },
@@ -178,17 +213,8 @@ export const footerColumns: FooterColumn[] = [
     groups: [
       {
         title: 'Customers',
-        links: [
-          l('Case studies', '/case-studies'),
-          l('Wall of love', '/wall'),
-          l('Casual chats', '/blog/casual-chats'),
-          l('Compare', '/compare/datocms-vs-contentful'),
-        ],
+        links: [caseStudies, wallOfLove, casualChats].map(footerLink),
       },
-    ],
-  },
-  {
-    groups: [
       {
         title: 'Partners',
         links: [
@@ -196,36 +222,6 @@ export const footerColumns: FooterColumn[] = [
           l('Partner showcase', '/partners/showcase'),
           l('Become a partner', '/partner-program'),
           l('Tech partners', '/tech-partners'),
-        ],
-      },
-    ],
-  },
-  {
-    groups: [
-      {
-        title: 'Resources',
-        links: [
-          l('Docs', '/docs'),
-          l('Blog', '/blog'),
-          l('Product updates', '/product-updates'),
-          l('Academy', '/academy'),
-          l('User guides', '/user-guides'),
-          l('Glossary', '/glossary'),
-          l('Plugins', '/plugins'),
-          l('Starters', '/starters'),
-          l('Community', communityHref),
-          l('Slack', '/slack'),
-          l('Support', '/support'),
-        ],
-      },
-      // The framework pages (/cms/[slug]).
-      {
-        title: 'Frameworks',
-        links: [
-          l('Next.js', '/cms/nextjs-cms'),
-          l('Nuxt', '/cms/nuxtjs-cms'),
-          l('SvelteKit', '/cms/svelte-cms'),
-          l('Astro', '/cms/astro-cms'),
         ],
       },
     ],
@@ -242,6 +238,14 @@ export const footerColumns: FooterColumn[] = [
           l('Contact', '/contact'),
         ],
       },
+      {
+        title: 'Help',
+        links: [
+          l('Support', '/support'),
+          l('Community forum', communityHref),
+          l('Slack', '/slack'),
+        ],
+      },
     ],
     status: { label: 'Status', text: 'All systems normal', href: 'https://status.datocms.com' },
   },
@@ -250,4 +254,24 @@ export const footerColumns: FooterColumn[] = [
 export const legal: LegalData = {
   email: 'support@datocms.com',
   text: '©2026 Dato srl, all rights reserved  P.IVA 06969620480',
+  links: [
+    l('Privacy policy', '/legal/privacy-policy'),
+    l('Cookie policy', '/legal/cookie-policy'),
+    l('GDPR Compliance', '/legal/gdpr'),
+    l('Terms of Service', '/legal/terms'),
+  ],
 };
+
+/**
+ * The paths of the pages of a group. The header marks the group of the
+ * page that the visitor reads. A path matches when it is the page or a
+ * page below it ('/blog' matches '/blog/casual-chats').
+ */
+export function groupPaths(group: NavGroup): string[] {
+  if (group.href) return [group.href];
+  return (group.columns ?? [])
+    .flatMap((column) => column.sections)
+    .flatMap((section) => [...section.links, ...(section.allLink ? [section.allLink] : [])])
+    .map((link) => link.href)
+    .filter((href) => href.startsWith('/'));
+}

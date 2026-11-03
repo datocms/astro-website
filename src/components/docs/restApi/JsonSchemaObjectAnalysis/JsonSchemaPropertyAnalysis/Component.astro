@@ -31,7 +31,10 @@ const { property, showRequiredOptional = true } = Astro.props;
         <span class={s.inlineTypes}>
           {intersperse(
             property.types.map((type) => (
-              <span class={s.type} set:html={inlineMarkdown(type).then(String)} />
+              <span
+                class:list={[s.type, 'codeInline']}
+                set:html={inlineMarkdown(type).then(String)}
+              />
             )),
             ', ',
           )}
@@ -41,13 +44,13 @@ const { property, showRequiredOptional = true } = Astro.props;
 
     {
       property.deprecated ? (
-        <span class={s.required}>Deprecated</span>
+        <span class:list={[s.required, 'caption']}>Deprecated</span>
       ) : (
         showRequiredOptional &&
         (property.required ? (
-          <span class={s.required}>Required</span>
+          <span class:list={[s.required, 'caption']}>Required</span>
         ) : (
-          <span class={s.optional}>Optional</span>
+          <span class:list={[s.optional, 'caption']}>Optional</span>
         ))
       )
     }
@@ -75,7 +78,10 @@ const { property, showRequiredOptional = true } = Astro.props;
           Type:
           {intersperse(
             property.types.map((type) => (
-              <span class={s.type} set:html={inlineMarkdown(type).then(String)} />
+              <span
+                class:list={[s.type, 'codeInline']}
+                set:html={inlineMarkdown(type).then(String)}
+              />
             )),
             ', ',
           )}
@@ -92,7 +98,9 @@ const { property, showRequiredOptional = true } = Astro.props;
           {property.examples.length > 1 ? <>Examples:</> : <>Example:</>}
 
           {intersperse(
-            property.examples.map((example) => <code>{example}</code>),
+            property.examples.map((example) => (
+              <code class:list={[s.example, 'codeInline']}>{example}</code>
+            )),
             ', ',
           )}
         </div>

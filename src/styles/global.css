@@ -15,7 +15,13 @@
 
 @layer tokens {
   :root {
-    --font-sans: 'ABC Oracle', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    /*
+     * The fallback faces (fonts.css) have the metrics of ABC Oracle. Thus the
+     * text does not move when ABC Oracle loads.
+     */
+    --font-sans:
+      'ABC Oracle', 'ABC Oracle Fallback HN', 'ABC Oracle Fallback Arial',
+      'ABC Oracle Fallback Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     --font-mono: 'Geist Mono', ui-monospace, Menlo, monospace;
 
     /* The product scenes use the fonts of the page. */
@@ -40,10 +46,10 @@
   body {
     margin: 0;
     font-family: var(--font-sans);
-    font-size: var(--type-body);
+    font-size: var(--type-m);
     font-weight: 400;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
+    line-height: calc(1.3 + var(--type-leading-dark));
+    letter-spacing: calc(-0.01em + var(--type-tracking-dark));
     background: var(--surface-default);
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
@@ -60,6 +66,22 @@
     margin: 0;
     font-size: inherit;
     font-weight: inherit;
+    /*
+     * A word longer than the line breaks. "anywhere" also lets a heading in
+     * a flex or grid cell shrink below the width of its longest word.
+     */
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* ABC Oracle has the weights 400 and 500 only. The bold of the browser is 700. */
+  strong,
+  b {
+    font-weight: 500;
   }
 
   p,
@@ -114,6 +136,16 @@
   :focus-visible {
     outline: 2px solid currentColor;
     outline-offset: 2px;
+  }
+
+  /*
+   * The placeholder of a field is the muted text of its ground. The
+   * browser grey is not a colour of the theme, and Firefox also sets an
+   * opacity on the placeholder.
+   */
+  ::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
   }
 
   .visuallyHidden {

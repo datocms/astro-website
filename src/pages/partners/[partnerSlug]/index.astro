@@ -6,6 +6,7 @@ import { ensureValidStructuredTextProps } from '@datocms/astro';
 import sortBy from 'lodash-es/sortBy';
 import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Fact, Facts } from '~/components/Facts';
 import { Hero } from '~/components/Hero';
 import { PluginCard } from '~/components/PluginCard';
 import { Prose } from '~/components/Prose';
@@ -96,7 +97,7 @@ const sortedProjects = sortBy(page.projects, (project) =>
   <Section>
     <div class={s.layout}>
       <div class={s.main}>
-        <h2 class="h2">{partner.description}</h2>
+        <h2 class="title">{partner.description}</h2>
         <Prose>
           <StructuredText
             {...ensureValidStructuredTextProps({
@@ -125,33 +126,18 @@ const sortedProjects = sortBy(page.projects, (project) =>
         </div>
       </div>
 
-      <aside class={s.aside}>
-        <section class={s.facts}>
-          <h2 class="bodyMedium">
-            {page.locations.length > 1 ? partner.locations : partner.location}
-          </h2>
-          <ul class={s.list}>
-            {
-              page.locations.map((area) => (
-                <li class="body">
-                  {area.emoji} {area.name}
-                </li>
-              ))
-            }
-          </ul>
-        </section>
-        <section class={s.facts}>
-          <h2 class="bodyMedium">{partner.services}</h2>
-          <ul class={s.list}>
-            {page.areasOfExpertise.map((area) => <li class="body">{area.name}</li>)}
-          </ul>
-        </section>
-        <section class={s.facts}>
-          <h2 class="bodyMedium">{partner.technologies}</h2>
-          <ul class={s.list}>
-            {page.technologies.map((technology) => <li class="body">{technology.name}</li>)}
-          </ul>
-        </section>
+      <aside>
+        <Facts>
+          <Fact
+            label={page.locations.length > 1 ? partner.locations : partner.location}
+            values={page.locations.map((area) => `${area.emoji} ${area.name}`)}
+          />
+          <Fact label={partner.services} values={page.areasOfExpertise.map((area) => area.name)} />
+          <Fact
+            label={partner.technologies}
+            values={page.technologies.map((technology) => technology.name)}
+          />
+        </Facts>
       </aside>
     </div>
   </Section>
@@ -167,7 +153,7 @@ const sortedProjects = sortBy(page.projects, (project) =>
     testimonials.length > 1 && (
       <Section flushTop>
         <div class={s.header}>
-          <h2 class="h2">{partner.testimonials}</h2>
+          <h2 class="title">{partner.testimonials}</h2>
         </div>
         <ul class={s.grid}>
           {testimonials.map((item) => (
@@ -184,7 +170,7 @@ const sortedProjects = sortBy(page.projects, (project) =>
     page.chats.length > 0 && (
       <Section flushTop={!quoteBand}>
         <div class={s.header}>
-          <h2 class="h2">{partner.chats}</h2>
+          <h2 class="title">{partner.chats}</h2>
           <p class:list={[s.muted, 'body']}>{partner.chatsIntro}</p>
         </div>
         <ul class={s.grid}>
@@ -208,7 +194,7 @@ const sortedProjects = sortBy(page.projects, (project) =>
     sortedProjects.length > 0 && (
       <Section flushTop={!(quoteBand && page.chats.length === 0)}>
         <div class={s.header}>
-          <h2 class="h2">{partner.projects}</h2>
+          <h2 class="title">{partner.projects}</h2>
         </div>
         <ul class={s.grid}>
           {sortedProjects.map((project) => {
@@ -237,7 +223,7 @@ const sortedProjects = sortBy(page.projects, (project) =>
     plugins.length > 0 && (
       <Section flushTop={!(quoteBand && page.chats.length === 0 && sortedProjects.length === 0)}>
         <div class={s.header}>
-          <h2 class="h2">{partner.plugins}</h2>
+          <h2 class="title">{partner.plugins}</h2>
         </div>
         <ul class:list={[s.grid, s.pluginsGrid]}>
           {plugins.map((plugin) => (

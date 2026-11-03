@@ -3,6 +3,7 @@
 //
 //     node upload.mjs geist-mono                    # the subsets from npm
 //     node upload.mjs ~/Downloads/ABCOracleVariable.woff2
+//     node upload.mjs ~/Downloads/ABCOracle-Regular.otf ~/Downloads/ABCOracle-Medium.otf
 //     node upload.mjs geist-mono --dry-run          # shows the uploads only
 //
 // A local file keeps its name as the key, thus the name must be in `FILES`
@@ -64,11 +65,25 @@ function localUpload(file) {
   return { key, file: path.resolve(file) };
 }
 
-// A woff2 file starts with the signature "wOF2"
-function assertWoff2({ key, file }) {
+// The content type and the first four bytes of each file format
+const FORMATS = {
+  '.woff2': { contentType: 'font/woff2', signature: 'wOF2' },
+  '.ttf': { contentType: 'font/ttf', signature: '\0\x01\0\0' },
+  '.otf': { contentType: 'font/otf', signature: 'OTTO' },
+};
+
+function formatOf(key) {
+  const format = FORMATS[path.extname(key)];
+  if (!format) {
+    throw new Error(`${key} has no known format (${Object.keys(FORMATS).join(', ')})`);
+  }
+  return format;
+}
+
+function assertSignature({ key, file }) {
   const signature = readFileSync(file).subarray(0, 4).toString('latin1');
-  if (signature !== 'wOF2') {
-    throw new Error(`${file} is not a woff2 file, thus it cannot go to ${key}`);
+  if (signature !== formatOf(key).signature) {
+    throw new Error(`${file} is not a ${path.extname(key)} file, thus it cannot go to ${key}`);
   }
 }
 
@@ -77,7 +92,7 @@ try {
     source === 'geist-mono' ? geistMonoUploads() : [localUpload(source)],
   );
 
-  uploads.forEach(assertWoff2);
+  uploads.forEach(assertSignature);
 
   for (const { key, file } of uploads) {
     run('npx', [
@@ -89,7 +104,7 @@ try {
       '--file',
       file,
       '--content-type',
-      'font/woff2',
+      formatOf(key).contentType,
       '--remote',
     ]);
   }

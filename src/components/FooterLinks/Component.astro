@@ -23,11 +23,11 @@ const { columns } = Astro.props;
       <div class={styles.column}>
         {column.groups.map((group) => (
           <div class={styles.group}>
-            {group.title && <p class:list={[styles.title, 'subtitle']}>{group.title}</p>}
+            <p class:list={[styles.title, 'label']}>{group.title}</p>
             <ul class={styles.links}>
               {group.links.map((link) => (
                 <li>
-                  <a href={link.href} class:list={[styles.link, 'subtitleMedium']}>
+                  <a href={link.href} class:list={[styles.link, 'labelMedium']}>
                     {link.label}
                   </a>
                 </li>
@@ -40,8 +40,8 @@ const { columns } = Astro.props;
           // theme of the footer: status.ts sets data-theme. When the status
           // is not known, the element has no data-theme and the dot is a ring.
           <status-badge class={styles.group} data-up-text={column.status.text}>
-            <p class:list={[styles.statusLabel, 'subtitle']}>{column.status.label}</p>
-            <a href={column.status.href} class:list={[styles.status, 'subtitleMedium']}>
+            <p class:list={[styles.statusLabel, 'label']}>{column.status.label}</p>
+            <a href={column.status.href} class:list={[styles.link, styles.status, 'labelMedium']}>
               <span class={styles.statusDot} aria-hidden="true" />
               <span data-status-text>Checking…</span>
             </a>

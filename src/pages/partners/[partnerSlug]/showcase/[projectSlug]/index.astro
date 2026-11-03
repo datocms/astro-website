@@ -1,10 +1,12 @@
 ---
 // The page of one project of the showcase: the introduction, the video or
-// the main image, the screenshots (with a lightbox to the large image),
-// the explanation, the partner and the tags.
+// the main image, the explanation, the screenshots (with a lightbox to the
+// large image),
+// the partner, the services and the technologies.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Fact, Facts } from '~/components/Facts';
 import { Hero } from '~/components/Hero';
 import { Lightbox } from '~/components/Lightbox';
 import { Prose } from '~/components/Prose';
@@ -76,51 +78,22 @@ const galleries = [
 
   <Section flushTop>
     <div class={s.layout}>
-      <div class={s.content}>
-        {
-          galleries.map((gallery) => (
-            <section>
-              <h2 class="h2">{gallery.title}</h2>
-              <ul class={s.gallery}>
-                {gallery.shots.map((screen) => (
-                  <li>
-                    <figure>
-                      <div class={s.shot}>
-                        <Lightbox
-                          url={screen.lightboxImageUrl}
-                          label={`Enlarge: ${screen.title ?? gallery.title}`}
-                          alt={screen.title ?? ''}
-                        >
-                          <ResponsiveImage data={screen.responsiveImage} />
-                        </Lightbox>
-                      </div>
-                      {screen.title && (
-                        <figcaption class:list={[s.shotTitle, 'body']}>{screen.title}</figcaption>
-                      )}
-                    </figure>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))
-        }
-      </div>
+      <section class={s.about}>
+        <h2 class="title">{project.about}</h2>
+        <Prose>
+          <StructuredText
+            {...ensureValidStructuredTextProps({
+              data: page.inDepthExplanation,
+              linkToRecordComponents: defaultLinkToRecordComponents,
+              inlineRecordComponents: defaultInlineRecordComponents,
+            })}
+          />
+        </Prose>
+      </section>
 
-      <aside class={s.aside}>
-        <section class={s.group}>
-          <h2 class="bodyMedium">{project.about}</h2>
-          <Prose>
-            <StructuredText
-              {...ensureValidStructuredTextProps({
-                data: page.inDepthExplanation,
-                linkToRecordComponents: defaultLinkToRecordComponents,
-                inlineRecordComponents: defaultInlineRecordComponents,
-              })}
-            />
-          </Prose>
-        </section>
-        <section class={s.group}>
-          <h2 class="bodyMedium">{project.madeBy}</h2>
+      <aside class={s.aside} data-density="dense">
+        <section class={s.partner}>
+          <h2 class:list={[s.partnerLabel, 'label']}>{project.madeBy}</h2>
           <a href={partnerUrl}>
             <img
               class={s.madeByLogo}
@@ -132,19 +105,46 @@ const galleries = [
             />
           </a>
           <p class="body"><PlainText data={page.partner.shortDescription} /></p>
-          <a href={partnerUrl} class="body">{project.viewProfile}</a>
+          <a href={partnerUrl} class:list={[s.partnerLink, 'labelMedium']}>{project.viewProfile}</a>
         </section>
-        <section class={s.group}>
-          <h2 class="bodyMedium">{project.tags}</h2>
-          <ul class={s.tags}>
-            {
-              [...page.areasOfExpertise, ...page.technologies].map((item) => (
-                <li class:list={[s.tag, 'body']}>{item.name}</li>
-              ))
-            }
-          </ul>
-        </section>
+
+        <Facts>
+          <Fact label={project.services} values={page.areasOfExpertise.map((item) => item.name)} />
+          <Fact label={project.technologies} values={page.technologies.map((item) => item.name)} />
+        </Facts>
       </aside>
+
+      {
+        galleries.length > 0 && (
+          <div class={s.shots}>
+            {galleries.map((gallery) => (
+              <section>
+                <h2 class="title">{gallery.title}</h2>
+                <ul class={s.gallery}>
+                  {gallery.shots.map((screen) => (
+                    <li>
+                      <figure>
+                        <div class={s.shot}>
+                          <Lightbox
+                            url={screen.lightboxImageUrl}
+                            label={`Enlarge: ${screen.title ?? gallery.title}`}
+                            alt={screen.title ?? ''}
+                          >
+                            <ResponsiveImage data={screen.responsiveImage} />
+                          </Lightbox>
+                        </div>
+                        {screen.title && (
+                          <figcaption class:list={[s.shotTitle, 'body']}>{screen.title}</figcaption>
+                        )}
+                      </figure>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        )
+      }
     </div>
   </Section>
 

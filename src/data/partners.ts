@@ -74,8 +74,9 @@ export const project = {
   projectShots: 'Project shots',
   backendShots: 'Backend shots',
   about: 'About the project',
-  viewProfile: 'View profile »',
-  tags: 'Tags',
+  viewProfile: 'View profile →',
+  services: 'Services',
+  technologies: 'Technologies',
 };
 
 /** The text of a count of showcase projects. */

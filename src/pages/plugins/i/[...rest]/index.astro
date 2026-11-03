@@ -4,6 +4,7 @@
 // package, version, installs, last update).
 import xss from 'xss';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Fact, Facts } from '~/components/Facts';
 import { Button } from '~/components/Button';
 import { Hero } from '~/components/Hero';
 import { Markdown } from '~/components/Markdown';
@@ -42,7 +43,7 @@ const video = page.previewImage?.video;
     <div slot="intro" class={s.intro}>
       {
         page.author.official && (
-          <p class:list={[s.officialNote, 'subtitleMedium']}>
+          <p class:list={[s.officialNote, 'labelMedium']}>
             <OfficialBadge size={20} />
             {detail.officialBadge}
           </p>
@@ -58,7 +59,7 @@ const video = page.previewImage?.video;
 
   <Section>
     <div class={s.grid}>
-      <div class={s.content}>
+      <div class={s.media}>
         {
           page.previewImage?.responsiveImage && (
             <div class={s.preview}>
@@ -97,10 +98,6 @@ const video = page.previewImage?.video;
           <strong>{page.author.official ? detail.officialNote : detail.communityNote}</strong>{' '}
           {detail.noteBody}
         </a>
-
-        <Prose>
-          <Markdown of={xss(page.readme)} />
-        </Prose>
       </div>
 
       <aside class={s.aside}>
@@ -112,65 +109,50 @@ const video = page.previewImage?.video;
           )
         }
 
-        <set-plugin-install-url data-package-name={page.packageName}>
+        <set-plugin-install-url class={s.asideInstall} data-package-name={page.packageName}>
           <Button href={dashboardUrl()} appearance="deep-on-light" attrs={{ target: '_blank' }}>
             {detail.install}
           </Button>
         </set-plugin-install-url>
 
-        <dl class={s.facts}>
-          <div class={s.fact}>
-            <dt class="subtitleMedium">Publisher</dt>
-            <dd class={s.publisher}>
-              <img src={avatarUrl} alt="" width="40" height="40" />
-              <span class="body">{page.author.name}</span>
-            </dd>
-          </div>
-
+        <Facts>
+          <Fact label="Publisher">
+            <span class={s.publisher}>
+              <img src={avatarUrl} alt="" width="24" height="24" />
+              <span>{page.author.name}</span>
+            </span>
+          </Fact>
           {
             page.homepage && (
-              <div class={s.fact}>
-                <dt class="subtitleMedium">Homepage</dt>
-                <dd class="body">
-                  <a href={page.homepage} target="_blank" rel="noreferrer">
-                    Visit homepage
-                  </a>
-                </dd>
-              </div>
+              <Fact label="Homepage">
+                <a href={page.homepage} target="_blank" rel="noreferrer">
+                  Visit homepage
+                </a>
+              </Fact>
             )
           }
-
-          <div class={s.fact}>
-            <dt class="subtitleMedium">Package</dt>
-            <dd class="body">
-              <a
-                href={`https://www.npmjs.com/package/${page.packageName}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Visit npm
-              </a>
-            </dd>
-          </div>
-
-          <div class={s.fact}>
-            <dt class="subtitleMedium">Current version</dt>
-            <dd class="body">{page.version}</dd>
-          </div>
-
-          <div class={s.fact}>
-            <dt class="subtitleMedium">Install count</dt>
-            <dd class="body">{page.installs}</dd>
-          </div>
-
-          <div class={s.fact}>
-            <dt class="subtitleMedium">Last update</dt>
-            <dd class="body">
-              <time datetime={page.lastUpdate}>{formatLongDate(page.lastUpdate)}</time>
-            </dd>
-          </div>
-        </dl>
+          <Fact label="Package">
+            <a
+              href={`https://www.npmjs.com/package/${page.packageName}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Visit npm
+            </a>
+          </Fact>
+          <Fact label="Current version" tabular>{page.version}</Fact>
+          <Fact label="Install count" tabular>{page.installs.toLocaleString('en-US')}</Fact>
+          <Fact label="Last update" tabular>
+            <time datetime={page.lastUpdate}>{formatLongDate(page.lastUpdate)}</time>
+          </Fact>
+        </Facts>
       </aside>
+
+      <div class={s.readme}>
+        <Prose>
+          <Markdown of={xss(page.readme)} />
+        </Prose>
+      </div>
     </div>
   </Section>
 

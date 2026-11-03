@@ -3,74 +3,139 @@
   display: block;
 }
 
-/* 82px tall, not sticky. */
+/*
+ * 82px tall, not sticky. A hairline closes it at the bottom: the header
+ * has the ground of the hero, and the line tells where it ends.
+ */
 .header {
   position: relative;
   z-index: 10;
   height: var(--header-height);
   padding-inline: var(--section-padding-x);
+  border-bottom: 1px solid var(--border-default);
   background: var(--surface-default);
   color: var(--text-primary);
 }
 
-/* The mega menu and the mobile menu are children with the class surfacePage: they keep the page roles. */
+/* The mobile menu is a child with the class surfacePage: it keeps the page roles. */
 .variantAccent {
   background: var(--surface-accent);
   color: var(--text-on-accent);
 }
 
+/* The logo at the left, the nav after it, the actions at the right. */
 .bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   height: 100%;
   max-width: var(--content-max);
   margin-inline: auto;
 }
 
-/*
- * The margin, not a gap of the bar, keeps the logo away from the actions.
- * The nav between them has no width (its children are absolute), and a gap
- * adds space on each side of it. Below 768 the bar is then too narrow.
- */
 .logo {
   display: inline-flex;
   flex-shrink: 0;
-  margin-inline-end: var(--space-md);
+  margin-inline-end: auto;
 }
 
-/* The nav links sit in the centre of the header, whatever the side widths. */
-.navList {
-  position: absolute;
-  top: 0;
-  left: 50%;
+/*
+ * The nav (≥1152). The first label starts 40px after the logo: the
+ * margin takes off the side padding of the pill. The shell of the cards
+ * is placed from the nav.
+ */
+.nav {
+  position: relative;
   display: none;
-  align-items: center;
-  gap: var(--space-sm);
-  height: var(--header-height);
-  transform: translateX(-50%);
+  flex: 1;
+  margin-inline: calc(var(--space-xl) - var(--space-sm)) var(--space-md);
 }
 
+.navList {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--header-height);
+}
+
+/*
+ * The items are pills, like the chips of the category nav: 40px tall,
+ * with a tint of the deep. With JS, one pill (the indicator) slides
+ * between the items; without it, each item paints its own.
+ */
 .navItem {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-4xs);
-  padding-block: var(--space-2xs);
+  gap: var(--space-3xs);
+  height: 40px;
+  padding-inline: var(--space-sm);
+  border-radius: var(--radius-full);
+  color: inherit;
   white-space: nowrap;
 }
 
-.chevron {
-  display: inline-flex;
-  align-items: center;
-  width: 6px;
+.navList:not([data-indicator]) .navItem[aria-current],
+.navList:not([data-indicator]) .navItem[aria-expanded='true'] {
+  background: var(--surface-inverse-faint);
 }
 
-/* The glyph of the icon is narrower than its box: the margin keeps the row width. */
-.chevron :global(svg) {
+/* The indicator: it goes to the item under the cursor, then rests on the open item or the item of the page. */
+.indicator {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: var(--indicator-width, 0);
+  height: 40px;
+  translate: var(--indicator-x, 0) -50%;
+  border-radius: var(--radius-full);
+  background: var(--surface-inverse-faint);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.navList[data-indicator][data-indicator-shown] .indicator {
+  opacity: 1;
+}
+
+:global(html[data-motion='on']) [data-indicator] .indicator {
+  transition:
+    translate 300ms cubic-bezier(0.3, 0, 0, 1),
+    width 300ms cubic-bezier(0.3, 0, 0, 1),
+    opacity 150ms ease-out;
+}
+
+/*
+ * With a card open, the pill and the label of the open item take the
+ * ground of the card: the item is the tab of its card. The swap is
+ * instant, as the hover of a button.
+ */
+.nav:has(.shellAccent[data-open]) .indicator {
+  background: var(--surface-accent);
+  color: var(--text-on-accent);
+}
+
+.nav:has(.shellInverse[data-open]) .indicator {
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+[data-nav]:has(.shellAccent[data-open]) [aria-expanded='true'] {
+  color: var(--text-on-accent);
+}
+
+[data-nav]:has(.shellInverse[data-open]) [aria-expanded='true'] {
+  color: var(--text-on-inverse);
+}
+
+.chevron {
   flex: none;
-  width: 8px;
-  height: 8px;
-  margin-inline: -1px;
+  width: 10px;
+  height: 10px;
+}
+
+:global(html[data-motion='on']) .chevron {
+  transition: transform 300ms cubic-bezier(0.3, 0, 0, 1);
 }
 
 .navItem[aria-expanded='true'] .chevron {
@@ -115,7 +180,10 @@
 }
 
 @media (hover: hover) {
-  .navItem:hover,
+  .navList:not([data-indicator]) .navItem:hover {
+    background: var(--surface-inverse-faint);
+  }
+
   .login:hover {
     text-decoration: underline;
     text-underline-offset: 0.15em;
@@ -123,85 +191,86 @@
 }
 
 /*
- * Mega-menu (≥1152). It keeps its own light styling for
- * every header variant. Fixed height 489, three 300px columns.
+ * The shell of the cards (≥1152). It hangs from the hairline of the
+ * header, under the open item, with the size of the open card: the
+ * script sets --card-x, --card-width and --card-height, and animates the
+ * shell from one card to the next. The shell is a field of colour, as a
+ * band: the accent under a page header, the deep under an accent header.
+ * The change of surface is the edge: it has no border. The negative
+ * offset puts the text of the card under the label of the pill.
  */
-.mega {
+.shell {
+  --card-padding-x: var(--space-xl);
+
   position: absolute;
   top: 100%;
+  left: calc(var(--card-x, 0px) + var(--space-sm) - var(--card-padding-x));
+  z-index: 1;
+  box-sizing: content-box;
+  width: var(--card-width, 0);
+  height: var(--card-height, 0);
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.shellAccent {
+  background: var(--surface-accent);
+  color: var(--text-on-accent);
+}
+
+.shellInverse {
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.shell[data-open] {
+  visibility: visible;
+}
+
+/* A card has its own size; the shell shows the active one. */
+.card {
+  position: absolute;
+  top: 0;
   left: 0;
-  right: 0;
-  height: 489px;
-  padding: var(--space-2xs) var(--section-padding-x) var(--space-lg);
-  background: var(--surface-default);
-  color: var(--text-on-page);
-  border-top: 1px solid var(--border-default);
+  display: flex;
+  gap: var(--space-2xl);
+  width: max-content;
+  padding: var(--space-lg) var(--card-padding-x);
+  visibility: hidden;
 }
 
-.mega[hidden] {
-  display: none;
+.card[data-active] {
+  visibility: visible;
 }
 
-.megaColumns {
-  display: grid;
-  grid-template-columns: repeat(3, 300px);
-  justify-content: space-between;
-  align-items: start;
-  max-width: var(--content-max);
-  margin-inline: auto;
-}
-
-.megaColumn {
+.cardColumn {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
 }
 
-/* A section: the group, then its "→ All …" link. */
-.megaSection {
+/* A section: the heading, the links, then its "→ All …" link. */
+.cardSection {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-md);
+  gap: var(--space-xs);
 }
 
-.megaGroup {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs);
-}
-
-.megaHeading {
+.heading {
   color: var(--text-muted);
 }
 
-.megaLinks {
+.cardLinks {
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);
-}
-
-/* A link with a description: the link, then a muted line under it. */
-.megaLink {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4xs);
-}
-
-/*
- * The description of a link names the chapters of a pillar. It can wrap,
- * thus it has a line height in proportion to its size.
- */
-.description {
-  max-width: 300px;
-  color: var(--text-muted);
-  line-height: 1.3;
-  letter-spacing: 0;
 }
 
 .allLink {
   display: inline-flex;
   gap: var(--space-4xs);
+  margin-top: var(--space-4xs);
   color: inherit;
 }
 
@@ -223,7 +292,6 @@
   padding: var(--space-lg) var(--section-padding-x);
   background: var(--surface-default);
   color: var(--text-on-page);
-  border-top: 1px solid var(--border-default);
 }
 
 .mobileNav[hidden] {
@@ -274,18 +342,41 @@
   display: block;
 }
 
+/* The sections of a group: one column on phones, two from 650. */
 .mobileGroupBody {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-xl) var(--space-md);
-  padding-top: var(--space-lg);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-md) var(--space-lg);
+  padding-top: var(--space-md);
 }
 
 .mobileSection {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-sm);
+  align-items: stretch;
+}
+
+.mobileHeading {
+  padding-block: var(--space-xs);
+}
+
+.mobileLinks {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Each link is a row of 44px at least: a tap target. */
+.mobileRow {
+  justify-content: center;
+  min-height: 44px;
+  padding-block: var(--space-3xs);
+}
+
+/* The "→ All …" link is a row: its content stays at the start. */
+.allLink.mobileRow {
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 0;
 }
 
 .mobileLink {
@@ -304,6 +395,12 @@
   }
 }
 
+@media (min-width: 650px) {
+  .mobileGroupBody {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (min-width: 768px) {
   .search,
   .login {
@@ -317,10 +414,15 @@
 }
 
 @media (min-width: 1152px) {
-  .navList {
+  .nav {
     display: flex;
   }
 
+  .logo {
+    margin-inline-end: 0;
+  }
+
+  /* The bar has no room for the login until 1320: the CTA leads to it. */
   .dots,
   .login {
     display: none;

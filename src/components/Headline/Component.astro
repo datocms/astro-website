@@ -5,7 +5,7 @@ import styles from './style.module.css';
 
 interface Props {
   as?: 'h1' | 'h2' | 'h3' | 'p';
-  size?: 'display' | 'h1' | 'h2';
+  size?: 'display' | 'headline' | 'title';
   /** The muted run after the main text. The `muted` slot can replace it. */
   muted?: string;
   breakBeforeMuted?: boolean;
@@ -19,7 +19,7 @@ interface Props {
 
 const {
   as: Tag = 'h2',
-  size = 'h1',
+  size = 'headline',
   muted,
   breakBeforeMuted = false,
   typewriter,
@@ -45,7 +45,7 @@ const wrapperProps = typewriter
       hasMuted && (
         <>
           {breakBeforeMuted ? <br /> : ' '}
-          <span class:list={[styles.muted, size === 'h2' && styles.mutedSmall]}>
+          <span class:list={[styles.muted, size === 'title' && styles.mutedSmall]}>
             {mutedHtml ? <Fragment set:html={mutedHtml} /> : muted}
           </span>
         </>

@@ -4,14 +4,15 @@ import styles from './style.module.css';
 interface Props {
   href: string;
   current?: boolean;
+  /** A muted line under the label. It is part of the link: a tap on it follows the link. */
+  description?: string;
   class?: string;
 }
 
-const { href, current = false, class: className } = Astro.props;
+const { href, current = false, description, class: className } = Astro.props;
 ---
 
-<a
-  href={href}
-  class:list={['h2', styles.navLink, className]}
-  aria-current={current ? 'page' : undefined}><slot /></a
->
+<a href={href} class:list={[styles.navLink, className]} aria-current={current ? 'page' : undefined}>
+  <span class:list={['title', styles.label]}><slot /></span>
+  {description && <span class:list={['caption', styles.description]}>{description}</span>}
+</a>

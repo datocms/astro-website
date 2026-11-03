@@ -1,20 +1,39 @@
+/*
+ * Three areas. On phones and tablets they stack: the media, the facts, the
+ * README. Thus the facts come before the long README. From 1152, the facts
+ * are a column on the right that stays in view while the visitor reads.
+ */
 .grid {
   display: grid;
-  gap: var(--space-2xl);
   grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'media'
+    'aside'
+    'readme';
+  gap: var(--space-2xl);
 }
 
 @media (min-width: 1152px) {
   .grid {
     grid-template-columns: minmax(0, 1fr) 300px;
-    gap: var(--space-3xl);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'media aside'
+      'readme aside';
+    column-gap: var(--space-3xl);
   }
 }
 
-.content {
+.media {
+  grid-area: media;
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
+  min-width: 0;
+}
+
+.readme {
+  grid-area: readme;
   min-width: 0;
 }
 
@@ -57,10 +76,16 @@
 }
 
 .aside {
+  grid-area: aside;
+  align-self: start;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-lg);
+}
+
+.facts {
+  align-self: stretch;
 }
 
 .technology {
@@ -69,22 +94,22 @@
   max-width: 100%;
 }
 
-.facts {
-  display: grid;
-  gap: var(--space-md);
-  width: 100%;
+/* The hero has the start button just above. Thus the button of the aside
+ * shows only from 1152, where the aside stays in view. */
+.asideStart {
+  display: none;
 }
 
-.fact {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4xs);
-}
+@media (min-width: 1152px) {
+  .asideStart {
+    display: block;
+  }
 
-.fact dd {
-  color: var(--text-muted);
-}
-
-.fact a {
-  text-decoration: underline;
+  /* The aside sticks only when the viewport is tall enough for all of it. */
+  @media (min-height: 800px) {
+    .aside {
+      position: sticky;
+      top: var(--space-lg);
+    }
+  }
 }

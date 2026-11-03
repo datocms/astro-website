@@ -29,15 +29,17 @@ const count = columns ?? (items.length >= 4 ? 4 : 3);
 const background = (
   { statement: 'default', stat: 'accent', statLight: 'accent-faint', text: 'inverse' } as const
 )[variant];
-const titleClass = { statement: 'h2', stat: 'display', statLight: 'h1', text: undefined }[variant];
-const taglineClass = variant === 'statLight' ? 'body' : 'h2';
+const titleClass = { statement: 'title', stat: 'display', statLight: 'headline', text: undefined }[
+  variant
+];
+const taglineClass = variant === 'statLight' ? 'body' : 'title';
 ---
 
 <Section id={id} theme={theme} background={background} contentClass={styles.content}>
-  {label && <p class:list={['subtitle', styles.label]}>{label}</p>}
+  {label && <p class:list={['label', styles.label]}>{label}</p>}
   {
     headline && (
-      <Headline as="h2" size={variant === 'statLight' ? 'h2' : 'h1'}>
+      <Headline as="h2" size={variant === 'statLight' ? 'title' : 'headline'}>
         {headline}
       </Headline>
     )

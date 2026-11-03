@@ -1,6 +1,8 @@
 /*
- * Grid: 2 → 3 (768) columns; from 1152
- * one row of 6 columns, spread across the content width.
+ * The groups of links. Below 1152 they flow in balanced text columns
+ * (2, then 3 from 768): the columns of the data are not boxes there, thus
+ * no column is taller than the others. From 1152 the five columns of the
+ * data stand in one row, spread across the content width.
  */
 .footerLinks {
   padding-block: var(--space-2xl);
@@ -9,21 +11,20 @@
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2xl);
+  columns: 2;
+  column-gap: var(--space-lg);
 }
 
 .column {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
+  display: contents;
 }
 
 .group {
   display: flex;
   flex-direction: column;
   gap: var(--space-4xs);
+  margin-bottom: var(--space-lg);
+  break-inside: avoid;
 }
 
 .title {
@@ -62,7 +63,6 @@
   display: flex;
   align-items: center;
   gap: var(--space-2xs);
-  color: var(--text-on-inverse);
 }
 
 .statusDot {
@@ -79,16 +79,41 @@
   background: transparent;
 }
 
+/* On touch, each link is a row of 44px: a tap target. The rows have no gap. */
+@media (pointer: coarse) {
+  .links {
+    gap: 0;
+  }
+
+  .link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
 @media (min-width: 768px) {
   .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    columns: 3;
+    column-gap: var(--space-xl);
   }
 }
 
 @media (min-width: 1152px) {
   .grid {
+    columns: auto;
     display: flex;
     justify-content: space-between;
     gap: var(--space-xl);
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .group {
+    margin-bottom: 0;
   }
 }

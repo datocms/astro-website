@@ -15,11 +15,12 @@ const { groups } = Astro.props;
     {
       groups.map((group) => (
         <>
-          <div class={s.tocTitle}>{group.title}</div>
+          <div class:list={[s.tocTitle, 'monoCaps']}>{group.title}</div>
           <div class={s.tocEntries}>
             {group.entries.map((node) => (
               <ActiveLink href={node.url} class={s.tocEntry} activeClass={s.tocEntryActive}>
-                {node.badge ? <span class={s.badge}>{node.badge}</span> : ''} {node.label}
+                {node.badge ? <span class:list={[s.badge, 'monoCaps']}>{node.badge}</span> : ''}{' '}
+                {node.label}
               </ActiveLink>
             ))}
           </div>

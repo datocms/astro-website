@@ -170,7 +170,7 @@ function DraftSite({
               </Editable>
             </p>
             <Editable editable={editable} order={1}>
-              <h1 className={site.title}>{article.title}</h1>
+              <p className={site.title}>{article.title}</p>
             </Editable>
             <p className={site.byline}>
               {BYLINE.before}

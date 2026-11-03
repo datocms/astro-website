@@ -7,13 +7,26 @@ import styles from './style.module.css';
 type Props = LegalData;
 
 // The footer takes the theme of the page (DESIGN.md, "Page themes").
-const { email, text } = Astro.props;
+const { email, text, links } = Astro.props;
 ---
 
 <Section as="footer" background="inverse" contentClass={styles.bar} class={styles.footerLegal}>
   <DatoLogo version="long" height={20} label="DatoCMS" />
-  <p class:list={[styles.text, 'caption']}>
-    <a href={`mailto:${email}`} class={styles.email}>{email}</a>
-    <span class={styles.rest}>{text}</span>
-  </p>
+  <div class={styles.legal}>
+    <ul class={styles.links} aria-label="Legal">
+      {
+        links.map((link) => (
+          <li>
+            <a href={link.href} class:list={[styles.link, 'caption']}>
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <p class:list={[styles.text, 'caption']}>
+      <a href={`mailto:${email}`} class={styles.email}>{email}</a>
+      <span class={styles.rest}>{text}</span>
+    </p>
+  </div>
 </Section>

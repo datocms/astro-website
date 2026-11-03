@@ -3,18 +3,27 @@
  * smaller, and a docs page has callouts, details, dense tables and videos.
  * The scope stops at the children of <prose-island>, as in Prose.
  */
-.extras {
-  --type-body: var(--type-docs-body);
-}
-
 @scope (.extras) to (prose-island > *) {
   :scope > * + * {
     margin-top: var(--space-md);
   }
 
+  /*
+   * The measure. The running text stops at 34em, approximately 70
+   * characters. Tables, code blocks, figures, callouts and the other wide
+   * blocks keep the full column. A heading is larger than the text: it
+   * stops at the same edge as the running text, 34 times the body size.
+   */
+  :scope > :is(p, ul, ol, blockquote) {
+    max-width: 34em;
+  }
+
+  :scope > :is(h2, h3, h4, h5, h6) {
+    max-width: calc(34 * var(--type-m));
+  }
+
   :is(h2, h3, h4, h5, h6) {
     padding-top: 0;
-    line-height: 1.2;
     text-wrap: balance;
   }
 
@@ -26,25 +35,33 @@
     margin-top: var(--space-xs);
   }
 
+  /*
+   * The headings take the roles of typography.css. The rules of Prose on
+   * the elements are in a higher layer than the role classes, thus the
+   * declarations of the roles are here.
+   * h2: the section role.
+   */
   h2 {
-    font-size: var(--type-docs-h2);
+    font-size: var(--type-xl);
+    font-weight: 500;
+    line-height: 1.2;
     letter-spacing: -0.03em;
   }
 
+  /* h3: the title role, with the line height of dense content. */
   h3 {
-    font-size: var(--type-docs-h3);
+    font-size: var(--type-l);
+    font-weight: 500;
+    line-height: 1.2;
     letter-spacing: -0.02em;
   }
 
-  h4 {
-    font-size: var(--type-docs-h3);
+  /* h4 to h6: the medium body role. */
+  :is(h4, h5, h6) {
+    font-size: var(--type-m);
     font-weight: 500;
-    letter-spacing: -0.02em;
-  }
-
-  :is(h5, h6) {
-    font-size: var(--type-docs-body);
-    font-weight: 500;
+    line-height: calc(1.3 + var(--type-leading-dark));
+    letter-spacing: calc(-0.01em + var(--type-tracking-dark));
   }
 
   li + li,
@@ -66,14 +83,14 @@
 
   [data-callout-title] {
     margin-bottom: var(--space-3xs);
-    font-size: var(--type-docs-body);
+    font-size: var(--type-m);
     font-weight: 500;
     line-height: 1.1;
     color: var(--text-status-info);
   }
 
   [data-callout-content] {
-    font-size: var(--type-docs-small);
+    font-size: var(--type-s);
     line-height: 1.4;
   }
 
@@ -95,7 +112,7 @@
 
   /* A list of details is one box: the borders join. */
   details {
-    font-size: var(--type-docs-small);
+    font-size: var(--type-s);
     border: 1px solid var(--border-default);
   }
 
@@ -124,7 +141,7 @@
 
   /* A reference table: dense, with a small header. */
   table {
-    font-size: var(--type-docs-small);
+    font-size: var(--type-s);
     line-height: 1.3;
   }
 
@@ -139,7 +156,7 @@
   }
 
   th {
-    font-size: var(--type-docs-label);
+    font-size: var(--type-xs);
     letter-spacing: 0;
   }
 
@@ -154,6 +171,6 @@
   }
 
   :is(figcaption, blockquote cite) {
-    font-size: var(--type-docs-small);
+    font-size: var(--type-s);
   }
 }

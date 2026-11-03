@@ -75,8 +75,8 @@ src/components/MyComponent/
   - `--surface-nav-active`, `--text-nav-active`: the entry of the page you read in a sidebar or a table of contents.
   - `--surface-field`, `--border-field`: a form field.
   - `--shadow-popover`, `--shadow-card`, `--scrim`, `--scrim-modal`: elevation, the backdrop of a drawer, and the backdrop of a modal.
-  - `--type-docs-body`, `--type-docs-small`, `--type-docs-label`, `--type-docs-h2`, `--type-docs-h3`: the type of dense reference content. Only the docs use them. The marketing pages use `--type-body` and the typography classes.
-- Spacing: only `--space-*` tokens. Type: only `--type-*` sizes, through the typography classes (`.display`, `.h1`, `.h2`, `.body`, `.bodyMedium`, `.bodyLong`, `.subtitle`, `.subtitleMedium`, `.caption`, `.code`, `.codeSmall`).
+  - `--type-2xs` to `--type-3xl`: the size ladder, in rem, fluid from `l` up (see DESIGN.md, Typography). The block `[data-density='dense']` sets the dense values of `s`, `m`, `l` and `xl`; the docs use it on `<body>` (`data-density="dense"`), and `Facts` and the showcase aside use it on their own element. `--type-inline-code` (0.9em) is the size of inline code. Three ground variables adjust the text for light-on-dark: `--type-leading-dark`, `--type-tracking-dark` and `--type-mono-weight`.
+- Spacing: only `--space-*` tokens. Type: only `--type-*` sizes, through the typography classes (`.display`, `.headline`, `.title`, `.section`, `.body`, `.bodyMedium`, `.bodyLong`, `.label`, `.labelMedium`, `.caption`, `.code`, `.codeSmall`, `.codeInline`, `.monoCaps`, `.pictureLabel`, `.tabular`).
 - Breakpoints (min-width): 768, 1152, 1320. The layout of the docs (`src/layouts/docs/BaseLayout`) has two more, 1500 and 1600: above 1500 the content is 1110px wide and the sidebar 300px, above 1600 the content is 1210px wide (`stylelint.config.mjs` allows them for that file only). One more exception: `SceneFrame` and `SceneFragment` switch from the phone drawing to the desktop drawing at 650. Hover only inside `@media (hover: hover)`.
 
 ### Design source
@@ -85,8 +85,8 @@ Figma file `WnWBSVVcroe5s4tXQGnhSA` (overnice's original), page **Components** (
 
 ### Fonts
 
-- `--font-sans`: ABC Oracle, variable. CSS 400 = Regular, 500 = Medium; use only these two.
-- `--font-mono`: Geist Mono 500, for code. The product scenes use it.
+- `--font-sans`: ABC Oracle, variable, then the three metric fallback faces of `src/styles/fonts.css` (Helvetica Neue, Arial, Roboto), so that the swap does not move the text. CSS 400 = Regular, 500 = Medium; use only these two.
+- `--font-mono`: Geist Mono, for code. Code blocks (`.code`, `.codeSmall`, expressive-code) are 500: the code ground is deep in both schemes. Mono on the page (`.codeInline`, `.monoCaps`, `.pictureLabel`) is at `--type-mono-weight` (400 on light grounds, 500 on dark grounds). The product scenes use it.
 - The files come from this site: `/fonts/<file>` (`src/pages/fonts/[file].ts`), a proxy to `UI_FONTS_BASE_URL`. The layout preloads ABC Oracle. In local dev, set `UI_FONTS_BASE_URL` (see `cubo.json5`), else the fonts give 404.
 - Never put a copy of a font file in this repository: the licence does not allow it.
 

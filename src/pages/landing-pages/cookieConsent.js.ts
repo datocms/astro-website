@@ -78,7 +78,7 @@ const cookieConsentScript = `
     animation-duration: 0.2s;
     animation-name: cookies-appear;
     animation-timing-function: ease-in;
-    font-family: Colfax, colfax-web;
+    font-family: 'ABC Oracle', 'ABC Oracle Fallback HN', 'ABC Oracle Fallback Arial', 'ABC Oracle Fallback Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
 
   @keyframes cookies-appear {
@@ -96,15 +96,15 @@ const cookieConsentScript = `
     border-radius: 10px;
     padding: 30px;
     max-width: 550px;
-    font-size: 14px;
+    font-size: var(--type-s, 0.875rem);
     text-align: center;
     box-shadow: 0 0 30px 10px rgba(0, 0, 0, 0.3);
     margin: 10px;
   }
 
   .consent--cookiesTitle {
-    font-weight: bold;
-    font-size: 22px;
+    font-weight: 500;
+    font-size: var(--type-m, 1rem);
     letter-spacing: -0.02em;
     margin-bottom: 10px;
   }
@@ -123,10 +123,11 @@ const cookieConsentScript = `
     background: transparent;
     display: inline-block;
     padding: 0.5em 1em;
-    font-family: var(--font-sans);
+    font-family: inherit;
     color: #71788a;
     border-radius: 3px;
-    font-size: 18px;
+    font-size: var(--type-s, 0.875rem);
+    font-weight: 400;
     border: 0;
     transition: opacity 150ms ease-in-out;
     cursor: pointer;
@@ -141,7 +142,7 @@ const cookieConsentScript = `
   .consent--cookiesPrimaryButton {
     background: linear-gradient(to right, #ff593d, #ff7751);
     color: white !important;
-    font-weight: bold;
+    font-weight: 500;
   }
   \`;
 

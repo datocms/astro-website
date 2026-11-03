@@ -1,6 +1,6 @@
 /*
- * Logo left, text right. The text fills
- * the remaining space, thus it wraps by itself under 768.
+ * Logo left; at the right the legal links in a row, then the email and
+ * the company line. Below 768 the logo stacks above, and the links wrap.
  */
 .footerLegal {
   padding-block: var(--space-lg);
@@ -10,13 +10,33 @@
 
 .bar {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: var(--space-md);
 }
 
+.legal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3xs);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4xs) var(--space-md);
+}
+
+.link {
+  display: block;
+  color: var(--text-on-inverse);
+  text-underline-offset: 0.15em;
+}
+
+.link:focus-visible {
+  text-decoration: underline;
+}
+
 .text {
-  flex: 1;
-  text-align: right;
   white-space: pre-wrap;
 }
 
@@ -30,4 +50,43 @@
 
 .rest::before {
   content: ' ';
+}
+
+@media (hover: hover) {
+  .link:hover {
+    text-decoration: underline;
+  }
+}
+
+/* On touch, each legal link is a row of 44px: a tap target. */
+@media (pointer: coarse) {
+  .links {
+    row-gap: 0;
+  }
+
+  .link {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+@media (min-width: 768px) {
+  .bar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .legal {
+    align-items: flex-end;
+  }
+
+  .links {
+    justify-content: flex-end;
+  }
+
+  .text {
+    text-align: right;
+  }
 }

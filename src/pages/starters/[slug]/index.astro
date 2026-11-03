@@ -6,6 +6,7 @@
 import ky from 'ky';
 import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { Fact, Facts } from '~/components/Facts';
 import { Hero } from '~/components/Hero';
 import { Markdown } from '~/components/Markdown';
 import { Prose } from '~/components/Prose';
@@ -66,7 +67,7 @@ const datoDeployUrl = dashboardUrl(`/deploy?repo=${page.githubRepo}`);
 
   <Section>
     <div class={s.grid}>
-      <div class={s.content}>
+      <div class={s.media}>
         <div class={s.slides}>
           <div class={s.slide}>
             <ResponsiveImage data={page.screenshot.responsiveImage} />
@@ -79,14 +80,6 @@ const datoDeployUrl = dashboardUrl(`/deploy?repo=${page.githubRepo}`);
         <a href={detail.note.href} class:list={[s.note, 'body']}>
           <strong>{detail.note.lead}</strong>{' '}{detail.note.body}
         </a>
-
-        {
-          page.readme && (
-            <Prose>
-              <Markdown of={page.readme} />
-            </Prose>
-          )
-        }
       </div>
 
       <aside class={s.aside}>
@@ -98,39 +91,40 @@ const datoDeployUrl = dashboardUrl(`/deploy?repo=${page.githubRepo}`);
           height={page.technology.logo.height ?? undefined}
         />
 
-        <Button href={datoDeployUrl} appearance="deep-on-light" attrs={{ target: '_blank' }}>
-          {detail.start}
-        </Button>
+        <div class={s.asideStart}>
+          <Button href={datoDeployUrl} appearance="deep-on-light" attrs={{ target: '_blank' }}>
+            {detail.start}
+          </Button>
+        </div>
 
-        <dl class={s.facts}>
-          <div class={s.fact}>
-            <dt class="subtitleMedium">Publisher</dt>
-            <dd class="body">DatoCMS</dd>
-          </div>
-
+        <Facts class={s.facts}>
+          <Fact label="Publisher">DatoCMS</Fact>
           {
             manifest.livePreviewUrl && (
-              <div class={s.fact}>
-                <dt class="subtitleMedium">Preview URL</dt>
-                <dd class="body">
-                  <a href={manifest.livePreviewUrl} target="_blank" rel="noreferrer">
-                    Visit preview website
-                  </a>
-                </dd>
-              </div>
+              <Fact label="Preview URL">
+                <a href={manifest.livePreviewUrl} target="_blank" rel="noreferrer">
+                  Visit preview website
+                </a>
+              </Fact>
             )
           }
-
-          <div class={s.fact}>
-            <dt class="subtitleMedium">GitHub repo</dt>
-            <dd class="body">
-              <a href={githubRepoWebUrl} target="_blank" rel="noreferrer">
-                {page.githubRepo.split(':')[0]}
-              </a>
-            </dd>
-          </div>
-        </dl>
+          <Fact label="GitHub repo">
+            <a href={githubRepoWebUrl} target="_blank" rel="noreferrer">
+              {page.githubRepo.split(':')[0]}
+            </a>
+          </Fact>
+        </Facts>
       </aside>
+
+      {
+        page.readme && (
+          <div class={s.readme}>
+            <Prose>
+              <Markdown of={page.readme} />
+            </Prose>
+          </div>
+        )
+      }
     </div>
   </Section>
 

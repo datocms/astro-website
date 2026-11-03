@@ -12,4 +12,11 @@ export const GEIST_MONO = {
 
 export const geistMonoKey = (subset) => `GeistMonoVariable-${subset}.woff2`;
 
-export const FILES = new Set(['ABCOracleVariable.woff2', ...GEIST_MONO.subsets.map(geistMonoKey)]);
+// The OG card (`src/pages/og-card/`) draws its text with satori, which reads
+// static TTF and OTF files only: the two static instances that the card uses.
+export const FILES = new Set([
+  'ABCOracleVariable.woff2',
+  'ABCOracle-Regular.otf',
+  'ABCOracle-Medium.otf',
+  ...GEIST_MONO.subsets.map(geistMonoKey),
+]);

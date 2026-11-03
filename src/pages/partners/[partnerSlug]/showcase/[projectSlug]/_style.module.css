@@ -17,14 +17,31 @@
   height: auto;
 }
 
+/*
+ * Three areas. On phones and tablets they stack: the explanation, the
+ * partner and the facts, the screenshots. From 1152, the partner and the
+ * facts are a column on the right that stays in view.
+ */
 .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'about'
+    'aside'
+    'shots';
   gap: var(--space-2xl);
-  align-items: start;
 }
 
-.content {
+.about {
+  grid-area: about;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-width: 0;
+}
+
+.shots {
+  grid-area: shots;
   display: flex;
   flex-direction: column;
   gap: var(--space-2xl);
@@ -57,16 +74,24 @@
 }
 
 .aside {
+  grid-area: aside;
+  align-self: start;
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
   min-width: 0;
 }
 
-.group {
+.partner {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-xs);
+  max-width: var(--reading-max);
+}
+
+.partnerLabel {
+  color: var(--text-muted);
 }
 
 .madeByLogo {
@@ -80,22 +105,26 @@
   border-radius: var(--radius-md);
 }
 
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3xs);
-  list-style: none;
-}
-
-.tag {
-  padding: var(--space-5xs) var(--space-2xs);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-full);
+.partnerLink {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 @media (min-width: 1152px) {
   .layout {
     grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-    gap: var(--space-3xl);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'about aside'
+      'shots aside';
+    column-gap: var(--space-3xl);
+  }
+
+  /* The aside sticks only when the viewport is tall enough for all of it. */
+  @media (min-height: 800px) {
+    .aside {
+      position: sticky;
+      top: var(--space-lg);
+    }
   }
 }

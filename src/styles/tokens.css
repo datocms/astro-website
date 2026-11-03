@@ -595,7 +595,9 @@
  *   default surface   the deep of the code card mixed with black: a near
  *                     black of the theme, as the paper is a near white
  *   text              the paper, with the alphas of the page text roles
- *   borders           the faint accent, the border of the inverse surface
+ *   borders           the hairline is the accent at 25%: a light line on
+ *                     a dark page needs more alpha than a dark line on a
+ *                     light page, and the faint accent (10%) does not show
  *   accent tints      muted, subtle and faint are dark tints of the accent
  *                     (muted: the accent at OKLCH lightness 0.36, the chroma
  *                     at most the edge of sRGB, thus the hue does not move)
@@ -612,6 +614,10 @@
    * of the light value (70%) dims it as much.
    */
   --scrim-modal: rgb(0 0 0 / 0.7);
+  /* The page is a dark ground: the type adjusts for light text. */
+  --type-leading-dark: 0.05;
+  --type-tracking-dark: 0.01em;
+  --type-mono-weight: 500;
 }
 
 :root[data-scheme='dark'],
@@ -641,7 +647,7 @@
     var(--theme-paper) var(--theme-alpha-page-headline-muted),
     transparent
   );
-  --border-on-page: var(--theme-accent-faint);
+  --border-on-page: color-mix(in srgb, var(--theme-accent) 25%, transparent);
   --border-on-page-strong: var(--theme-paper);
   --text-accent: var(--_ground-text-accent, var(--theme-accent));
   /* The signals, a little paler: the dark accent tints are not black */
@@ -685,11 +691,17 @@
   --_ground-text-positive: initial;
   --_ground-text-negative: initial;
   --_ground-text-status-warning: initial;
+  --type-leading-dark: 0;
+  --type-tracking-dark: 0em;
+  --type-mono-weight: 400;
   color: var(--text-primary);
   color-scheme: light;
 }
 
 :root[data-scheme='dark'] .surfacePage {
+  --type-leading-dark: 0.05;
+  --type-tracking-dark: 0.01em;
+  --type-mono-weight: 500;
   color-scheme: dark;
 }
 
@@ -710,6 +722,10 @@
   --_ground-text-positive: var(--text-on-accent);
   --_ground-text-negative: var(--text-on-accent);
   --_ground-text-status-warning: var(--text-on-accent);
+  /* The text is dark in both schemes: the type has the light values. */
+  --type-leading-dark: 0;
+  --type-tracking-dark: 0em;
+  --type-mono-weight: 400;
   color: var(--text-primary);
   color-scheme: light;
 }
@@ -744,6 +760,10 @@
   --_ground-text-positive: color-mix(in oklab, var(--surface-positive) 60%, var(--theme-paper));
   --_ground-text-negative: color-mix(in oklab, var(--surface-negative) 60%, var(--theme-paper));
   --_ground-text-status-warning: var(--text-on-inverse-strong);
+  /* The text is light in both schemes: the type adjusts for light text. */
+  --type-leading-dark: 0.05;
+  --type-tracking-dark: 0.01em;
+  --type-mono-weight: 500;
   color: var(--text-primary);
   color-scheme: dark;
 }
@@ -760,28 +780,45 @@
 
 /* The base values are for 393 px. 1920 uses the 1320 values. */
 :root {
-  --type-display: 37px;
-  --type-h1: 30px;
-  --type-h2: 17px;
-  --type-body: 14px;
-  --type-subtitle: 14px;
-  --type-code: 14px;
-  --type-code-small: 13px;
-  /* The titles of the panels of the diagrams: smaller than their content. */
-  --type-code-xsmall: 11px;
-  /* A quiet note next to a panel title: the number of records of a diagram. */
-  --type-code-2xsmall: 9px;
-  --type-caption: 12px;
+  /*
+   * The type sizes. The typography classes (typography.css) use them.
+   * Each step carries these roles:
+   *   2xs  picture label (only text inside a drawn picture)
+   *   xs   caption, mono caps, small code
+   *   s    label, code
+   *   m    body, long body
+   *   l    title
+   *   xl   section (the docs h2; a free step on the marketing pages)
+   *   2xl  headline
+   *   3xl  display
+   * The sizes are in rem, thus the zoom of the browser enlarges the text.
+   * l to 3xl are fluid: two linear segments through the sizes at 393, 768
+   * and 1320. This block holds the segment from 393 to 768. The 768 block
+   * holds the segment from 768 to 1320.
+   */
+  --type-2xs: 0.6875rem;
+  --type-xs: 0.8125rem;
+  --type-s: 0.875rem;
+  --type-m: 1rem;
+  --type-l: clamp(1.25rem, 0.9225rem + 1.3333vw, 1.5625rem);
+  --type-xl: clamp(1.5rem, 1.107rem + 1.6vw, 1.875rem);
+  --type-2xl: clamp(1.875rem, 1.22rem + 2.6667vw, 2.5rem);
+  --type-3xl: clamp(2.3125rem, 1.461rem + 3.4667vw, 3.125rem);
+  /* Inline code in running text: relative to the size of the text around it. */
+  --type-inline-code: 0.9em;
 
   /*
-   * The type of dense reference content (the docs). --type-body is a
-   * marketing size: a table, a signature or a list reads better smaller.
+   * The adjustments for the ground. Light text on a dark ground looks
+   * thinner and tighter. The dark grounds (the inverse surface, the page in
+   * the dark scheme) set larger values below.
+   *   --type-leading-dark: added to the line height of body, long body and
+   *   caption.
+   *   --type-tracking-dark: added to the letter spacing of the same roles.
+   *   --type-mono-weight: the weight of all monospace text.
    */
-  --type-docs-body: 16px;
-  --type-docs-small: 14px;
-  --type-docs-label: 12px;
-  --type-docs-h2: 24px;
-  --type-docs-h3: 20px;
+  --type-leading-dark: 0;
+  --type-tracking-dark: 0em;
+  --type-mono-weight: 400;
 
   --section-padding-x: 30px;
   --section-padding-x-headlines: 60px;
@@ -825,29 +862,43 @@
   --slider-dot-size: 8px;
 }
 
+/*
+ * Dense reference content (the docs). The docs layout sets
+ * data-density="dense" on <body>. The text steps are smaller and do not
+ * grow above 768. The 768 values stay at 1320 and up: this rule is on
+ * <body>, thus its values win over the values that <body> gets from :root,
+ * and no 1320 rule sets them again.
+ */
+[data-density='dense'] {
+  --type-s: 0.875rem;
+  --type-m: 1rem;
+  --type-l: 1.25rem;
+  --type-xl: 1.5rem;
+}
+
 @media (min-width: 768px) {
   :root {
-    --type-display: 50px;
-    --type-h1: 40px;
-    --type-h2: 25px;
-    --type-body: 17px;
-    --type-subtitle: 16px;
-    --type-code: 16px;
-    --type-code-small: 14px;
-    --type-code-xsmall: 12px;
-    --type-code-2xsmall: 10px;
-    --type-caption: 14px;
-
-    --type-docs-body: 17px;
-    --type-docs-small: 15px;
-    --type-docs-h2: 28px;
-    --type-docs-h3: 22px;
+    --type-2xs: 0.75rem;
+    --type-xs: 0.875rem;
+    --type-s: 0.9375rem;
+    --type-m: 1.0625rem;
+    --type-l: clamp(1.5625rem, 1.1277rem + 0.9058vw, 1.875rem);
+    --type-xl: clamp(1.875rem, 1.3533rem + 1.087vw, 2.25rem);
+    --type-2xl: clamp(2.5rem, 2.0652rem + 0.9058vw, 2.8125rem);
+    --type-3xl: clamp(3.125rem, 2.2554rem + 1.8116vw, 3.75rem);
 
     --section-padding-x: 60px;
     --section-padding-x-headlines: 80px;
     --section-padding-y: 60px;
 
     --slider-dot-size: 12px;
+  }
+
+  [data-density='dense'] {
+    --type-s: 0.9375rem;
+    --type-m: 1.0625rem;
+    --type-l: 1.375rem;
+    --type-xl: 1.75rem;
   }
 }
 
@@ -860,11 +911,8 @@
 
 @media (min-width: 1320px) {
   :root {
-    --type-display: 60px;
-    --type-h1: 45px;
-    --type-h2: 30px;
-    --type-body: 20px;
-    --type-caption: 15px;
+    --type-s: 1rem;
+    --type-m: 1.25rem;
 
     --section-padding-x: 80px;
     --section-padding-x-headlines: 200px;

@@ -14,6 +14,13 @@ import { UI_FONTS_BASE_URL } from 'astro:env/server';
  *
  * The plugins run in frames on other origins, thus the response needs CORS.
  */
+// The content type of each file format in the bucket
+const CONTENT_TYPES: Record<string, string> = {
+  woff2: 'font/woff2',
+  ttf: 'font/ttf',
+  otf: 'font/otf',
+};
+
 export async function serveUiFont(request: Request, filename: string): Promise<Response> {
   if (!UI_FONTS_BASE_URL) {
     return new Response('Not found', { status: 404 });
@@ -32,7 +39,7 @@ export async function serveUiFont(request: Request, filename: string): Promise<R
 
   const etag = upstream.headers.get('ETag');
   const headers = new Headers({
-    'Content-Type': 'font/woff2',
+    'Content-Type': CONTENT_TYPES[filename.split('.').pop() ?? ''] ?? 'application/octet-stream',
     'Cache-Control': 'public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800',
     'Access-Control-Allow-Origin': '*',
     'Cross-Origin-Resource-Policy': 'cross-origin',

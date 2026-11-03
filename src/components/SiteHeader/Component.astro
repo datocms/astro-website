@@ -11,7 +11,7 @@ import { Button } from '~/components/Button';
 import { DatoLogo } from '~/components/DatoLogo';
 import { Icon } from '~/components/Icon';
 import { NavLink } from '~/components/NavLink';
-import type { NavGroup } from '~/data/navigation';
+import { type NavGroup, groupPaths } from '~/data/navigation';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import styles from './style.module.css';
 
@@ -41,7 +41,31 @@ const ctaAppearance = {
 // On the page ground the CTA is a soft pill.
 const ctaVariant = ctaVariantProp ?? (variant === 'page' ? 'soft' : 'solid');
 
-const panelId = (i: number) => `site-header-mega-${i}`;
+// The shell of the cards takes the ground that the header does not have:
+// the accent under a page header, the deep under an accent header. The
+// card is a field of colour that hangs from the hairline, apart from the
+// hero in both schemes.
+const shellClass = {
+  page: [styles.shellAccent, 'surfaceAccent'],
+  accent: [styles.shellInverse, 'surfaceInverse'],
+}[variant];
+
+// The group of the page that the visitor reads. When two groups hold the
+// page ('/blog' and '/blog/casual-chats'), the longer path wins.
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isBelow = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
+let currentGroup = -1;
+let currentPathLength = 0;
+nav.forEach((group, i) => {
+  for (const path of groupPaths(group)) {
+    if (isBelow(path) && path.length > currentPathLength) {
+      currentPathLength = path.length;
+      currentGroup = i;
+    }
+  }
+});
+
+const cardId = (i: number) => `site-header-card-${i}`;
 ---
 
 <site-header class={styles.root}>
@@ -51,72 +75,77 @@ const panelId = (i: number) => `site-header-mega-${i}`;
         <DatoLogo version="long" height={20} />
       </a>
 
-      <nav aria-label="Main" class={styles.nav}>
-        <ul class={styles.navList}>
+      <nav aria-label="Main" class={styles.nav} data-nav>
+        <ul class={styles.navList} data-nav-list>
           {
-            nav.map((group, i) => (
-              <li>
-                {group.columns ? (
+            /* The tint pill. It slides to the item under the cursor, the open item or the item of the page. */
+          }
+          <li class={styles.indicator} aria-hidden="true"></li>
+          {
+            nav.map((group, i) =>
+              group.columns ? (
+                <li>
                   <button
                     type="button"
-                    class:list={[styles.navItem, 'subtitleMedium']}
+                    class:list={[styles.navItem, 'labelMedium']}
                     aria-expanded="false"
-                    aria-controls={panelId(i)}
-                    data-mega-trigger
+                    aria-controls={cardId(i)}
+                    aria-current={currentGroup === i ? 'true' : undefined}
+                    data-nav-item
+                    data-card-trigger
                   >
                     {group.label}
-                    <span class={styles.chevron}>
-                      <Icon icon={faChevronDown} />
-                    </span>
+                    <Icon icon={faChevronDown} class={styles.chevron} />
                   </button>
-                ) : (
+                </li>
+              ) : (
+                <li>
                   <a
                     href={group.href}
-                    class:list={[styles.navItem, 'subtitleMedium']}
-                    data-mega-plain
+                    class:list={[styles.navItem, 'labelMedium']}
+                    aria-current={
+                      pathname === group.href ? 'page' : currentGroup === i ? 'true' : undefined
+                    }
+                    data-nav-item
+                    data-card-plain
                   >
                     {group.label}
                   </a>
-                )}
-              </li>
-            ))
+                </li>
+              ),
+            )
           }
         </ul>
 
-        {
-          nav.map(
-            (group, i) =>
-              group.columns && (
-                <div
-                  id={panelId(i)}
-                  class:list={[styles.mega, 'surfacePage']}
-                  hidden
-                  data-mega-panel
-                >
-                  <div class={styles.megaColumns}>
+        {/* One shell holds the cards: it glides and resizes from one card to the next. */}
+        <div class:list={[styles.shell, shellClass]} data-card-shell>
+          {
+            nav.map(
+              (group, i) =>
+                group.columns && (
+                  <div id={cardId(i)} class={styles.card} data-card>
                     {group.columns.map((column) => (
-                      <div class={styles.megaColumn}>
+                      <div class={styles.cardColumn}>
                         {column.sections.map((section) => (
-                          <div class={styles.megaSection}>
-                            <div class={styles.megaGroup}>
-                              <p class:list={[styles.megaHeading, 'subtitleMedium']}>
-                                {section.heading}
-                              </p>
-                              <ul class={styles.megaLinks}>
-                                {section.links.map((link) => (
-                                  <li class={styles.megaLink}>
-                                    <NavLink href={link.href}>{link.label}</NavLink>
-                                    {link.description && (
-                                      <p class:list={[styles.description, 'caption']}>
-                                        {link.description}
-                                      </p>
-                                    )}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
+                          <div class={styles.cardSection}>
+                            <p class:list={[styles.heading, 'labelMedium']} data-card-row>
+                              {section.heading}
+                            </p>
+                            <ul class={styles.cardLinks}>
+                              {section.links.map((link) => (
+                                <li data-card-row>
+                                  <NavLink href={link.href} description={link.description}>
+                                    {link.label}
+                                  </NavLink>
+                                </li>
+                              ))}
+                            </ul>
                             {section.allLink && (
-                              <a href={section.allLink.href} class:list={[styles.allLink, 'h2']}>
+                              <a
+                                href={section.allLink.href}
+                                class:list={[styles.allLink, 'title']}
+                                data-card-row
+                              >
                                 <span aria-hidden="true">→</span>
                                 <span class={styles.allLabel}>{section.allLink.label}</span>
                               </a>
@@ -126,10 +155,10 @@ const panelId = (i: number) => `site-header-mega-${i}`;
                       </div>
                     ))}
                   </div>
-                </div>
-              ),
-          )
-        }
+                ),
+            )
+          }
+        </div>
       </nav>
 
       <div class={styles.actions}>
@@ -152,7 +181,7 @@ const panelId = (i: number) => `site-header-mega-${i}`;
         >
           <Icon icon={faCircleHalfStroke} />
         </button>
-        <a href={dashboardUrl('/login')} class:list={[styles.login, 'subtitleMedium']}>Login</a>
+        <a href={dashboardUrl('/login')} class:list={[styles.login, 'labelMedium']}>Login</a>
         <Button
           appearance={ctaAppearance}
           variant={ctaVariant}
@@ -180,11 +209,11 @@ const panelId = (i: number) => `site-header-mega-${i}`;
     >
       <ul class={styles.mobileList}>
         {
-          nav.map((group) => (
+          nav.map((group, i) => (
             <li class={styles.mobileItem}>
               {group.columns ? (
                 <details name="site-header-mobile-nav" class={styles.mobileGroup}>
-                  <summary class:list={[styles.mobileSummary, 'h1']}>
+                  <summary class:list={[styles.mobileSummary, 'headline']}>
                     {group.label}
                     <span class={styles.toggle} aria-hidden="true">
                       <Icon icon={faPlus} class={styles.plus} />
@@ -196,27 +225,33 @@ const panelId = (i: number) => `site-header-mega-${i}`;
                       .flatMap((column) => column.sections)
                       .map((section) => (
                         <div class={styles.mobileSection}>
-                          <p class:list={[styles.megaHeading, 'subtitleMedium']}>
+                          <p class:list={[styles.heading, styles.mobileHeading, 'labelMedium']}>
                             {section.heading}
                           </p>
-                          {section.links.map((link) =>
-                            link.description ? (
-                              <div class={styles.megaLink}>
-                                <NavLink href={link.href}>{link.label}</NavLink>
-                                <p class:list={[styles.description, 'caption']}>
-                                  {link.description}
-                                </p>
-                              </div>
-                            ) : (
-                              <NavLink href={link.href}>{link.label}</NavLink>
-                            ),
-                          )}
-                          {section.allLink && (
-                            <a href={section.allLink.href} class:list={[styles.allLink, 'h2']}>
-                              <span aria-hidden="true">→</span>
-                              <span class={styles.allLabel}>{section.allLink.label}</span>
-                            </a>
-                          )}
+                          <ul class={styles.mobileLinks}>
+                            {section.links.map((link) => (
+                              <li>
+                                <NavLink
+                                  href={link.href}
+                                  description={link.description}
+                                  class={styles.mobileRow}
+                                >
+                                  {link.label}
+                                </NavLink>
+                              </li>
+                            ))}
+                            {section.allLink && (
+                              <li>
+                                <a
+                                  href={section.allLink.href}
+                                  class:list={[styles.allLink, styles.mobileRow, 'title']}
+                                >
+                                  <span aria-hidden="true">→</span>
+                                  <span class={styles.allLabel}>{section.allLink.label}</span>
+                                </a>
+                              </li>
+                            )}
+                          </ul>
                         </div>
                       ))}
                   </div>
@@ -224,7 +259,10 @@ const panelId = (i: number) => `site-header-mega-${i}`;
               ) : (
                 <a
                   href={group.href ?? '#'}
-                  class:list={[styles.mobileSummary, styles.mobileLink, 'h1']}
+                  class:list={[styles.mobileSummary, styles.mobileLink, 'headline']}
+                  aria-current={
+                    pathname === group.href ? 'page' : currentGroup === i ? 'true' : undefined
+                  }
                 >
                   {group.label}
                 </a>
@@ -236,7 +274,7 @@ const panelId = (i: number) => `site-header-mega-${i}`;
         <li class:list={[styles.mobileItem, styles.mobileOnly]}>
           <button
             type="button"
-            class:list={[styles.mobileSummary, styles.mobileLink, 'h1']}
+            class:list={[styles.mobileSummary, styles.mobileLink, 'headline']}
             aria-haspopup="dialog"
             data-search-open
           >
@@ -246,7 +284,7 @@ const panelId = (i: number) => `site-header-mega-${i}`;
         <li class:list={[styles.mobileItem, styles.mobileOnly]}>
           <a
             href={dashboardUrl('/login')}
-            class:list={[styles.mobileSummary, styles.mobileLink, 'h1']}>Login</a
+            class:list={[styles.mobileSummary, styles.mobileLink, 'headline']}>Login</a
           >
         </li>
       </ul>
@@ -260,35 +298,100 @@ const panelId = (i: number) => `site-header-mega-${i}`;
 
   const DESKTOP = window.matchMedia('(min-width: 1152px)');
   const HOVER = window.matchMedia('(hover: hover)');
+  const EASE = 'cubic-bezier(0.3, 0, 0, 1)';
+
+  // The durations are 0 when the visitor asks for reduced motion (Layout
+  // sets data-motion="on" on <html> only when they do not).
+  const ms = (duration: number) =>
+    document.documentElement.dataset.motion === 'on' ? duration : 0;
+
+  const FOCUSABLE = 'a[href], button';
 
   customElements.define(
     'site-header',
     class SiteHeader extends WebComponent {
       openTrigger: HTMLButtonElement | null = null;
+      // The item under the cursor or with the focus. The pill rests elsewhere only when there is none.
+      pointed: HTMLElement | null = null;
+      list!: HTMLElement;
+      shell!: HTMLElement;
+      items!: HTMLElement[];
       mobileTrigger!: HTMLButtonElement;
       mobilePanel!: HTMLElement;
       schemeToggle!: HTMLButtonElement;
+      // The close in progress. A new open cancels it.
+      closing: Animation | null = null;
 
       parsedCallback() {
+        this.list = this.$('[data-nav-list]');
+        this.shell = this.$('[data-card-shell]');
+        this.items = this.$$('[data-nav-item]');
         this.mobileTrigger = this.$<HTMLButtonElement>('[data-mobile-trigger]');
         this.mobilePanel = this.$('[data-mobile-panel]');
         this.schemeToggle = this.$<HTMLButtonElement>('[data-scheme-toggle]');
 
-        // Mega-menu. No animation: the panels swap at once.
-        for (const trigger of this.$$<HTMLButtonElement>('[data-mega-trigger]')) {
+        // The pill follows the cursor and the focus. When they leave the
+        // row, it rests on the open item or on the item of the page.
+        for (const item of this.items) {
+          this.on(item, 'mouseenter', () => this.point(item));
+          this.on(item, 'focus', () => this.point(item));
+        }
+        this.on(this.list, 'mouseleave', () => this.point(null));
+        this.on(this.list, 'focusout', (event) => {
+          if (!this.list.contains(event.relatedTarget as Node)) this.point(null);
+        });
+        // The first placement is instant: the pill does not slide in from the edge.
+        this.restIndicator();
+        requestAnimationFrame(() => this.list.setAttribute('data-indicator', ''));
+
+        // The cards.
+        for (const trigger of this.$$<HTMLButtonElement>('[data-card-trigger]')) {
           this.on(trigger, 'mouseenter', () => {
-            if (DESKTOP.matches && HOVER.matches) this.openMega(trigger);
+            if (DESKTOP.matches && HOVER.matches) this.openCard(trigger);
           });
           this.on(trigger, 'click', () => {
-            if (this.openTrigger === trigger) this.closeMega();
-            else this.openMega(trigger);
+            // With a mouse, the hover opened the card: the click does not
+            // close it. On touch, the tap toggles it.
+            if (this.openTrigger === trigger) {
+              if (!HOVER.matches) this.closeCard();
+            } else {
+              this.openCard(trigger);
+            }
+          });
+          // Arrow down goes into the open card.
+          this.on(trigger, 'keydown', (event) => {
+            if (event.key === 'ArrowDown' && this.openTrigger === trigger) {
+              event.preventDefault();
+              this.firstLinkOf(this.cardOf(trigger))?.focus();
+            }
           });
         }
-        for (const plain of this.$$('[data-mega-plain]')) {
-          this.on(plain, 'mouseenter', () => this.closeMega());
+        for (const plain of this.$$('[data-card-plain]')) {
+          this.on(plain, 'mouseenter', () => this.closeCard());
         }
         this.on(this, 'mouseleave', () => {
-          if (HOVER.matches) this.closeMega();
+          if (HOVER.matches) this.closeCard();
+        });
+
+        // The shell is after the row in the DOM. Tab from the open item goes
+        // into its card, and Tab out of the last link goes to the next item.
+        this.on(this, 'keydown', (event) => {
+          if (event.key !== 'Tab' || !this.openTrigger) return;
+          const target = event.target as HTMLElement;
+          const card = this.cardOf(this.openTrigger);
+          const links = Array.from(card.querySelectorAll<HTMLElement>(FOCUSABLE));
+          if (target === this.openTrigger && !event.shiftKey && links[0]) {
+            event.preventDefault();
+            links[0].focus();
+          } else if (target === links[0] && event.shiftKey) {
+            event.preventDefault();
+            this.openTrigger.focus();
+          } else if (target === links[links.length - 1] && !event.shiftKey) {
+            event.preventDefault();
+            const next = this.items[this.items.indexOf(this.openTrigger) + 1];
+            this.closeCard();
+            (next ?? this.$<HTMLElement>('[data-scheme-toggle]')).focus();
+          }
         });
 
         this.on(this.mobileTrigger, 'click', () => {
@@ -305,22 +408,23 @@ const panelId = (i: number) => `site-header-mega-${i}`;
         const root = document.documentElement;
         this.on(root, 'colorschemechange', () => this.showScheme());
         this.on(root, 'click', (event) => {
-          if (!this.contains(event.target as Node)) this.closeMega();
+          if (!this.contains(event.target as Node)) this.closeCard();
         });
         this.on(root, 'keydown', (event) => {
           if (event.key !== 'Escape') return;
           // An open modal (the search) closes on Escape. The menu stays open
           // under it, thus the focus can go back to the menu.
           if (document.querySelector('[aria-modal="true"]')) return;
-          if (this.openTrigger) this.closeMega(true);
+          if (this.openTrigger) this.closeCard(true);
           if (this.mobileTrigger.getAttribute('aria-expanded') === 'true') {
             this.setMobile(false, true);
           }
         });
 
         const onDesktopChange = () => {
-          this.closeMega();
+          this.closeCard();
           this.setMobile(false);
+          this.restIndicator();
         };
         DESKTOP.addEventListener('change', onDesktopChange);
         this.eventListenerRemovers.push(() =>
@@ -330,24 +434,126 @@ const panelId = (i: number) => `site-header-mega-${i}`;
         this.showScheme();
       }
 
-      panelOf(trigger: HTMLButtonElement) {
+      point(item: HTMLElement | null) {
+        this.pointed = item;
+        this.restIndicator();
+      }
+
+      // The pill goes to the pointed item, else to the open item, else to
+      // the item of the page. With none of them, it fades out where it is.
+      restIndicator() {
+        const target =
+          this.pointed ??
+          this.openTrigger ??
+          this.items.find((item) => item.hasAttribute('aria-current'));
+        if (!target) {
+          this.list.removeAttribute('data-indicator-shown');
+          return;
+        }
+        this.list.style.setProperty('--indicator-x', `${target.offsetLeft}px`);
+        this.list.style.setProperty('--indicator-width', `${target.offsetWidth}px`);
+        this.list.setAttribute('data-indicator-shown', '');
+      }
+
+      cardOf(trigger: HTMLButtonElement) {
         return this.$(`#${trigger.getAttribute('aria-controls')}`);
       }
 
-      openMega(trigger: HTMLButtonElement) {
-        if (this.openTrigger === trigger) return;
-        this.closeMega();
-        trigger.setAttribute('aria-expanded', 'true');
-        this.panelOf(trigger).removeAttribute('hidden');
-        this.openTrigger = trigger;
+      firstLinkOf(card: HTMLElement) {
+        return card.querySelector<HTMLElement>(FOCUSABLE);
       }
 
-      closeMega(returnFocus = false) {
+      // The shell takes the place and the size of the card of the trigger.
+      // From closed, it grows down from the hairline and the rows arrive one
+      // after the other. From another card, it glides to the new shape while
+      // the two contents cross-fade.
+      openCard(trigger: HTMLButtonElement) {
+        if (this.openTrigger === trigger) return;
+        const previous = this.openTrigger;
+        const previousCard = previous && this.cardOf(previous);
+        const card = this.cardOf(trigger);
+        const shell = this.shell;
+
+        this.closing?.cancel();
+        this.closing = null;
+        previous?.setAttribute('aria-expanded', 'false');
+        trigger.setAttribute('aria-expanded', 'true');
+        this.openTrigger = trigger;
+
+        const from = {
+          left: shell.offsetLeft,
+          width: shell.offsetWidth,
+          height: shell.offsetHeight,
+        };
+        // A card of a cancelled close can still be active: only the two of the morph stay.
+        for (const other of this.$$('[data-card]')) {
+          if (other !== card && other !== previousCard) other.removeAttribute('data-active');
+        }
+        // The fade-out of an earlier morph fills forwards: it must not hide the card now.
+        for (const animation of card.getAnimations()) animation.cancel();
+        card.setAttribute('data-active', '');
+        shell.style.setProperty('--card-x', `${trigger.offsetLeft}px`);
+        shell.style.setProperty('--card-width', `${card.offsetWidth}px`);
+        shell.style.setProperty('--card-height', `${card.offsetHeight}px`);
+        shell.setAttribute('data-open', '');
+        const to = { left: shell.offsetLeft, width: shell.offsetWidth, height: shell.offsetHeight };
+
+        if (previousCard) {
+          previousCard
+            .animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms(120), fill: 'forwards' })
+            .finished.then(() => {
+              // The card can be open again by now.
+              if (previous !== this.openTrigger) previousCard.removeAttribute('data-active');
+            });
+          card.animate([{ opacity: 0 }, { opacity: 1 }], {
+            duration: ms(200),
+            delay: ms(60),
+            fill: 'backwards',
+          });
+          shell.animate(
+            [
+              { left: `${from.left}px`, width: `${from.width}px`, height: `${from.height}px` },
+              { left: `${to.left}px`, width: `${to.width}px`, height: `${to.height}px` },
+            ],
+            { duration: ms(300), easing: EASE },
+          );
+        } else {
+          shell.animate([{ height: '0px' }, { height: `${to.height}px` }], {
+            duration: ms(260),
+            easing: EASE,
+          });
+          card.querySelectorAll<HTMLElement>('[data-card-row]').forEach((row, i) => {
+            row.animate(
+              [
+                { opacity: 0, transform: 'translateY(4px)' },
+                { opacity: 1, transform: 'translateY(0)' },
+              ],
+              { duration: ms(200), delay: ms(60 + i * 20), easing: 'ease-out', fill: 'backwards' },
+            );
+          });
+        }
+        this.restIndicator();
+      }
+
+      closeCard(returnFocus = false) {
         const trigger = this.openTrigger;
         if (!trigger) return;
+        const card = this.cardOf(trigger);
+        const shell = this.shell;
         trigger.setAttribute('aria-expanded', 'false');
-        this.panelOf(trigger).setAttribute('hidden', '');
         this.openTrigger = null;
+        const closing = shell.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms(100) });
+        this.closing = closing;
+        closing.finished.then(
+          () => {
+            shell.removeAttribute('data-open');
+            card.removeAttribute('data-active');
+            this.closing = null;
+          },
+          // A new open cancelled the close: the shell stays.
+          () => {},
+        );
+        this.restIndicator();
         if (returnFocus) trigger.focus();
       }
 

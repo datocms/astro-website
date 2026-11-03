@@ -13,7 +13,7 @@
  */
 @scope (.prose) to (prose-island > *) {
   :scope {
-    font-size: var(--type-body);
+    font-size: var(--type-m);
     font-weight: 400;
     line-height: 1.5;
     letter-spacing: -0.01em;
@@ -39,19 +39,19 @@
   }
 
   h1 {
-    font-size: var(--type-display);
+    font-size: var(--type-3xl);
     line-height: 1;
     letter-spacing: -0.05em;
   }
 
   h2 {
-    font-size: var(--type-h1);
+    font-size: var(--type-2xl);
     line-height: 1;
     letter-spacing: -0.04em;
   }
 
   h3 {
-    font-size: var(--type-h2);
+    font-size: var(--type-l);
     line-height: 1.1;
     letter-spacing: -0.02em;
   }
@@ -61,12 +61,12 @@
   }
 
   :is(h5, h6) {
-    font-size: var(--type-subtitle);
+    font-size: var(--type-s);
     line-height: 1;
   }
 
   :global(.lead) {
-    font-size: var(--type-h2);
+    font-size: var(--type-l);
     font-weight: 500;
     line-height: 1.1;
     letter-spacing: -0.02em;
@@ -97,22 +97,26 @@
     color: var(--text-on-accent);
   }
 
+  /* A sub, a sup or a small is smaller than its text, but not under the floor (--type-xs). */
   :is(sub, sup, small) {
-    font-size: 0.7em;
+    font-size: max(0.7em, var(--type-xs));
     font-weight: 500;
   }
 
-  /* A mono font looks larger and heavier than the sans at the same size and weight. */
+  /* The code roles (typography.css): the mono, the mono weight of the ground. */
   code {
     font-family: var(--font-mono);
-    font-weight: 400;
+    font-weight: var(--type-mono-weight);
     letter-spacing: 0;
   }
 
-  /* Inline code: a box with a 1px border. A box that breaks over two lines gets its border on each line. */
+  /*
+   * Inline code: the size of the codeInline role, in a box with a 1px
+   * border. A box that breaks over two lines gets its border on each line.
+   */
   :not(pre) > code {
     padding: 0 var(--space-5xs);
-    font-size: 0.85em;
+    font-size: var(--type-inline-code);
     background: var(--surface-inverse-faint);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-sm);
@@ -122,7 +126,7 @@
   pre {
     padding: var(--space-md);
     overflow-x: auto;
-    font-size: var(--type-code);
+    font-size: var(--type-s);
     line-height: 1.4;
     background: var(--surface-inverse-faint);
     white-space: pre-wrap;
@@ -164,7 +168,7 @@
   }
 
   blockquote :is(cite, footer) {
-    font-size: var(--type-subtitle);
+    font-size: var(--type-s);
     font-style: normal;
     font-weight: 500;
     line-height: 1;
@@ -198,7 +202,7 @@
   }
 
   figcaption {
-    font-size: var(--type-subtitle);
+    font-size: var(--type-s);
     font-weight: 500;
     line-height: 1;
     color: var(--text-muted);
@@ -211,7 +215,7 @@
 
   table {
     width: 100%;
-    font-size: var(--type-subtitle);
+    font-size: var(--type-s);
     line-height: 1;
     border-collapse: collapse;
     /* Do not break the words in a cell. */
@@ -252,7 +256,7 @@
   }
 
   /*
-   * The subtitle style has its own letter spacing. Without this rule, these
+   * The label style has its own letter spacing. Without this rule, these
    * elements get the letter spacing of the body size from the parent.
    */
   :is(h5, h6, cite, footer, figcaption, table) {

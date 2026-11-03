@@ -23,9 +23,11 @@ type Props = {
    * The default is a page that does a full load.
    */
   clientRouter?: boolean;
+  /** The dense values of the type ladder, as `data-density` of <body>. */
+  density?: 'dense';
 };
 
-const { seo, theme = 'default', clientRouter = false } = Astro.props;
+const { seo, theme = 'default', clientRouter = false, density } = Astro.props;
 
 // The order of the cascade layers (see src/styles/global.css). The statement
 // is the first child of <head>, before all other CSS.
@@ -93,7 +95,7 @@ const finalSeo = pipeSeo(
       )
     }
   </head>
-  <body data-theme={theme}>
+  <body data-theme={theme} data-density={density}>
     <slot />
     {draftModeEnabled && <ContentLink />}
   </body>

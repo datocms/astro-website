@@ -139,7 +139,7 @@
     border: 1px solid var(--border-default);
     background: var(--surface-accent-faint);
     font-family: inherit;
-    font-size: var(--type-docs-label);
+    font-size: var(--type-xs);
     font-weight: 500;
     color: var(--text-muted);
     line-height: 1;
@@ -263,7 +263,7 @@
 .cardHeaderTitle {
   flex: 1;
   min-width: 0;
-  font-size: var(--type-subtitle);
+  font-size: var(--type-s);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.01em;
@@ -371,7 +371,7 @@
   background: transparent;
   color: var(--text-primary);
   font-family: inherit;
-  font-size: var(--type-h2);
+  font-size: var(--type-l);
   font-weight: 500;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -427,7 +427,7 @@
 
 .sectionLabel {
   padding: var(--space-sm) 0 var(--space-5xs);
-  font-size: var(--type-h2);
+  font-size: var(--type-l);
   font-weight: 500;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -450,7 +450,7 @@
   background: transparent;
   color: var(--text-muted);
   font-family: inherit;
-  font-size: var(--type-h2);
+  font-size: var(--type-l);
   font-weight: 500;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -511,7 +511,7 @@
   border-top: 1px solid var(--border-default);
   background: var(--surface-status-warning);
   color: var(--text-status-warning);
-  font-size: var(--type-subtitle);
+  font-size: var(--type-s);
   line-height: 1.3;
   letter-spacing: -0.01em;
   transition:
@@ -625,7 +625,7 @@
   background: transparent;
   color: var(--text-muted);
   font-family: inherit;
-  font-size: var(--type-subtitle);
+  font-size: var(--type-s);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.01em;
@@ -727,7 +727,7 @@
   gap: var(--space-3xs);
   min-width: 0;
   color: var(--text-muted);
-  font-size: var(--type-subtitle);
+  font-size: var(--type-s);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.01em;
@@ -748,7 +748,7 @@
 
 .resultTitle {
   overflow: hidden;
-  font-size: var(--type-h2);
+  font-size: var(--type-l);
   font-weight: 500;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -759,8 +759,10 @@
     padding: 0 var(--space-4xs);
     border-radius: var(--search-r-xs);
     background: var(--surface-accent-faint);
+    /* The codeInline role. */
     font-family: var(--font-mono);
-    font-size: 0.8em;
+    font-size: var(--type-inline-code);
+    font-weight: var(--type-mono-weight);
     letter-spacing: 0;
   }
 }
@@ -769,7 +771,7 @@
   display: -webkit-box;
   overflow: hidden;
   color: var(--text-muted);
-  font-size: var(--type-body);
+  font-size: var(--type-m);
   line-height: 1.3;
   letter-spacing: -0.01em;
   -webkit-line-clamp: 2;
@@ -819,17 +821,17 @@
 
 .skeletonLineMeta {
   width: 28%;
-  height: var(--type-subtitle);
+  height: var(--type-s);
 }
 
 .skeletonLineTitle {
   width: 55%;
-  height: var(--type-h2);
+  height: var(--type-l);
 }
 
 .skeletonLineBlurb {
   width: 95%;
-  height: var(--type-body);
+  height: var(--type-m);
 }
 
 .skeletonLineBlurbShort {
@@ -859,7 +861,7 @@
   flex-direction: column;
   gap: var(--space-md);
   padding: 0 0 var(--space-sm);
-  font-size: var(--type-body);
+  font-size: var(--type-m);
   line-height: 1.5;
   letter-spacing: -0.01em;
 }
@@ -942,8 +944,10 @@
     padding: 1px var(--space-4xs);
     border-radius: var(--search-r-xs);
     background: var(--surface-accent-faint);
+    /* The codeInline role. */
     font-family: var(--font-mono);
-    font-size: 0.85em;
+    font-size: var(--type-inline-code);
+    font-weight: var(--type-mono-weight);
     letter-spacing: 0;
   }
 
@@ -968,7 +972,8 @@
     width: 100%;
     margin: 0 0 0.8em;
     border-collapse: collapse;
-    font-size: 0.9em;
+    font-size: var(--type-s);
+    line-height: 1.3;
   }
 
   th,
@@ -991,7 +996,12 @@
     border-radius: var(--search-r-sm);
     background: var(--code-background);
     color: var(--code-plain);
-    font-size: 0.85em;
+    /* The code role. The code ground is deep in both schemes, thus the weight is 500. */
+    font-family: var(--font-mono);
+    font-size: var(--type-s);
+    font-weight: 500;
+    line-height: 1.55;
+    letter-spacing: 0;
 
     code {
       padding: 0;
@@ -1019,16 +1029,17 @@
     font-weight: 500;
   }
 
+  /* h1: the title role. h2 to h4: the medium body role. */
   h1 {
-    font-size: 1.2em;
+    font-size: var(--type-l);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
   }
 
-  h2 {
-    font-size: 1.1em;
-  }
-
-  h3 {
-    font-size: 1em;
+  :is(h2, h3, h4) {
+    font-size: var(--type-m);
+    line-height: calc(1.3 + var(--type-leading-dark));
+    letter-spacing: calc(-0.01em + var(--type-tracking-dark));
   }
 }
 
@@ -1039,8 +1050,11 @@
   border-radius: var(--search-r-pill);
   background: var(--surface-accent-faint);
   color: var(--text-muted);
-  font-size: 0.8em;
+  /* The caption role. */
+  font-size: var(--type-xs);
   font-weight: 500;
+  line-height: calc(1.35 + var(--type-leading-dark));
+  letter-spacing: calc(-0.01em + var(--type-tracking-dark));
   text-decoration: none;
 
   @media (hover: hover) {
@@ -1063,7 +1077,7 @@
   max-height: 4.5em;
   overflow: hidden;
   color: var(--text-muted);
-  font-size: var(--type-subtitle);
+  font-size: var(--type-s);
   line-height: 1.5;
   mask-image: linear-gradient(to bottom, transparent, black 50%);
 }
@@ -1097,8 +1111,11 @@
     padding: 1px var(--space-4xs);
     border-radius: var(--search-r-xs);
     background: var(--surface-accent-faint);
+    /* The codeInline role. */
     font-family: var(--font-mono);
-    font-size: 0.85em;
+    font-size: var(--type-inline-code);
+    font-weight: var(--type-mono-weight);
+    letter-spacing: 0;
   }
 
   strong,
@@ -1156,7 +1173,7 @@
   justify-content: flex-end;
   gap: var(--space-4xs);
   color: var(--text-muted);
-  font-size: var(--type-subtitle);
+  font-size: var(--type-s);
   transition-property: opacity, transform;
   transition-duration: 200ms;
   transition-timing-function: var(--search-ease-spring);
@@ -1255,7 +1272,7 @@
   gap: var(--space-3xs);
   margin-top: var(--space-2xs);
   color: var(--text-muted);
-  font-size: var(--type-subtitle);
+  font-size: var(--type-s);
 }
 
 .tickerDots {
@@ -1323,7 +1340,7 @@
 .errorLine {
   margin: var(--space-3xs) 0 0;
   color: var(--text-negative);
-  font-size: var(--type-body);
+  font-size: var(--type-m);
   line-height: 1.3;
 }
 
@@ -1343,7 +1360,7 @@
   margin: 0;
   padding: var(--space-md) 0;
   color: var(--text-muted);
-  font-size: var(--type-body);
+  font-size: var(--type-m);
   line-height: 1.3;
   letter-spacing: -0.01em;
 }
@@ -1362,7 +1379,7 @@
   }
 
   .triggerLabel {
-    font-size: var(--type-docs-small);
+    font-size: var(--type-s);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
