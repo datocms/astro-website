@@ -10,14 +10,14 @@
 }
 
 /*
- * A soft button in two parts: the action and the menu. The button roles
- * of src/styles/tokens.css give the colours, as for the Button component.
+ * A pill in two parts: the action and the menu. It has no fill, a hairline
+ * and the muted text.
  */
 .pill {
   display: inline-flex;
-  background: var(--surface-button-soft);
-  color: var(--text-button-soft);
+  color: var(--text-muted);
   border-radius: var(--radius-full);
+  box-shadow: inset 0 0 0 1px var(--border-default);
 }
 
 .part {
@@ -74,11 +74,11 @@
   transform: rotate(180deg);
 }
 
-/* The menu opens under the pill, centred on it. */
+/* The menu opens under the pill, at its right edge. */
 .menu {
   position: absolute;
   top: calc(100% + var(--space-3xs));
-  left: 50%;
+  right: 0;
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -89,7 +89,6 @@
   background: var(--surface-default);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  transform: translateX(-50%);
 }
 
 .menu[hidden] {
@@ -108,61 +107,9 @@
   cursor: pointer;
 }
 
-/* The quiet variant: no fill, a hairline, 32px, and the menu at the left edge. */
-.quiet .pill {
-  background: transparent;
-  color: var(--text-muted);
-  box-shadow: inset 0 0 0 1px var(--border-default);
-}
-
-.quiet .part {
-  height: 32px;
-  gap: var(--space-3xs);
-  padding: 0 var(--space-xs);
-  font-size: var(--type-xs);
-}
-
-.quiet .toggle {
-  padding: 0 var(--space-2xs);
-}
-
-.quiet .icon {
-  width: 12px;
-  height: 12px;
-}
-
-.quiet .menu {
-  left: 0;
-  transform: none;
-}
-
-/* The neutral variant: no fill, a hairline, the muted text, and the menu at the right edge. */
-.neutral .pill {
-  background: transparent;
-  color: var(--text-muted);
-  box-shadow: inset 0 0 0 1px var(--border-default);
-}
-
-.neutral .menu {
-  right: 0;
-  left: auto;
-  transform: none;
-}
-
 @media (hover: hover) {
-  .neutral .part:hover {
-    background: transparent;
-    color: var(--text-primary);
-  }
-
-  .quiet .part:hover {
-    background: transparent;
-    color: var(--text-primary);
-  }
-
   .part:hover {
-    background: var(--surface-button-hover);
-    color: var(--text-button-hover);
+    color: var(--text-primary);
   }
 
   .item:hover {

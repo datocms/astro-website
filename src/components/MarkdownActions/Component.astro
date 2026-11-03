@@ -7,19 +7,10 @@ import styles from './style.module.css';
 interface Props {
   /** The address of the Markdown version of the page (the page address + ".md"). */
   markdownUrl: string;
-  /**
-   * "soft" (default): a soft button of 40px, with the menu centred under it.
-   * "quiet": a smaller pill with no fill and a hairline, with the menu at its
-   * left edge. For a narrow column, for example the table of contents.
-   * "neutral": a pill of 40px with no fill and a hairline, in the muted text,
-   * with the menu at its right edge. For a bar of links, for example the
-   * Breadcrumb.
-   */
-  variant?: 'soft' | 'quiet' | 'neutral';
   class?: string;
 }
 
-const { markdownUrl, variant = 'soft', class: className } = Astro.props;
+const { markdownUrl, class: className } = Astro.props;
 const request = `Read ${markdownUrl} so I can ask questions about it.`;
 const links = [
   { label: 'View as Markdown', href: markdownUrl, icon: faMarkdown },
@@ -44,12 +35,7 @@ const links = [
 */
 }
 <markdown-actions
-  class:list={[
-    styles.root,
-    variant === 'quiet' && styles.quiet,
-    variant === 'neutral' && styles.neutral,
-    className,
-  ]}
+  class:list={[styles.root, className]}
   data-markdown-actions={markdownUrl}
   data-datocms-noindex
   hidden
