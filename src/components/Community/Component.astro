@@ -6,6 +6,7 @@ import { Section } from '~/components/Section';
 import { InlineText } from '~/components/InlineText';
 import { Typewriter } from '~/components/Typewriter';
 import type { CommunityData } from '~/data/home';
+import { formatRelativeDate } from '~/lib/format/date';
 import type { Step } from '~/lib/motion/typewriter';
 import type { Theme } from '~/lib/theme';
 import styles from './style.module.css';
@@ -79,7 +80,7 @@ const deck = Array.from(
                 <img src={post.author.avatar} alt="" width="40" height="40" class={styles.avatar} />
                 <span class={styles.name}>{post.author.name}</span>
                 <span class={styles.dot} />
-                <span class={styles.age}>{post.age}</span>
+                <span class={styles.age}>{formatRelativeDate(post.askedAt)}</span>
               </span>
               {post.tag && <span class={styles.tag}>{post.tag}</span>}
             </span>
@@ -87,18 +88,18 @@ const deck = Array.from(
             <span class:list={[styles.solved, 'surfaceAccent']}>
               <span class={styles.user}>
                 <img
-                  src={post.solvedBy.avatar}
+                  src={post.closedBy.avatar}
                   alt=""
                   width="40"
                   height="40"
                   class:list={[styles.avatar, styles.solvedAvatar]}
                 />
-                <span class={styles.name}>{post.solvedBy.name}</span>
+                <span class={styles.name}>{post.closedBy.name}</span>
                 <span class={styles.dot} />
-                <span class={styles.age}>{post.solvedAge}</span>
+                <span class={styles.age}>{formatRelativeDate(post.closedAt)}</span>
               </span>
               <span class={styles.solvedLabel}>
-                <span>Solved</span>
+                <span>{post.outcome === 'shipped' ? 'Shipped' : 'Solved'}</span>
                 <span class={styles.check}>
                   <Icon icon={faCircleCheck} width="40" height="40" />
                 </span>

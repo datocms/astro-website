@@ -100,13 +100,18 @@ export interface QuestionAnswerData {
   more?: { text: string; button: ButtonData };
 }
 
+/** A thread of community.datocms.com. The page shows the dates as a time before now. */
 interface CommunityPost {
   author: { name: string; avatar: string };
-  age: string;
+  /** The ISO date-time of the first post. */
+  askedAt: string;
   title: string;
   tag?: string;
-  solvedBy: { name: string; avatar: string };
-  solvedAge: string;
+  /** shipped: a feature request that we launched. solved: a question with an accepted answer. */
+  outcome: 'shipped' | 'solved';
+  closedBy: { name: string; avatar: string };
+  /** The ISO date-time of the post that closed the thread. */
+  closedAt: string;
 }
 
 export interface CommunityData {
@@ -545,37 +550,43 @@ export const community: CommunityData = {
     href: 'https://community.datocms.com',
     variant: 'soft',
   },
-  // Left to right.
+  // Left to right. The first post is the open card on top of the pile.
+  // Mostly feature requests that we shipped, from community.datocms.com.
   posts: [
     {
-      author: { name: 'Lee', avatar: forumAvatar(5) },
-      age: 'Yesterday',
-      title: 'Control Video Thumbnail/Poster',
+      author: { name: 'Flumi', avatar: forumAvatar(5) },
+      askedAt: '2025-05-01T20:00:27Z',
+      title: 'Support MCP?',
       tag: 'Feature Request',
-      solvedBy: { name: 'mat_jack1', avatar: forumAvatar(6) },
-      solvedAge: '23d',
+      outcome: 'shipped',
+      closedBy: { name: 'mat_jack1', avatar: forumAvatar(6) },
+      closedAt: '2025-12-11T00:00:00Z',
     },
     {
-      author: { name: 'Dev7', avatar: forumAvatar(1) },
-      age: '16d',
-      title: 'Vercel builds fail with connection error to graphql.datocms.com',
-      solvedBy: { name: 'roger', avatar: forumAvatar(2) },
-      solvedAge: '16d',
+      author: { name: 'kalle.laakso', avatar: forumAvatar(1) },
+      askedAt: '2026-06-16T00:00:00Z',
+      title: 'Allow disabling automatic bullet list generation',
+      tag: 'Feature Request',
+      outcome: 'shipped',
+      closedBy: { name: 's.verna', avatar: forumAvatar(2) },
+      closedAt: '2026-06-25T00:00:00Z',
     },
     {
       author: { name: 'yiying.lim', avatar: forumAvatar(3) },
-      age: '23d',
+      askedAt: '2026-07-20T08:03:29Z',
       title: 'Hitting MODULAR_BLOCK_IN_USE when performing migration',
-      solvedBy: { name: 'm.finamor', avatar: forumAvatar(4) },
-      solvedAge: '22d',
+      outcome: 'solved',
+      closedBy: { name: 'm.finamor', avatar: forumAvatar(4) },
+      closedAt: '2026-07-21T11:17:57Z',
     },
     {
-      author: { name: 'thomas.vanleynseele', avatar: forumAvatar(1) },
-      age: '30d',
-      title:
-        'Manual drag & drop record sorting not working anymore and all have the same position (when created in parallel)',
-      solvedBy: { name: 'roger', avatar: forumAvatar(2) },
-      solvedAge: 'Month Ago',
+      author: { name: 'Lee', avatar: forumAvatar(1) },
+      askedAt: '2020-10-27T20:47:47Z',
+      title: 'Control Video Thumbnail/Poster',
+      tag: 'Feature Request',
+      outcome: 'shipped',
+      closedBy: { name: 'mat_jack1', avatar: forumAvatar(6) },
+      closedAt: '2026-07-20T00:00:00Z',
     },
   ],
 };
