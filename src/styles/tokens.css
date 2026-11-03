@@ -860,8 +860,12 @@
   --type-xl: clamp(1.5rem, 1.107rem + 1.6vw, 1.875rem);
   --type-2xl: clamp(1.875rem, 1.22rem + 2.6667vw, 2.5rem);
   --type-3xl: clamp(2.3125rem, 1.461rem + 3.4667vw, 3.125rem);
-  /* Inline code in running text: relative to the size of the text around it. */
-  --type-inline-code: 0.9em;
+  /*
+   * Inline code in running text: relative to the size of the text around
+   * it, but not under the floor (--type-xs). The em resolves on the
+   * element that uses the token.
+   */
+  --type-inline-code: max(0.8em, var(--type-xs));
 
   /*
    * The adjustments for the ground. Light text on a dark ground looks

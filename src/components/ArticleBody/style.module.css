@@ -40,13 +40,17 @@
 /*
  * From 1320, the table of contents is in the column at the left of the
  * text. Its cell is as tall as the text, so that the table can stay in
- * view while the text scrolls. The gap holds the bleed of the wide
- * blocks, plus space between them and the table.
+ * view while the text scrolls. Each gap holds the bleed of the wide
+ * blocks. The gap at the left also holds 80 between the wide blocks and
+ * the table. The gap at the right is empty, thus it holds only 40. The
+ * text is 20 to the right of the centre: the eye does not see it.
  */
 @media (min-width: 1320px) {
   .content {
-    grid-template-columns: minmax(0, 1fr) minmax(0, var(--reading-max)) minmax(0, 1fr);
-    column-gap: calc(var(--bleed) + var(--space-xl));
+    grid-template-columns:
+      minmax(0, 1fr) calc(var(--bleed) + var(--space-3xl)) minmax(0, var(--reading-max))
+      calc(var(--bleed) + var(--space-xl)) minmax(0, 1fr);
+    column-gap: 0;
   }
 
   .toc {
@@ -56,6 +60,6 @@
 
   .text {
     grid-row: 1;
-    grid-column: 2;
+    grid-column: 3;
   }
 }

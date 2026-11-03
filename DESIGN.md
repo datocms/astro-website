@@ -87,7 +87,7 @@ typography:
     letterSpacing: '0em'
   code-inline:
     fontFamily: 'Geist Mono, ui-monospace, Menlo, monospace'
-    fontSize: '0.9em'
+    fontSize: '0.8em'
     fontWeight: 400
     lineHeight: inherit
     letterSpacing: '0em'
@@ -287,7 +287,7 @@ The sizes in the frontmatter are the 1320px values. Each role has a class in `sr
 - **Label** (400, 1.0, -0.01em): buttons, nav. The `.label` and `.labelMedium` (500) classes. A label is one line: a text that wraps takes Body.
 - **Caption** (500, 1.35, -0.01em): tooltips, notes, dates, metadata. The `.caption` class.
 - **Code** (Geist Mono, 1.55, 0): code cards, product chrome. The `.code` and `.codeSmall` classes.
-- **Inline code** (Geist Mono, 0.9em of the running text): the mono has a larger x-height and wider letters than ABC Oracle, so 0.9em gives the two the same visual size. The `.codeInline` class.
+- **Inline code** (Geist Mono, 0.8em of the running text but not under the xs floor, on a faint chip with no border): the mono has wider letters than ABC Oracle, and each letter takes the same width, so 0.8em gives the two the same visual size. The `.codeInline` class.
 - **Mono caps** (Geist Mono 500, 1.3, +0.06em, uppercase): diagram panel titles, docs sidebar group names. The one tracked uppercase role. The `.monoCaps` class.
 - **Picture label** (Geist Mono 500, 1.4): text inside drawn pictures only. The `.pictureLabel` class.
 - **Tabular**: a treatment, not a role. `.tabular` goes on a role: prices, counts, dates, stats.

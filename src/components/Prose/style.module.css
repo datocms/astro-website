@@ -2,7 +2,8 @@
 /*
  * The content comes from a CMS, thus the rules target the elements. The
  * sizes come from the --type-* tokens, as in the typography classes.
- * Blocks have 30 between them. A heading has 20 above it, and 20 between
+ * Blocks have 30 between them. Two runs of text (paragraphs and lists)
+ * have one line between them. A heading has 20 above it, and 20 between
  * it and the next block.
  *
  * The scope stops at the children of <prose-island>. Prose does not style
@@ -15,8 +16,9 @@
   :scope {
     font-size: var(--type-m);
     font-weight: 400;
-    line-height: 1.5;
-    letter-spacing: -0.01em;
+    /* The long body role (typography.css): a dark ground adds to the line height and the letter spacing. */
+    line-height: calc(1.5 + var(--type-leading-dark));
+    letter-spacing: calc(-0.01em + var(--type-tracking-dark));
     color: var(--text-primary);
     overflow-wrap: anywhere;
   }
@@ -27,6 +29,25 @@
 
   :scope > * + * {
     margin-top: var(--space-lg);
+  }
+
+  /*
+   * The measure. The running text stops at 32em, approximately 70
+   * characters of ABC Oracle. Tables, code blocks, figures and the other
+   * wide blocks keep the full column. A heading is larger than the text:
+   * it stops at the same edge as the running text, 32 times the body size.
+   */
+  :scope > :is(p, ul, ol, blockquote) {
+    max-width: 32em;
+  }
+
+  :scope > :is(h1, h2, h3, h4, h5, h6) {
+    max-width: calc(32 * var(--type-m));
+  }
+
+  /* Between two runs of text: one empty line, at each size of the type. */
+  :scope > :is(p, ul, ol) + :is(p, ul, ol) {
+    margin-top: 1lh;
   }
 
   :is(h1, h2, h3, h4, h5, h6) {
@@ -56,8 +77,10 @@
     letter-spacing: -0.02em;
   }
 
+  /* h4: the medium body role. The weight makes it a heading at the size of the text. */
   h4 {
-    font-weight: 400;
+    font-size: var(--type-m);
+    line-height: 1.3;
   }
 
   :is(h5, h6) {
@@ -77,9 +100,12 @@
     font-weight: 500;
   }
 
+  /* A thin underline: a paragraph with many links does not become a dark block. */
   a {
     font-weight: 500;
     text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
   }
 
   /* The highlight paints the accent: its text is the ink of the accent, in both schemes. */
@@ -111,14 +137,14 @@
   }
 
   /*
-   * Inline code: the size of the codeInline role, in a box with a 1px
-   * border. A box that breaks over two lines gets its border on each line.
+   * Inline code: the size of the codeInline role, on a faint chip with no
+   * border. A chip that breaks over two lines gets its padding and its
+   * corners on each line.
    */
   :not(pre) > code {
-    padding: 0 var(--space-5xs);
+    padding: 0 var(--space-4xs);
     font-size: var(--type-inline-code);
     background: var(--surface-inverse-faint);
-    border: 1px solid var(--border-default);
     border-radius: var(--radius-sm);
     box-decoration-break: clone;
   }

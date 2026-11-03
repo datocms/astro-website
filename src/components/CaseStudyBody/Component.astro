@@ -1,5 +1,6 @@
 ---
 import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { Fact, Facts, type FactValue } from '~/components/Facts';
 import { Prose } from '~/components/Prose';
 import { Section } from '~/components/Section';
 import { StructuredText } from '~/components/StructuredText';
@@ -28,50 +29,12 @@ interface Props {
 const { title, theme } = Astro.props;
 const story = readFragment(CaseStudyBodyStoryFragment, Astro.props.story);
 
-type FactValue = { text: string; href?: string; external?: boolean };
-type Fact = { label: string; values: FactValue[] };
-
 const tags = story.tags.map((tag) => tag.name.trim()).filter(Boolean);
-
-const facts: Fact[] = [
-  story.projectUrl
-    ? {
-        label: 'Project',
-        values: [{ text: cleanDomain(story.projectUrl), href: story.projectUrl, external: true }],
-      }
-    : null,
-  story.industry.length > 0
-    ? { label: 'Industry', values: story.industry.map((item) => ({ text: item.name })) }
-    : null,
-  story.useCase
-    ? {
-        label: 'Use case',
-        values: [
-          {
-            text: story.useCase.navigationBarTitle,
-            href: buildUrlForUseCasePage(story.useCase),
-          },
-        ],
-      }
-    : null,
-  tags.length > 0 ? { label: 'Solved', values: tags.map((text) => ({ text })) } : null,
-  story.keyFeatures.length > 0
-    ? {
-        label: 'Key Features',
-        values: story.keyFeatures.flatMap((feature) =>
-          'seoH1' in feature && feature.seoH1
-            ? [{ text: feature.seoH1, href: buildUrlForFeature(feature) }]
-            : [],
-        ),
-      }
-    : null,
-  story.partner
-    ? {
-        label: 'Partner',
-        values: [{ text: story.partner.name, href: buildUrlForPartner(story.partner) }],
-      }
-    : null,
-].filter((fact): fact is Fact => fact !== null && fact.values.length > 0);
+const keyFeatures: FactValue[] = story.keyFeatures.flatMap((feature) =>
+  'seoH1' in feature && feature.seoH1
+    ? [{ text: feature.seoH1, href: buildUrlForFeature(feature) }]
+    : [],
+);
 ---
 
 <Section theme={theme} contentClass={styles.content}>
@@ -93,28 +56,32 @@ const facts: Fact[] = [
       />
     </Prose>
   </div>
-  <dl class:list={[styles.facts, 'bodyLong']}>
+  <Facts class={styles.facts}>
     {
-      facts.map((fact) => (
-        <div>
-          <dt class={styles.label}>{fact.label}</dt>
-          {fact.values.map((value) => (
-            <dd>
-              {value.href ? (
-                <a
-                  class={styles.link}
-                  href={value.href}
-                  {...(value.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                >
-                  {value.text}
-                </a>
-              ) : (
-                value.text
-              )}
-            </dd>
-          ))}
-        </div>
-      ))
+      story.projectUrl && (
+        <Fact label="Project">
+          <a href={story.projectUrl} target="_blank" rel="noopener noreferrer">
+            {cleanDomain(story.projectUrl)}
+          </a>
+        </Fact>
+      )
     }
-  </dl>
+    {
+      story.useCase && (
+        <Fact label="Use case">
+          <a href={buildUrlForUseCasePage(story.useCase)}>{story.useCase.navigationBarTitle}</a>
+        </Fact>
+      )
+    }
+    {
+      story.partner && (
+        <Fact label="Partner">
+          <a href={buildUrlForPartner(story.partner)}>{story.partner.name}</a>
+        </Fact>
+      )
+    }
+    <Fact label="Industry" values={story.industry.map((item) => item.name)} />
+    <Fact label="Solved" values={tags} />
+    <Fact label="Key Features" values={keyFeatures} />
+  </Facts>
 </Section>

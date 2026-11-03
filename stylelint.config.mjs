@@ -135,8 +135,8 @@ export default {
       },
     },
     {
-      // The docs rules name the classes of expressive-code (ec-line, expressive-code).
-      files: ['src/layouts/docs/docs.css'],
+      // These rules name the classes of expressive-code (ec-line, expressive-code).
+      files: ['src/layouts/docs/docs.css', 'src/styles/expressiveCode.css'],
       rules: { 'selector-class-pattern': null, 'selector-max-specificity': null },
     },
     {

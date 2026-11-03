@@ -8,14 +8,24 @@
  *   its own. A list with one item also has this form, thus all the lists
  *   of a page look the same.
  *
+ * A value of the list is a string, or a FactValue with a link.
+ *
  * Without a value, the fact does not show.
  */
 import styles from './style.module.css';
 
+export type FactValue = {
+  text: string;
+  /** The value is a link to this URL. */
+  href?: string;
+  /** The link opens in a new tab. */
+  external?: boolean;
+};
+
 interface Props {
   label: string;
   /** The values of a list. Without it, the slot is the value. */
-  values?: string[];
+  values?: Array<string | FactValue>;
   /** Tabular numbers, for a version, a count or a date. */
   tabular?: boolean;
 }
@@ -23,19 +33,35 @@ interface Props {
 const { label, values, tabular = false } = Astro.props;
 
 const slotted = values ? undefined : await Astro.slots.render('default');
-const items = values ?? (slotted?.trim() ? [slotted] : []);
-const isList = values !== undefined;
+const listItems = values?.map((value) => (typeof value === 'string' ? { text: value } : value));
+const isList = listItems !== undefined;
+const count = listItems ? listItems.length : slotted?.trim() ? 1 : 0;
 ---
 
 {
-  items.length > 0 && (
+  count > 0 && (
     <div class:list={[styles.fact, isList && styles.list]}>
       <dt class:list={[styles.label, 'label']}>{label}</dt>
-      {items.map((item) => (
+      {listItems ? (
+        listItems.map((item) => (
+          <dd class:list={[styles.value, 'body', tabular && 'tabular']}>
+            {item.href ? (
+              <a
+                href={item.href}
+                {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                {item.text}
+              </a>
+            ) : (
+              item.text
+            )}
+          </dd>
+        ))
+      ) : (
         <dd class:list={[styles.value, 'body', tabular && 'tabular']}>
-          {values ? item : <Fragment set:html={item} />}
+          <Fragment set:html={slotted} />
         </dd>
-      ))}
+      )}
     </div>
   )
 }

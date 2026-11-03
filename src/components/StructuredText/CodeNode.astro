@@ -1,0 +1,29 @@
+---
+import type { Code as CodeNode } from 'datocms-structured-text-utils';
+import { Code } from '~/components/docs/Code';
+
+interface Props {
+  node: CodeNode;
+}
+
+const { node } = Astro.props;
+---
+
+{
+  /*
+  A code block of a Structured Text field: Expressive Code, as in the
+  Markdown and in the docs. The figure and the island make it a wide block
+  of Prose: Prose does not style it, and an article lets it go past the
+  sides of the text.
+*/
+}
+<figure>
+  <prose-island>
+    <Code
+      code={node.code}
+      language={node.language}
+      showLineNumbers={node.code.split('\n').length > 10}
+      highlightLines={node.highlight}
+    />
+  </prose-island>
+</figure>

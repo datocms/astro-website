@@ -1,8 +1,9 @@
 /*
- * A display title, the full story and a
- * list of facts. From 1152, two equal columns with 160 between them (500
- * each at 1320): the text on the left, the facts on the right. The facts
- * start at the top of the text. Below 1152, the text is full width.
+ * A display title, the full story and a list of facts. From 1152, the
+ * text is the wide column on the left, and the facts are a narrow column
+ * of 360 on the right, with 160 between them. At 1320 and up the text
+ * column is 640: the measure of Prose (32em). The facts stay on the screen
+ * while the text scrolls. Below 1152, the facts come after the text.
  */
 .content {
   display: grid;
@@ -17,35 +18,24 @@
   min-width: 0;
 }
 
+/* The facts (a Facts list) stay at the top of their row. */
 .facts {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-  color: var(--text-primary);
-}
-
-.facts dd {
-  margin: 0;
-}
-
-.label {
-  color: var(--text-muted);
-}
-
-.link {
-  color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
+  align-self: start;
 }
 
 @media (min-width: 1152px) {
   .content {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr) 360px;
     column-gap: var(--space-4xl);
   }
 
   .title {
     grid-column: 1 / -1;
+  }
+
+  /* The header does not stay on the screen, thus the facts stop near the top edge. */
+  .facts {
+    position: sticky;
+    top: var(--space-lg);
   }
 }
