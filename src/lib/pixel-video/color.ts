@@ -1,5 +1,5 @@
 // Resolve the colours of a pixel style (theme tokens) to RGBA for a canvas.
-// <pixel-video> and PixelImage use these functions.
+// <pixel-video> uses these functions.
 
 import type { Rgba } from './renderer';
 

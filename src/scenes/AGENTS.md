@@ -85,7 +85,7 @@ Each is decided once and used by every picture of its kind.
 - **`AppWindow`** (`src/components/AppWindow/`): a code editor with its file tab, or a browser with its address, the chrome of "Infrastructure with human skill" on the home page. It frames the code and the live blog of Real-time and the page of MediaComponents. A fake site page has its own CSS, system fonts, no site framework.
 - **The photo with its URL** (`Images/Lab.astro`): a photo with the parameters of its URL as switches, the weight and the edge cache.
 - **The neutral video player** (`Video/`): the chrome of a player with no brand. Mux's player is a web component we embed, not ours: keep the drawing generic.
-- **Pixel pictures** (`PixelImage`, `PixelVideo`): a dotted drawing in the three tones. A map in this style needs verified node lists first.
+- **Pixel pictures** (`PixelVideo`): a dotted drawing in the three tones. A map in this style needs verified node lists first.
 
 ## Photos
 

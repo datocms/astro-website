@@ -104,8 +104,7 @@ export const outline: Style = {
 };
 
 // Flat cells in three tones, with no visible grid: dark background, accent
-// midtones and the light pixel highlight. This is the pixel hover of the
-// image cards (PixelImage): orange cells with yellow highlights.
+// midtones and the light pixel highlight: orange cells with yellow highlights.
 export const tintHighlight: Style = {
   bgFill: INVERSE,
   bgStroke: INVERSE,
