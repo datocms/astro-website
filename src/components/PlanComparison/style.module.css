@@ -21,6 +21,12 @@
   --cmpGap: var(--space-md);
   /* The end padding. The start padding is --content-inset. */
   --cmpInsetEnd: var(--content-inset);
+  /*
+   * The chevron of a category header is before the name. The rows start
+   * after the chevron, at the same position as the name.
+   */
+  --cmpChevronSize: 16px;
+  --cmpRowIndent: calc(var(--cmpChevronSize) + var(--space-2xs));
 
   background: var(--surface-default);
 }
@@ -63,9 +69,15 @@
   top: 0;
   z-index: 2;
   row-gap: var(--space-xl);
+  /* The space before the first category. It is not in the sticky box. */
+  margin-bottom: var(--space-xl);
   padding-block: var(--space-md);
-  box-shadow: inset 0 -1px var(--border-default);
   background: var(--surface-default);
+}
+
+/* The bottom line shows only when the rows scroll below the header. */
+.header[data-stuck] {
+  box-shadow: inset 0 -1px var(--border-default);
 }
 
 .searchCell {
@@ -82,21 +94,10 @@
   }
 }
 
-/* Under 768 the search shows the purpose. The title takes too much space. */
-.featureTitle {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .featureTitle {
-    display: block;
-  }
-}
-
 .search {
   display: flex;
   align-items: center;
-  gap: var(--space-5xs);
+  gap: var(--space-3xs);
   padding-bottom: var(--space-2xs);
   border-bottom: 1px solid var(--text-muted);
   color: var(--text-muted);
@@ -204,6 +205,13 @@
   gap: var(--space-2xs);
 }
 
+/* The price is in the size of the values, below the name of the plan. */
+.planName {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5xs);
+}
+
 .muted {
   color: var(--text-muted);
 }
@@ -215,14 +223,39 @@
 .categoryHeader {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
+  gap: var(--space-2xs);
   padding: var(--space-md) var(--content-inset);
   /* An inset shadow draws the 1px line inside the header height. */
   box-shadow: inset 0 -1px var(--border-default);
-  background: var(--surface-accent-subtle);
+  /*
+   * The accent is translucent. It is on the page surface, thus the colour
+   * is opaque and the rows do not show through when the header is sticky.
+   */
+  background:
+    linear-gradient(var(--surface-accent-faint), var(--surface-accent-faint)),
+    var(--surface-default);
   list-style: none;
   cursor: pointer;
+}
+
+/* On hover the category header gets the stronger accent. */
+@media (hover: hover) {
+  .categoryHeader:hover {
+    background:
+      linear-gradient(var(--surface-accent-subtle), var(--surface-accent-subtle)),
+      var(--surface-default);
+  }
+}
+
+/*
+ * The header of an open category stays below the header row while its rows
+ * scroll. The next category pushes it up. The script gives
+ * --cmpHeaderHeight.
+ */
+.category[open] .categoryHeader {
+  position: sticky;
+  top: var(--cmpHeaderHeight, 0px);
+  z-index: 1;
 }
 
 .categoryHeader::-webkit-details-marker {
@@ -234,30 +267,56 @@
   color: var(--text-muted);
 }
 
-/* Collapsed shows “+”, expanded shows “–” (U+2013). The glyph changes instantly. */
-.sign::before {
-  content: '+';
+/* An open category shows its rows, thus it does not show the count. */
+.category[open] .count {
+  display: none;
 }
 
-.category[open] .sign::before {
-  content: '\2013';
+/*
+ * The chevron is before the name. It points right when the category is
+ * collapsed, and down when it is open.
+ */
+.chevron {
+  flex: none;
+  display: inline-flex;
+  width: var(--cmpChevronSize);
+  color: var(--text-muted);
+  transition: transform 150ms ease-out;
 }
 
-/* Stacked layout: 30px padding, 20px from the name to the values. */
-.row {
-  row-gap: var(--space-md);
-  padding-block: var(--space-lg);
-  border-bottom: 1px solid var(--border-default);
+.category[open] .chevron {
+  transform: rotate(90deg);
 }
 
-@media (min-width: 768px) {
-  .row {
-    padding-block: var(--space-md);
+.categoryHeader:hover .chevron {
+  color: var(--text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
   }
 }
 
-.row:nth-child(even of :not([hidden])) {
-  background: var(--surface-accent-faint);
+/* Stacked layout: 20px padding, 20px from the name to the values. */
+.row {
+  --rowPaddingY: var(--space-md);
+
+  row-gap: var(--space-md);
+  padding-block: var(--rowPaddingY);
+  border-bottom: 1px solid var(--border-default);
+}
+@media (min-width: 768px) {
+  .row {
+    --rowPaddingY: var(--space-xs);
+  }
+}
+
+/* The rows have no stripes. The row under the pointer gets a tint. */
+@media (hover: hover) {
+  .row:hover {
+    background: var(--surface-accent-faint);
+  }
 }
 
 .row[hidden] {
@@ -270,11 +329,21 @@
   gap: var(--space-2xs);
   min-width: 0;
   grid-column: 1 / -1;
+  /* The name starts after the chevron. The plan columns do not move. */
+  padding-inline-start: var(--cmpRowIndent);
 }
 
+/*
+ * The feature cell fills the full height of the row: it goes into the
+ * padding of the row, and its own padding keeps the text in the same
+ * position. Thus the pointer opens the bubble from each point of the cell.
+ */
 @media (min-width: 768px) {
   .feature {
     grid-column: auto;
+    align-self: stretch;
+    margin-block: calc(-1 * var(--rowPaddingY));
+    padding-block: var(--rowPaddingY);
   }
 }
 
@@ -286,16 +355,22 @@
   color: var(--text-muted);
 }
 
+/*
+ * The lines after the first line of a value (for example the price of the
+ * overage) are smaller and muted. Each line is a block. The line height
+ * comes from .body.
+ */
+.valueNote {
+  display: block;
+  margin-top: var(--space-5xs);
+  color: var(--text-muted);
+  font-size: var(--type-s);
+}
+
+/* The icon is a solid circle with the check cut out. The row shows through the check. */
 .check {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: var(--radius-full);
-  /* A solid dot with the check cut out. It stays visible in each scheme. */
-  background: var(--text-primary);
-  color: var(--surface-default);
+  color: var(--text-primary);
   vertical-align: middle;
 }
 
@@ -325,13 +400,16 @@
   width: 20px;
   height: 20px;
   border-radius: var(--radius-full);
-  background: var(--surface-inverse-faint);
   color: var(--text-muted);
-  /* The badge has the caption role. The circle is large enough for the letter. */
-  font-size: var(--type-xs);
-  font-weight: 500;
-  line-height: 1.35;
-  letter-spacing: -0.01em;
+}
+
+.info[data-open] .infoButton {
+  color: var(--text-primary);
+}
+
+.infoButton:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 1px;
 }
 
 .tooltip {
@@ -341,13 +419,15 @@
   z-index: 3;
   width: max-content;
   max-width: 333px;
-  padding: var(--space-3xs) var(--space-2xs);
+  padding: var(--space-2xs) var(--space-xs);
   border-radius: var(--radius-md);
   /* An opaque mix of the faint inverse tint on the page surface. */
   background:
     linear-gradient(var(--surface-inverse-faint), var(--surface-inverse-faint)),
     var(--surface-default);
-  color: var(--text-muted);
+  /* The text wraps, thus it has the body role, in the s size. */
+  color: var(--text-primary);
+  font-size: var(--type-s);
   white-space: normal;
   pointer-events: none;
   visibility: hidden;
@@ -382,8 +462,17 @@
   opacity: 1;
 }
 
+/* The pointer anywhere on the feature cell opens the bubble. */
 @media (hover: hover) {
-  .info:hover .tooltip {
+  .feature:has(.info):hover {
+    cursor: help;
+  }
+
+  .feature:hover .infoButton {
+    color: var(--text-primary);
+  }
+
+  .feature:hover .tooltip {
     visibility: visible;
     opacity: 1;
   }

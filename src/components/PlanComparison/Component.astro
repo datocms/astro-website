@@ -1,5 +1,10 @@
 ---
-import { faCheck, faMagnifyingGlass } from '@fortawesome/pro-regular-svg-icons';
+import {
+  faChevronRight,
+  faCircleInfo,
+  faMagnifyingGlass,
+} from '@fortawesome/pro-regular-svg-icons';
+import { faCircleCheck } from '@fortawesome/pro-solid-svg-icons';
 import { render as renderAsPlainText } from 'datocms-structured-text-to-plain-text';
 import { Button } from '~/components/Button';
 import { Icon } from '~/components/Icon';
@@ -59,20 +64,19 @@ const id = (s: string) =>
 ---
 
 <plan-comparison class={styles.root}>
-  <section class={styles.planComparison} data-plan-comparison>
+  <section class={styles.planComparison} data-plan-comparison data-density="dense">
     <h2 class:list={[styles.headline, 'headline']}>{headline}</h2>
 
     <div data-table-start></div>
-    <div class={styles.header}>
+    <div class={styles.header} data-header>
       <div class={styles.searchCell}>
-        <p class:list={[styles.featureTitle, 'title']} aria-hidden="true">Feature</p>
         <label class={styles.search}>
-          <span class="visuallyHidden">Search features</span>
+          <span class="visuallyHidden">Filter features</span>
           <Icon icon={faMagnifyingGlass} width="24" height="24" />
           <input
             type="search"
             class="title"
-            placeholder="Search ..."
+            placeholder="Filter features…"
             autocomplete="off"
             data-search
           />
@@ -90,11 +94,10 @@ const id = (s: string) =>
       {
         columns.map((col) => (
           <div class={styles.planCell}>
-            <p class="title">
-              {col.name}
-              <br />
-              <span class:list={[styles.muted, 'tabular']}>{col.price}</span>
-            </p>
+            <div class={styles.planName}>
+              <p class="title">{col.name}</p>
+              <p class:list={[styles.muted, 'body', 'tabular']}>{col.price}</p>
+            </div>
             <Button variant={col.button.variant} arrow={col.button.arrow} href={col.button.href}>
               {col.button.label}
             </Button>
@@ -107,13 +110,15 @@ const id = (s: string) =>
       categories.map((cat) => (
         <details class={styles.category} open={cat.open} data-category>
           <summary class={styles.categoryHeader}>
-            <span class:list={[styles.categoryTitle, 'bodyMedium']}>
+            <span class={styles.chevron} aria-hidden="true">
+              <Icon icon={faChevronRight} width="16" height="16" />
+            </span>
+            <span class:list={[styles.categoryTitle, 'title']}>
               {cat.title}
               <span class:list={[styles.count, 'tabular']} data-count>
                 {cat.rows.length}
               </span>
             </span>
-            <span class:list={[styles.sign, 'title']} aria-hidden="true" />
           </summary>
           <div role="list">
             {cat.rows.map((row) => {
@@ -133,7 +138,7 @@ const id = (s: string) =>
                   data-same={row.pro === row.enterprise || undefined}
                 >
                   <div class={styles.feature}>
-                    <span class="bodyMedium">{row.feature}</span>
+                    <span class="body">{row.feature}</span>
                     {hasInfo && (
                       <span class={styles.info}>
                         <button
@@ -144,13 +149,9 @@ const id = (s: string) =>
                           data-info-button
                         >
                           <span class="visuallyHidden">About {row.feature}</span>
-                          <span aria-hidden="true">i</span>
+                          <Icon icon={faCircleInfo} width="16" height="16" />
                         </button>
-                        <span
-                          id={tipId}
-                          role="tooltip"
-                          class:list={[styles.tooltip, 'labelMedium']}
-                        >
+                        <span id={tipId} role="tooltip" class:list={[styles.tooltip, 'body']}>
                           {row.infoText ? <InlineParagraphs data={row.infoText} /> : row.info}
                         </span>
                       </span>
@@ -163,7 +164,7 @@ const id = (s: string) =>
                       <span class="visuallyHidden">{columns[i]!.name}: </span>
                       {value === true ? (
                         <span class={styles.check}>
-                          <Icon icon={faCheck} width="10" height="10" />
+                          <Icon icon={faCircleCheck} width="20" height="20" />
                           <span class="visuallyHidden">Included</span>
                         </span>
                       ) : value === false ? (
@@ -171,12 +172,11 @@ const id = (s: string) =>
                           <span class="visuallyHidden">Not included</span>
                         </span>
                       ) : (
-                        value.split('\n').map((line, j) => (
-                          <>
-                            {j > 0 && <br />}
-                            <span class:list={[j > 0 && styles.muted]}>{line}</span>
-                          </>
-                        ))
+                        value
+                          .split('\n')
+                          .map((line, j) => (
+                            <span class:list={[j > 0 && styles.valueNote]}>{line}</span>
+                          ))
                       )}
                     </div>
                   ))}
@@ -209,11 +209,41 @@ const id = (s: string) =>
       parsedCallback() {
         this.setUpTips();
         this.setUpFilters();
+        this.setUpStickyHeader();
       }
 
       disconnectedCallback() {
         super.disconnectedCallback();
         this.#documentListeners.abort();
+        this.#observers.forEach((observer) => observer.disconnect());
+      }
+
+      #observers: (ResizeObserver | IntersectionObserver)[] = [];
+
+      // The header row is sticky. The header of an open category is sticky
+      // below it, thus the CSS needs the height of the header row
+      // (--cmpHeaderHeight). The header row gets data-stuck when the start
+      // of the table is above the viewport: then the CSS shows its bottom line.
+      setUpStickyHeader() {
+        const header = this.$('[data-header]');
+        const start = this.$('[data-table-start]');
+
+        const resize = new ResizeObserver(() => {
+          // Round down: a category header goes a fraction of a pixel under
+          // the header row, and no row shows through a gap.
+          const height = Math.floor(header.getBoundingClientRect().height);
+          this.style.setProperty('--cmpHeaderHeight', `${height}px`);
+        });
+        resize.observe(header);
+
+        const intersection = new IntersectionObserver(([entry]) => {
+          if (!entry) return;
+          const stuck = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+          header.toggleAttribute('data-stuck', stuck);
+        });
+        intersection.observe(start);
+
+        this.#observers.push(resize, intersection);
       }
 
       // Tooltips: a click or a tap on the icon opens or closes its bubble.
