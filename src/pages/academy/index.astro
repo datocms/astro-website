@@ -1,21 +1,10 @@
 ---
-import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Button } from '~/components/Button';
-import { CourseVideo } from '~/components/CourseVideo';
+import { CourseCell } from '~/components/CourseCell';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
-import { Prose } from '~/components/Prose';
 import { Section } from '~/components/Section';
-import { StructuredText } from '~/components/StructuredText';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
-import {
-  AcademyCourseUrlFragment,
-  buildUrlForAcademyCourse,
-} from '~/lib/datocms/gqlUrlBuilder/academyCourse';
-import { readFragment } from '~/lib/datocms/graphql';
-import { intersperse } from '~/lib/intersperse';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
@@ -34,43 +23,19 @@ const listed = courses.filter((course) => course.chapters.length > 0);
   <Hero
     variant="accent"
     headline="DatoCMS Academy"
-    intro="Browse the DatoCMS Academy for a deep dive into the concepts around Headless CMS. Content APIs, and frontend frameworks, to get up to speed with headless content management"
+    intro="Browse the DatoCMS Academy for a deep dive into the concepts around headless CMS, content APIs and frontend frameworks, to get up to speed with headless content management."
   />
-  <Section>
-    <ul class={s.courses}>
+  {/* Each course is a row of two cells. The picture changes side from row to row. */}
+  <Section padding="none" flush>
+    <ol class={s.courses}>
       {
-        listed.map((course) => {
-          const { slug } = readFragment(AcademyCourseUrlFragment, course);
-          return (
-            <li class={s.course}>
-              <CourseVideo slug={slug} class={s.video} />
-              <div class={s.content}>
-                <h2 class="title">
-                  <a href={buildUrlForAcademyCourse(course)}>{course.name}</a>
-                </h2>
-                <Prose class={s.intro}>
-                  <StructuredText
-                    {...ensureValidStructuredTextProps({ data: course.introduction })}
-                  />
-                </Prose>
-                <div>
-                  <Button href={buildUrlForAcademyCourse(course)}>Get started</Button>
-                </div>
-                <p class:list={[s.chapters, 'body']}>
-                  Chapters:{' '}
-                  {intersperse(
-                    course.chapters.map((chapter) => (
-                      <a href={buildUrlForAcademyChapter(chapter)}>{chapter.title}</a>
-                    )),
-                    ', ',
-                  )}
-                </p>
-              </div>
-            </li>
-          );
-        })
+        listed.map((course, index) => (
+          <li>
+            <CourseCell course={course} reverse={index % 2 === 1} />
+          </li>
+        ))
       }
-    </ul>
+    </ol>
   </Section>
 
   <DraftModeQueryListener query={query} />

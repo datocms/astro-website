@@ -23,9 +23,11 @@ interface Props {
   /** Accessible name. Without it, the video is decorative. */
   label?: string;
   class?: string;
+  /** Inline style, for example a custom property that the CSS of the parent reads. */
+  style?: string;
 }
 
-const { src, palette, lens = true, devTag = true, label, class: className } = Astro.props;
+const { src, palette, lens = true, devTag = true, label, class: className, style } = Astro.props;
 
 // Development only: the data of the file, for the tag of DevConfig.
 const devConfig = import.meta.env.DEV && devTag ? pxvDevConfig(src, { palette, lens }) : undefined;
@@ -33,6 +35,7 @@ const devConfig = import.meta.env.DEV && devTag ? pxvDevConfig(src, { palette, l
 
 <pixel-video
   class:list={[styles.pixelVideo, className]}
+  style={style}
   src={src}
   palette={palette}
   no-lens={lens ? undefined : ''}

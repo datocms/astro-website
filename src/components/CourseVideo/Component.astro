@@ -1,19 +1,35 @@
 ---
-import { courseVideos, defaultCourseVideo } from '~/data/academy';
+import { courseVideo } from '~/data/academy';
 import { PixelVideo } from '~/components/PixelVideo';
+import { pxvHeader } from '~/lib/pixel-video/headers';
 import styles from './style.module.css';
 
 interface Props {
   /** The slug of the course. It selects the video. */
   slug: string;
+  /**
+   * Set the height here, from `--cells` (the height of the file in cells):
+   * `calc(var(--cells) * 3px)` gives squares of 3px to each video.
+   */
   class?: string;
 }
 
 const { slug, class: className } = Astro.props;
-const video = courseVideos[slug] ?? defaultCourseVideo;
+const { src } = courseVideo(slug);
+const cells = pxvHeader(src).height;
 ---
 
-{/* The picture of a course: a pixel video on the surface of the theme. */}
-<div class:list={[styles.frame, className]}>
-  <PixelVideo src={video.src} palette={video.palette} />
-</div>
+{
+  /*
+  The picture of a course: a pixel video with no frame, always in the
+  palette tonal (also the default video, which has another palette).
+  Put it on the inverse surface: the ground of the palette fills the
+  element.
+*/
+}
+<PixelVideo
+  src={src}
+  palette="tonal"
+  class:list={[styles.video, className]}
+  style={`--cells: ${cells}`}
+/>

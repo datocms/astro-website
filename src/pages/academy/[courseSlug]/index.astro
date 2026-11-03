@@ -1,7 +1,7 @@
 ---
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { Breadcrumb } from '~/components/Breadcrumb';
-import { CourseVideo } from '~/components/CourseVideo';
+import { CourseCell } from '~/components/CourseCell';
 import { Hero } from '~/components/Hero';
 import { Prose } from '~/components/Prose';
 import { Section } from '~/components/Section';
@@ -10,15 +10,12 @@ import { JsonLd } from '~/components/JsonLd';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { indexes } from '~/data/breadcrumbs';
 import Layout from '~/layouts/Layout.astro';
-import { readFragment } from '~/lib/datocms/graphql';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
-import { AcademyCourseUrlFragment } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
 import { courseId, publisherRef } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
-import s from './_style.module.css';
 import { query } from './_graphql';
 
 const variables = { courseSlug: Astro.params.courseSlug! };
@@ -30,7 +27,6 @@ if (!course) {
   return notFoundResponse();
 }
 
-const { slug } = readFragment(AcademyCourseUrlFragment, course);
 const pageUrl = new URL(Astro.url.pathname, baseUrl(Astro)).href;
 ---
 
@@ -71,22 +67,8 @@ const pageUrl = new URL(Astro.url.pathname, baseUrl(Astro)).href;
     </Prose>
   </Hero>
   <Breadcrumb trail={[indexes.academy]} current={course.name} />
-  <Section contentClass={s.layout}>
-    <CourseVideo slug={slug} class={s.video} />
-    <ol class={s.chapters}>
-      {
-        course.chapters.map((chapter, index) => (
-          <li class={s.chapter}>
-            <span class:list={[s.chapterNumber, 'labelMedium']}>
-              {String(index + 1).padStart(2, '0')}
-            </span>
-            <a class:list={[s.chapterLink, 'title']} href={buildUrlForAcademyChapter(chapter)}>
-              {chapter.title}
-            </a>
-          </li>
-        ))
-      }
-    </ol>
+  <Section padding="none" flush>
+    <CourseCell course={course} variant="course" />
   </Section>
 
   <DraftModeQueryListener query={query} variables={variables} />

@@ -1,5 +1,5 @@
 import { TagFragment } from '~/lib/datocms/commonFragments';
-import { AcademyChapterUrlFragment } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+import { CourseCellFragment } from '~/components/CourseCell';
 import { AcademyCourseUrlFragment } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
 import { graphql } from '~/lib/datocms/graphql';
 
@@ -12,17 +12,14 @@ export const query = graphql(
         }
       }
       courses: allAcademyCourses(orderBy: position_ASC) {
-        name
-        introduction {
-          value
-        }
+        id
         chapters {
-          ...AcademyChapterUrlFragment
-          title
+          id
         }
+        ...CourseCellFragment
         ...AcademyCourseUrlFragment
       }
     }
   `,
-  [AcademyCourseUrlFragment, AcademyChapterUrlFragment, TagFragment],
+  [CourseCellFragment, AcademyCourseUrlFragment, TagFragment],
 );

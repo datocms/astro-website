@@ -1,3 +1,4 @@
+import { CourseCellFragment } from '~/components/CourseCell';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { AcademyChapterUrlFragment } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
@@ -29,10 +30,11 @@ export const query = graphql(
           title
         }
         ...AcademyCourseUrlFragment
+        ...CourseCellFragment
       }
     }
   `,
-  [TagFragment, AcademyChapterUrlFragment, AcademyCourseUrlFragment],
+  [TagFragment, AcademyChapterUrlFragment, AcademyCourseUrlFragment, CourseCellFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

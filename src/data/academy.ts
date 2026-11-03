@@ -1,20 +1,20 @@
 // The pixel video of each course of the academy. The key is the slug of the
-// course. A course without an entry gets the default video.
-
-// `palette` replaces the palette of the file (`palettes` in
-// src/lib/pixel-video/styles.ts).
+// course. A course without an entry gets the default video. `CourseVideo`
+// shows each one in the palette tonal, on the inverse surface.
 interface CourseVideoData {
   src: string;
-  palette?: string;
 }
 
 export const courseVideos: Record<string, CourseVideoData> = {
-  'headless-cms': { src: '/videos/academy-headless-cms.pxv' },
-  'frontend-frameworks': { src: '/videos/academy-frontend-frameworks.pxv' },
-  'modern-web-development': { src: '/videos/academy-modern-web-development.pxv' },
+  'headless-cms': { src: '/videos/robot-dance.pxv' },
+  'modern-web-development': { src: '/videos/robot-dance-2.pxv' },
+  'frontend-frameworks': { src: '/videos/robot-dance-3.pxv' },
 };
 
 export const defaultCourseVideo: CourseVideoData = {
-  src: '/videos/hand-waving.pxv',
-  palette: 'soft',
+  src: '/videos/person-dance-2.pxv',
 };
+
+/** The video of a course. */
+export const courseVideo = (slug: string): CourseVideoData =>
+  courseVideos[slug] ?? defaultCourseVideo;

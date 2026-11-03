@@ -1,0 +1,83 @@
+---
+import { CourseVideo } from '~/components/CourseVideo';
+import { InlineParagraphs } from '~/components/StructuredText';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
+import {
+  AcademyCourseUrlFragment,
+  buildUrlForAcademyCourse,
+} from '~/lib/datocms/gqlUrlBuilder/academyCourse';
+import { CourseCellFragment } from './graphql';
+import styles from './style.module.css';
+
+interface Props {
+  course: FragmentOf<typeof CourseCellFragment>;
+  /**
+   * `index`: the name and the introduction show above the chapters (the
+   * list of the courses). `course`: only the chapters show, because the
+   * hero of the page has the name and the introduction.
+   */
+  variant?: 'index' | 'course';
+  /** The picture is at the right (from 1152). The index alternates the sides. */
+  reverse?: boolean;
+  class?: string;
+}
+
+const { course: courseProp, variant = 'index', reverse = false, class: className } = Astro.props;
+const course = readFragment(CourseCellFragment, courseProp);
+const { slug } = readFragment(AcademyCourseUrlFragment, course);
+const href = buildUrlForAcademyCourse(course);
+const count = course.chapters.length;
+---
+
+{
+  /*
+  A course of the academy: two flat cells, full bleed. One cell is on
+  the inverse surface and holds the pixel video of the course. The other
+  cell is on the page and holds the chapters, as numbered rows.
+  Below 1152 the picture cell comes first, then the text.
+*/
+}
+<div class:list={[styles.row, reverse && styles.reverse, className]}>
+  <div class:list={[styles.picture, 'surfaceInverse']}>
+    <CourseVideo slug={slug} class={styles.video} />
+  </div>
+  <div class={styles.text}>
+    {
+      variant === 'index' && (
+        <div class={styles.intro}>
+          <h2 class="headline">
+            <a class={styles.name} href={href}>
+              {course.name}
+            </a>
+          </h2>
+          <p class:list={[styles.description, 'bodyLong']}>
+            <InlineParagraphs data={course.introduction} />
+          </p>
+        </div>
+      )
+    }
+    <nav class={styles.chapters} aria-label={`Chapters of ${course.name}`}>
+      <p class:list={[styles.count, 'caption']}>
+        {`${count} ${count === 1 ? 'chapter' : 'chapters'}`}
+      </p>
+      <ol class={styles.list}>
+        {
+          course.chapters.map((chapter, index) => (
+            <li>
+              <a class={styles.chapter} href={buildUrlForAcademyChapter(chapter)}>
+                <span class:list={[styles.number, 'labelMedium', 'tabular']}>
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span class:list={[styles.title, 'body']}>{chapter.title}</span>
+                <span class={styles.arrow} aria-hidden="true">
+                  →
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+  </div>
+</div>

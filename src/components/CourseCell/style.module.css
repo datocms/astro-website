@@ -1,0 +1,144 @@
+/* @layer blocks */
+/* Below 1152 the two cells stack: the picture, then the text. */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The video is in the palette tonal: its ground is the inverse surface. */
+.picture {
+  display: grid;
+  place-items: center;
+  padding: var(--section-padding-y) var(--section-padding-x);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+/*
+ * CourseVideo gives --cells, the height of the file in cells. Each cell
+ * is a full number of pixels (3, 4, then 6), thus all the courses have the
+ * same size of square.
+ */
+.video {
+  height: calc(var(--cells) * 3px);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  padding: var(--section-padding-y) var(--section-padding-x);
+  background: var(--surface-default);
+  color: var(--text-primary);
+}
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: var(--reading-max);
+}
+
+/* The name keeps the colour of the text. The underline shows on hover. */
+.name {
+  color: inherit;
+  text-decoration: none;
+}
+
+.description {
+  color: var(--text-soft);
+}
+
+.chapters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.count {
+  color: var(--text-muted);
+}
+
+.list {
+  list-style: none;
+  border-bottom: 1px solid var(--border-default);
+}
+
+/* A row is the full link: a number, the title and an arrow. */
+.chapter {
+  display: grid;
+  grid-template-columns: 2.5ch minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--space-sm);
+  padding-block: var(--space-sm);
+  border-top: 1px solid var(--border-default);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.number {
+  color: var(--text-muted);
+}
+
+.arrow {
+  color: var(--text-muted);
+}
+
+.chapter:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .name:hover,
+  .chapter:hover .title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
+  }
+
+  .chapter:hover .arrow {
+    color: var(--text-primary);
+  }
+}
+
+@media (min-width: 768px) {
+  .video {
+    height: calc(var(--cells) * 4px);
+  }
+}
+
+/*
+ * At 1152 and more: two halves. The backgrounds are full-bleed, but the
+ * text stays in the centred content column: --content-inset-half is the
+ * outer padding of a half.
+ */
+@media (min-width: 1152px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .picture {
+    padding-inline-start: var(--content-inset-half);
+  }
+
+  .video {
+    height: calc(var(--cells) * 6px);
+  }
+
+  .text {
+    padding-inline-end: var(--content-inset-half);
+  }
+
+  .reverse .picture {
+    grid-column: 2;
+    grid-row: 1;
+    padding-inline: var(--section-padding-x) var(--content-inset-half);
+  }
+
+  .reverse .text {
+    grid-column: 1;
+    grid-row: 1;
+    padding-inline: var(--content-inset-half) var(--section-padding-x);
+  }
+}
