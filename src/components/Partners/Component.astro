@@ -1,4 +1,5 @@
 ---
+import { stripStega } from '@datocms/astro';
 import { ButtonGroup } from '~/components/ButtonGroup';
 import { PixelVideo } from '~/components/PixelVideo';
 import { Section } from '~/components/Section';
@@ -20,7 +21,9 @@ const partners = Astro.props.partners.map((partner) =>
   readFragment(PartnersPartnerFragment, partner),
 );
 
-// The number of partners on each continent, the largest first. A partner
+// The number of partners on each continent, the largest first. Each
+// continent links to the partners page, filtered on that continent. The URL
+// has no stega, thus the filter finds the continent. A partner
 // counts once for each continent where it has an office. The key is the ID
 // of the continent, not its name: in draft mode the name has the stega of
 // Content Link.
@@ -50,9 +53,12 @@ const regions = sortBy([...counts.values()], (region) => -region.count);
       <h2 class="headline">
         {
           regions.map((region) => (
-            <span class={styles.region}>
+            <a
+              class={styles.region}
+              href={`/partners?${new URLSearchParams({ continent: stripStega(region.name) })}`}
+            >
               {region.name} ({region.count})
-            </span>
+            </a>
           ))
         }
       </h2>
