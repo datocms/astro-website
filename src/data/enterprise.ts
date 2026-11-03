@@ -11,6 +11,7 @@ import type { LogoItem } from '~/components/LogosLine';
 import type { StatementsSectionData } from '~/components/StatementsSection';
 import type { CtaBannerData, HeroData } from '~/data/home';
 import { svgLogo } from '~/data/home';
+import { numbers as developerNumbers } from '~/data/developers-pillar';
 import type { FaqData } from '~/data/pricing';
 import telekomClient from '~/assets/home/clients/deutsche-telekom.svg?raw';
 import mitClient from '~/assets/home/clients/mit.svg?raw';
@@ -52,11 +53,11 @@ const docs = (label: string, href: string): ButtonData => ({
 
 // New copy. The line of the hero.
 export const hero: HeroData & { subtitle: string; logosLabel: string } = {
-  headline: 'Big teams, many brands, one CMS.',
-  subheadline: 'With the security reviews, the contracts and the people to back it',
+  headline: 'Big teams, bigger brands, one CMS.',
+  subheadline: 'A piece for your peace of mind.',
   face: 'serious',
   subtitle:
-    'A complete headless CMS with the **governance, service and features to ensure you take your content machine to scale**. Dedicated onboarding service, premium technical support, private cloud and custom SLAs',
+    'DatoCMS is a headless CMS with the **governance, service and features your content operation needs to scale**: dedicated onboarding, premium technical support, private cloud and custom SLAs.',
   buttons: [
     { label: 'Talk To Sales', href: '#form', arrow: false, contact: 'sales' },
     {
@@ -101,33 +102,33 @@ export const security: ChapterLayoutData = {
     label: 'Security',
     // New copy.
     headline: 'Pass the security review.',
-    muted: 'With the answers ready.',
+    muted: 'With all questions already answered.',
     // New copy.
     intro:
-      'ISO 27001 certified, with a GDPR data processing agreement. Data is encrypted in transit and at rest, in multiple shards on servers in the EU (Ireland). An audit log records who made each change, and when.',
+      'We’re ISO 27001 certified and offer a GDPR data processing agreement. Your data is encrypted in transit and at rest, sharded across servers in the EU (Ireland), and audit logs record who changed what, and when.',
     link: docs('Read Our Security Page', '/security'),
   },
   fragments: [
     {
       // New copy.
-      title: 'Your login, your rules.',
-      text: 'Your team signs in to the CMS with the company account, through your identity provider.',
+      title: 'Sign in with your company account.',
+      text: 'Your team signs in to the CMS with the account they already use at work, through your identity provider.',
     },
     {
       // New copy.
       title: 'Connect your identity provider.',
-      text: 'SSO with SAML through Okta, OneLogin, Azure AD or any SAML provider, and SCIM provisioning to add and remove people from your directory.',
+      text: 'SSO with SAML through Okta, OneLogin, Azure AD or any SAML provider, plus SCIM provisioning to add and remove people from your directory.',
     },
     {
       // New copy. A full export of the project on a cron schedule, to the
       // S3 bucket of the customer: the scheduled exports of the old page.
-      title: 'Backups you don’t think about.',
-      text: 'A full export of your project on the schedule you choose, to your own AWS S3 bucket: models, records, assets, menus, plugins and workflows.',
+      title: 'Automatic backups to your own bucket.',
+      text: 'We export your full project to your own AWS S3 bucket at your chosen schedule, including models, records, assets, menus, plugins and workflows.',
     },
     {
       // New copy.
-      title: 'Your domain, your storage.',
-      text: 'Assets in your own bucket on AWS S3, Cloudflare R2, Google Cloud Storage or Azure Blob Storage, on your own domain. Static IPs for webhooks.',
+      title: 'Serve assets from your domain.',
+      text: 'Keep assets in your own bucket on AWS S3, Cloudflare R2, Google Cloud Storage or Azure Blob Storage, served from your own domain. Webhooks come from static IPs.',
     },
   ],
 };
@@ -138,55 +139,55 @@ export const governance: ChapterLayoutData = {
   theme: 'purple',
   chapter: {
     label: 'Governance',
-    headline: 'Twelve brands.',
-    muted: 'Nobody steps on anyone.',
+    headline: 'Multiple brands?',
+    muted: 'No stepping on each other’s toes.',
     // New copy.
     intro:
-      'Roles decide who can do what, down to the field and the locale. Workflows decide who approves it before it goes live.',
+      'Roles and granular permissions let you decide who can do what, down to the field and locale level. Workflows decide who gets to approve what before anything goes live.',
     link: docs('Read The Docs', '/docs/general-concepts/roles-and-permission-system'),
   },
   fragments: [
     {
       // New copy.
       title: 'A workflow for each brand.',
-      text: 'Each brand sets its own steps, from draft to published, with an approval at each step that needs one.',
+      text: 'Each brand sets its own steps from draft to published, with approvals wherever you need them.',
     },
     {
       // New copy.
-      title: 'Your brand on the CMS.',
-      text: 'White-label the CMS with your logo, your colors, and your domain.',
+      title: 'White-label the CMS.',
+      text: 'Bring your branding to the CMS with your logo, your colors and your domain.',
     },
   ],
 };
 
-// The proof, in numbers. The three results are from the old page, with their
-// descriptions and links.
 export const scale: StatementsSectionData = {
-  // New copy.
-  headline: 'Already running at your size.',
+  headline: 'Running at scale to match your ambitions.',
   items: [
     {
-      title: '38k',
-      text: 'migrated assets',
-      href: '/case-studies/oberlo',
-      description:
-        '**Oberlo** was able to switch to DatoCMS painlessly, offering blinding speed and an intuitive editing process.',
+      title: '250+',
+      text: 'content creators',
+      href: '/case-studies/polestar',
+      description: '**Polestar** runs 35 different roles across 28+ locales.',
+    },
+    {
+      title: '55+',
+      text: 'locales from a single project',
+      href: '/case-studies/le-pain-quotidien',
+      description: '**Le Pain Quotidien** has locations in 20+ countries.',
     },
     {
       title: '2TB',
       text: 'traffic per month',
       href: '/case-studies/hashicorp',
-      description:
-        '**HashiCorp** needed a flexible and secure enterprise headless CMS to manage its ever-expanding multi-site structure.',
+      description: '**HashiCorp** handles 5M API calls a month.',
     },
     {
-      title: '35k',
-      text: 'users',
-      description:
-        '**Vercel** hosted its [Next.js international conference](/blog/how-datocms-supports-next-js-conf) on DatoCMS.',
+      title: '50%',
+      text: 'faster time-to-market',
+      href: '/case-studies/arduino',
+      description: '**Arduino** loads 8x faster with 92.5% less code.',
     },
-    // New copy.
-    { title: '99.99%', text: 'uptime, in the SLA' },
+    ...developerNumbers.items,
   ],
 };
 
@@ -196,23 +197,23 @@ export const support: ChapterLayoutData = {
   theme: 'green',
   chapter: {
     label: 'Support',
-    headline: 'A team on your team.',
-    muted: 'Not a ticket number.',
+    headline: 'Our team on your team.',
+    muted: 'Not some ticket queue.',
     // New copy.
     intro:
-      'A shared Slack channel, solution architects for your build, and dedicated technical and editorial onboarding. With the SLAs in your contract.',
+      'A shared Slack channel, solution architects for your build, and dedicated technical and editorial onboarding, all backed by the SLAs in your contract.',
     link: { ...docs('Talk To Sales', '#form'), contact: 'sales' },
   },
   fragments: [
     {
       // New copy.
-      title: 'SLAs, in writing.',
-      text: 'A performance SLA with 99.99% uptime, and a support SLA that answers priority-one issues in one hour, around the clock.',
+      title: 'SLAs in your contract.',
+      text: 'A performance SLA with 99.99% uptime, and a support SLA that answers priority-one issues within an hour, around the clock.',
     },
     {
       // New copy. The onboarding of the old page: technical and editorial.
-      title: 'Onboarding, for each team.',
-      text: 'Technical onboarding for your developers, and editorial onboarding for your editors, with the people of DatoCMS.',
+      title: 'Onboarding for each team.',
+      text: 'Technical onboarding for your developers and editorial onboarding for your editors, run by the DatoCMS team.',
     },
   ],
 };
@@ -220,16 +221,16 @@ export const support: ChapterLayoutData = {
 // New copy. The questions of the security review. Each answer holds only
 // verified facts.
 export const faq: FaqData = {
-  headline: 'The questions your security team will ask.',
+  headline: 'Questions your security team will ask.',
   items: [
     {
       question: 'Where is our data stored?',
       answer:
-        'On servers in the EU (Ireland), in multiple shards, encrypted in transit and at rest. Database backups are kept up to 14 days.',
+        'On servers in the EU (Ireland), in multiple shards, encrypted in transit and at rest. Database backups are kept for up to 14 days.',
     },
     {
       question: 'Do you have a GDPR data processing agreement?',
-      answer: 'Yes. We have a GDPR DPA, and we are certified ISO 27001.',
+      answer: 'Yes. We offer a GDPR DPA, and we’re ISO 27001 certified.',
     },
     {
       question: 'Do you support SSO and SCIM?',
@@ -244,20 +245,20 @@ export const faq: FaqData = {
     {
       question: 'How fast do you answer when something breaks?',
       answer:
-        'Priority-one issues are answered in one hour, around the clock. Your team also gets a shared Slack channel with ours.',
+        'Priority-one issues are answered within an hour, around the clock. Your team also gets a shared Slack channel with ours.',
     },
     {
       question: 'Can we test a change before it goes live?',
       answer:
-        'Yes. Fork a sandbox environment, make the change there, and promote it when it is ready. A sandbox also works as a backup.',
+        'Yes. Fork a sandbox environment, make the change there, and promote it when it’s ready. A sandbox also works as a backup.',
     },
   ],
 };
 
 export const contact = {
-  headline: 'Talk with us',
+  headline: 'Let’s talk',
   description:
-    '**Quick and efficient support** is essential for an enterprise headless CMS. Enterprise accounts are put on a fast lane when it comes to providing help, feature requests and fixes of any kind. **Our experts are available in a number of ways**, any time that you need us.',
+    '**Enterprise accounts get a fast lane** for help, feature requests and fixes. **Our team is available in several ways**, whenever you need us.',
 };
 
 export const ctaClose: CtaBannerData = {
@@ -267,7 +268,7 @@ export const ctaClose: CtaBannerData = {
   headline: 'A headless CMS that is ready',
   muted: 'to scale with you',
   // CtaBanner prints the subline as plain text: it has no marks.
-  subline: 'An enterprise CMS has to scale with your company without extra effort.',
+  subline: 'Your CMS should grow with your company, without extra effort from your team.',
   buttons: [
     { label: 'Talk To Sales', href: '#form', arrow: false, contact: 'sales' },
     { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
