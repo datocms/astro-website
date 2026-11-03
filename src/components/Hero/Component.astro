@@ -83,6 +83,8 @@ const script: Step[] = [
 if (subheadline) {
   script.push({ type: 'pause', ms: 500 }, { type: 'text', text: subheadline, speedCps: 80 });
 }
+// The buttons fade in when the text is typed. They do not wait for the face.
+script.push({ type: 'mark', name: 'buttons' });
 // The face comes after a short stop, as in the home hero.
 if (subheadline && face) {
   script.push({ type: 'pause', ms: 300 }, faceStep(face));
@@ -207,7 +209,9 @@ const background = ({ page: 'default', accent: 'accent' } as const)[variant];
   import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
   import { WebComponent } from '~/lib/WebComponent';
 
-  // The buttons fade in 150ms after the typewriter ends.
+  // The buttons fade in when the script reaches the `buttons` mark, after
+  // the text and before the face. If the mark was missed, the end of the
+  // typewriter shows them.
   customElements.define(
     'hero-text',
     class extends WebComponent {
@@ -217,9 +221,11 @@ const background = ({ page: 'default', accent: 'accent' } as const)[variant];
         if (document.documentElement.dataset.motion !== 'on') return;
         if (tw.dataset.twState === 'done') return;
         buttons.dataset.twArmed = '';
-        this.on(tw, 'typewriter:done', () => {
-          setTimeout(() => (buttons.dataset.visible = 'true'), 150);
+        const show = () => (buttons.dataset.visible = 'true');
+        this.on<CustomEvent<string>, HTMLElement>(tw, 'typewriter:mark', (event) => {
+          if (event.detail === 'buttons') show();
         });
+        this.on(tw, 'typewriter:done', show);
       }
     },
   );
