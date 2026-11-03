@@ -144,6 +144,10 @@ export const HEADLINE_MUTED_FILES = [
   'src/components/UserExperience/style.module.css',
   'src/components/ChapterHeader/style.module.css',
   'src/components/ContentSource/style.module.css',
+  'src/components/Community/style.module.css',
+  'src/components/ProductUpdates/style.module.css',
+  'src/components/QuestionAnswer/style.module.css',
+  'src/components/TextWithImage/style.module.css',
 ];
 
 /** The code card: its text roles on `--code-background`. */

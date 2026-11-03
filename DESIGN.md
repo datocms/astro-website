@@ -3,23 +3,23 @@ name: DatoCMS
 description: Warm Logic. Flat fields of colour, two-tone headlines and the product drawn in code.
 colors:
   espresso: '#351615'
-  pollen: '#e7d864'
+  pollen: '#e8d855'
   cream-paper: '#fdfff5'
   ember-deep: '#42180f'
-  ember: '#f09063'
+  ember: '#f07a3d'
   ember-paper: '#fffbf5'
   fern-deep: '#1a4731'
-  fern: '#93c95b'
+  fern: '#93d44b'
   fern-paper: '#f5fff5'
   slate-deep: '#1d2229'
-  iris: '#aaa0ef'
+  iris: '#9e90ee'
   iris-paper: '#f6f5ff'
   harbour-deep: '#1a3a47'
-  glacier: '#58c6e7'
+  glacier: '#50c9ed'
   glacier-paper: '#edfeff'
-  plum-deep: '#3c0a35'
-  bubblegum: '#ef89cf'
-  bubblegum-paper: '#fff5fc'
+  plum-deep: '#3f0e16'
+  bubblegum: '#f28497'
+  bubblegum-paper: '#fff7f8'
   white: '#ffffff'
   signal-green: '#3f9a4a'
   signal-red: '#f25f5a'
@@ -204,11 +204,11 @@ The five other themes have the same three roles. A section picks its theme with 
 - **Fern** (fern) on **Fern Deep** (fern-deep) and **Fern Paper** (fern-paper). Green: News, the Editing pillar.
 - **Iris** (iris) on **Slate Deep** (slate-deep) and **Iris Paper** (iris-paper). Purple: Ecosystem. The deep is a blue-black slate, not a purple.
 - **Glacier** (glacier) on **Harbour Deep** (harbour-deep) and **Glacier Paper** (glacier-paper). Blue: Company and support, the pages for buyers (pricing, enterprise, compare), the AI pillar.
-- **Bubblegum** (bubblegum) on **Plum Deep** (plum-deep) and **Bubblegum Paper** (bubblegum-paper). Pink, toward magenta, so that its hue is far from Ember: Partners, the Media pillar.
+- **Bubblegum** (bubblegum) on **Plum Deep** (plum-deep) and **Bubblegum Paper** (bubblegum-paper). Pink, a rose (hue 10, 36 degrees from Ember) on a wine deep: Partners, the Media pillar.
 
 The theme of each page is in "Page themes" (Layout).
 
-The six accents follow one rule in OKLCH: lightness 0.745 to 0.775, and chroma 72% to 80% of the most chroma that sRGB gives at that lightness and hue. The percentage is what aligns them, not the raw chroma: a colour near the edge of sRGB looks neon next to the others, also when its chroma number is the same. Pollen is the one exception (lightness 0.87), because a darker yellow is a mustard. Ember and Bubblegum are tuned away from overnice's values (#ff6d00 at the edge of sRGB, #f1a5a7 too pale). Keep the rule when you add or change a hue.
+The six accents follow one rule in OKLCH: each accent keeps the lightness and the hue of overnice's value, and its chroma is 82% of the most chroma that sRGB gives at that lightness and hue. The percentage is what aligns them, not the raw chroma: a colour at the edge of sRGB looks neon next to the others (overnice's #ff6d00 is at 100%), and a colour far from it looks faded (#7fc4db was at 53%). Do not make an accent lighter to make it softer: a lighter orange is a salmon. Bubblegum is the one exception: overnice's #f1a5a7 is light (L 0.80), and at that lightness 82% is a pastel, thus Bubblegum is darker (L 0.74) and its hue moves from 18 to 10, away from Ember. Keep the rule when you add or change a hue.
 
 ### Tertiary
 
