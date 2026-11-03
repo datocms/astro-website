@@ -61,6 +61,13 @@ export interface Audit {
 
 const GROUNDS: Ground[] = ['page', 'accent', 'inverse'];
 
+/** The tints of the accent. */
+const ACCENT_TINTS = [
+  '--surface-accent-faint',
+  '--surface-accent-subtle',
+  '--surface-accent-muted',
+];
+
 /** The opaque colour of a surface: a tint is an alpha over the page. */
 function opaque(sheet: TokenSheet, path: PathElement[], surface: string, under: Rgba): Rgba {
   return composite(sheet.color(path, surface), under);
@@ -102,7 +109,8 @@ export function audit(sheet: TokenSheet): Audit {
       for (const ground of GROUNDS) {
         const box = pagePath(theme, scheme, [GROUND_CLASS[ground]]);
         // The main surface is the one the box paints: opaque, over the page.
-        const main = opaque(sheet, page, GROUND_SURFACE[ground], pageColor);
+        // It resolves on the box: the dark scheme changes the accent there.
+        const main = opaque(sheet, box, GROUND_SURFACE[ground], pageColor);
         const context = GROUND_CLASS[ground];
 
         // The canonical roles of the ground, on its main surface.
@@ -152,7 +160,7 @@ export function audit(sheet: TokenSheet): Audit {
         }
 
         // The page family inside the ground: the page and the accent grounds
-        // carry cards and tints (a card is white in the dark accent island).
+        // carry cards and tints.
         if (ground !== 'inverse') {
           const base = ground === 'page' ? main : opaque(sheet, box, '--surface-default', main);
           const family = ['--surface-default', ...PAGE_TINTS];
@@ -185,6 +193,24 @@ export function audit(sheet: TokenSheet): Audit {
             const surfaceColor = opaque(sheet, box, surface, base);
             pair(theme, scheme, context, box, text, surface, surfaceColor, AA_TEXT);
           }
+          // On the accent ground the accent tints also sit directly on the accent.
+          if (ground === 'accent') {
+            for (const surface of ACCENT_TINTS) {
+              const surfaceColor = opaque(sheet, box, surface, main);
+              for (const role of ['--text-primary', '--text-soft', '--text-muted']) {
+                pair(
+                  theme,
+                  scheme,
+                  `${context} on accent`,
+                  box,
+                  role,
+                  surface,
+                  surfaceColor,
+                  AA_TEXT,
+                );
+              }
+            }
+          }
           // The ink pill: the page surface as text on the primary text as fill.
           const ink = sheet.color(box, '--text-primary');
           pair(
@@ -203,7 +229,7 @@ export function audit(sheet: TokenSheet): Audit {
       // A theme switch inside a ground keeps the text of the ground.
       for (const ground of ['accent', 'inverse'] as Ground[]) {
         const outer = pagePath(theme, scheme, [GROUND_CLASS[ground]]);
-        const main = opaque(sheet, page, GROUND_SURFACE[ground], pageColor);
+        const main = opaque(sheet, outer, GROUND_SURFACE[ground], pageColor);
         for (const inner of THEMES) {
           if (inner === theme) continue;
           const nested = [...outer, { theme: inner }];
@@ -212,6 +238,17 @@ export function audit(sheet: TokenSheet): Audit {
             pair(theme, scheme, context, nested, role, GROUND_SURFACE[ground], main, AA_TEXT);
           }
         }
+      }
+
+      // The vivid accent ground (accentVivid): the canonical roles and the buttons.
+      const vivid = pagePath(theme, scheme, ['accentVivid'], ['surfaceAccent']);
+      const vividColor = opaque(sheet, vivid, '--surface-accent', pageColor);
+      for (const [role, minimum] of Object.entries(CANONICAL_ROLES.accent)) {
+        pair(theme, scheme, 'accentVivid', vivid, role, '--surface-accent', vividColor, minimum);
+      }
+      for (const [surface, text] of BUTTON_PAIRS) {
+        const fill = opaque(sheet, vivid, surface, vividColor);
+        pair(theme, scheme, 'accentVivid', vivid, text, surface, fill, AA_TEXT);
       }
 
       // A page window inside the inverse ground.

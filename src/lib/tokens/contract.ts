@@ -200,6 +200,7 @@ export const TEXT_COLOR_KEYWORDS = [
  */
 export const GROUND_PAINT: Record<string, RegExp> = {
   '--surface-accent': /^var\(--text-on-accent(-[\w-]+)?\)$/,
+  '--surface-accent-band': /^var\(--text-on-accent-band(-[\w-]+)?\)$/,
   '--surface-inverse': /^var\(--text-on-inverse(-[\w-]+)?\)$/,
   '--surface-inverse-deep': /^var\(--text-on-inverse(-[\w-]+)?\)$/,
   '--code-background': /^var\(--code-[\w-]+\)$/,
@@ -226,5 +227,20 @@ export const PILL_TEXT: Record<string, string[]> = {
  */
 export function canonicalFor(contextual: string): string[] {
   const byGround = CONTEXTUAL_ROLES[contextual];
-  return byGround ? Object.values(byGround) : [];
+  if (!byGround) return [];
+  const band = BAND_ROLES[byGround.accent];
+  return band ? [...Object.values(byGround), band] : Object.values(byGround);
 }
+
+/**
+ * The accent band: the accent as a large area that has no ground class (the
+ * split header, a hovered row). In the light scheme it is the accent. In the
+ * dark scheme it is a deep tone of the accent, and its text is light. Each
+ * canonical accent role has its band role.
+ */
+export const BAND_ROLES: Record<string, string> = {
+  '--text-on-accent': '--text-on-accent-band',
+  '--text-on-accent-muted': '--text-on-accent-band-muted',
+  '--text-on-accent-headline-muted': '--text-on-accent-band-headline-muted',
+  '--border-on-accent-strong': '--border-on-accent-band-strong',
+};

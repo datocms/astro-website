@@ -229,13 +229,19 @@ There is no grey. The neutrals are the deep tone of the theme at alpha: text-sof
 
 ### Dark scheme
 
-Only the page flips. The page becomes a near-black of the theme hue (the code deep mixed with black), the text becomes the paper white at the same alpha steps. The bright accent and the inverse surface do not change: the accent keeps its dark ink, the inverse keeps its light text. The ground classes (below) carry that: an element with the accent as background takes `surfaceAccent`, so the text on it stays dark.
+The three steps stay, all dark: the page, the accent band and the inverse. A bright accent band next to a dark page is too loud, thus the band becomes deep too.
+
+- **The page** is a dark tone of the theme ink (OKLCH lightness 0.21, chroma at most 0.02). The text is the paper white at the same alpha steps.
+- **The accent band** is a deep tone of the accent (lightness 0.36). The text on it is light: the accent mixed with the paper. An element with the accent as background takes `surfaceAccent`, and the class gives the deep band and its light text. A ground that cannot take the class (the split header, a hovered row) uses the band tokens: `--surface-accent-band`, `--text-on-accent-band`, `-muted`, `-headline-muted`, `--border-on-accent-band-strong`.
+- **The inverse** and the code card are the darkest surfaces (lightness 0.11), below the page. The footer is 0.06.
+- **Small accent shapes stay bright.** A pill or a button on the page keeps the bright accent and its dark ink: on a dark page a small bright shape is a point of colour, not a band.
+- **The vivid band.** A band with a dark subject (the `silhouette` closer) does not show on the deep band. The class `accentVivid` around it makes the band more vivid (lightness 0.48), with a paper button.
 
 ### Colour: grounds and text roles
 
 The rules below are the whole system. `src/styles/tokens.css` states them, `src/styles/tokens.test.ts` computes every pairing (all roles, all surfaces, six themes, two schemes) and fails under AA, and `npm run lint:css` refuses a text colour outside the roles.
 
-1. **Three grounds.** Every element sits on one ground: the **page** (`--surface-default` and its tints: `--surface-accent-faint|subtle|muted`, `--surface-inverse-faint`, `--surface-field`, `--surface-nav-active`, `--surface-status-*`), the **accent** (`--surface-accent`, bright in both schemes, dark text) or the **inverse** (`--surface-inverse`, deep in both schemes, light text). The code card (`--code-background`, `--code-*`) is a fourth, small ground.
+1. **Three grounds.** Every element sits on one ground: the **page** (`--surface-default` and its tints: `--surface-accent-faint|subtle|muted`, `--surface-inverse-faint`, `--surface-field`, `--surface-nav-active`, `--surface-status-*`), the **accent** (`--surface-accent`: bright with dark text in the light scheme, deep with light text in the dark scheme) or the **inverse** (`--surface-inverse`, deep in both schemes, light text). The code card (`--code-background`, `--code-*`) is a fourth, small ground.
 2. **Canonical text roles**, one set for each ground: page `--text-on-page`, `-soft`, `-muted`, `-headline-muted`; accent `--text-on-accent`, `-soft`, `-muted`, `-headline-muted`; inverse `--text-on-inverse-strong`, `--text-on-inverse`, `-soft`, `-muted`, `-headline-muted`. Each role has 4.5:1 or more on every surface of its ground, in the six themes and the two schemes. The one exception is `*-headline-muted`: 3:1 or more, for the quiet run of a two-tone headline or display lockup only (large text, 24px or more: a `.display` or `.headline` heading, the quiet words of the Single Source lockup; a `.title` is 20px on phones and takes `--text-muted`). Borders: `--border-on-page|accent|inverse` and `-strong`.
 3. **Contextual roles follow the ground, not the theme.** A component that does not paint a ground uses `--text-primary`, `--text-soft`, `--text-muted`, `--text-headline-muted`, `--border-default`, `--border-strong`, `--text-accent`, `--text-positive`, `--text-negative`. They resolve to the canonical roles of the ground that the element sits on. A theme switch (`data-theme`) inside a ground keeps the light or dark text of the ground.
 4. **Ground classes.** The element that paints a ground gets the global class of the ground: `surfacePage` (a window of the page inside another ground: a chat, the mega menu), `surfaceAccent` or `surfaceInverse`. The class sets the contextual roles and `color`. A small shape (a pill, a hovered row) that paints the accent or the inverse sets `color` to a canonical role of that ground in the same rule. A button takes its colours from the button roles (`--surface-button*`, `--text-button*`), which the ground class fills: see Buttons. A ground that comes with the viewport or a state (the split header, a hovered row that turns to the accent) cannot take a class: the rule sets a contextual role to the canonical role of the same kind (`--text-muted: var(--text-on-accent-muted)`), and nothing else.
@@ -249,7 +255,7 @@ A surface as text is a pill: `--surface-default` on a fill of `--text-primary` (
 
 **The Role Not Colour Rule.** Components use only semantic tokens (`--surface-*`, `--text-*`, `--border-*`), named for their role. A hex in a component is a bug.
 
-**The Dark Text On Accent Rule.** All six accents are light. Text on an accent is the deep tone, in both schemes.
+**The Dark Text On Accent Rule.** All six accents are light. Text on a bright accent is the deep tone. In the dark scheme the accent band is deep, and its text is light; a small bright accent shape keeps the deep tone.
 
 ## Typography
 
@@ -360,7 +366,7 @@ The same six hues serve the areas and the pillars. On a reference page the hue i
 
 **The ground of the hero.** A marketing page has its hero on the page ground: the scene or the typewriter carries it. A reference page has its hero on the accent: the band of colour marks the area. The Partners area is the exception: its heroes are on the page ground, because the logo of a partner keeps its own colours there. On `/partners` the accent marks the area one band lower, in the band with the counts and the map. An article (a post, an entry of the changelog) has the header on the accent, above the header of the article on the page ground. No hero is on the inverse: the footer holds the inverse at the end of the page. The header always takes the ground and the theme of the hero.
 
-**The ground of the closer.** The page closer is on the inverse (the `tonal` palette). The footer, with the "Questions? Ask away [••]" band, is on `--surface-inverse-deep`: the inverse of the same hue, 0.06 darker in OKLCH lightness. Thus the closer and the footer are two deep blocks in one hue, and the end of the closer stays visible. Only the footer and that band use `--surface-inverse-deep` (the lint enforces it). An accent palette (`silhouette`, `onAccent`) is only for a page whose last band above the closer is on the inverse, thus three deep blocks never stack.
+**The ground of the closer.** The page closer is on the inverse (the `tonal` palette). The footer, with the "Questions? Ask away [••]" band, is on `--surface-inverse-deep`: the inverse of the same hue, 0.06 darker in OKLCH lightness. Thus the closer and the footer are two deep blocks in one hue, and the end of the closer stays visible. Only the footer and that band use `--surface-inverse-deep` (the lint enforces it). An accent palette (`silhouette`, `onAccent`) is only for a page whose last band above the closer is on the inverse, thus three deep blocks never stack. In the dark scheme the closer is `accentVivid`: a dark subject does not show on the deep band.
 
 ### Named Rules
 

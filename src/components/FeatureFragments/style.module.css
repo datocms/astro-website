@@ -69,8 +69,15 @@
   margin-bottom: var(--space-md);
   --fragment-surface: var(--surface-accent);
   --fragment-corner: var(--radius-md);
-  /* The line is a darker accent. The box has the class surfaceAccent, thus --text-primary is the dark ink in both schemes. */
-  --fragment-line: color-mix(in oklab, var(--surface-accent) 65%, var(--text-primary));
+  /*
+   * The line is a darker accent: in the light scheme the box has the dark
+   * ink as --text-primary. The dark scheme sets --border-accent-edge: the
+   * deep band mixed with the page.
+   */
+  --fragment-line: var(
+    --border-accent-edge,
+    color-mix(in oklab, var(--surface-accent) 65%, var(--text-primary))
+  );
   --fragment-shadow: color-mix(in srgb, var(--surface-inverse) 20%, transparent);
 }
 
