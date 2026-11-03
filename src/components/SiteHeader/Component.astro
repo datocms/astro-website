@@ -8,6 +8,7 @@ import {
 } from '@fortawesome/pro-regular-svg-icons';
 import { faCircleHalfStroke } from '@fortawesome/pro-solid-svg-icons';
 import { Button } from '~/components/Button';
+import type { ButtonAppearance } from '~/components/Button/types';
 import { DatoLogo } from '~/components/DatoLogo';
 import { Icon } from '~/components/Icon';
 import { NavLink } from '~/components/NavLink';
@@ -36,7 +37,7 @@ const variantClass = {
 const ctaAppearance = {
   page: 'deep-on-white',
   accent: 'deep-on-light',
-}[variant] as 'deep-on-white' | 'deep-on-light';
+} as const satisfies Record<typeof variant, ButtonAppearance>;
 
 // On the page ground the CTA is a soft pill.
 const ctaVariant = ctaVariantProp ?? (variant === 'page' ? 'soft' : 'solid');
@@ -174,7 +175,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
         </button>
         <a href={dashboardUrl('/login')} class:list={[styles.login, 'labelMedium']}>Login</a>
         <Button
-          appearance={ctaAppearance}
+          appearance={ctaAppearance[variant]}
           variant={ctaVariant}
           href={dashboardUrl('/signup')}
           arrow={false}>Get Started</Button
@@ -192,8 +193,10 @@ const cardId = (i: number) => `site-header-card-${i}`;
       </div>
     </div>
 
-    <div
+    {/* The nav of the bar is hidden below 1152: this one is the landmark then. */}
+    <nav
       id="site-header-mobile-nav"
+      aria-label="Main"
       class:list={[styles.mobileNav, 'surfacePage']}
       hidden
       data-mobile-panel
@@ -249,7 +252,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
                 </details>
               ) : (
                 <a
-                  href={group.href ?? '#'}
+                  href={group.href}
                   class:list={[styles.mobileSummary, styles.mobileLink, 'headline']}
                   aria-current={
                     pathname === group.href ? 'page' : currentGroup === i ? 'true' : undefined
@@ -279,7 +282,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
           >
         </li>
       </ul>
-    </div>
+    </nav>
   </header>
 </site-header>
 
@@ -336,17 +339,20 @@ const cardId = (i: number) => `site-header-card-${i}`;
         // The first placement is instant: the pill does not slide in from the edge.
         this.restIndicator();
         requestAnimationFrame(() => this.list.setAttribute('data-indicator', ''));
+        // The fonts can land after this script: the items change width.
+        document.fonts.ready.then(() => this.restIndicator());
 
         // The cards.
         for (const trigger of this.$$<HTMLButtonElement>('[data-card-trigger]')) {
           this.on(trigger, 'mouseenter', () => {
             if (DESKTOP.matches && HOVER.matches) this.openCard(trigger);
           });
-          this.on(trigger, 'click', () => {
+          this.on(trigger, 'click', (event) => {
             // With a mouse, the hover opened the card: the click does not
-            // close it. On touch, the tap toggles it.
+            // close it. On touch, the tap toggles it. A click from the
+            // keyboard (Enter or Space, detail 0) toggles it too.
             if (this.openTrigger === trigger) {
-              if (!HOVER.matches) this.closeCard();
+              if (!HOVER.matches || event.detail === 0) this.closeCard();
             } else {
               this.openCard(trigger);
             }
@@ -365,9 +371,19 @@ const cardId = (i: number) => `site-header-card-${i}`;
         this.on(this, 'mouseleave', () => {
           if (HOVER.matches) this.closeCard();
         });
+        // The focus goes to the page, by keyboard: the card closes. A
+        // modal (the search) keeps it open, as Escape does. Without a
+        // target (the window loses the focus), the card stays.
+        this.on(this, 'focusout', (event) => {
+          const to = event.relatedTarget;
+          if (!(to instanceof Element) || this.contains(to)) return;
+          if (to.closest('[aria-modal="true"]')) return;
+          this.closeCard();
+        });
 
         // The shell is after the row in the DOM. Tab from the open item goes
         // into its card, and Tab out of the last link goes to the next item.
+        // After the last item, the default order goes on to the actions.
         this.on(this, 'keydown', (event) => {
           if (event.key !== 'Tab' || !this.openTrigger) return;
           const target = event.target as HTMLElement;
@@ -380,10 +396,12 @@ const cardId = (i: number) => `site-header-card-${i}`;
             event.preventDefault();
             this.openTrigger.focus();
           } else if (target === links[links.length - 1] && !event.shiftKey) {
-            event.preventDefault();
             const next = this.items[this.items.indexOf(this.openTrigger) + 1];
             this.closeCard();
-            (next ?? this.$<HTMLElement>('[data-scheme-toggle]')).focus();
+            if (next) {
+              event.preventDefault();
+              next.focus();
+            }
           }
         });
 
@@ -563,10 +581,12 @@ const cardId = (i: number) => `site-header-card-${i}`;
         if (returnFocus) trigger.focus();
       }
 
-      // Mobile nav. The page does not scroll while it is open.
+      // Mobile nav. The panel hangs from the header, thus the page goes to
+      // the top, and it does not scroll while the panel is open.
       setMobile(open: boolean, returnFocus = false) {
         this.mobileTrigger.setAttribute('aria-expanded', String(open));
         this.mobilePanel.hidden = !open;
+        if (open) window.scrollTo({ top: 0, behavior: 'instant' });
         document.documentElement.style.overflow = open ? 'hidden' : '';
         if (!open && returnFocus) this.mobileTrigger.focus();
       }

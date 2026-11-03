@@ -22,13 +22,10 @@ interface NavColumn {
   sections: NavSection[];
 }
 
-export interface NavGroup {
-  label: string;
-  /** A group without columns is a plain link (Partners, Philosophy, Pricing). */
-  href?: string;
-  /** The columns of the dropdown card of the group. */
-  columns?: NavColumn[];
-}
+/** A plain link (Partners, Philosophy, Pricing), or a group with the columns of a dropdown card. */
+export type NavGroup =
+  | { label: string; href: string; columns?: undefined }
+  | { label: string; href?: undefined; columns: NavColumn[] };
 
 export interface FooterGroup {
   title: string;
@@ -96,7 +93,7 @@ export const mainNavigation: NavGroup[] = [
           {
             heading: 'Product',
             links: [editorExperience, developers, media, ai],
-            allLink: l('The full list', '/features'),
+            allLink: l('The full list of features', '/features'),
           },
         ],
       },
@@ -262,8 +259,8 @@ export const legal: LegalData = {
  * page below it ('/blog' matches '/blog/casual-chats').
  */
 export function groupPaths(group: NavGroup): string[] {
-  if (group.href) return [group.href];
-  return (group.columns ?? [])
+  if (group.href !== undefined) return [group.href];
+  return group.columns
     .flatMap((column) => column.sections)
     .flatMap((section) => [...section.links, ...(section.allLink ? [section.allLink] : [])])
     .map((link) => link.href)
