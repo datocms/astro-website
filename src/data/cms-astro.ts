@@ -36,8 +36,8 @@ export const page: FrameworkPage = {
   // New copy.
   hero: {
     label: 'Astro + DatoCMS',
-    headline: 'Astro in front, DatoCMS behind.',
-    subheadline: 'The frontmatter fetches it, @datocms/astro renders it, cache tags keep it fresh',
+    headline: 'Astro in front, content backed by DatoCMS.',
+    subheadline: 'The frontmatter fetches it, @datocms/astro renders it, tags refresh it',
     face: 'cool',
     intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
@@ -59,7 +59,7 @@ export const page: FrameworkPage = {
     docsRoot,
     // New copy.
     intro:
-      'A cookie turns draft mode on, and the page passes includeDrafts from it. Add contentLink and one <ContentLink />: every text links to its field.',
+      'A cookie turns draft mode on, and the page passes `includeDrafts` when it’s set. Add `contentLink` and a single `<ContentLink />` component, and every text links to its field.',
     draft: code.draftCode,
     contentLink: code.contentLinkCode,
   }),
@@ -68,7 +68,7 @@ export const page: FrameworkPage = {
     // New copy.
     muted: 'The page reloads itself.',
     intro:
-      '<QueryListener /> from @datocms/astro listens to the query over Server-Sent Events and reloads the page when its result changes. For editors in draft mode, mostly.',
+      '`<QueryListener />` from `@datocms/astro` listens to the query over Server-Sent Events and reloads the page when the result changes. It’s most useful for editors in draft mode.',
   }),
   liveCode: code.liveCode,
   liveDescription:
@@ -78,23 +78,23 @@ export const page: FrameworkPage = {
     docsHref: `${docsRoot}/using-cache-tags`,
     // New copy.
     intro:
-      'Every response lists its records in X-Cache-Tags. Astro’s cache API tags the page with them; a webhook purges them on Cloudflare, Netlify or Vercel.',
+      'Every response lists its records in `X-Cache-Tags`. Astro’s cache API tags the page with them, and a webhook purges them on Cloudflare, Netlify or Vercel.',
     tags: {
       title: 'The tags go on the page.',
-      text: 'One option on the request, and the response names the records it used. Astro’s cache API tags the page with them, for a year.',
+      text: 'Add one option to the request, and the response names the records it used. Astro’s cache API tags the page with them for a year.',
       code: code.tagsCode,
     },
     webhook: {
-      title: 'One webhook, one invalidate.',
-      text: 'DatoCMS sends the tags that changed. The route hands them to the cache of Cloudflare, Netlify or Vercel. Nothing else moves.',
+      title: 'One webhook, one invalidation.',
+      text: 'DatoCMS sends the tags that changed, and the route passes them to the Cloudflare, Netlify or Vercel cache. Nothing else is purged.',
       code: code.webhookCode,
     },
   }),
   // New copy.
   showcase: {
     label: 'Built with Astro and DatoCMS',
-    headline: 'Some sites that run on both.',
-    intro: 'Websites of our customers and projects of our partners, built with Astro on DatoCMS.',
+    headline: 'Sites built on both.',
+    intro: 'Customer websites and partner projects built with Astro and DatoCMS.',
   },
   integrations: ['astro'],
   // The features of the README of the starter kit. No cache tags.
@@ -102,7 +102,7 @@ export const page: FrameworkPage = {
     repo: starterRepo,
     // New copy.
     subline:
-      'Astro in TypeScript, with draft mode, click-to-edit overlays, real-time updates and SEO metadata. The Web Previews and SEO plugins come set up. Every file is commented.',
+      'Astro in TypeScript, with draft mode, click-to-edit overlays, real-time updates and SEO metadata. The Web Previews and SEO plugins come set up. All with helpful comments to get you going.',
   }),
   // The review of Caleb Wise (Elliott Systems).
   reviewId: 'fT4Qn9KQSJCnKqPvVcYoIw',
