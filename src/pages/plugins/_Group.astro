@@ -12,13 +12,19 @@ interface Props {
   href?: string;
   count?: number;
   flushTop?: boolean;
+  /**
+   * The section has no side padding and no max width: the slot goes from
+   * edge to edge of the page (for a CardCarousel with `bleed`). The header
+   * stays in the centred column.
+   */
+  bleed?: boolean;
 }
 
-const { title, href, count, flushTop = true } = Astro.props;
+const { title, href, count, flushTop = true, bleed = false } = Astro.props;
 ---
 
-<Section flushTop={flushTop}>
-  <div class={s.groupHeader}>
+<Section flushTop={flushTop} padding={bleed ? 'none' : 'default'}>
+  <div class:list={[s.groupHeader, bleed && s.groupHeaderInset]}>
     <h2 class="h2">{title}</h2>
     {
       href && (

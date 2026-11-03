@@ -5,10 +5,16 @@ interface Props {
   label?: string;
   /** From 768, the cards wrap into a grid and the row does not scroll. */
   wrap?: boolean;
+  /**
+   * The row goes from edge to edge of its parent, and the first card starts
+   * at the edge of the centred column. Put the row in a parent with no side
+   * padding (for example, a Section with `padding="none"`).
+   */
+  bleed?: boolean;
   class?: string;
 }
 
-const { label, wrap = false, class: className } = Astro.props;
+const { label, wrap = false, bleed = false, class: className } = Astro.props;
 ---
 
 {
@@ -17,6 +23,10 @@ const { label, wrap = false, class: className } = Astro.props;
   cards snap to the start of the row. With `wrap`, the cards form a grid from 768. Only CSS: no buttons, no JS.
 */
 }
-<div class:list={[styles.carousel, wrap && styles.wrap, className]} role="list" aria-label={label}>
+<div
+  class:list={[styles.carousel, wrap && styles.wrap, bleed && styles.bleed, className]}
+  role="list"
+  aria-label={label}
+>
   <slot />
 </div>
