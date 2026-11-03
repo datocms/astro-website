@@ -74,8 +74,8 @@ export function deployUrl(repo: string): string {
 
 // New copy. The one opinion of the pages, after the carousel.
 export const opinion: StatementData = {
-  label: 'A CMS should not pick your framework.',
-  text: 'We write a client and components for yours, and under all of them it is the same GraphQL endpoint. Move from one framework to the next and your content does not notice. Neither do your editors.',
+  label: 'The CMS should not pick your framework for you.',
+  text: 'We write our client and components for yours, all served by the same GraphQL endpoint, so you can always use your favorite tools.',
 };
 
 // New copy. The call to action of the closer.
@@ -137,19 +137,19 @@ export function fetchChapter(args: {
       headline: 'One query per page.',
       muted: 'Typed from your schema.',
       intro:
-        '@datocms/cda-client wraps fetch. Ask for a post with its cover and its body, and get exactly that back, from the nearest edge.',
+        '`@datocms/cda-client` wraps `fetch`. Query a post with its cover and its body, and you get back exactly that, served from the nearest edge.',
       link: docs(args.docsRoot),
     },
     sceneCode: args.code,
     fragments: [
       {
-        title: 'Drafts, validation, tags: one option each.',
-        text: 'Pass includeDrafts, excludeInvalid or returnCacheTags to the same call. The client sets the headers; the query does not change.',
+        title: 'Drafts, validations and tags, all in the same call.',
+        text: 'Pass `includeDrafts`, `excludeInvalid` or `returnCacheTags` to the same query. The client sets the headers without your query changing.',
         code: args.client,
       },
       {
-        title: 'From the edge. Every time.',
-        text: 'Every query is answered from the edge node nearest to the visitor. This one is measured from your browser, right now.',
+        title: 'Served from the nearest edge.',
+        text: 'Every query is answered from the edge node nearest to the visitor. This one was just measured from your browser.',
       },
     ],
   };
@@ -171,18 +171,18 @@ export function mediaChapter(args: {
       headline: `responsiveImage in, ${args.imageTag} out.`,
       muted: 'Video streams the same way.',
       intro:
-        'Query responsiveImage or video, give the result to one component. Srcset, blur-up placeholder, lazy loading and HLS streaming come with it. No image pipeline.',
+        'Query `responsiveImage` or `video`, and pass the result to one component. Srcset, blur-up placeholders, lazy loading and HLS streaming are built in, so you don’t need an image pipeline.',
       link: docs(`${args.docsRoot}/managing-images`),
     },
     fragments: [
       {
-        title: 'One prop: the query result.',
-        text: 'The component reads src, srcSet, sizes and the base64 placeholder from the API. The browser picks the file for its width.',
+        title: 'Pass the query result as one prop.',
+        text: 'The component reads `src`, `srcSet`, `sizes` and the base64 placeholder from the API, and the browser picks the right file for its width.',
         code: args.image,
       },
       {
         title: 'Video without a video stack.',
-        text: 'Upload an MP4 and the API returns a Mux playback id. The player streams it in HLS, with a blurred poster while it starts.',
+        text: 'Upload an MP4 and the API returns a Mux playback ID. The player streams it in HLS, with a blurred poster placeholder.',
         code: args.video,
       },
     ],
@@ -205,18 +205,18 @@ export function blocksChapter(args: {
       headline: 'Blocks become components.',
       muted: 'Rich text becomes a tree.',
       intro:
-        'A landing page is a list of blocks, each with a __typename. A body is a DAST tree. Both map onto your components.',
+        'A landing page is a list of blocks, each with a `__typename`, and a body is a DAST tree. Both map onto your components with minimal configuration.',
       link: docs(args.docsHref),
     },
     fragments: [
       {
         title: 'A switch on __typename.',
-        text: 'Each block type is one component. Editors order the list; you render it in order.',
+        text: 'Each block type is one component. Editors order the list as they build pages, and you render it in that order.',
         code: args.sections,
       },
       {
         title: 'Structured Text, rendered.',
-        text: 'Headings and paragraphs render by default. A record or a block in the text gets your component.',
+        text: 'Headings and paragraphs render by default, and any record or block inside the text renders with your own component.',
         code: args.body,
       },
     ],
@@ -237,19 +237,19 @@ export function draftsChapter(args: {
     chapter: {
       label: 'Draft Mode and Content Link',
       headline: 'Editors see the draft.',
-      muted: 'Visitors see the published.',
+      muted: 'Visitors see what’s published.',
       intro: args.intro,
       link: docs(`${args.docsRoot}/visual-editing`),
     },
     fragments: [
       {
-        title: 'A cookie decides.',
-        text: 'One route sets the cookie, one removes it. The Web Previews plugin opens the draft of a record from the cms, cookie included.',
+        title: 'One cookie.',
+        text: 'One route sets the cookie, one removes it. The Web Previews plugin opens the draft of a record from the CMS with the cookie included.',
         code: args.draft,
       },
       {
         title: 'Click the text, edit the field.',
-        text: 'With contentLink on, the API wraps each text in invisible metadata. The ContentLink component reads it and draws the outlines. Off in production.',
+        text: 'With `contentLink` on, the API wraps each text in invisible metadata. The component reads it and draws the outlines. This stays off in production.',
         code: args.contentLink,
       },
     ],
@@ -320,18 +320,18 @@ export function buildTriggersChapter(args: { headersCode: CodeTab[] }): ChapterL
       headline: 'Rebuild on publish.',
       muted: 'Or purge just what changed.',
       intro:
-        'A build trigger redeploys the site when an editor publishes. Cache tags go finer: every response names its records, and a webhook purges only those.',
+        'A build trigger redeploys the site when an editor publishes a change. Cache tags go even finer: every response names the records it uses, and a webhook only purges the ones that changed.',
       link: docs('/docs/content-delivery-api/cache-tags'),
     },
     sceneCode: args.headersCode,
     fragments: [
       {
         title: 'Webhooks on any event.',
-        text: 'Records, uploads, publishing… pick the events and we call your URL, with the cache tags of what changed. Your CDN purges those pages, nothing else.',
+        text: 'Pick the events you care about, from records to uploads to publishing, and we call your URL with the cache tags of what changed. Your CDN purges only those pages.',
       },
       {
         title: 'Deploy when editors publish.',
-        text: 'The simple road: a full build on every publish. Connect Vercel, Netlify or your own pipeline, and editors see the build status in the cms.',
+        text: 'The simplest option is a full build on every publish. Connect Vercel, Netlify or your own pipeline, and editors see the build status in the CMS.',
       },
     ],
   };
@@ -343,8 +343,8 @@ export function starter(args: { repo: string; subline: string }): CtaBannerData 
     variant: 'subtle',
     theme: 'green',
     // New copy.
-    headline: 'Start from the starter kit.',
-    muted: 'A real project, not a hello world.',
+    headline: 'Start from a working project.',
+    muted: 'Deploy it, then make it yours.',
     subline: args.subline,
     buttons: [
       {
