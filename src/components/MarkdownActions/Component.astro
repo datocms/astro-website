@@ -13,9 +13,10 @@ interface Props {
    * left edge. For a narrow column, for example the table of contents.
    */
   variant?: 'soft' | 'quiet';
+  class?: string;
 }
 
-const { markdownUrl, variant = 'soft' } = Astro.props;
+const { markdownUrl, variant = 'soft', class: className } = Astro.props;
 const request = `Read ${markdownUrl} so I can ask questions about it.`;
 const links = [
   { label: 'View as Markdown', href: markdownUrl, icon: faMarkdown },
@@ -40,7 +41,7 @@ const links = [
 */
 }
 <markdown-actions
-  class:list={[styles.root, variant === 'quiet' && styles.quiet]}
+  class:list={[styles.root, variant === 'quiet' && styles.quiet, className]}
   data-markdown-actions={markdownUrl}
   data-datocms-noindex
   hidden
