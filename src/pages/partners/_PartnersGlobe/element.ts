@@ -11,7 +11,7 @@
 //   circle to the country, on the smooth zoom and pan path of van Wijk and
 //   Nuij (the path of d3.interpolateZoom): a long flight pulls back first,
 //   thus the speed on the screen stays approximately the same. At the
-//   country, the camera holds and pushes in slowly: the
+//   country, the camera holds still: the
 //   country is light (the TOP layer, in the pixel highlight), and the
 //   readout shows its name and number of partners. The other countries
 //   with partners stay deep. After the last stop, the camera goes back to the
@@ -19,6 +19,11 @@
 // - During a flight, the country of the next stop is light already.
 // - Each leg starts and stops at zero speed, thus the camera never jumps
 //   from one leg to the next.
+// - The globe moves in whole cells. The frame changes only when the image
+//   moves by one cell or more. A slow camera (at the start and at the end
+//   of a flight) thus moves the globe in steps of one cell, and all the
+//   coasts move together. If the frame changes at each move, a slow camera
+//   changes some cells of the coasts at random: the coasts flicker.
 // - The clock of the tour runs only when the globe is in view.
 // - With reduced motion, or without WebGL2, the globe stays in the wide
 //   view (the still SVG of the server without WebGL2).
@@ -58,12 +63,12 @@ const FLIGHT_MAX_MS = 3400;
 // strong curve makes the middle of the flight too fast, and then the cells
 // of the pixel video flicker.
 const ease = (t: number) => t * t * t * (t * (6 * t - 15) + 10);
-// The hold at a country, and at the wide view.
+// The hold at a country, and at the wide view. During a hold, the camera
+// does not move: a slow move makes the coasts flicker.
 const HOLD_MS = 3000;
 const WIDE_HOLD_MS = 2000;
-// During a hold, the camera pushes in by this part of the zoom. It does not
-// pan: a pan in a hold can go against the next flight.
-const HOLD_PUSH = 0.05;
+// The frame changes when the image moves by this number of cells or more.
+const STEP_CELLS = 1;
 // The readout shows a little after the camera stops, and goes a little
 // before it leaves.
 const READOUT_DELAY_MS = 150;
@@ -97,7 +102,9 @@ export class PartnersGlobeElement extends WebComponent {
   // The stops: an index in `countries`, the label and the count of each one.
   #stops: { country: number; label: string; count: string }[] = [];
 
+  // The camera of the frame on the screen, and the camera of the tour.
   #camera: Camera = { ...WIDE };
+  #target: Camera = { ...WIDE };
   #focus = -1;
   // The leg of the tour, and the time in it (ms). -1 is the wide view.
   #leg: Leg = { kind: 'hold', from: { ...WIDE }, duration: WIDE_HOLD_MS, stop: -1 };
@@ -202,8 +209,20 @@ export class PartnersGlobeElement extends WebComponent {
     // A long frame (a tab in the background) does not make a jump.
     const dt = Math.min(now - this.#lastTime, 50);
     this.#lastTime = now;
+    const focus = this.#focus;
     this.#step(dt);
-    this.#draw();
+    // The frame changes only when the image moves by one cell or more, at
+    // the start of a hold (the last step to the stop), or when the light
+    // country changes.
+    const { cols, rows } = this.#frames[this.#front]!;
+    const step =
+      !sameCamera(this.#camera, this.#target) &&
+      (this.#leg.kind === 'hold' ||
+        cellShift(this.#camera, this.#target, cols, rows) >= STEP_CELLS);
+    if (step || focus !== this.#focus) {
+      this.#camera = { ...this.#target };
+      this.#draw();
+    }
     if (this.#visible) this.#raf = requestAnimationFrame(this.#tick);
   };
 
@@ -221,16 +240,11 @@ export class PartnersGlobeElement extends WebComponent {
     if (leg.kind === 'flight') {
       // The country of the next stop is light for all the flight: the eye
       // has a target.
-      this.#camera = leg.path(e);
+      this.#target = leg.path(e);
       this.#focus = this.#stops[leg.stop]?.country ?? -1;
       this.#showReadout(null);
     } else {
-      const { from } = leg;
-      this.#camera = {
-        lon: from.lon,
-        lat: from.lat,
-        zoom: from.zoom * (1 + HOLD_PUSH * e),
-      };
+      this.#target = { ...leg.from };
       const stop = this.#stops[leg.stop];
       const show =
         stop && this.#legTime > READOUT_DELAY_MS && this.#legTime < leg.duration - READOUT_DELAY_MS;
@@ -244,14 +258,14 @@ export class PartnersGlobeElement extends WebComponent {
     if (leg.kind === 'flight') {
       return {
         kind: 'hold',
-        from: { ...this.#camera },
+        from: leg.path(1),
         duration: leg.stop < 0 ? WIDE_HOLD_MS : HOLD_MS,
         stop: leg.stop,
       };
     }
     // After the last stop, the wide view.
     const stop = leg.stop + 1 < this.#stops.length ? leg.stop + 1 : -1;
-    const from = { ...this.#camera };
+    const from = { ...leg.from };
     let to: Camera;
     if (stop < 0) {
       to = { ...WIDE };
@@ -283,7 +297,7 @@ export class PartnersGlobeElement extends WebComponent {
       this.#readoutLabel.textContent = stop.label;
       this.#readoutCount.textContent = stop.count;
       const height = this.#stage.clientHeight;
-      const radius = countries[stop.country]!.radius * RAD * this.#camera.zoom * height;
+      const radius = countries[stop.country]!.radius * RAD * this.#target.zoom * height;
       const lift = Math.min(radius * READOUT_LIFT, height * READOUT_MAX_LIFT);
       this.#readout.style.setProperty('--readout-lift', `${Math.round(lift)}px`);
     }
@@ -302,6 +316,26 @@ export class PartnersGlobeElement extends WebComponent {
 }
 
 const RAD = Math.PI / 180;
+
+function sameCamera(a: Camera, b: Camera) {
+  return a.lon === b.lon && a.lat === b.lat && a.zoom === b.zoom;
+}
+
+/**
+ * The largest move on the screen, in cells, of a point of the globe from
+ * camera `a` to camera `b`, for a frame of `cols` × `rows` cells: the move
+ * of the pan plus the move of the zoom at the edge of the visible globe.
+ */
+function cellShift(a: Camera, b: Camera, cols: number, rows: number) {
+  const va = toVector(a);
+  const vb = toVector(b);
+  const cos = Math.min(1, Math.max(-1, va[0] * vb[0] + va[1] * vb[1] + va[2] * vb[2]));
+  const radius = Math.max(a.zoom, b.zoom) * rows;
+  const pan = Math.acos(cos) * radius;
+  const reach = Math.min(radius, Math.hypot(cols, rows) / 2);
+  const zoom = (reach * Math.abs(a.zoom - b.zoom)) / Math.min(a.zoom, b.zoom);
+  return pan + zoom;
+}
 
 type Vector = [number, number, number];
 
