@@ -10,21 +10,14 @@ const RAW_DEPLOYMENT_TYPES: Record<RawDeploymentType, DeploymentType[] | undefin
 };
 
 type RawDeploymentType =
-  | 'static'
-  | 'server'
-  | 'serverless'
-  | 'copyRepo'
-  | 'zeit'
-  | 'vercel'
-  | 'netlify'
-  | 'heroku';
+  'static' | 'server' | 'serverless' | 'copyRepo' | 'zeit' | 'vercel' | 'netlify' | 'heroku';
 
 export type DeploymentType = 'netlify' | 'vercel' | 'heroku' | 'github';
 
 type EnvValue =
   | {
       type: 'datocmsAccessToken';
-      tokenName: string;
+      tokenName?: string;
     }
   | {
       type: 'datocmsProjectUrl';
@@ -141,13 +134,11 @@ export function normalizeManifest(
         ? {
             [manifest.datocmsApiTokenEnvName]: {
               type: 'datocmsAccessToken',
-              tokenName: 'Read-only API token',
             },
           }
         : {
             DATO_API_TOKEN: {
               type: 'datocmsAccessToken',
-              tokenName: 'Read-only API token',
             },
           }),
       ...(manifest.projectUrlEnvName
