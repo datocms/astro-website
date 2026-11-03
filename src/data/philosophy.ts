@@ -1,4 +1,5 @@
-import type { HeroData } from '~/data/home';
+import type { CtaBannerData, HeroData } from '~/data/home';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import type { Theme } from '~/lib/theme';
 
 interface Principle {
@@ -66,5 +67,16 @@ export const principles: PrinciplesData = {
       text: 'Everybody will have different things that come to mind or that they associate with Europe. For us it’s mainly the vibes.',
       theme: 'blue',
     },
+  ],
+};
+
+export const ctaStart: CtaBannerData = {
+  variant: 'light',
+  theme: 'default',
+  headline: 'Yes, we’re Italian. We talk with our hands.',
+  muted: 'We build with them too. Try DatoCMS for free.',
+  buttons: [
+    { label: 'Get Started', href: dashboardUrl('/signup'), arrow: false },
+    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
   ],
 };
