@@ -1,0 +1,46 @@
+/*
+ * The two offers under the plans. They use the halves of PricingPlans,
+ * with other grounds. Thus the row does not continue the plans above it.
+ *
+ * The first offer is on the subtle accent surface, the second on the
+ * accent surface. Under 1152 the halves stack, in the order of the
+ * markup: the grounds then alternate (Professional, Enterprise, first offer, second
+ * offer). From 1152 the second offer moves to the left half, under the
+ * Professional plan, and the outer padding of each half is
+ * --content-inset-half, as in PricingPlans.
+ */
+.offers {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1152px) {
+  .offers {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.offer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--section-padding-y) var(--section-padding-x);
+  background: var(--surface-accent-subtle);
+}
+
+.accent {
+  background: var(--surface-accent);
+  color: var(--text-on-accent);
+}
+
+@media (min-width: 1152px) {
+  .accent {
+    order: -1;
+    padding-inline-start: var(--content-inset-half);
+  }
+
+  .offer:not(.accent) {
+    padding-inline-end: var(--content-inset-half);
+  }
+}

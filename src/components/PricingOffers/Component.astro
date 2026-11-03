@@ -1,0 +1,23 @@
+---
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { Headline } from '~/components/Headline';
+import type { PricingOffersData } from '~/data/pricing';
+import styles from './style.module.css';
+
+type Props = PricingOffersData;
+
+const { offers } = Astro.props;
+---
+
+<section class={styles.offers}>
+  {
+    offers.map((offer, i) => (
+      <div class:list={[styles.offer, i === 1 && [styles.accent, 'surfaceAccent']]}>
+        <Headline as="h2" size="title" muted={offer.muted} breakBeforeMuted>
+          {offer.headline}
+        </Headline>
+        <ButtonGroup buttons={offer.buttons} size="l" />
+      </div>
+    ))
+  }
+</section>

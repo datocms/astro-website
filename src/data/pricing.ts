@@ -111,8 +111,19 @@ export const plans: PricingPlansData = {
   ],
 };
 
-export const freeBanner: CtaBannerData = {
-  variant: 'subtle',
+/** One offer of PricingOffers: a headline with a muted run, and its buttons. */
+export interface PricingOfferData {
+  headline: string;
+  muted: string;
+  buttons: ButtonData[];
+}
+
+/** The two offers under the plans: the Free plan and the Agency Partner Program. */
+export interface PricingOffersData {
+  offers: PricingOfferData[];
+}
+
+const freeOffer: PricingOfferData = {
   headline: 'Just getting started?',
   muted: 'Try DatoCMS out for free, forever (yes really).',
   buttons: [
@@ -159,8 +170,7 @@ export const freeReminder = {
   link: { label: 'See all limits in detail', href: '#free-plan-details' },
 };
 
-export const partnerBanner: CtaBannerData = {
-  variant: 'subtle',
+const partnerOffer: PricingOfferData = {
   headline: 'Working on many client projects?',
   muted: 'Our Agency Partner Program starts at €39/month.',
   buttons: [
@@ -172,6 +182,10 @@ export const partnerBanner: CtaBannerData = {
     },
   ],
 };
+
+// The second offer is on the accent surface, and from 1152 it is on the
+// left half (src/components/PricingOffers/style.module.css).
+export const offers: PricingOffersData = { offers: [partnerOffer, freeOffer] };
 
 export const comparison: PlanComparisonData = {
   headline: 'Compare plans',
