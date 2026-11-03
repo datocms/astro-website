@@ -274,12 +274,15 @@ One size ladder, in t-shirt steps, in rem (the zoom of the browser enlarges the 
 | `xs`  | 13       | 14  | 14   |          | caption, mono caps, small code              |
 | `s`   | 14       | 15  | 16   | 14/15/15 | label, code                                 |
 | `m`   | 16       | 17  | 20   | 16/17/17 | body, long body                             |
-| `l`   | fluid 20 | 25  | 30   | 20/22/22 | title                                       |
-| `xl`  | fluid 24 | 30  | 36   | 24/28/28 | section (the docs h2)                       |
-| `2xl` | fluid 30 | 40  | 45   |          | headline                                    |
-| `3xl` | fluid 37 | 50  | 60   |          | display                                     |
+| `l`   | fluid 18 | 21  | 24   | 18/19/19 | small heading (h4 to h6 in long text)       |
+| `xl`  | fluid 20 | 25  | 30   | 20/22/22 | title                                       |
+| `2xl` | fluid 24 | 30  | 36   | 24/28/28 | section (the docs h2)                       |
+| `3xl` | fluid 30 | 40  | 45   |          | headline                                    |
+| `4xl` | fluid 37 | 50  | 60   |          | display                                     |
 
-Dense: the docs layout sets `data-density="dense"` on `<body>`, and the `s`, `m`, `l` and `xl` steps take the dense values.
+Dense: the docs layout sets `data-density="dense"` on `<body>`, and the `s`, `m`, `l`, `xl` and `2xl` steps take the dense values.
+
+**Headings in long text** (`Prose`, the text from the CMS): h1 is the headline size, h2 the section size, h3 the title size, h4 to h6 the `l` step at 500. A heading has more space above it than below it, so it goes with the text that follows: 60 above h1 and h2, 40 above h3, 30 above h4 to h6; 20 below, 10 below h4 to h6.
 
 ### Hierarchy
 

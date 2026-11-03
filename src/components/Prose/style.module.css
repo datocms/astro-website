@@ -3,8 +3,9 @@
  * The content comes from a CMS, thus the rules target the elements. The
  * sizes come from the --type-* tokens, as in the typography classes.
  * Blocks have 30 between them. Two runs of text (paragraphs and lists)
- * have one line between them. A heading has 20 above it, and 20 between
- * it and the next block.
+ * have one line between them. A heading has more space above it (60 for
+ * h1 and h2, 40 for h3, 30 for h4 to h6) than below it (20, or 10 for h4
+ * to h6).
  *
  * The scope stops at the children of <prose-island>. Prose does not style
  * an element in an island: a block with its own design (a button, a card,
@@ -51,45 +52,68 @@
   }
 
   :is(h1, h2, h3, h4, h5, h6) {
-    padding-top: var(--space-md);
     font-weight: 500;
   }
 
-  :scope > :is(h1, h2, h3, h4, h5, h6) + * {
+  /*
+   * A heading has more space above it than below it: it goes with the
+   * text that follows it. A higher level has more space. A heading that
+   * starts the text has no space above it.
+   */
+  :scope > * + :is(h1, h2) {
+    margin-top: var(--space-2xl);
+  }
+
+  :scope > * + h3 {
+    margin-top: var(--space-xl);
+  }
+
+  :scope > * + :is(h4, h5, h6) {
+    margin-top: var(--space-lg);
+  }
+
+  /*
+   * These rules come after the rules above: a heading directly after a
+   * heading gets the small space of the heading above it.
+   */
+  :scope > :is(h1, h2, h3) + * {
     margin-top: var(--space-md);
   }
 
-  h1 {
-    font-size: var(--type-3xl);
-    line-height: 1;
-    letter-spacing: -0.05em;
+  :scope > :is(h4, h5, h6) + * {
+    margin-top: var(--space-2xs);
   }
 
-  h2 {
-    font-size: var(--type-2xl);
+  /* h1: the headline role. */
+  h1 {
+    font-size: var(--type-3xl);
     line-height: 1;
     letter-spacing: -0.04em;
   }
 
+  /* h2: the section role (the docs h2). */
+  h2 {
+    font-size: var(--type-2xl);
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+  }
+
+  /* h3: the title role. */
   h3 {
-    font-size: var(--type-l);
+    font-size: var(--type-xl);
     line-height: 1.1;
     letter-spacing: -0.02em;
   }
 
-  /* h4: the medium body role. The weight makes it a heading at the size of the text. */
-  h4 {
-    font-size: var(--type-m);
-    line-height: 1.3;
-  }
-
-  :is(h5, h6) {
-    font-size: var(--type-s);
-    line-height: 1;
+  /* h4 to h6: one size above the text. Only the space around them changes. */
+  :is(h4, h5, h6) {
+    font-size: var(--type-l);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
   }
 
   :global(.lead) {
-    font-size: var(--type-l);
+    font-size: var(--type-xl);
     font-weight: 500;
     line-height: 1.1;
     letter-spacing: -0.02em;
@@ -295,7 +319,7 @@
    * The label style has its own letter spacing. Without this rule, these
    * elements get the letter spacing of the body size from the parent.
    */
-  :is(h5, h6, cite, footer, figcaption, table) {
+  :is(cite, footer, figcaption, table) {
     letter-spacing: -0.01em;
   }
 }
