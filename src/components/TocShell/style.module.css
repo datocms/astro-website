@@ -92,19 +92,30 @@
   list-style: none;
 }
 
-/* One line for each link. The full text is in the title attribute. */
+/*
+ * The space between the links is on the items: the clamp clips the link
+ * at its padding box, thus a vertical padding on the link shows the top
+ * of the third line.
+ */
+.track li {
+  padding-block: var(--space-4xs);
+}
+
+/* Two lines at most for each link. The full text is in the title attribute. */
 .track a {
-  display: block;
+  display: -webkit-box;
   overflow: hidden;
-  padding: var(--space-4xs) 0 var(--space-4xs) var(--space-sm);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  padding-left: var(--space-sm);
   color: var(--text-muted);
   font-size: var(--type-xs);
   font-weight: 400;
   line-height: 1.35;
   letter-spacing: -0.01em;
   text-decoration: none;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  text-wrap: pretty;
 }
 
 .track a[aria-current] {

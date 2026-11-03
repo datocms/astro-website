@@ -9,9 +9,11 @@ interface Props {
   /** A logo under the image, as the logo of a partner. */
   logo?: { url: string; alt?: string | null };
   external?: boolean;
+  /** The ratio of the image, as "16 / 9". The default is 3 / 2: the image is cropped to it. */
+  imageRatio?: string;
 }
 
-const { href, title, label, logo, external = false } = Astro.props;
+const { href, title, label, logo, external = false, imageRatio } = Astro.props;
 ---
 
 {
@@ -27,7 +29,9 @@ const { href, title, label, logo, external = false } = Astro.props;
     target={external ? '_blank' : undefined}
     rel={external ? 'noreferrer' : undefined}
   >
-    <span class={styles.image}><slot name="image" /></span>
+    <span class={styles.image} style={imageRatio ? { aspectRatio: imageRatio } : undefined}
+      ><slot name="image" /></span
+    >
     <span class={styles.text}>
       {label && <span class:list={[styles.label, 'surfaceAccent', 'caption']}>{label}</span>}
       {logo && <img class={styles.logo} src={logo.url} alt={logo.alt ?? ''} loading="lazy" />}

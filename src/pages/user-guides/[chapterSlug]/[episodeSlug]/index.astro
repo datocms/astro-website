@@ -38,7 +38,6 @@ if (!episode || !currentChapter) {
 }
 
 const chapterIndex = chapters.indexOf(currentChapter);
-const otherChapters = chapters.filter((c) => c !== currentChapter && c.episodes.length);
 const episodeIndex = currentChapter.episodes.findIndex((e) => e.id === episode.id);
 const previousChapter = chapters[chapterIndex - 1];
 const nextChapter = chapters[chapterIndex + 1];
@@ -66,14 +65,28 @@ const next = nextEpisode
       }
     : undefined;
 
-const outline = currentChapter.episodes.map((nthEpisode) => {
-  const data = readFragment(EpisodeFragment, nthEpisode);
-  return {
-    title: data.title,
-    href: buildUrlForUserGuidesEpisode(data),
-    active: nthEpisode.id === episode.id,
-  };
-});
+// The chapters of the user guides. The chapter of the page is open, with its episodes.
+const outline = chapters
+  .filter((chapter) => chapter.episodes.length > 0)
+  .map((chapter) => ({
+    title: chapter.title,
+    href:
+      chapter === currentChapter
+        ? `${indexes.userGuides.href}#${chapter.slug}`
+        : buildUrlForUserGuidesEpisode(chapter.episodes[0]!),
+    active: chapter === currentChapter,
+    sections:
+      chapter === currentChapter
+        ? chapter.episodes.map((nthEpisode) => {
+            const data = readFragment(EpisodeFragment, nthEpisode);
+            return {
+              text: data.title,
+              href: buildUrlForUserGuidesEpisode(data),
+              current: nthEpisode.id === episode.id,
+            };
+          })
+        : undefined,
+  }));
 ---
 
 <Layout theme="orange" seo={episode._seoMetaTags} headerVariant="accent">
@@ -122,26 +135,12 @@ const outline = currentChapter.episodes.map((nthEpisode) => {
       current={episode.title}
     />
     <ArticleBody>
-      <CourseOutline slot="aside" title={currentChapter.title} chapters={outline}>
-        <p>
-          Chapter {chapterIndex + 1} of the <a href={indexes.userGuides.href}>user guides</a>.
-          {
-            otherChapters.length > 0 && (
-              <>
-                {' '}
-                Other chapters:{' '}
-                {otherChapters.map((chapter, i) => (
-                  <>
-                    {i > 0 && ', '}
-                    <a href={`${indexes.userGuides.href}#${chapter.slug}`}>{chapter.title}</a>
-                  </>
-                ))}
-                .
-              </>
-            )
-          }
-        </p>
-      </CourseOutline>
+      <CourseOutline
+        slot="aside"
+        title="User guides"
+        note={`Episode ${episodeIndex + 1} of ${currentChapter.episodes.length}`}
+        chapters={outline}
+      />
       <StructuredText
         {...ensureValidStructuredTextProps({
           data: episode.content,

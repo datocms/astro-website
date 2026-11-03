@@ -23,6 +23,9 @@ const chapter = readFragment(ChapterFragment, Astro.props.chapter);
 const { number } = Astro.props;
 
 const episodes = chapter.episodes.map((episode) => readFragment(EpisodeFragment, episode));
+// The card shows the whole frame of the video: its ratio, with no crop.
+const ratio = (video: { width: number | null; height: number | null }) =>
+  video.width && video.height ? `${video.width} / ${video.height}` : '16 / 9';
 const totalDuration = sum(chapter.episodes.map((episode) => episode.asset.video.duration || 0));
 ---
 
@@ -47,20 +50,20 @@ const totalDuration = sum(chapter.episodes.map((episode) => episode.asset.video.
       {formatVideoDuration(totalDuration)}
     </p>
   </div>
-  <CardCarousel label={`Episodes of ${chapter.title}`} wrap>
+  <CardCarousel label={`Episodes of ${chapter.title}`} wrap bleed class={s.row}>
     {
       episodes.map((data) => (
-        <CarouselCard href={buildUrlForUserGuidesEpisode(data)} title={data.title}>
+        <CarouselCard
+          href={buildUrlForUserGuidesEpisode(data)}
+          title={data.title}
+          imageRatio={ratio(data.asset.video)}
+        >
           <img
             slot="image"
-            src={muxThumbnailUrl(data.asset.video.thumbnailUrl, {
-              width: 600,
-              height: 400,
-              fit_mode: 'crop',
-            })}
+            src={muxThumbnailUrl(data.asset.video.thumbnailUrl, { width: 640 })}
             alt=""
-            width="600"
-            height="400"
+            width={data.asset.video.width ?? 16}
+            height={data.asset.video.height ?? 9}
             loading="lazy"
             style={{ background: `center / cover url("${data.asset.video.blurUpThumb}")` }}
           />

@@ -7,25 +7,35 @@ interface Chapter {
   href: string;
   /** The chapter of the page. Its sections show under it. */
   active?: boolean;
-  /** The headings of the chapter: the links go to the anchors of the page. */
-  sections?: { id: string; text: string }[];
+  /**
+   * The parts of the chapter. A part with an `id` links to that anchor of
+   * the page (a heading). A part with an `href` links to a page (an
+   * episode); `current` marks the page of the visitor.
+   */
+  sections?: ({ text: string; current?: boolean } & ({ id: string } | { href: string }))[];
 }
 
 interface Props {
   /** For example "Course chapters". */
   title: string;
+  /** The short text of the closed box. The default is the position of the open chapter, "2 of 5". */
+  note?: string;
   chapters: Chapter[];
   class?: string;
 }
 
-const { title, chapters, class: className } = Astro.props;
+const { title, note: noteProp, chapters, class: className } = Astro.props;
 const position = chapters.findIndex((chapter) => chapter.active) + 1;
-const note = position > 0 ? `${position} of ${chapters.length}` : undefined;
+const note = noteProp ?? (position > 0 ? `${position} of ${chapters.length}` : undefined);
+// When a part of the open chapter is the page, the part takes the mark, not the chapter.
+const isPage = (chapter: Chapter) =>
+  chapter.active && !chapter.sections?.some((section) => section.current);
 ---
 
 {
   /*
-  The chapters of a course, with the sections of the open chapter under it.
+  The chapters of a course, with the parts of the open chapter under it:
+  the sections of the page, or the pages of the chapter.
   The slot takes the text under the list. TocShell gives the box, the
   float and the mark on the section that the visitor reads.
 */
@@ -38,7 +48,7 @@ const note = position > 0 ? `${position} of ${chapters.length}` : undefined;
           <a
             href={chapter.href}
             title={chapter.title}
-            aria-current={chapter.active ? 'page' : undefined}
+            aria-current={isPage(chapter) ? 'page' : undefined}
           >
             {chapter.title}
           </a>
@@ -46,7 +56,12 @@ const note = position > 0 ? `${position} of ${chapters.length}` : undefined;
             <ul class={styles.sections}>
               {chapter.sections.map((section) => (
                 <li>
-                  <a class={styles.section} href={`#${section.id}`} title={section.text}>
+                  <a
+                    class={styles.section}
+                    href={'href' in section ? section.href : `#${section.id}`}
+                    title={section.text}
+                    aria-current={section.current ? 'page' : undefined}
+                  >
                     {section.text}
                   </a>
                 </li>
