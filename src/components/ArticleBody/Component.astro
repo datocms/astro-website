@@ -1,5 +1,4 @@
 ---
-import { MarkdownActions } from '~/components/MarkdownActions';
 import { Prose } from '~/components/Prose';
 import { Section } from '~/components/Section';
 import {
@@ -16,16 +15,9 @@ interface Props {
   items?: TableOfContentsItem[];
   /** The title of the table of contents, for example "In this article". Not needed with the slot "aside". */
   tocTitle?: string;
-  /**
-   * The address of the Markdown version of the page. With it, the table of
-   * contents shows MarkdownActions under its box. When the table does not
-   * show (too few headings), the page must show MarkdownActions in a
-   * different location.
-   */
-  markdownUrl?: string;
 }
 
-const { content, items = [], tocTitle, markdownUrl } = Astro.props;
+const { content, items = [], tocTitle } = Astro.props;
 const headings = tableOfContentsHeadings(content);
 const hasAside = Astro.slots.has('aside');
 const hasToc = !hasAside && tocTitle !== undefined && (headings.length > 0 || items.length > 0);
@@ -44,16 +36,7 @@ const hasToc = !hasAside && tocTitle !== undefined && (headings.length > 0 || it
   {
     hasToc && (
       <div class={styles.toc}>
-        <TableOfContents title={tocTitle!} headings={headings} items={items}>
-          {markdownUrl && (
-            <MarkdownActions
-              slot="actions"
-              markdownUrl={markdownUrl}
-              variant="quiet"
-              class={styles.markdownActions}
-            />
-          )}
-        </TableOfContents>
+        <TableOfContents title={tocTitle!} headings={headings} items={items} />
       </div>
     )
   }

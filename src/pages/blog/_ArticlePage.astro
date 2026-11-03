@@ -1,0 +1,166 @@
+---
+// The page of one article of the blog: a blog post or a casual chat. The two
+// routes get the record, and this file gives the markup, so they stay the same.
+import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
+import { ArticleBody } from '~/components/ArticleBody';
+import { Breadcrumb } from '~/components/Breadcrumb';
+import { JsonLd } from '~/components/JsonLd';
+import { MarkdownActions } from '~/components/MarkdownActions';
+import { PostHeader } from '~/components/PostHeader';
+import { RelatedPosts } from '~/components/RelatedPosts';
+import { StructuredText } from '~/components/StructuredText';
+import { defaultBlockComponents } from '~/components/StructuredText/blocks';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import * as blog from '~/data/blog';
+import { indexes } from '~/data/breadcrumbs';
+import Layout from '~/layouts/Layout.astro';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import {
+  extractFromSeoTags,
+  overrideSeo,
+  seoCanonical,
+  seoOgType,
+  seoTwitterCard,
+} from '~/lib/datocms/seo';
+import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
+import { publisherRef } from '~/lib/jsonLd';
+import { ArticleChatFragment, ArticlePostFragment } from './_article';
+import { loadRelated } from './_related';
+
+interface Props {
+  record:
+    | (FragmentOf<typeof ArticlePostFragment> & { __typename: 'BlogPostRecord' })
+    | (FragmentOf<typeof ArticleChatFragment> & { __typename: 'CustomerStoryRecord' });
+}
+
+const { record } = Astro.props;
+
+// The parts that are different for a post and for a chat. Each branch calls
+// ensureValidStructuredTextProps with its own content type: TypeScript cannot
+// resolve the call on the union of the two types.
+function articleData() {
+  switch (record.__typename) {
+    case 'BlogPostRecord': {
+      const article = readFragment(ArticlePostFragment, record);
+      return {
+        article,
+        header: { post: article },
+        trail: [
+          indexes.blog,
+          ...(article.category
+            ? [{ label: article.category.name, href: `/blog/category/${article.category.slug}` }]
+            : []),
+        ],
+        authors: article.author.map((author) => author.name),
+        jsonLdType: 'BlogPosting' as const,
+        tocTitle: 'In this article',
+        relatedCopy: blog.related,
+        structuredText: ensureValidStructuredTextProps({
+          data: article.content,
+          blockComponents: defaultBlockComponents,
+          linkToRecordComponents: defaultLinkToRecordComponents,
+          inlineRecordComponents: defaultInlineRecordComponents,
+        }),
+      };
+    }
+    case 'CustomerStoryRecord': {
+      const article = readFragment(ArticleChatFragment, record);
+      return {
+        article,
+        header: { chat: article },
+        trail: [indexes.blog, indexes.casualChats],
+        authors: article.people.map((person) => person.name),
+        jsonLdType: 'Article' as const,
+        tocTitle: 'In this story',
+        relatedCopy: blog.relatedToChat,
+        structuredText: ensureValidStructuredTextProps({
+          data: article.content,
+          blockComponents: defaultBlockComponents,
+          linkToRecordComponents: defaultLinkToRecordComponents,
+          inlineRecordComponents: defaultInlineRecordComponents,
+        }),
+      };
+    }
+  }
+}
+
+const { article, header, trail, authors, jsonLdType, tocTitle, relatedCopy, structuredText } =
+  articleData();
+
+const related = await loadRelated(Astro, article);
+
+const baseUrl = buildBaseUrl(Astro);
+const { description, image } = extractFromSeoTags(article.seo);
+const markdownUrl = new URL(
+  Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
+  baseUrl,
+);
+---
+
+<Layout
+  theme="green"
+  seo={overrideSeo(
+    article.seo,
+    article.canonicalUrl ? seoCanonical(article.canonicalUrl) : undefined,
+    seoOgType('article'),
+    seoTwitterCard('summary_large_image'),
+  )}
+  seoAnalysis={article.yoastAnalysis}
+  headerVariant="accent"
+>
+  <Fragment slot="head">
+    {
+      article._firstPublishedAt && (
+        <meta
+          property="article:published_time"
+          content={new Date(article._firstPublishedAt).toISOString()}
+        />
+      )
+    }
+    {
+      article._publishedAt && (
+        <meta
+          property="article:modified_time"
+          content={new Date(article._publishedAt).toISOString()}
+        />
+      )
+    }
+    {authors.map((name) => <meta property="article:author" content={stripStega(name)} />)}
+    {/* The JSON-LD values are plain strings: they must not contain stega. */}
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': jsonLdType,
+        headline: stripStega(article.title),
+        url: new URL(Astro.url.pathname, baseUrl).href,
+        datePublished: article._firstPublishedAt ?? article._createdAt,
+        dateModified: article._publishedAt
+          ? new Date(article._publishedAt).toISOString()
+          : undefined,
+        author: authors.map((name) => ({
+          '@type': 'Person' as const,
+          name: stripStega(name),
+        })),
+        publisher: publisherRef(baseUrl),
+        description,
+        image,
+      }}
+    />
+  </Fragment>
+
+  {/* The Markdown version of the page (markdownProxy) has only this element. */}
+  <div id="main-content">
+    <PostHeader {...header} />
+    <Breadcrumb trail={trail} current={article.title}>
+      <MarkdownActions slot="actions" markdownUrl={markdownUrl.href} variant="neutral" />
+    </Breadcrumb>
+    <ArticleBody content={article.content} tocTitle={tocTitle}>
+      <StructuredText {...structuredText} />
+    </ArticleBody>
+  </div>
+  {related.length > 0 && <RelatedPosts {...relatedCopy} posts={related} />}
+
+  {/* The DraftModeQueryListener of the route. */}
+  <slot />
+</Layout>
