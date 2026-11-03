@@ -4,6 +4,7 @@
 // the projects of the showcase and the plugins that the partner released.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import sortBy from 'lodash-es/sortBy';
+import { Breadcrumb } from '~/components/Breadcrumb';
 import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Fact, Facts } from '~/components/Facts';
@@ -16,6 +17,7 @@ import { PlainText, StructuredText } from '~/components/StructuredText';
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
 import { partner } from '~/data/partners';
+import { indexes } from '~/data/breadcrumbs';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { readFragment } from '~/lib/datocms/graphql';
@@ -121,6 +123,7 @@ const sortedProjects = sortBy(page.projects, (project) =>
     </div>
     <LogoPlate class={s.plate} name={page.name} logo={page.logo} />
   </Section>
+  <Breadcrumb trail={[indexes.partners]} current={page.name} />
 
   <Section>
     <div class={s.layout}>

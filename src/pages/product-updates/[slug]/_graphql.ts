@@ -14,6 +14,7 @@ export const query = graphql(
     query ProductUpdate($slug: String!) {
       entry: changelogEntry(filter: { slug: { eq: $slug } }) {
         _firstPublishedAt
+        title
         seo: _seoMetaTags {
           ...TagFragment
         }

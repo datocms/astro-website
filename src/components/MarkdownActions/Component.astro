@@ -11,8 +11,11 @@ interface Props {
    * "soft" (default): a soft button of 40px, with the menu centred under it.
    * "quiet": a smaller pill with no fill and a hairline, with the menu at its
    * left edge. For a narrow column, for example the table of contents.
+   * "neutral": a pill of 40px with no fill and a hairline, in the muted text,
+   * with the menu at its right edge. For a bar of links, for example the
+   * Breadcrumb.
    */
-  variant?: 'soft' | 'quiet';
+  variant?: 'soft' | 'quiet' | 'neutral';
   class?: string;
 }
 
@@ -41,7 +44,12 @@ const links = [
 */
 }
 <markdown-actions
-  class:list={[styles.root, variant === 'quiet' && styles.quiet, className]}
+  class:list={[
+    styles.root,
+    variant === 'quiet' && styles.quiet,
+    variant === 'neutral' && styles.neutral,
+    className,
+  ]}
   data-markdown-actions={markdownUrl}
   data-datocms-noindex
   hidden

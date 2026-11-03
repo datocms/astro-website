@@ -1,0 +1,157 @@
+/*
+ * A band of the page ground, full width, with a hairline at the bottom.
+ * The hero above it is on the accent (a hard cut), or on the page ground
+ * (the Partners area): there the hairline marks the band.
+ *
+ * The links are 40px tall, as the other controls. Thus the band is 64px
+ * tall, with 12px above and below.
+ *
+ * The band sticks to the top of the screen. The other sticky elements of
+ * the page (a table of contents, a column of facts) add --sticky-offset to
+ * their top, thus they stay below the band.
+ */
+:global(html):has(.bar) {
+  --sticky-offset: 64px;
+}
+
+.bar {
+  /* The root is a custom element: it is inline by default. */
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--surface-default);
+  box-shadow: inset 0 -1px var(--border-default);
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  max-width: var(--content-max);
+  /* The height of a link. With the padding, the band is 64px tall. */
+  min-height: 40px;
+  margin-inline: auto;
+  padding: var(--space-xs) var(--section-padding-x);
+  box-sizing: content-box;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  min-width: 0;
+  color: var(--text-muted);
+}
+
+.arrow {
+  flex: none;
+}
+
+.trail {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/*
+ * Only the last item that shows gets shorter: the name of the page when
+ * the bar sticks, else the last link.
+ */
+.item:not(:nth-last-child(-n + 2)) {
+  flex: none;
+}
+
+.bar[data-stuck] .item:nth-last-child(2) {
+  flex: none;
+}
+
+.item:not(:nth-last-child(-n + 2))::after,
+.current::before {
+  content: '/';
+  flex: none;
+  padding-inline: var(--space-3xs);
+}
+
+/*
+ * The name of the page shows only when the bar sticks. The h1 of the hero
+ * goes up and out of the screen, and the name comes into the bar: it fades
+ * in, comes 8px from the left and gets sharp. The separator comes with it.
+ * When the bar stops to stick, the name goes at once.
+ */
+.current {
+  display: none;
+}
+
+.bar[data-stuck] .current {
+  display: flex;
+  animation: name-in 320ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes name-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    translate: -8px 0;
+  }
+}
+
+/* With reduced motion, the name only fades in. */
+@media (prefers-reduced-motion: reduce) {
+  .bar[data-stuck] .current {
+    animation-name: name-fade-in;
+  }
+
+  @keyframes name-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+.current .link {
+  color: var(--text-primary);
+}
+
+.link {
+  display: block;
+  min-width: 0;
+  /* 40px tall, as the other controls. */
+  padding-block: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: inherit;
+  text-decoration: none;
+  text-underline-offset: 0.2em;
+}
+
+.actions {
+  flex: none;
+}
+
+/* On phones the trail takes the full row: the actions do not show. */
+@media (max-width: 767px) {
+  .actions {
+    display: none;
+  }
+}
+
+@media (hover: hover) {
+  a.link {
+    transition: color 300ms ease-out;
+  }
+
+  a.link:hover {
+    color: var(--text-primary);
+    text-decoration: underline;
+  }
+}

@@ -2,6 +2,7 @@
 // A case study, from a SuccessStory record of the CMS.
 import { stripStega } from '@datocms/astro';
 import { render as structuredTextToPlainText } from 'datocms-structured-text-to-plain-text';
+import { Breadcrumb } from '~/components/Breadcrumb';
 import { CaseStudies } from '~/components/CaseStudies';
 import { CaseStudyBody } from '~/components/CaseStudyBody';
 import { ChallengeSolution } from '~/components/ChallengeSolution';
@@ -11,6 +12,7 @@ import { PageCloser } from '~/components/PageCloser';
 import { Stats } from '~/components/Stats';
 import { TextWithImage } from '~/components/TextWithImage';
 import * as cs from '~/data/case-studies';
+import { indexes } from '~/data/breadcrumbs';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
@@ -49,6 +51,7 @@ const others = latest.filter((story) => story.id !== page.id).slice(0, 3);
   </Fragment>
 
   <TextWithImage story={page} media="photo" headingLevel="h1" theme="orange" />
+  <Breadcrumb trail={[indexes.caseStudies]} current={headline} />
   {page.numbers.length > 0 && <Stats stats={page.numbers} theme="orange" />}
   <CaseStudyBody title="The full story" story={page} theme="orange" />
   <ChallengeSolution story={page} />

@@ -1,8 +1,10 @@
 ---
-// One entry of the changelog, with its content and a link back to the index.
+// One entry of the changelog, with its content.
+import { Breadcrumb } from '~/components/Breadcrumb';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { PrevNext } from '~/components/PrevNext';
 import { ProductUpdate } from '~/components/ProductUpdate';
+import { indexes } from '~/data/breadcrumbs';
 import * as productUpdates from '~/data/product-updates';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
@@ -34,9 +36,10 @@ const neighbours = {
 ---
 
 <Layout theme="green" seo={entry.seo} headerVariant="accent">
+  <Breadcrumb trail={[indexes.productUpdates]} current={entry.title} />
   {/* The Markdown version of the page (markdownProxy) has only this element. */}
   <div id="main-content">
-    <ProductUpdate entry={entry} back={productUpdates.back} />
+    <ProductUpdate entry={entry} />
   </div>
   <PrevNext
     ariaLabel="Newer and older product update"

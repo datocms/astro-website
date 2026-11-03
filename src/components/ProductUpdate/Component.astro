@@ -16,11 +16,8 @@ import styles from './style.module.css';
 
 interface Props {
   entry: FragmentOf<typeof ProductUpdateFragment>;
-  /** A link above the date, back to the index. */
-  back: { label: string; href: string };
 }
 
-const { back } = Astro.props;
 const entry = readFragment(ProductUpdateFragment, Astro.props.entry);
 
 const blockComponents = {
@@ -35,7 +32,7 @@ const blockComponents = {
   /*
   One entry of the changelog: the title and the full content.
   The date and the categories are pills, as in the rows of ProductUpdates
-  and ProductUpdateList. On wide screens the back link, the date and the
+  and ProductUpdateList. On wide screens the date and the
   categories are in a column at the left, and they stay in view while the
   content scrolls.
 */
@@ -43,9 +40,6 @@ const blockComponents = {
 <Section>
   <article class={styles.article}>
     <div class={styles.meta}>
-      <a class:list={[styles.back, 'labelMedium']} href={back.href}>
-        ← {back.label}
-      </a>
       <time class:list={[styles.date, 'labelMedium']} datetime={entry._firstPublishedAt}>
         {formatLongDate(entry._firstPublishedAt)}
       </time>

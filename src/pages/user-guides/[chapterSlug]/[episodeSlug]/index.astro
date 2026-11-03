@@ -1,5 +1,6 @@
 ---
 import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { Breadcrumb } from '~/components/Breadcrumb';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
 import { JsonLd } from '~/components/JsonLd';
@@ -11,6 +12,7 @@ import { muxThumbnailUrl } from '~/components/StructuredText/blocks/TutorialVide
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
 import { VideoPlayer } from '~/components/VideoPlayer';
+import { indexes } from '~/data/breadcrumbs';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
@@ -69,14 +71,16 @@ const thumbnail = (video: { thumbnailUrl: string }, width: number, height: numbe
     />
   </Fragment>
   <div id="main-content">
-    <Hero
-      variant="accent"
-      label="Back to All Videos"
-      labelHref="/user-guides"
-      headline={episode.title}
-    >
+    <Hero variant="accent" headline={episode.title}>
       <p slot="intro">{formatVideoDuration(episode.asset.video.duration)}</p>
     </Hero>
+    <Breadcrumb
+      trail={[
+        indexes.userGuides,
+        { label: currentChapter.title, href: `${indexes.userGuides.href}#${currentChapter.slug}` },
+      ]}
+      current={episode.title}
+    />
     <Section flushBottom>
       <div data-datocms-nomd>
         <VideoPlayer data={episode.asset} />

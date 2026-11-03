@@ -6,6 +6,7 @@ export const ChapterFragment = graphql(
   /* GraphQL */ `
     fragment ChapterFragment on UserGuidesChapterRecord {
       title
+      slug
       introduction {
         value
       }

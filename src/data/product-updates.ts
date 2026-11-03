@@ -22,9 +22,6 @@ export const hero: HeroData = {
   ],
 };
 
-/** The link from the page of one entry back to the index. */
-export const back = { label: 'All product updates', href: '/product-updates' };
-
 /** The labels of the links to the next and the previous entry, at the end of an entry. */
 export const neighbours = { newer: 'Newer update', older: 'Older update' };
 

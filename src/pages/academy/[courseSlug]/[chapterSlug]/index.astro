@@ -8,6 +8,7 @@ import { query } from './_graphql';
 import { assignHeadingAnchors } from '~/lib/academyAnchors';
 import { type StructuredTextDocument } from 'datocms-structured-text-to-plain-text';
 import { ArticleBody } from '~/components/ArticleBody';
+import { Breadcrumb } from '~/components/Breadcrumb';
 import { CourseOutline } from '~/components/CourseOutline';
 import { Hero } from '~/components/Hero';
 import { Prose } from '~/components/Prose';
@@ -18,6 +19,7 @@ import { Table } from '~/components/StructuredText/blocks/Table';
 import { TabsBlock } from '~/components/StructuredText/blocks/TabsBlock';
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { indexes } from '~/data/breadcrumbs';
 import Layout from '~/layouts/Layout.astro';
 import HeadingNode from './_HeadingNode.astro';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
@@ -88,39 +90,17 @@ const outline = allChapters.map((nthChapter) => ({
         description: extractFromSeoTags(chapter.seo).description,
       }}
     />
-    <JsonLd
-      data={{
-        '@context': 'https://schema.org',
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          {
-            '@type': 'ListItem',
-            position: 1,
-            name: 'DatoCMS Academy',
-            item: new URL('/academy', baseUrl(Astro)).href,
-          },
-          {
-            '@type': 'ListItem',
-            position: 2,
-            name: course.name,
-            item: courseUrl,
-          },
-          {
-            '@type': 'ListItem',
-            position: 3,
-            name: chapter.title,
-            item: new URL(Astro.url.pathname, baseUrl(Astro)).href,
-          },
-        ],
-      }}
-    />
   </Fragment>
   <div id="main-content">
-    <Hero variant="accent" label="DatoCMS Academy" labelHref="/academy" headline={chapter.title}>
+    <Hero variant="accent" label="DatoCMS Academy" headline={chapter.title}>
       <Prose slot="intro">
         <StructuredText {...ensureValidStructuredTextProps({ data: course.introduction })} />
       </Prose>
     </Hero>
+    <Breadcrumb
+      trail={[indexes.academy, { label: course.name, href: buildUrlForAcademyCourse(course) }]}
+      current={chapter.title}
+    />
     <ArticleBody>
       <CourseOutline slot="aside" title="Course chapters" chapters={outline}>
         <p>

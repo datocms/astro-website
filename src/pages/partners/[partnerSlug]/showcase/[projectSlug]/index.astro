@@ -4,6 +4,7 @@
 // large image),
 // the partner, the services and the technologies.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { Breadcrumb } from '~/components/Breadcrumb';
 import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Fact, Facts } from '~/components/Facts';
@@ -16,6 +17,7 @@ import { PlainText, StructuredText } from '~/components/StructuredText';
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
 import { VideoPlayer, VideoPlayerFragment } from '~/components/VideoPlayer';
+import { indexes } from '~/data/breadcrumbs';
 import { project } from '~/data/partners';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
@@ -63,6 +65,10 @@ const galleries = [
       }
     </div>
   </Hero>
+  <Breadcrumb
+    trail={[indexes.partners, { label: page.partner.name, href: partnerUrl }]}
+    current={page.name}
+  />
 
   <Section>
     <div class={s.visual}>

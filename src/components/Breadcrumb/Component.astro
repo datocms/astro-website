@@ -1,0 +1,105 @@
+---
+import { stripStega } from '@datocms/astro';
+import { JsonLd } from '~/components/JsonLd';
+import { baseUrl } from '~/lib/draftMode';
+import type { BreadcrumbItem } from './types';
+import styles from './style.module.css';
+
+interface Props {
+  /** The pages above this page, from the top. */
+  trail: BreadcrumbItem[];
+  /**
+   * The name of the current page. The bar shows it only when it sticks to
+   * the top of the screen: before that, the h1 of the hero names the page.
+   */
+  current: string;
+}
+
+const { trail, current } = Astro.props;
+const origin = baseUrl(Astro);
+const hasActions = Astro.slots.has('actions');
+---
+
+{
+  /*
+  The band below the hero of a detail page. At the left, the trail of the
+  pages above this page. At the right, the slot "actions" takes the actions
+  on the page, for example MarkdownActions. The band sticks to the top of
+  the screen. When it sticks, the trail ends with the name of the page.
+*/
+}
+<breadcrumb-bar class={styles.bar}>
+  <div class={styles.content}>
+    <nav class={styles.nav} aria-label="Breadcrumb">
+      <span class={styles.arrow} aria-hidden="true">←</span>
+      <ol class={styles.trail}>
+        {
+          trail.map((item) => (
+            <li class={styles.item}>
+              <a class:list={[styles.link, 'labelMedium']} href={item.href} data-datocms-nomd>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li class:list={[styles.item, styles.current]}>
+          <span class:list={[styles.link, 'labelMedium']} aria-current="page">{current}</span>
+        </li>
+      </ol>
+    </nav>
+    {
+      hasActions && (
+        <div class={styles.actions}>
+          <slot name="actions" />
+        </div>
+      )
+    }
+  </div>
+</breadcrumb-bar>
+<JsonLd
+  data={{
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      ...trail.map((item, index) => ({
+        '@type': 'ListItem' as const,
+        position: index + 1,
+        name: stripStega(item.label),
+        item: new URL(item.href, origin).href,
+      })),
+      {
+        '@type': 'ListItem' as const,
+        position: trail.length + 1,
+        name: stripStega(current),
+        item: new URL(Astro.url.pathname, origin).href,
+      },
+    ],
+  }}
+/>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'breadcrumb-bar',
+    class extends WebComponent {
+      parsedCallback() {
+        let frame = 0;
+        // The bar sticks when its top is at the top of the screen and the page has scrolled.
+        const update = () => {
+          frame = 0;
+          this.toggleAttribute(
+            'data-stuck',
+            window.scrollY > 0 && this.getBoundingClientRect().top <= 0,
+          );
+        };
+        const onScroll = () => {
+          if (!frame) frame = requestAnimationFrame(update);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        this.eventListenerRemovers.push(() => window.removeEventListener('scroll', onScroll));
+        update();
+      }
+    },
+  );
+</script>
