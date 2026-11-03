@@ -51,14 +51,13 @@ const installScript: Step[] = [
   { type: 'text', text: '~/.', speedCps: 55 },
   { type: 'pause', ms: 350 },
   { type: 'text', text: 'claude/skills/', speedCps: 55 },
-  ...install.folders.flatMap((folder): Step[] => [
-    { type: 'text', text: '├──', speedCps: 0 },
+  // A mark shows the branch of the folder before the name types.
+  ...install.folders.flatMap((folder, index): Step[] => [
+    { type: 'mark', name: `branch:${index}` },
     { type: 'text', text: folder, speedCps: 55 },
   ]),
   { type: 'hideCursor' },
 ];
-
-const tree = install.folders.map((f) => `  ├── ${f}`).join('\n');
 ---
 
 <Section theme={theme} background="accent" contentClass={styles.content}>
@@ -76,25 +75,31 @@ const tree = install.folders.map((f) => `  ├── ${f}`).join('\n');
   </h2>
 
   <div class:list={[styles.cards, cardShape === 'landscape' && styles.landscape]}>
-    <article class={styles.card}>
-      <h3 class:list={[styles.cardHeader, 'headline']}>
-        <a href={ask.href} class={styles.cardLink}>{ask.title}</a>
-        <span class={styles.arrow} aria-hidden="true">→</span>
-      </h3>
-      <div class={styles.body}>
-        <Typewriter
-          as="div"
-          script={askScript}
-          start="view"
-          threshold={0.5}
-          delay={150}
-          class={styles.chat}
-        >
-          <p class:list={[styles.question, 'headline']}>{ask.question}</p>
-          <p class:list={[styles.answer, 'headline']}>{model}: {ask.answer} [&gt;.&lt;]</p>
-        </Typewriter>
-      </div>
-    </article>
+    <ask-card data-models={JSON.stringify(ask.models)}>
+      <article class={styles.card}>
+        <h3 class:list={[styles.cardHeader, 'headline']}>
+          <a href={ask.href} class={styles.cardLink}>{ask.title}</a>
+          <span class={styles.arrow} aria-hidden="true">→</span>
+        </h3>
+        <div class={styles.body}>
+          <Typewriter
+            as="div"
+            script={askScript}
+            start="view"
+            threshold={0.5}
+            delay={150}
+            class={styles.chat}
+          >
+            <p class:list={[styles.question, 'headline']}>{ask.question}</p>
+            <p class:list={[styles.answer, 'headline']}>
+              <span data-model>{model}</span><span class={styles.caret} data-caret hidden></span>: {
+                ask.answer
+              } [&gt;.&lt;]
+            </p>
+          </Typewriter>
+        </div>
+      </article>
+    </ask-card>
 
     <article class={styles.card}>
       <h3 class:list={[styles.cardHeader, 'headline']}>
@@ -102,18 +107,28 @@ const tree = install.folders.map((f) => `  ├── ${f}`).join('\n');
         <span class={styles.arrow} aria-hidden="true">→</span>
       </h3>
       <div class={styles.body}>
-        <Typewriter
-          as="div"
-          script={installScript}
-          start="view"
-          threshold={0.5}
-          delay={1350}
-          class:list={[styles.terminal, 'headline']}
-        >
-          <span class={styles.question}>{`[••] ${install.command}`}</span>{
-            `\n\n~/.claude/skills/\n${tree}`
-          }
-        </Typewriter>
+        <install-tree>
+          <Typewriter
+            as="div"
+            script={installScript}
+            start="view"
+            threshold={0.5}
+            delay={1350}
+            class:list={[styles.terminal, 'headline']}
+          >
+            <p class={styles.question}>{`[••] ${install.command}`}</p>
+            <p class={styles.root}>~/.claude/skills/</p>
+            <ul class={styles.tree}>
+              {
+                install.folders.map((folder) => (
+                  <li class={styles.branch} data-branch>
+                    {folder}
+                  </li>
+                ))
+              }
+            </ul>
+          </Typewriter>
+        </install-tree>
       </div>
     </article>
   </div>
@@ -127,3 +142,77 @@ const tree = install.folders.map((f) => `  ├── ${f}`).join('\n');
     )
   }
 </Section>
+
+<script>
+  import { prefersReducedMotion } from '~/lib/motion/inView';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+  // The same question gets the same answer from each model. When the
+  // pointer or the focus comes to the card, the name of the model is
+  // deleted and the next model types in. The answer does not change.
+  customElements.define(
+    'ask-card',
+    class extends WebComponent {
+      parsedCallback() {
+        const models = JSON.parse(this.dataset.models || '[]') as string[];
+        const card = this.$('article');
+        const typewriter = this.$('type-writer');
+        const name = this.$('[data-model]');
+        const caret = this.$('[data-caret]');
+        let current = 0;
+        let busy = false;
+
+        const swap = async () => {
+          // Wait for the typewriter. Do not start a new swap during a swap.
+          if (busy || models.length < 2 || typewriter.dataset.twState !== 'done') return;
+          busy = true;
+          current = (current + 1) % models.length;
+          const next = models[current]!;
+          if (prefersReducedMotion()) {
+            name.textContent = next;
+            busy = false;
+            return;
+          }
+          caret.hidden = false;
+          // Delete fast, stop, then type at the speed of the typewriter.
+          for (let text = name.textContent ?? ''; text.length > 0;) {
+            text = text.slice(0, -1);
+            name.textContent = text;
+            await sleep(35);
+          }
+          await sleep(160);
+          for (let i = 1; i <= next.length; i += 1) {
+            name.textContent = next.slice(0, i);
+            await sleep(55 + Math.random() * 30);
+          }
+          await sleep(450);
+          caret.hidden = true;
+          busy = false;
+        };
+
+        this.on(card, 'pointerenter', (event) => {
+          if (event.pointerType === 'mouse') void swap();
+        });
+        this.on(card, 'focusin', () => void swap());
+      }
+    },
+  );
+
+  // The CSS draws the branches of the tree. While the typewriter runs, a
+  // branch shows when its mark comes (`branch:<index>`).
+  customElements.define(
+    'install-tree',
+    class extends WebComponent {
+      parsedCallback() {
+        const branches = this.$$('[data-branch]');
+        this.on<CustomEvent<string>, HTMLElement>(this, 'typewriter:mark', (event) => {
+          const [kind, index] = event.detail.split(':');
+          if (kind !== 'branch') return;
+          branches[Number(index)]?.toggleAttribute('data-shown', true);
+        });
+      }
+    },
+  );
+</script>
