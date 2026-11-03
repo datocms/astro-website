@@ -389,7 +389,7 @@ The same language on photos: the image of a card (a post card, a media card) sho
 
 A picture of what DatoCMS does when the subject is not a screen of the cms: the real-time stream, the wall of cached pages, the media pipeline, the integrity of the schema. All diagrams speak one grammar, so the eye learns it once: **a pill does the work, a pulse is data that moves, a ring is what changed.**
 
-- **Surface:** the inverse sheet of the band, inside a `whole` frame (no frame drawn, nothing cut), 960px at most, top-down on phones. A diagram in a fragment can sit on a light surface (`data-diagram-surface="light"`).
+- **Surface:** the inverse sheet of the band, inside a `whole` frame (no frame drawn, nothing cut), 960px at most, top-down on phones. A diagram in a fragment sits on the surface of the page, in the scheme of the page (`data-diagram-surface="page"`, and the ground `surfacePage` on the `fill` fragment): light in the light scheme, dark in the dark scheme.
 - **Pill:** the actor or the event. 28px tall, full radius, Geist Mono at code-small size, the DatoCMS mark at 14px. Light on the inverse (`--text-on-inverse-strong`). An event pill shows one event and its time; the next one replaces it.
 - **Track:** a line, 1.5px, quiet (`--border-on-inverse-strong`) and always drawn. No arrows, no dashes.
 - **Pulse:** a short 2px dash of the accent that runs along the track once: data on the move.

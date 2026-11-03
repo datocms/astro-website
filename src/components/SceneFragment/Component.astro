@@ -68,7 +68,10 @@ interface Crop extends Common {
 
 /**
  * `fill`: the picture (a diagram) fills all the box, with no margin, and
- * the box cuts nothing. The picture has its own surface and padding.
+ * the box cuts nothing. The fragment is on the surface of the page (the
+ * ground `surfacePage`), in the scheme of the page: in the dark scheme it
+ * is dark, also in the accent box of FeatureFragments. The picture has its
+ * own padding.
  */
 interface Fill extends Common {
   fit: 'fill';
@@ -113,6 +116,7 @@ const vars = [
     styles[fit],
     align === 'end' && styles.end,
     fit === 'scale' && !border && styles.noBorder,
+    fit === 'fill' && 'surfacePage',
   ]}
   style={vars || undefined}
   data-fit={fit}
