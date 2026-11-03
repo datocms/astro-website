@@ -1,9 +1,10 @@
 ---
 import type { Heading } from 'datocms-structured-text-utils';
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { PlainText } from '~/components/StructuredText';
 import { headingId } from '~/components/StructuredText/headingId';
+import { TocShell } from '~/components/TocShell';
 import type { TableOfContentsItem } from './headings';
-import styles from './style.module.css';
 
 interface Props {
   /** For example "In this article". */
@@ -16,30 +17,24 @@ interface Props {
 }
 
 const { title, headings = [], items = [], class: className } = Astro.props;
-const topLevel = Math.min(...headings.map((heading) => heading.level));
-const topItemLevel = Math.min(...items.map((item) => item.level));
+const count = headings.length + items.length;
 ---
 
 {
   /*
-  The links to the headings of an article. The ids of a Structured Text
-  field come from headingId(), as in HeadingNode. The ids of a document
-  come from the document. A heading below the top level is indented.
-  The search index and the Markdown version of the page skip this list.
+  The links to the headings of an article, at all levels, in one flat
+  list. The ids of a Structured Text field come from headingId(), as in
+  HeadingNode. The ids of a document come from the document. TocShell
+  gives the box, the float and the mark on the heading that the visitor
+  reads.
 */
 }
-<nav
-  class:list={[styles.root, className]}
-  aria-label={title}
-  data-datocms-noindex
-  data-datocms-nomd
->
-  <p class:list={[styles.title, 'subtitleMedium']}>{title}</p>
-  <ol class={styles.list}>
+<TocShell title={title} note={`${count} sections`} class={className}>
+  <ol>
     {
       headings.map((heading) => (
-        <li class={heading.level > topLevel ? styles.nested : undefined}>
-          <a class:list={[styles.link, 'body']} href={`#${headingId(heading)}`}>
+        <li>
+          <a href={`#${headingId(heading)}`} title={toPlainText(heading)}>
             <PlainText
               data={{ value: { schema: 'dast', document: { type: 'root', children: [heading] } } }}
             />
@@ -49,12 +44,12 @@ const topItemLevel = Math.min(...items.map((item) => item.level));
     }
     {
       items.map((item) => (
-        <li class={item.level > topItemLevel ? styles.nested : undefined}>
-          <a class:list={[styles.link, 'body']} href={`#${item.id}`}>
+        <li>
+          <a href={`#${item.id}`} title={item.text}>
             {item.text}
           </a>
         </li>
       ))
     }
   </ol>
-</nav>
+</TocShell>

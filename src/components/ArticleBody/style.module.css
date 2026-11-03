@@ -1,24 +1,23 @@
 .content {
   display: grid;
   grid-template-columns: minmax(0, var(--reading-max));
-  gap: var(--space-2xl);
+  gap: var(--space-xl);
   justify-content: center;
 }
 
-@media (min-width: 1152px) {
+/*
+ * From 1320, the table of contents is in the column at the left of the
+ * text. Its cell is as tall as the text, so that the table can stay in
+ * view while the text scrolls.
+ */
+@media (min-width: 1320px) {
   .content {
     grid-template-columns: minmax(0, 1fr) minmax(0, var(--reading-max)) minmax(0, 1fr);
-    gap: var(--space-xl);
-    align-items: start;
   }
 
   .toc {
-    position: sticky;
-    top: var(--space-xl);
     grid-column: 1;
-    /* A long table scrolls on its own. */
-    max-height: calc(100dvh - 2 * var(--space-xl));
-    overflow-y: auto;
+    grid-row: 1;
   }
 
   .text {

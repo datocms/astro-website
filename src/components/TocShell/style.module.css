@@ -1,0 +1,180 @@
+/* @layer blocks */
+.root {
+  display: block;
+}
+
+/* The closed row: the title, the note and a chevron. */
+.details {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3xs);
+  padding: var(--space-xs) var(--space-sm);
+  cursor: pointer;
+  list-style: none;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+.title {
+  color: var(--text-primary);
+}
+
+.note {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.chevron {
+  align-self: center;
+  width: 0.45em;
+  height: 0.45em;
+  margin-left: auto;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: translateY(-0.15em) rotate(45deg);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.details[open] .chevron {
+  transform: translateY(0.1em) rotate(225deg);
+}
+
+.body {
+  padding: 0 var(--space-sm) var(--space-sm);
+}
+
+/* The line at the left of the links. The bar on it marks the link of the heading that the visitor reads. */
+.track {
+  position: relative;
+  border-left: 1px solid var(--border-default);
+}
+
+.marker {
+  position: absolute;
+  top: 0;
+  left: -1px;
+  width: 2px;
+  height: var(--marker-h, 0);
+  border-radius: var(--radius-full);
+  color: var(--text-nav-active);
+  background: currentColor;
+  opacity: 0;
+  transform: translateY(var(--marker-y, 0));
+}
+
+.marker[data-visible] {
+  opacity: 1;
+}
+
+.marker[data-ready] {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease-out;
+}
+
+.track :where(ol, ul) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One line for each link. The full text is in the title attribute. */
+.track a {
+  display: block;
+  overflow: hidden;
+  padding: var(--space-4xs) 0 var(--space-4xs) var(--space-sm);
+  color: var(--text-muted);
+  font-size: var(--type-caption);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.track a[aria-current] {
+  color: var(--text-nav-active);
+  font-weight: 500;
+}
+
+.track a:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
+.footer {
+  margin-top: var(--space-sm);
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.footer a {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+@media (hover: hover) {
+  .summary:hover .title,
+  .track a:hover {
+    color: var(--text-primary);
+  }
+}
+
+/*
+ * From 1320 the box floats in the column at the left of the text. It
+ * stays in the middle of the viewport. The script gives --toc-height.
+ * A list that is taller than the viewport scrolls on its own.
+ */
+@media (min-width: 1320px) {
+  .root {
+    position: sticky;
+    top: max(var(--space-xl), calc(50dvh - var(--toc-height, 100dvh) / 2));
+  }
+
+  .details {
+    border: 0;
+    border-radius: 0;
+  }
+
+  /* The box is always open. Browsers that know ::details-content show the list also before the script runs. */
+  .details::details-content {
+    content-visibility: visible;
+    display: block;
+  }
+
+  .summary {
+    padding: 0 0 var(--space-xs);
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .note,
+  .chevron {
+    display: none;
+  }
+
+  .body {
+    max-height: calc(100dvh - 2 * var(--space-xl) - 3em);
+    overflow-y: auto;
+    padding: 0;
+    scrollbar-color: var(--border-strong) transparent;
+    scrollbar-width: thin;
+  }
+}

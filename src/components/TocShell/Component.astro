@@ -1,0 +1,200 @@
+---
+import styles from './style.module.css';
+
+interface Props {
+  /** The name of the list, for example "In this article". */
+  title: string;
+  /** The short text after the title in the closed box, for example "8 sections". */
+  note?: string;
+  class?: string;
+}
+
+const { title, note, class: className } = Astro.props;
+---
+
+{
+  /*
+  The box of a table of contents. The default slot takes the list of
+  links, the slot "footer" takes the text under the list.
+
+  Below 1320, the box is a closed row that the visitor opens. From 1320,
+  the box is always open, it floats in the column at the left of the
+  text, and it stays in the middle of the viewport while the text scrolls.
+
+  The script finds the heading that the visitor reads, and marks its link
+  with aria-current="location". A bar on the line at the left of the list
+  moves to that link. Without the script, the links work and no link is
+  marked.
+
+  The search index and the Markdown version of the page skip this box.
+*/
+}
+<toc-shell class:list={[styles.root, className]} data-datocms-noindex data-datocms-nomd>
+  <nav aria-label={title}>
+    <details class={styles.details}>
+      <summary class={styles.summary}>
+        <span class:list={[styles.title, 'caption']}>{title}</span>
+        {note && <span class:list={[styles.note, 'caption']}>{note}</span>}
+        <span class={styles.chevron} aria-hidden="true"></span>
+      </summary>
+      <div class={styles.body} data-toc-body>
+        <div class={styles.track}>
+          <span class={styles.marker} aria-hidden="true" data-toc-marker></span>
+          <slot />
+        </div>
+        {
+          Astro.slots.has('footer') && (
+            <div class:list={[styles.footer, 'caption']}>
+              <slot name="footer" />
+            </div>
+          )
+        }
+      </div>
+    </details>
+  </nav>
+</toc-shell>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  // From 1320 the box floats and is always open. Below, it starts closed.
+  const wide = window.matchMedia('(min-width: 1320px)');
+
+  // A heading is the one that the visitor reads when its top is above this
+  // part of the viewport height.
+  const READ_LINE = 0.3;
+
+  customElements.define(
+    'toc-shell',
+    class extends WebComponent {
+      #globalListeners = new AbortController();
+      #frame = 0;
+      #active: HTMLAnchorElement | null = null;
+
+      parsedCallback() {
+        const box = this.$<HTMLDetailsElement>(':scope > nav > details');
+        const summary = this.$(':scope > nav > details > summary');
+        const body = this.$('[data-toc-body]');
+        const marker = this.$('[data-toc-marker]');
+        const signal = this.#globalListeners.signal;
+
+        // The links to a heading of this page, each with its heading.
+        const entries = this.$$<HTMLAnchorElement>('a[href^="#"]').flatMap((link) => {
+          const id = decodeURIComponent(link.hash.slice(1));
+          const heading = document.getElementById(id);
+          return heading ? [{ link, heading }] : [];
+        });
+
+        // Before the first heading, the bar shows on the link of the page,
+        // if the list has one (the chapter of a course).
+        const pageLink = this.querySelector<HTMLAnchorElement>('a[aria-current="page"]');
+
+        const syncBox = () => {
+          box.open = wide.matches;
+          summary.tabIndex = wide.matches ? -1 : 0;
+          this.#place(marker);
+          this.#measure();
+        };
+
+        const findActive = () => {
+          const line = window.innerHeight * READ_LINE;
+          const atEnd =
+            window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+          let found: HTMLAnchorElement | null = null;
+
+          for (const { link, heading } of entries) {
+            const top = heading.getBoundingClientRect().top;
+            if (top <= line || (atEnd && top < window.innerHeight)) found = link;
+          }
+
+          return found ?? pageLink;
+        };
+
+        const update = () => {
+          this.#frame = 0;
+          const next = findActive();
+          if (next === this.#active) return;
+
+          if (this.#active?.getAttribute('aria-current') === 'location') {
+            this.#active.removeAttribute('aria-current');
+          }
+          if (next && next !== pageLink) next.setAttribute('aria-current', 'location');
+          this.#active = next;
+          this.#place(marker);
+          this.#reveal(body);
+        };
+
+        const schedule = () => {
+          if (!this.#frame) this.#frame = requestAnimationFrame(update);
+        };
+
+        syncBox();
+        update();
+        // The first position of the bar does not animate.
+        requestAnimationFrame(() => marker.setAttribute('data-ready', ''));
+
+        wide.addEventListener('change', syncBox, { signal });
+        window.addEventListener('scroll', schedule, { passive: true, signal });
+        window.addEventListener('resize', schedule, { passive: true, signal });
+        new ResizeObserver(() => {
+          this.#measure();
+          this.#place(marker);
+        }).observe(body);
+
+        this.on(box, 'toggle', () => {
+          if (wide.matches && !box.open) box.open = true;
+          this.#place(marker);
+        });
+
+        // Below 1320, the box closes when the visitor goes to a heading.
+        this.on(body, 'click', 'a[href^="#"]', () => {
+          if (!wide.matches) box.open = false;
+        });
+      }
+
+      /** Give the height of the box to the CSS, which puts the box in the middle of the viewport. */
+      #measure() {
+        this.style.setProperty('--toc-height', `${this.offsetHeight}px`);
+      }
+
+      /** Move the bar to the marked link. With no marked link, hide the bar. */
+      #place(marker: HTMLElement) {
+        const link = this.#active;
+
+        if (!link || link.offsetParent === null) {
+          marker.removeAttribute('data-visible');
+          return;
+        }
+
+        const track = marker.parentElement!;
+        const linkBox = link.getBoundingClientRect();
+        const trackBox = track.getBoundingClientRect();
+        marker.style.setProperty('--marker-y', `${linkBox.top - trackBox.top}px`);
+        marker.style.setProperty('--marker-h', `${linkBox.height}px`);
+        marker.setAttribute('data-visible', '');
+      }
+
+      /** When the list scrolls, scroll it so that the marked link is in view. Do not scroll the page. */
+      #reveal(body: HTMLElement) {
+        const link = this.#active;
+        if (!link || body.scrollHeight <= body.clientHeight) return;
+
+        const linkBox = link.getBoundingClientRect();
+        const bodyBox = body.getBoundingClientRect();
+        const margin = linkBox.height * 2;
+
+        if (linkBox.top < bodyBox.top + margin) {
+          body.scrollTop -= bodyBox.top + margin - linkBox.top;
+        } else if (linkBox.bottom > bodyBox.bottom - margin) {
+          body.scrollTop += linkBox.bottom - (bodyBox.bottom - margin);
+        }
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.#globalListeners.abort();
+        cancelAnimationFrame(this.#frame);
+      }
+    },
+  );
+</script>
