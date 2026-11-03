@@ -1,13 +1,88 @@
-.logo {
-  display: block;
-  width: auto;
-  max-width: min(100%, 320px);
-  height: 64px;
-  margin-top: var(--space-md);
-  padding: var(--space-3xs) var(--space-xs);
-  object-fit: contain;
-  background: var(--surface-raised);
-  border-radius: var(--radius-md);
+/*
+ * The hero: a split. The text is in the left half of the content column.
+ * Below 1152 the plate comes after the text, and it goes to the right edge
+ * of the page. From 1152 the plate is the right half of the band: from the
+ * centre of the page to its right edge, and from the top of the text to
+ * the bottom of the band. A hairline across the full width of the page
+ * closes the band. The plate stops on it, thus the band cuts the plate, as
+ * the frame of a scene.
+ */
+.hero {
+  position: relative;
+  overflow-x: clip;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.label {
+  margin-bottom: calc(var(--space-2xs) - var(--space-md));
+  color: var(--text-muted);
+}
+
+@media (hover: hover) {
+  .label a:hover {
+    text-decoration: underline;
+  }
+}
+
+.intro {
+  max-width: var(--reading-max);
+  color: var(--text-muted);
+}
+
+.intro > * + * {
+  margin-top: var(--space-xs);
+}
+
+.heroText .actions {
+  margin-top: var(--space-xs);
+}
+
+/* The plate goes to the right edge of the page. 50% - 50vw is the distance to that edge. */
+.plate {
+  min-height: 240px;
+  margin-right: calc(50% - 50vw);
+  border-top-left-radius: var(--radius-sm);
+}
+
+@media (min-width: 768px) {
+  .plate {
+    min-height: 320px;
+    border-top-left-radius: var(--radius-lg);
+  }
+}
+
+@media (min-width: 1152px) {
+  .heroContent {
+    min-height: 440px;
+  }
+
+  .heroText {
+    width: calc(50% - var(--space-xl));
+    padding-bottom: var(--section-padding-y);
+  }
+
+  .plate {
+    position: absolute;
+    top: var(--section-padding-y);
+    right: 0;
+    bottom: 0;
+    left: 50%;
+    min-height: 0;
+    margin: 0;
+  }
 }
 
 .layout {
@@ -48,7 +123,41 @@
   list-style: none;
 }
 
+/*
+ * The projects: a justified gallery. Each image keeps its own ratio (the
+ * `--ratio` of its item). The items of a row grow in proportion to their
+ * ratios, thus all the images of a row have the same height and the row
+ * fills the width. The last item is a filler as wide as a short image: it
+ * takes a part of the free space of the last row, thus a last row of one
+ * or two images does not grow too tall. On phones, each image takes the
+ * full width.
+ */
+.gallery {
+  --row: 100%;
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xl) var(--space-lg);
+  list-style: none;
+}
+
+/* An image alone on its row does not grow taller than 480px. */
+.gallery > li {
+  flex: var(--ratio) 1 calc(var(--ratio) * var(--row));
+  min-width: 0;
+  max-width: calc(var(--ratio) * 480px);
+}
+
+.gallery::after {
+  content: '';
+  flex: 1.5 1 0;
+}
+
 @media (min-width: 768px) {
+  .gallery {
+    --row: 280px;
+  }
+
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

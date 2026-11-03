@@ -1,0 +1,44 @@
+---
+// The logo of a partner on a white plate. The plate is white in both
+// schemes, thus the logo always keeps its own colours on white. When the
+// plate comes into view, the logo develops: it starts as large square cells
+// in its own colours, and the cells get smaller in steps until the logo is
+// sharp. Without motion, the logo is sharp at once.
+import { stripStega } from '@datocms/astro';
+import s from './style.module.css';
+
+interface Props {
+  name: string;
+  logo: {
+    url: string;
+    alt?: string | null;
+    width?: number | null;
+    height?: number | null;
+    /** A PNG of the logo. The canvas reads this file, because an SVG can have no size. */
+    pngUrl: string;
+  };
+  class?: string;
+}
+
+const { name, logo, class: className } = Astro.props;
+---
+
+<logo-plate class:list={[s.plate, className]} data-src={logo.pngUrl}>
+  <span class={s.box}>
+    <img
+      class={s.logo}
+      src={logo.url}
+      alt={stripStega(logo.alt ?? '') || `${stripStega(name)} logo`}
+      width={logo.width ?? undefined}
+      height={logo.height ?? undefined}
+      fetchpriority="high"
+    />
+    <canvas class={s.canvas} aria-hidden="true"></canvas>
+  </span>
+</logo-plate>
+
+<script>
+  import { defineLogoPlate } from './element';
+
+  defineLogoPlate();
+</script>

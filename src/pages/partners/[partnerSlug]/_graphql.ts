@@ -111,18 +111,9 @@ export const query = graphql(
           headline {
             value
           }
-          technologies {
-            name
-            integrationType {
-              slug
-            }
-            logo {
-              url
-              alt
-            }
-          }
+          # The image keeps its own ratio: the gallery of the page shows it whole.
           mainImage {
-            responsiveImage(imgixParams: { w: 750, h: 500, fit: crop, crop: top }) {
+            responsiveImage(imgixParams: { w: 1400, auto: format }) {
               ...ResponsiveImageFragment
             }
           }

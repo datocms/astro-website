@@ -1,11 +1,11 @@
 ---
 // A card with an image, a title and a short text: a project of the
 // showcase or a chat. The optional logo is the partner of the project (a
-// logo of the agency) or the technology of the project. Both keep their colours.
+// logo of the agency): it keeps its colours, on white.
 import { stripStega } from '@datocms/astro';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
-import type { FragmentOf } from '~/lib/datocms/graphql';
-import type { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import s from './_Card.module.css';
 
 interface Props {
@@ -13,14 +13,25 @@ interface Props {
   title: string;
   image?: FragmentOf<typeof ResponsiveImageFragment> | null;
   logo?: { url: string; alt: string | null } | null;
+  /**
+   * The image keeps its own ratio. Without this, the box of the image is
+   * 3:2 and the image fills it (a cover crop).
+   */
+  natural?: boolean;
 }
 
-const { href, title, image, logo } = Astro.props;
+const { href, title, image, logo, natural = false } = Astro.props;
+
+const imageData = image ? readFragment(ResponsiveImageFragment, image) : null;
+const ratio =
+  natural && imageData?.width && imageData.height
+    ? `${imageData.width} / ${imageData.height}`
+    : undefined;
 ---
 
 <a href={href} class={s.card}>
-  <span class={s.image}>
-    {image && <ResponsiveImage data={image} sizes="(min-width: 768px) 360px, 100vw" />}
+  <span class={s.image} style={ratio ? { aspectRatio: ratio } : undefined}>
+    {image && <ResponsiveImage data={image} />}
   </span>
   <span class={s.text}>
     <span class:list={[s.title, 'bodyMedium']}>{title}</span>

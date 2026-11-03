@@ -7,7 +7,7 @@ import sortBy from 'lodash-es/sortBy';
 import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Fact, Facts } from '~/components/Facts';
-import { Hero } from '~/components/Hero';
+import { Headline } from '~/components/Headline';
 import { PluginCard } from '~/components/PluginCard';
 import { Prose } from '~/components/Prose';
 import { hasText, Quote, QuoteCard, readQuote } from '~/components/Quote';
@@ -18,6 +18,8 @@ import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkT
 import { partner } from '~/data/partners';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { readFragment } from '~/lib/datocms/graphql';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import {
@@ -31,6 +33,7 @@ import {
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import Card from '../_Card.astro';
+import LogoPlate from './_LogoPlate/Component.astro';
 import { extraQuery, query } from './_graphql';
 import s from './_style.module.css';
 
@@ -81,20 +84,43 @@ const sortedProjects = sortBy(page.projects, (project) =>
     }),
     seoOgType('website'),
   )}
-  headerVariant="accent"
+  headerVariant="page"
 >
-  <Hero variant="accent" label={partner.kicker} labelHref={partner.kickerHref} headline={page.name}>
-    <div slot="intro">
-      <StructuredText {...ensureValidStructuredTextProps({ data: page.shortDescription })} />
-      <img
-        class={s.logo}
-        src={page.logo.url}
-        alt={`${page.name} logo`}
-        width={page.logo.width ?? undefined}
-        height={page.logo.height ?? undefined}
-      />
+  {
+    /*
+      The hero is a split. The text is in the left half, on the page. The
+      right half is the white plate of the logo, cut by the right edge and
+      by the bottom edge of the band, as the frame of a product scene.
+    */
+  }
+  <Section flushBottom class={s.hero} contentClass={s.heroContent} data-hero>
+    <div class={s.heroText}>
+      <p class:list={[s.label, 'body']}>
+        <a href={partner.kickerHref} data-datocms-nomd>{partner.kicker}</a>
+      </p>
+      <Headline as="h1" size="headline">{page.name}</Headline>
+      <div class:list={[s.intro, 'body']}>
+        <StructuredText {...ensureValidStructuredTextProps({ data: page.shortDescription })} />
+      </div>
+      <div class={s.actions}>
+        <Button href={page.websiteUrl} attrs={{ target: '_blank' }}>
+          {partner.visitWebsite}
+        </Button>
+        {
+          page.publicContactEmail && (
+            <Button
+              href={`mailto:${page.publicContactEmail}`}
+              variant="soft"
+              attrs={{ target: '_blank' }}
+            >
+              {`${partner.contact} ${page.name}`}
+            </Button>
+          )
+        }
+      </div>
     </div>
-  </Hero>
+    <LogoPlate class={s.plate} name={page.name} logo={page.logo} />
+  </Section>
 
   <Section>
     <div class={s.layout}>
@@ -109,23 +135,6 @@ const sortedProjects = sortBy(page.projects, (project) =>
             })}
           />
         </Prose>
-        <div class={s.actions}>
-          <Button href={page.websiteUrl} appearance="deep-on-light" attrs={{ target: '_blank' }}>
-            {partner.visitWebsite}
-          </Button>
-          {
-            page.publicContactEmail && (
-              <Button
-                href={`mailto:${page.publicContactEmail}`}
-                variant="soft"
-                appearance="deep-on-light"
-                attrs={{ target: '_blank' }}
-              >
-                {`${partner.contact} ${page.name}`}
-              </Button>
-            )
-          }
-        </div>
       </div>
 
       <aside>
@@ -198,18 +207,20 @@ const sortedProjects = sortBy(page.projects, (project) =>
         <div class={s.header}>
           <h2 class="title">{partner.projects}</h2>
         </div>
-        <ul class={s.grid}>
+        <ul class={s.gallery}>
           {sortedProjects.map((project) => {
-            const framework = project.technologies.find(
-              (t) => t.integrationType.slug === 'framework',
-            )?.logo;
+            const { width, height } = readFragment(
+              ResponsiveImageFragment,
+              project.mainImage.responsiveImage,
+            );
+            const ratio = width && height ? width / height : 3 / 2;
             return (
-              <li>
+              <li style={{ '--ratio': ratio }}>
                 <Card
                   href={buildUrlForShowcaseProject(project)}
                   title={project.name}
                   image={project.mainImage.responsiveImage}
-                  logo={framework}
+                  natural
                 >
                   <PlainText data={project.headline} />
                 </Card>

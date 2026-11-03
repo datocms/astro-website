@@ -1,0 +1,69 @@
+/*
+ * The plate is white in both schemes: the one surface that stays light
+ * (--surface-raised). The page that holds the plate gives it its size and
+ * its cut: the plate fills that box. In the light scheme a hairline
+ * follows the edges that are not cut (the top and the left), thus the
+ * white shows on the pale page. In the dark scheme the white on the dark
+ * page shows the edge, and the hairline is the colour of the plate.
+ */
+.plate {
+  display: grid;
+  place-items: center;
+  padding: var(--space-xl);
+  background: var(--surface-raised);
+  border-top: 1px solid var(--border-default);
+  border-left: 1px solid var(--border-default);
+}
+
+:global(:root[data-scheme='dark']) .plate {
+  border-color: var(--surface-raised);
+}
+
+/* The box of the logo. The logo and the canvas fill it with the fit `contain`. */
+.box {
+  position: relative;
+  display: block;
+  width: min(100%, 360px);
+  height: clamp(72px, 12vw, 140px);
+}
+
+.logo,
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.logo {
+  object-fit: contain;
+}
+
+.canvas {
+  visibility: hidden;
+  image-rendering: pixelated;
+}
+
+/*
+ * With motion, the logo waits for the development. When the script does
+ * not run, the logo shows after a short time all the same.
+ */
+:global([data-motion='on']) .plate:not([data-state='sharp']) .logo {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- an image with no text waits for its development */
+  opacity: 0;
+  animation: failsafe 0s 2.2s forwards;
+}
+
+.plate[data-state='developing'] .logo {
+  animation: none;
+}
+
+.plate[data-state='developing'] .canvas {
+  visibility: visible;
+}
+
+@keyframes failsafe {
+  to {
+    opacity: 1;
+  }
+}
