@@ -27,7 +27,10 @@ npx tsx scripts/pixel-videos/encode.ts tmp/hand-ok-sign.mov public/videos/hand-o
 
 `key.py` options: `--only green` (use only the takes on green), `--trim
 <first> <last>` (the frames of the take), `--lo`, `--hi`, `--despill` (the
-key).
+key), `--from <s> --seconds <n>` (key this part of the video in place of
+`--run`, for footage where `runs` finds no take), `--crop <w>:<h>:<x>:<y>`
+(key only this box of the source frame: it removes text on the screen and
+black bars).
 
 `encode.ts` options:
 

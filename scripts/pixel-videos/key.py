@@ -22,6 +22,11 @@
 #                        black): for example when number cards on black come
 #                        between the takes
 #   --trim <first> <last>  the frames of the run to keep, from 0
+#   --from <s> --seconds <n>  key this part of the video in place of a run
+#                        (for footage that `runs` does not find, for
+#                        example a screen with text on it)
+#   --crop <w>:<h>:<x>:<y>  key only this box of the frame, in pixels of the
+#                        source: it removes text and black bars
 #   --lo, --hi, --despill  the key (see `matte()` below)
 import argparse, hashlib, json, pathlib, re, subprocess, sys
 import numpy as np
@@ -88,6 +93,8 @@ def kind(bg):
     r, g, b = bg
     # Some screens are yellow green (130, 167, 40): an excess of only 37.
     if g > 120 and g - max(r, b) > 30: return "green"
+    # Some screens are dark green (1, 58, 31): an excess of only 27.
+    if g > 40 and g - max(r, b) > 20 and g > 1.6 * max(r, b): return "green"
     if b > 120 and b - max(r, g) > 60: return "blue"
     if max(r, g, b) < 12: return "black"
     return None
@@ -173,7 +180,20 @@ def key_clip(args):
     mov, sheet = TMP / f"{name}.mov", TMP / f"{name}.png"
     src = source_file(url)
     W, H, FPS = probe(src)
-    a, b, k = detect_runs(url, args.only)[args.run - 1]
+    crop = ""
+    if args.crop:
+        W, H, X, Y = (int(v) for v in args.crop.split(":"))
+        crop = f"crop={W}:{H}:{X}:{Y},"
+    if args.run:
+        a, b, k = detect_runs(url, args.only)[args.run - 1]
+    else:
+        a = round(args.start * FPS)
+        b = a + round(args.seconds * FPS) - 1
+        f = next(frames(["-ss", f"{a / FPS:.4f}", "-i", str(src), "-frames:v", "1",
+                         "-vf", f"{crop}scale=960:-2"], 960, round(H * 960 / W / 2) * 2))
+        k = kind(corner(f.astype(np.float32)))
+        if k is None:
+            sys.exit(f"{name}: the top right corner of the frame is not a screen colour")
     if args.trim:
         a, b = a + args.trim[0], a + args.trim[1]
     n = b - a + 1
@@ -186,7 +206,7 @@ def key_clip(args):
     sw = 960
     sh = round(H * sw / W / 2) * 2
     bgs, boxes = [], []
-    for f in frames(["-ss", ss, "-i", str(src), "-frames:v", str(n), "-vf", f"scale={sw}:{sh}"], sw, sh):
+    for f in frames(["-ss", ss, "-i", str(src), "-frames:v", str(n), "-vf", f"{crop}scale={sw}:{sh}"], sw, sh):
         f = f.astype(np.float32)
         bg = corner(f)
         bgs.append(bg)
@@ -209,7 +229,7 @@ def key_clip(args):
     cw, ch = (cx1 - cx0) // 2 * 2, (cy1 - cy0) // 2 * 2
     a, b = a + i0, a + i1
     print(f"{name}: run {args.run}, frames {a}-{b} ({b - a + 1}) at {FPS:g} fps, {k}, "
-          f"crop {cw}x{ch}+{cx0}+{cy0} of {W}x{H}", flush=True)
+          f"crop {cw}x{ch}+{cx0}+{cy0} of {W}x{H}{' (' + args.crop + ')' if args.crop else ''}", flush=True)
 
     # Pass 2, at full size: key each frame, and send RGBA to the ProRes
     # encoder. The scale is on premultiplied colour, thus the colour of the
@@ -223,7 +243,7 @@ def key_clip(args):
     picks = set(np.linspace(i0, i1, 8).round().astype(int).tolist())
     tiles = []
     for i, f in enumerate(frames(["-ss", ss, "-i", str(src), "-frames:v", str(n),
-                                  "-vf", f"crop={cw}:{ch}:{cx0}:{cy0}"], cw, ch)):
+                                  "-vf", f"{crop}crop={cw}:{ch}:{cx0}:{cy0}"], cw, ch)):
         if i < i0 or i > i1:
             continue
         f = f.astype(np.float32)
@@ -262,14 +282,20 @@ def main():
         return
     p = argparse.ArgumentParser()
     p.add_argument("url")
-    p.add_argument("--run", type=int, required=True)
+    p.add_argument("--run", type=int)
+    p.add_argument("--from", dest="start", type=float)
+    p.add_argument("--seconds", type=float)
+    p.add_argument("--crop")
     p.add_argument("--name", required=True)
     p.add_argument("--only", choices=list(KEY_DEFAULTS))
     p.add_argument("--trim", type=int, nargs=2)
     p.add_argument("--lo", type=float)
     p.add_argument("--hi", type=float)
     p.add_argument("--despill", type=float)
-    key_clip(p.parse_args())
+    args = p.parse_args()
+    if (args.run is None) == (args.start is None) or (args.start is None) != (args.seconds is None):
+        p.error("give --run, or --from and --seconds")
+    key_clip(args)
 
 
 main()
