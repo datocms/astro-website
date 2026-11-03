@@ -34,8 +34,8 @@ export const page: FrameworkPage = {
   // New copy.
   hero: {
     label: 'Nuxt + DatoCMS',
-    headline: 'Nuxt in front, DatoCMS behind.',
-    subheadline: 'A composable fetches it, another subscribes to it, vue-datocms renders it',
+    headline: 'Nuxt in front, content backed by DatoCMS.',
+    subheadline: 'A composable fetches it, vue-datocms renders it, a cookie shows drafts',
     face: 'cool',
     intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
@@ -57,16 +57,16 @@ export const page: FrameworkPage = {
     docsRoot,
     // New copy.
     intro:
-      'A cookie turns draft mode on, and the page passes includeDrafts from it. Add contentLink and one <ContentLink />: every text links to its field.',
+      'A cookie turns draft mode on, and the page passes `includeDrafts` when it’s set. Add `contentLink` and a single `<ContentLink />` component, and every text links to its field.',
     draft: code.draftCode,
     contentLink: code.contentLinkCode,
   }),
   realTime: realTimeChapter({
     docsRoot,
     // New copy.
-    muted: 'Posts land without a reload.',
+    muted: 'New posts appear without a reload.',
     intro:
-      'useQuerySubscription from vue-datocms keeps the page in sync over Server-Sent Events. For editors in draft mode, or for every visitor of a live page.',
+      '`useQuerySubscription` from `vue-datocms` keeps the page in sync over Server-Sent Events, for editors in draft mode or for every visitor of a live page.',
   }),
   liveCode: code.liveCode,
   liveDescription:
@@ -76,8 +76,8 @@ export const page: FrameworkPage = {
   // New copy.
   showcase: {
     label: 'Built with Nuxt and DatoCMS',
-    headline: 'Some sites that run on both.',
-    intro: 'Websites of our customers and projects of our partners, built with Nuxt on DatoCMS.',
+    headline: 'Sites built on both.',
+    intro: 'Customer websites and partner projects built with Nuxt and DatoCMS.',
   },
   integrations: ['nuxt-js', 'vue'],
   // The features of the README of the starter kit.
@@ -85,7 +85,7 @@ export const page: FrameworkPage = {
     repo: starterRepo,
     // New copy.
     subline:
-      'Nuxt 4 in TypeScript, with draft mode, click-to-edit overlays, real-time updates and SEO metadata. The Web Previews and SEO plugins come set up. Every file is commented.',
+      'Nuxt 4 in TypeScript, with draft mode, click-to-edit overlays, real-time updates and SEO metadata. The Web Previews and SEO plugins come set up. All with helpful comments to get you going.',
   }),
   // The review of Emil Olsson.
   reviewId: '39832294',
