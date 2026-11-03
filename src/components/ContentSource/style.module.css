@@ -83,7 +83,8 @@
   display: none;
 }
 
-.listWindow {
+/* --offset (rows) and --stretch come from the script. */
+.reel {
   position: relative;
 }
 
@@ -99,17 +100,19 @@
 
 .item {
   color: var(--text-headline-muted);
+  transform: scaleY(var(--stretch, 1));
 }
 
-.item.active,
-.item[data-active] {
+/* The line of the source: one row of height, as wide as the band. */
+.lit {
+  position: absolute;
+  inset: 0 0 auto;
+  height: var(--size);
+  clip-path: inset(calc(var(--size) * -0.0555) -100vw);
+}
+
+.lit .item {
   color: var(--text-primary);
-}
-
-/* When JS runs, the data-active attribute replaces the first state. */
-/* stylelint-disable-next-line selector-max-specificity -- The data attribute of the JS state must win over the state class. */
-.list:has([data-active]) .item.active:not([data-active]) {
-  color: var(--text-headline-muted);
 }
 
 @media (min-width: 768px) {

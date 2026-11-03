@@ -15,6 +15,7 @@ const { headline, face, paragraph, channels, activeChannel, theme } = Astro.prop
 // Three copies of the list. The active item stays in the middle copy,
 // thus there are always items above it and below it.
 const activeIndex = channels.length + Math.max(0, channels.indexOf(activeChannel));
+const rows = [...channels, ...channels, ...channels];
 ---
 
 <Section
@@ -37,24 +38,27 @@ const activeIndex = channels.length + Math.max(0, channels.indexOf(activeChannel
   <p class:list={[styles.paragraph, 'body']}>{paragraph}</p>
 
   <div class={styles.visual} aria-hidden="true">
-    <content-source class={styles.lockup} data-content-source data-active={activeIndex}>
+    <content-source class={styles.lockup}>
       <span class={styles.label}>
         <span class={styles.labelLong}>Single Source</span>
         <span class={styles.labelShort}>Source</span>
       </span>
-      <span class={styles.symbol} set:html={symbol} />
-      <span class={styles.listWindow}>
-        <span class={styles.list} data-list style={`--active-start: ${activeIndex}`}>
-          {
-            [...channels, ...channels, ...channels].map((channel, i) => (
-              <span
-                class:list={[styles.item, i === activeIndex && styles.active]}
-                data-clone={Math.floor(i / channels.length) === 1 ? undefined : ''}
-              >
-                {channel}
-              </span>
-            ))
-          }
+      <span class={styles.symbol} data-symbol set:html={symbol} />
+      <span
+        class={styles.reel}
+        data-reel
+        data-count={channels.length}
+        data-start={activeIndex}
+        style={`--active-start: ${activeIndex}`}
+      >
+        <span class={styles.list}>
+          {rows.map((channel) => <span class={styles.item}>{channel}</span>)}
+        </span>
+        {/* The same list in the text colour, cut to the line of the source. */}
+        <span class={styles.lit}>
+          <span class={styles.list}>
+            {rows.map((channel) => <span class={styles.item}>{channel}</span>)}
+          </span>
         </span>
       </span>
     </content-source>
@@ -65,47 +69,119 @@ const activeIndex = channels.length + Math.max(0, channels.indexOf(activeChannel
   import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
   import { WebComponent } from '~/lib/WebComponent';
 
-  // Every 0.8s the list moves up one row, with a 416ms spring-like ease.
+  // The scroll of the page turns the reel a little, and a spring stops it
+  // on a channel. At rest, the reel moves one channel every STEP_MS.
+  // Units: rows and seconds.
   const STEP_MS = 800;
-  const MOVE_MS = 416;
+  // After a scroll, the reel stays on its channel for this time.
+  const REST_AFTER_SCROLL_MS = 1600;
+  // The scroll that turns the reel by one row.
+  const PX_PER_ROW = 150;
+  // A fast scroll turns the reel at this speed at most, and by this many rows at most.
+  const MAX_SPEED = 8;
+  const MAX_PENDING = 3;
+  const STIFFNESS = 170;
+  const DAMPING = 2 * 0.55 * Math.sqrt(STIFFNESS);
+  // At the maximum speed, the rows stretch this much in height.
+  const MAX_STRETCH = 0.08;
 
   customElements.define(
     'content-source',
     class extends WebComponent {
       parsedCallback() {
-        const list = this.$('[data-list]');
+        const reel = this.$('[data-reel]');
+        const symbol = this.$('[data-symbol]');
         if (prefersReducedMotion()) return;
-        const items = [...list.children] as HTMLElement[];
-        const count = items.length / 3;
-        const start = Number(this.dataset.active || 0);
-        let offset = 0;
-        let timer = 0;
 
-        const render = (animate: boolean) => {
-          list.style.transition = animate ? `transform ${MOVE_MS}ms var(--ease-spring)` : 'none';
-          list.style.setProperty('--offset', String(offset));
-          const active = start + offset;
-          items.forEach((item, i) => item.toggleAttribute('data-active', i === active));
+        const count = Number(reel.dataset.count);
+        const start = Number(reel.dataset.start);
+        // pos: where the reel is. aim: where the scroll and the steps send it.
+        // The spring takes pos to the row nearest to aim.
+        let pos = 0;
+        let speed = 0;
+        let aim = 0;
+        // The scroll that the reel has not turned yet.
+        let pending = 0;
+        let target = 0;
+        let landed = true;
+        // The time since the last step. It is negative after a scroll.
+        let sinceStep = 0;
+        let lastY = 0;
+        let lastTime = 0;
+        let frame = 0;
+
+        const nod = () => {
+          symbol.animate([{ scale: 1 }, { scale: 0.92, offset: 0.35 }, { scale: 1 }], {
+            duration: 360,
+            easing: 'cubic-bezier(0.3, 0, 0, 1)',
+          });
         };
 
-        const tick = () => {
-          // When the active item leaves the middle copy, jump back one copy
-          // with no animation. The two positions look the same.
-          if (start + offset >= 2 * count) {
-            offset -= count;
-            render(false);
-            // Apply the jump before the next move starts.
-            void list.offsetHeight;
+        const step = (time: number) => {
+          const dt = Math.min((time - lastTime) / 1000, 1 / 30);
+          lastTime = time;
+
+          // Keep the centre row in the middle copy. The jump of one copy
+          // does not show: the copies are the same.
+          const shift = start + pos >= 2 * count ? -count : start + pos < count ? count : 0;
+          pos += shift;
+          aim += shift;
+          target += shift;
+
+          const scrolled = window.scrollY - lastY;
+          lastY = window.scrollY;
+          if (scrolled !== 0) {
+            pending = Math.max(
+              -MAX_PENDING,
+              Math.min(MAX_PENDING, pending + scrolled / PX_PER_ROW),
+            );
+            sinceStep = -REST_AFTER_SCROLL_MS / 1000;
           }
-          offset += 1;
-          render(true);
+
+          if (pending !== 0) {
+            const turn = Math.max(-MAX_SPEED * dt, Math.min(MAX_SPEED * dt, pending));
+            aim += turn;
+            pending -= turn;
+          } else {
+            sinceStep += dt;
+            if (sinceStep >= STEP_MS / 1000) {
+              sinceStep = 0;
+              aim = target + 1;
+            }
+          }
+
+          if (Math.round(aim) !== target) {
+            target = Math.round(aim);
+            landed = false;
+          }
+
+          const before = target - pos;
+          speed += (STIFFNESS * before - DAMPING * speed) * dt;
+          pos += speed * dt;
+          const after = target - pos;
+          if (!landed && before * after <= 0) {
+            landed = true;
+            nod();
+          }
+          if (Math.abs(after) < 0.001 && Math.abs(speed) < 0.01) {
+            pos = target;
+            speed = 0;
+          }
+
+          const stretch = 1 + Math.min(Math.abs(speed) / MAX_SPEED, 1) * MAX_STRETCH;
+          reel.style.setProperty('--offset', pos.toFixed(4));
+          reel.style.setProperty('--stretch', stretch.toFixed(3));
+          frame = requestAnimationFrame(step);
         };
 
-        render(false);
-
-        onVisibilityChange(this, (visible) => {
-          clearInterval(timer);
-          if (visible) timer = window.setInterval(tick, STEP_MS);
+        onVisibilityChange(this.parentElement ?? this, (visible) => {
+          cancelAnimationFrame(frame);
+          if (!visible) return;
+          lastY = window.scrollY;
+          frame = requestAnimationFrame((time) => {
+            lastTime = time;
+            step(time);
+          });
         });
       }
     },
