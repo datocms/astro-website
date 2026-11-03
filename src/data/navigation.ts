@@ -53,22 +53,16 @@ const l = (label: string, href = '#', description?: string): LinkItem =>
 
 const communityHref = 'https://community.datocms.com';
 
-// The four pillars. Each description names the chapters of the pillar,
-// in page order (the chapter labels of src/data/developers-pillar.ts,
-// src/data/editor-experience.ts, src/data/media.ts and
-// src/data/ai-pillar.ts). When a chapter changes, change its line here.
-const developers = l(
-  'For developers',
-  '/developers',
-  'Schema, GraphQL, real-time, cache tags, environments, automation, plugins',
-);
+// The four pillars. Each description is one line of the card: a few of
+// the chapters of the pillar, in page order.
 const editorExperience = l(
   'Editor experience',
   '/editor-experience',
-  'Structured content, visual editing, layouts, localization, workflows, collaboration, SEO',
+  'Structured content and visual editing',
 );
-const media = l('Media', '/media', 'Media library, asset fields, images, video, components');
-const ai = l('AI', '/ai', 'MCP, agent skills, LLM-ready docs, translations, tags and captions');
+const developers = l('For developers', '/developers', 'Schema, GraphQL, real-time, cache tags');
+const media = l('Media', '/media', 'Images, video and the media library');
+const ai = l('AI', '/ai', 'MCP, agent skills, LLM-ready docs');
 
 // The framework pages (/cms/[slug]).
 const frameworks = [
@@ -102,7 +96,7 @@ export const mainNavigation: NavGroup[] = [
           {
             heading: 'Product',
             links: [editorExperience, developers, media, ai],
-            allLink: l('All features', '/features'),
+            allLink: l('The full list', '/features'),
           },
         ],
       },

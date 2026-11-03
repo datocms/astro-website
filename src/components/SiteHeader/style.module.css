@@ -4,15 +4,14 @@
 }
 
 /*
- * 82px tall, not sticky. A hairline closes it at the bottom: the header
- * has the ground of the hero, and the line tells where it ends.
+ * 82px tall, not sticky, with no line at the bottom: the header has the
+ * ground of the hero and runs into it.
  */
 .header {
   position: relative;
   z-index: 10;
   height: var(--header-height);
   padding-inline: var(--section-padding-x);
-  border-bottom: 1px solid var(--border-default);
   background: var(--surface-default);
   color: var(--text-primary);
 }
@@ -105,29 +104,6 @@
     opacity 150ms ease-out;
 }
 
-/*
- * With a card open, the pill and the label of the open item take the
- * ground of the card: the item is the tab of its card. The swap is
- * instant, as the hover of a button.
- */
-.nav:has(.shellAccent[data-open]) .indicator {
-  background: var(--surface-accent);
-  color: var(--text-on-accent);
-}
-
-.nav:has(.shellInverse[data-open]) .indicator {
-  background: var(--surface-inverse);
-  color: var(--text-on-inverse);
-}
-
-[data-nav]:has(.shellAccent[data-open]) [aria-expanded='true'] {
-  color: var(--text-on-accent);
-}
-
-[data-nav]:has(.shellInverse[data-open]) [aria-expanded='true'] {
-  color: var(--text-on-inverse);
-}
-
 .chevron {
   flex: none;
   width: 10px;
@@ -191,13 +167,14 @@
 }
 
 /*
- * The shell of the cards (≥1152). It hangs from the hairline of the
+ * The shell of the cards (≥1152). It hangs from the bottom of the
  * header, under the open item, with the size of the open card: the
  * script sets --card-x, --card-width and --card-height, and animates the
- * shell from one card to the next. The shell is a field of colour, as a
- * band: the accent under a page header, the deep under an accent header.
- * The change of surface is the edge: it has no border. The negative
- * offset puts the text of the card under the label of the pill.
+ * shell from one card to the next. The shell is a field of the deep of
+ * the page theme, as the footer: it stands apart from a page hero and
+ * from an accent hero. The change of surface is the edge: it has no
+ * border. The negative offset puts the text of the card under the label
+ * of the pill.
  */
 .shell {
   --card-padding-x: var(--space-xl);
@@ -210,24 +187,20 @@
   width: var(--card-width, 0);
   height: var(--card-height, 0);
   overflow: hidden;
-  visibility: hidden;
-}
-
-.shellAccent {
-  background: var(--surface-accent);
-  color: var(--text-on-accent);
-}
-
-.shellInverse {
   background: var(--surface-inverse);
   color: var(--text-on-inverse);
+  visibility: hidden;
 }
 
 .shell[data-open] {
   visibility: visible;
 }
 
-/* A card has its own size; the shell shows the active one. */
+/*
+ * A card has its own size; the shell shows the active one. The air is
+ * one step: 40px around the card and between its sections, 16px under
+ * a heading, 12px between the links.
+ */
 .card {
   position: absolute;
   top: 0;
@@ -235,7 +208,7 @@
   display: flex;
   gap: var(--space-2xl);
   width: max-content;
-  padding: var(--space-lg) var(--card-padding-x);
+  padding: var(--space-xl) var(--card-padding-x);
   visibility: hidden;
 }
 
@@ -246,7 +219,7 @@
 .cardColumn {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--space-xl);
 }
 
 /* A section: the heading, the links, then its "→ All …" link. */
@@ -254,7 +227,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
 }
 
 .heading {
@@ -264,7 +237,7 @@
 .cardLinks {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
+  gap: var(--space-xs);
 }
 
 .allLink {
@@ -280,7 +253,7 @@
   text-decoration-thickness: 0.06em;
 }
 
-/* Mobile nav (<1152). */
+/* Mobile nav (<1152). A hairline at its top separates it from the bar. */
 .mobileNav {
   position: absolute;
   top: 100%;
@@ -290,6 +263,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: var(--space-lg) var(--section-padding-x);
+  border-top: 1px solid var(--border-default);
   background: var(--surface-default);
   color: var(--text-on-page);
 }

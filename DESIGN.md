@@ -6,16 +6,16 @@ colors:
   pollen: '#e7d864'
   cream-paper: '#fdfff5'
   ember-deep: '#42180f'
-  ember: '#f98751'
+  ember: '#f09063'
   ember-paper: '#fffbf5'
   fern-deep: '#1a4731'
-  fern: '#9ad162'
+  fern: '#93c95b'
   fern-paper: '#f5fff5'
   slate-deep: '#1d2229'
-  iris: '#9e8ef5'
+  iris: '#aaa0ef'
   iris-paper: '#f6f5ff'
   harbour-deep: '#1a3a47'
-  glacier: '#7fc4db'
+  glacier: '#58c6e7'
   glacier-paper: '#edfeff'
   plum-deep: '#3c0a35'
   bubblegum: '#ef89cf'
@@ -208,7 +208,7 @@ The five other themes have the same three roles. A section picks its theme with 
 
 The theme of each page is in "Page themes" (Layout).
 
-Ember and Bubblegum are tuned away from overnice's values (#ff6d00 too vivid, #f1a5a7 too pale) so that all six accents have similar chroma: OKLCH C 0.08 to 0.155 (Glacier is the softest; Fern, Iris, Ember and Bubblegum are the strongest, at about 0.15). An accent above that range looks neon next to the others. Keep that balance when you add or change a hue.
+The six accents follow one rule in OKLCH: lightness 0.745 to 0.775, and chroma 72% to 80% of the most chroma that sRGB gives at that lightness and hue. The percentage is what aligns them, not the raw chroma: a colour near the edge of sRGB looks neon next to the others, also when its chroma number is the same. Pollen is the one exception (lightness 0.87), because a darker yellow is a mustard. Ember and Bubblegum are tuned away from overnice's values (#ff6d00 at the edge of sRGB, #f1a5a7 too pale). Keep the rule when you add or change a hue.
 
 ### Tertiary
 
@@ -414,8 +414,8 @@ There are few cards. Content sits in bands, cells and halves.
 
 ### Navigation
 
-- **Header:** 82px, not sticky, on the surface of the page or of the hero band, with a hairline (`--border-default`) at the bottom that tells where it ends. The logo is at the left, the links start 40px after it, the actions are at the right. The links (`.labelMedium`) are 40px pills like the chips. One tint pill (`--surface-inverse-faint`) slides between the items (300ms, `cubic-bezier(0.3, 0, 0, 1)`): to the item under the cursor or with the focus, else it rests on the open item or on the group of the page that the visitor reads. "Get Started" is a pill button.
-- **Dropdown cards:** a card hangs from the hairline under its item, with a width that comes from its columns (one for Customers, two for Product and Resources). The card is a field of colour, as a band, with no border: the accent of the page theme (dark text) under a page header, the deep (light text) under an accent header. While a card is open, the tint pill and the label of its item take the ground of the card: the item is the tab of its card. Padding 30px above and below, 40px at the sides. Muted headings, `.title` links, muted descriptions. One shell holds every card: from closed it grows down from the hairline (260ms) and the rows arrive 20ms apart; from another card it glides to the new place and size (300ms, the same curve) while the two contents cross-fade. With reduced motion, the swaps are instant. The groups with cards are Product, Resources and Customers; Partners, Philosophy and Pricing are plain links.
+- **Header:** 82px, not sticky, on the surface of the page or of the hero band, with no line at the bottom: it runs into the hero. The logo is at the left, the links start 40px after it, the actions are at the right. The links (`.labelMedium`) are 40px pills like the chips. One tint pill (`--surface-inverse-faint`) slides between the items (300ms, `cubic-bezier(0.3, 0, 0, 1)`): to the item under the cursor or with the focus, else it rests on the open item or on the group of the page that the visitor reads. "Get Started" is a pill button.
+- **Dropdown cards:** a card hangs from the bottom of the header under its item, with a width that comes from its columns (one for Customers, two for Product and Resources). The card is a field of the deep of the page theme (light text), as the footer, with no border: it stands apart from a page hero and from an accent hero. The tint pill of the open item stays the faint tint. The air is one step: 40px around the card and between its sections, 16px under a heading, 12px between the links. Muted headings, `.title` links, muted descriptions. One shell holds every card: from closed it grows down from the header (260ms) and the rows arrive 20ms apart; from another card it glides to the new place and size (300ms, the same curve) while the two contents cross-fade. With reduced motion, the swaps are instant. The groups with cards are Product, Resources and Customers; Partners, Philosophy and Pricing are plain links.
 - **Footer:** on `--surface-inverse-deep` of the page theme: a little darker than the page closer above it. It has a `.headline` closing line with a text face, five columns of links in the on-inverse colours (seven to nine links each; below 1152 the groups flow in balanced text columns), a status line with a dot, and a last bar with the logo, the legal links and the company line. On touch, each link is a row of 44px.
 
 ### Code card (signature)

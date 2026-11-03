@@ -41,15 +41,6 @@ const ctaAppearance = {
 // On the page ground the CTA is a soft pill.
 const ctaVariant = ctaVariantProp ?? (variant === 'page' ? 'soft' : 'solid');
 
-// The shell of the cards takes the ground that the header does not have:
-// the accent under a page header, the deep under an accent header. The
-// card is a field of colour that hangs from the hairline, apart from the
-// hero in both schemes.
-const shellClass = {
-  page: [styles.shellAccent, 'surfaceAccent'],
-  accent: [styles.shellInverse, 'surfaceInverse'],
-}[variant];
-
 // The group of the page that the visitor reads. When two groups hold the
 // page ('/blog' and '/blog/casual-chats'), the longer path wins.
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
@@ -118,7 +109,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
         </ul>
 
         {/* One shell holds the cards: it glides and resizes from one card to the next. */}
-        <div class:list={[styles.shell, shellClass]} data-card-shell>
+        <div class:list={[styles.shell, 'surfaceInverse']} data-card-shell>
           {
             nav.map(
               (group, i) =>
@@ -143,7 +134,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
                             {section.allLink && (
                               <a
                                 href={section.allLink.href}
-                                class:list={[styles.allLink, 'title']}
+                                class:list={[styles.allLink, 'labelMedium']}
                                 data-card-row
                               >
                                 <span aria-hidden="true">→</span>
@@ -464,7 +455,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
       }
 
       // The shell takes the place and the size of the card of the trigger.
-      // From closed, it grows down from the hairline and the rows arrive one
+      // From closed, it grows down from the header and the rows arrive one
       // after the other. From another card, it glides to the new shape while
       // the two contents cross-fade.
       openCard(trigger: HTMLButtonElement) {
