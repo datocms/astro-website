@@ -28,26 +28,24 @@ const totalDuration = sum(chapter.episodes.map((episode) => episode.asset.video.
 
 {
   /*
-  A chapter: the number, the counts, the title and the introduction, then
-  the episodes in a row of cards. The id is the slug of the chapter: the
-  breadcrumb of an episode links to it.
+  A chapter: the title and the introduction, then one muted line with the
+  number, the count of the episodes and the total time, then the episodes
+  in a row of cards. The id is the slug of the chapter: the chapter nav and
+  the breadcrumb of an episode link to it.
 */
 }
 <Section id={chapter.slug} class={s.chapter} contentClass={s.content}>
   <div class={s.intro}>
-    <p class:list={[s.number, 'labelMedium']}>Chapter #{number}</p>
-    <ul class={s.pills}>
-      <li class:list={[s.pill, 'caption']}>
-        {chapter.episodes.length > 1 ? `${chapter.episodes.length} episodes` : '1 episode'}
-      </li>
-      <li class:list={[s.pill, 'caption']}>
-        {formatVideoDuration(totalDuration)}
-      </li>
-    </ul>
     <h2 class="headline">{chapter.title}</h2>
     <Prose>
       <StructuredText {...ensureValidStructuredTextProps({ data: chapter.introduction })} />
     </Prose>
+    <p class:list={[s.meta, 'labelMedium']}>
+      Chapter {number} · {episodes.length === 1 ? '1 episode' : `${episodes.length} episodes`} ·{
+        ' '
+      }
+      {formatVideoDuration(totalDuration)}
+    </p>
   </div>
   <CardCarousel label={`Episodes of ${chapter.title}`} wrap>
     {

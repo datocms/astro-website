@@ -31,7 +31,7 @@ export const query = graphql(
           ...TagFragment
         }
       }
-      chapters: allUserGuidesChapters {
+      chapters: allUserGuidesChapters(orderBy: position_ASC) {
         ...ChapterFragment
       }
     }

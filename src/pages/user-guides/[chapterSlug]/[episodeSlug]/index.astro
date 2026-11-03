@@ -1,14 +1,15 @@
 ---
 import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { ArticleBody } from '~/components/ArticleBody';
 import { Breadcrumb } from '~/components/Breadcrumb';
+import { CourseOutline } from '~/components/CourseOutline';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
 import { JsonLd } from '~/components/JsonLd';
-import { Prose } from '~/components/Prose';
+import { PrevNext } from '~/components/PrevNext';
 import { Section } from '~/components/Section';
 import { StructuredText } from '~/components/StructuredText';
 import { InternalVideo } from '~/components/StructuredText/blocks/InternalVideo';
-import { muxThumbnailUrl } from '~/components/StructuredText/blocks/TutorialVideo/muxThumbnailUrl';
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
 import { VideoPlayer } from '~/components/VideoPlayer';
@@ -36,14 +37,43 @@ if (!episode || !currentChapter) {
   return notFoundResponse();
 }
 
+const chapterIndex = chapters.indexOf(currentChapter);
 const otherChapters = chapters.filter((c) => c !== currentChapter && c.episodes.length);
-const nextChapter = chapters[chapters.indexOf(currentChapter) + 1];
-const nextEpisodeRef =
-  currentChapter.episodes[currentChapter.episodes.findIndex((e) => e.id === episode.id) + 1] ||
-  nextChapter?.episodes[0];
-const nextEpisode = nextEpisodeRef && readFragment(EpisodeFragment, nextEpisodeRef);
-const thumbnail = (video: { thumbnailUrl: string }, width: number, height: number) =>
-  muxThumbnailUrl(video.thumbnailUrl, { width, height, fit_mode: 'crop' });
+const episodeIndex = currentChapter.episodes.findIndex((e) => e.id === episode.id);
+const previousChapter = chapters[chapterIndex - 1];
+const nextChapter = chapters[chapterIndex + 1];
+
+// Previous: the episode before, or the last episode of the chapter before.
+const previousRef = currentChapter.episodes[episodeIndex - 1] ?? previousChapter?.episodes.at(-1);
+const previousEpisode = previousRef && readFragment(EpisodeFragment, previousRef);
+
+// Next: the episode after, or the first episode of the chapter after. At the
+// end of a chapter the link names the chapter after, not the episode.
+const nextRef = currentChapter.episodes[episodeIndex + 1];
+const nextEpisode = nextRef && readFragment(EpisodeFragment, nextRef);
+const firstOfNextChapter = nextChapter?.episodes[0];
+const next = nextEpisode
+  ? {
+      label: 'Next episode',
+      title: nextEpisode.title,
+      href: buildUrlForUserGuidesEpisode(nextEpisode),
+    }
+  : nextChapter && firstOfNextChapter
+    ? {
+        label: 'Next chapter',
+        title: nextChapter.title,
+        href: buildUrlForUserGuidesEpisode(firstOfNextChapter),
+      }
+    : undefined;
+
+const outline = currentChapter.episodes.map((nthEpisode) => {
+  const data = readFragment(EpisodeFragment, nthEpisode);
+  return {
+    title: data.title,
+    href: buildUrlForUserGuidesEpisode(data),
+    active: nthEpisode.id === episode.id,
+  };
+});
 ---
 
 <Layout theme="orange" seo={episode._seoMetaTags} headerVariant="accent">
@@ -70,10 +100,20 @@ const thumbnail = (video: { thumbnailUrl: string }, width: number, height: numbe
       }}
     />
   </Fragment>
-  <div id="main-content">
+  <div id="main-content" class={s.episode}>
     <Hero variant="accent" headline={episode.title}>
-      <p slot="intro">{formatVideoDuration(episode.asset.video.duration)}</p>
+      <p slot="intro">Video · {formatVideoDuration(episode.asset.video.duration)}</p>
     </Hero>
+    {
+      /*
+        The stage: the player starts in the accent band of the hero, and the
+        band stops at the middle of the player, with a hard edge.
+      */
+    }
+    <Section flushTop class={s.stage} contentClass={s.stageContent} data-datocms-nomd>
+      <span class:list={[s.band, 'surfaceAccent']} aria-hidden="true"></span>
+      <VideoPlayer data={episode.asset} />
+    </Section>
     <Breadcrumb
       trail={[
         indexes.userGuides,
@@ -81,118 +121,48 @@ const thumbnail = (video: { thumbnailUrl: string }, width: number, height: numbe
       ]}
       current={episode.title}
     />
-    <Section flushBottom>
-      <div data-datocms-nomd>
-        <VideoPlayer data={episode.asset} />
-      </div>
-    </Section>
-    <Section contentClass={s.layout}>
-      <div class={s.main}>
-        <Prose>
-          <StructuredText
-            {...ensureValidStructuredTextProps({
-              data: episode.content,
-              blockComponents: {
-                InternalVideoRecord: InternalVideo,
-              },
-              linkToRecordComponents: defaultLinkToRecordComponents,
-              inlineRecordComponents: defaultInlineRecordComponents,
-            })}
-          />
-        </Prose>
-        {
-          nextEpisode && (
-            <a class={s.next} href={buildUrlForUserGuidesEpisode(nextEpisode)}>
-              <img
-                class={s.nextImage}
-                src={thumbnail(nextEpisode.asset.video, 320, 180)}
-                alt=""
-                width="320"
-                height="180"
-                loading="lazy"
-                style={{
-                  background: `center / cover url("${nextEpisode.asset.video.blurUpThumb}")`,
-                }}
-              />
-              <span class={s.nextText}>
-                <span class:list={[s.muted, 'caption']}>Next episode</span>
-                <span class="title">{nextEpisode.title}</span>
-                <span class:list={[s.muted, 'body']}>
-                  {formatVideoDuration(nextEpisode.asset.video.duration)}
-                </span>
-              </span>
-            </a>
-          )
-        }
-      </div>
-      <aside class={s.aside} data-datocms-nomd>
-        <section class={s.currentChapter}>
-          <p class:list={[s.muted, 'labelMedium']}>
-            Chapter #{chapters.indexOf(currentChapter) + 1}
-          </p>
-          <p class:list={[s.pill, 'caption']}>{currentChapter.episodes.length} episodes</p>
-          <h2 class="title">{currentChapter.title}</h2>
-          <ul class={s.episodes}>
-            {
-              currentChapter.episodes.map((nthEpisode) => {
-                const data = readFragment(EpisodeFragment, nthEpisode);
-                return (
-                  <li>
-                    <a
-                      class:list={[s.episode, nthEpisode.id === episode.id && s.active]}
-                      href={buildUrlForUserGuidesEpisode(data)}
-                      aria-current={nthEpisode.id === episode.id ? 'page' : undefined}
-                    >
-                      <img
-                        class={s.episodeImage}
-                        src={thumbnail(data.asset.video, 160, 90)}
-                        alt=""
-                        width="80"
-                        height="45"
-                        loading="lazy"
-                        style={{
-                          background: `center / cover url("${data.asset.video.blurUpThumb}")`,
-                        }}
-                      />
-                      <span class={s.episodeText}>
-                        <span class="body">{data.title}</span>
-                        <span class:list={[s.muted, 'caption']}>
-                          {formatVideoDuration(data.asset.video.duration)}
-                        </span>
-                      </span>
-                    </a>
-                  </li>
-                );
-              })
-            }
-          </ul>
-        </section>
-        <section class={s.others}>
-          <h3 class="labelMedium">Other chapters</h3>
-          <ul class={s.otherChapters}>
-            {
-              otherChapters.map((chapter) => (
-                <li>
-                  <a
-                    class={s.otherChapter}
-                    href={buildUrlForUserGuidesEpisode(chapter.episodes[0]!)}
-                  >
-                    <span class={s.otherIntro}>
-                      <span class:list={[s.muted, 'caption']}>Chapter #{chapter.position}</span>
-                      <span class:list={[s.pill, 'caption']}>
-                        {chapter.episodes.length} episodes
-                      </span>
-                    </span>
-                    <span class="bodyMedium">{chapter.title}</span>
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </section>
-      </aside>
-    </Section>
+    <ArticleBody>
+      <CourseOutline slot="aside" title={currentChapter.title} chapters={outline}>
+        <p>
+          Chapter {chapterIndex + 1} of the <a href={indexes.userGuides.href}>user guides</a>.
+          {
+            otherChapters.length > 0 && (
+              <>
+                {' '}
+                Other chapters:{' '}
+                {otherChapters.map((chapter, i) => (
+                  <>
+                    {i > 0 && ', '}
+                    <a href={`${indexes.userGuides.href}#${chapter.slug}`}>{chapter.title}</a>
+                  </>
+                ))}
+                .
+              </>
+            )
+          }
+        </p>
+      </CourseOutline>
+      <StructuredText
+        {...ensureValidStructuredTextProps({
+          data: episode.content,
+          blockComponents: {
+            InternalVideoRecord: InternalVideo,
+          },
+          linkToRecordComponents: defaultLinkToRecordComponents,
+          inlineRecordComponents: defaultInlineRecordComponents,
+        })}
+      />
+    </ArticleBody>
   </div>
+  <PrevNext
+    ariaLabel="Previous and next episode"
+    prev={previousEpisode && {
+      label: 'Previous episode',
+      title: previousEpisode.title,
+      href: buildUrlForUserGuidesEpisode(previousEpisode),
+    }}
+    next={next}
+  />
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

@@ -1,11 +1,13 @@
 ---
+import { CategoryNav } from '~/components/CategoryNav';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { readFragment } from '~/lib/datocms/graphql';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import Chapter from './_Chapter.astro';
-import { query } from './_graphql';
+import { ChapterFragment, query } from './_graphql';
 
 const { page, chapters } = await executeQuery(Astro, query);
 
@@ -20,6 +22,14 @@ if (!page) {
     variant="accent"
     headline="User Guides"
     intro="Editors and content creators, this one’s for you. Join along for a casual and non-technical walkthrough of DatoCMS focusing on content creation and the UI."
+  />
+  {/* The chapters. Sticky; it takes the theme of the page, as the hero. */}
+  <CategoryNav
+    ariaLabel="Chapters"
+    items={chapters.map((chapter) => {
+      const { title, slug } = readFragment(ChapterFragment, chapter);
+      return { label: title, href: `#${slug}` };
+    })}
   />
   {chapters.map((chapter, index) => <Chapter chapter={chapter} number={index + 1} />)}
 

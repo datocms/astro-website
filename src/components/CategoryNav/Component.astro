@@ -14,9 +14,11 @@ interface Props extends CategoryNavData {
    * out of the total. Without JS the score is full.
    */
   total?: number;
+  /** The accessible name of the nav. The default is "Feature categories". */
+  ariaLabel?: string;
 }
 
-const { items, theme, total } = Astro.props;
+const { items, theme, total, ariaLabel = 'Feature categories' } = Astro.props;
 ---
 
 <category-nav class={styles.root}>
@@ -27,7 +29,7 @@ const { items, theme, total } = Astro.props;
     flush
     class={styles.nav}
     contentClass={styles.content}
-    aria-label="Feature categories"
+    aria-label={ariaLabel}
     data-category-nav
   >
     {/* "#top" goes to the top of the page also without JS. */}

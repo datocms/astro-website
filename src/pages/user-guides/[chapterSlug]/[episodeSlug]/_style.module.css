@@ -1,151 +1,31 @@
 /* @layer pages */
-.layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-2xl);
-  align-items: start;
+/* The hero is short at the bottom: the stage below continues its band. */
+.episode [data-hero] {
+  --section-padding-bottom: var(--space-xl);
 }
 
-.main {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xl);
-  min-width: 0;
+/*
+ * The band of the stage goes past the content to the edges of the section.
+ * Clip it there. The breadcrumb band is close below the player.
+ */
+.stage {
+  --section-padding-bottom: var(--space-xl);
+  overflow-x: clip;
 }
 
-.muted {
-  color: var(--text-muted);
+.stageContent {
+  position: relative;
+  isolation: isolate;
 }
 
-.pill {
-  align-self: flex-start;
-  padding: var(--space-5xs) var(--space-xs);
+/*
+ * The accent band behind the top half of the player. It has the ground
+ * class of the accent: in the dark scheme the accent is the deep tone of
+ * the hero. 50% - 50vw is the distance to the edge of the page.
+ */
+.band {
+  position: absolute;
+  z-index: -1;
+  inset: 0 calc(50% - 50vw) 50%;
   background: var(--surface-accent);
-  border-radius: var(--radius-full);
-  color: var(--text-on-accent);
-}
-
-.next {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-  padding: var(--space-md);
-  color: var(--text-primary);
-  background: var(--surface-accent-faint);
-  border-radius: var(--radius-md);
-}
-
-.nextImage {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border-radius: var(--radius-md);
-}
-
-.nextText {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3xs);
-}
-
-.aside {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-}
-
-.currentChapter {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.episodes {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs);
-  margin-top: var(--space-xs);
-  list-style: none;
-}
-
-.episode {
-  display: flex;
-  gap: var(--space-sm);
-  align-items: center;
-  padding: var(--space-2xs);
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-}
-
-/* The entry on the accent: it sets the page text again, thus its parts take the dark text of the accent. */
-.active {
-  --text-primary: var(--text-on-accent);
-  --text-muted: var(--text-on-accent-muted);
-  background: var(--surface-accent);
-  color: var(--text-on-accent);
-}
-
-.episodeImage {
-  flex: none;
-  width: 80px;
-  height: 45px;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
-}
-
-.episodeText {
-  display: flex;
-  flex-direction: column;
-}
-
-.others {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.otherChapters {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-  list-style: none;
-}
-
-.otherChapter {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs);
-  padding: var(--space-sm);
-  color: var(--text-primary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-}
-
-.otherIntro {
-  display: flex;
-  gap: var(--space-xs);
-  align-items: center;
-}
-
-@media (hover: hover) {
-  .next:hover .nextText > :nth-child(2),
-  .episode:hover,
-  .otherChapter:hover {
-    text-decoration: underline;
-  }
-}
-
-@media (min-width: 1152px) {
-  .layout {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-    gap: var(--space-3xl);
-  }
-
-  .aside {
-    position: sticky;
-    top: calc(var(--sticky-offset) + var(--space-xl));
-    max-height: calc(100dvh - var(--sticky-offset) - 2 * var(--space-xl));
-    overflow-y: auto;
-  }
 }
