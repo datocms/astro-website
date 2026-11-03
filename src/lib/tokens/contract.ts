@@ -132,8 +132,10 @@ export const DERIVED_TEXT_ROLES = ['--text-accent', '--text-positive', '--text-n
 /** A status: a tint with its text. The pairs sit on the page and the accent grounds. */
 export const STATUS_PAIRS: [surface: string, text: string][] = [
   ['--surface-status-info', '--text-status-info'],
+  ['--surface-status-tip', '--text-status-tip'],
   ['--surface-status-positive', '--text-status-positive'],
   ['--surface-status-warning', '--text-status-warning'],
+  ['--surface-status-danger', '--text-status-danger'],
   ['--surface-nav-active', '--text-nav-active'],
 ];
 

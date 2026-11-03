@@ -21,7 +21,7 @@
  *      inverse  --text-on-inverse-strong, --text-on-inverse, -soft, -muted,
  *               -headline-muted
  *    Each role has a contrast of 4.5:1 or more on every surface of its ground,
- *    in the six themes and the two schemes. The one exception is
+ *    in the seven themes and the two schemes. The one exception is
  *    *-headline-muted: 3:1 or more, for the quiet run of a two-tone headline
  *    or display lockup only (large text: 24 px or more).
  *
@@ -135,6 +135,46 @@
   --color-pink-light-2: #f2849780;
   --color-pink-light-1: #f284971a;
   --color-pink-light-0: #fff7f8;
+  /*
+   * The docs. The docs are a tool, not a story: the page is white, and the
+   * ink is a near black with a small tint of violet (OKLCH L 0.22, C 0.02,
+   * hue 290). The accent is the purple of the site (--color-purple-light-5,
+   * the same hue): the links take a deep tone of it (--text-accent).
+   */
+  --color-slate-deep-5: #1a1923;
+  --color-slate-deep-3: #1a1923b2;
+  --color-slate-deep-2: #1a192380;
+  --color-slate-deep-1: #1a19231a;
+  /*
+   * The callouts of the docs. Each kind has its hue, not the hue of the
+   * theme: info is blue (250), tip is violet (300), positive is green
+   * (150), warning is amber (70), danger is red (25). The levels, in OKLCH:
+   *   tint        the light fill: L 0.965, C 0.03
+   *   text        the title on the tint: L 0.47, C 0.14 (5.8:1 or more)
+   *   tint-dark   the fill in the dark scheme: L 0.29, C 0.05
+   *   text-dark   the title on it: L 0.85, C 0.09 (8.8:1 or more)
+   * A chroma out of sRGB is reduced until the colour fits.
+   */
+  --color-callout-info-tint: #ebf5ff;
+  --color-callout-info-text: #005da1;
+  --color-callout-info-tint-dark: #172d43;
+  --color-callout-info-text-dark: #a8d2ff;
+  --color-callout-tip-tint: #f5f1ff;
+  --color-callout-tip-text: #68449c;
+  --color-callout-tip-tint-dark: #2f2540;
+  --color-callout-tip-text-dark: #d6c1ff;
+  --color-callout-positive-tint: #e6fae9;
+  --color-callout-positive-text: #016e30;
+  --color-callout-positive-tint-dark: #17321e;
+  --color-callout-positive-text-dark: #a4dfaf;
+  --color-callout-warning-tint: #fff1e2;
+  --color-callout-warning-text: #7e4f02;
+  --color-callout-warning-tint-dark: #3b260c;
+  --color-callout-warning-text-dark: #f4c48d;
+  --color-callout-danger-tint: #ffefee;
+  --color-callout-danger-text: #9a3130;
+  --color-callout-danger-tint-dark: #41211e;
+  --color-callout-danger-text-dark: #ffbab3;
   --color-white: #ffffff;
   /* The red of a deletion or a purge, on the inverse surface (the wall of Delivery) */
   --color-red-light-5: #f25f5a;
@@ -156,7 +196,7 @@
 
   /*
    * Code. The colours of the syntax in CodeSnippetPreview, built in OKLCH
-   * with one rule for the six themes (the levels are the same, the hue
+   * with one rule for the themes (the levels are the same, the hue
    * comes from the family: each is the hue of the light-5 primitive of a
    * theme). The levels, as lightness L and chroma C:
    *   deep    the card: L 0.23, the hue of the inverse surface, C at most 0.035
@@ -215,6 +255,12 @@
   --color-code-pink-faded: #c3aaad;
   --color-code-pink-dim: #a9898d;
   --color-code-pink-faint: #977f82;
+  /* The docs: the hue of the slate ink (290). The keywords are purple-strong. */
+  --color-code-slate-deep: #1d1b26;
+  --color-code-slate-plain: #e7e6f2;
+  --color-code-slate-faded: #b0afc0;
+  --color-code-slate-dim: #918fa4;
+  --color-code-slate-faint: #858495;
 }
 
 :root {
@@ -444,6 +490,65 @@
 }
 
 /*
+ * The docs theme: a white page, the slate ink, the purple accent. The
+ * callouts do not take the hue of the theme: each kind has its own hue
+ * (--theme-status-*). The data inherits, thus a ground class inside the
+ * docs keeps the callout colours.
+ */
+[data-theme='docs'] {
+  --theme-paper: var(--color-white);
+  --theme-ink: var(--color-slate-deep-5);
+  --theme-ink-muted: var(--color-slate-deep-3);
+  --theme-ink-subtle: var(--color-slate-deep-2);
+  --theme-ink-faint: var(--color-slate-deep-1);
+  --theme-accent: var(--color-purple-light-5);
+  --theme-accent-muted: var(--color-purple-light-3);
+  --theme-accent-subtle: var(--color-purple-light-2);
+  --theme-accent-faint: var(--color-purple-light-1);
+  --theme-pixel-highlight: var(--color-orchid-pale);
+  --theme-alpha-page-muted: 70%;
+  --theme-alpha-page-headline-muted: 55%;
+  --theme-alpha-on-accent-muted: 88%;
+  --theme-alpha-on-accent-headline-muted: 66%;
+  --theme-alpha-on-inverse-soft: 86%;
+  --theme-alpha-on-inverse-muted: 88%;
+  --theme-alpha-on-inverse-headline-muted: 65%;
+  --theme-dark-accent-chroma: 0.205;
+  --theme-status-info-surface: var(--color-callout-info-tint);
+  --theme-status-info-text: var(--color-callout-info-text);
+  --theme-status-tip-surface: var(--color-callout-tip-tint);
+  --theme-status-tip-text: var(--color-callout-tip-text);
+  --theme-status-positive-surface: var(--color-callout-positive-tint);
+  --theme-status-positive-text: var(--color-callout-positive-text);
+  --theme-status-warning-surface: var(--color-callout-warning-tint);
+  --theme-status-warning-text: var(--color-callout-warning-text);
+  --theme-status-danger-surface: var(--color-callout-danger-tint);
+  --theme-status-danger-text: var(--color-callout-danger-text);
+  --code-background: var(--color-code-slate-deep);
+  --code-plain: var(--color-code-slate-plain);
+  --code-keyword: var(--color-code-purple-strong);
+  --code-string: var(--color-code-green-soft);
+  --code-constant: var(--color-code-orange-pale);
+  --code-function: var(--color-code-purple-soft);
+  --code-punctuation: var(--color-code-slate-faded);
+  --code-comment: var(--color-code-slate-dim);
+  --code-line-number: var(--color-code-slate-faint);
+}
+
+:root[data-scheme='dark'] [data-theme='docs'] {
+  --theme-status-info-surface: var(--color-callout-info-tint-dark);
+  --theme-status-info-text: var(--color-callout-info-text-dark);
+  --theme-status-tip-surface: var(--color-callout-tip-tint-dark);
+  --theme-status-tip-text: var(--color-callout-tip-text-dark);
+  --theme-status-positive-surface: var(--color-callout-positive-tint-dark);
+  --theme-status-positive-text: var(--color-callout-positive-text-dark);
+  --theme-status-warning-surface: var(--color-callout-warning-tint-dark);
+  --theme-status-warning-text: var(--color-callout-warning-text-dark);
+  --theme-status-danger-surface: var(--color-callout-danger-tint-dark);
+  --theme-status-danger-text: var(--color-callout-danger-text-dark);
+}
+
+/*
  * The roles, derived from the theme data. The rule sits on every element
  * that sets a theme, thus the roles follow the theme of the section.
  *
@@ -578,18 +683,33 @@
 
   /*
    * A tint of a signal with a text of the same hue: a callout, a pill, a
-   * warning. "info" is neutral. The warning text is a deeper tone of the
-   * accent than --text-accent: its tint is the accent itself.
+   * warning. A theme can give each kind its own hue (--theme-status-*: the
+   * docs). Else "info" and "tip" are neutral, "danger" is the red of a
+   * deletion, and the warning text is a deeper tone of the accent than
+   * --text-accent: its tint is the accent itself.
    */
-  --surface-status-info: var(--surface-inverse-faint);
-  --text-status-info: var(--text-primary);
-  --surface-status-positive: color-mix(in srgb, var(--surface-positive) 18%, transparent);
-  --text-status-positive: var(--text-positive);
-  --surface-status-warning: color-mix(in srgb, var(--surface-accent) 40%, transparent);
+  --surface-status-info: var(--theme-status-info-surface, var(--surface-inverse-faint));
+  --text-status-info: var(--theme-status-info-text, var(--text-primary));
+  --surface-status-tip: var(--theme-status-tip-surface, var(--surface-inverse-faint));
+  --text-status-tip: var(--theme-status-tip-text, var(--text-primary));
+  --surface-status-positive: var(
+    --theme-status-positive-surface,
+    color-mix(in srgb, var(--surface-positive) 18%, transparent)
+  );
+  --text-status-positive: var(--theme-status-positive-text, var(--text-positive));
+  --surface-status-warning: var(
+    --theme-status-warning-surface,
+    color-mix(in srgb, var(--surface-accent) 40%, transparent)
+  );
   --text-status-warning: var(
     --_ground-text-status-warning,
-    oklch(from var(--theme-accent) 0.42 min(c, 0.11) h)
+    var(--theme-status-warning-text, oklch(from var(--theme-accent) 0.42 min(c, 0.11) h))
   );
+  --surface-status-danger: var(
+    --theme-status-danger-surface,
+    color-mix(in srgb, var(--surface-negative) 14%, transparent)
+  );
+  --text-status-danger: var(--theme-status-danger-text, var(--text-negative));
 
   /* The entry of the page that you read (a sidebar, a TOC) */
   --surface-nav-active: var(--surface-accent-faint);
@@ -738,7 +858,7 @@
   /* The warning tint is dark: a pale tone of the accent reads on it */
   --text-status-warning: var(
     --_ground-text-status-warning,
-    color-mix(in oklab, var(--theme-accent), var(--theme-paper))
+    var(--theme-status-warning-text, color-mix(in oklab, var(--theme-accent), var(--theme-paper)))
   );
 }
 

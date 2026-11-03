@@ -18,6 +18,7 @@ import type { Theme } from '~/lib/theme';
  * - `blue` 225: the hue of --color-blue-light-5 (#50c9ed) and
  *   --color-blue-deep-5 (#1a3a47).
  * - `pink` 10: the hue of --color-pink-light-5 (#f28497).
+ * - `docs` 290: the hue of --color-purple-light-5 (#9e90ee).
  */
 export const SCENE_HUE: Record<Theme, number> = {
   default: 80,
@@ -26,6 +27,7 @@ export const SCENE_HUE: Record<Theme, number> = {
   purple: 290,
   blue: 225,
   pink: 10,
+  docs: 290,
 };
 
 /**

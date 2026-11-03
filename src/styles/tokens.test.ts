@@ -1,7 +1,7 @@
 /*
  * The colour tokens meet WCAG 2.2 AA by construction. The test reads
  * tokens.css, computes each colour as the browser does, and checks every
- * text role on every surface of its ground, in the six themes and the two
+ * text role on every surface of its ground, in the seven themes and the two
  * schemes (the rules are in tokens.css and in src/lib/tokens/contract.ts).
  */
 import { fileURLToPath } from 'node:url';
@@ -27,7 +27,7 @@ const describePairing = (p: {
 
 describe('tokens.css', () => {
   it('audits every ground in every theme and scheme', () => {
-    // 2 schemes x 6 themes x 3 grounds, at least.
+    // 2 schemes x 7 themes x 3 grounds, at least.
     expect(result.pairings.length).toBeGreaterThan(1000);
   });
 

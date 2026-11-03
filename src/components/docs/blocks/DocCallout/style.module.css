@@ -1,12 +1,17 @@
+/*
+ * The box stops at the measure of the running text (32em, as Prose), and
+ * the text inside fills the box.
+ */
 .docCallout {
+  max-width: 32em;
   padding: var(--space-lg);
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
   line-height: 1.4;
 }
 
-.docCalloutNeutral,
-.docCalloutProtip {
+/* Each kind of callout has its tint and the colour of its title. */
+.docCalloutNeutral {
   background: var(--surface-status-info);
 
   .docCalloutTitle {
@@ -14,6 +19,18 @@
 
     svg {
       fill: var(--text-status-info);
+    }
+  }
+}
+
+.docCalloutProtip {
+  background: var(--surface-status-tip);
+
+  .docCalloutTitle {
+    color: var(--text-status-tip);
+
+    svg {
+      fill: var(--text-status-tip);
     }
   }
 }
@@ -59,4 +76,8 @@
 .content {
   font-size: var(--type-s);
   line-height: 1.4;
+
+  > * {
+    max-width: none;
+  }
 }

@@ -60,8 +60,12 @@
     border-radius: var(--radius-sm);
   }
 
-  /* The note boxes of the Markdown (callouts). */
+  /*
+   * The note boxes of the Markdown (callouts). The box stops at the measure
+   * of the running text (32em, as Prose).
+   */
   [data-callout-type] {
+    max-width: 32em;
     padding: var(--space-md);
     background: var(--surface-status-info);
     border-radius: var(--radius-md);
@@ -80,20 +84,45 @@
     line-height: 1.4;
   }
 
+  /*
+   * The kind of a Markdown callout is its marker ([!TIP]). Each kind has
+   * its tint and the colour of its title. An other marker is info.
+   */
+  [data-callout-type='tip'],
+  [data-callout-type='protip'],
+  [data-callout-type='important'] {
+    background: var(--surface-status-tip);
+
+    [data-callout-title] {
+      color: var(--text-status-tip);
+    }
+  }
+
+  [data-callout-type='positive'],
+  [data-callout-type='success'] {
+    background: var(--surface-status-positive);
+
+    [data-callout-title] {
+      color: var(--text-status-positive);
+    }
+  }
+
   [data-callout-type='warning'] {
     background: var(--surface-status-warning);
+
+    [data-callout-title] {
+      color: var(--text-status-warning);
+    }
   }
 
-  [data-callout-type='warning'] [data-callout-title] {
-    color: var(--text-status-warning);
-  }
+  [data-callout-type='caution'],
+  [data-callout-type='danger'],
+  [data-callout-type='negative'] {
+    background: var(--surface-status-danger);
 
-  [data-callout-type='positive'] {
-    background: var(--surface-status-positive);
-  }
-
-  [data-callout-type='positive'] [data-callout-title] {
-    color: var(--text-status-positive);
+    [data-callout-title] {
+      color: var(--text-status-danger);
+    }
   }
 
   /* A list of details is one box: the borders join. */

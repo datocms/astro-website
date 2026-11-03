@@ -91,4 +91,14 @@ export const palettes: Record<Theme, OgPalette> = {
     frameLine: '#af5866',
     inkOnAccentMuted: '#5d222c',
   },
+  docs: {
+    paper: '#ffffff',
+    ink: '#1a1923',
+    accent: '#9e90ee',
+    muted: '#5f5e65',
+    headlineMuted: '#818186',
+    chip: '#e8e8e9',
+    frameLine: '#6c63a0',
+    inkOnAccentMuted: '#2a273b',
+  },
 };

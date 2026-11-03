@@ -184,7 +184,7 @@ This system came from overnice's work ("Warm Logic" is their name for the route)
 
 **Key Characteristics:**
 
-- Six themes (default, orange, green, purple, blue, pink). Each is a set of three surfaces: a near-white paper, a bright accent and a deep inverse, all of one hue.
+- Six themes (default, orange, green, purple, blue, pink). Each is a set of three surfaces: a near-white paper, a bright accent and a deep inverse, all of one hue. The docs have a seventh theme of their own (see "The docs theme").
 - Full-bleed bands of flat colour; a theme changes from section to section, never inside a component.
 - Two-tone headlines: the claim in the text colour, then the aside in a muted tone of the same hue.
 - One sans (ABC Oracle) at two weights, tight negative tracking; Geist Mono for code and product chrome: 500 in code blocks, and on the page 400 on light grounds and 500 on dark grounds.
@@ -225,7 +225,16 @@ The six accents follow one rule in OKLCH: each accent keeps the lightness and th
 
 ### Neutral
 
-There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft at 80% on the page and 92% on the accent, text-muted at 70 to 90% (each theme sets the alpha that gives 4.5:1 on its ground: yellow holds 70%, orange and green need about 90% on the accent), and the hairline border at about 11% (in the dark scheme, the accent at 25%: a light line on a dark page needs more alpha). The one lighter role is the quiet run of a two-tone headline or display lockup (3:1, large text only). **White** (white) is only for a card that sits on a surface that stays light.
+There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft at 80% on the page and 92% on the accent, text-muted at 70 to 90% (each theme sets the alpha that gives 4.5:1 on its ground: yellow holds 70%, orange and green need about 90% on the accent), and the hairline border at about 11% (in the dark scheme, the accent at 25%: a light line on a dark page needs more alpha). The one lighter role is the quiet run of a two-tone headline or display lockup (3:1, large text only). **White** (white) is only for a card that sits on a surface that stays light. The docs theme is the exception (next section).
+
+### The docs theme
+
+The docs are a tool, not a story, thus they have a theme of their own: `docs`. Only the docs layout uses it.
+
+- **The page is white**, and the ink is a near black with a small tint of violet (slate, OKLCH L 0.22, C 0.02, hue 290). The tints of the ink are greys with the same small tint.
+- **The accent is the purple of the site** (#9e90ee, hue 289, the hue of the ink): the active tab, the focus ring, the hit of a search, the tags. The links and the kickers are a deep tone of it (#53458a). It stays small: the docs have no accent bands.
+- **The callouts do not take the hue of the theme.** Each kind has its own hue: info blue, tip violet, positive green, warning amber, danger red. The theme gives them as theme data (`--theme-status-*`); `--surface-status-*` and `--text-status-*` read it. A theme without the data keeps the old rule: info and tip are a tint of the ink, warning is a tint of the accent.
+- **The code card** is a deep slate, with the keywords in violet.
 
 ### Dark scheme
 
@@ -239,10 +248,10 @@ The three steps stay, all dark: the page, the accent band and the inverse. A bri
 
 ### Colour: grounds and text roles
 
-The rules below are the whole system. `src/styles/tokens.css` states them, `src/styles/tokens.test.ts` computes every pairing (all roles, all surfaces, six themes, two schemes) and fails under AA, and `npm run lint:css` refuses a text colour outside the roles.
+The rules below are the whole system. `src/styles/tokens.css` states them, `src/styles/tokens.test.ts` computes every pairing (all roles, all surfaces, seven themes, two schemes) and fails under AA, and `npm run lint:css` refuses a text colour outside the roles.
 
 1. **Three grounds.** Every element sits on one ground: the **page** (`--surface-default` and its tints: `--surface-accent-faint|subtle|muted`, `--surface-inverse-faint`, `--surface-field`, `--surface-nav-active`, `--surface-status-*`), the **accent** (`--surface-accent`: bright with dark text in the light scheme, deep with light text in the dark scheme) or the **inverse** (`--surface-inverse`, deep in both schemes, light text). The code card (`--code-background`, `--code-*`) is a fourth, small ground.
-2. **Canonical text roles**, one set for each ground: page `--text-on-page`, `-soft`, `-muted`, `-headline-muted`; accent `--text-on-accent`, `-soft`, `-muted`, `-headline-muted`; inverse `--text-on-inverse-strong`, `--text-on-inverse`, `-soft`, `-muted`, `-headline-muted`. Each role has 4.5:1 or more on every surface of its ground, in the six themes and the two schemes. The one exception is `*-headline-muted`: 3:1 or more, for the quiet run of a two-tone headline or display lockup only (large text, 24px or more: a `.display` or `.headline` heading, the quiet words of the Single Source lockup; a `.title` is 20px on phones and takes `--text-muted`). Borders: `--border-on-page|accent|inverse` and `-strong`.
+2. **Canonical text roles**, one set for each ground: page `--text-on-page`, `-soft`, `-muted`, `-headline-muted`; accent `--text-on-accent`, `-soft`, `-muted`, `-headline-muted`; inverse `--text-on-inverse-strong`, `--text-on-inverse`, `-soft`, `-muted`, `-headline-muted`. Each role has 4.5:1 or more on every surface of its ground, in the seven themes and the two schemes. The one exception is `*-headline-muted`: 3:1 or more, for the quiet run of a two-tone headline or display lockup only (large text, 24px or more: a `.display` or `.headline` heading, the quiet words of the Single Source lockup; a `.title` is 20px on phones and takes `--text-muted`). Borders: `--border-on-page|accent|inverse` and `-strong`.
 3. **Contextual roles follow the ground, not the theme.** A component that does not paint a ground uses `--text-primary`, `--text-soft`, `--text-muted`, `--text-headline-muted`, `--border-default`, `--border-strong`, `--text-accent`, `--text-positive`, `--text-negative`. They resolve to the canonical roles of the ground that the element sits on. A theme switch (`data-theme`) inside a ground keeps the light or dark text of the ground.
 4. **Ground classes.** The element that paints a ground gets the global class of the ground: `surfacePage` (a window of the page inside another ground: a chat, the mega menu), `surfaceAccent` or `surfaceInverse`. The class sets the contextual roles and `color`. A small shape (a pill, a hovered row) that paints the accent or the inverse sets `color` to a canonical role of that ground in the same rule. A button takes its colours from the button roles (`--surface-button*`, `--text-button*`), which the ground class fills: see Buttons. A ground that comes with the viewport or a state (the split header, a hovered row that turns to the accent) cannot take a class: the rule sets a contextual role to the canonical role of the same kind (`--text-muted: var(--text-on-accent-muted)`), and nothing else.
 5. **No alpha on text outside `tokens.css`.** A text colour is a token. No `opacity`, no `color-mix()` and no new `--text-*` property on a text colour in a component: every tint of text is a role. `opacity` under 1 is only for an element without text (a picture, a placeholder card), an inactive control or a pressed state, and says so in a disable comment.
@@ -340,7 +349,8 @@ Each page has one theme: the theme of the layout (a necessary prop). The header,
 
 | Area                | Theme  | Pages                                                                                                        |
 | ------------------- | ------ | ------------------------------------------------------------------------------------------------------------ |
-| Help                | orange | `/docs`, `/user-guides`, `/academy`, `/glossary`                                                             |
+| Help                | orange | `/user-guides`, `/academy`, `/glossary`                                                                      |
+| Docs                | docs   | `/docs` (see "The docs theme")                                                                               |
 | News                | green  | `/product-updates`, `/blog`                                                                                  |
 | Ecosystem           | purple | `/plugins`, `/starters`                                                                                      |
 | Partners            | pink   | `/partners`, `/tech-partners`                                                                                |

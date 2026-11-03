@@ -7,10 +7,12 @@ import styles from './style.module.css';
 interface Props {
   /** The address of the Markdown version of the page (the page address + ".md"). */
   markdownUrl: string;
+  /** The size of the pill: `m` is 40px tall, `s` is 32px tall with smaller type (the docs). */
+  size?: 's' | 'm';
   class?: string;
 }
 
-const { markdownUrl, class: className } = Astro.props;
+const { markdownUrl, size = 'm', class: className } = Astro.props;
 const request = `Read ${markdownUrl} so I can ask questions about it.`;
 const links = [
   { label: 'View as Markdown', href: markdownUrl, icon: faMarkdown },
@@ -35,13 +37,17 @@ const links = [
 */
 }
 <markdown-actions
-  class:list={[styles.root, className]}
+  class:list={[styles.root, size === 's' && styles.small, className]}
   data-markdown-actions={markdownUrl}
   data-datocms-noindex
   hidden
 >
   <div class={styles.pill}>
-    <button type="button" class:list={[styles.part, 'labelMedium']} data-action="copy-page">
+    <button
+      type="button"
+      class:list={[styles.part, size === 's' ? 'caption' : 'labelMedium']}
+      data-action="copy-page"
+    >
       <span class={styles.icon} data-icon="copy"><Icon icon={faCopy} /></span>
       <span class={styles.icon} data-icon="done" hidden><Icon icon={faCheck} /></span>
       <span data-label>Copy page</span>
