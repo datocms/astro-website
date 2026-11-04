@@ -38,7 +38,7 @@ export interface BuddyData {
 export const hero: HeroData = {
   label: 'Features',
   headline: 'A list that keeps on growing.',
-  subheadline: 'Everything DatoCMS does, in one list. Most of it exists because someone asked.',
+  subheadline: 'Here is everything DatoCMS does, in one list.',
   face: 'worried',
   buttons: [
     {
