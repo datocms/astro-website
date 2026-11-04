@@ -52,6 +52,8 @@ export interface ContentSourceData {
   /** The face at the end of the headline. It plays when it comes into view. */
   face?: FaceName;
   paragraph: string;
+  /** The button below the paragraph. */
+  button: ButtonData;
   channels: string[];
   activeChannel: string;
 }
@@ -244,6 +246,11 @@ export const contentSource: ContentSourceData = {
   face: 'magic',
   paragraph:
     'Website, chatbot, mobile, a smart fridge? One place for every role to manage content across every output.',
+  button: {
+    label: 'Get Started',
+    href: dashboardUrl('/signup'),
+    variant: 'accent',
+  },
   channels: [
     'Kiosk',
     'Watch',
