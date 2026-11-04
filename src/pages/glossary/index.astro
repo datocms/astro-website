@@ -2,6 +2,7 @@
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { groupBy } from 'lodash-es';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { CategoryNav } from '~/components/CategoryNav';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
 import { JsonLd } from '~/components/JsonLd';
@@ -54,56 +55,52 @@ const definedTermSet = {
         content management
       </p>
     </Hero>
-    <Section contentClass={s.root}>
-      <nav class={s.index} aria-label="Letters" data-datocms-nomd>
-        <div class={s.indexInner}>
-          {
-            Object.keys(entriesByLetter).map((letter) => (
-              <a class:list={[s.letter, 'bodyMedium']} href={`#group-${letter}`}>
-                {letter}
-              </a>
-            ))
-          }
-        </div>
-      </nav>
-      <dl class={s.groups}>
-        {
-          Object.entries(entriesByLetter).map(([letter, group]) => (
-            <div class={s.group}>
-              <h2 class={s.groupLetter} id={`group-${letter}`}>
-                {letter}
-              </h2>
-              <div class={s.entries}>
-                {group.map((entry) => (
-                  <div class={s.entry}>
-                    <dt class:list={[s.term, 'title']} id={slugify(entry.title)}>
-                      {entry.url ? (
-                        <a class={s.termLink} href={entry.url}>
-                          {entry.title}
-                        </a>
-                      ) : (
-                        entry.title
-                      )}
-                      <a
-                        class={s.permalink}
-                        href={`#${slugify(entry.title)}`}
-                        aria-label={`Link to ${slugify(entry.title)}`}
+    {/* The letters. Sticky; it takes the theme of the page, as the hero. */}
+    <CategoryNav
+      ariaLabel="Letters"
+      items={Object.keys(entriesByLetter).map((letter) => ({
+        label: letter,
+        href: `#group-${letter}`,
+      }))}
+    />
+    <Section contentClass={s.groups}>
+      {
+        Object.entries(entriesByLetter).map(([letter, group]) => (
+          <section class={s.group} id={`group-${letter}`} aria-labelledby={`letter-${letter}`}>
+            <h2 class:list={[s.letter, 'display']} id={`letter-${letter}`}>
+              {letter}
+            </h2>
+            <dl class={s.entries}>
+              {group.map((entry) => (
+                <div class={s.entry}>
+                  <dt class:list={[s.term, 'title']} id={slugify(entry.title)}>
+                    {entry.url ? (
+                      <a class={s.termLink} href={entry.url}>
+                        {entry.title}
+                        <span aria-hidden="true">&nbsp;→</span>
+                      </a>
+                    ) : (
+                      entry.title
+                    )}
+                    <a
+                      class={s.permalink}
+                      href={`#${slugify(entry.title)}`}
+                      aria-label={`Link to ${entry.title}`}
+                    />
+                  </dt>
+                  <dd class={s.description}>
+                    <Prose>
+                      <StructuredText
+                        {...ensureValidStructuredTextProps({ data: entry.description })}
                       />
-                    </dt>
-                    <dd class={s.description}>
-                      <Prose>
-                        <StructuredText
-                          {...ensureValidStructuredTextProps({ data: entry.description })}
-                        />
-                      </Prose>
-                    </dd>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))
-        }
-      </dl>
+                    </Prose>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))
+      }
     </Section>
   </div>
 

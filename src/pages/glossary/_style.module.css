@@ -1,96 +1,71 @@
 /* @layer pages */
 
-/* A phone: one column, with the letter bar above the groups. */
-.root {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-lg);
-  align-items: start;
-}
-
-.index {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--surface-default);
-  border-bottom: 1px solid var(--border-default);
-}
-
-.indexInner {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.letter {
-  padding: var(--space-2xs) var(--space-5xs);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  text-decoration: none;
-}
-
-@media (hover: hover) {
-  .letter:hover {
-    background: var(--surface-accent);
-    color: var(--text-on-accent);
-  }
-}
-
-.letter:focus-visible {
-  background: var(--surface-accent);
-  color: var(--text-on-accent);
-}
-
+/*
+ * One row for each letter, on the page ground. A hairline separates two
+ * letters. The space between two letters (2 × 40) is double the space
+ * between two entries (40), thus the eye sees the letters as groups.
+ *
+ * A phone: the letter is above its entries.
+ * From 768: the letter is in a column at the left, and it sticks below
+ * the letter nav while its row is on the screen.
+ * From 1152: the entries are in two columns.
+ */
 .groups {
   display: flex;
   flex-direction: column;
+}
+
+.group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-md);
+  align-items: start;
+  padding-block: var(--space-xl);
+  border-top: 1px solid var(--border-default);
+  /*
+   * The id is the target of a link: keep the row clear of the sticky nav.
+   * 1px less, thus the hairline of the row goes below the line of the nav.
+   */
+  scroll-margin-top: calc(var(--category-nav-height, 0px) - 1px);
+}
+
+.group:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.group:last-child {
+  padding-bottom: 0;
+}
+
+.letter {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.entries {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-xl);
   margin: 0;
 }
 
-.group {
-  scroll-margin-top: var(--space-4xl);
-  position: relative;
-  padding: var(--space-md);
-  border-radius: var(--radius-lg);
-  background: var(--surface-accent-faint);
-}
-
-.groupLetter {
-  margin-bottom: var(--space-md);
-  /* Decorative giant letter: no --type-* token fits. */
-  font-size: 80px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.05em;
-  color: var(--text-muted);
-  /* The id is the target of a link: keep the letter clear of the sticky bar. */
-  scroll-margin-top: var(--space-4xl);
-}
-
-.entries {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-}
-
 .term {
-  position: relative;
-  margin-bottom: var(--space-2xs);
-  scroll-margin-top: var(--space-4xl);
+  margin-bottom: var(--space-xs);
+  /* The id is the target of a link: keep the term clear of the sticky nav. */
+  scroll-margin-top: calc(var(--category-nav-height, 0px) + var(--space-lg));
 }
 
 .termLink {
   color: inherit;
-  text-decoration: underline;
+  text-decoration: none;
+  text-underline-offset: 0.15em;
   text-decoration-thickness: 2px;
-  text-underline-offset: 4px;
-  text-decoration-color: var(--border-default);
 }
 
 @media (hover: hover) {
   .termLink:hover {
-    text-decoration-color: var(--text-primary);
+    text-decoration-line: underline;
   }
 }
 
@@ -98,6 +73,7 @@
   margin-left: var(--space-xs);
   color: var(--text-muted);
   text-decoration: none;
+  /* The sign shows only on hover and on focus. */
   opacity: 0;
 }
 
@@ -114,50 +90,24 @@
   margin: 0;
 }
 
-/* From 768: the letter index is a column at the left. */
 @media (min-width: 768px) {
-  .root {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--space-2xl);
-  }
-
-  .index {
-    top: var(--space-xl);
-    border-bottom: 0;
-    background: none;
-  }
-
-  .indexInner {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    text-align: center;
-  }
-
-  .letter {
-    padding: var(--space-3xs) var(--space-xs);
-  }
-
   .group {
-    margin-top: var(--space-3xl);
-    padding: var(--space-3xl) var(--space-md) var(--space-xl);
+    grid-template-columns: var(--space-3xl) minmax(0, 1fr);
+    gap: var(--space-xl);
+    padding-block: var(--space-2xl);
   }
 
-  .group:first-child {
-    margin-top: var(--space-2xl);
-  }
-
-  .groupLetter {
-    position: absolute;
-    top: -90px;
-    left: var(--space-md);
-    margin: 0;
-    /* Decorative giant letter: no --type-* token fits. */
-    font-size: 180px;
+  /* The letter stays in view while its row is on the screen. */
+  .letter {
+    position: sticky;
+    top: calc(var(--category-nav-height, 0px) + var(--space-lg));
   }
 }
 
 @media (min-width: 1152px) {
   .entries {
-    padding-inline: var(--space-xl);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-2xl);
+    row-gap: var(--space-2xl);
   }
 }
