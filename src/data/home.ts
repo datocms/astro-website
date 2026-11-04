@@ -8,18 +8,7 @@ import type { CodeTab } from '~/components/CodeSnippetPreview';
 import type { CodeToken } from '~/components/UserExperience';
 import type { LogoItem } from '~/components/LogosLine';
 import type { Theme } from '~/lib/theme';
-import arduinoClient from '~/assets/home/clients/arduino.svg?raw';
-import telekomClient from '~/assets/home/clients/deutsche-telekom.svg?raw';
-import freitagClient from '~/assets/home/clients/freitag.svg?raw';
-import lofficielClient from '~/assets/home/clients/lofficiel.svg?raw';
-import mitClient from '~/assets/home/clients/mit.svg?raw';
-import netflixClient from '~/assets/home/clients/netflix.svg?raw';
-import polestarClient from '~/assets/home/clients/polestar.svg?raw';
-import ricolaClient from '~/assets/home/clients/ricola.svg?raw';
-import satispayClient from '~/assets/home/clients/satispay.svg?raw';
-import vercelClient from '~/assets/home/clients/vercel.svg?raw';
-import verizonClient from '~/assets/home/clients/verizon.svg?raw';
-import wildClient from '~/assets/home/clients/wild.svg?raw';
+import { clientLogos as c } from '~/data/clientLogos';
 
 export interface HeroData {
   label?: string;
@@ -156,13 +145,6 @@ export interface PartnersData {
   video: { src: string; palette?: string };
 }
 
-/** Make a logo from SVG markup. The size comes from the root attributes. */
-export function svgLogo(svg: string, alt: string): LogoItem {
-  const width = Number(svg.match(/\bwidth="([\d.]+)"/)?.[1] ?? 0);
-  const height = Number(svg.match(/\bheight="([\d.]+)"/)?.[1] ?? 0);
-  return { svg, alt, width, height };
-}
-
 export const hero: HeroData = {
   headline: 'Thoughtfully built and ambitiously used.',
   subheadline: 'The AI-agnostic headless CMS with human support and transparent pricing',
@@ -176,15 +158,6 @@ export const hero: HeroData = {
       theme: 'orange',
     },
     { label: 'Docs', href: '/docs', variant: 'soft', arrow: false },
-  ],
-  logos: [
-    svgLogo(polestarClient, 'Polestar'),
-    svgLogo(netflixClient, 'Netflix'),
-    svgLogo(verizonClient, 'Verizon'),
-    svgLogo(vercelClient, 'Vercel'),
-    svgLogo(telekomClient, 'Deutsche Telekom'),
-    svgLogo(mitClient, 'MIT'),
-    svgLogo(arduinoClient, 'Arduino'),
   ],
 };
 
@@ -215,13 +188,16 @@ export const homeHero: HomeHeroData = {
   ],
   logosLabel: 'Trusted by teams at',
   logos: [
-    svgLogo(arduinoClient, 'Arduino'),
-    svgLogo(ricolaClient, 'Ricola'),
-    svgLogo(lofficielClient, 'L’Officiel'),
-    svgLogo(satispayClient, 'Satispay'),
-    svgLogo(netflixClient, 'Netflix'),
-    svgLogo(freitagClient, 'Freitag'),
-    svgLogo(wildClient, 'Wild'),
+    c.polestar,
+    c.hashicorp,
+    c.arduino,
+    c.ricola,
+    c.lofficiel,
+    c.satispay,
+    c.wild,
+    c.freitag,
+    c.payfit,
+    c.netflix,
   ],
 };
 

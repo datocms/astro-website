@@ -3,7 +3,7 @@
 
 import type { ButtonData } from '~/components/Button';
 import type { CtaBannerData, HeroData } from '~/data/home';
-import { hero as homeHero } from '~/data/home';
+import { clientLogos as c } from '~/data/clientLogos';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 /** The plan change in the dashboard: it buys the Professional plan. */
@@ -225,7 +225,7 @@ export const trustedBy: HeroData = {
       arrow: false,
     },
   ],
-  logos: homeHero.logos,
+  logos: [c.telekom, c.hashicorp, c.verizon, c.polestar, c.vercel],
 };
 
 /** The questions of the FAQ come from the CMS. */

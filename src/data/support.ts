@@ -1,11 +1,7 @@
-import polestarClient from '~/assets/home/clients/polestar.svg?raw';
-import vercelClient from '~/assets/home/clients/vercel.svg?raw';
-import verizonClient from '~/assets/home/clients/verizon.svg?raw';
-import harrysClient from '~/assets/support/harrys.svg?raw';
-import hashicorpClient from '~/assets/support/hashicorp.svg?raw';
 import type { LogoItem } from '~/components/LogosLine';
 import type { ContactFormData } from '~/data/contact';
-import { svgLogo, type HeroData } from '~/data/home';
+import { clientLogos as c } from '~/data/clientLogos';
+import type { HeroData } from '~/data/home';
 
 /*
  * The support page. The support form sends its data to the action
@@ -42,13 +38,7 @@ export const talk = {
 
 export const logos = {
   label: 'We power experiences for over half a billion users',
-  items: [
-    svgLogo(polestarClient, 'Polestar'),
-    svgLogo(hashicorpClient, 'HashiCorp'),
-    svgLogo(verizonClient, 'Verizon'),
-    svgLogo(harrysClient, "Harry's"),
-    svgLogo(vercelClient, 'Vercel'),
-  ] as LogoItem[],
+  items: [c.polestar, c.hashicorp, c.verizon, c.harrys, c.vercel] as LogoItem[],
 };
 
 const legal = {

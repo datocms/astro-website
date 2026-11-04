@@ -7,43 +7,11 @@
 import type { ButtonData } from '~/components/Button';
 import type { CategoryNavData } from '~/components/CategoryNav';
 import type { ChapterLayoutData } from '~/components/ChapterLayout';
-import type { LogoItem } from '~/components/LogosLine';
 import type { StatementsSectionData } from '~/components/StatementsSection';
 import type { CtaBannerData, HeroData } from '~/data/home';
-import { svgLogo } from '~/data/home';
+import { clientLogos as c } from '~/data/clientLogos';
 import { numbers as developerNumbers } from '~/data/developers-pillar';
 import type { FaqData } from '~/data/pricing';
-import telekomClient from '~/assets/home/clients/deutsche-telekom.svg?raw';
-import mitClient from '~/assets/home/clients/mit.svg?raw';
-import vercelClient from '~/assets/home/clients/vercel.svg?raw';
-import verizonClient from '~/assets/home/clients/verizon.svg?raw';
-import afspSvg from '~/svg/logos/afsp.svg?raw';
-import harrysSvg from '~/svg/logos/harrys.svg?raw';
-import hashicorpSvg from '~/svg/logos/hashicorp.svg?raw';
-import linkedinSvg from '~/svg/logos/linkedin.svg?raw';
-import nhsSvg from '~/svg/logos/nhs.svg?raw';
-import oberloSvg from '~/svg/logos/oberlo.svg?raw';
-
-/** The height of a drawn logo. LogosLine scales the drawing from it. */
-const LOGO_HEIGHT = 40;
-
-/**
- * Make a logo from the SVG file of a single-colour logo that has no
- * client drawing. The logo takes the text colour of its theme. The viewBox
- * gives the ratio of the drawn size.
- */
-function logo(svg: string, alt: string): LogoItem {
-  const [, , boxWidth = 1, boxHeight = 1] = (svg.match(/viewBox="([^"]+)"/)?.[1] ?? '')
-    .split(/[\s,]+/)
-    .map(Number);
-  const width = Math.round((boxWidth / boxHeight) * LOGO_HEIGHT);
-  return {
-    svg: svg.replace('<svg ', `<svg fill="currentColor" width="${width}" height="${LOGO_HEIGHT}" `),
-    alt,
-    width,
-    height: LOGO_HEIGHT,
-  };
-}
 
 const docs = (label: string, href: string): ButtonData => ({
   label,
@@ -69,16 +37,16 @@ export const hero: HeroData & { subtitle: string; logosLabel: string } = {
   // The accessible name of the logos. It does not show.
   logosLabel: 'We power experiences for some of the most renowned brands',
   logos: [
-    svgLogo(telekomClient, 'Deutsche Telekom'),
-    logo(hashicorpSvg, 'HashiCorp'),
-    svgLogo(verizonClient, 'Verizon'),
-    svgLogo(vercelClient, 'Vercel'),
-    logo(linkedinSvg, 'LinkedIn'),
-    logo(oberloSvg, 'Oberlo'),
-    logo(nhsSvg, 'NHS'),
-    logo(harrysSvg, "Harry's"),
-    svgLogo(mitClient, 'MIT'),
-    logo(afspSvg, 'AFSP'),
+    c.telekom,
+    c.hashicorp,
+    c.verizon,
+    c.vercel,
+    c.linkedin,
+    c.oberlo,
+    c.nhs,
+    c.harrys,
+    c.mit,
+    c.afsp,
   ],
 };
 
