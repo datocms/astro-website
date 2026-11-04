@@ -25,6 +25,7 @@ import { readFragment } from '~/lib/datocms/graphql';
 import { overrideSeo, seoOgType } from '~/lib/datocms/seo';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import LogoPlate from '../../_LogoPlate/Component.astro';
 import ProjectFrame from './_ProjectFrame/Component.astro';
 import s from './_style.module.css';
 
@@ -81,12 +82,13 @@ const galleries = [
     </div>
     {
       page.video && video?.muxPlaybackId ? (
-        <ProjectFrame class={s.frame} video={page.video} />
+        <ProjectFrame class={s.frame} video={page.video} thumbhash={page.video.video.thumbhash} />
       ) : (
         <ProjectFrame
           class={s.frame}
           image={page.mainImage.responsiveImage}
           pixelSrc={page.mainImage.pixelSrc}
+          thumbhash={page.mainImage.thumbhash}
           sizes="(min-width: 1152px) 50vw, (min-width: 768px) calc(100vw - 60px), calc(100vw - 30px)"
         />
       )
@@ -115,15 +117,8 @@ const galleries = [
       <aside class={s.aside} data-density="dense">
         <section class={s.partner}>
           <h2 class:list={[s.partnerLabel, 'label']}>{project.madeBy}</h2>
-          <a href={partnerUrl}>
-            <img
-              class={s.madeByLogo}
-              src={page.partner.logo.url}
-              alt={page.partner.logo.alt || `${page.partner.name} logo`}
-              width={page.partner.logo.width ?? undefined}
-              height={page.partner.logo.height ?? undefined}
-              loading="lazy"
-            />
+          <a href={partnerUrl} class={s.madeByPlate}>
+            <LogoPlate framed name={page.partner.name} logo={page.partner.logo} />
           </a>
           <p class="body"><PlainText data={page.partner.shortDescription} /></p>
           <a href={partnerUrl} class:list={[s.partnerLink, 'labelMedium']}>{project.viewProfile}</a>

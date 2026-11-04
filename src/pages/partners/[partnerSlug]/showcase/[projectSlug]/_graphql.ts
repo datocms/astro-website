@@ -28,6 +28,7 @@ export const query = graphql(
             alt
             width
             height
+            pngUrl: url(imgixParams: { fm: png, h: 200 })
           }
           shortDescription {
             value
@@ -101,9 +102,13 @@ export const query = graphql(
             ...ResponsiveImageFragment
           }
           pixelSrc: url(imgixParams: { w: 480, fm: jpg })
+          thumbhash
         }
         video {
           ...VideoPlayerFragment
+          video {
+            thumbhash
+          }
         }
         projectScreenshots {
           id

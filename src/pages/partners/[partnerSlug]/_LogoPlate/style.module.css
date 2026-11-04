@@ -19,6 +19,20 @@
   border-color: var(--surface-raised);
 }
 
+/*
+ * The framed plate stands in a column, with no cut: the hairline follows
+ * all its edges, and its corners are round. The logo is smaller.
+ */
+.framed {
+  padding: var(--space-lg);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.framed .box {
+  height: 64px;
+}
+
 /* The box of the logo. The logo and the canvas fill it with the fit `contain`. */
 .box {
   position: relative;
@@ -69,14 +83,14 @@
 }
 
 /*
- * The spinner shows while the image loads, but only after a short time:
- * an image that loads quickly develops with no spinner. It goes at the
+ * The working mark shows while the image loads, but only after a short time:
+ * an image that loads quickly develops with no mark. It goes at the
  * time of the failsafe, when the CSS shows the sharp image all the same.
  * The ground under it is the white of the plate, in both schemes, thus
- * the bars are the deep of the theme.
+ * the dots are the deep of the theme.
  */
-.spinner {
-  --spinner-color: var(--surface-inverse);
+.working {
+  --working-color: var(--surface-inverse);
 
   position: absolute;
   top: 50%;
@@ -85,19 +99,19 @@
   visibility: hidden;
 }
 
-.plate[data-state='loading'] .spinner {
+.plate[data-state='loading'] .working {
   animation:
-    spinner-show 0s 300ms forwards,
-    spinner-hide 0s 2.2s forwards;
+    working-show 0s 300ms forwards,
+    working-hide 0s 2.2s forwards;
 }
 
-@keyframes spinner-show {
+@keyframes working-show {
   to {
     visibility: visible;
   }
 }
 
-@keyframes spinner-hide {
+@keyframes working-hide {
   to {
     visibility: hidden;
   }

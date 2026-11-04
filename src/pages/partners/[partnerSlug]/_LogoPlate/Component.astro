@@ -3,10 +3,10 @@
 // schemes, thus the logo always keeps its own colours on white. When the
 // plate comes into view, the logo develops: it starts as large square cells
 // in its own colours, and the cells get smaller in steps until the logo is
-// sharp. While the logo loads, the spinner of the cms shows. Without
+// sharp. While the logo loads, the working mark of the diagrams shows. Without
 // motion, the logo is sharp at once.
 import { stripStega } from '@datocms/astro';
-import { Spinner } from '~/components/Spinner';
+import { WorkingMark } from '~/components/WorkingMark';
 import s from './style.module.css';
 
 interface Props {
@@ -19,13 +19,18 @@ interface Props {
     /** A PNG of the logo. The canvas reads this file, because an SVG can have no size. */
     pngUrl: string;
   };
+  /**
+   * The plate is a box with a hairline on all its edges, not a plate that the
+   * band cuts. The logo is smaller and it loads when it comes near the view.
+   */
+  framed?: boolean;
   class?: string;
 }
 
-const { name, logo, class: className } = Astro.props;
+const { name, logo, framed = false, class: className } = Astro.props;
 ---
 
-<logo-plate class:list={[s.plate, className]} data-src={logo.pngUrl}>
+<logo-plate class:list={[s.plate, framed && s.framed, className]} data-src={logo.pngUrl}>
   <span class={s.box}>
     <img
       class={s.logo}
@@ -33,10 +38,11 @@ const { name, logo, class: className } = Astro.props;
       alt={stripStega(logo.alt ?? '') || `${stripStega(name)} logo`}
       width={logo.width ?? undefined}
       height={logo.height ?? undefined}
-      fetchpriority="high"
+      fetchpriority={framed ? undefined : 'high'}
+      loading={framed ? 'lazy' : undefined}
     />
     <canvas class={s.canvas} aria-hidden="true"></canvas>
-    <Spinner class={s.spinner} />
+    <WorkingMark class={s.working} />
   </span>
 </logo-plate>
 
