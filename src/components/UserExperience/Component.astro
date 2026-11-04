@@ -115,6 +115,7 @@ const FORM_SCREENS = {
       <AppWindow
         class:list={[styles.window, styles.role, styles.code]}
         file={query.file}
+        data-target="developer"
         aria-hidden="true"
       >
         <pre
@@ -128,6 +129,7 @@ const FORM_SCREENS = {
       <AppWindow
         class:list={[styles.window, styles.role, styles.form]}
         address="humaninterface.admin.datocms.com"
+        data-target="editor"
         aria-hidden="true"
       >
         <div class={styles.formBody}>
@@ -146,14 +148,14 @@ const FORM_SCREENS = {
 
     <div class={styles.text}>
       <h2 class="headline">
-        <span class={styles.runDeveloper}>{developer.headline}</span>{' '}
-        <span class={styles.runEditor}>{editor.headline}</span>
+        <span class={styles.runDeveloper} data-target="developer">{developer.headline}</span>{' '}
+        <span class={styles.runEditor} data-target="editor">{editor.headline}</span>
       </h2>
       <div class={styles.buttons}>
-        <span class={styles.buttonDeveloper}>
+        <span class={styles.buttonDeveloper} data-link="developer">
           <Button href={developer.button.href}>{developer.button.label}</Button>
         </span>
-        <span class={styles.buttonEditor}>
+        <span class={styles.buttonEditor} data-link="editor">
           <Button href={editor.button.href}>{editor.button.label}</Button>
         </span>
       </div>
@@ -195,6 +197,27 @@ const FORM_SCREENS = {
             setFocus(centre < rect.top + rect.height / 2 ? 'developer' : 'editor');
           });
         };
+        // ≥1152 with a pointer: the window and the headline of a role are
+        // links to the page of the role. The button is the real link: the
+        // keyboard and the screen readers use it.
+        const links = {
+          developer: this.$<HTMLAnchorElement>('[data-link="developer"] a'),
+          editor: this.$<HTMLAnchorElement>('[data-link="editor"] a'),
+        };
+        const follow = (event: MouseEvent, target: HTMLElement) => {
+          if (!DESKTOP.matches || event.button > 1) return;
+          // A click that ends a text selection does not open the page.
+          if (window.getSelection()?.toString()) return;
+          const href = links[target.dataset.target as keyof typeof links].href;
+          if (event.button === 1 || event.metaKey || event.ctrlKey) {
+            window.open(href, '_blank', 'noopener');
+          } else {
+            window.location.assign(href);
+          }
+        };
+        this.on(section, 'click', '[data-target]', follow);
+        this.on(section, 'auxclick', '[data-target]', follow);
+
         window.addEventListener('scroll', onScroll, {
           passive: true,
           signal: this.#globalListeners.signal,

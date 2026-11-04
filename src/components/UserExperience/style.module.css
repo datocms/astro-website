@@ -550,6 +550,61 @@
   gap: var(--space-3xs);
 }
 
+/*
+ * ≥1152: two columns, as wide as the mock-up. The developer headline and
+ * its button are at the left, the editor headline and its button are at
+ * the right. Each column is below its half of the section, thus the
+ * pointer lights the column that it is above. The heading and the button
+ * row give no box: their children go into the grid cells.
+ */
+@media (min-width: 1152px) {
+  .text {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-xl);
+    justify-items: center;
+    max-width: 1015px;
+  }
+
+  .text h2,
+  .buttons {
+    display: contents;
+  }
+
+  .runDeveloper,
+  .buttonDeveloper {
+    grid-column: 1;
+  }
+
+  .runEditor,
+  .buttonEditor {
+    grid-column: 2;
+  }
+
+  /* Each headline has half the width, thus it is one step smaller. It stays 30px or more. */
+  .runDeveloper,
+  .runEditor {
+    grid-row: 1;
+    /* The headline fills its cell down to the button, thus all the cell is clickable. */
+    justify-self: stretch;
+    padding-bottom: var(--space-md);
+    font-size: var(--type-2xl);
+    text-wrap: balance;
+  }
+
+  .buttonDeveloper,
+  .buttonEditor {
+    grid-row: 2;
+  }
+}
+
+/* ≥1152 with a pointer: the window and the headline of a role are links (see the script). */
+@media (min-width: 1152px) and (hover: hover) {
+  [data-target] {
+    cursor: pointer;
+  }
+}
+
 [data-focus='developer'] .buttonEditor :global(a),
 [data-focus='editor'] .buttonDeveloper :global(a) {
   --btnBg: var(--surface-inverse-faint);
