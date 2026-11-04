@@ -93,7 +93,7 @@ const id = (s: string) =>
       </div>
       {
         columns.map((col) => (
-          <div class={styles.planCell}>
+          <div class={styles.planCell} data-plan-cell>
             <div class={styles.planName}>
               <p class="title">{col.name}</p>
               <p class:list={[styles.muted, 'body', 'tabular']}>{col.price}</p>
@@ -221,18 +221,26 @@ const id = (s: string) =>
       #observers: (ResizeObserver | IntersectionObserver)[] = [];
 
       // The header row is sticky. The header of an open category is sticky
-      // below it, thus the CSS needs the height of the header row
-      // (--cmpHeaderHeight). The header row gets data-stuck when the start
-      // of the table is above the viewport: then the CSS shows its bottom line.
+      // below it, thus the CSS needs the visible height of the header row
+      // (--cmpHeaderHeight). On phones the search is above the plan cells,
+      // and the header row sticks with the search above the viewport: the
+      // CSS needs the height of that part (--cmpHeaderHide). From 768 the
+      // search is in the row of the plan cells, and the value is 0. The
+      // header row gets data-stuck when the start of the table is above the
+      // viewport: then the CSS shows its bottom line.
       setUpStickyHeader() {
         const header = this.$('[data-header]');
+        const plan = this.$('[data-plan-cell]');
         const start = this.$('[data-table-start]');
 
         const resize = new ResizeObserver(() => {
+          const box = header.getBoundingClientRect();
+          const paddingTop = parseFloat(getComputedStyle(header).paddingTop);
+          const hide = Math.max(0, plan.getBoundingClientRect().top - box.top - paddingTop);
+          this.style.setProperty('--cmpHeaderHide', `${hide}px`);
           // Round down: a category header goes a fraction of a pixel under
           // the header row, and no row shows through a gap.
-          const height = Math.floor(header.getBoundingClientRect().height);
-          this.style.setProperty('--cmpHeaderHeight', `${height}px`);
+          this.style.setProperty('--cmpHeaderHeight', `${Math.floor(box.height - hide)}px`);
         });
         resize.observe(header);
 

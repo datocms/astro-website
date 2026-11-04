@@ -158,6 +158,52 @@
   gap: var(--space-2xs);
 }
 
+/*
+ * Under 768 the three columns do not fit. Each row is a grid: the name of
+ * the limit on its own line, the two plans in two columns below it, as in
+ * the comparison table. The header row shows only the names of the two
+ * plans. Each value has the name of its plan for the screen readers.
+ */
+@media (max-width: 767px) {
+  .table,
+  .table thead,
+  .table tbody {
+    display: block;
+  }
+
+  .table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--space-3xs) var(--space-md);
+    padding: var(--space-sm) var(--space-2xs);
+    border-bottom: 1px solid var(--border-default);
+  }
+
+  .table th,
+  .table td {
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .table tbody th {
+    grid-column: 1 / -1;
+  }
+
+  .table thead th:first-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .name {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
 .muted {
   color: var(--text-muted);
 }
@@ -226,12 +272,26 @@
   transition: opacity 150ms ease-out;
 }
 
-/* Under 768 the bubble is below the name of the limit. */
+/*
+ * Under 768 the bubble opens below the name of the limit, in the flow of
+ * the row: it pushes the values down and does not cover them.
+ */
 @media (max-width: 767px) {
+  .info {
+    display: contents;
+  }
+
   .tooltip {
-    top: calc(100% + var(--space-3xs));
-    left: 0;
-    max-width: 220px;
+    position: static;
+    display: none;
+    flex-basis: 100%;
+    width: auto;
+    max-width: none;
+  }
+
+  .info[data-open] .tooltip,
+  .infoButton:focus-visible + .tooltip {
+    display: block;
   }
 }
 

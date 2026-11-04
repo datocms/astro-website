@@ -66,7 +66,12 @@
 
 .header {
   position: sticky;
-  top: 0;
+  /*
+   * On phones the search is above the plan cells. The header row sticks with
+   * the search above the viewport, thus only the plan cells stay. The script
+   * gives --cmpHeaderHide (0 from 768).
+   */
+  top: calc(-1 * var(--cmpHeaderHide, 0px));
   z-index: 2;
   row-gap: var(--space-xl);
   /* The space before the first category. It is not in the sticky box. */
@@ -238,6 +243,12 @@
   cursor: pointer;
 }
 
+@media (max-width: 767px) {
+  .categoryHeader {
+    padding-block: var(--space-xs);
+  }
+}
+
 /* On hover the category header gets the stronger accent. */
 @media (hover: hover) {
   .categoryHeader:hover {
@@ -298,11 +309,14 @@
   }
 }
 
-/* Stacked layout: 20px padding, 20px from the name to the values. */
+/*
+ * Stacked layout: 16px padding, 8px from the name to the values. The name
+ * and the values start at the edge of the plan cells.
+ */
 .row {
-  --rowPaddingY: var(--space-md);
+  --rowPaddingY: var(--space-sm);
 
-  row-gap: var(--space-md);
+  row-gap: var(--space-3xs);
   padding-block: var(--rowPaddingY);
   border-bottom: 1px solid var(--border-default);
 }
@@ -329,8 +343,6 @@
   gap: var(--space-2xs);
   min-width: 0;
   grid-column: 1 / -1;
-  /* The name starts after the chevron. The plan columns do not move. */
-  padding-inline-start: var(--cmpRowIndent);
 }
 
 /*
@@ -340,6 +352,8 @@
  */
 @media (min-width: 768px) {
   .feature {
+    /* The name starts after the chevron. The plan columns do not move. */
+    padding-inline-start: var(--cmpRowIndent);
     grid-column: auto;
     align-self: stretch;
     margin-block: calc(-1 * var(--rowPaddingY));
@@ -353,6 +367,25 @@
 
 .enterprise {
   color: var(--text-muted);
+}
+
+/*
+ * Stacked layout: a vertical line between the two values, in the middle of
+ * the gap.
+ */
+@media (max-width: 767px) {
+  .enterprise {
+    position: relative;
+  }
+
+  .enterprise::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    left: calc(var(--cmpGap) / -2);
+    width: 1px;
+    background: var(--border-default);
+  }
 }
 
 /*
@@ -436,23 +469,30 @@
 }
 
 /*
- * Under 768 the bubble is below the feature name, with the full content
- * width. It floats above the next rows.
+ * Under 768 the bubble opens below the feature name, with the full content
+ * width. It is in the flow of the row: it pushes the values down and does
+ * not cover them.
  */
 @media (max-width: 767px) {
   .feature {
-    position: relative;
+    flex-wrap: wrap;
   }
 
   .info {
-    position: static;
+    display: contents;
   }
 
   .tooltip {
-    top: calc(100% + var(--space-3xs));
-    left: 0;
-    width: 100%;
+    position: static;
+    display: none;
+    flex-basis: 100%;
+    width: auto;
     max-width: none;
+  }
+
+  .info[data-open] .tooltip,
+  .infoButton:focus-visible + .tooltip {
+    display: block;
   }
 }
 
