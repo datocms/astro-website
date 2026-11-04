@@ -1,12 +1,14 @@
 ---
 // The Wall of love page. The copy of the hero comes from
 // src/data/wall-of-love.ts. The quotes come from the CMS: all the reviews
-// and all the partner testimonials. The SEO is static.
+// and all the partner testimonials. The SEO is static. The face at the
+// right edge of the quotes comes from src/data/wall-of-love.ts too.
 import { stripStega } from '@datocms/astro';
 import type { Review } from 'schema-dts';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
 import { JsonLd } from '~/components/JsonLd';
+import { ListBuddy } from '~/components/ListBuddy';
 import { PageCloser } from '~/components/PageCloser';
 import { QuoteGrid, readQuote } from '~/components/Quote';
 import * as wall from '~/data/wall-of-love';
@@ -67,7 +69,9 @@ const seo = overrideSeo([], seoTitle(wall.seo.title), seoDescription(wall.seo.de
   </Fragment>
 
   <Hero {...wall.hero} variant="accent" alignment="center" typewriter />
-  <QuoteGrid items={items} layout="masonry" />
+  <ListBuddy {...wall.buddy} track="list">
+    <QuoteGrid items={items} layout="masonry" />
+  </ListBuddy>
   <PageCloser face="love" cta={wall.ctaStart} video="/videos/hand-heart.pxv" />
 
   <DraftModeQueryListener query={query} />

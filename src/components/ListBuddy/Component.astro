@@ -17,9 +17,12 @@ import type { BuddyData } from '~/data/features';
 import { faceReaction, faces } from '~/lib/motion/faces';
 import styles from './style.module.css';
 
-type Props = BuddyData;
+type Props = BuddyData & {
+  /** The source of the share of the list scrolled past. */
+  track?: 'categorynav' | 'list';
+};
 
-const { lines } = Astro.props;
+const { lines, track = 'categorynav' } = Astro.props;
 
 const script = lines.map(({ at, face, text }) => ({
   at,
@@ -30,7 +33,7 @@ const script = lines.map(({ at, face, text }) => ({
 const first = script[0]?.face ?? faces.wink.face;
 ---
 
-<list-buddy class={styles.list} data-list-buddy-list>
+<list-buddy class={styles.list} data-track={track}>
   <slot />
   <div class={styles.column} aria-hidden="true">
     <aside class={styles.buddy} data-theme="default" data-list-buddy data-hidden>
@@ -142,24 +145,35 @@ const first = script[0]?.face ?? faces.wink.face;
 
         // A line at each quarter, one time, on the way down: the last line
         // of the lines passed, when it is further than the last line said.
-        document.addEventListener(
-          'categorynav:score',
-          (event) => {
-            const ratio = (event as CustomEvent<number>).detail;
-            const next = lines.findLastIndex((line) => ratio >= line.at);
-            if (next <= stage || buddy.hasAttribute('data-hidden')) return;
-            stage = next;
-            say(lines[next]!, next === lines.length - 1 ? 4000 : 2200);
-          },
-          { signal },
-        );
+        const reach = (ratio: number) => {
+          const next = lines.findLastIndex((line) => ratio >= line.at);
+          if (next <= stage || buddy.hasAttribute('data-hidden')) return;
+          stage = next;
+          say(lines[next]!, next === lines.length - 1 ? 4000 : 2200);
+        };
+        const ownTrack = this.dataset.track === 'list';
+        if (!ownTrack) {
+          document.addEventListener(
+            'categorynav:score',
+            (event) => reach((event as CustomEvent<number>).detail),
+            { signal },
+          );
+        }
 
         // The buddy comes in once the list reaches the top 40% of the screen.
+        // With the track `list`, the share is the part of the list above the
+        // middle of the screen. The end of the list is also the last line.
         let queued = false;
         const check = () => {
           queued = false;
-          if (this.getBoundingClientRect().top < window.innerHeight * 0.4) {
+          const rect = this.getBoundingClientRect();
+          if (rect.top < window.innerHeight * 0.4) {
             buddy.removeAttribute('data-hidden');
+          }
+          if (ownTrack && rect.height > 0) {
+            const middle = window.innerHeight / 2;
+            const atEnd = rect.bottom <= window.innerHeight + 1;
+            reach(atEnd ? 1 : Math.min(1, Math.max(0, (middle - rect.top) / rect.height)));
           }
         };
         window.addEventListener(
