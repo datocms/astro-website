@@ -150,7 +150,7 @@ export interface PartnersData {
 export const hero: HeroData = {
   headline: 'Thoughtfully built and ambitiously used.',
   subheadline: 'The AI-agnostic headless CMS with human support and transparent pricing',
-  face: 'wink',
+  face: 'smile',
   buttons: [
     {
       label: 'Get Started',
@@ -243,7 +243,7 @@ export const userExperience: UserExperienceData = {
 
 export const contentSource: ContentSourceData = {
   headline: 'Give your content a long, healthy life',
-  face: 'magic',
+  face: 'relaxed',
   paragraph:
     'Website, chatbot, mobile, a smart fridge? One place for every role to manage content across every output.',
   button: {

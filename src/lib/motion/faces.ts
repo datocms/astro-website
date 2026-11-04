@@ -58,6 +58,12 @@ export const faces = {
     description: 'Opens its eyes, winks, looks at you. The default of the heroes.',
     frames: [...draw(), f('[••]', 650), f('[-•]', 170), f('[••]', 400)],
   },
+  smile: {
+    face: '[•ᴗ•]',
+    description:
+      'Opens its eyes, smiles, winks. The wink with a mouth: it reads as a face when it stops. The home hero.',
+    frames: [...draw(), f('[••]', 650), f('[•ᴗ•]', 350), f('[-ᴗ•]', 170), f('[•ᴗ•]', 400)],
+  },
   calm: {
     face: '[••]',
     description: 'Opens its eyes and blinks once. For a page where a wink is too much.',
