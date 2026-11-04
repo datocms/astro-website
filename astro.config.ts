@@ -459,9 +459,6 @@ export default defineConfig({
     '/marketplace/plugins/[...rest]': '/plugins/[...rest]',
     '/marketplace/starters': '/starters',
     '/marketplace/starters/[...rest]': '/starters/[...rest]',
-    // The recipes have no page. The plugin that imports their schema replaces them.
-    '/marketplace/recipes': '/plugins/i/datocms-plugin-schema-import-export',
-    '/marketplace/recipes/[...rest]': '/plugins/i/datocms-plugin-schema-import-export',
     '/cms/react': '/cms/nextjs-cms',
     '/cms/hugo': '/developers',
     '/cms/nextjs': '/cms/nextjs-cms',
