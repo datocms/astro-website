@@ -1,0 +1,81 @@
+---
+// The main media of a showcase project (the video, else the main image), in
+// a frame that the band cuts at the right, as the frame of a product scene.
+// When the frame comes into view, the media develops: it starts as large
+// square cells in its own colours, and the cells get smaller in steps until
+// the media is sharp (`~/lib/pixel-develop`, the `photo` mode). A video
+// develops from its poster: the frame that the player shows before it
+// plays. While the poster or the image loads, the spinner of the cms
+// shows. Without motion, the media is sharp at once.
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Spinner } from '~/components/Spinner';
+import type { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
+import { VideoPlayer, VideoPlayerFragment } from '~/components/VideoPlayer';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { muxThumbnailUrl } from '~/lib/muxThumbnailUrl';
+import s from './style.module.css';
+
+type Props = {
+  class?: string;
+} & (
+  | {
+      image: FragmentOf<typeof ResponsiveImageFragment>;
+      /** A small copy of the image that the canvas reads. It must allow CORS. */
+      pixelSrc: string;
+      /** The `sizes` of the image: the width of the frame at each breakpoint. */
+      sizes: string;
+    }
+  | {
+      /** A video with a Mux playback ID. */
+      video: FragmentOf<typeof VideoPlayerFragment>;
+    }
+);
+
+const { class: className } = Astro.props;
+const poster =
+  'video' in Astro.props ? readFragment(VideoPlayerFragment, Astro.props.video).video : null;
+// The poster of the player, at a small width: the canvas reads it.
+const pixelSrc =
+  'video' in Astro.props
+    ? muxThumbnailUrl(poster!.thumbnailUrl, { width: 480 })
+    : Astro.props.pixelSrc;
+---
+
+<project-frame class:list={[s.frame, className]} data-src={pixelSrc}>
+  <div class={s.media}>
+    {
+      'video' in Astro.props ? (
+        <VideoPlayer data={Astro.props.video} class={s.player} />
+      ) : (
+        <ResponsiveImage
+          data={Astro.props.image}
+          sizes={Astro.props.sizes}
+          priority
+          pictureClass={s.picture}
+          imgClass={s.image}
+        />
+      )
+    }
+  </div>
+  <canvas class={s.canvas} aria-hidden="true"></canvas>
+  <Spinner class={s.spinner} />
+</project-frame>
+
+<script>
+  import { developWhenInView } from '~/lib/pixel-develop';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'project-frame',
+    class extends WebComponent {
+      parsedCallback() {
+        developWhenInView(this, {
+          src: this.dataset.src!,
+          canvas: this.$<HTMLCanvasElement>('canvas'),
+          mode: 'photo',
+          fit: 'cover',
+        });
+      }
+    },
+  );
+</script>

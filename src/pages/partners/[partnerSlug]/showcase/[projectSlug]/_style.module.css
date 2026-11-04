@@ -1,17 +1,78 @@
+/*
+ * The hero: a split, as the hero of the partner page. The text is in the
+ * left half of the content column. Below 1152 the frame comes after the
+ * text, and it goes to the right edge of the page. From 1152 the frame is
+ * the right half of the band: from the centre of the page to its right
+ * edge. The image gives the height of the frame, and the frame stands on
+ * the hairline that closes the band, thus the band cuts the frame, as the
+ * frame of a scene.
+ */
+.hero {
+  position: relative;
+  overflow-x: clip;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.label {
+  margin-bottom: calc(var(--space-2xs) - var(--space-md));
+  color: var(--text-muted);
+}
+
+.intro {
+  max-width: var(--reading-max);
+  color: var(--text-muted);
+}
+
+.intro > * + * {
+  margin-top: var(--space-xs);
+}
+
+.actions {
+  margin-top: var(--space-xs);
+}
+
 .madeBy a {
   color: var(--text-primary);
   text-decoration: underline;
 }
 
-.visual {
-  overflow: hidden;
-  border-radius: var(--radius-lg);
+/* 50% - 50vw is the distance from the content column to the right edge of the page. */
+.frame {
+  margin-right: calc(50% - 50vw);
 }
 
-.visual :global(:is(picture, img)) {
-  display: block;
-  width: 100%;
-  height: auto;
+@media (min-width: 1152px) {
+  .heroContent {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: end;
+    gap: 0;
+    min-height: 440px;
+  }
+
+  .heroText {
+    align-self: center;
+    padding-right: var(--space-xl);
+    padding-bottom: var(--section-padding-y);
+  }
+
+  /* The column is half of the content column, thus the distance to the right edge is 100% - 50vw. */
+  .frame {
+    margin-right: calc(100% - 50vw);
+  }
 }
 
 /*

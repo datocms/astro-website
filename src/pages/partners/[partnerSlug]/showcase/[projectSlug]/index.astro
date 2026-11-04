@@ -1,13 +1,13 @@
 ---
-// The page of one project of the showcase: the introduction, the video or
-// the main image, the explanation, the screenshots (with a lightbox to the
-// large image),
-// the partner, the services and the technologies.
+// The page of one project of the showcase: the introduction next to the
+// video or the main image, the explanation, the screenshots (with a lightbox
+// to the large image), the partner, the services and the technologies.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { Breadcrumb } from '~/components/Breadcrumb';
+import { ButtonGroup } from '~/components/ButtonGroup';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Fact, Facts } from '~/components/Facts';
-import { Hero } from '~/components/Hero';
+import { Headline } from '~/components/Headline';
 import { Lightbox } from '~/components/Lightbox';
 import { Prose } from '~/components/Prose';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
@@ -15,7 +15,7 @@ import { Section } from '~/components/Section';
 import { PlainText, StructuredText } from '~/components/StructuredText';
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
-import { VideoPlayer, VideoPlayerFragment } from '~/components/VideoPlayer';
+import { VideoPlayerFragment } from '~/components/VideoPlayer';
 import { indexes } from '~/data/breadcrumbs';
 import { project } from '~/data/partners';
 import Layout from '~/layouts/Layout.astro';
@@ -25,6 +25,7 @@ import { readFragment } from '~/lib/datocms/graphql';
 import { overrideSeo, seoOgType } from '~/lib/datocms/seo';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import ProjectFrame from './_ProjectFrame/Component.astro';
 import s from './_style.module.css';
 
 const variables = { projectSlug: Astro.params.projectSlug! };
@@ -48,40 +49,55 @@ const galleries = [
   seo={overrideSeo(page._seoMetaTags, seoOgType('website'))}
   headerVariant="page"
 >
-  <Hero
-    variant="page"
-    label={project.kicker}
-    headline={page.name}
-    buttons={page.projectUrl
-      ? [{ label: project.visitProject, href: page.projectUrl, newTab: true }]
-      : undefined}
-  >
-    <Fragment slot="intro">
-      <StructuredText {...ensureValidStructuredTextProps({ data: page.headline })} />
-      <p class:list={[s.madeBy, 'body']}>
-        {project.madeBy}{' '}
-        <a href={partnerUrl}>{page.partner.name}</a>
-      </p>
-    </Fragment>
-  </Hero>
+  {
+    /*
+      The hero is a split, as the hero of the partner page. The text is in
+      the left half, on the page. The right half is the video of the
+      project, else its main image, cut by the right edge of the band, as
+      the frame of a product scene. The video replaces the main image: the
+      partner chose the video as the media of the project.
+    */
+  }
+  <Section flushBottom class={s.hero} contentClass={s.heroContent} data-hero>
+    <div class={s.heroText}>
+      <p class:list={[s.label, 'body']}>{project.kicker}</p>
+      <Headline as="h1" size="headline">{page.name}</Headline>
+      <div class:list={[s.intro, 'body']}>
+        <StructuredText {...ensureValidStructuredTextProps({ data: page.headline })} />
+        <p class={s.madeBy}>
+          {project.madeBy}{' '}
+          <a href={partnerUrl}>{page.partner.name}</a>
+        </p>
+      </div>
+      {
+        page.projectUrl && (
+          <ButtonGroup
+            buttons={[{ label: project.visitProject, href: page.projectUrl, newTab: true }]}
+            size="l"
+            class={s.actions}
+          />
+        )
+      }
+    </div>
+    {
+      page.video && video?.muxPlaybackId ? (
+        <ProjectFrame class={s.frame} video={page.video} />
+      ) : (
+        <ProjectFrame
+          class={s.frame}
+          image={page.mainImage.responsiveImage}
+          pixelSrc={page.mainImage.pixelSrc}
+          sizes="(min-width: 1152px) 50vw, (min-width: 768px) calc(100vw - 60px), calc(100vw - 30px)"
+        />
+      )
+    }
+  </Section>
   <Breadcrumb
     trail={[indexes.partners, { label: page.partner.name, href: partnerUrl }]}
     current={page.name}
   />
 
   <Section>
-    <div class={s.visual}>
-      {
-        video?.muxPlaybackId && page.video ? (
-          <VideoPlayer data={page.video} />
-        ) : (
-          <ResponsiveImage data={page.mainImage.responsiveImage} />
-        )
-      }
-    </div>
-  </Section>
-
-  <Section flushTop>
     <div class={s.layout}>
       <section class={s.about}>
         <h2 class="title">{project.about}</h2>

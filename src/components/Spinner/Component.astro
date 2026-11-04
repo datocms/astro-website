@@ -1,0 +1,25 @@
+---
+// The spinner of the cms (`Spinner.tsx` of the product UI): twelve bars on
+// a circle, each one goes from full to faint, one after the other. It is
+// 32px. The parent gives its place and its colour (`--spinner-color`, the
+// muted text by default). It has no text: the element that loads tells
+// its state.
+import s from './style.module.css';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+const SIZE = 32;
+const bars = Array.from({ length: 12 }, (_, index) => ({
+  // A negative delay: each bar starts at a different point of its cycle.
+  animationDelay: `${(index - 12) / 10}s`,
+  transform: `translate(-50%, -50%) rotate(${index * 30}deg) translate(${SIZE * 0.375}px)`,
+}));
+---
+
+<span class:list={[s.spinner, className]} aria-hidden="true">
+  {bars.map((style) => <span class={s.bar} style={style} />)}
+</span>
