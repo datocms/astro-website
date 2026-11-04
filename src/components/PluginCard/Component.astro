@@ -1,7 +1,6 @@
 ---
+import { stripStega } from '@datocms/astro';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { faPuzzlePiece } from '@fortawesome/pro-regular-svg-icons';
-import { Icon } from '~/components/Icon';
 import { buildUrlForPlugin } from '~/lib/datocms/gqlUrlBuilder/plugin';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { PluginCardFragment } from './graphql';
@@ -10,17 +9,53 @@ import styles from './style.module.css';
 
 interface Props {
   plugin: FragmentOf<typeof PluginCardFragment>;
-  /** `horizontal` puts a small image at the left of the text. */
-  orientation?: 'vertical' | 'horizontal';
+  /**
+   * `horizontal` puts a small image at the left of the text. `responsive`
+   * is horizontal on a phone and vertical from 768px.
+   */
+  orientation?: 'vertical' | 'horizontal' | 'responsive';
+  /** Show the install count below the description (for a list in the order of installs). */
+  showInstalls?: boolean;
 }
 
-const { plugin: maskedPlugin, orientation = 'vertical' } = Astro.props;
+const { plugin: maskedPlugin, orientation = 'vertical', showInstalls = false } = Astro.props;
 const plugin = readFragment(PluginCardFragment, maskedPlugin);
+
+/*
+ * A plugin with no cover gets a cover of its name, on the accent of a
+ * theme. The name selects the theme, thus a plugin always has the same
+ * colour, and the next plugin usually has a different colour.
+ */
+const coverThemes = ['default', 'orange', 'green', 'purple', 'blue', 'pink'] as const;
+
+function themeForName(name: string) {
+  let hash = 0;
+  for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return coverThemes[hash % coverThemes.length];
+}
+
+/*
+ * The official badge stays on the line of the last word: it never wraps
+ * alone. In draft mode the title ends with the stega of Content Link: the
+ * words come from the text without it, and the stega stays at the end.
+ */
+const cleanTitle = stripStega(plugin.title);
+const stega = plugin.title.startsWith(cleanTitle) ? plugin.title.slice(cleanTitle.length) : '';
+const titleWords = cleanTitle.trim().split(/\s+/);
+const lastWord = titleWords.pop();
+const firstWords = titleWords.length > 0 ? `${titleWords.join(' ')} ` : '';
+
+// The search results come from Algolia. A result can have no install count.
+const installs = showInstalls && typeof plugin.installs === 'number' ? plugin.installs : undefined;
 ---
 
 <a
   href={buildUrlForPlugin(plugin)}
-  class:list={[styles.card, orientation === 'horizontal' && styles.horizontal]}
+  class:list={[
+    styles.card,
+    orientation === 'horizontal' && styles.horizontal,
+    orientation === 'responsive' && styles.responsive,
+  ]}
 >
   <span class={styles.image}>
     {
@@ -30,17 +65,40 @@ const plugin = readFragment(PluginCardFragment, maskedPlugin);
           sizes="(min-width: 768px) 300px, 100vw"
         />
       ) : (
-        <span class={styles.placeholder} aria-hidden="true">
-          <Icon icon={faPuzzlePiece} />
+        <span
+          class:list={[styles.nameCover, 'surfaceAccent']}
+          data-theme={themeForName(plugin.title)}
+          aria-hidden="true"
+        >
+          <span class={styles.nameCoverText}>{plugin.title}</span>
         </span>
       )
     }
   </span>
   <span class={styles.text}>
     <span class:list={[styles.title, 'bodyMedium']}>
-      {plugin.title}
-      {plugin.author?.official && <OfficialBadge />}
+      {
+        plugin.author?.official ? (
+          <>
+            {firstWords}
+            <span class={styles.lastWord}>
+              {lastWord}
+              {stega}
+              <OfficialBadge />
+            </span>
+          </>
+        ) : (
+          plugin.title
+        )
+      }
     </span>
     <span class:list={[styles.description, 'label']}>{plugin.description}</span>
+    {
+      installs !== undefined && (
+        <span class:list={[styles.installs, 'caption', 'tabular']}>
+          {installs.toLocaleString('en-US')} {installs === 1 ? 'install' : 'installs'}
+        </span>
+      )
+    }
   </span>
 </a>

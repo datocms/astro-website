@@ -18,12 +18,14 @@ interface Props {
    * stays in the centred column.
    */
   bleed?: boolean;
+  /** The ground of the band. The collections share one tinted band. */
+  background?: 'default' | 'accent-faint';
 }
 
-const { title, href, count, flushTop = true, bleed = false } = Astro.props;
+const { title, href, count, flushTop = true, bleed = false, background = 'default' } = Astro.props;
 ---
 
-<Section flushTop={flushTop} padding={bleed ? 'none' : 'default'}>
+<Section flushTop={flushTop} padding={bleed ? 'none' : 'default'} background={background}>
   <div class:list={[s.groupHeader, bleed && s.groupHeaderInset]}>
     <h2 class="title">{title}</h2>
     {

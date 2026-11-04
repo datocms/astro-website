@@ -6,7 +6,6 @@ import { CardCarousel } from '~/components/CardCarousel';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
 import { PluginCard } from '~/components/PluginCard';
-import { Section } from '~/components/Section';
 import { groups, hero } from '~/data/plugins';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
@@ -32,18 +31,19 @@ const { official, officialMeta } = await executeQuery(Astro, officialPluginsQuer
 ---
 
 <Layout theme="purple" seo={page.seo} headerVariant="accent">
-  <Hero variant="accent" {...hero} />
+  <Hero variant="accent" {...hero}>
+    <Fragment slot="intro">
+      <p>{hero.intro}</p>
+      <SearchBox />
+    </Fragment>
+  </Hero>
 
-  <Section>
-    <SearchBox />
-  </Section>
-
-  <Group title={groups.highlighted}>
+  <Group title={groups.highlighted} flushTop={false}>
     <ul class={s.highlighted}>
       {
         page.highlighted.map((item) => (
           <li>
-            <PluginCard plugin={item} />
+            <PluginCard plugin={item} orientation="responsive" />
           </li>
         ))
       }
@@ -55,7 +55,7 @@ const { official, officialMeta } = await executeQuery(Astro, officialPluginsQuer
       {
         popular.map((item) => (
           <li>
-            <PluginCard plugin={item} orientation="horizontal" />
+            <PluginCard plugin={item} orientation="horizontal" showInstalls />
           </li>
         ))
       }
@@ -81,8 +81,8 @@ const { official, officialMeta } = await executeQuery(Astro, officialPluginsQuer
   }
 
   {
-    collections.map((collection) => (
-      <Group title={collection.title} bleed>
+    collections.map((collection, index) => (
+      <Group title={collection.title} bleed background="accent-faint" flushTop={index > 0}>
         <CardCarousel label={collection.title} bleed>
           {collection.plugins.map((item) => (
             <div role="listitem">
@@ -94,7 +94,7 @@ const { official, officialMeta } = await executeQuery(Astro, officialPluginsQuer
     ))
   }
 
-  <Group title={groups.latest}>
+  <Group title={groups.latest} flushTop={false}>
     <ul class={s.list}>
       {
         latest.map((item) => (
@@ -105,7 +105,6 @@ const { official, officialMeta } = await executeQuery(Astro, officialPluginsQuer
       }
     </ul>
   </Group>
-
   <DraftModeQueryListener query={query} />
 </Layout>
 

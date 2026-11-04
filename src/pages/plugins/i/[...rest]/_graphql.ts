@@ -31,7 +31,7 @@ export const query = graphql(
           }
         }
         coverImage {
-          responsiveImage(imgixParams: { w: 400 }) {
+          responsiveImage(imgixParams: { w: 600 }) {
             ...ResponsiveImageFragment
           }
         }

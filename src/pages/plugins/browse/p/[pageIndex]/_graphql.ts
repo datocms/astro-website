@@ -63,3 +63,19 @@ export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) 
 
   return range(2, 1 + Math.ceil(count / perPage)).map((i) => `/plugins/browse/p/${i}`);
 };
+
+/** The most popular plugins, for a search that finds no plugin. */
+export const popularQuery = graphql(
+  /* GraphQL */ `
+    query PopularPlugins {
+      popular: allPlugins(
+        first: 6
+        orderBy: installs_DESC
+        filter: { manuallyDeprecated: { eq: "false" } }
+      ) {
+        ...PluginCardFragment
+      }
+    }
+  `,
+  [PluginCardFragment],
+);

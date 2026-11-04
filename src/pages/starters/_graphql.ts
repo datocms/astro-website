@@ -23,6 +23,8 @@ export const query = graphql(
           logo {
             url
             alt
+            width
+            height
           }
           squareLogo {
             url

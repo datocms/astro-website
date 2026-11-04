@@ -1,12 +1,25 @@
+/*
+ * A custom element is inline by default. The parent can be a flex column
+ * that shrinks its children to their content, thus the root sets its own
+ * width: 480px, or the width of the page column on a phone. A percent
+ * does not work here, because the parent takes its width from the root.
+ */
+.root {
+  display: block;
+  width: min(480px, 100vw - 2 * var(--section-padding-x));
+}
+
+/* The search sits in the hero, below the intro, at the left. */
 .search {
+  position: relative;
   display: flex;
-  justify-content: center;
+  margin-top: var(--space-md);
 }
 
 .searchInput {
   width: 100%;
-  max-width: 480px;
-  padding: var(--space-xs) var(--space-lg);
+  padding-block: var(--space-xs);
+  padding-inline: calc(var(--space-md) + 26px) calc(var(--space-sm) + 32px);
   color: var(--text-primary);
   background: var(--surface-default);
   border: 1px solid var(--border-default);
@@ -18,9 +31,101 @@
     }
   }
 
+  /* The browser draws its own clear button in a search box. The form has its own. */
+  &::-webkit-search-cancel-button,
+  &::-webkit-search-decoration {
+    appearance: none;
+  }
+
   &:focus-visible {
     border-color: var(--border-strong);
     outline: 2px solid var(--border-strong);
     outline-offset: 2px;
+  }
+}
+
+/*
+ * The hint of the shortcut key, at the right of the box. It goes when the
+ * box has the focus or a text, and on touch screens (no keyboard).
+ */
+.shortcut {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: var(--space-sm);
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  margin-block: auto;
+  font-family: inherit;
+  line-height: 1;
+  color: var(--text-muted);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+.searchInput:is(:focus, :not(:placeholder-shown)) ~ .shortcut {
+  visibility: hidden;
+}
+
+/* The magnifying glass, at the left of the text. */
+.magnifier {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--space-md);
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.magnifier svg,
+.clear svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+/*
+ * The clear button, at the right, when the box has a text. It is a pill
+ * of 32px, and the tint of the ink shows on hover.
+ */
+.clear {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: var(--space-xs);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-block: auto;
+  padding: 0;
+  color: var(--text-muted);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--text-primary);
+      background: var(--surface-inverse-faint);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+.searchInput:placeholder-shown ~ .clear {
+  display: none;
+}
+
+@media (hover: none) {
+  .shortcut {
+    display: none;
   }
 }

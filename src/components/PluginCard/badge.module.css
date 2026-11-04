@@ -9,7 +9,20 @@
   line-height: 0;
 }
 
+/*
+ * The D sits on the baseline of the text. Without a size, it has the height
+ * of the capital letters (0.72em where the cap unit is not known).
+ */
 .icon svg {
-  width: var(--badge-size);
-  height: var(--badge-size);
+  --badge-cap: 0.72em;
+
+  width: var(--badge-size, var(--badge-cap));
+  height: var(--badge-size, var(--badge-cap));
+  vertical-align: baseline;
+}
+
+@supports (height: 1cap) {
+  .icon svg {
+    --badge-cap: 1cap;
+  }
 }

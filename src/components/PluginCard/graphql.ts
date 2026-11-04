@@ -13,6 +13,7 @@ export const PluginCardFragment = graphql(
       }
       title
       description
+      installs
       author {
         official
       }

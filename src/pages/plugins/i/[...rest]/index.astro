@@ -1,28 +1,35 @@
 ---
-// The page of one plugin: the title, the description, the install link, the
-// preview, the README and the facts about the plugin (publisher, homepage,
-// package, version, installs, last update).
-import xss from 'xss';
+// The page of one plugin. The author of the plugin gives the preview, the
+// cover and the README, thus their quality is not known. The page shows
+// first what comes from the package and the directory: the title, the
+// description, the install link and the facts. The preview and the cover
+// keep their proportions, on a neutral ground. The README is on a sheet of
+// its own (_Readme.astro). A card next to the facts tells the visitor that
+// they can build a plugin too.
+import { stripStega } from '@datocms/astro';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Fact, Facts } from '~/components/Facts';
 import { Button } from '~/components/Button';
 import { Hero } from '~/components/Hero';
-import { Markdown } from '~/components/Markdown';
 import { OfficialBadge } from '~/components/PluginCard';
-import { Prose } from '~/components/Prose';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { Section } from '~/components/Section';
+import { TableOfContents } from '~/components/TableOfContents';
 import { Breadcrumb } from '~/components/Breadcrumb';
 import { indexes } from '~/data/breadcrumbs';
 import { detail } from '~/data/plugins';
 import Layout from '~/layouts/Layout.astro';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { readFragment } from '~/lib/datocms/graphql';
 import { overrideSeo, seoOgType } from '~/lib/datocms/seo';
 import { formatLongDate } from '~/lib/format/date';
 import { getGravatarUrl } from '~/lib/gravatar';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import { prepareReadme } from './_readme';
+import Readme from './_Readme.astro';
 import s from './_style.module.css';
 
 const variables = {
@@ -31,92 +38,112 @@ const variables = {
 
 const { page } = await executeQuery(Astro, query, { variables });
 
-if (!page || !page.readme) {
+if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
 
 const avatarUrl = getGravatarUrl(page.author.email);
 const video = page.previewImage?.video;
+const image = video ? undefined : page.previewImage?.responsiveImage;
+// A preview keeps its proportions. It is never wider than its file, and
+// never taller than 70% of the viewport. The image component puts its
+// size in the style attribute, thus the width goes there too.
+const imageSize = image && readFragment(ResponsiveImageFragment, image);
+const previewStyle = imageSize && {
+  width: `min(100%, ${imageSize.width}px, 70vh * ${imageSize.width} / ${imageSize.height})`,
+  maxWidth: 'none',
+};
+const readme = await prepareReadme(page.readme);
+const fieldTypes = page.fieldTypes.map((fieldType) => fieldType.name);
+
+// The description comes from the npm package. It can be long, thus it is
+// the intro of the hero, not a part of the headline. npm cuts a description
+// at 255 characters, also in the middle of a word: such a text stops at
+// the last full word, with an ellipsis. In draft mode, the text ends with
+// the stega of Content Link: the stega stays.
+const NPM_DESCRIPTION_MAX = 255;
+const description = (() => {
+  const text = stripStega(page.description);
+  if (text.length < NPM_DESCRIPTION_MAX) return page.description;
+  const stega = page.description.slice(text.length);
+  const words = text.slice(0, text.lastIndexOf(' ')).replace(/[\s,;:.\-–—]+$/, '');
+  return `${words}…${stega}`;
+})();
 ---
 
 <Layout theme="purple" seo={overrideSeo(page.seo, seoOgType('website'))} headerVariant="accent">
-  <Hero variant="accent" headline={page.title} subheadline={page.description}>
+  <Hero variant="accent" headline={page.title}>
     <div slot="intro" class={s.intro}>
+      <p class={s.description}>{description}</p>
       {
         page.author.official && (
           <p class:list={[s.officialNote, 'labelMedium']}>
-            <OfficialBadge size={20} />
+            <OfficialBadge size={16} class={s.officialBadge} />
             {detail.officialBadge}
           </p>
         )
       }
-      <set-plugin-install-url data-package-name={page.packageName}>
+      <set-plugin-install-url data-package-name={stripStega(page.packageName)}>
         <Button href={dashboardUrl()} attrs={{ target: '_blank' }}>
           {detail.install}
         </Button>
       </set-plugin-install-url>
     </div>
   </Hero>
-  <Breadcrumb trail={[indexes.plugins]} current={page.title} />
+  <Breadcrumb trail={[indexes.plugins]} current={page.title} actionsWhenStuck>
+    <set-plugin-install-url slot="actions" data-package-name={stripStega(page.packageName)}>
+      <Button href={dashboardUrl()} attrs={{ target: '_blank' }}>
+        {detail.install}
+      </Button>
+    </set-plugin-install-url>
+  </Breadcrumb>
 
   <Section>
     <div class={s.grid}>
-      <div class={s.media}>
-        {
-          page.previewImage?.responsiveImage && (
-            <div class={s.preview}>
-              <ResponsiveImage data={page.previewImage.responsiveImage} />
-            </div>
-          )
-        }
-
-        {
-          video && (
-            <figure class={s.preview}>
-              <video
-                controls
-                playsinline
-                preload="none"
-                poster={video.thumbnailUrl}
-                width={video.width}
-                height={video.height}
-                aria-label={video.alt ?? video.title ?? undefined}
-                style={{
-                  aspectRatio: `${video.width} / ${video.height}`,
-                  background: video.blurUpThumb
-                    ? `center / cover url("${video.blurUpThumb}")`
-                    : undefined,
-                }}
-              >
-                <source src={video.streamingUrl} type="application/vnd.apple.mpegurl" />
-                {video.mp4Url && <source src={video.mp4Url} type="video/mp4" />}
-              </video>
-              {video.title && <figcaption class="caption">{video.title}</figcaption>}
-            </figure>
-          )
-        }
-
-        <a href={detail.noteHref} class:list={[s.note, 'body']}>
-          <strong>{page.author.official ? detail.officialNote : detail.communityNote}</strong>{' '}
-          {detail.noteBody}
-        </a>
-      </div>
+      {
+        (image || video) && (
+          <div class={s.media}>
+            {image && (
+              <div class={s.preview}>
+                <ResponsiveImage data={image} imgStyle={previewStyle} />
+              </div>
+            )}
+            {video && (
+              <figure class={s.video}>
+                <video
+                  controls
+                  playsinline
+                  preload="none"
+                  poster={video.thumbnailUrl}
+                  width={video.width}
+                  height={video.height}
+                  aria-label={video.alt ?? video.title ?? undefined}
+                  style={{
+                    aspectRatio: `${video.width} / ${video.height}`,
+                    background: video.blurUpThumb
+                      ? `center / cover url("${video.blurUpThumb}")`
+                      : undefined,
+                  }}
+                >
+                  <source src={video.streamingUrl} type="application/vnd.apple.mpegurl" />
+                  {video.mp4Url && <source src={video.mp4Url} type="video/mp4" />}
+                </video>
+                {video.title && <figcaption class="caption">{video.title}</figcaption>}
+              </figure>
+            )}
+          </div>
+        )
+      }
 
       <aside class={s.aside}>
         {
-          page.coverImage && (
+          page.coverImage?.responsiveImage && (
             <div class={s.cover}>
               <ResponsiveImage data={page.coverImage.responsiveImage} />
             </div>
           )
         }
-
-        <set-plugin-install-url class={s.asideInstall} data-package-name={page.packageName}>
-          <Button href={dashboardUrl()} attrs={{ target: '_blank' }}>
-            {detail.install}
-          </Button>
-        </set-plugin-install-url>
 
         <Facts>
           <Fact label="Publisher">
@@ -143,18 +170,40 @@ const video = page.previewImage?.video;
               Visit npm
             </a>
           </Fact>
+          {page.pluginType && <Fact label={detail.facts.type}>{page.pluginType.name}</Fact>}
+          <Fact label={detail.facts.fieldTypes} values={fieldTypes} />
           <Fact label="Current version" tabular>{page.version}</Fact>
           <Fact label="Install count" tabular>{page.installs.toLocaleString('en-US')}</Fact>
           <Fact label="Last update" tabular>
             <time datetime={page.lastUpdate}>{formatLongDate(page.lastUpdate)}</time>
           </Fact>
         </Facts>
+
+        <div class={s.note}>
+          <p class="bodyMedium">
+            {page.author.official ? detail.officialNote : detail.communityNote}
+          </p>
+          <p class:list={[s.noteBody, 'caption']}>{detail.noteBody}</p>
+          <a class:list={[s.noteLink, 'labelMedium']} href={detail.noteHref}>
+            {detail.noteLink} →
+          </a>
+        </div>
+
+        {
+          readme.toc.length > 0 && (
+            <TableOfContents title={detail.readme.tocTitle} items={readme.toc} class={s.toc} />
+          )
+        }
       </aside>
 
       <div class={s.readme}>
-        <Prose>
-          <Markdown of={xss(page.readme)} />
-        </Prose>
+        <Readme
+          html={readme.html}
+          packageName={page.packageName}
+          version={page.version}
+          author={page.author.name}
+          official={page.author.official}
+        />
       </div>
     </div>
   </Section>

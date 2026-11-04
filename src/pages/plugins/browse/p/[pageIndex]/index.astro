@@ -4,17 +4,23 @@
 // official plugins only (?official=true).
 import ky from 'ky';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { faArrowRight } from '@fortawesome/pro-regular-svg-icons';
+import { Breadcrumb } from '~/components/Breadcrumb';
+import { CopyPrompt } from '~/components/CopyPrompt';
+import { Face } from '~/components/Face';
+import { Icon } from '~/components/Icon';
 import { Hero } from '~/components/Hero';
 import { Pagination } from '~/components/Pagination';
 import { PluginCard, type PluginCardFragment } from '~/components/PluginCard';
 import { Section } from '~/components/Section';
+import { indexes } from '~/data/breadcrumbs';
 import { browse } from '~/data/plugins';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import type { FragmentOf } from '~/lib/datocms/graphql';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import SearchBox from '../../../_SearchBox.astro';
-import { officialAuthorsQuery, perPage, query } from './_graphql';
+import { officialAuthorsQuery, perPage, popularQuery, query } from './_graphql';
 import s from './_style.module.css';
 
 export interface Props {
@@ -80,27 +86,92 @@ if (!pluginsPage) {
   return notFoundResponse();
 }
 
+// A search that finds no plugin shows the most popular plugins below the message.
+const popular = plugins.length === 0 ? (await executeQuery(Astro, popularQuery)).popular : [];
+
+function searchHeadline(count: number, text: string) {
+  const words = browse.searchHeadline;
+  if (count === 0) return `${words.none} "${text}"`;
+  return `${count.toLocaleString('en-US')} ${count === 1 ? words.one : words.other} "${text}"`;
+}
+
+// A filter of the query string gives the list its own headline. Without one, it is the list of all plugins.
+const view = officialOnly
+  ? browse.views.official
+  : sort === 'latest'
+    ? browse.views.latest
+    : undefined;
+
 const hero =
   searchText !== null
-    ? { headline: `${browse.searchHeadline} "${searchText}"` }
-    : { headline: browse.headline, intro: browse.intro };
+    ? { headline: searchHeadline(totalEntries, searchText) }
+    : (view ?? { headline: browse.headline, intro: browse.intro });
+const { noResults } = browse;
+
+// The trail goes up to the index of the plugins. A search or a filtered list goes up to the list of all plugins first.
+const trail =
+  searchText !== null || view
+    ? [indexes.plugins, { label: browse.headline, href: '/plugins/browse' }]
+    : [indexes.plugins];
 ---
 
 <Layout theme="purple" seo={pluginsPage.seo} headerVariant="accent">
-  <Hero variant="accent" {...hero} />
+  <Hero variant="accent" {...hero}>
+    <Fragment slot="intro">
+      {hero.intro && <p>{hero.intro}</p>}
+      <SearchBox />
+    </Fragment>
+  </Hero>
+  <Breadcrumb trail={trail} current={hero.headline} />
   <Section>
     <div class={s.stack}>
-      <SearchBox />
-      {plugins.length === 0 && <p class:list={[s.noResults, 'title']}>{browse.noResults}</p>}
-      <ul class={s.grid}>
-        {
-          plugins.map((item) => (
-            <li>
-              <PluginCard plugin={item} />
-            </li>
-          ))
-        }
-      </ul>
+      {
+        plugins.length === 0 && (
+          <div class={s.noResults}>
+            <p class="title">
+              {noResults.title}&nbsp;
+              <Face name={noResults.face} />
+            </p>
+            <p class:list={[s.noResultsBody, 'body']}>
+              {noResults.before}
+              <a href={noResults.href}>{noResults.link}</a>
+              {noResults.after}
+            </p>
+            <CopyPrompt text={noResults.prompt(searchText ?? '')} align="center" />
+          </div>
+        )
+      }
+      {
+        popular.length > 0 && (
+          <div class={s.popular}>
+            <div class={s.popularHeader}>
+              <h2 class:list={[s.popularTitle, 'labelMedium']}>{noResults.popular}</h2>
+              <a href={noResults.viewAll.href} class:list={[s.viewAll, 'labelMedium']}>
+                <span>{noResults.viewAll.label}</span>
+                <Icon icon={faArrowRight} />
+              </a>
+            </div>
+            <ul class={s.popularList}>
+              {popular.map((item) => (
+                <li>
+                  <PluginCard plugin={item} orientation="horizontal" />
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+      {
+        plugins.length > 0 && (
+          <ul class={s.grid}>
+            {plugins.map((item) => (
+              <li>
+                <PluginCard plugin={item} />
+              </li>
+            ))}
+          </ul>
+        )
+      }
       <Pagination
         current={pageIndex}
         total={Math.ceil(totalEntries / perPage)}

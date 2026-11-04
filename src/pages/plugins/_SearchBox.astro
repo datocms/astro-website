@@ -1,23 +1,40 @@
 ---
+import { faMagnifyingGlass, faXmark } from '@fortawesome/pro-regular-svg-icons';
+import { Icon } from '~/components/Icon';
+import { browse } from '~/data/plugins';
 import s from './_SearchBox.module.css';
 ---
 
-<auto-submit-on-debounced-change>
+<auto-submit-on-debounced-change class={s.root}>
   <form class={s.search} action="/plugins/browse" method="GET" role="search">
+    <span class={s.magnifier} aria-hidden="true"><Icon icon={faMagnifyingGlass} /></span>
     <input
       class:list={[s.searchInput, 'body']}
-      placeholder="Search plugins..."
+      placeholder={browse.searchPlaceholder}
       aria-label="Search plugins"
+      aria-keyshortcuts={browse.searchShortcut}
       type="search"
       id="s"
       name="s"
       value={Astro.url.searchParams.get('s')}
     />
+    <kbd class:list={[s.shortcut, 'label']} aria-hidden="true">{browse.searchShortcut}</kbd>
+    <button type="button" class={s.clear} aria-label={browse.searchClear}>
+      <Icon icon={faXmark} />
+    </button>
   </form>
 </auto-submit-on-debounced-change>
 
 <script>
   import { WebComponent } from '~/lib/WebComponent';
+
+  /*
+   * The search goes to the results page 1 s after the last key. The new
+   * page gets the focus back in the box, with the caret at the end, thus
+   * the visitor can continue to type. A flag in the session tells the new
+   * page that the visitor typed: a link to a search does not take the focus.
+   */
+  const REFOCUS_KEY = 'pluginsSearchRefocus';
 
   function debounce<T extends (...args: any[]) => void>(
     fn: T,
@@ -31,12 +48,55 @@ import s from './_SearchBox.module.css';
     };
   }
 
+  function isEditable(target: EventTarget | null) {
+    return (
+      target instanceof HTMLElement &&
+      (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
+    );
+  }
+
+  function readFlag() {
+    try {
+      const flag = sessionStorage.getItem(REFOCUS_KEY) === '1';
+      sessionStorage.removeItem(REFOCUS_KEY);
+      return flag;
+    } catch {
+      return false;
+    }
+  }
+
+  function writeFlag() {
+    try {
+      sessionStorage.setItem(REFOCUS_KEY, '1');
+    } catch {
+      // Without the session storage, the new page does not take the focus.
+    }
+  }
+
   window.customElements.define(
     'auto-submit-on-debounced-change',
     class AutoSubmitOnDebouncedChange extends WebComponent {
       parsedCallback() {
         const input = this.$<HTMLInputElement>('input');
         const form = this.$<HTMLFormElement>('form');
+        const shortcut = input.getAttribute('aria-keyshortcuts');
+
+        if (readFlag()) {
+          input.focus({ preventScroll: true });
+          input.setSelectionRange(input.value.length, input.value.length);
+        }
+
+        this.on(form, 'submit', writeFlag);
+
+        // The clear button empties the box. On a results page, it goes to the list of all plugins.
+        this.on(this.$<HTMLButtonElement>('button'), 'click', () => {
+          input.value = '';
+          input.focus();
+          if (new URL(window.location.href).searchParams.has('s')) {
+            writeFlag();
+            document.location = form.action;
+          }
+        });
 
         this.on(
           input,
@@ -44,9 +104,19 @@ import s from './_SearchBox.module.css';
           debounce(() => {
             const url = new URL(form.action, window.location.href);
             url.searchParams.set('s', input.value);
+            writeFlag();
             document.location = url.toString();
           }, 1000),
         );
+
+        // The shortcut key moves the focus to the box, from anywhere on the page.
+        this.on(document.documentElement, 'keydown', (event) => {
+          if (event.key !== shortcut || event.metaKey || event.ctrlKey || event.altKey) return;
+          if (isEditable(event.target)) return;
+          event.preventDefault();
+          input.focus();
+          input.select();
+        });
       }
     },
   );

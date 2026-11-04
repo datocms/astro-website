@@ -162,7 +162,7 @@ components:
     width: '500px'
   tooltip:
     backgroundColor: '{colors.espresso}'
-    textColor: '{colors.pollen}'
+    textColor: '{colors.cream-paper}'
     typography: '{typography.caption}'
     rounded: '{rounded.sm}'
     padding: '8px 10px'

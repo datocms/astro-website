@@ -5,28 +5,54 @@
   gap: var(--space-md);
 }
 
+/* The description of the package: a paragraph, at the width of a reading line. */
+.description {
+  max-width: var(--reading-max);
+}
+
+/* The D comes before the label, as an icon: it has the size of the text. */
 .officialNote {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2xs);
 }
 
+.officialBadge {
+  margin-inline-start: 0;
+}
+
 /*
- * Three areas. On phones and tablets they stack: the media, the facts, the
- * README. Thus the facts come before the long README. From 1152, the facts
- * are a column on the right that stays in view while the visitor reads.
+ * On phones and tablets all of it is one column: the cover, the preview,
+ * the facts, the card, the table of contents, then the README. Thus all
+ * of it comes before the long README. From 1152, the aside is a column on
+ * the right. A plugin without a preview has no preview area.
  */
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-areas:
-    'media'
-    'aside'
-    'readme';
   gap: var(--space-2xl);
 }
 
+@media (max-width: 1151px) {
+  .cover {
+    order: -1;
+    max-width: 600px;
+  }
+}
+
 @media (min-width: 1152px) {
+  .media {
+    grid-area: media;
+  }
+
+  .readme {
+    grid-area: readme;
+  }
+
+  .aside {
+    grid-area: aside;
+  }
+
   .grid {
     grid-template-columns: minmax(0, 1fr) 300px;
     grid-template-rows: auto 1fr;
@@ -35,71 +61,41 @@
       'readme aside';
     column-gap: var(--space-3xl);
   }
+
+  .grid:not(:has(.media)) {
+    grid-template-rows: 1fr;
+    grid-template-areas: 'readme aside';
+  }
 }
 
 .media {
-  grid-area: media;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
   min-width: 0;
 }
 
-.readme {
-  grid-area: readme;
-  min-width: 0;
-}
-
+/*
+ * The preview of the author can have any size. It keeps its proportions.
+ * A tall preview is narrower than the column: it is in the middle of a
+ * neutral ground. The image component gives the size of the image.
+ */
 .preview {
   overflow: hidden;
   background: var(--surface-inverse-faint);
   border-radius: var(--radius-md);
 }
 
-.preview :global(:is(picture, img, video)) {
+.preview :global(picture) {
   display: block;
-  width: 100%;
-  height: auto;
 }
 
-.preview figcaption {
-  padding: var(--space-xs) var(--space-md);
-  color: var(--text-muted);
-}
-
-.note {
+.preview :global(img) {
   display: block;
-  padding: var(--space-md) var(--space-lg);
-  color: var(--text-primary);
-  background: var(--surface-accent-faint);
-  border-radius: var(--radius-md);
+  margin-inline: auto;
 }
 
-@media (hover: hover) {
-  .note:hover {
-    background: var(--surface-accent-subtle);
-  }
-}
-
-.aside {
-  grid-area: aside;
-  align-self: start;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-
-/* The hero has the install button just above. Thus the button of the aside
- * shows only from 1152, where the aside stays in view. */
-.asideInstall {
-  display: none;
-}
-
-/* The cover is the logo of the plugin. The hero names the plugin above,
- * thus the cover shows only in the column of the desktop. */
+/* The cover of the plugin, as on the cards of the directory. */
 .cover {
-  display: none;
   overflow: hidden;
+  background: var(--surface-inverse-faint);
   border-radius: var(--radius-md);
 }
 
@@ -109,17 +105,87 @@
   height: auto;
 }
 
-@media (min-width: 1152px) {
-  .asideInstall,
-  .cover {
-    display: block;
-  }
+.video {
+  overflow: hidden;
+  background: var(--surface-inverse-faint);
+  border-radius: var(--radius-md);
+}
 
-  /* The aside sticks only when the viewport is tall enough for all of it. */
-  @media (min-height: 800px) {
-    .aside {
+.video :global(video) {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.video figcaption {
+  padding: var(--space-xs) var(--space-md);
+  color: var(--text-muted);
+}
+
+.readme {
+  min-width: 0;
+}
+
+/* The card next to the facts: the visitor can build a plugin too. */
+.note {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  color: var(--text-primary);
+  background: var(--surface-accent-faint);
+  border-radius: var(--radius-md);
+}
+
+.noteBody {
+  color: var(--text-muted);
+}
+
+.noteLink {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+@media (hover: hover) {
+  .noteLink:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+/*
+ * The facts, then the table of contents of the README. The column has the
+ * full height of the grid: from 1320 the table of contents sticks in it
+ * while the visitor reads the README.
+ */
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* On phones and tablets the parts of the aside are parts of the grid. */
+@media (max-width: 1151px) {
+  .aside {
+    display: contents;
+  }
+}
+
+.toc {
+  margin-top: var(--space-md);
+}
+
+@media (min-width: 1152px) {
+  /*
+   * Without a table of contents, all of the aside sticks, when the
+   * viewport is tall enough for it.
+   */
+  @media (min-height: 1000px) {
+    .aside:not(:has(.toc)) {
       position: sticky;
       top: calc(var(--sticky-offset) + var(--space-lg));
+      align-self: start;
     }
   }
 }

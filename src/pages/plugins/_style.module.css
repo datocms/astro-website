@@ -34,20 +34,44 @@
 .highlighted,
 .list {
   display: grid;
-  gap: var(--space-xl);
   list-style: none;
 }
 
+/*
+ * On a phone, the editors' choice is a list of rows, as the other groups.
+ * From 768px it is three large cards.
+ */
 .highlighted {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.highlighted > li {
+  padding-block: var(--space-md);
+  border-top: 1px solid var(--border-default);
+}
+
+/*
+ * A list of plugins is a set of rows: a hairline above each row, and a
+ * small gap between the rows. The columns keep a wide gap.
+ */
 .list {
+  column-gap: var(--space-xl);
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.list > li {
+  padding-block: var(--space-md);
+  border-top: 1px solid var(--border-default);
 }
 
 @media (min-width: 768px) {
   .highlighted {
+    gap: var(--space-xl);
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .highlighted > li {
+    padding-block: 0;
+    border-top: 0;
   }
 }

@@ -11,6 +11,13 @@
   align-items: flex-start;
 }
 
+@media (max-width: 767px) {
+  .responsive:any-link {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
 .image {
   display: block;
   overflow: hidden;
@@ -23,6 +30,12 @@
   flex: 0 0 96px;
 }
 
+@media (max-width: 767px) {
+  .responsive .image {
+    flex: 0 0 96px;
+  }
+}
+
 .image :global(:is(picture, img)) {
   display: block;
   width: 100%;
@@ -31,17 +44,35 @@
   object-fit: cover;
 }
 
-.placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: var(--text-muted);
+/*
+ * The cover of a plugin with no image: its name in the display face, on
+ * the accent of a theme. The size of the text follows the width of the
+ * cover, thus the 96px cover of a row is a small copy of the large one.
+ */
+.image {
+  container-type: inline-size;
 }
 
-.placeholder svg {
-  width: 30%;
-  height: auto;
+.nameCover {
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+  padding: 8cqi;
+  color: var(--text-on-accent);
+  background: var(--surface-accent);
+}
+
+.nameCoverText {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 12cqi;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .text {
@@ -53,6 +84,15 @@
 
 .title {
   color: var(--text-primary);
+}
+
+/* The last word of the title and the official badge after it. */
+.lastWord {
+  white-space: nowrap;
+}
+
+.installs {
+  color: var(--text-muted);
 }
 
 .description {

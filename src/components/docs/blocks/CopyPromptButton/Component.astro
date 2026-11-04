@@ -1,5 +1,5 @@
 ---
-import { faCopy } from '@fortawesome/pro-regular-svg-icons';
+import { faCheck, faCopy } from '@fortawesome/pro-regular-svg-icons';
 import { readFragment, type FragmentOf } from 'gql.tada';
 import { CopyPromptButtonFragment } from './graphql';
 import { Icon } from '~/components/Icon';
@@ -26,6 +26,7 @@ const prompt = stripStega(block.prompt)?.replace(/<\/script>/gi, '<\\/script>');
       <span data-label>Copy prompt</span>
     </button>
     <p class={s.hint} data-hint aria-live="polite"></p>
+    <template data-check data-datocms-nomd><Icon icon={faCheck} /></template>
   </div>
   <script type="text/markdown" is:inline data-fenced="true" set:html={prompt} />
 </copy-prompt-button>
@@ -75,7 +76,8 @@ const prompt = stripStega(block.prompt)?.replace(/<\/script>/gi, '<\\/script>');
       if (!copied) return;
 
       this.copied = true;
-      this.hint.textContent = '✓ Copied: now paste that into your preferred AI agent!';
+      const check = this.$<HTMLTemplateElement>('[data-check]').content.cloneNode(true);
+      this.hint.replaceChildren(check, 'Copied: now paste that into your preferred AI agent!');
       this.hint.setAttribute('data-copied', '');
 
       if (this.hideTimer) clearTimeout(this.hideTimer);

@@ -1,0 +1,191 @@
+/*
+ * The edge of the README: the hairline of the page around it, and the
+ * corners of the other surfaces of the page (the preview, the cover, the
+ * card).
+ */
+.root {
+  display: block;
+  overflow: clip;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+/*
+ * The sheet of the README. It is on the ground of the docs theme (a white
+ * page in the light scheme, a slate page in the dark scheme), thus it is
+ * not the page of the site.
+ */
+.sheet {
+  color: var(--text-on-page);
+  background: var(--surface-default);
+}
+
+/* The bar: the name of the file and the package, then the author. */
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3xs) var(--space-md);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--surface-inverse-faint);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.file {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs);
+  min-width: 0;
+  color: var(--text-primary);
+}
+
+.package {
+  overflow-wrap: anywhere;
+  color: var(--text-muted);
+}
+
+.author {
+  color: var(--text-muted);
+}
+
+.authorName {
+  color: var(--text-primary);
+}
+
+.body {
+  padding: var(--space-xl) var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .body {
+    padding: var(--space-2xl) var(--space-2xl) var(--space-xl);
+  }
+}
+
+/* The script gives the focus to the body when the README opens. */
+.body:focus {
+  outline: none;
+}
+
+/* A long README: the first part, with a hard cut at the bottom. */
+.body[data-clamped] {
+  max-height: var(--readme-clamp);
+  overflow: clip;
+}
+
+/* The README starts at the top of the sheet. */
+.prose > :global(:first-child) {
+  margin-top: 0;
+}
+
+/*
+ * The images of the README: never taller than the viewport. An image that
+ * the sheet shows smaller than its size opens large on a click.
+ */
+.prose :global(img) {
+  max-height: 70vh;
+  width: auto;
+}
+
+.prose :global(img[data-zoom]) {
+  cursor: zoom-in;
+}
+
+.prose :global(img[data-zoom]:focus-visible) {
+  outline: 2px solid var(--border-strong);
+  outline-offset: 2px;
+}
+
+.more {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-md);
+  border-top: 1px solid var(--border-default);
+}
+
+.more[hidden] {
+  display: none;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  padding: var(--space-xl) var(--space-md);
+}
+
+.empty p {
+  color: var(--text-muted);
+}
+
+.empty a {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* The large image: the same dialog as Lightbox. */
+.dialog {
+  max-width: 90vw;
+  max-height: 90vh;
+  padding: 0;
+  margin: auto;
+  overflow: visible;
+  color: var(--text-primary);
+  background: transparent;
+  border: 0;
+}
+
+.dialog::backdrop {
+  background: var(--scrim-modal);
+}
+
+.large {
+  display: block;
+  max-width: 90vw;
+  max-height: calc(90vh - var(--space-2xl));
+  object-fit: contain;
+  background: var(--surface-default);
+  border-radius: var(--radius-md);
+}
+
+.close {
+  display: flex;
+  gap: var(--space-3xs);
+  align-items: center;
+  margin: 0 0 var(--space-3xs) auto;
+  padding: var(--space-4xs) var(--space-xs);
+  color: var(--text-on-inverse-strong);
+  background: var(--surface-inverse);
+  border: 0;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.close :global(svg) {
+  width: 14px;
+  height: 14px;
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--text-on-inverse-strong);
+  outline-offset: 2px;
+}
+
+/*
+ * A heading of the README is the target of a link (the table of contents).
+ * The id is on an empty anchor inside the heading. The anchor sits at the
+ * top of the heading, and keeps the space of the sticky breadcrumb above
+ * it, thus the heading does not go below the breadcrumb.
+ */
+.prose :global(:is(h2, h3, h4, h5, h6):has(> [data-anchor])) {
+  position: relative;
+}
+
+.prose :global([data-anchor]) {
+  position: absolute;
+  top: 0;
+  scroll-margin-top: calc(var(--sticky-offset, 0px) + var(--space-lg));
+}

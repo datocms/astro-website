@@ -13,9 +13,14 @@ interface Props {
    * the top of the screen: before that, the h1 of the hero names the page.
    */
   current: string;
+  /**
+   * The actions show only when the bar sticks: before that, the hero shows
+   * them, for example the install button of a plugin.
+   */
+  actionsWhenStuck?: boolean;
 }
 
-const { trail, current } = Astro.props;
+const { trail, current, actionsWhenStuck = false } = Astro.props;
 const origin = baseUrl(Astro);
 const hasActions = Astro.slots.has('actions');
 ---
@@ -49,7 +54,7 @@ const hasActions = Astro.slots.has('actions');
     </nav>
     {
       hasActions && (
-        <div class={styles.actions}>
+        <div class={styles.actions} data-when-stuck={actionsWhenStuck || undefined}>
           <slot name="actions" />
         </div>
       )

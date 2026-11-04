@@ -17,7 +17,6 @@ export const fullyFledged = {
   headline: 'Fully fledged demos',
   /** HTML: the text has a strong run. */
   body: "Use our pre-built demo projects to see all of DatoCMS's features in a <strong>realistic production-ready setup</strong>. Includes many example content types, and advanced features.",
-  highlight: 'Best choice to start!',
 };
 
 export const techStarters = {
