@@ -142,6 +142,22 @@
   }
 
   /*
+   * On a page of src/layouts/Layout.astro, the footer is at the bottom of
+   * the window when the content is short. The main element takes the free
+   * height. The docs layout has no #layout-content, thus this rule does
+   * not apply to it.
+   */
+  body:has(> [id='layout-content']) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+
+  body > [id='layout-content'] {
+    flex: 1 0 auto;
+  }
+
+  /*
    * The placeholder of a field is the muted text of its ground. The
    * browser grey is not a colour of the theme, and Firefox also sets an
    * opacity on the placeholder.
