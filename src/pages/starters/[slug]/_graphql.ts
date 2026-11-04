@@ -34,12 +34,12 @@ export const query = graphql(
           }
         }
         screenshot {
-          responsiveImage(imgixParams: { w: 700, h: 400, fit: crop, crop: top }) {
+          responsiveImage(imgixParams: { w: 1400, h: 800, fit: crop, crop: top }) {
             ...ResponsiveImageFragment
           }
         }
         backendScreenshot {
-          responsiveImage(imgixParams: { w: 700, h: 400, fit: crop, crop: top }) {
+          responsiveImage(imgixParams: { w: 1400, h: 800, fit: crop, crop: top }) {
             ...ResponsiveImageFragment
           }
         }

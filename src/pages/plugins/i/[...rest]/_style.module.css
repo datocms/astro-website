@@ -111,6 +111,27 @@
   border-radius: var(--radius-md);
 }
 
+/*
+ * The author gives the preview and the cover. A picture with a white or a
+ * pale ground has no edge on the page, thus a hairline goes on top of it.
+ */
+.preview,
+.cover,
+.video {
+  position: relative;
+}
+
+.preview::after,
+.cover::after,
+.video::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  border: 1px solid var(--border-default);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
 .video :global(video) {
   display: block;
   width: 100%;
@@ -196,10 +217,27 @@
   gap: var(--space-3xs);
 }
 
-.publisher img {
+/*
+ * The avatar of the publisher: the initial on a faint tint, and the
+ * Gravatar on top of it. Without a Gravatar, the image is transparent.
+ */
+.avatar {
+  position: relative;
+  display: grid;
   flex: none;
+  place-items: center;
   width: 24px;
   height: 24px;
-  border-radius: var(--radius-full);
+  overflow: hidden;
+  color: var(--text-muted);
+  background: var(--surface-inverse-faint);
   border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+}
+
+.avatar img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }

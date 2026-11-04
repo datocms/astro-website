@@ -1,17 +1,9 @@
 ---
-// The README of a plugin, on a sheet of its own. The author of the plugin
-// writes the README, not us: the sheet has another ground (the docs theme),
-// a bar with the name of the file and its author, and its own type.
-//
-// A long README shows its first part. A button opens the rest. Without the
-// script, the README is open. An image that is larger than the sheet opens
-// in a dialog. An image that does not load goes away.
-import { faXmark } from '@fortawesome/pro-regular-svg-icons';
-import { Button } from '~/components/Button';
-import { Icon } from '~/components/Icon';
-import { Prose } from '~/components/Prose';
+// The README of a plugin on the README sheet. The author of the plugin
+// writes it, not us: the byline says who wrote it. Without a README, the
+// sheet links to the package on npm.
+import { ReadmeSheet } from '~/components/ReadmeSheet';
 import { detail } from '~/data/plugins';
-import s from './_Readme.module.css';
 
 interface Props {
   /** The HTML from prepareReadme(). Empty when the plugin has no README. */
@@ -26,229 +18,27 @@ const { html, packageName, version, author, official } = Astro.props;
 const copy = detail.readme;
 ---
 
-<plugin-readme class={s.root}>
-  <div class:list={[s.sheet, 'surfacePage']} data-theme="docs" data-density="dense">
-    <div class={s.bar}>
-      <p class:list={[s.file, 'codeSmall']}>
-        <span>{copy.file}</span>
-        <span class={s.package}>{packageName}@{version}</span>
-      </p>
-      <p class:list={[s.author, 'caption']}>
-        {
-          official ? (
-            copy.official
-          ) : (
-            <>
-              {copy.writtenBy} <span class={s.authorName}>{author}</span>, {copy.notUs}
-            </>
-          )
-        }
-      </p>
-    </div>
-
+<ReadmeSheet html={html} source={`${packageName}@${version}`}>
+  <Fragment slot="byline">
     {
-      html ? (
-        <>
-          <div class={s.body} data-body tabindex="-1">
-            <Prose class={s.prose}>
-              <Fragment set:html={html} />
-            </Prose>
-          </div>
-          <div class={s.more} data-more hidden>
-            <Button variant="soft" arrow={false} attrs={{ 'data-expand': '' }}>
-              {copy.expand}
-            </Button>
-          </div>
-        </>
+      official ? (
+        copy.official
       ) : (
-        <div class={s.empty}>
-          <p class="body">{copy.empty}</p>
-          <a
-            class="label"
-            href={`https://www.npmjs.com/package/${packageName}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {copy.emptyLinks} →
-          </a>
-        </div>
+        <>
+          {copy.writtenBy} <strong>{author}</strong>, {copy.notUs}
+        </>
       )
     }
-  </div>
-  <dialog class={s.dialog} aria-label={copy.imageLabel} data-dialog>
-    <button class:list={[s.close, 'labelMedium']} type="button" data-close>
-      <Icon icon={faXmark} />
-      {copy.close}
-    </button>
-    <img class={s.large} alt="" data-large />
-  </dialog>
-</plugin-readme>
-
-<script>
-  import { WebComponent } from '~/lib/WebComponent';
-
-  /** The README shows this part of the viewport height before the button. */
-  const CLAMP = 0.75;
-  /** The README is clamped only when the rest is longer than this part of the clamp. */
-  const MIN_REST = 0.4;
-
-  customElements.define(
-    'plugin-readme',
-    class PluginReadme extends WebComponent {
-      parsedCallback() {
-        const dialog = this.$<HTMLDialogElement>('[data-dialog]');
-        const large = this.$<HTMLImageElement>('[data-large]');
-
-        this.on(this.$('[data-close]'), 'click', () => dialog.close());
-        // A click on the backdrop closes the dialog.
-        this.on(dialog, 'click', (event) => {
-          if (event.target === dialog) dialog.close();
-        });
-        this.on(dialog, 'close', () => {
-          document.body.style.overflow = '';
-        });
-
-        // An empty README has no body.
-        const body = this.querySelector<HTMLElement>('[data-body]');
-        if (!body) return;
-
-        for (const image of body.querySelectorAll('img')) {
-          this.#tameImage(image, dialog, large);
-        }
-
-        this.#followLinks(body, this.#clamp(body));
-      }
-
-      /**
-       * An image that does not load goes away. An image that the sheet
-       * shows smaller than its real size opens large on a click.
-       */
-      #tameImage(image: HTMLImageElement, dialog: HTMLDialogElement, large: HTMLImageElement) {
-        const check = () => {
-          if (image.naturalWidth === 0) {
-            (image.closest('p:only-child, figure') ?? image).setAttribute('hidden', '');
-            return;
-          }
-          if (image.naturalWidth > image.clientWidth * 1.2 && !image.closest('a')) {
-            image.setAttribute('data-zoom', '');
-            image.setAttribute('tabindex', '0');
-            image.setAttribute('role', 'button');
-          }
-        };
-
-        if (image.complete) check();
-        else {
-          image.addEventListener('load', check, { once: true });
-          image.addEventListener('error', check, { once: true });
-        }
-
-        const open = () => {
-          if (!image.hasAttribute('data-zoom')) return;
-          large.src = image.currentSrc || image.src;
-          large.alt = image.alt;
-          dialog.showModal();
-          document.body.style.overflow = 'hidden';
-        };
-
-        this.on(image, 'click', open);
-        this.on(image, 'keydown', (event) => {
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            open();
-          }
-        });
-      }
-
-      /**
-       * A long README shows its first part and the button. Gives the
-       * function that opens the rest.
-       */
-      #clamp(body: HTMLElement) {
-        const more = this.$('[data-more]');
-        const limit = window.innerHeight * CLAMP;
-
-        const expand = () => {
-          if (!body.hasAttribute('data-clamped')) return;
-          body.removeAttribute('data-clamped');
-          more.hidden = true;
-        };
-
-        if (body.scrollHeight < limit * (1 + MIN_REST)) return expand;
-
-        body.style.setProperty('--readme-clamp', `${Math.round(limit)}px`);
-        body.setAttribute('data-clamped', '');
-        more.hidden = false;
-
-        this.on(this.$('[data-expand]'), 'click', () => {
-          expand();
-          body.focus({ preventScroll: true });
-        });
-
-        return expand;
-      }
-
-      /**
-       * A link to a heading of the README (the table of contents, an anchor
-       * in the address) opens the README. The images of the README load
-       * lazily and have no size before they load: an image above the
-       * heading that loads during the scroll moves the heading down. Thus
-       * the images above the heading load first, then the page scrolls.
-       */
-      #followLinks(body: HTMLElement, expand: () => void) {
-        const headingOf = (hash: string) => {
-          if (!hash) return null;
-          const target = document.getElementById(decodeURIComponent(hash.slice(1)));
-          return target && body.contains(target) ? target : null;
-        };
-
-        const go = async (target: HTMLElement, behavior: ScrollBehavior) => {
-          expand();
-          await this.#loadImagesAbove(body, target);
-          target.scrollIntoView({ behavior });
-        };
-
-        this.on<'click', HTMLAnchorElement>(
-          document.body,
-          'click',
-          'a[href^="#"]',
-          (event, link) => {
-            const target = headingOf(link.hash);
-            if (!target) return;
-            event.preventDefault();
-            history.pushState(null, '', link.hash);
-            void go(target, 'smooth');
-          },
-        );
-
-        // The browser scrolls to the anchor of the address on load, before
-        // the images load. Thus the scroll comes again after the load.
-        const target = headingOf(window.location.hash);
-        if (target) {
-          expand();
-          if (document.readyState === 'complete') void go(target, 'instant');
-          else window.addEventListener('load', () => void go(target, 'instant'), { once: true });
-        }
-      }
-
-      /** Load the images of the README above the target. Wait 1.5 s at most. */
-      async #loadImagesAbove(body: HTMLElement, target: HTMLElement) {
-        const images = [...body.querySelectorAll('img')].filter(
-          (image) =>
-            !image.complete &&
-            image.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING,
-        );
-        if (images.length === 0) return;
-
-        const loads = images.map((image) => {
-          image.loading = 'eager';
-          return new Promise<void>((resolve) => {
-            image.addEventListener('load', () => resolve(), { once: true });
-            image.addEventListener('error', () => resolve(), { once: true });
-          });
-        });
-        const timeout = new Promise<void>((resolve) => setTimeout(resolve, 1500));
-        await Promise.race([Promise.all(loads), timeout]);
-      }
-    },
-  );
-</script>
+  </Fragment>
+  <Fragment slot="empty">
+    <p class="body">{copy.empty}</p>
+    <a
+      class="label"
+      href={`https://www.npmjs.com/package/${packageName}`}
+      target="_blank"
+      rel="noreferrer"
+    >
+      {copy.emptyLinks} →
+    </a>
+  </Fragment>
+</ReadmeSheet>

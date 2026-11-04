@@ -1,4 +1,3 @@
-import cn from 'classnames';
 import { type ReactNode } from 'react';
 import {
   Controller,
@@ -8,8 +7,17 @@ import {
   type FieldValues,
   type RegisterOptions,
 } from 'react-hook-form';
-import s from './style.module.css';
+import { FormRowReactComponent } from '~/components/FormBox/ReactComponent';
+import {
+  formControlClass,
+  FormFieldReactComponent,
+  FormSelectReactComponent,
+} from '~/components/FormField/ReactComponent';
 
+/*
+ * A field of a react-hook-form form, in a row of a FormBox. It has the look
+ * of FormField (the contact forms).
+ */
 type Props<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
@@ -49,6 +57,7 @@ export function FieldReactComponent<
   let input = (
     <input
       {...field}
+      className={formControlClass}
       id={name}
       placeholder={placeholder}
       type={type}
@@ -59,22 +68,20 @@ export function FieldReactComponent<
 
   if (options) {
     input = (
-      <>
-        <select id={name} {...field}>
-          <option value="" disabled>
-            {placeholder || 'Please select one...'}
-          </option>
-          {options.map((option) => {
-            const value = typeof option === 'string' ? option : option.value;
-            const label = typeof option === 'string' ? option : option.label;
-            return (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            );
-          })}
-        </select>
-      </>
+      <FormSelectReactComponent id={name} {...field}>
+        <option value="" disabled>
+          {placeholder || 'Please select one...'}
+        </option>
+        {options.map((option) => {
+          const value = typeof option === 'string' ? option : option.value;
+          const label = typeof option === 'string' ? option : option.label;
+          return (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          );
+        })}
+      </FormSelectReactComponent>
     );
   }
 
@@ -96,18 +103,16 @@ export function FieldReactComponent<
   const errorMessage = errors[name]?.message as string | undefined;
 
   return (
-    <div className={cn(s.field, errorMessage && s.fieldError)}>
-      {label && (
-        <label htmlFor={name}>
-          {label}
-          {validations && <span className={s.required}> *</span>}
-        </label>
-      )}
-
-      {input}
-
-      {errorMessage && <div className={s.error}>{errorMessage}</div>}
-    </div>
+    <FormRowReactComponent>
+      <FormFieldReactComponent
+        htmlFor={name}
+        label={label}
+        required={Boolean(validations)}
+        error={errorMessage}
+      >
+        {input}
+      </FormFieldReactComponent>
+    </FormRowReactComponent>
   );
 }
 
@@ -116,12 +121,11 @@ type FieldsetReactComponentProps = {
   children: ReactNode;
 };
 
+/* A group of controls with one label, in a row of a FormBox. */
 export function FieldsetReactComponent({ label, children }: FieldsetReactComponentProps) {
   return (
-    <div className={s.field}>
-      <label>{label}</label>
-
-      {children}
-    </div>
+    <FormRowReactComponent>
+      <FormFieldReactComponent label={label}>{children}</FormFieldReactComponent>
+    </FormRowReactComponent>
   );
 }

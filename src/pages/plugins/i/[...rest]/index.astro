@@ -28,7 +28,7 @@ import { formatLongDate } from '~/lib/format/date';
 import { getGravatarUrl } from '~/lib/gravatar';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
-import { prepareReadme } from './_readme';
+import { prepareReadme } from '~/lib/readme';
 import Readme from './_Readme.astro';
 import s from './_style.module.css';
 
@@ -43,7 +43,10 @@ if (!page) {
   return notFoundResponse();
 }
 
+const { facts } = detail;
+// Without a Gravatar, the image is transparent: the initial of the publisher shows below it.
 const avatarUrl = getGravatarUrl(page.author.email);
+const initial = [...stripStega(page.author.name).trim()][0]?.toUpperCase() ?? '';
 const video = page.previewImage?.video;
 const image = video ? undefined : page.previewImage?.responsiveImage;
 // A preview keeps its proportions. It is never wider than its file, and
@@ -146,43 +149,44 @@ const description = (() => {
         }
 
         <Facts>
-          <Fact label="Publisher">
+          <Fact label={facts.publisher}>
             <span class={s.publisher}>
-              <img src={avatarUrl} alt="" width="24" height="24" />
+              <span class={s.avatar} aria-hidden="true">
+                <span class="caption">{initial}</span>
+                <img src={avatarUrl} alt="" width="24" height="24" />
+              </span>
               <span>{page.author.name}</span>
             </span>
           </Fact>
           {
             page.homepage && (
-              <Fact label="Homepage">
+              <Fact label={facts.homepage}>
                 <a href={page.homepage} target="_blank" rel="noreferrer">
-                  Visit homepage
+                  {facts.homepageLink}
                 </a>
               </Fact>
             )
           }
-          <Fact label="Package">
+          <Fact label={facts.package}>
             <a
               href={`https://www.npmjs.com/package/${page.packageName}`}
               target="_blank"
               rel="noreferrer"
             >
-              Visit npm
+              {facts.packageLink}
             </a>
           </Fact>
-          {page.pluginType && <Fact label={detail.facts.type}>{page.pluginType.name}</Fact>}
-          <Fact label={detail.facts.fieldTypes} values={fieldTypes} />
-          <Fact label="Current version" tabular>{page.version}</Fact>
-          <Fact label="Install count" tabular>{page.installs.toLocaleString('en-US')}</Fact>
-          <Fact label="Last update" tabular>
+          {page.pluginType && <Fact label={facts.type}>{page.pluginType.name}</Fact>}
+          <Fact label={facts.fieldTypes} values={fieldTypes} />
+          <Fact label={facts.version} tabular>{page.version}</Fact>
+          <Fact label={facts.installs} tabular>{page.installs.toLocaleString('en-US')}</Fact>
+          <Fact label={facts.lastUpdate} tabular>
             <time datetime={page.lastUpdate}>{formatLongDate(page.lastUpdate)}</time>
           </Fact>
         </Facts>
 
         <div class={s.note}>
-          <p class="bodyMedium">
-            {page.author.official ? detail.officialNote : detail.communityNote}
-          </p>
+          <p class="bodyMedium">{detail.noteTitle}</p>
           <p class:list={[s.noteBody, 'caption']}>{detail.noteBody}</p>
           <a class:list={[s.noteLink, 'labelMedium']} href={detail.noteHref}>
             {detail.noteLink} →

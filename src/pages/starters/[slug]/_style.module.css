@@ -1,115 +1,107 @@
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+/* The description of the starter: a paragraph, at the width of a reading line. */
+.description {
+  max-width: var(--reading-max);
+}
+
 /*
- * Three areas. On phones and tablets they stack: the media, the facts, the
- * README. Thus the facts come before the long README. From 1152, the facts
- * are a column on the right that stays in view while the visitor reads.
+ * On phones and tablets all of it is one column: the facts, the note, the
+ * table of contents, then the README. Thus all of it comes before the long
+ * README. From 1152, the aside is a column on the right, with the full
+ * height of the README.
  */
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-areas:
-    'media'
-    'aside'
-    'readme';
   gap: var(--space-2xl);
 }
 
 @media (min-width: 1152px) {
   .grid {
     grid-template-columns: minmax(0, 1fr) 300px;
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-      'media aside'
-      'readme aside';
+    grid-template-areas: 'readme aside';
     column-gap: var(--space-3xl);
   }
-}
 
-.media {
-  grid-area: media;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-  min-width: 0;
+  .readme {
+    grid-area: readme;
+  }
+
+  .aside {
+    grid-area: aside;
+  }
 }
 
 .readme {
-  grid-area: readme;
   min-width: 0;
 }
 
-.slides {
-  display: grid;
-  gap: var(--space-md);
-  grid-template-columns: minmax(0, 1fr);
+/* The logo takes the text colour (a mask), thus it shows in both schemes. */
+.technology {
+  height: 20px;
 }
 
-@media (min-width: 768px) {
-  .slides {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+/* On phones and tablets the parts of the aside are parts of the grid. */
+@media (max-width: 1151px) {
+  .aside {
+    display: contents;
   }
 }
 
-.slide {
-  overflow: hidden;
-  background: var(--surface-inverse-faint);
-  border-radius: var(--radius-md);
-}
-
-.slide :global(:is(picture, img)) {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
+/* The note next to the facts: the visitor can make a project template too. */
 .note {
-  display: block;
-  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  padding: var(--space-md);
   color: var(--text-primary);
   background: var(--surface-accent-faint);
   border-radius: var(--radius-md);
 }
 
+.noteBody {
+  color: var(--text-muted);
+}
+
+.noteLink {
+  color: var(--text-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
 @media (hover: hover) {
-  .note:hover {
-    background: var(--surface-accent-subtle);
+  .noteLink:hover {
+    text-decoration-thickness: 2px;
   }
 }
 
-.aside {
-  grid-area: aside;
-  align-self: start;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-lg);
-}
-
-.facts {
-  align-self: stretch;
-}
-
-.technology {
-  height: 40px;
-  width: auto;
-  max-width: 100%;
-}
-
-/* The hero has the start button just above. Thus the button of the aside
- * shows only from 1152, where the aside stays in view. */
-.asideStart {
-  display: none;
+.toc {
+  margin-top: var(--space-md);
 }
 
 @media (min-width: 1152px) {
-  .asideStart {
-    display: block;
-  }
-
-  /* The aside sticks only when the viewport is tall enough for all of it. */
+  /*
+   * Without a table of contents, all of the aside sticks, when the
+   * viewport is tall enough for it.
+   */
   @media (min-height: 800px) {
-    .aside {
+    .aside:not(:has(.toc)) {
       position: sticky;
       top: calc(var(--sticky-offset) + var(--space-lg));
+      align-self: start;
     }
   }
 }

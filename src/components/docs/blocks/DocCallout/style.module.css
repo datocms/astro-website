@@ -1,13 +1,12 @@
 /*
- * The box stops at the measure of the running text (32em, as Prose), and
- * the text inside fills the box.
+ * The box stops at the measure of the running text (--prose-measure), as
+ * a Markdown callout, and the text inside fills the box.
  */
 .docCallout {
-  max-width: 32em;
+  max-width: calc(var(--prose-measure) * 1em);
   padding: var(--space-lg);
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
-  line-height: 1.4;
 }
 
 /* Each kind of callout has its tint and the colour of its title. */
@@ -73,9 +72,12 @@
   }
 }
 
+/*
+ * The text is one step smaller than the running text (--type-s). The line
+ * height (1.5) and the space between the paragraphs come from Prose.
+ */
 .content {
-  font-size: var(--type-s);
-  line-height: 1.4;
+  --prose-size: var(--type-s);
 
   > * {
     max-width: none;

@@ -98,7 +98,6 @@ const cookieConsentScript = `
     max-width: 550px;
     font-size: var(--type-s, 0.875rem);
     text-align: center;
-    box-shadow: 0 0 30px 10px rgba(0, 0, 0, 0.3);
     margin: 10px;
   }
 

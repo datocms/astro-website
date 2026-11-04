@@ -1,26 +1,31 @@
 ---
-// The page of one starter: the title, the description, the link that
-// starts a free project, the screenshots, the README and the facts about
-// the starter (technology, publisher, preview, GitHub repository). The
-// manifest in the GitHub repository gives the preview address.
+// The page of one starter. The hero has the title, the description, the
+// link that starts a free project and the screenshots. Below it are the
+// README and the aside: the facts about the starter (technology,
+// publisher, preview, GitHub repository), the note about project templates
+// and the table of contents of the README. The manifest in the GitHub
+// repository gives the preview address.
+import { stripStega } from '@datocms/astro';
 import ky from 'ky';
 import { Breadcrumb } from '~/components/Breadcrumb';
 import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Fact, Facts } from '~/components/Facts';
 import { Hero } from '~/components/Hero';
-import { Markdown } from '~/components/Markdown';
-import { Prose } from '~/components/Prose';
-import { ResponsiveImage } from '~/components/ResponsiveImage';
+import { Logo } from '~/components/Logo';
+import { ReadmeSheet } from '~/components/ReadmeSheet';
 import { Section } from '~/components/Section';
+import { TableOfContents } from '~/components/TableOfContents';
 import { indexes } from '~/data/breadcrumbs';
 import { detail } from '~/data/starters';
 import Layout from '~/layouts/Layout.astro';
 import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { overrideSeo, seoOgType } from '~/lib/datocms/seo';
+import { prepareReadme } from '~/lib/readme';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import HeroShots from './_HeroShots.astro';
 import s from './_style.module.css';
 import { normalizeManifest, type RawManifest } from './_utils';
 
@@ -45,7 +50,10 @@ const manifest = normalizeManifest(
 );
 
 const githubRepoWebUrl = `https://www.github.com/${page.githubRepo.replace(':', '/tree/')}`;
+const githubReadmeUrl = `https://github.com/${parts[0]}/blob/${parts[1]}/README.md`;
 const datoDeployUrl = dashboardUrl(`/deploy?repo=${page.githubRepo}`);
+const readme = await prepareReadme(page.readme);
+const logo = page.technology.logo;
 ---
 
 <Layout
@@ -54,59 +62,43 @@ const datoDeployUrl = dashboardUrl(`/deploy?repo=${page.githubRepo}`);
   seoAnalysis={page.yoastAnalysis}
   headerVariant="accent"
 >
-  <Hero
-    variant="accent"
-    label={page.seoH1 ?? undefined}
-    headline={page.name}
-    subheadline={page.cmsDescription}
-  >
-    <div slot="intro">
-      <Button href={datoDeployUrl} attrs={{ target: '_blank' }}>
+  {/* The description can be long, thus it is the intro, not a part of the h1. */}
+  <Hero variant="accent" label={page.seoH1 ?? undefined} headline={page.name}>
+    <div slot="intro" class={s.intro}>
+      <p class={s.description}>{page.cmsDescription}</p>
+      <Button href={datoDeployUrl} size="l" attrs={{ target: '_blank' }}>
         {detail.start}
       </Button>
     </div>
+    <HeroShots
+      slot="visual"
+      website={page.screenshot.responsiveImage}
+      cms={page.backendScreenshot.responsiveImage}
+      name={page.name}
+      previewUrl={manifest.livePreviewUrl ?? undefined}
+    />
   </Hero>
-  <Breadcrumb trail={[indexes.starters]} current={page.name} />
+  <Breadcrumb trail={[indexes.starters]} current={page.name} actionsWhenStuck>
+    <Button slot="actions" href={datoDeployUrl} attrs={{ target: '_blank' }}>
+      {detail.start}
+    </Button>
+  </Breadcrumb>
 
   <Section>
     <div class={s.grid}>
-      <div class={s.media}>
-        <div class={s.slides}>
-          <div class={s.slide}>
-            <ResponsiveImage
-              data={page.screenshot.responsiveImage}
-              sizes="auto, (min-width: 1152px) 380px, (min-width: 768px) 330px, 100vw"
-            />
-          </div>
-          <div class={s.slide}>
-            <ResponsiveImage
-              data={page.backendScreenshot.responsiveImage}
-              sizes="auto, (min-width: 1152px) 380px, (min-width: 768px) 330px, 100vw"
-            />
-          </div>
-        </div>
-
-        <a href={detail.note.href} class:list={[s.note, 'body']}>
-          <strong>{detail.note.lead}</strong>{' '}{detail.note.body}
-        </a>
-      </div>
-
       <aside class={s.aside}>
-        <img
-          class={s.technology}
-          src={page.technology.logo.url}
-          alt={page.technology.logo.alt ?? page.technology.name}
-          width={page.technology.logo.width ?? undefined}
-          height={page.technology.logo.height ?? undefined}
-        />
-
-        <div class={s.asideStart}>
-          <Button href={datoDeployUrl} attrs={{ target: '_blank' }}>
-            {detail.start}
-          </Button>
-        </div>
-
-        <Facts class={s.facts}>
+        <Facts>
+          <Fact label={detail.facts.technology}>
+            <Logo
+              class={s.technology}
+              logo={{
+                mask: logo.url,
+                alt: stripStega(logo.alt ?? page.technology.name),
+                width: logo.width ?? 1,
+                height: logo.height ?? 1,
+              }}
+            />
+          </Fact>
           <Fact label="Publisher">DatoCMS</Fact>
           {
             manifest.livePreviewUrl && (
@@ -123,14 +115,28 @@ const datoDeployUrl = dashboardUrl(`/deploy?repo=${page.githubRepo}`);
             </a>
           </Fact>
         </Facts>
+
+        <div class={s.note}>
+          <p class="bodyMedium">{detail.note.lead}</p>
+          <p class:list={[s.noteBody, 'caption']}>{detail.note.body}</p>
+          <a class:list={[s.noteLink, 'labelMedium']} href={detail.note.href}>
+            {detail.note.link} →
+          </a>
+        </div>
+
+        {
+          readme.toc.length > 0 && (
+            <TableOfContents title={detail.tocTitle} items={readme.toc} class={s.toc} />
+          )
+        }
       </aside>
 
       {
-        page.readme && (
+        readme.html && (
           <div class={s.readme}>
-            <Prose>
-              <Markdown of={page.readme} />
-            </Prose>
+            <ReadmeSheet html={readme.html} source={parts[0]!} href={githubReadmeUrl}>
+              <Fragment slot="byline">{detail.readmeByline}</Fragment>
+            </ReadmeSheet>
           </div>
         )
       }

@@ -36,6 +36,23 @@
   }
 }
 
+/*
+ * The author gives the cover. A cover with a white or a pale ground has no
+ * edge on the page, thus a hairline goes on top of the picture.
+ */
+.image:has(img) {
+  position: relative;
+}
+
+.image:has(img)::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  border: 1px solid var(--border-default);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
 .image :global(:is(picture, img)) {
   display: block;
   width: 100%;

@@ -1,5 +1,7 @@
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import s from './style.module.css';
+import { FormBoxReactComponent } from '~/components/FormBox/ReactComponent';
+import { formControlClass, FormSelectReactComponent } from '~/components/FormField/ReactComponent';
 import {
   FieldReactComponent,
   FieldsetReactComponent,
@@ -137,142 +139,150 @@ export default function CloneButtonGeneratorForm() {
     <FormProvider {...methods}>
       <SpaceReactComponent top={1} bottom={1}>
         <form onSubmit={submitFn(() => null)} className={s.form}>
-          <FieldReactComponent name="name" label="Project starter name" placeholder="Name" />
+          <FormBoxReactComponent>
+            <FieldReactComponent name="name" label="Project starter name" placeholder="Name" />
 
-          <FieldReactComponent
-            name="description"
-            label="Description"
-            placeholder="Insert a short description for the project starter"
-          />
+            <FieldReactComponent
+              name="description"
+              label="Description"
+              placeholder="Insert a short description for the project starter"
+            />
 
-          <FieldReactComponent
-            name="previewImage"
-            label="Frontend preview screenshot"
-            placeholder="https://acme.com/preview.png"
-          />
+            <FieldReactComponent
+              name="previewImage"
+              label="Frontend preview screenshot"
+              placeholder="https://acme.com/preview.png"
+            />
 
-          <FieldReactComponent
-            name="livePreviewUrl"
-            label="URL of an example of a successful deployment"
-            placeholder="https://my-project-starter.netlify.app/"
-          />
+            <FieldReactComponent
+              name="livePreviewUrl"
+              label="URL of an example of a successful deployment"
+              placeholder="https://my-project-starter.netlify.app/"
+            />
 
-          <FieldReactComponent
-            name="repo"
-            label="Github repository that will be copied"
-            placeholder="orgName/repoName:branchName"
-          />
+            <FieldReactComponent
+              name="repo"
+              label="Github repository that will be copied"
+              placeholder="orgName/repoName:branchName"
+            />
 
-          <FieldReactComponent
-            name="datocmsProjectId"
-            label="DatoCMS Project ID that will be duplicated"
-            placeholder="54321"
-          />
+            <FieldReactComponent
+              name="datocmsProjectId"
+              label="DatoCMS Project ID that will be duplicated"
+              placeholder="54321"
+            />
 
-          <FieldReactComponent
-            name="deploymentType"
-            label="How the project can be built and deployed?"
-            options={[
-              { value: 'copyRepo', label: 'Simply make a copy of the template repository' },
-              {
-                value: 'static',
-                label: 'It can be deployed to any static hosting (Vercel, Netlify)',
-              },
-              { value: 'vercel', label: 'It can be deployed only to Vercel' },
-              { value: 'netlify', label: 'It can be deployed only to Netlify' },
-              { value: 'heroku', label: 'It can be deployed only to Heroku' },
-            ]}
-          />
+            <FieldReactComponent
+              name="deploymentType"
+              label="How the project can be built and deployed?"
+              options={[
+                { value: 'copyRepo', label: 'Simply make a copy of the template repository' },
+                {
+                  value: 'static',
+                  label: 'It can be deployed to any static hosting (Vercel, Netlify)',
+                },
+                { value: 'vercel', label: 'It can be deployed only to Vercel' },
+                { value: 'netlify', label: 'It can be deployed only to Netlify' },
+                { value: 'heroku', label: 'It can be deployed only to Heroku' },
+              ]}
+            />
 
-          {deploymentType !== 'copyRepo' && (
-            <>
-              <FieldsetReactComponent label="Environment variables to be added on hosting">
-                <div className={s.fieldArray}>
-                  {environmentVariableFields.map((field, index) => {
-                    const type = formValues.environmentVariables[index]!.type;
+            {deploymentType !== 'copyRepo' && (
+              <>
+                <FieldsetReactComponent label="Environment variables to be added on hosting">
+                  <div className={s.fieldArray}>
+                    {environmentVariableFields.map((field, index) => {
+                      const type = formValues.environmentVariables[index]!.type;
 
-                    return (
-                      <div key={field.id} className={s.fieldArrayItem}>
-                        <div className={s.fieldArrayItemField} style={{ width: '35%' }}>
-                          <input
-                            required
-                            type="text"
-                            {...register(`environmentVariables.${index}.environmentVariableName`)}
-                            placeholder="ENV_NAME"
-                          />
-                        </div>
-                        <div className={s.fieldArrayItemField} style={{ flex: 1 }}>
-                          <select {...register(`environmentVariables.${index}.type`)} required>
-                            <option value="string">String</option>
-                            <option value="datocmsProjectUrl">
-                              DatoCMS Backend URL (https://PROJECT.admin.datocms.com/)
-                            </option>
-                            <option value="datocmsAccessToken">DatoCMS API token</option>
-                          </select>
-                        </div>
-                        {type === 'datocmsAccessToken' && (
-                          <div className={s.fieldArrayItemField} style={{ width: '25%' }}>
+                      return (
+                        <div key={field.id} className={s.fieldArrayItem}>
+                          <div className={s.fieldArrayItemField} style={{ width: '35%' }}>
                             <input
                               required
                               type="text"
-                              {...register(`environmentVariables.${index}.tokenName`)}
-                              placeholder="Read-only API token"
+                              {...register(`environmentVariables.${index}.environmentVariableName`)}
+                              placeholder="ENV_NAME"
+                              className={formControlClass}
                             />
                           </div>
-                        )}
-                        {type === 'string' && (
-                          <div className={s.fieldArrayItemField} style={{ width: '25%' }}>
-                            <input
+                          <div className={s.fieldArrayItemField} style={{ flex: 1 }}>
+                            <FormSelectReactComponent
+                              {...register(`environmentVariables.${index}.type`)}
                               required
-                              type="text"
-                              {...register(`environmentVariables.${index}.value`)}
-                              placeholder="Foo bar"
-                            />
+                            >
+                              <option value="string">String</option>
+                              <option value="datocmsProjectUrl">
+                                DatoCMS Backend URL (https://PROJECT.admin.datocms.com/)
+                              </option>
+                              <option value="datocmsAccessToken">DatoCMS API token</option>
+                            </FormSelectReactComponent>
                           </div>
-                        )}
-                        <button
-                          type="button"
-                          className={s.fieldArrayButton}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            removeEnvironmentVariable(index);
-                          }}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    );
-                  })}
-                  <button
-                    type="button"
-                    className={s.fieldArrayButton}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      addEnvironmentVariable({
-                        value: '',
-                        environmentVariableName: '',
-                        type: 'string',
-                      });
-                    }}
-                  >
-                    Add environment variable
-                  </button>
-                </div>
-              </FieldsetReactComponent>
+                          {type === 'datocmsAccessToken' && (
+                            <div className={s.fieldArrayItemField} style={{ width: '25%' }}>
+                              <input
+                                required
+                                type="text"
+                                {...register(`environmentVariables.${index}.tokenName`)}
+                                placeholder="Read-only API token"
+                                className={formControlClass}
+                              />
+                            </div>
+                          )}
+                          {type === 'string' && (
+                            <div className={s.fieldArrayItemField} style={{ width: '25%' }}>
+                              <input
+                                required
+                                type="text"
+                                {...register(`environmentVariables.${index}.value`)}
+                                placeholder="Foo bar"
+                                className={formControlClass}
+                              />
+                            </div>
+                          )}
+                          <button
+                            type="button"
+                            className={s.fieldArrayButton}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              removeEnvironmentVariable(index);
+                            }}
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      );
+                    })}
+                    <button
+                      type="button"
+                      className={s.fieldArrayButton}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        addEnvironmentVariable({
+                          value: '',
+                          environmentVariableName: '',
+                          type: 'string',
+                        });
+                      }}
+                    >
+                      Add environment variable
+                    </button>
+                  </div>
+                </FieldsetReactComponent>
 
-              <FieldReactComponent
-                name="buildCommand"
-                label="Build Command"
-                placeholder="npm run build"
-              />
+                <FieldReactComponent
+                  name="buildCommand"
+                  label="Build Command"
+                  placeholder="npm run build"
+                />
 
-              <FieldReactComponent
-                name="postInstallUrl"
-                label="Post-deploy install URL"
-                placeholder="/api/post-deploy"
-              />
-            </>
-          )}
+                <FieldReactComponent
+                  name="postInstallUrl"
+                  label="Post-deploy install URL"
+                  placeholder="/api/post-deploy"
+                />
+              </>
+            )}
+          </FormBoxReactComponent>
         </form>
       </SpaceReactComponent>
 

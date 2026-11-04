@@ -27,7 +27,7 @@ export const browse = {
       intro: 'The newest plugins in the directory, the most recent first.',
     },
   },
-  /** The headline of a search: the number of results, these words, then the search text. */
+  /** The headline of a search: the number of results, these words, then the search text in “ ”. */
   searchHeadline: { none: 'No plugins for', one: 'plugin for', other: 'plugins for' },
   /** The text in the search box. The hint shows the key that moves the focus to the box. */
   searchPlaceholder: 'Search plugins...',
@@ -73,33 +73,39 @@ export const groups = {
   popular: 'Most popular',
   official: 'DatoCMS Official Plugins',
   latest: 'Just released',
+  /** The link to the full list of a group. The count follows, in brackets. */
+  viewAll: 'View all',
 };
 
 export const detail = {
   install: 'Install plugin',
   officialBadge: 'DatoCMS Official Plugin',
-  officialNote: 'This is an Official DatoCMS Plugin!',
-  communityNote: 'Built by the DatoCMS community.',
+  /** The card next to the facts: the same for each plugin. */
+  noteTitle: "Want a plugin that isn't here?",
   noteBody: 'Learn how to create your own plugin, or copy and remix one, in our documentation.',
   noteHref: '/docs/plugin-sdk/introduction',
   noteLink: 'Build a plugin',
   /** The README: the author of the plugin writes it, not us. */
   readme: {
-    file: 'README.md',
     /** The author follows. */
     writtenBy: 'Written by',
     notUs: 'not by DatoCMS',
     official: 'Written by DatoCMS',
-    expand: 'Read the whole README',
     empty: 'This plugin has no README yet.',
     emptyLinks: 'See the package on npm',
     tocTitle: 'In the README',
-    imageLabel: 'Open the image',
-    close: 'Close',
   },
-  /** The labels of the facts. */
+  /** The labels of the facts, and the text of their links. */
   facts: {
+    publisher: 'Publisher',
+    homepage: 'Homepage',
+    homepageLink: 'Visit homepage',
+    package: 'Package',
+    packageLink: 'Visit npm',
     type: 'Type',
     fieldTypes: 'Works on',
+    version: 'Current version',
+    installs: 'Install count',
+    lastUpdate: 'Last update',
   },
 };

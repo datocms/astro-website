@@ -1,0 +1,89 @@
+/*
+ * The box keeps the space of the two screenshots, thus the hero does not
+ * move when they load or when they come in. The website is at the top
+ * left, the cms at the bottom right, in front of it. The two overlap by
+ * two fifths of the width.
+ */
+.shots {
+  position: relative;
+  aspect-ratio: 100 / 56;
+}
+
+/*
+ * The window (AppWindow) gives the edge, the bar and the ground. The
+ * design is flat: no shadow.
+ */
+.shot {
+  position: absolute;
+  display: flex;
+  animation: settle 400ms cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+
+.window {
+  flex: 1;
+  min-width: 0;
+}
+
+.shot :global(:is(picture, img)) {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* The two turn to each other, as the pages of an open book. */
+.website {
+  --tilt: 20deg;
+
+  top: 4%;
+  left: 0;
+  width: 66%;
+  transform: perspective(900px) rotateY(var(--tilt));
+}
+
+.cms {
+  --tilt: -20deg;
+
+  right: 0;
+  bottom: 4%;
+  z-index: 1;
+  width: 76%;
+  transform: perspective(900px) rotateY(var(--tilt));
+  animation-delay: 80ms;
+}
+
+/*
+ * They come in once, when the page loads (the hero is in view): a rise
+ * and a turn a little wider than the final one, then they stop. The final
+ * state is the style above, thus without the animation they are in place.
+ */
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: perspective(900px) translateY(var(--space-sm)) rotateY(calc(var(--tilt) * 1.5));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot {
+    animation: none;
+  }
+}
+
+/*
+ * The screenshots are 10% wider than their column. From 1152 they grow to
+ * the left, into the space between the text and the column. Below 1152
+ * they come after the text, and grow into the side padding of the page.
+ */
+@media (min-width: 1152px) {
+  .shots {
+    width: 110%;
+    margin-inline-start: -10%;
+  }
+}
+
+@media (max-width: 1151px) {
+  .shots {
+    width: min(110%, 616px);
+    margin-inline-start: max(-5%, -28px);
+  }
+}

@@ -136,6 +136,10 @@
   --color-pink-light-1: #f284971a;
   --color-pink-light-0: #fff7f8;
   /*
+   * The deep of the purple theme (--color-purple-deep-*) is a blue-black
+   * slate (hue 257), not a purple. DESIGN.md calls it Slate Deep. The
+   * slate family below is a different colour: the ink of the docs.
+   *
    * The docs. The docs are a tool, not a story: the page is white, and the
    * ink is a near black with a small tint of violet (OKLCH L 0.22, C 0.02,
    * hue 290). The accent is the purple of the site (--color-purple-light-5,
@@ -176,17 +180,26 @@
   --color-callout-danger-tint-dark: #41211e;
   --color-callout-danger-text-dark: #ffbab3;
   --color-white: #ffffff;
-  /* The red of a deletion or a purge, on the inverse surface (the wall of Delivery) */
+  /*
+   * The red of a deletion or a purge, on the inverse surface (the wall of
+   * Delivery). DESIGN.md calls it Signal Red; its partner is
+   * --color-green-signal (Signal Green).
+   */
   --color-red-light-5: #f25f5a;
 
   /*
    * Pixel highlights. Each one is the light partner of a theme accent, for
    * the brightest cells of the pixel pictures. The design pair is
-   * orange #ff6d00 with yellow #e8d855. Our orange is softer, but the peach
-   * highlight still fits the rule. The other values follow the same
-   * rule in OKLCH: from the accent, add approximately 0.17 lightness (stop
-   * near 0.94), use less chroma, and move the hue to yellow (at most 55 deg).
-   * The default accent is yellow already, thus its highlight is a pale cream.
+   * orange #ff6d00 with yellow #e8d855, thus the orange theme uses the
+   * yellow accent (--color-yellow-light-5) and has no pale of its own. The
+   * pales below follow the same rule in OKLCH: from the accent, add
+   * approximately 0.17 lightness (stop near 0.94), use less chroma, and move
+   * the hue to yellow (at most 55 deg).
+   *   cream   default (the accent is yellow already, thus a pale cream)
+   *   lime    green
+   *   orchid  purple and docs
+   *   aqua    blue
+   *   peach   pink
    */
   --color-cream-pale: #f8f2c2;
   --color-lime-pale: #eef0a8;
@@ -747,17 +760,13 @@
 }
 
 /*
- * Elevation and backdrop. A shadow is black with alpha: it works on both
- * schemes. The scrim dims the page behind a drawer.
- *   shadow-popover  A popover, a drawer, a dropdown.
- *   shadow-card     A card on hover, a media frame.
+ * Backdrop. There are no shadows: a popover, a drawer or a card separates
+ * from what is under it with a surface change and a 1px hairline. The scrim
+ * dims the page behind a drawer.
  *   scrim-modal     The page behind a modal (the search). It dims more
  *                   than the scrim. The dark scheme has its own value.
  */
 :root {
-  --shadow-popover:
-    0 1px 2px rgb(0 0 0 / 0.04), 0 6px 14px rgb(0 0 0 / 0.08), 0 20px 40px rgb(0 0 0 / 0.1);
-  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.1), 0 6px 20px rgb(0 0 0 / 0.1);
   --scrim: rgb(0 0 0 / 0.4);
   --scrim-modal: var(--color-brown-deep-3);
 }
@@ -798,7 +807,7 @@
   /* The page is a dark ground: the type adjusts for light text. */
   --type-leading-dark: 0.05;
   --type-tracking-dark: 0.01em;
-  --type-mono-weight: 500;
+  --type-mono-weight: 650;
 }
 
 :root[data-scheme='dark'],
@@ -893,7 +902,7 @@
   --_ground-surface-button-soft: initial;
   --type-leading-dark: 0;
   --type-tracking-dark: 0em;
-  --type-mono-weight: 400;
+  --type-mono-weight: 600;
   color: var(--text-primary);
   color-scheme: light;
 }
@@ -901,7 +910,7 @@
 :root[data-scheme='dark'] .surfacePage {
   --type-leading-dark: 0.05;
   --type-tracking-dark: 0.01em;
-  --type-mono-weight: 500;
+  --type-mono-weight: 650;
   color-scheme: dark;
 }
 
@@ -939,7 +948,7 @@
   /* The text is dark: the type has the light values. */
   --type-leading-dark: 0;
   --type-tracking-dark: 0em;
-  --type-mono-weight: 400;
+  --type-mono-weight: 600;
   color: var(--text-primary);
   color-scheme: light;
 }
@@ -975,7 +984,7 @@
   --_ground-surface-button-soft: color-mix(in srgb, var(--theme-paper) 16%, transparent);
   --type-leading-dark: 0.05;
   --type-tracking-dark: 0.01em;
-  --type-mono-weight: 500;
+  --type-mono-weight: 650;
   color-scheme: dark;
 }
 
@@ -1028,7 +1037,7 @@
   /* The text is light in both schemes: the type adjusts for light text. */
   --type-leading-dark: 0.05;
   --type-tracking-dark: 0.01em;
-  --type-mono-weight: 500;
+  --type-mono-weight: 650;
   color: var(--text-primary);
   color-scheme: dark;
 }
@@ -1089,7 +1098,7 @@
    */
   --type-leading-dark: 0;
   --type-tracking-dark: 0em;
-  --type-mono-weight: 400;
+  --type-mono-weight: 600;
 
   --section-padding-x: 30px;
   --section-padding-x-headlines: 60px;

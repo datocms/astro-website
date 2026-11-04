@@ -4,11 +4,9 @@
 // official plugins only (?official=true).
 import ky from 'ky';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { faArrowRight } from '@fortawesome/pro-regular-svg-icons';
 import { Breadcrumb } from '~/components/Breadcrumb';
 import { CopyPrompt } from '~/components/CopyPrompt';
 import { Face } from '~/components/Face';
-import { Icon } from '~/components/Icon';
 import { Hero } from '~/components/Hero';
 import { Pagination } from '~/components/Pagination';
 import { PluginCard, type PluginCardFragment } from '~/components/PluginCard';
@@ -20,6 +18,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import type { FragmentOf } from '~/lib/datocms/graphql';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import SearchBox from '../../../_SearchBox.astro';
+import ViewAll from '../../../_ViewAll.astro';
 import { officialAuthorsQuery, perPage, popularQuery, query } from './_graphql';
 import s from './_style.module.css';
 
@@ -64,7 +63,7 @@ async function fetchSearchResults(query: string, page: number) {
         json: {
           params: new URLSearchParams({
             query: query,
-            hitsPerPage: '36',
+            hitsPerPage: String(perPage),
             getRankingInfo: '1',
             page: page.toString(),
           }).toString(),
@@ -91,8 +90,8 @@ const popular = plugins.length === 0 ? (await executeQuery(Astro, popularQuery))
 
 function searchHeadline(count: number, text: string) {
   const words = browse.searchHeadline;
-  if (count === 0) return `${words.none} "${text}"`;
-  return `${count.toLocaleString('en-US')} ${count === 1 ? words.one : words.other} "${text}"`;
+  if (count === 0) return `${words.none} “${text}”`;
+  return `${count.toLocaleString('en-US')} ${count === 1 ? words.one : words.other} “${text}”`;
 }
 
 // A filter of the query string gives the list its own headline. Without one, it is the list of all plugins.
@@ -102,7 +101,8 @@ const view = officialOnly
     ? browse.views.latest
     : undefined;
 
-const hero =
+// A search has no intro.
+const hero: { headline: string; intro?: string } =
   searchText !== null
     ? { headline: searchHeadline(totalEntries, searchText) }
     : (view ?? { headline: browse.headline, intro: browse.intro });
@@ -146,10 +146,7 @@ const trail =
           <div class={s.popular}>
             <div class={s.popularHeader}>
               <h2 class:list={[s.popularTitle, 'labelMedium']}>{noResults.popular}</h2>
-              <a href={noResults.viewAll.href} class:list={[s.viewAll, 'labelMedium']}>
-                <span>{noResults.viewAll.label}</span>
-                <Icon icon={faArrowRight} />
-              </a>
+              <ViewAll href={noResults.viewAll.href} label={noResults.viewAll.label} />
             </div>
             <ul class={s.popularList}>
               {popular.map((item) => (

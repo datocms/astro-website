@@ -2,10 +2,19 @@
 /*
  * The content comes from a CMS, thus the rules target the elements. The
  * sizes come from the --type-* tokens, as in the typography classes.
- * Blocks have 30 between them. Two runs of text (paragraphs and lists)
- * have one line between them. A heading has more space above it (60 for
- * h1 and h2, 40 for h3, 30 for h4 to h6) than below it (20, or 10 for h4
- * to h6).
+ *
+ * The rhythm. All the space is a margin-top on the next element. The
+ * space between the runs of text follows the line height (lh), thus it
+ * changes with the size of the type:
+ * - Two runs of text (paragraphs and lists): 0.7 of a line. The text
+ *   reads as one continuous text.
+ * - A list after its paragraph: 0.4 of a line. Two items: 0.3 of a line.
+ * - A heading has approximately 4 times more space above it (60 for h1
+ *   to h3, 30 for h4 to h6) than below it (16, or 10 for h4 to h6). It
+ *   goes with the text that follows it.
+ * - An image or a video: 1.6 lines above and below. A picture is a pause
+ *   in the text.
+ * - The other blocks (code, tables, islands): 30.
  *
  * The scope stops at the children of <prose-island>. Prose does not style
  * an element in an island: a block with its own design (a button, a card,
@@ -14,14 +23,54 @@
  * new scope.
  */
 @scope (.prose) to (prose-island > *) {
+  /*
+   * The type of the running text. A Prose that has a different text (the
+   * docs) sets these properties:
+   * --prose-size: the size of the text.
+   * --prose-leading: the line height. A long line needs a loose leading.
+   * --prose-measure: the width of the running text, in ems of the text.
+   *   36 is approximately 80 characters of ABC Oracle, at each size.
+   * --prose-h1-size to --prose-h4-size: the size of the headings, as a
+   *   multiple of the text. The ratio is small (h2 is 1.4 times the text):
+   *   the space around a heading, not its size, shows the structure.
+   * --prose-h1-leading to --prose-h4-leading: the line height of the
+   *   headings. A smaller heading has a looser leading. h5 and h6 have
+   *   the size and the leading of h4.
+   * A dark ground adds to the line height and to the letter spacing.
+   *
+   * The colour. The running text is one step softer than the ink. The
+   * headings, the bold text, the links and the quotes have the full ink:
+   * the eye goes to them first, and a long text does not glare.
+   */
   :scope {
-    font-size: var(--type-m);
+    --prose-size: var(--type-m);
+    --prose-leading: 1.5;
+    --prose-measure: 36;
+    --prose-h1-size: calc(2.2 * var(--prose-size));
+    --prose-h2-size: calc(1.4 * var(--prose-size));
+    --prose-h3-size: calc(1.2 * var(--prose-size));
+    --prose-h4-size: calc(1.1 * var(--prose-size));
+    --prose-h1-leading: 1.1;
+    --prose-h2-leading: 1.33;
+    --prose-h3-leading: 1.33;
+    --prose-h4-leading: 1.4;
+
+    font-size: var(--prose-size);
     font-weight: 400;
-    /* The long body role (typography.css): a dark ground adds to the line height and the letter spacing. */
-    line-height: calc(1.5 + var(--type-leading-dark));
+    line-height: calc(var(--prose-leading) + var(--type-leading-dark));
     letter-spacing: calc(-0.01em + var(--type-tracking-dark));
-    color: var(--text-primary);
+    color: var(--text-soft);
     overflow-wrap: anywhere;
+  }
+
+  /* A block in an island has its own design: it gets the full ink, as outside Prose. */
+  prose-island {
+    color: var(--text-primary);
+  }
+
+  /* An empty paragraph of the CMS adds no space. */
+  :scope > p:empty {
+    display: none;
   }
 
   :where(figure, pre, blockquote) {
@@ -33,39 +82,51 @@
   }
 
   /*
-   * The measure. The running text stops at 32em, approximately 70
-   * characters of ABC Oracle. Tables, code blocks, figures and the other
-   * wide blocks keep the full column. A heading is larger than the text:
-   * it stops at the same edge as the running text, 32 times the body size.
+   * The measure. The running text stops at --prose-measure. Tables, code
+   * blocks, figures and the other wide blocks keep the full column. A
+   * heading is larger than the text: it stops at the same edge as the
+   * running text.
    */
   :scope > :is(p, ul, ol, blockquote) {
-    max-width: 32em;
+    max-width: calc(var(--prose-measure) * 1em);
   }
 
   :scope > :is(h1, h2, h3, h4, h5, h6) {
-    max-width: calc(32 * var(--type-m));
+    max-width: calc(var(--prose-measure) * var(--prose-size));
   }
 
-  /* Between two runs of text: one empty line, at each size of the type. */
+  /*
+   * An image or a video gets more space than the text around it. The
+   * :where() keeps the specificity low: a heading after the figure keeps
+   * its own space, and a figure after a heading is near the heading.
+   */
+  :scope > * + :where(figure:has(img, video, iframe)),
+  :scope > :where(figure:has(img, video, iframe)) + * {
+    margin-top: 1.6lh;
+  }
+
+  /* Between two runs of text: less than one line, at each size of the type. */
   :scope > :is(p, ul, ol) + :is(p, ul, ol) {
-    margin-top: 1lh;
+    margin-top: 0.7lh;
+  }
+
+  /* A list stays near the paragraph that starts it. */
+  :scope > p + :is(ul, ol) {
+    margin-top: 0.4lh;
   }
 
   :is(h1, h2, h3, h4, h5, h6) {
     font-weight: 500;
+    color: var(--text-primary);
   }
 
   /*
-   * A heading has more space above it than below it: it goes with the
-   * text that follows it. A higher level has more space. A heading that
-   * starts the text has no space above it.
+   * A heading has much more space above it than below it: it goes with
+   * the text that follows it. h1 to h3 have the same space above them. A
+   * heading that starts the text has no space above it.
    */
-  :scope > * + :is(h1, h2) {
+  :scope > * + :is(h1, h2, h3) {
     margin-top: var(--space-2xl);
-  }
-
-  :scope > * + h3 {
-    margin-top: var(--space-xl);
   }
 
   :scope > * + :is(h4, h5, h6) {
@@ -77,38 +138,38 @@
    * heading gets the small space of the heading above it.
    */
   :scope > :is(h1, h2, h3) + * {
-    margin-top: var(--space-md);
+    margin-top: var(--space-sm);
   }
 
   :scope > :is(h4, h5, h6) + * {
     margin-top: var(--space-2xs);
   }
 
-  /* h1: the headline role. */
+  /* h1: 2.2 times the text. */
   h1 {
-    font-size: var(--type-3xl);
-    line-height: 1;
+    font-size: var(--prose-h1-size);
+    line-height: var(--prose-h1-leading);
     letter-spacing: -0.04em;
   }
 
-  /* h2: the section role (the docs h2). */
+  /* h2: 1.4 times the text. A pull quote has the same size. */
   h2 {
-    font-size: var(--type-2xl);
-    line-height: 1.2;
+    font-size: var(--prose-h2-size);
+    line-height: var(--prose-h2-leading);
     letter-spacing: -0.03em;
   }
 
-  /* h3: the title role. */
+  /* h3: 1.2 times the text. */
   h3 {
-    font-size: var(--type-xl);
-    line-height: 1.1;
+    font-size: var(--prose-h3-size);
+    line-height: var(--prose-h3-leading);
     letter-spacing: -0.02em;
   }
 
-  /* h4 to h6: one size above the text. Only the space around them changes. */
+  /* h4 to h6: one step above the text. Only the space around them changes. */
   :is(h4, h5, h6) {
-    font-size: var(--type-l);
-    line-height: 1.2;
+    font-size: var(--prose-h4-size);
+    line-height: var(--prose-h4-leading);
     letter-spacing: -0.02em;
   }
 
@@ -119,17 +180,28 @@
     letter-spacing: -0.02em;
   }
 
-  /* The font has no bold weight. Medium is the strongest weight. */
+  /* The font has no bold weight. Medium is the strongest weight. Bold text also has the full ink. */
   :is(strong, b) {
     font-weight: 500;
+    color: var(--text-primary);
   }
 
-  /* A thin underline: a paragraph with many links does not become a dark block. */
+  /*
+   * A link has the full ink and the normal weight. Its underline is soft:
+   * a paragraph with many links does not become a dark block. On hover
+   * only the underline changes.
+   */
   a {
-    font-weight: 500;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.15em;
+    color: var(--text-primary);
+    text-decoration-line: underline;
+    text-decoration-color: color-mix(in srgb, currentcolor 40%, transparent);
+    text-decoration-thickness: from-font;
+    text-underline-offset: clamp(2px, 0.175em, 4px);
+    transition: text-decoration-color 150ms ease-out;
+  }
+
+  a:hover {
+    text-decoration-color: currentcolor;
   }
 
   /* The highlight paints the accent: its text is the ink of the accent, in both schemes. */
@@ -193,13 +265,26 @@
     border-radius: var(--radius-md);
   }
 
+  /*
+   * The markers hang in the indent of the list, in the colour of the text.
+   * The numbers have the same width, thus "9." and "10." end at the same
+   * place.
+   */
   :is(ul, ol) {
-    padding-left: var(--space-lg);
+    padding-left: 1.5em;
   }
 
+  ol > li::marker {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /*
+   * The space between two items is 0.3 of a line: the items stay
+   * separate, and the list stays one block.
+   */
   li + li,
   li > :is(ul, ol) {
-    margin-top: var(--space-xs);
+    margin-top: 0.3lh;
   }
 
   ul {
@@ -210,35 +295,66 @@
     list-style: decimal;
   }
 
+  ul ul {
+    list-style: circle;
+  }
+
+  ul ul ul {
+    list-style: disc;
+  }
+
   ol ol {
     list-style: lower-alpha;
   }
 
+  ol ol ol {
+    list-style: lower-roman;
+  }
+
+  /*
+   * A quote is a pull quote: the size of an h2, in the full ink, with no
+   * rule at its side. The opening quote mark hangs in the margin, thus the
+   * edge of the text stays straight.
+   */
   blockquote {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2xs);
-    padding: 0 var(--space-md);
-    border-left: 2px solid var(--border-strong);
+    gap: var(--space-xs);
+    color: var(--text-primary);
+    quotes: '\201C' '\201D' '\2018' '\2019';
   }
 
   blockquote p {
+    font-size: var(--prose-h2-size);
     font-weight: 500;
-    line-height: 1.3;
+    line-height: var(--prose-h2-leading);
+    letter-spacing: -0.02em;
+  }
+
+  blockquote p:first-of-type {
+    text-indent: -0.45em;
+  }
+
+  blockquote p:first-of-type::before {
+    content: open-quote;
+  }
+
+  blockquote p:last-of-type::after {
+    content: close-quote;
   }
 
   blockquote :is(cite, footer) {
     font-size: var(--type-s);
     font-style: normal;
-    font-weight: 500;
-    line-height: 1;
+    font-weight: 400;
+    line-height: 1.5;
     color: var(--text-muted);
   }
 
   figure {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2xs);
+    gap: var(--space-xs);
   }
 
   figure :is(img, video, iframe) {
@@ -261,11 +377,16 @@
     aspect-ratio: 16 / 9;
   }
 
+  /*
+   * The caption is small and quiet: the smallest step of the text, the
+   * normal weight, and balanced lines.
+   */
   figcaption {
-    font-size: var(--type-s);
-    font-weight: 500;
-    line-height: 1;
+    font-size: var(--type-xs);
+    font-weight: 400;
+    line-height: 1.4;
     color: var(--text-muted);
+    text-wrap: balance;
   }
 
   hr {
@@ -276,7 +397,8 @@
   table {
     width: 100%;
     font-size: var(--type-s);
-    line-height: 1;
+    /* A cell can have more than one line: the leading of the caption. */
+    line-height: calc(1.35 + var(--type-leading-dark));
     border-collapse: collapse;
     /* Do not break the words in a cell. */
     overflow-wrap: normal;

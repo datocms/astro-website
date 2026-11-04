@@ -1,0 +1,40 @@
+---
+// The two screenshots of a starter in the hero: the website at the back on
+// the left, the project in the cms at the front on the right. They turn to
+// each other, as the pages of an open book. Each one is in a window
+// (AppWindow, as in the scenes): the address of the site, the name of the
+// project in the cms.
+import { AppWindow } from '~/components/AppWindow';
+import { ResponsiveImage } from '~/components/ResponsiveImage';
+import type { ResultOf } from '~/lib/datocms/graphql';
+import type { query } from './_graphql';
+import s from './_HeroShots.module.css';
+
+type Page = NonNullable<ResultOf<typeof query>['page']>;
+
+interface Props {
+  website: Page['screenshot']['responsiveImage'];
+  cms: Page['backendScreenshot']['responsiveImage'];
+  /** The name of the starter: the bar of the cms window, and of the site without a preview. */
+  name: string;
+  /** The address of the preview of the website, when the starter has one. */
+  previewUrl?: string;
+}
+
+const { website, cms, name, previewUrl } = Astro.props;
+const address = previewUrl?.replace(/^https?:\/\//, '').replace(/\/$/, '');
+const sizes = 'auto, (min-width: 1152px) 400px, 70vw';
+---
+
+<div class={s.shots}>
+  <div class:list={[s.shot, s.website]}>
+    <AppWindow class={s.window} size="s" address={address ?? name}>
+      <ResponsiveImage data={website} sizes={sizes} priority />
+    </AppWindow>
+  </div>
+  <div class:list={[s.shot, s.cms]}>
+    <AppWindow class={s.window} size="s" address={`${name} - DatoCMS`}>
+      <ResponsiveImage data={cms} sizes={sizes} priority />
+    </AppWindow>
+  </div>
+</div>

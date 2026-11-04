@@ -72,7 +72,7 @@ A diagram is a `whole` frame that is a picture of what DatoCMS does, not a scree
 - An **icon** (Font Awesome, regular, with `Icon`) in the place of the mark, on a pill for a thing that is not DatoCMS: the schedule of the customer, their bucket, their domain. Two icons in a diagram at most. Choose an icon that stays clear at 14px: at that size the bucket looks like a padlock.
 - The **working mark, then a check**, on an item of a task (a part of an export): the working mark (`.working`) while it runs, a check when it is done, no mark at rest. Each mark is a box of 14 × 14 px, thus the item keeps its width. The still has all the checks.
 - The **ring** and the tint of the accent for a change. Never red: red is for a failure, and a purge is the product at work.
-- A **photo** or a video thumb has the class `photo`: a soft shadow, no ring (a ring made each photo look like a box). The same class serves a photo in a frame that is not a diagram (the image lab of `Images/`).
+- A **photo** or a video thumb has no class, no shadow and no ring (a ring made each photo look like a box).
 - Two curves (a strong ease-out for enter, exit and ping; a strong ease-in-out for travel and draw) and six durations, from the tokens of the grammar. The script waits for the pill to settle before the lines come, for the lines before the pulse, for the pulse before the ring.
 - 960px at most, and top-down on phones.
 

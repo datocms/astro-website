@@ -1,9 +1,9 @@
 ---
 // A group of plugins on the index: a heading, an optional link to the full
 // list, and the plugins in the slot.
-import { faArrowRight } from '@fortawesome/pro-regular-svg-icons';
-import { Icon } from '~/components/Icon';
 import { Section } from '~/components/Section';
+import { groups } from '~/data/plugins';
+import ViewAll from './_ViewAll.astro';
 import s from './_style.module.css';
 
 interface Props {
@@ -30,10 +30,10 @@ const { title, href, count, flushTop = true, bleed = false, background = 'defaul
     <h2 class="title">{title}</h2>
     {
       href && (
-        <a href={href} class:list={[s.viewAll, 'labelMedium']}>
-          <span>View all ({count})</span>
-          <Icon icon={faArrowRight} />
-        </a>
+        <ViewAll
+          href={href}
+          label={count === undefined ? groups.viewAll : `${groups.viewAll} (${count})`}
+        />
       )
     }
   </div>

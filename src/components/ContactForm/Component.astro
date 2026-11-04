@@ -1,5 +1,7 @@
 ---
 import { Button } from '~/components/Button';
+import { FormBox, FormRow } from '~/components/FormBox';
+import formBox from '~/components/FormBox/style.module.css';
 import { FormField } from '~/components/FormField';
 import { Headline } from '~/components/Headline';
 import type { ContactFormData } from '~/data/contact';
@@ -58,7 +60,7 @@ const needsScript = external && noscriptMessage !== undefined;
   {
     needsScript && (
       <noscript>
-        <p class:list={['labelMedium', styles.box, styles.noscript]}>{noscriptMessage}</p>
+        <p class:list={['labelMedium', formBox.box, styles.noscript]}>{noscriptMessage}</p>
       </noscript>
     )
   }
@@ -68,18 +70,14 @@ const needsScript = external && noscriptMessage !== undefined;
     hidden={submitted}
     data-form
   >
-    <div class={styles.box}>
+    <FormBox>
       {
-        rows.map((row, i) => (
-          <div class:list={[styles.row, i === 0 && styles.firstRow]}>
+        rows.map((row) => (
+          <FormRow>
             {row.map((field) => (
-              <FormField
-                {...field}
-                id={idPrefix ? `${idPrefix}-${field.name}` : undefined}
-                class={styles.cell}
-              />
+              <FormField {...field} id={idPrefix ? `${idPrefix}-${field.name}` : undefined} />
             ))}
-          </div>
+          </FormRow>
         ))
       }
       <slot name="extra" />
@@ -93,7 +91,7 @@ const needsScript = external && noscriptMessage !== undefined;
           {submitLabel}
         </Button>
       </div>
-    </div>
+    </FormBox>
     <p
       class:list={['labelMedium', styles.submitError]}
       role="alert"
@@ -106,7 +104,7 @@ const needsScript = external && noscriptMessage !== undefined;
     </p>
   </form>
 
-  <div class:list={[styles.box, styles.success]} tabindex="-1" hidden={!submitted} data-success>
+  <div class:list={[formBox.box, styles.success]} tabindex="-1" hidden={!submitted} data-success>
     <Headline as="h2" size="title">
       {success.headline}
       <Fragment slot="muted">

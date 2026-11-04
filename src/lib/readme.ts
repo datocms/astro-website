@@ -4,8 +4,7 @@ import { fromHtml } from 'hast-util-from-html';
 import { selectAll } from 'hast-util-select';
 import { toHtml } from 'hast-util-to-html';
 import { toString } from 'hast-util-to-string';
-import xss from 'xss';
-import { markdownToHtml } from '~/components/Markdown/utils';
+import { untrustedMarkdownToHtml } from '~/components/Markdown/utils';
 import { tableOfContentsItems, type TableOfContentsItem } from '~/components/TableOfContents';
 
 export interface Readme {
@@ -27,20 +26,20 @@ function firstElement(tree: Root) {
 }
 
 /**
- * Makes the README of a plugin fit the page. The author writes the README,
- * thus its form is not known:
+ * Makes a README fit a page (a plugin, a starter). The README comes from a
+ * repository, thus its form is not known, and its HTML is not trusted:
  *
  * - The first heading goes when it is an h1 at the top: it is usually the
- *   name of the plugin, and the hero already shows the name.
+ *   name of the project, and the hero already shows the name.
  * - The headings move, thus the highest one is an h2. The h1 of the page
- *   stays the name of the plugin.
+ *   stays the name of the project.
  * - The table of contents gets the h2 and h3 headings.
  * - The images load lazily.
  */
 export async function prepareReadme(markdown: string | null | undefined): Promise<Readme> {
   if (!markdown?.trim()) return { html: '', toc: [] };
 
-  const tree = fromHtml(await markdownToHtml(xss(markdown)), { fragment: true });
+  const tree = fromHtml(await untrustedMarkdownToHtml(markdown), { fragment: true });
 
   const first = firstElement(tree);
   if (first && level(first) === 1) {

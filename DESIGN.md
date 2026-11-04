@@ -20,6 +20,7 @@ colors:
   plum-deep: '#3f0e16'
   bubblegum: '#f28497'
   bubblegum-paper: '#fff7f8'
+  docs-ink: '#1a1923'
   white: '#ffffff'
   signal-green: '#3f9a4a'
   signal-red: '#f25f5a'
@@ -184,7 +185,7 @@ This system came from overnice's work ("Warm Logic" is their name for the route)
 
 **Key Characteristics:**
 
-- Six themes (default, orange, green, purple, blue, pink). Each is a set of three surfaces: a near-white paper, a bright accent and a deep inverse, all of one hue. The docs have a seventh theme of their own (see "The docs theme").
+- Six themes (default, orange, green, purple, blue, pink). Each is a set of three surfaces: a near-white paper, a bright accent and a deep inverse, in the hue of the accent (the deep of the default, green and purple themes is a neighbouring hue: see Colors). The docs have a seventh theme of their own (see "The docs theme").
 - Full-bleed bands of flat colour; a theme changes from section to section, never inside a component.
 - Two-tone headlines: the claim in the text colour, then the aside in a muted tone of the same hue.
 - One sans (ABC Oracle) at two weights, tight negative tracking; Geist Mono for code and product chrome: 500 in code blocks, and on the page 400 on light grounds and 500 on dark grounds.
@@ -196,7 +197,21 @@ This system came from overnice's work ("Warm Logic" is their name for the route)
 
 ## Colors
 
-Six monochrome families. In each family a deep tone, a bright accent and a paper white share one hue, so that a page is always in harmony with itself. The frontmatter holds the anchors; `src/styles/tokens.css` holds the alpha steps (`-1` to `-4`) and the semantic tokens that components use.
+Six families for the site, and a seventh theme for the docs. Each family has a deep tone, a bright accent and a paper white. The paper always takes the hue of the accent. The deep takes it too in orange, blue and pink; in the other three it is a different hue that goes with the accent: a brown under the yellow (Espresso), a forest green under the lime green (Fern Deep), a blue-black slate under the purple (Slate Deep). The frontmatter holds the anchors; `src/styles/tokens.css` holds the alpha steps and the semantic tokens that components use.
+
+The names here are the design names. The primitives in `tokens.css` are named by hue and role, with a step: `-5` is the full colour, `-1` to `-4` are alpha steps of it (`-4` is not used at the moment), `-0` is the paper.
+
+| Theme (`data-theme`) | Accent                           | Deep                               | Paper                                  |
+| -------------------- | -------------------------------- | ---------------------------------- | -------------------------------------- |
+| `default`            | Pollen `--color-yellow-light-5`  | Espresso `--color-brown-deep-5`    | Cream Paper `--color-yellow-light-0`   |
+| `orange`             | Ember `--color-orange-light-5`   | Ember Deep `--color-orange-deep-5` | Ember Paper `--color-orange-light-0`   |
+| `green`              | Fern `--color-green-light-5`     | Fern Deep `--color-green-deep-5`   | Fern Paper `--color-green-light-0`     |
+| `purple`             | Iris `--color-purple-light-5`    | Slate Deep `--color-purple-deep-5` | Iris Paper `--color-purple-light-0`    |
+| `blue`               | Glacier `--color-blue-light-5`   | Harbour Deep `--color-blue-deep-5` | Glacier Paper `--color-blue-light-0`   |
+| `pink`               | Bubblegum `--color-pink-light-5` | Plum Deep `--color-pink-deep-5`    | Bubblegum Paper `--color-pink-light-0` |
+| `docs`               | Iris `--color-purple-light-5`    | Docs Ink `--color-slate-deep-5`    | White `--color-white`                  |
+
+Careful with "slate": the design name Slate Deep is `--color-purple-deep-*`. The CSS family `--color-slate-*` is the docs ink, a different colour (a near black with a tint of violet).
 
 ### Primary
 
@@ -220,8 +235,9 @@ The six accents follow one rule in OKLCH: each accent keeps the lightness and th
 
 ### Tertiary
 
-- **Signal Green** (signal-green) and **Signal Red** (signal-red): a change applied, something deleted or refused. Only in diagrams, status and form feedback. They do not change with the theme.
-- **Code Espresso** (code-espresso) and the other `--color-code-*` deeps: the background of a code card. It is a calmer, deeper shade of the theme hue than the inverse surface. The syntax colours come from one OKLCH rule (see the comment in `tokens.css`): keywords take the accent hue, strings, constants and functions take three other hues of the family.
+- **Signal Green** (signal-green, `--color-green-signal`) and **Signal Red** (signal-red, `--color-red-light-5`): a change applied, something deleted or refused. Only in diagrams, status and form feedback. They do not change with the theme.
+- **Code Espresso** (code-espresso, `--color-code-brown-deep`) and the other `--color-code-*-deep`: the background of a code card. It is a calmer, deeper shade of the theme deep than the inverse surface. The syntax colours come from one OKLCH rule (see the comment in `tokens.css`): keywords take the accent hue, strings, constants and functions take three other hues of the family.
+- **Pixel highlights** (`--theme-pixel-highlight`): the brightest cells of the pixel pictures, a light partner of the accent. Default: `--color-cream-pale` (not Cream Paper: a deeper cream). Orange: Pollen. Green: `--color-lime-pale`. Purple and docs: `--color-orchid-pale`. Blue: `--color-aqua-pale`. Pink: `--color-peach-pale`.
 
 ### Neutral
 
@@ -231,8 +247,8 @@ There is no grey. The neutrals are the deep tone of the theme at alpha: text-sof
 
 The docs are a tool, not a story, thus they have a theme of their own: `docs`. Only the docs layout uses it.
 
-- **The page is white**, and the ink is a near black with a small tint of violet (slate, OKLCH L 0.22, C 0.02, hue 290). The tints of the ink are greys with the same small tint.
-- **The accent is the purple of the site** (#9e90ee, hue 289, the hue of the ink): the active tab, the focus ring, the hit of a search, the tags. The links and the kickers are a deep tone of it (#53458a). It stays small: the docs have no accent bands.
+- **The page is white**, and the ink is **Docs Ink** (docs-ink, `--color-slate-deep-5`): a near black with a small tint of violet (OKLCH L 0.22, C 0.02, hue 289). The tints of the ink are greys with the same small tint.
+- **The accent is Iris**, the purple of the site (#9e90ee, hue 289, the hue of the ink): the active tab, the focus ring, the hit of a search, the tags. The links and the kickers are a deep tone of it (`--text-accent`, OKLCH L 0.44, C 0.11: #52468b). It stays small: the docs have no accent bands.
 - **The callouts do not take the hue of the theme.** Each kind has its own hue: info blue, tip violet, positive green, warning amber, danger red. The theme gives them as theme data (`--theme-status-*`); `--surface-status-*` and `--text-status-*` read it. A theme without the data keeps the old rule: info and tip are a tint of the ink, warning is a tint of the accent.
 - **The code card** is a deep slate, with the keywords in violet.
 
@@ -393,7 +409,7 @@ Completely flat. There are no shadows, at rest or on hover. Depth comes only fro
 
 ### Named Rules
 
-**The Flat, No Exceptions Rule.** No `box-shadow` with blur, no `drop-shadow`, no glow. The tokens `--shadow-popover` and `--shadow-card` exist for the docs today, and the `.photo` class of the diagrams gives a photo a soft shadow; they are drift, not part of this system. Do not use them on new work.
+**The Flat, No Exceptions Rule.** No `box-shadow` with blur, no `drop-shadow`, no glow, in the site and in the docs. There are no shadow tokens. A photo in a diagram has no shadow and no ring.
 
 ## Shapes
 
@@ -419,7 +435,7 @@ Friendly and direct: a pill that says where it goes. The ground under the button
   - **Accent:** the loudest action, on the page only: the accent as fill, the deep as text (the hero "Get Started"). On the accent and on the inverse it is the same as solid.
 - **Hover:** the colours swap instantly, without a transition. Solid and soft go to the accent on the page, and to the page surface on the accent and on the inverse. Accent goes to the deep. Active keeps the hover and adds 80% opacity. Focus is a 2px outline in the current colour, 2px offset. Disabled is 40% opacity.
 - **Leading logos:** a row of up to three overlapping logos (20px, 24px in size l) leads the label ("Explore Integrations"). The arrow stays optional.
-- **Contact card:** a button that reaches a person (`contact`: `sales`, `partners`, `support`) is a plain pill, with no photo. On hover and on keyboard focus, a card rises above it: the 40px portraits of the people who answer (the height of the two lines of text), their names and the role (muted), from the TeamMember records of the CMS (`src/components/ContactCard/contacts.ts`). Sales is Kasimir, the Partner Program is Matteo Papadopoulos, Support is Marcelo and Roger. The card is on the deep inverse surface of the footer (`--surface-inverse-deep`, with `surfaceInverse` for the text roles) on every ground, 8px radius, 12px of padding (20px after the text), the popover shadow; it rises 8px in 260ms after an 80ms delay. Touch shows no card: the link goes straight to its page. Every sales, partner and support button has it; a button inside a link does not. The page closer band ("Questions? Ask away", to `/support`) has the support card too, at the right edge of its text (`placement="top-end"`). The position is fixed (Floating UI, `src/components/ContactCard/contactCard.ts`): a parent with `overflow: hidden` does not cut the card, the card stays 16px inside the viewport, and it goes below the link when there is no space above.
+- **Contact card:** a button that reaches a person (`contact`: `sales`, `partners`, `support`) is a plain pill, with no photo. On hover and on keyboard focus, a card rises above it: the 40px portraits of the people who answer (the height of the two lines of text), their names and the role (muted), from the TeamMember records of the CMS (`src/components/ContactCard/contacts.ts`). Sales is Kasimir, the Partner Program is Matteo Papadopoulos, Support is Marcelo and Roger. The card is on the deep inverse surface of the footer (`--surface-inverse-deep`, with `surfaceInverse` for the text roles) on every ground, 8px radius, 12px of padding (20px after the text), no shadow; it rises 8px in 260ms after an 80ms delay. Touch shows no card: the link goes straight to its page. Every sales, partner and support button has it; a button inside a link does not. The page closer band ("Questions? Ask away", to `/support`) has the support card too, at the right edge of its text (`placement="top-end"`). The position is fixed (Floating UI, `src/components/ContactCard/contactCard.ts`): a parent with `overflow: hidden` does not cut the card, the card stays 16px inside the viewport, and it goes below the link when there is no space above.
 - **A button inside a link** (a preview that links): `<Button as="span">`, and the link sets the hover of the span with `--surface-button-hover` and `--text-button-hover`.
 - **A tint without a ground class** (an accent-subtle cell) is part of the page: its buttons take the page values.
 
@@ -444,6 +460,7 @@ There are few cards. Content sits in bands, cells and halves.
 - **Style:** no border at rest, Label above the control, padding 30px, square by default.
 - **Focus:** a 2px ring in the deep (`--border-strong`) drawn inside the field. Hover fills with the faint accent.
 - **Error / Disabled:** error text in `--text-negative`.
+- **Box:** the fields of a form sit in a FormBox (`src/components/FormBox`, Astro and React): a box with a 1px line in `--text-soft` and the medium radius, one row for each line of fields, the same line between the rows and between the cells of a row (a row is a stack below 768). The contact forms and the docs forms (Clone and Deploy buttons) use it; a React island takes `FormFieldReactComponent` and the control classes of `src/components/FormField/ReactComponent.tsx`.
 
 ### Navigation
 
@@ -520,7 +537,7 @@ Only a marketing hero types, and each marketing hero types (a reference page, an
 - **Don't** use grey. Every neutral is the deep of the theme at an alpha.
 - **Don't** dim text with `opacity` or `color-mix()`. The quiet text is `--text-muted`; the quiet run of a headline is `--text-headline-muted`.
 - **Don't** round a band, a cell or a half, or float a coloured box with margins inside the column.
-- **Don't** put light text on an accent: all six accents take the deep text.
+- **Don't** put light text on a bright accent: all six accents take the deep text. (In the dark scheme the accent band is deep and its text is light: `surfaceAccent` does it.)
 - **Don't** add a third font weight, a bold, a tracked uppercase text outside the mono caps role or a second typeface for display.
 - **Don't** use screenshots, stock photos or AI imagery where a scene, pixel art or a real customer photo can go.
 - **Don't** mix two accents of different themes inside one section.

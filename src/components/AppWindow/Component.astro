@@ -7,9 +7,14 @@ type Props = HTMLAttributes<'div'> & {
   address?: string;
   /** The name of the open file in the bar, as a tab: a code editor */
   file?: string;
+  /**
+   * The size of the bar. `m` (the default) for a large window; `s` for a
+   * small window (a thumbnail), where the bar of `m` is too heavy.
+   */
+  size?: 'm' | 's';
 };
 
-const { address, file, class: className, ...rest } = Astro.props;
+const { address, file, size = 'm', class: className, ...rest } = Astro.props;
 ---
 
 {
@@ -20,7 +25,7 @@ const { address, file, class: className, ...rest } = Astro.props;
   gives the window its place and its size.
 */
 }
-<div class:list={[styles.window, className]} {...rest}>
+<div class:list={[styles.window, size === 's' && styles.small, className]} {...rest}>
   <div class={styles.bar}>
     <span class={styles.lights}><span></span><span></span><span></span></span>
     {address && <span class:list={[styles.address, 'caption']}>{address}</span>}

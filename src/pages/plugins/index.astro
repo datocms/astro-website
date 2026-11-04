@@ -25,8 +25,13 @@ if (!page || popular.length === 0 || latest.length === 0 || collections.length =
   return notFoundResponse();
 }
 
+// The official group shows the official plugins that are not in the most
+// popular group. The count is of all the official plugins.
 const { official, officialMeta } = await executeQuery(Astro, officialPluginsQuery, {
-  variables: { authorIds: officialAuthors.map((author) => author.id) },
+  variables: {
+    authorIds: officialAuthors.map((author) => author.id),
+    excludedIds: popular.map((plugin) => plugin.id),
+  },
 });
 ---
 
@@ -94,7 +99,12 @@ const { official, officialMeta } = await executeQuery(Astro, officialPluginsQuer
     ))
   }
 
-  <Group title={groups.latest} flushTop={false}>
+  <Group
+    title={groups.latest}
+    href="/plugins/browse?sort=latest"
+    count={meta.count}
+    flushTop={false}
+  >
     <ul class={s.list}>
       {
         latest.map((item) => (

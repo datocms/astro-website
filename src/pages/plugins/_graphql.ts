@@ -38,6 +38,7 @@ export const query = graphql(
         orderBy: installs_DESC
         filter: { manuallyDeprecated: { eq: "false" } }
       ) {
+        id
         ...PluginCardFragment
       }
 
@@ -51,11 +52,15 @@ export const query = graphql(
 
 export const officialPluginsQuery = graphql(
   /* GraphQL */ `
-    query OfficialPlugins($authorIds: [ItemId]!) {
+    query OfficialPlugins($authorIds: [ItemId]!, $excludedIds: [ItemId]!) {
       official: allPlugins(
         first: 6
         orderBy: installs_DESC
-        filter: { author: { in: $authorIds }, manuallyDeprecated: { eq: "false" } }
+        filter: {
+          id: { notIn: $excludedIds }
+          author: { in: $authorIds }
+          manuallyDeprecated: { eq: "false" }
+        }
       ) {
         ...PluginCardFragment
       }

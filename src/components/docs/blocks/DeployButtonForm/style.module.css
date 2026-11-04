@@ -1,9 +1,10 @@
+.button {
+  display: inline-block;
+}
+
+/* The fields are in a FormBox (src/components/FormBox). */
 .form {
   font-family: var(--font-sans);
-  box-shadow: var(--shadow-popover);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background: var(--surface-accent-faint);
 }
 
 .result pre {
@@ -15,20 +16,27 @@
 .manifest {
   padding: var(--space-lg);
   background: var(--surface-accent-faint);
-  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  border-radius: var(--radius-md);
 }
 
+/* The environment variables: one line for each variable, in the field of the group. */
 .fieldArray {
-  padding: var(--paddingTop) var(--space-lg) var(--space-md);
-
   .fieldArrayItem {
-    margin-bottom: var(--space-2xs);
+    margin-bottom: var(--space-sm);
     display: flex;
     align-items: center;
+    gap: var(--space-md);
   }
 
   .fieldArrayItemField {
-    margin-right: var(--space-md);
+    min-width: 0;
+  }
+
+  /* A control of a line has a hairline under it: the lines of the box are for the fields. */
+  .fieldArrayItemField > input,
+  .fieldArrayItemField > div {
+    padding-bottom: var(--space-4xs);
+    border-bottom: 1px solid var(--text-soft);
   }
 
   .fieldArrayButton {
@@ -49,82 +57,5 @@
       /* stylelint-disable-next-line datocms/text-roles -- The hover state of a button: the text keeps the colour of its role. */
       opacity: 0.8;
     }
-  }
-
-  input {
-    border: 0;
-    margin: 0;
-    padding: var(--space-4xs) 0;
-    background-color: var(--surface-field);
-    font-size: var(--type-s);
-    display: block;
-    box-sizing: border-box;
-    width: 100%;
-    appearance: none;
-    box-shadow: none;
-    border-bottom: 1px solid var(--border-field);
-
-    &:focus {
-      outline: none;
-      border-bottom-color: var(--text-accent);
-    }
-
-    &::placeholder {
-      color: var(--text-muted);
-    }
-  }
-
-  select {
-    width: 100%;
-    background: transparent;
-    appearance: none;
-    box-shadow: none;
-    padding: var(--space-5xs) var(--space-2xs);
-    font-size: var(--type-s);
-    border: 1px solid var(--border-field);
-    border-radius: var(--radius-sm);
-  }
-}
-
-.field {
-  .selectPlaceholder {
-    position: absolute;
-    top: var(--paddingTop);
-    left: 32px;
-    right: 30px;
-    font-size: var(--type-m);
-    color: var(--text-muted);
-    pointer-events: none;
-  }
-
-  select,
-  input,
-  textarea {
-    border: 0;
-    margin: 0;
-    background-color: var(--surface-field);
-    padding: var(--paddingTop) var(--space-lg) var(--space-md);
-    font-family: inherit;
-    font-size: var(--type-m);
-    display: block;
-    box-sizing: border-box;
-    width: 100%;
-    border-left: 4px solid transparent;
-    appearance: none;
-    box-shadow: none;
-
-    &:focus {
-      outline: none;
-      border-left-color: var(--text-accent);
-    }
-
-    &::placeholder {
-      color: var(--text-muted);
-    }
-  }
-
-  textarea {
-    min-height: 150px;
-    max-height: 300px;
   }
 }

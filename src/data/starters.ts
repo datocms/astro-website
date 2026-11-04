@@ -26,10 +26,19 @@ export const techStarters = {
 };
 
 export const detail = {
-  start: 'Start free project!',
+  /** The button clones the project into the account of the visitor and deploys it. */
+  start: 'Clone this project for free',
+  tocTitle: 'In the README',
+  /** The byline of the README sheet: we write the README of each starter. */
+  readmeByline: 'Written by DatoCMS',
+  facts: {
+    technology: 'Technology',
+  },
   note: {
-    lead: 'Want to create your own starter project?',
-    body: 'Learn how to do that in our documentation!',
+    lead: 'Make your own project templates',
+    body: 'Start each new site from a setup you already trust. Turn a project into a template, then share a button that clones it and deploys its frontend in one click.',
+    /** One line: a label does not wrap. */
+    link: 'Read the docs',
     href: '/docs/general-concepts/project-starters-and-templates#generate-a-project-starter-button',
   },
 };

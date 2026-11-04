@@ -13,6 +13,13 @@
   border-radius: var(--radius-md);
 }
 
+/* The screenshot of a demo fills the window. */
+.window :global(:is(picture, img)) {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .visual :global(:is(picture, img)) {
   display: block;
   width: 100%;
@@ -32,6 +39,34 @@
   height: auto;
 }
 
+/*
+ * On phones a starter kit is a row: the logo in a small square, then the
+ * text. The four kits are a short list, not a gallery of tall tiles.
+ */
+@media (max-width: 767px) {
+  /* `:any-link` as on `.card`: the same specificity, and this rule comes later. */
+  .kit:any-link {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    column-gap: var(--space-sm);
+    row-gap: var(--space-3xs);
+    align-items: start;
+  }
+
+  .kit .visual {
+    grid-row: span 2;
+    aspect-ratio: 1;
+  }
+
+  .kit .visual :global(img) {
+    width: 60%;
+  }
+
+  .kit .footer {
+    grid-column: 2;
+  }
+}
+
 .text {
   display: flex;
   flex-direction: column;
@@ -48,7 +83,7 @@
 .technology {
   display: block;
   height: 24px;
-  margin-top: var(--space-2xs);
+  margin-top: var(--space-xs);
 }
 
 .footer {

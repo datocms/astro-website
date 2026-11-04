@@ -110,12 +110,15 @@ if (import.meta.env.DEV) {
 }
 
 const background = ({ page: 'default', accent: 'accent' } as const)[variant];
+// A picture next to the text (the slot `visual`): from 1152 the hero has
+// two columns, below 1152 the picture comes after the text.
+const hasVisual = Astro.slots.has('visual');
 ---
 
 <Section
   background={background}
   class:list={[styles.hero, alignment === 'center' && styles.center]}
-  contentClass={styles.content}
+  contentClass={[styles.content, hasVisual && styles.withVisual].filter(Boolean).join(' ')}
   data-hero
 >
   <TextTag class={styles.text}>
@@ -181,6 +184,13 @@ const background = ({ page: 'default', accent: 'accent' } as const)[variant];
       )
     }
   </TextTag>
+  {
+    hasVisual && (
+      <div class={styles.visual}>
+        <slot name="visual" />
+      </div>
+    )
+  }
   {logos && <LogosLine logos={logos} label={logosLabel} size="small" class={styles.logos} />}
   {
     members.length > 0 && (

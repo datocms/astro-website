@@ -4,8 +4,23 @@
  * The scope stops at the children of <prose-island>, as in Prose.
  */
 @scope (.extras) to (prose-island > *) {
-  :scope > * + * {
-    margin-top: var(--space-md);
+  /*
+   * The measure of the docs: 37.5 is approximately 75 characters of ABC
+   * Oracle. The size of the text (--type-m of the dense content) and the
+   * line height (1.5) come from Prose.
+   */
+  :scope {
+    --prose-measure: 37.5;
+  }
+
+  /*
+   * The rhythm of the docs. The text, the figures and the blocks have the
+   * space of Prose. A list stays near the paragraph that starts it (12).
+   * A heading has much more space above it than below it (12): 60 for h2
+   * and h3, 30 for h4 to h6. Thus the levels show in the space too.
+   */
+  :scope > p + :is(ul, ol) {
+    margin-top: var(--space-xs);
   }
 
   :is(h2, h3, h4, h5, h6) {
@@ -13,8 +28,12 @@
     text-wrap: balance;
   }
 
-  :scope > :is(h2, h3, h4, h5, h6) {
-    margin-top: var(--space-xl);
+  :scope > :is(h2, h3) {
+    margin-top: var(--space-2xl);
+  }
+
+  :scope > :is(h4, h5, h6) {
+    margin-top: var(--space-lg);
   }
 
   :scope > :is(h2, h3, h4, h5, h6) + * {
@@ -22,31 +41,28 @@
   }
 
   /*
-   * The headings take the roles of typography.css. The rules of Prose on
-   * the elements are in a higher layer than the role classes, thus the
-   * declarations of the roles are here.
-   * h2: the section role.
+   * The headings have the sizes and the line heights of Prose
+   * (--prose-h2-size and the other properties), as multiples of the text.
    */
   h2 {
-    font-size: var(--type-2xl);
+    font-size: var(--prose-h2-size);
     font-weight: 500;
-    line-height: 1.2;
+    line-height: var(--prose-h2-leading);
     letter-spacing: -0.03em;
   }
 
-  /* h3: the title role, with the line height of dense content. */
   h3 {
-    font-size: var(--type-xl);
+    font-size: var(--prose-h3-size);
     font-weight: 500;
-    line-height: 1.2;
+    line-height: var(--prose-h3-leading);
     letter-spacing: -0.02em;
   }
 
-  /* h4 to h6: the small heading step, one size above the text (as in Prose). */
+  /* h4 to h6: one step above the text, as in Prose. */
   :is(h4, h5, h6) {
-    font-size: var(--type-l);
+    font-size: var(--prose-h4-size);
     font-weight: 500;
-    line-height: 1.2;
+    line-height: var(--prose-h4-leading);
     letter-spacing: -0.02em;
   }
 
@@ -62,10 +78,10 @@
 
   /*
    * The note boxes of the Markdown (callouts). The box stops at the measure
-   * of the running text (32em, as Prose).
+   * of the running text (--prose-measure).
    */
   [data-callout-type] {
-    max-width: 32em;
+    max-width: calc(var(--prose-measure) * 1em);
     padding: var(--space-md);
     background: var(--surface-status-info);
     border-radius: var(--radius-md);
@@ -79,9 +95,16 @@
     color: var(--text-status-info);
   }
 
+  /*
+   * The text is one step smaller than the running text, with the line
+   * height and the space between the paragraphs of the running text.
+   */
   [data-callout-content] {
     font-size: var(--type-s);
-    line-height: 1.4;
+  }
+
+  [data-callout-content] > * + * {
+    margin-top: 0.7lh;
   }
 
   /*
@@ -187,5 +210,27 @@
 
   :is(figcaption, blockquote cite) {
     font-size: var(--type-s);
+  }
+
+  /*
+   * In the docs a quote is a note, not a pull quote: the text keeps its
+   * size, with a rule at its side and no quote marks.
+   */
+  blockquote {
+    padding-inline: var(--space-md);
+    color: inherit;
+    border-left: 2px solid var(--border-strong);
+    quotes: none;
+  }
+
+  blockquote p {
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+  }
+
+  blockquote p:first-of-type {
+    text-indent: 0;
   }
 }

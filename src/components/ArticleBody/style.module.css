@@ -1,50 +1,72 @@
 /*
+ * The section has no side padding and no max width: the content pads
+ * itself. From 1320 the article uses the full width of the viewport, and
+ * the table of contents is outside the column of the page.
+ *
+ * The column of the text has the width of the measure of Prose
+ * (--prose-measure, at the size of the text), thus the column has no
+ * width of its own. The text is the only item that sets the width of the
+ * column: the other items (the table of contents, the figures) take it.
+ *
  * --bleed: the distance that a figure or a block goes past each side of
- * the text. From 1152 there is space for it.
+ * the text. It is the free space at each side of the text, from 0 to
+ * --bleed-max (80). The content is the container, thus 100cqi is its
+ * width without the padding.
  */
 .content {
-  --bleed: 0px;
+  --bleed-max: 80px;
 
   display: grid;
-  grid-template-columns: minmax(0, var(--reading-max));
+  grid-template-columns: minmax(0, auto);
   gap: var(--space-xl);
   justify-content: center;
+  padding-inline: var(--section-padding-x);
+  container-type: inline-size;
+}
+
+.text {
+  --column-width: calc(var(--prose-measure) * var(--prose-size));
+  --bleed: clamp(0px, (100cqi - var(--column-width)) / 2, var(--bleed-max));
+
+  width: var(--column-width);
+  max-width: 100%;
 }
 
 /*
- * A figure (an image, a video, a table) and a block in a <prose-island>
- * are wider than the text. A block that is only a button has the
- * attribute data-text-width: it stays in line with the text.
+ * A figure (an image, a video, a code block) and a block in a
+ * <prose-island> are wider than the text. A block that is only a button
+ * has the attribute data-text-width: it stays in line with the text.
  */
 .text > :is(figure, prose-island:not([data-text-width])) {
   margin-inline: calc(-1 * var(--bleed));
 }
 
-@media (min-width: 1152px) {
-  .content {
-    --bleed: var(--space-2xl);
-  }
+/* The caption of a wide figure stays in line with the text. */
+.text > figure > figcaption {
+  padding-inline: var(--bleed);
 }
 
 /*
- * From 1320, the table of contents is in the column at the left of the
- * text. Its cell is as tall as the text, so that the table can stay in
- * view while the text scrolls. Each gap holds the bleed of the wide
- * blocks. The gap at the left also holds 80 between the wide blocks and
- * the table. The gap at the right is empty, thus it holds only 40. The
- * text is 20 to the right of the centre: the eye does not see it.
+ * From 1320, the text is in the centre of the viewport. The columns at
+ * each side of the text hold the bleed of the wide blocks. The table of
+ * contents is in the column at the left, in the middle between the edge
+ * of the viewport and the left edge of a wide figure. Its cell is as tall
+ * as the text, so that the table can stay in view while the text scrolls.
  */
 @media (min-width: 1320px) {
   .content {
     grid-template-columns:
-      minmax(0, 1fr) calc(var(--bleed) + var(--space-3xl)) minmax(0, var(--reading-max))
-      calc(var(--bleed) + var(--space-xl)) minmax(0, 1fr);
+      minmax(0, 1fr) var(--bleed-max) auto
+      var(--bleed-max) minmax(0, 1fr);
     column-gap: 0;
+    padding-inline: 0;
   }
 
   .toc {
     grid-column: 1;
     grid-row: 1;
+    justify-self: center;
+    width: min(200px, 100% - 2 * var(--space-md));
   }
 
   .text {
