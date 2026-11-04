@@ -176,7 +176,7 @@ export const support: ChapterLayoutData = {
     {
       // New copy.
       title: 'SLAs in your contract.',
-      text: 'A performance SLA with 99.99% uptime, and a support SLA that answers priority-one issues within an hour, around the clock.',
+      text: 'A performance SLA with 99.99% uptime, and a support SLA that answers priority-one issues within two hours, around the clock.',
     },
     {
       // New copy. The onboarding of the old page: technical and editorial.
@@ -213,7 +213,7 @@ export const faq: FaqData = {
     {
       question: 'How fast do you answer when something breaks?',
       answer:
-        'Priority-one issues are answered within an hour, around the clock. Your team also gets a shared Slack channel with ours.',
+        'Priority-one issues are answered within two hours, around the clock. Your team also gets a shared Slack channel with ours.',
     },
     {
       question: 'Can we test a change before it goes live?',

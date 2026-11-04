@@ -326,10 +326,10 @@ export const SLA = {
   label: `${GROUP_NAME} contract`,
   levels: [
     { name: 'Performance SLA', value: '99.99%', term: 'Uptime' },
-    { name: 'Support SLA', value: '1 hour', term: 'First answer to a priority-one issue, 24/7' },
+    { name: 'Support SLA', value: '2 hours', term: 'First answer to a priority-one issue, 24/7' },
   ],
   description:
-    'The service levels in the contract of Northwind Group: the performance SLA, 99.99% uptime; the support SLA, an answer to a priority-one issue in one hour, around the clock.',
+    'The service levels in the contract of Northwind Group: the performance SLA, 99.99% uptime; the support SLA, an answer to a priority-one issue in two hours, around the clock.',
 } as const;
 
 /**
