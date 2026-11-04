@@ -15,7 +15,7 @@
   border-left: 1px solid var(--border-default);
 }
 
-:global(:root[data-scheme='dark']) .plate {
+:global(:root[data-color-scheme='dark']) .plate {
   border-color: var(--surface-raised);
 }
 
@@ -65,5 +65,40 @@
 @keyframes failsafe {
   to {
     opacity: 1;
+  }
+}
+
+/*
+ * The spinner shows while the image loads, but only after a short time:
+ * an image that loads quickly develops with no spinner. It goes at the
+ * time of the failsafe, when the CSS shows the sharp image all the same.
+ * The ground under it is the white of the plate, in both schemes, thus
+ * the bars are the deep of the theme.
+ */
+.spinner {
+  --spinner-color: var(--surface-inverse);
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  visibility: hidden;
+}
+
+.plate[data-state='loading'] .spinner {
+  animation:
+    spinner-show 0s 300ms forwards,
+    spinner-hide 0s 2.2s forwards;
+}
+
+@keyframes spinner-show {
+  to {
+    visibility: visible;
+  }
+}
+
+@keyframes spinner-hide {
+  to {
+    visibility: hidden;
   }
 }

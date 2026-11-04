@@ -1,6 +1,6 @@
 /*
  * The color scheme of the site: light or dark. The scheme is the
- * attribute data-scheme on <html> (src/styles/tokens.css). The product
+ * attribute data-color-scheme on <html> (src/styles/tokens.css). The product
  * scenes follow data-product-scenes-scheme on <html> (the README of
  * @datocms/product-scenes). The inline script of
  * src/components/SchemeScript sets both before the first paint, with the
@@ -14,12 +14,12 @@ export const STORAGE_KEY = 'color-scheme';
 export const SYSTEM_DARK = '(prefers-color-scheme: dark)';
 
 export function currentColorScheme(): ColorScheme {
-  return document.documentElement.dataset.scheme === 'dark' ? 'dark' : 'light';
+  return document.documentElement.dataset.colorScheme === 'dark' ? 'dark' : 'light';
 }
 
 function applyColorScheme(scheme: ColorScheme) {
   const root = document.documentElement;
-  root.dataset.scheme = scheme;
+  root.dataset.colorScheme = scheme;
   root.dataset.productScenesScheme = scheme;
   root.dispatchEvent(new CustomEvent('colorschemechange', { detail: scheme }));
 }

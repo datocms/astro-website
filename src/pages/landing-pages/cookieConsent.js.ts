@@ -64,14 +64,23 @@ const cookieConsentScript = `
   \`;
 
   const css = \`
+  /* The modal has a light and a dark scheme. The scheme comes from
+     data-color-scheme on <html> (www.datocms.com and the dashboard). When
+     <html> has no data-color-scheme, the scheme comes from the OS. */
   .consent--cookiesWrapper {
+    --consent-backdrop: rgba(0, 0, 0, 0.5);
+    --consent-surface: #ffffff;
+    --consent-border: transparent;
+    --consent-ink: #1f2126;
+    --consent-ink-muted: #71788a;
+    color-scheme: light;
     position: fixed;
     z-index: 1000000;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--consent-backdrop);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,6 +88,26 @@ const cookieConsentScript = `
     animation-name: cookies-appear;
     animation-timing-function: ease-in;
     font-family: 'ABC Oracle', 'ABC Oracle Fallback HN', 'ABC Oracle Fallback Arial', 'ABC Oracle Fallback Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+
+  :root[data-color-scheme='dark'] .consent--cookiesWrapper {
+    --consent-backdrop: rgba(0, 0, 0, 0.65);
+    --consent-surface: #1e1f24;
+    --consent-border: rgba(255, 255, 255, 0.12);
+    --consent-ink: #ececef;
+    --consent-ink-muted: #a3a8b5;
+    color-scheme: dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-color-scheme]) .consent--cookiesWrapper {
+      --consent-backdrop: rgba(0, 0, 0, 0.65);
+      --consent-surface: #1e1f24;
+      --consent-border: rgba(255, 255, 255, 0.12);
+      --consent-ink: #ececef;
+      --consent-ink-muted: #a3a8b5;
+      color-scheme: dark;
+    }
   }
 
   @keyframes cookies-appear {
@@ -92,7 +121,9 @@ const cookieConsentScript = `
   }
 
   .consent--cookies {
-    background: white;
+    background: var(--consent-surface);
+    border: 1px solid var(--consent-border);
+    color: var(--consent-ink);
     border-radius: 10px;
     padding: 30px;
     max-width: 550px;
@@ -123,7 +154,7 @@ const cookieConsentScript = `
     display: inline-block;
     padding: 0.5em 1em;
     font-family: inherit;
-    color: #71788a;
+    color: var(--consent-ink-muted);
     border-radius: 3px;
     font-size: var(--type-s, 0.875rem);
     font-weight: 400;

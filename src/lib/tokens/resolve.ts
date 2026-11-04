@@ -4,7 +4,7 @@
  * not copy its values.
  *
  * The model is a path of elements, as in the page:
- *   <html data-scheme>  >  <section data-theme>  >  <div class="surface…">
+ *   <html data-color-scheme>  >  <section data-theme>  >  <div class="surface…">
  * A rule applies to the element that its last compound selector matches,
  * when its other compounds match ancestors. A custom property inherits down
  * the path, and a `var()` in a value resolves on the element that declares
@@ -83,7 +83,7 @@ function matchesCompound(compound: Compound, element: PathElement): boolean {
     if (attr.name === 'data-theme') {
       if (!element.theme) return false;
       if (attr.value !== undefined && attr.value !== element.theme) return false;
-    } else if (attr.name === 'data-scheme') {
+    } else if (attr.name === 'data-color-scheme') {
       if (element.scheme !== attr.value) return false;
     } else {
       return false;
