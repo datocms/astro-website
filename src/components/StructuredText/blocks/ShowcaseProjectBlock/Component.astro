@@ -1,7 +1,7 @@
 ---
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { CardCarousel } from '~/components/CardCarousel';
-import { CarouselCard } from '~/components/CarouselCard';
+import { CarouselCard, carouselCardImageSizes } from '~/components/CarouselCard';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
@@ -30,7 +30,11 @@ function truncate(text: string, length = 200) {
           logo={project.partner.logo ?? undefined}
         >
           {project.mainImage.responsiveImage && (
-            <ResponsiveImage slot="image" data={project.mainImage.responsiveImage} />
+            <ResponsiveImage
+              slot="image"
+              data={project.mainImage.responsiveImage}
+              sizes={carouselCardImageSizes}
+            />
           )}
           {truncate(toPlainText(project.headline) ?? '')}
         </CarouselCard>

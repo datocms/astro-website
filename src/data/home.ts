@@ -339,7 +339,7 @@ export const postQuery = /* GraphQL */ \`
       cover {
         # Every size, plus a blurred preview
         responsiveImage(imgixParams: { w: 1200 }) {
-          src srcSet sizes width height
+          src srcSet width height
           alt base64
         }
       }

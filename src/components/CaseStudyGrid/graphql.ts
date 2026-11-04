@@ -20,7 +20,10 @@ export const CaseStudyGridStoryFragment = graphql(
         height
       }
       coverImage {
-        url(imgixParams: { auto: format, w: 1120, h: 770, fit: crop })
+        responsiveImage(imgixParams: { auto: format, w: 560, h: 385, fit: crop }) {
+          src
+          srcSet
+        }
         alt
       }
       ...SuccessStoryUrlFragment

@@ -8,7 +8,18 @@ interface Props extends Omit<ComponentProps<typeof Image>, 'data'> {
   data: FragmentOf<typeof ResponsiveImageFragment>;
 }
 
-const { data, ...rest } = Astro.props;
+const { data, sizes, ...rest } = Astro.props;
+const image = readFragment(ResponsiveImageFragment, data);
+
+/*
+ * A lazy image gets `sizes="auto"`: the browser takes the source for the
+ * width of the image on the screen. A browser with no `auto` (Safari)
+ * takes the next value. The default next value is the width of the query
+ * (`imgixParams: { w }`), not 100vw: the query asks for the largest width
+ * that the layout shows, and the srcset goes up to 4 times that width. A
+ * component that knows its width better gives `sizes="auto, …"`.
+ */
+const fallback = `(max-width: ${image.width}px) 100vw, ${image.width}px`;
 ---
 
-<Image {...rest} data={readFragment(ResponsiveImageFragment, data)} />
+<Image {...rest} data={image} sizes={sizes ?? `auto, ${fallback}`} />

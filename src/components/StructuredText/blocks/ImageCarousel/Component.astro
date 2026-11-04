@@ -10,6 +10,16 @@ interface Props {
 }
 
 const { carouselHeight, gallery } = readFragment(ImageCarouselFragment, Astro.props.block);
+
+/*
+ * The width of an image on the screen. The height is `carouselHeight`, or
+ * 60vw when the screen is narrow, thus the width follows the ratio. The
+ * image has `width: auto`: `sizes="auto"` cannot measure it before it loads.
+ */
+function carouselSizes(ratio: number) {
+  const narrow = Math.round(carouselHeight / 0.6);
+  return `(max-width: ${narrow}px) ${Math.round(60 * ratio)}vw, ${Math.round(carouselHeight * ratio)}px`;
+}
 ---
 
 {
@@ -35,7 +45,7 @@ const { carouselHeight, gallery } = readFragment(ImageCarouselFragment, Astro.pr
                   }}
                   sizes={
                     asset.width && asset.height
-                      ? `${Math.round((carouselHeight * asset.width) / asset.height)}px`
+                      ? carouselSizes(asset.width / asset.height)
                       : undefined
                   }
                 />

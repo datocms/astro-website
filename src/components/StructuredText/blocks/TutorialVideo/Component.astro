@@ -1,6 +1,6 @@
 ---
 import { CardCarousel } from '~/components/CardCarousel';
-import { CarouselCard } from '~/components/CarouselCard';
+import { CarouselCard, carouselCardImageSizes } from '~/components/CarouselCard';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
@@ -70,7 +70,11 @@ const { videoTutorialsOrUserGuidesEpisodes: items } = readFragment(
             return (
               <CarouselCard href={resource.url} title={item.title} external>
                 {resource.coverImage?.responsiveImage && (
-                  <ResponsiveImage slot="image" data={resource.coverImage.responsiveImage} />
+                  <ResponsiveImage
+                    slot="image"
+                    data={resource.coverImage.responsiveImage}
+                    sizes={carouselCardImageSizes}
+                  />
                 )}
                 Play video
               </CarouselCard>

@@ -45,6 +45,16 @@ const titleWords = cleanTitle.trim().split(/\s+/);
 const lastWord = titleWords.pop();
 const firstWords = titleWords.length > 0 ? `${titleWords.join(' ')} ` : '';
 
+/*
+ * The width of the cover on the screen, for a browser with no
+ * `sizes="auto"` (Safari): 96px in a row, at most 360px in a card.
+ */
+const sizes = {
+  horizontal: 'auto, 96px',
+  responsive: 'auto, (min-width: 768px) 360px, 96px',
+  vertical: 'auto, (min-width: 768px) 360px, 100vw',
+};
+
 // The search results come from Algolia. A result can have no install count.
 const installs = showInstalls && typeof plugin.installs === 'number' ? plugin.installs : undefined;
 ---
@@ -60,10 +70,7 @@ const installs = showInstalls && typeof plugin.installs === 'number' ? plugin.in
   <span class={styles.image}>
     {
       plugin.coverImage ? (
-        <ResponsiveImage
-          data={plugin.coverImage.responsiveImage}
-          sizes="(min-width: 768px) 300px, 100vw"
-        />
+        <ResponsiveImage data={plugin.coverImage.responsiveImage} sizes={sizes[orientation]} />
       ) : (
         <span
           class:list={[styles.nameCover, 'surfaceAccent']}

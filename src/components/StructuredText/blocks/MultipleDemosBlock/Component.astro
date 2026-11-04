@@ -1,6 +1,6 @@
 ---
 import { CardCarousel } from '~/components/CardCarousel';
-import { CarouselCard } from '~/components/CarouselCard';
+import { CarouselCard, carouselCardImageSizes } from '~/components/CarouselCard';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
@@ -23,7 +23,11 @@ const { demos } = readFragment(MultipleDemosBlockFragment, Astro.props.block);
           label={demo.badge ? `${demo.badge.emoji} ${demo.badge.name}` : (demo.label ?? undefined)}
         >
           {demo.screenshot.responsiveImage && (
-            <ResponsiveImage slot="image" data={demo.screenshot.responsiveImage} />
+            <ResponsiveImage
+              slot="image"
+              data={demo.screenshot.responsiveImage}
+              sizes={carouselCardImageSizes}
+            />
           )}
           Try this demo
         </CarouselCard>

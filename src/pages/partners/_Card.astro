@@ -18,9 +18,14 @@ interface Props {
    * 3:2 and the image fills it (a cover crop).
    */
   natural?: boolean;
+  /**
+   * The width of the image on the screen, for a browser with no
+   * `sizes="auto"` (Safari). The grid of the caller knows it.
+   */
+  sizes?: string;
 }
 
-const { href, title, image, logo, natural = false } = Astro.props;
+const { href, title, image, logo, natural = false, sizes } = Astro.props;
 
 const imageData = image ? readFragment(ResponsiveImageFragment, image) : null;
 const ratio =
@@ -31,7 +36,7 @@ const ratio =
 
 <a href={href} class={s.card}>
   <span class={s.image} style={ratio ? { aspectRatio: ratio } : undefined}>
-    {image && <ResponsiveImage data={image} />}
+    {image && <ResponsiveImage data={image} sizes={sizes} />}
   </span>
   <span class={s.text}>
     <span class:list={[s.title, 'bodyMedium']}>{title}</span>

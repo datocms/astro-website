@@ -161,7 +161,7 @@ export const images: ChapterLayoutData = {
   fragments: [
     {
       title: 'Responsive images in one query.',
-      text: 'Query for the responsive image in GraphQL, and get the sizes, the srcset, and a blurred placeholder in one object.',
+      text: 'Query for the responsive image in GraphQL, and get the srcset, the dimensions, and a blurred placeholder in one object.',
       code: [responsiveQuery, responsiveResponse],
     },
     {

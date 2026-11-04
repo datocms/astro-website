@@ -58,22 +58,21 @@ export const assetResponse: CodeTab = {
 
 // Fragment "Responsive in one field." (Images API). The imgix parameters
 // are the ones of the hero (1600 × 900, cropped); `srcSet` is the strong
-// token, in the query and in the response. The `sizes` argument comes back
-// as it was sent. The URLs and the placeholder are cut with "…".
+// token, in the query and in the response. The query does not ask for
+// `sizes`: the Image components of the SDKs make it automatic
+// (`sizes="auto"`). The URLs and the placeholder are cut with "…".
 export const responsiveQuery: CodeTab = {
   label: 'Query',
   lang: 'graphql',
-  focus: [9],
+  focus: [8],
   code: `query {
   exhibition {
     cover {
       responsiveImage(
         imgixParams: { w: 1600, h: 900, fit: crop }
-        sizes: "(max-width: 800px) 100vw, 800px"
       ) {
         src
         srcSet
-        sizes
         width
         height
         base64
@@ -94,7 +93,6 @@ export const responsiveResponse: CodeTab = {
       "responsiveImage": {
         "src": "…/1741000000-tide-line-detail.jpg?…",
         "srcSet": "…w=400 400w, …w=800 800w, …w=1600 1600w",
-        "sizes": "(max-width: 800px) 100vw, 800px",
         "width": 1600,
         "height": 900,
         "base64": "data:image/jpeg;base64,/9j/4AAQ…",

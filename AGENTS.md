@@ -23,6 +23,22 @@ Each client `<script>` (not `is:inline`) is a custom element that extends `WebCo
 - A custom element is `display: inline` by default. Set its `display` in the CSS. When the root must be a semantic element (`<form>`, `<nav>`, `<button>`, `<table>`), put the custom element around it.
 - Keep a plain script only when no element owns the behaviour, for example analytics or cookie consent.
 
+## Images from DatoCMS
+
+The browser must download a file that has the width of the image on the screen, not more. `@datocms/astro` gives a lazy image `sizes="auto"`: Chrome and Firefox then measure the image. Safari has no `auto` and uses the next value of `sizes`. Thus each `sizes` starts with `auto` and continues with a real width for Safari, never with `100vw` alone.
+
+- Show a raster image of the CMS with `ResponsiveImage` (`src/components/ResponsiveImage`) and `ResponsiveImageFragment`. Use a plain `<img src={asset.url}>` only for an SVG, or for a URL with a fixed imgix width at a fixed size on the screen (an avatar: `url(imgixParams: { w: 80, h: 80 })`).
+- Do not ask for `sizes` in a `responsiveImage` query: not the field, not the `sizes:` argument. A `sizes` from the query wins over `auto`.
+- Set `imgixParams.w` to the largest CSS width at which the layout shows the image. Do not double it for retina screens: the srcset goes from 0.25 to 4 times `w`.
+- Without a `sizes` prop, `ResponsiveImage` gives `auto, (max-width: Wpx) 100vw, Wpx`, with W the width of the query. This is correct when `w` is the largest width on the screen.
+- When the image is much smaller than `w`, or its width changes with the breakpoints (a card in a grid, a row, a carousel), give `sizes="auto, <widths>"`. Measure the widths in the browser at 390, 800, 1200 and 1440px, and use the breakpoints of the layout (768, 1152). Examples: `PluginCard` (`auto, 96px` for a row), `carouselCardImageSizes` in `src/components/CarouselCard/index.ts` (each image in the `image` slot of a `CarouselCard`), the `sizes` prop of `src/pages/partners/_Card.astro`.
+- Leave out `auto` only when the box of the image is not the width that the file needs:
+  - The image has `width: auto` (`ImageCarousel`): the browser cannot measure it before it loads. Calculate the width from the height and the ratio.
+  - The image covers a box of a different shape (`object-fit: cover`): the file must be wider than the box. Give the width of the cover crop (`TextWithImage`, `CaseStudyGrid`).
+  - The size is fixed: give it in px (`sizes="48px"` for an avatar).
+- To check, open the page in a new `agent-browser` session. Chrome uses a larger file from its cache, thus an old session can show wrong results. For each image, compare the width on the screen with the file of `currentSrc` (`w` times `dpr`). The `srcset` and the `sizes` are on the `<source>` of the `<picture>`, not on the `<img>`.
+- In the copy and the code samples, do not ask for `sizes` in a query. When the copy speaks of `sizes`, it says that they are automatic. Text about `srcSet` is correct.
+
 ## Dev servers, checks and worktrees
 
 Many agents can work on this repo at the same time. Each agent must use its own port and its own processes.

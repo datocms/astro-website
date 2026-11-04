@@ -177,7 +177,7 @@ export function mediaChapter(args: {
     fragments: [
       {
         title: 'Pass the query result as one prop.',
-        text: 'The component reads `src`, `srcSet`, `sizes` and the base64 placeholder from the API, and the browser picks the right file for its width.',
+        text: 'The component reads `src`, `srcSet` and the base64 placeholder from the API. The `sizes` are automatic: the browser picks the right file for the width of the image on the screen.',
         code: args.image,
       },
       {

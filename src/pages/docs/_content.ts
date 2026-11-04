@@ -86,7 +86,7 @@ curl https://www.datocms-assets.com/12345/hero.jpg \\
     responsiveImage(imgixParams: {
       w: 400, h: 400, fit: crop
     }) {
-      src srcSet sizes width height alt blurUpThumb
+      src srcSet width height alt blurUpThumb
     }
   }
 }`,

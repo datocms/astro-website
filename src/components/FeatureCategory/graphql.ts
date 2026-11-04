@@ -21,7 +21,7 @@ export const FeatureCategoryEntryFragment = graphql(
         value
       }
       image {
-        responsiveImage(imgixParams: { w: 900 }, sizes: "(min-width: 768px) 440px, 100vw") {
+        responsiveImage(imgixParams: { w: 900 }) {
           ...ResponsiveImageFragment
         }
       }

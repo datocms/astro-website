@@ -19,6 +19,14 @@ interface Props {
 
 const { theme } = Astro.props;
 const stories = Astro.props.stories.map((story) => readFragment(CaseStudyGridStoryFragment, story));
+
+/*
+ * The cover fills the box of the card (a cover crop). The box is square
+ * below 1152 and 385 high from 1152, thus the photo (560 × 385) is wider
+ * than the box: 1.45 times its height.
+ */
+const coverSizes =
+  '(min-width: 1152px) 560px, (min-width: 768px) 440px, calc((100vw - 60px) * 1.45)';
 ---
 
 <Section theme={theme}>
@@ -28,7 +36,12 @@ const stories = Astro.props.stories.map((story) => readFragment(CaseStudyGridSto
         <li>
           <MediaCard
             href={buildUrlForSuccessStory(story)}
-            image={{ src: story.coverImage.url, alt: story.coverImage.alt ?? '' }}
+            image={{
+              src: story.coverImage.responsiveImage.src,
+              srcSet: story.coverImage.responsiveImage.srcSet,
+              sizes: coverSizes,
+              alt: story.coverImage.alt ?? '',
+            }}
           >
             <Fragment slot="title">
               {story.title ? <PlainText data={story.title} /> : story.name}

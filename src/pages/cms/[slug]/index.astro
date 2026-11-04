@@ -3,7 +3,7 @@
 // copy comes from src/data/cms-<framework>.ts. Only the sites of the
 // carousel and the review of the quote come from the CMS.
 import { CardCarousel } from '~/components/CardCarousel';
-import { CarouselCard } from '~/components/CarouselCard';
+import { CarouselCard, carouselCardImageSizes } from '~/components/CarouselCard';
 import { CategoryNav } from '~/components/CategoryNav';
 import { ChapterHeader } from '~/components/ChapterHeader';
 import { ChapterLayout } from '~/components/ChapterLayout';
@@ -153,7 +153,11 @@ const seo = overrideSeo([], seoTitle(fw.seo.title), seoDescription(fw.seo.descri
             {sites.map((site) => (
               <CarouselCard href={site.url} title={site.title.trim()} external>
                 {site.image?.responsiveImage && (
-                  <ResponsiveImage slot="image" data={site.image.responsiveImage} />
+                  <ResponsiveImage
+                    slot="image"
+                    data={site.image.responsiveImage}
+                    sizes={carouselCardImageSizes}
+                  />
                 )}
                 {host(site.url)}
               </CarouselCard>

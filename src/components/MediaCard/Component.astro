@@ -3,8 +3,11 @@ import styles from './style.module.css';
 
 interface Props {
   href: string;
-  /** Without an image, the card shows an empty box of the same size. */
-  image?: { src: string; alt: string };
+  /**
+   * Without an image, the card shows an empty box of the same size. With
+   * `srcSet`, give `sizes` too: the width of the image on the screen.
+   */
+  image?: { src: string; alt: string; srcSet?: string; sizes?: string };
   /**
    * The shape of the image box. 'caseStudy' (the default) is
    * square below 1152, 385 high from 1152. 'cover' is 5:3 at all
@@ -28,6 +31,8 @@ const imageClass = imageShape === 'cover' ? `${styles.image} ${styles.cover}` : 
       <img
         class={imageClass}
         src={image.src}
+        srcset={image.srcSet}
+        sizes={image.sizes}
         alt={image.alt}
         width="560"
         height={imageShape === 'cover' ? '336' : '385'}
