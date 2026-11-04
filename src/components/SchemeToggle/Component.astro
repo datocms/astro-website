@@ -1,14 +1,20 @@
 ---
 import { faMoon, faSun } from '@fortawesome/pro-regular-svg-icons';
 import { Icon } from '~/components/Icon';
+import { Tooltip } from '~/components/Tooltip';
 import s from './style.module.css';
 ---
 
 <scheme-toggle class={s.root}>
-  <button type="button" class={s.toggle} aria-label="Dark mode" aria-pressed="false">
-    <Icon icon={faMoon} class={s.moon} />
-    <Icon icon={faSun} class={s.sun} />
-  </button>
+  <Tooltip>
+    <button type="button" class={s.toggle} aria-label="Dark mode" aria-pressed="false">
+      <Icon icon={faMoon} class={s.moon} />
+      <Icon icon={faSun} class={s.sun} />
+    </button>
+    <Fragment slot="tooltip"
+      ><span class={s.moon}>Dark mode</span><span class={s.sun}>Light mode</span></Fragment
+    >
+  </Tooltip>
 </scheme-toggle>
 
 <script>

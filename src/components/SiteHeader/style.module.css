@@ -46,7 +46,7 @@
   position: relative;
   display: none;
   flex: 1;
-  margin-inline: calc(var(--space-xl) - var(--space-sm)) var(--space-md);
+  margin-inline: calc(var(--space-xl) - var(--space-xs)) var(--space-md);
 }
 
 .navList {
@@ -68,7 +68,7 @@
   align-items: center;
   gap: var(--space-3xs);
   height: 40px;
-  padding-inline: var(--space-sm);
+  padding-inline: var(--space-xs);
   border-radius: var(--radius-full);
   color: inherit;
   white-space: nowrap;
@@ -125,7 +125,6 @@
 }
 
 .search,
-.scheme,
 .dots {
   display: inline-flex;
   align-items: center;
@@ -140,19 +139,18 @@
 }
 
 .search :global(svg),
-.scheme :global(svg),
 .dots :global(svg) {
   width: 16px;
   height: 16px;
 }
 
 .search,
-.login {
+.contact {
   display: none;
 }
 
-/* The login has the 40px hit area of the other controls of the bar. */
-.login {
+/* The text links have the 40px hit area of the other controls of the bar. */
+.contact {
   align-items: center;
   height: 40px;
   white-space: nowrap;
@@ -163,7 +161,7 @@
     background: var(--surface-inverse-faint);
   }
 
-  .login:hover {
+  .contact:hover {
     text-decoration: underline;
     text-underline-offset: 0.15em;
   }
@@ -380,11 +378,11 @@
 
 @media (min-width: 768px) {
   .search,
-  .login {
+  .contact {
     display: inline-flex;
   }
 
-  /* The search and the login of the menu: the bar shows them from 768. */
+  /* The search and the text links of the menu: the bar shows them from 768. */
   .mobileOnly {
     display: none;
   }
@@ -399,24 +397,15 @@
     margin-inline-end: 0;
   }
 
-  /* The bar has no room for the login until 1320: the CTA leads to it. */
+  /* The bar has no room for the text links until 1320. */
   .dots,
-  .login {
+  .contact {
     display: none;
   }
 }
 
 @media (min-width: 1320px) {
-  .login {
+  .contact {
     display: inline-flex;
   }
-}
-
-/*
- * The scheme toggle shows the scheme that a click selects: the moon on
- * a light page, the sun on a dark page.
- */
-:global(:root[data-scheme='dark']) .schemeMoon,
-:global(:root:not([data-scheme='dark'])) .schemeSun {
-  display: none;
 }

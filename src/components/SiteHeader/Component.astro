@@ -4,9 +4,7 @@ import {
   faEllipsisVertical,
   faMagnifyingGlass,
   faMinus,
-  faMoon,
   faPlus,
-  faSun,
 } from '@fortawesome/pro-regular-svg-icons';
 import { Button } from '~/components/Button';
 import { DatoLogo } from '~/components/DatoLogo';
@@ -159,21 +157,19 @@ const cardId = (i: number) => `site-header-card-${i}`;
         >
           <Icon icon={faMagnifyingGlass} />
         </button>
-        <button
-          type="button"
-          class={styles.scheme}
-          aria-label="Dark mode"
-          aria-pressed="false"
-          data-scheme-toggle
+        <a href="/contact" class:list={[styles.contact, 'labelMedium']}
+          ><span class="capTrim">Contact sales</span></a
         >
-          <Icon icon={faMoon} class={styles.schemeMoon} />
-          <Icon icon={faSun} class={styles.schemeSun} />
-        </button>
-        <a href={dashboardUrl('/login')} class:list={[styles.login, 'labelMedium']}
+        <a href={dashboardUrl('/login')} class:list={[styles.contact, 'labelMedium']} data-login
           ><span class="capTrim">Login</span></a
         >
-        <Button variant={ctaVariant} href={dashboardUrl('/signup')} arrow={false}
-          >Get Started</Button
+        {/* The script changes the CTA to the dashboard when the visitor has an account. */}
+        <Button
+          variant={ctaVariant}
+          href={dashboardUrl('/signup')}
+          arrow={false}
+          attrs={{ 'data-cta': '', 'data-dashboard-href': dashboardUrl() }}
+          ><span data-cta-label>Get Started</span></Button
         >
         <button
           type="button"
@@ -271,6 +267,11 @@ const cardId = (i: number) => `site-header-card-${i}`;
           </button>
         </li>
         <li class:list={[styles.mobileItem, styles.mobileOnly]}>
+          <a href="/contact" class:list={[styles.mobileSummary, styles.mobileLink, 'headline']}
+            >Contact sales</a
+          >
+        </li>
+        <li class:list={[styles.mobileItem, styles.mobileOnly]} data-login>
           <a
             href={dashboardUrl('/login')}
             class:list={[styles.mobileSummary, styles.mobileLink, 'headline']}>Login</a
@@ -282,7 +283,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
 </site-header>
 
 <script>
-  import { chooseColorScheme, currentColorScheme } from '~/lib/colorScheme';
+  import { getCookie } from '~/lib/cookies';
   import { WebComponent } from '~/lib/WebComponent';
 
   const DESKTOP = window.matchMedia('(min-width: 1152px)');
@@ -309,7 +310,6 @@ const cardId = (i: number) => `site-header-card-${i}`;
       items!: HTMLElement[];
       mobileTrigger!: HTMLButtonElement;
       mobilePanel!: HTMLElement;
-      schemeToggle!: HTMLButtonElement;
       // The close in progress. A new open cancels it.
       closing: Animation | null = null;
 
@@ -319,7 +319,16 @@ const cardId = (i: number) => `site-header-card-${i}`;
         this.items = this.$$('[data-nav-item]');
         this.mobileTrigger = this.$<HTMLButtonElement>('[data-mobile-trigger]');
         this.mobilePanel = this.$('[data-mobile-panel]');
-        this.schemeToggle = this.$<HTMLButtonElement>('[data-scheme-toggle]');
+
+        // The dashboard sets this cookie at login. A visitor with an
+        // account goes to the dashboard, not to the signup. The CTA then
+        // leads to the login, thus the login links go.
+        if (getCookie('datoAccountEmail')) {
+          const cta = this.$<HTMLAnchorElement>('[data-cta]');
+          cta.href = cta.dataset.dashboardHref!;
+          this.$('[data-cta-label]').textContent = 'Dashboard';
+          for (const login of this.$$('[data-login]')) login.remove();
+        }
 
         // The pill follows the cursor and the focus. When they leave the
         // row, it rests on the open item or on the item of the page.
@@ -404,15 +413,9 @@ const cardId = (i: number) => `site-header-card-${i}`;
           this.setMobile(this.mobileTrigger.getAttribute('aria-expanded') !== 'true');
         });
 
-        // The switch shows the scheme of the page, also after a change of the system.
-        this.on(this.schemeToggle, 'click', () => {
-          chooseColorScheme(currentColorScheme() === 'dark' ? 'light' : 'dark');
-        });
-
         // These listeners are on <html> and on the media query.
         // disconnectedCallback() removes them.
         const root = document.documentElement;
-        this.on(root, 'colorschemechange', () => this.showScheme());
         this.on(root, 'click', (event) => {
           if (!this.contains(event.target as Node)) this.closeCard();
         });
@@ -436,8 +439,6 @@ const cardId = (i: number) => `site-header-card-${i}`;
         this.eventListenerRemovers.push(() =>
           DESKTOP.removeEventListener('change', onDesktopChange),
         );
-
-        this.showScheme();
       }
 
       point(item: HTMLElement | null) {
@@ -584,10 +585,6 @@ const cardId = (i: number) => `site-header-card-${i}`;
         if (open) window.scrollTo({ top: 0, behavior: 'instant' });
         document.documentElement.style.overflow = open ? 'hidden' : '';
         if (!open && returnFocus) this.mobileTrigger.focus();
-      }
-
-      showScheme() {
-        this.schemeToggle.setAttribute('aria-pressed', String(currentColorScheme() === 'dark'));
       }
     },
   );
