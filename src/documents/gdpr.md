@@ -96,7 +96,7 @@ as few information as possible:
 - URL visited
 - limited user interaction (e.g. form submission)
 
-[Google GDPR Compliance]()
+[Google GDPR Compliance](<>)
 
 ### Google workspace
 
