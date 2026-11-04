@@ -5,7 +5,6 @@
 // the partner, the services and the technologies.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { Breadcrumb } from '~/components/Breadcrumb';
-import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Fact, Facts } from '~/components/Facts';
 import { Hero } from '~/components/Hero';
@@ -49,21 +48,21 @@ const galleries = [
   seo={overrideSeo(page._seoMetaTags, seoOgType('website'))}
   headerVariant="page"
 >
-  <Hero variant="page" label={project.kicker} headline={page.name}>
-    <div slot="intro">
+  <Hero
+    variant="page"
+    label={project.kicker}
+    headline={page.name}
+    buttons={page.projectUrl
+      ? [{ label: project.visitProject, href: page.projectUrl, newTab: true }]
+      : undefined}
+  >
+    <Fragment slot="intro">
       <StructuredText {...ensureValidStructuredTextProps({ data: page.headline })} />
       <p class:list={[s.madeBy, 'body']}>
         {project.madeBy}{' '}
         <a href={partnerUrl}>{page.partner.name}</a>
       </p>
-      {
-        page.projectUrl && (
-          <Button href={page.projectUrl} attrs={{ target: '_blank' }}>
-            {project.visitProject}
-          </Button>
-        )
-      }
-    </div>
+    </Fragment>
   </Hero>
   <Breadcrumb
     trail={[indexes.partners, { label: page.partner.name, href: partnerUrl }]}

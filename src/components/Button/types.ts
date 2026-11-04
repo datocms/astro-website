@@ -32,6 +32,8 @@ export interface ButtonData {
   arrow?: boolean;
   logos?: FrameworkLogo[];
   contact?: ContactPoint;
+  /** Opens the link in a new tab: for a site that is not datocms.com. */
+  newTab?: boolean;
   /** Overrides the theme of the section. */
   theme?: Theme;
 }
