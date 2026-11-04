@@ -36,8 +36,10 @@
   text-decoration: none;
   color: inherit;
 
+  /* The card of the snippet in the preview has the accent border. */
   &:hover,
-  &:focus-visible {
+  &:focus-visible,
+  &[aria-current='true'] {
     border-color: var(--surface-accent);
   }
 }
@@ -67,19 +69,24 @@
 }
 
 .pkg {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  align-self: flex-start;
+  /* The package name is at the bottom of the card. */
+  margin-top: auto;
+  font-family: var(--font-mono);
   font-size: var(--type-xs);
   color: var(--text-muted);
-  background: var(--surface-accent-faint);
-  padding: var(--space-5xs) var(--space-4xs);
-  border-radius: var(--radius-sm);
-  align-self: flex-start;
-  border: 1px solid var(--border-default);
-  margin-top: var(--space-5xs);
-  font-family: var(--font-mono);
 }
 
-/* The global class monoCaps gives the type. */
+.pkgIcon {
+  flex: none;
+}
+
+/* The global class monoCaps gives the type, one size smaller. */
 .protocol {
+  font-size: var(--type-2xs);
   background: var(--surface-accent-faint);
   color: var(--text-accent);
   padding: 1.5px var(--space-4xs);
@@ -97,6 +104,7 @@
   font-family: var(--font-mono);
   font-size: var(--type-xs);
   min-height: 240px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 
@@ -125,23 +133,35 @@
 .previewName {
   font-size: var(--type-s);
   color: var(--text-on-inverse-strong);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .previewEndpoint {
   font-size: var(--type-s);
   color: var(--code-punctuation);
   margin-left: auto;
+  flex: none;
 }
 
 .previewCodes {
   flex: 1;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .previewCode {
   grid-area: 1 / 1;
   min-width: 0;
   display: flex;
+
+  /* Long lines scroll inside the code, in the width of the preview. */
+  > * {
+    flex: 1;
+    min-width: 0;
+  }
 
   &[hidden] {
     display: flex;
@@ -163,9 +183,81 @@
     color: var(--code-function);
     text-decoration: none;
     margin-left: auto;
+    flex: none;
 
     &:hover {
       text-decoration: underline;
     }
+  }
+}
+
+/* A touch screen has no hover, thus the hint does not show. */
+.previewHint {
+  @media (hover: none) {
+    display: none;
+  }
+}
+
+/*
+ * The pixel ornament of a card, above the title (glyphs.ts). The current
+ * card shows the ornament with its dark heart. On hover and on keyboard
+ * focus, a ripple goes out from the heart again and again.
+ */
+.glyph {
+  --glyph-cell: 3px;
+  --glyph-gap: 1px;
+  /* Tones 0 to 2 are the tints of the pixel field of the hero (docsField). */
+  --glyph-tone-0: color-mix(in oklab, var(--surface-accent) 16%, var(--surface-default));
+  --glyph-tone-1: color-mix(in oklab, var(--surface-accent) 42%, var(--surface-default));
+  --glyph-tone-2: var(--surface-accent);
+  --glyph-tone-3: var(--text-accent);
+
+  display: grid;
+  grid-template-columns: repeat(var(--glyph-cols), var(--glyph-cell));
+  grid-auto-rows: var(--glyph-cell);
+  gap: var(--glyph-gap);
+  margin-bottom: var(--space-3xs);
+  align-self: flex-start;
+
+  i {
+    background: var(--a);
+  }
+}
+
+.card[aria-current='true'] .glyph i {
+  background: var(--c, var(--a));
+}
+
+/*
+ * The period is 6 beats of 250ms (glyphs.ts): the ripple takes 3 beats,
+ * then the ornament rests. Each cell starts at its own delay, thus all the
+ * cells can use the same keyframes.
+ */
+.card:is(:hover, :focus-visible) .glyph [data-ripple] {
+  animation: glyphRipple 1500ms linear var(--t) infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+/*
+ * In the dark scheme the accent text has the colour of the accent, thus
+ * tone 3 takes the paper, as the highlight of the pixel videos.
+ */
+:global(:root[data-scheme='dark']) .glyph {
+  --glyph-tone-3: var(--text-primary);
+}
+
+/* A flash of one beat (1/6 of the period) in tone b, then tone c. */
+@keyframes glyphRipple {
+  0%,
+  16.6% {
+    background: var(--b);
+  }
+
+  16.7%,
+  100% {
+    background: var(--c);
   }
 }

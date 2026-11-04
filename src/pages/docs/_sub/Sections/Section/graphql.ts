@@ -7,7 +7,6 @@ export const SectionFragment = graphql(
     fragment SectionFragment on DocsHomeSectionBlockRecord {
       id
       title
-      kicker
       width
       columns
       cards {

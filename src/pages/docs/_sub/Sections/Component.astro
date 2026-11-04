@@ -7,10 +7,8 @@ import s from './style.module.css';
 
 interface Props {
   page: FragmentOf<typeof SectionsFragment>;
-  startNumber?: number;
 }
 
-const { startNumber = 1 } = Astro.props;
 const page = readFragment(SectionsFragment, Astro.props.page);
 
 const widthSpan: Record<string, number> = {
@@ -21,10 +19,9 @@ const widthSpan: Record<string, number> = {
 };
 
 type SectionBlock = (typeof page.sections)[number];
-const rows: Array<Array<{ section: SectionBlock; number: number; span: number }>> = [];
+const rows: Array<Array<{ section: SectionBlock; span: number }>> = [];
 let currentRow: (typeof rows)[number] = [];
 let currentSum = 0;
-let n = startNumber;
 
 for (const section of page.sections) {
   if (section.__typename !== 'DocsHomeSectionBlockRecord') continue;
@@ -34,9 +31,8 @@ for (const section of page.sections) {
     currentRow = [];
     currentSum = 0;
   }
-  currentRow.push({ section, number: n, span });
+  currentRow.push({ section, span });
   currentSum += span;
-  n += 1;
 }
 if (currentRow.length > 0) rows.push(currentRow);
 ---
@@ -46,9 +42,9 @@ if (currentRow.length > 0) rows.push(currentRow);
     <section class={s.section}>
       <div class={s.inner}>
         <div class={s.row}>
-          {row.map(({ section, number, span }) => (
+          {row.map(({ section, span }) => (
             <div style={`--span: ${span}`} class={s.rowItem}>
-              <Section block={section} number={number} />
+              <Section block={section} />
             </div>
           ))}
         </div>

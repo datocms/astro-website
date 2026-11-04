@@ -8,20 +8,14 @@ import { SectionFragment } from './graphql';
 
 interface Props {
   block: FragmentOf<typeof SectionFragment>;
-  number: number;
 }
 
 const block = readFragment(SectionFragment, Astro.props.block);
-const padded = String(Astro.props.number).padStart(2, '0');
-const kicker = block.kicker ? `${padded} · ${block.kicker}` : padded;
 ---
 
 <div>
   <div class={s.sectionHeader}>
-    <div class={s.sectionHeaderLeft}>
-      <span class:list={[s.kicker, 'monoCaps']}>{kicker}</span>
-      <h2 class={s.sectionTitle}>{block.title}</h2>
-    </div>
+    <h2 class={s.sectionTitle}>{block.title}</h2>
   </div>
   <div class={s.cards} data-cols={stripStega(block.columns)}>
     {

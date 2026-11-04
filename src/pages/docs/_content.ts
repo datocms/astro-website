@@ -14,6 +14,8 @@ export const FRAMEWORKS: Framework[] = [
 
 export type Api = {
   name: string;
+  /* The pixel picture of the card (ApisSection/glyphs.ts). */
+  glyph: 'cda' | 'cma' | 'asset' | 'realtime';
   protocol: string;
   desc: string;
   pkg: string | null;
@@ -26,6 +28,7 @@ export type Api = {
 export const APIS: Api[] = [
   {
     name: 'Content Delivery API',
+    glyph: 'cda',
     protocol: 'GraphQL',
     desc: 'Read published content from any front-end via a fast, cached GraphQL endpoint.',
     pkg: '@datocms/cda-client',
@@ -48,6 +51,7 @@ const { allPosts } = await client.request({
   },
   {
     name: 'Content Management API',
+    glyph: 'cma',
     protocol: 'REST',
     desc: 'Create, update, and publish records programmatically through a typed client.',
     pkg: '@datocms/cma-client',
@@ -70,17 +74,19 @@ await client.items.publish(post.id);`,
   },
   {
     name: 'Asset API',
+    glyph: 'asset',
     protocol: 'CDN',
     desc: 'Upload, transform, and serve images, video, and files from a global CDN.',
     pkg: null,
     endpoint: 'www.datocms-assets.com',
     href: '/docs/asset-api/images',
     language: 'bash',
-    code: `# Upload a file via the CMA, then transform via the CDN.
-curl https://www.datocms-assets.com/12345/hero.jpg \\
-  ?fit=crop&w=1200&h=630&auto=format
+    code: `# Add imgix params to any asset URL:
+# the CDN transforms it on the fly.
+curl -o hero.jpg \\
+  "$ASSET_URL?w=1200&h=630&fit=crop"
 
-# Or in GraphQL — responsive variants from the CDA:
+# Or ask the CDA for responsive variants:
 {
   hero {
     responsiveImage(imgixParams: {
@@ -93,6 +99,7 @@ curl https://www.datocms-assets.com/12345/hero.jpg \\
   },
   {
     name: 'Real-time Updates API',
+    glyph: 'realtime',
     protocol: 'SSE',
     desc: 'Stream live content changes to power instant previews and live published views.',
     pkg: 'datocms-listen',

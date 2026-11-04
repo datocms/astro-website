@@ -7,9 +7,13 @@ type Props = {
   highlightLines?: number[];
   showLineNumbers?: boolean;
   theme?: 'catppuccin-frappe' | 'catppuccin-latte';
+  /* The window around the code. 'none' removes the title bar of a terminal. */
+  frame?: 'auto' | 'code' | 'terminal' | 'none';
+  /* Long lines go on the next line, with the same indent. They do not scroll. */
+  wrap?: boolean;
 };
 
-const { theme, code, language, highlightLines, showLineNumbers } = Astro.props;
+const { theme, code, language, highlightLines, showLineNumbers, frame, wrap } = Astro.props;
 ---
 
 {
@@ -20,6 +24,8 @@ const { theme, code, language, highlightLines, showLineNumbers } = Astro.props;
         lang={language}
         mark={highlightLines?.map((line) => line + 1)}
         showLineNumbers={showLineNumbers}
+        frame={frame}
+        wrap={wrap}
       />
     </set-fancy-data-theme>
   ) : (
@@ -28,6 +34,8 @@ const { theme, code, language, highlightLines, showLineNumbers } = Astro.props;
       lang={language}
       mark={highlightLines?.map((line) => line + 1)}
       showLineNumbers={showLineNumbers}
+      frame={frame}
+      wrap={wrap}
     />
   )
 }

@@ -1,0 +1,28 @@
+---
+import { SIZE, glyphCells, type GlyphKind } from './glyphs';
+import s from './style.module.css';
+
+type Props = { kind: GlyphKind };
+
+const { kind } = Astro.props;
+const cells = glyphCells(kind);
+
+const tone = (t: number) => `var(--glyph-tone-${t})`;
+---
+
+<div class={s.glyph} style={`--glyph-cols: ${SIZE}`} aria-hidden="true">
+  {
+    cells.map((cell) => (
+      <i
+        data-ripple={cell.b !== undefined ? '' : undefined}
+        style={[
+          `--a: ${tone(cell.a)}`,
+          cell.c !== undefined && `--c: ${tone(cell.c)}`,
+          cell.b !== undefined && `--b: ${tone(cell.b)}; --t: ${cell.t}ms`,
+        ]
+          .filter(Boolean)
+          .join('; ')}
+      />
+    ))
+  }
+</div>

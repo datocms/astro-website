@@ -1,7 +1,26 @@
 ---
+import type { IconDefinition } from '@fortawesome/fontawesome-common-types';
+import { Icon } from '~/components/Icon';
 import { Code } from '~/components/docs/Code';
 import { APIS } from '../../_content';
+import Glyph from './Glyph.astro';
 import s from './style.module.css';
+
+/*
+ * The square mark of npm (an "n" in a square), from Simple Icons (CC0).
+ * Font Awesome has only the wide "npm" mark, which is too small at text size.
+ */
+const npmMark = {
+  prefix: 'fab',
+  iconName: 'npm',
+  icon: [
+    24,
+    24,
+    [],
+    '',
+    'M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z',
+  ],
+} as unknown as IconDefinition;
 ---
 
 <docs-api-switcher class={s.root}>
@@ -15,13 +34,20 @@ import s from './style.module.css';
           data-api-name={api.name}
           data-api-endpoint={api.endpoint}
           data-api-href={api.href}
+          aria-current={i === 0 ? 'true' : undefined}
         >
+          <Glyph kind={api.glyph} />
           <div class={s.cardHeader}>
             <h3 class={s.cardTitle}>{api.name}</h3>
             <span class:list={[s.protocol, 'monoCaps']}>{api.protocol}</span>
           </div>
           <p class={s.cardDesc}>{api.desc}</p>
-          {api.pkg && <code class={s.pkg}>{api.pkg}</code>}
+          {api.pkg && (
+            <span class={s.pkg}>
+              <Icon icon={npmMark} class={s.pkgIcon} />
+              <code>{api.pkg}</code>
+            </span>
+          )}
         </a>
       ))
     }
@@ -40,15 +66,16 @@ import s from './style.module.css';
             <Code
               code={api.code}
               language={api.language}
-              theme="catppuccin-frappe"
               showLineNumbers={false}
+              frame="none"
+              wrap
             />
           </div>
         ))
       }
     </div>
     <div class={s.previewFooter}>
-      <span>Hover any API to switch snippet</span>
+      <span class={s.previewHint}>Hover any API to switch snippet</span>
       <a href={APIS[0]!.href} data-preview-link>Open full reference →</a>
     </div>
   </div>
@@ -73,6 +100,10 @@ import s from './style.module.css';
 
     select(i: number, sourceCard: HTMLElement) {
       this.currentIndex = i;
+      for (const card of this.$$<HTMLElement>('[data-api-index]')) {
+        if (card === sourceCard) card.setAttribute('aria-current', 'true');
+        else card.removeAttribute('aria-current');
+      }
       for (const pre of this.$$<HTMLElement>('[data-api-code]')) {
         pre.hidden = pre.dataset.apiCode !== String(i);
       }
