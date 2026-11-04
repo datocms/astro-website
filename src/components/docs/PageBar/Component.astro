@@ -1,0 +1,41 @@
+---
+import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
+import { MarkdownActions } from '~/components/MarkdownActions';
+import s from './style.module.css';
+
+type Props = {
+  /** The path to the page. The last crumb is the page itself. An empty crumb does not show. */
+  crumbs: (string | null | undefined)[];
+  /** Show the actions on the Markdown version of the page (Copy page). */
+  markdown?: boolean;
+};
+
+const { crumbs: allCrumbs, markdown = true } = Astro.props;
+const crumbs = allCrumbs.filter((crumb): crumb is string => Boolean(crumb));
+
+const markdownUrl = new URL(
+  Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
+  buildBaseUrl(Astro),
+);
+---
+
+{
+  /*
+  The bar at the top of a docs page: the breadcrumb, and the actions on
+  the page. The docs layout puts it in its header (the slot "pagebar").
+*/
+}
+<div class={s.root} data-datocms-noindex>
+  <nav class={s.crumbs} aria-label="Breadcrumb">
+    <ol>
+      {
+        crumbs.map((crumb, index) => (
+          <li class="capTrim" aria-current={index === crumbs.length - 1 ? 'page' : undefined}>
+            {crumb}
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+  {markdown && <MarkdownActions markdownUrl={markdownUrl.href} size="s" class={s.actions} />}
+</div>

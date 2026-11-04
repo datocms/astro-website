@@ -10,22 +10,20 @@ interface Props {
 const { groups } = Astro.props;
 ---
 
-<div class={s.toc}>
-  <div class={s.tocInner}>
-    {
-      groups.map((group) => (
-        <>
-          <div class:list={[s.tocTitle, 'monoCaps']}>{group.title}</div>
-          <div class={s.tocEntries}>
-            {group.entries.map((node) => (
-              <ActiveLink href={node.url} class={s.tocEntry} activeClass={s.tocEntryActive}>
-                {node.badge ? <span class:list={[s.badge, 'monoCaps']}>{node.badge}</span> : ''}{' '}
-                {node.label}
-              </ActiveLink>
-            ))}
-          </div>
-        </>
-      ))
-    }
-  </div>
-</div>
+<nav class={s.toc} aria-label="In this page">
+  {
+    groups.map((group) => (
+      <div class={s.group}>
+        {group.title && <div class:list={[s.tocTitle, 'monoCaps']}>{group.title}</div>}
+        <div class={s.tocEntries}>
+          {group.entries.map((node) => (
+            <ActiveLink href={node.url} class={s.tocEntry} activeClass={s.tocEntryActive}>
+              {node.badge ? <span class:list={[s.badge, 'monoCaps']}>{node.badge}</span> : ''}{' '}
+              {node.label}
+            </ActiveLink>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</nav>

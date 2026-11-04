@@ -1,82 +1,72 @@
 /*
- * The title stops a little after the running text: 40 times the body size
- * (the text stops at 32). The lines of a long title are balanced.
+ * The title has the ratio to the body text of the Linear docs (32 to 15):
+ * 2.13 times the body, thus 36px next to 17px text. It is near the text
+ * that follows it (20). The title stops a little after the running text:
+ * 40 times the body size (the text stops at 37.5). The lines of a long
+ * title are balanced.
  */
 .title {
   max-width: calc(40 * var(--type-m));
   text-wrap: balance;
-  font-size: var(--type-3xl);
-  margin-bottom: var(--space-xl);
-  line-height: 1;
-  letter-spacing: -0.04em;
+  font-size: calc(2.13 * var(--type-m));
+  margin-bottom: var(--space-md);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
   font-family: var(--font-sans);
   font-weight: 500;
 }
 
-/* The global class monoCaps gives the type. */
-.kicker {
-  color: var(--text-muted);
-}
-
 .article {
+  min-width: 0;
   padding-top: var(--space-xl);
   padding-bottom: var(--space-xl);
   font-size: var(--type-m);
   line-height: 1.6;
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin: 0 0 var(--space-sm) 0;
+/*
+ * The article is one column of --docs-article-width (650px, from the docs
+ * layout): the running text (37.5em) fits in it, and the wide blocks
+ * (tables, code) use all of it. Below 1152 the column fills the screen,
+ * with the side padding.
+ */
+/* The side padding is the bleed of the blocks that go to the edge (Carousel). */
+.articleContainer {
+  padding-inline: var(--space-lg);
 }
 
-.headerTitles {
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-.markdownActions {
-  flex: 0 0 auto;
-}
-
-@media (min-width: 1320px) {
+/*
+ * From 1152 the article stays at its width. When the main area is wider
+ * than the article, the article is in the centre.
+ */
+@media (min-width: 1152px) {
   .articleContainer {
-    display: flex;
-    flex-direction: row-reverse;
+    display: grid;
+    grid-template-columns: minmax(0, var(--docs-article-width));
+    justify-content: center;
   }
+}
 
-  .article {
-    min-width: 538px;
-    flex: 1;
-  }
+/*
+ * From 1320 the table of contents is at the right of the article. The
+ * article and the table of contents are one group, in the centre of the
+ * main area.
+ */
+@media (min-width: 1320px) {
+  .articleContainer[data-docs-toc] {
+    grid-template-columns: minmax(0, var(--docs-article-width)) var(--docs-toc-width);
 
-  .sidebar {
-    padding-top: var(--space-2xl);
-    padding-left: var(--space-2xl);
-    width: 330px;
+    /* The gap also holds the bleed of the blocks (--docs-bleed, from the docs layout). */
+    column-gap: calc(var(--space-2xl) + var(--docs-bleed, 0px));
   }
+}
+
+.toc {
+  display: none;
 }
 
 @media (min-width: 1320px) {
-  .emptySidebar {
-    padding-top: var(--space-2xl);
-    padding-left: var(--space-2xl);
-    width: 330px;
-  }
-}
-
-@media (max-width: 1319px) {
-  .article {
-    padding-left: var(--space-lg);
-    padding-right: var(--space-lg);
-  }
-
-  .sidebar,
-  .emptySidebar {
-    display: none;
+  .toc {
+    display: block;
   }
 }

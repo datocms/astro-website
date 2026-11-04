@@ -5,17 +5,19 @@ import { addLanguageToUrl, currentLanguage } from './utils';
 const language = currentLanguage(Astro);
 ---
 
-<div class:list={[s.picker, 'label']}>
-  <div class={s.pickerLabel}>Show examples in:</div>
+<div class:list={[s.picker, 'label']} data-docs-sticky-bar>
+  <div class:list={[s.pickerLabel, 'capTrim']}>Show examples in:</div>
   <a
     href={addLanguageToUrl(Astro, Astro.url, 'javascript')}
     class:list={[s.pickerButton, language === 'javascript' && s.pickerButtonActive]}
+    aria-current={language === 'javascript' ? 'true' : undefined}
   >
     Javascript</a
   >
   <a
     href={addLanguageToUrl(Astro, Astro.url, 'http')}
-    class:list={[s.pickerButton, language === 'http' && s.pickerButtonActive]}>HTTP</a
+    class:list={[s.pickerButton, language === 'http' && s.pickerButtonActive]}
+    aria-current={language === 'http' ? 'true' : undefined}>HTTP</a
   >
 </div>
 

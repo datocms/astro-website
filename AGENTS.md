@@ -7,8 +7,8 @@ Astro standalone Node server, deployed via `cubo` to Kubernetes on AWS. Three en
 The site has one layout family. Its rules are in `src/REDESIGN.md`: read it before you touch the pages or the components.
 
 - **Pages**: `src/layouts/Layout.astro`. It imports `src/styles/global.css` and the scene kit CSS, has no router (a full load), and has the layer statement `@layer reset, tokens, base, vendor, blocks, sections, pages;`.
-- **Docs pages** (`src/pages/docs/`): `src/layouts/docs/BaseLayout` is the layout of the docs. It imports `src/styles/global.css`, has the same layer statement, uses the view transitions router, and its components are in `src/components/docs/` (tokens from `src/styles/tokens.css`).
-- Both use `src/layouts/BaseLayout` for the head (SEO, favicon, canonical, RSS, cookie consent, analytics, draft mode). BaseLayout imports no global stylesheet and puts the layer statement as the first child of `<head>`. Its props are `theme` (the `data-theme` of `<body>`) and `clientRouter` (the view transitions router, off by default).
+- **Docs pages** (`src/pages/docs/`): `src/layouts/docs/BaseLayout` is the layout of the docs. It imports `src/styles/global.css`, has the same layer statement, has no router (a full load), and its components are in `src/components/docs/` (tokens from `src/styles/tokens.css`).
+- Both use `src/layouts/BaseLayout` for the head (SEO, favicon, canonical, RSS, cookie consent, analytics, draft mode). BaseLayout imports no global stylesheet and puts the layer statement as the first child of `<head>`. Its props are `theme` (the `data-theme` of `<body>`) and `density` (the `data-density` of `<body>`). No page uses the view transitions router.
 - **Cascade layers**: the Vite plugin `cssLayers` (`astro.config.ts`) wraps each CSS module of `src/` in a layer: `pages` for `src/pages/`, `sections` for the rest, unless line 1 of the file is a marker such as `/* @layer blocks */`. `css-scope.mjs` holds the scope. `npm run lint:css` uses the same scope.
 
 ## Client scripts

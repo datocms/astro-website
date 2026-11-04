@@ -1,48 +1,34 @@
 ---
-import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
 import s from './style.module.css';
 import { Toc } from './Toc';
 import type { TocGroup } from './types';
-import { MarkdownActions } from '~/components/MarkdownActions';
 
 type Props = {
   tocGroups: TocGroup[];
 };
 
 const { tocGroups } = Astro.props;
-
-const baseUrl = buildBaseUrl(Astro);
-
-const markdownUrl = new URL(
-  Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
-  baseUrl,
-);
 ---
 
-<div class={s.articleContainer}>
-  {
-    tocGroups.length > 0 ? (
-      <div class={s.sidebar} data-datocms-noindex>
-        <Toc groups={tocGroups} />
-      </div>
-    ) : (
-      <div class={s.emptySidebar} />
-    )
-  }
+{
+  /*
+  The article and its table of contents. The breadcrumb and the actions on
+  the page are not here: the page gives them to the header of the layout
+  (PageBar, in the slot "pagebar").
+*/
+}
+<div class={s.articleContainer} data-docs-toc={tocGroups.length > 0 ? '' : undefined}>
   <article class={s.article} id="main-content">
-    <div class={s.header}>
-      <div class={s.headerTitles}>
-        <div class:list={[s.kicker, 'monoCaps']} data-datocms-noindex>
-          <slot name="kicker" />
-        </div>
-      </div>
-      <div class={s.markdownActions}>
-        <MarkdownActions markdownUrl={markdownUrl.href} size="s" />
-      </div>
-    </div>
     <h1 class={s.title}>
       <slot name="title" />
     </h1>
     <slot />
   </article>
+  {
+    tocGroups.length > 0 && (
+      <div class={s.toc} data-datocms-noindex>
+        <Toc groups={tocGroups} />
+      </div>
+    )
+  }
 </div>

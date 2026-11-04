@@ -1,47 +1,50 @@
-@media (min-width: 1320px) {
-  .toc {
-    display: block;
-    position: sticky;
-    top: 48px;
-    height: calc(100vh - 48px);
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
+/*
+ * The table of contents stays in view below the header of the docs, and
+ * below a bar that sticks under the header (--docs-toc-offset). It starts
+ * at the same height as the title of the article.
+ */
+.toc {
+  --toc-top: calc(var(--docs-sticky-top) + var(--docs-toc-offset, 0px));
 
-  .tocInner {
-    padding-bottom: var(--space-xl);
-  }
+  position: sticky;
+  top: var(--toc-top);
+  max-height: calc(100vh - var(--toc-top));
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-block: var(--space-xl);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-default) transparent;
 }
 
-@media (min-width: 1320px) {
-  .emptySidebar {
-    padding-top: var(--space-2xl);
-    padding-left: var(--space-2xl);
-    width: 330px;
-  }
+.group + .group {
+  margin-top: var(--space-lg);
 }
 
-@media (max-width: 1319px) {
-  .toc {
-    padding: var(--space-lg) var(--space-lg);
-    border-bottom: 1px solid var(--border-default);
-    padding-bottom: var(--space-xl);
-  }
-}
-
-/* The global class monoCaps gives the type. */
+/*
+ * The global class monoCaps gives the type. The name of a group is one
+ * step smaller (2xs), as in the sidebar: it labels the list.
+ */
 .tocTitle {
+  font-size: var(--type-2xs);
   color: var(--text-muted);
-  margin: var(--space-lg) 0 var(--space-2xs);
+  margin-bottom: var(--space-2xs);
+}
+
+/* A hairline at the left of the entries. The entry of the page you read marks it. */
+.tocEntries {
+  border-left: 1px solid var(--border-default);
 }
 
 .tocEntry {
   display: block;
+  margin-left: -1px;
+  padding: var(--space-4xs) 0 var(--space-4xs) var(--space-xs);
+  border-left: 1px solid transparent;
   color: var(--text-muted);
   text-decoration: none;
-  margin-bottom: var(--space-2xs);
   font-size: var(--type-s);
-  line-height: 1.3;
+  line-height: 1.4;
+  transition: color 120ms ease-out;
 
   /* Inline code in a label: the codeInline role. */
   code {
@@ -51,16 +54,17 @@
     letter-spacing: 0;
   }
 
-  &:hover {
-    text-decoration: underline;
-    color: var(--text-primary);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--text-primary);
+    }
   }
 }
 
 .tocEntryActive,
 .tocEntryActive:hover {
-  font-weight: 500;
-  color: var(--text-nav-active);
+  border-left-color: var(--text-primary);
+  color: var(--text-primary);
 }
 
 /* The global class monoCaps gives the type. */

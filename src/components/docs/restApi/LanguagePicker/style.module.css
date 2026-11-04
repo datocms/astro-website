@@ -7,16 +7,10 @@
   background: var(--surface-default);
   z-index: 2;
   border-bottom: 1px solid var(--border-default);
-  top: -1px;
+  /* Below the sticky header of the docs layout (--docs-sticky-top). */
+  top: calc(var(--docs-sticky-top, 0px) - 1px);
+  padding-left: var(--space-lg);
   font-family: var(--font-sans);
-
-  @media (max-width: 1319px) {
-    padding-left: var(--space-lg);
-  }
-
-  @media (min-width: 1320px) {
-    padding-left: var(--space-lg);
-  }
 }
 
 .pickerLabel {
@@ -24,26 +18,33 @@
   margin-right: var(--space-md);
 }
 
+/*
+ * Each language is a pill, 32px high. The active pill has the tint of the
+ * active entry of the sidebar.
+ */
 .pickerButton {
-  appearance: none;
-  border: 0;
-  color: inherit;
-  text-decoration: none;
-  background: none;
-  padding: var(--space-4xs) var(--space-2xs);
-  border-bottom: 3px solid transparent;
-  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
   margin-right: var(--space-4xs);
+  padding-inline: var(--space-xs);
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: var(--radius-full);
+  transition:
+    color 120ms ease-out,
+    background-color 120ms ease-out;
 
-  &:hover {
-    border-bottom-color: var(--border-default);
+  @media (hover: hover) {
+    &:hover {
+      color: var(--text-primary);
+      background: var(--surface-inverse-faint);
+    }
   }
 }
 
-.pickerButtonActive {
-  border-bottom-color: var(--surface-accent);
-
-  &:hover {
-    border-bottom-color: var(--surface-accent);
-  }
+.pickerButtonActive,
+.pickerButtonActive:hover {
+  color: var(--text-nav-active);
+  background: var(--surface-nav-active);
 }

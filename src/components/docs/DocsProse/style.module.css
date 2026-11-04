@@ -14,6 +14,17 @@
   }
 
   /*
+   * A block with its own design (a <prose-island>, alone or in a figure)
+   * is wider than the text: it goes --docs-bleed (up to 60px, from the
+   * docs layout) past each side. The caption of a figure stays in line
+   * with the text. A callout and a block with data-text-width (a button,
+   * a list of properties with no frame) stay at the width of the text.
+   */
+  :is(:scope, :scope > figure) > prose-island:not([data-text-width], :has(> [data-callout-type])) {
+    margin-inline: calc(-1 * var(--docs-bleed, 0px));
+  }
+
+  /*
    * The rhythm of the docs. The text, the figures and the blocks have the
    * space of Prose. A list stays near the paragraph that starts it (12).
    * A heading has much more space above it than below it (12): 60 for h2
@@ -200,12 +211,6 @@
 
   td {
     font-weight: 400;
-  }
-
-  mux-player {
-    display: block;
-    overflow: hidden;
-    border-radius: var(--radius-md);
   }
 
   :is(figcaption, blockquote cite) {

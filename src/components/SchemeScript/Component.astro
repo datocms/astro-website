@@ -3,18 +3,11 @@
  * Inline script for the head. It sets the color scheme before the first
  * paint: the choice of the visitor, else the scheme of the system. The
  * keys and the attribute names come from src/lib/colorScheme.ts.
- * With keepOnSwap, the view transitions router keeps the scheme at each visit.
  */
 import { STORAGE_KEY, SYSTEM_DARK } from '~/lib/colorScheme';
-
-interface Props {
-  keepOnSwap?: boolean;
-}
-
-const { keepOnSwap = false } = Astro.props;
 ---
 
-<script is:inline define:vars={{ STORAGE_KEY, SYSTEM_DARK, keepOnSwap }}>
+<script is:inline define:vars={{ STORAGE_KEY, SYSTEM_DARK }}>
   (function () {
     var root = document.documentElement;
     var scheme = null;
@@ -25,14 +18,5 @@ const { keepOnSwap = false } = Astro.props;
       scheme = matchMedia(SYSTEM_DARK).matches ? 'dark' : 'light';
     root.dataset.scheme = scheme;
     root.dataset.productScenesScheme = scheme;
-
-    if (keepOnSwap) {
-      // The router replaces the attributes of <html> at each visit.
-      document.addEventListener('astro:before-swap', function (event) {
-        var next = event.newDocument.documentElement;
-        next.dataset.scheme = root.dataset.scheme;
-        next.dataset.productScenesScheme = root.dataset.scheme;
-      });
-    }
   })();
 </script>

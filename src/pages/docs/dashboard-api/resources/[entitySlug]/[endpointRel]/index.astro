@@ -16,6 +16,7 @@ import { JsExample } from '~/components/docs/restApi/JsExample';
 import { HttpExample } from '~/components/docs/restApi/HttpExample';
 import { JsonSchemaObjectAnalysis } from '~/components/docs/restApi/JsonSchemaObjectAnalysis';
 import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
+import { PageBar } from '~/components/docs/PageBar';
 import { Prose } from '~/components/docs/DocsProse';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Icon } from '~/components/Icon';
@@ -111,6 +112,7 @@ const propsForExamples = { entity, endpoint, jsClient, api: 'dashboard-api' as c
   additionalSidebarItems={sidebarItems}
   contentWrapperComponent={LanguagePicker}
 >
+  <PageBar slot="pagebar" crumbs={['Dashboard API', entity.title, endpoint.title]} />
   <ContentPlusToc
     tocGroups={[
       ...buildTocGroupsFromMarkdown(description),
@@ -125,7 +127,6 @@ const propsForExamples = { entity, endpoint, jsClient, api: 'dashboard-api' as c
       ...buildTocGroupsFromExamples(examples, description),
     ]}
   >
-    <Fragment slot="kicker">Dashboard API > {entity.title}</Fragment>
     <Fragment slot="title">{endpoint.title}</Fragment>
 
     <DashboardExperimentalAPIWarning />

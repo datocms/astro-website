@@ -5,6 +5,7 @@ export type TocEntry = {
 };
 
 export type TocGroup = {
-  title: string;
+  /** The label above the entries. The headings of the page have no label. */
+  title?: string;
   entries: TocEntry[];
 };

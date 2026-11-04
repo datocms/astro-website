@@ -34,7 +34,7 @@ css-scope.mjs               which CSS gets a cascade layer, and which CSS lint:c
 - The other props: `theme`, `headerVariant`, `headerCta`, `footer`.
 - `theme` is the theme of the page: the hue of its area (a reference page) or of its first chapter (a marketing page). The table of all the pages is in DESIGN.md, "Page themes". On a marketing page, read the theme from the data of the first chapter (`theme={dev.schema.theme}`), not from a literal. The header, the `PageCloser` and the footer have no theme prop: they take the theme of the page.
 - `headerVariant` is the ground of the hero, and the `variant` of the `Hero` is the same value: `page` on a marketing page, `accent` on a reference page.
-- A page does a full load: no `ClientRouter`, no progress bar. Only the docs layout turns the router on.
+- A page does a full load: no `ClientRouter`, no progress bar. The docs too.
 - The optional prop `seoAnalysis` takes the `yoastAnalysis` field (the SEO/Readability plugin) of the CMS record. In draft mode, the layout then shows `SeoAnalysisPanel` at the bottom right: the keywords of the record, and where the page uses them (title, meta description, h1, h2, first paragraph).
 - `<main>` has `id="layout-content"`: the endpoint `/api/seo-analysis` reads the content of the page from this element. Do not remove it.
 - `PageNav` (the menu at the bottom left) shows only when `DEPLOYMENT_DESTINATION` is not `production`. It is for reviewers, not part of the design.
@@ -77,7 +77,7 @@ src/components/MyComponent/
   - `--scrim`, `--scrim-modal`: the backdrop of a drawer and the backdrop of a modal. There are no shadow tokens: see the Flat rule in `DESIGN.md`.
   - `--type-2xs` to `--type-4xl`: the size ladder, in rem, fluid from `l` up (see DESIGN.md, Typography). The block `[data-density='dense']` sets the dense values of `s`, `m`, `l`, `xl` and `2xl`; the docs use it on `<body>` (`data-density="dense"`), and `Facts` and the showcase aside use it on their own element. `--type-inline-code` (0.8em, not under `--type-xs`) is the size of inline code. Three ground variables adjust the text for light-on-dark: `--type-leading-dark`, `--type-tracking-dark` and `--type-mono-weight`.
 - Spacing: only `--space-*` tokens. Type: only `--type-*` sizes, through the typography classes (`.display`, `.headline`, `.title`, `.section`, `.body`, `.bodyMedium`, `.bodyLong`, `.label`, `.labelMedium`, `.caption`, `.code`, `.codeSmall`, `.codeInline`, `.monoCaps`, `.pictureLabel`, `.tabular`).
-- Breakpoints (min-width): 768, 1152, 1320. The layout of the docs (`src/layouts/docs/BaseLayout`) has two more, 1500 and 1600: above 1500 the content is 1110px wide and the sidebar 300px, above 1600 the content is 1210px wide (`stylelint.config.mjs` allows them for that file only). One more exception: `SceneFrame` and `SceneFragment` switch from the phone drawing to the desktop drawing at 650. Hover only inside `@media (hover: hover)`.
+- Breakpoints (min-width): 768, 1152, 1320. The layout of the docs (`src/layouts/docs/BaseLayout`) has no more breakpoints: the sidebar (280px) is at the left edge from 1152, and the article (650px) and its table of contents (250px, from 1320) are in the centre of the main area. One more exception: `SceneFrame` and `SceneFragment` switch from the phone drawing to the desktop drawing at 650. Hover only inside `@media (hover: hover)`.
 
 ### Design source
 

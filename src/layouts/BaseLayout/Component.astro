@@ -1,8 +1,5 @@
 ---
 import { ContentLink, Seo, stripStega, type TitleMetaLinkTag } from '@datocms/astro';
-import { ClientRouter } from 'astro:transitions';
-import KeepCssLayersFirst from './_KeepCssLayersFirst.astro';
-import ProgressBar from './_ProgressBar.astro';
 import { fetchFavicon } from './fetchFavicon';
 import { baseUrl, isDraftModeEnabled } from '~/lib/draftMode';
 import type { Theme } from '~/lib/theme';
@@ -18,16 +15,11 @@ type Props = {
   seo: TitleMetaLinkTag[];
   /** The `data-theme` of <body>. */
   theme?: Theme;
-  /**
-   * Set to true to render the view transitions router and its progress bar.
-   * The default is a page that does a full load.
-   */
-  clientRouter?: boolean;
   /** The dense values of the type ladder, as `data-density` of <body>. */
   density?: 'dense';
 };
 
-const { seo, theme = 'default', clientRouter = false, density } = Astro.props;
+const { seo, theme = 'default', density } = Astro.props;
 
 // The order of the cascade layers (see src/styles/global.css). The statement
 // is the first child of <head>, before all other CSS.
@@ -66,7 +58,7 @@ const finalSeo = pipeSeo(
 ---
 
 <!doctype html>
-<html lang="en" transition:animate="none">
+<html lang="en">
   <head>
     <style id="css-layers" is:inline set:html={cssLayersStatement}></style>
     <meta charset="UTF-8" />
@@ -85,15 +77,6 @@ const finalSeo = pipeSeo(
     />
     <script is:inline src="/landing-pages/cookieConsent.js" async></script>
     <slot name="head" />
-    {
-      clientRouter && (
-        <>
-          <ClientRouter />
-          <ProgressBar />
-          <KeepCssLayersFirst />
-        </>
-      )
-    }
   </head>
   <body data-theme={theme} data-density={density}>
     <slot />
@@ -119,18 +102,6 @@ const finalSeo = pipeSeo(
       setCookie('datoUtm', cookieContent, 365);
     }
   }
-
-  document.addEventListener('astro:page-load', () => {
-    if ('posthog' in window) {
-      (window as any).posthog.capture('$pageview');
-    }
-  });
-
-  document.addEventListener('astro:before-swap', () => {
-    if ('posthog' in window) {
-      (window as any).posthog.capture('$pageleave');
-    }
-  });
 
   document.addEventListener('click', (e) => {
     const link = (e.target as Element).closest('a');

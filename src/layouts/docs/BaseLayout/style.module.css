@@ -1,26 +1,239 @@
+/*
+ * The shell of the docs. From 1152 the sidebar is at the left edge of the
+ * screen and the main area fills the rest. One header line goes across
+ * the two: the logo and the search at the left, the breadcrumb and the
+ * actions on the page at the right. Below 1152 the sidebar is a drawer.
+ */
+.root {
+  --docs-header-height: 56px;
+  /*
+   * The sidebar is 280px, and up to 10% wider (308px) when the main area
+   * keeps the space for the article and the side padding (and from 1320,
+   * for the table of contents). In a grid template, 100% is the width of
+   * the grid.
+   */
+  --docs-main-min: calc(var(--docs-article-width) + 2 * var(--space-lg));
+  --docs-sidebar-width: clamp(280px, calc(100% - var(--docs-main-min)), 308px);
+  --docs-article-width: 650px;
+  --docs-toc-width: 250px;
+
+  /*
+   * --docs-bleed: the distance that a block (a <prose-island>) goes past
+   * each side of the text. It is the free space at each side of the
+   * article, from 0 to 60px. 100cqi is the width of the main column
+   * (.container). Below 1152 it is 0: the text fills the screen.
+   */
+  --docs-bleed: 0px;
+
+  /* The top of a part that sticks below the header. The header sticks only from 1152. */
+  --docs-sticky-top: 0px;
+}
+
+/*
+ * A bar that sticks below the header (data-docs-sticky-bar, the picker of
+ * the API pages) is 56px high. The table of contents sticks below it.
+ */
+.root:has([data-docs-sticky-bar]) {
+  --docs-toc-offset: 56px;
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  height: var(--docs-header-height);
+  padding-inline: var(--space-md);
+  border-bottom: 1px solid var(--border-default);
+  flex: none;
+}
+
+/*
+ * As in the Linear docs: the symbol goes to the home of the site, and
+ * "Docs" goes to the home of the docs. A hairline separates the two.
+ */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  color: var(--text-primary);
+
+  svg {
+    display: block;
+    width: 20px;
+    height: auto;
+  }
+}
+
+.docsHome {
+  padding-left: var(--space-xs);
+  border-left: 1px solid var(--border-default);
+  font-size: var(--type-m);
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.headerTools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+}
+
+/*
+ * The search is a round button, as the other controls of the header. The
+ * Search component renders the button: :global() reaches it.
+ */
+.search {
+  --search-icon-size: 16px;
+
+  display: contents;
+
+  :global(button) {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-full);
+    color: var(--text-muted);
+
+    @media (hover: hover) {
+      &:hover {
+        color: var(--text-primary);
+        background: var(--surface-inverse-faint);
+      }
+    }
+  }
+}
+
+.mainHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: var(--docs-header-height);
+  padding-inline: var(--space-md);
+  border-bottom: 1px solid var(--border-default);
+  background: var(--surface-default);
+}
+
+/* The sidebar footer: the other resources and the links to help. */
+.sidebarFooter {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  padding: var(--space-3xs) var(--space-xs);
+  border-top: 1px solid var(--border-default);
+}
+
+.footerLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  min-height: 32px;
+  padding-inline: var(--space-3xs);
+  border-radius: var(--radius-md);
+  font-size: var(--type-s);
+  color: var(--text-soft);
+  text-decoration: none;
+  transition: background-color 120ms ease-out;
+
+  svg {
+    width: 14px;
+    color: var(--text-accent);
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--text-primary);
+      background: var(--surface-inverse-faint);
+    }
+  }
+}
+
+.container {
+  padding-bottom: var(--space-lg);
+  container-type: inline-size;
+}
+
+/*
+ * The end of the page (the date and the feedback) has the width of the
+ * article and its table of contents, in the centre of the main area.
+ * ContentPlusToc sets data-docs-toc when the page has a table of contents.
+ */
+.pageEnd {
+  max-width: var(--docs-article-width);
+  margin-inline: auto;
+  padding-inline: var(--space-lg);
+  box-sizing: content-box;
+}
+
+/*
+ * With the table of contents, the gap between the article and the table
+ * holds the bleed at the right. The group (article, gap, table) is in the
+ * centre, thus the free space at the left is a third of the rest.
+ */
+@media (min-width: 1320px) {
+  .container:has([data-docs-toc]) {
+    --docs-bleed: clamp(
+      0px,
+      (
+          100cqi - 2 * var(--space-lg) - var(--docs-article-width) - var(--space-2xl) -
+            var(--docs-toc-width)
+        ) /
+        3,
+      60px
+    );
+  }
+
+  .container:has([data-docs-toc]) .pageEnd {
+    max-width: calc(
+      var(--docs-article-width) + var(--space-2xl) + var(--docs-bleed) + var(--docs-toc-width)
+    );
+  }
+}
+
+.footer {
+  border-top: 1px solid var(--border-default);
+  padding-block: var(--space-xl);
+  margin-top: var(--space-xl);
+  font-size: var(--type-s);
+  line-height: 1.3;
+
+  a {
+    color: var(--text-accent);
+  }
+}
+
+.footerTitle {
+  font-weight: 500;
+  margin: 0 0 var(--space-2xs);
+  font-size: var(--type-m);
+}
+
+.lastUpdate {
+  color: var(--text-muted);
+  font-size: var(--type-s);
+}
+
 @media (max-width: 1151px) {
-  .logo {
-    display: none;
-  }
-
-  .sidebarHeader {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    border-bottom: 1px solid var(--border-default);
-    padding: var(--space-4xs) var(--space-lg);
-  }
-
-  .mobileSearch {
-    flex: 1;
-    min-width: 0;
+  /* On a phone the bars have the side padding of the article. */
+  .sidebarHeader,
+  .mainHeader {
+    padding-inline: var(--space-lg);
   }
 
   .desktopScheme {
     display: none;
   }
 
-  .desktopSearch {
+  /* On a phone, a page without a breadcrumb has no bar. */
+  .mainHeaderEmpty {
     display: none;
   }
 
@@ -35,7 +248,7 @@
     font-size: inherit;
     text-decoration: none;
     border: 1px solid var(--border-default);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-full);
     flex: none;
     transition: transform 160ms ease-out;
 
@@ -57,16 +270,11 @@
   .iconTimes {
     grid-area: 1 / 1;
     display: block;
+    transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
   }
 
   .iconTimes {
     opacity: 0;
-    transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
-  }
-
-  .iconBars {
-    opacity: 1;
-    transition: opacity 200ms cubic-bezier(0.2, 0, 0, 1);
   }
 
   .root[data-drawer-open] .iconBars {
@@ -75,28 +283,6 @@
 
   .root[data-drawer-open] .iconTimes {
     opacity: 1;
-  }
-
-  .hamburgerBadge {
-    position: absolute;
-    bottom: -6px;
-    left: -6px;
-    width: 18px;
-    height: 18px;
-    border-radius: var(--radius-sm);
-    background: var(--surface-default);
-    border: 1px solid var(--border-default);
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-
-    svg {
-      width: 10px;
-      height: 10px;
-      display: block;
-    }
   }
 
   .backdrop {
@@ -132,7 +318,6 @@
       visibility 0ms 350ms;
     border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
     border-right: 1px solid var(--border-default);
-    padding: 0;
   }
 
   .root[data-drawer-open] .innerSidebar {
@@ -203,272 +388,112 @@
   .drawerNav {
     flex: 1;
     overflow-y: auto;
-    padding: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
   }
 
-  .footer {
-    padding: var(--space-lg) var(--space-lg);
-  }
-
-  .lastUpdate {
-    padding: 0 var(--space-lg);
-  }
-
-  .mainHeader {
-    display: none;
-  }
-
-  .footerCol {
-    margin-bottom: var(--space-lg);
+  .sidebarFooter {
+    padding-inline: var(--space-md);
   }
 }
 
 @media (min-width: 1152px) {
   .root {
-    width: 100%;
-    height: 100%;
+    --docs-sticky-top: var(--docs-header-height);
+
     display: grid;
-    grid-template-columns: 252px calc(100vw - 252px);
+    grid-template-columns: var(--docs-sidebar-width) minmax(0, 1fr);
+    min-height: 100vh;
     font-size: var(--type-m);
-    position: relative;
+  }
+
+  /*
+   * The space at the right of the search is the space above and below it:
+   * (56 - 40) / 2 = 8.
+   */
+  .sidebarHeader {
+    padding-right: var(--space-3xs);
+  }
+
+  /* The toggler of the hidden hamburger adds no gap. TargetToggler renders it. */
+  .headerTools > :global(target-toggler) {
+    display: none;
   }
 
   .sidebar {
-    background: var(--surface-default);
     position: sticky;
-    display: flex;
-    z-index: 11;
-    flex-direction: column;
-    align-items: flex-end;
-    -moz-user-select: none;
-    user-select: none;
-    width: 252px;
-    height: 100vh;
     top: 0;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 1px;
-      height: 100%;
-      background: var(--border-default);
-    }
-  }
-
-  .hamburger {
-    display: none;
-  }
-
-  .drawerHeader {
-    display: none;
-  }
-
-  .backdrop {
-    display: none;
-  }
-
-  .contentWrapper {
-    outline: none;
-    background: var(--surface-default);
-    z-index: 5;
-  }
-
-  .logo {
-    overflow: hidden;
-    width: 230px;
-    height: 55px;
-    padding: var(--space-xs) 0;
-    flex: none;
-    border-bottom: 1px solid var(--border-default);
+    z-index: 11;
     display: flex;
-    align-items: center;
-    color: var(--text-primary);
+    flex-direction: column;
+    height: 100vh;
+    border-right: 1px solid var(--border-default);
+    background: var(--surface-default);
+    user-select: none;
   }
 
-  .hamburgerBadge {
-    display: none;
-  }
-
-  .mobileSearch,
+  .hamburger,
+  .drawerHeader,
+  .backdrop,
   .mobileScheme {
     display: none;
   }
 
-  .desktopScheme {
-    display: inline-flex;
-    align-items: center;
-    padding-left: var(--space-md);
+  .innerSidebar {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
   }
 
-  .innerSidebar {
+  .drawerNav {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    z-index: 1;
-    width: 230px;
-    margin-top: 1px;
-    padding: var(--space-2xl) var(--space-md) var(--space-2xl) 0;
+    padding: var(--space-md) var(--space-md) var(--space-xl);
     scrollbar-width: thin;
     scrollbar-gutter: stable;
     scrollbar-color: var(--border-default) transparent;
-
-    &::after {
-      content: '';
-      height: 80px;
-      display: block;
-    }
   }
 
-  .desktopSearch {
-    flex: 1 1 auto;
+  .contentWrapper {
     min-width: 0;
-    display: flex;
+    outline: none;
+    background: var(--surface-default);
   }
 
+  /* The header of the main area stays at the top, in line with the header of the sidebar. */
   .mainHeader {
-    min-width: 700px;
-    border-bottom: 1px solid var(--border-default);
-    display: flex;
-    align-items: center;
-    height: 55px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: var(--docs-header-height);
+    padding-inline: var(--space-lg);
+  }
 
-    .otherResources {
-      flex: none;
-      margin-left: auto;
-      padding-right: var(--space-md);
-      margin-right: var(--space-md);
-      border-right: 1px solid var(--border-default);
-      display: flex;
-      align-items: center;
-      height: 32px;
-    }
+  .desktopScheme {
+    display: contents;
+  }
 
-    ul {
-      margin: 0 var(--space-lg) 0 0;
-      flex: none;
-      white-space: nowrap;
-
-      li {
-        display: inline-block;
-
-        a {
-          font-size: var(--type-m);
-          padding-left: var(--space-lg);
-          color: var(--text-primary);
-          display: flex;
-          align-items: center;
-          text-decoration: none;
-
-          &:hover {
-            text-decoration: underline;
-          }
-
-          svg {
-            margin-right: var(--space-4xs);
-            color: var(--text-accent);
-          }
-        }
-      }
-    }
+  .mainHeaderEmpty {
+    justify-content: flex-end;
   }
 
   .container {
-    padding-bottom: var(--space-lg);
+    --docs-bleed: clamp(0px, (100cqi - 2 * var(--space-lg) - var(--docs-article-width)) / 2, 60px);
   }
 
   .footer {
-    border-top: 1px solid var(--border-default);
-    padding: var(--space-xl) var(--space-lg);
-    margin-top: var(--space-xl);
     display: grid;
     column-gap: var(--space-xl);
-    grid-template-columns: 350px auto;
-  }
-
-  .lastUpdate {
-    padding: 0 var(--space-lg);
-  }
-
-  .footerCol {
-    flex: 1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
   }
 }
 
+/* From 1320 the main area also keeps the space for the table of contents. */
 @media (min-width: 1320px) {
   .root {
-    --content-width: 1010px;
-    --sidebar-width: 270px;
-    grid-template-columns:
-      minmax(
-        var(--sidebar-width),
-        calc((100% - var(--content-width) - var(--sidebar-width)) / 2 + var(--sidebar-width))
-      )
-      var(--content-width) 1fr;
+    --docs-main-min: calc(
+      var(--docs-article-width) + var(--space-2xl) + var(--docs-toc-width) + 2 * var(--space-lg)
+    );
   }
-
-  .sidebar,
-  .emptySidebar {
-    min-width: 292px;
-    width: 100%;
-  }
-
-  .logo {
-    width: var(--sidebar-width);
-  }
-
-  .innerSidebar {
-    width: var(--sidebar-width);
-  }
-
-  .container {
-    padding-left: var(--space-2xl);
-  }
-
-  .mainHeader {
-    width: var(--content-width);
-  }
-
-  .footer {
-    padding: var(--space-xl) 0;
-  }
-
-  .lastUpdate {
-    padding: 0;
-  }
-}
-
-/* A wide screen. The content and the sidebar of the docs get wider. */
-@media (min-width: 1500px) {
-  .root {
-    --content-width: 1110px;
-    --sidebar-width: 300px;
-  }
-}
-
-@media (min-width: 1600px) {
-  .root {
-    --content-width: 1210px;
-    --sidebar-width: 300px;
-  }
-}
-
-.footer {
-  font-size: var(--type-s);
-  line-height: 1.3;
-
-  a {
-    color: var(--text-accent);
-  }
-}
-
-.footerTitle {
-  font-weight: 500;
-  margin: 0 0 var(--space-2xs);
-  font-size: var(--type-m);
-}
-
-.lastUpdate {
-  color: var(--text-muted);
-  font-size: var(--type-s);
 }

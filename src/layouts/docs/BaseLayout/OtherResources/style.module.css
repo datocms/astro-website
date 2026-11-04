@@ -1,30 +1,37 @@
+/* A row of the sidebar footer. The menu opens above the row. */
 .root {
   position: relative;
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+}
+
+/* The toggler around the button fills the row. TargetToggler renders it. */
+.root > :global(target-toggler) {
+  display: flex;
+  flex: 1;
 }
 
 .trigger {
-  display: inline-flex;
+  display: flex;
+  flex: 1;
   align-items: center;
+  justify-content: space-between;
   gap: var(--space-3xs);
-  background: var(--surface-default);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4xs) var(--space-xs);
+  min-height: 32px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md);
+  padding-inline: var(--space-3xs);
   font: inherit;
   font-size: var(--type-s);
-  color: var(--text-primary);
+  color: var(--text-soft);
   cursor: pointer;
   white-space: nowrap;
   transition: background-color 150ms ease-out;
 
   &:hover,
-  &:focus-visible {
-    background: var(--surface-inverse-faint);
-  }
-
+  &:focus-visible,
   &[aria-expanded='true'] {
+    color: var(--text-primary);
     background: var(--surface-inverse-faint);
   }
 }
@@ -35,39 +42,34 @@
   height: 6px;
   border-right: 2px solid currentColor;
   border-bottom: 2px solid currentColor;
-  transform: rotate(45deg);
-  margin: -3px 0 1px 0;
+  /* The caret points up: the menu opens above. */
+  transform: rotate(-135deg);
+  margin: 1px 0 -3px 0;
   transition: transform 150ms ease-out;
   color: var(--text-muted);
 }
 
 .trigger[aria-expanded='true'] .caret {
-  transform: rotate(-135deg);
-  margin: 1px 0 -3px 0;
+  transform: rotate(45deg);
+  margin: -3px 0 1px 0;
 }
 
 .dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  bottom: calc(100% + var(--space-3xs));
   left: 0;
+  right: 0;
   display: none;
   flex-direction: column;
-  width: 270px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-default);
   background: var(--surface-default);
-  padding: var(--space-xs) var(--space-3xs) var(--space-3xs);
+  padding: var(--space-3xs);
   z-index: 20;
 }
 
 .dropdown[data-open] {
   display: flex;
-}
-
-/* The global class monoCaps gives the type. */
-.dropdownHeader {
-  margin: 0 var(--space-3xs) var(--space-3xs);
-  color: var(--text-muted);
 }
 
 .dropdownItem {

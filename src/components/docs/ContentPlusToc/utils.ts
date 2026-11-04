@@ -24,10 +24,6 @@ export function buildGroupsFromHeadings(structuredTextValue: unknown): TocGroup[
     return [];
   }
 
-  return [
-    {
-      title: 'In this page',
-      entries,
-    },
-  ];
+  // The headings of the page need no title: the TOC itself says "In this page".
+  return [{ entries }];
 }

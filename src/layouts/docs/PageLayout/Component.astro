@@ -20,6 +20,7 @@ import { Table } from '~/components/docs/blocks/Table';
 import { TabsBlock } from '~/components/docs/blocks/TabsBlock';
 import { TutorialVideo } from '~/components/docs/blocks/TutorialVideo';
 import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
+import { PageBar } from '~/components/docs/PageBar';
 import type { TocGroup } from '~/components/docs/ContentPlusToc/types';
 import { buildGroupsFromHeadings } from '~/components/docs/ContentPlusToc/utils';
 import {
@@ -93,8 +94,11 @@ const tocGroups = [
       }}
     />
   </Fragment>
+  <PageBar
+    slot="pagebar"
+    crumbs={group.pagesOrSections.length > 1 ? [page.parents[0]!.name, page.title] : [page.title]}
+  />
   <ContentPlusToc tocGroups={tocGroups}>
-    {group.pagesOrSections.length > 1 && <Fragment slot="kicker">{page.parents[0]!.name}</Fragment>}
     <Fragment slot="title">{page.title}</Fragment>
 
     <Prose>

@@ -1,0 +1,73 @@
+.root {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+/*
+ * The crumbs are on one line. A long crumb gets an ellipsis. The last
+ * crumb is the page: it has the full ink, the others are muted.
+ */
+.crumbs {
+  flex: 1;
+  min-width: 0;
+
+  ol {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--type-s);
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  li {
+    min-width: 0;
+    /*
+     * The crumb is trimmed to the caps. The padding gives room to the
+     * descenders in the clipped box, and the margin takes it back.
+     */
+    padding-block: 0.3em;
+    margin-block: -0.3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-muted);
+  }
+
+  li + li::before {
+    content: '/';
+    margin-right: var(--space-3xs);
+    color: var(--text-muted);
+  }
+
+  li[aria-current='page'] {
+    flex-shrink: 0;
+    max-width: 100%;
+    color: var(--text-primary);
+  }
+}
+
+.actions {
+  flex: none;
+}
+
+/*
+ * On a phone only the page shows: the other crumbs get no width, and
+ * without them the separator is alone.
+ */
+@media (max-width: 767px) {
+  .crumbs {
+    li:not([aria-current='page']) {
+      display: none;
+    }
+
+    li[aria-current='page']::before {
+      content: none;
+    }
+  }
+}

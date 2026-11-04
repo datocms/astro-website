@@ -64,6 +64,8 @@ function Trigger({
       onPointerEnter={prefetchModal}
       onFocus={prefetchModal}
       aria-label="Open search and AI"
+      // The icon has no text: the tooltip gives the name and the shortcut.
+      title={variant === 'icon' ? `Search or Ask AI (${isMac ? '⌘' : 'Ctrl+'}K)` : undefined}
     >
       <span className={s.triggerIcon}>
         <IconReact icon={faMagnifyingGlass} />

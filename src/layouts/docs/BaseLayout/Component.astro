@@ -12,7 +12,6 @@ import type { TitleMetaLinkTag } from '@datocms/astro';
 import '../../../styles/global.css';
 // The rules of the docs that cannot sit in a CSS module (see the file).
 import '../docs.css';
-import { DatoLogo } from '~/components/DatoLogo';
 import symbol from '~/assets/logo/dato-symbol.svg?raw';
 import { iconDataUri } from '~/lib/iconDataUri';
 import { BaseLayout } from '~/layouts/BaseLayout';
@@ -34,9 +33,10 @@ type Props = {
 
 const { seo, contentWrapperComponent, lastUpdatedAt } = Astro.props;
 const ContentWrapper = contentWrapperComponent || 'div';
+const hasPageBar = Astro.slots.has('pagebar');
 ---
 
-<BaseLayout seo={seo} theme="docs" density="dense" clientRouter>
+<BaseLayout seo={seo} theme="docs" density="dense">
   <Fragment slot="head">
     <slot name="head" />
     <link
@@ -46,35 +46,37 @@ const ContentWrapper = contentWrapperComponent || 'div';
       type="font/woff2"
       crossorigin
     />
-    <SchemeScript keepOnSwap />
+    <SchemeScript />
   </Fragment>
 
   <docs-sidebar-drawer>
     <div class={s.root} data-drawer-root>
       <div class={s.sidebar}>
         <div class={s.sidebarHeader}>
-          <a href="/" class={s.logo}>
-            <DatoLogo version="long" height={20} label="DatoCMS" />
-          </a>
-          <TargetToggler targetId="sidebar">
-            <button type="button" class={s.hamburger} aria-label="Toggle navigation menu">
-              <span class={s.iconBars}><Icon icon={faBars} /></span>
-              <span class={s.iconTimes}><Icon icon={faXmark} /></span>
-              <span class={s.hamburgerBadge} aria-hidden="true" set:html={symbol} />
-            </button>
-          </TargetToggler>
-          <div class={s.mobileSearch}>
-            <Search client:idle variant="docs" />
+          <div class={s.brand}>
+            <a href="/" class={s.logo} aria-label="DatoCMS home" set:html={symbol} />
+            <a href="/docs" class={s.docsHome}>Docs</a>
           </div>
-          <div class={s.mobileScheme}>
-            <SchemeToggle />
+          <div class={s.headerTools}>
+            <span class={s.search}>
+              <Search client:idle variant="icon" />
+            </span>
+            <span class={s.mobileScheme}>
+              <SchemeToggle />
+            </span>
+            <TargetToggler targetId="sidebar">
+              <button type="button" class={s.hamburger} aria-label="Toggle navigation menu">
+                <span class={s.iconBars}><Icon icon={faBars} /></span>
+                <span class={s.iconTimes}><Icon icon={faXmark} /></span>
+              </button>
+            </TargetToggler>
           </div>
         </div>
         <aside class={s.innerSidebar} data-datocms-noindex id="sidebar">
           <div class={s.drawerHeader}>
             <div class={s.drawerBranding}>
               <span class={s.drawerSymbol} aria-hidden="true" set:html={symbol} />
-              <span class={s.drawerTitle}>DatoCMS Docs</span>
+              <span class:list={[s.drawerTitle, 'capTrim']}>DatoCMS Docs</span>
             </div>
             <button
               type="button"
@@ -88,60 +90,59 @@ const ContentWrapper = contentWrapperComponent || 'div';
           <div class={s.drawerNav}>
             <slot name="sidebar" />
           </div>
+          <div class={s.sidebarFooter}>
+            <OtherResources />
+            <a href="/support" class={s.footerLink}>
+              <Icon icon={faHeadset} />
+              <span class="capTrim">Ask for help</span>
+            </a>
+            <a
+              href="https://status.datocms.com"
+              target="_blank"
+              rel="noreferrer"
+              class={s.footerLink}
+            >
+              <Icon icon={faGaugeHigh} />
+              <span class="capTrim">Status page</span>
+            </a>
+          </div>
         </aside>
         <div class={s.backdrop} data-sidebar-backdrop></div>
       </div>
       <div class={s.contentWrapper} data-drawer-content>
-        <div class={s.mainHeader}>
-          <div class={s.desktopSearch}>
-            <Search client:idle variant="docs" />
-          </div>
-          <div class={s.otherResources}>
-            <OtherResources />
-          </div>
-          <ul>
-            <li>
-              <a href="/support">
-                <Icon icon={faHeadset} />
-                Ask for help!
-              </a>
-            </li>
-            <li>
-              <a href="https://status.datocms.com" target="_blank" rel="noreferrer">
-                <Icon icon={faGaugeHigh} />
-                Status page
-              </a>
-            </li>
-            <li class={s.desktopScheme}>
-              <SchemeToggle />
-            </li>
-          </ul>
+        <div class:list={[s.mainHeader, !hasPageBar && s.mainHeaderEmpty]}>
+          <slot name="pagebar" />
+          <span class={s.desktopScheme}>
+            <SchemeToggle />
+          </span>
         </div>
         <ContentWrapper>
-          <div class={s.container} transition:animate="slide">
+          <div class={s.container}>
             <slot />
-            {
-              lastUpdatedAt && (
-                <p class={s.lastUpdate}>
-                  Last updated: <LLMDate date={lastUpdatedAt} />
-                </p>
-              )
-            }
-            <div class={s.footer} data-datocms-noindex>
-              <div class={s.footerCol}>
-                <div class={s.footerTitle}>Did this doc help you?</div>
-                <div class={s.footerBody}>
-                  <Feedback />
+            <div class={s.pageEnd}>
+              {
+                lastUpdatedAt && (
+                  <p class={s.lastUpdate}>
+                    Last updated: <LLMDate date={lastUpdatedAt} />
+                  </p>
+                )
+              }
+              <div class={s.footer} data-datocms-noindex>
+                <div class={s.footerCol}>
+                  <div class={s.footerTitle}>Did this doc help you?</div>
+                  <div class={s.footerBody}>
+                    <Feedback />
+                  </div>
                 </div>
-              </div>
-              <div class={s.footerCol}>
-                <div class={s.footerTitle}>Need help?</div>
-                <div class={s.footerBody}>
-                  Explore our <a href="https://community.datocms.com">forum</a>,{' '}
-                  <a href="/support">contact support</a>, or{' '}
-                  <a href="/enterprise-headless-cms#form"> connect with our sales team </a>
-                  . You can also chat live with other users in our{' '}
-                  <a href="/slack">Slack channel</a>.
+                <div class={s.footerCol}>
+                  <div class={s.footerTitle}>Need help?</div>
+                  <div class={s.footerBody}>
+                    Explore our <a href="https://community.datocms.com">forum</a>,{' '}
+                    <a href="/support">contact support</a>, or{' '}
+                    <a href="/enterprise-headless-cms#form"> connect with our sales team </a>
+                    . You can also chat live with other users in our{' '}
+                    <a href="/slack">Slack channel</a>.
+                  </div>
                 </div>
               </div>
             </div>
