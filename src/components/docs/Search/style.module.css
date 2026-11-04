@@ -334,7 +334,7 @@
   flex-shrink: 0;
   align-items: center;
   gap: var(--space-2xs);
-  height: 73px;
+  height: 60px;
   padding: 0 var(--space-md);
 }
 
@@ -355,8 +355,8 @@
 
   svg {
     display: block;
-    width: 21px;
-    height: 21px;
+    width: 18px;
+    height: 18px;
     color: currentColor;
     fill: currentColor;
   }
@@ -372,10 +372,10 @@
   background: transparent;
   color: var(--text-primary);
   font-family: inherit;
-  font-size: var(--type-xl);
+  font-size: var(--type-l);
   font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
   outline: none;
   appearance: none;
 
@@ -391,6 +391,26 @@
 
   &::-webkit-search-cancel-button {
     display: none;
+  }
+}
+
+/*
+ * The bottom row (the AI question) is smaller than the top row: its text
+ * goes with the text of the conversation. 16px or more, thus iOS does not
+ * zoom the page when the field gets the focus.
+ */
+.bottomInputRow {
+  height: 56px;
+
+  .inputIcon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  input {
+    font-size: var(--type-m);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -427,11 +447,11 @@
 /* === Section label (Search, Quick links, Try asking) === */
 
 .sectionLabel {
-  padding: var(--space-sm) 0 var(--space-5xs);
-  font-size: var(--type-xl);
+  padding: var(--space-sm) 0 var(--space-2xs);
+  font-size: var(--type-s);
   font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
   color: var(--text-muted);
 }
 
@@ -439,22 +459,25 @@
   padding-top: 0;
 }
 
-/* === Rows of the home, of the search prompts and of the AI prompts === */
+/*
+ * === Rows of the home, of the search prompts and of the AI prompts ===
+ * A prompt is a sentence and can wrap: the icon aligns with the first line.
+ */
 
 .row {
   display: flex;
-  align-items: center;
-  gap: var(--space-3xs);
+  align-items: flex-start;
+  gap: var(--space-2xs);
   width: 100%;
-  padding: var(--space-5xs) 0;
+  padding: var(--space-3xs) 0;
   border: 0;
   background: transparent;
   color: var(--text-muted);
   font-family: inherit;
-  font-size: var(--type-xl);
+  font-size: var(--type-m);
   font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
   text-align: left;
   text-decoration: none;
   cursor: pointer;
@@ -482,6 +505,7 @@
   align-items: center;
   justify-content: center;
   width: 0.8em;
+  height: 1lh;
 
   svg {
     display: block;
@@ -681,9 +705,9 @@
 .result {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
+  gap: var(--space-4xs);
   margin-inline: calc(var(--space-md) * -1);
-  padding: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   border-bottom: 1px solid var(--border-default);
   color: var(--text-primary);
   text-decoration: none;
@@ -727,8 +751,9 @@
   align-items: center;
   gap: var(--space-3xs);
   min-width: 0;
+  margin-bottom: var(--space-5xs);
   color: var(--text-muted);
-  font-size: var(--type-s);
+  font-size: var(--type-xs);
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.01em;
@@ -749,10 +774,10 @@
 
 .resultTitle {
   overflow: hidden;
-  font-size: var(--type-xl);
+  font-size: var(--type-m);
   font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   text-overflow: ellipsis;
 
@@ -772,8 +797,8 @@
   display: -webkit-box;
   overflow: hidden;
   color: var(--text-muted);
-  font-size: var(--type-m);
-  line-height: 1.3;
+  font-size: var(--type-s);
+  line-height: 1.4;
   letter-spacing: -0.01em;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -790,9 +815,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
+  gap: var(--space-4xs);
   margin-inline: calc(var(--space-md) * -1);
-  padding: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   overflow: hidden;
   border-bottom: 1px solid var(--border-default);
   animation: skeletonFadeIn 180ms var(--ease-out) backwards;
@@ -822,17 +847,17 @@
 
 .skeletonLineMeta {
   width: 28%;
-  height: var(--type-s);
+  height: var(--type-xs);
 }
 
 .skeletonLineTitle {
   width: 55%;
-  height: var(--type-xl);
+  height: var(--type-m);
 }
 
 .skeletonLineBlurb {
   width: 95%;
-  height: var(--type-m);
+  height: var(--type-s);
 }
 
 .skeletonLineBlurbShort {
@@ -862,7 +887,7 @@
   flex-direction: column;
   gap: var(--space-md);
   padding: 0 0 var(--space-sm);
-  font-size: var(--type-m);
+  font-size: var(--type-s);
   line-height: 1.5;
   letter-spacing: -0.01em;
 }
@@ -1032,7 +1057,7 @@
 
   /* h1: the title role. h2 to h4: the medium body role. */
   h1 {
-    font-size: var(--type-xl);
+    font-size: var(--type-l);
     line-height: 1.2;
     letter-spacing: -0.02em;
   }
@@ -1341,7 +1366,7 @@
 .errorLine {
   margin: var(--space-3xs) 0 0;
   color: var(--text-negative);
-  font-size: var(--type-m);
+  font-size: var(--type-s);
   line-height: 1.3;
 }
 
@@ -1361,8 +1386,8 @@
   margin: 0;
   padding: var(--space-md) 0;
   color: var(--text-muted);
-  font-size: var(--type-m);
-  line-height: 1.3;
+  font-size: var(--type-s);
+  line-height: 1.4;
   letter-spacing: -0.01em;
 }
 

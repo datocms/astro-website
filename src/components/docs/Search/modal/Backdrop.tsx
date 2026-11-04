@@ -11,7 +11,15 @@ type Props = {
 export function ModalBackdrop({ children, onMouseDown, phase }: Props) {
   return (
     // The modal always has the default theme, also on a page with a theme.
-    <div className={s.backdrop} onMouseDown={onMouseDown} data-state={phase} data-theme="default">
+    // It always has the dense type scale: on a marketing page and on a docs
+    // page, the text of the modal has the same size.
+    <div
+      className={s.backdrop}
+      onMouseDown={onMouseDown}
+      data-state={phase}
+      data-theme="default"
+      data-density="dense"
+    >
       {children}
     </div>
   );
