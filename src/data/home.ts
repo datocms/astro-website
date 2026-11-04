@@ -614,20 +614,6 @@ export const community: CommunityData = {
   ],
 };
 
-export const ctaSlack: CtaBannerData = {
-  variant: 'light',
-  theme: 'green',
-  headline: 'Or join us on Slack.',
-  subline: 'Talk to us and to 3,000+ other developers in real time.',
-  buttons: [
-    {
-      label: 'Join Us On Slack',
-      href: 'https://datocms.com/slack',
-      variant: 'soft',
-    },
-  ],
-};
-
 export const ctaPricing: CtaBannerData = {
   variant: 'light',
   theme: 'default',

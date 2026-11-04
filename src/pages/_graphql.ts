@@ -18,7 +18,7 @@ export const query = graphql(
         }
         yoastAnalysis
       }
-      productUpdates: allChangelogEntries(first: 6, orderBy: _firstPublishedAt_DESC) {
+      productUpdates: allChangelogEntries(first: 5, orderBy: _firstPublishedAt_DESC) {
         ...ProductUpdatesItemFragment
       }
       successStories: allSuccessStories(first: 6, orderBy: _firstPublishedAt_DESC) {
