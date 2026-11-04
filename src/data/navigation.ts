@@ -22,7 +22,7 @@ interface NavColumn {
   sections: NavSection[];
 }
 
-/** A plain link (Partners, Philosophy, Pricing), or a group with the columns of a dropdown card. */
+/** A plain link (Philosophy, Pricing), or a group with the columns of a dropdown card. */
 export type NavGroup =
   | { label: string; href: string; columns?: undefined }
   | { label: string; href?: undefined; columns: NavColumn[] };
@@ -83,6 +83,11 @@ const compare = [
 const caseStudies = l('Case studies', '/case-studies', 'Projects that teams built on DatoCMS');
 const wallOfLove = l('Wall of love', '/wall', 'What customers say about us');
 const casualChats = l('Casual chats', '/blog/casual-chats', 'Conversations with customers');
+
+// The partner pages. The header shows the directory and the program, each
+// with a line that says what it holds. The footer shows all four.
+const agencyDirectory = l('Agency directory', '/partners', 'Agencies that build with DatoCMS');
+const partnerProgram = l('Partner program', '/partner-program', 'Become a DatoCMS partner');
 
 export const mainNavigation: NavGroup[] = [
   {
@@ -151,7 +156,10 @@ export const mainNavigation: NavGroup[] = [
       },
     ],
   },
-  { label: 'Partners', href: '/partners' },
+  {
+    label: 'Partners',
+    columns: [{ sections: [{ heading: 'Partners', links: [agencyDirectory, partnerProgram] }] }],
+  },
   { label: 'Philosophy', href: '/philosophy' },
   { label: 'Pricing', href: '/pricing' },
 ];
@@ -209,9 +217,9 @@ export const footerColumns: FooterColumn[] = [
       {
         title: 'Partners',
         links: [
-          l('Agency directory', '/partners'),
+          footerLink(agencyDirectory),
           l('Partner showcase', '/partners/showcase'),
-          l('Become a partner', '/partner-program'),
+          footerLink(partnerProgram),
           l('Tech partners', '/tech-partners'),
         ],
       },
