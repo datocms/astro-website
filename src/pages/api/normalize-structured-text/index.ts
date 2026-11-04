@@ -210,9 +210,8 @@ export const POST: APIRoute = async ({ url, request }) => {
       const content = /* HTML */ `
         <p>
           <a
-            href="https://cms.datocms.com/editor/item_types/${
-              item.relationships.item_type.data.id
-            }/items/${item.id}/edit"
+            href="https://cms.datocms.com/editor/item_types/${item.relationships.item_type.data
+              .id}/items/${item.id}/edit"
             >This record</a
           >
           contains some links that cannot be normalized/converted into records, as their structured

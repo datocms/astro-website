@@ -100,7 +100,8 @@ export async function updateStructuredTextFields(
     } else if (field.attributes.field_type === 'rich_text') {
       // Handle rich text fields with nested blocks
       const itemBlocksOrIds = item.attributes[field.attributes.api_key] as (
-        string | RawApiTypes.Item
+        | string
+        | RawApiTypes.Item
       )[];
       const result: Array<RawApiTypes.ItemUpdateSchema['data'] | string> = [];
       for (const itemBlockOrId of itemBlocksOrIds) {
@@ -120,7 +121,9 @@ export async function updateStructuredTextFields(
     } else if (field.attributes.field_type === 'single_block') {
       // Handle single block fields
       const itemBlockOrId = item.attributes[field.attributes.api_key] as
-        string | RawApiTypes.Item | null;
+        | string
+        | RawApiTypes.Item
+        | null;
       if (itemBlockOrId && isItem(itemBlockOrId)) {
         const result = await updateStructuredTextFields(fieldsFinder, itemBlockOrId, cb, [
           ...path,
