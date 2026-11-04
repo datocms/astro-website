@@ -14,4 +14,8 @@ export interface LogoItem {
    * `svg` does. Use it in place of `src`.
    */
   mask?: string;
+  /** The page of the client, such as its case study. The logo is then a link. */
+  href?: string;
+  /** A short result of the client, such as "92.5% less code". It shows in a tooltip on the link. */
+  description?: string;
 }

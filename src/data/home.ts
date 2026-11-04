@@ -190,16 +190,56 @@ export const homeHero: HomeHeroData = {
   ],
   logosLabel: 'Trusted by teams at',
   logos: [
-    c.polestar,
-    c.hashicorp,
-    c.arduino,
-    c.ricola,
-    c.lofficiel,
-    c.satispay,
-    c.wild,
-    c.freitag,
-    c.payfit,
-    c.netflix,
+    {
+      ...c.polestar,
+      href: '/case-studies/polestar',
+      description: '250+ editors powering 28+ locales across 35 roles',
+    },
+    {
+      ...c.hashicorp,
+      href: '/case-studies/hashicorp',
+      description: '5M API calls and 2TB traffic monthly, stress free',
+    },
+    {
+      ...c.arduino,
+      href: '/case-studies/arduino',
+      description: '92.5% less code and 50% faster time to market',
+    },
+    {
+      ...c.ricola,
+      href: '/partners/dept/showcase/ricola',
+      description: 'A futureproof platform for a globally loved brand',
+    },
+    {
+      ...c.lofficiel,
+      href: '/partners/cantiere-creativo/showcase/l-officiel',
+      description: '30 magazines powered from a single instance',
+    },
+    {
+      ...c.satispay,
+      href: '/partners/quinck/showcase/satispay',
+      description: "A powerhouse stack for Europe's leading fintech",
+    },
+    {
+      ...c.wild,
+      href: '/partners/rotate/showcase/wild',
+      description: 'Combining Shopify and Dato for eCommerce perfection',
+    },
+    {
+      ...c.freitag,
+      href: '/partners/dept/showcase/freitag-f-cut',
+      description: 'A central database layer for 300K products in 5 locales',
+    },
+    {
+      ...c.payfit,
+      href: '/partners/nicolas-spehler/showcase/payfit',
+      description: "A modern website for the UK's leading Payroll SaaS",
+    },
+    {
+      ...c.netflix,
+      href: '/partners/thomas-aufresne/showcase/netflix-france-10-year-anniversary',
+      description: 'A digital experience marking 10 years of Netflix France',
+    },
   ],
 };
 

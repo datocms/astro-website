@@ -68,6 +68,54 @@ span.inline {
   animation-play-state: paused;
 }
 
+/* The line stops under the pointer, thus a logo is easy to click. */
+.logosLine:has(.link):hover .track {
+  animation-play-state: paused;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  color: inherit;
+  transition: opacity 150ms ease;
+}
+
+/*
+ * The bubble of the descriptions, the same as Tooltip. A popover has a
+ * margin, a border and an inset from the browser: remove them.
+ */
+.bubble {
+  position: fixed;
+  inset: auto;
+  top: 0;
+  left: 0;
+  width: max-content;
+  /* Wider than Tooltip: each description stays on one line. */
+  max-width: min(400px, calc(100vw - 20px));
+  margin: 0;
+  padding: var(--space-3xs) var(--space-2xs);
+  overflow: visible;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse-strong);
+  pointer-events: none;
+}
+
+.arrow {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: rotate(45deg);
+}
+
+.link:hover {
+  /* stylelint-disable-next-line datocms/text-roles -- A logo is an image, not text. */
+  opacity: 0.6;
+}
+
 @keyframes marquee {
   to {
     transform: translateX(calc(var(--marquee-distance) * -1));

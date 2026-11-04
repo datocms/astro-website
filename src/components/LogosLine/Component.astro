@@ -39,14 +39,48 @@ const {
     {
       logos.map((logo) => (
         <li class={styles.item}>
-          <Logo logo={logo} class:list={[styles.logo, logo.svg && styles.inline]} loading="eager" />
+          {logo.href ? (
+            <a class={styles.link} href={logo.href} data-description={logo.description}>
+              <Logo
+                logo={logo}
+                class:list={[styles.logo, logo.svg && styles.inline]}
+                loading="eager"
+              />
+              {logo.description && <span class="visuallyHidden">: {logo.description}</span>}
+            </a>
+          ) : (
+            <Logo
+              logo={logo}
+              class:list={[styles.logo, logo.svg && styles.inline]}
+              loading="eager"
+            />
+          )}
         </li>
       ))
     }
   </ul>
+  {
+    /*
+      One bubble for all the links of the line. It is a popover, thus it is in
+      the top layer: the overflow and the transform of the track do not cut it.
+      Screen readers do not read it: each link has the text in a hidden span.
+    */
+    logos.some((logo) => logo.description) && (
+      <span
+        class:list={[styles.bubble, 'caption']}
+        popover="manual"
+        aria-hidden="true"
+        data-logos-bubble
+      >
+        <span data-logos-bubble-text />
+        <span class={styles.arrow} data-logos-bubble-arrow />
+      </span>
+    )
+  }
 </logos-line>
 
 <script>
+  import { arrow, autoUpdate, computePosition, flip, offset, shift } from '@floating-ui/dom';
   import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
   import { WebComponent } from '~/lib/WebComponent';
 
@@ -57,6 +91,7 @@ const {
     class extends WebComponent {
       parsedCallback() {
         const track = this.$('[data-logos-track]');
+        if (this.querySelector('[data-logos-bubble]')) this.setUpTooltip(track);
         if (prefersReducedMotion()) return;
         const items = [...track.children] as HTMLElement[];
 
@@ -78,6 +113,8 @@ const {
               const clone = item.cloneNode(true) as HTMLElement;
               clone.dataset.clone = '';
               clone.setAttribute('aria-hidden', 'true');
+              // The copies are not in the tab order: the keyboard goes through each link one time.
+              for (const link of clone.querySelectorAll('a')) link.tabIndex = -1;
               track.appendChild(clone);
             }
           }
@@ -101,6 +138,59 @@ const {
         onVisibilityChange(this, (visible) => {
           this.dataset.paused = visible ? 'false' : 'true';
         });
+      }
+
+      /** Show the description of a link in the bubble, on hover and on focus. */
+      setUpTooltip(track: HTMLElement) {
+        const bubble = this.$('[data-logos-bubble]');
+        const text = this.$('[data-logos-bubble-text]');
+        const arrowElement = this.$('[data-logos-bubble-arrow]');
+        let current: HTMLElement | null = null;
+        let stop: (() => void) | null = null;
+
+        const hide = () => {
+          stop?.();
+          stop = null;
+          current = null;
+          if (bubble.matches(':popover-open')) bubble.hidePopover();
+        };
+
+        const show = (link: HTMLElement) => {
+          if (link === current) return;
+          hide();
+          current = link;
+          text.textContent = link.dataset.description ?? '';
+          bubble.showPopover();
+          stop = autoUpdate(link, bubble, async () => {
+            const { x, y, placement, middlewareData } = await computePosition(link, bubble, {
+              placement: 'top',
+              strategy: 'fixed',
+              middleware: [
+                offset(10),
+                flip({ fallbackPlacements: ['bottom'] }),
+                shift({ padding: 10 }),
+                arrow({ element: arrowElement, padding: 5 }),
+              ],
+            });
+            Object.assign(bubble.style, { left: `${x}px`, top: `${y}px` });
+            const side = placement.startsWith('top') ? 'bottom' : 'top';
+            Object.assign(arrowElement.style, {
+              left: `${middlewareData.arrow?.x ?? 0}px`,
+              top: '',
+              bottom: '',
+              [side]: `${-arrowElement.offsetWidth / 2}px`,
+            });
+          });
+        };
+
+        this.on(track, 'mouseover', (event) => {
+          const link = (event.target as Element).closest<HTMLElement>('a[data-description]');
+          if (link) show(link);
+          else hide();
+        });
+        this.on(track, 'mouseleave', hide);
+        this.on(track, 'focusin', 'a[data-description]', (_event, link) => show(link));
+        this.on(track, 'focusout', hide);
       }
     },
   );
