@@ -10,6 +10,7 @@ import {
   seoCanonicalIfMissing,
 } from '~/lib/datocms/seo';
 import { organizationNode, webPageNode, websiteNode } from '~/lib/jsonLd';
+import { picturesFor } from '~/lib/pictures';
 import { JsonLd } from '~/components/JsonLd';
 
 /*
@@ -92,7 +93,7 @@ const pageMeta = extractFromSeoTags(stripStega(finalSeo));
         '@graph': [
           organizationNode(base),
           websiteNode(base),
-          webPageNode(base, canonicalHref, pageMeta),
+          webPageNode(base, canonicalHref, pageMeta, picturesFor(Astro.url.pathname)),
         ],
       }}
     />

@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { SitemapStream, streamToPromise } from 'sitemap';
 import { baseUrl } from '~/lib/draftMode';
+import { picturesFor } from '~/lib/pictures';
 import { toArrayBuffer } from '~/lib/toArrayBuffer';
 import { handleUnexpectedError } from './api/_utils';
 
@@ -64,7 +65,8 @@ const BLACKLISTED_URL_PREFIXES = ['/docs/dashboard-api', '/lp'];
 
 export const GET: APIRoute = async ({ request }) => {
   try {
-    const stream = new SitemapStream({ hostname: baseUrl(request) });
+    const base = baseUrl(request);
+    const stream = new SitemapStream({ hostname: base });
     const sitemapPromise = streamToPromise(stream);
 
     const responseHeaders = new Headers({
@@ -82,7 +84,13 @@ export const GET: APIRoute = async ({ request }) => {
         continue;
       }
 
-      stream.write(typeof item === 'string' ? { url } : item);
+      const img = picturesFor(new URL(url, base).pathname).map((picture) => ({
+        url: picture.url,
+        title: picture.title,
+        caption: picture.alt,
+      }));
+      const entry = typeof item === 'string' ? { url } : item;
+      stream.write(img.length > 0 ? { ...entry, img } : entry);
     }
 
     stream.end();

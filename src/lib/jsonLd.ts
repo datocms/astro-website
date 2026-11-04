@@ -1,6 +1,7 @@
 import type { AstroGlobal } from 'astro';
 import type { Organization, Thing, WebPage, WebSite } from 'schema-dts';
 import { baseUrl } from '~/lib/draftMode';
+import type { Picture } from '~/lib/pictures';
 
 export function organizationId(base: string | URL) {
   return new URL('/#organization', base).href;
@@ -84,6 +85,7 @@ export function webPageNode(
   base: string | URL,
   url: string,
   page: { title?: string | null; description?: string; image?: string },
+  pictures: Picture[] = [],
 ): WebPage {
   return {
     '@type': 'WebPage',
@@ -94,6 +96,28 @@ export function webPageNode(
     inLanguage: 'en',
     isPartOf: { '@id': websiteId(base) },
     ...(page.image ? { primaryImageOfPage: { '@type': 'ImageObject', url: page.image } } : {}),
+    ...(pictures.length > 0
+      ? {
+          image: pictures.map((picture) => ({
+            '@type': 'ImageObject' as const,
+            '@id': `${url}#picture-${picture.section}`,
+            contentUrl: picture.url,
+            url: picture.url,
+            name: picture.title,
+            description: picture.alt,
+            width: { '@type': 'QuantitativeValue' as const, value: picture.width, unitCode: 'E37' },
+            height: {
+              '@type': 'QuantitativeValue' as const,
+              value: picture.height,
+              unitCode: 'E37',
+            },
+            caption: picture.alt,
+            creator: { '@id': organizationId(base) },
+            creditText: 'DatoCMS',
+            representativeOfPage: false,
+          })),
+        }
+      : {}),
   };
 }
 
