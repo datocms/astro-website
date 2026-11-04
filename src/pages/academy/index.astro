@@ -19,18 +19,24 @@ if (!page || courses.length === 0) {
 const listed = courses.filter((course) => course.chapters.length > 0);
 ---
 
-<Layout theme="orange" seo={page.seo} headerVariant="accent">
+<Layout theme="default" seo={page.seo} headerVariant="accent">
   <Hero
     variant="accent"
     headline="DatoCMS Academy"
     intro="Browse the DatoCMS Academy for a deep dive into the concepts around headless CMS, content APIs and frontend frameworks, to get up to speed with headless content management."
   />
-  {/* Each course is a row of two cells. The picture changes side from row to row. */}
+  {
+    /*
+    Each course is a row of two cells. The picture changes side from row to
+    row. The rows use the orange theme of the course pages, not the yellow
+    theme of this page.
+  */
+  }
   <Section padding="none" flush>
     <ol class={s.courses}>
       {
         listed.map((course, index) => (
-          <li>
+          <li data-theme="orange">
             <CourseCell course={course} reverse={index % 2 === 1} />
           </li>
         ))
