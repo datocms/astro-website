@@ -1,3 +1,4 @@
+import { featureTargets } from '~/lib/retiredRoutes';
 import { graphql, readFragment, type FragmentOf } from '../graphql';
 
 export const FeatureUrlFragment = graphql(/* GraphQL */ `
@@ -8,5 +9,5 @@ export const FeatureUrlFragment = graphql(/* GraphQL */ `
 
 export function buildUrlForFeature(feature: FragmentOf<typeof FeatureUrlFragment>) {
   const data = readFragment(FeatureUrlFragment, feature);
-  return `/features/${data.slug}`;
+  return featureTargets[data.slug] ?? '/features';
 }

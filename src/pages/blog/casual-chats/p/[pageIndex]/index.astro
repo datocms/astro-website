@@ -6,11 +6,13 @@ import { loadFeedPage, parsePageIndex } from '../../../_feed';
 const page = parsePageIndex(Astro.params.pageIndex);
 if (page === 'redirect') return Astro.redirect('/blog/casual-chats', 301);
 
-const feed = page ? await loadFeedPage(Astro, page, { kind: 'chats' }) : null;
-if (!feed) {
+if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+const feed = await loadFeedPage(Astro, page, { kind: 'chats' });
+if (!feed) return Astro.redirect('/blog/casual-chats', 301);
 ---
 
 <FeedPage feed={feed} />

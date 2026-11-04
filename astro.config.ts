@@ -7,6 +7,12 @@ import { writeFile } from 'fs/promises';
 import type { Plugin } from 'vite';
 import { cssLayerArea } from './css-scope.mjs';
 import { readHeader } from './src/lib/pixel-video/format';
+import {
+  featureTargets,
+  landingPageTargets,
+  redirectsFrom,
+  useCaseTargets,
+} from './src/lib/retiredRoutes';
 
 const MAX_CLIENT_CHUNK_SIZE_IN_KB = 500;
 
@@ -419,31 +425,13 @@ export default defineConfig({
     '/cma-ts-schema':
       '/docs/content-management-api/resources/item#type-safe-development-with-typescript',
     '/search': '/docs/site-search',
-    // The feature pages of the Editing pillar redirect to chapters of /editor-experience.
-    '/features/structured-content-cms': '/editor-experience#structured-content',
-    '/features/visual-editing': '/editor-experience#visual-editing',
-    '/features/dynamic-layouts': '/editor-experience#dynamic-layouts',
-    '/features/headless-cms-multi-language': '/editor-experience#localization',
-    '/features/workflow-cms': '/editor-experience#workflows',
-    '/features/editor-experience': '/editor-experience',
-    // The dark mode page is only an entry in the index of the features.
-    '/features/dark-mode': '/features#editor-experience',
-    // The feature pages of the Developers pillar redirect to chapters of /developers.
-    '/features/schema-builder': '/developers#schema',
-    '/features/headless-cms-graphql': '/developers#graphql',
-    '/features/real-time-api': '/developers#real-time',
-    '/features/cache-tags': '/developers#delivery',
-    // The numbers section holds the claims of the CDN page.
-    '/features/worldwide-cdn': '/developers#numbers',
-    '/features/data-integrity': '/developers#environments',
-    '/features/developer-experience': '/developers',
-    '/features/plugins': '/developers#plugins',
+    ...redirectsFrom('/features', featureTargets),
+    ...redirectsFrom('/use-cases', useCaseTargets),
+    ...redirectsFrom('/cms', landingPageTargets),
     '/made-for/developers': '/developers',
     // The feature pages of the Media pillar redirect to chapters of /media.
     '/features/images-api': '/media#images',
     '/features/video-api': '/media#video',
-    // The AI page redirects to the AI pillar.
-    '/features/ai': '/ai',
     // The about page redirects to the philosophy page.
     '/company/about': '/philosophy',
     '/blog/2': '/blog/p/2',
@@ -475,37 +463,30 @@ export default defineConfig({
     '/marketplace/starters': '/starters',
     '/marketplace/starters/[...rest]': '/starters/[...rest]',
     '/cms/react': '/cms/nextjs-cms',
-    '/cms/react-cms': '/cms/nextjs-cms',
-    '/cms/hugo': '/',
+    '/cms/hugo': '/developers',
     '/cms/nextjs': '/cms/nextjs-cms',
     '/cms/nuxt-js': '/cms/nuxtjs-cms',
-    '/cms/jekyll': '/',
-    '/cms/middleman': '/',
+    '/cms/jekyll': '/developers',
+    '/cms/middleman': '/developers',
     '/cms/vue': '/cms/nuxtjs-cms',
-    '/cms/vue-js-cms': '/cms/nuxtjs-cms',
-    '/cms/gatsbyjs': '/',
-    '/cms/gatsbyjs-cms': '/',
-    '/cms/gatsby-cms': '/',
+    '/cms/gatsbyjs': '/developers',
+    '/cms/gatsbyjs-cms': '/developers',
+    '/company/brand-assets': '/philosophy',
     '/legal/security': '/security',
     '/legal/privacy': '/legal/privacy-policy',
     '/pricing/compare': '/pricing',
     '/partners/harvey-cameron/showcase/jacuzzi ': '/partners',
-    '/use-cases': '/',
-    '/use-cases/knowledge-management': '/',
-    '/use-cases/ecommerce': '/',
-    '/use-cases/modern-websites': '/',
-    '/use-cases/digital-publishing': '/',
-    '/use-cases/headless-cms-travel': '/',
-    '/lp/migcs': '/',
-    '/lp/migcs/thanks': '/',
+    '/use-cases': '/case-studies',
+    '/lp/migcs': '/features',
+    '/lp/migcs/thanks': '/features',
     '/lp/modernize-cms': '/partners/voorhoede',
     '/lp/modernize-cms/thanks': '/partners/voorhoede',
     '/lp/nuxt2eol': '/partners/voorhoede',
     '/lp/nuxt2eol/thanks': '/partners/voorhoede',
-    '/marketplace/plugins/i/datocms-plugin-gatsby-cloud': '/',
+    '/marketplace/plugins/i/datocms-plugin-gatsby-cloud': '/plugins',
     '/partners/harvey-cameron': '/partners',
     '/partners/dev-kitchen': '/partners',
-    '/cms/hugo-cms': '/',
+    '/cms/hugo-cms': '/developers',
     '/docs/gatsby': '/docs',
     '/docs/other-ssgs': '/docs',
     '/docs/hugo': '/docs',
@@ -532,7 +513,7 @@ export default defineConfig({
     '/docs/gatsby/examples': '/docs',
     '/docs/guides/custom-assets-domain/google-cloud-storage':
       '/docs/enterprise-apps/google-cloud-storage',
-    '/use-cases/docs': '/',
+    '/use-cases/docs': '/case-studies',
     '/docs/guides/custom-assets-domain': '/docs',
     '/docs/deployments/zeit': '/docs',
     '/foo': '/docs',
@@ -594,6 +575,7 @@ export default defineConfig({
     '/customer-stories/[...rest]': '/blog/casual-chats/[...rest]',
     // The casual chats are part of the blog.
     '/casual-chats': '/blog/casual-chats',
+    '/casual-chats/p/[...rest]': '/blog/casual-chats',
     '/casual-chats/[...rest]': '/blog/casual-chats/[...rest]',
     // The customers pages redirect to the case studies. The product overview is gone.
     '/success-stories': '/case-studies',
@@ -601,10 +583,10 @@ export default defineConfig({
     '/how-to-datocms': '/academy',
     '/customers/[...rest]': '/case-studies/[...rest]',
     '/product': '/features',
-    '/use-cases/headless-cms-publishing': '/',
-    '/use-cases/headless-cms-websites': '/',
-    '/use-cases/headless-ecommerce': '/',
-    '/use-cases/headless-cms-knowledge-management': '/',
+    '/use-cases/headless-cms-publishing': '/case-studies',
+    '/use-cases/headless-cms-websites': '/case-studies',
+    '/use-cases/headless-ecommerce': '/case-studies',
+    '/use-cases/headless-cms-knowledge-management': '/case-studies',
     '/partners/boldboy': '/partners/peter-coolen',
     '/marketplace/starters/nuxt-js-blog': '/blog/how-to-build-a-nuxt-blog',
     '/docs/building-plugins/publishing': '/docs/plugin-sdk/publishing-to-marketplace',
