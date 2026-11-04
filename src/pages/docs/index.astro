@@ -1,11 +1,9 @@
 ---
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Search } from '~/components/docs/Search';
-import { Svg } from '~/components/docs/Svg';
 import { BaseLayout } from '~/layouts/docs/BaseLayout';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { notFoundResponse, avoidAstroTypeCheckBug } from '~/lib/notFoundResponse';
-import { FRAMEWORKS } from './_content';
 import { query } from './_graphql';
 import s from './_style.module.css';
 import { ApisSection } from './_sub/ApisSection';
@@ -13,6 +11,7 @@ import { PixelField } from '~/components/docs/PixelField';
 import { HomeSidebar } from './_sub/HomeSidebar';
 import { Sections } from './_sub/Sections';
 import { HomeBanner } from './_sub/HomeBanner';
+import { Quickstart } from './_sub/Quickstart';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -33,30 +32,15 @@ if (!page) {
       <div class={s.inner}>
         <div class={s.heroInner}>
           <div class={s.heroCopy}>
-            <p class:list={[s.kicker, 'monoCaps']}>Documentation</p>
             <h1 class={s.heroTitle}>DatoCMS Developer Docs</h1>
-            <p class={s.heroSubhead}>Build with the headless CMS for the modern web!</p>
+            <p class={s.heroSubhead}>Model your content, query it from any stack, and ship it.</p>
           </div>
           <div class={s.heroSearch}>
             <Search client:idle variant="input" />
           </div>
         </div>
 
-        <div class={s.quickstart}>
-          <div class={s.quickstartLabel}>
-            <p class="monoCaps">Quickstarts</p>
-            <p>Pick your framework</p>
-            <p>Ship your first page in 5 min</p>
-          </div>
-          {
-            FRAMEWORKS.map((fw) => (
-              <a href={fw.href} class={s.quickstartTile}>
-                <Svg name={fw.logo} />
-                <span>{fw.name}</span>
-              </a>
-            ))
-          }
-        </div>
+        <Quickstart />
       </div>
     </section>
 

@@ -1,0 +1,272 @@
+---
+// The quickstart strip of the docs home: a label and one tile for each
+// framework. On hover and on keyboard focus, the logo of the tile builds
+// itself from pixels: 6px cells, then 4px, then 2px, then the vector. The
+// colour of the cells goes from the colour at rest to the hover colour.
+import { Svg } from '~/components/docs/Svg';
+import { FRAMEWORKS } from '../../_content';
+import s from './style.module.css';
+---
+
+<docs-quickstart class={s.quickstart}>
+  <div class={s.label}>
+    <p class="monoCaps">Quickstarts</p>
+    <p>Pick your framework</p>
+    <p>Ship your first page in 5 min</p>
+  </div>
+  {
+    FRAMEWORKS.map((fw) => (
+      <a href={fw.href} class={s.tile} data-tile data-framework={fw.id}>
+        <span class={s.logo}>
+          <Svg name={fw.logo} />
+          <canvas aria-hidden="true" />
+        </span>
+        <span class={s.name}>{fw.name}</span>
+      </a>
+    ))
+  }
+  <!--
+    The gradient of the Astro flame, as in the Astro mark. The flame takes
+    it on hover (style.module.css). It is not display: none, as a browser
+    then does not paint the gradient.
+  -->
+  <svg class={s.defs} aria-hidden="true">
+    <linearGradient id="docs-quickstart-astro-flame" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d83333"></stop>
+      <stop offset="1" stop-color="#f041ff"></stop>
+    </linearGradient>
+  </svg>
+</docs-quickstart>
+
+<script>
+  import { prefersReducedMotion } from '~/lib/motion/inView';
+  import type { Rgba } from '~/lib/pixel-video/renderer';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  // The cells across the logo for each step of the build. The logo is
+  // 36px wide: the cells are 6px (the cells of the hero field), 4px and
+  // 2px.
+  const STEPS = [6, 9, 18];
+  // The length of a step: the beat of the hero field and of the pixel
+  // images.
+  const STEP_MS = 125;
+  // The part of a cell that the logo must cover to show the cell.
+  const COVER = 0.4;
+
+  type Logo = {
+    svg: SVGSVGElement;
+    canvas: HTMLCanvasElement;
+    // For each step, one value for each cell: 1 when the cell shows.
+    masks: Uint8Array[] | null;
+    timer: number;
+  };
+
+  // A part of a tile. It throws an error when the tile does not have it.
+  function part<T extends Element>(tile: HTMLElement, selector: string): T {
+    const element = tile.querySelector<T>(selector);
+    if (!element) throw new Error(`[docs-quickstart]: Could not find ${selector}`);
+    return element;
+  }
+
+  // A white shape of a logo (the N of Next.js, the S of Svelte) is a hole:
+  // it has the colour of the page, not of the logo. svgo writes white as
+  // #fff. A gradient fill is white too.
+  const isHole = (shape: Element) =>
+    /^(white|#fff(fff)?|url\()/i.test(shape.getAttribute('fill') ?? '');
+
+  // A CSS colour as RGBA from 0 to 1, with its alpha.
+  function readRgba(css: string): Rgba {
+    const canvas = Object.assign(document.createElement('canvas'), { width: 1, height: 1 });
+    const context = canvas.getContext('2d', { willReadFrequently: true })!;
+    context.fillStyle = css;
+    context.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = context.getImageData(0, 0, 1, 1).data;
+    return [r! / 255, g! / 255, b! / 255, a! / 255];
+  }
+
+  function toImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
+    svg.setAttribute('width', '72');
+    svg.setAttribute('height', '72');
+    const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(svg))}`;
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+      image.src = url;
+    });
+  }
+
+  // The logo in the colours of its shapes now (on hover: the brand
+  // colours and the Astro gradient), without the backdrop and without the
+  // holes.
+  function loadColorImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
+    const clone = svg.cloneNode(true) as SVGSVGElement;
+    const shapes = Array.from(svg.children);
+    const copies = Array.from(clone.children);
+    shapes.forEach((shape, i) => {
+      const copy = copies[i]!;
+      if (i === 0) copy.remove();
+      else if (shape.localName === 'defs') return;
+      else if (isHole(shape)) copy.setAttribute('fill', 'none');
+      else {
+        const fill = getComputedStyle(shape).fill;
+        copy.setAttribute('fill', fill);
+        // A gradient of the page (the Astro flame): the image needs a copy.
+        const id = /url\(["']?#([^"')]+)/.exec(fill)?.[1];
+        const gradient = id && document.getElementById(id);
+        if (gradient) clone.append(gradient.cloneNode(true));
+      }
+    });
+    return toImage(clone);
+  }
+
+  // The colours of the logo at `n` × `n`: the mean colour of the shapes in
+  // each cell, as RGBA bytes.
+  function sample(image: HTMLImageElement, n: number): Uint8ClampedArray {
+    const canvas = Object.assign(document.createElement('canvas'), { width: n, height: n });
+    const context = canvas.getContext('2d', { willReadFrequently: true })!;
+    context.drawImage(image, 0, 0, n, n);
+    return context.getImageData(0, 0, n, n).data;
+  }
+
+  // The logo as an image: black ink and white holes, without the square
+  // backdrop.
+  function loadImage(svg: SVGSVGElement): Promise<HTMLImageElement> {
+    const clone = svg.cloneNode(true) as SVGSVGElement;
+    clone.firstElementChild?.remove();
+    clone.setAttribute('fill', 'black');
+    return toImage(clone);
+  }
+
+  // The cells of the logo at `n` × `n`. A cell shows when the ink covers
+  // enough of it. The white parts of a logo (the N of Next.js) are holes.
+  function mask(image: HTMLImageElement, n: number): Uint8Array {
+    const canvas = document.createElement('canvas');
+    canvas.width = n;
+    canvas.height = n;
+    const context = canvas.getContext('2d', { willReadFrequently: true })!;
+    context.drawImage(image, 0, 0, n, n);
+    const data = context.getImageData(0, 0, n, n).data;
+    const cells = new Uint8Array(n * n);
+    for (let i = 0; i < cells.length; i++) {
+      const alpha = data[i * 4 + 3]! / 255;
+      const luminance = (data[i * 4]! + data[i * 4 + 1]! + data[i * 4 + 2]!) / 765;
+      cells[i] = alpha * (1 - luminance) > COVER ? 1 : 0;
+    }
+    return cells;
+  }
+
+  customElements.define(
+    'docs-quickstart',
+    class extends WebComponent {
+      #logos = new Map<HTMLElement, Logo>();
+
+      parsedCallback() {
+        if (prefersReducedMotion()) return;
+
+        for (const tile of this.$$('[data-tile]')) {
+          const logo: Logo = {
+            svg: part<SVGSVGElement>(tile, 'svg'),
+            canvas: part<HTMLCanvasElement>(tile, 'canvas'),
+            masks: null,
+            timer: 0,
+          };
+          this.#logos.set(tile, logo);
+          loadImage(logo.svg)
+            .then((image) => {
+              logo.masks = STEPS.map((n) => mask(image, n));
+            })
+            .catch(() => {
+              // Without the image, the tile has only its hover.
+            });
+        }
+
+        this.on(this, 'pointerover', '[data-tile]', (event, tile) => {
+          const from = event.relatedTarget as Node | null;
+          if (event.pointerType === 'touch' || (from && tile.contains(from))) return;
+          this.#build(tile);
+        });
+        this.on(this, 'focusin', '[data-tile]', (_event, tile) => {
+          if (tile.matches(':focus-visible')) this.#build(tile);
+        });
+      }
+
+      // Show the steps of the build, one for each beat, then the vector.
+      async #build(tile: HTMLElement) {
+        const logo = this.#logos.get(tile);
+        if (!logo?.masks || logo.timer) return;
+        // The build runs: a second hover does not start it again.
+        logo.timer = -1;
+
+        const { canvas, masks } = logo;
+        // The colour of each shape on hover, and the colour at rest. The CSS
+        // gives the colour at rest to the canvas as `color`.
+        const from = readRgba(getComputedStyle(canvas).color);
+        let colors: Uint8ClampedArray[];
+        try {
+          const image = await loadColorImage(logo.svg);
+          colors = STEPS.map((n) => sample(image, n));
+        } catch {
+          logo.timer = 0;
+          return;
+        }
+
+        const size = canvas.clientWidth;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(size * dpr);
+        canvas.height = Math.round(size * dpr);
+        const context = canvas.getContext('2d')!;
+
+        const draw = (step: number) => {
+          const n = STEPS[step]!;
+          const cell = canvas.width / n;
+          // 0 at the first step (the colour at rest), 1 at the last step
+          // (the colour on hover).
+          const k = step / (STEPS.length - 1);
+          const cells = masks[step]!;
+          const color = colors[step]!;
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          for (let i = 0; i < cells.length; i++) {
+            if (!cells[i]) continue;
+            const to = color[i * 4 + 3]
+              ? [color[i * 4]! / 255, color[i * 4 + 1]! / 255, color[i * 4 + 2]! / 255, 1]
+              : from;
+            const [r, g, b, a] = from.map((v, j) => v + (to[j]! - v) * k) as Rgba;
+            context.fillStyle = `rgb(${r * 255} ${g * 255} ${b * 255} / ${a})`;
+            const x = i % n;
+            const y = Math.floor(i / n);
+            // Round the edges of the cells to device pixels: no seams.
+            const left = Math.round(x * cell);
+            const top = Math.round(y * cell);
+            context.fillRect(
+              left,
+              top,
+              Math.round((x + 1) * cell) - left,
+              Math.round((y + 1) * cell) - top,
+            );
+          }
+        };
+
+        let step = 0;
+        tile.dataset.building = '';
+        draw(step);
+        const next = () => {
+          step++;
+          if (step < STEPS.length) {
+            draw(step);
+            logo.timer = window.setTimeout(next, STEP_MS);
+          } else {
+            delete tile.dataset.building;
+            logo.timer = 0;
+          }
+        };
+        logo.timer = window.setTimeout(next, STEP_MS);
+      }
+
+      disconnectedCallback() {
+        for (const logo of this.#logos.values()) window.clearTimeout(logo.timer);
+        super.disconnectedCallback();
+      }
+    },
+  );
+</script>

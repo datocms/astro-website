@@ -1,0 +1,202 @@
+/*
+ * The quickstart strip: a label and four tiles on a pane of the page over
+ * the hero field. Desktop: one row. From 650px to 767px: the label above,
+ * the tiles in a 2 × 2 grid. Phones: one column.
+ */
+.quickstart {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto repeat(4, 1fr);
+  gap: var(--space-2xs);
+  align-items: stretch;
+  padding: var(--space-sm);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-default) 80%, transparent);
+
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 649px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 180px;
+  padding: 0 var(--space-md) 0 var(--space-2xs);
+
+  @media (max-width: 767px) {
+    grid-column: 1 / -1;
+    padding: 0 0 var(--space-2xs);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  /* The global class monoCaps gives the type of the first line. */
+  p:nth-child(1) {
+    margin-bottom: var(--space-4xs);
+    color: var(--text-accent);
+  }
+
+  p:nth-child(2) {
+    color: var(--text-primary);
+    font-size: var(--type-m);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  p:nth-child(3) {
+    margin-top: var(--space-5xs);
+    color: var(--text-muted);
+    font-size: var(--type-xs);
+    line-height: 1.4;
+  }
+}
+
+/*
+ * A tile. The hover is instant, as on the cards: the faint accent fills
+ * the tile, the border takes the accent, and the logo takes the colours
+ * of its brand. `--tile-ink-2` is the second colour of a logo (the flame
+ * of Astro).
+ */
+.tile {
+  --tile-surface: var(--surface-default);
+  --tile-ink: var(--text-muted);
+  --tile-ink-2: var(--tile-ink);
+  --tile-brand: var(--text-primary);
+  --tile-brand-2: var(--tile-brand);
+
+  &[data-framework='astro'] {
+    --tile-brand-2: url('#docs-quickstart-astro-flame');
+  }
+
+  &[data-framework='nuxt'] {
+    --tile-brand: #00dc82;
+  }
+
+  &[data-framework='sveltekit'] {
+    --tile-brand: #ff3e00;
+  }
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3xs);
+  min-height: 64px;
+  padding: var(--space-4xs) var(--space-sm);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background-color: var(--tile-surface);
+  text-decoration: none;
+
+  @media (hover: hover) {
+    &:hover {
+      --tile-surface: var(--surface-accent-faint);
+      --tile-ink: var(--tile-brand);
+      --tile-ink-2: var(--tile-brand-2);
+
+      border-color: var(--text-accent);
+    }
+  }
+
+  &:focus-visible {
+    --tile-surface: var(--surface-accent-faint);
+    --tile-ink: var(--tile-brand);
+    --tile-ink-2: var(--tile-brand-2);
+
+    outline: 2px solid var(--text-accent);
+    outline-offset: 2px;
+    border-color: var(--text-accent);
+  }
+}
+
+/*
+ * The logo, and the canvas of its pixel build at the same place. While
+ * the tile builds, the canvas shows and the vector waits.
+ */
+.logo {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 36px;
+  aspect-ratio: 1 / 1;
+
+  svg,
+  canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  svg {
+    fill: var(--tile-ink);
+  }
+
+  [data-framework='astro'] & svg > :nth-child(2) {
+    fill: var(--tile-ink-2);
+  }
+
+  /*
+   * The white shapes of a logo (the N of Next.js, the S of Svelte) are
+   * holes: they take the colour of the page, also in the dark scheme.
+   * svgo writes white as #fff. The N of Next.js has white gradients.
+   */
+  svg > :is([fill='#fff'], [fill='white']) {
+    fill: var(--surface-default);
+  }
+
+  svg stop {
+    stop-color: var(--surface-default);
+  }
+
+  /*
+   * The logos have a square backdrop of their own as the first shape. It
+   * does not show: the faint accent of the hover is translucent, and a
+   * second layer of it makes a darker square.
+   */
+  svg > :first-child {
+    fill: none;
+  }
+
+  /* The script reads `color`: the first step of the build has the colour of the logo at rest. */
+  canvas {
+    visibility: hidden;
+    color: var(--text-muted);
+  }
+
+  [data-building] & {
+    svg {
+      visibility: hidden;
+    }
+
+    canvas {
+      visibility: visible;
+    }
+  }
+}
+
+.defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.name {
+  color: var(--text-primary);
+  font-size: var(--type-s);
+  font-weight: 500;
+
+  @media (min-width: 650px) {
+    font-size: var(--type-m);
+  }
+}
