@@ -3,7 +3,7 @@ import * as productUpdates from '~/data/product-updates';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import IndexPage from '../../_IndexPage.astro';
-import { legacyLastPage, pageQuery } from './_graphql';
+import { pageQuery } from './_graphql';
 
 const param = Astro.params.pageIndex ?? '';
 const page = /^[1-9]\d*$/.test(param) ? Number.parseInt(param, 10) : null;
@@ -20,17 +20,8 @@ const { perPage } = productUpdates;
 const variables = { first: perPage, skip: (page - 1) * perPage };
 const data = await executeQuery(Astro, pageQuery, { variables });
 
-if (data.entries.length === 0) {
-  const lastPage = Math.ceil(data.meta.count / perPage);
-  if (page <= legacyLastPage && lastPage > 0) {
-    return Astro.redirect(
-      lastPage > 1 ? `/product-updates/p/${lastPage}` : '/product-updates',
-      301,
-    );
-  }
-  avoidAstroTypeCheckBug(notFoundResponse);
-  return notFoundResponse();
-}
+// A page past the last one goes to the index, as in the blog.
+if (data.entries.length === 0) return Astro.redirect('/product-updates', 301);
 ---
 
 <IndexPage page={page} data={data} variables={variables} />
