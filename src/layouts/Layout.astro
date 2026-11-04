@@ -4,7 +4,6 @@
 // SEO tags, the favicon, the canonical URL, the RSS links, the cookie
 // consent, the analytics and the content link of the draft mode.
 import type { TitleMetaLinkTag } from '@datocms/astro';
-import { DEPLOYMENT_DESTINATION } from 'astro:env/server';
 import { FooterLegal } from '~/components/FooterLegal';
 import { FooterLinks } from '~/components/FooterLinks';
 import { PageNav } from '~/components/PageNav';
@@ -50,9 +49,6 @@ interface Props {
 }
 
 const { seo, theme, headerVariant = 'page', headerCta, footer = true, seoAnalysis } = Astro.props;
-
-// The page menu for the reviewers. It does not show in production.
-const showReviewTools = DEPLOYMENT_DESTINATION !== 'production';
 
 // The endpoint of the SEO/Readability plugin of the CMS
 // (src/pages/api/seo-analysis) reads the content of <main id="layout-content">:
@@ -106,7 +102,7 @@ const showSeoAnalysis = seoAnalysis !== undefined && isDraftModeEnabled(Astro);
   </slot>
   <SiteSearch />
   {showSeoAnalysis && <SeoAnalysisPanel analysis={seoAnalysis} />}
-  {showReviewTools && <PageNav />}
+  <PageNav />
   <script>
     import { followSystemColorScheme } from '~/lib/colorScheme';
 

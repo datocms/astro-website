@@ -19,7 +19,7 @@ src/
   lib/pixel-video/          the player of the .pxv files, and format.ts (the file format, for the player and the scripts)
   lib/code/, lib/format/, lib/theme.ts, lib/colorScheme.ts
   styles/                   tokens.css (all tokens), typography.css (type classes), global.css (reset + element defaults)
-  dev/                      the tools of the developers, only in `astro dev` (see "Pixel videos")
+  dev/                      the tools of the developers, at /dev/* (see "Pixel videos")
 vendor/                     the tarball of the scene kit (@datocms/product-scenes)
 public/videos/              the .pxv files
 scripts/pixel-videos/       the source videos of the .pxv files, drawn in code
@@ -37,7 +37,7 @@ css-scope.mjs               which CSS gets a cascade layer, and which CSS lint:c
 - A page does a full load: no `ClientRouter`, no progress bar. The docs too.
 - The optional prop `seoAnalysis` takes the `yoastAnalysis` field (the SEO/Readability plugin) of the CMS record. In draft mode, the layout then shows `SeoAnalysisPanel` at the bottom right: the keywords of the record, and where the page uses them (title, meta description, h1, h2, first paragraph).
 - `<main>` has `id="layout-content"`: the endpoint `/api/seo-analysis` reads the content of the page from this element. Do not remove it.
-- `PageNav` (the menu at the bottom left) shows only when `DEPLOYMENT_DESTINATION` is not `production`. It is for reviewers, not part of the design.
+- `PageNav` (the menu at the bottom left) shows on every page, also in production. It is for reviewers, not part of the design.
 
 ## Components
 
@@ -99,14 +99,14 @@ Figma file `WnWBSVVcroe5s4tXQGnhSA` (overnice's original), page **Components** (
 ## Text faces
 
 - **`src/lib/motion/faces.ts` has every face, with its animation.** The copy in `src/data/` gives the name of a face (`face: 'happy'`), never its glyphs: the name gives the final glyphs (`faces.happy.face`) and the typewriter step (`faceStep('happy')`). Each animation has the rhythm of the home hero: the face comes in one sign at a time with its eyes closed, opens its eyes and rests, does one thing (a wink, a laugh, a yawn), then settles on its final face. The last frame is the final face: the typewriter then shows the glyphs of the copy.
-- **`/dev/face-gallery` plays every face in a loop**, with its frames and times, and marks the glyphs that ABC Oracle does not have (`ᴗ`, `◡`, `﹏`, `✓`, `ᴥ`): the browser takes them from a system font, and they look different on each system. The glyphs of the font that make a face are at the end of the gallery. The gallery is only in `astro dev`, as the pxv gallery.
+- **`/dev/face-gallery` plays every face in a loop**, with its frames and times, and marks the glyphs that ABC Oracle does not have (`ᴗ`, `◡`, `﹏`, `✓`, `ᴥ`): the browser takes them from a system font, and they look different on each system. The glyphs of the font that make a face are at the end of the gallery. The gallery is on every deploy, as the pxv gallery.
 - **A new face goes in `faces.ts`, not in a component.** Then look at it in the gallery before you give it to a page.
 
 ## Pixel videos
 
 - **The scripts of `scripts/pixel-videos/` make a `.pxv` file**: `key.py` (green screen footage) or `lottie.py` (a Lottie animation) make a transparent video, and `encode.ts` makes the file with `format.ts`, the same module as the player. Save the file in `public/videos/`. `/dev/pxv-gallery` shows all the files.
-- **The gallery is only in `astro dev`.** The page is not in `src/pages/`: the integration `dev-tools` in `astro.config.ts` adds its route when the command is `dev`. Thus the build does not have it, and the production site does not show it. Put a new tool for the developers in `src/dev/`, and add its route in `dev-tools`. Why: the tools use the layout, the tokens and the player of the site, thus the preview is the same as the page, and there is one copy of `format.ts` for the encoder and the player.
-- **The pages in `src/dev/` are not pages of the site.** They can have a plain client script (not a `WebComponent`), and they can use the dev dependencies.
+- **The galleries are not pages of the site.** The page is not in `src/pages/`: the integration `dev-tools` in `astro.config.ts` adds its route, in `astro dev` and in the build. Thus the production site shows it, but the sitemap and `PageNav` do not list it. Put a new tool for the developers in `src/dev/`, and add its route in `dev-tools`. Why: the tools use the layout, the tokens and the player of the site, thus the preview is the same as the page, and there is one copy of `format.ts` for the encoder and the player.
+- **The pages in `src/dev/` are not pages of the site.** They can have a plain client script (not a `WebComponent`). They must not import a dev dependency: the build has the routes, and the runtime image installs no dev dependencies.
 - **The `.pxv` file is the only copy.** No recipe makes it again: the footage and the keyed videos stay in `tmp/` (Git ignores it), and the file records the URL of its footage (`source`). Read `src/lib/pixel-video/AGENTS.md` and `scripts/pixel-videos/README.md` before you add one.
 
 ## CMS

@@ -80,5 +80,5 @@ npx tsx scripts/pixel-videos/resize.ts public/videos/hand-ok.pxv public/videos/h
 npx tsx scripts/pixel-videos/resize.ts in.pxv out.pxv --scale 0.5
 ```
 
-The page `/dev/pxv-gallery` (only in `npm run dev`) shows all the files of
+The page `/dev/pxv-gallery` shows all the files of
 `public/videos/` in the footer of the site.

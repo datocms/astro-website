@@ -1,6 +1,6 @@
 # Pixel videos
 
-`<pixel-video>` plays `.pxv` files (`src/lib/pixel-video/format.ts`), not `.mp4` files. The files are in `public/videos/` and shown by `PageCloser` (the footer). Each file gives all its look (see "The file gives the look" below): a page gives only its URL, `<PageCloser video="/videos/hand-ok.pxv" />`. The scripts of `scripts/pixel-videos/` make a `.pxv`: from green screen footage (below) or from a Lottie animation (see "Lottie animations"). `/dev/pxv-gallery` shows all the files; it is only in `astro dev`. The commands are in `scripts/pixel-videos/README.md`.
+`<pixel-video>` plays `.pxv` files (`src/lib/pixel-video/format.ts`), not `.mp4` files. The files are in `public/videos/` and shown by `PageCloser` (the footer). Each file gives all its look (see "The file gives the look" below): a page gives only its URL, `<PageCloser video="/videos/hand-ok.pxv" />`. The scripts of `scripts/pixel-videos/` make a `.pxv`: from green screen footage (below) or from a Lottie animation (see "Lottie animations"). `/dev/pxv-gallery` shows all the files. The commands are in `scripts/pixel-videos/README.md`.
 
 ## Footage on a flat background (the pattern for hands and people)
 

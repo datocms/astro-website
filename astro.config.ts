@@ -297,13 +297,12 @@ export default defineConfig({
     },
     {
       // The tools of the developers. They are not in src/pages/, thus they
-      // have no route by default. Add their routes only in `astro dev`: the
-      // build does not have them. An injected route has the origin
-      // "external", thus the integration "routes" ignores it.
+      // have no route by default. Add their routes in `astro dev` and in the
+      // build: the reviewers use them on each deploy. An injected route has
+      // the origin "external", thus the integration "routes" ignores it.
       name: 'dev-tools',
       hooks: {
-        'astro:config:setup': ({ command, injectRoute }) => {
-          if (command !== 'dev') return;
+        'astro:config:setup': ({ injectRoute }) => {
           injectRoute({
             pattern: '/dev/pxv-gallery',
             entrypoint: './src/dev/pxv-gallery.astro',

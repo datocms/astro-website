@@ -423,7 +423,7 @@ Signs are typographic, not icons: `→` at the end of a button or a link, `+` an
 
 ### Buttons
 
-Friendly and direct: a pill that says where it goes. The ground under the button sets its colours, thus a button has no colour prop: the `Button` component (`src/components/Button/`) takes a `variant`, and the button roles of `src/styles/tokens.css` resolve on the ground. `src/styles/tokens.test.ts` checks every state on every ground, theme and scheme. `/dev/button-gallery` (dev only) shows them all.
+Friendly and direct: a pill that says where it goes. The ground under the button sets its colours, thus a button has no colour prop: the `Button` component (`src/components/Button/`) takes a `variant`, and the button roles of `src/styles/tokens.css` resolve on the ground. `src/styles/tokens.test.ts` checks every state on every ground, theme and scheme. `/dev/button-gallery` shows them all.
 
 - **Shape:** full pill (9999px). An arrow `→` follows the label by default; `arrow={false}` drops it.
 - **Sizes** (`size`):
