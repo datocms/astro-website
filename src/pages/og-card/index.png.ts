@@ -4,7 +4,7 @@ import satori from 'satori';
 import { html } from 'satori-html';
 import sharp from 'sharp';
 import css from 'style-object-to-css-string';
-import wordmarkSvg from '~/assets/logo/dato-logo-no-space-faded-cms.svg?raw';
+import wordmarkSvg from '~/assets/logo/dato-logo-no-space.svg?raw';
 import { ogCardHeight, ogCardWidth } from '~/lib/datocms/seo';
 import type { OgCardData } from '~/lib/ogCardUrl';
 import { toArrayBuffer } from '~/lib/toArrayBuffer';
