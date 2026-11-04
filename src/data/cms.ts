@@ -1,6 +1,5 @@
 import type { ChapterHeaderData } from '~/components/ChapterHeader';
 import type { ChapterLayoutData } from '~/components/ChapterLayout';
-import type { StatementData } from '~/components/Statement';
 import type { CtaBannerData, HeroData } from '~/data/home';
 import type { CodeTab } from '~/components/CodeSnippetPreview';
 import type { CategoryNavData } from '~/components/CategoryNav';
@@ -49,12 +48,13 @@ export interface FrameworkPage {
    */
   publishKind: 'cache-tags' | 'build-triggers';
   publish: ChapterLayoutData;
-  /** The header of the carousel of the sites built with the framework. */
+  /** The header of the carousel of the projects built with the framework. */
   showcase: ChapterHeaderData;
-  /** The integration records whose websites and showcase projects the carousel shows. */
+  /** The integration records whose showcase projects the carousel shows. */
   integrations: string[];
-  starter: CtaBannerData;
-  /** The ID of the CMS review of the quote that closes the page. */
+  /** The call to action of the closer: the starter kit. */
+  closer: CtaBannerData;
+  /** The ID of the CMS review of the quote after the real-time chapter. */
   reviewId: string;
   /** The root of the docs of the framework. */
   docsRoot: string;
@@ -71,33 +71,6 @@ export function docs(href: string): ChapterHeaderData['link'] {
 export function deployUrl(repo: string): string {
   return dashboardUrl(`/deploy?repo=${repo}:main`);
 }
-
-// New copy. The one opinion of the pages, after the carousel.
-export const opinion: StatementData = {
-  label: 'The CMS should not pick your framework for you.',
-  text: 'We write our client and components for yours, all served by the same GraphQL endpoint, so you can always use your favorite tools.',
-};
-
-// New copy. The call to action of the closer.
-export const closer: CtaBannerData = {
-  variant: 'light',
-  theme: 'green',
-  headline: 'Start with the starter kit,',
-  muted: 'or with a blank project and the docs.',
-  buttons: [
-    {
-      label: 'Get Started',
-      href: dashboardUrl('/signup'),
-      arrow: false,
-    },
-    {
-      label: 'Talk To Sales',
-      href: '/contact',
-      contact: 'sales',
-      variant: 'soft',
-    },
-  ],
-};
 
 /*
  * The chapters. The structure and most of the copy are the same on the
@@ -337,10 +310,10 @@ export function buildTriggersChapter(args: { headersCode: CodeTab[] }): ChapterL
   };
 }
 
-/** The starter kit banner. */
-export function starter(args: { repo: string; subline: string }): CtaBannerData {
+/** The call to action of the closer: the starter kit of the framework. */
+export function closer(args: { repo: string; subline: string }): CtaBannerData {
   return {
-    variant: 'subtle',
+    variant: 'light',
     theme: 'green',
     // New copy.
     headline: 'Start from a working project.',
@@ -351,6 +324,12 @@ export function starter(args: { repo: string; subline: string }): CtaBannerData 
         label: 'Deploy The Starter',
         href: deployUrl(args.repo),
         arrow: false,
+      },
+      {
+        label: 'Talk To Sales',
+        href: '/contact',
+        contact: 'sales',
+        variant: 'soft',
       },
     ],
   };

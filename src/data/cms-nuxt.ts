@@ -3,12 +3,12 @@ import {
   blocksChapter,
   buildTriggersChapter,
   chapterNav,
+  closer,
   draftsChapter,
   fetchChapter,
   heroButtons,
   mediaChapter,
   realTimeChapter,
-  starter,
   type FrameworkPage,
 } from '~/data/cms';
 import * as code from '~/data/cms-nuxt-code';
@@ -16,7 +16,7 @@ import * as code from '~/data/cms-nuxt-code';
 /*
  * Route /cms/nuxtjs-cms: DatoCMS with Nuxt (src/data/cms.ts). Nuxt 4 and
  * vue-datocms, as datocms/nuxt-starter-kit. The carousel also shows the
- * sites of the Vue integration.
+ * projects of the Vue integration.
  */
 
 const docsRoot = '/docs/nuxt';
@@ -37,7 +37,6 @@ export const page: FrameworkPage = {
     headline: 'Nuxt in front, content backed by DatoCMS.',
     subheadline: 'A composable fetches it, vue-datocms renders it, a cookie shows drafts',
     face: 'cool',
-    intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
   },
   chapterNav: chapterNav({ label: 'Build triggers and cache tags', href: '#build-triggers' }),
@@ -77,11 +76,11 @@ export const page: FrameworkPage = {
   showcase: {
     label: 'Built with Nuxt and DatoCMS',
     headline: 'Sites built on both.',
-    intro: 'Customer websites and partner projects built with Nuxt and DatoCMS.',
+    intro: 'Projects that our partners built with Nuxt and DatoCMS.',
   },
   integrations: ['nuxt-js', 'vue'],
   // The features of the README of the starter kit.
-  starter: starter({
+  closer: closer({
     repo: starterRepo,
     // New copy.
     subline:

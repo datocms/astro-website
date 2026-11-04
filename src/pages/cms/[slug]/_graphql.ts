@@ -2,39 +2,28 @@ import { QuoteReviewFragment } from '~/components/Quote';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage';
 import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { graphql } from '~/lib/datocms/graphql';
+import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 /*
- * The CMS content of a framework page: the sites of the carousel (the
- * websites and the showcase projects that reference the integration
- * records of the framework, newest first) and the review of the quote.
+ * The CMS content of a framework page: the projects of the carousel (the
+ * showcase projects that reference the integration records of the
+ * framework, newest first) and the review of the quote.
  * The rest of the page is in src/data/cms-<framework>.ts.
  */
 export const query = graphql(
   /* GraphQL */ `
     query CmsFramework($integrations: [String], $reviewId: ItemId) {
       integrations: allIntegrations(filter: { slug: { in: $integrations } }) {
-        websites: _allReferencingWebsites(orderBy: _createdAt_DESC, first: 12) {
+        showcaseProjects: _allReferencingShowcaseProjects(orderBy: _createdAt_DESC, first: 12) {
           id
           _createdAt
-          title
-          url
-          image {
-            responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop, crop: top }) {
-              ...ResponsiveImageFragment
-            }
+          name
+          partner {
+            name
           }
-        }
-        showcaseProjects: _allReferencingShowcaseProjects(
-          filter: { projectUrl: { isBlank: false } }
-          orderBy: _createdAt_DESC
-          first: 12
-        ) {
-          id
-          _createdAt
-          title: name
-          url: projectUrl
+          ...ShowcaseProjectUrlFragment
           image: mainImage {
             responsiveImage(imgixParams: { auto: format, w: 600, h: 400, fit: crop, crop: top }) {
               ...ResponsiveImageFragment
@@ -48,7 +37,7 @@ export const query = graphql(
       }
     }
   `,
-  [ResponsiveImageFragment, QuoteReviewFragment],
+  [ResponsiveImageFragment, QuoteReviewFragment, ShowcaseProjectUrlFragment],
 );
 
 /** The slugs of the framework pages, in the order of the footer. */

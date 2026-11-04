@@ -2,12 +2,12 @@ import {
   blocksChapter,
   cacheTagsChapter,
   chapterNav,
+  closer,
   draftsChapter,
   fetchChapter,
   heroButtons,
   mediaChapter,
   realTimeChapter,
-  starter,
   type FrameworkPage,
 } from '~/data/cms';
 import * as code from '~/data/cms-nextjs-code';
@@ -35,7 +35,6 @@ export const page: FrameworkPage = {
     headline: 'Next.js in front, content backed by DatoCMS.',
     subheadline: 'Server Components fetch it, Draft Mode previews it, tags refresh it',
     face: 'cool',
-    intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
   },
   chapterNav: chapterNav({ label: 'Cache tags', href: '#cache-tags' }),
@@ -93,11 +92,11 @@ export const page: FrameworkPage = {
   showcase: {
     label: 'Built with Next.js and DatoCMS',
     headline: 'Sites built on both.',
-    intro: 'Customer websites and partner projects built with Next.js and DatoCMS.',
+    intro: 'Projects that our partners built with Next.js and DatoCMS.',
   },
   integrations: ['nextjs'],
   // The features of the README of the starter kit.
-  starter: starter({
+  closer: closer({
     repo: starterRepo,
     // New copy.
     subline:

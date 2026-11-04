@@ -1,13 +1,12 @@
 ---
 // A framework page: DatoCMS with Astro, Next.js, Nuxt or SvelteKit. The
-// copy comes from src/data/cms-<framework>.ts. Only the sites of the
+// copy comes from src/data/cms-<framework>.ts. Only the projects of the
 // carousel and the review of the quote come from the CMS.
 import { CardCarousel } from '~/components/CardCarousel';
 import { CarouselCard, carouselCardImageSizes } from '~/components/CarouselCard';
 import { CategoryNav } from '~/components/CategoryNav';
 import { ChapterHeader } from '~/components/ChapterHeader';
 import { ChapterLayout } from '~/components/ChapterLayout';
-import { CtaBanner } from '~/components/CtaBanner';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
 import { PageCloser } from '~/components/PageCloser';
@@ -16,14 +15,13 @@ import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { SceneFragment } from '~/components/SceneFragment';
 import { SceneFrame } from '~/components/SceneFrame';
 import { Section } from '~/components/Section';
-import { Statement } from '~/components/Statement';
-import * as cms from '~/data/cms';
 import { page as astro } from '~/data/cms-astro';
 import { page as nextjs } from '~/data/cms-nextjs';
 import { page as nuxt } from '~/data/cms-nuxt';
 import { page as sveltekit } from '~/data/cms-sveltekit';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
+import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import Deploys from '~/scenes/Automation/Deploys.astro';
@@ -46,26 +44,18 @@ if (!fw) {
 const variables = { integrations: fw.integrations, reviewId: fw.reviewId };
 const { integrations, review } = await executeQuery(Astro, query, { variables });
 
-// The sites of the carousel: the websites and the showcase projects of all
-// the integration records with a URL, newest first, each one once.
-const sites = [
+// The projects of the carousel: the showcase projects of all the
+// integration records, newest first, each one once. Each card opens the
+// page of the project on this site, not the site of the customer.
+const projects = [
   ...new Map(
     integrations
-      .flatMap((integration) => [...integration.websites, ...integration.showcaseProjects])
-      .flatMap((site) => (site.url ? [[site.id, { ...site, url: site.url }] as const] : [])),
+      .flatMap((integration) => integration.showcaseProjects)
+      .map((project) => [project.id, project] as const),
   ).values(),
 ]
   .sort((a, b) => b._createdAt.localeCompare(a._createdAt))
   .slice(0, 12);
-
-// The host of a site, as the text under its name.
-function host(url: string) {
-  try {
-    return new URL(url).host.replace(/^www\./, '');
-  } catch {
-    return url;
-  }
-}
 
 const seo = overrideSeo([], seoTitle(fw.seo.title), seoDescription(fw.seo.description));
 ---
@@ -123,6 +113,8 @@ const seo = overrideSeo([], seoTitle(fw.seo.title), seoDescription(fw.seo.descri
     </Fragment>
   </ChapterLayout>
 
+  <Quote quote={review} theme="default" />
+
   {
     fw.publishKind === 'cache-tags' ? (
       <ChapterLayout {...fw.publish}>
@@ -145,21 +137,21 @@ const seo = overrideSeo([], seoTitle(fw.seo.title), seoDescription(fw.seo.descri
   }
 
   {
-    sites.length > 0 && (
+    projects.length > 0 && (
       <>
         <ChapterHeader {...fw.showcase} theme="green" />
-        <Section theme="green" flushTop>
-          <CardCarousel label={fw.showcase.label}>
-            {sites.map((site) => (
-              <CarouselCard href={site.url} title={site.title.trim()} external>
-                {site.image?.responsiveImage && (
+        <Section theme="green" flushTop padding="none">
+          <CardCarousel label={fw.showcase.label} bleed>
+            {projects.map((project) => (
+              <CarouselCard href={buildUrlForShowcaseProject(project)} title={project.name.trim()}>
+                {project.image?.responsiveImage && (
                   <ResponsiveImage
                     slot="image"
-                    data={site.image.responsiveImage}
+                    data={project.image.responsiveImage}
                     sizes={carouselCardImageSizes}
                   />
                 )}
-                {host(site.url)}
+                by {project.partner.name}
               </CarouselCard>
             ))}
           </CardCarousel>
@@ -168,10 +160,7 @@ const seo = overrideSeo([], seoTitle(fw.seo.title), seoDescription(fw.seo.descri
     )
   }
 
-  <Statement {...cms.opinion} theme="green" variant="light" />
-  <CtaBanner {...fw.starter} />
-  <Quote quote={review} theme="default" />
-  <PageCloser face="aha" cta={cms.closer} video="/videos/hand-point-up-2.pxv" />
+  <PageCloser face="aha" cta={fw.closer} video="/videos/hand-point-up-2.pxv" />
 
   <DraftModeQueryListener query={query} variables={variables} />
 </Layout>

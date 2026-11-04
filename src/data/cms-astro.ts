@@ -2,12 +2,12 @@ import {
   blocksChapter,
   cacheTagsChapter,
   chapterNav,
+  closer,
   draftsChapter,
   fetchChapter,
   heroButtons,
   mediaChapter,
   realTimeChapter,
-  starter,
   type FrameworkPage,
 } from '~/data/cms';
 import * as code from '~/data/cms-astro-code';
@@ -39,7 +39,6 @@ export const page: FrameworkPage = {
     headline: 'Astro in front, content backed by DatoCMS.',
     subheadline: 'The frontmatter fetches it, @datocms/astro renders it, tags refresh it',
     face: 'cool',
-    intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
   },
   chapterNav: chapterNav({ label: 'Cache tags', href: '#cache-tags' }),
@@ -94,11 +93,11 @@ export const page: FrameworkPage = {
   showcase: {
     label: 'Built with Astro and DatoCMS',
     headline: 'Sites built on both.',
-    intro: 'Customer websites and partner projects built with Astro and DatoCMS.',
+    intro: 'Projects that our partners built with Astro and DatoCMS.',
   },
   integrations: ['astro'],
   // The features of the README of the starter kit. No cache tags.
-  starter: starter({
+  closer: closer({
     repo: starterRepo,
     // New copy.
     subline:

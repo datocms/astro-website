@@ -98,7 +98,7 @@ export const query = graphql(
           name
         }
         mainImage {
-          responsiveImage(imgixParams: { w: 960 }) {
+          responsiveImage(imgixParams: { w: 1440 }) {
             ...ResponsiveImageFragment
           }
           pixelSrc: url(imgixParams: { w: 480, fm: jpg })

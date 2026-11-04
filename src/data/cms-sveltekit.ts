@@ -3,12 +3,12 @@ import {
   blocksChapter,
   buildTriggersChapter,
   chapterNav,
+  closer,
   draftsChapter,
   fetchChapter,
   heroButtons,
   mediaChapter,
   realTimeChapter,
-  starter,
   type FrameworkPage,
 } from '~/data/cms';
 import * as code from '~/data/cms-sveltekit-code';
@@ -37,7 +37,6 @@ export const page: FrameworkPage = {
     headline: 'SvelteKit in front, content backed by DatoCMS.',
     subheadline: 'Load functions fetch it, @datocms/svelte renders and previews it',
     face: 'cool',
-    intro: 'Nothing to host but your app.',
     buttons: heroButtons({ repo: starterRepo, docsRoot }),
   },
   chapterNav: chapterNav({ label: 'Build triggers and cache tags', href: '#build-triggers' }),
@@ -77,11 +76,11 @@ export const page: FrameworkPage = {
   showcase: {
     label: 'Built with SvelteKit and DatoCMS',
     headline: 'Sites built on both.',
-    intro: 'Customer websites and partner projects built with SvelteKit and DatoCMS.',
+    intro: 'Projects that our partners built with SvelteKit and DatoCMS.',
   },
   integrations: ['svelte'],
   // The features of the README of the starter kit.
-  starter: starter({
+  closer: closer({
     repo: starterRepo,
     // New copy.
     subline:
