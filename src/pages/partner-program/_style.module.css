@@ -1,59 +1,110 @@
-.logos {
+.benefitsHead {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+  padding-bottom: var(--space-2xl);
 }
 
-.logosLabel {
+.intro {
+  max-width: var(--reading-max);
   margin: 0;
-  text-align: center;
   color: var(--text-muted);
 }
 
-.benefits {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-}
-
-.benefitList {
+/*
+ * The cells of the benefits. Below 1152 they stack, and the tint
+ * alternates. From 1152 they are two halves, and the tint makes a
+ * checkerboard, as on /philosophy. Each cell pads itself.
+ */
+.cells {
   display: grid;
-  gap: var(--space-md);
+  grid-template-columns: 1fr;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.benefit {
+.cell {
+  --cell-tint: transparent;
+
+  padding: var(--section-padding-y) var(--section-padding-x);
+  /* surface/accent-subtle is transparent. It goes on top of surface/default. */
+  background: linear-gradient(var(--cell-tint), var(--cell-tint)), var(--surface-default);
+  color: var(--text-primary);
+}
+
+.cell:nth-child(even) {
+  --cell-tint: var(--surface-accent-subtle);
+}
+
+.cellText {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  padding: var(--space-lg);
-  border-radius: var(--radius-md);
-  background: var(--surface-accent-faint);
 }
 
-.benefit > p {
+.cellText > p {
   margin: 0;
 }
 
-.text {
-  color: var(--text-muted);
+.icon {
+  margin-bottom: var(--space-xs);
+  font-size: var(--type-2xl);
+  color: var(--text-accent);
 }
 
-.text a,
+.cellBody {
+  color: var(--text-soft);
+}
+
+.cellBody a,
 .link {
   color: var(--text-primary);
   text-decoration: underline;
+  text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
 }
 
-.talk {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-  max-width: 720px;
-  margin-inline: auto;
+.link {
+  display: inline-block;
+  margin-top: var(--space-xs);
+}
+
+@media (hover: hover) {
+  .cellBody a:hover,
+  .link:hover {
+    text-decoration-thickness: 2px;
+  }
+}
+
+/*
+ * At 1152 and more: two halves. The backgrounds are full-bleed, but the
+ * text stays in the centred content column. --content-inset-half gives
+ * the outer padding of a half.
+ */
+@media (min-width: 1152px) {
+  .cells {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cellText {
+    max-width: 500px;
+  }
+
+  .cell:nth-child(odd) {
+    padding-inline-start: var(--content-inset-half);
+  }
+
+  /* The checkerboard: in rows 1 and 3 the right cell has the tint, in row 2 the left cell. */
+  .cell:nth-child(4n + 2),
+  .cell:nth-child(4n + 3) {
+    --cell-tint: var(--surface-accent-subtle);
+  }
+
+  .cell:nth-child(4n + 1),
+  .cell:nth-child(4n + 4) {
+    --cell-tint: transparent;
+  }
 }
 
 /*
@@ -66,13 +117,7 @@
   border-bottom: 1px solid var(--text-soft);
 }
 
-@media (min-width: 768px) {
-  .benefitList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* The custom element around the contact form has no box of its own. */
+/* The custom element around the contact section has no box of its own. */
 .form {
   display: contents;
 }

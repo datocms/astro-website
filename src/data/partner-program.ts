@@ -1,6 +1,19 @@
+import type { IconDefinition } from '@fortawesome/fontawesome-common-types';
+import { faAddressCard } from '@fortawesome/pro-regular-svg-icons/faAddressCard';
+import { faBadgePercent } from '@fortawesome/pro-regular-svg-icons/faBadgePercent';
+import { faKey } from '@fortawesome/pro-regular-svg-icons/faKey';
+import { faMegaphone } from '@fortawesome/pro-regular-svg-icons/faMegaphone';
+import { faTags } from '@fortawesome/pro-regular-svg-icons/faTags';
+import { faUserTie } from '@fortawesome/pro-regular-svg-icons/faUserTie';
 import { getData } from 'country-list';
 import type { ButtonData } from '~/components/Button';
-import { contact, type ContactFormData, type FormOption } from '~/data/contact';
+import {
+  contact,
+  type ContactFormData,
+  type ContactSectionData,
+  type FormOption,
+} from '~/data/contact';
+import type { CtaBannerData } from '~/data/home';
 
 /*
  * The agency partner program page. The form sends its data to the action
@@ -17,15 +30,22 @@ export const hero = {
   label: 'DatoCMS Agency Partner Program',
   headline: 'Become a Partner',
   intro:
-    'Agency-specific plans from €39/month. No sales targets. No reselling requirements. No BS. Just real benefits including 30% off for your clients and free access to every project you manage.',
-  button: { label: 'Become a Partner', href: '#partner-form' },
+    'Agency-specific plans from €39/month. No sales targets. No reselling requirements. No BS. Just real benefits including 30% off for your clients and free access to every project you manage. Join 250+ partners in 50+ countries.',
+  button: {
+    label: 'Become a Partner',
+    href: '#partner-form',
+    contact: 'partners',
+  } satisfies ButtonData,
 };
 
+// The accessible name of the logos in the hero. It does not show.
 export const logos = {
-  label: '250+ happy Partners in 50+ Countries',
+  label: 'Some of our 250+ partners',
 };
 
 export interface Benefit {
+  /** The Font Awesome icon above the title. */
+  icon: IconDefinition;
   title: string;
   /** HTML: the text has links. */
   body: string;
@@ -34,50 +54,58 @@ export interface Benefit {
 }
 
 export const benefits = {
-  headline: 'Partnerships done right',
-  muted:
+  headline: 'Partnerships done right.',
+  muted: 'We started as an agency too.',
+  intro:
     "DatoCMS was born out of an agency. It's only natural that our partner program incorporates all the essential elements to support the success of your agency.",
   items: [
     {
-      title: '💰 Special plans and deals',
+      icon: faTags,
+      title: 'Special plans and deals',
       body: 'Custom plans to get you started without surprises, and a 30% discount on the Professional plan for your clients.',
     },
     {
-      title: '🎁 Discounts for your clients',
+      icon: faBadgePercent,
+      title: 'Discounts for your clients',
       body: 'Enable special plans on your clients\' accounts <a href="/docs/agency-partner-program/partners-dashboard#enabling-special-plans-to-clients">directly from your dashboard</a>, no need to ask us.',
     },
     {
-      title: "🔑 Full access to your clients' projects",
+      icon: faKey,
+      title: "Full access to your clients' projects",
       body: 'Give your team <a href="/docs/agency-partner-program/partners-dashboard#automatic-access-to-your-clients-projects">predefined access to all client projects</a> without any extra collaborator seats.',
     },
     {
-      title: '🧙‍♂️ Dedicated partner manager',
+      icon: faUserTie,
+      title: 'Dedicated partner manager',
       body: 'Direct access to our Partner Team for you and your clients, with constant updates and support.',
     },
     {
-      title: '🔖 Dedicated partner listing',
+      icon: faAddressCard,
+      title: 'Dedicated partner listing',
       body: 'Get listed on our <a href="/partners">Partners page</a> with your projects and co-marketing content so teams looking for development help can find you.',
       link: { label: 'Explore our partner listings →', href: '/partners' },
     },
     {
-      title: '🫶 Co-marketing',
+      icon: faMegaphone,
+      title: 'Co-marketing',
       body: 'We\'ll promote your work through <a href="/case-studies">case studies</a>, articles, and other collaborations. We also LOVE to talk to you about your work.',
       link: { label: 'Explore our partner chats →', href: '/blog/casual-chats' },
     },
   ] satisfies Benefit[],
 };
 
-export const plans = {
-  variant: 'subtle',
+// The closing call to action of the page closer, above the video.
+export const plans: CtaBannerData = {
+  variant: 'light',
   headline: 'Agency partners unlock plans',
-  muted: 'starting at just €39/month',
+  muted: 'starting at just €39/month.',
   subline:
     "Yeah, that's not a typo. We designed our partnership program to help you find new clients, gain more flexibility, and receive assistance in implementing projects with DatoCMS.",
-  button: { label: 'Become a Partner', href: '#partner-form' },
-} as const;
+  buttons: [{ label: 'Become a Partner', href: '#partner-form', contact: 'partners' }],
+};
 
 export const steps = {
-  title: 'Getting started is easy',
+  title: 'Getting started is easy.',
   muted: 'Join our Partner Program and start your journey to become a DatoCMS Partner today.',
   items: [
     {
@@ -95,9 +123,18 @@ export const steps = {
   ],
 };
 
-export const talk = {
+export const talk: Omit<ContactSectionData, 'form'> = {
+  label: '',
   headline: "Let's talk!",
   muted: "Fill in the form, and we'll be in touch!",
+  links: [
+    { lead: 'Who is in already?', label: 'Agency directory', href: '/partners' },
+    {
+      lead: 'How does it work?',
+      label: 'Partner docs',
+      href: '/docs/agency-partner-program',
+    },
+  ],
 };
 
 // All the countries of the package country-list: the ISO code is the value.

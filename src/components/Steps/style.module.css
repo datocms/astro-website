@@ -1,16 +1,19 @@
-/* Stacked below 768. One column for each step from 768. */
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
+/*
+ * The headline, then the steps in a row of columns, with a hairline
+ * between them. Below 1152 the steps stack, with a hairline between
+ * two rows. There is no tint: a tinted cell between two plain cells
+ * looks like a card.
+ */
+.head {
+  padding-bottom: var(--space-2xl);
 }
 
 .list {
   display: grid;
-  gap: var(--space-md);
   margin: 0;
   padding: 0;
   list-style: none;
+  border-top: 1px solid var(--border-default);
   counter-reset: step;
 }
 
@@ -18,21 +21,25 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  padding: var(--space-lg);
-  border-radius: var(--radius-md);
-  background: var(--surface-accent-faint);
+  padding-block: var(--space-xl);
   counter-increment: step;
+}
+
+.step + .step {
+  border-top: 1px solid var(--border-default);
 }
 
 .step::before {
   content: counter(step, decimal-leading-zero);
+  margin-bottom: var(--space-3xs);
   font-size: var(--type-xl);
   line-height: 1;
   color: var(--text-muted);
 }
 
 .body {
-  color: var(--text-muted);
+  max-width: var(--reading-max);
+  color: var(--text-soft);
 }
 
 .body :where(p + p) {
@@ -42,11 +49,34 @@
 .body :where(a) {
   color: var(--text-primary);
   text-decoration: underline;
+  text-decoration-thickness: 1px;
   text-underline-offset: 0.15em;
 }
 
-@media (min-width: 768px) {
+/*
+ * From 1152: one column for each step. The outer columns start and end
+ * at the edge of the content column. The air between two texts is the
+ * same everywhere (--space-2xl), thus the three texts have the same width.
+ */
+@media (min-width: 1152px) {
   .list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .step {
+    padding: var(--space-xl) calc(var(--space-2xl) / 2) 0;
+  }
+
+  .step + .step {
+    border-top: 0;
+    border-left: 1px solid var(--border-default);
+  }
+
+  .step:first-child {
+    padding-inline: 0 var(--space-2xl);
+  }
+
+  .step:last-child {
+    padding-inline: var(--space-2xl) 0;
   }
 }

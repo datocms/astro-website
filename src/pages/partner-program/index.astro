@@ -4,12 +4,10 @@
 // action forms.submitPartnerProgramRequest, then goes to
 // /partner-program/thanks. The SEO is static: the page has no CMS record.
 import { stripStega } from '@datocms/astro';
-import { ContactForm } from '~/components/ContactForm';
-import { CtaBanner } from '~/components/CtaBanner';
-import { Headline } from '~/components/Headline';
+import { ContactSection } from '~/components/ContactSection';
 import { Hero } from '~/components/Hero';
-import { LogosLine, type LogoItem } from '~/components/LogosLine';
-import { Section } from '~/components/Section';
+import type { LogoItem } from '~/components/LogosLine';
+import { PageCloser } from '~/components/PageCloser';
 import { Step, Steps } from '~/components/Steps';
 import { ButtonGroup } from '~/components/ButtonGroup';
 import { QuoteGrid } from '~/components/Quote';
@@ -29,7 +27,7 @@ import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
-import Benefit from './_Benefit.astro';
+import Benefits from './_Benefits.astro';
 import { query } from './_graphql';
 import s from './_style.module.css';
 
@@ -42,7 +40,7 @@ if (!page) {
 
 const seo = overrideSeo([], seoTitle(partnerSeo.title));
 
-const partnerLogos: LogoItem[] = page.highlightedPartners.slice(0, 7).map((partner) => ({
+const partnerLogos: LogoItem[] = page.highlightedPartners.map((partner) => ({
   mask: partner.logo.url,
   alt: stripStega(partner.logo.alt || partner.name),
   width: partner.logo.width ?? 0,
@@ -57,23 +55,11 @@ const partnerLogos: LogoItem[] = page.highlightedPartners.slice(0, 7).map((partn
     headline={hero.headline}
     intro={hero.intro}
     buttons={[{ ...hero.button }]}
+    logos={partnerLogos}
+    logosLabel={logos.label}
   />
 
-  <Section>
-    <div class={s.logos}>
-      <p class:list={['labelMedium', s.logosLabel]}>{logos.label}</p>
-      <LogosLine logos={partnerLogos} label={logos.label} marquee="overflow" />
-    </div>
-  </Section>
-
-  <Section flushTop>
-    <div class={s.benefits}>
-      <Headline as="h2" size="headline" muted={benefits.muted}>{benefits.headline}</Headline>
-      <ul class={s.benefitList}>
-        {benefits.items.map((benefit) => <Benefit {...benefit} />)}
-      </ul>
-    </div>
-  </Section>
+  <Benefits {...benefits} />
 
   {
     partnerTestimonials.length > 0 && (
@@ -83,28 +69,17 @@ const partnerLogos: LogoItem[] = page.highlightedPartners.slice(0, 7).map((partn
     )
   }
 
-  <CtaBanner
-    variant={plans.variant}
-    headline={plans.headline}
-    muted={plans.muted}
-    subline={plans.subline}
-    buttons={[{ ...plans.button }]}
-  />
-
   <Steps title={steps.title} muted={steps.muted}>
     {steps.items.map((step) => <Step title={step.title}>{step.text}</Step>)}
   </Steps>
 
-  <Section id="partner-form">
-    <div class={s.talk}>
-      <Headline as="h2" size="headline" muted={talk.muted}>{talk.headline}</Headline>
-      <partner-form class={s.form}>
-        <ContactForm {...form} external>
-          <div slot="extra" class={s.turnstile} data-turnstile></div>
-        </ContactForm>
-      </partner-form>
-    </div>
-  </Section>
+  <partner-form class={s.form}>
+    <ContactSection id="partner-form" headingLevel="h2" external {...talk} form={form}>
+      <div slot="extra" class={s.turnstile} data-turnstile></div>
+    </ContactSection>
+  </partner-form>
+
+  <PageCloser face="money" cta={plans} video="/videos/hand-counting-money.pxv" />
 
   <DraftModeQueryListener query={query} />
 </Layout>

@@ -1,0 +1,40 @@
+---
+import { Headline } from '~/components/Headline';
+import { Icon } from '~/components/Icon';
+import { Section } from '~/components/Section';
+import type { benefits as benefitsData } from '~/data/partner-program';
+import s from './_style.module.css';
+
+type Props = typeof benefitsData;
+
+const { headline, muted, intro, items } = Astro.props;
+---
+
+{/* The headline and the intro, then the benefits in a grid of cells, as on /philosophy. */}
+<Section flushBottom contentClass={s.benefitsHead}>
+  <Headline as="h2" size="headline" muted={muted}>{headline}</Headline>
+  <p class:list={['bodyLong', s.intro]}>{intro}</p>
+</Section>
+
+<Section padding="none" flush>
+  <ul class={s.cells}>
+    {
+      items.map((benefit) => (
+        <li class={s.cell}>
+          <div class={s.cellText}>
+            <Icon icon={benefit.icon} class={s.icon} />
+            <h3 class="title">{benefit.title}</h3>
+            <p class:list={['body', s.cellBody]} set:html={benefit.body} />
+            {benefit.link && (
+              <p class="labelMedium">
+                <a class={s.link} href={benefit.link.href}>
+                  {benefit.link.label}
+                </a>
+              </p>
+            )}
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</Section>

@@ -14,11 +14,15 @@ const { title, muted, class: className } = Astro.props;
 ---
 
 {
-  /* Numbered steps in a row of cards. The slot takes the `Step` elements. The CSS counter gives the numbers. */
+  /* Numbered steps in a row of columns. The slot takes the `Step` elements. The CSS counter gives the numbers. */
 }
-<Section class={className} contentClass={styles.content}>
-  <Headline as="h2" size="headline" muted={muted}>{title}</Headline>
-  <ol class={styles.list}>
-    <slot />
-  </ol>
-</Section>
+<div class={className}>
+  <Section flushBottom contentClass={styles.head}>
+    <Headline as="h2" size="headline" muted={muted}>{title}</Headline>
+  </Section>
+  <Section flushTop>
+    <ol class={styles.list}>
+      <slot />
+    </ol>
+  </Section>
+</div>
