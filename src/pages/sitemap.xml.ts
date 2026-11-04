@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { SitemapStream, streamToPromise } from 'sitemap';
 import { baseUrl } from '~/lib/draftMode';
-import { picturesFor } from '~/lib/pictures';
+import { pictureUrl, picturesFor } from '~/lib/pictures';
 import { toArrayBuffer } from '~/lib/toArrayBuffer';
 import { handleUnexpectedError } from './api/_utils';
 
@@ -85,7 +85,7 @@ export const GET: APIRoute = async ({ request }) => {
       }
 
       const img = picturesFor(new URL(url, base).pathname).map((picture) => ({
-        url: picture.url,
+        url: pictureUrl(base, picture),
         title: picture.title,
         caption: picture.alt,
       }));

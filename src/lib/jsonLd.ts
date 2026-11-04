@@ -1,7 +1,7 @@
 import type { AstroGlobal } from 'astro';
 import type { Organization, Thing, WebPage, WebSite } from 'schema-dts';
 import { baseUrl } from '~/lib/draftMode';
-import type { Picture } from '~/lib/pictures';
+import { pictureUrl, type Picture } from '~/lib/pictures';
 
 export function organizationId(base: string | URL) {
   return new URL('/#organization', base).href;
@@ -101,8 +101,8 @@ export function webPageNode(
           image: pictures.map((picture) => ({
             '@type': 'ImageObject' as const,
             '@id': `${url}#picture-${picture.section}`,
-            contentUrl: picture.url,
-            url: picture.url,
+            contentUrl: pictureUrl(base, picture),
+            url: pictureUrl(base, picture),
             name: picture.title,
             description: picture.alt,
             width: { '@type': 'QuantitativeValue' as const, value: picture.width, unitCode: 'E37' },

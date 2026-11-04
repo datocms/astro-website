@@ -1,8 +1,6 @@
 import { spawn } from 'node:child_process';
-import { createHash } from 'node:crypto';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
-import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
@@ -11,7 +9,9 @@ import sharp from 'sharp';
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const port = Number(process.env.PICTURES_PORT ?? 4790);
 const origin = `http://localhost:${port}`;
-const outDir = process.env.PICTURES_OUT ?? path.join(tmpdir(), 'datocms-pictures');
+const outDir = path.join(root, 'public/pictures');
+const manifestPath = path.join(root, 'src/data/pictures.json');
+const previous = JSON.parse(readFileSync(manifestPath, 'utf8'));
 
 const pages = [
   '/',
@@ -79,9 +79,9 @@ function stopServer(child) {
   } catch {}
 }
 
-function pictureId(pathname, section) {
+function defaultFile(pathname, section) {
   const page = pathname === '/' ? 'home' : pathname.slice(1).replaceAll('/', '-');
-  return `${page}-${section}`;
+  return `datocms-${page}-${section}.png`;
 }
 
 if (!(await portIsFree(port))) {
@@ -102,8 +102,8 @@ try {
     reducedMotion: 'reduce',
   });
   const page = await context.newPage();
-  rmSync(outDir, { recursive: true, force: true });
   mkdirSync(outDir, { recursive: true });
+  const written = new Set();
 
   for (const pathname of pages) {
     await page.goto(origin + pathname, { waitUntil: 'load', timeout: 120000 });
@@ -126,20 +126,34 @@ try {
         }
         if (!current || found.some((c) => c.section === current.id)) continue;
         el.dataset.picture = current.id;
+        const scene = [...el.querySelectorAll('figcaption, [aria-label]')].find(
+          (node) => node.matches('figcaption') || node.tagName.startsWith('SCENE-'),
+        );
         found.push({
           section: current.id,
           title: (current.querySelector('h1, h2')?.textContent ?? '').replace(/\s+/g, ' ').trim(),
-          intro: [...current.querySelectorAll('p')]
-            .map((p) => p.textContent.replace(/\s+/g, ' ').trim())
-            .filter(Boolean)
-            .join(' '),
+          alt: (scene?.matches('figcaption')
+            ? scene.textContent
+            : scene?.getAttribute('aria-label')
+          )
+            ?.replace(/\s+/g, ' ')
+            .trim(),
         });
       }
       return found;
     });
 
     const entries = [];
-    for (const { section, title, intro } of chapters) {
+    for (const { section, title, alt } of chapters) {
+      const known = previous[pathname]?.find((entry) => entry.section === section);
+      const file = known?.file ?? defaultFile(pathname, section);
+      if (written.has(file)) {
+        const shared = [...Object.values(manifest).flat(), ...entries].find(
+          (entry) => entry.file === file,
+        );
+        entries.push({ ...shared, section, ...(known && { title: known.title, alt: known.alt }) });
+        continue;
+      }
       const frame = page.locator(`[data-picture="${section}"]`);
       await frame.scrollIntoViewIfNeeded();
       await page.waitForTimeout(200);
@@ -164,23 +178,32 @@ try {
         return { x: left, y: top, width: right - left, height: bottom - top };
       });
       const shot = await page.screenshot({ clip, animations: 'disabled' });
-      const id = pictureId(pathname, section);
       const png = await sharp(shot)
         .png({ compressionLevel: 9, palette: true, quality: 90 })
         .toBuffer();
-      const md5 = createHash('md5').update(png).digest('hex');
       const { width, height } = await sharp(png).metadata();
-      writeFileSync(path.join(outDir, `${id}.png`), png);
-      entries.push({ id, section, title, intro, width, height, md5 });
-      console.log(`${id}.png ${width}x${height} ${Math.round(png.length / 1024)} kB`);
+      writeFileSync(path.join(outDir, file), png);
+      written.add(file);
+      entries.push({
+        section,
+        file,
+        title: known?.title ?? title,
+        alt: known?.alt ?? alt ?? title,
+        width,
+        height,
+      });
+      console.log(`${file} ${width}x${height} ${Math.round(png.length / 1024)} kB`);
     }
     if (entries.length > 0) manifest[pathname] = entries;
   }
 
   await browser.close();
 
-  writeFileSync(path.join(outDir, 'pictures.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-  console.log(`Wrote ${outDir}`);
+  for (const name of readdirSync(outDir)) {
+    if (!written.has(name)) rmSync(path.join(outDir, name));
+  }
+  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  console.log(`Wrote ${written.size} files to ${outDir} and ${manifestPath}`);
 } finally {
   stopServer(server);
 }
