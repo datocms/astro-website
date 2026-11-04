@@ -1,10 +1,10 @@
 // The static copy of the pricing page. The rows of the comparison and the
 // questions of the FAQ come from the dashboard API and from the CMS.
 
-import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
-import type { CtaBannerData, HeroData } from '~/data/home';
 import type { ButtonData } from '~/components/Button';
+import type { CtaBannerData, HeroData } from '~/data/home';
 import { hero as homeHero } from '~/data/home';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 
 /** The plan change in the dashboard: it buys the Professional plan. */
 const purchaseHref = dashboardUrl(
@@ -164,7 +164,7 @@ export const freeLimits: FreeLimitsData = {
 
 /** The line under the comparison table. The link opens the dialog of the free limits. */
 export const freeReminder = {
-  lead: 'We also offer a',
+  lead: 'We also offer a ',
   strong: '100% free plan',
   text: '. No overages allowed.',
   link: { label: 'See all limits in detail', href: '#free-plan-details' },

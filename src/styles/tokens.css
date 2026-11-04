@@ -763,12 +763,14 @@
  * Backdrop. There are no shadows: a popover, a drawer or a card separates
  * from what is under it with a surface change and a 1px hairline. The scrim
  * dims the page behind a drawer.
- *   scrim-modal     The page behind a modal (the search). It dims more
- *                   than the scrim. The dark scheme has its own value.
+ *   scrim-modal     The page behind a modal (a dialog, a lightbox, the
+ *                   search). It dims more than the scrim. It is neutral
+ *                   black on :root, thus it is the same over each theme
+ *                   and in each scheme.
  */
 :root {
   --scrim: rgb(0 0 0 / 0.4);
-  --scrim-modal: var(--color-brown-deep-3);
+  --scrim-modal: rgb(0 0 0 / 0.7);
 }
 
 /*
@@ -799,11 +801,6 @@
  */
 :root[data-scheme='dark'] {
   color-scheme: dark;
-  /*
-   * The page is dark: a dark brown does not dim it. Black with the alpha
-   * of the light value (70%) dims it as much.
-   */
-  --scrim-modal: rgb(0 0 0 / 0.7);
   /* The page is a dark ground: the type adjusts for light text. */
   --type-leading-dark: 0.05;
   --type-tracking-dark: 0.01em;
