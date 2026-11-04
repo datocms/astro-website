@@ -8,8 +8,8 @@ import { legacyLastPage, pageQuery } from './_graphql';
 const param = Astro.params.pageIndex ?? '';
 const page = /^[1-9]\d*$/.test(param) ? Number.parseInt(param, 10) : null;
 
-// Page 1 is /product-updates.
-if (page === 1) return Astro.redirect('/product-updates', 301);
+// Page 1 is /product-updates. The old site numbered its pages from 0, thus /p/0 is page 1 too.
+if (page === 1 || param === '0') return Astro.redirect('/product-updates', 301);
 
 if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);

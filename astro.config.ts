@@ -429,9 +429,6 @@ export default defineConfig({
     ...redirectsFrom('/use-cases', useCaseTargets),
     ...redirectsFrom('/cms', landingPageTargets),
     '/made-for/developers': '/developers',
-    // The feature pages of the Media pillar redirect to chapters of /media.
-    '/features/images-api': '/media#images',
-    '/features/video-api': '/media#video',
     // The about page redirects to the philosophy page.
     '/company/about': '/philosophy',
     '/blog/2': '/blog/p/2',
@@ -462,6 +459,9 @@ export default defineConfig({
     '/marketplace/plugins/[...rest]': '/plugins/[...rest]',
     '/marketplace/starters': '/starters',
     '/marketplace/starters/[...rest]': '/starters/[...rest]',
+    // The recipes have no page. The plugin that imports their schema replaces them.
+    '/marketplace/recipes': '/plugins/i/datocms-plugin-schema-import-export',
+    '/marketplace/recipes/[...rest]': '/plugins/i/datocms-plugin-schema-import-export',
     '/cms/react': '/cms/nextjs-cms',
     '/cms/hugo': '/developers',
     '/cms/nextjs': '/cms/nextjs-cms',
@@ -572,7 +572,9 @@ export default defineConfig({
     '/made-for/marketers': '/editor-experience',
     '/made-for/content-creators': '/editor-experience',
     '/customer-stories': '/blog/casual-chats',
+    '/customer-stories/p/[...rest]': '/blog/casual-chats',
     '/customer-stories/[...rest]': '/blog/casual-chats/[...rest]',
+    '/docs/real-time-updates-api/rate-limiting': '/docs/real-time-updates-api/limits-and-pricing',
     // The casual chats are part of the blog.
     '/casual-chats': '/blog/casual-chats',
     '/casual-chats/p/[...rest]': '/blog/casual-chats',
