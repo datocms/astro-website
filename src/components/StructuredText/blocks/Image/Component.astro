@@ -18,10 +18,15 @@ const zoomUrl = asset.width && asset.width > 1500 ? asset.lightboxImageUrl : nul
 {
   /*
   An image of the article. A GIF plays as a muted video in view. A large
-  image opens in a dialog. A framed image has a border.
+  image opens in a dialog. A framed image has a border. An image that is
+  narrower than the figure is in the centre of the figure: it does not
+  grow past its width.
 */
 }
-<figure class:list={[styles.figure, !frameless && styles.framed]}>
+<figure
+  class:list={[styles.figure, !frameless && styles.framed]}
+  style={asset.width ? `--image-width: ${asset.width}px` : undefined}
+>
   {
     asset.format === 'gif' ? (
       <InViewVideo

@@ -28,6 +28,8 @@ interface Props {
   media?: 'photo' | 'visual';
   /** `even`: from 1152 the media half has the side padding on all four sides. */
   mediaPadding?: 'default' | 'even';
+  /** `accent`: the text half has the accent of the theme as its background. */
+  textBackground?: 'default' | 'accent';
   /** A case-studies-logo above the headline. It fits in 220 × 30. */
   logo?: LogoItem;
   button?: ButtonData;
@@ -45,6 +47,7 @@ const {
   panelOrder = 'image-right',
   media = 'visual',
   mediaPadding = 'default',
+  textBackground = 'default',
   logo,
   button,
   headingLevel: Heading = 'h2',
@@ -68,7 +71,12 @@ const shownLogo = storyLogo ?? logo;
   class:list={[styles.textWithImage, panelOrder === 'image-left' && styles.imageLeft]}
   contentClass={styles.split}
 >
-  <div class={styles.textHalf}>
+  <div
+    class:list={[
+      styles.textHalf,
+      textBackground === 'accent' && [styles.textAccent, 'surfaceAccent'],
+    ]}
+  >
     <div class:list={[styles.text, headlineStyle === 'two-tone' && styles.twoToneText]}>
       {
         shownLogo && (

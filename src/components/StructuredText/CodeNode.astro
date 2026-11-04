@@ -7,6 +7,10 @@ interface Props {
 }
 
 const { node } = Astro.props;
+
+// A short code block fits in the text: it does not go past the sides of the text.
+const longestLine = Math.max(...node.code.split('\n').map((line) => line.length));
+const textWidth = longestLine <= 70;
 ---
 
 {
@@ -14,10 +18,10 @@ const { node } = Astro.props;
   A code block of a Structured Text field: Expressive Code, as in the
   Markdown and in the docs. The figure and the island make it a wide block
   of Prose: Prose does not style it, and an article lets it go past the
-  sides of the text.
+  sides of the text. A block with short lines stays in line with the text.
 */
 }
-<figure>
+<figure data-text-width={textWidth ? '' : undefined}>
   <prose-island>
     <Code
       code={node.code}

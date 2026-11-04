@@ -224,7 +224,6 @@ export const footerColumns: FooterColumn[] = [
         links: [
           l('Philosophy', '/philosophy'),
           l('Security', '/security'),
-          l('Profit sharing', '/company/profit-sharing'),
           l('Research program', '/research-program'),
           l('Contact', '/contact'),
         ],
