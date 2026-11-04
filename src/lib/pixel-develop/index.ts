@@ -25,10 +25,15 @@
 //   get half as large at each step. The steps do not fade: a change of
 //   step is one frame, as in pixel art.
 // - The element gets `data-state`: `pending` until it comes into view,
-//   `loading` while the image loads (the CSS shows the spinner),
+//   `loading` while the image loads (the CSS shows the working mark),
 //   `developing` while the canvas shows the cells, `sharp` at the end. The
-//   CSS of the element shows the spinner, the canvas or the image for each
+//   CSS of the element shows the mark, the canvas or the image for each
 //   state.
+// - The HTML can have the first step already, from the thumbhash of the
+//   image (`./thumbhash.ts`). Then the canvas starts at the second step
+//   (`fromStep: 1`).
+// - The cells come from `./cells.ts`, which has no DOM: the server uses it
+//   too.
 // - Without motion (no `data-motion="on"` on the root), when the image
 //   does not load, or when the browser does not let the page read it, the
 //   state is `sharp` at once.
@@ -41,8 +46,9 @@
 //   development.
 
 import { onEnterViewport } from '~/lib/motion/inView';
+import { cellsOf, groundOf, STEPS, type DevelopMode, type Pixels } from './cells';
 
-export type DevelopMode = 'ink' | 'photo';
+export type { DevelopMode };
 export type DevelopFit = 'contain' | 'cover';
 
 export interface DevelopOptions {
@@ -53,33 +59,19 @@ export interface DevelopOptions {
   mode: DevelopMode;
   /** `contain`: centred in the canvas. `cover`: fills the canvas from its top left corner. */
   fit: DevelopFit;
+  /** The first step that the canvas draws. 1 when the HTML has the first step. */
+  fromStep?: number;
 }
 
 type State = 'pending' | 'loading' | 'developing' | 'sharp';
 
-// The size of the cells at each step, as a part of the side of a square
-// with the area of the image.
-const STEPS = [1 / 4, 1 / 8, 1 / 16, 1 / 32];
 // The time of each step, in ms. The first step stays longer: the eye sees
 // the large cells first, then the image comes quickly into focus.
 const STEP_MS = [260, 140, 110, 90];
 // The time from the entry in view to the first step.
 const DELAY_MS = 150;
-// A pixel is ink when it is this far from the ground (the sum of the
-// differences of the three channels, 0–765).
-const INK_DISTANCE = 60;
-// A cell gets the colour of the ink when the ink covers this part of its
-// area or more. A logo is solid, thus it needs much ink. An illustration
-// can be thin lines, thus a photo needs less.
-const INK_COVERAGE: Record<DevelopMode, number> = { ink: 0.3, photo: 0.08 };
-
 /** The visible part of the image, drawn on white, in device pixels. */
-interface Source {
-  pixels: Uint8ClampedArray;
-  /** The colour that is not ink. */
-  ground: Rgb;
-  width: number;
-  height: number;
+interface Source extends Pixels {
   /** The position of this part in the canvas, in device pixels. */
   x: number;
   y: number;
@@ -114,6 +106,7 @@ export function developWhenInView(element: HTMLElement, options: DevelopOptions)
       setState('developing');
       await wait(DELAY_MS);
       for (const [index, step] of STEPS.entries()) {
+        if (index < (options.fromStep ?? 0)) continue;
         drawCells(options.canvas, source, step, options.mode);
         await wait(STEP_MS[index]!);
       }
@@ -160,96 +153,18 @@ function readSource(image: HTMLImageElement, { canvas, fit, mode }: DevelopOptio
 
   canvas.width = width;
   canvas.height = height;
-  const ground = mode === 'ink' ? { r: 255, g: 255, b: 255 } : mostFrequentColour(data);
+  const ground = groundOf(data, mode);
   return { pixels: data, ground, width: visibleWidth, height: visibleHeight, x, y };
 }
 
-// Draws one step: square cells of `step` times the side of the image. The
-// grid has its centre at the centre of the image, thus the cells at the
-// two sides are equal.
+// Draws one step of `./cells.ts` into the canvas.
 function drawCells(canvas: HTMLCanvasElement, source: Source, step: number, mode: DevelopMode) {
   const context = canvas.getContext('2d')!;
   context.clearRect(0, 0, canvas.width, canvas.height);
-
-  const side = Math.sqrt(source.width * source.height);
-  const cell = Math.max(2, Math.round(side * step));
-  const cols = Math.ceil(source.width / cell);
-  const rows = Math.ceil(source.height / cell);
-  const left = Math.round((source.width - cols * cell) / 2);
-  const top = Math.round((source.height - rows * cell) / 2);
-
-  for (let row = 0; row < rows; row++) {
-    for (let col = 0; col < cols; col++) {
-      const x0 = Math.max(0, left + col * cell);
-      const y0 = Math.max(0, top + row * cell);
-      const x1 = Math.min(source.width, left + (col + 1) * cell);
-      const y1 = Math.min(source.height, top + (row + 1) * cell);
-      const pixels: number[] = [];
-      for (let y = y0; y < y1; y++) {
-        for (let x = x0; x < x1; x++) pixels.push((y * source.width + x) * 4);
-      }
-      const isInk = (i: number) => distance(source.pixels, i, source.ground) >= INK_DISTANCE;
-      const ink = pixels.filter(isInk);
-      const colour =
-        ink.length > 0 && ink.length >= pixels.length * INK_COVERAGE[mode]
-          ? mostFrequentColour(source.pixels, ink)
-          : mode === 'photo'
-            ? source.ground
-            : null;
-      if (!colour) continue;
-      const { r, g, b } = colour;
-      context.fillStyle = `rgb(${r} ${g} ${b})`;
-      context.fillRect(source.x + left + col * cell, source.y + top + row * cell, cell, cell);
-    }
+  for (const { x, y, size, colour } of cellsOf(source, step, mode)) {
+    context.fillStyle = `rgb(${colour.r} ${colour.g} ${colour.b})`;
+    context.fillRect(source.x + x, source.y + y, size, size);
   }
-}
-
-interface Rgb {
-  r: number;
-  g: number;
-  b: number;
-}
-
-// The sum of the differences of the three channels between the pixel at
-// `i` and `colour`.
-function distance(pixels: Uint8ClampedArray, i: number, colour: Rgb) {
-  return (
-    Math.abs(pixels[i]! - colour.r) +
-    Math.abs(pixels[i + 1]! - colour.g) +
-    Math.abs(pixels[i + 2]! - colour.b)
-  );
-}
-
-// The pixels go into buckets of similar colours (4 bits for each channel).
-// The result is the mean colour of the largest bucket. `indexes` are the
-// pixels to read; without it, all the pixels.
-function mostFrequentColour(pixels: Uint8ClampedArray, indexes?: number[]): Rgb {
-  const buckets = new Map<number, Rgb & { n: number }>();
-  const add = (i: number) => {
-    const r = pixels[i]!;
-    const g = pixels[i + 1]!;
-    const b = pixels[i + 2]!;
-    const key = ((r >> 4) << 8) | ((g >> 4) << 4) | (b >> 4);
-    const bucket = buckets.get(key);
-    if (bucket) {
-      bucket.r += r;
-      bucket.g += g;
-      bucket.b += b;
-      bucket.n++;
-    } else {
-      buckets.set(key, { r, g, b, n: 1 });
-    }
-  };
-  if (indexes) for (const i of indexes) add(i);
-  else for (let i = 0; i < pixels.length; i += 4) add(i);
-  let largest = { r: 255, g: 255, b: 255, n: 0 };
-  for (const bucket of buckets.values()) if (bucket.n > largest.n) largest = bucket;
-  if (largest.n === 0) return largest;
-  return {
-    r: Math.round(largest.r / largest.n),
-    g: Math.round(largest.g / largest.n),
-    b: Math.round(largest.b / largest.n),
-  };
 }
 
 async function loadImage(src: string) {

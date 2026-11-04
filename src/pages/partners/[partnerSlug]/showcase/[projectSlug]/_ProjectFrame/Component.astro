@@ -5,17 +5,23 @@
 // square cells in its own colours, and the cells get smaller in steps until
 // the media is sharp (`~/lib/pixel-develop`, the `photo` mode). A video
 // develops from its poster: the frame that the player shows before it
-// plays. While the poster or the image loads, the spinner of the cms
-// shows. Without motion, the media is sharp at once.
+// plays. With a thumbhash, the HTML has the first step already: the
+// server decodes the thumbhash into the large cells, thus the frame is
+// never empty, and the canvas continues from the second step. While the
+// poster or the image loads, the working mark of the diagrams shows on the
+// cells. Without motion, the media is sharp at once.
 import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { Spinner } from '~/components/Spinner';
+import { WorkingMark } from '~/components/WorkingMark';
 import type { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { VideoPlayer, VideoPlayerFragment } from '~/components/VideoPlayer';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { muxThumbnailUrl } from '~/lib/muxThumbnailUrl';
+import { firstStepFromThumbhash } from '~/lib/pixel-develop/thumbhash';
 import s from './style.module.css';
 
 type Props = {
+  /** The thumbhash of the image, or of the poster of the video. */
+  thumbhash?: string | null;
   class?: string;
 } & (
   | {
@@ -31,7 +37,7 @@ type Props = {
     }
 );
 
-const { class: className } = Astro.props;
+const { thumbhash, class: className } = Astro.props;
 const poster =
   'video' in Astro.props ? readFragment(VideoPlayerFragment, Astro.props.video).video : null;
 // The poster of the player, at a small width: the canvas reads it.
@@ -39,9 +45,15 @@ const pixelSrc =
   'video' in Astro.props
     ? muxThumbnailUrl(poster!.thumbnailUrl, { width: 480 })
     : Astro.props.pixelSrc;
+const firstStep = thumbhash ? firstStepFromThumbhash(thumbhash) : null;
 ---
 
-<project-frame class:list={[s.frame, className]} data-src={pixelSrc}>
+<project-frame
+  class:list={[s.frame, className]}
+  data-src={pixelSrc}
+  data-from-step={firstStep ? '1' : undefined}
+  data-ground={firstStep?.dark ? 'dark' : undefined}
+>
   <div class={s.media}>
     {
       'video' in Astro.props ? (
@@ -57,8 +69,29 @@ const pixelSrc =
       )
     }
   </div>
+  {
+    firstStep && (
+      <svg
+        class={s.cells}
+        viewBox={`0 0 ${firstStep.width} ${firstStep.height}`}
+        preserveAspectRatio="xMinYMin slice"
+        shape-rendering="crispEdges"
+        aria-hidden="true"
+      >
+        {firstStep.cells.map(({ x, y, size, colour }) => (
+          <rect
+            x={x}
+            y={y}
+            width={size}
+            height={size}
+            fill={`rgb(${colour.r} ${colour.g} ${colour.b})`}
+          />
+        ))}
+      </svg>
+    )
+  }
   <canvas class={s.canvas} aria-hidden="true"></canvas>
-  <Spinner class={s.spinner} />
+  <WorkingMark class={s.working} />
 </project-frame>
 
 <script>
@@ -74,6 +107,7 @@ const pixelSrc =
           canvas: this.$<HTMLCanvasElement>('canvas'),
           mode: 'photo',
           fit: 'cover',
+          fromStep: Number(this.dataset.fromStep ?? 0),
         });
       }
     },

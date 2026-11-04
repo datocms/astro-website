@@ -5,13 +5,16 @@
  * left corner, thus the band cuts it at the bottom. A video has no maximum:
  * the controls of the player must stay in view. A hairline follows the
  * edges that are not cut (the top and the left). The canvas is on the
- * media and has the same box.
+ * media and has the same box. The white under the media (it shows while
+ * the media loads) stops inside the hairline: the hairline has alpha, and
+ * on white it is a white line in the dark scheme.
  */
 .frame {
   position: relative;
   display: block;
   overflow: hidden;
   background: var(--surface-raised);
+  background-clip: padding-box;
   border-top: 1px solid var(--border-default);
   border-left: 1px solid var(--border-default);
   border-top-left-radius: var(--radius-sm);
@@ -40,6 +43,30 @@
   max-height: 560px;
   object-fit: cover;
   object-position: left top;
+}
+
+/*
+ * The first step from the thumbhash, in the HTML. It covers the frame as
+ * the image does (from the top left corner). It shows with motion, until
+ * the canvas takes the next step, or until the failsafe shows the media.
+ */
+.cells {
+  position: absolute;
+  inset: 0;
+  display: none;
+  width: 100%;
+  height: 100%;
+}
+
+:global([data-motion='on']) .frame:not([data-state='developing'], [data-state='sharp']) .cells {
+  display: block;
+  animation: cells-hide 0s 2.2s forwards;
+}
+
+@keyframes cells-hide {
+  to {
+    visibility: hidden;
+  }
 }
 
 .canvas {
@@ -76,14 +103,15 @@
 }
 
 /*
- * The spinner shows while the image loads, but only after a short time:
- * an image that loads quickly develops with no spinner. It goes at the
+ * The working mark shows while the image loads, but only after a short time:
+ * an image that loads quickly develops with no mark. It goes at the
  * time of the failsafe, when the CSS shows the sharp image all the same.
- * The ground under it is the white of the frame, in both schemes, thus
- * the bars are the deep of the theme.
+ * The ground under it is the white of the frame or the cells of the
+ * thumbhash, the same in both schemes. On a light ground the dots are the
+ * deep of the theme, on a dark ground (`data-ground="dark"`) the white.
  */
-.spinner {
-  --spinner-color: var(--surface-inverse);
+.working {
+  --working-color: var(--surface-inverse);
 
   position: absolute;
   top: 50%;
@@ -92,19 +120,23 @@
   visibility: hidden;
 }
 
-.frame[data-state='loading'] .spinner {
-  animation:
-    spinner-show 0s 300ms forwards,
-    spinner-hide 0s 2.2s forwards;
+.frame[data-ground='dark'] .working {
+  --working-color: var(--surface-raised);
 }
 
-@keyframes spinner-show {
+.frame[data-state='loading'] .working {
+  animation:
+    working-show 0s 300ms forwards,
+    working-hide 0s 2.2s forwards;
+}
+
+@keyframes working-show {
   to {
     visibility: visible;
   }
 }
 
-@keyframes spinner-hide {
+@keyframes working-hide {
   to {
     visibility: hidden;
   }

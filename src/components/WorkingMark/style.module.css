@@ -1,0 +1,38 @@
+/* @layer blocks */
+/* The grid and the cycle of the working mark of the diagrams: a gap of half a dot. */
+.mark {
+  --working-dot: 4px;
+
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(5, var(--working-dot));
+  grid-auto-rows: var(--working-dot);
+  gap: calc(var(--working-dot) / 2);
+}
+
+.mark > * {
+  background: var(--working-color, currentColor);
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list, datocms/text-roles -- a dot with no text is dim in its cycle */
+  opacity: 0.3;
+  animation: blink 1.6s steps(1, end) var(--d, 0s) infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+
+  25% {
+    /* stylelint-disable-next-line declaration-property-value-disallowed-list, datocms/text-roles -- a dot with no text is dim in its cycle */
+    opacity: 0.3;
+  }
+
+  62.5% {
+    opacity: 1;
+  }
+
+  75% {
+    /* stylelint-disable-next-line declaration-property-value-disallowed-list, datocms/text-roles -- a dot with no text is dim in its cycle */
+    opacity: 0.3;
+  }
+}

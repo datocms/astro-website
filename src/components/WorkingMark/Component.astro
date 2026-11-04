@@ -1,0 +1,24 @@
+---
+// The working mark of the diagrams (`src/scenes/diagram/style.module.css`)
+// outside of a diagram: a grid of 5 × 5 square dots, each one on or dim in turn,
+// in steps. It tells that an action is in progress. The dots and the
+// delays are those of the diagrams, at a larger scale (`--working-dot`,
+// 4px by default; 2px in a pill of a diagram). The parent gives its place
+// and its colour (`--working-color`, else the colour of the text). It has no text: the element that loads tells
+// its state.
+import s from './style.module.css';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+
+// A negative delay for each dot, as in the diagrams: each dot starts at a
+// different point of its cycle.
+const dots = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) * 64)}ms`);
+---
+
+<span class:list={[s.mark, className]} aria-hidden="true">
+  {dots.map((style) => <span style={style} />)}
+</span>
