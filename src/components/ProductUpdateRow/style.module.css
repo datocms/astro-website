@@ -26,6 +26,11 @@
   gap: var(--space-xs);
 }
 
+/* In the list of the changelog, a long title wraps at 600px. */
+.item:not(.large) .title {
+  max-width: 600px;
+}
+
 @media (max-width: 1151px) {
   .large .title {
     font-size: var(--type-3xl);
@@ -72,6 +77,17 @@
   .item:hover .tag {
     border-color: var(--border-on-accent-band-strong);
   }
+
+  /* In the list of the changelog, the hovered row is a light tint of the accent, and the text keeps its colours. */
+  .item:not(.large):hover {
+    background: var(--surface-accent-faint);
+    color: inherit;
+    --text-muted: inherit;
+  }
+
+  .item:not(.large):hover .tag {
+    border-color: var(--border-default);
+  }
 }
 
 @media (min-width: 768px) {
@@ -91,5 +107,10 @@
   /* The title wraps, the tags do not. */
   .tags {
     flex-shrink: 0;
+  }
+
+  /* In the list of the changelog, the tags align with the last line of the title. */
+  .item:not(.large) .tags {
+    align-self: flex-end;
   }
 }
