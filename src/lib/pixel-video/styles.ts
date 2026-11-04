@@ -221,6 +221,25 @@ export const partnersGlobe: Style = {
   topStroke: ACCENT,
 };
 
+// The field behind the hero of the docs home, drawn live (not from
+// footage) on the page surface. The tints of the accent go up in three
+// steps: faint, muted, the accent. The grid has the colour of the page,
+// thus each cell is a separate square. A few cells of the accent flash in
+// the pixel highlight (the TOP layer). The tints mix the accent into the
+// page surface, thus they are light on the white page and deep on the ink
+// page: the same palette works in light and in dark.
+export const docsField: Style = {
+  bgFill: `color-mix(in oklab, ${ACCENT} 16%, var(--surface-default))`,
+  bgStroke: 'var(--surface-default)',
+  midFill: `color-mix(in oklab, ${ACCENT} 42%, var(--surface-default))`,
+  midStroke: 'var(--surface-default)',
+  highFill: ACCENT,
+  highStroke: 'var(--surface-default)',
+  groundFill: 'var(--surface-default)',
+  topFill: 'var(--surface-pixel-highlight)',
+  topStroke: 'var(--surface-default)',
+};
+
 /**
  * A palette: a style with a name, and the switches that go with it. A .pxv
  * file gives the name in its settings (`palette`), never the colours. Thus
@@ -292,6 +311,13 @@ export const palettes: readonly Palette[] = [
     label: 'Partners globe',
     surface: 'accent',
     colors: partnersGlobe,
+    extend: false,
+  },
+  {
+    name: 'docsField',
+    label: 'Docs field',
+    surface: 'default',
+    colors: docsField,
     extend: false,
   },
 ];

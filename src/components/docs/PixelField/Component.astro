@@ -1,0 +1,151 @@
+---
+// The pixel field behind the hero of the docs home: a live pixel video in
+// the `docsField` palette (src/lib/pixel-video/styles.ts). One field for
+// the two schemes: the colours are tokens. Put it as a child of the hero:
+// the pointer on the hero moves the lens.
+import s from './style.module.css';
+---
+
+<docs-pixel-field class={s.field}>
+  <canvas aria-hidden="true"></canvas>
+</docs-pixel-field>
+
+<script>
+  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  import { resolveColor } from '~/lib/pixel-video/color';
+  import { createRenderer, type DrawSettings, type Renderer } from '~/lib/pixel-video/renderer';
+  import { findPalette } from '~/lib/pixel-video/styles';
+  import { WebComponent } from '~/lib/WebComponent';
+  import { fillField } from './field';
+
+  // The size of a cell on the screen, in CSS px: the cells of the partners
+  // globe.
+  const CELL_PX = 6;
+  // The field moves in steps, as the pixel images: it moves as pixel art,
+  // not as a video.
+  const STEP_MS = 125;
+  // The step of the still field (reduced motion).
+  const STILL_STEP = 40;
+
+  customElements.define(
+    'docs-pixel-field',
+    class extends WebComponent {
+      #canvas!: HTMLCanvasElement;
+      #renderer: Renderer | null = null;
+      #settings!: DrawSettings;
+      #cells = new Uint8Array(0);
+      #cols = 0;
+      #rows = 0;
+      #step = STILL_STEP;
+      #still = false;
+      #visible = false;
+      #raf = 0;
+      #start = 0;
+
+      parsedCallback() {
+        this.#canvas = this.$<HTMLCanvasElement>('canvas');
+        this.#still = prefersReducedMotion();
+        this.#readColors();
+        try {
+          this.#renderer = createRenderer(
+            this.#canvas,
+            () => this.#settings,
+            this.#requestFrame,
+            this.parentElement ?? this.#canvas,
+          );
+        } catch (error) {
+          console.warn(`[docs-pixel-field] ${error instanceof Error ? error.message : error}`);
+          return;
+        }
+
+        const refresh = () => {
+          this.#readColors();
+          this.#draw();
+        };
+        const scheme = matchMedia('(prefers-color-scheme: dark)');
+        scheme.addEventListener('change', refresh);
+        this.eventListenerRemovers.push(() => scheme.removeEventListener('change', refresh));
+        this.on(document.documentElement, 'colorschemechange', refresh);
+
+        new ResizeObserver(() => this.#resize()).observe(this);
+        this.#resize();
+
+        if (!this.#still) {
+          this.#start = performance.now();
+          onVisibilityChange(this, (visible) => {
+            this.#visible = visible;
+            this.#requestFrame();
+          });
+        }
+        this.dataset.ready = '';
+      }
+
+      // The colours of the palette come from the tokens of the page.
+      #readColors() {
+        const style = getComputedStyle(this);
+        const resolve = (value: string) => resolveColor(value, style);
+        const palette = findPalette('docsField')!;
+        const c = palette.colors;
+        this.#settings = {
+          colors: {
+            fill: [resolve(c.bgFill), resolve(c.midFill), resolve(c.highFill)],
+            stroke: [resolve(c.bgStroke), resolve(c.midStroke), resolve(c.highStroke)],
+            ground: c.groundFill ? resolve(c.groundFill) : null,
+            top: { fill: resolve(c.topFill!), stroke: resolve(c.topStroke!) },
+          },
+          noStroke: [false, false, false],
+          extend: palette.extend ?? true,
+          hover: !this.#still,
+        };
+      }
+
+      // The frame has as many cells as the element has room for.
+      #resize() {
+        const cols = Math.max(1, Math.round(this.clientWidth / CELL_PX));
+        const rows = Math.max(1, Math.round(this.clientHeight / CELL_PX));
+        if (cols === this.#cols && rows === this.#rows) return;
+        this.#cols = cols;
+        this.#rows = rows;
+        this.#cells = new Uint8Array(cols * rows);
+        this.#fill();
+        this.#draw();
+      }
+
+      #fill() {
+        fillField(this.#cells, this.#cols, this.#rows, this.#step, STEP_MS / 1000);
+        // A new array: the renderer uploads the cells again.
+        this.#cells = this.#cells.slice();
+        this.#renderer?.setFrame(this.#cells, this.#cols, this.#rows);
+      }
+
+      #draw = () => {
+        this.#renderer?.render(performance.now() / 1000);
+      };
+
+      // A draw on the next frame. The loop goes on while the field is in
+      // view, or while the lens moves.
+      #requestFrame = () => {
+        if (!this.#raf) this.#raf = requestAnimationFrame(this.#tick);
+      };
+
+      #tick = (now: number) => {
+        this.#raf = 0;
+        if (this.#visible && !this.#still) {
+          const step = STILL_STEP + Math.floor((now - this.#start) / STEP_MS);
+          if (step !== this.#step) {
+            this.#step = step;
+            this.#fill();
+          }
+        }
+        this.#draw();
+        if ((this.#visible && !this.#still) || this.#renderer?.hovering) this.#requestFrame();
+      };
+
+      disconnectedCallback() {
+        cancelAnimationFrame(this.#raf);
+        this.#renderer?.destroy();
+        super.disconnectedCallback();
+      }
+    },
+  );
+</script>

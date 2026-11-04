@@ -193,12 +193,15 @@ export interface Renderer {
 /**
  * Start to draw into `canvas`. `getSettings` gives the current settings for
  * each draw. `onChange` runs when the canvas needs a new draw (resize,
- * pointer, restored context).
+ * pointer, restored context). `pointerArea` is the element that moves the
+ * lens (the canvas when it is not set): use it when other elements are on
+ * the canvas.
  */
 export function createRenderer(
   canvas: HTMLCanvasElement,
   getSettings: () => DrawSettings,
   onChange: () => void,
+  pointerArea: HTMLElement = canvas,
 ): Renderer {
   const gl = canvas.getContext('webgl2', { antialias: false, depth: false });
   if (!gl) throw new Error('WebGL2 is not available');
@@ -272,7 +275,8 @@ export function createRenderer(
 
   let pointer: [number, number] | null = null;
   const track = (e: PointerEvent) => {
-    pointer = [e.offsetX * dpr, e.offsetY * dpr];
+    const rect = canvas.getBoundingClientRect();
+    pointer = [(e.clientX - rect.left) * dpr, (e.clientY - rect.top) * dpr];
     onChange();
   };
   const leave = () => {
@@ -286,7 +290,7 @@ export function createRenderer(
     ['pointerleave', leave],
     ['pointercancel', leave],
   ];
-  for (const [type, fn] of pointerEvents) canvas.addEventListener(type, fn as EventListener);
+  for (const [type, fn] of pointerEvents) pointerArea.addEventListener(type, fn as EventListener);
 
   const onLost = (e: Event) => {
     e.preventDefault();
@@ -386,7 +390,8 @@ export function createRenderer(
     },
     destroy() {
       observer.disconnect();
-      for (const [type, fn] of pointerEvents) canvas.removeEventListener(type, fn as EventListener);
+      for (const [type, fn] of pointerEvents)
+        pointerArea.removeEventListener(type, fn as EventListener);
       canvas.removeEventListener('webglcontextlost', onLost);
       canvas.removeEventListener('webglcontextrestored', onRestored);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
