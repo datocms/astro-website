@@ -191,37 +191,45 @@ const visuals = await Promise.all(
   const DESKTOP = window.matchMedia('(min-width: 1152px)');
   const FADE_MS = 600;
 
-  // The theme tokens (src/styles/tokens.css) that the fade mixes.
-  const TOKENS = [
-    '--surface-default',
-    '--surface-inverse',
-    '--surface-inverse-muted',
-    '--surface-inverse-subtle',
-    '--surface-inverse-faint',
-    '--surface-accent',
-    '--surface-accent-muted',
-    '--surface-accent-subtle',
-    '--surface-accent-faint',
-    '--surface-pixel-highlight',
-    '--text-on-page',
-    '--text-on-page-soft',
-    '--text-on-page-muted',
-    '--text-on-accent',
-    '--text-on-accent-soft',
-    '--text-on-accent-muted',
-    '--text-on-accent-headline-muted',
-    '--text-on-inverse',
-    '--text-on-inverse-soft',
-    '--text-on-inverse-muted',
-    '--text-on-inverse-headline-muted',
-    '--text-on-inverse-strong',
-    '--border-on-page',
-    '--border-on-page-strong',
-    '--border-on-accent',
-    '--border-on-accent-strong',
-    '--border-on-inverse',
-    '--border-on-inverse-strong',
+  // The theme data (src/styles/tokens.css) that the fade mixes. The fade
+  // sets the data on the section, not the roles: each role (also a role
+  // that a ground class inside the section sets again) comes from the data.
+  // The colours mix in oklch.
+  const COLORS = [
+    '--theme-paper',
+    '--theme-ink',
+    '--theme-ink-muted',
+    '--theme-ink-subtle',
+    '--theme-ink-faint',
+    '--theme-accent',
+    '--theme-accent-muted',
+    '--theme-accent-subtle',
+    '--theme-accent-faint',
+    '--theme-pixel-highlight',
+    '--code-background',
+    '--code-plain',
+    '--code-keyword',
+    '--code-string',
+    '--code-constant',
+    '--code-function',
+    '--code-punctuation',
+    '--code-comment',
+    '--code-line-number',
   ];
+
+  // The numbers and the percentages mix in a straight line.
+  const NUMBERS = [
+    '--theme-alpha-page-muted',
+    '--theme-alpha-page-headline-muted',
+    '--theme-alpha-on-accent-muted',
+    '--theme-alpha-on-accent-headline-muted',
+    '--theme-alpha-on-inverse-soft',
+    '--theme-alpha-on-inverse-muted',
+    '--theme-alpha-on-inverse-headline-muted',
+    '--theme-dark-accent-chroma',
+  ];
+
+  const TOKENS = [...COLORS, ...NUMBERS];
 
   // A CSS transition mixes colours in oklab, and a custom property that is
   // not registered does not transition. Thus animate one registered number
@@ -270,9 +278,12 @@ const visuals = await Promise.all(
           const next = getComputedStyle(section);
           const to = TOKENS.map((token) => next.getPropertyValue(token).trim());
           TOKENS.forEach((token, i) => {
+            if (from[i] === to[i]) return;
             section.style.setProperty(
               token,
-              `color-mix(in oklch, ${from[i]}, ${to[i]} calc(var(--features-mix) * 100%))`,
+              COLORS.includes(token)
+                ? `color-mix(in oklch, ${from[i]}, ${to[i]} calc(var(--features-mix) * 100%))`
+                : `calc(${from[i]} + (${to[i]} - ${from[i]}) * var(--features-mix))`,
             );
           });
           fade = section.animate(
