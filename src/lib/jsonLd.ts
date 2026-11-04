@@ -1,6 +1,7 @@
-import type { Organization } from 'schema-dts';
+import type { AstroGlobal } from 'astro';
+import type { Organization, Thing, WebPage, WebSite } from 'schema-dts';
+import { baseUrl } from '~/lib/draftMode';
 
-// Stable global @id nodes so entities reconcile across pages.
 export function organizationId(base: string | URL) {
   return new URL('/#organization', base).href;
 }
@@ -9,24 +10,57 @@ export function websiteId(base: string | URL) {
   return new URL('/#website', base).href;
 }
 
+export function softwareId(base: string | URL) {
+  return new URL('/#software', base).href;
+}
+
 export function courseId(base: string | URL, slug: string) {
   return new URL(`/academy/${slug}#course`, base).href;
 }
 
-function organizationLogoUrl(base: string | URL) {
-  return new URL('/brand/main-lockup.svg', base).href;
+export function webPageId(url: string) {
+  return `${url}#webpage`;
 }
 
-// Full Organization node — defined once on the homepage @graph.
-export function organizationNode(base: string | URL, description?: string): Organization {
+export function breadcrumbId(url: string) {
+  return `${url}#breadcrumb`;
+}
+
+export function mainEntityId(url: string) {
+  return `${url}#main`;
+}
+
+export function canonicalUrl(astro: AstroGlobal) {
+  return new URL(astro.url.pathname, baseUrl(astro)).href;
+}
+
+export function mainEntityRefs(url: string) {
+  return { '@id': mainEntityId(url), mainEntityOfPage: webPageRef(url) };
+}
+
+export function webPageRef(url: string) {
+  return { '@id': webPageId(url) };
+}
+
+export function publisherRef(base: string | URL): Organization {
+  return { '@type': 'Organization', '@id': organizationId(base) };
+}
+
+export function organizationNode(base: string | URL): Organization {
   return {
     '@type': 'Organization',
     '@id': organizationId(base),
     name: 'DatoCMS',
     url: new URL('/', base).href,
-    logo: organizationLogoUrl(base),
-    description,
-    sameAs: ['https://twitter.com/datocms', 'https://www.linkedin.com/company/datocms/'],
+    logo: {
+      '@type': 'ImageObject',
+      url: new URL('/brand/main-lockup.svg', base).href,
+    },
+    sameAs: [
+      'https://twitter.com/datocms',
+      'https://www.linkedin.com/company/datocms/',
+      'https://github.com/datocms',
+    ],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer support',
@@ -35,7 +69,39 @@ export function organizationNode(base: string | URL, description?: string): Orga
   };
 }
 
-// Lightweight reference to the Organization node above, for publisher fields.
-export function publisherRef(base: string | URL): Organization {
-  return { '@type': 'Organization', '@id': organizationId(base) };
+export function websiteNode(base: string | URL): WebSite {
+  return {
+    '@type': 'WebSite',
+    '@id': websiteId(base),
+    name: 'DatoCMS',
+    url: new URL('/', base).href,
+    inLanguage: 'en',
+    publisher: { '@id': organizationId(base) },
+  };
+}
+
+export function webPageNode(
+  base: string | URL,
+  url: string,
+  page: { title?: string | null; description?: string; image?: string },
+): WebPage {
+  return {
+    '@type': 'WebPage',
+    '@id': webPageId(url),
+    url,
+    name: page.title ?? undefined,
+    description: page.description,
+    inLanguage: 'en',
+    isPartOf: { '@id': websiteId(base) },
+    ...(page.image ? { primaryImageOfPage: { '@type': 'ImageObject', url: page.image } } : {}),
+  };
+}
+
+export function serializeJsonLd(data: Thing | object) {
+  return JSON.stringify(data)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
 }

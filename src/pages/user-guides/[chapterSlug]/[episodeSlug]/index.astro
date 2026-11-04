@@ -1,5 +1,5 @@
 ---
-import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
 import { ArticleBody } from '~/components/ArticleBody';
 import { Breadcrumb } from '~/components/Breadcrumb';
 import { CourseOutline } from '~/components/CourseOutline';
@@ -19,7 +19,9 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { buildUrlForUserGuidesEpisode } from '~/lib/datocms/gqlUrlBuilder/userGuidesEpisode';
 import { readFragment } from '~/lib/datocms/graphql';
+import { baseUrl } from '~/lib/draftMode';
 import { formatVideoDuration, toIso8601Duration } from '~/lib/formatters';
+import { canonicalUrl, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { EpisodeFragment, query } from './_graphql';
 import s from './_style.module.css';
@@ -95,21 +97,22 @@ const outline = chapters
       data={{
         '@context': 'https://schema.org',
         '@type': 'VideoObject',
-        name: episode.title,
+        ...mainEntityRefs(canonicalUrl(Astro)),
+        name: stripStega(episode.title),
         uploadDate: episode._firstPublishedAt,
         duration: toIso8601Duration(episode.asset.video.duration!),
         thumbnailUrl: episode.asset.video.muxPlaybackId
           ? `https://image.mux.com/${episode.asset.video.muxPlaybackId}/thumbnail.jpg`
           : undefined,
+        contentUrl: episode.asset.video.muxPlaybackId
+          ? `https://stream.mux.com/${episode.asset.video.muxPlaybackId}.m3u8`
+          : undefined,
         description: extractFromSeoTags(episode._seoMetaTags).description,
-      }}
-    />
-    <JsonLd
-      data={{
-        '@context': 'https://schema.org',
-        '@type': 'Course',
-        name: currentChapter.title,
-        provider: { '@type': 'Organization' as const, name: 'DatoCMS' },
+        publisher: publisherRef(baseUrl(Astro)),
+        isPartOf: {
+          '@type': 'CreativeWorkSeries',
+          name: stripStega(currentChapter.title),
+        },
       }}
     />
   </Fragment>

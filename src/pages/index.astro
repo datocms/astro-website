@@ -2,7 +2,6 @@
 // The home page. The copy of the sections comes from
 // src/data/home.ts. The SEO, the changelog entries, the case studies and
 // the region counts of the partners come from the CMS.
-import type { Graph } from 'schema-dts';
 import { CaseStudies } from '~/components/CaseStudies';
 import { CodeSnippetPreview } from '~/components/CodeSnippetPreview';
 import { Community } from '~/components/Community';
@@ -11,7 +10,6 @@ import { CtaBanner } from '~/components/CtaBanner';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Features } from '~/components/Features';
 import { HomeHero } from '~/components/HomeHero';
-import { JsonLd } from '~/components/JsonLd';
 import { PageCloser } from '~/components/PageCloser';
 import { Partners } from '~/components/Partners';
 import { ProductUpdates } from '~/components/ProductUpdates';
@@ -21,9 +19,6 @@ import { UserExperience } from '~/components/UserExperience';
 import * as home from '~/data/home';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
-import { extractFromSeoTags } from '~/lib/datocms/seo';
-import { baseUrl } from '~/lib/draftMode';
-import { organizationId, organizationNode, websiteId } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 // One 16:9 window for the four pillars, with a different screen for each
 // row. The edges of the section cut the window at the right and at the
@@ -37,27 +32,9 @@ if (!page) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
-
-// The Organization and the WebSite of the home page.
-const base = baseUrl(Astro);
-const jsonLd: Graph = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    organizationNode(base, extractFromSeoTags(page.seo).description),
-    {
-      '@type': 'WebSite',
-      '@id': websiteId(base),
-      name: 'DatoCMS',
-      url: new URL('/', base).href,
-      publisher: { '@id': organizationId(base) },
-    },
-  ],
-};
 ---
 
 <Layout theme="orange" seo={page.seo} seoAnalysis={page.yoastAnalysis}>
-  <JsonLd slot="head" data={jsonLd} />
-
   <HomeHero {...home.homeHero} />
   <UserExperience {...home.userExperience} />
   <ContentSource {...home.contentSource} theme="default" />

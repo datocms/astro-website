@@ -14,7 +14,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyChapter';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
-import { courseId, publisherRef } from '~/lib/jsonLd';
+import { courseId, publisherRef, webPageRef } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 
@@ -39,6 +39,7 @@ const pageUrl = new URL(Astro.url.pathname, baseUrl(Astro)).href;
         '@id': courseId(baseUrl(Astro), variables.courseSlug),
         name: course.name,
         url: pageUrl,
+        mainEntityOfPage: webPageRef(pageUrl),
         description: extractFromSeoTags(course.seo).description,
         image: extractFromSeoTags(course.seo).image,
         provider: publisherRef(baseUrl(Astro)),

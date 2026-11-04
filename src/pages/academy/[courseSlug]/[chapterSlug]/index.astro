@@ -27,7 +27,7 @@ import { buildUrlForAcademyChapter } from '~/lib/datocms/gqlUrlBuilder/academyCh
 import { buildUrlForAcademyCourse } from '~/lib/datocms/gqlUrlBuilder/academyCourse';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { JsonLd } from '~/components/JsonLd';
-import { publisherRef } from '~/lib/jsonLd';
+import { canonicalUrl, courseId, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
 
@@ -76,6 +76,7 @@ const outline = allChapters.map((nthChapter) => ({
       data={{
         '@context': 'https://schema.org',
         '@type': 'TechArticle',
+        ...mainEntityRefs(canonicalUrl(Astro)),
         headline: chapter.title,
         url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
         datePublished: chapter._firstPublishedAt ?? undefined,
@@ -83,6 +84,7 @@ const outline = allChapters.map((nthChapter) => ({
         image: extractFromSeoTags(chapter.seo).image,
         isPartOf: {
           '@type': 'Course',
+          '@id': courseId(baseUrl(Astro), variables.courseSlug),
           name: course.name,
           url: courseUrl,
         },

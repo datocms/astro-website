@@ -12,6 +12,7 @@ import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { JsonLd } from '~/components/JsonLd';
 import { closing, faqTitle, hero, steps } from '~/data/research-program';
 import Layout from '~/layouts/Layout.astro';
+import { canonicalUrl, webPageId } from '~/lib/jsonLd';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import Faq from './_Faq.astro';
@@ -41,6 +42,7 @@ const jsonLd: WithContext<FAQPage> | null =
     ? {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
+        '@id': webPageId(canonicalUrl(Astro)),
         mainEntity: questions.map(({ question, answer }) => ({
           '@type': 'Question',
           name: question,

@@ -13,6 +13,8 @@ import { PageCloser } from '~/components/PageCloser';
 import { QuoteGrid, readQuote } from '~/components/Quote';
 import * as wall from '~/data/wall-of-love';
 import Layout from '~/layouts/Layout.astro';
+import { baseUrl } from '~/lib/draftMode';
+import { softwareId } from '~/lib/jsonLd';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { query } from './_graphql';
@@ -42,12 +44,13 @@ const items = featured.length
 
 // The Review JSON-LD of the old wall. JSON-LD needs strings, without the
 // stega of Content Link.
+const base = baseUrl(Astro);
 const reviews = items.map((item): Review => {
   const quote = readQuote(item);
   const reviewBody = stripStega(quote.text).replace(/\s+/g, ' ').trim();
   return {
     '@type': 'Review',
-    itemReviewed: { '@type': 'SoftwareApplication', name: 'DatoCMS' },
+    itemReviewed: { '@type': 'SoftwareApplication', '@id': softwareId(base), name: 'DatoCMS' },
     author: {
       '@type': 'Person',
       name: stripStega(quote.name),

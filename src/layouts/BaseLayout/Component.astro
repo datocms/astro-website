@@ -3,7 +3,14 @@ import { ContentLink, Seo, stripStega, type TitleMetaLinkTag } from '@datocms/as
 import { fetchFavicon } from './fetchFavicon';
 import { baseUrl, isDraftModeEnabled } from '~/lib/draftMode';
 import type { Theme } from '~/lib/theme';
-import { pipeSeo, replaceSeoPageTitleSuffix, seoCanonicalIfMissing } from '~/lib/datocms/seo';
+import {
+  extractFromSeoTags,
+  pipeSeo,
+  replaceSeoPageTitleSuffix,
+  seoCanonicalIfMissing,
+} from '~/lib/datocms/seo';
+import { organizationNode, webPageNode, websiteNode } from '~/lib/jsonLd';
+import { JsonLd } from '~/components/JsonLd';
 
 /*
  * The head of every page: SEO, favicon, canonical URL, RSS links, cookie
@@ -55,6 +62,9 @@ const finalSeo = pipeSeo(
   suffix ? replaceSeoPageTitleSuffix(suffix) : undefined,
   seoCanonicalIfMissing(canonicalHref),
 );
+
+const base = baseUrl(Astro);
+const pageMeta = extractFromSeoTags(stripStega(finalSeo));
 ---
 
 <!doctype html>
@@ -76,6 +86,16 @@ const finalSeo = pipeSeo(
       href="/product-changelog.xml"
     />
     <script is:inline src="/landing-pages/cookieConsent.js" async></script>
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@graph': [
+          organizationNode(base),
+          websiteNode(base),
+          webPageNode(base, canonicalHref, pageMeta),
+        ],
+      }}
+    />
     <slot name="head" />
   </head>
   <body data-theme={theme} data-density={density}>

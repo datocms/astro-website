@@ -16,6 +16,7 @@ import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
+import { canonicalUrl, publisherRef, softwareId, webPageRef } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 
@@ -86,11 +87,15 @@ const total = categories.reduce((n, c) => n + c.entries.length, 0);
 const jsonLd: WithContext<SoftwareApplication> = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
+  '@id': softwareId(baseUrl(Astro)),
   name: 'DatoCMS',
-  applicationCategory: 'WebApplication',
+  applicationCategory: 'DeveloperApplication',
   operatingSystem: 'Web',
-  url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
+  url: new URL('/', baseUrl(Astro)).href,
   description: extractFromSeoTags(page._seoMetaTags).description,
+  publisher: publisherRef(baseUrl(Astro)),
+  subjectOf: webPageRef(canonicalUrl(Astro)),
+  offers: { '@type': 'Offer', price: 0, priceCurrency: 'EUR' },
 };
 ---
 

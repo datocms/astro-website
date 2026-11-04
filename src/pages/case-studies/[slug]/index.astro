@@ -17,7 +17,7 @@ import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
-import { publisherRef } from '~/lib/jsonLd';
+import { canonicalUrl, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 
@@ -40,6 +40,7 @@ const others = latest.filter((story) => story.id !== page.id).slice(0, 3);
       data={{
         '@context': 'https://schema.org',
         '@type': 'Article',
+        ...mainEntityRefs(canonicalUrl(Astro)),
         headline,
         url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
         datePublished: page._firstPublishedAt ?? undefined,

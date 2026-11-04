@@ -10,6 +10,7 @@ import { Demo } from '~/components/docs/blocks/Demo';
 import { overrideSeo, seoGeneratedCard, prependToSeoPageTitleIfMissing } from '~/lib/datocms/seo';
 import { JsonLd } from '~/components/JsonLd';
 import { baseUrl } from '~/lib/draftMode';
+import { canonicalUrl, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { DeployButtonForm } from '~/components/docs/blocks/DeployButtonForm';
 import { DocCallout } from '~/components/docs/blocks/DocCallout';
 import { MultipleDemosBlock } from '~/components/docs/blocks/MultipleDemosBlock';
@@ -28,7 +29,7 @@ import {
   type SidebarEntry,
   type SidebarGroup,
 } from '~/components/docs/Sidebar';
-import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
 import { Text } from '~/components/docs/DocsStructuredText/Text';
 import { GroupLayout } from '~/layouts/docs/GroupLayout';
 import { GroupLayoutFragment } from '../GroupLayout/_graphql';
@@ -87,10 +88,12 @@ const tocGroups = [
       data={{
         '@context': 'https://schema.org',
         '@type': 'TechArticle',
-        headline: page.title,
+        ...mainEntityRefs(canonicalUrl(Astro)),
+        headline: stripStega(page.title),
         url: new URL(Astro.url.pathname, baseUrl(Astro)).href,
-        datePublished: page._publishedAt,
+        dateModified: page._publishedAt,
         description: page.seo?.description ?? undefined,
+        publisher: publisherRef(baseUrl(Astro)),
       }}
     />
   </Fragment>

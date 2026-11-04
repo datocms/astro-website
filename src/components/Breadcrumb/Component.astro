@@ -2,6 +2,7 @@
 import { stripStega } from '@datocms/astro';
 import { JsonLd } from '~/components/JsonLd';
 import { baseUrl } from '~/lib/draftMode';
+import { breadcrumbId, webPageId } from '~/lib/jsonLd';
 import type { BreadcrumbItem } from './types';
 import styles from './style.module.css';
 
@@ -22,6 +23,7 @@ interface Props {
 
 const { trail, current, actionsWhenStuck = false } = Astro.props;
 const origin = baseUrl(Astro);
+const pageUrl = new URL(Astro.url.pathname, origin).href;
 const hasActions = Astro.slots.has('actions');
 ---
 
@@ -64,19 +66,29 @@ const hasActions = Astro.slots.has('actions');
 <JsonLd
   data={{
     '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      ...trail.map((item, index) => ({
-        '@type': 'ListItem' as const,
-        position: index + 1,
-        name: stripStega(item.label),
-        item: new URL(item.href, origin).href,
-      })),
+    '@graph': [
       {
-        '@type': 'ListItem' as const,
-        position: trail.length + 1,
-        name: stripStega(current),
-        item: new URL(Astro.url.pathname, origin).href,
+        '@type': 'WebPage',
+        '@id': webPageId(pageUrl),
+        breadcrumb: { '@id': breadcrumbId(pageUrl) },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': breadcrumbId(pageUrl),
+        itemListElement: [
+          ...trail.map((item, index) => ({
+            '@type': 'ListItem' as const,
+            position: index + 1,
+            name: stripStega(item.label),
+            item: new URL(item.href, origin).href,
+          })),
+          {
+            '@type': 'ListItem' as const,
+            position: trail.length + 1,
+            name: stripStega(current),
+            item: pageUrl,
+          },
+        ],
       },
     ],
   }}

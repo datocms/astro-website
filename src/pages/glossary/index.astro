@@ -12,6 +12,7 @@ import { StructuredText } from '~/components/StructuredText';
 import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { baseUrl } from '~/lib/draftMode';
+import { mainEntityRefs } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { slugify } from '~/lib/slugify';
 import { query } from './_graphql';
@@ -31,6 +32,7 @@ const glossaryUrl = new URL('/glossary', baseUrl(Astro)).href;
 const definedTermSet = {
   '@context': 'https://schema.org',
   '@type': 'DefinedTermSet',
+  ...mainEntityRefs(glossaryUrl),
   name: 'DatoCMS Glossary',
   url: glossaryUrl,
   hasDefinedTerm: entries.map((entry) => ({

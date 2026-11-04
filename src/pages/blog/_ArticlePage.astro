@@ -24,7 +24,7 @@ import {
   seoTwitterCard,
 } from '~/lib/datocms/seo';
 import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
-import { publisherRef } from '~/lib/jsonLd';
+import { canonicalUrl, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { ArticleChatFragment, ArticlePostFragment } from './_article';
 import { loadRelated } from './_related';
 
@@ -132,6 +132,7 @@ const markdownUrl = new URL(
       data={{
         '@context': 'https://schema.org',
         '@type': jsonLdType,
+        ...mainEntityRefs(canonicalUrl(Astro)),
         headline: stripStega(article.title),
         url: new URL(Astro.url.pathname, baseUrl).href,
         datePublished: article._firstPublishedAt ?? article._createdAt,
