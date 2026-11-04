@@ -28,6 +28,18 @@
 #   --crop <w>:<h>:<x>:<y>  key only this box of the frame, in pixels of the
 #                        source: it removes text and black bars
 #   --lo, --hi, --despill  the key (see `matte()` below)
+#   --bg <kind>          the background (green, blue, black), when the
+#                        corner does not show it: for example a dark grey
+#                        studio, which is not black enough for `kind()`
+#   --suit <lo> <hi>     also key a green suit on the subject (see
+#                        `suit_matte()`): the clothes on the suit stay, the
+#                        body in the suit becomes transparent
+#   --choke <px>         with --suit: the suit key also takes this many
+#                        pixels (of the source) around the suit. It removes
+#                        the line where the suit meets the background
+#   --warm <lo> <hi>     with a black key: a pixel with R - B of `hi` or
+#                        more stays opaque, also when it is dark. It keeps
+#                        the dark folds of warm clothes on a cool grey floor
 import argparse, hashlib, json, pathlib, re, subprocess, sys
 import numpy as np
 
@@ -158,6 +170,47 @@ def matte(f, bg, k, key):
     return np.clip((key["hi"] - r) / (key["hi"] - key["lo"]), 0, 1)
 
 
+def suit_matte(f, suit):
+    """The alpha (0-1) of each pixel for a green suit on the subject.
+
+    The excess G - max(R, B) is in levels (0-255), not a fraction of the
+    screen, because the suit is not in the corner. A pixel with an excess of
+    `lo` or less is opaque, `hi` or more is transparent.
+    """
+    lo, hi = suit
+    excess = f[..., 1] - f[..., [0, 2]].max(-1)
+    return np.clip((hi - excess) / (hi - lo), 0, 1)
+
+
+def erode(a, r):
+    """The minimum of each box of (2r + 1) x (2r + 1) pixels."""
+    for axis in (0, 1):
+        out = a.copy()
+        for d in range(1, r + 1):
+            out = np.minimum(out, np.roll(a, d, axis))
+            out = np.minimum(out, np.roll(a, -d, axis))
+        a = out
+    return a
+
+
+def alpha_of(f, bg, k, key, args, scale=1.0):
+    """The alpha of the background key, with the --warm and --suit keys.
+
+    `scale` is the width of `f` divided by the width of the source: --choke
+    is in pixels of the source.
+    """
+    a = matte(f, bg, k, key)
+    if args.warm:
+        lo, hi = args.warm
+        warm = np.clip((f[..., 0] - f[..., 2] - lo) / (hi - lo), 0, 1)
+        a = np.maximum(a, warm)
+    if args.suit:
+        suit = suit_matte(f, args.suit)
+        r = round((args.choke or 0) * scale)
+        a = np.minimum(a, erode(suit, r) if r else suit)
+    return a
+
+
 def despill(f, k, amount):
     """Remove the screen colour that the screen reflects on the subject."""
     if k == "black" or amount == 0:
@@ -191,7 +244,7 @@ def key_clip(args):
         b = a + round(args.seconds * FPS) - 1
         f = next(frames(["-ss", f"{a / FPS:.4f}", "-i", str(src), "-frames:v", "1",
                          "-vf", f"{crop}scale=960:-2"], 960, round(H * 960 / W / 2) * 2))
-        k = kind(corner(f.astype(np.float32)))
+        k = args.bg or kind(corner(f.astype(np.float32)))
         if k is None:
             sys.exit(f"{name}: the top right corner of the frame is not a screen colour")
     if args.trim:
@@ -210,13 +263,14 @@ def key_clip(args):
         f = f.astype(np.float32)
         bg = corner(f)
         bgs.append(bg)
-        m = matte(f, bg, k, key) > 0.5
+        m = alpha_of(f, bg, k, key, args, sw / W) > 0.5
         cols, rows = np.where(m.sum(0) >= 2)[0], np.where(m.sum(1) >= 2)[0]
         boxes.append((cols[0], rows[0], cols[-1], rows[-1]) if len(cols) and len(rows) else None)
     # A frame at the start or the end of the run can be a frame of the
     # transition (for example a black card). It has no screen colour, thus
     # the key keeps all of it. Remove these frames.
-    good = [i for i, bg in enumerate(bgs) if kind(bg) == k]
+    # With --bg, kind() does not find the background: keep all the frames.
+    good = [i for i, bg in enumerate(bgs) if args.bg or kind(bg) == k]
     i0, i1 = good[0], good[-1]
     x0, y0, x1, y1 = sw, sh, 0, 0
     for box in boxes[i0:i1 + 1]:
@@ -247,8 +301,10 @@ def key_clip(args):
         if i < i0 or i > i1:
             continue
         f = f.astype(np.float32)
-        alpha = matte(f, bgs[i], k, key)
+        alpha = alpha_of(f, bgs[i], k, key, args)
         rgb = despill(f, k, key["despill"])
+        if args.suit:
+            rgb = despill(rgb, "green", 1.0)
         out = np.dstack([rgb, alpha * 255]).round().clip(0, 255).astype(np.uint8)
         enc.stdin.write(out.tobytes())
         if i in picks:
@@ -292,6 +348,10 @@ def main():
     p.add_argument("--lo", type=float)
     p.add_argument("--hi", type=float)
     p.add_argument("--despill", type=float)
+    p.add_argument("--bg", choices=list(KEY_DEFAULTS))
+    p.add_argument("--suit", type=float, nargs=2)
+    p.add_argument("--choke", type=int)
+    p.add_argument("--warm", type=float, nargs=2)
     args = p.parse_args()
     if (args.run is None) == (args.start is None) or (args.start is None) != (args.seconds is None):
         p.error("give --run, or --from and --seconds")
