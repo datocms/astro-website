@@ -30,18 +30,18 @@ export const principles: PrinciplesData = {
       theme: 'green',
     },
     {
-      title: 'A CMS is just that: the “boring” infrastructure.',
-      text: 'Content is the foundation of your organization, so we think long-term. We’re with you at the start, and we plan to stay to the very end.',
+      title: 'A CMS should be boring. In a good way.',
+      text: 'A CMS is infrastructure, so we think long-term. We’re with you at the start, and we plan to stay to the very end.',
       theme: 'green',
     },
     {
       title: 'We don’t try to tame AI here.',
-      text: 'We let it shine. No pricey integrations that train on your data and inflate your bill. Bring your own AI, and change your mind whenever you like.',
+      text: 'We let it shine. Bring your own AI, keep your data where it is, and change your mind whenever you like.',
       theme: 'default',
     },
     {
       title: 'We price things the way we’d want to pay for them.',
-      text: 'Linear, transparent, predictable. No scary jumps and no guilt-tripping in a field that usually punishes you for growing. Just room to grow without giving up control.',
+      text: 'Linear, transparent, predictable. Your bill grows in step with your project, with no scary jumps along the way. Just room to grow without giving up control.',
       theme: 'default',
     },
     {
@@ -51,17 +51,17 @@ export const principles: PrinciplesData = {
     },
     {
       title: 'We’re building a company to keep, not to sell.',
-      text: 'No exit plan and no acquisition on the horizon. Every decision is made by people who expect to still be here in ten years, looking after what they ship today.',
+      text: 'No exit plan and no acquisition on the horizon. We make every decision expecting to still be here in ten years, looking after what we ship today.',
       theme: 'default',
     },
     {
       title: 'Real people, real conversations.',
-      text: 'We’re 13 people, so support comes from those building and using DatoCMS every day. Whether you want to think something through or just need an answer, we care about both.',
+      text: 'We’re 13 people, so support comes from the people who build DatoCMS every day. Whether you want to think something through or just need an answer, you’ll get someone who knows the code.',
       theme: 'blue',
     },
     {
       title: 'European.',
-      text: 'We build like we eat: slowly, passionately, with care, and with conviction. Real holidays, sane hours, and the stubborn belief that good things take time. And sunshine.',
+      text: 'We build like we eat: slowly, with care, and with conviction. Real holidays, sane hours, and the stubborn belief that good things take time. And sunshine.',
       theme: 'blue',
     },
   ],
