@@ -55,124 +55,197 @@ const cookieConsentScript = `
   const html = \`
   <div class="consent--cookiesWrapper">
     <div class="consent--cookies">
-      <div class="consent--cookiesTitle">Do you allow us to use cookies?</div>
-      <div class="consent--cookiesText">We use cookies to learn where you struggle when you're navigating our website, and fix them for your future visits. Your privacy is important for us, and we will never sell your data — read our <a href="https://www.datocms.com/legal/cookie-policy">Cookie Policy</a> for more info.</div>
-      <button class="consent--cookiesButton consent--cookiesPrimaryButton" data-consent="true">Accept recommended cookies</button>
+      <div class="consent--cookiesTitle">Can we use cookies?</div>
+      <div class="consent--cookiesText">We use them to find the parts of the site that get in your way, so we can fix them, and to see which of our ads work. We never sell your data. The details are in our <a href="https://www.datocms.com/legal/cookie-policy">Cookie Policy</a>.</div>
+      <button class="consent--cookiesButton consent--cookiesPrimaryButton" data-consent="true">Accept cookies</button>
       <button class="consent--cookiesButton" data-decline="true">Reject</button>
     </div>
   </div>
   \`;
 
   const css = \`
-  /* The modal has a light and a dark scheme. The scheme comes from
-     data-color-scheme on <html> (www.datocms.com and the dashboard). When
-     <html> has no data-color-scheme, the scheme comes from the OS. */
+  /* The modal of www.datocms.com: a flat card on the paper of the page, a
+     hairline, no shadow, the text at the left, the pill buttons of the
+     website. On www.datocms.com the colours are the tokens of the theme of
+     the page (src/styles/tokens.css), thus the modal takes the theme. On a
+     page without these tokens (the dashboard), the colours are the neutral
+     values after the comma. The scheme comes from data-color-scheme on
+     <html>. When <html> has no data-color-scheme, it comes from the OS. */
   .consent--cookiesWrapper {
-    --consent-backdrop: rgba(0, 0, 0, 0.5);
-    --consent-surface: #ffffff;
-    --consent-border: transparent;
-    --consent-ink: #1f2126;
-    --consent-ink-muted: #71788a;
+    --consent-backdrop: rgba(0, 0, 0, 0.45);
+    --consent-surface: var(--surface-default, #ffffff);
+    --consent-border: var(--border-on-page, rgba(31, 33, 38, 0.16));
+    --consent-ink: var(--text-on-page, #1f2126);
+    --consent-ink-muted: var(--text-on-page-muted, #5c6270);
+    --consent-button: var(--surface-button, #1f2126);
+    --consent-button-ink: var(--text-button, #ffffff);
+    --consent-button-hover: var(--surface-button-hover, #3a3d45);
+    --consent-button-hover-ink: var(--text-button-hover, #ffffff);
+    --consent-soft: var(--surface-button-soft, rgba(31, 33, 38, 0.07));
+    --consent-soft-ink: var(--text-button-soft, #1f2126);
     color-scheme: light;
     position: fixed;
     z-index: 1000000;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--consent-backdrop);
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    animation-duration: 0.2s;
-    animation-name: cookies-appear;
-    animation-timing-function: ease-in;
+    padding: 16px;
+    background: var(--consent-backdrop);
+    animation: consent-appear 240ms cubic-bezier(0.16, 1, 0.3, 1);
     font-family: 'ABC Oracle', 'ABC Oracle Fallback HN', 'ABC Oracle Fallback Arial', 'ABC Oracle Fallback Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
 
   :root[data-color-scheme='dark'] .consent--cookiesWrapper {
-    --consent-backdrop: rgba(0, 0, 0, 0.65);
-    --consent-surface: #1e1f24;
-    --consent-border: rgba(255, 255, 255, 0.12);
-    --consent-ink: #ececef;
-    --consent-ink-muted: #a3a8b5;
+    --consent-backdrop: rgba(0, 0, 0, 0.6);
+    --consent-surface: var(--surface-default, #1e1f24);
+    --consent-border: var(--border-on-page, rgba(255, 255, 255, 0.14));
+    --consent-ink: var(--text-on-page, #ececef);
+    --consent-ink-muted: var(--text-on-page-muted, #a3a8b5);
+    --consent-button: var(--surface-button, #ececef);
+    --consent-button-ink: var(--text-button, #1e1f24);
+    --consent-button-hover: var(--surface-button-hover, #ffffff);
+    --consent-button-hover-ink: var(--text-button-hover, #1e1f24);
+    --consent-soft: var(--surface-button-soft, rgba(255, 255, 255, 0.09));
+    --consent-soft-ink: var(--text-button-soft, #ececef);
     color-scheme: dark;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-color-scheme]) .consent--cookiesWrapper {
-      --consent-backdrop: rgba(0, 0, 0, 0.65);
-      --consent-surface: #1e1f24;
-      --consent-border: rgba(255, 255, 255, 0.12);
-      --consent-ink: #ececef;
-      --consent-ink-muted: #a3a8b5;
+      --consent-backdrop: rgba(0, 0, 0, 0.6);
+      --consent-surface: var(--surface-default, #1e1f24);
+      --consent-border: var(--border-on-page, rgba(255, 255, 255, 0.14));
+      --consent-ink: var(--text-on-page, #ececef);
+      --consent-ink-muted: var(--text-on-page-muted, #a3a8b5);
+      --consent-button: var(--surface-button, #ececef);
+      --consent-button-ink: var(--text-button, #1e1f24);
+      --consent-button-hover: var(--surface-button-hover, #ffffff);
+      --consent-button-hover-ink: var(--text-button-hover, #1e1f24);
+      --consent-soft: var(--surface-button-soft, rgba(255, 255, 255, 0.09));
+      --consent-soft-ink: var(--text-button-soft, #ececef);
       color-scheme: dark;
     }
   }
 
-  @keyframes cookies-appear {
+  /* The card comes up a little and the backdrop fades in */
+  @keyframes consent-appear {
     from {
       opacity: 0;
     }
+  }
 
-    to {
-      opacity: 1;
+  @keyframes consent-rise {
+    from {
+      transform: translateY(8px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .consent--cookiesWrapper,
+    .consent--cookies {
+      animation: none;
     }
   }
 
   .consent--cookies {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 480px;
+    padding: 28px;
     background: var(--consent-surface);
     border: 1px solid var(--consent-border);
+    border-radius: 12px;
     color: var(--consent-ink);
-    border-radius: 10px;
-    padding: 30px;
-    max-width: 550px;
     font-size: var(--type-s, 0.875rem);
-    text-align: center;
-    margin: 10px;
+    font-weight: 400;
+    line-height: 1.45;
+    letter-spacing: -0.005em;
+    text-align: left;
+    animation: consent-rise 320ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .consent--cookiesTitle {
-    font-weight: 500;
-    font-size: var(--type-m, 1rem);
-    letter-spacing: -0.02em;
     margin-bottom: 10px;
+    font-size: var(--type-l, 1.375rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
   }
 
   .consent--cookiesText {
-    margin-right: 20px;
-    display: block;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    color: var(--consent-ink-muted);
+    text-wrap: pretty;
   }
 
   .consent--cookies a {
-    color: inherit;
+    color: var(--consent-ink);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
   }
 
+  /* The pills of the website: the hover changes the colours at once */
   .consent--cookiesButton {
-    background: transparent;
-    display: inline-block;
-    padding: 0.5em 1em;
-    font-family: inherit;
-    color: var(--consent-ink-muted);
-    border-radius: 3px;
-    font-size: var(--type-s, 0.875rem);
-    font-weight: 400;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 16px;
+    margin: 0 8px 0 0;
     border: 0;
-    transition: opacity 150ms ease-in-out;
+    border-radius: 999px;
+    background: var(--consent-soft);
+    color: var(--consent-soft-ink);
+    font: inherit;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
     cursor: pointer;
-    text-decoration: none;
-    margin-right: 4px;
+  }
 
-    &:hover {
-      opacity: 0.8;
-    }
+  .consent--cookiesButton:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  .consent--cookiesButton:active {
+    opacity: 0.8;
   }
 
   .consent--cookiesPrimaryButton {
-    background: linear-gradient(to right, #ff593d, #ff7751);
-    color: white !important;
-    font-weight: 500;
+    background: var(--consent-button);
+    color: var(--consent-button-ink);
+  }
+
+  /* The arrow is decoration: screen readers do not read it */
+  .consent--cookiesPrimaryButton::after {
+    content: '→' / '';
+  }
+
+  @media (hover: hover) {
+    .consent--cookiesButton:hover {
+      background: var(--consent-button);
+      color: var(--consent-button-ink);
+    }
+
+    .consent--cookiesPrimaryButton:hover {
+      background: var(--consent-button-hover);
+      color: var(--consent-button-hover-ink);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .consent--cookies {
+      padding: 22px;
+    }
+
+    .consent--cookiesButton {
+      margin: 0 0 8px;
+    }
   }
   \`;
 
