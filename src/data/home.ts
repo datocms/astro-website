@@ -327,14 +327,13 @@ export const features: FeaturesData = {
     {
       title: 'Media',
       href: '/media',
-      description:
-        'Upload once, query everywhere. Every file in one library, optimized for the size each screen needs.',
+      description: 'Upload once, query everywhere. Every file in one library, sized for each screen.',
       theme: 'pink',
     },
     {
       title: 'AI',
       href: '/ai',
-      description: 'Bring the assistant you already use, or none at all.',
+      description: 'Bring the assistant you already use, or none at all. Your models, your call.',
       theme: 'blue',
     },
   ],

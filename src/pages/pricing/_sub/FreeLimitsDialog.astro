@@ -2,7 +2,7 @@
 // The dialog that compares the limits of the Free plan and of the
 // Professional plan. A link to "#<id>" opens it. When the address of the
 // page has this hash, the dialog opens on load.
-import { faCheck, faXmark } from '@fortawesome/pro-regular-svg-icons';
+import { faCheck, faCircleInfo, faXmark } from '@fortawesome/pro-regular-svg-icons';
 import { Icon } from '~/components/Icon';
 import type { FreeLimitsData } from '~/data/pricing';
 import type { FreeLimitRow } from './limits';
@@ -15,7 +15,13 @@ const titleId = `${id}-title`;
 ---
 
 <free-limits-dialog class={styles.root}>
-  <dialog id={id} class={styles.dialog} data-theme="default" aria-labelledby={titleId}>
+  <dialog
+    id={id}
+    class={styles.dialog}
+    data-theme="default"
+    data-density="dense"
+    aria-labelledby={titleId}
+  >
     <div class={styles.panel}>
       <div class={styles.top}>
         <h2 id={titleId} class="title">{headline}</h2>
@@ -45,7 +51,7 @@ const titleId = `${id}-title`;
                   <tr>
                     <th scope="row">
                       <span class={styles.name}>
-                        <span class="bodyMedium">{row.name}</span>
+                        <span>{row.name}</span>
                         {row.description && (
                           <span class={styles.info} data-free-info>
                             <button
@@ -56,7 +62,7 @@ const titleId = `${id}-title`;
                               data-free-info-button
                             >
                               <span class="visuallyHidden">About {row.name}</span>
-                              <span aria-hidden="true">i</span>
+                              <Icon icon={faCircleInfo} width="16" height="16" />
                             </button>
                             <span
                               id={tipId}

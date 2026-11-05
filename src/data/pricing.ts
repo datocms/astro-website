@@ -166,8 +166,8 @@ export const freeLimits: FreeLimitsData = {
 export const freeReminder = {
   lead: 'We also offer a ',
   strong: '100% free plan',
-  text: '. No overages allowed.',
-  link: { label: 'See all limits in detail', href: '#free-plan-details' },
+  text: ', with no overages.',
+  link: { label: 'Compare Free and Professional', href: '#free-plan-details' },
 };
 
 const partnerOffer: PricingOfferData = {
@@ -218,13 +218,7 @@ export const trustedBy: HeroData = {
   label: 'Trusted By Teams',
   headline:
     "We've worked with our customers long enough that they tell our story better than we do.",
-  buttons: [
-    {
-      label: 'Get Started',
-      href: dashboardUrl('/signup'),
-      arrow: false,
-    },
-  ],
+  buttons: [{ label: 'Read Their Stories', href: '/case-studies', arrow: false }],
   logos: [c.telekom, c.hashicorp, c.verizon, c.polestar, c.vercel],
 };
 
@@ -244,6 +238,6 @@ export const ctaStart: CtaBannerData = {
       href: dashboardUrl('/signup'),
       arrow: false,
     },
-    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
+    { label: 'Talk To Sales', href: '/contact', variant: 'soft', contact: 'sales' },
   ],
 };

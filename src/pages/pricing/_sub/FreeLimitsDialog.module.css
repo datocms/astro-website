@@ -243,13 +243,34 @@
   width: 20px;
   height: 20px;
   border-radius: var(--radius-full);
-  background: var(--surface-inverse-faint);
   color: var(--text-muted);
-  /* The badge has the caption role. The circle is large enough for the letter. */
-  font-size: var(--type-xs);
-  font-weight: 500;
-  line-height: 1.35;
-  letter-spacing: -0.01em;
+}
+
+.info[data-open] .infoButton {
+  color: var(--text-primary);
+}
+
+.infoButton:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 1px;
+}
+
+/*
+ * With a pointer, the icon shows only on the row under the pointer, on the
+ * row that has the focus, and when its bubble is open. Touch screens have
+ * no hover, thus they always show the icon.
+ */
+@media (hover: hover) {
+  .infoButton {
+    opacity: 0;
+    transition: opacity 150ms ease-out;
+  }
+
+  .table tbody tr:hover .infoButton,
+  .table tbody tr:focus-within .infoButton,
+  .info[data-open] .infoButton {
+    opacity: 1;
+  }
 }
 
 .tooltip {
@@ -310,6 +331,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .close,
+  .infoButton,
   .tooltip {
     transition: none;
   }

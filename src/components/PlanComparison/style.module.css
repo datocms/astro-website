@@ -445,6 +445,24 @@
   outline-offset: 1px;
 }
 
+/*
+ * With a pointer, the icon shows only on the row under the pointer, on the
+ * row that has the focus, and when its bubble is open. Touch screens have
+ * no hover, thus they always show the icon.
+ */
+@media (hover: hover) {
+  .infoButton {
+    opacity: 0;
+    transition: opacity 150ms ease-out;
+  }
+
+  .row:hover .infoButton,
+  .row:focus-within .infoButton,
+  .info[data-open] .infoButton {
+    opacity: 1;
+  }
+}
+
 .tooltip {
   position: absolute;
   top: 0;
@@ -519,6 +537,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .infoButton,
   .tooltip {
     transition: none;
   }
