@@ -12,10 +12,12 @@ import {
 import { organizationNode, webPageNode, websiteNode } from '~/lib/jsonLd';
 import { picturesFor } from '~/lib/pictures';
 import { JsonLd } from '~/components/JsonLd';
+import { NavigationProgress } from '~/components/NavigationProgress';
 
 /*
  * The head of every page: SEO, favicon, canonical URL, RSS links, cookie
- * consent, analytics and the content link of the draft mode.
+ * consent, analytics, the content link of the draft mode and the bar that
+ * shows while the next page loads.
  * This layout loads no global stylesheet. A layout that wraps it imports
  * src/styles/global.css.
  */
@@ -100,6 +102,7 @@ const pageMeta = extractFromSeoTags(stripStega(finalSeo));
     <slot name="head" />
   </head>
   <body data-theme={theme} data-density={density}>
+    <NavigationProgress />
     <slot />
     {draftModeEnabled && <ContentLink />}
   </body>

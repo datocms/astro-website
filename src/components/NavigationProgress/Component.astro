@@ -1,0 +1,78 @@
+---
+/*
+ * A bar at the top of the page while the next page loads. Each navigation is
+ * a full load, thus the bar starts when the browser starts a navigation to a
+ * different page of the site, and it goes with the old page. The browser
+ * tells about the navigation with the Navigation API. Without that API, the
+ * page shows no bar.
+ */
+import s from './style.module.css';
+---
+
+<navigation-progress class={s.bar} aria-hidden="true"></navigation-progress>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  // The part of the Navigation API that this script uses. The DOM types of
+  // TypeScript 5.6 do not have it.
+  type NavigateEvent = Event & {
+    destination: { url: string; sameDocument: boolean };
+    hashChange: boolean;
+    downloadRequest: string | null;
+  };
+  type Navigation = {
+    addEventListener(type: 'navigate', listener: (event: NavigateEvent) => void): void;
+    addEventListener(type: 'navigateerror', listener: () => void): void;
+  };
+
+  // The browser sends no event when a response does not replace the page (a
+  // 204 response). Thus the bar goes after this time.
+  const MAX_LOADING_MS = 10_000;
+
+  customElements.define(
+    'navigation-progress',
+    class extends WebComponent {
+      timeout: number | undefined;
+
+      parsedCallback() {
+        const navigation = (window as { navigation?: Navigation }).navigation;
+        if (!navigation) return;
+
+        navigation.addEventListener('navigate', (event) => {
+          if (
+            event.destination.sameDocument ||
+            event.hashChange ||
+            event.downloadRequest !== null ||
+            new URL(event.destination.url).origin !== location.origin
+          ) {
+            return;
+          }
+          this.start();
+        });
+
+        // The visitor stops the load, or a new navigation cancels it.
+        navigation.addEventListener('navigateerror', () => this.stop());
+
+        // The back-forward cache gives back the page as it was, with the bar.
+        window.addEventListener('pageshow', (event) => {
+          if (event.persisted) this.stop();
+        });
+      }
+
+      start() {
+        this.stop();
+        // Read the layout, thus the browser applies the removal of the
+        // attribute, and the animation starts again from the beginning.
+        void this.offsetWidth;
+        this.setAttribute('data-loading', '');
+        this.timeout = window.setTimeout(() => this.stop(), MAX_LOADING_MS);
+      }
+
+      stop() {
+        window.clearTimeout(this.timeout);
+        this.removeAttribute('data-loading');
+      }
+    },
+  );
+</script>

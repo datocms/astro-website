@@ -1,0 +1,40 @@
+/* @layer blocks */
+/*
+ * The bar shows only when a load takes more than 200ms. It grows fast at the
+ * start, then slower, and it stops at 90%: the page does not tell how much
+ * of the load is done. When the new page paints, the old page and its bar go.
+ */
+.bar {
+  display: block;
+  position: fixed;
+  z-index: 1000;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--text-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bar[data-loading] {
+  opacity: 1;
+  transition: opacity 0s 200ms;
+  animation: grow 10s 200ms cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes grow {
+  from {
+    transform: scaleX(0.1);
+  }
+  to {
+    transform: scaleX(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar[data-loading] {
+    animation: none;
+    transform: scaleX(1);
+  }
+}

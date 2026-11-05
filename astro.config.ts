@@ -126,6 +126,9 @@ function cssLayers(): Plugin {
 export default defineConfig({
   base: '/', // Can be any string, but MUST be set or component imports on astro build will fail.
   output: 'server',
+  // Each page is a full load. On hover of a link, the browser gets the next
+  // page before the click.
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   image: {
     domains: ['image.mux.com', 'www.datocms-assets.com'],
   },
