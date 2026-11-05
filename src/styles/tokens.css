@@ -321,6 +321,12 @@
  *                              page, the accent, the inverse.
  *   dark-accent-chroma         the chroma of the accent at OKLCH lightness
  *                              0.36 that stays in sRGB, for the dark tints
+ *   dark-ground-chroma         the chroma of the dark grounds (the page, the
+ *                              band, the inverse, the footer): the value at
+ *                              which the tint of the theme shows as much as
+ *                              on the other themes. See the dark scheme
+ *   alpha-dark-border          the alpha of the ink in the hairline of the
+ *                              dark page
  *   code-*                     the syntax colours of the code card. The
  *                              keywords take the accent hue; strings,
  *                              constants and functions take three other hues
@@ -350,6 +356,8 @@
   --theme-alpha-on-inverse-muted: 70%;
   --theme-alpha-on-inverse-headline-muted: 48%;
   --theme-dark-accent-chroma: 0.075;
+  --theme-dark-ground-chroma: 0.025;
+  --theme-alpha-dark-border: 18%;
   --code-background: var(--color-code-brown-deep);
   --code-plain: var(--color-code-yellow-plain);
   --code-keyword: var(--color-code-yellow-strong);
@@ -381,6 +389,8 @@
   --theme-alpha-on-inverse-muted: 90%;
   --theme-alpha-on-inverse-headline-muted: 64%;
   --theme-dark-accent-chroma: 0.102;
+  --theme-dark-ground-chroma: 0.021;
+  --theme-alpha-dark-border: 18%;
   --code-background: var(--color-code-orange-deep);
   --code-plain: var(--color-code-orange-plain);
   --code-keyword: var(--color-code-orange-strong);
@@ -412,6 +422,8 @@
   --theme-alpha-on-inverse-muted: 86%;
   --theme-alpha-on-inverse-headline-muted: 61%;
   --theme-dark-accent-chroma: 0.098;
+  --theme-dark-ground-chroma: 0.029;
+  --theme-alpha-dark-border: 18%;
   --code-background: var(--color-code-green-deep);
   --code-plain: var(--color-code-green-plain);
   --code-keyword: var(--color-code-green-strong);
@@ -443,6 +455,8 @@
   --theme-alpha-on-inverse-muted: 88%;
   --theme-alpha-on-inverse-headline-muted: 65%;
   --theme-dark-accent-chroma: 0.205;
+  --theme-dark-ground-chroma: 0.028;
+  --theme-alpha-dark-border: 18%;
   --code-background: var(--color-code-purple-deep);
   --code-plain: var(--color-code-purple-plain);
   --code-keyword: var(--color-code-purple-strong);
@@ -474,6 +488,8 @@
   --theme-alpha-on-inverse-muted: 84%;
   --theme-alpha-on-inverse-headline-muted: 60%;
   --theme-dark-accent-chroma: 0.066;
+  --theme-dark-ground-chroma: 0.019;
+  --theme-alpha-dark-border: 18%;
   --code-background: var(--color-code-blue-deep);
   --code-plain: var(--color-code-blue-plain);
   --code-keyword: var(--color-code-blue-strong);
@@ -505,6 +521,8 @@
   --theme-alpha-on-inverse-muted: 81%;
   --theme-alpha-on-inverse-headline-muted: 61%;
   --theme-dark-accent-chroma: 0.144;
+  --theme-dark-ground-chroma: 0.024;
+  --theme-alpha-dark-border: 18%;
   --code-background: var(--color-code-pink-deep);
   --code-plain: var(--color-code-pink-plain);
   --code-keyword: var(--color-code-pink-strong);
@@ -542,6 +560,8 @@
   --theme-alpha-on-inverse-muted: 88%;
   --theme-alpha-on-inverse-headline-muted: 65%;
   --theme-dark-accent-chroma: 0.205;
+  --theme-dark-ground-chroma: 0.004;
+  --theme-alpha-dark-border: 12%;
   --theme-status-info-surface: var(--color-callout-info-tint);
   --theme-status-info-text: var(--color-callout-info-text);
   --theme-status-tip-surface: var(--color-callout-tip-tint);
@@ -830,21 +850,29 @@
  * its chroma, and puts the colour in the ink: a bright colour on a large
  * surface is heavy on a dark screen, on the text it is not. The block
  * changes these tokens, with the colours of the theme:
- *   default surface   the page, OKLCH L 0.19, chroma 0.03
- *   accent band       L 0.21, chroma 0.035: a little lighter than the page.
- *                     surfaceAccent and the band tokens use it; its text is
- *                     the accent with a little paper, the same text as the
- *                     inverse
- *   inverse, code     L 0.17, a little darker than the page; the footer
- *                     (inverse-deep) is L 0.15. All the grounds have the
- *                     same chroma, 0.03 (0.028 at L 0.15): near black the
- *                     eye reads a chroma as a colour (brown) or as no colour
- *                     (grey), thus two chromas do not read as one hue. The
- *                     chroma stays in sRGB for every hue; the blue is the
- *                     narrowest
+ *   default surface   the page, OKLCH L 0.17, the chroma of the theme
+ *                     (--theme-dark-ground-chroma)
+ *   accent band       L 0.19: a little lighter than the page. surfaceAccent
+ *                     and the band tokens use it; its text is the bright
+ *                     accent, the same text as the inverse
+ *   inverse, code     L 0.15, a little darker than the page; the footer
+ *                     (inverse-deep) is L 0.13. All the grounds of a theme
+ *                     have one chroma: near black the eye reads a chroma as
+ *                     a colour (brown) or as no colour (grey), thus two
+ *                     chromas do not read as one hue. The chroma is a value
+ *                     per theme, 0.019 (blue) to 0.029 (green): at these
+ *                     lightnesses the same OKLCH chroma is a clear teal on
+ *                     the blue and almost a grey on the green and the purple,
+ *                     thus each theme has the chroma at which its grounds
+ *                     show the same amount of tint. The docs page is almost
+ *                     neutral (0.004), as its paper is white in light. Each
+ *                     value stays in sRGB at L 0.13; the blue is the
+ *                     narrowest hue
  *   text              the paper with a fifth of the accent, with the
  *                     alphas of the page text roles
- *   borders           the hairline is the text of the page at 18%: a tint
+ *   borders           the hairline is the text of the page at the alpha of
+ *                     the theme (--theme-alpha-dark-border, 18%; the docs
+ *                     12%, a quieter line on their neutral page): a tint
  *                     of the ink, as in the light scheme. An alpha of the
  *                     accent is a muddy line (an olive for the yellow)
  *   accent tints      muted, subtle and faint are dark tints of the accent
@@ -870,12 +898,12 @@
 :root[data-color-scheme='dark'] .surfaceAccent,
 :root[data-color-scheme='dark'] .surfaceInverse {
   /* The grounds of the dark scheme: one family in the hue of the accent. */
-  --_page-dark: oklch(from var(--theme-accent) 0.19 0.03 h);
+  --_page-dark: oklch(from var(--theme-accent) 0.17 var(--theme-dark-ground-chroma) h);
   --surface-default: var(--_page-dark);
-  --surface-inverse: oklch(from var(--theme-accent) 0.17 0.03 h);
-  --surface-inverse-deep: oklch(from var(--theme-accent) 0.15 0.028 h);
+  --surface-inverse: oklch(from var(--theme-accent) 0.15 var(--theme-dark-ground-chroma) h);
+  --surface-inverse-deep: oklch(from var(--theme-accent) 0.13 var(--theme-dark-ground-chroma) h);
   --code-background: var(--surface-inverse);
-  --surface-accent-band: oklch(from var(--theme-accent) 0.21 0.035 h);
+  --surface-accent-band: oklch(from var(--theme-accent) 0.19 var(--theme-dark-ground-chroma) h);
   /*
    * The text on the band and on the inverse: one ink on the dark grounds,
    * the bright accent, with the alphas of the inverse for the quiet roles.
@@ -931,7 +959,11 @@
     var(--_page-ink-dark) var(--theme-alpha-page-headline-muted),
     transparent
   );
-  --border-on-page: color-mix(in srgb, var(--_page-ink-dark) 18%, transparent);
+  --border-on-page: color-mix(
+    in srgb,
+    var(--_page-ink-dark) var(--theme-alpha-dark-border),
+    transparent
+  );
   --border-on-page-strong: var(--theme-paper);
   --text-accent: var(--_ground-text-accent, var(--theme-accent));
   /* The signals, a little paler: the dark accent tints are not black */

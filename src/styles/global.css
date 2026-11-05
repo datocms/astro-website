@@ -292,12 +292,13 @@
 @layer blocks {
   /*
    * The screens of the scene kit that follow the page, in the dark scheme.
-   * The dark ramp of the kit has a chroma of 0.012 at tint 1, less than
-   * half of the chroma of the grounds of the site (0.03): a screen is a
-   * grey box on a tinted ground. Each stop gets two times its chroma, and
-   * the dark stops go down: the surface of a screen is at L 0.15, under
-   * the page (0.19), thus a screen is a window in the ground, not a box
-   * on it. The shift is in proportion to the darkness, thus the light
+   * The dark ramp of the kit has a chroma of 0.012 at tint 1, a grey next
+   * to the grounds of the site: a screen is a grey box on a tinted ground.
+   * Each stop gets the chroma of the grounds of the theme
+   * (--theme-dark-ground-chroma, in proportion to the 0.012 of the kit),
+   * and the dark stops go down: the surface of a screen is at L 0.13,
+   * under the page (0.17), thus a screen is a window in the ground, not a
+   * box on it. The shift is in proportion to the darkness, thus the light
    * stops (the text) do not move. The light ramp keeps the tint of the
    * kit: the tint of the kit is one number for the two ramps, and on the
    * paper the kit is right. The stop 0 is the white of the text and has
@@ -307,25 +308,85 @@
    * wins over the vendor layer.
    */
   :root[data-product-scenes-scheme='dark'] [data-color-scheme='page'][data-palette] {
-    --wash-0: oklch(from var(--product-scenes-wash-dark-0) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-30: oklch(from var(--product-scenes-wash-dark-30) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-50: oklch(from var(--product-scenes-wash-dark-50) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-100: oklch(from var(--product-scenes-wash-dark-100) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-150: oklch(from var(--product-scenes-wash-dark-150) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-200: oklch(from var(--product-scenes-wash-dark-200) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-250: oklch(from var(--product-scenes-wash-dark-250) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-300: oklch(from var(--product-scenes-wash-dark-300) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-350: oklch(from var(--product-scenes-wash-dark-350) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-400: oklch(from var(--product-scenes-wash-dark-400) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-450: oklch(from var(--product-scenes-wash-dark-450) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-500: oklch(from var(--product-scenes-wash-dark-500) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-550: oklch(from var(--product-scenes-wash-dark-550) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-600: oklch(from var(--product-scenes-wash-dark-600) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-650: oklch(from var(--product-scenes-wash-dark-650) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-700: oklch(from var(--product-scenes-wash-dark-700) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-750: oklch(from var(--product-scenes-wash-dark-750) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-800: oklch(from var(--product-scenes-wash-dark-800) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-850: oklch(from var(--product-scenes-wash-dark-850) calc(l * 1.06 - 0.06) calc(c * 2) h);
-    --wash-900: oklch(from var(--product-scenes-wash-dark-900) calc(l * 1.06 - 0.06) calc(c * 2) h);
+    --wash-0: oklch(
+      from var(--product-scenes-wash-dark-0) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-30: oklch(
+      from var(--product-scenes-wash-dark-30) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-50: oklch(
+      from var(--product-scenes-wash-dark-50) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-100: oklch(
+      from var(--product-scenes-wash-dark-100) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-150: oklch(
+      from var(--product-scenes-wash-dark-150) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-200: oklch(
+      from var(--product-scenes-wash-dark-200) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-250: oklch(
+      from var(--product-scenes-wash-dark-250) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-300: oklch(
+      from var(--product-scenes-wash-dark-300) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-350: oklch(
+      from var(--product-scenes-wash-dark-350) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-400: oklch(
+      from var(--product-scenes-wash-dark-400) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-450: oklch(
+      from var(--product-scenes-wash-dark-450) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-500: oklch(
+      from var(--product-scenes-wash-dark-500) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-550: oklch(
+      from var(--product-scenes-wash-dark-550) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-600: oklch(
+      from var(--product-scenes-wash-dark-600) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-650: oklch(
+      from var(--product-scenes-wash-dark-650) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-700: oklch(
+      from var(--product-scenes-wash-dark-700) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-750: oklch(
+      from var(--product-scenes-wash-dark-750) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-800: oklch(
+      from var(--product-scenes-wash-dark-800) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-850: oklch(
+      from var(--product-scenes-wash-dark-850) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
+    --wash-900: oklch(
+      from var(--product-scenes-wash-dark-900) calc(l * 1.085 - 0.085)
+        calc(c * var(--theme-dark-ground-chroma) / 0.012) h
+    );
   }
 }
