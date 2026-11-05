@@ -342,6 +342,14 @@
   border-bottom: 1px solid var(--text-muted);
 }
 
+/*
+ * The dark scheme: the muted text is a light colour, thus a line in it is
+ * too bright. The line takes the hairline, as the other lines of the card.
+ */
+:global(:root[data-color-scheme='dark']) .inputRow {
+  border-bottom-color: var(--border-default);
+}
+
 .bottomInputRow {
   border-top: 1px solid var(--border-default);
 }
@@ -716,52 +724,31 @@
   transition: background-color 150ms ease;
 
   /*
-   * The row on the accent: its parts take the dark text of the accent. The
-   * row sets the page tokens again, thus each part follows. In light they
-   * have the same values.
+   * The hovered and the selected row: a light tint of the accent, not the
+   * accent. The row is a large surface, and the full accent is too loud on
+   * it. The tints of the theme are 8% (faint, too pale to find the row) and
+   * 50% (subtle, too loud), thus the row takes the accent at 25%. The text
+   * keeps the roles of the page.
    */
+  --result-highlight: color-mix(in srgb, var(--theme-accent) 25%, transparent);
+
   @media (hover: hover) {
     &:hover {
-      --text-primary: var(--text-on-accent);
-      --text-muted: var(--text-on-accent-muted);
-      --border-default: var(--border-on-accent);
-      background-color: var(--surface-accent);
-      color: var(--text-on-accent);
+      background-color: var(--result-highlight);
     }
   }
 
   &.selected {
-    --text-primary: var(--text-on-accent);
-    --text-muted: var(--text-on-accent-muted);
-    --border-default: var(--border-on-accent);
-    background-color: var(--surface-accent);
-    color: var(--text-on-accent);
+    background-color: var(--result-highlight);
   }
 }
 
 /*
- * The dark scheme: the row is a large surface, thus it takes a tint of the
- * accent, not the accent (the bright colour goes on the ink). The text
- * keeps the roles of the page.
+ * The dark scheme: the row takes the subtle tint of the dark scheme, the
+ * accent at 14%.
  */
 :global(:root[data-color-scheme='dark']) .result {
-  @media (hover: hover) {
-    &:hover {
-      --text-primary: var(--text-on-page);
-      --text-muted: var(--text-on-page-muted);
-      --border-default: var(--border-on-page);
-      background-color: var(--surface-accent-subtle);
-      color: var(--text-on-page);
-    }
-  }
-
-  &.selected {
-    --text-primary: var(--text-on-page);
-    --text-muted: var(--text-on-page-muted);
-    --border-default: var(--border-on-page);
-    background-color: var(--surface-accent-subtle);
-    color: var(--text-on-page);
-  }
+  --result-highlight: var(--surface-accent-subtle);
 }
 
 @keyframes resultIn {
