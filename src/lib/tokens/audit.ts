@@ -240,17 +240,6 @@ export function audit(sheet: TokenSheet): Audit {
         }
       }
 
-      // The vivid accent ground (accentVivid): the canonical roles and the buttons.
-      const vivid = pagePath(theme, scheme, ['accentVivid'], ['surfaceAccent']);
-      const vividColor = opaque(sheet, vivid, '--surface-accent', pageColor);
-      for (const [role, minimum] of Object.entries(CANONICAL_ROLES.accent)) {
-        pair(theme, scheme, 'accentVivid', vivid, role, '--surface-accent', vividColor, minimum);
-      }
-      for (const [surface, text] of BUTTON_PAIRS) {
-        const fill = opaque(sheet, vivid, surface, vividColor);
-        pair(theme, scheme, 'accentVivid', vivid, text, surface, fill, AA_TEXT);
-      }
-
       // A page window inside the inverse ground.
       const window = pagePath(theme, scheme, ['surfaceInverse'], ['surfacePage']);
       const windowColor = sheet.color(window, '--surface-default');

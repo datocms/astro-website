@@ -134,10 +134,12 @@ export const onAccent: Style = {
 // of the source is the midtones, the subject is the background layer. The
 // midtones become the accent surface with no grid, thus only the subject and
 // the highlights show. The background layer is the subject, thus the grid
-// does not fill the band (`extend: false` in `palettes`). The strokes of the subject are
-// half dark, as in On accent.
+// does not fill the band (`extend: false` in `palettes`). The subject is
+// the deep in the light scheme and the bright accent in the dark scheme
+// (--surface-pixel-silhouette). The strokes of the subject are half dark,
+// as in On accent.
 export const silhouette: Style = {
-  bgFill: INVERSE,
+  bgFill: 'var(--surface-pixel-silhouette)',
   bgStroke: HALF_DARK,
   midFill: ACCENT,
   midStroke: ACCENT,
@@ -183,14 +185,16 @@ export const tonalHighlight: Style = {
 
 // The globe footage has black space, a grey ocean and white land. Space
 // becomes the accent surface, the ocean dark squares with an accent grid,
-// and the land accent squares with a light grid. This is the globe of the
-// Partners section.
+// and the land accent squares with a light grid. In the dark scheme the
+// ocean and the land are tints of the bright accent on the dark band
+// (--surface-pixel-globe-ocean, -continent). This is the globe of the
+// Partners section of the home.
 export const globe: Style = {
   bgFill: ACCENT,
   bgStroke: ACCENT,
-  midFill: INVERSE,
+  midFill: 'var(--surface-pixel-globe-ocean)',
   midStroke: ACCENT,
-  highFill: ACCENT,
+  highFill: 'var(--surface-pixel-globe-continent)',
   highStroke: 'var(--surface-default)',
 };
 
@@ -212,10 +216,10 @@ export const globeDim: Style = {
 // layer) is the pixel highlight, the light partner of the accent.
 export const partnersGlobe: Style = {
   bgFill: ACCENT,
-  bgStroke: `color-mix(in oklab, ${INVERSE} 16%, ${ACCENT})`,
-  midFill: `color-mix(in oklab, ${INVERSE} 28%, ${ACCENT})`,
+  bgStroke: 'var(--surface-pixel-globe-sea)',
+  midFill: 'var(--surface-pixel-globe-land)',
   midStroke: ACCENT,
-  highFill: INVERSE,
+  highFill: 'var(--surface-pixel-globe-country)',
   highStroke: ACCENT,
   topFill: 'var(--surface-pixel-highlight)',
   topStroke: ACCENT,
