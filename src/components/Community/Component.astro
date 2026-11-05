@@ -1,8 +1,6 @@
 ---
-import { faCircleCheck } from '@fortawesome/pro-solid-svg-icons';
 import { Avatar } from '~/components/Avatar';
 import { ButtonGroup } from '~/components/ButtonGroup';
-import { Icon } from '~/components/Icon';
 import { Section } from '~/components/Section';
 import { InlineText } from '~/components/InlineText';
 import { Typewriter } from '~/components/Typewriter';
@@ -57,6 +55,12 @@ const deck = Array.from(
   { length: STAGES },
   (_, i) => posts[(((i - 7) % posts.length) + posts.length) % posts.length]!,
 );
+
+// "asked 3 months ago": the time is in the middle of the line.
+const ago = (iso: string) => {
+  const text = formatRelativeDate(iso);
+  return text.charAt(0).toLowerCase() + text.slice(1);
+};
 ---
 
 <Section theme={theme} padding="headlines" class={styles.community} contentClass={styles.content}>
@@ -79,9 +83,9 @@ const deck = Array.from(
             <span class={styles.cardHeader}>
               <span class={styles.user}>
                 <Avatar name={post.author.name} />
-                <span class={styles.name}>{post.author.name}</span>
-                <span class={styles.dot} />
-                <span class={styles.age}>{formatRelativeDate(post.askedAt)}</span>
+                <span class={styles.byline}>
+                  <span class={styles.name}>{post.author.name}</span> asked {ago(post.askedAt)}
+                </span>
               </span>
               {post.tag && <span class={styles.tag}>{post.tag}</span>}
             </span>
@@ -93,15 +97,23 @@ const deck = Array.from(
                   teamMember={post.closedBy.teamMember}
                   class={styles.solvedAvatar}
                 />
-                <span class={styles.name}>{post.closedBy.name}</span>
-                <span class={styles.dot} />
-                <span class={styles.age}>{formatRelativeDate(post.closedAt)}</span>
+                <span class={styles.byline}>
+                  <span class={styles.name}>{post.closedBy.name}</span> answered{' '}
+                  {ago(post.closedAt)}
+                </span>
               </span>
               <span class={styles.solvedLabel}>
-                <span>{post.outcome === 'shipped' ? 'Shipped' : 'Solved'}</span>
-                <span class={styles.check}>
-                  <Icon icon={faCircleCheck} width="40" height="40" />
+                <span class={styles.labelText}>
+                  {post.outcome === 'shipped' ? 'Shipped' : 'Solved'}
                 </span>
+                <svg class={styles.check} viewBox="0 0 26 26" width="26" height="26">
+                  <circle class={styles.checkDisc} cx="13" cy="13" r="13" />
+                  <path
+                    class={styles.checkTick}
+                    d="M7.5 13.5 11.25 17.25 18.5 9.5"
+                    pathLength="1"
+                  />
+                </svg>
               </span>
             </span>
           </li>

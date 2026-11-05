@@ -1,6 +1,6 @@
 /*
  * The deck is an illustration: it is drawn at 1320 in fixed px (not
- * tokens) and scales to 69% (768+) and 49% (393+).
+ * tokens) and scales to 75% (1152+), 60% (768+) and 49% (393+).
  */
 
 /* The band is wider than the section. Do not show a horizontal scroll bar. */
@@ -49,7 +49,8 @@
   }
 }
 
-@media (min-width: 768px) and (max-width: 1151px) {
+/* The cards behind the pile show at the top of the band: they add to the gap. */
+@media (min-width: 768px) {
   .content {
     gap: var(--space-xl);
   }
@@ -68,30 +69,31 @@
   /* The band is a custom element: it is inline by default. */
   display: block;
   align-self: stretch;
-  height: calc(460px * var(--scale));
+  height: calc(336px * var(--scale));
   margin-inline: calc(50% - 50vw);
   overflow: hidden;
 }
 
 @media (min-width: 768px) {
   .band {
-    --scale: 0.69;
+    --scale: 0.6;
   }
 }
 
 @media (min-width: 1152px) {
   .band {
-    --scale: 1;
+    --scale: 0.75;
   }
 }
 
 /*
- * The origin of the deck is 40px below the centre of the band: the cards
- * behind the top of the pile show above it.
+ * The origin of the deck is 240px below the top of the band: the cards
+ * behind the top of the pile show above it. The band ends 20px below the
+ * tallest open card (a title of two lines).
  */
 .deck {
   position: absolute;
-  top: calc(50% + 40px * var(--scale));
+  top: calc(240px * var(--scale));
   left: 50%;
   width: 0;
   height: 0;
@@ -226,28 +228,26 @@
   gap: var(--space-2xs);
 }
 
-.name,
-.age {
+/* "yiying.lim asked 3 months ago": the name is strong, the rest is soft. */
+.byline {
+  color: var(--text-soft);
   /* Fixed size: no --type-* token has this value at every width. */
   font-size: 20px;
   line-height: 1.3;
+  white-space: nowrap;
 }
 
 .name {
+  color: var(--text-primary);
   font-weight: 500;
 }
 
-.age {
-  color: var(--text-soft);
+.solved .byline {
+  color: var(--text-on-accent-soft);
 }
 
-/* The dot has 4px on each side: 10px gap minus 6px. */
-.user > .dot {
-  width: 4px;
-  height: 4px;
-  margin-inline: -6px;
-  border-radius: var(--radius-full);
-  background: var(--text-soft);
+.solved .name {
+  color: var(--text-on-accent);
 }
 
 .tag {
@@ -266,26 +266,27 @@
 
 .title {
   /* Fixed size: no --type-* token has this value at every width. */
-  font-size: 45px;
+  font-size: 36px;
   font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.04em;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
 }
 
 /*
  * The answer bar is 93px high. An open card shows 80px of it. A closed
- * card ends at the top of the bar. The content is 20px below the
- * top of the bar, thus it is in the middle of the 80px that show. The margins also remove the
- * 2px of the border, because the design counts the border in the height.
+ * card ends at the top of the bar. The bottom padding is the 13px that
+ * do not show, thus the content is in the middle of the 80px that show.
+ * The margins also remove the 2px of the border, because the design
+ * counts the border in the height.
  */
 .solved {
   display: flex;
   flex-shrink: 0;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   height: 93px;
   margin: 0 -20px -15px;
-  padding: var(--space-md);
+  padding: 0 var(--space-md) 13px;
   background: var(--surface-accent);
   color: var(--text-on-accent);
 }
@@ -297,61 +298,102 @@
 .solvedLabel {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: 10px;
   /* Fixed size: no --type-* token has this value at every width. */
-  font-size: 30px;
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
 }
 
+.labelText {
+  display: block;
+}
+
+/* The disc has the colour of the text, and the tick has the colour of the bar. */
 .check {
   display: block;
-  color: var(--text-primary);
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.checkDisc {
+  fill: var(--text-primary);
+  transform-origin: 13px 13px;
+}
+
+.checkTick {
+  fill: none;
+  stroke: var(--surface-accent);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
 }
 
 /*
- * The queue is first in, first out. One step is 1875ms: all the cards
- * move one stage to the right in 400ms (the spring curve), then the card
- * that landed opens in 400ms, then the deck stops for 1075ms. In each
- * step, a card comes into slot 3 from the left, and the card at the
- * bottom of the pile goes out to the right. A card goes through the 8
- * stages in 8 steps (15s). Each card has the same animation, with a delay
- * of one step for each stage.
+ * The queue is first in, first out. One step is 3500ms: all the cards
+ * move one stage to the right in 600ms (the spring curve), then the card
+ * that landed opens in 400ms, then the deck stops for 2500ms, thus the
+ * visitor can read the open card. In each step, a card comes into slot 3
+ * from the left, and the card at the bottom of the pile goes out to the
+ * right. A card goes through the 8 stages in 8 steps (28s). Each card has
+ * the same animation, with a delay of one step for each stage.
  *
- *   step k starts at 12.5% * k; the move ends 2.667% later and the open
- *   ends 5.333% later.
+ *   step k starts at 12.5% * k; the move ends 2.143% later and the open
+ *   ends 3.571% later.
  *
- * JS sets data-state. The delay puts each card 1500ms into its start
+ * After the open, the label comes in from the left (250ms), the disc of
+ * the check grows (300ms), and the tick draws (300ms, 100ms after the
+ * disc starts). Then the card stops for 1.5s with the full answer.
+ *
+ * JS sets data-state. The delay puts each card 2000ms into its start
  * stage, thus the deck in view starts the same as the CSS without
  * animation. Without JS (and with reduced motion) the deck does not move.
  */
 .band[data-state] .card {
   animation-name: travel, stack;
-  animation-duration: 15000ms;
+  animation-duration: 28000ms;
   animation-timing-function: cubic-bezier(0.3, 0, 0, 1), step-end;
-  animation-delay: calc(var(--i) * -1875ms - 1500ms);
+  animation-delay: calc(var(--i) * -3500ms - 2000ms);
   animation-iteration-count: infinite;
   animation-fill-mode: both;
 }
 
 .band[data-state] .solved {
-  animation: open 15000ms cubic-bezier(0.3, 0, 0, 1) calc(var(--i) * -1875ms - 1500ms) infinite both;
+  animation: open 28000ms cubic-bezier(0.3, 0, 0, 1) calc(var(--i) * -3500ms - 2000ms) infinite both;
 }
 
 .band[data-state] .card::after {
-  animation: veil 15000ms cubic-bezier(0.3, 0, 0, 1) calc(var(--i) * -1875ms - 1500ms) infinite both;
+  animation: veil 28000ms cubic-bezier(0.3, 0, 0, 1) calc(var(--i) * -3500ms - 2000ms) infinite both;
+}
+
+.band[data-state] .labelText {
+  animation: label 28000ms cubic-bezier(0.3, 0, 0, 1) calc(var(--i) * -3500ms - 2000ms) infinite
+    both;
+}
+
+.band[data-state] .checkDisc {
+  animation: disc 28000ms cubic-bezier(0.3, 0, 0, 1) calc(var(--i) * -3500ms - 2000ms) infinite both;
+}
+
+.band[data-state] .checkTick {
+  animation: tick 28000ms cubic-bezier(0.3, 0, 0, 1) calc(var(--i) * -3500ms - 2000ms) infinite both;
 }
 
 .band[data-state='paused'] .card,
 .band[data-state='paused'] .solved,
-.band[data-state='paused'] .card::after {
+.band[data-state='paused'] .card::after,
+.band[data-state='paused'] .labelText,
+.band[data-state='paused'] .checkDisc,
+.band[data-state='paused'] .checkTick {
   animation-play-state: paused;
 }
 
 /*
  * The last card of the pile fades out with opacity: no card is behind it,
- * thus nothing shows through. It is not visible from 77.667% to 100%,
+ * thus nothing shows through. It is not visible from 77.143% to 100%,
  * thus it can go back to the start.
  */
 @keyframes travel {
@@ -360,39 +402,39 @@
     scale: 1;
     opacity: 0;
   }
-  2.667%,
+  2.143%,
   12.5% {
     translate: var(--slot-3) 0;
     scale: 1;
     opacity: 1;
   }
-  15.167%,
+  14.643%,
   25% {
     translate: var(--slot-2) 0;
     scale: 1;
   }
-  27.667%,
+  27.143%,
   37.5% {
     translate: var(--slot-1) 0;
     scale: 1;
   }
-  40.167%,
+  39.643%,
   50% {
     translate: var(--pile-1);
     scale: 1;
   }
-  52.667%,
+  52.143%,
   62.5% {
     translate: var(--pile-2);
     scale: var(--behind-1-scale);
   }
-  65.167%,
+  64.643%,
   75% {
     translate: var(--pile-3);
     scale: var(--behind-2-scale);
     opacity: 1;
   }
-  77.667%,
+  77.143%,
   100% {
     translate: var(--pile-4);
     scale: var(--gone-scale);
@@ -405,15 +447,15 @@
   50% {
     opacity: 0;
   }
-  52.667%,
+  52.143%,
   62.5% {
     opacity: var(--behind-1-veil);
   }
-  65.167%,
+  64.643%,
   75% {
     opacity: var(--behind-2-veil);
   }
-  77.667%,
+  77.143%,
   100% {
     opacity: 1;
   }
@@ -446,11 +488,11 @@
 
 @keyframes open {
   0%,
-  40.167% {
+  39.643% {
     margin-bottom: -95px;
   }
-  42.833%,
-  90.167% {
+  41.071%,
+  89.643% {
     margin-bottom: -15px;
   }
   100% {
@@ -458,10 +500,65 @@
   }
 }
 
+/*
+ * The answer comes in after the open (41.071%) and stays until the card
+ * is not visible. 250ms is 0.893%, 300ms is 1.071%, 100ms is 0.357%.
+ */
+@keyframes label {
+  0%,
+  41.071% {
+    opacity: 0;
+    translate: -8px 0;
+  }
+  41.964%,
+  89.643% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  100% {
+    opacity: 0;
+    translate: -8px 0;
+  }
+}
+
+@keyframes disc {
+  0%,
+  41.964% {
+    opacity: 0;
+    scale: 0.6;
+  }
+  43.036%,
+  89.643% {
+    opacity: 1;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+@keyframes tick {
+  0%,
+  42.321% {
+    stroke-dashoffset: 1;
+  }
+  43.393%,
+  89.643% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .band[data-state] .card,
   .band[data-state] .solved,
-  .band[data-state] .card::after {
+  .band[data-state] .card::after,
+  .band[data-state] .labelText,
+  .band[data-state] .checkDisc,
+  .band[data-state] .checkTick {
     animation: none;
   }
 }
