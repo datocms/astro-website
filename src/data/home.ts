@@ -536,7 +536,7 @@ export const frameworkIntegration: TextWithImageData = {
 
 export const questionAnswer: QuestionAnswerData = {
   headline: 'Bring your AI',
-  face: 'robot',
+  face: 'aha',
   subline: 'Your AI feels right at home in the CMS, the CLI, or over MCP.',
   ask: {
     title: 'Connect your AI',
@@ -554,7 +554,7 @@ export const questionAnswer: QuestionAnswerData = {
   // New copy. Leads to the AI pillar.
   more: {
     text: 'Translations, image tags, video captions, and whatever ships next. All opt-in.',
-    button: { label: 'Explore AI', href: '/ai', variant: 'soft' },
+    button: { label: 'Explore AI', href: '/ai', variant: 'solid', size: 'l' },
   },
 };
 
