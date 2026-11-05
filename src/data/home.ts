@@ -327,7 +327,8 @@ export const features: FeaturesData = {
     {
       title: 'Media',
       href: '/media',
-      description: 'Upload once, query everywhere. Every file in one library, sized for each screen.',
+      description:
+        'Upload once, query everywhere. Every file in one library, sized for each screen.',
       theme: 'pink',
     },
     {
