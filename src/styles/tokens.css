@@ -1119,8 +1119,21 @@
   /* The text column of an article. */
   --reading-max: 560px;
   --header-height: 82px;
-  /* The height of a band that sticks to the top of the screen (the Breadcrumb). Other sticky elements add it to their top. */
-  --sticky-offset: 0px;
+  /* The height of the site header after the page scrolls more than 82px. */
+  --header-height-scrolled: 64px;
+  /*
+   * The height of the bands that stick to the top of the screen: the site
+   * header while it shows (--header-offset, from SiteHeader) and the
+   * Breadcrumb. Other sticky elements add it to their top.
+   */
+  --sticky-offset: var(--header-offset, 0px);
+  /*
+   * The transition of the top of a sticky element below the site header.
+   * SiteHeader gives it a duration when the visitor does not ask for
+   * reduced motion. Each element that adds --header-offset or
+   * --sticky-offset to its top uses it, thus it moves with the header.
+   */
+  --header-slide: top 0s;
 
   /*
    * Wide screens (1920 and 2560). The content column stays

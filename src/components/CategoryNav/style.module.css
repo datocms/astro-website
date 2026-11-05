@@ -1,6 +1,7 @@
 /*
- * 80px tall, sticky at the
- * top; 54px on phones (less space above and below the items). Active item: surface/subtle background and primary text.
+ * 80px tall, sticky at the top; 54px on phones (less space above and below
+ * the items). When it sticks, it is 56px tall from 768: the page below has
+ * more space. Active item: surface/subtle background and primary text.
  * Other items: muted text. On narrow screens the row scrolls sideways.
  * All items have a side padding (16px), thus the labels do not move when the
  * active item changes.
@@ -18,25 +19,41 @@
 }
 
 .nav {
-  /* The space above and below the items. On phones the nav is thinner: it takes less of a small screen. */
-  --nav-padding-y: var(--space-md);
+  /*
+   * The space above and below the items: --nav-padding-rest, and
+   * --nav-padding-stuck when the nav sticks. On phones the nav is thinner
+   * (it takes less of a small screen), and the two values are the same.
+   */
+  --nav-padding-rest: var(--space-md);
+  --nav-padding-stuck: var(--space-3xs);
+  --nav-padding-y: var(--nav-padding-rest);
 
   position: sticky;
-  top: 0;
+  top: var(--header-offset, 0px);
   z-index: 2;
   /* An inset shadow, not a border: the height of the nav must not change. */
   box-shadow: inset 0 -1px transparent;
-  transition: box-shadow 300ms ease-out;
+  transition:
+    box-shadow 300ms ease-out,
+    var(--header-slide);
 }
 
-/* When the nav sticks to the top, a line separates it from the page below. */
+/*
+ * When the nav sticks to the top, it is thinner and a line separates it
+ * from the page below. The margin takes the space that the padding gives
+ * back, thus the page below does not move.
+ */
 .nav[data-stuck] {
+  --nav-padding-y: var(--nav-padding-stuck);
+
+  margin-bottom: calc(2 * (var(--nav-padding-rest) - var(--nav-padding-stuck)));
   box-shadow: inset 0 -1px var(--border-default);
 }
 
 @media (max-width: 767px) {
   .nav {
-    --nav-padding-y: var(--space-3xs);
+    --nav-padding-rest: var(--space-3xs);
+    --nav-padding-stuck: var(--space-3xs);
   }
 }
 

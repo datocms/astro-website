@@ -1,25 +1,89 @@
-/* The custom element around the header. */
-.root {
-  display: block;
+/*
+ * The height of the header that covers the top of the screen: the header
+ * height when the header shows, 0 when it hides. The script sets
+ * data-header="hidden" on <html> when the header hides. Each sticky element
+ * of the page adds this value to its top, thus it stays below the header.
+ *
+ * The header and the sticky elements move together: each one has a
+ * transition of top (--header-slide, in tokens.css), with the same
+ * duration and curve. Only top moves. A transition of transform runs apart
+ * from the page script, thus the header moved before the sticky elements
+ * and the page showed through the gap. A transition of this value on
+ * <html> restyled each element of the page at each frame.
+ *
+ * When the page scrolls more than the header height (data-scrolled), the
+ * header is shorter (--header-height-scrolled): --header-now is the
+ * current height.
+ */
+:global(html):has(.root) {
+  --header-now: var(--header-height);
+  --header-offset: var(--header-now);
+}
+
+:global(html):has(.root[data-scrolled]) {
+  --header-now: var(--header-height-scrolled);
+}
+
+:global(html[data-header='hidden']):has(.root) {
+  --header-offset: 0px;
+}
+
+:global(html[data-motion='on']):has(.root) {
+  --header-slide: top 200ms cubic-bezier(0.3, 0, 0, 1);
+  --header-resize: 200ms cubic-bezier(0.3, 0, 0, 1);
 }
 
 /*
- * 82px tall, not sticky, with no line at the bottom: the header has the
- * ground of the hero and runs into it.
+ * The custom element around the header. It sticks to the top of the
+ * screen. When it hides, its top is minus its height: it is above the
+ * screen. The script hides it when the visitor scrolls down and shows it
+ * when the visitor scrolls up.
+ *
+ * When the header is shorter, the bottom margin adds the difference: the
+ * page below does not move. The height and the margin change with the
+ * same duration and curve, thus their sum stays the same at each frame.
+ */
+.root {
+  display: block;
+  position: sticky;
+  top: calc(var(--header-offset) - var(--header-now));
+  z-index: 10;
+  transition:
+    var(--header-slide),
+    margin-bottom var(--header-resize, 0s);
+}
+
+.root[data-scrolled] {
+  margin-bottom: calc(var(--header-height) - var(--header-height-scrolled));
+}
+
+/*
+ * 82px tall, 64px when the page scrolls. At the top of the page it has the
+ * ground of the hero and no line at the bottom: it runs into the hero.
  */
 .header {
   position: relative;
-  z-index: 10;
-  height: var(--header-height);
+  height: var(--header-now);
+  transition: height var(--header-resize, 0s);
   padding-inline: var(--section-padding-x);
   background: var(--surface-default);
   color: var(--text-primary);
 }
 
-/* The mobile menu is a child with the class surfacePage: it keeps the page roles. */
-.variantAccent {
+/*
+ * The mobile menu is a child with the class surfacePage: it keeps the page
+ * roles. When the page scrolls more than the header height (data-scrolled),
+ * the header has the page ground on all pages: the script removes the class
+ * surfaceAccent.
+ */
+.root:not([data-scrolled]) .variantAccent {
   background: var(--surface-accent);
   color: var(--text-on-accent);
+}
+
+/* With data-scrolled, a hairline separates the header from the page. */
+.root[data-scrolled] .header {
+  box-shadow: inset 0 -1px var(--border-default);
 }
 
 /* The logo at the left, the nav after it, the actions at the right. */
@@ -53,7 +117,8 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: var(--header-height);
+  height: var(--header-now);
+  transition: height var(--header-resize, 0s);
 }
 
 /*
@@ -260,7 +325,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  height: calc(100dvh - var(--header-height));
+  height: calc(100dvh - var(--header-now));
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: var(--space-lg) var(--section-padding-x);

@@ -84,10 +84,17 @@ const { items, theme, total, ariaLabel = 'Feature categories' } = Astro.props;
         const counted = count ? [...document.querySelectorAll<HTMLElement>('[data-counted]')] : [];
         nav.setAttribute('data-js', '');
         const sections = links.map((link) => document.getElementById(link.hash.slice(1)));
-        document.documentElement.style.setProperty(
-          '--category-nav-height',
-          `${nav.offsetHeight}px`,
-        );
+        // The height of the nav when it sticks: the anchors of the page
+        // scroll to the line below it. The nav is thinner when it sticks,
+        // thus the height comes from the two paddings (px tokens).
+        {
+          const style = getComputedStyle(nav);
+          const rest = parseFloat(style.getPropertyValue('--nav-padding-rest'));
+          const stuck = parseFloat(style.getPropertyValue('--nav-padding-stuck'));
+          const height =
+            nav.offsetHeight - (nav.hasAttribute('data-stuck') ? 0 : 2 * (rest - stuck));
+          document.documentElement.style.setProperty('--category-nav-height', `${height}px`);
+        }
         // The row needs an end padding as wide as the score: the score is on top of the row.
         const scoreEl = nav.querySelector<HTMLElement>('[data-category-nav-score]');
         if (scoreEl)
@@ -146,10 +153,12 @@ const { items, theme, total, ariaLabel = 'Feature categories' } = Astro.props;
           });
           setActive(index);
           keepScore();
-          // Show the link to the top only when the nav sticks to the top of the screen.
+          // Show the link to the top only when the nav sticks (at the top of
+          // the screen, or below the site header).
+          const stickyTop = parseFloat(getComputedStyle(nav).top) || 0;
           nav.toggleAttribute(
             'data-stuck',
-            window.scrollY > 0 && nav.getBoundingClientRect().top <= 0,
+            window.scrollY > 0 && nav.getBoundingClientRect().top <= stickyTop + 1,
           );
         };
         window.addEventListener(

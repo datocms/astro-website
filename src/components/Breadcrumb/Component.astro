@@ -102,12 +102,14 @@ const hasActions = Astro.slots.has('actions');
     class extends WebComponent {
       parsedCallback() {
         let frame = 0;
-        // The bar sticks when its top is at the top of the screen and the page has scrolled.
+        // The bar sticks when its top is at its sticky top (the top of the
+        // screen, or below the site header) and the page has scrolled.
         const update = () => {
           frame = 0;
+          const stickyTop = parseFloat(getComputedStyle(this).top) || 0;
           this.toggleAttribute(
             'data-stuck',
-            window.scrollY > 0 && this.getBoundingClientRect().top <= 0,
+            window.scrollY > 0 && this.getBoundingClientRect().top <= stickyTop + 1,
           );
         };
         const onScroll = () => {

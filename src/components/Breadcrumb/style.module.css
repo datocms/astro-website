@@ -6,20 +6,22 @@
  * The links are 40px tall, as the other controls. Thus the band is 64px
  * tall, with 12px above and below.
  *
- * The band sticks to the top of the screen. The other sticky elements of
- * the page (a table of contents, a column of facts) add --sticky-offset to
- * their top, thus they stay below the band.
+ * The band sticks to the top of the screen, below the site header while
+ * the header shows. The other sticky elements of the page (a table of
+ * contents, a column of facts) add --sticky-offset to their top, thus they
+ * stay below the band.
  */
 :global(html):has(.bar) {
-  --sticky-offset: 64px;
+  --sticky-offset: calc(var(--header-offset, 0px) + 64px);
 }
 
 .bar {
   /* The root is a custom element: it is inline by default. */
   display: block;
   position: sticky;
-  top: 0;
+  top: var(--header-offset, 0px);
   z-index: 3;
+  transition: var(--header-slide);
   background: var(--surface-default);
   box-shadow: inset 0 -1px var(--border-default);
 }

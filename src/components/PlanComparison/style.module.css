@@ -67,12 +67,14 @@
 .header {
   position: sticky;
   /*
+   * The header row sticks below the site header while the header shows.
    * On phones the search is above the plan cells. The header row sticks with
    * the search above the viewport, thus only the plan cells stay. The script
    * gives --cmpHeaderHide (0 from 768).
    */
-  top: calc(-1 * var(--cmpHeaderHide, 0px));
+  top: calc(var(--header-offset, 0px) - var(--cmpHeaderHide, 0px));
   z-index: 2;
+  transition: var(--header-slide);
   row-gap: var(--space-xl);
   /* The space before the first category. It is not in the sticky box. */
   margin-bottom: var(--space-xl);
@@ -265,8 +267,9 @@
  */
 .category[open] .categoryHeader {
   position: sticky;
-  top: var(--cmpHeaderHeight, 0px);
+  top: calc(var(--header-offset, 0px) + var(--cmpHeaderHeight, 0px));
   z-index: 1;
+  transition: var(--header-slide);
 }
 
 .categoryHeader::-webkit-details-marker {

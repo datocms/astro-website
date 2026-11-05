@@ -439,6 +439,88 @@ const cardId = (i: number) => `site-header-card-${i}`;
         this.eventListenerRemovers.push(() =>
           DESKTOP.removeEventListener('change', onDesktopChange),
         );
+
+        this.setUpAutoHide();
+      }
+
+      // The header hides when the visitor scrolls down, and shows when the
+      // visitor scrolls up by SHOW_DISTANCE or more. It stays at the top of
+      // the page, while a card or the mobile menu is open, and while the
+      // pointer or the focus is in it. A jump to an anchor of the page does
+      // not show it: the header must not cover the target.
+      setUpAutoHide() {
+        const SHOW_DISTANCE = 10;
+        const root = document.documentElement;
+        const header = this.$('header');
+        const accent = header.classList.contains('surfaceAccent');
+        let lastY = window.scrollY;
+        let frame = 0;
+        let jumping = false;
+        let jumpTimer = 0;
+
+        const setHidden = (hidden: boolean) => {
+          root.dataset.header = hidden ? 'hidden' : 'shown';
+        };
+        const pinned = () =>
+          this.openTrigger !== null ||
+          this.mobileTrigger.getAttribute('aria-expanded') === 'true' ||
+          this.matches(':focus-within') ||
+          (HOVER.matches && this.matches(':hover'));
+
+        // The header is shorter when the page scrolls. Thus keep the height at the top of the page.
+        const threshold = header.offsetHeight;
+
+        const update = () => {
+          frame = 0;
+          const y = Math.max(0, window.scrollY);
+          const scrolled = y > threshold;
+          this.toggleAttribute('data-scrolled', scrolled);
+          if (accent) header.classList.toggle('surfaceAccent', !scrolled);
+
+          if (!scrolled) {
+            setHidden(false);
+            lastY = y;
+          } else if (jumping || y > lastY) {
+            if (!pinned()) setHidden(true);
+            lastY = y;
+          } else if (lastY - y >= SHOW_DISTANCE) {
+            setHidden(false);
+            lastY = y;
+          }
+        };
+
+        // A link to an anchor of this page starts a smooth scroll. The jump
+        // ends with the scrollend event, or after 1.5 s in a browser
+        // without it.
+        const endJump = () => {
+          jumping = false;
+          clearTimeout(jumpTimer);
+        };
+        this.on(root, 'click', (event) => {
+          const link = (event.target as Element).closest('a[href*="#"]');
+          if (!(link instanceof HTMLAnchorElement)) return;
+          if (link.pathname !== location.pathname || !link.hash) return;
+          jumping = true;
+          clearTimeout(jumpTimer);
+          jumpTimer = window.setTimeout(endJump, 1500);
+        });
+
+        // These listeners are on the window. disconnectedCallback() removes them.
+        const onScroll = () => {
+          if (!frame) frame = requestAnimationFrame(update);
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('scrollend', endJump);
+        this.eventListenerRemovers.push(() => {
+          window.removeEventListener('scroll', onScroll);
+          window.removeEventListener('scrollend', endJump);
+          clearTimeout(jumpTimer);
+        });
+
+        // The keyboard focus goes into the hidden header: it shows.
+        this.on(this, 'focusin', () => setHidden(false));
+
+        update();
       }
 
       point(item: HTMLElement | null) {
@@ -577,12 +659,12 @@ const cardId = (i: number) => `site-header-card-${i}`;
         if (returnFocus) trigger.focus();
       }
 
-      // Mobile nav. The panel hangs from the header, thus the page goes to
-      // the top, and it does not scroll while the panel is open.
+      // Mobile nav. The panel hangs from the sticky header, thus it covers
+      // the rest of the screen at each scroll position. The page does not
+      // scroll while the panel is open.
       setMobile(open: boolean, returnFocus = false) {
         this.mobileTrigger.setAttribute('aria-expanded', String(open));
         this.mobilePanel.hidden = !open;
-        if (open) window.scrollTo({ top: 0, behavior: 'instant' });
         document.documentElement.style.overflow = open ? 'hidden' : '';
         if (!open && returnFocus) this.mobileTrigger.focus();
       }
