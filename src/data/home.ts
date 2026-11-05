@@ -285,7 +285,7 @@ export const contentSource: ContentSourceData = {
   headline: 'Give your content a long, healthy life',
   face: 'relaxed',
   paragraph:
-    'Website, chatbot, mobile, a smart fridge? One place for every role to manage content across every output.',
+    'Website, chatbot, mobile, a car dashboard? One place for every role to manage content across every output.',
   button: {
     label: 'Get Started',
     href: dashboardUrl('/signup'),
