@@ -171,11 +171,11 @@
   display: none;
 }
 
-.row[data-active] .arrow {
+.row[data-open] .arrow {
   display: inline;
 }
 
-.row[data-active] .description {
+.row[data-open] .description {
   display: block;
   color: var(--text-on-inverse-muted);
 }
@@ -209,7 +209,7 @@
   color: var(--text-on-accent);
 }
 
-.inverted .row[data-active] .description {
+.inverted .row[data-open] .description {
   color: var(--text-muted);
 }
 
@@ -273,10 +273,10 @@
 
   /*
    * Each description is two lines high, not more and not less. Thus the
-   * active row always has the same height, and the list does not move
-   * when the hover changes the active row.
+   * open row always has the same height, and the list does not move
+   * when the hover changes the open row.
    */
-  .row[data-active] .description {
+  .row[data-open] .description {
     display: -webkit-box;
     height: 2lh;
     overflow: hidden;
@@ -398,7 +398,12 @@
 
 /*
  * The pill of the row under the pointer: a faint tint of the colour of the
- * other half (the muted tokens are the colour of the half itself).
+ * other half (the muted tokens are the colour of the half itself). The
+ * pointer does not open the row at once. The script opens the row 150ms
+ * after the pointer stops on it: first the visitor reads the text. 450ms
+ * after the pointer stops, the row becomes active: the theme and the
+ * picture change, and the pill gets the colours of the other half. Thus a
+ * pointer that crosses the list does not move the rows.
  */
 @media (hover: hover) {
   .row:hover {
@@ -410,33 +415,22 @@
   }
 }
 
-/*
- * ≥1152: the row under the pointer shows its arrow and its description at
- * once. The theme and the picture change 150ms later (the script). While
- * the pointer is on a different row, the active row hides its description:
- * thus only one row has a description, and the list does not move.
- */
 @media (min-width: 1152px) and (hover: hover) {
-  .row:hover .arrow {
-    display: inline;
+  .row[data-active] {
+    background: var(--surface-accent);
+    color: var(--text-on-accent);
   }
 
-  .row:hover .description {
-    display: -webkit-box;
-    height: 2lh;
-    overflow: hidden;
+  .row[data-active] .description {
+    color: var(--text-on-accent-muted);
+  }
+
+  .inverted .row[data-active] {
+    background: var(--surface-inverse);
+    color: var(--text-on-inverse);
+  }
+
+  .inverted .row[data-active] .description {
     color: var(--text-on-inverse-muted);
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-  }
-
-  .inverted .row:hover .description {
-    color: var(--text-muted);
-  }
-
-  /* stylelint-disable-next-line selector-max-specificity -- The hovered row hides the detail of the active row. */
-  .rows:has(.row:hover) .row[data-active]:not(:hover) :is(.arrow, .description) {
-    display: none;
   }
 }

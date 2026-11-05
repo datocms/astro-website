@@ -537,17 +537,17 @@ export const frameworkIntegration: TextWithImageData = {
 export const questionAnswer: QuestionAnswerData = {
   headline: 'Bring your AI',
   face: 'aha',
-  subline: 'Your AI feels right at home in the CMS, the CLI, or over MCP.',
+  subline: 'Your AI assistant feels right at home in DatoCMS.',
   ask: {
     title: 'Connect your AI',
-    href: '/docs/mcp',
+    href: '/docs/mcp-server',
     question: 'How many pages are still missing SEO descriptions?',
     models: ['Claude', 'ChatGPT', 'Gemini'],
     answer: '8 pages are missing them',
   },
   install: {
     title: 'Teach it DatoCMS',
-    href: '/docs/skills',
+    href: '/docs/agent-skills',
     command: 'npx skills add datocms',
     folders: ['datocms-setup/', 'datocms-cda/', 'datocms-cli/'],
   },

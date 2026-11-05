@@ -61,14 +61,15 @@ that cut the subject).
 
 ## Change a .pxv
 
-`meta.ts` shows the edges, the source and the settings of files, and sets
-them. The cells do not change.
+`meta.ts` shows the edges, the source, the frame rate and the settings of
+files, and sets them. The cells do not change.
 
 ```bash
 npx tsx scripts/pixel-videos/meta.ts public/videos/*.pxv                       # show
 npx tsx scripts/pixel-videos/meta.ts public/videos/italian-pinch.pxv --set edges=right --set focus=0.35
 npx tsx scripts/pixel-videos/meta.ts public/videos/hand-ok.pxv --set palette=onAccent
 npx tsx scripts/pixel-videos/meta.ts public/videos/hand-ok.pxv --set 'source=https://www.youtube.com/watch?v=TJfYrg8qwhI&t=15s'
+npx tsx scripts/pixel-videos/meta.ts public/videos/spinning-globe.pxv --set fps=15   # slower
 ```
 
 To make the pixels of a file larger, `resize.ts` makes it smaller (fewer

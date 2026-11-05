@@ -157,6 +157,7 @@ const visuals = await Promise.all(
                 class={styles.row}
                 data-features-row={i}
                 data-row-theme={feature.theme}
+                data-open={i === 0 ? '' : undefined}
                 data-active={i === 0 ? '' : undefined}
               >
                 <h3 class:list={[styles.title, titleSize]}>
@@ -186,15 +187,17 @@ const visuals = await Promise.all(
   import { prefersReducedMotion } from '~/lib/motion/inView';
   import { WebComponent } from '~/lib/WebComponent';
 
-  // The rows and the pictures change at once.
-  // The colours of the theme go to the new theme in 600ms, in oklch.
+  // The active row and the picture change at once.
+  // The colours of the theme go to the new theme in 600ms, in oklab.
   const DESKTOP = window.matchMedia('(min-width: 1152px)');
   const FADE_MS = 600;
 
   // The theme data (src/styles/tokens.css) that the fade mixes. The fade
   // sets the data on the section, not the roles: each role (also a role
   // that a ground class inside the section sets again) comes from the data.
-  // The colours mix in oklch.
+  // The colours mix in oklab: a straight line from one colour to the other.
+  // Do not use oklch: it turns around the hue circle, thus the middle of a
+  // fade has full chroma (a bright yellow from green to orange).
   const COLORS = [
     '--theme-paper',
     '--theme-ink',
@@ -231,9 +234,9 @@ const visuals = await Promise.all(
 
   const TOKENS = [...COLORS, ...NUMBERS];
 
-  // A CSS transition mixes colours in oklab, and a custom property that is
-  // not registered does not transition. Thus animate one registered number
-  // from 0 to 1, and mix each token in oklch with that number.
+  // A custom property that is not registered does not transition. Thus
+  // animate one registered number from 0 to 1, and mix each token in oklab
+  // with that number.
   try {
     CSS.registerProperty({
       name: '--features-mix',
@@ -282,7 +285,7 @@ const visuals = await Promise.all(
             section.style.setProperty(
               token,
               COLORS.includes(token)
-                ? `color-mix(in oklch, ${from[i]}, ${to[i]} calc(var(--features-mix) * 100%))`
+                ? `color-mix(in oklab, ${from[i]}, ${to[i]} calc(var(--features-mix) * 100%))`
                 : `calc(${from[i]} + (${to[i]} - ${from[i]}) * var(--features-mix))`,
             );
           });
@@ -296,7 +299,13 @@ const visuals = await Promise.all(
           };
         };
 
+        // The open row shows its arrow and its description.
+        const open = (index: number) =>
+          rows.forEach((row, i) => row.toggleAttribute('data-open', i === index));
+
+        // The active row has the theme and the picture. It is also open.
         const activate = (index: number) => {
+          open(index);
           if (index === active || !rows[index]) return;
           active = index;
           rows.forEach((row, i) => row.toggleAttribute('data-active', i === index));
@@ -307,19 +316,35 @@ const visuals = await Promise.all(
           setTheme(rows[index]!.dataset.rowTheme);
         };
 
-        // ≥1152: only a hover on a row changes the active row. The pointer on
-        // the picture does not change it. The row becomes active after the
-        // pointer stays on it for 150ms. Thus a pointer that only crosses the
-        // list does not change the theme and the scene. The last active row
-        // stays active when the pointer leaves.
-        let hoverTimer = 0;
+        // ≥1152: only a hover on a row changes the open row and the active
+        // row. The pointer on the picture does not change them. When the
+        // pointer stays on a row, the row opens after 150ms: first the
+        // visitor reads the text. The row becomes active after 450ms: then
+        // the theme and the scene change. Thus a pointer that only crosses
+        // the list does not move the rows or change the scene. When the
+        // pointer leaves a row and goes to no other row for 150ms, the
+        // active row opens again. The last active row stays active.
+        const OPEN_MS = 150;
+        const ACTIVATE_MS = 450;
+        let openTimer = 0;
+        let activateTimer = 0;
+        let closeTimer = 0;
+        const clearTimers = () => {
+          clearTimeout(openTimer);
+          clearTimeout(activateTimer);
+          clearTimeout(closeTimer);
+        };
         rows.forEach((row, i) => {
           this.on(row, 'pointerenter', () => {
             if (!DESKTOP.matches) return;
-            clearTimeout(hoverTimer);
-            hoverTimer = window.setTimeout(() => activate(i), 150);
+            clearTimers();
+            openTimer = window.setTimeout(() => open(i), OPEN_MS);
+            activateTimer = window.setTimeout(() => activate(i), ACTIVATE_MS);
           });
-          this.on(row, 'pointerleave', () => clearTimeout(hoverTimer));
+          this.on(row, 'pointerleave', () => {
+            clearTimers();
+            closeTimer = window.setTimeout(() => open(active), OPEN_MS);
+          });
         });
 
         // <1152: the active row is the topmost row fully visible under the sticky image.

@@ -1,4 +1,4 @@
-// Show or set the edges, the source and the settings of .pxv files. The cells do not
+// Show or set the edges, the source, the frame rate and the settings of .pxv files. The cells do not
 // change.
 //
 // Usage:
@@ -14,6 +14,8 @@
 //                  removes it
 //   palette=<name> a palette of src/lib/pixel-video/styles.ts. `palette=`
 //                  removes it: the default (`tonal`) applies
+//   fps=<n>        the frames per second. A lower value plays the same
+//                  frames slower
 //   focus=<0-1>    the point of the subject, from the left, that stays in
 //                  the centre when a container cuts the sides. `focus=`
 //                  removes it: the default (0.5) applies
@@ -72,16 +74,20 @@ for (const file of positionals) {
     );
     let edges = frames.edges ?? [];
     let source = frames.source;
+    let fps = frames.fps;
     for (const pair of values.set) {
       const [key, ...rest] = pair.split('=');
       const text = rest.join('=');
       if (!key || !pair.includes('=')) throw new Error(`--set: "${pair}" is not key=value`);
       if (key === 'edges') edges = parseEdges(text, frames);
       else if (key === 'source') source = text || undefined;
-      else if (text === '') delete settings[key];
+      else if (key === 'fps') {
+        fps = Number(text);
+        if (!(fps > 0 && fps <= 600)) throw new Error('--set: "fps" is a number from 0 to 600');
+      } else if (text === '') delete settings[key];
       else settings[key] = settingValue(key, text);
     }
-    const bytes = await encode({ ...frames, settings, edges, source });
+    const bytes = await encode({ ...frames, fps, settings, edges, source });
     const back = await decode(bytes);
     if (back.cells.some((v, i) => v !== frames.cells[i]))
       throw new Error(`${file}: round trip FAILED, the file did not change`);
