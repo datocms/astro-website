@@ -227,17 +227,18 @@ export const partnersGlobe: Style = {
 
 // The field behind the hero of the docs home, drawn live (not from
 // footage) on the page surface. The tints of the accent go up in three
-// steps: faint, muted, the accent. The grid has the colour of the page,
-// thus each cell is a separate square. A few cells of the accent flash in
-// the pixel highlight (the TOP layer). The tints mix the accent into the
-// page surface, thus they are light on the white page and deep on the ink
-// page: the same palette works in light and in dark.
+// steps: faint, muted, strong. The strong step is not the full accent:
+// the field is a quiet texture behind the headline. The grid has the
+// colour of the page, thus each cell is a separate square. A few cells of
+// the accent flash in the pixel highlight (the TOP layer). The tints mix
+// the accent into the page surface, thus they are light on the white page
+// and deep on the ink page: the same palette works in light and in dark.
 export const docsField: Style = {
-  bgFill: `color-mix(in oklab, ${ACCENT} 16%, var(--surface-default))`,
+  bgFill: `color-mix(in oklab, ${ACCENT} 10%, var(--surface-default))`,
   bgStroke: 'var(--surface-default)',
-  midFill: `color-mix(in oklab, ${ACCENT} 42%, var(--surface-default))`,
+  midFill: `color-mix(in oklab, ${ACCENT} 28%, var(--surface-default))`,
   midStroke: 'var(--surface-default)',
-  highFill: ACCENT,
+  highFill: `color-mix(in oklab, ${ACCENT} 50%, var(--surface-default))`,
   highStroke: 'var(--surface-default)',
   groundFill: 'var(--surface-default)',
   topFill: 'var(--surface-pixel-highlight)',
