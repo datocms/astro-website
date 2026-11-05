@@ -5,14 +5,7 @@ import { dataSource } from '~/lib/dataSource';
 type ScalarInput = {
   type: 'scalar';
   input_type:
-    | 'boolean'
-    | 'date'
-    | 'date_time'
-    | 'float'
-    | 'integer'
-    | 'string'
-    | 'upload_id'
-    | 'item_id';
+    'boolean' | 'date' | 'date_time' | 'float' | 'integer' | 'string' | 'upload_id' | 'item_id';
   array?: boolean;
   required?: boolean;
 };
