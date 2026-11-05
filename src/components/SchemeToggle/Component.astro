@@ -3,11 +3,26 @@ import { faMoon, faSun } from '@fortawesome/pro-regular-svg-icons';
 import { Icon } from '~/components/Icon';
 import { Tooltip } from '~/components/Tooltip';
 import s from './style.module.css';
+
+interface Props {
+  /**
+   * `circle` is a 40px circle with a border. `bare` is the icon alone, with
+   * the 40px hit area of the icon buttons of the site header.
+   */
+  variant?: 'circle' | 'bare';
+}
+
+const { variant = 'circle' } = Astro.props;
 ---
 
 <scheme-toggle class={s.root}>
   <Tooltip>
-    <button type="button" class={s.toggle} aria-label="Dark mode" aria-pressed="false">
+    <button
+      type="button"
+      class:list={[s.toggle, variant === 'bare' && s.bare]}
+      aria-label="Dark mode"
+      aria-pressed="false"
+    >
       <Icon icon={faMoon} class={s.moon} />
       <Icon icon={faSun} class={s.sun} />
     </button>
