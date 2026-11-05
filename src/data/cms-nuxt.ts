@@ -81,6 +81,7 @@ export const page: FrameworkPage = {
   integrations: ['nuxt-js', 'vue'],
   // The features of the README of the starter kit.
   closer: closer({
+    docsRoot,
     repo: starterRepo,
     // New copy.
     subline:

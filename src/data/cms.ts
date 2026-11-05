@@ -310,8 +310,8 @@ export function buildTriggersChapter(args: { headersCode: CodeTab[] }): ChapterL
   };
 }
 
-/** The call to action of the closer: the starter kit of the framework. */
-export function closer(args: { repo: string; subline: string }): CtaBannerData {
+/** The call to action of the closer: the starter kit and the docs of the framework. */
+export function closer(args: { repo: string; docsRoot: string; subline: string }): CtaBannerData {
   return {
     variant: 'light',
     theme: 'green',
@@ -325,12 +325,7 @@ export function closer(args: { repo: string; subline: string }): CtaBannerData {
         href: deployUrl(args.repo),
         arrow: false,
       },
-      {
-        label: 'Talk To Sales',
-        href: '/contact',
-        contact: 'sales',
-        variant: 'soft',
-      },
+      { label: 'Read The Docs', href: args.docsRoot, variant: 'soft' },
     ],
   };
 }

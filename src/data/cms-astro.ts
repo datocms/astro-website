@@ -98,6 +98,7 @@ export const page: FrameworkPage = {
   integrations: ['astro'],
   // The features of the README of the starter kit. No cache tags.
   closer: closer({
+    docsRoot,
     repo: starterRepo,
     // New copy.
     subline:

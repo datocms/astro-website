@@ -97,6 +97,7 @@ export const page: FrameworkPage = {
   integrations: ['nextjs'],
   // The features of the README of the starter kit.
   closer: closer({
+    docsRoot,
     repo: starterRepo,
     // New copy.
     subline:
