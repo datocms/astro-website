@@ -11,6 +11,12 @@ interface Props {
   start?: TypewriterStart;
   /** Delay in ms after the start trigger. */
   delay?: number;
+  /**
+   * When the visitor scrolls, presses a key or taps before the end, the
+   * rest of the animation ends in 500ms. For a hero: the visitor does not
+   * wait for it.
+   */
+  hurryOnInteraction?: boolean;
   /** IntersectionObserver options for `start="view"`. */
   threshold?: number;
   rootMargin?: string;
@@ -22,6 +28,7 @@ const {
   script,
   start = 'view',
   delay = 0,
+  hurryOnInteraction = false,
   threshold = 0,
   rootMargin = '0px',
   class: className,
@@ -36,6 +43,7 @@ const Inner = as === 'span' ? 'span' : 'div';
   data-typewriter={JSON.stringify(script)}
   data-tw-start={start}
   data-tw-delay={delay}
+  data-tw-hurry={hurryOnInteraction ? '' : undefined}
   data-tw-threshold={threshold}
   data-tw-root-margin={rootMargin}
 >
@@ -50,7 +58,9 @@ const Inner = as === 'span' ? 'span' : 'div';
   // The element types its text once: on load, in view, or on a
   // `typewriter:start` event. A `typewriter:replay` event types it again,
   // each time (for example, a form error that comes back). `data-tw-armed`
-  // tells the CSS that the script runs.
+  // tells the CSS that the script runs. With `data-tw-hurry`, the first
+  // scroll, key or tap of the visitor sends `typewriter:hurry`: the rest of
+  // the animation then ends in 500ms.
   customElements.define(
     'type-writer',
     class extends WebComponent {
@@ -79,11 +89,25 @@ const Inner = as === 'span' ? 'span' : 'div';
             rootMargin: this.dataset.twRootMargin || '0px',
           });
         }
+        if ('twHurry' in this.dataset) this.hurryOnInteraction();
         this.on(this, 'typewriter:start', play);
         this.on(this, 'typewriter:replay', () => {
           started = true;
           run();
         });
+      }
+
+      hurryOnInteraction() {
+        const events = ['scroll', 'keydown', 'pointerdown'] as const;
+        const hurry = () => {
+          stop();
+          this.dispatchEvent(new CustomEvent('typewriter:hurry'));
+        };
+        const stop = () => {
+          for (const event of events) window.removeEventListener(event, hurry);
+        };
+        for (const event of events) window.addEventListener(event, hurry, { passive: true });
+        this.on(this, 'typewriter:done', stop);
       }
     },
   );

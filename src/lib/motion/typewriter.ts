@@ -14,6 +14,10 @@ import { prefersReducedMotion } from './inView';
  * The steps must follow the order of the final text. Whitespace in the
  * final markup is not important: a step matches the non-whitespace
  * characters only.
+ *
+ * A `typewriter:hurry` event on the element makes the rest of the
+ * animation end in HURRY_MS: all the remaining delays get shorter by the
+ * same factor, thus the animation keeps its shape.
  */
 
 export type Frame = string | { text: string; ms: number };
@@ -54,9 +58,37 @@ export interface TypewriteOptions {
   defaultCps?: number;
 }
 
-const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+/** The time in ms that the rest of the animation takes after a `typewriter:hurry` event. */
+export const HURRY_MS = 500;
 
 const isSpace = (ch: string) => /\s/.test(ch);
+
+/**
+ * The approximate duration of a step in ms, at normal speed. The human
+ * rhythm is slower than its mean speed: the spaces and the punctuation
+ * take longer.
+ */
+function stepMs(step: Step, defaultCps: number): number {
+  switch (step.type) {
+    case 'pause':
+      return step.ms;
+    case 'hideCursor':
+      return step.fadeMs ?? 0;
+    case 'cursor':
+      return step.glyphs.reduce((sum, f) => sum + frameOf(f, step.msPerGlyph ?? 75).ms, 0);
+    case 'face':
+      return step.frames.reduce((sum, f) => sum + frameOf(f, step.msPerFrame ?? 120).ms, 0);
+    case 'shuffle':
+      return step.ms;
+    case 'text': {
+      const cps = step.speedCps ?? defaultCps;
+      if (cps <= 0) return 0;
+      return ((step.text.length * 1000) / cps) * (step.rhythm === 'human' ? 1.3 : 1);
+    }
+    case 'mark':
+      return 0;
+  }
+}
 
 function frameOf(frame: Frame, fallbackMs: number) {
   return typeof frame === 'string' ? { text: frame, ms: fallbackMs } : frame;
@@ -142,6 +174,46 @@ export function typewrite(
 
   let index = 0;
   let last: CharPos | null = null;
+
+  // The clock of the animation. After a `typewriter:hurry` event, `scale`
+  // makes each delay shorter, and no delay goes past `deadline`.
+  let scale = 1;
+  let deadline = Infinity;
+  let wake: (() => void) | null = null;
+  // The step that runs, and the part of it that is done (0 to 1).
+  let stepIndex = 0;
+  let stepDone = 0;
+
+  const sleep = (ms: number) => {
+    const scaled = ms * scale;
+    if (scaled <= 0 || performance.now() >= deadline) return Promise.resolve();
+    return new Promise<void>((resolve) => {
+      const timer = setTimeout(() => {
+        wake = null;
+        resolve();
+      }, scaled);
+      wake = () => {
+        clearTimeout(timer);
+        wake = null;
+        resolve();
+      };
+    });
+  };
+
+  const durations = steps.map((step) => stepMs(step, defaultCps));
+  const remainingMs = () =>
+    durations[stepIndex]! * (1 - stepDone) +
+    durations.slice(stepIndex + 1).reduce((sum, ms) => sum + ms, 0);
+
+  const hurry = () => {
+    if (deadline !== Infinity) return;
+    const remaining = remainingMs();
+    if (remaining <= HURRY_MS) return;
+    deadline = performance.now() + HURRY_MS;
+    scale = HURRY_MS / remaining;
+    // The delay that runs now ends at once: the next delays are short.
+    wake?.();
+  };
 
   /** The range of the characters not typed yet, in the highlight. */
   let hidden: Range | null = null;
@@ -273,7 +345,9 @@ export function typewrite(
 
   const run = async () => {
     place();
-    for (const step of steps) {
+    for (const [s, step] of steps.entries()) {
+      stepIndex = s;
+      stepDone = 0;
       switch (step.type) {
         case 'pause':
           // The bar blinks while the typing stops.
@@ -288,7 +362,7 @@ export function typewrite(
           break;
         case 'hideCursor':
           if (step.fadeMs) {
-            cursor.style.transition = `opacity ${step.fadeMs}ms ease-out`;
+            cursor.style.transition = `opacity ${step.fadeMs * scale}ms ease-out`;
             cursor.style.opacity = '0';
             await sleep(step.fadeMs);
             cursor.style.transition = '';
@@ -297,9 +371,10 @@ export function typewrite(
           cursor.style.visibility = 'hidden';
           break;
         case 'cursor':
-          for (const f of step.glyphs) {
+          for (const [n, f] of step.glyphs.entries()) {
             const { text, ms } = frameOf(f, step.msPerGlyph ?? 75);
             setGlyph(text);
+            stepDone = n / step.glyphs.length;
             await sleep(ms);
           }
           setGlyph(cursorGlyph);
@@ -311,7 +386,10 @@ export function typewrite(
           cursor.style.visibility = 'visible';
           let prev = '';
           let wordPos = 0;
+          let n = 0;
           for (const ch of step.text) {
+            stepDone = n / step.text.length;
+            n += 1;
             if (isSpace(ch)) {
               flushSpaces();
               wordPos = 0;
@@ -333,10 +411,11 @@ export function typewrite(
           cursor.style.visibility = 'visible';
           place(true);
           let lastText = '';
-          for (const f of step.frames) {
+          for (const [n, f] of step.frames.entries()) {
             const { text, ms } = frameOf(f, step.msPerFrame ?? 120);
             setGlyph(text);
             lastText = text;
+            stepDone = n / step.frames.length;
             await sleep(ms);
           }
           if (lastText && matchesNext(lastText)) {
@@ -352,11 +431,13 @@ export function typewrite(
           flushSpaces();
           place(true);
           const every = step.every ?? 100;
-          const end = performance.now() + step.ms;
+          const start = performance.now();
           let i = 0;
-          while (performance.now() < end) {
+          // `scale` and `deadline` can change while the words run.
+          while (performance.now() < Math.min(start + step.ms * scale, deadline)) {
             setGlyph(step.words[i % step.words.length]!);
             i += 1;
+            stepDone = (performance.now() - start) / (step.ms * scale);
             await sleep(every);
           }
           revealGlyphs(glyphCount(step.final));
@@ -381,9 +462,11 @@ export function typewrite(
 
   const onResize = () => place();
   window.addEventListener('resize', onResize);
+  el.addEventListener('typewriter:hurry', hurry);
 
   return run().finally(() => {
     window.removeEventListener('resize', onResize);
+    el.removeEventListener('typewriter:hurry', hurry);
     if (hidden) highlight.delete(hidden);
     cursor.remove();
     el.dataset.twState = 'done';

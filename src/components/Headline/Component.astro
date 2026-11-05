@@ -13,6 +13,8 @@ interface Props {
   typewriter?: Step[];
   typewriterStart?: TypewriterStart;
   typewriterDelay?: number;
+  /** See `hurryOnInteraction` of Typewriter. */
+  typewriterHurry?: boolean;
   class?: string;
   id?: string;
 }
@@ -25,6 +27,7 @@ const {
   typewriter,
   typewriterStart,
   typewriterDelay,
+  typewriterHurry,
   class: className,
   id,
 } = Astro.props;
@@ -35,7 +38,12 @@ const mutedHtml = Astro.slots.has('muted') ? (await Astro.slots.render('muted'))
 const hasMuted = Boolean(muted) || mutedHtml !== '';
 const Wrapper = typewriter ? Typewriter : Fragment;
 const wrapperProps = typewriter
-  ? { script: typewriter, start: typewriterStart, delay: typewriterDelay }
+  ? {
+      script: typewriter,
+      start: typewriterStart,
+      delay: typewriterDelay,
+      hurryOnInteraction: typewriterHurry,
+    }
   : {};
 ---
 

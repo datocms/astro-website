@@ -75,13 +75,13 @@ const shortName = (name: string) => {
 // Times are from the start of the page.
 // Without a subheadline, the script ends after the headline.
 const script: Step[] = [
-  { type: 'pause', ms: 750 },
+  { type: 'pause', ms: 300 },
   { type: 'cursor', glyphs: ['•', '~', '-', 'ᴗ', '•'], msPerGlyph: 75 },
   { type: 'pause', ms: 25 },
-  { type: 'text', text: headline, speedCps: 80 },
+  { type: 'text', text: headline, speedCps: 110 },
 ];
 if (subheadline) {
-  script.push({ type: 'pause', ms: 500 }, { type: 'text', text: subheadline, speedCps: 80 });
+  script.push({ type: 'pause', ms: 250 }, { type: 'text', text: subheadline, speedCps: 110 });
 }
 // The buttons fade in when the text is typed. They do not wait for the face.
 script.push({ type: 'mark', name: 'buttons' });
@@ -149,6 +149,7 @@ const hasVisual = Astro.slots.has('visual');
       breakBeforeMuted={breakBeforeMuted}
       typewriter={typewriter ? script : undefined}
       typewriterStart="load"
+      typewriterHurry
       class={styles.headline}
     >
       {headline}
