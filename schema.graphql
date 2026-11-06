@@ -17121,6 +17121,8 @@ input ProductComparisonModelFilter {
   seoSocial: SeoFilter
   slug: SlugFilter
   testimonials: LinksFilter
+  whenToChooseCompetitor: StructuredTextFilter
+  whenToChooseDatocms: StructuredTextFilter
   OR: [ProductComparisonModelFilter]
   AND: [ProductComparisonModelFilter]
 }
@@ -17154,6 +17156,20 @@ enum ProductComparisonModelOrderBy {
 
 union ProductComparisonModelTestimonialsField = PartnerTestimonialRecord | ReviewRecord
 
+type ProductComparisonModelWhenToChooseCompetitorField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
+type ProductComparisonModelWhenToChooseDatocmsField {
+  blocks: [String!]!
+  inlineBlocks: [String!]!
+  links: [String!]!
+  value: JsonField!
+}
+
 """Record of type 📊 Product Comparison (product_comparison)"""
 type ProductComparisonRecord implements RecordInterface {
   _createdAt: DateTime!
@@ -17186,6 +17202,8 @@ type ProductComparisonRecord implements RecordInterface {
   testimonials: [ProductComparisonModelTestimonialsField!]!
   topics: [DifferencesOnTopicRecord!]!
   updatedAt: DateTime!
+  whenToChooseCompetitor: ProductComparisonModelWhenToChooseCompetitorField!
+  whenToChooseDatocms: ProductComparisonModelWhenToChooseDatocmsField!
 }
 
 type ProductDifferenceModelCompetitorTakeField {
@@ -20469,7 +20487,6 @@ input ReviewModelFilter {
   updatedAt: UpdatedAtFilter
   _isValid: BooleanFilter
   company: StringFilter
-  excerpt: StringFilter
   featured: BooleanFilter
   image: FileFilter
   name: StringFilter
@@ -20508,8 +20525,6 @@ enum ReviewModelOrderBy {
   _isValid_DESC
   company_ASC
   company_DESC
-  excerpt_ASC
-  excerpt_DESC
   featured_ASC
   featured_DESC
   name_ASC
@@ -20551,7 +20566,6 @@ type ReviewRecord implements RecordInterface {
   _updatedAt: DateTime!
   company: String
   createdAt: DateTime!
-  excerpt: String
   featured: BooleanType!
   id: ItemId!
   image: ImageFileField!

@@ -2341,6 +2341,9 @@ export type ProductComparison = ItemTypeDefinition<
       type: 'rich_text';
       blocks: DifferencesOnTopic;
     };
+    when_to_choose_datocms: {
+      type: 'structured_text';
+    };
     competitor_characterization: {
       type: 'structured_text';
     };
@@ -2349,6 +2352,9 @@ export type ProductComparison = ItemTypeDefinition<
     };
     seo_social: {
       type: 'seo';
+    };
+    when_to_choose_competitor: {
+      type: 'structured_text';
     };
   }
 >;
@@ -2578,9 +2584,6 @@ export type Review = ItemTypeDefinition<
     };
     use_in_dashboard: {
       type: 'boolean';
-    };
-    excerpt: {
-      type: 'string';
     };
     featured: {
       type: 'boolean';

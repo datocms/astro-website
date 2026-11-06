@@ -30,6 +30,12 @@ export const query = graphql(
         competitorCharacterization {
           value
         }
+        whenToChooseDatocms {
+          value
+        }
+        whenToChooseCompetitor {
+          value
+        }
         reasons {
           ...ReasonColumnsReasonFragment
         }
