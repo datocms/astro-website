@@ -42,36 +42,43 @@ const alternatives = Astro.props.alternatives
     <table class={styles.table} data-comparison-table>
       <thead>
         <tr>
-          <th scope="col" class:list={[styles.head, styles.headDato, 'surfaceAccent', 'title']}>
+          <th scope="col" class:list={[styles.head, styles.headDato, 'surfaceInverse', 'title']}>
             <div class={styles.inner}>DatoCMS</div>
           </th>
-          <th scope="col" class:list={[styles.head, styles.headOther, 'surfaceInverse']}>
+          <th scope="col" class:list={[styles.head, styles.headOther, 'surfaceAccent']}>
             <div class={styles.inner}>
-              <button
-                type="button"
-                class:list={[styles.trigger, 'title']}
-                aria-expanded="false"
-                aria-controls="comparison-alternatives"
-                data-comparison-trigger
-              >
-                {comparison.product}
-                <Icon icon={faChevronDown} class={styles.chevron} width="12" height="12" />
-              </button>
+              <div class={styles.menu}>
+                <button
+                  type="button"
+                  class:list={[styles.trigger, 'title']}
+                  aria-expanded="false"
+                  aria-controls="comparison-alternatives"
+                  data-comparison-trigger
+                >
+                  {comparison.product}
+                  <Icon icon={faChevronDown} class={styles.chevron} width="12" height="12" />
+                </button>
+                <ul
+                  id="comparison-alternatives"
+                  class:list={[styles.options, 'surfaceInverse']}
+                  hidden
+                  data-comparison-options
+                >
+                  {
+                    alternatives.map((alternative) => (
+                      <li>
+                        <a
+                          class:list={[styles.option, 'surfaceInverse', 'title']}
+                          href={buildUrlForProductComparison(alternative)}
+                        >
+                          {alternative.product}
+                        </a>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
             </div>
-            <ul id="comparison-alternatives" class={styles.options} hidden data-comparison-options>
-              {
-                alternatives.map((alternative) => (
-                  <li>
-                    <a
-                      class:list={[styles.option, 'surfaceAccent', 'title']}
-                      href={buildUrlForProductComparison(alternative)}
-                    >
-                      {alternative.product}
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
           </th>
         </tr>
       </thead>

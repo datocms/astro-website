@@ -1,7 +1,8 @@
 /*
  * Header cells and category
  * labels 73px, text cells 20px vertical padding. The DatoCMS column is on
- * surface/accent-faint, the competitor column on surface/accent-subtle.
+ * surface/accent-subtle, the competitor column on surface/accent-faint.
+ * The darker column is DatoCMS: the eye goes to the dark side.
  * Above 1320 the backgrounds are full width, but the texts keep the 1320
  * layout and stay next to the centre line (see .inner).
  */
@@ -28,19 +29,25 @@
   transition: var(--header-slide);
   width: 50%;
   padding: var(--space-md) var(--space-sm);
-  /* The 1px line is inside the 73px cell. */
-  box-shadow: inset 0 -1px var(--text-on-inverse);
   text-align: center;
 }
 
 .headDato {
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.headOther {
   background: var(--surface-accent);
   color: var(--text-on-accent);
 }
 
-.headOther {
-  background: var(--surface-inverse);
-  color: var(--text-on-inverse);
+/* The anchor of the list: the list is centred on the trigger, not on the column. */
+.menu {
+  position: relative;
+  display: flex;
+  width: fit-content;
+  margin-inline: auto;
 }
 
 .trigger {
@@ -63,12 +70,21 @@
   rotate: 180deg;
 }
 
+/*
+ * The list has the width of the longest name. It starts at the bottom of
+ * the header cell: the offset is the padding of the cell.
+ */
 .options {
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  top: calc(100% + var(--space-md));
+  left: 50%;
+  translate: -50% 0;
+  width: max-content;
+  min-width: 100%;
   margin: 0;
+  /* The hover of a row in the dark scheme is translucent: the list is the solid ground under it. */
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
   padding: 0;
   list-style: none;
 }
@@ -76,8 +92,8 @@
 .option {
   display: block;
   padding: var(--space-md) var(--space-sm);
-  background: var(--surface-accent);
-  color: var(--text-on-accent);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
   text-decoration: none;
 }
 
@@ -86,8 +102,16 @@
 }
 
 @media (hover: hover) {
+  /* The tints of the inverse do not show on the light scheme: the row takes the accent. */
   .option:hover {
-    background: var(--surface-default);
+    background: var(--surface-accent);
+    color: var(--text-on-accent);
+  }
+
+  /* On the near-black list of the dark scheme the accent is too loud: the row takes one step of the inverse. */
+  :global(:root[data-color-scheme='dark']) .option:hover {
+    background: var(--surface-inverse-muted);
+    color: var(--text-on-inverse);
   }
 }
 
@@ -106,11 +130,11 @@
 }
 
 .cellDato {
-  background: var(--surface-accent-faint);
+  background: var(--surface-accent-subtle);
 }
 
 .cellOther {
-  background: var(--surface-accent-subtle);
+  background: var(--surface-accent-faint);
 }
 
 /*
@@ -153,9 +177,13 @@
 }
 
 @media (min-width: 768px) {
-  .head,
-  .option {
+  .head {
     padding-inline: var(--section-padding-x);
+  }
+
+  /* Below 768 the column is too narrow for this padding. */
+  .option {
+    padding-inline: calc(var(--space-sm) + var(--space-2xl));
   }
 
   .cell {
