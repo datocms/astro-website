@@ -16,6 +16,16 @@ type Props = {
 };
 
 const { property, showRequiredOptional = true } = Astro.props;
+
+/* An example longer than this is not inline: a short preview opens the full value. */
+const MAX_INLINE_EXAMPLE_LENGTH = 120;
+const PREVIEW_LENGTH = 60;
+
+const oneLine = (example: string) => example.replace(/\s+/g, ' ').trim();
+
+const examples = await Promise.all(property.examples);
+const inlineExamples = examples.filter((e) => oneLine(e).length <= MAX_INLINE_EXAMPLE_LENGTH);
+const longExamples = examples.filter((e) => oneLine(e).length > MAX_INLINE_EXAMPLE_LENGTH);
 ---
 
 <div class={s.schema}>
@@ -75,7 +85,7 @@ const { property, showRequiredOptional = true } = Astro.props;
       <div class={s.types}>
         <Icon icon={faCode} />
         <div>
-          Type:
+          Type:{' '}
           {intersperse(
             property.types.map((type) => (
               <span
@@ -95,14 +105,25 @@ const { property, showRequiredOptional = true } = Astro.props;
       <div class={s.examples}>
         <Icon icon={faLightbulb} />
         <div>
-          {property.examples.length > 1 ? <>Examples:</> : <>Example:</>}
-
+          {property.examples.length > 1 ? <>Examples:</> : <>Example:</>}{' '}
           {intersperse(
-            property.examples.map((example) => (
+            inlineExamples.map((example) => (
               <code class:list={[s.example, 'codeInline']}>{example}</code>
             )),
             ', ',
           )}
+          {longExamples.map((example) => (
+            <details class={s.longExample}>
+              <summary>
+                <code class:list={[s.example, s.preview, 'codeInline']}>
+                  {oneLine(example).slice(0, PREVIEW_LENGTH)}…
+                </code>
+                <span class={s.showFull}>Show full</span>
+                <span class={s.hideFull}>Hide</span>
+              </summary>
+              <pre class="codeSmall">{example.trim()}</pre>
+            </details>
+          ))}
         </div>
       </div>
     )

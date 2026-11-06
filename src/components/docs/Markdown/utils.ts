@@ -5,13 +5,14 @@ import striptags from 'striptags';
 import expressiveCodeConfig from '~~/ec.config.mjs';
 import { remarkTabs } from './remarkPlugins';
 import { autolinkHeadings } from '~/components/HeadingAnchor/autolinkHeadings';
-import { callouts, figureAroundCodeBlocks } from './rehypePlugins';
+import { callouts, figureAroundCodeBlocks, scrollBoxAroundTables } from './rehypePlugins';
 
 export const config: AstroMarkdownOptions = {
   syntaxHighlight: false,
   remarkPlugins: [remarkDirective, remarkTabs],
   rehypePlugins: [
     figureAroundCodeBlocks,
+    scrollBoxAroundTables,
     autolinkHeadings,
     callouts,
     [rehypeExpressiveCode, expressiveCodeConfig],

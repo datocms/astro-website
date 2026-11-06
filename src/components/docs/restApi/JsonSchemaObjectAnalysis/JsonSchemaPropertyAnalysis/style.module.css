@@ -69,6 +69,57 @@
     flex-shrink: 0;
     color: var(--text-muted);
   }
+
+  /* The text can get narrower than its longest word, thus a long value breaks. */
+  > div {
+    min-width: 0;
+  }
+}
+
+/*
+ * The preview of a long example. The summary opens the full value. The
+ * preview stays on the line of the label, thus the row has the look of the
+ * short examples.
+ */
+.longExample,
+.longExample summary {
+  display: inline;
+}
+
+.longExample summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.longExample summary::-webkit-details-marker {
+  display: none;
+}
+
+.showFull,
+.hideFull {
+  margin-inline-start: 0.5em;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.hideFull,
+.longExample[open] .showFull,
+.longExample[open] .preview {
+  display: none;
+}
+
+.longExample[open] .hideFull {
+  display: inline;
+  margin-inline-start: 0;
+}
+
+/* The full value scrolls in this box, and the page does not scroll. */
+.longExample pre {
+  margin-top: var(--space-4xs);
+  padding: var(--space-2xs);
+  overflow-x: auto;
+  background: var(--surface-inverse-faint);
+  border-radius: var(--radius-md);
 }
 
 .deprecatedDescription {

@@ -4,12 +4,13 @@ import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import expressiveCodeConfig from '~~/ec.config.mjs';
 import { autolinkHeadings } from '~/components/HeadingAnchor/autolinkHeadings';
-import { callouts, figureAroundCodeBlocks } from './rehypePlugins';
+import { callouts, figureAroundCodeBlocks, scrollBoxAroundTables } from './rehypePlugins';
 
 const config: AstroMarkdownOptions = {
   syntaxHighlight: false,
   rehypePlugins: [
     figureAroundCodeBlocks,
+    scrollBoxAroundTables,
     autolinkHeadings,
     callouts,
     [rehypeExpressiveCode, expressiveCodeConfig],

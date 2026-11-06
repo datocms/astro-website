@@ -76,6 +76,27 @@
   flex: none;
 }
 
+/*
+ * On phones the row has no room for the full trail when the bar sticks.
+ * Only the last link and the name of the page show. The name gets shorter
+ * first. When the name is at its minimum width, the link gets shorter too.
+ * This block comes after the rules above, thus it wins over them.
+ */
+@media (max-width: 767px) {
+  .bar[data-stuck] .item:not(:nth-last-child(-n + 2)) {
+    display: none;
+  }
+
+  .bar[data-stuck] .item:nth-last-child(2) {
+    flex: 0 1 auto;
+  }
+
+  .bar[data-stuck] .current {
+    flex-shrink: 1000;
+    min-width: 5em;
+  }
+}
+
 .item:not(:nth-last-child(-n + 2))::after,
 .current::before {
   content: '/';

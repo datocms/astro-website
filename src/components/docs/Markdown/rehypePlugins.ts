@@ -4,6 +4,17 @@ import { toString } from 'hast-util-to-string';
 import { h } from 'hastscript';
 import { visit } from 'unist-util-visit';
 
+// Puts each table in a box that scrolls. A wide table stays in the column.
+export function scrollBoxAroundTables() {
+  return function transformer(tree: Root) {
+    visit(tree, 'element', (node, index, parent) => {
+      if (parent && index !== undefined && node.tagName === 'table') {
+        parent.children[index] = h('div', { 'data-table-scroll': true }, [node]);
+      }
+    });
+  };
+}
+
 export function figureAroundCodeBlocks() {
   return function transformer(tree: Root) {
     visit(tree, 'element', (node, index, parent) => {

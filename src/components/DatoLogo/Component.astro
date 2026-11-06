@@ -1,8 +1,10 @@
 ---
 import long from '~/assets/logo/dato-logo-no-space.svg?raw';
+import short from '~/assets/logo/dato-symbol.svg?raw';
 import styles from './style.module.css';
 
 interface Props {
+  /** `long` is the wordmark. `short` is the symbol alone. */
   version?: 'short' | 'long';
   /** Height in px. The width follows the aspect ratio. */
   height?: number;
@@ -13,8 +15,7 @@ interface Props {
 
 const { version = 'long', height = 20, label, class: className } = Astro.props;
 
-// Both versions use the long SVG.
-const svg = { short: long, long }[version];
+const svg = { short, long }[version];
 ---
 
 <span
