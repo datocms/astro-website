@@ -13,7 +13,7 @@ interface Props {
   class?: string;
 }
 
-const { url, label, alt = '', class: className } = Astro.props;
+const { url, label, alt = '', class: className, ...rest } = Astro.props;
 ---
 
 {
@@ -22,11 +22,11 @@ const { url, label, alt = '', class: className } = Astro.props;
   modal <dialog>: the browser gives the focus trap and closes it with Escape.
 */
 }
-<img-lightbox class:list={[styles.lightbox, className]}>
+<img-lightbox class:list={[styles.lightbox, className]} {...rest}>
   <button class={styles.trigger} type="button" aria-haspopup="dialog" aria-label={label}>
     <slot />
   </button>
-  <dialog class={styles.dialog} aria-label={label}>
+  <dialog class={styles.dialog} aria-label={label} data-datocms-nomd>
     <button class:list={[styles.close, 'labelMedium']} type="button" data-close>
       <Icon icon={faXmark} />
       Close

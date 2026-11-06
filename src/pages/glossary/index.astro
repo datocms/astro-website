@@ -47,61 +47,61 @@ const definedTermSet = {
 
 <Layout theme="orange" seo={page.seo} headerVariant="accent">
   <Fragment slot="head">
+    <meta name="datocms-md-title" content="DatoCMS Glossary" />
     <JsonLd data={definedTermSet} />
   </Fragment>
-  {/* The Markdown export of the page reads #main-content. */}
-  <div id="main-content">
-    <Hero variant="accent" headline="DatoCMS" subheadline="Glossary">
-      <p slot="intro">
-        A comprehensive guide to terms and terminology related to DatoCMS and Headless CMS that you
-        may encounter when using our product, reading our docs, or getting started with headless
-        content management
-      </p>
-    </Hero>
-    {/* The letters. Sticky; it takes the theme of the page, as the hero. */}
-    <CategoryNav
-      ariaLabel="Letters"
-      items={Object.keys(entriesByLetter).map((letter) => ({
-        label: letter,
-        href: `#group-${letter}`,
-      }))}
-    />
-    <Section contentClass={s.groups}>
-      {
-        Object.entries(entriesByLetter).map(([letter, group]) => (
-          <section class={s.group} id={`group-${letter}`} aria-labelledby={`letter-${letter}`}>
-            <h2 class:list={[s.letter, 'display']} id={`letter-${letter}`}>
-              {letter}
-            </h2>
-            <dl class={s.entries}>
-              {group.map((entry) => (
-                <div class={s.entry}>
-                  <dt class:list={[s.term, 'title']} id={slugify(entry.title)}>
-                    {entry.url ? (
-                      <a class={s.termLink} href={entry.url}>
-                        {entry.title}
-                        <span aria-hidden="true">&nbsp;→</span>
-                      </a>
-                    ) : (
-                      entry.title
-                    )}
-                    <HeadingAnchor id={slugify(entry.title)} text={entry.title} />
-                  </dt>
-                  <dd class={s.description}>
-                    <Prose>
-                      <StructuredText
-                        {...ensureValidStructuredTextProps({ data: entry.description })}
-                      />
-                    </Prose>
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-        ))
-      }
-    </Section>
-  </div>
+  <Hero variant="accent" headline="DatoCMS" subheadline="Glossary">
+    <p slot="intro">
+      A comprehensive guide to terms and terminology related to DatoCMS and Headless CMS that you
+      may encounter when using our product, reading our docs, or getting started with headless
+      content management
+    </p>
+  </Hero>
+  {/* The letters. Sticky; it takes the theme of the page, as the hero. */}
+  <CategoryNav
+    ariaLabel="Letters"
+    items={Object.keys(entriesByLetter).map((letter) => ({
+      label: letter,
+      href: `#group-${letter}`,
+    }))}
+  />
+  <Section contentClass={s.groups}>
+    {
+      Object.entries(entriesByLetter).map(([letter, group]) => (
+        <section class={s.group} id={`group-${letter}`} aria-labelledby={`letter-${letter}`}>
+          <h2 class:list={[s.letter, 'display']} id={`letter-${letter}`}>
+            {letter}
+          </h2>
+          <dl class={s.entries}>
+            {group.map((entry) => (
+              <div class={s.entry}>
+                <dt class:list={[s.term, 'title']} id={slugify(entry.title)}>
+                  {entry.url ? (
+                    <a class={s.termLink} href={entry.url}>
+                      {entry.title}
+                      <span aria-hidden="true" data-datocms-nomd>
+                        &nbsp;→
+                      </span>
+                    </a>
+                  ) : (
+                    entry.title
+                  )}
+                  <HeadingAnchor id={slugify(entry.title)} text={entry.title} />
+                </dt>
+                <dd class={s.description}>
+                  <Prose>
+                    <StructuredText
+                      {...ensureValidStructuredTextProps({ data: entry.description })}
+                    />
+                  </Prose>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ))
+    }
+  </Section>
 
   <DraftModeQueryListener query={query} />
 </Layout>

@@ -68,7 +68,7 @@ const id = (s: string) =>
     <h2 class:list={[styles.headline, 'headline']}>{headline}</h2>
 
     <div data-table-start></div>
-    <div class={styles.header} data-header>
+    <div class={styles.header} data-header data-datocms-nomd>
       <div class={styles.searchCell}>
         <label class={styles.search}>
           <span class="visuallyHidden">Filter features</span>
@@ -115,7 +115,7 @@ const id = (s: string) =>
             </span>
             <span class:list={[styles.categoryTitle, 'title']}>
               {cat.title}
-              <span class:list={[styles.count, 'tabular']} data-count>
+              <span class:list={[styles.count, 'tabular']} data-count data-datocms-nomd>
                 {cat.rows.length}
               </span>
             </span>
@@ -138,7 +138,9 @@ const id = (s: string) =>
                   data-same={row.pro === row.enterprise || undefined}
                 >
                   <div class={styles.feature}>
-                    <span class="body">{row.feature}</span>
+                    <span class="body" data-datocms-as-tag="h4">
+                      {row.feature}
+                    </span>
                     {hasInfo && (
                       <span class={styles.info}>
                         <button
@@ -147,11 +149,17 @@ const id = (s: string) =>
                           aria-describedby={tipId}
                           aria-expanded="false"
                           data-info-button
+                          data-datocms-nomd
                         >
                           <span class="visuallyHidden">About {row.feature}</span>
                           <Icon icon={faCircleInfo} width="16" height="16" />
                         </button>
-                        <span id={tipId} role="tooltip" class:list={[styles.tooltip, 'body']}>
+                        <span
+                          id={tipId}
+                          role="tooltip"
+                          class:list={[styles.tooltip, 'body']}
+                          data-datocms-as-tag="p"
+                        >
                           {row.infoText ? <InlineParagraphs data={row.infoText} /> : row.info}
                         </span>
                       </span>
@@ -172,11 +180,12 @@ const id = (s: string) =>
                           <span class="visuallyHidden">Not included</span>
                         </span>
                       ) : (
-                        value
-                          .split('\n')
-                          .map((line, j) => (
+                        value.split('\n').map((line, j) => (
+                          <>
+                            {j > 0 && ' '}
                             <span class:list={[j > 0 && styles.valueNote]}>{line}</span>
-                          ))
+                          </>
+                        ))
                       )}
                     </div>
                   ))}

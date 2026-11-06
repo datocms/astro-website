@@ -5,4 +5,4 @@
  * format suitable for LLM consumption, following the llmstxt.org specification.
  */
 
-export { convertHtmlToMarkdown, type ConversionOptions } from './converter';
+export { convertHtmlToMarkdown } from './converter';

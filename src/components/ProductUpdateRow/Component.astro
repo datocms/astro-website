@@ -35,16 +35,24 @@ const formatDate = date === 'relative' ? formatRelativeDate : formatDayOfMonth;
 <li class:list={[styles.item, large && styles.large]}>
   <a href={buildUrlForChangelogEntry(entry)} class={styles.row}>
     <span class={styles.main}>
-      <time class:list={[styles.date, 'labelMedium']} datetime={entry._firstPublishedAt}>
+      <time
+        class:list={[styles.date, 'labelMedium']}
+        datetime={entry._firstPublishedAt}
+        data-datocms-llm-date
+      >
         {formatDate(entry._firstPublishedAt)}
-      </time>
-      <span class:list={[styles.title, 'title']}>{entry.title}</span>
-    </span>
+      </time>{' '}
+      <span class:list={[styles.title, 'title']} data-datocms-link-text>{entry.title}</span>
+    </span>{' '}
     {
       entry.categories.length > 0 && (
         <span class={styles.tags}>
           {entry.categories.map((category) => (
-            <span class:list={[styles.tag, 'labelMedium']}>{category.name}</span>
+            <>
+              <span class:list={[styles.tag, 'labelMedium']} data-datocms-as-tag="code">
+                {category.name}
+              </span>{' '}
+            </>
           ))}
         </span>
       )

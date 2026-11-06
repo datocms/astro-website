@@ -99,6 +99,25 @@ Many agents can work on this repo at the same time. Each agent must use its own 
 - Give each `agent-browser` call your own session: `agent-browser --session <your-name> ...`. Without `--session`, all agents share the `default` session.
 - Close only your session: `agent-browser --session <your-name> close`. Do not use `close --all`.
 
+## Markdown versions of the pages
+
+Each page has a Markdown version at `<path>.md`, and at its own URL with `Accept: text/markdown`. `src/lib/llmtxt/converter.ts` makes it from the HTML. `llms-txt` (a different repo) reads these files each night and makes the `/llms.txt` bundles. `knowledge` reads the same bundles. Thus the markup of a page is an API. The consumers use:
+
+- **The H1**: the title of the page in `llms.txt`. A page with no H1 shows as `Untitled`. When the headline is a sentence, declare a short title: `<meta slot="head" name="datocms-md-title" content="…" />`.
+- **`aside#sidebar` with an `h6`** (docs): the links after the `h6` become `## Related content in "…"`. `llms-txt` finds the docs pages from these links. Do not change the `id` or the `h6`.
+- **`<time datetime={iso} data-datocms-llm-date>`**: becomes `[date: <iso>]`. `knowledge` reads the first marker as the date of the page.
+
+The attributes that control the conversion:
+
+- `data-datocms-md-root` marks the content of a page: on `<main>` in `Layout`, on the article in `ContentPlusToc` and on the docs home. Each page has exactly one. Without it, the conversion gives an error.
+- `data-datocms-nomd` removes an element. Use it for what has no meaning as text: faces, forms, duplicated links, calls to action.
+- `data-datocms-as-tag="dt"` converts an element as a different tag. Use it for a layout that is not good Markdown (`ComparisonTable`).
+- `data-datocms-link-text` on a part of a large link keeps only that part in the link.
+- `data-datocms-subline` moves the muted run of a headline out of the heading.
+- `data-compare-product="Name"` on a `dd` gives `**Name:** text`.
+
+To check a change, compare the `.md` of the page with `https://www.datocms.com/<path>.md`.
+
 ## Environment variables
 
 Three distinct mechanisms — pick the right one by asking: **when is the value needed, and is it secret?**

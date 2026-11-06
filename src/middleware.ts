@@ -140,11 +140,7 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
       const htmlContent = await htmlResponse.text();
 
       // Convert HTML to Markdown
-      const markdown = convertHtmlToMarkdown(stripStega(htmlContent), htmlUrl.href, {
-        includeTitle: false,
-        includeSidebar: true,
-        preserveTables: true,
-      });
+      const markdown = convertHtmlToMarkdown(stripStega(htmlContent), htmlUrl.href);
 
       // Copy cache-related headers from the HTML response
       const headers = new Headers({ 'Content-Type': 'text/markdown; charset=utf-8' });
@@ -193,11 +189,7 @@ export const contentNegotiation: MiddlewareHandler = async (context, next) => {
   }
 
   const htmlContent = await response.text();
-  const markdown = convertHtmlToMarkdown(stripStega(htmlContent), context.url.href, {
-    includeTitle: false,
-    includeSidebar: true,
-    preserveTables: true,
-  });
+  const markdown = convertHtmlToMarkdown(stripStega(htmlContent), context.url.href);
 
   const headers = new Headers({ 'Content-Type': 'text/markdown; charset=utf-8', Vary: 'Accept' });
 

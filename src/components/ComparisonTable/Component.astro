@@ -39,8 +39,8 @@ const alternatives = Astro.props.alternatives
 }
 <Section theme={theme} padding="none" flush contentClass={styles.content}>
   <comparison-table class={styles.root}>
-    <table class={styles.table} data-comparison-table>
-      <thead>
+    <table class={styles.table} data-comparison-table data-datocms-as-tag="dl">
+      <thead data-datocms-nomd>
         <tr>
           <th scope="col" class:list={[styles.head, styles.headDato, 'surfaceInverse', 'title']}>
             <div class={styles.inner}>DatoCMS</div>
@@ -84,15 +84,24 @@ const alternatives = Astro.props.alternatives
       </thead>
       {
         comparison.topics.map((topic) => (
-          <tbody>
-            <tr>
-              <th scope="colgroup" colspan="2" class:list={[styles.label, 'title']}>
+          <tbody data-datocms-as-tag="div">
+            <tr data-datocms-as-tag="div">
+              <th
+                scope="colgroup"
+                colspan="2"
+                class:list={[styles.label, 'title']}
+                data-datocms-as-tag="dt"
+              >
                 {topic.topic}
               </th>
             </tr>
             {topic.differences.map((difference) => (
-              <tr>
-                <td class:list={[styles.cell, styles.cellDato, 'body']}>
+              <tr data-datocms-as-tag="div">
+                <td
+                  class:list={[styles.cell, styles.cellDato, 'body']}
+                  data-datocms-as-tag="dd"
+                  data-compare-product="DatoCMS"
+                >
                   <div class:list={[styles.inner, styles.rich]}>
                     <StructuredText
                       {...ensureValidStructuredTextProps({
@@ -103,7 +112,11 @@ const alternatives = Astro.props.alternatives
                     />
                   </div>
                 </td>
-                <td class:list={[styles.cell, styles.cellOther, 'body']}>
+                <td
+                  class:list={[styles.cell, styles.cellOther, 'body']}
+                  data-datocms-as-tag="dd"
+                  data-compare-product={comparison.product}
+                >
                   <div class:list={[styles.inner, styles.rich]}>
                     <StructuredText
                       {...ensureValidStructuredTextProps({ data: difference.competitorTake })}

@@ -93,34 +93,32 @@ const outline = allChapters.map((nthChapter) => ({
       }}
     />
   </Fragment>
-  <div id="main-content">
-    <Hero variant="accent" label="DatoCMS Academy" headline={chapter.title}>
-      <Prose slot="intro">
-        <StructuredText {...ensureValidStructuredTextProps({ data: course.introduction })} />
-      </Prose>
-    </Hero>
-    <Breadcrumb
-      trail={[indexes.academy, { label: course.name, href: buildUrlForAcademyCourse(course) }]}
-      current={chapter.title}
+  <Hero variant="accent" label="DatoCMS Academy" headline={chapter.title}>
+    <Prose slot="intro">
+      <StructuredText {...ensureValidStructuredTextProps({ data: course.introduction })} />
+    </Prose>
+  </Hero>
+  <Breadcrumb
+    trail={[indexes.academy, { label: course.name, href: buildUrlForAcademyCourse(course) }]}
+    current={chapter.title}
+  />
+  <ArticleBody>
+    <CourseOutline slot="aside" title="Course chapters" chapters={outline} />
+    <StructuredText
+      {...ensureValidStructuredTextProps({
+        data: chapter.content,
+        blockComponents: {
+          ImageRecord: Image,
+          TableRecord: Table,
+          TabsBlockRecord: TabsBlock,
+          InternalVideoRecord: InternalVideo,
+        },
+        linkToRecordComponents: defaultLinkToRecordComponents,
+        inlineRecordComponents: defaultInlineRecordComponents,
+      })}
+      nodeOverrides={{ heading: HeadingNode }}
     />
-    <ArticleBody>
-      <CourseOutline slot="aside" title="Course chapters" chapters={outline} />
-      <StructuredText
-        {...ensureValidStructuredTextProps({
-          data: chapter.content,
-          blockComponents: {
-            ImageRecord: Image,
-            TableRecord: Table,
-            TabsBlockRecord: TabsBlock,
-            InternalVideoRecord: InternalVideo,
-          },
-          linkToRecordComponents: defaultLinkToRecordComponents,
-          inlineRecordComponents: defaultInlineRecordComponents,
-        })}
-        nodeOverrides={{ heading: HeadingNode }}
-      />
-    </ArticleBody>
-  </div>
+  </ArticleBody>
   <PrevNext
     ariaLabel="Previous and next chapter"
     prev={prevChapter && {

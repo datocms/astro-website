@@ -11,8 +11,12 @@ export function isDraftModeEnabled(requestOrAstro: Request | AstroGlobal) {
 }
 
 export function baseUrl(requestOrAstro: Request | AstroGlobal) {
+  // A dev server can use any port.
+  if (DRAFT_MODE_HOSTNAME === 'localhost') {
+    const request = 'headers' in requestOrAstro ? requestOrAstro : requestOrAstro.request;
+    return new URL(request.url).origin;
+  }
+
   const draftMode = isDraftModeEnabled(requestOrAstro);
-  return DRAFT_MODE_HOSTNAME === 'localhost'
-    ? 'http://localhost:4321'
-    : `https://${draftMode ? DRAFT_MODE_HOSTNAME : PUBLIC_HOSTNAME}`;
+  return `https://${draftMode ? DRAFT_MODE_HOSTNAME : PUBLIC_HOSTNAME}`;
 }

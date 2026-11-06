@@ -5,15 +5,8 @@
  * https://github.com/jatinkrmalik/LLMFeeder
  */
 
-import { Readability } from '@mozilla/readability';
 import { parseHTML } from 'linkedom';
 import TurndownService from 'turndown';
-
-export interface ConversionOptions {
-  includeTitle?: boolean;
-  preserveTables?: boolean;
-  includeSidebar?: boolean;
-}
 
 interface SidebarLink {
   title: string;
@@ -25,26 +18,13 @@ interface SidebarData {
   links: SidebarLink[];
 }
 
-const DEFAULT_OPTIONS: ConversionOptions = {
-  includeTitle: false,
-  preserveTables: true,
-  includeSidebar: false,
-};
-
 /**
  * Convert HTML string to Markdown
  * @param htmlString - The HTML content to convert
  * @param url - The source URL of the page (for absolute URL conversion)
- * @param options - Conversion options
  * @returns Markdown string
  */
-export function convertHtmlToMarkdown(
-  htmlString: string,
-  url: string,
-  options: ConversionOptions = {},
-): string {
-  const settings = { ...DEFAULT_OPTIONS, ...options };
-
+export function convertHtmlToMarkdown(htmlString: string, url: string): string {
   // Parse HTML with linkedom
   const { document } = parseHTML(htmlString);
 
@@ -57,9 +37,13 @@ export function convertHtmlToMarkdown(
   // Rewrite elements carrying data-datocms-as-tag to the requested tag,
   // so downstream cleanup and turndown rules treat them as that tag.
   applyAsTagOverrides(content);
+  narrowLinks(content);
 
   // Clean the content before conversion
-  cleanContent(content, settings);
+  cleanContent(content);
+
+  // Give the Markdown the title that the page declares
+  applyMarkdownTitle(document, content);
 
   // Make URLs absolute
   makeUrlsAbsolute(content, url);
@@ -71,7 +55,7 @@ export function convertHtmlToMarkdown(
   const placeholders = extractPreRenderedMarkdown(content);
 
   // Convert to Markdown using TurndownService
-  const turndownService = configureTurndownService(settings);
+  const turndownService = configureTurndownService();
 
   let markdown = turndownService.turndown(content);
 
@@ -81,17 +65,9 @@ export function convertHtmlToMarkdown(
     throw new Error('Conversion resulted in empty markdown');
   }
 
-  // Add page title as H1 if enabled
-  if (settings.includeTitle) {
-    const pageTitle = document.title.trim();
-    if (pageTitle.length > 0) {
-      markdown = `# ${pageTitle}\n\n${markdown}`;
-    }
-  }
-
   // Append sidebar links if any
   // Skip if all links are just anchors to the same URL (current page)
-  if (options.includeSidebar && sidebarData.links.length > 0) {
+  if (sidebarData.links.length > 0) {
     const currentPageUrl = new URL(url).href.replace(/\/?$/, '.md');
     const allLinksAreSameUrl = sidebarData.links.every((link: SidebarLink) => {
       // Remove hash from link URL for comparison
@@ -139,6 +115,11 @@ function extractSidebarData(document: Document, baseUrl: string): SidebarData {
       return;
     }
 
+    // The links below the navigation of the group are not related content
+    if (element.closest('[data-datocms-nomd]')) {
+      return;
+    }
+
     // Only collect links if we've passed the h6 (or if there was no h6)
     if (collectLinks && element.tagName === 'A') {
       const linkElement = element as HTMLAnchorElement;
@@ -173,71 +154,18 @@ function extractSidebarData(document: Document, baseUrl: string): SidebarData {
 }
 
 /**
- * Extract the full page content
- */
-function extractFullPageContent(document: Document): HTMLElement {
-  const body = document.body.cloneNode(true) as HTMLElement;
-
-  // Remove script and style tags
-  const scripts = body.getElementsByTagName('script');
-  const styles = body.getElementsByTagName('style');
-
-  // Remove scripts and styles (iterate backwards to avoid issues with live collections)
-  for (let i = scripts.length - 1; i >= 0; i--) {
-    const script = scripts[i];
-    if (script && script.parentNode) {
-      script.parentNode.removeChild(script);
-    }
-  }
-
-  for (let i = styles.length - 1; i >= 0; i--) {
-    const style = styles[i];
-    if (style && style.parentNode) {
-      style.parentNode.removeChild(style);
-    }
-  }
-
-  return body;
-}
-
-/**
- * Extract the main content using Readability
+ * Extract the content of the page. Each layout marks it with
+ * `data-datocms-md-root`.
  */
 function extractMainContent(document: Document): HTMLElement {
-  try {
-    // Try to find main content area with common selectors
-    const mainElement = document.querySelector('#main-content');
-    if (mainElement) {
-      const container = document.createElement('div');
-      container.innerHTML = mainElement.innerHTML;
-      return container;
-    }
-
-    // Fallback to Readability for blog posts/articles
-    const documentClone = document.cloneNode(true) as Document;
-
-    const reader = new Readability(documentClone, {
-      // Be less aggressive in removing content for technical documentation
-      charThreshold: 100, // Lower from default 500
-      nbTopCandidates: 10, // Increase from default 5
-      keepClasses: false,
-    });
-    const article = reader.parse();
-
-    if (!article || !article.content) {
-      // Fallback to full page if Readability fails
-      return extractFullPageContent(document);
-    }
-
-    const container = document.createElement('div');
-    container.innerHTML = article.content;
-
-    return container;
-  } catch (error) {
-    console.error('Readability error:', error);
-    // Fallback to full page extraction
-    return extractFullPageContent(document);
+  const root = document.querySelector('[data-datocms-md-root]');
+  if (!root) {
+    throw new Error('The page has no element with data-datocms-md-root');
   }
+
+  const container = document.createElement('div');
+  container.innerHTML = root.innerHTML;
+  return container;
 }
 
 /**
@@ -294,7 +222,6 @@ function restorePreRenderedMarkdown(
  * element of the requested tag, preserving children and other attributes.
  */
 function applyAsTagOverrides(content: HTMLElement): void {
-  const doc = content.ownerDocument;
   const elements = Array.from(content.querySelectorAll('[data-datocms-as-tag]'));
 
   for (const el of elements) {
@@ -304,27 +231,117 @@ function applyAsTagOverrides(content: HTMLElement): void {
       continue;
     }
 
-    const replacement = doc.createElement(asTag);
-    for (const attr of Array.from(el.attributes)) {
-      if (attr.name === 'data-datocms-as-tag') continue;
-      replacement.setAttribute(attr.name, attr.value);
-    }
-    while (el.firstChild) replacement.appendChild(el.firstChild);
-    el.parentNode?.replaceChild(replacement, el);
+    el.removeAttribute('data-datocms-as-tag');
+    retag(el, asTag);
+  }
+}
+
+/**
+ * A row can be one large link that holds a date, a title and tags. In Markdown
+ * the link must hold only its text. `data-datocms-link-text` marks that text.
+ */
+function narrowLinks(content: HTMLElement): void {
+  const texts = Array.from(content.querySelectorAll('[data-datocms-link-text]'));
+
+  for (const text of texts) {
+    const row = text.closest('a');
+    if (!row) continue;
+
+    const link = text.ownerDocument.createElement('a');
+    link.setAttribute('href', row.getAttribute('href') ?? '');
+    while (text.firstChild) link.appendChild(text.firstChild);
+    text.appendChild(link);
+    retag(row, 'span');
+  }
+}
+
+/**
+ * Replace an element with a new element of a different tag. The new element
+ * keeps the children and the attributes.
+ */
+function retag(el: Element, tag: string): void {
+  const replacement = el.ownerDocument.createElement(tag);
+  for (const attr of Array.from(el.attributes)) {
+    replacement.setAttribute(attr.name, attr.value);
+  }
+  while (el.firstChild) replacement.appendChild(el.firstChild);
+  el.parentNode?.replaceChild(replacement, el);
+}
+
+/**
+ * The hero headline of a page is a sentence, and llms-txt uses the H1 as the
+ * title of the page in its index. A page can declare a shorter title with
+ * `<meta name="datocms-md-title">`. The title becomes the H1, and the H1 of
+ * the page becomes an H2.
+ */
+function applyMarkdownTitle(document: Document, content: HTMLElement): void {
+  const meta = document.querySelector('meta[name="datocms-md-title"]');
+  const title = meta?.getAttribute('content')?.trim();
+  if (!title) return;
+
+  const pageHeading = content.querySelector('h1');
+  if (pageHeading) retag(pageHeading, 'h2');
+
+  const heading = content.ownerDocument.createElement('h1');
+  heading.textContent = title;
+  content.insertBefore(heading, content.firstChild);
+}
+
+/**
+ * The muted run of a headline continues the sentence on the page, but it is
+ * not part of the title. Move it to a paragraph after the heading.
+ */
+function moveSublinesOutOfHeadings(content: HTMLElement): void {
+  const sublines = Array.from(content.querySelectorAll('[data-datocms-subline]'));
+
+  for (const subline of sublines) {
+    const heading = subline.closest('h1, h2, h3, h4, h5, h6');
+    if (!heading) continue;
+
+    const paragraph = subline.ownerDocument.createElement('p');
+    while (subline.firstChild) paragraph.appendChild(subline.firstChild);
+    subline.parentNode?.removeChild(subline);
+    heading.parentNode?.insertBefore(paragraph, heading.nextSibling);
+  }
+}
+
+/**
+ * A grid of cards is a list whose items have headings. Markdown then indents
+ * each heading below a bullet, and a consumer that reads a heading from the
+ * start of a line does not find it. Change these lists to plain blocks.
+ */
+function flattenListsOfHeadings(content: HTMLElement): void {
+  const lists = Array.from(content.querySelectorAll('ul, ol'));
+
+  for (const list of lists) {
+    const items = Array.from(list.children).filter((child) => child.tagName === 'LI');
+    if (!items.some((item) => item.querySelector('h1, h2, h3, h4, h5, h6'))) continue;
+
+    for (const item of items) retag(item, 'div');
+    retag(list, 'div');
   }
 }
 
 /**
  * Clean the HTML content before conversion
  */
-function cleanContent(content: HTMLElement, _settings: ConversionOptions): void {
+function cleanContent(content: HTMLElement): void {
   // Replace videos with placeholder
   const videos = content.querySelectorAll(
-    'video, iframe[src*="youtube"], iframe[src*="vimeo"], astro-island[component-export="VideoPlayer"]',
+    'video, video-player, iframe[src*="youtube"], iframe[src*="vimeo"]',
   );
   videos.forEach((video) => {
     const placeholder = content.ownerDocument.createTextNode('(Video content)');
     video.parentNode?.replaceChild(placeholder, video);
+  });
+
+  // A link that holds only an image opens the large image. Keep the image only.
+  const links = content.querySelectorAll('a');
+  links.forEach((link) => {
+    const image = link.querySelector('img, picture');
+    if (image && !link.textContent?.trim()) {
+      link.parentNode?.replaceChild(image, link);
+    }
   });
 
   // Replace images with placeholder
@@ -342,9 +359,6 @@ function cleanContent(content: HTMLElement, _settings: ConversionOptions): void 
     'iframe',
     'nav',
     'footer',
-    '.comments',
-    '.ads',
-    '.sidebar',
     'svg',
     '[data-datocms-noindex]',
     '[data-datocms-nomd]',
@@ -354,10 +368,6 @@ function cleanContent(content: HTMLElement, _settings: ConversionOptions): void 
   elementsToRemove.forEach((selector) => {
     const elements = content.querySelectorAll(selector);
     elements.forEach((element) => {
-      // Don't remove aside#sidebar even if it matches the selector
-      if (element.tagName === 'ASIDE' && element.id === 'sidebar') {
-        return;
-      }
       element.parentNode?.removeChild(element);
     });
   });
@@ -374,8 +384,8 @@ function cleanContent(content: HTMLElement, _settings: ConversionOptions): void 
     }
   });
 
-  // Remove line number gutters from code blocks (expressive-code, prism, etc.)
-  const lineNumberGutters = content.querySelectorAll('.gutter, .line-numbers-rows');
+  // Remove the line number gutters of expressive-code
+  const lineNumberGutters = content.querySelectorAll('.gutter');
   lineNumberGutters.forEach((element) => {
     element.parentNode?.removeChild(element);
   });
@@ -385,6 +395,9 @@ function cleanContent(content: HTMLElement, _settings: ConversionOptions): void 
   emptyElements.forEach((element) => {
     element.parentNode?.removeChild(element);
   });
+
+  moveSublinesOutOfHeadings(content);
+  flattenListsOfHeadings(content);
 
   normalizeWhitespace(content);
 }
@@ -523,9 +536,9 @@ function makeUrlsAbsolute(content: HTMLElement, baseUrl: string): void {
 }
 
 /**
- * Configure the TurndownService based on user settings
+ * Configure the TurndownService
  */
-function configureTurndownService(settings: ConversionOptions): TurndownService {
+function configureTurndownService(): TurndownService {
   const turndownService = new TurndownService({
     headingStyle: 'atx', // Use # style headings
     hr: '---', // Use --- for horizontal rules
@@ -545,15 +558,7 @@ function configureTurndownService(settings: ConversionOptions): TurndownService 
       const preNode = node as HTMLElement;
       const codeNode = preNode.firstChild as HTMLElement;
 
-      // Check for data-language attribute on <pre> tag
-      let languageIdentifier = preNode.getAttribute('data-language') || '';
-
-      // Fallback to class-based language detection
-      if (!languageIdentifier) {
-        const classAttr = codeNode?.getAttribute('class') || '';
-        const languageMatch = classAttr.match(/language-(\S+)/);
-        languageIdentifier = languageMatch?.[1] || '';
-      }
+      const languageIdentifier = preNode.getAttribute('data-language') || '';
 
       return (
         '\n\n```' +
@@ -565,10 +570,7 @@ function configureTurndownService(settings: ConversionOptions): TurndownService 
     },
   });
 
-  // Add table support if enabled
-  if (settings.preserveTables) {
-    addTableSupport(turndownService);
-  }
+  addTableSupport(turndownService);
 
   // Add callout support
   turndownService.addRule('callouts', {
