@@ -1,5 +1,5 @@
 ---
-import { Heading } from '~/components/docs/Heading';
+import { HeadingAnchor } from '~/components/HeadingAnchor';
 import s from './style.module.css';
 import { TargetToggler } from '~/components/docs/TargetToggler';
 import { Markdown } from '~/components/docs/Markdown';
@@ -21,12 +21,16 @@ const { id, title, description, tabs, startVisible } = Astro.props;
 <prose-island>
   <endpoint-example slug={id}>
     <div class={s.reqRes}>
-      <TargetToggler targetId={`example-${id}`} startVisible={startVisible}>
-        <Heading as="button" class={`${s.title} bodyMedium`} anchor={id} data-datocms-as-tag="h6">
-          <span class:list={[s.pill, 'monoCaps']}>Example</span>{' '}
-          <span class={s.titleTitle}>{title}</span>
-        </Heading>
-      </TargetToggler>
+      <div class={s.titleRow} id={id}>
+        <TargetToggler targetId={`example-${id}`} startVisible={startVisible}>
+          <button type="button" class={`${s.title} bodyMedium`} data-datocms-as-tag="h6">
+            <span class:list={[s.pill, 'monoCaps']}>Example</span>{' '}
+            <span class={s.titleTitle}>{title}</span>
+          </button>
+        </TargetToggler>
+        {/* Outside the button: a link in a button is not valid HTML. */}
+        <HeadingAnchor id={id} text={title} />
+      </div>
 
       <div id={`example-${id}`} class={s.details}>
         {

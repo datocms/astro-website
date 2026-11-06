@@ -3,7 +3,8 @@ import rehypeExpressiveCode from 'rehype-expressive-code';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize from 'rehype-sanitize';
 import expressiveCodeConfig from '~~/ec.config.mjs';
-import { autolinkHeadings, callouts, figureAroundCodeBlocks } from './rehypePlugins';
+import { autolinkHeadings } from '~/components/HeadingAnchor/autolinkHeadings';
+import { callouts, figureAroundCodeBlocks } from './rehypePlugins';
 
 const config: AstroMarkdownOptions = {
   syntaxHighlight: false,

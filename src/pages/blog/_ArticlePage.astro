@@ -9,6 +9,7 @@ import { MarkdownActions } from '~/components/MarkdownActions';
 import { PostHeader } from '~/components/PostHeader';
 import { RelatedPosts } from '~/components/RelatedPosts';
 import { StructuredText } from '~/components/StructuredText';
+import AnchoredHeadingNode from '~/components/StructuredText/AnchoredHeadingNode.astro';
 import { defaultBlockComponents } from '~/components/StructuredText/blocks';
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
@@ -157,7 +158,7 @@ const markdownUrl = new URL(
       <MarkdownActions slot="actions" markdownUrl={markdownUrl.href} />
     </Breadcrumb>
     <ArticleBody content={article.content} tocTitle={tocTitle}>
-      <StructuredText {...structuredText} />
+      <StructuredText {...structuredText} nodeOverrides={{ heading: AnchoredHeadingNode }} />
     </ArticleBody>
   </div>
   {related.length > 0 && <RelatedPosts {...relatedCopy} posts={related} />}

@@ -19,6 +19,7 @@ const sidebarItems = await buildCmaSidebarItems(Astro);
 
 const response = await fetchErrorCodes(Astro);
 const sortedErrorCodes = Object.keys(response).sort();
+import s from './_errors.module.css';
 ---
 
 <PageLayout
@@ -40,7 +41,7 @@ const sortedErrorCodes = Object.keys(response).sort();
     {
       sortedErrorCodes.map((errorCode) => (
         <>
-          <Heading anchor={errorCode} as="h6">
+          <Heading anchor={errorCode} as="h6" class={s.code}>
             <code>{errorCode}</code>
           </Heading>
           <Markdown of={response[errorCode]!} />

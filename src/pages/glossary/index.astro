@@ -4,6 +4,7 @@ import { groupBy } from 'lodash-es';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { CategoryNav } from '~/components/CategoryNav';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
+import { HeadingAnchor } from '~/components/HeadingAnchor';
 import { Hero } from '~/components/Hero';
 import { JsonLd } from '~/components/JsonLd';
 import { Prose } from '~/components/Prose';
@@ -84,11 +85,7 @@ const definedTermSet = {
                     ) : (
                       entry.title
                     )}
-                    <a
-                      class={s.permalink}
-                      href={`#${slugify(entry.title)}`}
-                      aria-label={`Link to ${entry.title}`}
-                    />
+                    <HeadingAnchor id={slugify(entry.title)} text={entry.title} />
                   </dt>
                   <dd class={s.description}>
                     <Prose>

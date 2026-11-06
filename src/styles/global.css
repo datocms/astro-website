@@ -191,6 +191,99 @@
     text-box: trim-both cap alphabetic;
   }
 
+  /*
+   * The target of a link stops below the bands that stick to the top of
+   * the screen, with some air. A layout with other bands (the docs) sets
+   * --anchor-offset. A page with a sticky nav sets the scroll margin.
+   */
+  :is(h1, h2, h3, h4, h5, h6)[id],
+  [id]:has(> heading-anchor) {
+    scroll-margin-top: var(--anchor-offset, calc(var(--sticky-offset) + var(--space-lg)));
+  }
+
+  /* A ring shows where the link stopped, and then goes. */
+  :target:has(> heading-anchor) {
+    position: relative;
+  }
+
+  :target:has(> heading-anchor)::before {
+    content: '';
+    position: absolute;
+    inset: calc(var(--space-xs) * -1);
+    box-shadow: 0 0 0 var(--space-5xs) var(--surface-accent);
+    border-radius: var(--radius-md);
+    animation: anchorRing 2s 0.5s ease-in-out forwards;
+    pointer-events: none;
+  }
+
+  @keyframes anchorRing {
+    0%,
+    20% {
+      box-shadow: 0 0 0 var(--space-5xs) var(--surface-accent);
+    }
+
+    60%,
+    100% {
+      box-shadow: 0 0 0 var(--space-5xs) transparent;
+    }
+  }
+
+  /*
+   * HeadingAnchor. The icon must not go alone on a new line. Balance gives
+   * the last line more words, thus the icon has a word next to it. Each h1
+   * to h6 has balance: this rule adds the other elements (a dt). A heading
+   * that is one long token has no words to balance: give it a row, as the
+   * error codes of the docs.
+   *
+   * The link is 24px or more, for a finger, and its negative margins keep
+   * the line height of the heading. The icon is a mask on ::before, because
+   * a mask on the link cuts the focus ring. The icon shows when the pointer
+   * is on the heading, on focus and on a screen with no hover.
+   */
+  :has(> heading-anchor) {
+    text-wrap: balance;
+  }
+
+  heading-anchor a {
+    display: inline-grid;
+    place-items: center;
+    width: max(1.2em, 24px);
+    height: max(1.2em, 24px);
+    margin-block: calc(max(1.2em, 24px) / -2);
+    vertical-align: middle;
+    border-radius: var(--radius-sm);
+  }
+
+  heading-anchor a::before {
+    content: '';
+    width: 0.7em;
+    height: 0.7em;
+    background: var(--text-muted);
+    mask: var(--anchor-icon-link) center / contain no-repeat;
+    /* stylelint-disable-next-line datocms/text-roles -- A link icon drawn with a mask: a shape, not text. */
+    opacity: 0;
+    transition: opacity 100ms ease-out;
+  }
+
+  :hover > heading-anchor a::before,
+  heading-anchor a:focus-visible::before,
+  heading-anchor[data-copied] a::before {
+    /* stylelint-disable-next-line datocms/text-roles -- A link icon drawn with a mask: a shape, not text. */
+    opacity: 1;
+  }
+
+  heading-anchor[data-copied] a::before {
+    background: var(--text-primary);
+    mask-image: var(--anchor-icon-done);
+  }
+
+  @media (hover: none) {
+    heading-anchor a::before {
+      /* stylelint-disable-next-line datocms/text-roles -- A link icon drawn with a mask: a shape, not text. */
+      opacity: 1;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

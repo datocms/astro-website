@@ -1,0 +1,17 @@
+---
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import type { Heading } from 'datocms-structured-text-utils';
+import { HeadingAnchor } from '~/components/HeadingAnchor';
+import { headingId } from './headingId';
+
+interface Props {
+  node: Heading;
+}
+
+const { node } = Astro.props;
+const Tag = `h${node.level}` as const;
+const id = headingId(node)!;
+---
+
+{/* A heading with a link to it. Give it as the `heading` of `nodeOverrides`. */}
+<Tag id={id}><slot /><HeadingAnchor id={id} text={toPlainText(node) ?? ''} /></Tag>

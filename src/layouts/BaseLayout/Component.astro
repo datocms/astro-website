@@ -1,4 +1,5 @@
 ---
+import { faCheck, faLink } from '@fortawesome/pro-regular-svg-icons';
 import { ContentLink, Seo, stripStega, type TitleMetaLinkTag } from '@datocms/astro';
 import { fetchFavicon } from './fetchFavicon';
 import { baseUrl, isDraftModeEnabled } from '~/lib/draftMode';
@@ -12,6 +13,7 @@ import {
 import { organizationNode, webPageNode, websiteNode } from '~/lib/jsonLd';
 import { picturesFor } from '~/lib/pictures';
 import { JsonLd } from '~/components/JsonLd';
+import { iconDataUri } from '~/lib/iconDataUri';
 import { NavigationProgress } from '~/components/NavigationProgress';
 
 /*
@@ -34,6 +36,7 @@ const { seo, theme = 'default', density } = Astro.props;
 // The order of the cascade layers (see src/styles/global.css). The statement
 // is the first child of <head>, before all other CSS.
 const cssLayersStatement = '@layer reset, tokens, base, vendor, blocks, sections, pages;';
+const anchorIcons = `:root{--anchor-icon-link:${iconDataUri(faLink)};--anchor-icon-done:${iconDataUri(faCheck)}}`;
 
 const result = await fetchFavicon(Astro);
 const draftModeEnabled = isDraftModeEnabled(Astro);
@@ -99,6 +102,8 @@ const pageMeta = extractFromSeoTags(stripStega(finalSeo));
         ],
       }}
     />
+    {/* The icons of HeadingAnchor: CSS masks, because that markup has no icon. */}
+    <style is:inline set:html={anchorIcons}></style>
     <slot name="head" />
   </head>
   <body data-theme={theme} data-density={density}>
@@ -107,6 +112,10 @@ const pageMeta = extractFromSeoTags(stripStega(finalSeo));
     {draftModeEnabled && <ContentLink />}
   </body>
 </html>
+
+<script>
+  import '~/components/HeadingAnchor/element';
+</script>
 
 <script>
   import { getCookie, setCookie } from '~/lib/cookies';

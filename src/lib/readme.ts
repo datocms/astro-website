@@ -54,10 +54,9 @@ export async function prepareReadme(markdown: string | null | undefined): Promis
     heading.tagName = `h${Math.min(6, level(heading) + shift)}`;
   }
 
-  // autolinkHeadings gives each heading an anchor: an empty <a> with the id.
+  // autolinkHeadings gives each heading its id.
   const toc = headings.flatMap((heading) => {
-    const anchor = selectAll('a[data-anchor]', heading)[0];
-    const id = anchor?.properties['id'];
+    const id = heading.properties['id'];
     const text = toString(heading).trim();
     const headingLevel = level(heading);
     return typeof id === 'string' && text && headingLevel <= 3

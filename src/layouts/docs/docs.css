@@ -1,69 +1,15 @@
 /*
  * The rules of the docs that cannot sit in a CSS module: a rule for an
- * element that the CMS or a plugin renders (an anchor, a video, a code
- * block).
+ * element that the CMS or a plugin renders (a video, a code block).
  */
 
 @layer base {
-  /* The target of an anchor: a ring, and a link icon that shows on hover. */
-  :has(> [id][data-anchor]):has(> [data-permalink]) {
-    position: relative;
-  }
-
-  :has(> [id][data-anchor]):has(> [data-permalink]) > [data-anchor] {
-    position: absolute;
-    top: calc(var(--header-height) * -1.5);
-  }
-
-  :has(> [id][data-anchor]):has(> [data-permalink]) > [data-permalink] {
-    display: inline-block;
-    width: 0.7em;
-    height: 0.7em;
-    margin-left: 0.3em;
-    background: var(--text-muted);
-    mask: var(--docs-link-icon) center / contain no-repeat;
-    opacity: 0;
-    transition: opacity 100ms ease-in-out;
-  }
-
-  :has(> [id][data-anchor]):has(> [data-permalink]):hover > [data-permalink] {
-    /* stylelint-disable-next-line datocms/text-roles -- A link icon drawn with a mask: a shape, not text. */
-    opacity: 0.5;
-  }
-
-  :has(> [id][data-anchor]):has(> [data-permalink]) > [data-permalink]:hover {
-    opacity: 1;
-  }
-
-  :has(> [id][data-anchor]):has(> [data-permalink]):has(> [id][data-anchor]:target)::before {
-    content: '';
-    position: absolute;
-    inset: calc(var(--space-md) * -1);
-    box-shadow: 0 0 0 var(--space-5xs) var(--surface-accent);
-    border-radius: var(--radius-md);
-    animation: highlightElement 2s 0.5s ease-in-out forwards;
-    pointer-events: none;
-    z-index: 10;
-  }
-
   mux-player {
     width: 100%;
   }
 
   [data-datocms-contains-stega] {
     letter-spacing: 0;
-  }
-
-  @keyframes highlightElement {
-    0%,
-    20% {
-      box-shadow: 0 0 0 var(--space-5xs) var(--surface-accent);
-    }
-
-    60%,
-    100% {
-      box-shadow: 0 0 0 var(--space-5xs) transparent;
-    }
   }
 }
 

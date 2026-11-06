@@ -4,7 +4,8 @@ import remarkDirective from 'remark-directive';
 import striptags from 'striptags';
 import expressiveCodeConfig from '~~/ec.config.mjs';
 import { remarkTabs } from './remarkPlugins';
-import { autolinkHeadings, callouts, figureAroundCodeBlocks } from './rehypePlugins';
+import { autolinkHeadings } from '~/components/HeadingAnchor/autolinkHeadings';
+import { callouts, figureAroundCodeBlocks } from './rehypePlugins';
 
 export const config: AstroMarkdownOptions = {
   syntaxHighlight: false,

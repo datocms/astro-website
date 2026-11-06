@@ -1,5 +1,8 @@
 ---
 import type { HTMLTag, Polymorphic } from 'astro/types';
+import { fromHtml } from 'hast-util-from-html';
+import { toString } from 'hast-util-to-string';
+import { HeadingAnchor } from '~/components/HeadingAnchor';
 
 type Props<T extends HTMLTag = 'h1'> = Polymorphic<{
   as: T;
@@ -7,10 +10,10 @@ type Props<T extends HTMLTag = 'h1'> = Polymorphic<{
 }>;
 
 const { as: Tag = 'h1' as any, anchor, children, ...props } = Astro.props;
+const html = await Astro.slots.render('default');
 ---
 
-<Tag {...props} class={props.class}>
-  <slot />
-  {anchor && <a data-anchor={anchor} id={anchor} />}
-  {anchor && <a data-permalink href={`#${anchor}`} />}
+<Tag {...props} id={anchor} class={props.class}>
+  <Fragment set:html={html} />
+  {anchor && <HeadingAnchor id={anchor} text={toString(fromHtml(html, { fragment: true }))} />}
 </Tag>

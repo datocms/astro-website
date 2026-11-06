@@ -1,7 +1,8 @@
 ---
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import type { Heading } from 'datocms-structured-text-utils';
+import { HeadingAnchor } from '~/components/HeadingAnchor';
 import { headingAnchor } from '~/lib/academyAnchors';
-import s from './_style.module.css';
 
 interface Props {
   node: Heading;
@@ -13,7 +14,4 @@ const anchor = headingAnchor(node);
 ---
 
 {/* The anchor is unique in the page: two equal headings get a number. */}
-<Tag id={anchor}>
-  <slot />
-  <a class={s.permalink} href={`#${anchor}`} aria-label="Link to this section"></a>
-</Tag>
+<Tag id={anchor}><slot /><HeadingAnchor id={anchor} text={toPlainText(node) ?? ''} /></Tag>
