@@ -217,7 +217,6 @@ const cardId = (i: number) => `site-header-card-${i}`;
                     </span>
                   </summary>
                   <div class={styles.mobileGroupBody}>
-                    {group.promo && <MenuPromo {...group.promo} class={styles.mobilePromo} />}
                     {group.columns
                       .flatMap((column) => column.sections)
                       .map((section) => (
@@ -424,11 +423,6 @@ const cardId = (i: number) => `site-header-card-${i}`;
         this.on(this.mobileTrigger, 'click', () => {
           this.setMobile(this.mobileTrigger.getAttribute('aria-expanded') !== 'true');
         });
-        for (const group of this.$$<HTMLDetailsElement>('details')) {
-          this.on(group, 'toggle', () => {
-            this.tellPromos(group, group.open ? 'menu:open' : 'menu:close');
-          });
-        }
 
         // These listeners are on <html> and on the media query.
         // disconnectedCallback() removes them.

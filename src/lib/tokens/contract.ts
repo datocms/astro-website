@@ -55,7 +55,8 @@ export const INVERSE_SURFACES = ['--surface-inverse-deep'] as const;
  * The surfaces that have one job. Only the listed files may use them.
  * `--surface-inverse-deep` is the footer: the page closer above it stays on
  * `--surface-inverse`, thus the end of the closer is visible. The contact
- * card also uses it: the card is darker than an inverse band below it.
+ * card also uses it: the card is darker than an inverse band below it. The
+ * field of the Product menu also uses it: the field is darker than the menu.
  */
 export const SURFACE_FILES: Record<string, string[]> = {
   '--surface-inverse-deep': [
@@ -63,6 +64,7 @@ export const SURFACE_FILES: Record<string, string[]> = {
     'src/components/FooterLegal/style.module.css',
     'src/components/PageCloser/style.module.css',
     'src/components/ContactCard/style.module.css',
+    'src/components/MenuPromo/style.module.css',
   ],
 };
 
