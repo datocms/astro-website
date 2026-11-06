@@ -5,12 +5,6 @@ import { executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { graphql } from '~/lib/datocms/graphql';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
-/**
- * Former links go to pages up to page 30 (10 entries on each page). A page
- * in this range that does not exist now redirects to the last page.
- */
-export const legacyLastPage = 30;
-
 /** One page of the index: the newest entries first. */
 export const pageQuery = graphql(
   /* GraphQL */ `
