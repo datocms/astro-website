@@ -61,8 +61,10 @@ const entries = Astro.props.entries.map((data) => {
       entries.map((entry) => (
         <li class={styles.entry} data-counted>
           <div class={styles.text}>
-            {entry.badge && <span class:list={[styles.badge, 'caption']}>{entry.badge}</span>}
-            <h3 class:list={[styles.entryTitle, 'title']}>{entry.emoji && <PixelEmoji emoji={entry.emoji} class={styles.emoji} />}{entry.title}</h3>
+            <div class={styles.titleRow}>
+              <h3 class:list={[styles.entryTitle, 'title']}>{entry.emoji && <PixelEmoji emoji={entry.emoji} class={styles.emoji} />}{entry.title}</h3>
+              {entry.badge && <span class:list={[styles.badge, 'caption']}>{entry.badge}</span>}
+            </div>
             <p class:list={[styles.entryDescription, 'body']}><InlineParagraphs data={entry.description} /></p>
           </div>
           {(entry.buttons.length > 0 || entry.screenshot) && (
@@ -74,7 +76,7 @@ const entries = Astro.props.entries.map((data) => {
                   <ul class={styles.links}>
                     {entry.buttons.map((b) => (
                       <li>
-                        <a class:list={[styles.link, 'title']} href={b.href}>
+                        <a class:list={[styles.link, 'bodyMedium']} href={b.href}>
                           <span aria-hidden="true">→</span>
                           <span class={styles.linkLabel}>{b.label}</span>
                         </a>
@@ -92,7 +94,7 @@ const entries = Astro.props.entries.map((data) => {
                   <Button as="span" variant="soft" arrow={false} class={styles.screenshotButton}>
                     Screenshot
                   </Button>
-                  <span class:list={[styles.screenshotLink, styles.linkLabel, 'title']}>
+                  <span class:list={[styles.screenshotLink, styles.linkLabel, 'bodyMedium']}>
                     Screenshot
                   </span>
                 </Lightbox>

@@ -1,9 +1,11 @@
 /*
  * Header, then a grid of index entries in 2 columns from 768.
  * Header → entries 80px at all widths.
- * 393+: one entry per row, 40px apart. 768+: row gap 80px, column gap
- * 40px. 1152+: column gap 60px. Here the rows are nearer: 20px on
- * phones, 40px from 768.
+ * Phones: one entry per row, 40px apart. 768+: row gap 60px, column gap
+ * 40px. 1152+: row gap 40px, column gap 60px.
+ * Under 1152 the text and the links of an entry are 12px apart, thus the
+ * entry reads as one group. From 1152 they are 20px apart: the buttons
+ * are hidden until a hover, and they need the air.
  */
 .category {
   /* The sticky category nav must not cover the header after a jump. */
@@ -29,13 +31,13 @@
 
 .entries {
   display: grid;
-  gap: var(--space-md);
+  gap: var(--space-xl);
 }
 
 .entry {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-xs);
 }
 
 .text {
@@ -45,11 +47,10 @@
   max-width: 550px;
 }
 
+/* 24px on phones, 30px from 768: not larger than the title on a desktop. */
 @media (max-width: 1151px) {
   .entryTitle {
-    font-size: var(--type-3xl);
-    line-height: 1;
-    letter-spacing: -0.04em;
+    font-size: min(var(--type-2xl), 1.875rem);
   }
 }
 
@@ -61,7 +62,8 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2xs) var(--space-sm);
+  align-items: baseline;
+  gap: var(--space-3xs) var(--space-sm);
 }
 
 .buttons {
@@ -70,13 +72,13 @@
 }
 
 /*
- * An arrow and an underlined label in H2, 16px apart,
- * 10px between the lines when they wrap.
+ * An arrow and an underlined label in body size, 16px apart,
+ * 8px between the lines when they wrap.
  */
 .links {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2xs) var(--space-sm);
+  gap: var(--space-3xs) var(--space-sm);
 }
 
 .links li {
@@ -104,6 +106,10 @@
 }
 
 @media (min-width: 1152px) {
+  .entry {
+    gap: var(--space-md);
+  }
+
   .actions {
     gap: var(--space-2xs);
   }
@@ -143,13 +149,13 @@
 @media (min-width: 768px) {
   .entries {
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-xl);
+    gap: var(--space-2xl) var(--space-xl);
   }
 }
 
 @media (min-width: 1152px) {
   .entries {
-    column-gap: var(--space-2xl);
+    gap: var(--space-xl) var(--space-2xl);
   }
 }
 
@@ -174,13 +180,23 @@
   display: flex;
 }
 
-/* The optional extras of an entry: the emoji before the title and a badge above it. */
+/*
+ * The optional extras of an entry: the emoji before the title and a badge
+ * after it. The title stays on the first line of the entry, thus the titles
+ * of a row align. A badge that does not fit goes under the title.
+ */
 .emoji {
   margin-inline-end: 0.3em;
 }
 
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4xs) var(--space-2xs);
+}
+
 .badge {
-  align-self: flex-start;
   padding: var(--space-4xs) var(--space-2xs);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-full);
