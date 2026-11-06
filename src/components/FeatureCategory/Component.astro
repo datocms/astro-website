@@ -3,6 +3,7 @@ import { stripStega } from '@datocms/astro';
 import { Button } from '~/components/Button';
 import { ButtonGroup } from '~/components/ButtonGroup';
 import { Lightbox } from '~/components/Lightbox';
+import { PixelEmoji } from '~/components/PixelEmoji';
 import { Section } from '~/components/Section';
 import { InlineParagraphs } from '~/components/StructuredText';
 import type { FeatureCategoryData, OpenSlotData } from '~/data/features';
@@ -61,7 +62,7 @@ const entries = Astro.props.entries.map((data) => {
         <li class={styles.entry} data-counted>
           <div class={styles.text}>
             {entry.badge && <span class:list={[styles.badge, 'caption']}>{entry.badge}</span>}
-            <h3 class:list={[styles.entryTitle, 'title']}>{entry.emoji && <span class={styles.emoji} aria-hidden="true">{entry.emoji}</span>}{entry.title}</h3>
+            <h3 class:list={[styles.entryTitle, 'title']}>{entry.emoji && <PixelEmoji emoji={entry.emoji} class={styles.emoji} />}{entry.title}</h3>
             <p class:list={[styles.entryDescription, 'body']}><InlineParagraphs data={entry.description} /></p>
           </div>
           {(entry.buttons.length > 0 || entry.screenshot) && (

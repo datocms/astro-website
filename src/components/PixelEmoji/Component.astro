@@ -1,0 +1,34 @@
+---
+import { stripStega } from '@datocms/astro';
+import drawings from './drawings.json';
+import styles from './style.module.css';
+
+// A pixel drawing in place of an emoji of the CMS. An emoji without a drawing
+// stays text. The drawings decorate: the words around them say everything.
+
+interface Props {
+  emoji: string;
+  class?: string;
+}
+
+const { emoji, class: className } = Astro.props;
+
+// The key has the code points of the emoji, without the variation selector.
+const key = [...stripStega(emoji)]
+  .map((char) => char.codePointAt(0)?.toString(16))
+  .filter((codePoint) => codePoint !== 'fe0f')
+  .join('-');
+const drawing = (drawings as Record<string, string>)[key];
+---
+
+{
+  drawing ? (
+    <span class:list={[styles.emoji, className]} aria-hidden="true">
+      <svg viewBox="0 0 10 10" shape-rendering="crispEdges" set:html={drawing} />
+    </span>
+  ) : (
+    <span class={className} aria-hidden="true">
+      {emoji}
+    </span>
+  )
+}
