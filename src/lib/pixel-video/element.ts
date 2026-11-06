@@ -6,6 +6,10 @@
 // - It loads the file when it is near the viewport, and plays only when it
 //   is on screen and the tab is visible.
 // - Under reduced motion it shows the first frame.
+// - The attribute `hold="38-47"` plays the video once up to frame 47. Then
+//   the video stays in these frames: it goes back and forth between them
+//   at a quarter of the speed, and it does not play the frames after them.
+//   Under reduced motion it shows the last frame of the range.
 // - The .pxv file gives its settings: a palette and a focus (see
 //   settings.ts). The `palette` attribute replaces the palette of the file.
 // - A lens under the pointer makes the squares smaller. The boolean
@@ -150,11 +154,7 @@ export class PixelVideoElement extends Base {
     this.#applySettings();
     try {
       this.#renderer = createRenderer(this.#canvas, () => this.#draw, this.#requestFrame);
-      this.#renderer.setFrame(
-        this.#cellsAt(0),
-        this.#frames?.width ?? 0,
-        this.#frames?.height ?? 0,
-      );
+      this.#renderer.setFrame(this.#cellsAt(), this.#frames?.width ?? 0, this.#frames?.height ?? 0);
     } catch (error) {
       console.warn(`[pixel-video] ${error instanceof Error ? error.message : error}`);
     }
@@ -266,17 +266,34 @@ export class PixelVideoElement extends Base {
     // of the page: `pixel-video[data-edges~='right']`.
     if (frames?.edges?.length) this.dataset.edges = frames.edges.join(' ');
     else delete this.dataset.edges;
-    const index = frames ? Math.floor(this.#clock * frames.fps) : 0;
-    this.#renderer?.setFrame(this.#cellsAt(index), frames?.width ?? 0, frames?.height ?? 0);
+    this.#renderer?.setFrame(this.#cellsAt(), frames?.width ?? 0, frames?.height ?? 0);
     if (frames) this.dispatchEvent(new Event('load'));
     this.#requestFrame();
   }
 
-  #cellsAt(index: number): Uint8Array | null {
+  /** The first and the last frame of the `hold` attribute. */
+  get #hold(): [number, number] | null {
+    const match = this.getAttribute('hold')?.match(/^(\d+)-(\d+)$/);
+    return match ? [Number(match[1]), Number(match[2])] : null;
+  }
+
+  /** The frame to show at the current time of the clock. */
+  #frameIndex(fps: number): number {
+    const hold = this.#hold;
+    if (prefersReducedMotion()) return hold ? hold[1] : 0;
+    const played = this.#clock * fps;
+    if (!hold || played < hold[1]) return Math.floor(played);
+    const [first, last] = hold;
+    const span = last - first;
+    const position = ((played - last) / 4) % (2 * span);
+    return Math.floor(last - (position < span ? position : 2 * span - position));
+  }
+
+  #cellsAt(): Uint8Array | null {
     const f = this.#frames;
     if (!f) return null;
     const size = f.width * f.height;
-    const i = index % f.count;
+    const i = this.#frameIndex(f.fps) % f.count;
     return f.cells.subarray(i * size, (i + 1) * size);
   }
 
@@ -301,14 +318,8 @@ export class PixelVideoElement extends Base {
     if (playing && this.#last) this.#clock += Math.min((now - this.#last) / 1000, 0.1);
     this.#last = playing ? now : 0;
     const f = this.#frames;
-    // When it does not play, it keeps the current frame. Under reduced
-    // motion it shows the first frame.
-    if (f)
-      renderer.setFrame(
-        this.#cellsAt(prefersReducedMotion() ? 0 : Math.floor(this.#clock * f.fps)),
-        f.width,
-        f.height,
-      );
+    // When it does not play, it keeps the current frame.
+    if (f) renderer.setFrame(this.#cellsAt(), f.width, f.height);
     renderer.render(prefersReducedMotion() ? 0 : now / 1000);
     if (playing || renderer.hovering) this.#requestFrame();
   };

@@ -130,6 +130,18 @@ export const onAccent: Style = {
   highStroke: ACCENT,
 };
 
+// The same as On accent in the light scheme. In the dark scheme the accent
+// surface is deep, thus a deep square does not show on it: the squares of
+// the subject take the bright accent (--surface-pixel-silhouette). Use it
+// for a subject on an element with the class surfaceAccent. The strokes
+// have the colour of the ground, thus each square stands apart.
+export const onAccentField: Style = {
+  ...onAccent,
+  bgFill: 'var(--surface-pixel-silhouette)',
+  bgStroke: ACCENT,
+  midFill: `color-mix(in oklab, var(--surface-pixel-silhouette) 50%, ${ACCENT})`,
+};
+
 // The silhouette of a dark subject on a light background: the background
 // of the source is the midtones, the subject is the background layer. The
 // midtones become the accent surface with no grid, thus only the subject and
@@ -271,6 +283,7 @@ export interface Palette {
 export const palettes: readonly Palette[] = [
   { name: 'tonal', label: 'Tonal', surface: 'inverse', colors: tonal },
   { name: 'onAccent', label: 'On accent', surface: 'accent', colors: onAccent },
+  { name: 'onAccentField', label: 'On accent field', surface: 'accent', colors: onAccentField },
   {
     name: 'silhouette',
     label: 'Silhouette',

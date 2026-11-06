@@ -9,6 +9,7 @@ import {
 import { Button } from '~/components/Button';
 import { DatoLogo } from '~/components/DatoLogo';
 import { Icon } from '~/components/Icon';
+import { MenuPromo } from '~/components/MenuPromo';
 import { NavLink } from '~/components/NavLink';
 import { SchemeToggle } from '~/components/SchemeToggle';
 import { type NavGroup, groupPaths } from '~/data/navigation';
@@ -133,14 +134,21 @@ const cardId = (i: number) => `site-header-card-${i}`;
                                 class:list={[styles.allLink, 'labelMedium']}
                                 data-card-row
                               >
-                                <span aria-hidden="true">→</span>
                                 <span class={styles.allLabel}>{section.allLink.label}</span>
+                                <span aria-hidden="true">→</span>
                               </a>
                             )}
                           </div>
                         ))}
                       </div>
                     ))}
+                    {group.promo && (
+                      <MenuPromo
+                        {...group.promo}
+                        class={styles.cardPromo}
+                        rowAttrs={{ 'data-card-row': '' }}
+                      />
+                    )}
                   </div>
                 ),
             )
@@ -209,6 +217,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
                     </span>
                   </summary>
                   <div class={styles.mobileGroupBody}>
+                    {group.promo && <MenuPromo {...group.promo} class={styles.mobilePromo} />}
                     {group.columns
                       .flatMap((column) => column.sections)
                       .map((section) => (
@@ -234,8 +243,8 @@ const cardId = (i: number) => `site-header-card-${i}`;
                                   href={section.allLink.href}
                                   class:list={[styles.allLink, styles.mobileRow, 'title']}
                                 >
-                                  <span aria-hidden="true">→</span>
                                   <span class={styles.allLabel}>{section.allLink.label}</span>
+                                  <span aria-hidden="true">→</span>
                                 </a>
                               </li>
                             )}
@@ -415,6 +424,11 @@ const cardId = (i: number) => `site-header-card-${i}`;
         this.on(this.mobileTrigger, 'click', () => {
           this.setMobile(this.mobileTrigger.getAttribute('aria-expanded') !== 'true');
         });
+        for (const group of this.$$<HTMLDetailsElement>('details')) {
+          this.on(group, 'toggle', () => {
+            this.tellPromos(group, group.open ? 'menu:open' : 'menu:close');
+          });
+        }
 
         // These listeners are on <html> and on the media query.
         // disconnectedCallback() removes them.
@@ -555,6 +569,13 @@ const cardId = (i: number) => `site-header-card-${i}`;
         return card.querySelector<HTMLElement>(FOCUSABLE);
       }
 
+      // A promo starts when its menu opens and stops when its menu closes.
+      tellPromos(menu: HTMLElement, event: 'menu:open' | 'menu:close') {
+        for (const promo of menu.querySelectorAll('menu-promo')) {
+          promo.dispatchEvent(new CustomEvent(event));
+        }
+      }
+
       // The shell takes the place and the size of the card of the trigger.
       // From closed, it grows down from the header and the rows arrive one
       // after the other. From another card, it glides to the new shape while
@@ -589,6 +610,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
         // The fade-out of an earlier morph fills forwards: it must not hide the card now.
         for (const animation of card.getAnimations()) animation.cancel();
         card.setAttribute('data-active', '');
+        this.tellPromos(card, 'menu:open');
         shell.style.setProperty('--card-x', `${trigger.offsetLeft}px`);
         shell.style.setProperty('--card-width', `${card.offsetWidth}px`);
         shell.style.setProperty('--card-height', `${card.offsetHeight}px`);
@@ -600,6 +622,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
         if (shownCard === card) return;
 
         if (shownCard) {
+          this.tellPromos(shownCard, 'menu:close');
           for (const animation of shownCard.getAnimations()) animation.cancel();
           shownCard
             .animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms(120), fill: 'forwards' })
@@ -652,6 +675,7 @@ const cardId = (i: number) => `site-header-card-${i}`;
           () => {
             shell.removeAttribute('data-open');
             card.removeAttribute('data-active');
+            this.tellPromos(card, 'menu:close');
             this.shownCard = null;
             this.closing = null;
           },

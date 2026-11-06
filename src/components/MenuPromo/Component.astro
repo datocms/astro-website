@@ -1,0 +1,69 @@
+---
+import { Button } from '~/components/Button';
+import { Face } from '~/components/Face';
+import { PixelVideo } from '~/components/PixelVideo';
+import type { NavPromo } from '~/data/navigation';
+import styles from './style.module.css';
+
+type Props = NavPromo & {
+  class?: string;
+  /** The attributes of the rows that the card of the header animates. */
+  rowAttrs?: Record<string, string>;
+};
+
+const { title, aside, face, button, video, videoHold, class: className, rowAttrs } = Astro.props;
+---
+
+<menu-promo class:list={[styles.root, 'surfaceAccent', className]}>
+  <div class={styles.text}>
+    <div class={styles.copy} {...rowAttrs}>
+      <p class="title">{title}</p>
+      <p class:list={[styles.aside, 'body']}>{aside}&nbsp;<Face name={face} start="manual" /></p>
+    </div>
+    <Button href={button.href} attrs={rowAttrs}>{button.label}</Button>
+  </div>
+  {/* The header is on each page: the picture mounts only when the menu opens. */}
+  <div class={styles.picture}>
+    <template
+      ><PixelVideo
+        src={video}
+        palette="onAccentField"
+        lens={false}
+        hold={videoHold}
+        devTag={false}
+      /></template
+    >
+  </div>
+</menu-promo>
+
+<script>
+  import type { PixelVideoElement } from '~/lib/pixel-video/element';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  // The menu sends `menu:open` and `menu:close`. At the first open, the
+  // face plays once and the picture mounts. The picture plays only while
+  // the menu is open: the card keeps its place when it hides, thus the
+  // picture cannot find that it is not on the screen.
+  customElements.define(
+    'menu-promo',
+    class extends WebComponent {
+      video: PixelVideoElement | null = null;
+
+      parsedCallback() {
+        this.on(this, 'menu:open', () => {
+          this.$('type-writer').dispatchEvent(new CustomEvent('typewriter:start'));
+          if (this.video) {
+            this.video.paused = false;
+            return;
+          }
+          const template = this.$<HTMLTemplateElement>('template');
+          template.after(template.content.cloneNode(true));
+          this.video = this.$<PixelVideoElement>('pixel-video');
+        });
+        this.on(this, 'menu:close', () => {
+          if (this.video) this.video.paused = true;
+        });
+      }
+    },
+  );
+</script>

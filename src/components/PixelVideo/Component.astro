@@ -14,6 +14,11 @@ interface Props {
   /** The lens under the pointer (default true). */
   lens?: boolean;
   /**
+   * The first and the last frame of a pose. The video plays once up to the
+   * last frame, then it stays in these frames with small movements.
+   */
+  hold?: [number, number];
+  /**
    * In development, a tag at the top right corner of the video shows the
    * data of the file (default true). A parent that cuts the top or the
    * sides of the video sets false and shows its own `DevConfig` with
@@ -27,7 +32,16 @@ interface Props {
   style?: string;
 }
 
-const { src, palette, lens = true, devTag = true, label, class: className, style } = Astro.props;
+const {
+  src,
+  palette,
+  lens = true,
+  hold,
+  devTag = true,
+  label,
+  class: className,
+  style,
+} = Astro.props;
 
 // Development only: the data of the file, for the tag of DevConfig.
 const devConfig = import.meta.env.DEV && devTag ? pxvDevConfig(src, { palette, lens }) : undefined;
@@ -39,6 +53,7 @@ const devConfig = import.meta.env.DEV && devTag ? pxvDevConfig(src, { palette, l
   src={src}
   palette={palette}
   no-lens={lens ? undefined : ''}
+  hold={hold?.join('-')}
   role={label ? 'img' : undefined}
   aria-label={label}>{devConfig && <DevConfig name="PixelVideo" config={devConfig} />}</pixel-video
 >

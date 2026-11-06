@@ -3,6 +3,8 @@
 // structure. Every link goes to a page, never to a list of content, and
 // no page has two names. A link without a page on this site goes to '#'.
 
+import type { FaceName } from '~/lib/motion/faces';
+
 interface LinkItem {
   label: string;
   href: string;
@@ -10,7 +12,7 @@ interface LinkItem {
   description?: string;
 }
 
-/** A muted heading, its links and an optional "→ All …" link. */
+/** A muted heading, its links and an optional "All … →" link. */
 interface NavSection {
   heading: string;
   links: LinkItem[];
@@ -22,10 +24,23 @@ interface NavColumn {
   sections: NavSection[];
 }
 
+/** A field of the accent in a dropdown card: an action, not a page of the map. */
+export interface NavPromo {
+  title: string;
+  /** The quiet run of the title. The face ends it. */
+  aside: string;
+  face: FaceName;
+  button: { label: string; href: string };
+  /** URL of a .pxv file of public/videos. */
+  video: string;
+  /** The frames of the pose in which the video stays (see `PixelVideo`). */
+  videoHold: [number, number];
+}
+
 /** A plain link (Philosophy, Pricing), or a group with the columns of a dropdown card. */
 export type NavGroup =
-  | { label: string; href: string; columns?: undefined }
-  | { label: string; href?: undefined; columns: NavColumn[] };
+  | { label: string; href: string; columns?: undefined; promo?: undefined }
+  | { label: string; href?: undefined; columns: NavColumn[]; promo?: NavPromo };
 
 export interface FooterGroup {
   title: string;
@@ -109,6 +124,14 @@ export const mainNavigation: NavGroup[] = [
         ],
       },
     ],
+    promo: {
+      title: 'The real product, in 30 seconds.',
+      aside: 'No signup, and a few short videos to guide you',
+      face: 'wink',
+      button: { label: 'Try The Demo', href: 'https://try.datocms.com' },
+      video: '/videos/hand-ok-2.pxv',
+      videoHold: [38, 47],
+    },
   },
   {
     label: 'Resources',

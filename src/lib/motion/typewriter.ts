@@ -263,7 +263,9 @@ export function typewrite(
     // The cursor is a child of the element. The characters can be in a
     // child with a different type style, thus copy their font.
     const style = getComputedStyle(ref.node.parentElement ?? finalEl);
-    cursor.style.color = style.color;
+    // The cursor inherits the colour when it is the same. Thus it follows a
+    // change of colour during the animation (the hover of a button).
+    cursor.style.color = style.color === getComputedStyle(el).color ? '' : style.color;
     // The computed `font` shorthand can be empty, thus copy each property.
     for (const prop of ['font-family', 'font-size', 'font-weight', 'letter-spacing'] as const) {
       cursor.style.setProperty(prop, style.getPropertyValue(prop));
