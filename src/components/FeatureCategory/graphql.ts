@@ -1,4 +1,3 @@
-import { ResponsiveImageFragment } from '~/components/ResponsiveImage';
 import { BlogPostUrlFragment } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { ChangelogEntryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
 import { DocPageUrlFragment } from '~/lib/datocms/gqlUrlBuilder/docPage';
@@ -21,9 +20,7 @@ export const FeatureCategoryEntryFragment = graphql(
         value
       }
       image {
-        responsiveImage(imgixParams: { w: 900 }) {
-          ...ResponsiveImageFragment
-        }
+        lightboxImageUrl: url(imgixParams: { auto: format, w: 2000, fit: max })
       }
       badge
       links {
@@ -44,7 +41,6 @@ export const FeatureCategoryEntryFragment = graphql(
     }
   `,
   [
-    ResponsiveImageFragment,
     BlogPostUrlFragment,
     ChangelogEntryUrlFragment,
     DocPageUrlFragment,
