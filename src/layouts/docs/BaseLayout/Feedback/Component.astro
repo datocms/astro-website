@@ -70,6 +70,12 @@ import { Button } from '~/components/Button';
           this.button = this.$('button[type=submit]');
 
           this.on(this.form, 'submit', this.handleSubmit);
+          this.on(this.form, 'change', 'input[name=reaction]', this.showForm);
+        }
+
+        /* The fields open below the reaction. Move the page only if they are out of view. */
+        showForm() {
+          this.form.scrollIntoView({ block: 'nearest' });
         }
 
         async handleSubmit(event: SubmitEvent) {
@@ -106,7 +112,10 @@ import { Button } from '~/components/Button';
               if (errorEl) {
                 errorEl.innerText = message;
               } else {
-                fieldEl.after(`<div data-error>${errors.join(', ')}</div>`);
+                const newErrorEl = document.createElement('div');
+                newErrorEl.dataset.error = '';
+                newErrorEl.innerText = message;
+                fieldEl.after(newErrorEl);
               }
             }
 

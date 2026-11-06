@@ -29,9 +29,10 @@ type Props = {
   seo: TitleMetaLinkTag[];
   contentWrapperComponent?: (props: any) => any;
   lastUpdatedAt?: string;
+  hideFooter?: boolean;
 };
 
-const { seo, contentWrapperComponent, lastUpdatedAt } = Astro.props;
+const { seo, contentWrapperComponent, lastUpdatedAt, hideFooter } = Astro.props;
 const ContentWrapper = contentWrapperComponent || 'div';
 const hasPageBar = Astro.slots.has('pagebar');
 ---
@@ -119,7 +120,7 @@ const hasPageBar = Astro.slots.has('pagebar');
         <ContentWrapper>
           <div class={s.container}>
             <slot />
-            <div class={s.pageEnd}>
+            <div class:list={[s.pageEnd, hideFooter && s.pageEndBare]}>
               {
                 lastUpdatedAt && (
                   <p class={s.lastUpdate}>
@@ -127,24 +128,28 @@ const hasPageBar = Astro.slots.has('pagebar');
                   </p>
                 )
               }
-              <div class={s.footer} data-datocms-noindex>
-                <div class={s.footerCol}>
-                  <div class={s.footerTitle}>Did this doc help you?</div>
-                  <div class={s.footerBody}>
-                    <Feedback />
+              {
+                !hideFooter && (
+                  <div class={s.footer} data-datocms-noindex>
+                    <div class={s.footerCol}>
+                      <div class={s.footerTitle}>Did this doc help you?</div>
+                      <div class={s.footerBody}>
+                        <Feedback />
+                      </div>
+                    </div>
+                    <div class={s.footerCol}>
+                      <div class={s.footerTitle}>Need help?</div>
+                      <div class={s.footerBody}>
+                        Explore our <a href="https://community.datocms.com">forum</a>,{' '}
+                        <a href="/support">contact support</a>, or{' '}
+                        <a href="/enterprise-headless-cms#form"> connect with our sales team </a>.
+                        You can also chat live with other users in our{' '}
+                        <a href="/slack">Slack channel</a>.
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div class={s.footerCol}>
-                  <div class={s.footerTitle}>Need help?</div>
-                  <div class={s.footerBody}>
-                    Explore our <a href="https://community.datocms.com">forum</a>,{' '}
-                    <a href="/support">contact support</a>, or{' '}
-                    <a href="/enterprise-headless-cms#form"> connect with our sales team </a>
-                    . You can also chat live with other users in our{' '}
-                    <a href="/slack">Slack channel</a>.
-                  </div>
-                </div>
-              </div>
+                )
+              }
             </div>
           </div>
         </ContentWrapper>
