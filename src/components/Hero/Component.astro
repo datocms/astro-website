@@ -135,17 +135,11 @@ const hasVisual = Astro.slots.has('visual');
         </p>
       )
     }
-    {
-      /* A no-break space before the face: the face stays on the line of the last word, never alone on a new line. */
-    }
     <Headline
       as={headingLevel}
       size="headline"
-      muted={subheadline && !(face && !typewriter)
-        ? face
-          ? `${subheadline}\u00A0${faces[face].face}`
-          : subheadline
-        : undefined}
+      muted={subheadline && !(face && !typewriter) ? subheadline : undefined}
+      faceGlyphs={subheadline && typewriter && face ? faces[face].face : undefined}
       breakBeforeMuted={breakBeforeMuted}
       typewriter={typewriter ? script : undefined}
       typewriterStart="load"

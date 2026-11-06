@@ -8,6 +8,12 @@ interface Props {
   size?: 'display' | 'headline' | 'title';
   /** The muted run after the main text. The `muted` slot can replace it. */
   muted?: string;
+  /**
+   * The glyphs of the face at the end of the muted run, for a typewriter
+   * script that plays the face. A no-break space joins it to the last word.
+   * It is decoration, thus it is hidden from assistive technology.
+   */
+  faceGlyphs?: string;
   breakBeforeMuted?: boolean;
   /** Animate the full headline (main and muted runs) with these steps. */
   typewriter?: Step[];
@@ -23,6 +29,7 @@ const {
   as: Tag = 'h2',
   size = 'headline',
   muted,
+  faceGlyphs,
   breakBeforeMuted = false,
   typewriter,
   typewriterStart,
@@ -61,6 +68,12 @@ const wrapperProps = typewriter
             ]}
           >
             {mutedHtml ? <Fragment set:html={mutedHtml} /> : muted}
+            {faceGlyphs && (
+              <>
+                {'\u00A0'}
+                <span aria-hidden="true">{faceGlyphs}</span>
+              </>
+            )}
           </span>
         </>
       )
