@@ -14,7 +14,7 @@ export const PostHeaderFragment = graphql(/* GraphQL */ `
     author {
       name
       avatar {
-        url(imgixParams: { w: 80, h: 80, fit: crop, crop: faces })
+        url(imgixParams: { w: 80, h: 80, fit: crop })
       }
     }
   }
@@ -31,7 +31,7 @@ export const ChatHeaderFragment = graphql(/* GraphQL */ `
       title
       company
       avatar {
-        url(imgixParams: { w: 80, h: 80, fit: crop, crop: faces })
+        url(imgixParams: { w: 80, h: 80, fit: crop })
       }
     }
   }

@@ -7,7 +7,7 @@ export const HeroTeamMemberFragment = graphql(
     fragment HeroTeamMemberFragment on TeamMemberRecord {
       name
       avatar {
-        responsiveImage(imgixParams: { w: 162, h: 162, fit: crop, crop: faces }) {
+        responsiveImage(imgixParams: { w: 162, h: 162, fit: crop }) {
           ...ResponsiveImageFragment
         }
       }

@@ -20,7 +20,7 @@ export const QuoteReviewFragment = graphql(
         value
       }
       image {
-        responsiveImage(imgixParams: { w: 120, h: 120, fit: crop, crop: faces }) {
+        responsiveImage(imgixParams: { w: 120, h: 120, fit: crop }) {
           ...ResponsiveImageFragment
         }
       }
@@ -39,7 +39,7 @@ export const QuotePartnerTestimonialFragment = graphql(
         value
       }
       image {
-        responsiveImage(imgixParams: { w: 120, h: 120, fit: crop, crop: faces }) {
+        responsiveImage(imgixParams: { w: 120, h: 120, fit: crop }) {
           ...ResponsiveImageFragment
         }
       }
