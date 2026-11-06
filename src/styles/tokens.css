@@ -905,11 +905,13 @@
   --code-background: var(--surface-inverse);
   --surface-accent-band: oklch(from var(--theme-accent) 0.19 var(--theme-dark-ground-chroma) h);
   /*
-   * The text on the band and on the inverse: one ink on the dark grounds,
-   * the bright accent, with the alphas of the inverse for the quiet roles.
+   * The text on the band is the bright accent, with the alphas of the
+   * inverse for the quiet roles. The text on the inverse is the text of
+   * the page (see --text-on-page): the menus, the footer and the windows
+   * show text to read, not a colour.
    */
   --text-on-accent-band: var(--theme-accent-bright);
-  --text-on-inverse: var(--theme-accent-bright);
+  --text-on-inverse: var(--text-on-page);
   --text-on-accent-band-soft: color-mix(
     in srgb,
     var(--theme-accent-bright) var(--theme-alpha-on-inverse-soft),
@@ -925,9 +927,9 @@
     var(--theme-accent-bright) var(--theme-alpha-on-inverse-headline-muted),
     transparent
   );
-  --text-on-inverse-soft: var(--text-on-accent-band-soft);
-  --text-on-inverse-muted: var(--text-on-accent-band-muted);
-  --text-on-inverse-headline-muted: var(--text-on-accent-band-headline-muted);
+  --text-on-inverse-soft: var(--text-on-page-soft);
+  --text-on-inverse-muted: var(--text-on-page-muted);
+  --text-on-inverse-headline-muted: var(--text-on-page-headline-muted);
   --border-on-accent-band-strong: var(--theme-accent);
   /*
    * The line along the edge of a picture on the accent band: the accent at
@@ -1145,6 +1147,32 @@
   --type-mono-weight: 500;
   color: var(--text-primary);
   color-scheme: dark;
+}
+
+/*
+ * surfaceMenu: add it next to surfaceInverse on the menus of the header.
+ * The text is the paper with a fifth of the accent, thus a menu has the
+ * same ink in the two schemes. In the dark scheme this is the text of the
+ * page, and the rule for surfaceInverse gives it.
+ */
+.surfaceMenu {
+  --_menu-ink: color-mix(in oklab, var(--theme-accent) 20%, var(--theme-paper));
+  --text-on-inverse: var(--_menu-ink);
+  --text-on-inverse-soft: color-mix(in srgb, var(--_menu-ink) 80%, transparent);
+  --text-on-inverse-muted: color-mix(in srgb, var(--_menu-ink) 70%, transparent);
+}
+
+/*
+ * surfaceInverseBright: add it next to surfaceInverse. In the dark scheme,
+ * the text on this inverse is the bright accent, not the text of the page.
+ * Use it only for the band of the page closer, the status badge and the
+ * legal bar of the footer. The light scheme does not change.
+ */
+:root[data-color-scheme='dark'] .surfaceInverseBright {
+  --text-on-inverse: var(--theme-accent-bright);
+  --text-on-inverse-soft: var(--text-on-accent-band-soft);
+  --text-on-inverse-muted: var(--text-on-accent-band-muted);
+  --text-on-inverse-headline-muted: var(--text-on-accent-band-headline-muted);
 }
 
 /*
