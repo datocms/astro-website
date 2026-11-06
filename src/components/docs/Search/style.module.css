@@ -206,14 +206,26 @@
   background: var(--surface-default);
   color: var(--text-primary);
   transform-origin: center;
+
+  /*
+   * The hovered and the selected row, and the question of the AI chat: a
+   * light tint of the accent, not the accent. The full accent is too loud on
+   * a row, which is a large surface. The tints of the theme are 8% (faint, too pale to find the row) and
+   * 50% (subtle, too loud), thus the tint is the accent at 25%. The text
+   * keeps the roles of the page.
+   */
+  --card-tint: color-mix(in srgb, var(--theme-accent) 25%, transparent);
 }
 
 /*
  * The dark scheme: the card and the dimmed page are both dark. A ring
- * shows the edge of the card.
+ * shows the edge of the card. The tint is the subtle tint of the dark
+ * scheme, the accent at 14%.
  */
 :global(:root[data-color-scheme='dark']) .card {
   box-shadow: 0 0 0 1px var(--border-default);
+
+  --card-tint: var(--surface-accent-subtle);
 }
 
 @media (min-width: 768px) {
@@ -339,15 +351,7 @@
 }
 
 .inputRow {
-  border-bottom: 1px solid var(--text-muted);
-}
-
-/*
- * The dark scheme: the muted text is a light colour, thus a line in it is
- * too bright. The line takes the hairline, as the other lines of the card.
- */
-:global(:root[data-color-scheme='dark']) .inputRow {
-  border-bottom-color: var(--border-default);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .bottomInputRow {
@@ -470,14 +474,16 @@
 /*
  * === Rows of the home, of the search prompts and of the AI prompts ===
  * A prompt is a sentence and can wrap: the icon aligns with the first line.
+ * A row goes to the full width of the card body, as a result.
  */
 
 .row {
   display: flex;
   align-items: flex-start;
   gap: var(--space-2xs);
-  width: 100%;
-  padding: var(--space-3xs) 0;
+  width: calc(100% + var(--space-md) * 2);
+  margin-inline: calc(var(--space-md) * -1);
+  padding: var(--space-2xs) var(--space-md);
   border: 0;
   background: transparent;
   color: var(--text-muted);
@@ -489,21 +495,24 @@
   text-align: left;
   text-decoration: none;
   cursor: pointer;
-  transition: color 150ms ease;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
 
   strong {
     font-weight: inherit;
   }
 }
 
-/* The keys and the pointer set the selected row: the text shows it. */
+/* The keys and the pointer set the selected row. */
 .rowSelected,
 .row:focus-visible {
+  background-color: var(--card-tint);
   color: var(--text-primary);
   outline: none;
 
   .rowIcon svg {
-    color: var(--text-accent);
+    color: currentColor;
   }
 }
 
@@ -723,32 +732,15 @@
   animation-delay: calc(min(var(--i, 0), 4) * 32ms);
   transition: background-color 150ms ease;
 
-  /*
-   * The hovered and the selected row: a light tint of the accent, not the
-   * accent. The row is a large surface, and the full accent is too loud on
-   * it. The tints of the theme are 8% (faint, too pale to find the row) and
-   * 50% (subtle, too loud), thus the row takes the accent at 25%. The text
-   * keeps the roles of the page.
-   */
-  --result-highlight: color-mix(in srgb, var(--theme-accent) 25%, transparent);
-
   @media (hover: hover) {
     &:hover {
-      background-color: var(--result-highlight);
+      background-color: var(--card-tint);
     }
   }
 
   &.selected {
-    background-color: var(--result-highlight);
+    background-color: var(--card-tint);
   }
-}
-
-/*
- * The dark scheme: the row takes the subtle tint of the dark scheme, the
- * accent at 14%.
- */
-:global(:root[data-color-scheme='dark']) .result {
-  --result-highlight: var(--surface-accent-subtle);
 }
 
 @keyframes resultIn {
@@ -909,8 +901,8 @@
   max-width: 80%;
   padding: var(--space-2xs) var(--space-sm);
   border-radius: var(--search-r-lg) var(--search-r-lg) var(--search-r-sm) var(--search-r-lg);
-  background: var(--surface-accent);
-  color: var(--text-on-accent);
+  background: var(--card-tint);
+  color: var(--text-primary);
   overflow-wrap: anywhere;
   transform-origin: bottom right;
   animation: questionBubbleIn 220ms var(--ease-out) both;
@@ -968,8 +960,20 @@
     padding-left: 1.4em;
   }
 
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
   li {
     margin: 0.2em 0;
+  }
+
+  li::marker {
+    color: var(--text-muted);
   }
 
   strong,
@@ -1139,6 +1143,14 @@
   ol {
     margin: 0 0 0.6em;
     padding-left: 1.4em;
+  }
+
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
   }
 
   li {
