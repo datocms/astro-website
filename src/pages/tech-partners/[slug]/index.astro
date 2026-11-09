@@ -1,12 +1,13 @@
 ---
-// The page of one technology partner: the logo, the short description,
-// the description and the links to the website and to the contact email.
+// The page of one technology partner: the introduction with the links to
+// the website and to the contact email, the logo and the description.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { Breadcrumb } from '~/components/Breadcrumb';
 import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
-import { Hero } from '~/components/Hero';
+import { Headline } from '~/components/Headline';
+import { LogoPlate } from '~/components/LogoPlate';
 import { Prose } from '~/components/Prose';
 import { Section } from '~/components/Section';
 import { StructuredText } from '~/components/StructuredText';
@@ -58,31 +59,20 @@ const description = toPlainText(page.shortDescription);
   )}
   headerVariant="page"
 >
-  <Hero variant="page" label={techPartner.kicker} headline={page.name}>
-    <div slot="intro">
-      <StructuredText {...ensureValidStructuredTextProps({ data: page.shortDescription })} />
-      <img
-        class={s.logo}
-        src={page.logo.url}
-        alt={page.logo.alt || `${page.name} logo`}
-        width={page.logo.width ?? undefined}
-        height={page.logo.height ?? undefined}
-      />
-    </div>
-  </Hero>
-  <Breadcrumb trail={[indexes.techPartners]} current={page.name} />
-
-  <Section>
-    <div class={s.main}>
-      <Prose>
-        <StructuredText
-          {...ensureValidStructuredTextProps({
-            data: page.description,
-            linkToRecordComponents: defaultLinkToRecordComponents,
-            inlineRecordComponents: defaultInlineRecordComponents,
-          })}
-        />
-      </Prose>
+  {
+    /*
+      The hero is a split. The text is in the left half, on the page. The
+      right half is the white plate of the logo, cut by the right edge and
+      by the bottom edge of the band, as the frame of a product scene.
+    */
+  }
+  <Section flushBottom class={s.hero} contentClass={s.heroContent} data-hero>
+    <div class={s.heroText}>
+      <p class:list={[s.label, 'body']}>{techPartner.kicker}</p>
+      <Headline as="h1" size="headline">{page.name}</Headline>
+      <div class:list={[s.intro, 'body']}>
+        <StructuredText {...ensureValidStructuredTextProps({ data: page.shortDescription })} />
+      </div>
       <div class={s.actions}>
         <Button href={page.websiteUrl} attrs={{ target: '_blank' }}>
           {techPartner.visitWebsite}
@@ -99,6 +89,22 @@ const description = toPlainText(page.shortDescription);
           )
         }
       </div>
+    </div>
+    <LogoPlate class={s.plate} name={page.name} logo={page.logo} />
+  </Section>
+  <Breadcrumb trail={[indexes.techPartners]} current={page.name} />
+
+  <Section>
+    <div class={s.main}>
+      <Prose>
+        <StructuredText
+          {...ensureValidStructuredTextProps({
+            data: page.description,
+            linkToRecordComponents: defaultLinkToRecordComponents,
+            inlineRecordComponents: defaultInlineRecordComponents,
+          })}
+        />
+      </Prose>
     </div>
   </Section>
 
