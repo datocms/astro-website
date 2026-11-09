@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import symbolSvg from '~/assets/logo/dato-symbol.svg?raw';
+import symbolSvg from '~/assets/logo/symbol.svg?raw';
 import type { OgPalette } from './palette';
 
 /**
