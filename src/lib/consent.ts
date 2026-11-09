@@ -37,14 +37,15 @@ const gdprCountries = [
 
 export const CONSENT_COOKIE_NAME = 'cookies-accepted';
 
-// Mirrors the client-side cookie banner logic in cookieConsent.js.ts:
-// non-GDPR visitors are auto-accepted (no banner shown); GDPR visitors must
-// have explicitly accepted via the banner.
+// This function has the same logic as the cookie banner in cookieConsent.js.ts.
+// A visitor out of the GDPR countries does not see the banner and has consent.
+// A visitor in a GDPR country has consent only after a click on Accept. The
+// value of the cookie is 'true' after Accept and 'false' after Reject.
 export function hasMarketingConsent(request: Request, cookies: AstroCookies): boolean {
   const country = request.headers.get('client-geo-country');
 
   // No country or non-GDPR → no banner shown, so the visitor is auto-accepted.
   if (!country || !gdprCountries.includes(country)) return true;
 
-  return Boolean(cookies.get(CONSENT_COOKIE_NAME));
+  return cookies.get(CONSENT_COOKIE_NAME)?.value === 'true';
 }

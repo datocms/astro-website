@@ -1,15 +1,7 @@
 import type { APIRoute } from 'astro';
-import { LINKEDIN_PARTNER_ID, PUBLIC_HOSTNAME } from 'astro:env/client';
+import { LINKEDIN_PARTNER_ID } from 'astro:env/client';
 import { CONSENT_COOKIE_NAME, hasMarketingConsent } from '~/lib/consent';
 import { GOOGLE_ADS_ID } from '~/lib/googleAds';
-
-function maybeCookieDomain() {
-  if (!PUBLIC_HOSTNAME) {
-    return '';
-  }
-
-  return 'domain=.' + PUBLIC_HOSTNAME.split('.').slice(-2).join('.') + ';';
-}
 
 // Usage:
 // <script type="text/javascript" src="https://www.datocms.com/landing-pages/cookieConsent.js"></script>
@@ -38,9 +30,13 @@ posthog.init('phc_u7FPCuTnUpVlYYTYmfeutKpnI7qEE2cjwgzjz3JDuH6', {
 
 const cookieConsentScript = `
 (() => {
+  // The tracking scripts go in an inline script, thus they run in the global
+  // scope (window.gtag, window.posthog). They are in this file, thus Accept
+  // sends no second request: the server of a different domain does not get
+  // the cookie and would send the banner again.
   function addScripts() {
     const script = document.createElement('script');
-    script.src = 'https://www.datocms.com/landing-pages/cookieConsent.js?loadTracking=true';
+    script.textContent = ${JSON.stringify(scriptsToAddOnCookieConsent).replace(/</g, '\\u003c')};
     document.getElementsByTagName('head')[0].appendChild(script);
   }
 
@@ -252,18 +248,37 @@ const cookieConsentScript = `
   const cookieName = '${CONSENT_COOKIE_NAME}';
 
   const getCookie = (name) => {
-    const match = document.cookie.match(new RegExp(name + '=([^;]+)'));
+    const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]+)'));
     if (match) return match[1];
+  };
+
+  // The cookie is for the domain of the page and all its subdomains
+  // (www.datocms.com and dashboard.datocms.com share it). The domain comes
+  // from the page, not from the host of this script: a page on a different
+  // domain can load this script, and the browser rejects a cookie for a
+  // domain that is not the domain of the page. On localhost or on an IP
+  // address, the cookie has no domain.
+  const cookieDomain = () => {
+    const host = location.hostname;
+    if (!host.includes('.') || /^[0-9.]+$/.test(host)) return '';
+    return ' domain=.' + host.split('.').slice(-2).join('.') + ';';
   };
 
   const setCookie = (name, value) => {
     const expiration = new Date(new Date().getTime() + 365 * 24 * 60 * 60 * 1000).toUTCString();
-    document.cookie = name + '=' + value + '; expires=' + expiration + '; path=/; ${maybeCookieDomain()} samesite=none; secure';
+    document.cookie = name + '=' + value + '; expires=' + expiration + '; path=/;' + cookieDomain() + ' samesite=none; secure';
   };
 
   onReady(() => {
-    if (getCookie(cookieName)) {
+    // 'true' after Accept, 'false' after Reject. Each choice stays for a year.
+    const choice = getCookie(cookieName);
+
+    if (choice === 'true') {
       addScripts();
+      return;
+    }
+
+    if (choice === 'false') {
       return;
     }
 
@@ -288,6 +303,7 @@ const cookieConsentScript = `
       .querySelector('.consent--cookies [data-decline]')
       .addEventListener('click', () => {
         container.parentNode.removeChild(container);
+        setCookie(cookieName, 'false');
       });
   });
 })();
