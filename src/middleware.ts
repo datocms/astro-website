@@ -73,11 +73,23 @@ export const security: MiddlewareHandler = async (_context, next) => {
   return response;
 };
 
-const routesWithNoAuth = ['/up', '/landing-pages/cookieConsent.js', '/_image'];
+const routesWithNoAuth = [
+  '/up',
+  '/landing-pages/cookieConsent.js',
+  '/_image',
+  '/favicon.ico',
+  '/favicon.svg',
+  '/apple-touch-icon.png',
+];
+
+// The pages preload the fonts without the token. If a font needs auth, the
+// browser shows a login prompt on a page that has a correct token.
+const prefixesWithNoAuth = ['/fonts/'];
 
 export const basicAuth: MiddlewareHandler = (context, next) => {
   if (
     routesWithNoAuth.includes(context.url.pathname) ||
+    prefixesWithNoAuth.some((prefix) => context.url.pathname.startsWith(prefix)) ||
     DEPLOYMENT_DESTINATION === 'development' ||
     !isDraftModeEnabled(context.request)
   ) {

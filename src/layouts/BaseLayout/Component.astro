@@ -1,7 +1,6 @@
 ---
 import { faCheck, faLink } from '@fortawesome/pro-regular-svg-icons';
 import { ContentLink, Seo, stripStega, type TitleMetaLinkTag } from '@datocms/astro';
-import { fetchFavicon } from './fetchFavicon';
 import { baseUrl, isDraftModeEnabled } from '~/lib/draftMode';
 import type { Theme } from '~/lib/theme';
 import {
@@ -38,7 +37,6 @@ const { seo, theme = 'default', density } = Astro.props;
 const cssLayersStatement = '@layer reset, tokens, base, vendor, blocks, sections, pages;';
 const anchorIcons = `:root{--anchor-icon-link:${iconDataUri(faLink)};--anchor-icon-done:${iconDataUri(faCheck)}}`;
 
-const result = await fetchFavicon(Astro);
 const draftModeEnabled = isDraftModeEnabled(Astro);
 
 // Maps route prefixes to section-specific title suffixes. Top-level pages
@@ -82,7 +80,10 @@ const pageMeta = extractFromSeoTags(stripStega(finalSeo));
     <meta name="generator" content={Astro.generator} />
     <!-- Strip stega (content-link annotation) characters from head meta tags so
          that invisible markers don't inflate the <title> length in draft mode -->
-    <Seo data={stripStega([...result._site.faviconMetaTags, ...finalSeo])} />
+    <Seo data={stripStega(finalSeo)} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="alternate" type="text/markdown" href={`${Astro.url.pathname}.md`} />
     <link rel="alternate" type="application/rss+xml" title="DatoCMS Blog" href="/blog.xml" />
     <link

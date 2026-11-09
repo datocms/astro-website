@@ -3,7 +3,6 @@ import { SECRET_API_TOKEN } from 'astro:env/server';
 import { maybeInvalidateFetchPluginSdkManifest } from '~/components/docs/blocks/PluginSdkHookGroup';
 import { maybeInvalidateCmaHyperschema } from '~/components/docs/cmaApi/fetchSchema';
 import { maybeInvalidateDashboardHyperschema } from '~/components/docs/dashboardApi/fetchSchema';
-import { maybeInvalidateFavicon } from '~/layouts/BaseLayout/fetchFavicon';
 import {
   maybeInvalidateCdaIntrospectionFieldFilters,
   maybeInvalidateCdaIntrospectionUploadFilters,
@@ -29,7 +28,6 @@ export const POST: APIRoute = async ({ url, request }) => {
       maybeInvalidateDashboardHyperschema(),
       maybeInvalidatePerOwnerPricingPlans(),
       maybeInvalidateDastSchema(),
-      maybeInvalidateFavicon(),
       maybeInvalidateCdaIntrospectionUploadFilters(),
       maybeInvalidateCdaIntrospectionFieldFilters(),
       maybeInvalidateSiteApiErrorCodes(),
