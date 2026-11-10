@@ -2,7 +2,7 @@ import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } fro
 import { createPortal } from 'react-dom';
 
 import s from './style.module.css';
-import { faMagnifyingGlass } from '@fortawesome/pro-regular-svg-icons';
+import { Search as SearchIcon } from 'lucide';
 import { IconReact } from '~/components/Icon/Icon';
 
 const LazyModal = lazy(() => import('./LazyModal'));
@@ -68,7 +68,7 @@ function Trigger({
       title={variant === 'icon' ? `Search or Ask AI (${isMac ? '⌘' : 'Ctrl+'}K)` : undefined}
     >
       <span className={s.triggerIcon}>
-        <IconReact icon={faMagnifyingGlass} />
+        <IconReact icon={SearchIcon} />
       </span>
       {variant !== 'icon' && (
         <>

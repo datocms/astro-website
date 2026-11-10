@@ -1,6 +1,6 @@
 import s from '../style.module.css';
 import { useSearch } from '../context';
-import { faArrowLeft, faXmark } from '@fortawesome/pro-regular-svg-icons';
+import { ArrowLeft, X } from 'lucide';
 import { IconReact } from '~/components/Icon/Icon';
 
 type Props = {
@@ -15,7 +15,7 @@ export function ModalHeader({ title }: Props) {
     <div className={s.cardHeader}>
       <button type="button" className={s.backButton} onClick={goHome} aria-label="Back">
         <span>
-          <IconReact icon={faArrowLeft} />
+          <IconReact icon={ArrowLeft} />
         </span>
       </button>
       <span className={s.cardHeaderTitle}>{title}</span>
@@ -25,7 +25,7 @@ export function ModalHeader({ title }: Props) {
         onClick={closeModal}
         aria-label="Close search"
       >
-        <IconReact icon={faXmark} />
+        <IconReact icon={X} />
       </button>
     </div>
   );

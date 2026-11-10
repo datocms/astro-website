@@ -13,7 +13,7 @@ import { ModalInputRow } from '../modal/InputRow';
 import { ModalBody } from '../modal/Body';
 import { useSearch } from '../context';
 import { goToEntries } from '../constants';
-import { faArrowRight, faBook, faSparkles } from '@fortawesome/pro-regular-svg-icons';
+import { ArrowRight, BookOpen, Sparkles } from 'lucide';
 import { IconReact } from '~/components/Icon/Icon';
 
 export function HomeScreen() {
@@ -105,7 +105,7 @@ export function HomeScreen() {
           onClick={goSearch}
         >
           <span className={s.rowIcon}>
-            <IconReact icon={faBook} />
+            <IconReact icon={BookOpen} />
           </span>
           <span className={s.rowLabel}>
             {trimmedQuery ? (
@@ -125,7 +125,7 @@ export function HomeScreen() {
           onClick={() => goAi(searchInput)}
         >
           <span className={s.rowIcon}>
-            <IconReact icon={faSparkles} />
+            <IconReact icon={Sparkles} />
           </span>
           <span className={s.rowLabel}>
             {trimmedQuery ? (
@@ -153,7 +153,7 @@ export function HomeScreen() {
                   onClick={closeModal}
                 >
                   <span className={s.rowIcon}>
-                    <IconReact icon={faArrowRight} />
+                    <IconReact icon={ArrowRight} />
                   </span>
                   <span className={s.rowLabel}>{entry.label}</span>
                 </a>

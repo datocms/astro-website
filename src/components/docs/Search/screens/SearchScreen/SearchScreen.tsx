@@ -20,7 +20,7 @@ import { ResultsList } from './ResultsList';
 import { SkeletonResults } from './SkeletonResults';
 import { fetchResults } from './fetchResults';
 import type { ResultWithArea } from './types';
-import { faMagnifyingGlass } from '@fortawesome/pro-regular-svg-icons';
+import { Search } from 'lucide';
 import { IconReact } from '~/components/Icon/Icon';
 
 export function SearchScreen() {
@@ -168,7 +168,7 @@ export function SearchScreen() {
                 onClick={() => setSearchInput(prompt)}
               >
                 <span className={s.rowIcon}>
-                  <IconReact icon={faMagnifyingGlass} />
+                  <IconReact icon={Search} />
                 </span>
                 <span className={s.rowLabel}>{prompt}</span>
               </button>

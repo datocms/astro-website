@@ -1,37 +1,37 @@
-import type { IconDefinition } from '@fortawesome/fontawesome-common-types';
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
+import type { IconData } from '~/components/Icon/data';
 import {
-  faBars,
-  faBook,
-  faBookBlank,
-  faBrowser,
-  faComments,
-  faGraduationCap,
-  faMessageLines,
-  faPenNib,
-  faRocket,
-  faScaleBalanced,
-  faTrophy,
-  faVideo,
-  faWandMagic,
-} from '@fortawesome/pro-regular-svg-icons';
+  AppWindow,
+  Book,
+  BookOpen,
+  GraduationCap,
+  Menu,
+  MessageSquareText,
+  MessagesSquare,
+  PenTool,
+  Rocket,
+  Scale,
+  Trophy,
+  Video,
+  WandSparkles,
+} from 'lucide';
+import { siGithub } from 'simple-icons';
 import type { SearchFilter } from './apis/search';
 
-export type Area = { id: string; label: string; icon: IconDefinition };
+export type Area = { id: string; label: string; icon: IconData };
 
 export const areasBySource: Record<string, Area> = {
-  skills: { id: 'skills', label: 'Agent Skills', icon: faWandMagic },
-  docs: { id: 'docs', label: 'Docs', icon: faBook },
-  github: { id: 'github', label: 'GitHub', icon: faGithub },
-  blog: { id: 'blog', label: 'Blog', icon: faPenNib },
-  'case-studies': { id: 'case-studies', label: 'Case Studies', icon: faTrophy },
-  academy: { id: 'academy', label: 'CMS Academy', icon: faGraduationCap },
-  'casual-chats': { id: 'casual-chats', label: 'Customer Interviews', icon: faComments },
-  'product-updates': { id: 'product-updates', label: 'Product Updates', icon: faRocket },
-  glossary: { id: 'glossary', label: 'Glossary', icon: faBookBlank },
-  compare: { id: 'compare', label: 'Comparisons', icon: faScaleBalanced },
-  'user-guides': { id: 'user-guides', label: 'User Guides', icon: faVideo },
-  marketing: { id: 'marketing', label: 'Website', icon: faBrowser },
+  skills: { id: 'skills', label: 'Agent Skills', icon: WandSparkles },
+  docs: { id: 'docs', label: 'Docs', icon: BookOpen },
+  github: { id: 'github', label: 'GitHub', icon: siGithub },
+  blog: { id: 'blog', label: 'Blog', icon: PenTool },
+  'case-studies': { id: 'case-studies', label: 'Case Studies', icon: Trophy },
+  academy: { id: 'academy', label: 'CMS Academy', icon: GraduationCap },
+  'casual-chats': { id: 'casual-chats', label: 'Customer Interviews', icon: MessagesSquare },
+  'product-updates': { id: 'product-updates', label: 'Product Updates', icon: Rocket },
+  glossary: { id: 'glossary', label: 'Glossary', icon: Book },
+  compare: { id: 'compare', label: 'Comparisons', icon: Scale },
+  'user-guides': { id: 'user-guides', label: 'User Guides', icon: Video },
+  marketing: { id: 'marketing', label: 'Website', icon: AppWindow },
 };
 
 export type Group = { id: string; label: string; filter?: SearchFilter };
@@ -64,8 +64,8 @@ export const groups: Group[] = [
   { id: COMMUNITY_GROUP_ID, label: 'Community' },
 ];
 
-export const otherArea: Area = { id: 'other', label: 'Elsewhere', icon: faBars };
-export const communityArea: Area = { id: 'community', label: 'Community', icon: faMessageLines };
+export const otherArea: Area = { id: 'other', label: 'Elsewhere', icon: Menu };
+export const communityArea: Area = { id: 'community', label: 'Community', icon: MessageSquareText };
 
 export type GoToEntry = { label: string; url: string };
 

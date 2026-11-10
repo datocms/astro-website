@@ -14,7 +14,7 @@ import s from '../../style.module.css';
 import { streamAskAi } from '../../apis/ask';
 import { useSearch } from '../../context';
 import { Thinking } from './Thinking';
-import { faThumbsDown, faThumbsUp } from '@fortawesome/pro-regular-svg-icons';
+import { ThumbsDown, ThumbsUp } from 'lucide';
 import { IconReact } from '~/components/Icon/Icon';
 
 const codePlugin = createCodePlugin({ themes: ['github-light', 'github-light'] });
@@ -248,7 +248,7 @@ export const AskAi = forwardRef<AskAiHandle, Props>(function AskAi({ initialQues
                       onClick={() => submitFeedback(i, 'up')}
                     >
                       <span className={s.feedbackButtonIcon}>
-                        <IconReact icon={faThumbsUp} />
+                        <IconReact icon={ThumbsUp} />
                       </span>
                       Yes
                     </button>
@@ -259,7 +259,7 @@ export const AskAi = forwardRef<AskAiHandle, Props>(function AskAi({ initialQues
                       onClick={() => submitFeedback(i, 'down')}
                     >
                       <span className={s.feedbackButtonIcon}>
-                        <IconReact icon={faThumbsDown} />
+                        <IconReact icon={ThumbsDown} />
                       </span>
                       No
                     </button>

@@ -1,4 +1,4 @@
-import { faChevronDown } from '@fortawesome/pro-regular-svg-icons';
+import { ChevronDown } from 'lucide';
 import classNames from 'classnames';
 import type { ComponentProps, ReactNode } from 'react';
 import { IconReact } from '~/components/Icon/Icon';
@@ -60,7 +60,7 @@ export function FormSelectReactComponent({ className, ...props }: ComponentProps
         {...props}
       />
       <span className={styles.chevron}>
-        <IconReact icon={faChevronDown} />
+        <IconReact icon={ChevronDown} />
       </span>
     </div>
   );

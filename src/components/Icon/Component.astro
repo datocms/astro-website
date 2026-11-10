@@ -1,32 +1,27 @@
 ---
-import type { IconDefinition } from '@fortawesome/fontawesome-common-types';
+import { type IconData, iconParts } from './data';
 
 interface Props extends astroHTML.JSX.SVGAttributes {
-  /** The Font Awesome icon. Import it one at a time from the package. */
-  icon: IconDefinition;
+  /** A Lucide icon or a Simple Icons brand mark. */
+  icon: IconData;
   /** The accessible name. Without it, the icon is hidden from assistive technology. */
   label?: string;
 }
 
 const { icon, label, ...attrs } = Astro.props;
-
-const [width, height, , , pathData] = icon.icon;
-const paths = Array.isArray(pathData) ? pathData : [pathData];
-// Keep the proportions of the icon: the height is 1em, the width follows.
-const widthEm = Number((width / height).toFixed(4));
+const { svgAttrs, children } = iconParts(icon);
 ---
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  viewBox={`0 0 ${width} ${height}`}
-  width={`${widthEm}em`}
+  {...svgAttrs}
+  width="1em"
   height="1em"
-  fill="currentColor"
   role={label ? 'img' : undefined}
   aria-label={label}
   aria-hidden={label ? undefined : 'true'}
   focusable="false"
   {...attrs}
 >
-  {paths.map((d) => <path d={d} />)}
+  {children.map(({ tag: Tag, attrs }) => <Tag {...attrs} />)}
 </svg>

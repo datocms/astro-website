@@ -1,20 +1,22 @@
 ---
-import { faAt } from '@fortawesome/pro-regular-svg-icons/faAt';
-import { faBold } from '@fortawesome/pro-regular-svg-icons/faBold';
-import { faBookmark } from '@fortawesome/pro-regular-svg-icons/faBookmark';
-import { faChevronDown } from '@fortawesome/pro-regular-svg-icons/faChevronDown';
-import { faCode } from '@fortawesome/pro-regular-svg-icons/faCode';
-import { faFaceSmile } from '@fortawesome/pro-regular-svg-icons/faFaceSmile';
-import { faFont } from '@fortawesome/pro-regular-svg-icons/faFont';
-import { faItalic } from '@fortawesome/pro-regular-svg-icons/faItalic';
-import { faLink } from '@fortawesome/pro-regular-svg-icons/faLink';
-import { faListUl } from '@fortawesome/pro-regular-svg-icons/faListUl';
-import { faLock } from '@fortawesome/pro-regular-svg-icons/faLock';
-import { faMessageLines } from '@fortawesome/pro-regular-svg-icons/faMessageLines';
-import { faPaperPlane } from '@fortawesome/pro-regular-svg-icons/faPaperPlane';
-import { faPaperPlaneTop } from '@fortawesome/pro-regular-svg-icons/faPaperPlaneTop';
-import { faPlus } from '@fortawesome/pro-regular-svg-icons/faPlus';
-import { faXmark } from '@fortawesome/pro-regular-svg-icons/faXmark';
+import {
+  AtSign,
+  Bold,
+  Bookmark,
+  ChevronDown,
+  Code,
+  Italic,
+  Link,
+  List,
+  Lock,
+  MessageSquareText,
+  Plus,
+  Send,
+  SendHorizontal,
+  Smile,
+  Type,
+  X,
+} from 'lucide';
 import symbol from '~/assets/logo/symbol.svg?raw';
 import { Icon } from '~/components/Icon';
 import ChatAvatar from './ChatAvatar.astro';
@@ -38,12 +40,12 @@ const lastReply = chat.thread[chat.thread.length - 1]!;
 const description = `A team chat with the channel #${chat.channel}, which ${chat.workspace} shares with ${chat.sharedWith}. ${question.name} of ${question.org} asks: “${question.text}” In the thread, ${chat.thread.map((reply) => `${reply.name} of ${reply.org} answers: “${reply.text}${'code' in reply ? ` ${reply.code} ${reply.after}` : ''}”`).join(' ')}`;
 
 const SIDEBAR_LINKS = [
-  { icon: faMessageLines, label: 'Threads' },
-  { icon: faPaperPlane, label: 'Drafts & sent' },
-  { icon: faBookmark, label: 'Saved' },
+  { icon: MessageSquareText, label: 'Threads' },
+  { icon: Send, label: 'Drafts & sent' },
+  { icon: Bookmark, label: 'Saved' },
 ];
 
-const TOOLBAR = [faBold, faItalic, faLink, faListUl, faCode];
+const TOOLBAR = [Bold, Italic, Link, List, Code];
 ---
 
 <div class:list={[styles.window, 'surfacePage']} role="img" aria-label={description}>
@@ -51,7 +53,7 @@ const TOOLBAR = [faBold, faItalic, faLink, faListUl, faCode];
     <div class={styles.sidebar}>
       <p class={styles.workspace}>
         {chat.workspace}
-        <Icon icon={faChevronDown} />
+        <Icon icon={ChevronDown} />
       </p>
       <ul class={styles.nav}>
         {
@@ -66,7 +68,7 @@ const TOOLBAR = [faBold, faItalic, faLink, faListUl, faCode];
       <p class={styles.section}>External connections</p>
       <ul class={styles.nav}>
         <li class={styles.navItem} data-current>
-          <Icon icon={faLock} />
+          <Icon icon={Lock} />
           {chat.channel}
         </li>
       </ul>
@@ -86,7 +88,7 @@ const TOOLBAR = [faBold, faItalic, faLink, faListUl, faCode];
     <div class={styles.channel}>
       <div class={styles.channelHeader}>
         <p class={styles.title}>
-          <Icon icon={faLock} />
+          <Icon icon={Lock} />
           {chat.channel}
         </p>
       </div>
@@ -143,11 +145,11 @@ const TOOLBAR = [faBold, faItalic, faLink, faListUl, faCode];
           <p class={styles.toolbar}>{TOOLBAR.map((icon) => <Icon icon={icon} />)}</p>
           <p class={styles.placeholder}>Message {chat.channel}</p>
           <p class={styles.actions}>
-            <span class={styles.round}><Icon icon={faPlus} /></span>
-            <Icon icon={faFont} />
-            <Icon icon={faFaceSmile} />
-            <Icon icon={faAt} />
-            <span class={styles.send}><Icon icon={faPaperPlaneTop} /></span>
+            <span class={styles.round}><Icon icon={Plus} /></span>
+            <Icon icon={Type} />
+            <Icon icon={Smile} />
+            <Icon icon={AtSign} />
+            <span class={styles.send}><Icon icon={SendHorizontal} /></span>
           </p>
         </div>
       </div>
@@ -156,8 +158,8 @@ const TOOLBAR = [faBold, faItalic, faLink, faListUl, faCode];
     <div class={styles.thread}>
       <p class={styles.threadHeader}>
         <span class={styles.title}>Thread</span>
-        <span class={styles.threadChannel}><Icon icon={faLock} />{chat.channel}</span>
-        <span class={styles.close}><Icon icon={faXmark} /></span>
+        <span class={styles.threadChannel}><Icon icon={Lock} />{chat.channel}</span>
+        <span class={styles.close}><Icon icon={X} /></span>
       </p>
       <ul class={styles.messages}>
         <li class={styles.message}>
@@ -193,7 +195,7 @@ const TOOLBAR = [faBold, faItalic, faLink, faListUl, faCode];
                       {reply.reaction.emoji} {reply.reaction.count}
                     </span>
                     <span class={styles.reaction} data-add>
-                      <Icon icon={faFaceSmile} />
+                      <Icon icon={Smile} />
                     </span>
                   </p>
                 )}
@@ -206,11 +208,11 @@ const TOOLBAR = [faBold, faItalic, faLink, faListUl, faCode];
         <div class={styles.composer}>
           <p class={styles.placeholder}>Reply…</p>
           <p class={styles.actions}>
-            <span class={styles.round}><Icon icon={faPlus} /></span>
-            <Icon icon={faFont} />
-            <Icon icon={faFaceSmile} />
-            <Icon icon={faAt} />
-            <span class={styles.send}><Icon icon={faPaperPlaneTop} /></span>
+            <span class={styles.round}><Icon icon={Plus} /></span>
+            <Icon icon={Type} />
+            <Icon icon={Smile} />
+            <Icon icon={AtSign} />
+            <span class={styles.send}><Icon icon={SendHorizontal} /></span>
           </p>
         </div>
       </div>

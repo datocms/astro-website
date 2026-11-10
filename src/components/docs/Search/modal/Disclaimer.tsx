@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import s from '../style.module.css';
-import { faTriangleExclamation, faXmark } from '@fortawesome/pro-regular-svg-icons';
+import { TriangleAlert, X } from 'lucide';
 import { IconReact } from '~/components/Icon/Icon';
 
 const STORAGE_KEY = 'datocms-search-ai-disclaimer-dismissed';
@@ -44,7 +44,7 @@ export function ModalDisclaimer() {
   return (
     <div className={s.disclaimer} data-state={phase}>
       <span className={s.disclaimerIcon}>
-        <IconReact icon={faTriangleExclamation} />
+        <IconReact icon={TriangleAlert} />
       </span>
       <span className={s.disclaimerText}>
         AI answers are experimental and may be inaccurate. Always double-check before relying on
@@ -56,7 +56,7 @@ export function ModalDisclaimer() {
         onClick={handleDismiss}
         aria-label="Dismiss disclaimer"
       >
-        <IconReact icon={faXmark} />
+        <IconReact icon={X} />
       </button>
     </div>
   );

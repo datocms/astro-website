@@ -42,11 +42,9 @@ if [[ $MODE == clone ]]; then
   # The Vite cache of the main tree has the wrong root for this tree.
   rm -rf "$DIR/node_modules/.vite" "$DIR/node_modules/.astro"
 else
-  # .npmrc reads FONTAWESOME_PACKAGE_TOKEN, thus npm ci runs through dotenv.
   # INSIDE_DOCKER=1 stops the "prepare" script. It does not install the git
   # hooks again into the .git directory that all worktrees share.
-  (cd "$DIR" && INSIDE_DOCKER=1 "$MAIN/node_modules/.bin/dotenv" -e "$ENV_FILE" -- \
-    npm ci --no-audit --no-fund --loglevel=error)
+  (cd "$DIR" && INSIDE_DOCKER=1 npm ci --no-audit --no-fund --loglevel=error)
 fi
 echo "node_modules ($MODE) ready in $(( $(date +%s) - t0 ))s"
 

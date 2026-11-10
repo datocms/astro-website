@@ -1,10 +1,5 @@
-import type { IconDefinition } from '@fortawesome/fontawesome-common-types';
-import { faAddressCard } from '@fortawesome/pro-regular-svg-icons/faAddressCard';
-import { faBadgePercent } from '@fortawesome/pro-regular-svg-icons/faBadgePercent';
-import { faKey } from '@fortawesome/pro-regular-svg-icons/faKey';
-import { faMegaphone } from '@fortawesome/pro-regular-svg-icons/faMegaphone';
-import { faTags } from '@fortawesome/pro-regular-svg-icons/faTags';
-import { faUserTie } from '@fortawesome/pro-regular-svg-icons/faUserTie';
+import type { IconData } from '~/components/Icon/data';
+import { BadgePercent, BriefcaseBusiness, IdCard, KeyRound, Megaphone, Tags } from 'lucide';
 import { getData } from 'country-list';
 import type { ButtonData } from '~/components/Button';
 import {
@@ -44,8 +39,8 @@ export const logos = {
 };
 
 export interface Benefit {
-  /** The Font Awesome icon above the title. */
-  icon: IconDefinition;
+  /** The icon above the title. */
+  icon: IconData;
   title: string;
   /** HTML: the text has links. */
   body: string;
@@ -60,33 +55,33 @@ export const benefits = {
     "DatoCMS was born out of an agency. It's only natural that our partner program incorporates all the essential elements to support the success of your agency.",
   items: [
     {
-      icon: faTags,
+      icon: Tags,
       title: 'Special plans and deals',
       body: 'Custom plans to get you started without surprises, and a 30% discount on the Professional plan for your clients.',
     },
     {
-      icon: faBadgePercent,
+      icon: BadgePercent,
       title: 'Discounts for your clients',
       body: 'Enable special plans on your clients\' accounts <a href="/docs/agency-partner-program/partners-dashboard#enabling-special-plans-to-clients">directly from your dashboard</a>, no need to ask us.',
     },
     {
-      icon: faKey,
+      icon: KeyRound,
       title: "Full access to your clients' projects",
       body: 'Give your team <a href="/docs/agency-partner-program/partners-dashboard#automatic-access-to-your-clients-projects">predefined access to all client projects</a> without any extra collaborator seats.',
     },
     {
-      icon: faUserTie,
+      icon: BriefcaseBusiness,
       title: 'Dedicated partner manager',
       body: 'Direct access to our Partner Team for you and your clients, with constant updates and support.',
     },
     {
-      icon: faAddressCard,
+      icon: IdCard,
       title: 'Dedicated partner listing',
       body: 'Get listed on our <a href="/partners">Partners page</a> with your projects and co-marketing content so teams looking for development help can find you.',
       link: { label: 'Explore our partner listings →', href: '/partners' },
     },
     {
-      icon: faMegaphone,
+      icon: Megaphone,
       title: 'Co-marketing',
       body: 'We\'ll promote your work through <a href="/case-studies">case studies</a>, articles, and other collaborations. We also LOVE to talk to you about your work.',
       link: { label: 'Explore our partner chats →', href: '/blog/casual-chats' },

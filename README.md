@@ -24,7 +24,7 @@ https://www.datocms.com/blog/why-we-switched-to-astro
 
 1. Clone this repository: `git clone https://github.com/datocms/website`
 2. Run `npm run decrypt-env` to decrypt the secrets.
-3. Install dependencies with `npm run install-deps`. It runs `npm ci` with the Font Awesome Pro token of `.env.development` (`.npmrc` reads `FONTAWESOME_PACKAGE_TOKEN`). Use `node scripts/install-deps.mjs install <package>` to add a package.
+3. Install dependencies with `npm ci`.
 4. Run `npm run dev` to start a local development server at [localhost:4321](http://localhost:4321).
 
 # Conventions

@@ -2,7 +2,7 @@ import cn from 'classnames';
 
 import s from '../../style.module.css';
 import { COMMUNITY_GROUP_ID, groups } from '../../constants';
-import { faMessageLines } from '@fortawesome/pro-regular-svg-icons';
+import { MessageSquareText } from 'lucide';
 import { IconReact } from '~/components/Icon/Icon';
 
 type Props = {
@@ -38,7 +38,7 @@ export function FilterChips({ selected, onSelect, showCommunity }: Props) {
             onClick={() => onSelect(communityGroup.id)}
           >
             <span className={s.filterChipIcon}>
-              <IconReact icon={faMessageLines} />
+              <IconReact icon={MessageSquareText} />
             </span>
             Community Forum
           </button>

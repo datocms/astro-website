@@ -18,7 +18,7 @@ import { ModalDisclaimer } from '../../modal/Disclaimer';
 import { useSearch } from '../../context';
 import { aiStarterPrompts } from '../../constants';
 import type { AskAiHandle } from './AskAi';
-import { faMessages, faSparkles } from '@fortawesome/pro-regular-svg-icons';
+import { MessagesSquare, Sparkles } from 'lucide';
 import { IconReact } from '~/components/Icon/Icon';
 
 const AskAi = lazy(() => import('./AskAi').then((m) => ({ default: m.AskAi })));
@@ -122,7 +122,7 @@ export function AiScreen() {
                 onClick={() => goAi(prompt)}
               >
                 <span className={s.rowIcon}>
-                  <IconReact icon={faMessages} />
+                  <IconReact icon={MessagesSquare} />
                 </span>
                 <span className={s.rowLabel}>{prompt}</span>
               </button>
@@ -139,7 +139,7 @@ export function AiScreen() {
         value={searchInput}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        icon={faSparkles}
+        icon={Sparkles}
       />
       <ModalDisclaimer />
     </>

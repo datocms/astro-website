@@ -1,6 +1,6 @@
 ---
-import { faClaude, faMarkdown, faOpenai } from '@fortawesome/free-brands-svg-icons';
-import { faCheck, faChevronDown, faCopy, faLink } from '@fortawesome/pro-regular-svg-icons';
+import { Bot, Check, ChevronDown, Copy, Link } from 'lucide';
+import { siClaude, siMarkdown } from 'simple-icons';
 import { Icon } from '~/components/Icon';
 import styles from './style.module.css';
 
@@ -15,16 +15,16 @@ interface Props {
 const { markdownUrl, size = 'm', class: className } = Astro.props;
 const request = `Read ${markdownUrl} so I can ask questions about it.`;
 const links = [
-  { label: 'View as Markdown', href: markdownUrl, icon: faMarkdown },
+  { label: 'View as Markdown', href: markdownUrl, icon: siMarkdown },
   {
     label: 'Open in ChatGPT',
     href: `https://chatgpt.com/?hints=search&q=${encodeURIComponent(request)}`,
-    icon: faOpenai,
+    icon: Bot,
   },
   {
     label: 'Open in Claude',
     href: `https://claude.ai/new?q=${encodeURIComponent(request)}`,
-    icon: faClaude,
+    icon: siClaude,
   },
 ];
 ---
@@ -48,8 +48,8 @@ const links = [
       class:list={[styles.part, size === 's' ? 'caption' : 'labelMedium']}
       data-action="copy-page"
     >
-      <span class={styles.icon} data-icon="copy"><Icon icon={faCopy} /></span>
-      <span class={styles.icon} data-icon="done" hidden><Icon icon={faCheck} /></span>
+      <span class={styles.icon} data-icon="copy"><Icon icon={Copy} /></span>
+      <span class={styles.icon} data-icon="done" hidden><Icon icon={Check} /></span>
       <span class="capTrim" data-label>Copy page</span>
     </button>
     <button
@@ -59,13 +59,13 @@ const links = [
       aria-expanded="false"
       data-action="toggle"
     >
-      <span class={styles.chevron}><Icon icon={faChevronDown} /></span>
+      <span class={styles.chevron}><Icon icon={ChevronDown} /></span>
     </button>
   </div>
   <ul class={styles.menu} data-menu hidden>
     <li>
       <button type="button" class:list={[styles.item, 'caption']} data-action="copy-link">
-        <span class={styles.icon}><Icon icon={faLink} /></span>
+        <span class={styles.icon}><Icon icon={Link} /></span>
         Copy Markdown link
       </button>
     </li>

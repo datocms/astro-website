@@ -69,7 +69,7 @@ A diagram is a `whole` frame that is a picture of what DatoCMS does, not a scree
 - A **pill** for the actor: the mark of DatoCMS and a mono label in literal case. An event pill shows one event and its time; the next event takes its place; a history shows only in the panel.
 - A **track** for a line: quiet and solid, with a pulse of the accent for data that moves. No arrows, no dashes.
 - A **panel** with a label in capitals for a container.
-- An **icon** (Font Awesome, regular, with `Icon`) in the place of the mark, on a pill for a thing that is not DatoCMS: the schedule of the customer, their bucket, their domain. Two icons in a diagram at most. Choose an icon that stays clear at 14px: at that size the bucket looks like a padlock.
+- An **icon** (Lucide, with `Icon`) in the place of the mark, on a pill for a thing that is not DatoCMS: the schedule of the customer, their bucket, their domain. Two icons in a diagram at most. Choose an icon that stays clear at 14px: at that size the bucket looks like a padlock.
 - The **working mark, then a check**, on an item of a task (a part of an export): the working mark (`.working`) while it runs, a check when it is done, no mark at rest. Each mark is a box of 14 × 14 px, thus the item keeps its width. The still has all the checks.
 - The **ring** and the tint of the accent for a change. Never red: red is for a failure, and a purge is the product at work.
 - A **photo** or a video thumb has no class, no shadow and no ring (a ring made each photo look like a box).

@@ -1,8 +1,8 @@
 import type { ChangeEventHandler, KeyboardEventHandler, RefObject } from 'react';
 
 import s from '../style.module.css';
-import type { IconDefinition } from '@fortawesome/fontawesome-common-types';
-import { faMagnifyingGlass, faXmark } from '@fortawesome/pro-regular-svg-icons';
+import type { IconData } from '~/components/Icon/data';
+import { Search, X } from 'lucide';
 import { IconReact } from '~/components/Icon/Icon';
 
 type Props = {
@@ -14,7 +14,7 @@ type Props = {
   onChange: ChangeEventHandler<HTMLInputElement>;
   onKeyDown: KeyboardEventHandler<HTMLInputElement>;
   placement?: 'top' | 'bottom';
-  icon?: IconDefinition;
+  icon?: IconData;
   /** When set, the row shows a close button. */
   onClose?: () => void;
 };
@@ -28,7 +28,7 @@ export function ModalInputRow({
   onChange,
   onKeyDown,
   placement = 'top',
-  icon = faMagnifyingGlass,
+  icon = Search,
   onClose,
 }: Props) {
   return (
@@ -50,7 +50,7 @@ export function ModalInputRow({
       />
       {onClose && (
         <button type="button" className={s.closeButton} onClick={onClose} aria-label="Close search">
-          <IconReact icon={faXmark} />
+          <IconReact icon={X} />
         </button>
       )}
     </div>
