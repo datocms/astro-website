@@ -304,7 +304,7 @@ export default function CloneButtonGeneratorForm() {
           <TabsReactComponent>
             <TabReactComponent title="Markdown">
               <pre>
-                [![Clone DatoCMS project](https://dashboard.datocms.com/clone/button.svg)](
+                [![Deploy with DatoCMS](https://dashboard.datocms.com/deploy/button.svg)](
                 {deployUrl})
               </pre>
             </TabReactComponent>
@@ -313,7 +313,7 @@ export default function CloneButtonGeneratorForm() {
               <pre>{`<a href="${deployUrl}" target="_blank" rel="noopener">
     <img
       src="https://dashboard.datocms.com/deploy/button.svg"
-      alt="deploy project button"
+      alt="Deploy with DatoCMS"
     />
   </a>`}</pre>
             </TabReactComponent>
@@ -326,7 +326,7 @@ export default function CloneButtonGeneratorForm() {
               <a href={deployUrl} target="_blank" rel="noopener noreferrer" className={s.button}>
                 <img
                   src="https://dashboard.datocms.com/deploy/button.svg"
-                  alt="deploy project button"
+                  alt="Deploy with DatoCMS"
                 />
               </a>
             </TabReactComponent>
