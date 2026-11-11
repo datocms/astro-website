@@ -5,7 +5,7 @@ Two more files hold rules for their directory:
 - `src/data/AGENTS.md`: the copy, the pages, the pillars and the chapters.
 - `src/scenes/AGENTS.md`: the pictures of the product (scenes, frames, fragments, diagrams, photos).
 
-Read `TONE_OF_VOICE.md` (repository root) before you write or change any text that a visitor sees.
+Read the voice in `BRAND.md` (repository root, sections 2, 4, 5 and 7) before you write or change any text that a visitor sees.
 
 ## Directories
 

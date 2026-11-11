@@ -69,7 +69,7 @@ Home page line, today: "Thoughtfully built and ambitiously used. The AI-agnostic
 ## Brand Commitments
 
 - Name: DatoCMS. In copy, "we", never "DatoCMS provides…".
-- Voice: `TONE_OF_VOICE.md` is binding. Effortless, independent, generous, thoughtful. "Boring × Brilliant": solid infrastructure with a point of view. Understatement over superlatives. The list of banned words is in that file.
+- Voice: `BRAND.md` (sections 2, 4, 5 and 7) is binding. Effortless, independent, generous, thoughtful. "Boring × Brilliant": solid infrastructure with a point of view. Understatement over superlatives. The words we avoid are in section 7 of that file.
 - The text faces (`[••]`, `[•ᴥ•]`, `[•*•]`) are part of the current headlines.
 - Litmus test: good copy feels like advice from someone who has done this before.
 - From the rebrand workshop with overnice, kept on purpose: the opinionated, casual, anti-corporate tone; the vertical flow of content; the highlight style of headlines and quotes.

@@ -1,6 +1,6 @@
 # AGENTS.md: the copy and the pages
 
-The copy of every page lives here, one typed file for each route. The general conventions are in the root `AGENTS.md`; the pictures are in `src/scenes/AGENTS.md`. All copy follows the Dato voice in `TONE_OF_VOICE.md`: read it before you write or change any text that a visitor sees.
+The copy of every page lives here, one typed file for each route. The general conventions are in the root `AGENTS.md`; the pictures are in `src/scenes/AGENTS.md`. All copy follows the Dato voice in `BRAND.md` (sections 2, 4, 5 and 7): read it before you write or change any text that a visitor sees.
 
 ## Data files
 
