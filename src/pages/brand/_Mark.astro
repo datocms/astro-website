@@ -1,0 +1,57 @@
+---
+// The DatoCMS logo as an inline SVG, from the master files of
+// src/assets/logo/. The first path is the symbol and the other paths are
+// the letters: `data-part` tells them apart, thus a specimen can draw each
+// part in its own way. The slot is for lines on top of the logo.
+import symbolSvg from '~/assets/logo/symbol.svg?raw';
+import wordmarkSvg from '~/assets/logo/wordmark.svg?raw';
+
+interface Props {
+  kind: 'wordmark' | 'symbol';
+  /** A larger view box, for a drawing that has lines around the logo. */
+  viewBox?: string;
+  /** With an id, the drawing has a clip path of this id, in the shape of the logo. */
+  clipId?: string;
+  /** The accessible name. Without it, the logo is hidden from assistive technology. */
+  label?: string;
+  class?: string;
+  style?: string;
+}
+
+const { kind, clipId, label, class: className, style } = Astro.props;
+const source = kind === 'wordmark' ? wordmarkSvg : symbolSvg;
+const viewBox = Astro.props.viewBox ?? source.match(/viewBox="([^"]+)"/)?.[1];
+const paths = [...source.matchAll(/<path([^>]*?)\sd="([^"]+)"/g)].map((match, index) => ({
+  evenodd: match[1]?.includes('evenodd'),
+  d: match[2],
+  part: index === 0 ? 'symbol' : 'letters',
+}));
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox={viewBox}
+  fill="currentColor"
+  class={className}
+  style={style}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+>
+  {
+    paths.map((path) => (
+      <path data-part={path.part} fill-rule={path.evenodd ? 'evenodd' : undefined} d={path.d} />
+    ))
+  }
+  {
+    clipId && (
+      <clipPath id={clipId}>
+        {paths.map((path) => (
+          <path clip-rule={path.evenodd ? 'evenodd' : undefined} d={path.d} />
+        ))}
+      </clipPath>
+    )
+  }
+  <slot />
+</svg>

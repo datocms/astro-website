@@ -1,0 +1,837 @@
+/*
+ * The hero: a split. The text is in the left half of the content column,
+ * on the accent. Below 1152 the plate comes after the text, and it goes to
+ * the right edge of the page. From 1152 the plate is the right half of the
+ * band: from the centre of the page to its right edge, and from the top of
+ * the text to the bottom of the band. The band cuts the plate, as the
+ * frame of a scene.
+ */
+.hero {
+  position: relative;
+  overflow-x: clip;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.heroLabel {
+  margin: 0 0 calc(var(--space-2xs) - var(--space-md));
+  color: var(--text-muted);
+}
+
+.heroIntro {
+  max-width: var(--reading-max);
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.heroButtons {
+  margin-top: var(--space-xs);
+}
+
+.heroPlate {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 280px;
+  margin: 0 calc(50% - 50vw) 0 0;
+  padding: var(--space-xl) var(--space-md) var(--space-2xl);
+  border-top-left-radius: var(--radius-sm);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+/*
+ * The symbol with the lines of its construction. Each line fades out
+ * between the symbol and the edge of the drawing. The two masks do that:
+ * one for the left and right ends, one for the top and bottom ends. The
+ * symbol is in the part where the two masks are solid (from 20.6% of the
+ * width and from 16.7% of the height), thus it does not fade.
+ */
+.construction {
+  width: min(100%, 340px);
+  height: auto;
+  mask-image:
+    linear-gradient(to right, transparent, black 19%, black 81%, transparent),
+    linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+  mask-composite: intersect;
+}
+
+/*
+ * A line of the construction. The symbol is 20 units tall, and the drawing
+ * shows a unit at 9 to 12px, thus the line is approximately 1px wide
+ * (--guide-width, from the page).
+ * `pathLength="1"` in the markup makes the length of each line 1: the
+ * dash can then draw the line from its start to its end.
+ */
+.guide {
+  fill: none;
+  stroke: var(--text-on-inverse-muted);
+  stroke-width: var(--guide-width);
+  stroke-dasharray: 1;
+}
+
+/* The lines in the symbol have the colour of the plate. */
+.guidesInside .guide {
+  stroke: var(--surface-inverse);
+}
+
+.heroCaption {
+  position: absolute;
+  bottom: var(--space-md);
+  left: var(--space-md);
+  color: var(--text-on-inverse-soft);
+}
+
+/*
+ * The lines draw themselves one time, one after the other, when the page
+ * loads. The symbol is there from the start.
+ */
+:global(html[data-motion='on']) .guide {
+  animation: draw 900ms cubic-bezier(0.77, 0, 0.175, 1) both;
+  animation-delay: calc(350ms + var(--i) * 70ms);
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The content of a section: the headline, then its block. */
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.intro {
+  max-width: var(--reading-max);
+  color: var(--text-soft);
+}
+
+.note {
+  color: var(--text-muted);
+}
+
+/* The marks of a correct and of a wrong example. */
+.yes,
+.no {
+  flex: none;
+}
+
+.yes {
+  color: var(--text-positive);
+}
+
+.no {
+  color: var(--text-negative);
+}
+
+/*
+ * The name: a correction sheet. Each rule is a row between two hairlines.
+ * Below 768 the three parts of a row are one above the other. From 768
+ * they are three columns, with the names of the columns above the first
+ * row.
+ */
+.sheetOfWords {
+  --wording-columns: minmax(0, 5fr) minmax(0, 3fr) minmax(0, 4fr);
+}
+
+.wordingHeads {
+  display: none;
+  margin: 0;
+  padding-bottom: var(--space-xs);
+  color: var(--text-muted);
+}
+
+.wordings {
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--border-default);
+  list-style: none;
+}
+
+.wording {
+  display: grid;
+  gap: var(--space-xs);
+  padding-block: var(--space-md);
+  border-top: 1px solid var(--border-default);
+}
+
+.wording :where(p) {
+  margin: 0;
+}
+
+/* A wrong wording: one for each line, with a line through it. */
+.not {
+  color: var(--text-muted);
+}
+
+.not :where(s) {
+  display: block;
+  text-decoration-color: var(--text-negative);
+  text-decoration-thickness: 1px;
+}
+
+.why {
+  max-width: 44ch;
+  color: var(--text-soft);
+}
+
+/*
+ * The logo files: a grid of cards. Each card is a plate, a name and its
+ * links. A wordmark is wide and a symbol is square, thus a wordmark takes
+ * more columns. From 1152 the two wordmarks are one row and the five
+ * other files are the next row.
+ */
+.assets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xl) var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asset {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.assetWide {
+  grid-column: span 2;
+}
+
+/*
+ * The plate shows the file on the ground it is made for. The light plate
+ * is white in both schemes, as the plate of a partner logo. The plate of
+ * a file that has its own ground has only a hairline.
+ */
+.plate {
+  display: grid;
+  place-items: center;
+  height: 160px;
+  padding: var(--space-md);
+  border: 1px solid var(--border-default);
+}
+
+.plateLight {
+  background: var(--surface-raised);
+}
+
+.plateDark {
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+}
+
+.picture {
+  max-width: 100%;
+  max-height: 56px;
+}
+
+.assetWide .picture {
+  max-height: 40px;
+}
+
+.pictureCircle,
+.pictureRounded {
+  width: 88px;
+  max-height: none;
+}
+
+.pictureCircle {
+  border-radius: var(--radius-full);
+}
+
+/* The corner of an app icon is about a fifth of its side. */
+.pictureRounded {
+  border-radius: 22%;
+}
+
+.assetText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5xs);
+}
+
+.assetText :where(h3, p) {
+  margin: 0;
+}
+
+/*
+ * The links are one line, at the bottom of the card: the cards of a row
+ * have notes of different lengths, and the links stay on one line across
+ * the row.
+ */
+.downloads {
+  display: flex;
+  gap: var(--space-xs);
+  margin: auto 0 0;
+  white-space: nowrap;
+}
+
+/* Below 768 a card is narrow: the links have no icons, thus they stay on one line. */
+.downloads :where(svg) {
+  display: none;
+  flex: none;
+}
+
+.downloads :where(a, button) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4xs);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
+}
+
+/* The copy button looks as the links next to it. */
+.copy {
+  display: inline-flex;
+}
+
+.copy[hidden] {
+  display: none;
+}
+
+.copy button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.copyIdle,
+.copyDone {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4xs);
+}
+
+.copyDone,
+.copy[data-copied] .copyIdle {
+  display: none;
+}
+
+.copy[data-copied] .copyDone {
+  display: inline-flex;
+}
+
+.copy[data-copied] button {
+  color: var(--text-positive);
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .downloads :where(a, button):hover {
+    text-decoration: none;
+  }
+}
+
+/* The circle: the text, then the picture with its two states. */
+.split {
+  display: grid;
+  gap: var(--space-2xl);
+  align-items: center;
+}
+
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* The profile pictures: one large, then three at real sizes, on one base line. */
+.stage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-md);
+}
+
+/*
+ * A profile picture: a circle cuts what is in it. --disc is its diameter.
+ * The symbol has two states.
+ *   symbol  the file with no margin, with its box in the centre: the
+ *           height of the symbol is 76% of the diameter.
+ *   avatar  the avatar file: the height is 50% of the diameter (0.658 of
+ *           the first state), and the symbol moves to the right by 9% of
+ *           its width. The numbers are those of scripts/brand-assets.mjs.
+ */
+.disc {
+  --disc: 64px;
+
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--disc);
+  height: var(--disc);
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: var(--color-purple-light-5);
+}
+
+/* The colours of the avatar file: they do not change with the scheme. */
+.discMark {
+  fill: var(--color-purple-deep-5);
+}
+
+.disc[data-large] {
+  --disc: min(240px, 56vw);
+
+  margin-right: var(--space-xs);
+}
+
+.discScale {
+  display: block;
+  height: 76%;
+  aspect-ratio: 19.8929 / 20.0209;
+  transform: scale(0.658);
+}
+
+.discMark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: translateX(9%);
+}
+
+.demo:has([value='symbol']:checked) .discScale {
+  transform: none;
+}
+
+.demo:has([value='symbol']:checked) .discMark {
+  transform: none;
+}
+
+/*
+ * The symbol moves between the states as a spring that goes a little too
+ * far and comes back. A browser with no `linear()` uses the curve of the
+ * first declaration.
+ */
+:global(html[data-motion='on']) :where(.discScale, .discMark) {
+  transition: transform 550ms cubic-bezier(0.3, 0, 0, 1);
+  transition-timing-function: linear(
+    0,
+    0.006,
+    0.025 2.8%,
+    0.101 6.1%,
+    0.539 18.9%,
+    0.721 25.3%,
+    0.849 31.5%,
+    0.937 38.1%,
+    0.968 41.8%,
+    0.991 45.7%,
+    1.006 50.1%,
+    1.015 55%,
+    1.017 63.9%,
+    1.001 85.9%,
+    1
+  );
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+/* The two states, as the tabs of the site: pills in a row, the selected one filled. */
+.switch {
+  display: inline-flex;
+  gap: var(--space-4xs);
+  padding: var(--space-4xs);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+}
+
+.option {
+  padding: var(--space-3xs) var(--space-sm);
+  border-radius: var(--radius-full);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.option:has(:checked) {
+  background: var(--surface-button);
+  color: var(--text-button);
+}
+
+.option:has(:focus-visible) {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .option:not(:has(:checked)):hover {
+    color: var(--text-primary);
+  }
+}
+
+/* Only the sentence of the selected state shows. */
+.verdict {
+  display: none;
+  align-items: center;
+  gap: var(--space-4xs);
+  margin: 0;
+}
+
+.demo:has([value='symbol']:checked) :where([data-verdict='symbol']),
+.demo:has([value='avatar']:checked) :where([data-verdict='avatar']) {
+  display: flex;
+}
+
+.sizes {
+  margin: 0;
+}
+
+/*
+ * The rules: each rule is a drawing on a sheet, and its sentence below.
+ * Two columns, three from 768.
+ */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.group :where(h3) {
+  margin: 0;
+}
+
+.specimens {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xl) var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.specimen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.sheet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 140px;
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+  background: var(--surface-default);
+  color: var(--text-primary);
+}
+
+.caption {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4xs);
+  margin: 0;
+  color: var(--text-soft);
+}
+
+/* The icon is on the line of the first words of a text that wraps. */
+.caption :where(svg) {
+  position: relative;
+  top: 0.15em;
+}
+
+/* The wordmark of a drawing. */
+.mark {
+  width: 58%;
+  height: auto;
+  overflow: visible;
+}
+
+.markSmall {
+  width: 68%;
+  height: auto;
+}
+
+/*
+ * A flat ground: the same wordmark on a light half and on a dark half.
+ * The light half is white in both schemes, as the light plate of a file.
+ */
+.half {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  align-self: stretch;
+  background: var(--surface-raised);
+}
+
+.half svg {
+  fill: var(--surface-inverse);
+}
+
+.halfInverse {
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse-strong);
+}
+
+.halfInverse svg {
+  fill: var(--text-on-inverse-strong);
+}
+
+/*
+ * The margin: a flat field around the wordmark, with a copy of the symbol
+ * in each corner. The symbol is the unit: the field is one symbol wide on
+ * every side.
+ */
+.room {
+  width: 84%;
+  height: auto;
+}
+
+.roomRing {
+  fill: var(--surface-accent-faint);
+}
+
+.roomUnit {
+  fill: var(--surface-accent-muted);
+}
+
+/*
+ * The smallest sizes, at their real size. Below 768 the sheet is narrow,
+ * thus the two logos are one above the other.
+ */
+.sheet[data-rule='size'] {
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.sized {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--text-muted);
+}
+
+.sized svg {
+  color: var(--text-primary);
+}
+
+.minWordmark {
+  width: auto;
+  height: 20px;
+}
+
+.minSymbol {
+  width: auto;
+  height: 16px;
+}
+
+/* Two colours: the symbol in the accent, and the letters in a weak tone. */
+.sheet[data-rule='tones'] [data-part='symbol'] {
+  fill: var(--text-accent);
+}
+
+.sheet[data-rule='tones'] [data-part='letters'] {
+  fill: var(--text-muted);
+}
+
+/* An outline: the lines of the logo, with no fill. */
+.sheet[data-rule='outline'] .mark {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The retired logo had an orange symbol. */
+.sheet[data-rule='orange'] [data-part='symbol'] {
+  fill: var(--color-orange-light-5);
+}
+
+.sheet[data-rule='stretch'] .mark {
+  transform: rotate(-7deg) scale(1.3, 0.72);
+}
+
+/* A busy picture: stripes in the tones of the theme. */
+.sheet[data-rule='busy'] {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--surface-accent) 0 14px,
+    var(--surface-accent-muted) 14px 22px,
+    var(--surface-inverse) 22px 30px,
+    var(--surface-accent-subtle) 30px 44px
+  );
+}
+
+/* The logo of a different company, with our symbol as a part of it. */
+.ownLogo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: 2px solid currentColor;
+  border-radius: var(--radius-md);
+}
+
+.ownMark {
+  width: auto;
+  height: 28px;
+}
+
+.ownName {
+  font-size: var(--type-l);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* Your work and ours: columns with a hairline above. */
+.columns {
+  display: grid;
+  gap: var(--space-xl);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-default);
+}
+
+.column :where(h3, p) {
+  margin: 0;
+}
+
+.columnText {
+  color: var(--text-soft);
+}
+
+@media (min-width: 768px) {
+  .heroPlate {
+    min-height: 360px;
+    border-top-left-radius: var(--radius-lg);
+  }
+
+  .columns {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .wordingHeads,
+  .wording {
+    display: grid;
+    grid-template-columns: var(--wording-columns);
+    column-gap: var(--space-xl);
+    align-items: baseline;
+  }
+
+  .wording {
+    padding-block: var(--space-lg);
+  }
+
+  .assets {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--space-xl) var(--space-lg);
+  }
+
+  .asset {
+    grid-column: span 2;
+  }
+
+  .assetWide {
+    grid-column: span 3;
+  }
+
+  .downloads :where(svg) {
+    display: block;
+  }
+
+  .plate {
+    height: 200px;
+    padding: var(--space-xl);
+  }
+
+  .assetWide .picture {
+    max-height: 44px;
+  }
+
+  .specimens {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-xl) var(--space-lg);
+  }
+
+  .sheet {
+    height: 180px;
+  }
+
+  .sheet[data-rule='size'] {
+    flex-direction: row;
+    gap: var(--space-xl);
+  }
+}
+
+@media (min-width: 1152px) {
+  .heroContent {
+    min-height: 460px;
+  }
+
+  .heroText {
+    width: calc(50% - var(--space-xl));
+    padding-bottom: var(--section-padding-y);
+  }
+
+  .heroPlate {
+    position: absolute;
+    top: var(--section-padding-y);
+    right: 0;
+    bottom: 0;
+    left: 50%;
+    min-height: 0;
+    margin: 0;
+  }
+
+  /* Ten columns: a wordmark takes five, and each other file takes two. */
+  .assets {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+
+  .assetWide {
+    grid-column: span 5;
+  }
+
+  .split {
+    grid-template-columns: 1fr auto;
+    gap: var(--space-3xl);
+  }
+}

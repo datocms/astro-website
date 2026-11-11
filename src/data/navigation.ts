@@ -256,6 +256,7 @@ export const footerColumns: FooterColumn[] = [
           l('Philosophy', '/philosophy'),
           l('Security', '/security'),
           l('Research program', '/research-program'),
+          l('Brand', '/brand'),
           l('Contact', '/contact'),
         ],
       },

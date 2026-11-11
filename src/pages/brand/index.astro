@@ -1,0 +1,433 @@
+---
+// The brand page: the name, the logo files to download, and the rules for
+// the people who use them. Each rule has a drawing. The copy is in
+// src/data/brand.ts. The files are in public/brand/
+// (scripts/brand-assets.mjs makes them).
+import { Check, Copy, Download, X } from 'lucide';
+import { ButtonGroup } from '~/components/ButtonGroup';
+import { CtaBanner } from '~/components/CtaBanner';
+import { Headline } from '~/components/Headline';
+import { Icon } from '~/components/Icon';
+import { Section } from '~/components/Section';
+import { circle, closing, hero, logo, name, rules, seo, together } from '~/data/brand';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
+import wordmarkSvg from '~/assets/logo/wordmark.svg?raw';
+import Mark from './_Mark.astro';
+import s from './_style.module.css';
+
+const tags = overrideSeo([], seoTitle(seo.title), seoDescription(seo.description));
+const file = (asset: string, extension: 'svg' | 'png') => `/brand/${asset}.${extension}`;
+
+// The symbol is a square with a circle on its right side. The numbers are
+// in the units of src/assets/logo/symbol.svg.
+const D = { width: 19.8929, height: 20.0209, cx: 9.9464, cy: 10.0105 };
+// The view box of the hero drawing: the symbol in the centre, with room for the lines.
+const HERO_BOX = { x: -7, y: -5, width: 33.8929, height: 30.0209 };
+// The width of a line of the drawing, in the same units. The CSS uses it.
+const GUIDE_WIDTH = 0.07;
+// The lines along the four sides of the square. Each line is outside the
+// symbol and touches its side: a line with its centre on the side is half
+// in the symbol and half out of it, and the side then looks out of line.
+const out = GUIDE_WIDTH / 2;
+const sideLines = [
+  { x1: HERO_BOX.x, y1: -out, x2: HERO_BOX.x + HERO_BOX.width, y2: -out },
+  { x1: HERO_BOX.x, y1: D.height + out, x2: HERO_BOX.x + HERO_BOX.width, y2: D.height + out },
+  { x1: -out, y1: HERO_BOX.y, x2: -out, y2: HERO_BOX.y + HERO_BOX.height },
+  { x1: D.width + out, y1: HERO_BOX.y, x2: D.width + out, y2: HERO_BOX.y + HERO_BOX.height },
+];
+// The two lines through the centre. They go across the symbol.
+const centreLines = [
+  { x1: HERO_BOX.x, y1: D.cy, x2: HERO_BOX.x + HERO_BOX.width, y2: D.cy },
+  { x1: D.cx, y1: HERO_BOX.y, x2: D.cx, y2: HERO_BOX.y + HERO_BOX.height },
+];
+
+// The left half of the circle of the symbol: the right half is the edge of
+// the symbol itself.
+const bowl = `M${D.cx} 0A${D.cx} ${D.cy} 0 0 0 ${D.cx} ${D.height}`;
+
+// The wordmark with its margin: the margin is the height of the symbol.
+// The numbers are in the units of src/assets/logo/wordmark.svg.
+const W = { x: 138.645, y: 182.469, width: 363.05, height: 55.062 };
+const ROOM = {
+  x: W.x - W.height,
+  y: W.y - W.height,
+  width: W.width + 2 * W.height,
+  height: 3 * W.height,
+};
+const roomViewBox = `${ROOM.x} ${ROOM.y} ${ROOM.width} ${ROOM.height}`;
+// The margin as a shape: the outer box with the box of the wordmark cut out.
+const roomRing =
+  `M${ROOM.x} ${ROOM.y}h${ROOM.width}v${ROOM.height}h${-ROOM.width}z` +
+  `M${W.x} ${W.y}h${W.width}v${W.height}h${-W.width}z`;
+// The symbol of the wordmark is the unit of the margin. A copy of it in
+// each corner of the margin shows that: `x` and `y` move the copy from the
+// position of the symbol in the wordmark.
+const symbolPath = wordmarkSvg.match(/<path[^>]*?\sd="([^"]+)"/)?.[1];
+const roomCorners = [
+  { x: -W.height, y: -W.height },
+  { x: W.width, y: -W.height },
+  { x: -W.height, y: W.height },
+  { x: W.width, y: W.height },
+];
+
+// The profile pictures of the circle section: one large, then three real sizes.
+const discSizes = ['large', 64, 40, 24] as const;
+---
+
+<Layout theme="purple" seo={tags} headerVariant="accent">
+  {
+    /*
+      The hero is a split. The text is in the left half, on the accent. The
+      right half is a dark plate with the drawing of the symbol, cut by the
+      right edge and by the bottom edge of the band, as the frame of a
+      product scene.
+    */
+  }
+  <Section background="accent" flushBottom class={s.hero} contentClass={s.heroContent} data-hero>
+    <div class={s.heroText}>
+      <p class:list={[s.heroLabel, 'body']}>{hero.label}</p>
+      <Headline as="h1" size="headline" muted={hero.subheadline}>{hero.headline}</Headline>
+      <p class:list={[s.heroIntro, 'body']}>{hero.intro}</p>
+      <ButtonGroup buttons={hero.buttons} size="l" class={s.heroButtons} data-datocms-nomd />
+    </div>
+    <figure class:list={[s.heroPlate, 'surfaceInverse']} data-datocms-nomd>
+      <Mark
+        kind="symbol"
+        viewBox={`${HERO_BOX.x} ${HERO_BOX.y} ${HERO_BOX.width} ${HERO_BOX.height}`}
+        label={hero.drawing.alt}
+        clipId="brand-symbol"
+        class={s.construction}
+        style={`--guide-width: ${GUIDE_WIDTH}`}
+      >
+        {
+          /*
+            The lines are drawn two times. The first set has the light
+            colour of the plate. The second set shows only in the symbol,
+            in the dark colour of the plate: a light line does not show on
+            a light symbol.
+          */
+          [undefined, 'url(#brand-symbol)'].map((clip) => (
+            <g class={clip ? s.guidesInside : undefined} clip-path={clip}>
+              {!clip &&
+                sideLines.map((line, index) => (
+                  <line class={s.guide} style={`--i: ${index}`} pathLength="1" {...line} />
+                ))}
+              {centreLines.map((line, index) => (
+                <line class={s.guide} style={`--i: ${index + 4}`} pathLength="1" {...line} />
+              ))}
+              <path class={s.guide} style="--i: 6" pathLength="1" d={bowl} />
+            </g>
+          ))
+        }
+      </Mark>
+      <figcaption class:list={['pictureLabel', s.heroCaption]}>{hero.drawing.caption}</figcaption>
+    </figure>
+  </Section>
+
+  <Section contentClass={s.block}>
+    <Headline as="h2" size="headline" muted={name.muted}>{name.headline}</Headline>
+    {
+      /*
+        A correction sheet: one row for each rule. The correct wording is
+        large, the wrong wordings have a line through them, and the reason
+        is at the end of the row.
+      */
+    }
+    <div class={s.sheetOfWords}>
+      <p class:list={['label', s.wordingHeads]} aria-hidden="true" data-datocms-nomd>
+        {name.heads.map((head) => <span>{head}</span>)}
+      </p>
+      <ul class={s.wordings}>
+        {
+          name.rules.map((rule) => (
+            <li class={s.wording}>
+              <p class:list={['title', s.write]}>
+                <span class="visuallyHidden">{name.heads[0]}: </span>
+                {rule.write}
+              </p>
+              <p class:list={['body', s.not]}>
+                <span class="visuallyHidden">{name.heads[1]}: </span>
+                {rule.not.map((wrong, index) => (
+                  <>
+                    {index > 0 && <span class="visuallyHidden"> · </span>}
+                    <s>{wrong}</s>
+                  </>
+                ))}
+              </p>
+              <p class:list={['body', s.why]}>{rule.note}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </Section>
+
+  <Section background="accent-faint" contentClass={s.block}>
+    <div class={s.head}>
+      <Headline as="h2" size="headline" muted={logo.muted}>{logo.headline}</Headline>
+      <p class:list={['body', s.intro]}>{logo.intro}</p>
+    </div>
+    <ul class={s.assets}>
+      {
+        logo.assets.map((asset) => (
+          <li class:list={[s.asset, asset.file.includes('wordmark') && s.assetWide]}>
+            <div
+              class:list={[
+                s.plate,
+                asset.preview === 'dark' && [s.plateDark, 'surfaceInverse'],
+                asset.preview === 'light' && s.plateLight,
+              ]}
+              data-datocms-nomd
+            >
+              <img
+                class:list={[
+                  s.picture,
+                  asset.preview === 'circle' && s.pictureCircle,
+                  asset.preview === 'rounded' && s.pictureRounded,
+                ]}
+                src={file(asset.file, 'svg')}
+                alt={asset.alt}
+                loading="lazy"
+              />
+            </div>
+            <div class={s.assetText}>
+              <h3 class="labelMedium">{asset.title}</h3>
+              <p class:list={['label', s.note]}>{asset.note}</p>
+            </div>
+            <p class:list={['label', s.downloads]}>
+              <a href={file(asset.file, 'svg')} download>
+                <Icon icon={Download} />
+                SVG<span class="visuallyHidden">: {asset.title}</span>
+              </a>
+              <a href={file(asset.file, 'png')} download>
+                <Icon icon={Download} />
+                PNG<span class="visuallyHidden">: {asset.title}</span>
+              </a>
+              <copy-svg class={s.copy} data-src={file(asset.file, 'svg')} hidden data-datocms-nomd>
+                <button type="button">
+                  <span class={s.copyIdle}>
+                    <Icon icon={Copy} />
+                    {logo.copy}
+                  </span>
+                  <span class={s.copyDone}>
+                    <Icon icon={Check} />
+                    {logo.copied}
+                  </span>
+                  <span class="visuallyHidden"> SVG: {asset.title}</span>
+                </button>
+                <span class="visuallyHidden" role="status" />
+              </copy-svg>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section contentClass={s.split}>
+    <div class={s.head}>
+      <Headline as="h2" size="headline" muted={circle.muted}>{circle.headline}</Headline>
+      <p class:list={['body', s.intro]}>{circle.text}</p>
+    </div>
+    {
+      /*
+        The picture has two states, and the two radio buttons select the
+        state. The CSS reads the selected button, thus the picture works
+        without a script.
+      */
+    }
+    <fieldset class={s.demo} data-datocms-nomd>
+      <legend class="visuallyHidden">{circle.legend}</legend>
+      <div class={s.stage} aria-hidden="true">
+        {
+          discSizes.map((size) => (
+            <span
+              class={s.disc}
+              style={size === 'large' ? undefined : `--disc: ${size}px`}
+              data-large={size === 'large' ? '' : undefined}
+            >
+              <span class={s.discScale}>
+                <Mark kind="symbol" class={s.discMark} />
+              </span>
+            </span>
+          ))
+        }
+      </div>
+      <div class={s.controls}>
+        <div class={s.switch}>
+          {
+            circle.options.map((option) => (
+              <label class:list={['labelMedium', s.option]}>
+                <input
+                  class="visuallyHidden"
+                  type="radio"
+                  name="circle-file"
+                  value={option.value}
+                  checked={option.value === 'avatar'}
+                />
+                {option.label}
+              </label>
+            ))
+          }
+        </div>
+        {
+          circle.options.map((option) => (
+            <p class:list={['label', s.verdict]} data-verdict={option.value}>
+              <Icon
+                icon={option.value === 'avatar' ? Check : X}
+                class={option.value === 'avatar' ? s.yes : s.no}
+              />
+              {option.verdict}
+            </p>
+          ))
+        }
+        <p class:list={['label', s.note, s.sizes]}>{circle.sizes}</p>
+      </div>
+    </fieldset>
+  </Section>
+
+  <Section background="accent-faint" contentClass={s.block}>
+    <Headline as="h2" size="headline" muted={rules.muted}>{rules.headline}</Headline>
+    <div class={s.group}>
+      <h3 class="title">{rules.give.title}</h3>
+      <ul class={s.specimens}>
+        {
+          rules.give.items.map((item) => (
+            <li class={s.specimen}>
+              <div class={s.sheet} data-rule={item.id} data-datocms-nomd aria-hidden="true">
+                {item.id === 'ground' && (
+                  <>
+                    <span class={s.half}>
+                      <Mark kind="wordmark" class={s.markSmall} />
+                    </span>
+                    <span class:list={[s.half, s.halfInverse, 'surfaceInverse']}>
+                      <Mark kind="wordmark" class={s.markSmall} />
+                    </span>
+                  </>
+                )}
+                {item.id === 'room' && (
+                  <Mark kind="wordmark" viewBox={roomViewBox} class={s.room}>
+                    <path class={s.roomRing} fill-rule="evenodd" d={roomRing} />
+                    {roomCorners.map((corner) => (
+                      <path
+                        class={s.roomUnit}
+                        fill-rule="evenodd"
+                        transform={`translate(${corner.x} ${corner.y})`}
+                        d={symbolPath}
+                      />
+                    ))}
+                  </Mark>
+                )}
+                {item.id === 'size' && (
+                  <>
+                    <span class={s.sized}>
+                      <Mark kind="wordmark" class={s.minWordmark} />
+                      <span class="pictureLabel">20 px</span>
+                    </span>
+                    <span class={s.sized}>
+                      <Mark kind="symbol" class={s.minSymbol} />
+                      <span class="pictureLabel">16 px</span>
+                    </span>
+                  </>
+                )}
+              </div>
+              <p class:list={['label', s.caption]}>
+                <Icon icon={Check} class={s.yes} />
+                <span>{item.text}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <div class={s.group}>
+      <h3 class="title">{rules.dont.title}</h3>
+      <ul class={s.specimens}>
+        {
+          rules.dont.items.map((item) => (
+            <li class={s.specimen}>
+              <div class={s.sheet} data-rule={item.id} data-datocms-nomd aria-hidden="true">
+                {item.id === 'own' ? (
+                  <span class={s.ownLogo}>
+                    <Mark kind="symbol" class={s.ownMark} />
+                    <span class={s.ownName}>ACME</span>
+                  </span>
+                ) : (
+                  <Mark kind="wordmark" class={s.mark} />
+                )}
+              </div>
+              <p class:list={['label', s.caption]}>
+                <Icon icon={X} class={s.no} />
+                <span>{item.text}</span>
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </Section>
+
+  <Section contentClass={s.block}>
+    <Headline as="h2" size="headline" muted={together.muted}>{together.headline}</Headline>
+    <ul class={s.columns}>
+      {
+        together.items.map((item) => (
+          <li class={s.column}>
+            <h3 class="title">{item.title}</h3>
+            <p class:list={['body', s.columnText]}>{item.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <CtaBanner {...closing} />
+</Layout>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  // A button that copies the source of an SVG file. Without JS the button
+  // cannot copy, thus the element stays hidden.
+  customElements.define(
+    'copy-svg',
+    class extends WebComponent {
+      parsedCallback() {
+        const button = this.$<HTMLButtonElement>('button');
+        const status = this.$('[role="status"]');
+        const source = this.dataset.src ?? '';
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        if (!navigator.clipboard) return;
+        this.hidden = false;
+
+        this.on(button, 'click', async () => {
+          const text = fetch(source).then((response) => response.text());
+          try {
+            // Safari permits a copy only in the click itself. Thus the
+            // clipboard gets a promise of the text, not the text.
+            await navigator.clipboard.write([
+              new ClipboardItem({
+                'text/plain': text.then((value) => new Blob([value], { type: 'text/plain' })),
+              }),
+            ]);
+          } catch {
+            try {
+              await navigator.clipboard.writeText(await text);
+            } catch {
+              return;
+            }
+          }
+          this.dataset.copied = '';
+          status.textContent = 'Copied';
+          clearTimeout(timer);
+          // After 2 seconds, show the label again.
+          timer = setTimeout(() => {
+            delete this.dataset.copied;
+            status.textContent = '';
+          }, 2000);
+        });
+      }
+    },
+  );
+</script>

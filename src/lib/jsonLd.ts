@@ -55,7 +55,7 @@ export function organizationNode(base: string | URL): Organization {
     url: new URL('/', base).href,
     logo: {
       '@type': 'ImageObject',
-      url: new URL('/brand/main-lockup.svg', base).href,
+      url: new URL('/brand/datocms-wordmark-dark.png', base).href,
     },
     sameAs: [
       'https://twitter.com/datocms',

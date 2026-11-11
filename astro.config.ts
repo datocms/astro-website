@@ -474,7 +474,10 @@ export default defineConfig({
     '/cms/vue': '/cms/nuxtjs-cms',
     '/cms/gatsbyjs': '/developers',
     '/cms/gatsbyjs-cms': '/developers',
-    '/company/brand-assets': '/philosophy',
+    // The old page of the brand assets, and the old zip of the logo files.
+    '/company/brand-assets': '/brand',
+    '/brand-assets': '/brand',
+    '/brand/brand-kit.zip': '/brand/datocms-brand-assets.zip',
     '/legal/security': '/security',
     '/legal/privacy': '/legal/privacy-policy',
     '/pricing/compare': '/pricing',
