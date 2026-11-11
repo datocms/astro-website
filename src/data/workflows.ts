@@ -19,7 +19,7 @@ export const chapter: ChapterHeaderData = {
   muted: 'built into the record.',
   intro: 'Name the stages, pick which roles can move a record along, and that’s your workflow.',
   link: {
-    label: 'Read The Docs',
+    label: 'Read the docs',
     href: '/docs/general-concepts/workflows',
     variant: 'soft',
   },

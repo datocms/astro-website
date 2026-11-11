@@ -11,7 +11,7 @@ export const seo = {
 };
 
 export const hero: HeroData = {
-  label: 'Wall Of Love',
+  label: 'Wall of love',
   headline: 'Don’t take our word for it.',
   subheadline: 'Take theirs.',
   face: 'skeptical',
@@ -38,10 +38,10 @@ export const ctaStart: CtaBannerData = {
   muted: 'Start a free project and see what they’re talking about.',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
-    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
+    { label: 'Explore pricing', href: '/pricing', variant: 'soft' },
   ],
 };

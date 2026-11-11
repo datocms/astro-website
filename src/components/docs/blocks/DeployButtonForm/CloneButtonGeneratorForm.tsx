@@ -272,7 +272,7 @@ export default function CloneButtonGeneratorForm() {
 
                 <FieldReactComponent
                   name="buildCommand"
-                  label="Build Command"
+                  label="Build command"
                   placeholder="npm run build"
                 />
 

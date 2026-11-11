@@ -18,7 +18,7 @@ export const chapter: ChapterHeaderData = {
   intro:
     'You define the blocks a Modular Content field accepts. Marketers stack them into landing pages, and your code gets an ordered list of typed blocks.',
   link: {
-    label: 'Read The Docs',
+    label: 'Read the docs',
     href: '/docs/content-modelling/modular-content',
     variant: 'soft',
   },

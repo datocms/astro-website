@@ -24,13 +24,13 @@ export const areasBySource: Record<string, Area> = {
   docs: { id: 'docs', label: 'Docs', icon: BookOpen },
   github: { id: 'github', label: 'GitHub', icon: siGithub },
   blog: { id: 'blog', label: 'Blog', icon: PenTool },
-  'case-studies': { id: 'case-studies', label: 'Case Studies', icon: Trophy },
+  'case-studies': { id: 'case-studies', label: 'Case studies', icon: Trophy },
   academy: { id: 'academy', label: 'CMS Academy', icon: GraduationCap },
-  'casual-chats': { id: 'casual-chats', label: 'Customer Interviews', icon: MessagesSquare },
-  'product-updates': { id: 'product-updates', label: 'Product Updates', icon: Rocket },
+  'casual-chats': { id: 'casual-chats', label: 'Customer interviews', icon: MessagesSquare },
+  'product-updates': { id: 'product-updates', label: 'Product updates', icon: Rocket },
   glossary: { id: 'glossary', label: 'Glossary', icon: Book },
   compare: { id: 'compare', label: 'Comparisons', icon: Scale },
-  'user-guides': { id: 'user-guides', label: 'User Guides', icon: Video },
+  'user-guides': { id: 'user-guides', label: 'User guides', icon: Video },
   marketing: { id: 'marketing', label: 'Website', icon: AppWindow },
 };
 
@@ -47,12 +47,12 @@ export const groups: Group[] = [
   },
   {
     id: 'developers',
-    label: 'For Developers',
+    label: 'For developers',
     filter: { include: ['docs', 'github', 'skills'] },
   },
   {
     id: 'editors',
-    label: 'For Editors',
+    label: 'For editors',
     filter: { include: ['academy', 'glossary', 'user-guides'] },
   },
   { id: 'news', label: 'News', filter: { include: ['blog', 'product-updates'] } },

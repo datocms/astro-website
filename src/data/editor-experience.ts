@@ -25,11 +25,11 @@ export const hero: HeroData = {
   face: 'relaxed',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
-    { label: 'Talk To Sales', href: '/contact', variant: 'soft', contact: 'sales' },
+    { label: 'Talk to sales', href: '/contact', variant: 'soft', contact: 'sales' },
   ],
 };
 
@@ -70,12 +70,12 @@ export const ctaDemo: CtaBannerData = {
   muted: 'Start a free project, or try the demo first.',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
     {
-      label: 'Try The Demo',
+      label: 'Try the demo',
       href: 'https://try.datocms.com',
       variant: 'soft',
     },

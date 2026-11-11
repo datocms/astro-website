@@ -42,12 +42,12 @@ export const hero: HeroData = {
   face: 'worried',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
     {
-      label: 'Talk To Sales',
+      label: 'Talk to sales',
       href: '/contact',
       contact: 'sales',
       variant: 'soft',
@@ -145,7 +145,7 @@ export const ctaStart: CtaBannerData = {
   subline: 'The best way to understand any of it is to use it. Free account, no card.',
   buttons: [
     {
-      label: 'Get Started For Free',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },

@@ -32,12 +32,12 @@ export const hero: HeroData = {
   face: 'thinking',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
     {
-      label: 'Talk To Sales',
+      label: 'Talk to sales',
       href: '/contact',
       variant: 'soft',
       contact: 'sales',
@@ -48,11 +48,11 @@ export const hero: HeroData = {
 /** The buttons below the two characterizations. */
 export const introButtons: { datocms: ButtonData; competitor: ButtonData } = {
   datocms: {
-    label: 'Sign Up For Free',
+    label: 'Get started',
     href: dashboardUrl('/signup'),
   },
   competitor: {
-    label: 'Talk About Migration',
+    label: 'Talk about migration',
     href: '/contact',
     contact: 'sales',
     variant: 'soft',
@@ -74,10 +74,10 @@ export const ctaSwitch: CtaBannerData = {
   muted: 'and start building big.',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
-    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
+    { label: 'Explore pricing', href: '/pricing', variant: 'soft' },
   ],
 };

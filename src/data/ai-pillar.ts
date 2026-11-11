@@ -27,7 +27,7 @@ import type { CategoryNavData } from '~/components/CategoryNav';
  */
 
 const docs = (href: string): ChapterHeaderData['link'] => ({
-  label: 'Read The Docs',
+  label: 'Read the docs',
   href,
   variant: 'soft',
 });
@@ -44,12 +44,12 @@ export const hero: HeroData = {
   face: 'magic',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
     {
-      label: 'Connect Your AI',
+      label: 'Connect your AI',
       href: '/docs/mcp-server',
       variant: 'soft',
     },
@@ -158,7 +158,7 @@ export const translations: ChapterLayoutData = {
     intro:
       'The AI Translations plugin brings OpenAI, Gemini, Claude, or DeepL to one field or a whole model. Nothing goes live until you hit Publish.',
     link: {
-      label: 'See The Plugin',
+      label: 'See the plugin',
       href: '/plugins/i/datocms-plugin-ai-translations',
       variant: 'soft',
     },
@@ -215,11 +215,11 @@ export const ctaBuild: CtaBannerData = {
   muted: 'You keep the rhythm.',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
-    { label: 'Book a Demo', href: '/contact', variant: 'soft', contact: 'sales' },
+    { label: 'Book a demo', href: '/contact', variant: 'soft', contact: 'sales' },
   ],
 };
 

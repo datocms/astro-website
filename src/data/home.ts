@@ -161,13 +161,13 @@ export const hero: HeroData = {
   face: 'smile',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       variant: 'accent',
       arrow: false,
       theme: homeTheme,
     },
-    { label: 'Docs', href: '/docs', variant: 'soft', arrow: false },
+    { label: 'Read the docs', href: '/docs', variant: 'soft', arrow: false },
   ],
 };
 
@@ -192,12 +192,12 @@ export const homeHero: HomeHeroData = {
   face: hero.face,
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       variant: 'accent',
       arrow: false,
     },
-    { label: 'Docs', href: '/docs', variant: 'soft', arrow: false },
+    { label: 'Read the docs', href: '/docs', variant: 'soft', arrow: false },
   ],
   logosLabel: 'Trusted by teams at',
   logos: [
@@ -258,11 +258,11 @@ export const userExperience: UserExperienceData = {
   theme: homeTheme,
   developer: {
     headline: 'Fresh tools, predictable workflows, and full control.',
-    button: { label: 'Developer Comfort', href: '/developers' },
+    button: { label: 'Developer comfort', href: '/developers' },
   },
   editor: {
     headline: 'Familiar editing, structured content, and fewer bottlenecks.',
-    button: { label: 'Editor Happiness', href: '/editor-experience' },
+    button: { label: 'Editor happiness', href: '/editor-experience' },
   },
   record: {
     title: 'Infrastructure with human skills',
@@ -299,7 +299,7 @@ export const contentSource: ContentSourceData = {
   paragraph:
     'Website, chatbot, mobile, a car dashboard? One place for every role to manage content across every output.',
   button: {
-    label: 'Get Started',
+    label: 'Get started',
     href: dashboardUrl('/signup'),
     variant: 'accent',
   },
@@ -351,7 +351,7 @@ export const features: FeaturesData = {
     },
   ],
   button: {
-    label: 'See All Features',
+    label: 'See all features',
     href: '/features',
     variant: 'soft',
   },
@@ -488,7 +488,7 @@ export const frameworkIntegration: TextWithImageData = {
   tagline:
     'Use the frameworks you prefer. Our official guides and SDKs cover :astro: Astro, :nextjs: Next.js, :nuxt: Nuxt, and :sveltekit: SvelteKit.',
   button: {
-    label: 'Explore Integrations',
+    label: 'Explore integrations',
     href: '/docs',
     variant: 'soft',
     logos: ['astro', 'nextjs', 'nuxt', 'sveltekit'],
@@ -581,7 +581,7 @@ export const community: CommunityData = {
   muted: 'Ask us anything. We’d :heart: to help you build.',
   paragraph: 'Connect with developers who already run DatoCMS in production.',
   button: {
-    label: 'Visit Community',
+    label: 'Visit community',
     href: 'https://community.datocms.com',
     variant: 'soft',
   },
@@ -631,7 +631,7 @@ export const ctaPricing: CtaBannerData = {
   theme: 'default',
   headline: 'Pricing as it should be.',
   muted: 'Transparent and predictable (even when renewing).',
-  buttons: [{ label: 'Explore Pricing', href: '/pricing', variant: 'soft' }],
+  buttons: [{ label: 'Explore pricing', href: '/pricing', variant: 'soft' }],
 };
 
 export const productUpdates: ProductUpdatesData = {
@@ -644,13 +644,13 @@ export const caseStudies: CaseStudiesData = {
   headline: 'Trusted by teams who build things we’re both proud of.',
   buttons: [
     {
-      label: 'Let’s Talk',
+      label: 'Talk to sales',
       href: '/contact',
       arrow: false,
       contact: 'sales',
     },
     {
-      label: 'All Case Studies',
+      label: 'All case studies',
       href: '/case-studies',
       variant: 'soft',
     },
@@ -668,7 +668,7 @@ export const partners: PartnersData = {
       contact: 'partners',
     },
     {
-      label: 'Explore All Partners',
+      label: 'Explore all partners',
       href: '/partners',
       variant: 'soft',
     },

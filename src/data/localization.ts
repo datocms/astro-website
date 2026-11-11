@@ -17,7 +17,7 @@ export const chapter: ChapterHeaderData = {
   intro:
     'You choose what gets translated per field: the title yes, the price no. A locale that isn’t ready falls back to one you set.',
   link: {
-    label: 'Read The Docs',
+    label: 'Read the docs',
     href: '/docs/general-concepts/localization',
     variant: 'soft',
   },

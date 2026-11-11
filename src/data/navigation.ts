@@ -128,7 +128,7 @@ export const mainNavigation: NavGroup[] = [
       title: 'The real product, in 30 seconds.',
       aside: 'No signup, and a few short videos to guide you',
       face: 'wink',
-      button: { label: 'Try The Demo', href: 'https://try.datocms.com' },
+      button: { label: 'Try the demo', href: 'https://try.datocms.com' },
       video: '/videos/hand-ok-2.pxv',
       videoHold: [38, 47],
     },

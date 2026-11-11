@@ -19,7 +19,7 @@ export const chapter: ChapterHeaderData = {
   intro:
     'Headings, links, quotes, blocks, and references to other records, all in one field. Editors see a document. Your code sees a typed tree, not HTML.',
   link: {
-    label: 'Read The Docs',
+    label: 'Read the docs',
     href: '/docs/structured-text/dast',
     variant: 'soft',
   },

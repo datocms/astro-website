@@ -30,7 +30,7 @@ export const chapter: ChapterHeaderData = {
   intro:
     'Editors click any text or image on the draft site, and the CMS opens on the exact field. Developers set it up once.',
   link: {
-    label: 'Read The Docs',
+    label: 'Read the docs',
     href: '/docs/visual-editing',
     variant: 'soft',
   },

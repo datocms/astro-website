@@ -11,7 +11,7 @@ import type { HeroData } from '~/data/home';
 export const index = {
   seoTitle: 'Solution Partners',
   hero: {
-    label: 'Solution Partners',
+    label: 'Solution partners',
     headline: 'Find the perfect Partner to meet',
     subheadline: 'your digital needs',
     intro:
@@ -92,7 +92,7 @@ export function projectsCountLabel(count: number) {
 
 export const techIndex = {
   hero: {
-    label: 'Ecosystem Partners',
+    label: 'Ecosystem partners',
     headline: 'Find the perfect Tech Partner to supercharge',
     subheadline: 'your DatoCMS projects',
     intro:

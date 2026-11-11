@@ -36,7 +36,7 @@ import type { CategoryNavData } from '~/components/CategoryNav';
  */
 
 const docs = (href: string): ChapterHeaderData['link'] => ({
-  label: 'Read The Docs',
+  label: 'Read the docs',
   href,
   variant: 'soft',
 });
@@ -49,11 +49,11 @@ export const hero: HeroData = {
   face: 'aha',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
-    { label: 'Read The Docs', href: '/docs', variant: 'soft' },
+    { label: 'Read the docs', href: '/docs', variant: 'soft' },
   ],
 };
 
@@ -341,12 +341,12 @@ export const ctaBuild: CtaBannerData = {
   muted: 'is to build something with it.',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
     {
-      label: 'Talk To Sales',
+      label: 'Talk to sales',
       href: '/contact',
       contact: 'sales',
       variant: 'soft',

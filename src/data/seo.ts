@@ -20,7 +20,7 @@ export const chapter: ChapterHeaderData = {
   intro:
     'The SEO field has the title, description, and share image, with fallbacks, validations, and a preview. Your code gets the meta tags ready to render.',
   link: {
-    label: 'Read The Docs',
+    label: 'Read the docs',
     href: '/docs/content-modelling/seo-fields',
     variant: 'soft',
   },

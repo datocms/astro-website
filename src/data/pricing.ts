@@ -97,7 +97,7 @@ export const plans: PricingPlansData = {
     {
       name: 'Enterprise',
       tagline: 'Premium features, high-touch support and advanced compliance.',
-      price: 'Custom Pricing',
+      price: 'Custom pricing',
       button: { label: 'Contact', href: '/contact', contact: 'sales' },
       features: [
         'Guaranteed support and uptime SLAs',
@@ -128,7 +128,7 @@ const freeOffer: PricingOfferData = {
   muted: 'Try DatoCMS out for free, forever (yes really).',
   buttons: [
     {
-      label: 'Sign up for free',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
@@ -215,10 +215,10 @@ export const aiBanner: CtaBannerData = {
 };
 
 export const trustedBy: HeroData = {
-  label: 'Trusted By Teams',
+  label: 'Trusted by teams',
   headline:
     "We've worked with our customers long enough that they tell our story better than we do.",
-  buttons: [{ label: 'Read Their Stories', href: '/case-studies', arrow: false }],
+  buttons: [{ label: 'Read their stories', href: '/case-studies', arrow: false }],
   logos: [c.telekom, c.hashicorp, c.verizon, c.polestar, c.vercel],
 };
 
@@ -234,10 +234,10 @@ export const ctaStart: CtaBannerData = {
   muted: 'Explore DatoCMS and never look back.',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
-    { label: 'Talk To Sales', href: '/contact', variant: 'soft', contact: 'sales' },
+    { label: 'Talk to sales', href: '/contact', variant: 'soft', contact: 'sales' },
   ],
 };

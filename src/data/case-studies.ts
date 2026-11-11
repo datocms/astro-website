@@ -4,24 +4,24 @@ import type { StatementData } from '~/components/Statement';
 import type { CaseStudiesData, CtaBannerData, HeroData } from '~/data/home';
 
 export const hero: HeroData = {
-  label: 'Case Studies',
+  label: 'Case studies',
   headline: 'Cream of the crop.',
   subheadline: 'See how teams have used DatoCMS to build successful digital experiences',
   face: 'starry',
   buttons: [
     {
-      label: 'Let’s Talk!',
+      label: 'Talk to sales',
       href: '/contact',
       arrow: false,
       contact: 'sales',
     },
-    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
+    { label: 'Explore pricing', href: '/pricing', variant: 'soft' },
   ],
 };
 
 /* The button of the highlight story. The page gives the link. */
 export const featuredButton: Omit<ButtonData, 'href'> = {
-  label: 'Learn More',
+  label: 'Learn more',
   variant: 'soft',
 };
 
@@ -32,11 +32,11 @@ export const ctaBuild: CtaBannerData = {
   muted: 'Every feature is built around real customer insights and needs',
   buttons: [
     {
-      label: 'Get Started',
+      label: 'Get started',
       href: dashboardUrl('/signup'),
       arrow: false,
     },
-    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
+    { label: 'Explore pricing', href: '/pricing', variant: 'soft' },
   ],
 };
 

@@ -104,8 +104,8 @@ export const contact: ContactSectionData = {
   muted: "Tell us what you're building and we'll get back to you",
   face: 'happy',
   links: [
-    { lead: 'Need support?', label: 'Visit Support', href: '/support' },
-    { lead: 'Self-service plans?', label: 'See Pricing', href: '/pricing' },
+    { lead: 'Need support?', label: 'Visit support', href: '/support' },
+    { lead: 'Self-service plans?', label: 'Explore pricing', href: '/pricing' },
   ],
   form: {
     rows: [

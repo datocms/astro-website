@@ -23,7 +23,7 @@ export const chapter: ChapterHeaderData = {
   intro:
     'We show who has a record open and lock it while someone edits. Every save is a version you can compare and roll back to.',
   link: {
-    label: 'Read The Docs',
+    label: 'Read the docs',
     href: '/docs/general-concepts/collaboration-features',
     variant: 'soft',
   },

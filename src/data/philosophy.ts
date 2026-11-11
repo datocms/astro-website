@@ -73,7 +73,7 @@ export const ctaStart: CtaBannerData = {
   headline: 'Yes, we’re Italian. We talk with our hands.',
   muted: 'We build with them too. Try DatoCMS for free.',
   buttons: [
-    { label: 'Get Started', href: dashboardUrl('/signup'), arrow: false },
-    { label: 'Explore Pricing', href: '/pricing', variant: 'soft' },
+    { label: 'Get started', href: dashboardUrl('/signup'), arrow: false },
+    { label: 'Explore pricing', href: '/pricing', variant: 'soft' },
   ],
 };

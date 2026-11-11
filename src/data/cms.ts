@@ -64,7 +64,7 @@ export interface FrameworkPage {
 
 /** The docs link of a chapter header. */
 export function docs(href: string): ChapterHeaderData['link'] {
-  return { label: 'Read The Docs', href, variant: 'soft' };
+  return { label: 'Read the docs', href, variant: 'soft' };
 }
 
 /** The dashboard link that deploys the starter kit of a repository. */
@@ -321,11 +321,11 @@ export function closer(args: { repo: string; docsRoot: string; subline: string }
     subline: args.subline,
     buttons: [
       {
-        label: 'Deploy The Starter',
+        label: 'Deploy the starter',
         href: deployUrl(args.repo),
         arrow: false,
       },
-      { label: 'Read The Docs', href: args.docsRoot, variant: 'soft' },
+      { label: 'Read the docs', href: args.docsRoot, variant: 'soft' },
     ],
   };
 }
@@ -334,10 +334,10 @@ export function closer(args: { repo: string; docsRoot: string; subline: string }
 export function heroButtons(args: { repo: string; docsRoot: string }): HeroData['buttons'] {
   return [
     {
-      label: 'Deploy The Starter',
+      label: 'Deploy the starter',
       href: deployUrl(args.repo),
       arrow: false,
     },
-    { label: 'Read The Docs', href: args.docsRoot, variant: 'soft' },
+    { label: 'Read the docs', href: args.docsRoot, variant: 'soft' },
   ];
 }
