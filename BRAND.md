@@ -249,7 +249,7 @@ The logo has two forms.
 - **The wordmark**: the symbol and the name "DatoCMS", in one piece. This is the default.
 - **The symbol**: the "D" alone. Use it where the wordmark does not fit (an avatar, a favicon, a badge, a narrow header) or where the name is already next to it.
 
-The master files are `src/assets/logo/wordmark.svg` and `src/assets/logo/symbol.svg`, in the astro-website repository. Every other copy comes from these two: `npm run brand-assets` makes the files of `public/brand/`, which the page `/brand` offers. The logo files of the other repositories (`dato_symbol.svg` and `dato_wordmark.svg` in `ui-public` of web, the favicons of the cms, the dashboard, and the API) are copies: change the masters, run the script, then copy the files again.
+The master files are `src/assets/logo/wordmark.svg` and `src/assets/logo/symbol.svg`, in the astro-website repository. Every other copy comes from these two: `npm run brand-assets` makes the files of `public/brand/`, which the page `/brand` offers. The logo files of the other repositories (`dato_symbol.svg` and `dato_wordmark.svg` in `ui-public` of web, the favicons of the cms, the dashboard, and the API, and the README buttons of the dashboard) are copies: change the masters, run the script, then copy the files again.
 
 | Rule         | Detail                                                                                                                                                                                                      |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

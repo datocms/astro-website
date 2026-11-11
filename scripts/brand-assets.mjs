@@ -9,13 +9,15 @@
 //
 // The script also writes the icons of the site in public/: favicon.svg,
 // favicon.ico and apple-touch-icon.png. The other apps (cms, dashboard,
-// api) use copies of these three files. It also writes
+// api) use copies of these three files. It writes the README buttons in
+// public/brand/: the dashboard serves copies of them. It also writes
 // public/images/full_logo.svg, the dark wordmark: the READMEs of old repos
 // and pages of other people link to this URL.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import * as hb from 'harfbuzzjs';
 import sharp from 'sharp';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -123,6 +125,99 @@ const files = {
  */
 const favicon = badge({ size: 0.6875, shift: 0.0425, side: 64, radius: 0.22 });
 
+/*
+ * The README buttons: the dark symbol and a label on a pill of purple, the
+ * pair of the fixed marks. People put them in READMEs with an <img>, and
+ * an SVG in an <img> cannot load a font. Thus the label is the outlines of
+ * ABC Oracle Medium (500). HarfBuzz gives the glyphs and the kerning.
+ *
+ * The dashboard serves the copies at dashboard.datocms.com/deploy/button.svg
+ * and /clone/button.svg. One file must read on a light and on a dark ground,
+ * because other people write the markup and cannot add a dark version.
+ */
+const BUTTON = {
+  height: 32,
+  fontSize: 14,
+  symbolHeight: 16,
+  // The space before the symbol, between the symbol and the ink of the label, and after the ink.
+  left: 12,
+  gap: 8,
+  right: 16,
+};
+
+const oracleResponse = await fetch('https://www.datocms.com/fonts/ABCOracle-Medium.otf');
+if (!oracleResponse.ok) {
+  throw new Error(`Could not load ABC Oracle Medium: HTTP ${oracleResponse.status}`);
+}
+const oracle = new hb.Font(new hb.Face(new hb.Blob(await oracleResponse.arrayBuffer())));
+const oracleUpem = oracle.face.upem;
+const capHeight = oracle.getMetricPosition(hb.MetricsTag.CAP_HEIGHT);
+
+const num = (value) => String(Number(value.toFixed(2)));
+
+/**
+ * The outlines of `text` as one SVG path, with the pen at x=0 and the
+ * baseline at y=0, and the box of its ink. The units are px at `size`.
+ */
+function label(text, size) {
+  const buffer = new hb.Buffer();
+  buffer.addText(text);
+  buffer.guessSegmentProperties();
+  hb.shape(oracle, buffer);
+  const k = size / oracleUpem;
+  let pen = 0;
+  let d = '';
+  const ink = { left: Infinity, right: -Infinity };
+  for (const {
+    codepoint: glyph,
+    xAdvance,
+    xOffset,
+    yOffset,
+  } of buffer.getGlyphInfosAndPositions()) {
+    const x0 = pen + xOffset;
+    // The font has y up. SVG has y down.
+    for (const { type, values } of oracle.glyphToJson(glyph)) {
+      const points = values.map((value, i) =>
+        i % 2 === 0 ? (x0 + value) * k : -(yOffset + value) * k,
+      );
+      d += type + points.map(num).join(' ');
+    }
+    const extents = oracle.glyphExtents(glyph);
+    if (extents?.width) {
+      ink.left = Math.min(ink.left, (x0 + extents.xBearing) * k);
+      ink.right = Math.max(ink.right, (x0 + extents.xBearing + extents.width) * k);
+    }
+    pen += xAdvance;
+  }
+  return { d, ink };
+}
+
+function readmeButton(text) {
+  const { height: h, fontSize, symbolHeight, left, gap, right } = BUTTON;
+  const { d, ink } = label(text, fontSize);
+  const scale = symbolHeight / symbol.height;
+  const symbolY = (h - symbolHeight) / 2;
+  // The ink of the first letter starts `gap` after the symbol.
+  const labelX = left + symbol.width * scale + gap - ink.left;
+  const baseline = h / 2 + (capHeight * fontSize) / oracleUpem / 2;
+  const width = Math.round(labelX + ink.right + right);
+  const symbolTransform = `translate(${num(left)} ${num(symbolY)}) scale(${scale.toFixed(5)})`;
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${h}" viewBox="0 0 ${width} ${h}" role="img" aria-label="${text}">` +
+    `<title>${text}</title>` +
+    `<rect width="${width}" height="${h}" rx="${h / 2}" fill="${COLORS.purple}"/>` +
+    pathTags(symbol, COLORS.dark, symbolTransform) +
+    `<path fill="${COLORS.dark}" transform="translate(${num(labelX)} ${num(baseline)})" d="${d}"/>` +
+    `</svg>\n`
+  );
+}
+
+// The name of each button file and its label.
+const readmeButtons = {
+  'readme-button-deploy': 'Deploy with DatoCMS',
+  'readme-button-clone': 'Clone with DatoCMS',
+};
+
 const png = (file, width) =>
   sharp(Buffer.from(file.svg), { density: (72 * width) / file.width })
     .resize({ width })
@@ -173,6 +268,10 @@ writeFileSync(
   path.join(root, 'public/favicon.ico'),
   ico(await Promise.all([16, 32, 48].map((size) => png(favicon, size)))),
 );
+
+for (const [name, text] of Object.entries(readmeButtons)) {
+  writeFileSync(path.join(outDir, `${name}.svg`), readmeButton(text));
+}
 
 writeFileSync(
   path.join(outDir, 'README.txt'),
