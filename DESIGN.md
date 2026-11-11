@@ -372,6 +372,7 @@ Each page has one theme: the theme of the layout (a necessary prop). The header,
 | Ecosystem           | purple | `/plugins`, `/starters`                                                                                      |
 | Partners            | pink   | `/partners`, `/tech-partners`                                                                                |
 | Company and support | blue   | `/support`, `/slack`, `/security`, `/legal`, `/contact`, `/company`, `/partner-program`, `/research-program` |
+| Brand               | purple | `/brand` (purple is the color of the fixed marks, see BRAND.md)                                              |
 
 **A marketing page takes the hue of its first chapter**, or of its hero when it has no chapters. The page reads the theme from the data of the first chapter, not from a literal, thus the page and its row in the product list of the home page change together (`src/data/home.ts`).
 

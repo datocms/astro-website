@@ -167,4 +167,4 @@ On staging, in both schemes, at 1320 and 390:
 
 ### Loose ends
 
-- No importer: `src/scenes/ThemedScene.astro`, `src/assets/logo/dato-logo-{long,no-space,pascal-case}.svg`. Keep or delete.
+- No importer: `src/scenes/ThemedScene.astro`. Keep or delete.

@@ -9,7 +9,9 @@
 //
 // The script also writes the icons of the site in public/: favicon.svg,
 // favicon.ico and apple-touch-icon.png. The other apps (cms, dashboard,
-// api) use copies of these three files.
+// api) use copies of these three files. It also writes
+// public/images/full_logo.svg, the dark wordmark: the READMEs of old repos
+// and pages of other people link to this URL.
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -166,6 +168,7 @@ writeFileSync(
   await png(files['datocms-app-icon'], 180),
 );
 writeFileSync(path.join(root, 'public/favicon.svg'), favicon.svg);
+writeFileSync(path.join(root, 'public/images/full_logo.svg'), files['datocms-wordmark-dark'].svg);
 writeFileSync(
   path.join(root, 'public/favicon.ico'),
   ico(await Promise.all([16, 32, 48].map((size) => png(favicon, size)))),

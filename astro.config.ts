@@ -478,6 +478,15 @@ export default defineConfig({
     '/company/brand-assets': '/brand',
     '/brand-assets': '/brand',
     '/brand/brand-kit.zip': '/brand/datocms-brand-assets.zip',
+    // The old logo files, which other pages link to. A lockup becomes the
+    // dark wordmark. An icon becomes the app icon, because the purple tile
+    // shows on a light ground and on a dark ground.
+    '/brand/main-lockup.svg': '/brand/datocms-wordmark-dark.svg',
+    '/brand/alternative-lockups.svg': '/brand/datocms-wordmark-dark.svg',
+    '/brand/vertical-lockups.svg': '/brand/datocms-wordmark-dark.svg',
+    '/brand/main-icon.svg': '/brand/datocms-app-icon.svg',
+    '/brand/alt-icon1.svg': '/brand/datocms-app-icon.svg',
+    '/brand/alt-icon2.svg': '/brand/datocms-app-icon.svg',
     '/legal/security': '/security',
     '/legal/privacy': '/legal/privacy-policy',
     '/pricing/compare': '/pricing',
