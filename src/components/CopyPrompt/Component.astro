@@ -14,31 +14,31 @@ interface Props {
 const { text, align = 'start' } = Astro.props;
 const prompt = text.trim();
 const firstLine = prompt.split('\n').find((line) => line.trim()) ?? '';
+// A closing script tag in the prompt stops the script element. Thus escape
+// it. The Markdown converter and the script remove the escape.
+const escapedPrompt = prompt.replace(/<\/script>/gi, '<\\/script>');
 ---
 
 {
   /*
   A button that copies a prompt for an AI agent. The prompt is in a
-  template, thus it is in the DOM but not on the page. The hint shows the
-  first line of the prompt, then a message when the copy is done. Without
-  JS the button cannot copy, thus the element stays hidden.
+  script of type text/markdown, thus it is in the DOM but not on the page.
+  The Markdown version of the page shows the prompt as a code block, and
+  not the button. The hint shows the first line of the prompt, then a
+  message when the copy is done. Without JS the button cannot copy, thus
+  the element stays hidden.
 */
 }
 <copy-prompt class:list={[styles.root, align === 'center' && styles.center]} hidden>
-  <Button arrow={false}>
-    <span class={styles.label}>
-      <Icon icon={Copy} />
-      Copy prompt
-    </span>
-  </Button>
-  <p class:list={[styles.hint, 'caption']} aria-live="polite">
+  <Button arrow={false} icon={Copy} attrs={{ 'data-datocms-nomd': '' }}>Copy prompt</Button>
+  <p class:list={[styles.hint, 'caption']} aria-live="polite" data-datocms-nomd>
     <span class={styles.firstLine}>“{firstLine}”</span>
     <span class={styles.done}>
       <Icon icon={Check} />
       Copied: now paste that into your preferred AI agent!
     </span>
   </p>
-  <template>{prompt}</template>
+  <script type="text/markdown" is:inline data-fenced="true" set:html={escapedPrompt} />
 </copy-prompt>
 
 <script>
@@ -49,13 +49,15 @@ const firstLine = prompt.split('\n').find((line) => line.trim()) ?? '';
     class extends WebComponent {
       parsedCallback() {
         const button = this.$<HTMLButtonElement>('button');
-        const template = this.$<HTMLTemplateElement>('template');
+        const source = this.$<HTMLScriptElement>('script[type="text/markdown"]');
+        // Remove the backslash that escapes each closing script tag.
+        const prompt = (source.textContent ?? '').replace(/<\\(\/script)/gi, '<$1').trim();
         let timer: ReturnType<typeof setTimeout> | undefined;
         this.hidden = false;
 
         this.on(button, 'click', async () => {
           try {
-            await navigator.clipboard.writeText(template.content.textContent ?? '');
+            await navigator.clipboard.writeText(prompt);
           } catch {
             return;
           }

@@ -2,6 +2,8 @@
 import type { HTMLAttributes } from 'astro/types';
 import type { Theme } from '~/lib/theme';
 import { ContactCard } from '~/components/ContactCard';
+import { Icon } from '~/components/Icon';
+import type { IconData } from '~/components/Icon/data';
 import styles from './style.module.css';
 import { logos as logoMarks } from '~/components/Emoji/emojis';
 import type { ButtonSize, ButtonVariant, ContactPoint, FrameworkLogo } from './types';
@@ -11,6 +13,11 @@ interface Props {
   size?: ButtonSize;
   /** The marks of frameworks before the label, 20px tall (24px in size l). */
   logos?: FrameworkLogo[];
+  /**
+   * An icon before the label. It is outside the label, thus it is in the
+   * vertical centre of the button, as the caps of the label.
+   */
+  icon?: IconData;
   /**
    * The team that answers this button. On hover and on focus, a card above
    * the button shows the faces, the names and the role of the people.
@@ -35,6 +42,7 @@ const {
   variant = 'solid',
   size = 'm',
   logos = [],
+  icon,
   contact,
   arrow = true,
   href,
@@ -55,7 +63,7 @@ const classes = [
   variant === 'accent' && styles.accent,
   variant === 'soft' && styles.soft,
   size === 'l' && styles.large,
-  logos.length > 0 && styles.hasLeading,
+  (logos.length > 0 || icon) && styles.hasLeading,
   card && styles.hasContact,
   className,
 ];
@@ -80,6 +88,7 @@ const tagProps = Tag === 'a' ? { href } : Tag === 'button' ? { type, disabled } 
       </span>
     )
   }
+  {icon && <Icon icon={icon} class={styles.icon} />}
   {card && <ContactCard contact={card} />}
   <span class:list={[styles.label, 'capTrim']}>
     <slot />

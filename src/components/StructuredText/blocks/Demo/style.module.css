@@ -1,32 +1,86 @@
+/*
+ * One block on the tint of an info callout: the window, then the
+ * details under it, at its left edge (the name and the logo on one line,
+ * the description, the actions). The block has the width of the column,
+ * up to 820px: the width of the column on large screens. On a tablet the
+ * column is wider, and a larger screenshot adds nothing. The corners have
+ * the radius of the window.
+ */
 .demo {
-  display: grid;
-  gap: var(--space-md);
-  align-items: center;
-}
-
-.window :global(img) {
-  display: block;
-}
-
-.text {
+  max-width: 820px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-xs);
-}
-
-.description {
-  color: var(--text-muted);
-}
-
-.logo {
-  width: auto;
-  height: 24px;
-  margin-top: var(--space-3xs);
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--surface-status-info);
+  border-radius: var(--radius-lg);
 }
 
 @media (min-width: 768px) {
   .demo {
-    grid-template-columns: 1fr 1fr;
+    padding: var(--space-lg);
   }
+}
+
+/* The screenshot fills the window. */
+.window :global(:is(picture, img)) {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.heading {
+  display: flex;
+  align-self: stretch;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+/* The logo takes the text colour (a mask), thus it shows in both schemes. */
+.technology {
+  flex: none;
+  display: block;
+  height: 20px;
+}
+
+.description {
+  max-width: var(--reading-max);
+  margin-top: var(--space-3xs);
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.github {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  min-height: 40px;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .github:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+}
+
+.note {
+  margin-top: var(--space-xs);
+  color: var(--text-muted);
 }

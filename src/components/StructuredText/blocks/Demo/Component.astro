@@ -1,55 +1,80 @@
 ---
+import { siGithub } from 'simple-icons';
+import { stripStega } from '@datocms/astro';
+import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { AppWindow } from '~/components/AppWindow';
 import { Button } from '~/components/Button';
+import { Icon } from '~/components/Icon';
+import { Logo } from '~/components/Logo';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
-import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import { dashboardUrl } from '~/lib/datocms/dashboardUrl';
 import { DemoFragment } from './graphql';
-import styles from './style.module.css';
+import s from './style.module.css';
 
 interface Props {
   block: FragmentOf<typeof DemoFragment>;
 }
 
 const { demo } = readFragment(DemoFragment, Astro.props.block);
-const { screenshot } = demo;
+const { technology } = demo;
 
-// Show a screenshot with a ratio from 1 to 2 as it is. Crop the others.
-const ratio = screenshot.width && screenshot.height ? screenshot.width / screenshot.height : 0;
-const image = ratio >= 1 && ratio < 2 ? screenshot.freeFormImage : screenshot.croppedImage;
+// The repo is `owner/name:branch`. The link opens the branch on GitHub.
+const [repo, branch] = stripStega(demo.githubRepo).split(':');
+// The width of the window: the column less the padding of the column and
+// of the block, then 560px to 760px (the content column of the docs, less
+// the padding of the block).
+const sizes =
+  'auto, (max-width: 767px) calc(100vw - 115px), (max-width: 899px) calc(100vw - 135px), (min-width: 1320px) and (max-width: 1599px) 660px, 760px';
+const githubUrl = `https://github.com/${repo}${branch ? `/tree/${branch}` : ''}`;
 ---
 
 {
   /*
-  A starter project: its screenshot in a window, its name, and a button
-  that deploys it from the DatoCMS dashboard.
+  A starter to launch from a docs page, on a tinted block: its screenshot
+  in a small window, then its name, the logo of its technology,
+  its description, and the actions (deploy it, read its code).
 */
 }
-<prose-island>
-  <div class={styles.demo}>
-    <AppWindow address={demo.name} class={styles.window}>
-      {image && <ResponsiveImage data={image} />}
-    </AppWindow>
-    <div class={styles.text}>
-      <p class="title">{demo.name}</p>
-      <p class:list={[styles.description, 'body']}>
-        Publish this demo online with just three clicks in a matter of minutes.
-      </p>
-      <Button
-        href={`https://dashboard.datocms.com/deploy?repo=${demo.githubRepo}`}
-        attrs={{ target: '_blank', rel: 'noreferrer' }}
-      >
-        Deploy the demo project
-      </Button>
-      {
-        demo.technology.logo && (
-          <img
-            class={styles.logo}
-            src={demo.technology.logo.url}
-            alt={demo.technology.logo.alt ?? demo.technology.name}
-            loading="lazy"
-          />
-        )
-      }
+<figure data-datocms-content-link-boundary>
+  <prose-island>
+    <div class={s.demo}>
+      <AppWindow address={demo.name} class={s.window} size="s">
+        <ResponsiveImage data={demo.screenshot.responsiveImage} sizes={sizes} />
+      </AppWindow>
+      <div class={s.details}>
+        <div class={s.heading}>
+          <p class="bodyMedium">{demo.name}</p>
+          <span class={s.technology}>
+            <Logo
+              logo={{
+                mask: technology.logo.url,
+                alt: stripStega(technology.logo.alt ?? technology.name),
+                width: technology.logo.width ?? 1,
+                height: technology.logo.height ?? 1,
+              }}
+            />
+          </span>
+        </div>
+        {demo.cmsDescription && <p class:list={[s.description, 'body']}>{demo.cmsDescription}</p>}
+        <div class={s.actions}>
+          <Button
+            href={dashboardUrl(`/deploy?repo=${demo.githubRepo}`)}
+            attrs={{ target: '_blank', rel: 'noreferrer' }}
+          >
+            Deploy the demo project
+          </Button>
+          <a
+            class:list={[s.github, 'labelMedium']}
+            href={githubUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Icon icon={siGithub} />
+            Code on GitHub
+          </a>
+        </div>
+        <p class:list={[s.note, 'caption']}>Online in three clicks, in a few minutes.</p>
+      </div>
     </div>
-  </div>
-</prose-island>
+  </prose-island>
+</figure>

@@ -15,12 +15,15 @@
 
   /*
    * A block with its own design (a <prose-island>, alone or in a figure)
-   * is wider than the text: it goes --docs-bleed (up to 60px, from the
-   * docs layout) past each side. The caption of a figure stays in line
-   * with the text. A callout and a block with data-text-width (a button,
-   * a list of properties with no frame) stay at the width of the text.
+   * and the image of an image block (its link, or the video of a GIF) are
+   * wider than the text: they go --docs-bleed (up to 60px, from the docs
+   * layout) past each side. The caption of a figure stays in line with
+   * the text. A callout and a block with data-text-width (a button, a list
+   * of properties with no frame) stay at the width of the text.
    */
-  :is(:scope, :scope > figure) > prose-island:not([data-text-width], :has(> [data-callout-type])) {
+  :is(:scope, :scope > figure) > prose-island:not([data-text-width], :has(> [data-callout-type])),
+  :scope > figure > image-zoom > a,
+  :scope > figure > in-view-video {
     margin-inline: calc(-1 * var(--docs-bleed, 0px));
   }
 

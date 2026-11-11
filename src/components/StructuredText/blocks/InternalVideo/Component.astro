@@ -1,4 +1,5 @@
 ---
+import { VideoPlayer } from '~/components/VideoPlayer';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { InternalVideoFragment } from './graphql';
 
@@ -6,32 +7,19 @@ interface Props {
   block: FragmentOf<typeof InternalVideoFragment>;
 }
 
-const { video: file } = readFragment(InternalVideoFragment, Astro.props.block);
-const { video } = file;
+const { video } = readFragment(InternalVideoFragment, Astro.props.block);
 ---
 
 {
   /*
-  A video of the DatoCMS media area (Mux), in the native player. The
-  browser plays HLS when it can, else the MP4 file. No JS.
+  A video of the DatoCMS media area, in the Mux player. The player has its
+  own design, thus it is in an island. The title of the video is the
+  caption.
 */
 }
-<figure>
-  <video
-    controls
-    playsinline
-    preload="none"
-    poster={video.thumbnailUrl}
-    width={video.width}
-    height={video.height}
-    aria-label={file.alt ?? file.title ?? undefined}
-    style={{
-      aspectRatio: `${video.width} / ${video.height}`,
-      background: video.blurUpThumb ? `center / cover url("${video.blurUpThumb}")` : undefined,
-    }}
-  >
-    <source src={video.streamingUrl} type="application/vnd.apple.mpegurl" />
-    {video.mp4Url && <source src={video.mp4Url} type="video/mp4" />}
-  </video>
-  {file.title && <figcaption>{file.title}</figcaption>}
+<figure data-datocms-content-link-boundary>
+  <prose-island>
+    <VideoPlayer data={video} />
+  </prose-island>
+  {video.title && <figcaption>{video.title}</figcaption>}
 </figure>
