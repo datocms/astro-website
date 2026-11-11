@@ -11,8 +11,8 @@ colors:
   fern-deep: '#1a4731'
   fern: '#93d44b'
   fern-paper: '#f5fff5'
-  slate-deep: '#1d2229'
-  iris: '#9e90ee'
+  iris-deep: '#18032e'
+  iris: '#9d75f7'
   iris-paper: '#f6f5ff'
   harbour-deep: '#1a3a47'
   glacier: '#50c9ed'
@@ -197,7 +197,7 @@ This system came from overnice's work ("Warm Logic" is their name for the route)
 
 ## Colors
 
-Six families for the site, and a seventh theme for the docs. Each family has a deep tone, a bright accent and a paper white. The paper always takes the hue of the accent. The deep takes it too in orange, blue and pink; in the other three it is a different hue that goes with the accent: a brown under the yellow (Espresso), a forest green under the lime green (Fern Deep), a blue-black slate under the purple (Slate Deep). The frontmatter holds the anchors; `src/styles/tokens.css` holds the alpha steps and the semantic tokens that components use.
+Six families for the site, and a seventh theme for the docs. Each family has a deep tone, a bright accent and a paper white. The paper always takes the hue of the accent. The deep takes it too in orange, blue and pink; in the other three it is a different hue that goes with the accent: a brown under the yellow (Espresso), a forest green under the lime green (Fern Deep), a dark plum-violet under the purple, a little warmer than the accent (Iris Deep). The frontmatter holds the anchors; `src/styles/tokens.css` holds the alpha steps and the semantic tokens that components use.
 
 The names here are the design names. The primitives in `tokens.css` are named by hue and role, with a step: `-5` is the full colour, `-1` to `-4` are alpha steps of it (`-4` is not used at the moment), `-0` is the paper.
 
@@ -206,12 +206,12 @@ The names here are the design names. The primitives in `tokens.css` are named by
 | `default`            | Pollen `--color-yellow-light-5`  | Espresso `--color-brown-deep-5`    | Cream Paper `--color-yellow-light-0`   |
 | `orange`             | Ember `--color-orange-light-5`   | Ember Deep `--color-orange-deep-5` | Ember Paper `--color-orange-light-0`   |
 | `green`              | Fern `--color-green-light-5`     | Fern Deep `--color-green-deep-5`   | Fern Paper `--color-green-light-0`     |
-| `purple`             | Iris `--color-purple-light-5`    | Slate Deep `--color-purple-deep-5` | Iris Paper `--color-purple-light-0`    |
+| `purple`             | Iris `--color-purple-light-5`    | Iris Deep `--color-purple-deep-5`  | Iris Paper `--color-purple-light-0`    |
 | `blue`               | Glacier `--color-blue-light-5`   | Harbour Deep `--color-blue-deep-5` | Glacier Paper `--color-blue-light-0`   |
 | `pink`               | Bubblegum `--color-pink-light-5` | Plum Deep `--color-pink-deep-5`    | Bubblegum Paper `--color-pink-light-0` |
 | `docs`               | Iris `--color-purple-light-5`    | Docs Ink `--color-slate-deep-5`    | White `--color-white`                  |
 
-Careful with "slate": the design name Slate Deep is `--color-purple-deep-*`. The CSS family `--color-slate-*` is the docs ink, a different colour (a near black with a tint of violet).
+Careful with "slate": the CSS family `--color-slate-*` is the docs ink (Docs Ink), a near black with a tint of violet. It is not Iris Deep (`--color-purple-deep-*`).
 
 ### Primary
 
@@ -223,32 +223,32 @@ Careful with "slate": the design name Slate Deep is `--color-purple-deep-*`. The
 
 The five other themes have the same three roles. A section picks its theme with `data-theme`; the children inherit.
 
-- **Ember** (ember) on **Ember Deep** (ember-deep) and **Ember Paper** (ember-paper). Orange: the home page, Help, the Developers pillar.
+- **Ember** (ember) on **Ember Deep** (ember-deep) and **Ember Paper** (ember-paper). Orange: Help, the Developers pillar.
 - **Fern** (fern) on **Fern Deep** (fern-deep) and **Fern Paper** (fern-paper). Green: News, the Editing pillar.
-- **Iris** (iris) on **Slate Deep** (slate-deep) and **Iris Paper** (iris-paper). Purple: Ecosystem. The deep is a blue-black slate, not a purple.
+- **Iris** (iris) on **Iris Deep** (iris-deep) and **Iris Paper** (iris-paper). Purple, a violet (hue 295) on a dark plum-violet deep (hue 301, a little warmer than the accent): the home page, Ecosystem, Brand.
 - **Glacier** (glacier) on **Harbour Deep** (harbour-deep) and **Glacier Paper** (glacier-paper). Blue: Company and support, the pages for buyers (pricing, enterprise, compare), the AI pillar.
 - **Bubblegum** (bubblegum) on **Plum Deep** (plum-deep) and **Bubblegum Paper** (bubblegum-paper). Pink, a rose (hue 10, 36 degrees from Ember) on a wine deep: Partners, the Media pillar.
 
 The theme of each page is in "Page themes" (Layout).
 
-The six accents follow one rule in OKLCH: each accent keeps the lightness and the hue of overnice's value, and its chroma is 82% of the most chroma that sRGB gives at that lightness and hue. The percentage is what aligns them, not the raw chroma: a colour at the edge of sRGB looks neon next to the others (overnice's #ff6d00 is at 100%), and a colour far from it looks faded (#7fc4db was at 53%). Do not make an accent lighter to make it softer: a lighter orange is a salmon. Bubblegum is the one exception: overnice's #f1a5a7 is light (L 0.80), and at that lightness 82% is a pastel, thus Bubblegum is darker (L 0.74) and its hue moves from 18 to 10, away from Ember. Keep the rule when you add or change a hue.
+The six accents follow one rule in OKLCH: each accent keeps the lightness and the hue of overnice's value, and its chroma is 82% of the most chroma that sRGB gives at that lightness and hue. The percentage is what aligns them, not the raw chroma: a colour at the edge of sRGB looks neon next to the others (overnice's #ff6d00 is at 100%), and a colour far from it looks faded (#7fc4db was at 53%). Do not make an accent lighter to make it softer: a lighter orange is a salmon. There are two exceptions. Bubblegum: overnice's #f1a5a7 is light (L 0.80), and at that lightness 82% is a pastel, thus Bubblegum is darker (L 0.74) and its hue moves from 18 to 10, away from Ember. Iris: at L 0.70 a purple is a pastel, because the gamut of the purple hues is widest near L 0.53. Thus Iris is darker (L 0.66) and has more chroma (C 0.187, 92% of the edge). Its deep, Iris Deep, is a dark plum-violet (L 0.18, C 0.082, hue 301, 88% of the edge). Keep the rule when you add or change a hue.
 
 ### Tertiary
 
 - **Signal Green** (signal-green, `--color-green-signal`) and **Signal Red** (signal-red, `--color-red-light-5`): a change applied, something deleted or refused. Only in diagrams, status and form feedback. They do not change with the theme.
 - **Code Espresso** (code-espresso, `--color-code-brown-deep`) and the other `--color-code-*-deep`: the background of a code card. It is a calmer, deeper shade of the theme deep than the inverse surface. The syntax colours come from one OKLCH rule (see the comment in `tokens.css`): keywords take the accent hue, strings, constants and functions take three other hues of the family.
-- **Pixel highlights** (`--theme-pixel-highlight`): the brightest cells of the pixel pictures, a light partner of the accent. Default: `--color-cream-pale` (not Cream Paper: a deeper cream). Orange: Pollen. Green: `--color-lime-pale`. Purple and docs: `--color-orchid-pale`. Blue: `--color-aqua-pale`. Pink: `--color-peach-pale`.
+- **Pixel highlights** (`--theme-pixel-highlight`): the brightest cells of the pixel pictures, a light partner of the accent. Default: `--color-cream-pale` (not Cream Paper: a deeper cream). Orange: Pollen. Green: `--color-lime-pale`. Purple and docs: `--color-lilac-pale`. Blue: `--color-aqua-pale`. Pink: `--color-peach-pale`.
 
 ### Neutral
 
-There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft at 80% on the page and 92% on the accent, text-muted at 70 to 90% (each theme sets the alpha that gives 4.5:1 on its ground: yellow holds 70%, orange and green need about 90% on the accent), and the hairline border at about 11% (in the dark scheme, the accent at 25%: a light line on a dark page needs more alpha). The one lighter role is the quiet run of a two-tone headline or display lockup (3:1, large text only). **White** (white) is only for a card that sits on a surface that stays light. The docs theme is the exception (next section).
+There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft at 80% on the page and 92% on the accent, text-muted at 66 to 93% (each theme sets the alpha that gives 4.5:1 on its ground: yellow holds 70%, orange and green need about 90% on the accent), and the hairline border at about 11% (in the dark scheme, the accent at 25%: a light line on a dark page needs more alpha). The one lighter role is the quiet run of a two-tone headline or display lockup (3:1, large text only). **White** (white) is only for a card that sits on a surface that stays light. The docs theme is the exception (next section).
 
 ### The docs theme
 
 The docs are a tool, not a story, thus they have a theme of their own: `docs`. Only the docs layout uses it.
 
 - **The page is white**, and the ink is **Docs Ink** (docs-ink, `--color-slate-deep-5`): a near black with a small tint of violet (OKLCH L 0.22, C 0.02, hue 289). The tints of the ink are greys with the same small tint.
-- **The accent is Iris**, the purple of the site (#9e90ee, hue 289, the hue of the ink): the active tab, the focus ring, the hit of a search, the tags. The links and the kickers are a deep tone of it (`--text-accent`, OKLCH L 0.44, C 0.11: #52468b). It stays small: the docs have no accent bands.
+- **The accent is Iris**, the purple of the site (#9d75f7, hue 295, near the hue of the ink): the active tab, the focus ring, the hit of a search, the tags. The links and the kickers are a deep tone of it (`--text-accent`, OKLCH L 0.43, C 0.11: #554185). It stays small: the docs have no accent bands.
 - **The hero of the docs home** has a pixel field (`src/components/docs/PixelField`): the renderer of the pixel videos, with live cells from a slow noise, in the `docsField` palette (tints of Iris on the page, a grid of the page colour, a few glints of the pixel highlight). 6px cells, steps of 125ms, the shared lens. The field is empty at the top left (the headline) and dense at the right and at the bottom. One field for the two schemes: the tints mix the accent into the page surface. No gradient, no second effect for the dark scheme.
 - **The callouts do not take the hue of the theme.** Each kind has its own hue: info blue, tip violet, positive green, warning amber, danger red. The theme gives them as theme data (`--theme-status-*`); `--surface-status-*` and `--text-status-*` read it. A theme without the data keeps the old rule: info and tip are a tint of the ink, warning is a tint of the accent.
 - **The code card** is a deep slate, with the keywords in violet.
@@ -378,7 +378,7 @@ Each page has one theme: the theme of the layout (a necessary prop). The header,
 
 | Page                                    | Theme   | From               |
 | --------------------------------------- | ------- | ------------------ |
-| `/`                                     | orange  | the home hero      |
+| `/`                                     | purple  | the home hero      |
 | `/editor-experience`                    | green   | Visual editing     |
 | `/developers`                           | orange  | Schema             |
 | `/media`                                | pink    | Media library      |

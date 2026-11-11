@@ -76,6 +76,7 @@
    * orange is a salmon.
    * The design value of the orange is #ff6d00 (L 0.705, C 0.199, hue 46, at
    * the edge of sRGB). At 82%: C 0.163.
+   * The pink and the purple are exceptions (see the comment of each).
    */
   --color-orange-light-5: #f07a3d;
   --color-orange-light-4: #f07a3de8;
@@ -96,16 +97,24 @@
   --color-green-light-0: #f5fff5;
   /* The green of a signal: dark enough for a small icon on a light surface */
   --color-green-signal: #3f9a4a;
-  --color-purple-deep-5: #1d2229;
-  --color-purple-deep-4: #1d2229d9;
-  --color-purple-deep-3: #1d2229bf;
-  --color-purple-deep-2: #1d222980;
-  --color-purple-deep-1: #1d22291a;
-  --color-purple-light-5: #9e90ee;
-  --color-purple-light-4: #9e90eedb;
-  --color-purple-light-3: #9e90eeb2;
-  --color-purple-light-2: #9e90ee80;
-  --color-purple-light-1: #9e90ee1a;
+  /*
+   * The purple is a violet (OKLCH L 0.66, C 0.187, hue 295, 92% of the edge
+   * of sRGB). At L 0.70 a purple is a pastel: the gamut of this hue is
+   * widest near L 0.53, thus the purple is darker and has more chroma than
+   * the rule gives. Its deep is a dark plum-violet (L 0.18, C 0.082, hue
+   * 301, 88% of the edge): a little warmer than the accent, as the deep of
+   * other themes is a near hue. DESIGN.md calls them Iris and Iris Deep.
+   */
+  --color-purple-deep-5: #18032e;
+  --color-purple-deep-4: #18032ed9;
+  --color-purple-deep-3: #18032ebf;
+  --color-purple-deep-2: #18032e80;
+  --color-purple-deep-1: #18032e1a;
+  --color-purple-light-5: #9d75f7;
+  --color-purple-light-4: #9d75f7db;
+  --color-purple-light-3: #9d75f7b2;
+  --color-purple-light-2: #9d75f780;
+  --color-purple-light-1: #9d75f71a;
   --color-purple-light-0: #f6f5ff;
   --color-blue-deep-5: #1a3a47;
   --color-blue-deep-4: #1a3a47d9;
@@ -136,14 +145,11 @@
   --color-pink-light-1: #f284971a;
   --color-pink-light-0: #fff7f8;
   /*
-   * The deep of the purple theme (--color-purple-deep-*) is a blue-black
-   * slate (hue 257), not a purple. DESIGN.md calls it Slate Deep. The
-   * slate family below is a different colour: the ink of the docs.
-   *
    * The docs. The docs are a tool, not a story: the page is white, and the
    * ink is a near black with a small tint of violet (OKLCH L 0.22, C 0.02,
    * hue 290). The accent is the purple of the site (--color-purple-light-5,
-   * the same hue): the links take a deep tone of it (--text-accent).
+   * hue 295): the links take a deep tone of it (--text-accent). DESIGN.md
+   * calls the ink Docs Ink.
    */
   --color-slate-deep-5: #1a1923;
   --color-slate-deep-3: #1a1923b2;
@@ -194,16 +200,17 @@
    * yellow accent (--color-yellow-light-5) and has no pale of its own. The
    * pales below follow the same rule in OKLCH: from the accent, add
    * approximately 0.17 lightness (stop near 0.94), use less chroma, and move
-   * the hue to yellow (at most 55 deg).
+   * the hue to yellow (at most 55 deg). The purple does not move its hue:
+   * from violet the way to yellow goes through rose and pink.
    *   cream   default (the accent is yellow already, thus a pale cream)
    *   lime    green
-   *   orchid  purple and docs
+   *   lilac   purple and docs (L 0.85, C 0.083, hue 295)
    *   aqua    blue
    *   peach   pink
    */
   --color-cream-pale: #f8f2c2;
   --color-lime-pale: #eef0a8;
-  --color-orchid-pale: #ffbef1;
+  --color-lilac-pale: #d1c4ff;
   --color-aqua-pale: #cbf5ee;
   --color-peach-pale: #ffd6b3;
 
@@ -246,14 +253,14 @@
   --color-code-green-faded: #aab5a2;
   --color-code-green-dim: #8a987e;
   --color-code-green-faint: #808a77;
-  --color-code-purple-deep: #181d24;
-  --color-code-purple-strong: #c8c2fe;
-  --color-code-purple-soft: #ccc6fe;
-  --color-code-purple-pale: #d2ceff;
-  --color-code-purple-plain: #e7e6f5;
-  --color-code-purple-faded: #b0aec3;
-  --color-code-purple-dim: #918faa;
-  --color-code-purple-faint: #858498;
+  --color-code-purple-deep: #20192b;
+  --color-code-purple-strong: #cebffe;
+  --color-code-purple-soft: #d1c4fe;
+  --color-code-purple-pale: #d7ccfe;
+  --color-code-purple-plain: #e8e6f4;
+  --color-code-purple-faded: #b2aec3;
+  --color-code-purple-dim: #938ea9;
+  --color-code-purple-faint: #878397;
   --color-code-blue-deep: #08202a;
   --color-code-blue-strong: #6adcff;
   --color-code-blue-soft: #7eddfc;
@@ -327,6 +334,10 @@
  *                              on the other themes. See the dark scheme
  *   alpha-dark-border          the alpha of the ink in the hairline of the
  *                              dark page
+ *   alpha-on-accent-button-soft the alpha of the ink in the fill of a soft
+ *                              button on the accent. :root sets 10% and
+ *                              the themes inherit it. The docs set 8%:
+ *                              their ink is lighter
  *   code-*                     the syntax colours of the code card. The
  *                              keywords take the accent hue; strings,
  *                              constants and functions take three other hues
@@ -358,6 +369,7 @@
   --theme-dark-accent-chroma: 0.075;
   --theme-dark-ground-chroma: 0.025;
   --theme-alpha-dark-border: 18%;
+  --theme-alpha-on-accent-button-soft: 10%;
   --code-background: var(--color-code-brown-deep);
   --code-plain: var(--color-code-yellow-plain);
   --code-keyword: var(--color-code-yellow-strong);
@@ -445,16 +457,16 @@
   --theme-accent-muted: var(--color-purple-light-3);
   --theme-accent-subtle: var(--color-purple-light-2);
   --theme-accent-faint: var(--color-purple-light-1);
-  --theme-accent-bright: #b4a8ff;
-  --theme-pixel-highlight: var(--color-orchid-pale);
-  --theme-alpha-page-muted: 73%;
-  --theme-alpha-page-headline-muted: 60%;
-  --theme-alpha-on-accent-muted: 88%;
-  --theme-alpha-on-accent-headline-muted: 66%;
-  --theme-alpha-on-inverse-soft: 86%;
-  --theme-alpha-on-inverse-muted: 88%;
-  --theme-alpha-on-inverse-headline-muted: 65%;
-  --theme-dark-accent-chroma: 0.205;
+  --theme-accent-bright: #ab89ff;
+  --theme-pixel-highlight: var(--color-lilac-pale);
+  --theme-alpha-page-muted: 66%;
+  --theme-alpha-page-headline-muted: 54%;
+  --theme-alpha-on-accent-muted: 83%;
+  --theme-alpha-on-accent-headline-muted: 61%;
+  --theme-alpha-on-inverse-soft: 87%;
+  --theme-alpha-on-inverse-muted: 87%;
+  --theme-alpha-on-inverse-headline-muted: 66%;
+  --theme-dark-accent-chroma: 0.198;
   --theme-dark-ground-chroma: 0.028;
   --theme-alpha-dark-border: 18%;
   --code-background: var(--color-code-purple-deep);
@@ -549,19 +561,25 @@
   --theme-accent: var(--color-purple-light-5);
   --theme-accent-muted: var(--color-purple-light-3);
   --theme-accent-subtle: var(--color-purple-light-2);
-  --theme-accent-faint: var(--color-purple-light-1);
-  --theme-accent-bright: #b4a8ff;
-  --theme-pixel-highlight: var(--color-orchid-pale);
+  /*
+   * The faint tint is 9% of the accent, not 10% (--color-purple-light-1):
+   * the docs ink is lighter than Iris Deep, and the accent text of a soft
+   * button on the inverse needs 4.6:1 on it.
+   */
+  --theme-accent-faint: #9d75f718;
+  --theme-accent-bright: #ab89ff;
+  --theme-pixel-highlight: var(--color-lilac-pale);
   --theme-alpha-page-muted: 70%;
   --theme-alpha-page-headline-muted: 55%;
-  --theme-alpha-on-accent-muted: 88%;
-  --theme-alpha-on-accent-headline-muted: 66%;
-  --theme-alpha-on-inverse-soft: 86%;
-  --theme-alpha-on-inverse-muted: 88%;
-  --theme-alpha-on-inverse-headline-muted: 65%;
-  --theme-dark-accent-chroma: 0.205;
+  --theme-alpha-on-accent-muted: 91%;
+  --theme-alpha-on-accent-headline-muted: 67%;
+  --theme-alpha-on-inverse-soft: 92%;
+  --theme-alpha-on-inverse-muted: 92%;
+  --theme-alpha-on-inverse-headline-muted: 68%;
+  --theme-dark-accent-chroma: 0.198;
   --theme-dark-ground-chroma: 0.004;
   --theme-alpha-dark-border: 12%;
+  --theme-alpha-on-accent-button-soft: 8%;
   --theme-status-info-surface: var(--color-callout-info-tint);
   --theme-status-info-text: var(--color-callout-info-text);
   --theme-status-tip-surface: var(--color-callout-tip-tint);
@@ -749,11 +767,11 @@
   /*
    * Accent-hued text (a link, an icon) and the signals, as text. The accent
    * surface is a light hue and does not read as text on the page: the text
-   * takes a dark tone of the hue (OKLCH lightness 0.44 reads on the
+   * takes a dark tone of the hue (OKLCH lightness 0.43 reads on the
    * accent-subtle tint too). A signal mixed with the ink is dark enough on
    * the page and on its tints.
    */
-  --text-accent: var(--_ground-text-accent, oklch(from var(--theme-accent) 0.44 min(c, 0.11) h));
+  --text-accent: var(--_ground-text-accent, oklch(from var(--theme-accent) 0.43 min(c, 0.11) h));
   --text-positive: var(
     --_ground-text-positive,
     color-mix(in oklab, var(--surface-positive) 40%, var(--theme-ink))
@@ -880,7 +898,8 @@
  *                     at most the edge of sRGB, thus the hue does not move)
  *   inverse-faint     a light tint, because a dark tint does not show on
  *                     the dark surface
- *   accent text       the accent itself, and the signals as they are
+ *   accent text       the bright accent (--theme-accent-bright), and the
+ *                     signals as they are
  * The bright accent (--surface-accent outside surfaceAccent) stays for the
  * small shapes: a pill or a button on the page keeps the accent and its ink.
  */
@@ -967,7 +986,7 @@
     transparent
   );
   --border-on-page-strong: var(--theme-paper);
-  --text-accent: var(--_ground-text-accent, var(--theme-accent));
+  --text-accent: var(--_ground-text-accent, var(--theme-accent-bright));
   /* The signals, a little paler: the dark accent tints are not black */
   --text-positive: var(
     --_ground-text-positive,
@@ -1054,10 +1073,15 @@
   --_ground-surface-button-hover: var(--surface-default);
   --_ground-text-button-hover: var(--text-on-accent);
   /*
-   * The soft fill: the ink at 10% in each theme. The faint ink of a theme
-   * (up to 12%) is too dark for the text on the orange accent.
+   * The soft fill: the ink at --theme-alpha-on-accent-button-soft (10%,
+   * the docs 8%). The faint ink of a theme (up to 12%) is too dark for the
+   * text on the orange accent.
    */
-  --_ground-surface-button-soft: color-mix(in srgb, var(--theme-ink) 10%, transparent);
+  --_ground-surface-button-soft: color-mix(
+    in srgb,
+    var(--theme-ink) var(--theme-alpha-on-accent-button-soft),
+    transparent
+  );
   /* The text is dark: the type has the light values. */
   --type-leading-dark: 0;
   --type-tracking-dark: 0em;

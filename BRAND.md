@@ -251,15 +251,15 @@ The logo has two forms.
 
 The master files are `src/assets/logo/wordmark.svg` and `src/assets/logo/symbol.svg`, in the astro-website repository. Every other copy comes from these two: `npm run brand-assets` makes the files of `public/brand/`, which the page `/brand` offers. The logo files of the other repositories (`dato_symbol.svg` and `dato_wordmark.svg` in `ui-public` of web, the favicons of the cms, the dashboard, and the API) are copies: change the masters, run the script, then copy the files again.
 
-| Rule         | Detail                                                                                                                                                                                         |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| One color    | The logo is always a single flat color.                                                                                                                                                        |
-| Which color  | On a light ground, the dark ink of the theme. On a dark ground, the accent of the theme or white.                                                                                              |
-| Fixed marks  | Where the logo stands alone with no page around it (favicon, app icon, social avatar, email), it is the dark slate symbol on the Iris purple. The bare purple symbol is for dark grounds only. |
-| Clear space  | Keep a margin of the height of the symbol on every side.                                                                                                                                       |
-| Minimum size | Wordmark: 20 px high. Symbol: 16 px. Below that, don't use the logo.                                                                                                                           |
-| Ground       | A flat color with enough contrast. Never a photo, a pattern, or a busy picture.                                                                                                                |
-| In a circle  | Never the symbol alone. Use the avatar file: it has a margin, and the D is moved to where it looks centered.                                                                                   |
+| Rule         | Detail                                                                                                                                                                                                      |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| One color    | The logo is always a single flat color.                                                                                                                                                                     |
+| Which color  | On a light ground, the dark ink of the theme. On a dark ground, the accent of the theme or white.                                                                                                           |
+| Fixed marks  | Where the logo stands alone with no page around it (favicon, app icon, social avatar, email), it is the dark violet symbol (Iris Deep) on the Iris purple. The bare purple symbol is for dark grounds only. |
+| Clear space  | Keep a margin of the height of the symbol on every side.                                                                                                                                                    |
+| Minimum size | Wordmark: 20 px high. Symbol: 16 px. Below that, don't use the logo.                                                                                                                                        |
+| Ground       | A flat color with enough contrast. Never a photo, a pattern, or a busy picture.                                                                                                                             |
+| In a circle  | Never the symbol alone. Use the avatar file: it has a margin, and the D is moved to where it looks centered.                                                                                                |
 
 ### Don't
 
@@ -353,9 +353,14 @@ For partners, customers, press, and plugin authors. We are happy when you show t
 
 The badge files need to be drawn. Until then, use the wordmark with the text.
 
-### Buttons **TBC**
+### Buttons
 
-"Deploy with DatoCMS", "Clone project", and "Install plugin" are buttons that we host, for a README or a docs page. Embed them from our URL and don't redraw them. The current files still have the old orange and will be replaced.
+"Deploy with DatoCMS" and "Clone with DatoCMS" are buttons that we host, for a README or a docs page. Embed them from our URL and don't redraw them:
+
+- `https://dashboard.datocms.com/deploy/button.svg`
+- `https://dashboard.datocms.com/clone/button.svg`
+
+Each button is one file: the dark symbol and the label on the Iris purple, the pair of the fixed marks. It reads on a light and on a dark ground, thus a README needs no second file for dark mode. The forms of [Project templates](https://www.datocms.com/docs/general-concepts/project-starters-and-templates) in the docs make the link and the code for your project.
 
 ### Press
 

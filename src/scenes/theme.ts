@@ -12,22 +12,22 @@ import type { Theme } from '~/lib/theme';
  *   has the OKLCH hue 130, but at that hue the bar of the cms is a loud
  *   lime. 150 gives a deep green that goes with the dark green of the
  *   inverse surface (#1a4731).
- * - `purple` 290: the purple of the home page (--color-purple-light-5,
- *   #9e90ee) has the OKLCH hue 289. It is also the default hue of the kit.
- *   (249, the HSL hue of #9e90ee, gives a blue.)
+ * - `purple` 295: the hue of the purple of the home page
+ *   (--color-purple-light-5, #9d75f7). (The HSL hue of #9d75f7 is 258,
+ *   and it gives a blue.)
  * - `blue` 225: the hue of --color-blue-light-5 (#50c9ed) and
  *   --color-blue-deep-5 (#1a3a47).
  * - `pink` 10: the hue of --color-pink-light-5 (#f28497).
- * - `docs` 290: the hue of --color-purple-light-5 (#9e90ee).
+ * - `docs` 295: the hue of --color-purple-light-5 (#9d75f7).
  */
 export const SCENE_HUE: Record<Theme, number> = {
   default: 80,
   orange: 45,
   green: 150,
-  purple: 290,
+  purple: 295,
   blue: 225,
   pink: 10,
-  docs: 290,
+  docs: 295,
 };
 
 /**

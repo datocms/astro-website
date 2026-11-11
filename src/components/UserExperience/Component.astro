@@ -9,7 +9,7 @@ import styles from './style.module.css';
 
 type Props = UserExperienceData;
 
-const { developer, editor, record, site, query, video } = Astro.props;
+const { developer, editor, record, site, query, video, theme } = Astro.props;
 
 // The screen of the form at each breakpoint: the width of the editor
 // window, and its height under the bar. The window width changes, and
@@ -31,7 +31,7 @@ const FORM_SCREENS = {
 
 <user-experience class={styles.root}>
   <Section
-    theme="orange"
+    {theme}
     background="accent"
     class={styles.userExperience}
     contentClass={styles.content}
@@ -134,13 +134,13 @@ const FORM_SCREENS = {
       >
         <div class={styles.formBody}>
           <div class={styles.formPhone}>
-            <UserExperienceScene {...FORM_SCREENS.phone} video={video} />
+            <UserExperienceScene {...FORM_SCREENS.phone} video={video} theme={theme} />
           </div>
           <div class={styles.formMedium}>
-            <UserExperienceScene {...FORM_SCREENS.medium} video={video} />
+            <UserExperienceScene {...FORM_SCREENS.medium} video={video} theme={theme} />
           </div>
           <div class={styles.formWide}>
-            <UserExperienceScene {...FORM_SCREENS.wide} video={video} />
+            <UserExperienceScene {...FORM_SCREENS.wide} video={video} theme={theme} />
           </div>
         </div>
       </AppWindow>

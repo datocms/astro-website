@@ -10,8 +10,8 @@ import { Scene } from '../Scene';
 
 /**
  * The strength of the hue on the surfaces of the cms. At 1 the dark
- * scheme is almost black. At 4 it is a warm dark brown, a bit darker
- * than the --surface-inverse of the other two windows. 3 is too grey
+ * scheme is almost black. At 4 it is a dark tone of the hue, a bit
+ * darker than the --surface-inverse of the other two windows. 3 is too grey
  * next to them.
  */
 const TINT = 4;
@@ -40,12 +40,14 @@ type UserExperienceSceneProps = {
   height: number;
   /** The hero video of the site window. The Hero video field plays it too. */
   video: UserExperienceData['video'];
+  /** The theme of the band: it gives the hue of the cms. */
+  theme: UserExperienceData['theme'];
 };
 
-export function UserExperienceScene({ width, height, video }: UserExperienceSceneProps) {
+export function UserExperienceScene({ width, height, video, theme }: UserExperienceSceneProps) {
   return (
     <Scene
-      theme="orange"
+      theme={theme}
       appearance={{ surface: 'inverse', tint: TINT }}
       description="The record editor of DatoCMS with the case study: the title, the subtitle, the hero video and the slug."
       width={width}

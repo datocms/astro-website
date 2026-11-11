@@ -10,6 +10,12 @@ import type { LogoItem } from '~/components/LogosLine';
 import type { Theme } from '~/lib/theme';
 import { clientLogos as c } from '~/data/clientLogos';
 
+/**
+ * The theme of the home page. The layout, the hero and the first band (the
+ * product scene) read it, thus the page starts and ends in this hue.
+ */
+export const homeTheme: Theme = 'purple';
+
 export interface HeroData {
   label?: string;
   /** The strong run of the h1. */
@@ -45,6 +51,8 @@ export interface UserExperienceData {
    * src/lib/pixel-video/styles.ts. `lens: false` removes the lens.
    */
   video: { src: string; palette?: string; lens?: boolean };
+  /** The theme of the band, of its windows and of its scene. */
+  theme: Theme;
 }
 
 export interface ContentSourceData {
@@ -157,14 +165,16 @@ export const hero: HeroData = {
       href: dashboardUrl('/signup'),
       variant: 'accent',
       arrow: false,
-      theme: 'orange',
+      theme: homeTheme,
     },
     { label: 'Docs', href: '/docs', variant: 'soft', arrow: false },
   ],
 };
 
-/** The hero of the home page, on a dark purple section (HomeHero). */
+/** The hero of the home page, on the page ground (HomeHero). */
 export interface HomeHeroData {
+  /** The theme of the hero and of the page. */
+  theme: Theme;
   headline: string;
   subheadline: string;
   /** The face after the subheadline (src/lib/motion/faces.ts). */
@@ -176,6 +186,7 @@ export interface HomeHeroData {
 }
 
 export const homeHero: HomeHeroData = {
+  theme: homeTheme,
   headline: hero.headline,
   subheadline: hero.subheadline ?? '',
   face: hero.face,
@@ -244,6 +255,7 @@ export const homeHero: HomeHeroData = {
 };
 
 export const userExperience: UserExperienceData = {
+  theme: homeTheme,
   developer: {
     headline: 'Fresh tools, predictable workflows, and full control.',
     button: { label: 'Developer Comfort', href: '/developers' },
@@ -276,8 +288,8 @@ export const userExperience: UserExperienceData = {
     ],
     thread: 2,
   },
-  // No grid on the background, the yellow highlight of the theme, and no
-  // lens.
+  // No grid on the background, the pixel highlight of the theme (the
+  // lilac of the purple theme), and no lens.
   video: { src: '/videos/fist-bump.pxv', palette: 'tonalHighlight', lens: false },
 };
 

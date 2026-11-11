@@ -104,7 +104,7 @@ export const outline: Style = {
 };
 
 // Flat cells in three tones, with no visible grid: dark background, accent
-// midtones and the light pixel highlight: orange cells with yellow highlights.
+// midtones and the light pixel highlight of the theme.
 export const tintHighlight: Style = {
   bgFill: INVERSE,
   bgStroke: INVERSE,
@@ -188,7 +188,7 @@ export const lineIcon: Style = {
   groundFill: 'var(--surface-default)',
 };
 
-// Tonal with the yellow pixel highlight, and no grid on the background.
+// Tonal with the pixel highlight of the theme, and no grid on the background.
 // This is the hero video of the site window of the home page.
 export const tonalHighlight: Style = {
   ...tonal,
