@@ -12,8 +12,8 @@ import { DeployButtonFormFragment } from '~/components/docs/blocks/DeployButtonF
 import { DocCalloutFragment } from '~/components/docs/blocks/DocCallout/graphql';
 import { PluginSdkHookGroupFragment } from '~/components/docs/blocks/PluginSdkHookGroup/graphql';
 import { ReactUiLiveExampleFragment } from '~/components/docs/blocks/ReactUiLiveExample/graphql';
-import { defaultInlineRecordFragments } from '~/components/docs/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/docs/linkToRecords';
+import { defaultInlineRecordFragments } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/StructuredText/linkToRecords';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';

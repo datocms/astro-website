@@ -1,8 +1,8 @@
 import { ImageFragment } from '~/components/docs/blocks/Image/graphql';
 import { VideoFragment } from '~/components/docs/blocks/Video/graphql';
 import { DocCalloutFragment } from '~/components/docs/blocks/DocCallout/graphql';
-import { defaultInlineRecordFragments } from '~/components/docs/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/docs/linkToRecords';
+import { defaultInlineRecordFragments } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/StructuredText/linkToRecords';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const TabBlockFragment = graphql(

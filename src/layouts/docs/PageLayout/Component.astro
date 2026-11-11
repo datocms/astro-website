@@ -30,13 +30,14 @@ import {
   type SidebarGroup,
 } from '~/components/docs/Sidebar';
 import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
-import { Text } from '~/components/docs/DocsStructuredText/Text';
+import { StructuredText } from '~/components/StructuredText';
+import AnchoredHeadingNode from '~/components/StructuredText/AnchoredHeadingNode.astro';
 import { GroupLayout } from '~/layouts/docs/GroupLayout';
 import { GroupLayoutFragment } from '../GroupLayout/_graphql';
 import { PageLayoutFragment } from './_graphql';
 import { Prose } from '~/components/docs/DocsProse';
-import { defaultLinkToRecordComponents } from '~/components/docs/linkToRecords';
-import { defaultInlineRecordComponents } from '~/components/docs/inlineRecords';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 
 type Props = {
   group: FragmentOf<typeof GroupLayoutFragment>;
@@ -106,7 +107,8 @@ const tocGroups = [
 
     <Prose>
       <slot>
-        <Text
+        <StructuredText
+          nodeOverrides={{ heading: AnchoredHeadingNode }}
           {...ensureValidStructuredTextProps({
             data: page.content,
             blockComponents: {

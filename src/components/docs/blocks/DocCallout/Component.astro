@@ -3,9 +3,10 @@ import { DocCalloutFragment } from './graphql';
 import type { FragmentOf } from 'gql.tada';
 import { readFragment } from 'gql.tada';
 import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Text } from '~/components/docs/DocsStructuredText/Text';
-import { defaultLinkToRecordComponents } from '~/components/docs/linkToRecords';
-import { defaultInlineRecordComponents } from '~/components/docs/inlineRecords';
+import { StructuredText } from '~/components/StructuredText';
+import AnchoredHeadingNode from '~/components/StructuredText/AnchoredHeadingNode.astro';
+import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
+import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 import Base from './Base.astro';
 import { stripStega } from '@datocms/astro';
 
@@ -21,7 +22,8 @@ const { calloutType, title, text } = block;
 ---
 
 <Base calloutType={stripStega(calloutType)} title={title}>
-  <Text
+  <StructuredText
+    nodeOverrides={{ heading: AnchoredHeadingNode }}
     {...ensureValidStructuredTextProps({
       data: text,
       linkToRecordComponents: defaultLinkToRecordComponents,

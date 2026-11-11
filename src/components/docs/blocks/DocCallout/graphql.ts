@@ -1,5 +1,5 @@
-import { defaultInlineRecordFragments } from '~/components/docs/inlineRecords';
-import { defaultLinkToRecordFragments } from '~/components/docs/linkToRecords';
+import { defaultInlineRecordFragments } from '~/components/StructuredText/inlineRecords';
+import { defaultLinkToRecordFragments } from '~/components/StructuredText/linkToRecords';
 import { graphql } from '~/lib/datocms/graphql';
 
 export const DocCalloutFragment = graphql(
