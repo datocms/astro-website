@@ -1,0 +1,82 @@
+---
+import { Check, Copy } from 'lucide';
+import { Icon } from '~/components/Icon';
+import type { SnippetLang } from '~/lib/code/snippet';
+import s from './style.module.css';
+
+type Props = astroHTML.JSX.HTMLAttributes & {
+  lang: SnippetLang;
+  /** One long line (a URL): it continues on the next line. */
+  wrap?: boolean;
+};
+
+const { lang, wrap, class: className, ...rest } = Astro.props;
+---
+
+{
+  /*
+  The script of the page sets the code in the attribute `code`. The element
+  then shows it with the colours of the syntax.
+*/
+}
+<code-snippet class:list={[s.root, wrap && s.wrap, className]} data-lang={lang} {...rest}>
+  <pre class={s.pre}><code /></pre>
+  <button type="button" class={s.copy} aria-label="Copy to clipboard">
+    <Icon icon={Copy} class={s.idle} />
+    <Icon icon={Check} class={s.done} />
+  </button>
+  <span class={s.status} aria-live="polite"></span>
+</code-snippet>
+
+<script>
+  import { type SnippetLang, tokenize } from '~/lib/code/snippet';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'code-snippet',
+    class extends WebComponent {
+      static observedAttributes = ['code'];
+      timer: ReturnType<typeof setTimeout> | undefined;
+
+      parsedCallback() {
+        const status = this.$('[aria-live]');
+
+        this.on(this.$('button'), 'click', async () => {
+          try {
+            await navigator.clipboard.writeText(this.getAttribute('code') ?? '');
+          } catch {
+            return;
+          }
+          this.dataset.copied = '';
+          status.textContent = 'Copied';
+          clearTimeout(this.timer);
+          this.timer = setTimeout(() => {
+            delete this.dataset.copied;
+            status.textContent = '';
+          }, 2000);
+        });
+
+        this.render();
+      }
+
+      attributeChangedCallback() {
+        // Before the children are parsed, parsedCallback shows the code.
+        if (this.isConnected && this.querySelector('code')) this.render();
+      }
+
+      render() {
+        const code = this.$('code');
+        const tokens = tokenize(this.getAttribute('code') ?? '', this.dataset.lang as SnippetLang);
+        code.replaceChildren(
+          ...tokens.map(({ text, role }) => {
+            if (role === 'plain') return text;
+            const span = document.createElement('span');
+            span.dataset.token = role;
+            span.textContent = text;
+            return span;
+          }),
+        );
+      }
+    },
+  );
+</script>

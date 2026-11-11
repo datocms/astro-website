@@ -1,0 +1,109 @@
+/*
+ * The code that a form makes in the browser. It has the look of the code
+ * blocks of Expressive Code (src/styles/expressiveCode.css): a dark card
+ * in both schemes, the --code-* colours, and a copy button that shows when
+ * the pointer is on the card.
+ */
+.root {
+  display: block;
+  position: relative;
+}
+
+.pre {
+  margin: 0;
+  /* The space on the right is for the copy button. */
+  padding: var(--space-sm) var(--space-3xl) var(--space-sm) var(--space-md);
+  background: var(--code-background);
+  color: var(--code-plain);
+  border: 1px solid var(--border-on-inverse);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  font-weight: 500;
+  line-height: 1.55;
+  white-space: pre;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--code-plain) 25%, transparent) transparent;
+}
+
+/* One long line (a URL): it continues on the next line, and it can break in a word. */
+.wrap .pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.pre [data-token='punctuation'] {
+  color: var(--code-punctuation);
+}
+
+.pre [data-token='keyword'] {
+  color: var(--code-keyword);
+}
+
+.pre [data-token='string'] {
+  color: var(--code-string);
+}
+
+.pre [data-token='constant'] {
+  color: var(--code-constant);
+}
+
+.pre [data-token='function'] {
+  color: var(--code-function);
+}
+
+.copy {
+  position: absolute;
+  top: var(--space-2xs);
+  right: var(--space-2xs);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: var(--code-background);
+  color: var(--code-plain);
+  border: 1px solid var(--border-on-inverse);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* A touch screen has no pointer on the card, thus the button always shows. */
+.root:hover .copy,
+.copy:focus-visible,
+.root[data-copied] .copy {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .copy {
+    opacity: 1;
+  }
+}
+
+.done,
+.root[data-copied] .idle {
+  display: none;
+}
+
+.root[data-copied] .done {
+  display: block;
+}
+
+/* The message for a screen reader. */
+.status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

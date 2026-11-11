@@ -36,7 +36,7 @@ export default function TabsReactComponent({ children }: { children: ReactNode }
         }
 
         return (
-          <div key="content" className={s.content}>
+          <div key="content" className={child.props.noPadding ? s.noPaddingContent : s.content}>
             {child.props.children}
           </div>
         );
@@ -48,6 +48,8 @@ export default function TabsReactComponent({ children }: { children: ReactNode }
 type TabProps = {
   title: string;
   code?: boolean;
+  /** No panel around the content: for content that has its own box, such as code. */
+  noPadding?: boolean;
   children: ReactNode;
 };
 

@@ -4,6 +4,7 @@ import s from './style.module.css';
 import { FormBox, FormRow } from '~/components/FormBox';
 import { FormField } from '~/components/FormField';
 import { Tab, Tabs } from '~/components/docs/Tabs';
+import { CodeSnippet } from '~/components/docs/CodeSnippet';
 ---
 
 <clone-button-form>
@@ -32,20 +33,20 @@ import { Tab, Tabs } from '~/components/docs/Tabs';
     </form>
   </Space>
 
-  <div class={s.result}>
+  <div>
     <p>Use the following code to share the button on your README file or documentation:</p>
     <Space top={1} bottom={1}>
       <Tabs>
-        <Tab title="URL">
-          <pre data-url></pre>
+        <Tab title="Markdown" noPadding>
+          <CodeSnippet lang="markdown" wrap data-markdown />
         </Tab>
-        <Tab title="Markdown">
-          <pre data-markdown></pre>
+        <Tab title="HTML" noPadding>
+          <CodeSnippet lang="html" data-html />
         </Tab>
-        <Tab title="HTML">
-          <pre data-html></pre>
+        <Tab title="URL" noPadding>
+          <CodeSnippet lang="text" wrap data-url />
         </Tab>
-        <Tab title="Button Preview">
+        <Tab title="Preview">
           <a target="_blank" rel="noopener noreferrer" class={s.button} data-href>
             <img src="https://dashboard.datocms.com/clone/button.svg" alt="Clone with DatoCMS" />
           </a>
@@ -84,14 +85,24 @@ import { Tab, Tabs } from '~/components/docs/Tabs';
         const params = new URLSearchParams(data as unknown as Record<string, string>).toString();
         const url = `https://dashboard.datocms.com/clone?${params}`;
 
-        this.url.innerText = url;
-        this.markdown.innerText = `[![Clone with DatoCMS](https://dashboard.datocms.com/clone/button.svg)](${url})`;
-        this.html.innerText = `<a href="${url}" target="_blank" rel="noopener">
+        this.url.setAttribute('code', url);
+        this.markdown.setAttribute(
+          'code',
+          `[![Clone with DatoCMS](https://dashboard.datocms.com/clone/button.svg)](${url})`,
+        );
+        this.html.setAttribute(
+          'code',
+          `<a
+  href="${url}"
+  target="_blank"
+  rel="noopener"
+>
   <img
     src="https://dashboard.datocms.com/clone/button.svg"
     alt="Clone with DatoCMS"
   />
-</a>`;
+</a>`,
+        );
         this.href.href = url;
       }
     },

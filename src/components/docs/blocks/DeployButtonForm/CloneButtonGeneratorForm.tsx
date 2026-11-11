@@ -8,6 +8,7 @@ import {
 } from '~/components/docs/form/Field/ReactComponent';
 import { SpaceReactComponent } from '~/components/docs/Space/ReactComponent';
 import TabsReactComponent, { TabReactComponent } from '~/components/docs/Tabs/ReactComponent';
+import { CodeSnippetReact } from '~/components/docs/CodeSnippet/ReactComponent';
 
 type Manifest = {
   name: string;
@@ -286,43 +287,49 @@ export default function CloneButtonGeneratorForm() {
         </form>
       </SpaceReactComponent>
 
-      <div className={s.result}>
+      <div>
         <SpaceReactComponent top={1} bottom={1}>
           <h5>Result</h5>
           <p>
             Copy the following code and add it to your Git repository in a file called{' '}
             <code>datocms.json</code>:
           </p>
-          <div className={s.manifest}>
-            <pre>{JSON.stringify(datocmsJson, null, 2)}</pre>
-          </div>
+          <CodeSnippetReact code={JSON.stringify(datocmsJson, null, 2)} lang="json" />
         </SpaceReactComponent>
 
         <SpaceReactComponent top={1} bottom={1}>
           <p>Use the following code to share the button on your README file or documentation:</p>
 
           <TabsReactComponent>
-            <TabReactComponent title="Markdown">
-              <pre>
-                [![Deploy with DatoCMS](https://dashboard.datocms.com/deploy/button.svg)](
-                {deployUrl})
-              </pre>
+            <TabReactComponent title="Markdown" noPadding>
+              <CodeSnippetReact
+                code={`[![Deploy with DatoCMS](https://dashboard.datocms.com/deploy/button.svg)](${deployUrl})`}
+                lang="markdown"
+                wrap
+              />
             </TabReactComponent>
 
-            <TabReactComponent title="HTML">
-              <pre>{`<a href="${deployUrl}" target="_blank" rel="noopener">
-    <img
-      src="https://dashboard.datocms.com/deploy/button.svg"
-      alt="Deploy with DatoCMS"
-    />
-  </a>`}</pre>
+            <TabReactComponent title="HTML" noPadding>
+              <CodeSnippetReact
+                code={`<a
+  href="${deployUrl}"
+  target="_blank"
+  rel="noopener"
+>
+  <img
+    src="https://dashboard.datocms.com/deploy/button.svg"
+    alt="Deploy with DatoCMS"
+  />
+</a>`}
+                lang="html"
+              />
             </TabReactComponent>
 
-            <TabReactComponent title="URL">
-              <pre>{deployUrl}</pre>
+            <TabReactComponent title="URL" noPadding>
+              <CodeSnippetReact code={deployUrl} lang="text" wrap />
             </TabReactComponent>
 
-            <TabReactComponent title="Button Preview">
+            <TabReactComponent title="Preview">
               <a href={deployUrl} target="_blank" rel="noopener noreferrer" className={s.button}>
                 <img
                   src="https://dashboard.datocms.com/deploy/button.svg"
