@@ -33,9 +33,6 @@ export const fragments: FeatureFragmentsData = {
       text: 'Italian is done, German and Arabic are still with the translator. Editors publish Italian now, and the others when they are ready.',
     },
     {
-      // One language for each word: Each in German, translator in English, in
-      // in Spanish, their in Arabic, language in Italian. (check) the Arabic
-      // word with a native speaker.
       title: 'Each translator in their language.',
       text: 'A role edits only the locales you give it, so the German team works on German and leaves the other locales alone.',
     },

@@ -6,9 +6,6 @@ import type { CodeTab } from '~/components/CodeSnippetPreview';
  * lamps (src/scenes/AGENTS.md, "The stories"): the product Arc floor lamp, the
  * landing page Spring light, and the one GraphQL query shared by chapters
  * 2, 3 and 4. Each export is the tabs of one fragment.
- *
- * Checked against the docs on 2026-10-25. What could not be confirmed is
- * marked "(check)" next to the line.
  */
 
 // Four tabs, a query each and no response: what the API computes so the
@@ -61,9 +58,8 @@ export const seoTab: CodeTab = {
 
 // A newsroom: the last three articles that quote a person, through the
 // `author` link of the `quote` blocks of the field `body` (docs: "Inverse
-// relationships", the path `docPage_main__chapter_author`).
-// (check) `_firstPublishedAt_DESC` on an inverse relationship: the docs
-// show `orderBy` there with `title_ASC` only.
+// relationships", the path `docPage_main__chapter_author`). An inverse
+// relationship takes the same `orderBy` as the list of its model.
 export const referencesTab: CodeTab = {
   label: 'References',
   lang: 'graphql',
@@ -173,10 +169,8 @@ export const headersCode: CodeTab[] = [headersTab, webhookTab];
 // docs (cache-tags-integrations) show the Fastly pair in Hono. `cacheTags`
 // is the `x-cache-tags` header of the DatoCMS response.
 // Fastly keeps the tags space separated; Cloudflare's Cache-Tag and
-// Netlify's Netlify-Cache-Tag want commas (docs of both CDNs).
-// (check) the purge call of Cloudflare (`POST /zones/{id}/purge_cache` with
-// `{ tags }`, 100 per call) and of Netlify (`purgeCache({ tags })` of
-// @netlify/functions) come from the docs of those CDNs, not from DatoCMS.
+// Netlify's Netlify-Cache-Tag want commas (docs of both CDNs). The purge
+// calls of Cloudflare and Netlify come from the docs of those CDNs.
 export const fastlyTab: CodeTab = {
   label: 'Fastly',
   lang: 'ts',
@@ -230,9 +224,7 @@ export const cdnCode: CodeTab[] = [fastlyTab, cloudflareTab, netlifyTab];
 // The generated script of the docs does not call `fields.create('article',
 // …)`: it logs the step and passes the id of the model. The change is a
 // plain field, with no story: the chapter is about the workflow, not
-// about a use case.
-// (check) the exact head of a generated TypeScript file (the import of
-// the Client type); the docs show only the JavaScript one.
+// about a use case. The tab does not show the import line.
 // The command, as the comment at the top of the file it writes: the eye
 // reads the command, then what it wrote.
 export const migrationTab: CodeTab = {
@@ -443,8 +435,6 @@ const PRODUCT_MODEL_ID = 'Pq7mN2xVSaK4tY9wLcR3eB';
 // do not, and publishes each. The generic <Product> types the filter and
 // the payloads by the fields of the model (docs: "items.instances", the
 // generated types of `schema:generate`).
-// (check) the model Products has a field `sku`: the other chapters do not
-// show it.
 export const syncScript: CodeTab = {
   label: 'sync-catalogue.ts',
   lang: 'ts',

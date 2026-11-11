@@ -18,8 +18,7 @@ import type { CategoryNavData } from '~/components/CategoryNav';
  * chapters: Media library, Asset fields, Images, Video, In your frontend.
  * The opinion sits between Images and Video.
  *
- * Every chapter is a ChapterLayout with its copy. A "(check)" comment
- * marks a fact to verify. Asset fields and In your
+ * Every chapter is a ChapterLayout with its copy. Asset fields and In your
  * frontend are the thin chapters (src/data/AGENTS.md, "The pillars").
  *
  * The pictures of the page tell one story: Saltmarsh Museum, a museum of
@@ -214,10 +213,9 @@ export const video: ChapterLayoutData = {
     },
     {
       // From the chapter Streaming, which went: adaptive bitrate, as the
-      // viewer sees it. (check) 270p and 4K: the old chapter had them, and
-      // nobody has verified them against the docs of Mux.
+      // viewer sees it. No resolutions: 4K is only on some plans.
       title: 'No spinning wheel.',
-      text: 'The player picks the rendition each connection can carry, from 270p to 4K. On a train? Lighter. Back on fiber? Sharp again.',
+      text: 'The player picks the rendition each connection can carry. On a train? Lighter. Back on fiber? Sharp again.',
     },
     {
       // From the chapter Streaming, which went.

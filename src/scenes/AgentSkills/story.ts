@@ -10,8 +10,8 @@ export const CWD = '~/marram';
 
 /**
  * The install, done before the scene starts. The command is the one of
- * /docs/agent-skills ("Other agents"). (check) the count the day the page
- * ships.
+ * /docs/agent-skills ("Other agents"). The count is the number of folders
+ * in skills/ of datocms/agent-skills (9 on 2026-11-11).
  */
 export const INSTALL = {
   command: "npx skills add datocms/agent-skills --skill '*'",

@@ -24,8 +24,7 @@ import type { CategoryNavData } from '~/components/CategoryNav';
  * and Automation.
  *
  * Every chapter is a ChapterLayout: its real copy, and a box with
- * the description of each picture that has no scene. A "(check)" comment
- * marks a fact to verify.
+ * the description of each picture that has no scene.
  *
  * The pictures of the page tell one story: Northlight, a maker of lamps
  * with a shop and a journal. Its product "Arc floor lamp" runs through the
@@ -79,8 +78,6 @@ export const schema: ChapterLayoutData = {
     label: 'Schema builder',
     headline: 'Model it.',
     muted: 'Query it a second later.',
-    // (check) The intro does not claim "no codegen step": types are
-    // generated optionally.
     intro:
       'Models, blocks, and fields with their validations, built in the UI or the CLI. Change something, and it’s live in the API. No redeploy.',
     link: docs('/docs/content-modelling'),
@@ -169,7 +166,6 @@ export const realTime: ChapterLayoutData = {
   // cms: the stream stays open, each new record goes down it, through the
   // hook in the component, and comes in at the top of the live blog of a
   // cup final. The frame says the chapter, thus no fragments follow.
-  // (check) the names of the hooks of vue-datocms and @datocms/svelte.
   fragments: [],
 };
 
@@ -223,9 +219,9 @@ export const environments: ChapterLayoutData = {
   chapter: {
     label: 'Environments',
     headline: 'A sandbox is a branch.',
-    muted: 'Promotion is the merge.',
+    muted: 'Promotion is the deploy.',
     intro:
-      'Fork the primary environment with its content. Break the schema all you want, write the migration, and promote it. Editors keep working the whole time.',
+      'Fork the primary environment with its content. Break the schema all you want, write the migration, and promote it. Editors keep working while you build.',
     link: docs('/docs/general-concepts/primary-and-sandbox-environments'),
   },
   // In the grammar of the diagrams
@@ -233,12 +229,8 @@ export const environments: ChapterLayoutData = {
   // releases, no caption and no use case: the frame tells the workflow,
   // not a change of a schema. The dialogs of the fork and of the
   // promotion and the maintenance banner went: the graph shows each of
-  // those steps.
-  // (check) The muted line and the intro do not match the graph: a
-  // promotion moves the ref of the primary, it does not merge (an edit in
-  // main after the fork is not in the sandbox; the maintenance mode is
-  // there for that), and editors keep working while you build, but not
-  // during a release.
+  // those steps. A promotion moves the ref of the primary: it does not
+  // merge, and the maintenance mode stops the edits during a release.
   fragments: [
     {
       title: 'The CLI generates migration scripts.',
@@ -299,10 +291,10 @@ export const plugins: ChapterLayoutData = {
     label: 'Plugins',
     headline: 'Extend.',
     muted: 'Don’t bloat.',
-    // The docs say "100+ open-source plugins". (check) the number the day
-    // the page ships.
+    // The plugin directory has 200 plugins that are not deprecated
+    // (2026-11-11).
     intro:
-      'A plugin is a small React app in a frame inside the CMS. Build your own, or install one of 100+ from the plugin directory.',
+      'A plugin is a small React app in a frame inside the CMS. Build your own, or install one of 200+ from the plugin directory.',
     link: docs('/docs/plugin-sdk'),
   },
   // Each part of the plugin Trail tools is drawn in the record editor, with
@@ -319,8 +311,6 @@ export const plugins: ChapterLayoutData = {
       // The list of the Plugins screen in the settings of the project, as
       // the cms sorts it: by name.
       title: 'Private, or for the community.',
-      // "most of the 100+ are open source": the docs say "100+ open-source
-      // plugins". (check) with the plugins page the day the page ships.
       text: 'A private plugin stays in your projects. A published one goes on npm and into the plugin directory. Want a head start? Fork one.',
     },
   ],

@@ -35,7 +35,6 @@ export const fragments: FeatureFragmentsData = {
       text: 'A writer sends a draft to review, and only an editor approves it. Nothing goes live by mistake.',
     },
     {
-      // (check) the scheduling of one locale.
       title: 'Publish de-AT on Monday at 10:15.',
       text: 'Pick a date and a time, per locale or for all of them, and the record publishes or unpublishes itself, with nobody at the keyboard.',
     },

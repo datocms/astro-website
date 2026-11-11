@@ -13,8 +13,7 @@ import type { CategoryNavData } from '~/components/CategoryNav';
  * between Build with an agent and Translate.
  *
  * Every chapter is a ChapterLayout: its real copy, and a box with
- * the description of each picture that has no scene. A "(check)" comment
- * marks a fact to verify. The "DatoCMS Agent" exists
+ * the description of each picture that has no scene. The "DatoCMS Agent" exists
  * today as the official plugin "Dato Agent (Beta)" on /plugins; it
  * has no chapter until someone decides it is a product to show.
  *
@@ -32,11 +31,7 @@ const docs = (href: string): ChapterHeaderData['link'] => ({
   variant: 'soft',
 });
 
-// New copy. The design of the hero has a row of logos (ChatGPT, Claude, Gemini,
-// DeepSeek, Grok, Qwen). (check) DeepSeek, Grok and Qwen are models, not
-// MCP clients: the row comes back only with the clients we support (the
-// docs list Claude Code, Claude Desktop, ChatGPT, Cursor, Codex, VS Code,
-// Windsurf).
+// New copy.
 export const hero: HeroData = {
   label: 'AI',
   headline: 'Bring your own AI. We’ll make it feel at home.',
