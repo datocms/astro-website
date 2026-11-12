@@ -189,7 +189,7 @@ export const CODE_ROLES: Record<string, number> = {
  * property (`--btnFg`) is allowed when every value that the same file gives
  * it is in this list.
  */
-export const TEXT_COLOR_TOKEN = /^var\(--(text-[\w-]+|code-(?!background)[\w-]+|added-text)\)$/;
+export const TEXT_COLOR_TOKEN = /^var\(--(text-[\w-]+|code-(?!background)[\w-]+)\)$/;
 export const TEXT_COLOR_KEYWORDS = [
   'currentcolor',
   'inherit',

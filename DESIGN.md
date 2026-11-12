@@ -199,17 +199,17 @@ This system came from overnice's work ("Warm Logic" is their name for the route)
 
 Six families for the site, and a seventh theme for the docs. Each family has a deep tone, a bright accent and a paper white. The paper always takes the hue of the accent. The deep takes it too in orange, blue and pink; in the other three it is a different hue that goes with the accent: a brown under the yellow (Espresso), a forest green under the lime green (Fern Deep), a dark plum-violet under the purple, a little warmer than the accent (Iris Deep). The frontmatter holds the anchors; `src/styles/tokens.css` holds the alpha steps and the semantic tokens that components use.
 
-The names here are the design names. In `tokens.css` each theme block gives its colours as literal hex values: `--theme-accent`, `--theme-ink`, `--theme-paper`, and their tints as the same hex with a baked alpha (`--theme-ink-muted`, `--theme-accent-faint`, ...). A primitive (`--color-*`) exists only for a colour that more than one declaration uses, or that a file outside `tokens.css` reads (Pollen, Ember, Iris, Iris Deep, Bubblegum and its deep and paper, white, the lilac highlight and the code colours that themes share).
+The names here are the design names. In `tokens.css` each theme block gives its colours as literal hex values: `--theme-accent`, `--theme-ink`, `--theme-paper`, and their tints as the same hex with a baked alpha (`--theme-ink-muted`, `--theme-accent-faint`, ...). A primitive (`--color-*`) exists for one of two reasons only. Shared: more than one theme uses the colour (Pollen, Iris and two of its tints, white, the lilac highlight, the code colours that themes share). Brand: the brand page and `scripts/brand-assets.mjs` read the colour (Ember, Iris Deep).
 
-| Theme (`data-theme`) | Accent (`--theme-accent`)                  | Deep (`--theme-ink`)                        | Paper (`--theme-paper`)                          |
-| -------------------- | ------------------------------------------ | ------------------------------------------- | ------------------------------------------------ |
-| `yellow`             | Pollen `#e8d855` `--color-yellow-light-5`  | Espresso `#351615`                          | Cream Paper `#fdfff5`                            |
-| `orange`             | Ember `#f07a3d` `--color-orange-light-5`   | Ember Deep `#42180f`                        | Ember Paper `#fffbf5`                            |
-| `green`              | Fern `#93d44b`                             | Fern Deep `#1a4731`                         | Fern Paper `#f5fff5`                             |
-| `purple`             | Iris `#9d75f7` `--color-purple-light-5`    | Iris Deep `#18032e` `--color-purple-deep-5` | Iris Paper `#f6f5ff`                             |
-| `blue`               | Glacier `#50c9ed`                          | Harbour Deep `#1a3a47`                      | Glacier Paper `#edfeff`                          |
-| `pink`               | Bubblegum `#f28497` `--color-pink-light-5` | Plum Deep `#3f0e16` `--color-pink-deep-5`   | Bubblegum Paper `#fff7f8` `--color-pink-light-0` |
-| `docs`               | Iris `#9d75f7` `--color-purple-light-5`    | Docs Ink `#1a1923`                          | White `#ffffff` `--color-white`                  |
+| Theme (`data-theme`) | Accent (`--theme-accent`)                 | Deep (`--theme-ink`)                        | Paper (`--theme-paper`)         |
+| -------------------- | ----------------------------------------- | ------------------------------------------- | ------------------------------- |
+| `yellow`             | Pollen `#e8d855` `--color-yellow-light-5` | Espresso `#351615`                          | Cream Paper `#fdfff5`           |
+| `orange`             | Ember `#f07a3d` `--color-orange-light-5`  | Ember Deep `#42180f`                        | Ember Paper `#fffbf5`           |
+| `green`              | Fern `#93d44b`                            | Fern Deep `#1a4731`                         | Fern Paper `#f5fff5`            |
+| `purple`             | Iris `#9d75f7` `--color-purple-light-5`   | Iris Deep `#18032e` `--color-purple-deep-5` | Iris Paper `#f6f5ff`            |
+| `blue`               | Glacier `#50c9ed`                         | Harbour Deep `#1a3a47`                      | Glacier Paper `#edfeff`         |
+| `pink`               | Bubblegum `#f28497`                       | Plum Deep `#3f0e16`                         | Bubblegum Paper `#fff7f8`       |
+| `docs`               | Iris `#9d75f7` `--color-purple-light-5`   | Docs Ink `#1a1923`                          | White `#ffffff` `--color-white` |
 
 Careful: Docs Ink (`#1a1923`), the ink of the docs theme, is a near black with a tint of violet. It is not Iris Deep (`#18032e`).
 

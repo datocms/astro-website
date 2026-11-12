@@ -51,10 +51,11 @@
  */
 
 /*
- * The primitives. A primitive is a colour that more than one declaration
- * of this file uses, or that a file outside this file reads (the brand
- * page, scripts/brand-assets.mjs). The theme blocks give each other colour
- * as a literal.
+ * The primitives. The theme blocks give each colour as a literal. A
+ * primitive exists for one of two reasons only:
+ *   shared   more than one theme uses the colour
+ *   brand    a file outside this file reads the colour: the brand page and
+ *            scripts/brand-assets.mjs show the fixed colours of the brand
  */
 :root {
   /*
@@ -66,11 +67,15 @@
    * lighter orange is a salmon.
    * The design value of the orange is #ff6d00 (L 0.705, C 0.199, hue 46, at
    * the edge of sRGB). At 82%: C 0.163.
-   * The pink and the purple are exceptions (see the comment of each).
+   * The pink and the purple are exceptions: see the comment of the purple
+   * below and the comment in the pink theme block.
    */
+
+  /* Shared: the accent of the default theme, the pixel highlight of the orange theme. */
   --color-yellow-light-5: #e8d855;
-  --color-orange-light-5: #f07a3d;
   /*
+   * Shared: the accent and two of its tints, in the purple theme and the
+   * docs theme. The brand page reads the accent too.
    * The purple is a violet (OKLCH L 0.66, C 0.187, hue 295, 92% of the edge
    * of sRGB). At L 0.70 a purple is a pastel: the gamut of this hue is
    * widest near L 0.53, thus the purple is darker and has more chroma than
@@ -78,22 +83,17 @@
    * 301, 88% of the edge): a little warmer than the accent, as the deep of
    * other themes is a near hue. DESIGN.md calls them Iris and Iris Deep.
    */
-  --color-purple-deep-5: #18032e;
   --color-purple-light-5: #9d75f7;
   --color-purple-light-3: #9d75f7b2;
   --color-purple-light-2: #9d75f780;
-  --color-pink-deep-5: #3f0e16;
-  /*
-   * The pink is a rose (OKLCH L 0.74, C 0.135, hue 10, 82% of the edge of
-   * sRGB). The design value #f1a5a7 (L 0.80, hue 18) is pale next to the
-   * other accents: at that lightness the edge of sRGB is near, thus 82% gives
-   * only C 0.10. The rose is darker, and its hue is 36 deg from the orange.
-   */
-  --color-pink-light-5: #f28497;
-  --color-pink-light-0: #fff7f8;
-  --color-white: #ffffff;
-  /* The pixel highlight of the purple and the docs themes (see --theme-pixel-highlight). */
+  /* Shared: the pixel highlight of the purple theme and the docs theme (see --theme-pixel-highlight). */
   --color-lilac-pale: #d1c4ff;
+  /* Shared: the paper of the docs theme and the white surfaces of all the themes. */
+  --color-white: #ffffff;
+
+  /* Brand: the accent of the orange theme (Ember) and the deep of the purple theme (Iris Deep). */
+  --color-orange-light-5: #f07a3d;
+  --color-purple-deep-5: #18032e;
 
   /*
    * Code. The colours of the syntax in CodeSnippetPreview, built in OKLCH
@@ -379,12 +379,18 @@
 }
 
 [data-theme='pink'] {
-  --theme-paper: var(--color-pink-light-0);
-  --theme-ink: var(--color-pink-deep-5);
+  --theme-paper: #fff7f8;
+  --theme-ink: #3f0e16;
   --theme-ink-muted: #3f0e16bd;
   --theme-ink-subtle: #3f0e1680;
   --theme-ink-faint: #3f0e161a;
-  --theme-accent: var(--color-pink-light-5);
+  /*
+   * The pink is a rose (OKLCH L 0.74, C 0.135, hue 10, 82% of the edge of
+   * sRGB). The design value #f1a5a7 (L 0.80, hue 18) is pale next to the
+   * other accents: at that lightness the edge of sRGB is near, thus 82% gives
+   * only C 0.10. The rose is darker, and its hue is 36 deg from the orange.
+   */
+  --theme-accent: #f28497;
   --theme-accent-muted: #f28497b2;
   --theme-accent-subtle: #f2849780;
   --theme-accent-faint: #f284971a;
@@ -1258,11 +1264,4 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-full: 9999px;
-}
-
-/* Review chrome: the badge of the component Added, on every theme. */
-:root {
-  --added-surface: var(--color-pink-deep-5);
-  --added-text: var(--color-pink-light-0);
-  --added-accent: var(--color-pink-light-5);
 }

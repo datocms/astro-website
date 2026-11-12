@@ -17,7 +17,7 @@ import type { Theme } from '~/lib/theme';
  *   and it gives a blue.)
  * - `blue` 225: the hue of the accent (#50c9ed) and of the deep (#1a3a47)
  *   of the blue theme.
- * - `pink` 10: the hue of --color-pink-light-5 (#f28497).
+ * - `pink` 10: the hue of the accent of the pink theme (#f28497).
  * - `docs` 295: the hue of --color-purple-light-5 (#9d75f7).
  */
 export const SCENE_HUE: Record<Theme, number> = {
