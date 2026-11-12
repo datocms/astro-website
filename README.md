@@ -29,53 +29,19 @@ https://www.datocms.com/blog/why-we-switched-to-astro
 
 # Conventions
 
-## SVGs
+The rules for the code, the copy and the design are in these files:
 
-SVGs are inlined. A page that needs the markup of an SVG imports it with the `?raw` suffix:
-
-```ts
-import keyIllustration from '~/svg/illustrations/key.svg?raw';
-```
-
-The docs have a `<Svg />` Astro component (`src/components/docs/Svg`) that reads a file of `src/` by name and optimizes it with SVGO:
-
-```jsx
-<Svg name="svg/logos/next-squared" />
-```
-
-## `<Prose />`
-
-This component is meant to add some nice, consistent formatting on text-heavy content like articles or blog posts.
-
-The `<prose-island>` element is a custom HTML element that you can wrap around
-part of HTML inside <Prose /> that you don't want to style with the rules below.
-It's basically a reset.
-
-```jsx
-<Prose>
-  <h1>This will be formatted</h1>
-
-  <prose-island>
-    <h1>This will NOT be formatted</h1>
-
-    <Prose>
-      <h1>This will be formatted again</h1>
-    </Prose>
-  </prose-island>
-</Prose>
-```
+- [`AGENTS.md`](AGENTS.md): the layouts, the client scripts, the images, the dev servers, the environment variables, the deployment and the migrations.
+- [`src/REDESIGN.md`](src/REDESIGN.md): the components, the styling and the CMS queries.
+- [`src/data/AGENTS.md`](src/data/AGENTS.md): the copy and the pages. [`src/scenes/AGENTS.md`](src/scenes/AGENTS.md): the pictures of the product.
+- [`DESIGN.md`](DESIGN.md), [`BRAND.md`](BRAND.md) and [`PRODUCT.md`](PRODUCT.md): the design system, the voice and the positioning.
 
 ## Remote markdown content
 
-To render markdown, you can use:
+To render markdown, use `<Markdown of={content} />` or `markdown(content)`, and `inlineMarkdown` for a single paragraph without the wrapping `<p>`. On top of standard GFM, the pipeline supports:
 
-- `<Markdown of={content} />` or `markdown(content)` (they're basically the same).
-- `inlineMarkdown` for small, single-paragraph markdown content that you want to render without the wrapping paragraph.
-
-On top of standard GFM, the markdown pipeline supports a few extras:
-
-- **Callouts** — GitHub-style blockquotes: `> [!NOTE] Title\n> Body` (also `TIP`, `WARNING`, etc.).
-- **Tabs** — `remark-directive` container syntax for grouping mixed content into tabs:
+- **Callouts**: GitHub-style blockquotes, `> [!NOTE] Title\n> Body` (also `TIP`, `WARNING`, etc.).
+- **Tabs**: `remark-directive` containers, only at the root level. The outer container needs more colons than the inner one. Each tab can contain any markdown.
 
   ````md
   ::::tabs
@@ -96,49 +62,17 @@ On top of standard GFM, the markdown pipeline supports a few extras:
     ::::
   ````
 
-  Outer container needs more colons than inner (`::::` vs `:::`). Each tab can contain any markdown (paragraphs, code, lists, blockquotes, …). Only recognized at the root level.
-
-- **Syntax highlighting** — fenced code blocks are rendered through [Expressive Code](https://expressive-code.com/) (see `ec.config.mjs`).
-- **Auto-linked headings** — every heading gets an anchor and a permalink, slugified from its text.
+- **Syntax highlighting**: fenced code blocks render through [Expressive Code](https://expressive-code.com/) (see `ec.config.mjs`).
+- **Auto-linked headings**: every heading gets an anchor and a permalink, slugified from its text.
 
 ## Structured Text
 
-Render a Structured Text field with the components of `~/components/StructuredText`: `StructuredText` (the full rendering), `InlineParagraphs` (inside a `<p>` or a `<span>`) or `PlainText` (only the text).
+Render a Structured Text field with the components of `~/components/StructuredText`. Use [`ensureValidStructuredTextProps`](https://github.com/datocms/astro-datocms/blob/main/src/StructuredText/README.md#strict-props-type-checking), so that the type check finds a block or a linked record that has no component.
 
-Also, make sure to use [`ensureValidStructuredTextProps`](https://github.com/datocms/astro-datocms/blob/main/src/StructuredText/README.md#strict-props-type-checking) to make sure that EVERY kind of available block/linked record is handled correctly!
+# Known issues
 
-```jsx
-<Text
-  {...ensureValidStructuredTextProps({
-    data: episode.content,
-    blockComponents: {
-      InternalVideoRecord: InternalVideo,
-      ImageRecord: Image,
-      TableRecord: Table,
-    },
-  })}
-/>
-```
-
-# Weird issues...
-
-## Astro, Prettier and white-spaces
-
-Prettier sometimes will format the code this way (please notice the {link.text} is on a separate line). This will generate visible white-space inside the link.
-
-```jsx
-<div>
-  {navLinks.map((link) => (
-    <a href={link.href}>{link.text}</a>
-  ))}
-</div>
-```
-
-It's a [known issue](https://github.com/withastro/prettier-plugin-astro/issues/308). Sometimes you can solve adding `/* prettier-ignore */` to avoid auto-formatting...
-
-## Astro.slots.has() returns true when slot exists inside a falsy conditional block
-
-The title says it all. More info in this [Github issue](https://github.com/withastro/astro/issues/10024).
+- **Prettier and white space**: Prettier can put the content of an inline element on its own line, which gives visible white space inside a link ([issue](https://github.com/withastro/prettier-plugin-astro/issues/308)). Add `/* prettier-ignore */` where it occurs.
+- **`Astro.slots.has()`** returns true when the slot exists inside a falsy conditional block ([issue](https://github.com/withastro/astro/issues/10024)).
 
 <!--datocms-autoinclude-footer start-->
 
