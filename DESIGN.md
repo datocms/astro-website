@@ -405,6 +405,8 @@ Completely flat. There are no shadows, at rest or on hover. Depth comes only fro
 
 **The Flat, No Exceptions Rule.** No `box-shadow` with blur, no `drop-shadow`, no glow, in the site and in the docs. There are no shadow tokens. A photo in a diagram has no shadow and no ring.
 
+No gradients: surfaces are solid, and the edge of a band cuts its content hard. One exception: a short fade at the edge of an area that scrolls (a row of tabs, a nav, a list in a card) tells that there is more content. The fade shows only at an edge that has more content.
+
 ## Shapes
 
 Two families of form. Controls are pills: buttons, tabs, category nav items and switches use a full radius. Surfaces are square: bands, cells, halves and plan cards have no radius at all. The product scenes are the one exception: a frame of the product has only its top-left corner rounded (12px; 4px on phones), because the band cuts it on the right and the bottom. A thin hairline in a mix of the accent and the deep follows the cut edges.
