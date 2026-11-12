@@ -18,7 +18,7 @@ export const steps = {
   muted: 'Register to our Research Program, participate to our studies, get rewarded!',
 };
 
-export const faqTitle = 'Frequently Asked Questions';
+export const faqTitle = 'Frequently asked questions';
 
 /** The button of the closing banner is added by the page: its label and link come from the CMS. */
 export const closing: Omit<CtaBannerData, 'buttons'> = {

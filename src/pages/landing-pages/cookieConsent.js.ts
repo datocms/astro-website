@@ -52,7 +52,7 @@ const cookieConsentScript = `
   <div class="consent--cookiesWrapper">
     <div class="consent--cookies">
       <div class="consent--cookiesTitle">Can we use cookies?</div>
-      <div class="consent--cookiesText">We use them to find the parts of the site that get in your way, so we can fix them, and to see which of our ads work. We never sell your data. The details are in our <a href="https://www.datocms.com/legal/cookie-policy">Cookie Policy</a>.</div>
+      <div class="consent--cookiesText">We use them to find the parts of the site that get in your way, so we can fix them, and to see which of our ads work. We never sell your data. The details are in our <a href="https://www.datocms.com/legal/cookie-policy">cookie policy</a>.</div>
       <button class="consent--cookiesButton consent--cookiesPrimaryButton" data-consent="true">Accept cookies</button>
       <button class="consent--cookiesButton" data-decline="true">Reject</button>
     </div>

@@ -253,8 +253,8 @@ export const legal: LegalData = {
   links: [
     l('Privacy policy', '/legal/privacy-policy'),
     l('Cookie policy', '/legal/cookie-policy'),
-    l('GDPR Compliance', '/legal/gdpr'),
-    l('Terms of Service', '/legal/terms'),
+    l('GDPR compliance', '/legal/gdpr'),
+    l('Terms of service', '/legal/terms'),
   ],
 };
 

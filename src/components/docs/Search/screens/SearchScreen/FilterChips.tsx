@@ -40,7 +40,7 @@ export function FilterChips({ selected, onSelect, showCommunity }: Props) {
             <span className={s.filterChipIcon}>
               <IconReact icon={MessageSquareText} />
             </span>
-            Community Forum
+            Community forum
           </button>
         </>
       )}

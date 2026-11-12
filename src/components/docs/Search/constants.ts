@@ -25,8 +25,8 @@ export const areasBySource: Record<string, Area> = {
   github: { id: 'github', label: 'GitHub', icon: siGithub },
   blog: { id: 'blog', label: 'Blog', icon: PenTool },
   'case-studies': { id: 'case-studies', label: 'Case studies', icon: Trophy },
-  academy: { id: 'academy', label: 'CMS Academy', icon: GraduationCap },
-  'casual-chats': { id: 'casual-chats', label: 'Customer interviews', icon: MessagesSquare },
+  academy: { id: 'academy', label: 'Academy', icon: GraduationCap },
+  'casual-chats': { id: 'casual-chats', label: 'Casual chats', icon: MessagesSquare },
   'product-updates': { id: 'product-updates', label: 'Product updates', icon: Rocket },
   glossary: { id: 'glossary', label: 'Glossary', icon: Book },
   compare: { id: 'compare', label: 'Comparisons', icon: Scale },
@@ -70,8 +70,8 @@ export const communityArea: Area = { id: 'community', label: 'Community', icon: 
 export type GoToEntry = { label: string; url: string };
 
 export const goToEntries: GoToEntry[] = [
-  { label: 'General Concepts', url: '/docs/general-concepts' },
-  { label: 'Content Modelling', url: '/docs/content-modelling' },
+  { label: 'General concepts', url: '/docs/general-concepts' },
+  { label: 'Content modelling', url: '/docs/content-modelling' },
   { label: 'Content Delivery API (CDA)', url: '/docs/content-delivery-api' },
   { label: 'Content Management API (CMA)', url: '/docs/content-management-api' },
   { label: 'Plugin SDK', url: '/docs/plugin-sdk/introduction' },

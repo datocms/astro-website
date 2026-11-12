@@ -57,25 +57,25 @@ export const hero: HeroData = {
 
 const categoryData: Omit<FeatureCategoryData, 'id' | 'navLabel'>[] = [
   {
-    title: 'Core Features',
+    title: 'Core features',
     description:
       'Separate content, settings, and branding across multiple sites, apps, or clients.',
     theme: 'blue',
   },
   {
-    title: 'Editor Experience',
+    title: 'Editor experience',
     description:
       'A powerful, intuitive editing interface with live collaboration, visual editing, and structured content tools.',
     theme: 'green',
   },
   {
-    title: 'Developer Experience',
+    title: 'Developer experience',
     description:
       'APIs, SDKs, and developer tools designed for seamless integration with any tech stack.',
     theme: 'blue',
   },
   {
-    title: 'Image & Video Management',
+    title: 'Image & video management',
     description:
       'Built-in media processing with transformations, optimization, and adaptive streaming.',
     theme: 'green',
@@ -93,19 +93,19 @@ const categoryData: Omit<FeatureCategoryData, 'id' | 'navLabel'>[] = [
     theme: 'green',
   },
   {
-    title: 'Content Integrity',
+    title: 'Content integrity',
     description:
       'Safely test and deploy content changes with sandboxed environments, forks, and instant rollbacks.',
     theme: 'blue',
   },
   {
-    title: 'Governance & Compliance',
+    title: 'Governance & compliance',
     description:
       'Enterprise-grade access control, audit logging, SSO, and custom domain configuration.',
     theme: 'green',
   },
   {
-    title: 'Security & Infrastructure',
+    title: 'Security & infrastructure',
     description:
       'Secure, reliable infrastructure with encryption, global CDN, and 24/7 monitoring.',
     theme: 'blue',
@@ -114,10 +114,10 @@ const categoryData: Omit<FeatureCategoryData, 'id' | 'navLabel'>[] = [
 
 // The nav labels are not the same as the section titles.
 const nav: [id: string, label: string][] = [
-  ['core', 'Core Features'],
-  ['editor-experience', 'Editor Experience'],
-  ['developer-experience', 'Developer Experience'],
-  ['image-video', 'Image & Video'],
+  ['core', 'Core features'],
+  ['editor-experience', 'Editor experience'],
+  ['developer-experience', 'Developer experience'],
+  ['image-video', 'Image & video'],
   ['localisation', 'Localisation'],
   ['extensibility', 'Extensibility'],
   ['content-integrity', 'Content'],

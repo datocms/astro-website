@@ -45,7 +45,7 @@ const legal = {
   before: 'By submitting you agree to our ',
   terms: { label: 'Terms', href: '/legal/terms' },
   between: ' and ',
-  privacy: { label: 'Privacy Policy', href: '/legal/privacy-policy' },
+  privacy: { label: 'Privacy policy', href: '/legal/privacy-policy' },
   after: '.',
 };
 

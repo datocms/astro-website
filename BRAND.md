@@ -179,22 +179,23 @@ The product is where people work, often under pressure. The copy is calm and com
 
 ## 6. Writing mechanics
 
-| Topic               | Rule                                                                                                          | ✅ Do                                | ⛔ Don't                           |
-| ------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ---------------------------------- |
-| Case                | Sentence case everywhere: headlines, navigation, buttons, labels. Capitals only for the first word and names. | Read the docs · Talk to sales        | Read The Docs · Core Features      |
-| Headlines           | A headline that is a sentence ends with a period.                                                             | A sandbox is a branch.               | A Sandbox Is A Branch              |
-| Spelling            | US English. Product names keep their own spelling.                                                            | color, organization, canceled        | colour, organisation, cancelled    |
-| Oxford comma        | Always, in a list of three or more.                                                                           | images, video, audio, and documents  | images, video, audio and documents |
-| Point of view       | "We" for us, "you" for the reader.                                                                            | Your code gets a typed tree.         | Users receive a typed tree.        |
-| Contractions        | Yes in marketing and support. No in product messages (see section 5).                                         | We'll take it from there.            | We will be in touch soon.          |
-| Exclamation marks   | None.                                                                                                         | Welcome on board.                    | Welcome on board!                  |
-| Emoji               | None in the website and the product. Fine on social and in support, one at a time.                            |                                      | Welcome on board! 🎉               |
-| "And" or "&"        | "And" in sentences. "&" only in a short label where space is tight.                                           | Images, video, and the media library | Fast & reliable APIs               |
-| Ellipsis            | The single character "…", for loading states and actions that ask for more input.                             | Loading…                             | Loading...                         |
-| Apostrophes, quotes | Curly: ’ and “ ”.                                                                                             | We’re 13 people.                     | We're 13 people.                   |
-| Dashes              | No em dash in copy. Use a period or a colon.                                                                  | Off by default.                      | It's off — by default.             |
-| Numbers             | Words from one to nine in prose, digits from 10 and for anything with a unit. A space before the unit.        | two hours · 13 people · 40 ms        | 2 hours · thirteen people · 40ms   |
-| Currency            | Symbol first, no space, "/month".                                                                             | €149/month                           | 149 € · €199/monthly               |
+| Topic               | Rule                                                                                                             | ✅ Do                                               | ⛔ Don't                           |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ---------------------------------- |
+| Case                | Sentence case everywhere: headlines, navigation, buttons, labels. Capitals only for the first word and names.    | Read the docs · Talk to sales                       | Read The Docs · Core Features      |
+| Names               | A name keeps its capitals in the middle of a sentence. If the copy writes it in lower case there, it is a label. | Research Program · DatoCMS Academy · Privacy policy | Research program · Privacy Policy  |
+| Headlines           | A headline that is a sentence ends with a period.                                                                | A sandbox is a branch.                              | A Sandbox Is A Branch              |
+| Spelling            | US English. Product names keep their own spelling.                                                               | color, organization, canceled                       | colour, organisation, cancelled    |
+| Oxford comma        | Always, in a list of three or more.                                                                              | images, video, audio, and documents                 | images, video, audio and documents |
+| Point of view       | "We" for us, "you" for the reader.                                                                               | Your code gets a typed tree.                        | Users receive a typed tree.        |
+| Contractions        | Yes in marketing and support. No in product messages (see section 5).                                            | We'll take it from there.                           | We will be in touch soon.          |
+| Exclamation marks   | None.                                                                                                            | Welcome on board.                                   | Welcome on board!                  |
+| Emoji               | None in the website and the product. Fine on social and in support, one at a time.                               |                                                     | Welcome on board! 🎉               |
+| "And" or "&"        | "And" in sentences. "&" only in a short label where space is tight.                                              | Images, video, and the media library                | Fast & reliable APIs               |
+| Ellipsis            | The single character "…", for loading states and actions that ask for more input.                                | Loading…                                            | Loading...                         |
+| Apostrophes, quotes | Curly: ’ and “ ”.                                                                                                | We’re 13 people.                                    | We're 13 people.                   |
+| Dashes              | No em dash in copy. Use a period or a colon.                                                                     | Off by default.                                     | It's off — by default.             |
+| Numbers             | Words from one to nine in prose, digits from 10 and for anything with a unit. A space before the unit.           | two hours · 13 people · 40 ms                       | 2 hours · thirteen people · 40ms   |
+| Currency            | Symbol first, no space, "/month".                                                                                | €149/month                                          | 149 € · €199/monthly               |
 
 ---
 
