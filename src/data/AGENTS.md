@@ -111,5 +111,6 @@ A menu is a map of pages. Every link goes to a page: no list of case studies, co
   - **Resources**: Learn, Catalogs, Help and News. The name is not "Developers": that word belongs to `/developers`.
   - **Customers**: Case studies, Wall of love and Casual chats, each with a line that says what it holds.
   - **Partners**: Agency directory and Partner program, each with a line too.
-- **The footer** is five columns of pages, seven to nine links each, with the legal pages in the last bar. Partner showcase, Tech partners and the compare pages are in the footer only.
+- **The footer** is five columns of pages, seven to nine links each, with the legal pages in the last bar: Product; Frameworks and Compare; Learn, Catalogs and Help; Customers and Partners; Company, News and the status. Partner showcase, Tech partners and the compare pages are in the footer only.
+- A group that the header and the footer both show (Learn, Catalogs, Help, News) is one constant in `navigation.ts`. The two use it, thus the links and the heading are the same.
 - The CMS navigation model will follow this shape: a few groups of plain links, nothing fetched from lists.

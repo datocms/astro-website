@@ -104,6 +104,18 @@ const casualChats = l('Casual chats', '/blog/casual-chats', 'Conversations with 
 const agencyDirectory = l('Agency directory', '/partners', 'Agencies that build with DatoCMS');
 const partnerProgram = l('Partner program', '/partner-program', 'Become a DatoCMS partner');
 
+// The groups that the header and the footer both show. Each list is here
+// once, thus the two show the same links under the same heading.
+const learn = [
+  l('Docs', '/docs'),
+  l('Academy', '/academy'),
+  l('User guides', '/user-guides'),
+  l('Glossary', '/glossary'),
+];
+const catalogs = [l('Plugins', '/plugins'), l('Starters', '/starters')];
+const help = [l('Support', '/support'), l('Community forum', communityHref), l('Slack', '/slack')];
+const news = [l('Blog', '/blog'), l('Product updates', '/product-updates')];
+
 export const mainNavigation: NavGroup[] = [
   {
     label: 'Product',
@@ -138,35 +150,14 @@ export const mainNavigation: NavGroup[] = [
     columns: [
       {
         sections: [
-          {
-            heading: 'Learn',
-            links: [
-              l('Docs', '/docs'),
-              l('Academy', '/academy'),
-              l('User guides', '/user-guides'),
-              l('Glossary', '/glossary'),
-            ],
-          },
-          {
-            heading: 'Catalogs',
-            links: [l('Plugins', '/plugins'), l('Starters', '/starters')],
-          },
+          { heading: 'Learn', links: learn },
+          { heading: 'Catalogs', links: catalogs },
         ],
       },
       {
         sections: [
-          {
-            heading: 'Help',
-            links: [
-              l('Support', '/support'),
-              l('Community forum', communityHref),
-              l('Slack', '/slack'),
-            ],
-          },
-          {
-            heading: 'News',
-            links: [l('Blog', '/blog'), l('Product updates', '/product-updates')],
-          },
+          { heading: 'Help', links: help },
+          { heading: 'News', links: news },
         ],
       },
     ],
@@ -190,15 +181,17 @@ export const mainNavigation: NavGroup[] = [
 // The footer has no description: only the label of each link shows.
 const footerLink = ({ label, href }: LinkItem): LinkItem => ({ label, href });
 
-// Five columns of seven to nine links. The legal pages are in the bar at
-// the end (`legal.links`), not in a column.
+// Five columns of seven to nine links, in the order of the tasks of a
+// visitor: the product, the stack, the use of DatoCMS, the people who use
+// it, and the company. The legal pages are in the bar at the end
+// (`legal.links`), not in a column.
 export const footerColumns: FooterColumn[] = [
   {
     groups: [
       {
         title: 'Product',
         links: [
-          ...[developers, editorExperience, media, ai].map(footerLink),
+          ...[editorExperience, developers, media, ai].map(footerLink),
           l('All features', '/features'),
           l('Enterprise', '/enterprise-headless-cms'),
           l('Pricing', '/pricing'),
@@ -214,21 +207,9 @@ export const footerColumns: FooterColumn[] = [
   },
   {
     groups: [
-      {
-        title: 'Learn',
-        links: [
-          l('Docs', '/docs'),
-          l('Academy', '/academy'),
-          l('User guides', '/user-guides'),
-          l('Glossary', '/glossary'),
-          l('Plugins', '/plugins'),
-          l('Starters', '/starters'),
-        ],
-      },
-      {
-        title: 'News',
-        links: [l('Blog', '/blog'), l('Product updates', '/product-updates')],
-      },
+      { title: 'Learn', links: learn },
+      { title: 'Catalogs', links: catalogs },
+      { title: 'Help', links: help },
     ],
   },
   {
@@ -260,14 +241,7 @@ export const footerColumns: FooterColumn[] = [
           l('Contact', '/contact'),
         ],
       },
-      {
-        title: 'Help',
-        links: [
-          l('Support', '/support'),
-          l('Community forum', communityHref),
-          l('Slack', '/slack'),
-        ],
-      },
+      { title: 'News', links: news },
     ],
     status: { label: 'Status', text: 'All systems normal', href: 'https://status.datocms.com' },
   },
