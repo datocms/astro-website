@@ -8,7 +8,7 @@ The copy of every page lives here, one typed file for each route. The general co
 - Shared files: `navigation.ts` (header and footer), `search.ts` (the search popup), `features.ts` (the feature list of `/features`), `*-code.ts` (the code of the "Code:" pictures of a pillar).
 - A pillar page has one file for the hero, the opinion and the closer, and the chapters in it (`developers-pillar.ts`, `media.ts`, `ai-pillar.ts`) or one file for each chapter (`/editor-experience`: `structured-content.ts`, `visual-editing-chapter.ts`, `dynamic-layouts.ts`, `localization.ts`, `workflows.ts`, `collaboration.ts`, `seo.ts`).
 - Before you use a section, read its data type and one page that uses it. Know what each field shows on screen; do not use a field for something else than its purpose.
-- Buttons link to a route of the new site, or of the old site. When the target does not exist yet, `/todo`. The navigation links to `#` when the page is not on this site yet.
+- The navigation links to `#` when the page does not exist yet.
 - Do not invent facts: customer names, numbers, quotes, prices, feature claims, integrations. Take them from the live site, the docs or the feature list, or ask.
 
 ## Markers
@@ -19,17 +19,17 @@ The copy of every page lives here, one typed file for each route. The general co
 
 ## Page classes
 
-Every route of the old site (https://www.datocms.com; the code is in `src/pages/`) is one of:
+Every route (https://www.datocms.com; the code is in `src/pages/`) is one of:
 
-- **marketing**: needs copy and structure.
-- **templated**: the copy is CMS content (blog, docs, plugins, starters, academy, glossary, partner pages…). What they need is a template, in the design phase.
-- **utility**: legal, thank-you pages, 404. Ported as they are.
+- **marketing**: the copy is written by hand, in `src/data/`.
+- **templated**: the copy is CMS content (blog, docs, plugins, starters, academy, glossary, partner pages…). What they need is a template.
+- **utility**: legal, thank-you pages, 404.
 
 Why: copywriting time goes where words are decided by hand; a template is a design task.
 
 ## The pillars
 
-Few pillar pages instead of the seventeen flat feature pages of the old site. A pillar tells one story for one audience in five to eight chapters. There is no page per feature: every old feature URL redirects to its chapter anchor (`astro.config.ts`). Why: seventeen flat pages make seventeen thin arguments; five stories can be told well, and the thin features (the CDN, data integrity) stop pretending to be pages.
+A pillar tells one story for one audience in five to eight chapters. There is no page per feature: every old feature URL redirects to its chapter anchor (`astro.config.ts`). Why: a page per feature makes many thin arguments; a few stories can be told well.
 
 | Pillar                | Route                | Label             | Chapters                                                                                                                     |
 | --------------------- | -------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -40,8 +40,7 @@ Few pillar pages instead of the seventeen flat feature pages of the old site. A 
 
 - **Media is a pillar**, not a chapter group of Modeling and delivery: three more chapters would take that page past eight, and media has two audiences at once (editors in the library, developers in the APIs). Asset fields and In your frontend are its thin chapters; if one folds, Media runs at four, which we accept rather than inventing a fifth.
 - **Trust is not a pillar.** Roles and permissions, SSO, SCIM, audit logs, custom domains, encryption, backups are chapters of `/enterprise` (and `/security`), written once there. Validations are a fragment of Schema builder, environments a chapter of Developers, workflows a chapter of Editing.
-- **No marketers pillar.** The claims of the old `/made-for/marketers` are chapters of Editing, Media and Developers.
-- `developer-experience` and `worldwide-cdn` folded into the Developers pillar; `data-integrity` split between Schema builder, Environments, Workflows and Trust. The dark mode page is out of scope: an entry in the index.
+- **No marketers pillar.** The claims for marketers are chapters of Editing, Media and Developers.
 - **The index** (`/features`) is the list and nothing else: the hero, the category nav with its score, the nine groups, the open slot of the next feature as the last card, the face at the edge with a line at each quarter, the closer. No highlights or pillar teasers (the pillars already pick the highlights; a reel here is a second home page), no banner, no prize at the end (a prize and a superlative are both against the voice). The page is long because the product is, and the visitor is invited into the list rather than rewarded for it. One feature list (`features.ts`) feeds the index and, later, the pricing table.
 - Every addition to a pillar is a chapter (header, frame, fragments, an item in the chapter nav), never loose fragments under someone else's chapter.
 
@@ -57,7 +56,7 @@ The unit of a pillar page. Three parts, always the same: a visitor who read one 
 
 A chapter data object has a `scene` string for its frame and a `picture` string for each fragment. They describe a picture that does not exist yet. When the picture is built, remove the string.
 
-What a chapter does not have: a text-and-image section, a statement, a how-it-works grid, a quote. Everything it wants to say fits in the intro, the fragment sentences and the pictures, or it goes to the docs. Why: the first exemplar had all of those and read as a page for one feature; with eight of them a pillar would be forty screens.
+What a chapter does not have: a text-and-image section, a statement, a how-it-works grid, a quote. Everything it wants to say fits in the intro, the fragment sentences and the pictures, or it goes to the docs. Why: with those, a chapter reads as a page for one feature, and a pillar of eight is forty screens.
 
 **Budgets.** A budget leaves no room for the second adjective and the third joke.
 
@@ -83,7 +82,7 @@ Each attribute of the voice guide decides a part of the page.
 - **Thoughtful: both sides of the same thing.** The fragments mix the editor's view and the developer's view of the same content, with the same words, as the feature needs. A GraphQL chapter may be all code, an editor chapter all product.
 - **Effortless: the product at rest, in daylight.** Boring states, shown with confidence.
 
-What goes: SEO kickers above the headline (the label stays, as the name of the feature), bold inside body text, exclamation marks, the third person, the banned words of the guide, the shared cross-link block of the old pages, the jokes of the 2025 pages beyond one per page.
+What goes: SEO kickers above the headline (the label stays, as the name of the feature), bold inside body text, exclamation marks, the third person, the banned words of the guide.
 
 ## Who owns a subject
 
@@ -105,4 +104,12 @@ A subject is explained in one chapter. Another chapter may show it in one pictur
 
 ## Navigation
 
-Six items in the header: Product, Resources, Customers, Partners, Philosophy, Pricing. The first four open a dropdown card. Product lists the four pillars, each with its chapters as one muted line, the index, Enterprise and the four framework pages, and it has the `promo` of `navigation.ts`: the field that invites to the demo (try.datocms.com), the only action in a menu. The promo shows only in the desktop card: the mobile menu does not have it, because the demo is not usable on a phone. Resources is Learn, Catalogs, Help and News. Customers is Case studies, Wall of love and Casual chats, each with a line that says what it holds. Partners is Agency directory and Partner program, each with a line too. Partner showcase and Tech partners are in the footer only. The compare pages are in the footer only. Every link goes to a page: no list of case studies, continents or docs sections in a menu, and no page under two names. The footer is five columns of pages, seven to nine links each, with the legal pages in the last bar. The second level of navigation is the chapter nav on each pillar page. Why: a menu is a map of pages, and a chapter anchor is a place inside a page; the old lists of features existed to link one URL per feature for search engines. "Developers" became "Resources" because the word now belongs to `/developers`. The CMS navigation model will follow this shape: a few groups of plain links, nothing fetched from lists.
+A menu is a map of pages. Every link goes to a page: no list of case studies, continents or docs sections in a menu, no chapter anchors, and no page under two names. The second level of navigation is the chapter nav on each pillar page.
+
+- **The header** has six items: Product, Resources, Customers, Partners, Philosophy, Pricing. The first four open a dropdown card.
+  - **Product**: the four pillars, each with its chapters as one muted line, the index, Enterprise and the four framework pages. It has the `promo` of `navigation.ts`: the field that invites to the demo (try.datocms.com), the only action in a menu. The promo shows only in the desktop card: the demo is not usable on a phone.
+  - **Resources**: Learn, Catalogs, Help and News. The name is not "Developers": that word belongs to `/developers`.
+  - **Customers**: Case studies, Wall of love and Casual chats, each with a line that says what it holds.
+  - **Partners**: Agency directory and Partner program, each with a line too.
+- **The footer** is five columns of pages, seven to nine links each, with the legal pages in the last bar. Partner showcase, Tech partners and the compare pages are in the footer only.
+- The CMS navigation model will follow this shape: a few groups of plain links, nothing fetched from lists.
