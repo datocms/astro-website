@@ -160,26 +160,7 @@ The voice stays the same. The tone moves with the situation.
 
 The product is where people work, often under pressure. The copy is calm and complete, and it never performs.
 
-**The rules**
-
-- Full sentences that end with a period. Titles, buttons, and menu items have no period.
-- No exclamation marks. No "Sorry", "Oops", or "Whoops". No emoticons.
-- No "successfully". The past tense already says it worked.
-- "Please" only when we ask for a real favor.
-- No contractions in messages: "Could not", "cannot", "does not".
-- An error says what happened and what to do next. It does not blame the person.
-
-**The patterns**
-
-| Message       | Pattern                                                             | ✅ Do                                                                                                                        | ⛔ Don't                                                                                                         |
-| ------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Success       | Thing + past tense.                                                 | Asset updated.                                                                                                               | Asset updated successfully!                                                                                      |
-| Error         | Could not + verb. Then the next step.                               | Could not delete the record. Try again later.                                                                                | Couldn't delete record!                                                                                          |
-| Unknown error | Say it is on our side. Give a way out.                              | Something went wrong on our side. Reload the page and try again.                                                             | Whoops, this shouldn't happen… there's an error on our side :(                                                   |
-| Confirmation  | Title: verb + thing + "?". Body: the consequence. Button: the verb. | **Delete record?** The record will be permanently deleted. This cannot be undone. · Yes, delete                              | **Confirm the operation?** Are you sure? This operation is not reversible!                                       |
-| Empty state   | Short title. One sentence with the next step.                       | No results. Nothing matches your search. Try different keywords, or remove some filters.                                     | No results were found. Please check your query or try broadening your search.                                    |
-| No permission | What the role cannot do. Who can help.                              | Your role doesn't include the permissions this area requires. Contact a project administrator.                               | Permission denied!                                                                                               |
-| Plan limit    | The fact. Then the two ways forward. No sales pitch.                | You reached the record limit of your plan. The project owner can upgrade the plan, or ask our sales team for a custom quote. | …please head over to your account dashboard to upgrade the plan or contact our Sales team to get a custom quote! |
+The rules and the patterns of the product copy (messages, confirmations, errors, plan limits) live in the `web` repository, in the section "Words of the UI" of its root `AGENTS.md`. Section 11 has two examples.
 
 ---
 
