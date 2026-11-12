@@ -103,7 +103,7 @@ On top of standard GFM, the markdown pipeline supports a few extras:
 
 ## Structured Text
 
-Avoid directly using `<StructuredText />`. Prefer `<Text />` or `<InlineText />` which offers a few sane defaults.
+Render a Structured Text field with the components of `~/components/StructuredText`: `StructuredText` (the full rendering), `InlineParagraphs` (inside a `<p>` or a `<span>`) or `PlainText` (only the text).
 
 Also, make sure to use [`ensureValidStructuredTextProps`](https://github.com/datocms/astro-datocms/blob/main/src/StructuredText/README.md#strict-props-type-checking) to make sure that EVERY kind of available block/linked record is handled correctly!
 

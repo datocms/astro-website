@@ -121,6 +121,5 @@ Figma file `WnWBSVVcroe5s4tXQGnhSA` (overnice's original), page **Components** (
 
 ## Gotchas
 
-- `astro build` and `astro check` while `astro dev` runs break the dependency cache of the dev server: stop `astro dev` first.
 - After a new tarball of the scene kit in `vendor/`, run `npm install` and restart `astro dev`.
 - Write every code comment in Simplified Technical English (short sentences, one idea each, the imperative for instructions).
