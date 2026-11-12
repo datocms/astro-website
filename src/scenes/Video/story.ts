@@ -1,6 +1,6 @@
 // The fake content of the chapter "Video API" of /media. The scenes show
 // the video "Restoring Tide Line" of Saltmarsh Museum, the museum of the
-// chapter "Media library": a film of the restoration of the tapestry Tide
+// chapter "Media Area": a film of the restoration of the tapestry Tide
 // Line, paused at 2:40 on the hands of the weaver that smooth the linen,
 // with its thumbnail at 1:30 on the hands that sew. Do not change a text
 // here without a change to the copy (src/data/media.ts).

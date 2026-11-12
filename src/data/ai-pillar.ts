@@ -57,7 +57,7 @@ export const chapterNav: CategoryNavData = {
     { label: 'MCP server', href: '#mcp' },
     { label: 'Agent Skills', href: '#skills' },
     { label: 'AI translations', href: '#translations' },
-    { label: 'AI in the media library', href: '#media' },
+    { label: 'AI in the Media Area', href: '#media' },
     { label: 'Opt-in', href: '#opt-in' },
   ],
 };
@@ -162,13 +162,13 @@ export const translations: ChapterLayoutData = {
   fragments: [],
 };
 
-// Chapter 4: the AI of the media library.
+// Chapter 4: the AI of the Media Area.
 // The frame is in the grammar of the diagrams (src/scenes/diagram/).
 export const media: ChapterLayoutData = {
   id: 'media',
   theme: 'green',
   chapter: {
-    label: 'AI in the media library',
+    label: 'AI in the Media Area',
     headline: 'Images get tags.',
     muted: 'Videos get captions.',
     intro:
@@ -183,7 +183,7 @@ export const media: ChapterLayoutData = {
     {
       // The cms shows the smart tags as a row of Asset info, and the tags of
       // the editor as "Manual tags" in Categorization. The filters of the
-      // media area have one for each.
+      // Media Area have one for each.
       title: 'Tags we suggest, tags you keep.',
       text: 'We suggest tags. Keep them, change them, and filter the library by them.',
     },

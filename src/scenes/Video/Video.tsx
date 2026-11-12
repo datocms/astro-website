@@ -32,7 +32,7 @@ const POSTER = { time: VIDEO.time, src: frame.src, open: true };
 
 const TRACK_LIST = TRACKS.map(({ name }) => name).join(' and ');
 
-// The grid of the media area behind the dialog: the video first, in the
+// The grid of the Media Area behind the dialog: the video first, in the
 // collection Light and Thread, then the assets of the chapter "Media
 // library". The card shows the frame of the thumbnail.
 const LIBRARY_GRID = [
@@ -46,7 +46,7 @@ const LIBRARY_GRID = [
 ];
 
 /**
- * The frame: the media area of the museum, and over it the dialog of the
+ * The frame: the Media Area of the museum, and over it the dialog of the
  * video. The player is paused at 2:40; the pointer clicks the marker of
  * the thumbnail and its card opens on the frame at 1:30
  * (THUMBNAIL_MARKER_SEQUENCE). The picture at rest is the card open. The
@@ -63,7 +63,7 @@ export function VideoScene({
     <Scene
       theme={THEME}
       appearance={appearance}
-      description={`The media library of DatoCMS, and over it a dialog with the video “${VIDEO.title}” of the collection ${COLLECTION}. The player is paused at 2:40 of 4:12, on the hands of a weaver: one smooths the linen, the other pulls a thread. Above the marker at 1:30 on the seek bar, the card of the thumbnail: the hands that sew the linen with a needle, and “Thumbnail at 1:30.00”. In the sidebar, the subtitles ${TRACK_LIST}.`}
+      description={`The Media Area of DatoCMS, and over it a dialog with the video “${VIDEO.title}” of the collection ${COLLECTION}. The player is paused at 2:40 of 4:12, on the hands of a weaver: one smooths the linen, the other pulls a thread. Above the marker at 1:30 on the seek bar, the card of the thumbnail: the hands that sew the linen with a needle, and “Thumbnail at 1:30.00”. In the sidebar, the subtitles ${TRACK_LIST}.`}
       minWidth={1180}
       sequence={THUMBNAIL_MARKER_SEQUENCE}
       height={height}

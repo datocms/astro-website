@@ -32,7 +32,7 @@ import threadSpools from './thread-spools.jpg';
 import tideLine from './tide-line.jpg';
 import weaverHands from './weaver-hands.jpg';
 
-// The scenes of the chapter "Media library" of /media: the media area of
+// The scenes of the chapter "Media Area" of /media: the Media Area of
 // Saltmarsh Museum, and its asset "Vessel with dry grasses". Read the scene
 // rules in the README of @datocms/product-scenes. All the values are
 // fixed, thus the markup is the same on each render.
@@ -82,7 +82,7 @@ export const FRAME_GRID: GridSize = { width: 945, cardWidth: 225 };
 const FRAGMENT_CARD_WIDTH = 120;
 
 /**
- * The media area with the collection Light and Thread, behind the dialog or
+ * The Media Area with the collection Light and Thread, behind the dialog or
  * alone. Without `sources`, the upload button has no menu, thus the toolbar
  * is shorter. `assets` replaces the cards of the grid (the chapter "Video
  * API" puts its video in the collection).
@@ -132,7 +132,7 @@ export function Library({
 }
 
 /**
- * The toolbar and the grid of the media area, without the sidebar. The
+ * The toolbar and the grid of the Media Area, without the sidebar. The
  * toolbar has no menu of the saved filters, thus the upload button gets the
  * attention.
  */
@@ -204,7 +204,7 @@ function Detail({
 }
 
 /**
- * The frame: the media area of the museum, the collection Light and Thread
+ * The frame: the Media Area of the museum, the collection Light and Thread
  * in the grid. The pointer clicks the card of Vessel with dry grasses, and
  * its dialog opens over the grid. The asset has no focal point: the pointer
  * clicks the vase, and the previews of the crops go from the center to the
@@ -223,7 +223,7 @@ export function MediaLibraryScene({
   height?: number;
   detail?: boolean;
 }) {
-  const library = `The media library of DatoCMS for ${PROJECT_NAME}: the tree of the collections, with ${COLLECTION} open under Exhibitions › 2026, and its grid of ${GRID.length} assets.`;
+  const library = `The Media Area of DatoCMS for ${PROJECT_NAME}: the tree of the collections, with ${COLLECTION} open under Exhibitions › 2026, and its grid of ${GRID.length} assets.`;
 
   return (
     <Scene
@@ -269,7 +269,7 @@ export function MediaLibraryLocaleScene({ width, height, appearance }: FragmentS
 }
 
 /**
- * The media area without the dialog: the tree of the collections, and the
+ * The Media Area without the dialog: the tree of the collections, and the
  * menu of the saved filters open, with Press kit 2026 active
  */
 export function MediaLibraryCollectionsScene({ width, height, appearance }: FragmentSceneProps) {
@@ -277,7 +277,7 @@ export function MediaLibraryCollectionsScene({ width, height, appearance }: Frag
     <Scene
       theme={THEME}
       appearance={appearance}
-      description={`The media library of DatoCMS. In the sidebar, the collections Exhibitions › 2025, 2026 › ${COLLECTION}, Press and Objects; ${COLLECTION} is active. In the toolbar the menu of the saved filters is open: no filter, the shared filters ${SAVED_FILTERS.shared.join(', ')}, with ${SAVED_FILTERS.active} active, and the personal filter ${SAVED_FILTERS.personal.join(', ')}.`}
+      description={`The Media Area of DatoCMS. In the sidebar, the collections Exhibitions › 2025, 2026 › ${COLLECTION}, Press and Objects; ${COLLECTION} is active. In the toolbar the menu of the saved filters is open: no filter, the shared filters ${SAVED_FILTERS.shared.join(', ')}, with ${SAVED_FILTERS.active} active, and the personal filter ${SAVED_FILTERS.personal.join(', ')}.`}
       width={width}
       height={height}
     >
@@ -312,7 +312,7 @@ export function MediaLibraryLinksScene({ width, height, appearance }: FragmentSc
 }
 
 /**
- * The toolbar and the grid of the media area, with the menu of the upload
+ * The toolbar and the grid of the Media Area, with the menu of the upload
  * button open: the asset sources of the plugins, Museum archive under the
  * pointer
  */
@@ -321,7 +321,7 @@ export function MediaLibrarySourcesScene({ width, height, appearance }: Fragment
     <Scene
       theme={THEME}
       appearance={appearance}
-      description={`The media library of DatoCMS with the menu of the button “Upload new assets” open: the sources that plugins add, ${SOURCES.map(({ name }) => name).join(' and ')}. The pointer is on ${SOURCES[0].name}, the archive of the museum.`}
+      description={`The Media Area of DatoCMS with the menu of the button “Upload new assets” open: the sources that plugins add, ${SOURCES.map(({ name }) => name).join(' and ')}. The pointer is on ${SOURCES[0].name}, the archive of the museum.`}
       width={width}
       height={height}
     >

@@ -34,7 +34,7 @@ A pillar tells one story for one audience in five to eight chapters. There is no
 | --------------------- | -------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | Editing               | `/editor-experience` | Editor experience | Structured content, Visual editing, Dynamic layouts, Localization, Workflows, Collaboration and versions, SEO                |
 | Modeling and delivery | `/developers`        | For developers    | Schema builder, GraphQL, Real-time, Delivery (cache tags), Environments, Automation (Management API and webhooks), Plugins   |
-| Media                 | `/media`             | Media             | Media library, Asset fields, Images, Video, In your frontend                                                                 |
+| Media                 | `/media`             | Media             | Media Area, Asset fields, Images, Video, In your frontend                                                                    |
 | AI                    | `/ai`                | AI                | Ask your project (MCP, with the docs for machines as a fragment), Build with an agent (skills), Translate, Tags and captions |
 
 - **Media is a pillar**, not a chapter group of Modeling and delivery: three more chapters would take that page past eight, and media has two audiences at once (editors in the library, developers in the APIs). Asset fields and In your frontend are its thin chapters; if one folds, Media runs at four, which we accept rather than inventing a fifth.
@@ -93,10 +93,10 @@ A subject is explained in one chapter. Another chapter may show it in one pictur
 | Roles and permissions | Trust (`/enterprise`)      | Editing (translators, writers) and Developers (a token's role): one picture each, no explanation |
 | Environments          | Developers, Environments   | Schema builder intro, one clause                                                                 |
 | Previews              | Editing, Visual editing    | Developers, Real-time: the mechanism, links to Editing                                           |
-| Media library         | Media, Media library       | AI, Tags and captions shows the suggested tags only                                              |
+| Media Area            | Media, Media Area          | AI, Tags and captions shows the suggested tags only                                              |
 | Webhooks              | Developers, Automation     | Developers, Delivery shows only the cache-tags webhook                                           |
 | CDN                   | Developers, GraphQL        | Media hero and Images intro: "from the edge", one clause each                                    |
-| Plugins               | Developers, Plugins        | AI, Translate says "plugin" in one clause; Media library shows one upload source a plugin adds   |
+| Plugins               | Developers, Plugins        | AI, Translate says "plugin" in one clause; Media Area shows one upload source a plugin adds      |
 | CLI                   | Developers, Environments   | AI, Build with an agent, as the thing skills run                                                 |
 | Validations           | Developers, Schema builder | Media, Asset fields, for assets only                                                             |
 | MCP                   | AI, Ask your project       | Developers, Automation may add "or let an assistant do it", with a link                          |

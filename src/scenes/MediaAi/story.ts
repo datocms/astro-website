@@ -1,5 +1,5 @@
-// The fake content of the chapter "AI in the media library" of /ai. The
-// scenes show the media area of Marram, the maker of bike bags of the
+// The fake content of the chapter "AI in the Media Area" of /ai. The
+// scenes show the Media Area of Marram, the maker of bike bags of the
 // page: the photos and the videos that go into the frame with their tags
 // and their subtitles, the photo "Loaded tourer on the Stelvio" with its
 // tags, and the video "Fitting a rolltop pannier".

@@ -15,7 +15,7 @@ import type { CategoryNavData } from '~/components/CategoryNav';
 
 /*
  * Route /media: the Media pillar (src/data/AGENTS.md). Five
- * chapters: Media library, Asset fields, Images, Video, In your frontend.
+ * chapters: Media Area, Asset fields, Images, Video, In your frontend.
  * The opinion sits between Images and Video.
  *
  * Every chapter is a ChapterLayout with its copy. Asset fields and In your
@@ -57,7 +57,7 @@ export const hero: HeroData = {
 // The href is the id of the chapter.
 export const chapterNav: CategoryNavData = {
   items: [
-    { label: 'Media library', href: '#library' },
+    { label: 'Media Area', href: '#library' },
     { label: 'Asset fields', href: '#fields' },
     { label: 'Images API', href: '#images' },
     { label: 'Video API', href: '#video' },
@@ -74,14 +74,14 @@ export const library = {
   id: 'library',
   theme: 'pink',
   chapter: {
-    label: 'Media library',
+    label: 'Media Area',
     headline: 'One library,',
     muted: 'organized your way.',
     intro:
       // The docs confirm it: a new version dropped on an asset replaces it
       // in every occurrence.
       'Images, video, audio, and documents in one library that every record links to. Replace a file once, and every record that uses it follows.',
-    // The route of the docs of the media area, confirmed.
+    // The route of the docs of the Media Area, confirmed.
     link: docs('/docs/general-concepts/media-area'),
   },
   fragments: [

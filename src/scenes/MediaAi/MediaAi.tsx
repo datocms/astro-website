@@ -2,7 +2,7 @@ import { AssetDetail } from '@datocms/product-scenes';
 import { type FragmentSceneProps, Scene } from '../Scene';
 import { LANGUAGE, PHOTO, VIDEO } from './story';
 
-// The fragments of the chapter "AI in the media library" of /ai: the tags
+// The fragments of the chapter "AI in the Media Area" of /ai: the tags
 // of the photo Loaded tourer on the Stelvio, and the dialog that generates
 // the captions of the video Fitting a rolltop pannier. The frame is not a
 // screen: it is in Pipeline.astro. Read the scene rules in the README of

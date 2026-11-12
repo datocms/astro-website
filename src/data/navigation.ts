@@ -73,7 +73,7 @@ const editorExperience = l(
   'Structured content and visual editing',
 );
 const developers = l('For developers', '/developers', 'Schema, GraphQL, real-time, cache tags');
-const media = l('Media', '/media', 'Images, video, and the media library');
+const media = l('Media', '/media', 'Images, video, and the Media Area');
 const ai = l('AI', '/ai', 'MCP, Agent Skills, LLM-ready docs');
 
 // The framework pages (/cms/[slug]).

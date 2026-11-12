@@ -1,5 +1,5 @@
-// The fake content of the chapter "Media library" of /media. The scenes
-// show the media area of Saltmarsh Museum, a museum of textiles: the
+// The fake content of the chapter "Media Area" of /media. The scenes
+// show the Media Area of Saltmarsh Museum, a museum of textiles: the
 // collection "Light and Thread", the exhibition of 2026, and its asset
 // "Vessel with dry grasses", a clay vase in the afternoon light. Do not
 // change a text here without a change to the copy (src/data/media.ts).

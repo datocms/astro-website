@@ -6,8 +6,6 @@ This is a high-level guide, not a design system. The exact values (color tokens,
 
 Sections 1 to 9 are for anyone who writes or designs as DatoCMS. Section 10 is for partners, press, and plugin authors.
 
-> Lines marked **TBC** are proposals that still need a decision.
-
 ---
 
 ## 1. In short
@@ -177,7 +175,7 @@ The rules and the patterns of the product copy (messages, confirmations, errors,
 | Contractions        | Yes in marketing and support. No in product messages (see section 5).                                            | We'll take it from there.                           | We will be in touch soon.          |
 | Exclamation marks   | None.                                                                                                            | Welcome on board.                                   | Welcome on board!                  |
 | Emoji               | None in the website and the product. Fine on social and in support, one at a time.                               |                                                     | Welcome on board! 🎉               |
-| "And" or "&"        | "And" in sentences. "&" only in a short label where space is tight.                                              | Images, video, and the media library                | Fast & reliable APIs               |
+| "And" or "&"        | "And" in sentences. "&" only in a short label where space is tight.                                              | Images, video, and the Media Area                   | Fast & reliable APIs               |
 | Numbers and units   | A space between a number and its unit. No space before a multiplier (M, B, x).                                   | 40 ms · 2 TB · 5M · 6B · 8x                         | 40ms · 2TB · 5 M                   |
 | Ellipsis            | The single character "…", for loading states and actions that ask for more input.                                | Loading…                                            | Loading...                         |
 | Apostrophes, quotes | Curly: ’ and “ ”. The product keeps straight quotes (' and ").                                                   | We’re 13 people.                                    | We're 13 people.                   |
@@ -191,32 +189,32 @@ The rules and the patterns of the product copy (messages, confirmations, errors,
 
 ### Say this, not that
 
-| ✅ Say                                                     | ⛔ Not                                       | Note                                               |
-| ---------------------------------------------------------- | -------------------------------------------- | -------------------------------------------------- |
-| DatoCMS                                                    | Dato CMS, Dato, Datocms                      | See section 3.                                     |
-| record                                                     | item, entry                                  | "Item" is the API word. "Menu item" is fine.       |
-| model                                                      | content type, item type                      |                                                    |
-| block                                                      | block model, modular block                   |                                                    |
-| project                                                    | site, space                                  | "Site" is the customer's frontend.                 |
-| environment · sandbox environment · primary environment    | Sandbox Environment, Primary Environment     | Lowercase.                                         |
-| Structured Text · Modular Content                          | Structured text, Modular content             | Field types are proper names.                      |
-| Content Delivery API · Content Management API              | content API, REST API                        | Short forms CDA and CMA only after the full name.  |
-| Real-time Updates API · real-time updates                  | realtime, real time (as adjective)           |                                                    |
-| visual editing · cache tags · webhooks                     | Visual Editing, Cache Tags, web hooks        | Features are common nouns.                         |
-| Media Area                                                 | media library, media area                    | The area of the product.                           |
-| asset                                                      | upload, file                                 | "Upload" is the action.                            |
-| plugin directory                                           | marketplace, plugin store                    |                                                    |
-| MCP server · agent skills                                  | Mcp, Agent Skills                            |                                                    |
-| API token                                                  | API key (for a credential)                   | "API key" is the identifier of a model or a field. |
-| Free, Professional, Enterprise + "plan"                    | free plan, Pro plan, higher plans            | The name has a capital, "plan" does not.           |
-| log in · log out (verb), login (noun)                      | sign in, Logout, "Couldn't login"            |                                                    |
-| sign up (verb), signup (noun)                              | Sign Up, sign-up                             |                                                    |
-| two-factor authentication                                  | 2FA, 2-factor                                | "2FA" only where space is tight.                   |
-| email · frontend · backend · headless CMS                  | e-mail · front-end · back end · Headless CMS |                                                    |
-| locale (content) · language (interface)                    |                                              | Two different things.                              |
-| delete (erase for good) · remove (take out of a list)      | destroy                                      |                                                    |
-| our support team · our sales team                          | DatoCMS Support, our Sales team              |                                                    |
-| Get started · Talk to sales · Read the docs · Try the demo | Start for free, Contact sales, Learn more    | One label for each action.                         |
+| ✅ Say                                                     | ⛔ Not                                       | Note                                                                                               |
+| ---------------------------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| DatoCMS                                                    | Dato CMS, Dato, Datocms                      | See section 3.                                                                                     |
+| record                                                     | item, entry                                  | "Item" is the API word. "Menu item" is fine.                                                       |
+| model                                                      | content type, item type                      |                                                                                                    |
+| block                                                      | block model, modular block                   |                                                                                                    |
+| project                                                    | site, space                                  | "Site" is the customer's frontend.                                                                 |
+| environment · sandbox environment · primary environment    | Sandbox Environment, Primary Environment     | Lowercase. "Sandbox" alone is fine once the context is environments: a headline, a second mention. |
+| Structured Text · Modular Content                          | Structured text, Modular content             | Field types are proper names.                                                                      |
+| Content Delivery API · Content Management API              | content API, REST API                        | Short forms CDA and CMA only after the full name.                                                  |
+| Real-time Updates API · real-time updates                  | realtime, real time (as adjective)           |                                                                                                    |
+| visual editing · cache tags · webhooks                     | Visual Editing, Cache Tags, web hooks        | Features are common nouns.                                                                         |
+| Media Area                                                 | media library, media area                    | The area of the product.                                                                           |
+| asset                                                      | upload, file                                 | "Upload" is the action.                                                                            |
+| plugin directory                                           | marketplace, plugin store                    |                                                                                                    |
+| MCP server · agent skills                                  | Mcp, Agent Skills                            |                                                                                                    |
+| API token                                                  | API key (for a credential)                   | "API key" is the identifier of a model or a field.                                                 |
+| Free, Professional, Enterprise + "plan"                    | free plan, Pro plan, higher plans            | The name has a capital, "plan" does not.                                                           |
+| log in · log out (verb), login (noun)                      | sign in, Logout, "Couldn't login"            |                                                                                                    |
+| sign up (verb), signup (noun)                              | Sign Up, sign-up                             |                                                                                                    |
+| two-factor authentication                                  | 2FA, 2-factor                                | "2FA" only where space is tight.                                                                   |
+| email · frontend · backend · headless CMS                  | e-mail · front-end · back end · Headless CMS |                                                                                                    |
+| locale (content) · language (interface)                    |                                              | Two different things.                                                                              |
+| delete (erase for good) · remove (take out of a list)      | destroy                                      |                                                                                                    |
+| our support team · our sales team                          | DatoCMS Support, our Sales team              |                                                                                                    |
+| Get started · Talk to sales · Read the docs · Try the demo | Start for free, Contact sales, Learn more    | One label for each action.                                                                         |
 
 ### Words we avoid
 
@@ -333,7 +331,7 @@ For partners, customers, press, and plugin authors. We are happy when you show t
 - On our website, your logo is on a white plate so that its colors stay correct on every theme.
 - ⛔ Don't merge the two into one mark.
 
-### Badges **TBC**
+### Badges
 
 | Badge              | Who can use it                                         |
 | ------------------ | ------------------------------------------------------ |
