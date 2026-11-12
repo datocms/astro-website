@@ -234,7 +234,7 @@ export const homeHero: HomeHeroData = {
     {
       ...c.wild,
       href: '/partners/rotate/showcase/wild',
-      description: 'Combining Shopify and Dato for eCommerce perfection',
+      description: 'Shopify and DatoCMS, for ecommerce',
     },
     {
       ...c.freitag,

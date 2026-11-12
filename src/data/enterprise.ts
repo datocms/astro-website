@@ -25,7 +25,7 @@ export const hero: HeroData & { subtitle: string; logosLabel: string } = {
   subheadline: 'A piece for your peace of mind.',
   face: 'serious',
   subtitle:
-    'DatoCMS is a headless CMS with the **governance, service and features your content operation needs to scale**: dedicated onboarding, premium technical support, private cloud and custom SLAs.',
+    'The **governance, service and features your content operation needs to scale**: dedicated onboarding, premium technical support, private cloud and custom SLAs.',
   buttons: [
     { label: 'Talk to sales', href: '#form', arrow: false, contact: 'sales' },
     {

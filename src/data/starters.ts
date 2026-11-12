@@ -16,7 +16,7 @@ export const hero: HeroData = {
 export const fullyFledged = {
   headline: 'Fully fledged demos',
   /** HTML: the text has a strong run. */
-  body: "Use our pre-built demo projects to see all of DatoCMS's features in a <strong>realistic production-ready setup</strong>. Includes many example content types, and advanced features.",
+  body: 'Use our demo projects to see every DatoCMS feature in a <strong>realistic, production-ready setup</strong>, with many example content types.',
 };
 
 export const techStarters = {

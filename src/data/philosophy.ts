@@ -46,7 +46,7 @@ export const principles: PrinciplesData = {
     },
     {
       title: 'We run purely on our customers’ subscriptions.',
-      text: 'DatoCMS is bootstrapped and profitable, with no debt and no investors. The only pressure we feel is to give you a CMS worth building ambitious projects on.',
+      text: 'We’re bootstrapped and profitable, with no debt and no investors. The only pressure we feel is to give you a CMS worth building ambitious projects on.',
       theme: 'green',
     },
     {

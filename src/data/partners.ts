@@ -12,7 +12,7 @@ export const index = {
   seoTitle: 'Solution Partners',
   hero: {
     label: 'Solution partners',
-    headline: 'Find the perfect Partner to meet',
+    headline: 'Find the perfect partner to meet',
     subheadline: 'your digital needs',
     intro:
       'Our most successful customers work with a Solution Partner to accomplish their goals and ship their digital products faster.',
@@ -93,10 +93,9 @@ export function projectsCountLabel(count: number) {
 export const techIndex = {
   hero: {
     label: 'Ecosystem partners',
-    headline: 'Find the perfect Tech Partner to supercharge',
+    headline: 'Find the perfect tech partner to supercharge',
     subheadline: 'your DatoCMS projects',
-    intro:
-      'DatoCMS partners with leading technology providers and APIs to ensure your projects are getting the best possible treatment.',
+    intro: 'We work with the tools you already use.',
   } satisfies HeroData,
 };
 

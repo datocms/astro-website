@@ -51,8 +51,7 @@ export interface Benefit {
 export const benefits = {
   headline: 'Partnerships done right.',
   muted: 'We started as an agency too.',
-  intro:
-    "DatoCMS was born out of an agency. It's only natural that our partner program incorporates all the essential elements to support the success of your agency.",
+  intro: 'So we built the partner program around what an agency needs to grow.',
   items: [
     {
       icon: Tags,
