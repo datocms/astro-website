@@ -10,9 +10,20 @@ import styles from './style.module.css';
 interface Props extends ContentSourceData {
   /** Without a theme, the section takes the theme of its parent. */
   theme?: Theme;
+  /** The ground of the band: the deep ink of the theme, or its paper. */
+  background?: 'inverse' | 'default';
 }
 
-const { headline, face, paragraph, button, channels, activeChannel, theme } = Astro.props;
+const {
+  headline,
+  face,
+  paragraph,
+  button,
+  channels,
+  activeChannel,
+  theme,
+  background = 'inverse',
+} = Astro.props;
 // Three copies of the list. The active item stays in the middle copy,
 // thus there are always items above it and below it.
 const activeIndex = channels.length + Math.max(0, channels.indexOf(activeChannel));
@@ -21,8 +32,8 @@ const rows = [...channels, ...channels, ...channels];
 
 <Section
   theme={theme}
-  background="inverse"
-  class={styles.contentSource}
+  background={background}
+  class:list={[styles.contentSource, background === 'default' && styles.onPage]}
   contentClass={styles.content}
 >
   <h2 class:list={[styles.headline, 'title']}>
