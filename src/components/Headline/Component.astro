@@ -15,6 +15,8 @@ interface Props {
    */
   faceGlyphs?: string;
   breakBeforeMuted?: boolean;
+  /** The headline is on the subtle tint of the page. */
+  onTint?: boolean;
   /** Animate the full headline (main and muted runs) with these steps. */
   typewriter?: Step[];
   typewriterStart?: TypewriterStart;
@@ -31,6 +33,7 @@ const {
   muted,
   faceGlyphs,
   breakBeforeMuted = false,
+  onTint = false,
   typewriter,
   typewriterStart,
   typewriterDelay,
@@ -63,7 +66,7 @@ const wrapperProps = typewriter
           <span
             class:list={[
               styles.muted,
-              size === 'title' && styles.mutedSmall,
+              size === 'title' && (onTint ? styles.mutedSmallOnTint : styles.mutedSmall),
               breakBeforeMuted && styles.mutedBlock,
             ]}
             data-datocms-subline

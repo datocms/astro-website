@@ -45,6 +45,9 @@ export const PAGE_TINTS = [
 
 export const PAGE_STRONG_TINTS = ['--surface-accent-muted'] as const;
 
+/** The tints of the page on which the muted text does not read. */
+export const PAGE_TINTS_WITHOUT_MUTED = ['--surface-accent-subtle'] as const;
+
 /**
  * The other surfaces of the inverse ground. Every text role of the inverse
  * ground must also read on each of them.

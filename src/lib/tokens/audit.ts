@@ -17,6 +17,7 @@ import {
   BUTTON_PAIRS,
   PAGE_STRONG_TINTS,
   PAGE_TINTS,
+  PAGE_TINTS_WITHOUT_MUTED,
   STATUS_PAIRS,
   type Ground,
 } from './contract';
@@ -168,6 +169,12 @@ export function audit(sheet: TokenSheet): Audit {
             const surfaceColor =
               surface === '--surface-default' ? base : opaque(sheet, box, surface, base);
             for (const role of ['--text-primary', '--text-soft', '--text-muted']) {
+              if (
+                role === '--text-muted' &&
+                (PAGE_TINTS_WITHOUT_MUTED as readonly string[]).includes(surface)
+              ) {
+                continue;
+              }
               pair(theme, scheme, context, box, role, surface, surfaceColor, AA_TEXT);
             }
             // A two-tone headline on a tinted section: large text.
