@@ -39,7 +39,7 @@ export const fragments: FeatureFragmentsData = {
       // The retention per plan comes from the docs page on versioning.
       text: 'Open an earlier version, compare it with the current one, and restore it.',
     },
-    // New copy. Roles and permissions belong to /enterprise
+    // Roles and permissions belong to /enterprise
     // (src/data/AGENTS.md, "Who owns a subject"): one picture here, no
     // explanation.
     {

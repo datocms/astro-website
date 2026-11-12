@@ -92,7 +92,7 @@ export function chapterNav(last: { label: string; href: string }): CategoryNavDa
   };
 }
 
-// New copy. Chapter 1: the query of a page. The frame is code: the page
+// Chapter 1: the query of a page. The frame is code: the page
 // file and the response, side by side. The second fragment is the Ping of
 // /developers.
 export function fetchChapter(args: {
@@ -128,7 +128,7 @@ export function fetchChapter(args: {
   };
 }
 
-// New copy. Chapter 2: images and video. The frame is the Lab of /media.
+// Chapter 2: images and video. The frame is the Lab of /media.
 export function mediaChapter(args: {
   docsRoot: string;
   /** The image component of the framework, as the headline writes it. */
@@ -162,7 +162,7 @@ export function mediaChapter(args: {
   };
 }
 
-// New copy. Chapter 3: blocks and Structured Text. The frame is the
+// Chapter 3: blocks and Structured Text. The frame is the
 // Sections field of the Dynamic layouts chapter of /editor-experience.
 export function blocksChapter(args: {
   /** The docs page of Structured Text of the framework. */
@@ -196,7 +196,7 @@ export function blocksChapter(args: {
   };
 }
 
-// New copy. Chapter 4: draft mode and Content Link. The frame is the tab
+// Chapter 4: draft mode and Content Link. The frame is the tab
 // Visual of the Visual editing chapter of /editor-experience.
 export function draftsChapter(args: {
   docsRoot: string;
@@ -229,7 +229,7 @@ export function draftsChapter(args: {
   };
 }
 
-// New copy. Chapter 5: the Real-time Updates API. The frame is the Stream
+// Chapter 5: the Real-time Updates API. The frame is the Stream
 // of /developers, with the code card of the framework. No fragments.
 export function realTimeChapter(args: {
   docsRoot: string;
@@ -250,7 +250,7 @@ export function realTimeChapter(args: {
   };
 }
 
-// New copy. Chapter 6, for a framework with a cache that takes tags: the
+// Chapter 6, for a framework with a cache that takes tags: the
 // frame is the Wall of /developers, the fragments are the helper and the
 // webhook route.
 export function cacheTagsChapter(args: {
@@ -280,7 +280,7 @@ export function cacheTagsChapter(args: {
   };
 }
 
-// New copy. Chapter 6, for a framework without a cache that takes tags:
+// Chapter 6, for a framework without a cache that takes tags:
 // two roads, a build on each publish or a purge by cache tag. The frame
 // is code (the headers and the webhook payload of /developers), the
 // fragments are the Hooks and the Deploys of /developers.
@@ -315,7 +315,6 @@ export function closer(args: { repo: string; docsRoot: string; subline: string }
   return {
     variant: 'light',
     theme: 'green',
-    // New copy.
     headline: 'Start from a working project.',
     muted: 'Deploy it, then make it yours.',
     subline: args.subline,

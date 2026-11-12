@@ -19,7 +19,7 @@ const docs = (label: string, href: string): ButtonData => ({
   variant: 'soft',
 });
 
-// New copy. The line of the hero.
+// The line of the hero.
 export const hero: HeroData & { subtitle: string; logosLabel: string } = {
   headline: 'Big teams, bigger brands, one CMS.',
   subheadline: 'A piece for your peace of mind.',
@@ -68,33 +68,28 @@ export const security: ChapterLayoutData = {
   theme: 'blue',
   chapter: {
     label: 'Security',
-    // New copy.
     headline: 'Pass the security review.',
     muted: 'With all questions already answered.',
-    // New copy.
     intro:
       'We’re ISO 27001 certified and offer a GDPR data processing agreement. Your data is encrypted in transit and at rest, sharded across servers in the EU (Ireland), and audit logs record who changed what, and when.',
     link: docs('Read our security page', '/security'),
   },
   fragments: [
     {
-      // New copy.
       title: 'Sign in with your company account.',
       text: 'Your team signs in to the CMS with the account they already use at work, through your identity provider.',
     },
     {
-      // New copy.
       title: 'Connect your identity provider.',
       text: 'SSO with SAML through Okta, OneLogin, Azure AD or any SAML provider, plus SCIM provisioning to add and remove people from your directory.',
     },
     {
-      // New copy. A full export of the project on a cron schedule, to the
+      // A full export of the project on a cron schedule, to the
       // S3 bucket of the customer: the scheduled exports of the old page.
       title: 'Automatic backups to your own bucket.',
       text: 'We export your full project to your own AWS S3 bucket at your chosen schedule, including models, records, assets, menus, plugins and workflows.',
     },
     {
-      // New copy.
       title: 'Serve assets from your domain.',
       text: 'Keep assets in your own bucket on AWS S3, Cloudflare R2, Google Cloud Storage or Azure Blob Storage, served from your own domain. Webhooks come from static IPs.',
     },
@@ -109,19 +104,16 @@ export const governance: ChapterLayoutData = {
     label: 'Governance',
     headline: 'Multiple brands?',
     muted: 'No stepping on each other’s toes.',
-    // New copy.
     intro:
       'Roles and granular permissions let you decide who can do what, down to the field and locale level. Workflows decide who gets to approve what before anything goes live.',
     link: docs('Read the docs', '/docs/general-concepts/roles-and-permission-system'),
   },
   fragments: [
     {
-      // New copy.
       title: 'A workflow for each brand.',
       text: 'Each brand sets its own steps from draft to published, with approvals wherever you need them.',
     },
     {
-      // New copy.
       title: 'White-label the CMS.',
       text: 'Bring your branding to the CMS with your logo, your colors and your domain.',
     },
@@ -167,26 +159,24 @@ export const support: ChapterLayoutData = {
     label: 'Support',
     headline: 'Our team on your team.',
     muted: 'Not some ticket queue.',
-    // New copy.
     intro:
       'A shared Slack channel, solution architects for your build, and dedicated technical and editorial onboarding, all backed by the SLAs in your contract.',
     link: { ...docs('Talk to sales', '#form'), contact: 'sales' },
   },
   fragments: [
     {
-      // New copy.
       title: 'SLAs in your contract.',
       text: 'A performance SLA with 99.99% uptime, and a support SLA that answers priority-one issues within two hours, around the clock.',
     },
     {
-      // New copy. The onboarding of the old page: technical and editorial.
+      // The onboarding of the old page: technical and editorial.
       title: 'Onboarding for each team.',
       text: 'Technical onboarding for your developers and editorial onboarding for your editors, run by the DatoCMS team.',
     },
   ],
 };
 
-// New copy. The questions of the security review. Each answer holds only
+// The questions of the security review. Each answer holds only
 // verified facts.
 export const faq: FaqData = {
   headline: 'Questions your security team will ask.',
@@ -232,7 +222,6 @@ export const contact = {
 export const ctaClose: CtaBannerData = {
   variant: 'light',
   theme: 'orange',
-  // New copy.
   headline: 'A headless CMS that is ready',
   muted: 'to scale with you',
   // CtaBanner prints the subline as plain text: it has no marks.

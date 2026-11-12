@@ -27,13 +27,10 @@ export const page: FrameworkPage = {
   slug: 'astro-cms',
   name: 'Astro',
   seo: {
-    // New copy.
     title: 'Headless CMS for Astro',
-    // New copy.
     description:
       'DatoCMS with Astro: GraphQL from the frontmatter, responsive images with @datocms/astro, draft mode with visual editing, real-time updates and cache tags.',
   },
-  // New copy.
   hero: {
     label: 'Astro + DatoCMS',
     headline: 'Astro in front, content backed by DatoCMS.',
@@ -56,7 +53,6 @@ export const page: FrameworkPage = {
   }),
   drafts: draftsChapter({
     docsRoot,
-    // New copy.
     intro:
       'A cookie turns draft mode on, and the page passes `includeDrafts` when it’s set. Add `contentLink` and a single `<ContentLink />` component, and every text links to its field.',
     draft: code.draftCode,
@@ -64,7 +60,6 @@ export const page: FrameworkPage = {
   }),
   realTime: realTimeChapter({
     docsRoot,
-    // New copy.
     muted: 'The page reloads itself.',
     intro:
       '`<QueryListener />` from `@datocms/astro` listens to the query over Server-Sent Events and reloads the page when the result changes. It’s most useful for editors in draft mode.',
@@ -75,7 +70,6 @@ export const page: FrameworkPage = {
   publishKind: 'cache-tags',
   publish: cacheTagsChapter({
     docsHref: `${docsRoot}/using-cache-tags`,
-    // New copy.
     intro:
       'Every response lists its records in `X-Cache-Tags`. Astro’s cache API tags the page with them, and a webhook purges them on Cloudflare, Netlify or Vercel.',
     tags: {
@@ -89,7 +83,6 @@ export const page: FrameworkPage = {
       code: code.webhookCode,
     },
   }),
-  // New copy.
   showcase: {
     label: 'Built with Astro and DatoCMS',
     headline: 'Sites built on both.',
@@ -100,7 +93,6 @@ export const page: FrameworkPage = {
   closer: closer({
     docsRoot,
     repo: starterRepo,
-    // New copy.
     subline:
       'Astro in TypeScript, with draft mode, click-to-edit overlays, real-time updates and SEO metadata. The Web Previews and SEO plugins come set up. All with helpful comments to get you going.',
   }),

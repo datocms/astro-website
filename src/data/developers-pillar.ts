@@ -40,7 +40,7 @@ const docs = (href: string): ChapterHeaderData['link'] => ({
   variant: 'soft',
 });
 
-// New copy. The line of the voice guide.
+// The line of the voice guide.
 export const hero: HeroData = {
   label: 'For developers',
   headline: 'Modular how you like it.',
@@ -205,7 +205,7 @@ export const delivery: ChapterLayoutData = {
   ],
 };
 
-// New copy. The one opinion of the page, between chapter 5 and chapter 6.
+// The one opinion of the page, between chapter 5 and chapter 6.
 export const opinion: StatementData = {
   label: 'The boring stuff matters.',
   // *already* is in italics (src/components/InlineText).

@@ -25,11 +25,9 @@ export const page: FrameworkPage = {
   name: 'Next.js',
   seo: {
     title: 'Headless CMS for Next.js',
-    // New copy.
     description:
       'DatoCMS with Next.js: GraphQL from Server Components, responsive images and video, Draft Mode with visual editing, real-time updates and cache tags.',
   },
-  // New copy.
   hero: {
     label: 'Next.js + DatoCMS',
     headline: 'Next.js in front, content backed by DatoCMS.',
@@ -52,7 +50,6 @@ export const page: FrameworkPage = {
   }),
   drafts: draftsChapter({
     docsRoot,
-    // New copy.
     intro:
       'Draft Mode sets a cookie, and the page passes `includeDrafts` when it’s there. Add `contentLink` and a single `<ContentLink />` component, and every text links to its field.',
     draft: code.draftCode,
@@ -60,7 +57,6 @@ export const page: FrameworkPage = {
   }),
   realTime: realTimeChapter({
     docsRoot,
-    // New copy.
     muted: 'New posts appear without a reload.',
     intro:
       '`useQuerySubscription` from `react-datocms` keeps a Client Component in sync over Server-Sent Events, for editors in Draft Mode or for every visitor of a live page.',
@@ -71,7 +67,6 @@ export const page: FrameworkPage = {
   publishKind: 'cache-tags',
   publish: cacheTagsChapter({
     docsHref: `${docsRoot}/using-cache-tags`,
-    // New copy.
     intro:
       'Every response lists its records in `X-Cache-Tags`. Store them next to the query ID, and the webhook calls `revalidateTag` on the queries that changed.',
     tags: {
@@ -88,7 +83,6 @@ export const page: FrameworkPage = {
       code: code.webhookCode,
     },
   }),
-  // New copy.
   showcase: {
     label: 'Built with Next.js and DatoCMS',
     headline: 'Sites built on both.',
@@ -99,7 +93,6 @@ export const page: FrameworkPage = {
   closer: closer({
     docsRoot,
     repo: starterRepo,
-    // New copy.
     subline:
       'Next.js 16 and the App Router in TypeScript, with draft mode, click-to-edit overlays, real-time updates, SEO metadata and cache invalidation on publish. All with helpful comments to get you going.',
   }),

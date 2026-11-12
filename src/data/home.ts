@@ -484,7 +484,7 @@ const { post } = await executeQuery(postQuery, {
 
 export const frameworkIntegration: TextWithImageData = {
   title: 'Integrate with one line of code.',
-  // New copy. Each :name: is the mark of the framework (src/components/Emoji).
+  // Each :name: is the mark of the framework (src/components/Emoji).
   tagline:
     'Use the frameworks you prefer. Our official guides and SDKs cover :astro: Astro, :nextjs: Next.js, :nuxt: Nuxt, and :sveltekit: SvelteKit.',
   button: {
@@ -563,7 +563,7 @@ export const questionAnswer: QuestionAnswerData = {
     command: 'npx skills add datocms',
     folders: ['datocms-setup/', 'datocms-cda/', 'datocms-cli/'],
   },
-  // New copy. Leads to the AI pillar.
+  // Leads to the AI pillar.
   more: {
     text: 'Translations, image tags, video captions, and whatever ships next. All opt-in.',
     button: { label: 'Explore AI', href: '/ai', variant: 'solid', size: 'l' },
@@ -577,7 +577,7 @@ const MARCELO_FINAMOR = '79766956';
 
 export const community: CommunityData = {
   headline: 'Community',
-  // New copy. :heart: reads "love" (src/components/Emoji).
+  // :heart: reads "love" (src/components/Emoji).
   muted: 'Ask us anything. We’d :heart: to help you build.',
   paragraph: 'Connect with developers who already run DatoCMS in production.',
   button: {

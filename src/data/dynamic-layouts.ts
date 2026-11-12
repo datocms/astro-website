@@ -10,7 +10,7 @@ import type { FeatureFragmentsData } from '~/components/FeatureFragments';
  * blocks shows the blocks in its Feature grid block.
  */
 
-// Part 1 of the chapter: the header. New copy.
+// Part 1 of the chapter: the header.
 export const chapter: ChapterHeaderData = {
   label: 'Dynamic layouts',
   headline: 'Drag, drop, done.',
@@ -34,7 +34,7 @@ export const fragments: FeatureFragmentsData = {
       title: 'Drag and drop into place.',
       text: 'Editors drag blocks up and down the page. A new campaign page is *just* a new record, not a ticket or a sprint.',
     },
-    // New copy. Blocks in blocks: the picture is a diagram, the Feature grid
+    // Blocks in blocks: the picture is a diagram, the Feature grid
     // block with three Feature blocks, each with a Button block
     // (src/scenes/DynamicLayouts/Nest.astro). The depth has a limit (the
     // blocks_depth of the project), which the copy does not give.

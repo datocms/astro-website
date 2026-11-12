@@ -27,11 +27,9 @@ export const page: FrameworkPage = {
   name: 'Nuxt',
   seo: {
     title: 'Headless CMS for Nuxt',
-    // New copy.
     description:
       'DatoCMS with Nuxt: GraphQL from one composable, responsive images and video with vue-datocms, draft mode with visual editing, and real-time updates.',
   },
-  // New copy.
   hero: {
     label: 'Nuxt + DatoCMS',
     headline: 'Nuxt in front, content backed by DatoCMS.',
@@ -54,7 +52,6 @@ export const page: FrameworkPage = {
   }),
   drafts: draftsChapter({
     docsRoot,
-    // New copy.
     intro:
       'A cookie turns draft mode on, and the page passes `includeDrafts` when it’s set. Add `contentLink` and a single `<ContentLink />` component, and every text links to its field.',
     draft: code.draftCode,
@@ -62,7 +59,6 @@ export const page: FrameworkPage = {
   }),
   realTime: realTimeChapter({
     docsRoot,
-    // New copy.
     muted: 'New posts appear without a reload.',
     intro:
       '`useQuerySubscription` from `vue-datocms` keeps the page in sync over Server-Sent Events, for editors in draft mode or for every visitor of a live page.',
@@ -72,7 +68,6 @@ export const page: FrameworkPage = {
     'Events Record created on the left, the component with its useQuerySubscription composable under it, the live blog Cup final: live on the right. Each event goes down the stream into the composable, and its post comes in at the top of the blog, with no reload.',
   publishKind: 'build-triggers',
   publish: buildTriggersChapter({ headersCode }),
-  // New copy.
   showcase: {
     label: 'Built with Nuxt and DatoCMS',
     headline: 'Sites built on both.',
@@ -83,7 +78,6 @@ export const page: FrameworkPage = {
   closer: closer({
     docsRoot,
     repo: starterRepo,
-    // New copy.
     subline:
       'Nuxt 4 in TypeScript, with draft mode, click-to-edit overlays, real-time updates and SEO metadata. The Web Previews and SEO plugins come set up. All with helpful comments to get you going.',
   }),

@@ -34,7 +34,6 @@ const docs = (href: string): ChapterHeaderData['link'] => ({
   variant: 'soft',
 });
 
-// New copy.
 export const hero: HeroData = {
   label: 'Media',
   headline: 'Upload once. Optimized for every size, every screen.',
@@ -171,7 +170,7 @@ export const images: ChapterLayoutData = {
   ],
 };
 
-// New copy. The one opinion of the page, between chapter 3 and chapter 4.
+// The one opinion of the page, between chapter 3 and chapter 4.
 export const opinion: StatementData = {
   label: 'We don’t run our own pipeline.',
   text: 'imgix has done images for years, and Mux has done video. Our job is to make them feel like one field in your schema and one library for your editors.',
@@ -269,7 +268,6 @@ export const seo = {
     'One library for every file. Resize, crop and convert images from the URL, stream video with captions, and ship both to the frontend with ready-made components.',
 };
 
-// New copy.
 export const ctaBuild: CtaBannerData = {
   variant: 'light',
   theme: 'green',

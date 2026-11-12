@@ -11,7 +11,7 @@ import type { FeatureFragmentsData } from '~/components/FeatureFragments';
  * embargo.
  */
 
-// Part 1 of the chapter: the header. New copy. Workflows are an Enterprise
+// Part 1 of the chapter: the header. Workflows are an Enterprise
 // feature (the docs page of the feature): the intro does not say it.
 export const chapter: ChapterHeaderData = {
   label: 'Workflows',

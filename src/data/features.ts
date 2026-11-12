@@ -118,7 +118,7 @@ const nav: [id: string, label: string][] = [
   ['editor-experience', 'Editor experience'],
   ['developer-experience', 'Developer experience'],
   ['image-video', 'Image & video'],
-  ['localisation', 'Localisation'],
+  ['localisation', 'Localization'],
   ['extensibility', 'Extensibility'],
   ['content-integrity', 'Content'],
   ['compliance', 'Compliance'],

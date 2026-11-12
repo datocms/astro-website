@@ -71,7 +71,7 @@ export type GoToEntry = { label: string; url: string };
 
 export const goToEntries: GoToEntry[] = [
   { label: 'General concepts', url: '/docs/general-concepts' },
-  { label: 'Content modelling', url: '/docs/content-modelling' },
+  { label: 'Content modeling', url: '/docs/content-modelling' },
   { label: 'Content Delivery API (CDA)', url: '/docs/content-delivery-api' },
   { label: 'Content Management API (CMA)', url: '/docs/content-management-api' },
   { label: 'Plugin SDK', url: '/docs/plugin-sdk/introduction' },

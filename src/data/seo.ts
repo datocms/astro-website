@@ -12,7 +12,7 @@ import { EVENT, FAVICON_URL, SEO, SHARE_IMAGE_URL, SITE } from '~/scenes/Seo/sto
  * (src/scenes/Seo/story.ts).
  */
 
-// Part 1 of the chapter: the header. New copy.
+// Part 1 of the chapter: the header.
 export const chapter: ChapterHeaderData = {
   label: 'SEO',
   headline: 'SEO is content.',

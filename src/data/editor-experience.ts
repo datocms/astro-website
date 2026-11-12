@@ -17,7 +17,7 @@ import type { CategoryNavData } from '~/components/CategoryNav';
  * (src/data/features.ts) and the docs pages that the chapters link.
  */
 
-// New copy. The hero is about the pillar, not about one chapter.
+// The hero is about the pillar, not about one chapter.
 export const hero: HeroData = {
   label: 'Editor experience',
   headline: 'Familiar to write in. Predictable to build on.',
@@ -47,7 +47,7 @@ export const chapterNav: CategoryNavData = {
   ],
 };
 
-// New copy. The one opinion of the page, after chapter 4 (Structured Text):
+// The one opinion of the page, after chapter 4 (Structured Text):
 // "one field" is the Structured Text field. It has the theme of that chapter.
 // The label is the muted lead-in of the statement.
 export const opinion: StatementData = {

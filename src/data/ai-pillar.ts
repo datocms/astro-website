@@ -31,7 +31,6 @@ const docs = (href: string): ChapterHeaderData['link'] => ({
   variant: 'soft',
 });
 
-// New copy.
 export const hero: HeroData = {
   label: 'AI',
   headline: 'Bring your own AI. We’ll make it feel at home.',
@@ -128,7 +127,7 @@ export const skills: ChapterLayoutData = {
   fragments: [],
 };
 
-// New copy. The one opinion of the page, between chapter 2 and chapter 3.
+// The one opinion of the page, between chapter 2 and chapter 3.
 // The label is the headline of the philosophy banner of the design.
 // "The model you choose" holds: the translation plugin takes your key, MCP
 // and skills run in the assistant you already pay for.

@@ -9,7 +9,7 @@ import type { FeatureFragmentsData } from '~/components/FeatureFragments';
  * Lume Kitchen.
  */
 
-// Part 1 of the chapter: the header. New copy.
+// Part 1 of the chapter: the header.
 export const chapter: ChapterHeaderData = {
   label: 'Localization',
   headline: 'Localize each field.',
@@ -24,8 +24,7 @@ export const chapter: ChapterHeaderData = {
 };
 
 // Part 3: two fragments. The locales of a record, which the editor
-// publishes one at a time, then the role of a translator. New copy for the
-// first.
+// publishes one at a time, then the role of a translator.
 export const fragments: FeatureFragmentsData = {
   items: [
     {
