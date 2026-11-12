@@ -7,14 +7,14 @@ import type { ContactFormData } from '~/data/contact';
  */
 
 export const seo = {
-  title: 'Join the DatoCMS Slack Channel',
+  title: 'Join the DatoCMS Slack community',
 };
 
 export const hero = {
-  label: 'DatoCMS Community Slack Channel',
-  headline: 'Join us on Slack!',
+  label: 'Slack community',
+  headline: 'Join us on Slack.',
   intro:
-    'Try out new product updates before they’re widely released, help us test and improve the product, and connect with other users!',
+    'Try out new product updates before they’re widely released, help us test and improve the product, and connect with other users.',
 };
 
 export const form: ContactFormData = {
@@ -23,7 +23,7 @@ export const form: ContactFormData = {
       {
         type: 'email',
         name: 'email',
-        label: 'Please insert your email',
+        label: 'Your email',
         placeholder: 'm.smith@gmail.com',
         autocomplete: 'email',
         // A simple pattern for an e-mail address.
@@ -40,14 +40,14 @@ export const form: ContactFormData = {
     privacy: { label: 'Privacy policy', href: '/legal/privacy-policy' },
     after: '.',
   },
-  submitLabel: 'Get my Slack invite!',
+  submitLabel: 'Get my Slack invite',
   sendingMessage: 'Sending your invite request…',
   submitErrorMessage:
     'Something went wrong and your invite wasn’t sent. Please try again in a few minutes.',
   noscriptMessage: 'This form needs JavaScript. Turn on JavaScript and reload the page.',
   // The page goes to /slack/thanks after the submit: the form never shows this.
   success: {
-    headline: 'Welcome on board!',
+    headline: 'Welcome on board.',
     muted: 'Check your email for the invite',
     face: 'wave',
     button: { label: 'Back to homepage', href: '/', variant: 'soft' },

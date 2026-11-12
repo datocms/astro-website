@@ -65,13 +65,13 @@ const categoryData: Omit<FeatureCategoryData, 'id' | 'navLabel'>[] = [
   {
     title: 'Editor experience',
     description:
-      'A powerful, intuitive editing interface with live collaboration, visual editing, and structured content tools.',
+      'An intuitive editing interface with live collaboration, visual editing, and structured content tools.',
     theme: 'green',
   },
   {
     title: 'Developer experience',
     description:
-      'APIs, SDKs, and developer tools designed for seamless integration with any tech stack.',
+      'GraphQL and REST APIs, SDKs, and developer tools that integrate with any tech stack.',
     theme: 'blue',
   },
   {
@@ -173,6 +173,6 @@ export const buddy: BuddyData = {
     { at: 0.25, face: 'happy', text: 'Still going.' },
     { at: 0.5, face: 'serious', text: 'Halfway. Really.' },
     { at: 0.75, face: 'starry', text: 'Nearly there.' },
-    { at: 1, face: 'cheer', text: 'Made it!' },
+    { at: 1, face: 'cheer', text: 'Made it.' },
   ],
 };

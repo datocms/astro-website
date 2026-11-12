@@ -265,7 +265,7 @@ export const AskAi = forwardRef<AskAiHandle, Props>(function AskAi({ initialQues
                     </button>
                   </div>
                   <div className={s.feedbackThanks} aria-live="polite">
-                    Thank you for your feedback!
+                    Thank you for your feedback.
                   </div>
                 </div>
               )}

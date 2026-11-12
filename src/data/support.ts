@@ -15,9 +15,9 @@ export const seo = {
 };
 
 export const hero: HeroData = {
-  label: 'Support page',
+  label: 'Support',
   headline: 'Got issues?',
-  subheadline: 'We’re here to help!',
+  subheadline: 'We’re here to help.',
   face: 'calm',
 };
 
@@ -26,13 +26,13 @@ export const picker = {
   placeholder: 'Please select a topic…',
   guidesTitle: 'Popular guides and tutorials',
   guidesText:
-    'Please take a look at these resources, as they might probably be the fastest way to solve your issue!',
+    'Please take a look at these resources, as they’re probably the fastest way to solve your issue.',
   moreTitle: 'Didn’t find what you’re looking for?',
   moreLink: 'Contact our support team',
 };
 
 export const talk = {
-  title: 'Talk with us!',
+  title: 'Talk with us.',
   text: 'Our experts are available to answer any of your questions. We’re available in a number of ways, any time that you need us.',
 };
 

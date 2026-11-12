@@ -22,12 +22,12 @@ export const seo = {
 };
 
 export const hero = {
-  label: 'DatoCMS Agency Partner Program',
-  headline: 'Become a Partner',
+  label: 'Agency partner program',
+  headline: 'Become a partner',
   intro:
     'Agency-specific plans from €39/month. No sales targets. No reselling requirements. No BS. Just real benefits including 30% off for your clients and free access to every project you manage. Join 250+ partners in 50+ countries.',
   button: {
-    label: 'Become a Partner',
+    label: 'Become a partner',
     href: '#partner-form',
     contact: 'partners',
   } satisfies ButtonData,
@@ -71,7 +71,7 @@ export const benefits = {
     {
       icon: BriefcaseBusiness,
       title: 'Dedicated partner manager',
-      body: 'Direct access to our Partner Team for you and your clients, with constant updates and support.',
+      body: 'Direct access to our partner team for you and your clients, with constant updates and support.',
     },
     {
       icon: IdCard,
@@ -82,7 +82,7 @@ export const benefits = {
     {
       icon: Megaphone,
       title: 'Co-marketing',
-      body: 'We\'ll promote your work through <a href="/case-studies">case studies</a>, articles, and other collaborations. We also LOVE to talk to you about your work.',
+      body: 'We\'ll promote your work through <a href="/case-studies">case studies</a>, articles, and other collaborations. We also love to hear about your work.',
       link: { label: 'Explore our partner chats →', href: '/blog/casual-chats' },
     },
   ] satisfies Benefit[],
@@ -91,16 +91,16 @@ export const benefits = {
 // The closing call to action of the page closer, above the video.
 export const plans: CtaBannerData = {
   variant: 'light',
-  headline: 'Agency partners unlock plans',
+  headline: 'Agency partners get plans',
   muted: 'starting at just €39/month.',
   subline:
     'Yeah, that’s not a typo. We designed our partnership program to help you find new clients, gain more flexibility, and receive assistance in implementing projects with DatoCMS.',
-  buttons: [{ label: 'Become a Partner', href: '#partner-form', contact: 'partners' }],
+  buttons: [{ label: 'Become a partner', href: '#partner-form', contact: 'partners' }],
 };
 
 export const steps = {
   title: 'Getting started is easy.',
-  muted: 'Join our Partner Program and start your journey to become a DatoCMS Partner today.',
+  muted: 'Join the partner program and get listed as a DatoCMS partner.',
   items: [
     {
       title: 'Submit the form',
@@ -108,19 +108,19 @@ export const steps = {
     },
     {
       title: 'Complete the enrollment',
-      text: 'While you can already enjoy the benefits, activate a paid plan and fill out your public Partner profile for us to get you listed.',
+      text: 'While you can already enjoy the benefits, activate a paid plan and fill out your public partner profile for us to get you listed.',
     },
     {
       title: 'It’s official',
-      text: 'Utilize the support of our partnership and grow your business. We’ll reach out about co-marketing opportunities all the time!',
+      text: 'Use the support of our partnership to grow your business. We’ll reach out about co-marketing opportunities.',
     },
   ],
 };
 
 export const talk: Omit<ContactSectionData, 'form'> = {
   label: '',
-  headline: 'Let’s talk!',
-  muted: 'Fill in the form, and we’ll be in touch!',
+  headline: 'Let’s talk.',
+  muted: 'Fill in the form, and we’ll be in touch.',
   links: [
     { lead: 'Who is in already?', label: 'Agency directory', href: '/partners' },
     {
@@ -176,7 +176,7 @@ export const form: ContactFormData = {
         name: 'teamSize',
         label: 'Company size',
         placeholder: 'Select number of employees',
-        options: ["1 — it's just me", '2-10', '10-50', '50-200', '200-1000', '1000+'],
+        options: ['1 — it’s just me', '2-10', '10-50', '50-200', '200-1000', '1000+'],
       },
       {
         type: 'select',
@@ -215,13 +215,13 @@ export const form: ContactFormData = {
         type: 'textarea',
         name: 'body',
         label:
-          'Please introduce yourself and your agency. If you have any additional question or concern, please ask!',
-        placeholder: 'Looking forward to chatting with you!',
+          'Please introduce yourself and your agency. If you have any other question or concern, please ask.',
+        placeholder: 'Looking forward to chatting with you.',
       },
     ],
   ],
   legal: contact.form.legal,
-  submitLabel: 'Let’s have a chat!',
+  submitLabel: 'Let’s have a chat.',
   sendingMessage: 'Sending your request…',
   submitErrorMessage:
     'Something went wrong and your request wasn’t sent. Please try again in a few minutes.',
@@ -229,7 +229,7 @@ export const form: ContactFormData = {
     'This form needs JavaScript. Turn on JavaScript and reload the page, or email us at support@datocms.com.',
   // The page goes to /partner-program/thanks after the submit: the form never shows this.
   success: {
-    headline: 'Thank you for reaching out!',
+    headline: 'Thanks for reaching out.',
     muted: 'We will be in touch soon',
     face: 'laugh',
     button: { label: 'Back to homepage', href: '/', variant: 'soft' },

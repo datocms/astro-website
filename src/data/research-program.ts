@@ -15,7 +15,7 @@ export const hero = {
 
 export const steps = {
   title: 'How does it work?',
-  muted: 'Register to our Research Program, participate to our studies, get rewarded!',
+  muted: 'Register for our Research Program, take part in our studies, and get rewarded.',
 };
 
 export const faqTitle = 'Frequently asked questions';
@@ -24,7 +24,7 @@ export const faqTitle = 'Frequently asked questions';
 export const closing: Omit<CtaBannerData, 'buttons'> = {
   variant: 'subtle',
   headline: 'Have a say',
-  muted: 'in what we build next!',
+  muted: 'in what we build next.',
   subline:
     'Every study shapes our roadmap. Sign up once, join only when it fits your schedule, and get rewarded each time you take part.',
 };

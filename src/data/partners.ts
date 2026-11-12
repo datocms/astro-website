@@ -15,7 +15,7 @@ export const index = {
     headline: 'Find the perfect partner to meet',
     subheadline: 'your digital needs',
     intro:
-      'Our most successful customers work with a Solution Partner to accomplish their goals and ship their digital products faster.',
+      'Our most successful customers work with a solution partner to accomplish their goals and ship their digital products faster.',
   } satisfies HeroData,
   /** The globe of the countries of the partners, and its list for screen readers. */
   globe: {
@@ -23,9 +23,9 @@ export const index = {
     count: (n: number) => (n === 1 ? '1 partner' : `${n} partners`),
   },
   announce: {
-    strong: 'Want to become a DatoCMS Partner?',
-    text: 'Learn more about our Partner Program and its benefits!',
-    button: 'Partner Program',
+    strong: 'Want to become a DatoCMS partner?',
+    text: 'Learn more about our partner program and its benefits.',
+    button: 'Partner program',
     href: '/partner-program',
   },
   filters: {
@@ -41,10 +41,9 @@ export const showcase = {
   seoTitle: 'Partner Projects Showcase',
   hero: {
     label: 'Showcase',
-    headline: 'Projects from Our',
-    subheadline: 'Partners',
-    intro:
-      'Check out some of the projects our incredible agency partners have brought to life with DatoCMS.',
+    headline: 'Projects from',
+    subheadline: 'our partners',
+    intro: 'Check out some of the projects our agency partners have brought to life with DatoCMS.',
   } satisfies HeroData,
   filters: {
     technology: 'Filter by Technology',
@@ -93,8 +92,8 @@ export function projectsCountLabel(count: number) {
 export const techIndex = {
   hero: {
     label: 'Ecosystem partners',
-    headline: 'Find the perfect tech partner to supercharge',
-    subheadline: 'your DatoCMS projects',
+    headline: 'Find the right tech partner',
+    subheadline: 'for your DatoCMS projects',
     intro: 'We work with the tools you already use.',
   } satisfies HeroData,
 };
