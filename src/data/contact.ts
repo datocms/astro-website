@@ -100,8 +100,8 @@ const countries: FormOption[] = getData()
 
 export const contact: ContactSectionData = {
   label: 'Contact sales',
-  headline: "Let's talk about your project.",
-  muted: "Tell us what you're building and we'll get back to you",
+  headline: 'Let’s talk about your project.',
+  muted: 'Tell us what you’re building and we’ll get back to you',
   face: 'happy',
   links: [
     { lead: 'Need support?', label: 'Visit support', href: '/support' },
@@ -208,7 +208,7 @@ export const contact: ContactSectionData = {
         {
           type: 'textarea',
           name: 'body',
-          label: "What's your question?",
+          label: 'What’s your question?',
           placeholder: 'Tell us about your project',
           requiredMessage: 'Tell us a bit about your project',
         },
@@ -240,11 +240,11 @@ export const contact: ContactSectionData = {
     submitLabel: 'Get in touch',
     sendingMessage: 'Sending your message…',
     submitErrorMessage:
-      "Something went wrong and your message wasn't sent. Please try again, or email us at sales@datocms.com",
+      'Something went wrong and your message wasn’t sent. Please try again, or email us at sales@datocms.com',
     noscriptMessage:
       'This form needs JavaScript. Turn on JavaScript and reload the page, or email us at sales@datocms.com.',
     success: {
-      headline: "Thanks, we've got it.",
+      headline: 'Thanks, we’ve got it.',
       muted: 'Our sales team will reply to your work email soon',
       face: 'grateful',
       body: 'You will soon get an automated confirmation by email.',
@@ -262,7 +262,7 @@ export const contact: ContactSectionData = {
 export const seo = {
   title: 'Contact sales',
   description:
-    "Tell the DatoCMS sales team what you're building: plans, enterprise needs, migrations. We reply to your work email.",
+    'Tell the DatoCMS sales team what you’re building: plans, enterprise needs, migrations. We reply to your work email.',
 };
 
 export const thanksSeo = {

@@ -70,7 +70,7 @@ export function FieldReactComponent<
     input = (
       <FormSelectReactComponent id={name} {...field}>
         <option value="" disabled>
-          {placeholder || 'Please select one...'}
+          {placeholder || 'Please select one…'}
         </option>
         {options.map((option) => {
           const value = typeof option === 'string' ? option : option.value;

@@ -17,17 +17,17 @@ export const seo = {
 export const hero: HeroData = {
   label: 'Support page',
   headline: 'Got issues?',
-  subheadline: "We're here to help!",
+  subheadline: 'We’re here to help!',
   face: 'calm',
 };
 
 export const picker = {
   topicLabel: 'Topic:',
-  placeholder: 'Please select a topic...',
+  placeholder: 'Please select a topic…',
   guidesTitle: 'Popular guides and tutorials',
   guidesText:
     'Please take a look at these resources, as they might probably be the fastest way to solve your issue!',
-  moreTitle: "Didn't find what you're looking for?",
+  moreTitle: 'Didn’t find what you’re looking for?',
   moreLink: 'Contact our support team',
 };
 
@@ -84,7 +84,7 @@ export const supportForm: ContactFormData = {
       {
         type: 'textarea',
         name: 'body',
-        label: "What's your question?",
+        label: 'What’s your question?',
         placeholder: 'Please tell us how we can help',
         requiredMessage: 'Tell us how we can help',
       },
@@ -104,12 +104,12 @@ export const supportForm: ContactFormData = {
   submitLabel: 'Get in touch',
   sendingMessage: 'Sending your request…',
   submitErrorMessage:
-    "Something went wrong and your request wasn't sent. Please try again, or email us at support@datocms.com",
+    'Something went wrong and your request wasn’t sent. Please try again, or email us at support@datocms.com',
   noscriptMessage:
     'This form needs JavaScript. Turn on JavaScript and reload the page, or email us at support@datocms.com.',
   // The action gives a redirect: the form never shows this.
   success: {
-    headline: "Thanks, we've got it.",
+    headline: 'Thanks, we’ve got it.',
     muted: 'Our support team will be in touch shortly',
     face: 'approved',
     button: { label: 'Back to homepage', href: '/', variant: 'soft' },

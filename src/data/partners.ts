@@ -53,7 +53,7 @@ export const showcase = {
   noResults: 'No projects match your current filters.',
 };
 
-export const filterPlaceholder = 'Select...';
+export const filterPlaceholder = 'Select…';
 
 export const partner = {
   kicker: 'DatoCMS Agency Partner',

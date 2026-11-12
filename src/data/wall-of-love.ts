@@ -7,7 +7,7 @@ import type { CtaBannerData, HeroData } from '~/data/home';
 export const seo = {
   title: 'Wall of love',
   description:
-    'Hear from the developers, agencies and marketing teams who build with DatoCMS: what changed for the better since they switched.',
+    'Hear from the developers, agencies, and marketing teams who build with DatoCMS: what changed for the better since they switched.',
 };
 
 export const hero: HeroData = {

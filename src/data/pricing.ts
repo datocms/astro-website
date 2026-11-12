@@ -85,7 +85,7 @@ export const plans: PricingPlansData = {
     {
       name: 'Professional',
       tagline: 'Everything you need – and more – to build great digital projects.',
-      price: 'From €149/month billed yearly or €199/monthly',
+      price: 'From €149/month billed yearly, or €199/month billed monthly',
       button: { label: 'Purchase', href: purchaseHref },
       features: [
         'Generous quota with soft limits',
@@ -96,12 +96,12 @@ export const plans: PricingPlansData = {
     },
     {
       name: 'Enterprise',
-      tagline: 'Premium features, high-touch support and advanced compliance.',
+      tagline: 'Premium features, high-touch support, and advanced compliance.',
       price: 'Custom pricing',
       button: { label: 'Contact', href: '/contact', contact: 'sales' },
       features: [
         'Guaranteed support and uptime SLAs',
-        'SSO, Audit logs and Static webhook IPs',
+        'SSO, audit logs, and static webhook IPs',
         'Fully customizable roles and tasks',
         'Support via shared Slack channel',
         'Editorial onboarding',
@@ -156,7 +156,7 @@ export interface FreeLimitsData {
 export const freeLimits: FreeLimitsData = {
   id: 'free-plan-details',
   headline: 'Free vs Professional',
-  warning: "In the Free plan, you can't go over the allowed monthly limits.",
+  warning: 'In the Free plan, you can’t go over the allowed monthly limits.',
   warningDetail: 'If you reach these limits, the service will stop responding as expected.',
   columns: ['Plan limits & overages', 'Free plan', 'Professional plan'],
   closeLabel: 'Close',
@@ -217,7 +217,7 @@ export const aiBanner: CtaBannerData = {
 export const trustedBy: HeroData = {
   label: 'Trusted by teams',
   headline:
-    "We've worked with our customers long enough that they tell our story better than we do.",
+    'We’ve worked with our customers long enough that they tell our story better than we do.',
   buttons: [{ label: 'Read their stories', href: '/case-studies', arrow: false }],
   logos: [c.telekom, c.hashicorp, c.verizon, c.polestar, c.vercel],
 };

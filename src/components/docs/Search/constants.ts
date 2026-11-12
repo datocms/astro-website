@@ -81,7 +81,7 @@ export const goToEntries: GoToEntry[] = [
 export const searchStarterPrompts = [
   'Visual Editing',
   'Structured Text',
-  'Modular content',
+  'Modular Content',
   'Cache Tags',
   'Plugin SDK',
   'MCP Server',

@@ -28,7 +28,7 @@ import { Button } from '~/components/Button';
           <div class={s.labelName}>Would you like to add more information?</div>
           <div class={s.labelInfo}>Optional</div>
         </div>
-        <textarea placeholder="Your feedback..." name="notes"></textarea>
+        <textarea placeholder="Your feedback…" name="notes"></textarea>
       </div>
 
       <div class={s.field}>
@@ -81,7 +81,7 @@ import { Button } from '~/components/Button';
         async handleSubmit(event: SubmitEvent) {
           event.preventDefault();
 
-          this.button.innerText = 'Submitting...';
+          this.button.innerText = 'Submitting…';
           this.button.disabled = true;
 
           let token: string;
@@ -89,7 +89,8 @@ import { Button } from '~/components/Button';
           try {
             token = await solveTurnstile(this.$('[data-turnstile]'), 'docs-feedback');
           } catch (e) {
-            this.form.innerHTML = e instanceof Error ? e.message : 'Mh! Something went wrong...';
+            this.form.innerHTML =
+              e instanceof Error ? e.message : 'Something went wrong. Try again.';
             return;
           }
 
@@ -122,7 +123,7 @@ import { Button } from '~/components/Button';
             this.button.innerText = 'Submit feedback';
             this.button.disabled = false;
           } else if (isActionError(error)) {
-            this.form.innerHTML = 'Mh! Something went wrong...';
+            this.form.innerHTML = 'Something went wrong. Try again.';
           } else {
             this.form.innerHTML = 'Thank you! We received your feedback 🙏';
           }

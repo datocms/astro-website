@@ -73,11 +73,11 @@ export const fieldTypeName: Record<string, string> = {
   lat_lon: 'Geolocation',
   link: 'Single link',
   links: 'Multiple links',
-  rich_text: 'Modular content',
+  rich_text: 'Modular Content',
   seo: 'SEO meta tags',
   slug: 'Slug',
   string: 'Single-line string',
   text: 'Multiple-paragraph text',
-  structured_text: 'Structured text',
+  structured_text: 'Structured Text',
   video: 'Video',
 };

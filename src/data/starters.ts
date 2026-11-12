@@ -5,12 +5,13 @@
 import type { HeroData } from '~/data/home';
 
 export const seo = {
-  title: 'Project starters - Free demo projects',
+  title: 'Project starters: free demo projects',
 };
 
 export const hero: HeroData = {
   headline: 'Starters',
-  intro: 'Start with a fully configured DatoCMS project, a best-practice frontend and free hosting',
+  intro:
+    'Start with a fully configured DatoCMS project, a best-practice frontend, and free hosting',
 };
 
 export const fullyFledged = {

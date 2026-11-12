@@ -209,7 +209,7 @@ export const homeHero: HomeHeroData = {
     {
       ...c.hashicorp,
       href: '/case-studies/hashicorp',
-      description: '5M API calls and 2TB traffic monthly, stress free',
+      description: '5M API calls and 2 TB of traffic a month, stress-free',
     },
     {
       ...c.arduino,
@@ -229,7 +229,7 @@ export const homeHero: HomeHeroData = {
     {
       ...c.satispay,
       href: '/partners/quinck/showcase/satispay',
-      description: "A powerhouse stack for Europe's leading fintech",
+      description: 'A powerhouse stack for Europe’s leading fintech',
     },
     {
       ...c.wild,
@@ -244,7 +244,7 @@ export const homeHero: HomeHeroData = {
     {
       ...c.payfit,
       href: '/partners/nicolas-spehler/showcase/payfit',
-      description: "A modern website for the UK's leading Payroll SaaS",
+      description: 'A modern website for the UK’s leading Payroll SaaS',
     },
     {
       ...c.netflix,

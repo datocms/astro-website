@@ -14,7 +14,7 @@ export const hero = {
   label: 'DatoCMS Community Slack Channel',
   headline: 'Join us on Slack!',
   intro:
-    "Try out new product updates before they're widely released, help us test and improve the product, and connect with other users!",
+    'Try out new product updates before they’re widely released, help us test and improve the product, and connect with other users!',
 };
 
 export const form: ContactFormData = {
@@ -43,7 +43,7 @@ export const form: ContactFormData = {
   submitLabel: 'Get my Slack invite!',
   sendingMessage: 'Sending your invite request…',
   submitErrorMessage:
-    "Something went wrong and your invite wasn't sent. Please try again in a few minutes.",
+    'Something went wrong and your invite wasn’t sent. Please try again in a few minutes.',
   noscriptMessage: 'This form needs JavaScript. Turn on JavaScript and reload the page.',
   // The page goes to /slack/thanks after the submit: the form never shows this.
   success: {

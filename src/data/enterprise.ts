@@ -25,7 +25,7 @@ export const hero: HeroData & { subtitle: string; logosLabel: string } = {
   subheadline: 'A piece for your peace of mind.',
   face: 'serious',
   subtitle:
-    'The **governance, service and features your content operation needs to scale**: dedicated onboarding, premium technical support, private cloud and custom SLAs.',
+    'The **governance, service, and features your content operation needs to scale**: dedicated onboarding, premium technical support, private cloud, and custom SLAs.',
   buttons: [
     { label: 'Talk to sales', href: '#form', arrow: false, contact: 'sales' },
     {
@@ -81,17 +81,17 @@ export const security: ChapterLayoutData = {
     },
     {
       title: 'Connect your identity provider.',
-      text: 'SSO with SAML through Okta, OneLogin, Azure AD or any SAML provider, plus SCIM provisioning to add and remove people from your directory.',
+      text: 'SSO with SAML through Okta, OneLogin, Azure AD, or any SAML provider, plus SCIM provisioning to add and remove people from your directory.',
     },
     {
       // A full export of the project on a cron schedule, to the
       // S3 bucket of the customer: the scheduled exports of the old page.
       title: 'Automatic backups to your own bucket.',
-      text: 'We export your full project to your own AWS S3 bucket at your chosen schedule, including models, records, assets, menus, plugins and workflows.',
+      text: 'We export your full project to your own AWS S3 bucket at your chosen schedule, including models, records, assets, menus, plugins, and workflows.',
     },
     {
       title: 'Serve assets from your domain.',
-      text: 'Keep assets in your own bucket on AWS S3, Cloudflare R2, Google Cloud Storage or Azure Blob Storage, served from your own domain. Webhooks come from static IPs.',
+      text: 'Keep assets in your own bucket on AWS S3, Cloudflare R2, Google Cloud Storage, or Azure Blob Storage, served from your own domain. Webhooks come from static IPs.',
     },
   ],
 };
@@ -115,7 +115,7 @@ export const governance: ChapterLayoutData = {
     },
     {
       title: 'White-label the CMS.',
-      text: 'Bring your branding to the CMS with your logo, your colors and your domain.',
+      text: 'Bring your branding to the CMS with your logo, your colors, and your domain.',
     },
   ],
 };
@@ -136,7 +136,7 @@ export const scale: StatementsSectionData = {
       description: '**Le Pain Quotidien** has locations in 20+ countries.',
     },
     {
-      title: '2TB',
+      title: '2 TB',
       text: 'traffic per month',
       href: '/case-studies/hashicorp',
       description: '**HashiCorp** handles 5M API calls a month.',
@@ -193,12 +193,12 @@ export const faq: FaqData = {
     {
       question: 'Do you support SSO and SCIM?',
       answer:
-        'Yes. SSO works with SAML through Okta, OneLogin, Azure AD or any SAML provider. SCIM adds and removes people as your directory changes.',
+        'Yes. SSO works with SAML through Okta, OneLogin, Azure AD, or any SAML provider. SCIM adds and removes people as your directory changes.',
     },
     {
       question: 'Can we keep the files in our own storage?',
       answer:
-        'Yes. Your assets can live in your own bucket on AWS S3, Cloudflare R2, Google Cloud Storage or Azure Blob Storage, served from your own domain. The CMS can sit on your domain too.',
+        'Yes. Your assets can live in your own bucket on AWS S3, Cloudflare R2, Google Cloud Storage, or Azure Blob Storage, served from your own domain. The CMS can sit on your domain too.',
     },
     {
       question: 'How fast do you answer when something breaks?',
@@ -216,7 +216,7 @@ export const faq: FaqData = {
 export const contact = {
   headline: 'Let’s talk',
   description:
-    '**Enterprise accounts get a fast lane** for help, feature requests and fixes. **Our team is available in several ways**, whenever you need us.',
+    '**Enterprise accounts get a fast lane** for help, feature requests, and fixes. **Our team is available in several ways**, whenever you need us.',
 };
 
 export const ctaClose: CtaBannerData = {

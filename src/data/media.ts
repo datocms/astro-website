@@ -37,7 +37,7 @@ const docs = (href: string): ChapterHeaderData['link'] => ({
 export const hero: HeroData = {
   label: 'Media',
   headline: 'Upload once. Optimized for every size, every screen.',
-  subheadline: 'Images, video, audio and documents, all in one library',
+  subheadline: 'Images, video, audio, and documents, all in one library',
   face: 'surprised',
   buttons: [
     {
@@ -265,7 +265,7 @@ export const components: ChapterLayoutData = {
 export const seo = {
   title: 'Media',
   description:
-    'One library for every file. Resize, crop and convert images from the URL, stream video with captions, and ship both to the frontend with ready-made components.',
+    'One library for every file. Resize, crop, and convert images from the URL, stream video with captions, and ship both to the frontend with ready-made components.',
 };
 
 export const ctaBuild: CtaBannerData = {

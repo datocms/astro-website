@@ -550,7 +550,7 @@ partnership, joint venture, or employment is created as a result of this Agreeme
 have any authority of any kind to bind DATO SRL in any respect whatsoever. Any notice to DATO SRL
 that is required or permitted by this Agreement shall be in writing and shall be deemed effective
 upon receipt, when delivered in person by nationally recognized overnight courier or mailed by first
-class, registered or certified mail, postage prepaid, to DATO SRL SRL, Via U. Visconti di Modrone 2,
+class, registered or certified mail, postage prepaid, to DATO SRL, Via U. Visconti di Modrone 2,
 20122, Milano, Italy
 
 Version ID: 0.1.5, January 13, 2026

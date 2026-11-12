@@ -73,8 +73,8 @@ const editorExperience = l(
   'Structured content and visual editing',
 );
 const developers = l('For developers', '/developers', 'Schema, GraphQL, real-time, cache tags');
-const media = l('Media', '/media', 'Images, video and the media library');
-const ai = l('AI', '/ai', 'MCP, agent skills, LLM-ready docs');
+const media = l('Media', '/media', 'Images, video, and the media library');
+const ai = l('AI', '/ai', 'MCP, Agent Skills, LLM-ready docs');
 
 // The framework pages (/cms/[slug]).
 const frameworks = [
@@ -249,7 +249,7 @@ export const footerColumns: FooterColumn[] = [
 
 export const legal: LegalData = {
   email: 'support@datocms.com',
-  text: '©2026 Dato srl, all rights reserved  P.IVA 06969620480',
+  text: '©2026 Dato srl, all rights reserved. VAT IT06969620480',
   links: [
     l('Privacy policy', '/legal/privacy-policy'),
     l('Cookie policy', '/legal/cookie-policy'),

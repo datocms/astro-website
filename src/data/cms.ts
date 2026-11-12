@@ -116,7 +116,7 @@ export function fetchChapter(args: {
     sceneCode: args.code,
     fragments: [
       {
-        title: 'Drafts, validations and tags, all in the same call.',
+        title: 'Drafts, validations, and tags, all in the same call.',
         text: 'Pass `includeDrafts`, `excludeInvalid` or `returnCacheTags` to the same query. The client sets the headers without your query changing.',
         code: args.client,
       },
@@ -144,7 +144,7 @@ export function mediaChapter(args: {
       headline: `responsiveImage in, ${args.imageTag} out.`,
       muted: 'Video streams the same way.',
       intro:
-        'Query `responsiveImage` or `video`, and pass the result to one component. Srcset, blur-up placeholders, lazy loading and HLS streaming are built in, so you don’t need an image pipeline.',
+        'Query `responsiveImage` or `video`, and pass the result to one component. Srcset, blur-up placeholders, lazy loading, and HLS streaming are built in, so you don’t need an image pipeline.',
       link: docs(`${args.docsRoot}/managing-images`),
     },
     fragments: [
@@ -304,7 +304,7 @@ export function buildTriggersChapter(args: { headersCode: CodeTab[] }): ChapterL
       },
       {
         title: 'Deploy when editors publish.',
-        text: 'The simplest option is a full build on every publish. Connect Vercel, Netlify or your own pipeline, and editors see the build status in the CMS.',
+        text: 'The simplest option is a full build on every publish. Connect Vercel, Netlify, or your own pipeline, and editors see the build status in the CMS.',
       },
     ],
   };

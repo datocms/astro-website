@@ -30,7 +30,7 @@ export const browse = {
   /** The headline of a search: the number of results, these words, then the search text in “ ”. */
   searchHeadline: { none: 'No plugins for', one: 'plugin for', other: 'plugins for' },
   /** The text in the search box. The hint shows the key that moves the focus to the box. */
-  searchPlaceholder: 'Search plugins...',
+  searchPlaceholder: 'Search plugins…',
   searchShortcut: '/',
   /** The label of the button that empties the search box. */
   searchClear: 'Clear the search',
@@ -52,7 +52,7 @@ export const browse = {
     prompt: (searchText: string) =>
       `Build me a DatoCMS plugin that does this: ${searchText}
 
-First, make sure the DatoCMS agent skills are installed. They know the
+First, make sure the DatoCMS Agent Skills are installed. They know the
 Plugin SDK. If they are not, install them, or tell me what to run:
 - Claude Code: /plugin marketplace add datocms/agent-skills
   then /plugin install datocms@datocms-skills
@@ -81,7 +81,7 @@ export const detail = {
   install: 'Install plugin',
   officialBadge: 'DatoCMS Official Plugin',
   /** The card next to the facts: the same for each plugin. */
-  noteTitle: "Want a plugin that isn't here?",
+  noteTitle: 'Want a plugin that isn’t here?',
   noteBody: 'Learn how to create your own plugin, or copy and remix one, in our documentation.',
   noteHref: '/docs/plugin-sdk/introduction',
   noteLink: 'Build a plugin',

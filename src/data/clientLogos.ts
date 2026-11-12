@@ -59,7 +59,7 @@ export const clientLogos = {
   afsp: logo(afspSvg, 'AFSP', 40),
   arduino: logo(arduinoSvg, 'Arduino', 24),
   freitag: logo(freitagSvg, 'Freitag', 38),
-  harrys: logo(harrysSvg, "Harry's", 20),
+  harrys: logo(harrysSvg, 'Harry’s', 20),
   hashicorp: logo(hashicorpSvg, 'HashiCorp', 34),
   linkedin: logo(linkedinSvg, 'LinkedIn', 34),
   lofficiel: logo(lofficielSvg, 'L’Officiel', 36),

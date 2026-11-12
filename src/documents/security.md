@@ -6,10 +6,10 @@ DatoCMS is ISO 27001 certified. The certification and additional documentation a
 
 The information security policy aims to:
 
-- ensure that the organisation's activities take information security into consideration right from their design;
+- ensure that the organization's activities take information security into consideration right from their design;
 - ensure that all staff, internal and external, are aware and informed of their responsibilities regarding information security;
 - define roles and responsibilities regarding the security of information and associated assets;
-- guarantee that in terms of access to information everyone should be authorised, identified and consistent with one's access rights;
+- guarantee that in terms of access to information everyone should be authorized, identified and consistent with one's access rights;
 - strengthen the awareness of all people and entities who access the information assets;
 - implement security controls effectively and efficiently;
 - monitor and promptly recognize events, threats, vulnerabilities and incidents;
@@ -95,7 +95,7 @@ Risk of fire has been reduced with automatic fire detection and suppression equi
 
 All our servers and services are protected by firewalls that let traffic through explicitely allowed ports and protocols. Even applications on the same host cannot communicate via localhost, to further improve network separation from other virtual machines.
 
-**Our global CDN provides DDoS mitigation techniques** to spread the load across the globe and minimise the impact of those attacks.
+**Our global CDN provides DDoS mitigation techniques** to spread the load across the globe and minimize the impact of those attacks.
 
 **Automatic Web Application Firewalls are enabled in front of our applications**, to prevent the most common attacks to be performed. In particular the top 10 OWASP vulnerabilities are always tested plus a set of custom dynamic rules are enforced to maximise the protection while adding less than 1ms of latency.
 
@@ -120,7 +120,7 @@ To process the payments we use [Stripe](https://stripe.com/docs/security/stripe)
 
 #### Development
 
-Every change made in the production environment has previously passed a set of automated tests and we routinely do manual testing to ensure that the application has a consistent and expected behaviour.
+Every change made in the production environment has previously passed a set of automated tests and we routinely do manual testing to ensure that the application has a consistent and expected behavior.
 
 We have warnings in place from our continuous integration system about logical errors and also coding style violations, which helps us maintain a quality code base, which means that is clean and more secure.
 
@@ -128,7 +128,7 @@ Routinely we upgrade dependencies in order to keep our development processes as 
 
 #### Third parties
 
-We interact with many third parties that are useful for various parts of the application. In every case we give access to the minimal set of information that we need to give them and for every third party we use a unique password/access token. In doing this we try to minimise the risk of one system being compromised and having access to everything else.
+We interact with many third parties that are useful for various parts of the application. In every case we give access to the minimal set of information that we need to give them and for every third party we use a unique password/access token. In doing this we try to minimize the risk of one system being compromised and having access to everything else.
 
 We make sure that every third party that we use is as careful as we are on security.
 
@@ -152,7 +152,7 @@ The user passwords are hashed using Bcrypt and then stored in our database.
 
 From the CMS interface you can very **easily rotate the API tokens** used to access the API programmatically, allowing a smooth process to rotate the access keys across projects. The rotation is also possible using the APIs, making the process completely automatic.
 
-**Each user can have a specific role** attached which allows a very granular configuration on what is visible and editable for each role. The roles can be customised and created by the project admins.
+**Each user can have a specific role** attached which allows a very granular configuration on what is visible and editable for each role. The roles can be customized and created by the project admins.
 
 **Avoid sharing account information internally** by using Organisations to share ownership of accounts, or to enter projects as account owners. We have done our part to prevent any benefit in sharing accounts between multiple people. Minimize any risk by having personal accounts with 2FA enabled.
 
@@ -173,7 +173,7 @@ DatoCMS's team is made of highly trained professionals that are very careful wit
 Nevertheless we have the following team policies:
 
 - **2FA**: we access all the services hosting DatoCMS with 2FA-enabled accounts
-- **remote access**: we minimise the access points to our production environment
+- **remote access**: we minimize the access points to our production environment
 - **computer security**: we enforce strong passwords for our computers, we encrypt disks, we use password managers to create strong passwords and store them safely.
 
 ### Vulnerability disclosure

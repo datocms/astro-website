@@ -13,7 +13,7 @@ import type { HeroData } from '~/data/home';
 export const hero: HeroData = {
   label: 'Blog',
   headline: 'Welcome to the DatoCMS Blog.',
-  subheadline: 'News, tips and highlights from the team at DatoCMS',
+  subheadline: 'News, tips, and highlights from the team at DatoCMS',
   face: 'kiss',
 };
 
@@ -43,7 +43,7 @@ export interface RelatedPostsData {
 
 export const related: RelatedPostsData = {
   headline: 'Want more?',
-  muted: "Check out other recent stories we've written on our blog.",
+  muted: 'Check out other recent stories we’ve written on our blog.',
 };
 
 /** The copy of RelatedPosts under a casual chat. */

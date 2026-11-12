@@ -94,7 +94,7 @@ export const plans: CtaBannerData = {
   headline: 'Agency partners unlock plans',
   muted: 'starting at just €39/month.',
   subline:
-    "Yeah, that's not a typo. We designed our partnership program to help you find new clients, gain more flexibility, and receive assistance in implementing projects with DatoCMS.",
+    'Yeah, that’s not a typo. We designed our partnership program to help you find new clients, gain more flexibility, and receive assistance in implementing projects with DatoCMS.',
   buttons: [{ label: 'Become a Partner', href: '#partner-form', contact: 'partners' }],
 };
 
@@ -104,23 +104,23 @@ export const steps = {
   items: [
     {
       title: 'Submit the form',
-      text: "Fill in the form below to share some details, and tell us a bit about who you are and what you're working on.",
+      text: 'Fill in the form below to share some details, and tell us a bit about who you are and what you’re working on.',
     },
     {
       title: 'Complete the enrollment',
       text: 'While you can already enjoy the benefits, activate a paid plan and fill out your public Partner profile for us to get you listed.',
     },
     {
-      title: "It's official",
-      text: "Utilize the support of our partnership and grow your business. We'll reach out about co-marketing opportunities all the time!",
+      title: 'It’s official',
+      text: 'Utilize the support of our partnership and grow your business. We’ll reach out about co-marketing opportunities all the time!',
     },
   ],
 };
 
 export const talk: Omit<ContactSectionData, 'form'> = {
   label: '',
-  headline: "Let's talk!",
-  muted: "Fill in the form, and we'll be in touch!",
+  headline: 'Let’s talk!',
+  muted: 'Fill in the form, and we’ll be in touch!',
   links: [
     { lead: 'Who is in already?', label: 'Agency directory', href: '/partners' },
     {
@@ -158,7 +158,7 @@ export const form: ContactFormData = {
       {
         type: 'text',
         name: 'agencyName',
-        label: "What's the name of your agency?",
+        label: 'What’s the name of your agency?',
         placeholder: 'Acme Inc.',
         autocomplete: 'organization',
       },
@@ -182,7 +182,7 @@ export const form: ContactFormData = {
         type: 'select',
         name: 'productFamiliarity',
         label: 'How familiar are you with DatoCMS?',
-        placeholder: 'Please select one...',
+        placeholder: 'Please select one…',
         options: [
           'Exploring the product',
           'Already published a few projects',
@@ -194,7 +194,7 @@ export const form: ContactFormData = {
       {
         type: 'email',
         name: 'email',
-        label: "What's your DatoCMS account email?",
+        label: 'What’s your DatoCMS account email?',
         placeholder: 'info@acme.com',
         autocomplete: 'email',
         // A simple pattern for an e-mail address.
@@ -221,10 +221,10 @@ export const form: ContactFormData = {
     ],
   ],
   legal: contact.form.legal,
-  submitLabel: "Let's have a chat!",
+  submitLabel: 'Let’s have a chat!',
   sendingMessage: 'Sending your request…',
   submitErrorMessage:
-    "Something went wrong and your request wasn't sent. Please try again in a few minutes.",
+    'Something went wrong and your request wasn’t sent. Please try again in a few minutes.',
   noscriptMessage:
     'This form needs JavaScript. Turn on JavaScript and reload the page, or email us at support@datocms.com.',
   // The page goes to /partner-program/thanks after the submit: the form never shows this.

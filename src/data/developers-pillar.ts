@@ -321,7 +321,7 @@ export const plugins: ChapterLayoutData = {
 export const seo = {
   title: 'For developers',
   description:
-    'Model it in the schema builder, query it with GraphQL, stream it in real time, purge it with cache tags, fork it with environments, script it with the API and extend it with plugins.',
+    'Model it in the schema builder, query it with GraphQL, stream it in real time, purge it with cache tags, fork it with environments, script it with the API, and extend it with plugins.',
 };
 
 export const ctaBuild: CtaBannerData = {

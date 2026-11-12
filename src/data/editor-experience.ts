@@ -60,7 +60,7 @@ export const opinion: StatementData = {
 export const seo = {
   title: 'Editor experience',
   description:
-    'Editors get a calm place to write, developers get structured content. Visual editing, dynamic layouts, localization, workflows, collaboration and SEO in one editor.',
+    'Editors get a calm place to write, developers get structured content. Visual editing, dynamic layouts, localization, workflows, collaboration, and SEO in one editor.',
 };
 
 export const ctaDemo: CtaBannerData = {

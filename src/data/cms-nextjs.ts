@@ -26,7 +26,7 @@ export const page: FrameworkPage = {
   seo: {
     title: 'Headless CMS for Next.js',
     description:
-      'DatoCMS with Next.js: GraphQL from Server Components, responsive images and video, Draft Mode with visual editing, real-time updates and cache tags.',
+      'DatoCMS with Next.js: GraphQL from Server Components, responsive images and video, Draft Mode with visual editing, real-time updates, and cache tags.',
   },
   hero: {
     label: 'Next.js + DatoCMS',
@@ -94,7 +94,7 @@ export const page: FrameworkPage = {
     docsRoot,
     repo: starterRepo,
     subline:
-      'Next.js 16 and the App Router in TypeScript, with draft mode, click-to-edit overlays, real-time updates, SEO metadata and cache invalidation on publish. All with helpful comments to get you going.',
+      'Next.js 16 and the App Router in TypeScript, with draft mode, click-to-edit overlays, real-time updates, SEO metadata, and cache invalidation on publish. All with helpful comments to get you going.',
   }),
   // The review of Guillermo Rauch (Vercel).
   reviewId: '42406722',

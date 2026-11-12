@@ -29,7 +29,7 @@ export const page: FrameworkPage = {
   seo: {
     title: 'Headless CMS for Astro',
     description:
-      'DatoCMS with Astro: GraphQL from the frontmatter, responsive images with @datocms/astro, draft mode with visual editing, real-time updates and cache tags.',
+      'DatoCMS with Astro: GraphQL from the frontmatter, responsive images with @datocms/astro, draft mode with visual editing, real-time updates, and cache tags.',
   },
   hero: {
     label: 'Astro + DatoCMS',
@@ -71,7 +71,7 @@ export const page: FrameworkPage = {
   publish: cacheTagsChapter({
     docsHref: `${docsRoot}/using-cache-tags`,
     intro:
-      'Every response lists its records in `X-Cache-Tags`. Astro’s cache API tags the page with them, and a webhook purges them on Cloudflare, Netlify or Vercel.',
+      'Every response lists its records in `X-Cache-Tags`. Astro’s cache API tags the page with them, and a webhook purges them on Cloudflare, Netlify, or Vercel.',
     tags: {
       title: 'The tags go on the page.',
       text: 'Add one option to the request, and the response names the records it used. Astro’s cache API tags the page with them for a year.',
@@ -79,7 +79,7 @@ export const page: FrameworkPage = {
     },
     webhook: {
       title: 'One webhook, one invalidation.',
-      text: 'DatoCMS sends the tags that changed, and the route passes them to the Cloudflare, Netlify or Vercel cache. Nothing else is purged.',
+      text: 'DatoCMS sends the tags that changed, and the route passes them to the Cloudflare, Netlify, or Vercel cache. Nothing else is purged.',
       code: code.webhookCode,
     },
   }),
@@ -94,7 +94,7 @@ export const page: FrameworkPage = {
     docsRoot,
     repo: starterRepo,
     subline:
-      'Astro in TypeScript, with draft mode, click-to-edit overlays, real-time updates and SEO metadata. The Web Previews and SEO plugins come set up. All with helpful comments to get you going.',
+      'Astro in TypeScript, with draft mode, click-to-edit overlays, real-time updates, and SEO metadata. The Web Previews and SEO plugins come set up. All with helpful comments to get you going.',
   }),
   // The review of Caleb Wise (Elliott Systems).
   reviewId: 'fT4Qn9KQSJCnKqPvVcYoIw',

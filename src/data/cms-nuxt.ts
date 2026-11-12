@@ -79,7 +79,7 @@ export const page: FrameworkPage = {
     docsRoot,
     repo: starterRepo,
     subline:
-      'Nuxt 4 in TypeScript, with draft mode, click-to-edit overlays, real-time updates and SEO metadata. The Web Previews and SEO plugins come set up. All with helpful comments to get you going.',
+      'Nuxt 4 in TypeScript, with draft mode, click-to-edit overlays, real-time updates, and SEO metadata. The Web Previews and SEO plugins come set up. All with helpful comments to get you going.',
   }),
   // The review of Emil Olsson.
   reviewId: '39832294',
