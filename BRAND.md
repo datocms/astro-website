@@ -114,6 +114,12 @@ We don't need to oversell.
 - ⛔ "The ultimate content platform." · "The most complete headless CMS to work with Next.js"
 - ✅ "A CMS should be boring. In a good way."
 
+Understatement is about hype, not about facts. A true quality keeps its word: the localization is comprehensive, the access control is enterprise-grade, the infrastructure is secure and reliable. Removing those words undersells what is real. Cut the superlative, the hyperbole, and the empty adjective that shows nothing; keep the adjective that a customer could check.
+
+- ⛔ "The most secure CMS on the market." (a superlative nobody can verify)
+- ⛔ "Infrastructure with encryption, a CDN, and monitoring." (true, but it hides the point)
+- ✅ "Secure, reliable infrastructure with encryption, global CDN, and 24/7 monitoring."
+
 ### We stay constructive
 
 We focus on what we're for, not what we're against. Competitors are named plainly and never put down.
@@ -236,6 +242,8 @@ The product is where people work, often under pressure. The copy is calm and com
 Disruptive · revolutionary · game-changing · cutting-edge · next-generation · transformative · future-proof · synergy · leverage · best-in-class · ultimate · world-class · seamless · supercharge · unlock · empower · utilize · incredible · awesome.
 
 Use with care: "powerful", "easy", "simply", "just". They usually mean the sentence has not shown anything yet.
+
+The list above is the whole list. Other strong words (comprehensive, enterprise-grade, secure, reliable, fast) are fine when they are true. When you edit old copy, fix what breaks a rule (a word on the list, an exclamation mark, a hedge, a grammar error) and keep the rest of the claim as strong as it was.
 
 Hedges to cut: "designed to", "aims to", "created to", "helps you to". Say what it does.
 
