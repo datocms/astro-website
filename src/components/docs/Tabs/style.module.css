@@ -1,15 +1,3 @@
-@property --scroll-fade-left {
-  syntax: '<length>';
-  initial-value: 0px;
-  inherits: false;
-}
-
-@property --scroll-fade-right {
-  syntax: '<length>';
-  initial-value: 0px;
-  inherits: false;
-}
-
 .handles {
   display: flex;
   overflow-x: auto;
@@ -17,41 +5,10 @@
   -webkit-overflow-scrolling: touch;
   padding-right: var(--space-md);
   border-bottom: 1px solid var(--border-default);
-  mask-image: linear-gradient(
-    to right,
-    transparent 0,
-    black var(--scroll-fade-left),
-    black calc(100% - var(--scroll-fade-right)),
-    transparent 100%
-  );
 }
 
 .handles::-webkit-scrollbar {
   display: none;
-}
-
-@supports (animation-timeline: scroll()) {
-  .handles {
-    animation: handles-scroll-fade linear both;
-    animation-timeline: scroll(self inline);
-  }
-
-  @keyframes handles-scroll-fade {
-    0% {
-      --scroll-fade-left: 0px;
-      --scroll-fade-right: 24px;
-    }
-    100% {
-      --scroll-fade-left: 24px;
-      --scroll-fade-right: 0px;
-    }
-  }
-}
-
-@supports not (animation-timeline: scroll()) {
-  .handles {
-    --scroll-fade-right: 24px;
-  }
 }
 
 .handle {

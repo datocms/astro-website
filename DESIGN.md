@@ -411,8 +411,6 @@ Two families of form. Controls are pills: buttons, tabs, category nav items and 
 
 Small radii: 4px for tooltips and the windows inside a scene, 8px for inner screens and form notes, 12px for code cards.
 
-Signs are typographic, not icons: `→` at the end of a button or a link, `+` and `–` for a disclosure, `•` for a list bullet.
-
 ## Components
 
 ### Buttons
@@ -479,7 +477,7 @@ There are few cards. Content sits in bands, cells and halves.
 
 ### Heading anchors
 
-- **HeadingAnchor** (`src/components/HeadingAnchor/`): the link to a heading, on the reference surfaces that visitors quote: docs, glossary, academy, READMEs and blog. Marketing pages have none: their chapters come from the navigation. The mark is the `faLink` icon, muted, 0.7em, in a box of 24px or more. It never goes alone on a new line: `text-wrap: balance` gives it a word next to it, and a heading that is one long token is a row (the error codes of the docs). It shows when the pointer is on the heading, on keyboard focus, and always on a screen with no hover. A click copies the full URL and follows the link; for one second the icon is a tick. The target stops below the sticky bands (`--sticky-offset`, or `--anchor-offset` in the docs) and gets an accent ring that fades. Each `h1`–`h6` with an id has this offset, also with no anchor (legal, security). A heading from Markdown gets the same markup from `autolinkHeadings`.
+- **HeadingAnchor** (`src/components/HeadingAnchor/`): the link to a heading, on the reference surfaces that visitors quote: docs, glossary, academy, READMEs and blog. Marketing pages have none: their chapters come from the navigation. The mark is the Lucide `Link` icon, muted, 0.7em, in a box of 24px or more. It never goes alone on a new line: `text-wrap: balance` gives it a word next to it, and a heading that is one long token is a row (the error codes of the docs). It shows when the pointer is on the heading, on keyboard focus, and always on a screen with no hover. A click copies the full URL and follows the link; for one second the icon is the Lucide `Check`. The target stops below the sticky bands (`--sticky-offset`, or `--anchor-offset` in the docs) and gets an accent ring that fades. Each `h1`–`h6` with an id has this offset, also with no anchor (legal, security). A heading from Markdown gets the same markup from `autolinkHeadings`.
 
 ### Code card (signature)
 

@@ -11,6 +11,10 @@ The site has one layout family. Its rules are in `src/REDESIGN.md`: read it befo
 - Both use `src/layouts/BaseLayout` for the head (SEO, favicon, canonical, RSS, cookie consent, analytics, draft mode). BaseLayout imports no global stylesheet and puts the layer statement as the first child of `<head>`. Its props are `theme` (the `data-theme` of `<body>`) and `density` (the `data-density` of `<body>`). No page uses the view transitions router.
 - **Cascade layers**: the Vite plugin `cssLayers` puts each CSS module of `src/` in a layer. The rules are in `src/REDESIGN.md`, "Styling".
 
+## Files that other apps load
+
+The site does not use the Colfax and Tiempos files in `public/fonts/`. Do not delete them: the CMS, the dashboard, the status site, `sales-tools`, `try.datocms.com` and the assets worker of `cloudflare-workers` load them from `https://www.datocms.com/fonts/`. Before you delete or move a file in `public/`, search the other repos for its URL.
+
 ## Client scripts
 
 Each client `<script>` (not `is:inline`) is a custom element that extends `WebComponent` (`src/lib/WebComponent.ts`). Examples: `src/components/docs/TargetToggler/Component.astro`, `src/components/Lightbox/Component.astro`.
