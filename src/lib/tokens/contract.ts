@@ -169,6 +169,9 @@ export const HEADLINE_MUTED_FILES = [
   'src/components/ProductUpdates/style.module.css',
   'src/components/QuestionAnswer/style.module.css',
   'src/components/TextWithImage/style.module.css',
+  'src/components/PricingPlans/style.module.css',
+  'src/components/Statement/style.module.css',
+  'src/components/ChallengeSolution/style.module.css',
 ];
 
 /** The code card: its text roles on `--code-background`. */
