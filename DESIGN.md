@@ -199,19 +199,19 @@ This system came from overnice's work ("Warm Logic" is their name for the route)
 
 Six families for the site, and a seventh theme for the docs. Each family has a deep tone, a bright accent and a paper white. The paper always takes the hue of the accent. The deep takes it too in orange, blue and pink; in the other three it is a different hue that goes with the accent: a brown under the yellow (Espresso), a forest green under the lime green (Fern Deep), a dark plum-violet under the purple, a little warmer than the accent (Iris Deep). The frontmatter holds the anchors; `src/styles/tokens.css` holds the alpha steps and the semantic tokens that components use.
 
-The names here are the design names. The primitives in `tokens.css` are named by hue and role, with a step: `-5` is the full colour, `-1` to `-4` are alpha steps of it (`-4` is not used at the moment), `-0` is the paper.
+The names here are the design names. In `tokens.css` each theme block gives its colours as literal hex values: `--theme-accent`, `--theme-ink`, `--theme-paper`, and their tints as the same hex with a baked alpha (`--theme-ink-muted`, `--theme-accent-faint`, ...). A primitive (`--color-*`) exists only for a colour that more than one declaration uses, or that a file outside `tokens.css` reads (Pollen, Ember, Iris, Iris Deep, Bubblegum and its deep and paper, white, the lilac highlight and the code colours that themes share).
 
-| Theme (`data-theme`) | Accent                           | Deep                               | Paper                                  |
-| -------------------- | -------------------------------- | ---------------------------------- | -------------------------------------- |
-| `default`            | Pollen `--color-yellow-light-5`  | Espresso `--color-brown-deep-5`    | Cream Paper `--color-yellow-light-0`   |
-| `orange`             | Ember `--color-orange-light-5`   | Ember Deep `--color-orange-deep-5` | Ember Paper `--color-orange-light-0`   |
-| `green`              | Fern `--color-green-light-5`     | Fern Deep `--color-green-deep-5`   | Fern Paper `--color-green-light-0`     |
-| `purple`             | Iris `--color-purple-light-5`    | Iris Deep `--color-purple-deep-5`  | Iris Paper `--color-purple-light-0`    |
-| `blue`               | Glacier `--color-blue-light-5`   | Harbour Deep `--color-blue-deep-5` | Glacier Paper `--color-blue-light-0`   |
-| `pink`               | Bubblegum `--color-pink-light-5` | Plum Deep `--color-pink-deep-5`    | Bubblegum Paper `--color-pink-light-0` |
-| `docs`               | Iris `--color-purple-light-5`    | Docs Ink `--color-slate-deep-5`    | White `--color-white`                  |
+| Theme (`data-theme`) | Accent (`--theme-accent`)                  | Deep (`--theme-ink`)                        | Paper (`--theme-paper`)                          |
+| -------------------- | ------------------------------------------ | ------------------------------------------- | ------------------------------------------------ |
+| `default`            | Pollen `#e8d855` `--color-yellow-light-5`  | Espresso `#351615`                          | Cream Paper `#fdfff5`                            |
+| `orange`             | Ember `#f07a3d` `--color-orange-light-5`   | Ember Deep `#42180f`                        | Ember Paper `#fffbf5`                            |
+| `green`              | Fern `#93d44b`                             | Fern Deep `#1a4731`                         | Fern Paper `#f5fff5`                             |
+| `purple`             | Iris `#9d75f7` `--color-purple-light-5`    | Iris Deep `#18032e` `--color-purple-deep-5` | Iris Paper `#f6f5ff`                             |
+| `blue`               | Glacier `#50c9ed`                          | Harbour Deep `#1a3a47`                      | Glacier Paper `#edfeff`                          |
+| `pink`               | Bubblegum `#f28497` `--color-pink-light-5` | Plum Deep `#3f0e16` `--color-pink-deep-5`   | Bubblegum Paper `#fff7f8` `--color-pink-light-0` |
+| `docs`               | Iris `#9d75f7` `--color-purple-light-5`    | Docs Ink `#1a1923`                          | White `#ffffff` `--color-white`                  |
 
-Careful with "slate": the CSS family `--color-slate-*` is the docs ink (Docs Ink), a near black with a tint of violet. It is not Iris Deep (`--color-purple-deep-*`).
+Careful: Docs Ink (`#1a1923`), the ink of the docs theme, is a near black with a tint of violet. It is not Iris Deep (`#18032e`).
 
 ### Primary
 
@@ -235,9 +235,9 @@ The six accents follow one rule in OKLCH: each accent keeps the lightness and th
 
 ### Tertiary
 
-- **Signal Green** (signal-green, `--color-green-signal`) and **Signal Red** (signal-red, `--color-red-light-5`): a change applied, something deleted or refused. Only in diagrams, status and form feedback. They do not change with the theme.
-- **Code Espresso** (code-espresso, `--color-code-brown-deep`) and the other `--color-code-*-deep`: the background of a code card. It is a calmer, deeper shade of the theme deep than the inverse surface. The syntax colours come from one OKLCH rule (see the comment in `tokens.css`): keywords take the accent hue, strings, constants and functions take three other hues of the family.
-- **Pixel highlights** (`--theme-pixel-highlight`): the brightest cells of the pixel pictures, a light partner of the accent. Default: `--color-cream-pale` (not Cream Paper: a deeper cream). Orange: Pollen. Green: `--color-lime-pale`. Purple and docs: `--color-lilac-pale`. Blue: `--color-aqua-pale`. Pink: `--color-peach-pale`.
+- **Signal Green** (signal-green, `--surface-positive`, `#3f9a4a`) and **Signal Red** (signal-red, `--surface-negative`, `#f25f5a`): a change applied, something deleted or refused. Only in diagrams, status and form feedback. They do not change with the theme.
+- **Code Espresso** (code-espresso, `#2b1615`, the `--code-background` of the default theme) and the `--code-background` of the other themes: the background of a code card. It is a calmer, deeper shade of the theme deep than the inverse surface. The syntax colours come from one OKLCH rule (see the comment in `tokens.css`): keywords take the accent hue, strings, constants and functions take three other hues of the family.
+- **Pixel highlights** (`--theme-pixel-highlight`): the brightest cells of the pixel pictures, a light partner of the accent. Default: cream `#f8f2c2` (not Cream Paper: a deeper cream). Orange: Pollen. Green: lime `#eef0a8`. Purple and docs: lilac `#d1c4ff` (`--color-lilac-pale`). Blue: aqua `#cbf5ee`. Pink: peach `#ffd6b3`.
 
 ### Neutral
 
@@ -247,7 +247,7 @@ There is no grey. The neutrals are the deep tone of the theme at alpha: text-sof
 
 The docs are a tool, not a story, thus they have a theme of their own: `docs`. Only the docs layout uses it.
 
-- **The page is white**, and the ink is **Docs Ink** (docs-ink, `--color-slate-deep-5`): a near black with a small tint of violet (OKLCH L 0.22, C 0.02, hue 289). The tints of the ink are greys with the same small tint.
+- **The page is white**, and the ink is **Docs Ink** (docs-ink, `#1a1923`): a near black with a small tint of violet (OKLCH L 0.22, C 0.02, hue 289). The tints of the ink are greys with the same small tint.
 - **The accent is Iris**, the purple of the site (#9d75f7, hue 295, near the hue of the ink): the active tab, the focus ring, the hit of a search, the tags. The links and the kickers are a deep tone of it (`--text-accent`, OKLCH L 0.43, C 0.11: #554185). It stays small: the docs have no accent bands.
 - **The hero of the docs home** has a pixel field (`src/components/docs/PixelField`): the renderer of the pixel videos, with live cells from a slow noise, in the `docsField` palette (tints of Iris on the page, a grid of the page colour, a few glints of the pixel highlight). 6px cells, steps of 125ms, the shared lens. The field is empty at the top left (the headline) and dense at the right and at the bottom. One field for the two schemes: the tints mix the accent into the page surface. No gradient, no second effect for the dark scheme.
 - **The callouts do not take the hue of the theme.** Each kind has its own hue: info blue, tip violet, positive green, warning amber, danger red. The theme gives them as theme data (`--theme-status-*`); `--surface-status-*` and `--text-status-*` read it. A theme without the data keeps the old rule: info and tip are a tint of the ink, warning is a tint of the accent.
@@ -267,7 +267,7 @@ The three grounds stay, all dark, all in the hue of the accent, one family: the 
 
 The rules below are the whole system. `src/styles/tokens.css` states them, `src/styles/tokens.test.ts` computes every pairing (all roles, all surfaces, seven themes, two schemes) and fails under AA, and `npm run lint:css` refuses a text colour outside the roles.
 
-1. **Three grounds.** Every element sits on one ground: the **page** (`--surface-default` and its tints: `--surface-accent-faint|subtle|muted`, `--surface-inverse-faint`, `--surface-field`, `--surface-nav-active`, `--surface-status-*`), the **accent** (`--surface-accent`: bright with dark text in the light scheme, deep with light text in the dark scheme) or the **inverse** (`--surface-inverse`, deep in both schemes, light text). The code card (`--code-background`, `--code-*`) is a fourth, small ground.
+1. **Three grounds.** Every element sits on one ground: the **page** (`--surface-default` and its tints: `--surface-accent-faint|subtle|muted`, `--surface-inverse-faint`, `--surface-nav-active`, `--surface-status-*`), the **accent** (`--surface-accent`: bright with dark text in the light scheme, deep with light text in the dark scheme) or the **inverse** (`--surface-inverse`, deep in both schemes, light text). The code card (`--code-background`, `--code-*`) is a fourth, small ground.
 2. **Canonical text roles**, one set for each ground: page `--text-on-page`, `-soft`, `-muted`, `-headline-muted`; accent `--text-on-accent`, `-soft`, `-muted`, `-headline-muted`; inverse `--text-on-inverse-strong`, `--text-on-inverse`, `-soft`, `-muted`, `-headline-muted`. Each role has 4.5:1 or more on every surface of its ground, in the seven themes and the two schemes. The one exception is `*-headline-muted`: 3:1 or more, for the quiet run of a two-tone headline or display lockup only (large text, 24px or more: a `.display` or `.headline` heading, the quiet words of the Single Source lockup; a `.title` is 20px on phones and takes `--text-muted`). Borders: `--border-on-page|accent|inverse` and `-strong`.
 3. **Contextual roles follow the ground, not the theme.** A component that does not paint a ground uses `--text-primary`, `--text-soft`, `--text-muted`, `--text-headline-muted`, `--border-default`, `--border-strong`, `--text-accent`, `--text-positive`, `--text-negative`. They resolve to the canonical roles of the ground that the element sits on. A theme switch (`data-theme`) inside a ground keeps the light or dark text of the ground.
 4. **Ground classes.** The element that paints a ground gets the global class of the ground: `surfacePage` (a window of the page inside another ground: a chat, the mega menu), `surfaceAccent` or `surfaceInverse`. The class sets the contextual roles and `color`. A small shape (a pill, a hovered row) that paints the accent or the inverse sets `color` to a canonical role of that ground in the same rule. A button takes its colours from the button roles (`--surface-button*`, `--text-button*`), which the ground class fills: see Buttons. A ground that comes with the viewport or a state (the split header, a hovered row that turns to the accent) cannot take a class: the rule sets a contextual role to the canonical role of the same kind (`--text-muted: var(--text-on-accent-muted)`), and nothing else.

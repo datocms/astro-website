@@ -38,7 +38,6 @@ export const PAGE_TINTS = [
   '--surface-accent-faint',
   '--surface-accent-subtle',
   '--surface-inverse-faint',
-  '--surface-field',
   '--surface-nav-active',
   '--surface-status-info',
 ] as const;

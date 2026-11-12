@@ -6,8 +6,8 @@
  *
  * 1. Three grounds. Every element sits on one ground:
  *      page     --surface-default and its tints (accent-faint, accent-subtle,
- *               accent-muted, inverse-faint, raised, field, nav-active,
- *               status-*). Light in the light scheme, dark in the dark scheme.
+ *               accent-muted, inverse-faint, raised, nav-active, status-*).
+ *               Light in the light scheme, dark in the dark scheme.
  *      accent   --surface-accent. Bright in the light scheme: the text is
  *               dark. Deep in the dark scheme (a deep tone of the accent):
  *               the text is light.
@@ -50,53 +50,26 @@
  * --code-*).
  */
 
+/*
+ * The primitives. A primitive is a colour that more than one declaration
+ * of this file uses, or that a file outside this file reads (the brand
+ * page, scripts/brand-assets.mjs). The theme blocks give each other colour
+ * as a literal.
+ */
 :root {
-  --color-brown-deep-5: #351615;
-  --color-brown-deep-4: #351615cc;
-  --color-brown-deep-3: #351615b2;
-  --color-brown-deep-2: #35161580;
-  --color-brown-deep-1: #3516151c;
-  --color-yellow-light-5: #e8d855;
-  --color-yellow-light-4: #e8d855cc;
-  --color-yellow-light-3: #e8d855b2;
-  --color-yellow-light-2: #e8d85580;
-  --color-yellow-light-1: #e8d85514;
-  --color-yellow-light-0: #fdfff5;
-  --color-orange-deep-5: #42180f;
-  --color-orange-deep-4: #42180fcc;
-  --color-orange-deep-3: #42180fb2;
-  --color-orange-deep-2: #42180f80;
-  --color-orange-deep-1: #42180f1f;
   /*
-   * The accents (light-5) share one rule in OKLCH: each accent keeps the
-   * lightness and the hue of the design value, and its chroma is 82% of the
-   * most chroma that sRGB gives at that lightness and hue. A colour at the
-   * edge of sRGB looks neon next to the others. A colour far from the edge
-   * looks faded. Do not make an accent lighter to make it softer: a lighter
-   * orange is a salmon.
+   * The accents (--theme-accent) share one rule in OKLCH: each accent keeps
+   * the lightness and the hue of the design value, and its chroma is 82% of
+   * the most chroma that sRGB gives at that lightness and hue. A colour at
+   * the edge of sRGB looks neon next to the others. A colour far from the
+   * edge looks faded. Do not make an accent lighter to make it softer: a
+   * lighter orange is a salmon.
    * The design value of the orange is #ff6d00 (L 0.705, C 0.199, hue 46, at
    * the edge of sRGB). At 82%: C 0.163.
    * The pink and the purple are exceptions (see the comment of each).
    */
+  --color-yellow-light-5: #e8d855;
   --color-orange-light-5: #f07a3d;
-  --color-orange-light-4: #f07a3de8;
-  --color-orange-light-3: #f07a3db2;
-  --color-orange-light-2: #f07a3d80;
-  --color-orange-light-1: #f07a3d1c;
-  --color-orange-light-0: #fffbf5;
-  --color-green-deep-5: #1a4731;
-  --color-green-deep-4: #1a4731de;
-  --color-green-deep-3: #1a4731b2;
-  --color-green-deep-2: #1a473180;
-  --color-green-deep-1: #1a47311f;
-  --color-green-light-5: #93d44b;
-  --color-green-light-4: #93d44be5;
-  --color-green-light-3: #93d44bd1;
-  --color-green-light-2: #93d44b80;
-  --color-green-light-1: #93d44b1a;
-  --color-green-light-0: #f5fff5;
-  /* The green of a signal: dark enough for a small icon on a light surface */
-  --color-green-signal: #3f9a4a;
   /*
    * The purple is a violet (OKLCH L 0.66, C 0.187, hue 295, 92% of the edge
    * of sRGB). At L 0.70 a purple is a pastel: the gamut of this hue is
@@ -106,32 +79,10 @@
    * other themes is a near hue. DESIGN.md calls them Iris and Iris Deep.
    */
   --color-purple-deep-5: #18032e;
-  --color-purple-deep-4: #18032ed9;
-  --color-purple-deep-3: #18032ebf;
-  --color-purple-deep-2: #18032e80;
-  --color-purple-deep-1: #18032e1a;
   --color-purple-light-5: #9d75f7;
-  --color-purple-light-4: #9d75f7db;
   --color-purple-light-3: #9d75f7b2;
   --color-purple-light-2: #9d75f780;
-  --color-purple-light-1: #9d75f71a;
-  --color-purple-light-0: #f6f5ff;
-  --color-blue-deep-5: #1a3a47;
-  --color-blue-deep-4: #1a3a47d9;
-  --color-blue-deep-3: #1a3a47bf;
-  --color-blue-deep-2: #1a3a4780;
-  --color-blue-deep-1: #1a3a471a;
-  --color-blue-light-5: #50c9ed;
-  --color-blue-light-4: #50c9edc9;
-  --color-blue-light-3: #50c9edb2;
-  --color-blue-light-2: #50c9ed80;
-  --color-blue-light-1: #50c9ed17;
-  --color-blue-light-0: #edfeff;
   --color-pink-deep-5: #3f0e16;
-  --color-pink-deep-4: #3f0e16d9;
-  --color-pink-deep-3: #3f0e16bd;
-  --color-pink-deep-2: #3f0e1680;
-  --color-pink-deep-1: #3f0e161a;
   /*
    * The pink is a rose (OKLCH L 0.74, C 0.135, hue 10, 82% of the edge of
    * sRGB). The design value #f1a5a7 (L 0.80, hue 18) is pale next to the
@@ -139,86 +90,16 @@
    * only C 0.10. The rose is darker, and its hue is 36 deg from the orange.
    */
   --color-pink-light-5: #f28497;
-  --color-pink-light-4: #f28497cc;
-  --color-pink-light-3: #f28497b2;
-  --color-pink-light-2: #f2849780;
-  --color-pink-light-1: #f284971a;
   --color-pink-light-0: #fff7f8;
-  /*
-   * The docs. The docs are a tool, not a story: the page is white, and the
-   * ink is a near black with a small tint of violet (OKLCH L 0.22, C 0.02,
-   * hue 290). The accent is the purple of the site (--color-purple-light-5,
-   * hue 295): the links take a deep tone of it (--text-accent). DESIGN.md
-   * calls the ink Docs Ink.
-   */
-  --color-slate-deep-5: #1a1923;
-  --color-slate-deep-3: #1a1923b2;
-  --color-slate-deep-2: #1a192380;
-  --color-slate-deep-1: #1a19231a;
-  /*
-   * The callouts of the docs. Each kind has its hue, not the hue of the
-   * theme: info is blue (250), tip is violet (300), positive is green
-   * (150), warning is amber (70), danger is red (25). The levels, in OKLCH:
-   *   tint        the light fill: L 0.965, C 0.03
-   *   text        the title on the tint: L 0.47, C 0.14 (5.8:1 or more)
-   *   tint-dark   the fill in the dark scheme: L 0.29, C 0.05
-   *   text-dark   the title on it: L 0.85, C 0.09 (8.8:1 or more)
-   * A chroma out of sRGB is reduced until the colour fits.
-   */
-  --color-callout-info-tint: #ebf5ff;
-  --color-callout-info-text: #005da1;
-  --color-callout-info-tint-dark: #172d43;
-  --color-callout-info-text-dark: #a8d2ff;
-  --color-callout-tip-tint: #f5f1ff;
-  --color-callout-tip-text: #68449c;
-  --color-callout-tip-tint-dark: #2f2540;
-  --color-callout-tip-text-dark: #d6c1ff;
-  --color-callout-positive-tint: #e6fae9;
-  --color-callout-positive-text: #016e30;
-  --color-callout-positive-tint-dark: #17321e;
-  --color-callout-positive-text-dark: #a4dfaf;
-  --color-callout-warning-tint: #fff1e2;
-  --color-callout-warning-text: #7e4f02;
-  --color-callout-warning-tint-dark: #3b260c;
-  --color-callout-warning-text-dark: #f4c48d;
-  --color-callout-danger-tint: #ffefee;
-  --color-callout-danger-text: #9a3130;
-  --color-callout-danger-tint-dark: #41211e;
-  --color-callout-danger-text-dark: #ffbab3;
   --color-white: #ffffff;
-  /*
-   * The red of a deletion or a purge, on the inverse surface (the wall of
-   * Delivery). DESIGN.md calls it Signal Red; its partner is
-   * --color-green-signal (Signal Green).
-   */
-  --color-red-light-5: #f25f5a;
-
-  /*
-   * Pixel highlights. Each one is the light partner of a theme accent, for
-   * the brightest cells of the pixel pictures. The design pair is
-   * orange #ff6d00 with yellow #e8d855, thus the orange theme uses the
-   * yellow accent (--color-yellow-light-5) and has no pale of its own. The
-   * pales below follow the same rule in OKLCH: from the accent, add
-   * approximately 0.17 lightness (stop near 0.94), use less chroma, and move
-   * the hue to yellow (at most 55 deg). The purple does not move its hue:
-   * from violet the way to yellow goes through rose and pink.
-   *   cream   default (the accent is yellow already, thus a pale cream)
-   *   lime    green
-   *   lilac   purple and docs (L 0.85, C 0.083, hue 295)
-   *   aqua    blue
-   *   peach   pink
-   */
-  --color-cream-pale: #f8f2c2;
-  --color-lime-pale: #eef0a8;
+  /* The pixel highlight of the purple and the docs themes (see --theme-pixel-highlight). */
   --color-lilac-pale: #d1c4ff;
-  --color-aqua-pale: #cbf5ee;
-  --color-peach-pale: #ffd6b3;
 
   /*
    * Code. The colours of the syntax in CodeSnippetPreview, built in OKLCH
    * with one rule for the themes (the levels are the same, the hue
-   * comes from the family: each is the hue of the light-5 primitive of a
-   * theme). The levels, as lightness L and chroma C:
+   * comes from the family: each is the hue of the accent of a theme). The
+   * levels, as lightness L and chroma C:
    *   deep    the card: L 0.23, the hue of the inverse surface, C at most 0.035
    *   strong  keywords: L 0.84, C 0.15 (never more than the accent's own)
    *   soft    strings and functions: L 0.85, C 0.10
@@ -231,56 +112,15 @@
    * the deep background: plain 13.7, strong 10.0, soft 10.3, pale 11.1,
    * faded 7.8, dim 5.4, faint 4.6 (minimums across the themes). Each level
    * is text on the card, thus each one has 4.5:1 or more.
+   * The primitives below are the levels that more than one theme uses. The
+   * theme blocks give the other levels as literals (--code-*).
    */
-  --color-code-brown-deep: #2b1615;
-  --color-code-yellow-strong: #dece49;
-  --color-code-yellow-plain: #eae9da;
-  --color-code-yellow-faded: #b4b29d;
-  --color-code-yellow-dim: #979477;
-  --color-code-yellow-faint: #898773;
-  --color-code-orange-deep: #2b1712;
-  --color-code-orange-strong: #ffb897;
-  --color-code-orange-soft: #ffbc9e;
   --color-code-orange-pale: #fcc7ae;
-  --color-code-orange-plain: #f4e4dd;
-  --color-code-orange-faded: #c2aca2;
-  --color-code-orange-dim: #a88b7e;
-  --color-code-orange-faint: #968177;
-  --color-code-green-deep: #0d2217;
-  --color-code-green-strong: #a8de72;
   --color-code-green-soft: #b7dc96;
-  --color-code-green-plain: #e3ebdd;
-  --color-code-green-faded: #aab5a2;
-  --color-code-green-dim: #8a987e;
-  --color-code-green-faint: #808a77;
-  --color-code-purple-deep: #20192b;
   --color-code-purple-strong: #cebffe;
   --color-code-purple-soft: #d1c4fe;
   --color-code-purple-pale: #d7ccfe;
-  --color-code-purple-plain: #e8e6f4;
-  --color-code-purple-faded: #b2aec3;
-  --color-code-purple-dim: #938ea9;
-  --color-code-purple-faint: #878397;
-  --color-code-blue-deep: #08202a;
-  --color-code-blue-strong: #6adcff;
   --color-code-blue-soft: #7eddfc;
-  --color-code-blue-plain: #daebf1;
-  --color-code-blue-faded: #9db6bf;
-  --color-code-blue-dim: #7898a4;
-  --color-code-blue-faint: #738b93;
-  --color-code-pink-deep: #2b1618;
-  --color-code-pink-strong: #ffb2bd;
-  --color-code-pink-soft: #ffb7c1;
-  --color-code-pink-plain: #f5e3e5;
-  --color-code-pink-faded: #c3aaad;
-  --color-code-pink-dim: #a9898d;
-  --color-code-pink-faint: #977f82;
-  /* The docs: the hue of the slate ink (290). The keywords are purple-strong. */
-  --color-code-slate-deep: #1d1b26;
-  --color-code-slate-plain: #e7e6f2;
-  --color-code-slate-faded: #b0afc0;
-  --color-code-slate-dim: #918fa4;
-  --color-code-slate-faint: #858495;
 }
 
 :root {
@@ -289,10 +129,17 @@
 
 /* The signals do not change with the theme */
 :root {
-  /* Something goes away: a purge, a deletion */
-  --surface-negative: var(--color-red-light-5);
-  /* Something is done: an applied change */
-  --surface-positive: var(--color-green-signal);
+  /*
+   * Something goes away: a purge, a deletion. The red of a deletion or a
+   * purge, on the inverse surface (the wall of Delivery). DESIGN.md calls
+   * it Signal Red; its partner is --surface-positive (Signal Green).
+   */
+  --surface-negative: #f25f5a;
+  /*
+   * Something is done: an applied change. The green of a signal: dark
+   * enough for a small icon on a light surface.
+   */
+  --surface-positive: #3f9a4a;
   /* An item that sits on a light surface: the event pill of a diagram */
   --surface-raised: var(--color-white);
 }
@@ -346,20 +193,37 @@
  *                              the others. The plain code, the punctuation,
  *                              the comments and the line numbers are tints of
  *                              the accent hue.
+ * The tints of the ink and of the accent are the colour with a baked alpha
+ * (#rrggbbaa). The alpha of each step is a value per theme.
  */
 :root,
 [data-theme='default'] {
-  --theme-paper: var(--color-yellow-light-0);
-  --theme-ink: var(--color-brown-deep-5);
-  --theme-ink-muted: var(--color-brown-deep-3);
-  --theme-ink-subtle: var(--color-brown-deep-2);
-  --theme-ink-faint: var(--color-brown-deep-1);
+  --theme-paper: #fdfff5;
+  --theme-ink: #351615;
+  --theme-ink-muted: #351615b2;
+  --theme-ink-subtle: #35161580;
+  --theme-ink-faint: #3516151c;
   --theme-accent: var(--color-yellow-light-5);
-  --theme-accent-muted: var(--color-yellow-light-3);
-  --theme-accent-subtle: var(--color-yellow-light-2);
-  --theme-accent-faint: var(--color-yellow-light-1);
+  --theme-accent-muted: #e8d855b2;
+  --theme-accent-subtle: #e8d85580;
+  --theme-accent-faint: #e8d85514;
   --theme-accent-bright: #fff17b;
-  --theme-pixel-highlight: var(--color-cream-pale);
+  /*
+   * The pixel highlight: the light partner of the accent, for the brightest
+   * cells of the pixel pictures. The design pair is orange #ff6d00 with
+   * yellow #e8d855, thus the orange theme uses the yellow accent
+   * (--color-yellow-light-5) and has no pale of its own. The pales of the
+   * other themes follow the same rule in OKLCH: from the accent, add
+   * approximately 0.17 lightness (stop near 0.94), use less chroma, and move
+   * the hue to yellow (at most 55 deg). The purple does not move its hue:
+   * from violet the way to yellow goes through rose and pink.
+   *   cream   default (the accent is yellow already, thus a pale cream)
+   *   lime    green
+   *   lilac   purple and docs (L 0.85, C 0.083, hue 295)
+   *   aqua    blue
+   *   peach   pink
+   */
+  --theme-pixel-highlight: #f8f2c2;
   --theme-alpha-page-muted: 66%;
   --theme-alpha-page-headline-muted: 55%;
   --theme-alpha-on-accent-muted: 70%;
@@ -371,27 +235,27 @@
   --theme-dark-ground-chroma: 0.025;
   --theme-alpha-dark-border: 18%;
   --theme-alpha-on-accent-button-soft: 10%;
-  --code-background: var(--color-code-brown-deep);
-  --code-plain: var(--color-code-yellow-plain);
-  --code-keyword: var(--color-code-yellow-strong);
-  --code-string: var(--color-code-pink-soft);
+  --code-background: #2b1615;
+  --code-plain: #eae9da;
+  --code-keyword: #dece49;
+  --code-string: #ffb7c1;
   --code-constant: var(--color-code-purple-pale);
   --code-function: var(--color-code-blue-soft);
-  --code-punctuation: var(--color-code-yellow-faded);
-  --code-comment: var(--color-code-yellow-dim);
-  --code-line-number: var(--color-code-yellow-faint);
+  --code-punctuation: #b4b29d;
+  --code-comment: #979477;
+  --code-line-number: #898773;
 }
 
 [data-theme='orange'] {
-  --theme-paper: var(--color-orange-light-0);
-  --theme-ink: var(--color-orange-deep-5);
-  --theme-ink-muted: var(--color-orange-deep-3);
-  --theme-ink-subtle: var(--color-orange-deep-2);
-  --theme-ink-faint: var(--color-orange-deep-1);
+  --theme-paper: #fffbf5;
+  --theme-ink: #42180f;
+  --theme-ink-muted: #42180fb2;
+  --theme-ink-subtle: #42180f80;
+  --theme-ink-faint: #42180f1f;
   --theme-accent: var(--color-orange-light-5);
-  --theme-accent-muted: var(--color-orange-light-3);
-  --theme-accent-subtle: var(--color-orange-light-2);
-  --theme-accent-faint: var(--color-orange-light-1);
+  --theme-accent-muted: #f07a3db2;
+  --theme-accent-subtle: #f07a3d80;
+  --theme-accent-faint: #f07a3d1c;
   --theme-accent-bright: #ff915c;
   --theme-pixel-highlight: var(--color-yellow-light-5);
   --theme-alpha-page-muted: 68%;
@@ -404,29 +268,29 @@
   --theme-dark-accent-chroma: 0.102;
   --theme-dark-ground-chroma: 0.021;
   --theme-alpha-dark-border: 18%;
-  --code-background: var(--color-code-orange-deep);
-  --code-plain: var(--color-code-orange-plain);
-  --code-keyword: var(--color-code-orange-strong);
+  --code-background: #2b1712;
+  --code-plain: #f4e4dd;
+  --code-keyword: #ffb897;
   --code-string: var(--color-code-green-soft);
   --code-constant: var(--color-code-purple-pale);
   --code-function: var(--color-code-blue-soft);
-  --code-punctuation: var(--color-code-orange-faded);
-  --code-comment: var(--color-code-orange-dim);
-  --code-line-number: var(--color-code-orange-faint);
+  --code-punctuation: #c2aca2;
+  --code-comment: #a88b7e;
+  --code-line-number: #968177;
 }
 
 [data-theme='green'] {
-  --theme-paper: var(--color-green-light-0);
-  --theme-ink: var(--color-green-deep-5);
-  --theme-ink-muted: var(--color-green-deep-3);
-  --theme-ink-subtle: var(--color-green-deep-2);
-  --theme-ink-faint: var(--color-green-deep-1);
-  --theme-accent: var(--color-green-light-5);
-  --theme-accent-muted: var(--color-green-light-3);
-  --theme-accent-subtle: var(--color-green-light-2);
-  --theme-accent-faint: var(--color-green-light-1);
+  --theme-paper: #f5fff5;
+  --theme-ink: #1a4731;
+  --theme-ink-muted: #1a4731b2;
+  --theme-ink-subtle: #1a473180;
+  --theme-ink-faint: #1a47311f;
+  --theme-accent: #93d44b;
+  --theme-accent-muted: #93d44bd1;
+  --theme-accent-subtle: #93d44b80;
+  --theme-accent-faint: #93d44b1a;
   --theme-accent-bright: #bfff80;
-  --theme-pixel-highlight: var(--color-lime-pale);
+  --theme-pixel-highlight: #eef0a8;
   --theme-alpha-page-muted: 79%;
   --theme-alpha-page-headline-muted: 66%;
   --theme-alpha-on-accent-muted: 90%;
@@ -437,27 +301,27 @@
   --theme-dark-accent-chroma: 0.098;
   --theme-dark-ground-chroma: 0.029;
   --theme-alpha-dark-border: 18%;
-  --code-background: var(--color-code-green-deep);
-  --code-plain: var(--color-code-green-plain);
-  --code-keyword: var(--color-code-green-strong);
-  --code-string: var(--color-code-orange-soft);
+  --code-background: #0d2217;
+  --code-plain: #e3ebdd;
+  --code-keyword: #a8de72;
+  --code-string: #ffbc9e;
   --code-constant: var(--color-code-purple-pale);
   --code-function: var(--color-code-blue-soft);
-  --code-punctuation: var(--color-code-green-faded);
-  --code-comment: var(--color-code-green-dim);
-  --code-line-number: var(--color-code-green-faint);
+  --code-punctuation: #aab5a2;
+  --code-comment: #8a987e;
+  --code-line-number: #808a77;
 }
 
 [data-theme='purple'] {
-  --theme-paper: var(--color-purple-light-0);
+  --theme-paper: #f6f5ff;
   --theme-ink: var(--color-purple-deep-5);
-  --theme-ink-muted: var(--color-purple-deep-3);
-  --theme-ink-subtle: var(--color-purple-deep-2);
-  --theme-ink-faint: var(--color-purple-deep-1);
+  --theme-ink-muted: #18032ebf;
+  --theme-ink-subtle: #18032e80;
+  --theme-ink-faint: #18032e1a;
   --theme-accent: var(--color-purple-light-5);
   --theme-accent-muted: var(--color-purple-light-3);
   --theme-accent-subtle: var(--color-purple-light-2);
-  --theme-accent-faint: var(--color-purple-light-1);
+  --theme-accent-faint: #9d75f71a;
   --theme-accent-bright: #ab89ff;
   --theme-pixel-highlight: var(--color-lilac-pale);
   --theme-alpha-page-muted: 61%;
@@ -470,29 +334,29 @@
   --theme-dark-accent-chroma: 0.198;
   --theme-dark-ground-chroma: 0.028;
   --theme-alpha-dark-border: 18%;
-  --code-background: var(--color-code-purple-deep);
-  --code-plain: var(--color-code-purple-plain);
+  --code-background: #20192b;
+  --code-plain: #e8e6f4;
   --code-keyword: var(--color-code-purple-strong);
   --code-string: var(--color-code-green-soft);
   --code-constant: var(--color-code-orange-pale);
   --code-function: var(--color-code-blue-soft);
-  --code-punctuation: var(--color-code-purple-faded);
-  --code-comment: var(--color-code-purple-dim);
-  --code-line-number: var(--color-code-purple-faint);
+  --code-punctuation: #b2aec3;
+  --code-comment: #938ea9;
+  --code-line-number: #878397;
 }
 
 [data-theme='blue'] {
-  --theme-paper: var(--color-blue-light-0);
-  --theme-ink: var(--color-blue-deep-5);
-  --theme-ink-muted: var(--color-blue-deep-3);
-  --theme-ink-subtle: var(--color-blue-deep-2);
-  --theme-ink-faint: var(--color-blue-deep-1);
-  --theme-accent: var(--color-blue-light-5);
-  --theme-accent-muted: var(--color-blue-light-3);
-  --theme-accent-subtle: var(--color-blue-light-2);
-  --theme-accent-faint: var(--color-blue-light-1);
+  --theme-paper: #edfeff;
+  --theme-ink: #1a3a47;
+  --theme-ink-muted: #1a3a47bf;
+  --theme-ink-subtle: #1a3a4780;
+  --theme-ink-faint: #1a3a471a;
+  --theme-accent: #50c9ed;
+  --theme-accent-muted: #50c9edb2;
+  --theme-accent-subtle: #50c9ed80;
+  --theme-accent-faint: #50c9ed17;
   --theme-accent-bright: #76deff;
-  --theme-pixel-highlight: var(--color-aqua-pale);
+  --theme-pixel-highlight: #cbf5ee;
   --theme-alpha-page-muted: 74%;
   --theme-alpha-page-headline-muted: 64%;
   --theme-alpha-on-accent-muted: 88%;
@@ -503,29 +367,29 @@
   --theme-dark-accent-chroma: 0.066;
   --theme-dark-ground-chroma: 0.019;
   --theme-alpha-dark-border: 18%;
-  --code-background: var(--color-code-blue-deep);
-  --code-plain: var(--color-code-blue-plain);
-  --code-keyword: var(--color-code-blue-strong);
+  --code-background: #08202a;
+  --code-plain: #daebf1;
+  --code-keyword: #6adcff;
   --code-string: var(--color-code-green-soft);
   --code-constant: var(--color-code-orange-pale);
   --code-function: var(--color-code-purple-soft);
-  --code-punctuation: var(--color-code-blue-faded);
-  --code-comment: var(--color-code-blue-dim);
-  --code-line-number: var(--color-code-blue-faint);
+  --code-punctuation: #9db6bf;
+  --code-comment: #7898a4;
+  --code-line-number: #738b93;
 }
 
 [data-theme='pink'] {
   --theme-paper: var(--color-pink-light-0);
   --theme-ink: var(--color-pink-deep-5);
-  --theme-ink-muted: var(--color-pink-deep-3);
-  --theme-ink-subtle: var(--color-pink-deep-2);
-  --theme-ink-faint: var(--color-pink-deep-1);
+  --theme-ink-muted: #3f0e16bd;
+  --theme-ink-subtle: #3f0e1680;
+  --theme-ink-faint: #3f0e161a;
   --theme-accent: var(--color-pink-light-5);
-  --theme-accent-muted: var(--color-pink-light-3);
-  --theme-accent-subtle: var(--color-pink-light-2);
-  --theme-accent-faint: var(--color-pink-light-1);
+  --theme-accent-muted: #f28497b2;
+  --theme-accent-subtle: #f2849780;
+  --theme-accent-faint: #f284971a;
   --theme-accent-bright: #ff98a8;
-  --theme-pixel-highlight: var(--color-peach-pale);
+  --theme-pixel-highlight: #ffd6b3;
   --theme-alpha-page-muted: 65%;
   --theme-alpha-page-headline-muted: 57%;
   --theme-alpha-on-accent-muted: 83%;
@@ -536,36 +400,40 @@
   --theme-dark-accent-chroma: 0.144;
   --theme-dark-ground-chroma: 0.024;
   --theme-alpha-dark-border: 18%;
-  --code-background: var(--color-code-pink-deep);
-  --code-plain: var(--color-code-pink-plain);
-  --code-keyword: var(--color-code-pink-strong);
+  --code-background: #2b1618;
+  --code-plain: #f5e3e5;
+  --code-keyword: #ffb2bd;
   --code-string: var(--color-code-green-soft);
   --code-constant: var(--color-code-purple-pale);
   --code-function: var(--color-code-blue-soft);
-  --code-punctuation: var(--color-code-pink-faded);
-  --code-comment: var(--color-code-pink-dim);
-  --code-line-number: var(--color-code-pink-faint);
+  --code-punctuation: #c3aaad;
+  --code-comment: #a9898d;
+  --code-line-number: #977f82;
 }
 
 /*
- * The docs theme: a white page, the slate ink, the purple accent. The
- * callouts do not take the hue of the theme: each kind has its own hue
+ * The docs theme: a white page, the slate ink, the purple accent. The docs
+ * are a tool, not a story: the page is white, and the ink is a near black
+ * with a small tint of violet (OKLCH L 0.22, C 0.02, hue 290). The accent
+ * is the purple of the site (--color-purple-light-5, hue 295): the links
+ * take a deep tone of it (--text-accent). DESIGN.md calls the ink Docs Ink.
+ * The callouts do not take the hue of the theme: each kind has its own hue
  * (--theme-status-*). The data inherits, thus a ground class inside the
  * docs keeps the callout colours.
  */
 [data-theme='docs'] {
   --theme-paper: var(--color-white);
-  --theme-ink: var(--color-slate-deep-5);
-  --theme-ink-muted: var(--color-slate-deep-3);
-  --theme-ink-subtle: var(--color-slate-deep-2);
-  --theme-ink-faint: var(--color-slate-deep-1);
+  --theme-ink: #1a1923;
+  --theme-ink-muted: #1a1923b2;
+  --theme-ink-subtle: #1a192380;
+  --theme-ink-faint: #1a19231a;
   --theme-accent: var(--color-purple-light-5);
   --theme-accent-muted: var(--color-purple-light-3);
   --theme-accent-subtle: var(--color-purple-light-2);
   /*
-   * The faint tint is 9% of the accent, not 10% (--color-purple-light-1):
-   * the docs ink is lighter than Iris Deep, and the accent text of a soft
-   * button on the inverse needs 4.6:1 on it.
+   * The faint tint is 9% of the accent, not 10% (the faint tint of the
+   * purple theme): the docs ink is lighter than Iris Deep, and the accent
+   * text of a soft button on the inverse needs 4.6:1 on it.
    */
   --theme-accent-faint: #9d75f718;
   --theme-accent-bright: #ab89ff;
@@ -581,25 +449,37 @@
   --theme-dark-ground-chroma: 0.004;
   --theme-alpha-dark-border: 12%;
   --theme-alpha-on-accent-button-soft: 8%;
-  --theme-status-info-surface: var(--color-callout-info-tint);
-  --theme-status-info-text: var(--color-callout-info-text);
-  --theme-status-tip-surface: var(--color-callout-tip-tint);
-  --theme-status-tip-text: var(--color-callout-tip-text);
-  --theme-status-positive-surface: var(--color-callout-positive-tint);
-  --theme-status-positive-text: var(--color-callout-positive-text);
-  --theme-status-warning-surface: var(--color-callout-warning-tint);
-  --theme-status-warning-text: var(--color-callout-warning-text);
-  --theme-status-danger-surface: var(--color-callout-danger-tint);
-  --theme-status-danger-text: var(--color-callout-danger-text);
-  --code-background: var(--color-code-slate-deep);
-  --code-plain: var(--color-code-slate-plain);
+  /*
+   * The callouts. Each kind has its hue, not the hue of the theme: info is
+   * blue (250), tip is violet (300), positive is green (150), warning is
+   * amber (70), danger is red (25). The levels, in OKLCH:
+   *   surface        the light fill: L 0.965, C 0.03
+   *   text           the title on the fill: L 0.47, C 0.14 (5.8:1 or more)
+   *   dark surface   the fill in the dark scheme: L 0.29, C 0.05
+   *   dark text      the title on it: L 0.85, C 0.09 (8.8:1 or more)
+   * A chroma out of sRGB is reduced until the colour fits. The dark scheme
+   * block of the docs gives the dark levels.
+   */
+  --theme-status-info-surface: #ebf5ff;
+  --theme-status-info-text: #005da1;
+  --theme-status-tip-surface: #f5f1ff;
+  --theme-status-tip-text: #68449c;
+  --theme-status-positive-surface: #e6fae9;
+  --theme-status-positive-text: #016e30;
+  --theme-status-warning-surface: #fff1e2;
+  --theme-status-warning-text: #7e4f02;
+  --theme-status-danger-surface: #ffefee;
+  --theme-status-danger-text: #9a3130;
+  /* The code: the hue of the slate ink (290). The keywords are the purple strong level. */
+  --code-background: #1d1b26;
+  --code-plain: #e7e6f2;
   --code-keyword: var(--color-code-purple-strong);
   --code-string: var(--color-code-green-soft);
   --code-constant: var(--color-code-orange-pale);
   --code-function: var(--color-code-purple-soft);
-  --code-punctuation: var(--color-code-slate-faded);
-  --code-comment: var(--color-code-slate-dim);
-  --code-line-number: var(--color-code-slate-faint);
+  --code-punctuation: #b0afc0;
+  --code-comment: #918fa4;
+  --code-line-number: #858495;
 }
 
 /*
@@ -611,17 +491,18 @@
   --theme-alpha-on-inverse-headline-muted: 60%;
 }
 
+/* The callouts of the docs in the dark scheme: the dark levels (see the docs theme). */
 :root[data-color-scheme='dark'] [data-theme='docs'] {
-  --theme-status-info-surface: var(--color-callout-info-tint-dark);
-  --theme-status-info-text: var(--color-callout-info-text-dark);
-  --theme-status-tip-surface: var(--color-callout-tip-tint-dark);
-  --theme-status-tip-text: var(--color-callout-tip-text-dark);
-  --theme-status-positive-surface: var(--color-callout-positive-tint-dark);
-  --theme-status-positive-text: var(--color-callout-positive-text-dark);
-  --theme-status-warning-surface: var(--color-callout-warning-tint-dark);
-  --theme-status-warning-text: var(--color-callout-warning-text-dark);
-  --theme-status-danger-surface: var(--color-callout-danger-tint-dark);
-  --theme-status-danger-text: var(--color-callout-danger-text-dark);
+  --theme-status-info-surface: #172d43;
+  --theme-status-info-text: #a8d2ff;
+  --theme-status-tip-surface: #2f2540;
+  --theme-status-tip-text: #d6c1ff;
+  --theme-status-positive-surface: #17321e;
+  --theme-status-positive-text: #a4dfaf;
+  --theme-status-warning-surface: #3b260c;
+  --theme-status-warning-text: #f4c48d;
+  --theme-status-danger-surface: #41211e;
+  --theme-status-danger-text: #ffbab3;
 }
 
 /*
@@ -815,10 +696,6 @@
   /* The entry of the page that you read (a sidebar, a TOC) */
   --surface-nav-active: var(--surface-accent-faint);
   --text-nav-active: var(--text-primary);
-
-  /* A control on the page: a field, a picker */
-  --surface-field: var(--surface-default);
-  --border-field: var(--border-default);
 
   /*
    * The button: a pill that paints a ground of its own. The ground under

@@ -73,7 +73,6 @@ src/components/MyComponent/
   - `--text-accent`, `--text-positive`, `--text-negative`: accent-hued, confirmation and error text. They follow the ground: the ink on the bright accent, light tones on the deep accent band, pale signals on the inverse.
   - `--surface-status-info|positive|warning` with `--text-status-*`: callouts, pills and warnings.
   - `--surface-nav-active`, `--text-nav-active`: the entry of the page you read in a sidebar or a table of contents.
-  - `--surface-field`, `--border-field`: a form field.
   - `--scrim`, `--scrim-modal`: the backdrop of a drawer and the backdrop of a modal. There are no shadow tokens: see the Flat rule in `DESIGN.md`.
   - `--type-2xs` to `--type-4xl`: the size ladder, in rem, fluid from `l` up (see DESIGN.md, Typography). The block `[data-density='dense']` sets the dense values of `s`, `m`, `l`, `xl` and `2xl`; the docs use it on `<body>` (`data-density="dense"`), and `Facts` and the showcase aside use it on their own element. `--type-inline-code` (0.8em, not under `--type-xs`) is the size of inline code. Three ground variables adjust the text for light-on-dark: `--type-leading-dark`, `--type-tracking-dark` and `--type-mono-weight`.
 - Spacing: only `--space-*` tokens. Type: only `--type-*` sizes, through the typography classes (`.display`, `.headline`, `.title`, `.section`, `.body`, `.bodyMedium`, `.bodyLong`, `.label`, `.labelMedium`, `.caption`, `.code`, `.codeSmall`, `.codeInline`, `.monoCaps`, `.pictureLabel`, `.tabular`).
