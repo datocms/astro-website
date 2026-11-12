@@ -51,7 +51,7 @@ export const principles: PrinciplesData = {
     },
     {
       title: 'We’re building a company to keep, not to sell.',
-      text: 'No exit plan and no acquisition on the horizon. We make every decision expecting to still be here in ten years, looking after what we ship today.',
+      text: 'Over a decade in, with no exit plan and no acquisition on the horizon. We make every decision expecting to still be here in ten more years, looking after what we ship today.',
       theme: 'green',
     },
     {

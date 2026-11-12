@@ -79,7 +79,7 @@ Home page line, today: "Thoughtfully built and ambitiously used. The AI-agnostic
 
 - Case studies, customer logos, testimonials and the wall of love come from the CMS (`/case-studies`, `/wall`). Use only those.
 - The feature list is in `src/data/features.ts`. The code samples are in `src/data/*-code.ts`.
-- **Numbers**: `src/data/AGENTS.md` ("Markers") lists the verified numbers and the unverified ones. An unverified number does not go in the copy without a check.
+- **Numbers**: a number that the live site shows is verified. A new number does not go in the copy without a check (`src/data/AGENTS.md`, "Markers").
 - Trust facts the site already states: ISO 27001 certification, a GDPR DPA (`src/data/enterprise.ts`, `/legal/gdpr`).
 - Site analytics from the workshop (internal, not for the copy): 15,000–16,000 visitors a month, about half new; 2–2.5% sign-up conversion (4–5% for new visitors); 0.4% to paid self-service; 40–45 sales or partner requests a month.
 - Do not invent customers, quotes, numbers, prices, integrations or feature claims.

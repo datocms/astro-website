@@ -13,7 +13,7 @@ The copy of every page lives here, one typed file for each route. The general co
 
 ## Markers
 
-- `(check)` in a comment: a fact nobody verified yet. Verified numbers: 74 edge locations, 6B requests a month, 99.99% uptime, 40 ms average API response, and the Enterprise SLA (99.99% uptime, priority one within two hours). The other numbers of the old pages (650TB, 25K+ teams, 400+ locales, 50% smaller images, "2 hours" for cache tags, "5 minutes" for a plugin) are unverified: none goes in the copy without a check.
+- `(check)` in a comment: a fact nobody verified yet. A number that the live site (www.datocms.com) shows is verified. A new number gets `(check)` until somebody verifies it. The Enterprise SLA (99.99% uptime, priority one within two hours) is verified too, though the live site does not show the two hours.
 - `[TODO: …]` in the copy: a fact that is missing, visible on the page.
 
 ## Page classes
