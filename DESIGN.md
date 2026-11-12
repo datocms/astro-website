@@ -383,22 +383,7 @@ Each page has one theme: the theme of the layout (a necessary prop). Purple is t
 
 **A marketing page takes the hue of its first chapter**, or of its hero when it has no chapters. The page reads the theme from the data of the first chapter, not from a literal, thus the page and its row in the product list of the home page change together (`src/data/home.ts`).
 
-| Page                                    | Theme  | From               |
-| --------------------------------------- | ------ | ------------------ |
-| `/`                                     | purple | the home hero      |
-| `/editor-experience`                    | green  | Visual editing     |
-| `/developers`                           | orange | Schema             |
-| `/media`                                | pink   | Media library      |
-| `/ai`                                   | blue   | MCP                |
-| `/cms/[slug]`                           | green  | Fetch              |
-| `/features`                             | blue   | the first category |
-| `/enterprise-headless-cms`              | blue   | Security           |
-| `/compare/[slug]`                       | blue   | the versus split   |
-| `/pricing`                              | purple | the hero           |
-| `/case-studies`, `/case-studies/[slug]` | orange | the hero           |
-| `/philosophy`                           | green  | the hero           |
-| `/wall`                                 | pink   | the hero           |
-| `/404`                                  | yellow | the hero           |
+The pages with no chapters have a chosen hue: `/pricing` purple, `/case-studies` orange, `/philosophy` green, `/wall` pink, `/404` yellow. `/compare/[slug]` is blue, as the pages for buyers.
 
 The same six hues serve the areas and the pillars. On a reference page the hue is the area; on a marketing page it is the pillar. They meet only through links, never on one page.
 
