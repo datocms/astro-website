@@ -19,7 +19,7 @@ src/
   lib/pixel-video/          the player of the .pxv files, and format.ts (the file format, for the player and the scripts)
   lib/code/, lib/format/, lib/theme.ts, lib/colorScheme.ts
   styles/                   tokens.css (all tokens), typography.css (type classes), global.css (reset + element defaults)
-  dev/                      the tools of the developers, at /dev/* (see "Pixel videos")
+  dev/                      the tools of the developers, at /dev/* (see "Dev tools")
 vendor/                     the tarball of the scene kit (@datocms/product-scenes)
 public/videos/              the .pxv files
 scripts/pixel-videos/       the source videos of the .pxv files, drawn in code
@@ -34,7 +34,6 @@ css-scope.mjs               which CSS gets a cascade layer, and which CSS lint:c
 - The other props: `theme`, `headerVariant`, `headerCta`, `footer`.
 - `theme` is the theme of the page: the hue of its area (a reference page) or of its first chapter (a marketing page). The table of all the pages is in DESIGN.md, "Page themes". On a marketing page, read the theme from the data of the first chapter (`theme={dev.schema.theme}`), not from a literal. The header, the `PageCloser` and the footer have no theme prop: they take the theme of the page.
 - `headerVariant` is the ground of the hero, and the `variant` of the `Hero` is the same value: `page` on a marketing page, `accent` on a reference page.
-- A page does a full load: no `ClientRouter`, no progress bar. The docs too.
 - The optional prop `seoAnalysis` takes the `yoastAnalysis` field (the SEO/Readability plugin) of the CMS record. In draft mode, the layout then shows `SeoAnalysisPanel` at the bottom right: the keywords of the record, and where the page uses them (title, meta description, h1, h2, first paragraph).
 - `<main>` has `id="layout-content"`: the endpoint `/api/seo-analysis` reads the content of the page from this element. Do not remove it.
 - `PageNav` (the menu at the bottom left) shows on every page, also in production. It is for reviewers, not part of the design.
@@ -53,6 +52,7 @@ src/components/MyComponent/
 - `Prose` styles long-form text: its CSS targets the elements of the HTML, inside `@scope (.prose) to (prose-island > *)`. A block with its own design wraps its markup in `<prose-island>`, and Prose does not style it.
 - A section sets `data-theme="yellow|orange|green|purple|blue|pink"` (the docs layout sets `docs`); children inherit. Theme comes from the section, never from the component. Breakpoints are media queries, never props. State (hover, active, focus) is CSS/JS, never a prop.
 - React only for the product scenes, rendered on the server (no `client:` directive).
+- SVGs are inlined. Import the markup with the `?raw` suffix (`import key from '~/svg/illustrations/key.svg?raw'`). The docs have `Svg` (`src/components/docs/Svg`), which reads a file of `src/` by name and optimizes it with SVGO (`<Svg name="svg/logos/next-squared" />`).
 
 ## Styling
 
@@ -66,15 +66,20 @@ src/components/MyComponent/
   - Two rules in the same layer on the same element and property: give one of them more specificity on purpose, or put the base rule in `:where()`. Say why in a comment.
   - Run `npm run lint:css` (stylelint, on all CSS of `src/`). A disable comment needs a reason (`/* stylelint-disable-next-line rule -- reason */`).
 - **Never hard-code a hex in a component.** Use the semantic theme tokens `--surface-*`, `--text-*`, `--border-*`. Primitives (`--color-*`) are only for `tokens.css`.
-- **Two schemes, light and dark.** `data-color-scheme` on `<html>` gives the scheme: the inline script in the head of the layout sets it before the first paint, and `src/lib/colorScheme.ts` changes it. In the dark scheme the page, the accent band (`surfaceAccent` and the `--surface-accent-band` tokens) and the inverse are one family of dark grounds in the hue of the accent, and the band and the inverse have the bright accent (`--theme-accent-bright`) as text. A small accent shape (a pill, a button) on the page stays bright. Use a token for its role, not for the colour it has in light. Only when no token fits, a component sets a rule under `:global(:root[data-color-scheme='dark'])`, with a comment that says why. Check each change in both schemes.
-- **Grounds and text roles** (the rules are in the header of `src/styles/tokens.css` and in `DESIGN.md`, "Colour: grounds and text roles"). Three grounds: page, accent, inverse. The element that paints a ground gets its global class, `surfacePage`, `surfaceAccent` or `surfaceInverse` (Section does it from its `background` prop), and sets `color` to a canonical role of the ground in the same rule as the background: `--text-on-page*`, `--text-on-accent*`, `--text-on-inverse*`. Inside, a component uses the contextual roles `--text-primary`, `--text-soft`, `--text-muted`, `--text-headline-muted`, `--border-default`, `--border-strong`, `--text-accent`, `--text-positive`, `--text-negative`: they follow the ground, also across a `data-theme` switch. A small shape that paints the accent or the inverse (a pill, a hovered row) sets `color` to a canonical role in the same rule. A button has no colour prop: the ground fills the button roles (`--surface-button*`, `--text-button*`), and `Button` takes only a `variant` (`solid`, `soft`, `accent`; see `DESIGN.md`, Buttons). No `opacity`, `color-mix()` or local `--text-*` property on text: the quiet text is `--text-muted`, the quiet run of a two-tone headline or display lockup is `--text-headline-muted` (3:1, large text only; `HEADLINE_MUTED_FILES` in `src/lib/tokens/contract.ts` lists the files that may use it). `npm run lint:css` enforces this (`scripts/stylelint/text-roles.mjs`), `npm test` computes every pairing (`src/styles/tokens.test.ts`).
+- **Two schemes, light and dark.** `data-color-scheme` on `<html>` gives the scheme: the inline script in the head of the layout sets it before the first paint, and `src/lib/colorScheme.ts` changes it. Use a token for its role, not for the colour it has in light (`DESIGN.md`, "Dark scheme"). Only when no token fits, a component sets a rule under `:global(:root[data-color-scheme='dark'])`, with a comment that says why. Check each change in both schemes.
+- **Grounds and text roles.** `DESIGN.md`, "Colour: grounds and text roles", has the system. In a component:
+  - The element that paints a ground (page, accent, inverse) gets the global class `surfacePage`, `surfaceAccent` or `surfaceInverse` (Section does it from its `background` prop), and sets `color` to a canonical role of that ground (`--text-on-page*`, `--text-on-accent*`, `--text-on-inverse*`) in the same rule as the background. A small shape that paints the accent or the inverse (a pill, a hovered row) does the same.
+  - Inside a ground, use the contextual roles: `--text-primary`, `--text-soft`, `--text-muted`, `--text-headline-muted`, `--border-default`, `--border-strong`, `--text-accent`, `--text-positive`, `--text-negative`. They follow the ground, also across a `data-theme` switch.
+  - No `opacity`, `color-mix()` or local `--text-*` property on text. The quiet text is `--text-muted`. The quiet run of a two-tone headline is `--text-headline-muted` (large text only; `HEADLINE_MUTED_FILES` in `src/lib/tokens/contract.ts` lists the files that may use it).
+  - A button has no colour prop: `Button` takes only a `variant` (`solid`, `soft`, `accent`), and the ground fills the button roles.
+  - `npm run lint:css` enforces this (`scripts/stylelint/text-roles.mjs`), and `npm test` computes every pairing (`src/styles/tokens.test.ts`).
 - Content column max `--content-max` (1160px), side padding `--section-padding-x`, headline column `--section-padding-x-headlines`, vertical padding `--section-padding-y`. Centred statements cap at `--headline-max` (900px).
 - Tokens for roles, all in `src/styles/tokens.css`:
   - `--text-accent`, `--text-positive`, `--text-negative`: accent-hued, confirmation and error text. They follow the ground: the ink on the bright accent, light tones on the deep accent band, pale signals on the inverse.
   - `--surface-status-info|positive|warning` with `--text-status-*`: callouts, pills and warnings.
   - `--surface-nav-active`, `--text-nav-active`: the entry of the page you read in a sidebar or a table of contents.
   - `--scrim`, `--scrim-modal`: the backdrop of a drawer and the backdrop of a modal. There are no shadow tokens: see the Flat rule in `DESIGN.md`.
-  - `--type-2xs` to `--type-4xl`: the size ladder, in rem, fluid from `l` up (see DESIGN.md, Typography). The block `[data-density='dense']` sets the dense values of `s`, `m`, `l`, `xl` and `2xl`; the docs use it on `<body>` (`data-density="dense"`), and `Facts` and the showcase aside use it on their own element. `--type-inline-code` (0.8em, not under `--type-xs`) is the size of inline code. Three ground variables adjust the text for light-on-dark: `--type-leading-dark`, `--type-tracking-dark` and `--type-mono-weight`.
+  - `--type-2xs` to `--type-4xl`: the size ladder (`DESIGN.md`, Typography). The docs set `data-density="dense"` on `<body>`; `Facts` and the showcase aside set it on their own element. `--type-inline-code` is the size of inline code.
 - Spacing: only `--space-*` tokens. Type: only `--type-*` sizes, through the typography classes (`.display`, `.headline`, `.title`, `.section`, `.body`, `.bodyMedium`, `.bodyLong`, `.label`, `.labelMedium`, `.caption`, `.code`, `.codeSmall`, `.codeInline`, `.monoCaps`, `.pictureLabel`, `.tabular`).
 - Breakpoints (min-width): 768, 1152, 1320. The layout of the docs (`src/layouts/docs/BaseLayout`) has no more breakpoints: the sidebar (280px) is at the left edge from 1152, and the article (650px) and its table of contents (250px, from 1320) are in the centre of the main area. Two more exceptions: `SceneFrame` and `SceneFragment` switch from the phone drawing to the desktop drawing at 650, and `SiteHeader` shows the symbol instead of the wordmark below 360. Hover only inside `@media (hover: hover)`.
 
@@ -84,8 +89,7 @@ Figma file `WnWBSVVcroe5s4tXQGnhSA` (overnice's original), page **Components** (
 
 ### Fonts
 
-- `--font-sans`: ABC Oracle, variable, then the three metric fallback faces of `src/styles/fonts.css` (Helvetica Neue, Arial, Roboto), so that the swap does not move the text. CSS 400 = Regular, 500 = Medium; use only these two.
-- `--font-mono`: Geist Mono, for code. Code blocks (`.code`, `.codeSmall`, expressive-code) are 500: the code ground is deep in both schemes. Mono on the page (`.codeInline`, `.monoCaps`, `.pictureLabel`) is at `--type-mono-weight` (400 on light grounds, 500 on dark grounds). The product scenes use it.
+- `--font-sans` is ABC Oracle (400 and 500 only), `--font-mono` is Geist Mono. The weights and the roles are in `DESIGN.md`, Typography.
 - The files come from this site: `/fonts/<file>` (`src/pages/fonts/[file].ts`), a proxy to `UI_FONTS_BASE_URL`. The layout preloads ABC Oracle. In local dev, set `UI_FONTS_BASE_URL` (see `cubo.json5`), else the fonts give 404.
 - Never put a copy of a font file in this repository: the licence does not allow it.
 
@@ -97,16 +101,21 @@ Figma file `WnWBSVVcroe5s4tXQGnhSA` (overnice's original), page **Components** (
 
 ## Text faces
 
-- **`src/lib/motion/faces.ts` has every face, with its animation.** The copy in `src/data/` gives the name of a face (`face: 'happy'`), never its glyphs: the name gives the final glyphs (`faces.happy.face`) and the typewriter step (`faceStep('happy')`). Each animation has the rhythm of the home hero: the face comes in one sign at a time with its eyes closed, opens its eyes and rests, does one thing (a wink, a laugh, a yawn), then settles on its final face. The last frame is the final face: the typewriter then shows the glyphs of the copy.
-- **`/dev/face-gallery` plays every face in a loop**, with its frames and times, and marks the glyphs that ABC Oracle does not have (`ᴗ`, `◡`, `﹏`, `✓`, `ᴥ`): the browser takes them from a system font, and they look different on each system. The glyphs of the font that make a face are at the end of the gallery. The gallery is on every deploy, as the pxv gallery.
-- **A new face goes in `faces.ts`, not in a component.** Then look at it in the gallery before you give it to a page.
+The rules of a face on a page are in `DESIGN.md`, "The Text Face Rule".
+
+- `src/lib/motion/faces.ts` has every face, with its animation. The copy in `src/data/` gives the name of a face (`face: 'happy'`), never its glyphs. No component writes the glyphs: a typewriter script plays `faceStep('happy')`, and the `Face` component plays a face everywhere else.
+- Each animation has the rhythm of the home hero: the face comes in one sign at a time with its eyes closed, opens its eyes and rests, does one thing (a wink, a laugh, a yawn), then settles on its final face.
+- A new face goes in `faces.ts`, not in a component. Look at it in `/dev/face-gallery` before you give it to a page. The gallery marks the glyphs that ABC Oracle does not have (`ᴗ`, `◡`, `﹏`, `✓`, `ᴥ`): the browser takes them from a system font, and they look different on each system.
 
 ## Pixel videos
 
-- **The scripts of `scripts/pixel-videos/` make a `.pxv` file**: `key.py` (green screen footage) or `lottie.py` (a Lottie animation) make a transparent video, and `encode.ts` makes the file with `format.ts`, the same module as the player. Save the file in `public/videos/`. `/dev/pxv-gallery` shows all the files.
-- **The galleries are not pages of the site.** The page is not in `src/pages/`: the integration `dev-tools` in `astro.config.ts` adds its route, in `astro dev` and in the build. Thus the production site shows it, but the sitemap and `PageNav` do not list it. Put a new tool for the developers in `src/dev/`, and add its route in `dev-tools`. Why: the tools use the layout, the tokens and the player of the site, thus the preview is the same as the page, and there is one copy of `format.ts` for the encoder and the player.
-- **The pages in `src/dev/` are not pages of the site.** They can have a plain client script (not a `WebComponent`). They must not import a dev dependency: the build has the routes, and the runtime image installs no dev dependencies.
-- **The `.pxv` file is the only copy.** No recipe makes it again: the footage and the keyed videos stay in `tmp/` (Git ignores it), and the file records the URL of its footage (`source`). Read `src/lib/pixel-video/AGENTS.md` and `scripts/pixel-videos/README.md` before you add one.
+Read `src/lib/pixel-video/AGENTS.md` (the process and the rules) and `scripts/pixel-videos/README.md` (the commands) before you add or change a `.pxv` file. The files are in `public/videos/`, and `/dev/pxv-gallery` shows them all.
+
+## Dev tools
+
+- The galleries (`/dev/face-gallery`, `/dev/pxv-gallery`, `/dev/button-gallery`) are in `src/dev/`, not in `src/pages/`: the integration `dev-tools` in `astro.config.ts` adds their routes, in `astro dev` and in the build. Thus the production site shows them, but the sitemap and `PageNav` do not list them.
+- Put a new tool for the developers in `src/dev/`, and add its route in `dev-tools`. The tools use the layout, the tokens and the player of the site, thus the preview is the same as the page.
+- A page of `src/dev/` can have a plain client script (not a `WebComponent`). It must not import a dev dependency: the build has the routes, and the runtime image installs no dev dependencies.
 
 ## CMS
 
