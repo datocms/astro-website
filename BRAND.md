@@ -189,32 +189,32 @@ The rules and the patterns of the product copy (messages, confirmations, errors,
 
 ### Say this, not that
 
-| ✅ Say                                                     | ⛔ Not                                       | Note                                                                                               |
-| ---------------------------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| DatoCMS                                                    | Dato CMS, Dato, Datocms                      | See section 3.                                                                                     |
-| record                                                     | item, entry                                  | "Item" is the API word. "Menu item" is fine.                                                       |
-| model                                                      | content type, item type                      |                                                                                                    |
-| block                                                      | block model, modular block                   |                                                                                                    |
-| project                                                    | site, space                                  | "Site" is the customer's frontend.                                                                 |
-| environment · sandbox environment · primary environment    | Sandbox Environment, Primary Environment     | Lowercase. "Sandbox" alone is fine once the context is environments: a headline, a second mention. |
-| Structured Text · Modular Content                          | Structured text, Modular content             | Field types are proper names.                                                                      |
-| Content Delivery API · Content Management API              | content API, REST API                        | Short forms CDA and CMA only after the full name.                                                  |
-| Real-time Updates API · real-time updates                  | realtime, real time (as adjective)           |                                                                                                    |
-| visual editing · cache tags · webhooks                     | Visual Editing, Cache Tags, web hooks        | Features are common nouns.                                                                         |
-| Media Area                                                 | media library, media area                    | The area of the product.                                                                           |
-| asset                                                      | upload, file                                 | "Upload" is the action.                                                                            |
-| plugin directory                                           | marketplace, plugin store                    |                                                                                                    |
-| MCP server · agent skills                                  | Mcp, Agent Skills                            |                                                                                                    |
-| API token                                                  | API key (for a credential)                   | "API key" is the identifier of a model or a field.                                                 |
-| Free, Professional, Enterprise + "plan"                    | free plan, Pro plan, higher plans            | The name has a capital, "plan" does not.                                                           |
-| log in · log out (verb), login (noun)                      | sign in, Logout, "Couldn't login"            |                                                                                                    |
-| sign up (verb), signup (noun)                              | Sign Up, sign-up                             |                                                                                                    |
-| two-factor authentication                                  | 2FA, 2-factor                                | "2FA" only where space is tight.                                                                   |
-| email · frontend · backend · headless CMS                  | e-mail · front-end · back end · Headless CMS |                                                                                                    |
-| locale (content) · language (interface)                    |                                              | Two different things.                                                                              |
-| delete (erase for good) · remove (take out of a list)      | destroy                                      |                                                                                                    |
-| our support team · our sales team                          | DatoCMS Support, our Sales team              |                                                                                                    |
-| Get started · Talk to sales · Read the docs · Try the demo | Start for free, Contact sales, Learn more    | One label for each action.                                                                         |
+| ✅ Say                                                     | ⛔ Not                                       | Note                                                                                                         |
+| ---------------------------------------------------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| DatoCMS                                                    | Dato CMS, Dato, Datocms                      | See section 3.                                                                                               |
+| record                                                     | item, entry                                  | "Item" is the API word. "Menu item" is fine.                                                                 |
+| model                                                      | content type, item type                      |                                                                                                              |
+| block                                                      | block model, modular block                   |                                                                                                              |
+| project                                                    | site, space                                  | "Site" is the customer's frontend.                                                                           |
+| environment · sandbox environment · primary environment    | Sandbox Environment, Primary Environment     | Lowercase. "Sandbox" alone is fine once the context is environments: a headline, a second mention.           |
+| Structured Text · Modular Content                          | Structured text, Modular content             | Field types are proper names.                                                                                |
+| Content Delivery API · Content Management API              | content API, REST API                        | Short forms CDA and CMA only after the full name.                                                            |
+| Real-time Updates API · real-time updates                  | realtime, real time (as adjective)           |                                                                                                              |
+| visual editing · cache tags · webhooks                     | Visual Editing, Cache Tags, web hooks        | Features are common nouns.                                                                                   |
+| Media Area                                                 | media library, media area                    | The area of the product.                                                                                     |
+| asset                                                      | upload, file                                 | "Upload" is the action.                                                                                      |
+| plugin directory                                           | marketplace, plugin store                    |                                                                                                              |
+| MCP server · agent skills                                  | Mcp, Agent Skills                            |                                                                                                              |
+| API token                                                  | API key (for a credential)                   | "API key" is the identifier of a model or a field.                                                           |
+| Free, Professional, Enterprise + "plan"                    | Pro plan, higher plans                       | The name has a capital, "plan" does not. "free plan" in lower case means any free plan, the legacy ones too. |
+| log in · log out (verb), login (noun)                      | sign in, Logout, "Couldn't login"            |                                                                                                              |
+| sign up (verb), signup (noun)                              | Sign Up, sign-up                             |                                                                                                              |
+| two-factor authentication                                  | 2FA, 2-factor                                | "2FA" only where space is tight.                                                                             |
+| email · frontend · backend · headless CMS                  | e-mail · front-end · back end · Headless CMS |                                                                                                              |
+| locale (content) · language (interface)                    |                                              | Two different things.                                                                                        |
+| delete (erase for good) · remove (take out of a list)      | destroy                                      |                                                                                                              |
+| our support team · our sales team                          | DatoCMS Support, our Sales team              |                                                                                                              |
+| Get started · Talk to sales · Read the docs · Try the demo | Start for free, Contact sales, Learn more    | One label for each action.                                                                                   |
 
 ### Words we avoid
 
