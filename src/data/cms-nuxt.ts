@@ -26,7 +26,7 @@ export const page: FrameworkPage = {
   slug: 'nuxtjs-cms',
   name: 'Nuxt',
   seo: {
-    title: 'Nuxt.js CMS - The easiest way to manage content with Nuxt.js',
+    title: 'Headless CMS for Nuxt',
     // New copy.
     description:
       'DatoCMS with Nuxt: GraphQL from one composable, responsive images and video with vue-datocms, draft mode with visual editing, and real-time updates.',

@@ -24,7 +24,7 @@ export const page: FrameworkPage = {
   slug: 'nextjs-cms',
   name: 'Next.js',
   seo: {
-    title: 'The most complete headless CMS to work with Next.js',
+    title: 'Headless CMS for Next.js',
     // New copy.
     description:
       'DatoCMS with Next.js: GraphQL from Server Components, responsive images and video, Draft Mode with visual editing, real-time updates and cache tags.',
