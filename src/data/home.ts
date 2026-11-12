@@ -628,7 +628,7 @@ export const community: CommunityData = {
 
 export const ctaPricing: CtaBannerData = {
   variant: 'light',
-  theme: 'default',
+  theme: 'yellow',
   headline: 'Pricing as it should be.',
   muted: 'Transparent and predictable (even when renewing).',
   buttons: [{ label: 'Explore pricing', href: '/pricing', variant: 'soft' }],

@@ -185,7 +185,7 @@ This system came from overnice's work ("Warm Logic" is their name for the route)
 
 **Key Characteristics:**
 
-- Six themes (default, orange, green, purple, blue, pink). Each is a set of three surfaces: a near-white paper, a bright accent and a deep inverse, in the hue of the accent (the deep of the default, green and purple themes is a neighbouring hue: see Colors). The docs have a seventh theme of their own (see "The docs theme").
+- Six themes (yellow, orange, green, purple, blue, pink). Each is a set of three surfaces: a near-white paper, a bright accent and a deep inverse, in the hue of the accent (the deep of the yellow, green and purple themes is a neighbouring hue: see Colors). The docs have a seventh theme of their own (see "The docs theme").
 - Full-bleed bands of flat colour; a theme changes from section to section, never inside a component.
 - Two-tone headlines: the claim in the text colour, then the aside in a muted tone of the same hue.
 - One sans (ABC Oracle) at two weights, tight negative tracking; Geist Mono for code and product chrome: 500 in code blocks, and on the page 400 on light grounds and 500 on dark grounds.
@@ -203,7 +203,7 @@ The names here are the design names. In `tokens.css` each theme block gives its 
 
 | Theme (`data-theme`) | Accent (`--theme-accent`)                  | Deep (`--theme-ink`)                        | Paper (`--theme-paper`)                          |
 | -------------------- | ------------------------------------------ | ------------------------------------------- | ------------------------------------------------ |
-| `default`            | Pollen `#e8d855` `--color-yellow-light-5`  | Espresso `#351615`                          | Cream Paper `#fdfff5`                            |
+| `yellow`             | Pollen `#e8d855` `--color-yellow-light-5`  | Espresso `#351615`                          | Cream Paper `#fdfff5`                            |
 | `orange`             | Ember `#f07a3d` `--color-orange-light-5`   | Ember Deep `#42180f`                        | Ember Paper `#fffbf5`                            |
 | `green`              | Fern `#93d44b`                             | Fern Deep `#1a4731`                         | Fern Paper `#f5fff5`                             |
 | `purple`             | Iris `#9d75f7` `--color-purple-light-5`    | Iris Deep `#18032e` `--color-purple-deep-5` | Iris Paper `#f6f5ff`                             |
@@ -215,9 +215,9 @@ Careful: Docs Ink (`#1a1923`), the ink of the docs theme, is a near black with a
 
 ### Primary
 
-- **Pollen** (pollen): the accent of the default theme. A full band, the accent half of a split, the light button, the enterprise plan. It is light, so text on it is always dark (Espresso).
-- **Espresso** (espresso): the deep of the default theme. The text, the inverse band, the footer of the default page, the deep button.
-- **Cream Paper** (cream-paper): the page of the default theme. A white that leans to yellow.
+- **Pollen** (pollen): the accent of the yellow theme. A full band, the accent half of a split, the light button, the enterprise plan. It is light, so text on it is always dark (Espresso).
+- **Espresso** (espresso): the deep of the yellow theme. The text, the inverse band, the footer of a yellow page, the deep button.
+- **Cream Paper** (cream-paper): the page of the yellow theme. A white that leans to yellow.
 
 ### Secondary
 
@@ -225,8 +225,8 @@ The five other themes have the same three roles. A section picks its theme with 
 
 - **Ember** (ember) on **Ember Deep** (ember-deep) and **Ember Paper** (ember-paper). Orange: Help, the Developers pillar.
 - **Fern** (fern) on **Fern Deep** (fern-deep) and **Fern Paper** (fern-paper). Green: News, the Editing pillar.
-- **Iris** (iris) on **Iris Deep** (iris-deep) and **Iris Paper** (iris-paper). Purple, a violet (hue 295) on a dark plum-violet deep (hue 301, a little warmer than the accent): the home page, Ecosystem, Brand.
-- **Glacier** (glacier) on **Harbour Deep** (harbour-deep) and **Glacier Paper** (glacier-paper). Blue: Company and support, the pages for buyers (pricing, enterprise, compare), the AI pillar.
+- **Iris** (iris) on **Iris Deep** (iris-deep) and **Iris Paper** (iris-paper). Purple, a violet (hue 295) on a dark plum-violet deep (hue 301, a little warmer than the accent): the home page, Company and support, pricing.
+- **Glacier** (glacier) on **Harbour Deep** (harbour-deep) and **Glacier Paper** (glacier-paper). Blue: Ecosystem, Brand, the pages for buyers (enterprise, compare), the AI pillar.
 - **Bubblegum** (bubblegum) on **Plum Deep** (plum-deep) and **Bubblegum Paper** (bubblegum-paper). Pink, a rose (hue 10, 36 degrees from Ember) on a wine deep: Partners, the Media pillar.
 
 The theme of each page is in "Page themes" (Layout).
@@ -236,12 +236,12 @@ The six accents follow one rule in OKLCH: each accent keeps the lightness and th
 ### Tertiary
 
 - **Signal Green** (signal-green, `--surface-positive`, `#3f9a4a`) and **Signal Red** (signal-red, `--surface-negative`, `#f25f5a`): a change applied, something deleted or refused. Only in diagrams, status and form feedback. They do not change with the theme.
-- **Code Espresso** (code-espresso, `#2b1615`, the `--code-background` of the default theme) and the `--code-background` of the other themes: the background of a code card. It is a calmer, deeper shade of the theme deep than the inverse surface. The syntax colours come from one OKLCH rule (see the comment in `tokens.css`): keywords take the accent hue, strings, constants and functions take three other hues of the family.
+- **Code Espresso** (code-espresso, `#2b1615`, the `--code-background` of the yellow theme) and the `--code-background` of the other themes: the background of a code card. It is a calmer, deeper shade of the theme deep than the inverse surface. The syntax colours come from one OKLCH rule (see the comment in `tokens.css`): keywords take the accent hue, strings, constants and functions take three other hues of the family.
 - **Pixel highlights** (`--theme-pixel-highlight`): the brightest cells of the pixel pictures, a light partner of the accent. Default: cream `#f8f2c2` (not Cream Paper: a deeper cream). Orange: Pollen. Green: lime `#eef0a8`. Purple and docs: lilac `#d1c4ff` (`--color-lilac-pale`). Blue: aqua `#cbf5ee`. Pink: peach `#ffd6b3`.
 
 ### Neutral
 
-There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft at 80% on the page and 92% on the accent, text-muted at 66 to 93% (each theme sets the alpha that gives 4.5:1 on its ground: yellow holds 70%, orange and green need about 90% on the accent), and the hairline border at about 11% (in the dark scheme, the accent at 25%: a light line on a dark page needs more alpha). The one lighter role is the quiet run of a two-tone headline or display lockup (3:1, large text only). **White** (white) is only for a card that sits on a surface that stays light. The docs theme is the exception (next section).
+There is no grey. The neutrals are the deep tone of the theme at alpha: text-soft at 80% on the page and 92% on the accent, text-muted at 61 to 93% (each theme sets the alpha that gives 4.5:1 on its ground: yellow holds 66%, orange and green need about 90% on the accent), and the hairline border at about 11% (in the dark scheme, the accent at 25%: a light line on a dark page needs more alpha). The one lighter role is the quiet run of a two-tone headline or display lockup (3:1, large text only). **White** (white) is only for a card that sits on a surface that stays light. The docs theme is the exception (next section).
 
 ### The docs theme
 
@@ -360,7 +360,7 @@ Breakpoints (min-width): 768, 1152, 1320. The scenes switch from the phone drawi
 
 ### Page themes
 
-Each page has one theme: the theme of the layout (a necessary prop). The header, the hero, the page closer and the footer take it, thus a page starts and ends in the same hue. The chapters between them can take other themes (The One Hue Rule applies to each band).
+Each page has one theme: the theme of the layout (a necessary prop). Purple is the fallback: `:root` has the purple theme. The header, the hero, the page closer and the footer take it, thus a page starts and ends in the same hue. The chapters between them can take other themes (The One Hue Rule applies to each band).
 
 **A reference page takes the hue of its area.** The colour tells the visitor where they are.
 
@@ -369,29 +369,29 @@ Each page has one theme: the theme of the layout (a necessary prop). The header,
 | Help                | orange | `/user-guides`, `/academy`, `/glossary`                                                                      |
 | Docs                | docs   | `/docs` (see "The docs theme")                                                                               |
 | News                | green  | `/product-updates`, `/blog`                                                                                  |
-| Ecosystem           | purple | `/plugins`, `/starters`                                                                                      |
+| Ecosystem           | blue   | `/plugins`, `/starters`                                                                                      |
 | Partners            | pink   | `/partners`, `/tech-partners`                                                                                |
-| Company and support | blue   | `/support`, `/slack`, `/security`, `/legal`, `/contact`, `/company`, `/partner-program`, `/research-program` |
-| Brand               | purple | `/brand` (purple is the color of the fixed marks, see BRAND.md)                                              |
+| Company and support | purple | `/support`, `/slack`, `/security`, `/legal`, `/contact`, `/company`, `/partner-program`, `/research-program` |
+| Brand               | blue   | `/brand`                                                                                                     |
 
 **A marketing page takes the hue of its first chapter**, or of its hero when it has no chapters. The page reads the theme from the data of the first chapter, not from a literal, thus the page and its row in the product list of the home page change together (`src/data/home.ts`).
 
-| Page                                    | Theme   | From               |
-| --------------------------------------- | ------- | ------------------ |
-| `/`                                     | purple  | the home hero      |
-| `/editor-experience`                    | green   | Visual editing     |
-| `/developers`                           | orange  | Schema             |
-| `/media`                                | pink    | Media library      |
-| `/ai`                                   | blue    | MCP                |
-| `/cms/[slug]`                           | green   | Fetch              |
-| `/features`                             | blue    | the first category |
-| `/enterprise-headless-cms`              | blue    | Security           |
-| `/compare/[slug]`                       | blue    | the versus split   |
-| `/pricing`                              | blue    | the hero           |
-| `/case-studies`, `/case-studies/[slug]` | orange  | the hero           |
-| `/philosophy`                           | green   | the hero           |
-| `/wall`                                 | pink    | the hero           |
-| `/404`                                  | default | the hero           |
+| Page                                    | Theme  | From               |
+| --------------------------------------- | ------ | ------------------ |
+| `/`                                     | purple | the home hero      |
+| `/editor-experience`                    | green  | Visual editing     |
+| `/developers`                           | orange | Schema             |
+| `/media`                                | pink   | Media library      |
+| `/ai`                                   | blue   | MCP                |
+| `/cms/[slug]`                           | green  | Fetch              |
+| `/features`                             | blue   | the first category |
+| `/enterprise-headless-cms`              | blue   | Security           |
+| `/compare/[slug]`                       | blue   | the versus split   |
+| `/pricing`                              | purple | the hero           |
+| `/case-studies`, `/case-studies/[slug]` | orange | the hero           |
+| `/philosophy`                           | green  | the hero           |
+| `/wall`                                 | pink   | the hero           |
+| `/404`                                  | yellow | the hero           |
 
 The same six hues serve the areas and the pillars. On a reference page the hue is the area; on a marketing page it is the pillar. They meet only through links, never on one page.
 

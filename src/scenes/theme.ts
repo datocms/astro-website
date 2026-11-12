@@ -4,7 +4,7 @@ import type { Theme } from '~/lib/theme';
  * The hue of the brand colour of the cms for each theme of the site, in
  * OKLCH. A scene takes the hue of the theme of its section.
  *
- * - `default` 80: the yellow of the theme (--color-yellow-light-5, #e8d855)
+ * - `yellow` 80: the yellow of the theme (--color-yellow-light-5, #e8d855)
  *   has the OKLCH hue 100, but at that hue the bar of the cms is a loud
  *   lime. 80 gives a warm yellow that goes with the theme.
  * - `orange` 45: the hue of the orange theme.
@@ -21,7 +21,7 @@ import type { Theme } from '~/lib/theme';
  * - `docs` 295: the hue of --color-purple-light-5 (#9d75f7).
  */
 export const SCENE_HUE: Record<Theme, number> = {
-  default: 80,
+  yellow: 80,
   orange: 45,
   green: 150,
   purple: 295,

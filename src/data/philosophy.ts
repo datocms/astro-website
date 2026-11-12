@@ -27,12 +27,12 @@ export const principles: PrinciplesData = {
     {
       title: 'Our opinions come from experience.',
       text: 'With roots in agency, we used CMSes of every shape and size. We saw where they got in people’s way, and built DatoCMS to be the content infrastructure that real work runs on.',
-      theme: 'default',
+      theme: 'yellow',
     },
     {
       title: 'A CMS should be boring. In a good way.',
       text: 'A CMS is infrastructure, so we think long-term. We’re with you at the start, and we plan to stay to the very end.',
-      theme: 'default',
+      theme: 'yellow',
     },
     {
       title: 'We don’t try to tame AI here.',
@@ -57,19 +57,19 @@ export const principles: PrinciplesData = {
     {
       title: 'Real people, real conversations.',
       text: 'We’re 13 people, so support comes from the people who build DatoCMS every day. Whether you want to think something through or just need an answer, you’ll get someone who knows the code.',
-      theme: 'default',
+      theme: 'yellow',
     },
     {
       title: 'European.',
       text: 'We build like we eat: slowly, with care, and with conviction. Real holidays, sane hours, and the stubborn belief that good things take time. And sunshine.',
-      theme: 'default',
+      theme: 'yellow',
     },
   ],
 };
 
 export const ctaStart: CtaBannerData = {
   variant: 'light',
-  theme: 'default',
+  theme: 'yellow',
   headline: 'Yes, we’re Italian. We talk with our hands.',
   muted: 'We build with them too. Try DatoCMS for free.',
   buttons: [

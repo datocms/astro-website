@@ -29,7 +29,7 @@ import {
   rgbaToOklch,
 } from './color.ts';
 
-export const THEMES = ['default', 'orange', 'green', 'purple', 'blue', 'pink', 'docs'] as const;
+export const THEMES = ['yellow', 'orange', 'green', 'purple', 'blue', 'pink', 'docs'] as const;
 export type Theme = (typeof THEMES)[number];
 export const SCHEMES = ['light', 'dark'] as const;
 export type Scheme = (typeof SCHEMES)[number];

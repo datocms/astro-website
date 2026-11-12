@@ -301,7 +301,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       return invalidRequestResponse('Invalid data URL param', 404);
     }
 
-    const palette = palettes[data.theme ?? 'default'] ?? palettes.default;
+    const palette = palettes[data.theme ?? 'purple'] ?? palettes.purple;
 
     // A logo that does not load gives the symbol: the card never fails for it.
     const loadLogo = async (): Promise<Buffer | null> => {
