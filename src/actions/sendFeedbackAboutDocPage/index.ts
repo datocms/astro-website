@@ -14,7 +14,7 @@ export default defineAction({
     url: z.string(),
     reaction: z.enum(['positive', 'negative']),
     notes: z.string().optional(),
-    email: z.string().email().optional(),
+    email: z.email().optional(),
     // Empty when no Turnstile sitekey is configured for the environment; the
     // verifier decides whether that is acceptable.
     token: z.string().optional(),

@@ -9,7 +9,7 @@ import { isSpam } from '~/lib/spam';
 export default defineAction({
   accept: 'form',
   input: z.object({
-    email: z.string().email(),
+    email: z.email(),
     project: z.string(),
     subject: z.string().optional(),
     body: z.string(),

@@ -32,9 +32,12 @@ const errorLabels: Partial<Record<string, string>> = {
 export default defineAction({
   accept: 'form',
   input: z.object({
-    email: z
-      .string({ error: 'Please, enter your email! 😊' })
-      .email('Please, enter a valid email! 😊'),
+    email: z.email({
+      error: (issue) =>
+        issue.input === undefined
+          ? 'Please, enter your email! 😊'
+          : 'Please, enter a valid email! 😊',
+    }),
     // Empty when no Turnstile sitekey is configured for the environment; the
     // verifier decides whether that is acceptable.
     token: z.string().optional(),
