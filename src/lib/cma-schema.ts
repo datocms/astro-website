@@ -208,9 +208,6 @@ export type BlogPost = ItemTypeDefinition<
     category: {
       type: 'link';
     };
-    topics: {
-      type: 'links';
-    };
   }
 >;
 export const BlogPost = {
@@ -236,26 +233,6 @@ export type BlogPostCategory = ItemTypeDefinition<
 export const BlogPostCategory = {
   ID: 'A4pCmYEGQJuva0IMyyMK6A',
   REF: { type: 'item_type', id: 'A4pCmYEGQJuva0IMyyMK6A' },
-} as const;
-
-export type BlogPostTopic = ItemTypeDefinition<
-  EnvironmentSettings,
-  'ZPFH8dPDQcOKOj-cFYXmcA',
-  {
-    name: {
-      type: 'string';
-    };
-    slug: {
-      type: 'slug';
-    };
-    position: {
-      type: 'integer';
-    };
-  }
->;
-export const BlogPostTopic = {
-  ID: 'ZPFH8dPDQcOKOj-cFYXmcA',
-  REF: { type: 'item_type', id: 'ZPFH8dPDQcOKOj-cFYXmcA' },
 } as const;
 
 export type Changelog = ItemTypeDefinition<
@@ -924,9 +901,6 @@ export type Feature = ItemTypeDefinition<
     yoast_analysis: {
       type: 'json';
     };
-    github_url: {
-      type: 'string';
-    };
   }
 >;
 export const Feature = {
@@ -1351,15 +1325,6 @@ export type Integration = ItemTypeDefinition<
     };
     square_logo_dark: {
       type: 'file';
-    };
-    landing_url: {
-      type: 'string';
-    };
-    documentation_url: {
-      type: 'string';
-    };
-    plugin_url: {
-      type: 'string';
     };
     slug: {
       type: 'slug';
@@ -1926,14 +1891,11 @@ export type PartnerTestimonial = ItemTypeDefinition<
     role: {
       type: 'string';
     };
-    excerpt: {
-      type: 'string';
+    featured: {
+      type: 'boolean';
     };
     image: {
       type: 'file';
-    };
-    featured: {
-      type: 'boolean';
     };
   }
 >;
@@ -2138,9 +2100,6 @@ export type PluginCollection = ItemTypeDefinition<
     title: {
       type: 'string';
     };
-    description: {
-      type: 'text';
-    };
     slug: {
       type: 'slug';
     };
@@ -2247,9 +2206,6 @@ export type PricingHint = ItemTypeDefinition<
       type: 'slug';
     };
     description: {
-      type: 'string';
-    };
-    documentation_url: {
       type: 'string';
     };
     position: {
@@ -2519,20 +2475,6 @@ export type Recipe = ItemTypeDefinition<
 export const Recipe = {
   ID: 'KqL8W3bSSSCZIZJgUEWPqQ',
   REF: { type: 'item_type', id: 'KqL8W3bSSSCZIZJgUEWPqQ' },
-} as const;
-
-export type RecipesPage = ItemTypeDefinition<
-  EnvironmentSettings,
-  'Ye9qbJIORQuaI3oHPNuuwQ',
-  {
-    seo: {
-      type: 'seo';
-    };
-  }
->;
-export const RecipesPage = {
-  ID: 'Ye9qbJIORQuaI3oHPNuuwQ',
-  REF: { type: 'item_type', id: 'Ye9qbJIORQuaI3oHPNuuwQ' },
 } as const;
 
 export type ResearchProgramPage = ItemTypeDefinition<
@@ -2934,9 +2876,6 @@ export type TeamMember = ItemTypeDefinition<
   EnvironmentSettings,
   '810917',
   {
-    legacy_avatar: {
-      type: 'file';
-    };
     avatar: {
       type: 'file';
     };
@@ -2991,9 +2930,6 @@ export type TechPartner = ItemTypeDefinition<
     };
     slug: {
       type: 'slug';
-    };
-    npm_user: {
-      type: 'link';
     };
     public_contact_email: {
       type: 'string';
@@ -3153,29 +3089,6 @@ export const TryTutorial = {
   REF: { type: 'item_type', id: 'IRlMog2vQN2RnipE9NZCTw' },
 } as const;
 
-export type Tutorial = ItemTypeDefinition<
-  EnvironmentSettings,
-  '810923',
-  {
-    title: {
-      type: 'string';
-    };
-    excerpt: {
-      type: 'structured_text';
-    };
-    url: {
-      type: 'string';
-    };
-    position: {
-      type: 'integer';
-    };
-  }
->;
-export const Tutorial = {
-  ID: '810923',
-  REF: { type: 'item_type', id: '810923' },
-} as const;
-
 export type TutorialVideo = ItemTypeDefinition<
   EnvironmentSettings,
   '1989853',
@@ -3321,23 +3234,6 @@ export const UseCasePage = {
   REF: { type: 'item_type', id: 'AEpdxu11TLq_NGCUWlqJcA' },
 } as const;
 
-export type UseCasesPage = ItemTypeDefinition<
-  EnvironmentSettings,
-  '810903',
-  {
-    title: {
-      type: 'string';
-    };
-    seo: {
-      type: 'seo';
-    };
-  }
->;
-export const UseCasesPage = {
-  ID: '810903',
-  REF: { type: 'item_type', id: '810903' },
-} as const;
-
 export type UserGuidesChapter = ItemTypeDefinition<
   EnvironmentSettings,
   'd5_WObmoRb-vKEv8wUTznA',
@@ -3429,9 +3325,6 @@ export type VideoTutorial = ItemTypeDefinition<
     video_tutorial_resource: {
       type: 'single_block';
       blocks: YoutubeVideoResource | OtherVideoResource;
-    };
-    show_in_docs_homepage: {
-      type: 'boolean';
     };
   }
 >;
@@ -3554,7 +3447,6 @@ export type AnyModel =
   | Blog
   | BlogPost
   | BlogPostCategory
-  | BlogPostTopic
   | Changelog
   | ChangelogCategory
   | ChangelogEntry
@@ -3602,7 +3494,6 @@ export type AnyModel =
   | ProductComparison
   | ProductOverview
   | Recipe
-  | RecipesPage
   | ResearchProgramPage
   | Review
   | SchemaMigration
@@ -3617,9 +3508,7 @@ export type AnyModel =
   | TechPartnersPage
   | TemplateDemo
   | TryTutorial
-  | Tutorial
   | UseCasePage
-  | UseCasesPage
   | UserGuidesChapter
   | UserGuidesEpisode
   | UserGuidesHome

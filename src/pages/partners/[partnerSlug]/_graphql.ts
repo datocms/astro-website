@@ -104,7 +104,13 @@ export const query = graphql(
         featuredProjects {
           id
         }
-        projects: _allReferencingShowcaseProjects(first: 100, orderBy: _firstPublishedAt_DESC) {
+        # Only the projects of the partner: a project that names the partner in
+        # its text is not one of them.
+        projects: _allReferencingShowcaseProjects(
+          first: 100
+          orderBy: _firstPublishedAt_DESC
+          through: { fields: { anyIn: [showcaseProject_partner] } }
+        ) {
           ...ShowcaseProjectUrlFragment
           id
           name
@@ -123,7 +129,13 @@ export const query = graphql(
           __typename
           ...QuotePartnerTestimonialFragment
         }
-        chats: _allReferencingCustomerStories(first: 100, orderBy: _firstPublishedAt_DESC) {
+        # Only the chats where the partner is the agency or the partner: a chat
+        # that names the partner in its text is not one of them.
+        chats: _allReferencingCustomerStories(
+          first: 100
+          orderBy: _firstPublishedAt_DESC
+          through: { fields: { anyIn: [customerStory_agency, customerStory_partner] } }
+        ) {
           ...CustomerStoryUrlFragment
           id
           title

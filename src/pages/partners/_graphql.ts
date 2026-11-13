@@ -30,7 +30,10 @@ export const PartnerFragment = graphql(
           name
         }
       }
-      _allReferencingShowcaseProjectsMeta {
+      # The same projects as the page of the partner.
+      _allReferencingShowcaseProjectsMeta(
+        through: { fields: { anyIn: [showcaseProject_partner] } }
+      ) {
         count
       }
       ...PartnerUrlFragment
