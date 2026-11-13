@@ -1,6 +1,4 @@
-import type { LogoItem } from '~/components/LogosLine';
 import type { ContactFormData } from '~/data/contact';
-import { clientLogos as c } from '~/data/clientLogos';
 import type { HeroData } from '~/data/home';
 
 /*
@@ -34,11 +32,6 @@ export const picker = {
 export const talk = {
   title: 'Talk with us.',
   text: 'Our experts are available to answer any of your questions. We’re available in a number of ways, any time that you need us.',
-};
-
-export const logos = {
-  label: 'We power experiences for over half a billion users',
-  items: [c.polestar, c.hashicorp, c.verizon, c.harrys, c.vercel] as LogoItem[],
 };
 
 const legal = {
