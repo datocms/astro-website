@@ -1,7 +1,6 @@
 // @ts-check
 /*
- * The scope of the CSS of the site (see "Cascade layers" in
- * src/REDESIGN.md).
+ * The scope of the CSS of the site (see "Styling" in AGENTS.md).
  *
  * Two users read this file:
  * - the Vite plugin cssLayers in astro.config.ts. It puts a CSS module

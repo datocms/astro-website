@@ -171,7 +171,7 @@ components:
 
 # Design System: DatoCMS
 
-<!-- Authority: the user. Reference pages (liked, not final): /, /editor-experience, /developers, /media, /ai, /compare, /case-studies/*, /philosophy, /pricing, /contact. Other pages can contain patterns that are not part of this system. Code rules live in src/REDESIGN.md; tokens live in src/styles/tokens.css. -->
+<!-- Authority: the user. Reference pages (liked, not final): /, /editor-experience, /developers, /media, /ai, /compare, /case-studies/*, /philosophy, /pricing, /contact. Other pages can contain patterns that are not part of this system. Code rules live in AGENTS.md; tokens live in src/styles/tokens.css. -->
 
 ## Overview
 

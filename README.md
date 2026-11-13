@@ -31,8 +31,7 @@ https://www.datocms.com/blog/why-we-switched-to-astro
 
 The rules for the code, the copy and the design are in these files:
 
-- [`AGENTS.md`](AGENTS.md): the layouts, the client scripts, the images, the dev servers, the environment variables, the deployment and the migrations.
-- [`src/REDESIGN.md`](src/REDESIGN.md): the components, the styling and the CMS queries.
+- [`AGENTS.md`](AGENTS.md): the layouts, the components, the styling, the CMS queries, the client scripts, the images, the dev servers, the environment variables, the deployment and the migrations.
 - [`src/data/AGENTS.md`](src/data/AGENTS.md): the copy and the pages. [`src/scenes/AGENTS.md`](src/scenes/AGENTS.md): the pictures of the product.
 - [`DESIGN.md`](DESIGN.md), [`BRAND.md`](BRAND.md) and [`PRODUCT.md`](PRODUCT.md): the design system, the voice and the positioning.
 

@@ -4,12 +4,55 @@ Astro standalone Node server, deployed via `cubo` to Kubernetes on AWS. Three en
 
 ## The layout
 
-The site has one layout family. Its rules are in `src/REDESIGN.md`: read it before you touch the pages or the components.
+Read the voice in `BRAND.md` (sections 2, 4, 5 and 7) before you change any text that a visitor sees. More rules are next to the code: `src/data/AGENTS.md` (the copy, the pages, the pillars, the chapters), `src/scenes/AGENTS.md` (the pictures of the product), `src/lib/pixel-video/AGENTS.md` (the `.pxv` files) and `src/components/PixelCover/AGENTS.md` (the blog covers).
 
 - **Pages**: `src/layouts/Layout.astro`. It imports `src/styles/global.css` and the scene kit CSS, has no router (a full load), and has the layer statement `@layer reset, tokens, base, vendor, blocks, sections, pages;`.
 - **Docs pages** (`src/pages/docs/`): `src/layouts/docs/BaseLayout` is the layout of the docs. It imports `src/styles/global.css`, has the same layer statement, has no router (a full load), and its components are in `src/components/docs/` (tokens from `src/styles/tokens.css`).
 - Both use `src/layouts/BaseLayout` for the head (SEO, favicon, canonical, RSS, cookie consent, analytics, draft mode). BaseLayout imports no global stylesheet and puts the layer statement as the first child of `<head>`. Its props are `theme` (the `data-theme` of `<body>`) and `density` (the `data-density` of `<body>`). No page uses the view transitions router.
-- **Cascade layers**: the Vite plugin `cssLayers` puts each CSS module of `src/` in a layer. The rules are in `src/REDESIGN.md`, "Styling".
+- `Layout` requires `seo`: the `_seoMetaTags` of the CMS record of the page, else `overrideSeo([], seoTitle(title), seoDescription(text))` from `~/lib/datocms/seo`.
+- `theme` is the hue of the page (`DESIGN.md`, "Page themes"). A marketing page reads it from the data of its first chapter (`theme={dev.schema.theme}`), not from a literal. The header, the `PageCloser` and the footer take the theme of the page.
+- `headerVariant` is the same value as the `variant` of the `Hero`: `page` on a marketing page, `accent` on a reference page.
+- Do not remove `id="layout-content"` from `<main>`: `/api/seo-analysis` reads the page from it.
+- `PageNav` (bottom left) is for the reviewers, not part of the design. It shows also in production.
+
+## Components
+
+- A component is `src/components/<Name>/` with `Component.astro`, `style.module.css` and `index.ts` (the barrel). Import it from the barrel (`~/components/Name`); inside the directory, use relative imports.
+- A section sets `data-theme`, and its children inherit it. A component never takes a theme, a breakpoint or a state (hover, active, focus) as a prop: these are `data-theme`, media queries and CSS/JS.
+- `Prose` styles long-form HTML inside `@scope (.prose) to (prose-island > *)`. A block with its own design wraps its markup in `<prose-island>`.
+- React only for the product scenes, rendered on the server (no `client:` directive).
+- Inline the SVGs: `import key from '~/svg/illustrations/key.svg?raw'`. The docs use `Svg` (`<Svg name="svg/logos/next-squared" />`), which optimizes the file with SVGO.
+- Text faces are in `src/lib/motion/faces.ts`. The copy names a face (`face: 'happy'`), never its glyphs, and only `Face` and the typewriter (`faceStep`) draw it. Add a new face there, and check it in `/dev/face-gallery` (`DESIGN.md`, "The Text Face Rule").
+- Motion: use the helpers in `src/lib/motion/`, CSS before JS. Reduced motion shows the final state, animations play only in view, no layout shift, and the final state is in the DOM without JS. No Lottie, and no video for what CSS can do.
+- `ChatCover` draws the cover of a casual chat from its guests: the portrait is a continuous black and white photograph, never cells. Add the slug of a new chat at the top of `src/data/chatCoverThemes.ts`.
+- The dev tools (`/dev/face-gallery`, `/dev/pxv-gallery`, `/dev/cover-gallery`, `/dev/button-gallery`) are in `src/dev/`, and the integration `dev-tools` in `astro.config.ts` adds their routes. A dev tool must not import a dev dependency: the build has the routes, and the runtime image has no dev dependencies.
+- After a new tarball of the scene kit in `vendor/`, run `npm install` and restart `astro dev`.
+
+## Styling
+
+- **Cascade layers**, lowest first: `reset, tokens, base, vendor, blocks, sections, pages`. A higher layer wins, whatever the specificity. The Vite plugin `cssLayers` puts a module under `src/pages/` in `pages`, every other module of `src/` in `sections`, unless line 1 is a marker such as `/* @layer blocks */`. `css-scope.mjs` gives its scope.
+- If a rule does not win, the file is in the wrong layer, or the block needs an API. Never repeat a class, add an ancestor or use `!important` (outside `global.css`) to win. A section or a page uses the props and the custom properties of a block (`--section-padding-top`, `--section-content-max`), never overrides its longhands. `contentClass` of `Section` never sets `max-width` or `margin-inline`: use `width="headline"` or `width="reading"`.
+- Two rules in the same layer on the same element and property: give one more specificity on purpose, or put the base rule in `:where()`, and say why in a comment.
+- **Colour**: never a hex in a component, and primitives (`--color-*`) only in `tokens.css`. The system is in `DESIGN.md`, "Colour: grounds and text roles" and "Dark scheme":
+  - The element that paints a ground gets `surfacePage`, `surfaceAccent` or `surfaceInverse` (`Section` does it from `background`) and sets `color` to a role of that ground (`--text-on-page*`, `--text-on-accent*`, `--text-on-inverse*`) in the same rule.
+  - Inside a ground, use the contextual roles (`--text-primary`, `--text-soft`, `--text-muted`, `--border-default`, `--text-accent`…): they follow the ground and `data-theme`.
+  - No `opacity`, `color-mix()` or local `--text-*` on text. `--text-headline-muted` only on large text, in the files of `HEADLINE_MUTED_FILES` (`src/lib/tokens/contract.ts`).
+  - `Button` takes only a `variant` (`solid`, `soft`, `accent`): the ground gives its colours.
+  - Use a token for its role, not for its colour in light. A rule under `:global(:root[data-color-scheme='dark'])` only when no token fits, with a comment. Check each change in both schemes.
+- Spacing only with `--space-*`; type only with the typography classes of `src/styles/typography.css`.
+- Breakpoints (min-width): 768, 1152, 1320. The exceptions: `SceneFrame` and `SceneFragment` at 650, and `SiteHeader` below 360. Hover only inside `@media (hover: hover)`.
+- `npm run lint:css` enforces the layers and the text roles, and `npm test` checks every pairing of the tokens. A disable comment needs a reason (`-- reason`).
+- Fonts: never put a copy of a font file in this repository (the licence does not allow it). The site serves them from `UI_FONTS_BASE_URL`: set it in local dev, else they give 404.
+- The design source is the Figma file `WnWBSVVcroe5s4tXQGnhSA`, page **Components** (`455:11066`); for the Figma MCP, use the shared copy `2nEQ2LGxRaWjxWzjuVoXBV` (same node IDs).
+
+## CMS
+
+- Run the queries with `executeQuery(Astro, query, options?)` from `~/lib/datocms/executeQuery`. Queries go in `_graphql.ts` next to the page; a route with parameters must have one (the `routes` integration expects it).
+- A component that shows CMS data declares a fragment in its `graphql.ts`, and the barrel exports it. Its props are `FragmentOf<typeof Fragment>`, read with `readFragment`. The page spreads the fragment and passes the result unchanged: do not convert it into the types of `src/data/`.
+- A prop that takes records of two types: select `__typename` next to one fragment for each type (see `Quote`). Not a fragment on `RecordInterface` with `... on XRecord`: the CDA refuses it.
+- Render Structured Text with `~/components/StructuredText` (`StructuredText`, `InlineParagraphs`, `PlainText`): they keep the stega of Content Link. Make a string only when the target needs one (JSON-LD, a search attribute), say why in a comment, and use `stripStega` when it is not visible text.
+- A CMS logo goes in a `LogoItem` with `mask`, not `src`: it then takes the colour of the text.
+- A fragment on `ResponsiveImage` sets no `imgixParams`: the caller passes them in the query.
 
 ## Files that other apps load
 

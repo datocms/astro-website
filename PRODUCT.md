@@ -56,7 +56,7 @@ Home page line, today: "Thoughtfully built and ambitiously used. The AI-agnostic
 
 ## Capabilities and Constraints
 
-- Astro server app, deployed with `cubo` to Kubernetes (production, staging1, staging2). The code rules are in `AGENTS.md` and `src/REDESIGN.md`.
+- Astro server app, deployed with `cubo` to Kubernetes (production, staging1, staging2). The code rules are in `AGENTS.md`.
 - The fonts (ABC Oracle, Geist Mono) are licensed. Serve them through the `/fonts` proxy. Never commit a font file.
 - Two colour schemes, light and dark, both supported.
 - The original design comes from the agency overnice (Figma file `WnWBSVVcroe5s4tXQGnhSA`).
