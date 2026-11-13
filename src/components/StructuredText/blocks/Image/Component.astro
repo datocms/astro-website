@@ -2,14 +2,16 @@
 import { InViewVideo } from '~/components/InViewVideo';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
-import { ImageFragment } from './graphql';
+import { ImageAssetFragment, ImageFragment } from './graphql';
 import styles from './style.module.css';
 
 interface Props {
   block: FragmentOf<typeof ImageFragment>;
 }
 
-const { frameless, asset } = readFragment(ImageFragment, Astro.props.block);
+const block = readFragment(ImageFragment, Astro.props.block);
+const { frameless } = block;
+const asset = readFragment(ImageAssetFragment, block.nextAsset ?? block.asset);
 
 // A large image opens at full size. Without JS, the link opens the image file.
 const zoomUrl = asset.width && asset.width > 1500 ? asset.lightboxImageUrl : null;

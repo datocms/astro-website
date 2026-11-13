@@ -1206,6 +1206,9 @@ export type Image = ItemTypeDefinition<
     image: {
       type: 'file';
     };
+    image_next: {
+      type: 'file';
+    };
     frameless: {
       type: 'boolean';
     };
@@ -1422,6 +1425,9 @@ export type InternalVideo = ItemTypeDefinition<
   '810948',
   {
     video: {
+      type: 'file';
+    };
+    video_next: {
       type: 'file';
     };
   }
