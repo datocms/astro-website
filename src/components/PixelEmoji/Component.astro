@@ -1,5 +1,4 @@
 ---
-import { stripStega } from '@datocms/astro';
 import drawings from './drawings.json';
 import styles from './style.module.css';
 
@@ -14,7 +13,7 @@ interface Props {
 const { emoji, class: className } = Astro.props;
 
 // The key has the code points of the emoji, without the variation selector.
-const key = [...stripStega(emoji)]
+const key = [...emoji]
   .map((char) => char.codePointAt(0)?.toString(16))
   .filter((codePoint) => codePoint !== 'fe0f')
   .join('-');

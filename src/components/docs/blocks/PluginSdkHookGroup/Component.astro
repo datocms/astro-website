@@ -4,7 +4,6 @@ import Hook from './Hook/index.astro';
 import { PluginSdkHookGroupFragment } from './graphql';
 import type { FragmentOf } from 'gql.tada';
 import { readFragment } from 'gql.tada';
-import { stripStega } from '@datocms/astro';
 
 interface Props {
   block: FragmentOf<typeof PluginSdkHookGroupFragment>;
@@ -17,7 +16,7 @@ const { groupName } = readFragment(PluginSdkHookGroupFragment, block);
 const manifest = await fetchPluginSdkManifest(Astro);
 
 const hooks = sortRelatedHooks(
-  Object.values(manifest.hooks).filter((hook) => hook.comment?.tag === stripStega(groupName)),
+  Object.values(manifest.hooks).filter((hook) => hook.comment?.tag === groupName),
 );
 ---
 

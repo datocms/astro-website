@@ -1,5 +1,4 @@
 ---
-import { stripStega } from '@datocms/astro';
 import { type FragmentOf, readFragment } from 'gql.tada';
 import Section from './Section/Component.astro';
 import { SectionsFragment } from './graphql';
@@ -25,7 +24,7 @@ let currentSum = 0;
 
 for (const section of page.sections) {
   if (section.__typename !== 'DocsHomeSectionBlockRecord') continue;
-  const span = widthSpan[stripStega(section.width)] ?? 12;
+  const span = widthSpan[section.width] ?? 12;
   if (currentSum + span > 12) {
     rows.push(currentRow);
     currentRow = [];

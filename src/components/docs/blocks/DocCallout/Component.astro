@@ -8,7 +8,6 @@ import AnchoredHeadingNode from '~/components/StructuredText/AnchoredHeadingNode
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 import Base from './Base.astro';
-import { stripStega } from '@datocms/astro';
 
 interface Props {
   block: FragmentOf<typeof DocCalloutFragment>;
@@ -21,7 +20,7 @@ const block = readFragment(DocCalloutFragment, maskedBlock);
 const { calloutType, title, text } = block;
 ---
 
-<Base calloutType={stripStega(calloutType)} title={title}>
+<Base calloutType={calloutType} title={title}>
   <StructuredText
     nodeOverrides={{ heading: AnchoredHeadingNode }}
     {...ensureValidStructuredTextProps({

@@ -1,4 +1,3 @@
-import { stripStega } from '@datocms/astro';
 import { graphql, readFragment, type FragmentOf } from '../graphql';
 
 export const PluginUrlFragment = graphql(/* GraphQL */ `
@@ -9,5 +8,5 @@ export const PluginUrlFragment = graphql(/* GraphQL */ `
 
 export function buildUrlForPlugin(plugin: FragmentOf<typeof PluginUrlFragment>) {
   const data = readFragment(PluginUrlFragment, plugin);
-  return `/plugins/i/${stripStega(data.packageName)}`;
+  return `/plugins/i/${data.packageName}`;
 }

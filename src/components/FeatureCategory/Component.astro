@@ -39,8 +39,7 @@ const entries = Astro.props.entries.map((data) => {
     screenshot: entry.image?.lightboxImageUrl,
     plainTitle: stripStega(entry.title),
     buttons: entry.links.map((link): ButtonData => {
-      // In draft mode the title carries the invisible marks of the content link.
-      const key = stripStega(link.linkTitle ?? '');
+      const key = link.linkTitle ?? '';
       return {
         label: linkLabels[key] ?? key,
         href: buildUrlFromGql(link.content),

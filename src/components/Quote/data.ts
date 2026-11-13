@@ -47,7 +47,7 @@ const PROFILE_HOSTS = ['twitter.com', 'x.com', 'linkedin.com', 'github.com', 'bs
  * goes to a page of this site, and a javascript: href is not safe.
  */
 function safeHref(value: string | null | undefined) {
-  const url = stripStega(value ?? '').trim();
+  const url = (value ?? '').trim();
   if (!url) return null;
   try {
     const parsed = new URL(/^[a-z][a-z0-9+.-]*:/i.test(url) ? url : `https://${url}`);

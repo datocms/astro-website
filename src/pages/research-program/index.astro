@@ -25,8 +25,6 @@ if (!page) {
   return notFoundResponse();
 }
 
-const ctaUrl = stripStega(page.ctaUrl);
-
 const faqs = page.faqs.flatMap((faq) => ('question' in faq ? [faq] : []));
 
 // The JSON-LD needs strings: the question and the answer as plain text,
@@ -55,7 +53,7 @@ const jsonLd: WithContext<FAQPage> | null =
 <Layout theme="purple" seo={page.seo} headerVariant="accent">
   {jsonLd && <JsonLd slot="head" data={jsonLd} />}
 
-  <Hero variant="accent" {...hero} buttons={[{ label: page.heroCtaLabel, href: ctaUrl }]} />
+  <Hero variant="accent" {...hero} buttons={[{ label: page.heroCtaLabel, href: page.ctaUrl }]} />
 
   <Steps title={steps.title} muted={steps.muted}>
     {
@@ -73,7 +71,7 @@ const jsonLd: WithContext<FAQPage> | null =
 
   <Faq title={faqTitle} questions={faqs} />
 
-  <CtaBanner {...closing} buttons={[{ label: page.bottomCtaButtonLabel, href: ctaUrl }]} />
+  <CtaBanner {...closing} buttons={[{ label: page.bottomCtaButtonLabel, href: page.ctaUrl }]} />
 
   <DraftModeQueryListener query={query} />
 </Layout>

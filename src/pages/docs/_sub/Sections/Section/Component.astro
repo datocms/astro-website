@@ -1,5 +1,4 @@
 ---
-import { stripStega } from '@datocms/astro';
 import { type FragmentOf, readFragment } from 'gql.tada';
 import DocCard from '../DocCard/Component.astro';
 import ExternalCard from '../ExternalCard/Component.astro';
@@ -17,7 +16,7 @@ const block = readFragment(SectionFragment, Astro.props.block);
   <div class={s.sectionHeader}>
     <h2 class={s.sectionTitle}>{block.title}</h2>
   </div>
-  <div class={s.cards} data-cols={stripStega(block.columns)}>
+  <div class={s.cards} data-cols={block.columns}>
     {
       block.cards.map((card) =>
         card.__typename === 'DocsHomeDocCardBlockRecord' ? (

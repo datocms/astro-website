@@ -3,7 +3,6 @@
 // of the chosen topic and, when the topic needs it, a form. The URL holds
 // the choice (?topics=a/b). The first render follows the URL, as the script
 // does after a change.
-import { stripStega } from '@datocms/astro';
 import { ChevronDown } from 'lucide';
 import { render as renderAsHtmlString } from 'datocms-structured-text-to-html-string';
 import { ContactForm } from '~/components/ContactForm';
@@ -43,8 +42,8 @@ const metas: TopicMeta[] = topics.map((topic) => ({
   slug: topic.slug,
   childSlugs: childrenOf(topic.slug).map((child) => child.slug),
   formMode: formModeOf(topic),
-  formType: stripStega(topic.contactFormType) === 'support' ? 'support' : 'sales',
-  responder: stripStega(topic.autoResponderType ?? ''),
+  formType: topic.contactFormType === 'support' ? 'support' : 'sales',
+  responder: topic.autoResponderType ?? '',
 }));
 
 // The first render follows the URL, as the script does after a change.
