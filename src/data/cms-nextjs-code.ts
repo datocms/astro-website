@@ -34,7 +34,7 @@ query Post($slug: String!) {
 export default async function Page({ params }) {
   const { slug } = await params;
   const { post } = await executeQuery(POST_QUERY, {
-    token: process.env.DATOCMS_TOKEN,
+    token: process.env.DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN,
     variables: { slug },
   });
 
@@ -49,14 +49,13 @@ export const clientCode: CodeTab[] = [
   {
     label: 'lib/datocms.ts',
     lang: 'ts',
-    focus: [[5, 9]],
+    focus: [[5, 8]],
     code: `import { executeQuery as cdaExecuteQuery } from '@datocms/cda-client';
 
 export function executeQuery(query, options = {}) {
   return cdaExecuteQuery(query, {
     ...options,
-    token: process.env.DATOCMS_TOKEN,
-    environment: process.env.DATOCMS_ENVIRONMENT,
+    token: process.env.DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN,
     // Records that fail a validation stay out of the response
     excludeInvalid: true,
   });
@@ -69,11 +68,11 @@ export const imageCode: CodeTab[] = [
   {
     label: 'components/Cover.tsx',
     lang: 'tsx',
-    code: `import { SRCImage } from 'react-datocms';
+    code: `import { RSCImage } from 'react-datocms/rsc-image';
 
 export function Cover({ cover }) {
   // A Server Component: one <picture>, no JS, native lazy loading
-  return <SRCImage data={cover.responsiveImage} />;
+  return <RSCImage data={cover.responsiveImage} />;
 }`,
   },
 ];
@@ -229,7 +228,7 @@ import { storeQueryCacheTags } from '@/lib/cache-tags';
 export async function executeQuery(query, options = {}) {
   const queryId = hash([query, options.variables]);
   const [data, response] = await rawExecuteQuery(query, {
-    token: process.env.DATOCMS_TOKEN,
+    token: process.env.DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN,
     excludeInvalid: true,
     returnCacheTags: true,
     variables: options.variables,

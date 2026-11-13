@@ -15,7 +15,7 @@ export const pageTab: CodeTab = {
   label: 'src/pages/posts/[slug].astro',
   lang: 'astro',
   code: `---
-import { executeQuery } from '~/lib/datocms';
+import { executeQuery } from '~/lib/datocms/executeQuery';
 
 const POST_QUERY = /* GraphQL */ \`
 query Post($slug: String!) {
@@ -47,16 +47,16 @@ export const fetchCode: CodeTab[] = [pageTab, responseTab];
 // Chapter 1, fragment 1: the helper that all the pages call.
 export const clientCode: CodeTab[] = [
   {
-    label: 'src/lib/datocms.ts',
+    label: 'src/lib/datocms/executeQuery.ts',
     lang: 'ts',
     focus: [[6, 9]],
     code: `import { executeQuery as cdaExecuteQuery } from '@datocms/cda-client';
-import { DATOCMS_CDA_TOKEN } from 'astro:env/server';
+import { DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN } from 'astro:env/server';
 
 export const executeQuery = (query, options = {}) =>
   cdaExecuteQuery(query, {
     ...options,
-    token: DATOCMS_CDA_TOKEN,
+    token: DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN,
     // Records that fail a validation stay out of the response
     excludeInvalid: true,
   });`,
@@ -206,17 +206,17 @@ export const liveCode: CodeTab = {
 // The pages give it Astro as the context.
 export const tagsCode: CodeTab[] = [
   {
-    label: 'src/lib/datocms.ts',
+    label: 'src/lib/datocms/executeQuery.ts',
     lang: 'ts',
     focus: [9, [12, 17]],
     code: `import { rawExecuteQuery } from '@datocms/cda-client';
-import { DATOCMS_CDA_TOKEN } from 'astro:env/server';
+import { DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN } from 'astro:env/server';
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
 export async function executeQuery(context, query, variables) {
   const [result, response] = await rawExecuteQuery(query, {
-    token: DATOCMS_CDA_TOKEN,
+    token: DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN,
     returnCacheTags: true,
     variables,
   });

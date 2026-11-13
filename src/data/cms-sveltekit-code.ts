@@ -50,7 +50,7 @@ import { executeQuery as cdaExecuteQuery } from '@datocms/cda-client';
 export const executeQuery = (query, options = {}) =>
   cdaExecuteQuery(query, {
     ...options,
-    token: env.DATOCMS_CDA_TOKEN,
+    token: env.PRIVATE_DATOCMS_PUBLISHED_CONTENT_CDA_TOKEN,
     // Records that fail a validation stay out of the response
     excludeInvalid: true,
   });`,
