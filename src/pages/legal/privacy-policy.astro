@@ -6,11 +6,15 @@ import { Hero } from '~/components/Hero';
 import { tableOfContentsItems } from '~/components/TableOfContents';
 import privacy from '~/documents/privacy.json';
 import Layout from '~/layouts/Layout.astro';
-import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { prepareIubendaHtml } from '~/lib/iubenda';
 import styles from './_iubenda.module.css';
 
-const seo = overrideSeo([], seoTitle('Privacy policy'));
+const seo = overrideSeo(
+  [],
+  seoTitle('Privacy policy'),
+  seoDescription('How DatoCMS collects and processes your personal data.'),
+);
 const { html, items } = prepareIubendaHtml(privacy.content);
 ---
 

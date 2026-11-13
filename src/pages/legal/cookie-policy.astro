@@ -6,11 +6,17 @@ import { Hero } from '~/components/Hero';
 import { tableOfContentsItems } from '~/components/TableOfContents';
 import policy from '~/documents/cookie-policy.json';
 import Layout from '~/layouts/Layout.astro';
-import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { prepareIubendaHtml } from '~/lib/iubenda';
 import styles from './_iubenda.module.css';
 
-const seo = overrideSeo([], seoTitle('Cookie policy'));
+const seo = overrideSeo(
+  [],
+  seoTitle('Cookie policy'),
+  seoDescription(
+    'The cookies and the tracking tools of the DatoCMS website, and what each one does.',
+  ),
+);
 const { html, items } = prepareIubendaHtml(policy.content);
 ---
 

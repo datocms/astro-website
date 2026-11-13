@@ -5,9 +5,13 @@ import { Hero } from '~/components/Hero';
 import { tableOfContentsItems } from '~/components/TableOfContents';
 import { Content, getHeadings } from '~/documents/gdpr.md';
 import Layout from '~/layouts/Layout.astro';
-import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 
-const seo = overrideSeo([], seoTitle('GDPR compliance'));
+const seo = overrideSeo(
+  [],
+  seoTitle('GDPR compliance'),
+  seoDescription('How DatoCMS handles personal data under the GDPR.'),
+);
 // Astro gives each heading an id. The table lists the h2 and h3 headings.
 const items = tableOfContentsItems(
   getHeadings()
