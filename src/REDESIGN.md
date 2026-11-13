@@ -117,6 +117,13 @@ Read `src/lib/pixel-video/AGENTS.md` (the process and the rules) and `scripts/pi
 
 Read `src/components/PixelCover/AGENTS.md` (the rules and the process) and `scripts/blog-covers/README.md` (the commands) before you add or change a blog cover. The files are in `src/assets/blog-covers/`, the theme of each post is in `src/data/blogCoverThemes.ts`, and `/dev/cover-gallery` shows them all.
 
+## Chat covers
+
+A casual chat has no file for its cover. `ChatCover` (`src/components/ChatCover/`) draws it from the guests of the chat: the split of the theme, and for each guest a flat speech bubble in the paper of the theme, with the portrait of the CMS in it. The portrait is a continuous photograph in black and white: never cells, never a stencil. The shapes are in `layout.ts`, in cells of the grid of the blog covers (100 × 58). One guest has one bubble on the seam, two guests have one bubble on each half, three guests have three small bubbles.
+
+- The featured card of a chat shows the cover as a still. The header of the page of a chat sets `animated`: the bubble arrives in steps from the point of its tail, and a small reply bubble with three dots shows for a moment, and again when the pointer is on the cover. The motion is CSS only, and reduced motion shows the still.
+- The theme of each chat is in `src/data/chatCoverThemes.ts`: add the slug of a new chat at the top of the list.
+
 ## Dev tools
 
 - The galleries (`/dev/face-gallery`, `/dev/pxv-gallery`, `/dev/cover-gallery`, `/dev/button-gallery`) are in `src/dev/`, not in `src/pages/`: the integration `dev-tools` in `astro.config.ts` adds their routes, in `astro dev` and in the build. Thus the production site shows them, but the sitemap and `PageNav` do not list them.

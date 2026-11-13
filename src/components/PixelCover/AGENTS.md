@@ -53,7 +53,7 @@ Judge each cover at feed size first. A cover that works only in the post header 
 - A title with a joke can take the joke, but only when the rules above stay true.
 - Read the post first: `curl -s http://localhost:<port>/blog/<slug>.md`.
 - **Animals only.** No hands, no people, no UI, no text, no logos.
-- **Never a face of a real person**, not as pixels, not as a stencil, not posterized. The casual chats (interviews) have no cover yet: their direction is open.
+- **Never a face of a real person**, not as pixels, not as a stencil, not posterized. The casual chats (interviews) have their own cover, `ChatCover` (`src/components/ChatCover/`): the real portrait of each guest, in black and white, in a speech bubble made of cells. Only the outline of the bubble is cells. The photo is whole.
 - **Each animal once.** `gen.ts list` shows the animals in use and marks an animal that is in use two times. Look at the list before you search.
 
 ### 6. Tones and contrast

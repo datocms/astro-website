@@ -26,12 +26,16 @@ export const ChatHeaderFragment = graphql(/* GraphQL */ `
     title
     _firstPublishedAt
     _createdAt
+    slug
     people {
       name
       title
       company
       avatar {
         url(imgixParams: { w: 80, h: 80, fit: crop })
+      }
+      portrait: avatar {
+        url(imgixParams: { w: 640, h: 640, fit: crop })
       }
     }
   }

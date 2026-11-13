@@ -15,6 +15,7 @@ import { defaultInlineRecordComponents } from '~/components/StructuredText/inlin
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
 import * as blog from '~/data/blog';
 import { blogCover } from '~/data/blogCovers';
+import { chatCoverTheme } from '~/data/chatCoverThemes';
 import { indexes } from '~/data/breadcrumbs';
 import Layout from '~/layouts/Layout.astro';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
@@ -49,6 +50,7 @@ function articleData() {
         article,
         header: { post: article },
         cover: blogCover(article.slug),
+        theme: blogCover(article.slug)?.theme,
         trail: [
           indexes.blog,
           ...(article.category
@@ -73,6 +75,7 @@ function articleData() {
         article,
         header: { chat: article },
         cover: undefined,
+        theme: chatCoverTheme(article.slug),
         trail: [indexes.blog, indexes.casualChats],
         authors: article.people.map((person) => person.name),
         jsonLdType: 'Article' as const,
@@ -93,6 +96,7 @@ const {
   article,
   header,
   cover,
+  theme,
   trail,
   authors,
   jsonLdType,
@@ -100,7 +104,8 @@ const {
   relatedCopy,
   structuredText,
 } = articleData();
-// A post with a cover takes the theme of its cover. The other articles are in the green of the blog.
+// A post with a cover takes the theme of its cover, and a chat takes the theme of its portraits.
+// The other articles are in the green of the blog.
 
 const related = await loadRelated(Astro, article);
 
@@ -113,7 +118,7 @@ const markdownUrl = new URL(
 ---
 
 <Layout
-  theme={cover?.theme ?? 'green'}
+  theme={theme ?? 'green'}
   seo={overrideSeo(
     article.seo,
     article.canonicalUrl ? seoCanonical(article.canonicalUrl) : undefined,

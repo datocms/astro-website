@@ -1,0 +1,116 @@
+---
+import type { Theme } from '~/lib/theme';
+import {
+  bubbleLayout,
+  bubblePath,
+  COLUMNS,
+  photoBox,
+  photoPath,
+  replyDots,
+  replyPath,
+  ROWS,
+  tailTip,
+} from './layout';
+import styles from './style.module.css';
+
+interface Props {
+  /** The guests of the chat. The URL of a portrait is a square crop of 640 px. */
+  people: { name: string; portrait: { url: string } }[];
+  theme: Theme;
+  /** The cover moves: the page of a chat sets it. A cover on a card is a still. */
+  animated?: boolean;
+  class?: string;
+  [attribute: `data-${string}`]: unknown;
+}
+
+const { people, theme, animated = false, class: className, ...rest } = Astro.props;
+
+// Each cover on a page needs its own clip paths: an id is unique in the document.
+// A counter on the global object is shared by all the renders of the server.
+const counter = globalThis as { __chatCoverCount?: number };
+counter.__chatCoverCount = ((counter.__chatCoverCount ?? 0) + 1) % 1_000_000;
+const instance = counter.__chatCoverCount;
+
+const bubbles = bubbleLayout(people.length);
+// The reply bubble is a part of the motion. A cover with one guest has room for it.
+const hasReply = animated && bubbles.length === 1;
+---
+
+{
+  /*
+  A chat cover. The two grounds of the split are the background of the box,
+  so they fill a box of any shape. The grid of cells keeps its ratio and sits
+  in the middle of the box, with its seam on the seam of the grounds. Each guest has a
+  speech bubble: a flat shape in the paper of the theme, with the portrait in
+  it. The portrait is a continuous photograph in black and white. A clip path
+  cuts it. The shapes are lists of rectangles on cell lines, so every edge is
+  a step of whole cells.
+
+  With `animated`, the cover moves in steps, like pixel art. When the page loads, each bubble
+  grows from the point of its tail, and the reply bubble shows its three dots
+  for a moment. When the pointer is on the cover or on the link around it,
+  the bubble goes up one cell and the reply bubble shows again. On a cover
+  with more guests, the bubbles go up in turns.
+*/
+}
+<div
+  class:list={[styles.cover, animated && styles.animated, className]}
+  data-theme={theme}
+  {...rest}
+>
+  <svg
+    class={styles.svg}
+    viewBox={`0 0 ${COLUMNS} ${ROWS}`}
+    preserveAspectRatio="xMidYMid meet"
+    shape-rendering="crispEdges"
+    role="img"
+    aria-label={`Portrait of ${people.map((person) => person.name).join(', ')}`}
+  >
+    {
+      bubbles.map((bubble, index) => {
+        const tip = tailTip(bubble);
+        const photo = photoBox(bubble);
+        return (
+          <g
+            class={styles.arrive}
+            style={`--index: ${index}; transform-origin: ${tip.x}px ${tip.y}px`}
+          >
+            <g class:list={[styles.bubble, styles[`count${Math.min(bubbles.length, 3)}`]]}>
+              <path class={styles.frame} d={bubblePath(bubble)} />
+              <clipPath id={`chat-cover-${instance}-${index}`}>
+                <path d={photoPath(bubble)} />
+              </clipPath>
+              <image
+                class={styles.photo}
+                href={people[index]!.portrait.url}
+                x={photo.x}
+                y={photo.y}
+                width={photo.size}
+                height={photo.size}
+                preserveAspectRatio="xMidYMid slice"
+                clip-path={`url(#chat-cover-${instance}-${index})`}
+              />
+            </g>
+          </g>
+        );
+      })
+    }
+    {
+      hasReply && (
+        <g class={styles.reply} aria-hidden="true">
+          <path class={styles.replyShape} d={replyPath()} />
+          {replyDots.map((dot, index) => (
+            <rect
+              class={styles.dot}
+              style={`--index: ${index}`}
+              x={dot.x}
+              y={dot.y}
+              width={dot.size}
+              height={dot.size}
+            />
+          ))}
+        </g>
+      )
+    }
+  </svg>
+</div>

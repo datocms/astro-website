@@ -1,0 +1,193 @@
+/* @layer blocks */
+
+/*
+ * The box of the cover. The parent gives its size. The two grounds of the
+ * theme fill the box, so the space around the shapes has the colour of the
+ * cover.
+ */
+.cover {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: linear-gradient(to right, var(--theme-accent) 50%, var(--theme-ink) 50%);
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The bubble is flat, in the paper of the theme. It shows on the two grounds. */
+.frame {
+  fill: var(--theme-paper);
+}
+
+/* The portraits come from many sources. Black and white makes them one series. */
+.photo {
+  filter: grayscale(1) contrast(1.05);
+}
+
+/* One unit of a transform is one cell: the origin and the lengths are in the grid. */
+.arrive,
+.bubble,
+.dot {
+  transform-box: view-box;
+}
+
+/*
+ * The reply bubble is flat, in the accent, on the ink half. It does not show
+ * at rest. It shows when the pointer is on the cover or on the link around
+ * the cover, and when the link has the keyboard focus.
+ */
+.reply {
+  visibility: hidden;
+}
+
+.replyShape {
+  fill: var(--theme-accent);
+}
+
+.dot {
+  fill: var(--theme-ink);
+}
+
+a:focus-visible .reply {
+  visibility: visible;
+}
+
+@media (hover: hover) {
+  .cover:hover .reply,
+  a:hover .reply {
+    visibility: visible;
+  }
+}
+
+/*
+ * The motion, only on a cover with `animated`. Each keyframe holds its values until the next keyframe
+ * (step-end), so the cover moves in frames and all its edges stay hard.
+ * Without motion the cover is the still: the bubbles in their place.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  /* The bubble grows from the point of its tail. The bubbles of a cover arrive in turns. */
+  .animated .arrive {
+    animation: arrive 350ms step-end backwards;
+    animation-delay: calc(var(--index) * 210ms);
+  }
+
+  /* After the bubble, the reply bubble shows for three rounds of its dots. */
+  .reply {
+    animation: reply 2250ms step-end backwards;
+    animation-delay: 560ms;
+  }
+
+  .dot {
+    animation: tick 750ms step-end 3 backwards;
+    animation-delay: calc(560ms + var(--index) * 125ms);
+  }
+
+  a:focus-visible .reply {
+    animation: none;
+  }
+
+  a:focus-visible .dot {
+    animation: tick 750ms step-end infinite;
+    animation-delay: calc(var(--index) * 125ms);
+  }
+
+  @media (hover: hover) {
+    .cover:hover .reply,
+    a:hover .reply {
+      animation: none;
+    }
+
+    .cover:hover .dot,
+    a:hover .dot {
+      animation: tick 750ms step-end infinite;
+      animation-delay: calc(var(--index) * 125ms);
+    }
+
+    /* One guest: the bubble goes up one cell, at once. */
+    .animated:hover .count1,
+    a:hover .animated .count1 {
+      transform: translateY(-1px);
+    }
+
+    /* More guests: the bubbles go up in turns, as people who speak in turns. */
+    .animated:hover .count2,
+    a:hover .animated .count2 {
+      animation: turnOfTwo 1000ms step-end infinite;
+      animation-delay: calc(var(--index) * 500ms);
+    }
+
+    .animated:hover .count3,
+    a:hover .animated .count3 {
+      animation: turnOfThree 1500ms step-end infinite;
+      animation-delay: calc(var(--index) * 500ms);
+    }
+  }
+}
+
+@keyframes arrive {
+  0% {
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+    transform: scale(0.5);
+  }
+
+  40% {
+    transform: scale(0.75);
+  }
+
+  60% {
+    transform: scale(1.05);
+  }
+
+  80% {
+    transform: none;
+  }
+}
+
+@keyframes reply {
+  0% {
+    visibility: visible;
+  }
+
+  100% {
+    visibility: hidden;
+  }
+}
+
+/* A dot is one cell higher for one frame of 125ms. */
+@keyframes tick {
+  0% {
+    transform: translateY(-1px);
+  }
+
+  16.67% {
+    transform: none;
+  }
+}
+
+@keyframes turnOfTwo {
+  0% {
+    transform: translateY(-1px);
+  }
+
+  50% {
+    transform: none;
+  }
+}
+
+@keyframes turnOfThree {
+  0% {
+    transform: translateY(-1px);
+  }
+
+  33.33% {
+    transform: none;
+  }
+}

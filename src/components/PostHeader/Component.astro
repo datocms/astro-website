@@ -1,7 +1,9 @@
 ---
+import { ChatCover } from '~/components/ChatCover';
 import { PixelCover } from '~/components/PixelCover';
 import { Section } from '~/components/Section';
 import type { BlogCover } from '~/data/blogCovers';
+import { chatCoverTheme } from '~/data/chatCoverThemes';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { formatLongDate } from '~/lib/format/date';
 import { ChatHeaderFragment, PostHeaderFragment } from './graphql';
@@ -25,6 +27,8 @@ const { title, _firstPublishedAt, _createdAt } = (chat ?? post)!;
 const date = _firstPublishedAt ?? _createdAt;
 const isChat = Boolean(chat);
 const { cover } = Astro.props;
+// A chat always has a cover: the portraits of its guests.
+const hasCover = Boolean(cover) || isChat;
 const people = chat ? chat.people : post!.author;
 // A casual chat gives the role and the company of each person: "Laís Kantor (Founder, goodbase)".
 const names = new Intl.ListFormat('en', { type: 'conjunction' }).format(
@@ -35,17 +39,26 @@ const names = new Intl.ListFormat('en', { type: 'conjunction' }).format(
       })
     : post!.author.map((author) => author.name),
 );
+
+// In draft mode each value ends with the stega of Content Link: characters with
+// no width. One of them permits a line break, so a ")" or a "," after a value
+// can go alone to the next line. Thus the last word of a value, its stega and
+// the punctuation after it stay on one line.
+const STEGA = '\u200B\u200C\u200D\uFEFF';
+const gluedPattern = new RegExp(`([^\\s${STEGA}]*[${STEGA}]+[^\\s${STEGA}]+)`);
+// The parts at the odd positions are the parts that stay on one line.
+const nameParts = names.split(gluedPattern);
 ---
 
 <Section
   as="header"
-  padding={cover ? 'none' : 'headlines'}
+  padding={hasCover ? 'none' : 'headlines'}
   width="headline"
-  flush={Boolean(cover)}
+  flush={hasCover}
   background="accent"
-  contentClass={cover ? styles.split : undefined}
+  contentClass={hasCover ? styles.split : undefined}
 >
-  <div class:list={[styles.content, cover && styles.splitText]}>
+  <div class:list={[styles.content, hasCover && styles.splitText]}>
     {isChat && <p class:list={[styles.label, 'labelMedium']}>Casual chat</p>}
     <h1 class:list={[styles.title, 'display']}>{title}</h1>
     <div class={styles.byline}>
@@ -58,9 +71,24 @@ const names = new Intl.ListFormat('en', { type: 'conjunction' }).format(
       </div>
       <p class="labelMedium">
         Posted on <time datetime={date} data-datocms-llm-date>{formatLongDate(date)}</time><br />
-        {isChat ? 'In conversation with' : 'by'}{' '}{names}
+        {isChat ? 'In conversation with' : 'by'}{' '}{
+          nameParts.map((part, index) =>
+            index % 2 ? <span class={styles.glued}>{part}</span> : part,
+          )
+        }
       </p>
     </div>
   </div>
   {cover && <PixelCover cover={cover} class={styles.splitPicture} data-datocms-nomd />}
+  {
+    chat && (
+      <ChatCover
+        people={chat.people}
+        theme={chatCoverTheme(chat.slug)}
+        animated
+        class={styles.splitPicture}
+        data-datocms-nomd
+      />
+    )
+  }
 </Section>

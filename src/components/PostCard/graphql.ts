@@ -51,6 +51,9 @@ export const ChatCardFragment = graphql(
         avatar {
           url(imgixParams: { w: 60, h: 60, fit: crop })
         }
+        portrait: avatar {
+          url(imgixParams: { w: 640, h: 640, fit: crop })
+        }
       }
     }
   `,
