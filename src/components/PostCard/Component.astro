@@ -1,8 +1,10 @@
 ---
+import { PixelCover } from '~/components/PixelCover';
 import { PlainText } from '~/components/StructuredText';
 import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { readFragment } from '~/lib/datocms/graphql';
+import { blogCoverForHref } from '~/data/blogCovers';
 import { formatLongDate } from '~/lib/format/date';
 import { ChatCardFragment, PostCardFragment } from './graphql';
 import { maxAvatars, shortByline } from './names';
@@ -32,12 +34,18 @@ const people = chat ? chat.people : post!.author;
 const short = shortByline(people.map((person) => person.name));
 const shown = people.slice(0, maxAvatars);
 const isFeatured = variant === 'featured';
+// A featured cell shows the cover of the post when the post has one.
+const cover = isFeatured && post ? blogCoverForHref(href) : undefined;
 ---
 
 <a
   href={href}
-  class:list={[styles.cell, isFeatured ? [styles.featured, styles[tint]] : styles.dense]}
+  class:list={[
+    styles.cell,
+    isFeatured ? [styles.featured, cover ? styles.withCover : styles[tint]] : styles.dense,
+  ]}
 >
+  {cover && <PixelCover cover={cover} class={styles.cover} data-cover />}
   <span class:list={[styles.label, 'caption']}>
     <time class={styles.date} datetime={date}>{formatLongDate(date)}</time>
     {kind && <span class={styles.kind}>{kind}</span>}

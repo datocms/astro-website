@@ -1,0 +1,121 @@
+---
+import type { BlogCover } from '~/data/blogCovers';
+import styles from './style.module.css';
+
+interface Props {
+  cover: BlogCover;
+  class?: string;
+  [attribute: `data-${string}`]: unknown;
+}
+
+const { cover, class: className, ...rest } = Astro.props;
+---
+
+{
+  /*
+  A blog cover: a grid of square cells with a gap of one device pixel between
+  them. The file has one pixel for each cell. The script draws the grid on a
+  canvas: each cell is a whole number of device pixels.
+  When the browser scales an image, the gaps become blurred lines. Thus the
+  script does not scale an image, it draws the cells.
+*/
+}
+<pixel-cover class:list={[styles.cover, className]} data-theme={cover.theme} {...rest}>
+  <img
+    class={styles.image}
+    src={cover.image.src}
+    alt=""
+    width={cover.image.width}
+    height={cover.image.height}
+  />
+  <canvas class={styles.canvas} aria-hidden="true"></canvas>
+</pixel-cover>
+
+<script>
+  import { WebComponent } from '~/lib/WebComponent';
+
+  /** The smallest pitch, in device pixels, that has a gap between the cells. */
+  const MIN_PITCH_WITH_GAP = 6;
+
+  customElements.define(
+    'pixel-cover',
+    class PixelCover extends WebComponent {
+      #cells?: ImageData;
+      #size?: { width: number; height: number };
+
+      parsedCallback() {
+        const image = this.$<HTMLImageElement>('img');
+        const canvas = this.$<HTMLCanvasElement>('canvas');
+
+        const observer = new ResizeObserver(([entry]) => {
+          // The size in device pixels. Safari does not give it, and the device emulation of
+          // Chrome gives the CSS size: then the script calculates it.
+          const ratio = window.devicePixelRatio || 1;
+          const css = entry!.contentRect;
+          const device = entry!.devicePixelContentBoxSize?.[0];
+          this.#size =
+            device && Math.abs(device.inlineSize - css.width * ratio) < 2
+              ? { width: device.inlineSize, height: device.blockSize }
+              : { width: Math.round(css.width * ratio), height: Math.round(css.height * ratio) };
+          this.#draw(canvas);
+        });
+        observer.observe(this);
+        this.eventListenerRemovers.push(() => observer.disconnect());
+
+        const read = () => {
+          const buffer = document.createElement('canvas');
+          buffer.width = image.naturalWidth;
+          buffer.height = image.naturalHeight;
+          const context = buffer.getContext('2d')!;
+          context.drawImage(image, 0, 0);
+          this.#cells = context.getImageData(0, 0, buffer.width, buffer.height);
+          this.#draw(canvas);
+        };
+        if (image.complete && image.naturalWidth) read();
+        else this.on(image, 'load', read);
+      }
+
+      #draw(canvas: HTMLCanvasElement) {
+        const cells = this.#cells;
+        const size = this.#size;
+        if (!cells || !size || !size.width || !size.height) return;
+
+        const { width, height } = size;
+        const ratio = window.devicePixelRatio || 1;
+        // One pixel of the canvas is one device pixel. The box can be a part of a
+        // device pixel larger or smaller. It clips the canvas.
+        canvas.width = width;
+        canvas.height = height;
+        canvas.style.width = `${width / ratio}px`;
+        canvas.style.height = `${height / ratio}px`;
+        const context = canvas.getContext('2d')!;
+
+        // The pitch is a whole number of device pixels: all the cells have the same size.
+        // The nearest whole number can make the grid a little larger than the box. Then
+        // the box cuts the edges of the grid, which are ground.
+        const pitch = Math.max(1, Math.round(Math.min(width / cells.width, height / cells.height)));
+        // The gap is one device pixel. A small cell has no gap: on it, the gaps make a screen.
+        const gap = pitch >= MIN_PITCH_WITH_GAP ? 1 : 0;
+        const left = Math.floor((width - pitch * cells.width) / 2);
+        const top = Math.floor((height - pitch * cells.height) / 2);
+        // The seam of the grounds is at the seam of the cells.
+        const seam = left + pitch * (cells.width / 2);
+
+        const style = getComputedStyle(this);
+        context.fillStyle = style.getPropertyValue('--theme-accent');
+        context.fillRect(0, 0, seam, height);
+        context.fillStyle = style.getPropertyValue('--theme-ink');
+        context.fillRect(seam, 0, width - seam, height);
+
+        const { data } = cells;
+        for (let y = 0; y < cells.height; y++) {
+          for (let x = 0; x < cells.width; x++) {
+            const i = (y * cells.width + x) * 4;
+            context.fillStyle = `rgb(${data[i]} ${data[i + 1]} ${data[i + 2]})`;
+            context.fillRect(left + x * pitch, top + y * pitch, pitch - gap, pitch - gap);
+          }
+        }
+      }
+    },
+  );
+</script>

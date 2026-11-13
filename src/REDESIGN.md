@@ -19,10 +19,12 @@ src/
   lib/pixel-video/          the player of the .pxv files, and format.ts (the file format, for the player and the scripts)
   lib/code/, lib/format/, lib/theme.ts, lib/colorScheme.ts
   styles/                   tokens.css (all tokens), typography.css (type classes), global.css (reset + element defaults)
+  assets/blog-covers/       the blog covers, one pixel for each cell ("Blog covers")
   dev/                      the tools of the developers, at /dev/* (see "Dev tools")
 vendor/                     the tarball of the scene kit (@datocms/product-scenes)
 public/videos/              the .pxv files
 scripts/pixel-videos/       the source videos of the .pxv files, drawn in code
+scripts/blog-covers/        gen.ts: makes and checks the blog covers
 css-scope.mjs               which CSS gets a cascade layer, and which CSS lint:css reads
 ```
 
@@ -111,9 +113,13 @@ The rules of a face on a page are in `DESIGN.md`, "The Text Face Rule".
 
 Read `src/lib/pixel-video/AGENTS.md` (the process and the rules) and `scripts/pixel-videos/README.md` (the commands) before you add or change a `.pxv` file. The files are in `public/videos/`, and `/dev/pxv-gallery` shows them all.
 
+## Blog covers
+
+Read `src/components/PixelCover/AGENTS.md` (the rules and the process) and `scripts/blog-covers/README.md` (the commands) before you add or change a blog cover. The files are in `src/assets/blog-covers/`, the theme of each post is in `src/data/blogCoverThemes.ts`, and `/dev/cover-gallery` shows them all.
+
 ## Dev tools
 
-- The galleries (`/dev/face-gallery`, `/dev/pxv-gallery`, `/dev/button-gallery`) are in `src/dev/`, not in `src/pages/`: the integration `dev-tools` in `astro.config.ts` adds their routes, in `astro dev` and in the build. Thus the production site shows them, but the sitemap and `PageNav` do not list them.
+- The galleries (`/dev/face-gallery`, `/dev/pxv-gallery`, `/dev/cover-gallery`, `/dev/button-gallery`) are in `src/dev/`, not in `src/pages/`: the integration `dev-tools` in `astro.config.ts` adds their routes, in `astro dev` and in the build. Thus the production site shows them, but the sitemap and `PageNav` do not list them.
 - Put a new tool for the developers in `src/dev/`, and add its route in `dev-tools`. The tools use the layout, the tokens and the player of the site, thus the preview is the same as the page.
 - A page of `src/dev/` can have a plain client script (not a `WebComponent`). It must not import a dev dependency: the build has the routes, and the runtime image installs no dev dependencies.
 

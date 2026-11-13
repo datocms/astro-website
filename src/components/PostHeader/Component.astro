@@ -1,19 +1,30 @@
 ---
+import { PixelCover } from '~/components/PixelCover';
 import { Section } from '~/components/Section';
+import type { BlogCover } from '~/data/blogCovers';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { formatLongDate } from '~/lib/format/date';
 import { ChatHeaderFragment, PostHeaderFragment } from './graphql';
 import styles from './style.module.css';
 
-type Props =
+type Props = (
   | { post: FragmentOf<typeof PostHeaderFragment>; chat?: never }
-  | { chat: FragmentOf<typeof ChatHeaderFragment>; post?: never };
+  | { chat: FragmentOf<typeof ChatHeaderFragment>; post?: never }
+) & {
+  /**
+   * The cover of the post. With a cover the header is a split: the text on
+   * the accent at the left, the cover at the right. The seam of the cover is
+   * at the middle of the page.
+   */
+  cover?: BlogCover;
+};
 
 const chat = Astro.props.chat ? readFragment(ChatHeaderFragment, Astro.props.chat) : undefined;
 const post = Astro.props.post ? readFragment(PostHeaderFragment, Astro.props.post) : undefined;
 const { title, _firstPublishedAt, _createdAt } = (chat ?? post)!;
 const date = _firstPublishedAt ?? _createdAt;
 const isChat = Boolean(chat);
+const { cover } = Astro.props;
 const people = chat ? chat.people : post!.author;
 // A casual chat gives the role and the company of each person: "Laís Kantor (Founder, goodbase)".
 const names = new Intl.ListFormat('en', { type: 'conjunction' }).format(
@@ -28,24 +39,28 @@ const names = new Intl.ListFormat('en', { type: 'conjunction' }).format(
 
 <Section
   as="header"
-  padding="headlines"
+  padding={cover ? 'none' : 'headlines'}
   width="headline"
+  flush={Boolean(cover)}
   background="accent"
-  contentClass={styles.content}
+  contentClass={cover ? styles.split : undefined}
 >
-  {isChat && <p class:list={[styles.label, 'labelMedium']}>Casual chat</p>}
-  <h1 class:list={[styles.title, 'display']}>{title}</h1>
-  <div class={styles.byline}>
-    <div class={styles.avatars}>
-      {
-        people.map((person) => (
-          <img class={styles.avatar} src={person.avatar.url} alt="" width="40" height="40" />
-        ))
-      }
+  <div class:list={[styles.content, cover && styles.splitText]}>
+    {isChat && <p class:list={[styles.label, 'labelMedium']}>Casual chat</p>}
+    <h1 class:list={[styles.title, 'display']}>{title}</h1>
+    <div class={styles.byline}>
+      <div class={styles.avatars}>
+        {
+          people.map((person) => (
+            <img class={styles.avatar} src={person.avatar.url} alt="" width="40" height="40" />
+          ))
+        }
+      </div>
+      <p class="labelMedium">
+        Posted on <time datetime={date} data-datocms-llm-date>{formatLongDate(date)}</time><br />
+        {isChat ? 'In conversation with' : 'by'}{' '}{names}
+      </p>
     </div>
-    <p class="labelMedium">
-      Posted on <time datetime={date} data-datocms-llm-date>{formatLongDate(date)}</time><br />
-      {isChat ? 'In conversation with' : 'by'}{' '}{names}
-    </p>
   </div>
+  {cover && <PixelCover cover={cover} class={styles.splitPicture} data-datocms-nomd />}
 </Section>

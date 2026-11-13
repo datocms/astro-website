@@ -1,0 +1,97 @@
+---
+import { PixelCover } from '~/components/PixelCover';
+import { allBlogCovers } from '~/data/blogCovers';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+
+// Show all the covers of the blog (src/assets/blog-covers/) as the site
+// draws them, with PixelCover:
+//
+// - at the size of a feed card (366 × 214 CSS px), three in each row, in the
+//   order of src/data/blogCoverThemes.ts. No cover may look smaller or
+//   busier than the other covers of its row.
+// - at the size of the post header (712 CSS px wide).
+//
+// This page is not in src/pages/. The integration "dev-tools" in
+// astro.config.ts adds its route.
+
+const covers = allBlogCovers();
+const seo = overrideSeo([], seoTitle('cover gallery'));
+---
+
+<Layout seo={seo} theme="green" headerVariant={false} footer={false}>
+  <section class="section">
+    <h2 class="label">Feed card, 366 × 214</h2>
+    <ul class="feed">
+      {
+        covers.map((cover) => (
+          <li>
+            <PixelCover cover={cover} class="feedCover" />
+            <p class="caption label">
+              {cover.slug} · {cover.theme}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2 class="label">Post header, 712 wide</h2>
+    <ul class="headers">
+      {
+        covers.map((cover) => (
+          <li>
+            <PixelCover cover={cover} class="headerCover" />
+            <p class="caption label">{cover.slug}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Layout>
+
+<style>
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .feed {
+    display: grid;
+    grid-template-columns: repeat(3, 366px);
+    gap: var(--space-xl) var(--space-lg);
+    list-style: none;
+  }
+
+  .headers {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    list-style: none;
+  }
+
+  .feedCover {
+    width: 366px;
+    aspect-ratio: 12 / 7;
+  }
+
+  .headerCover {
+    width: 712px;
+    max-width: 100%;
+    aspect-ratio: 12 / 7;
+  }
+
+  .caption {
+    margin-top: var(--space-2xs);
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 1200px) {
+    .feed {
+      grid-template-columns: repeat(auto-fill, 366px);
+    }
+  }
+</style>

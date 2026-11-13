@@ -1,0 +1,45 @@
+/* @layer blocks */
+
+/*
+ * The box of the cover. The parent gives its size. The two grounds of the
+ * theme fill the box: the accent at the left half, the ink at the right
+ * half. Thus the space around the grid of cells has the color of the cover.
+ */
+.cover {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: linear-gradient(to right, var(--theme-accent) 50%, var(--theme-ink) 50%);
+}
+
+/* Without the script, the file shows. It has one pixel for each cell. */
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/*
+ * The script gives the size of the canvas: one pixel of the canvas is one
+ * device pixel. The box can start between two device pixels. Then the
+ * browser moves the canvas by a part of a pixel, and without `pixelated` it
+ * blends the edges of the cells.
+ */
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  image-rendering: pixelated;
+}
+
+/*
+ * With the script, the file does not show: the script reads it and draws
+ * the cells. Until then the box shows its two grounds.
+ */
+@media (scripting: enabled) {
+  .image {
+    visibility: hidden;
+  }
+}

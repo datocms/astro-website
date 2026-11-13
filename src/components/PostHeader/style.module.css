@@ -44,3 +44,50 @@
   margin-bottom: calc(-1 * var(--space-sm));
   color: var(--text-muted);
 }
+
+/*
+ * The split: a header with a cover. The text is on the accent at the left,
+ * from the left edge of the content to the middle of the page. The cover
+ * fills the right half, from the middle to the right edge, and its seam is
+ * at the middle of that half. Below 1152 the cover goes under the text.
+ */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.splitText {
+  align-items: flex-start;
+  padding: var(--space-3xl) var(--section-padding-x);
+  text-align: left;
+}
+
+.splitText .byline,
+.splitText .avatars {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.splitPicture {
+  aspect-ratio: 12 / 7;
+}
+
+@media (min-width: 1152px) {
+  /* The first track is the inset of the content: the text starts where the content of the page starts. */
+  .split {
+    grid-template-columns: var(--content-inset) minmax(0, 1fr) minmax(0, 50%);
+    min-height: 560px;
+  }
+
+  .splitText {
+    grid-column: 2;
+    align-self: center;
+    padding: var(--space-3xl) var(--space-2xl) var(--space-3xl) 0;
+  }
+
+  /* The cover takes the height of the header. */
+  .splitPicture {
+    grid-column: 3;
+    aspect-ratio: auto;
+  }
+}

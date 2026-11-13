@@ -14,6 +14,7 @@ import { defaultBlockComponents } from '~/components/StructuredText/blocks';
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
 import * as blog from '~/data/blog';
+import { blogCover } from '~/data/blogCovers';
 import { indexes } from '~/data/breadcrumbs';
 import Layout from '~/layouts/Layout.astro';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
@@ -47,6 +48,7 @@ function articleData() {
       return {
         article,
         header: { post: article },
+        cover: blogCover(article.slug),
         trail: [
           indexes.blog,
           ...(article.category
@@ -70,6 +72,7 @@ function articleData() {
       return {
         article,
         header: { chat: article },
+        cover: undefined,
         trail: [indexes.blog, indexes.casualChats],
         authors: article.people.map((person) => person.name),
         jsonLdType: 'Article' as const,
@@ -86,8 +89,18 @@ function articleData() {
   }
 }
 
-const { article, header, trail, authors, jsonLdType, tocTitle, relatedCopy, structuredText } =
-  articleData();
+const {
+  article,
+  header,
+  cover,
+  trail,
+  authors,
+  jsonLdType,
+  tocTitle,
+  relatedCopy,
+  structuredText,
+} = articleData();
+// A post with a cover takes the theme of its cover. The other articles are in the green of the blog.
 
 const related = await loadRelated(Astro, article);
 
@@ -100,7 +113,7 @@ const markdownUrl = new URL(
 ---
 
 <Layout
-  theme="green"
+  theme={cover?.theme ?? 'green'}
   seo={overrideSeo(
     article.seo,
     article.canonicalUrl ? seoCanonical(article.canonicalUrl) : undefined,
@@ -151,7 +164,7 @@ const markdownUrl = new URL(
     />
   </Fragment>
 
-  <PostHeader {...header} />
+  <PostHeader {...header} cover={cover} />
   <Breadcrumb trail={trail} current={article.title}>
     <MarkdownActions slot="actions" markdownUrl={markdownUrl.href} />
   </Breadcrumb>
