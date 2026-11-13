@@ -29,6 +29,25 @@ export const picker = {
   moreLink: 'Contact our support team',
 };
 
+// The links below the select before the visitor chooses a topic. They
+// answer the usual questions without a request.
+export const shortcuts = {
+  title: 'Or look here first',
+  items: [
+    { label: 'Docs', text: 'Guides, tutorials and the API reference.', href: '/docs' },
+    {
+      label: 'Community forum',
+      text: 'Ask other developers and search old answers.',
+      href: 'https://community.datocms.com',
+    },
+    {
+      label: 'Status page',
+      text: 'Is it us? See the state of each service.',
+      href: 'https://status.datocms.com',
+    },
+  ],
+};
+
 export const talk = {
   title: 'Talk with us.',
   text: 'Our experts are available to answer any of your questions. We’re available in a number of ways, any time that you need us.',

@@ -11,7 +11,7 @@ import { FormField } from '~/components/FormField';
 import { Icon } from '~/components/Icon';
 import { Prose } from '~/components/Prose';
 import { contact } from '~/data/contact';
-import { errorIdField, picker, supportForm, talk } from '~/data/support';
+import { errorIdField, picker, shortcuts, supportForm, talk } from '~/data/support';
 import type { ResultOf } from '~/lib/datocms/graphql';
 import type { SupportTopicFragment } from './_graphql';
 import { computeView, parseTopicSlugs, type FormMode, type TopicMeta } from './_state';
@@ -104,6 +104,27 @@ const hasHelp = (topic: (typeof topics)[number]) =>
     }
   </div>
 
+  <nav
+    class={s.shortcuts}
+    aria-labelledby="support-shortcuts"
+    hidden={Boolean(view.rootSlug)}
+    data-shortcuts
+  >
+    <h2 id="support-shortcuts" class="labelMedium">{shortcuts.title}</h2>
+    <ul>
+      {
+        shortcuts.items.map((item) => (
+          <li>
+            <a href={item.href} class={s.shortcut}>
+              <span class="labelMedium">{item.label}</span>
+              <span class:list={[s.shortcutText, 'caption']}>{item.text}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
   {
     topics.filter(hasHelp).map((topic) => (
       <div class={s.help} data-topic={topic.slug} hidden={view.leafSlug !== topic.slug}>
@@ -182,6 +203,7 @@ const hasHelp = (topic: (typeof topics)[number]) =>
         const topicSelect = this.$<HTMLSelectElement>('select[data-level="0"]');
         const groups = this.$$('[data-subtopics]');
         const helps = this.$$('[data-topic]');
+        const shortcutsNav = this.$('[data-shortcuts]');
         const region = this.$('[data-form-region]');
         const forms = this.$$('[data-form-kind]');
         const support = this.$('[data-form-kind="support"]');
@@ -198,6 +220,7 @@ const hasHelp = (topic: (typeof topics)[number]) =>
             const select = group.querySelector('select');
             if (visible && select) select.value = view.subSlug ?? 'empty';
           }
+          shortcutsNav.hidden = Boolean(view.rootSlug);
           for (const help of helps) help.hidden = help.dataset.topic !== view.leafSlug;
           region.hidden = !view.form;
           for (const form of forms) form.hidden = form.dataset.formKind !== view.form;

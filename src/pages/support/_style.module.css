@@ -20,7 +20,8 @@
 
 /* The attribute hidden must win over the display of the class. */
 .topic[hidden],
-.talk[hidden] {
+.talk[hidden],
+.shortcuts[hidden] {
   display: none;
 }
 
@@ -108,4 +109,47 @@
 .turnstile[data-visible] {
   padding: var(--space-lg);
   border-bottom: 1px solid var(--text-soft);
+}
+
+/* The links before the choice of a topic: one column on a phone, three
+   columns from 768px. */
+.shortcuts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.shortcuts ul {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .shortcuts ul {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.shortcut {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  height: 100%;
+  padding: var(--space-lg);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.shortcut:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-accent-faint);
+}
+
+.shortcutText {
+  color: var(--text-muted);
 }
