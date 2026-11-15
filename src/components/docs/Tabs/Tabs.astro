@@ -1,8 +1,18 @@
 ---
 import s from './style.module.css';
+
+interface Props {
+  /*
+   * The row of the tabs goes --docs-bleed past each side, as the code
+   * blocks in the panels. Use it only when each panel holds only code.
+   */
+  bleed?: boolean;
+}
+
+const { bleed } = Astro.props;
 ---
 
-<custom-tabs>
+<custom-tabs class={s.tabs} data-bleed={bleed ? '' : undefined}>
   <div class:list={['handles-group', s.handles]}></div>
   <div class="panels-group"></div>
   <slot />

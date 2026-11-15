@@ -1,5 +1,6 @@
 ---
 import { ensureValidStructuredTextProps } from '@datocms/astro';
+import { isCode, isDocument } from 'datocms-structured-text-utils';
 import { DocCallout } from '~/components/docs/blocks/DocCallout';
 import { Prose } from '~/components/docs/DocsProse';
 import { Tab, Tabs } from '~/components/docs/Tabs';
@@ -18,6 +19,12 @@ interface Props {
 
 const block = readFragment(TabsBlockFragment, Astro.props.block);
 const tabs = block.tabs.map((tab) => readFragment(TabBlockFragment, tab));
+
+/* The code blocks bleed. When each panel holds only code, the row of the tabs bleeds too. */
+const codeOnly = tabs.every((tab) => {
+  const value = tab.content?.value;
+  return isDocument(value) && value.document.children.every(isCode);
+});
 ---
 
 {
@@ -28,7 +35,7 @@ const tabs = block.tabs.map((tab) => readFragment(TabBlockFragment, tab));
 */
 }
 <figure>
-  <Tabs>
+  <Tabs bleed={codeOnly}>
     {
       tabs.map((tab) => (
         <Tab title={tab.title} noPadding>
