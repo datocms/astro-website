@@ -506,6 +506,9 @@ export default defineConfig({
     '/partners/harvey-cameron': '/partners',
     '/partners/dev-kitchen': '/partners',
     '/cms/hugo-cms': '/developers',
+    // The list of the DatoCMS domains is a section of the overview of the APIs.
+    '/docs/overview/datocms-domains-and-content-security-policy-csp':
+      '/docs/overview/overview-of-datocms-apis#datocms-domains-and-content-security-policy-csp',
     '/docs/gatsby': '/docs',
     '/docs/other-ssgs': '/docs',
     '/docs/hugo': '/docs',
