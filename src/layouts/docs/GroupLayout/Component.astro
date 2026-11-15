@@ -9,6 +9,7 @@ import {
   type SidebarGroup,
 } from '~/components/docs/Sidebar';
 import { Card } from '~/components/docs/Card';
+import { HomeSidebar } from '~/components/docs/HomeSidebar';
 import { Space } from '~/components/docs/Space';
 import { Icon } from '~/components/Icon';
 import { BaseLayout } from '~/layouts/docs/BaseLayout';
@@ -20,7 +21,6 @@ type Props = {
   contentWrapperComponent?: (props: any) => any;
   group: FragmentOf<typeof GroupLayoutFragment>;
   seo: TitleMetaLinkTag[];
-  sidebarItemsIfNoPagesOrSectionsInGroup?: (SidebarEntry | SidebarGroup)[];
   additionalSidebarItems?: (SidebarEntry | SidebarGroup)[];
   lastUpdatedAt?: string;
 };
@@ -29,12 +29,15 @@ const {
   contentWrapperComponent,
   group: maskedGroup,
   seo,
-  sidebarItemsIfNoPagesOrSectionsInGroup = [],
   additionalSidebarItems = [],
   lastUpdatedAt,
 } = Astro.props;
 
 const group = readFragment(GroupLayoutFragment, maskedGroup);
+
+// A group with one page and no other entries has no navigation of its own:
+// the sidebar then shows the groups of the docs home.
+const showDocsNav = group.pagesOrSections.length <= 1 && additionalSidebarItems.length === 0;
 ---
 
 <BaseLayout
@@ -46,20 +49,25 @@ const group = readFragment(GroupLayoutFragment, maskedGroup);
   <slot name="pagebar" slot="pagebar" />
 
   <Fragment slot="sidebar">
-    <a href="/docs" class={s.backHome}>
+    <a href="/docs" class={s.backHome} data-datocms-nomd>
       <Icon icon={ChevronLeft} />
       <span class="capTrim">Back to Docs</span>
     </a>
 
-    <Sidebar
-      title={group.name}
-      items={[
-        ...(group.pagesOrSections.length > 1
-          ? buildItemsForDocGroup(group)
-          : sidebarItemsIfNoPagesOrSectionsInGroup),
-        ...additionalSidebarItems,
-      ]}
-    />
+    {
+      showDocsNav ? (
+        // The links of the docs home are not related content of this page: the
+        // Markdown version leaves them out.
+        <div data-datocms-nomd>
+          <HomeSidebar />
+        </div>
+      ) : (
+        <Sidebar
+          title={group.name}
+          items={[...buildItemsForDocGroup(group), ...additionalSidebarItems]}
+        />
+      )
+    }
 
     {
       group.techStarterKit && (

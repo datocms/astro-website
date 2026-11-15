@@ -24,11 +24,7 @@ import { ContentPlusToc } from '~/components/docs/ContentPlusToc';
 import { PageBar } from '~/components/docs/PageBar';
 import type { TocGroup } from '~/components/docs/ContentPlusToc/types';
 import { buildGroupsFromHeadings } from '~/components/docs/ContentPlusToc/utils';
-import {
-  buildItemsFromHeadings,
-  type SidebarEntry,
-  type SidebarGroup,
-} from '~/components/docs/Sidebar';
+import { type SidebarEntry, type SidebarGroup } from '~/components/docs/Sidebar';
 import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
 import { StructuredText } from '~/components/StructuredText';
 import AnchoredHeadingNode from '~/components/StructuredText/AnchoredHeadingNode.astro';
@@ -61,7 +57,7 @@ const tocGroupsFromPageContent = (
 ).flat();
 
 const tocGroups = [
-  ...(group.pagesOrSections.length > 1 ? buildGroupsFromHeadings(page.content.value) : []),
+  ...buildGroupsFromHeadings(page.content.value),
   ...tocGroupsFromPageContent,
   ...additionalTocGroups,
 ];
@@ -80,7 +76,6 @@ const tocGroups = [
       theme: 'docs',
     }),
   )}
-  sidebarItemsIfNoPagesOrSectionsInGroup={buildItemsFromHeadings(page.content.value)}
   additionalSidebarItems={additionalSidebarItems}
   lastUpdatedAt={page._publishedAt}
 >
