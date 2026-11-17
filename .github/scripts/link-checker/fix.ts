@@ -179,7 +179,7 @@ const report = [
 if (redirects.length > 0) await addRedirects(redirects);
 
 if (!shouldOpenPr) {
-  console.log(report);
+  await summarize(report);
   if (redirects.length > 0) console.log(await sh('git', ['diff', '--', 'astro.config.ts']));
   process.exit(0);
 }
