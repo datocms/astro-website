@@ -1,5 +1,5 @@
-# Finds docs URLs that vanished from the CMS without a redirect, and proposes
-# redirects in a draft PR. The check uses no AI; the fix job, which alone holds
+# Finds site URLs (tracked sitemap sections plus CMS docs) that vanished without a
+# redirect, and proposes redirects in a draft PR. The check uses no AI; the fix job, which alone holds
 # the Anthropic key, runs only when something is broken.
 name: Link checker
 
@@ -13,6 +13,10 @@ on:
         description: Seconds to wait before checking
         type: number
         default: 0
+      allow_mass_removal:
+        description: Accept a removal larger than the per-section limit, once
+        type: boolean
+        default: false
   # Daily safety net, for missed webhooks and for URLs broken by code changes.
   # Minute 17: the top of the hour is when GitHub delays or drops scheduled runs.
   schedule:
@@ -34,6 +38,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # To skip URLs already covered by an open checker PR or issue.
+      pull-requests: read
+      issues: read
     outputs:
       has_broken: ${{ steps.check.outputs.has_broken }}
     steps:
@@ -55,23 +62,25 @@ jobs:
       - run: npm ci
         working-directory: ${{ env.SCRIPTS }}
 
-      # The previous run's list of live URLs. Each run saves a new cache entry;
-      # the newest one matching the prefix is restored.
+      # The previous run's state. Each run attempt saves a new cache entry; the
+      # newest one matching the prefix is restored. v2: the state format changed.
       - uses: actions/cache/restore@v6
         with:
           path: .link-checker
-          key: link-checker-${{ github.run_id }}
-          restore-keys: link-checker-
+          key: link-checker-v2-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: link-checker-v2-
 
       - id: check
         run: mkdir -p .link-checker && node "$SCRIPTS/check.ts" --state "$STATE" --broken "$BROKEN"
         env:
           DATOCMS_API_TOKEN: ${{ secrets.DATOCMS_API_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          ALLOW_MASS_REMOVAL: ${{ inputs.allow_mass_removal }}
 
       - uses: actions/cache/save@v6
         with:
           path: .link-checker
-          key: link-checker-${{ github.run_id }}
+          key: link-checker-v2-${{ github.run_id }}-${{ github.run_attempt }}
 
       - if: steps.check.outputs.has_broken == 'true'
         uses: actions/upload-artifact@v7
