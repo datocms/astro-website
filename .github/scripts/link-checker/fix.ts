@@ -273,7 +273,7 @@ if (!shouldOpenPr) {
 }
 
 const footer =
-  'Found by the hourly **Link checker** workflow: these docs URLs vanished from the CMS and answer 404.\n\n' +
+  'Found by the **Link checker** workflow: these docs URLs vanished from the CMS and answer 404.\n\n' +
   'To stop reporting a URL that should 404, add it to `.github/scripts/link-checker/ignored-urls.txt`.';
 
 if (redirects.length > 0) {

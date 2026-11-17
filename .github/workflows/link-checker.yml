@@ -4,10 +4,19 @@
 name: Link checker
 
 on:
-  schedule:
-    # Minute 17: the top of the hour is when GitHub delays or drops scheduled runs.
-    - cron: '17 * * * *'
+  # A DatoCMS webhook starts a run when a doc page or group is published,
+  # unpublished or deleted, and passes wait_seconds so a burst of edits settles
+  # first. The concurrency group below keeps at most one run waiting.
   workflow_dispatch:
+    inputs:
+      wait_seconds:
+        description: Seconds to wait before checking
+        type: number
+        default: 0
+  # Daily safety net, for missed webhooks and for URLs broken by code changes.
+  # Minute 17: the top of the hour is when GitHub delays or drops scheduled runs.
+  schedule:
+    - cron: '17 6 * * *'
 
 permissions: {}
 
@@ -28,6 +37,11 @@ jobs:
     outputs:
       has_broken: ${{ steps.check.outputs.has_broken }}
     steps:
+      - if: inputs.wait_seconds > 0
+        run: sleep "$WAIT_SECONDS"
+        env:
+          WAIT_SECONDS: ${{ inputs.wait_seconds }}
+
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
