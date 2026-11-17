@@ -3,8 +3,14 @@ import { slugify } from '../../../src/lib/slugify.ts';
 
 export const SITE = 'https://www.datocms.com';
 
-/** One live docs page: its title and the anchors of its headings. */
-export type PageEntry = { title: string; anchors: string[] };
+/**
+ * A stretch of a page between two headings (`anchor: null`, `level: 0` for the
+ * text before the first heading), with the hashes of its 4-word sequences.
+ */
+export type Section = { anchor: string | null; level: number; hashes: number[] };
+
+/** One live docs page: its title, heading anchors, and text fingerprints by section. */
+export type PageEntry = { title: string; anchors: string[]; sections: Section[] };
 
 /** Every live docs URL built from the CMS, keyed by path (e.g. `/docs/overview/foo`). */
 export type Snapshot = { generatedAt: string; pages: Record<string, PageEntry> };
@@ -15,7 +21,13 @@ export type BrokenUrl = PageEntry & { url: string; firstSeenAt: string };
 /** What the check carries from one run to the next. */
 export type State = { snapshot: Snapshot; unresolved: BrokenUrl[] };
 
-type DastNode = { type: string; level?: number; value?: string; children?: DastNode[] };
+type DastNode = {
+  type: string;
+  level?: number;
+  value?: string;
+  code?: string;
+  children?: DastNode[];
+};
 
 type GroupPageLink = { page: { id: string; slug: string } | null };
 type DocGroup = {
@@ -75,6 +87,52 @@ const fetchAll = async <T>(query: string, token: string): Promise<T[]> => {
 const plainText = (node: DastNode): string =>
   node.value ?? (node.children ?? []).map(plainText).join('');
 
+const INLINE_PARENTS = new Set(['paragraph', 'heading', 'link', 'itemLink']);
+
+/** Text of a block for fingerprinting: like `plainText`, plus code, with spaces between blocks. */
+const blockText = (node: DastNode): string =>
+  node.value ??
+  node.code ??
+  (node.children ?? []).map(blockText).join(INLINE_PARENTS.has(node.type) ? '' : ' ');
+
+/** 32-bit FNV-1a hash. */
+const fnv1a = (text: string): number => {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < text.length; index++) {
+    hash = Math.imul(hash ^ text.charCodeAt(index), 0x01000193);
+  }
+  return hash >>> 0;
+};
+
+/** Hashes of every run of 4 consecutive words; dotted names like `www.datocms-assets.com` stay whole. */
+const shingleHashes = (text: string): number[] => {
+  const words = text.toLowerCase().match(/[a-z0-9]+(?:\.[a-z0-9]+)*/g) ?? [];
+  const hashes = new Set<number>();
+  for (let index = 0; index + 4 <= words.length; index++) {
+    hashes.add(fnv1a(words.slice(index, index + 4).join(' ')));
+  }
+  return [...hashes];
+};
+
+/** Splits a page at its headings (h6 stays in its parent, as it gets no anchor) and fingerprints each part. */
+export const buildSections = (document: DastNode): Section[] => {
+  const parts: Array<{ anchor: string | null; level: number; texts: string[] }> = [
+    { anchor: null, level: 0, texts: [] },
+  ];
+  for (const node of document.children ?? []) {
+    if (node.type === 'heading' && node.level !== 6) {
+      parts.push({ anchor: slugify(plainText(node)), level: node.level!, texts: [] });
+    } else {
+      parts.at(-1)!.texts.push(blockText(node));
+    }
+  }
+  return parts.map(({ anchor, level, texts }) => ({
+    anchor,
+    level,
+    hashes: shingleHashes(texts.join(' ')),
+  }));
+};
+
 /**
  * Anchors of a page's headings, built the way the site builds them
  * (`buildGroupsFromHeadings`: every heading except h6, slugified).
@@ -104,10 +162,10 @@ export const buildSnapshot = async (token: string): Promise<Snapshot> => {
         const page = pagesById.get(id);
         if (!page) return [];
         const url = slug === 'index' ? `/docs/${group.slug}` : `/docs/${group.slug}/${slug}`;
-        const anchors = page.content
-          ? [...new Set(headingAnchors(page.content.value.document))]
-          : [];
-        return [[url, { title: page.title, anchors }] as const];
+        const document = page.content?.value.document;
+        const anchors = document ? [...new Set(headingAnchors(document))] : [];
+        const sections = document ? buildSections(document) : [];
+        return [[url, { title: page.title, anchors, sections }] as const];
       }),
   );
 
