@@ -468,5 +468,7 @@ export default defineConfig({
     '/academy/ancillary-concepts/react-concepts': '/academy/frontend-frameworks/react',
     '/academy/ancillary-concepts/astro-concepts': '/academy/frontend-frameworks/astro',
     '/academy/ancillary-concepts/next-js-concepts': '/academy/frontend-frameworks/nextjs',
+    '/docs/overview/datocms-domains-and-content-security-policy-csp':
+      '/docs/overview/overview-of-datocms-apis#datocms-domains-and-content-security-policy-csp',
   },
 });
