@@ -1,0 +1,102 @@
+# Finds docs URLs that vanished from the CMS without a redirect, and proposes
+# redirects in a draft PR. The check uses no AI; the fix job, which alone holds
+# the Anthropic key, runs only when something is broken.
+name: Link checker
+
+on:
+  schedule:
+    # Minute 17: the top of the hour is when GitHub delays or drops scheduled runs.
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: link-checker
+  cancel-in-progress: false
+
+env:
+  SCRIPTS: .github/scripts/link-checker
+  STATE: ${{ github.workspace }}/.link-checker/state.json
+  BROKEN: ${{ github.workspace }}/.link-checker/broken.json
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      has_broken: ${{ steps.check.outputs.has_broken }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ env.SCRIPTS }}/package-lock.json
+
+      - run: npm ci
+        working-directory: ${{ env.SCRIPTS }}
+
+      # The previous run's list of live URLs. Each run saves a new cache entry;
+      # the newest one matching the prefix is restored.
+      - uses: actions/cache/restore@v6
+        with:
+          path: .link-checker
+          key: link-checker-${{ github.run_id }}
+          restore-keys: link-checker-
+
+      - id: check
+        run: mkdir -p .link-checker && node "$SCRIPTS/check.ts" --state "$STATE" --broken "$BROKEN"
+        env:
+          DATOCMS_API_TOKEN: ${{ secrets.DATOCMS_API_TOKEN }}
+
+      - uses: actions/cache/save@v6
+        with:
+          path: .link-checker
+          key: link-checker-${{ github.run_id }}
+
+      - if: steps.check.outputs.has_broken == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: link-checker
+          path: .link-checker
+          retention-days: 7
+
+  fix:
+    needs: check
+    if: needs.check.outputs.has_broken == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            ${{ env.SCRIPTS }}/package-lock.json
+
+      # The root install provides Prettier, to format astro.config.ts.
+      - run: npm ci --ignore-scripts && npm ci --prefix "$SCRIPTS"
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: link-checker
+          path: .link-checker
+
+      - run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          node "$SCRIPTS/fix.ts" --state "$STATE" --broken "$BROKEN"
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
