@@ -5,8 +5,8 @@
  * and cuts the screen at the bottom. The stage of the kit gets the width
  * of `.stage` and the zoom of --product-scenes-zoom; below the smallest
  * width of the screen the kit makes the zoom smaller, thus the screen
- * fills the box. The frame has no surface and no outline: only `window`
- * and `detailEnd` have a line.
+ * fills the box. The frame has no surface, no outline and no line: it
+ * cuts the screen with a hard edge.
  */
 .sceneFrame {
   position: relative;
@@ -28,7 +28,8 @@
 /*
  * The frame has no surface and no outline. Only the top corner on the
  * side of the screen is round (--frame-corner): the top left, or the top
- * right for `detailEnd`.
+ * right for `detailEnd`. Where the frame cuts the screen, the corners are
+ * square: the cut is a hard edge.
  * On phones the frame is 70% of the page width high, or less. The height
  * is a limit, not a size: a screen shorter than the limit gives a shorter
  * frame, thus the frame never shows empty space below the screen.
@@ -45,44 +46,8 @@
 }
 
 /*
- * `window` and `detailEnd` only: a line in a darker accent goes along the
- * side where the frame cuts the screen, away from the round corner. There
- * is no line at the bottom. The line is 1px wide. A shadow of 3px goes
- * from the line toward the screen. The line and the shadow continue
- * --frame-line-overshoot above the frame, and on that length they fade
- * from transparent to the full colour. The line is on a layer of the box, above
- * the screen and outside the clip of the frame: it does not move the screen.
- */
-.window::after,
-.detailEnd::after {
-  /*
-   * The line is the accent mixed with the text: in the light scheme the text
-   * is dark, thus the line is a darker accent. The dark scheme sets
-   * --border-accent-edge: the accent at 15% in the band.
-   */
-  --frame-line: var(
-    --border-accent-edge,
-    color-mix(in oklab, var(--surface-accent) 65%, var(--text-primary))
-  );
-  --frame-line-overshoot: var(--space-xl);
-  --frame-shadow: color-mix(in srgb, var(--surface-inverse) 35%, transparent);
-  --frame-shadow-direction: to left;
-
-  content: '';
-  position: absolute;
-  z-index: 1;
-  inset: calc(-1 * var(--frame-line-overshoot)) 0 0;
-  background:
-    linear-gradient(var(--frame-line), var(--frame-line)) right 0 top 0 / 1px 100% no-repeat,
-    linear-gradient(var(--frame-shadow-direction), var(--frame-shadow), transparent) right 1px top
-      0 / 3px 100% no-repeat;
-  pointer-events: none;
-  mask-image: linear-gradient(to bottom, transparent, black var(--frame-line-overshoot));
-}
-
-/*
  * The screen has no ring, no border and no shadow. The frame cuts it. The
- * z-index values of the kit stay in the stage: the line stays above.
+ * z-index values of the kit stay in the stage.
  */
 .stage {
   isolation: isolate;
@@ -120,14 +85,14 @@
  * `window`
  *
  *   desktop                      phone
- *   ┌────────────────────┐       ┌──────────┐
- *   │  ╭─────────────────┼──     │──────────┼──
- *   │  │ screen          │       │ screen   │
- *   │  │                 │       │          │
- *   └──┴─────────────────┘       └──────────┘
+ *   ╭────────────────────┐       ╭──────────┐
+ *   │ screen             ┊       │ screen   ┊
+ *   │                    ┊       │          ┊
+ *   └────────────────────┘       └──────────┘
  *
  * The frame has no margin and no surface: the screen starts at the top
- * left corner. From 650px the box is --scene-frame-cut-end (`cutEnd`,
+ * left corner. The frame cuts the screen at the right (┊) with a hard
+ * edge and a square corner. From 650px the box is --scene-frame-cut-end (`cutEnd`,
  * default 2 × --space-3xl) wider than the frame: the frame cuts the info
  * aside. On phones the box is 615/330 of the frame (615px at 390px, where
  * the frame is 330px), thus the kit gives a screen of 1025px the zoom 0.6:
@@ -160,27 +125,20 @@
  * `detailEnd`
  *
  *   desktop                      phone
- *  ─┼─────────────────╮──┐     ──┼──────────┐
- *   │  screen, larger │  │       │  screen  │
- *   │                 │  │       │          │
+ *   ┌─────────────────╮──╮       ┌──────────╮
+ *   ┊  screen, larger │  │       ┊  screen  │
+ *   ┊                 │  │       ┊          │
  *   └─────────────────┴──┘       └──────────┘
  *
  * The screen is 1100px wide, at the zoom of the frame: above 1, the frame
- * shows the info aside as a detail, cut at the left too. Smaller
+ * shows the info aside as a detail, cut at the left too (┊), with a hard
+ * edge and a square corner. Smaller
  * pages make the zoom smaller (× 0.8, × 0.6 on phones), thus a phone still
  * shows all the aside.
  */
 .detailEnd .frame {
   align-items: flex-end;
   border-radius: 0 var(--frame-corner) 0 0;
-}
-
-.detailEnd::after {
-  --frame-shadow-direction: to right;
-
-  background-position:
-    left 0 top 0,
-    left 1px top 0;
 }
 
 .detailEnd .stage {
@@ -191,11 +149,6 @@
 @media (min-width: 650px) {
   .detailEnd .frame {
     padding-right: var(--space-2xl);
-  }
-
-  /* The line goes along the screen, not the frame: it starts --frame-line-overshoot above the screen. */
-  .detailEnd::after {
-    inset: calc(-1 * var(--frame-line-overshoot)) var(--space-2xl) 0 0;
   }
 
   .detailEnd .stage {

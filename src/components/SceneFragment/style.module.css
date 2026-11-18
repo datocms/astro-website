@@ -35,10 +35,6 @@
    */
   --product-scenes-dialog-margin: 0px;
   --product-scenes-dialog-radius: var(--radius-sm);
-
-  /* The line of the fragment, see .fragment::after. */
-  --fragment-line-overshoot: var(--space-3xs);
-  --fragment-line-fade: var(--space-md);
 }
 
 /*
@@ -52,56 +48,16 @@
 }
 
 /*
- * The clip cuts the picture at the edges of the box. The line of the
- * fragment is outside the clip, thus it can go past the box. The clip has
- * square corners: the round corner of the box must not cut the corner of
- * a picture at the top left corner of the box.
+ * The clip cuts the picture at the edges of the box. It has square
+ * corners, no line, no shadow and no fade: the cut is a hard edge. The
+ * corner where the picture starts keeps the round corner that the picture
+ * draws itself.
  */
 .clip {
   position: absolute;
   inset: 0;
   isolation: isolate;
   overflow: hidden;
-}
-
-/*
- * --fragment-line: a parent can give a line of this colour along the two
- * edges where the box cuts the picture: the bottom and the side away from
- * the round corner. The lines are 1px wide. At the corner where they meet,
- * the two lines continue --fragment-line-overshoot past the box, thus they
- * cross. At the other end, the end toward the round corner, each line
- * continues --fragment-line-fade past the box, and on that length it fades
- * from transparent to the full colour, as the line of the SceneFrame.
- * Without --fragment-line, the line is transparent.
- *
- * --fragment-shadow: a parent can give a shadow of this colour along the
- * side line, as the SceneFrame. The shadow is 3px wide and goes from the
- * line toward the picture. It stops at the bottom of the box. Without
- * --fragment-shadow, there is no shadow.
- */
-.fragment::after {
-  content: '';
-  position: absolute;
-  z-index: 1;
-  inset: calc(-1 * var(--fragment-line-fade)) calc(-1 * var(--fragment-line-overshoot))
-    calc(-1 * var(--fragment-line-overshoot)) calc(-1 * var(--fragment-line-fade));
-  background:
-    linear-gradient(var(--fragment-line, transparent), var(--fragment-line, transparent)) right
-      var(--fragment-line-overshoot) top 0 / 1px 100% no-repeat,
-    linear-gradient(var(--fragment-line, transparent), var(--fragment-line, transparent)) left 0
-      bottom var(--fragment-line-overshoot) / 100% 1px no-repeat,
-    linear-gradient(
-        var(--fragment-shadow-direction, to left),
-        var(--fragment-shadow, transparent),
-        transparent
-      )
-      right calc(var(--fragment-line-overshoot) + 1px) top 0 / 3px
-      calc(100% - var(--fragment-line-overshoot)) no-repeat;
-  pointer-events: none;
-  mask-image:
-    linear-gradient(to bottom, transparent, black var(--fragment-line-fade)),
-    linear-gradient(to right, transparent, black var(--fragment-line-fade));
-  mask-composite: intersect;
 }
 
 /* `scale`, `crop`: no surface. The picture is on the surface of the parent. */
@@ -160,20 +116,6 @@
   border-radius: 0 var(--fragment-corner, 0) 0 0;
 }
 
-.end::after {
-  --fragment-shadow-direction: to right;
-
-  inset: calc(-1 * var(--fragment-line-fade)) calc(-1 * var(--fragment-line-fade))
-    calc(-1 * var(--fragment-line-overshoot)) calc(-1 * var(--fragment-line-overshoot));
-  background-position:
-    left var(--fragment-line-overshoot) top 0,
-    left 0 bottom var(--fragment-line-overshoot),
-    left calc(var(--fragment-line-overshoot) + 1px) top 0;
-  mask-image:
-    linear-gradient(to bottom, transparent, black var(--fragment-line-fade)),
-    linear-gradient(to left, transparent, black var(--fragment-line-fade));
-}
-
 .end .window {
   inset: 0 0 -2px -2px;
 }
@@ -194,25 +136,20 @@
 /*
  * `crop`: the picture keeps its size, and goes 2px past the right edge of
  * the box at every width of the box, thus the box cuts it at the right as
- * at the bottom. Only the line of the fragment shows on these two edges.
+ * at the bottom.
  */
 .crop .surface {
   width: calc(100% + 2px);
 }
 
 /*
- * `fill`: the picture fills the box and the box cuts nothing, thus it has
- * no line. The fragment has the class `surfacePage` (Component.astro): the
+ * `fill`: the picture fills the box and the box cuts nothing. The fragment has the class `surfacePage` (Component.astro): the
  * page tokens resolve on it, thus the surface is the one of the page in
  * the scheme of the page, also in a box with the accent ground
  * (FeatureFragments).
  */
 .fill {
   background: var(--surface-default);
-}
-
-.fill::after {
-  content: none;
 }
 
 .fill .surface {

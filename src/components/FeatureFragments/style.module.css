@@ -55,10 +55,8 @@
  * The box of the picture, ratio 4:3 (--visual-aspect: the `visualAspect`
  * prop can change it): no outline, and the accent colour as
  * its surface, as the SceneFrame. A SceneFragment fills it and cuts the
- * picture at its edges. The SceneFragment makes round only the top corner
- * on the side of its picture (--fragment-corner), and draws the line along
- * the edges where it cuts the picture (--fragment-line), with a shadow
- * along the side line (--fragment-shadow). A `fill` fragment (a diagram)
+ * picture at its edges, with a hard edge and square corners: no line,
+ * no shadow and no fade. A `fill` fragment (a diagram)
  * is on the surface of the page, with no box around it: the fragment has
  * the ground `surfacePage`, and the diagram takes the colours of the page
  * (data-diagram-surface="page"), dark in the dark scheme.
@@ -69,16 +67,6 @@
   margin-bottom: var(--space-md);
   --fragment-surface: var(--surface-accent);
   --fragment-corner: var(--radius-md);
-  /*
-   * The line is a darker accent: in the light scheme the box has the dark
-   * ink as --text-primary. The dark scheme sets --border-accent-edge: the
-   * accent at 15% in the band.
-   */
-  --fragment-line: var(
-    --border-accent-edge,
-    color-mix(in oklab, var(--surface-accent) 65%, var(--text-primary))
-  );
-  --fragment-shadow: color-mix(in srgb, var(--surface-inverse) 20%, transparent);
 }
 
 /* On phones a diagram (a SceneFragment `fill`, `phoneHeight="content"`) gives the height of its box: the box has no fixed ratio, thus it has no empty band above and below the diagram. */
@@ -88,28 +76,11 @@
   }
 }
 
-/* Without a picture, the box keeps its size and has the line of the SceneFragment, at its bottom and right edges, with the same overshoot and the same fade. */
+/* Without a picture, the box keeps its size, with the accent colour. Only the top left corner is round, as the box of a picture. */
 .empty {
   background: var(--surface-accent);
   color: var(--text-on-accent);
   border-radius: var(--fragment-corner) 0 0 0;
-}
-
-.empty::after {
-  content: '';
-  position: absolute;
-  inset: calc(-1 * var(--space-md)) calc(-1 * var(--space-3xs)) calc(-1 * var(--space-3xs))
-    calc(-1 * var(--space-md));
-  background:
-    linear-gradient(var(--fragment-line), var(--fragment-line)) right var(--space-3xs) top 0 / 1px
-      100% no-repeat,
-    linear-gradient(var(--fragment-line), var(--fragment-line)) left 0 bottom var(--space-3xs) /
-      100% 1px no-repeat;
-  pointer-events: none;
-  mask-image:
-    linear-gradient(to bottom, transparent, black var(--space-md)),
-    linear-gradient(to right, transparent, black var(--space-md));
-  mask-composite: intersect;
 }
 
 .title {
