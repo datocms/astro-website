@@ -1,14 +1,8 @@
 ---
 /*
- * One fact of a Facts list. It has two forms:
- *
- * - One value (the slot): the label and the value are on one row, the
- *   label on the left, the value on the right.
- * - A list (`values`): the label is above, and each value is on a line of
- *   its own. A list with one item also has this form, thus all the lists
- *   of a page look the same.
- *
- * A value of the list is a string, or a FactValue with a link.
+ * One fact of a Facts list: the label above, then the value. The value is
+ * the slot, or a list (`values`) with each value on a line of its own. A
+ * value of the list is a string, or a FactValue with a link.
  *
  * Without a value, the fact does not show.
  */
@@ -34,13 +28,12 @@ const { label, values, tabular = false } = Astro.props;
 
 const slotted = values ? undefined : await Astro.slots.render('default');
 const listItems = values?.map((value) => (typeof value === 'string' ? { text: value } : value));
-const isList = listItems !== undefined;
 const count = listItems ? listItems.length : slotted?.trim() ? 1 : 0;
 ---
 
 {
   count > 0 && (
-    <div class:list={[styles.fact, isList && styles.list]}>
+    <div class={styles.fact}>
       <dt class:list={[styles.label, 'label']}>{label}</dt>
       {listItems ? (
         listItems.map((item) => (

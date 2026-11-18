@@ -22,9 +22,15 @@ type Props = PostCardItem & {
   variant: 'featured' | 'dense';
   /** The tint of a featured cell. */
   tint?: 'faint' | 'subtle';
+  /**
+   * The size of the title of a dense cell. `small` is for a grid of many
+   * posts. `title` is for a short list (the related posts). A featured cell
+   * always has the title size.
+   */
+  titleSize?: 'small' | 'title';
 };
 
-const { variant, tint = 'faint' } = Astro.props;
+const { variant, tint = 'faint', titleSize = 'small' } = Astro.props;
 const chat = Astro.props.chat ? readFragment(ChatCardFragment, Astro.props.chat) : undefined;
 const post = Astro.props.post ? readFragment(PostCardFragment, Astro.props.post) : undefined;
 const item = (chat ?? post)!;
@@ -65,7 +71,9 @@ const hasCover = Boolean(cover) || showChatCover;
     <time class={styles.date} datetime={date}>{formatLongDate(date)}</time>
     {kind && <span class={styles.kind}>{kind}</span>}
   </span>
-  <h3 class:list={[styles.title, isFeatured ? 'title' : 'bodyMedium']}>{item.title}</h3>
+  <h3 class:list={[styles.title, isFeatured || titleSize === 'title' ? 'title' : 'titleSmall']}>
+    {item.title}
+  </h3>
   {
     isFeatured && (
       <span class={styles.excerpt}>

@@ -1,9 +1,10 @@
 /* @layer pages */
 
 /*
- * One row for each letter, on the page ground. A hairline separates two
- * letters. The space between two letters (2 × 40) is double the space
- * between two entries (40), thus the eye sees the letters as groups.
+ * One band for each letter, from side to side of the page. The bands
+ * alternate: the page ground, then the faint tint of the accent. The
+ * change of ground separates two letters: there are no lines. The text of
+ * a band is in the centred content column (--content-inset).
  *
  * A phone: the letter is above its entries.
  * From 768: the letter is in a column at the left, and it sticks below
@@ -20,22 +21,13 @@
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-md);
   align-items: start;
-  padding-block: var(--space-xl);
-  border-top: 1px solid var(--border-default);
-  /*
-   * The id is the target of a link: keep the row clear of the sticky nav.
-   * 1px less, thus the hairline of the row goes below the line of the nav.
-   */
-  scroll-margin-top: calc(var(--category-nav-height, 0px) - 1px);
+  padding: var(--space-2xl) var(--content-inset);
+  /* The id is the target of a link: keep the row clear of the sticky nav. */
+  scroll-margin-top: var(--category-nav-height, 0px);
 }
 
-.group:first-child {
-  padding-top: 0;
-  border-top: 0;
-}
-
-.group:last-child {
-  padding-bottom: 0;
+.group:nth-child(even) {
+  background: var(--surface-accent-faint);
 }
 
 .letter {
@@ -77,7 +69,7 @@
   .group {
     grid-template-columns: var(--space-3xl) minmax(0, 1fr);
     gap: var(--space-xl);
-    padding-block: var(--space-2xl);
+    padding-block: var(--space-3xl);
   }
 
   /* The letter stays in view while its row is on the screen. */
