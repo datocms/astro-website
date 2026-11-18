@@ -1,28 +1,21 @@
 /* @layer blocks */
 
 /*
- * The grid of cells. A hairline is at the right and at the bottom of each
- * cell. The frame clips the lines at the right edge and at the bottom
- * edge of the grid, thus a line shows only between two cells. The frame
- * goes out by the padding of a cell on the two sides: the text of the
- * cells then aligns with the content column.
+ * The grid of cells. The padding of the cells is the space between two
+ * cells: there are no lines. The frame goes out by the padding of a cell
+ * on the two sides: the text of the cells then aligns with the content
+ * column.
  */
 .gridFrame {
   margin-inline: calc(-1 * var(--space-lg));
-  overflow: clip;
 }
 
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  margin: 0 -1px -1px 0;
+  margin: 0;
   padding: 0;
   list-style: none;
-}
-
-.grid > li {
-  border-right: 1px solid var(--border-default);
-  border-bottom: 1px solid var(--border-default);
 }
 
 @media (min-width: 768px) {
@@ -37,7 +30,7 @@
   }
 }
 
-/* A square cell on the ground of the band. The hover fills it with the faint accent, at once. */
+/* A square cell on the ground of the band. The hover fills it with the accent, at once. */
 .card:any-link {
   display: flex;
   flex-direction: column;
@@ -84,9 +77,16 @@
   color: var(--text-muted);
 }
 
+/*
+ * The hovered cell is the bright accent in the two schemes: one cell is a
+ * small shape, not a band. A state cannot take a ground class, thus the
+ * rule sets the text roles that the cell uses (tokens.css, rule 4).
+ */
 @media (hover: hover) {
   .card:hover {
-    background: var(--surface-accent-faint);
+    background: var(--surface-accent);
+    color: var(--text-on-accent);
+    --text-muted: var(--text-on-accent-muted);
   }
 }
 

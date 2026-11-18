@@ -303,7 +303,7 @@ One size ladder, in t-shirt steps, in rem (the zoom of the browser enlarges the 
 | `xs`  | 13       | 14  | 14   |          | caption, mono caps, small code              |
 | `s`   | 14       | 15  | 16   | 14/15/15 | label, code                                 |
 | `m`   | 16       | 17  | 20   | 16/17/17 | body, long body                             |
-| `l`   | fluid 18 | 21  | 24   | 18/19/19 | small heading (h4 to h6 in long text)       |
+| `l`   | fluid 18 | 21  | 24   | 18/19/19 | small title, h4 to h6 in long text          |
 | `xl`  | fluid 20 | 25  | 30   | 20/22/22 | title                                       |
 | `2xl` | fluid 24 | 30  | 36   | 24/28/28 | section (the docs h2)                       |
 | `3xl` | fluid 30 | 40  | 45   |          | headline                                    |
@@ -320,6 +320,7 @@ The sizes in the frontmatter are the 1320px values. Each role has a class in `sr
 - **Display** (500, 1.0, -0.05em): stats, the biggest statements. The `.display` class.
 - **Headline** (500, 1.0, -0.04em): heroes, chapter headers, statements, quotes. The `.headline` class.
 - **Title** (500, 1.1, -0.02em; 1.2 in dense): sub-headlines, FAQ questions, footer titles. The `.title` class.
+- **Small title** (500, 1.2, -0.02em): the title of an item in a grid of many items (a post of the blog index). The `.titleSmall` class.
 - **Section** (500, 1.2, -0.03em): the docs h2. The `.section` class.
 - **Body** (400, 1.3, -0.01em): running text. The `.body` and `.bodyMedium` (500) classes. `.bodyLong` (line height 1.5) is for intros and for any text over two lines, max 560px.
 - **Label** (400, 1.0, -0.01em): buttons, nav. The `.label` and `.labelMedium` (500) classes. A label is one line: a text that wraps takes Body.
@@ -424,6 +425,15 @@ Completely flat. There are no shadows, at rest or on hover. Depth comes only fro
 
 **The Flat, No Exceptions Rule.** No `box-shadow` with blur, no `drop-shadow`, no glow, in the site and in the docs. There are no shadow tokens. A photo in a diagram has no shadow and no ring.
 
+**The Space Before Line Rule.** Space separates. The test: take the line away. If the groups still read, the line goes. A line stays only when it has a job that space cannot do:
+
+- Rows that open or change their height: the list of "Meet the product", the questions of an FAQ. Without the line, the text of the open row is between two titles and belongs to neither.
+- Values to compare across columns: a table (the plan comparison).
+- The edge of a bar that sticks over content that scrolls under it (the header, the category nav), and the edge of the breadcrumb band.
+- A box of form fields.
+
+Items that have a structure of their own (a label and a value, a number and a title and a text, a date and a title and an author) have space between them and no line: the facts of a sidebar, the steps, the posts of the blog index and of the related posts, the rows of the product updates, the cards of the partners and of the tech partners, the rows of the plugins, the chapters of the user guides and of a course, the letters of the glossary. Space above a group is larger than space between its items, thus a month of the product updates still reads as a group. A line is never an ornament, and never the answer to items that are too near: give them more space.
+
 No gradients: surfaces are solid, and the edge of a band cuts its content hard. One exception: a short fade at the edge of an area that scrolls (a row of tabs, a nav, a list in a card) tells that there is more content. The fade shows only at an edge that has more content.
 
 ## Shapes
@@ -464,9 +474,9 @@ There are few cards. Content sits in bands, cells and halves.
 - **Corner Style:** square.
 - **Background:** the surface of the band, or a tint of the accent (`-subtle`, `-faint`) to alternate cells.
 - **Shadow Strategy:** none (see Elevation & Depth).
-- **Border:** none. Rows use a 1px hairline.
+- **Border:** none. Space separates two rows or two cells (see "The Space Before Line Rule").
 - **Internal Padding:** the band padding (`--section-padding-y` and `--section-padding-x`).
-- **Hover:** a case-study card fills with the faint accent, instantly.
+- **Hover:** a cell or a row that is one link (a case study, a partner, a post, a product update) fills with the accent, instantly, and its text takes the roles of the accent. Never a tint: a tint next to a hairline is a pastel with an outline. The tints are for cells at rest, for controls (a field, a nav item) and for the docs. A cell with a cover has no fill: the hover is the pixel version of the cover.
 
 ### Inputs / Fields
 

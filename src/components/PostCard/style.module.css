@@ -3,7 +3,9 @@
 /*
  * One cell is one link. The label line, the title and the byline are the
  * same in both variants. The featured cell adds a tint, an excerpt and
- * room. The dense cell has a hairline under it.
+ * room. The dense cell is text on the page: its three lines are near each
+ * other, and the grid puts much more space between two cells, thus each
+ * post reads as one block.
  */
 
 .cell {
@@ -101,23 +103,20 @@
   color: var(--text-soft);
 }
 
-/* A subtle cell has the hover tint already, thus the title gets an underline. */
+/*
+ * The hovered cell is the bright accent in the two schemes: one cell is a
+ * small shape, not a band. A state cannot take a ground class, thus the
+ * rule sets the text roles that the cell uses (tokens.css, rule 4). A cell
+ * with a cover has no fill: the hover is on its cover.
+ */
 @media (hover: hover) {
-  .featured:hover {
-    background:
-      linear-gradient(var(--surface-accent-subtle), var(--surface-accent-subtle)),
-      var(--surface-default);
-  }
-
-  .featured:hover .kind,
-  .featured:hover .names {
-    color: var(--text-soft);
-  }
-
-  .featured:hover .title {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.15em;
+  .featured:not(.withCover):hover,
+  .dense:hover {
+    background: var(--surface-accent);
+    color: var(--text-on-accent);
+    --text-primary: var(--text-on-accent);
+    --text-soft: var(--text-on-accent-soft);
+    --text-muted: var(--text-on-accent-muted);
   }
 }
 
@@ -134,24 +133,20 @@
   margin-bottom: var(--space-2xs);
 }
 
-@media (hover: hover) {
-  .featured.withCover:hover {
-    background: none;
-  }
-}
-
-/* The variant "dense": text on the page, with a rule under it. */
+/* The variant "dense": text on the page. The accent fill of the hover shows the cell as a target. */
 
 .dense {
-  padding: var(--space-md) var(--space-md) var(--space-lg);
-  /* An inset shadow draws the 1px rule inside the cell. */
-  box-shadow: inset 0 -1px var(--border-default);
+  padding: var(--space-md);
 }
 
-@media (hover: hover) {
-  .dense:hover {
-    background: var(--surface-accent-faint);
-  }
+/*
+ * The byline is directly below the title, not at the bottom of the cell:
+ * at the bottom, it is as near to the post below as to its own title.
+ * Two classes: the rule must win over `.byline` above, in this file.
+ */
+.dense .byline {
+  margin-top: 0;
+  padding-top: var(--space-4xs);
 }
 
 .cell:focus-visible {
