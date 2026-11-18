@@ -1,5 +1,5 @@
 ---
-import { ChevronRight, CircleCheck, Info, Search } from 'lucide';
+import { ChevronRight, Info, Search } from 'lucide';
 import { render as renderAsPlainText } from 'datocms-structured-text-to-plain-text';
 import { Button } from '~/components/Button';
 import { Icon } from '~/components/Icon';
@@ -11,6 +11,7 @@ import type {
   PlanValue,
 } from '~/data/pricing';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
+import checkCircle from '~/svg/icons/check-circle-fill.svg?raw';
 import { PlanComparisonFeatureGroupFragment } from './graphql';
 import styles from './style.module.css';
 
@@ -167,7 +168,9 @@ const id = (s: string) =>
                       <span class="visuallyHidden">{columns[i]!.name}: </span>
                       {value === true ? (
                         <span class={styles.check}>
-                          <Icon icon={CircleCheck} width="20" height="20" />
+                          <span class={styles.checkIcon} aria-hidden="true">
+                            <Fragment set:html={checkCircle} />
+                          </span>
                           <span class="visuallyHidden">Included</span>
                         </span>
                       ) : value === false ? (
