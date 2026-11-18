@@ -204,29 +204,34 @@
     text-decoration-color: currentcolor;
   }
 
-  /* The highlight paints the accent: its text is the ink of the accent, in both schemes. */
+  /*
+   * The highlight paints the pale partner of the accent, with the ink of the
+   * theme. The padding and the corners continue on each line when the mark
+   * wraps.
+   */
   mark {
-    background: var(--surface-accent);
+    padding-inline: var(--space-5xs);
+    border-radius: var(--radius-sm);
+    background: var(--surface-pixel-highlight);
     color: var(--text-on-accent);
+    box-decoration-break: clone;
   }
 
   /*
-   * In the dark scheme the inherited text is light, and the accent stays
-   * bright: the mark takes the dark text of the accent. Only in dark: in
-   * light the mark keeps the colour of its text (for example in a quote).
+   * In the dark scheme no text role is dark, thus the pale highlight has no
+   * ink. The mark takes the deep accent band and its light ink.
    */
   :global(:root[data-color-scheme='dark']) :scope mark {
-    color: var(--text-on-accent);
+    background: var(--surface-accent-band);
+    color: var(--text-on-accent-band);
   }
 
   /*
-   * In the dark scheme an accent ground is deep, and the accent surface is
-   * the colour of the ground. Thus on it the mark is a tint of the accent,
-   * with the text of the ground.
+   * Bold text in a mark keeps the ink of the mark. This rule has more
+   * specificity than the rule of strong and b on purpose.
    */
-  :global([data-color-scheme='dark'] .surfaceAccent) :scope mark {
-    background: var(--surface-accent-muted);
-    color: var(--text-primary);
+  mark :is(strong, b) {
+    color: inherit;
   }
 
   /* A sub, a sup or a small is smaller than its text, but not under the floor (--type-xs). */
