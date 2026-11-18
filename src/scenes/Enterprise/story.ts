@@ -110,13 +110,11 @@ export const STORAGE = {
 } as const;
 
 /**
- * The white-label CMS of the group: its address, its logo in the
- * navigation bar, and its brand colour (the hue of the theme `green`) on
- * the interface. A landing page of the German market is open.
+ * The white-label CMS of the group: its address and its logo in the
+ * navigation bar. A landing page of the German market is open.
  */
 export const WHITE_LABEL = {
   address: 'cms.northwind.com',
-  brandTheme: 'green',
   landingPage: {
     title: 'Autumn collection 2026',
     slugPrefix: 'northwind.com/de/',

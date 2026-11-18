@@ -1,6 +1,6 @@
 import { AuditLog, type AuditLogColumn, SignIn, SsoSettings } from '@datocms/product-scenes';
 import { type FragmentSceneProps, Scene, type SceneAppearance } from '../Scene';
-import logoUrl from './northwind-logo.svg?url';
+import { northwindLogoUrl } from './logo';
 import { AUDIT_LOG, GROUP_NAME, SIGN_IN_EMAIL, SSO } from './story';
 
 // The scenes of the chapter "Security" of the enterprise page. Read the
@@ -79,7 +79,11 @@ export function SignInScene({ width, height, appearance }: FragmentSceneProps) {
       width={width}
       height={height}
     >
-      <SignIn project={{ name: GROUP_NAME, logoUrl }} email={SIGN_IN_EMAIL} whiteLabel />
+      <SignIn
+        project={{ name: GROUP_NAME, logoUrl: northwindLogoUrl(THEME) }}
+        email={SIGN_IN_EMAIL}
+        whiteLabel
+      />
     </Scene>
   );
 }

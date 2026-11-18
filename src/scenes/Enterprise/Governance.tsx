@@ -1,7 +1,7 @@
 import { RecordForm, RolePermissions, WorkflowStages } from '@datocms/product-scenes';
 import { EditorScene, type EditorStory } from '../editor';
 import { type FragmentSceneProps, Scene, type SceneAppearance } from '../Scene';
-import logoUrl from './northwind-logo.svg?url';
+import { northwindLogoUrl } from './logo';
 import { BRAND_WORKFLOW, GROUP_NAME, LANDING_PAGE_ICON, ROLES, WHITE_LABEL } from './story';
 
 // The scenes of the chapter "Governance" of the enterprise page. Read the
@@ -72,7 +72,7 @@ export function BrandWorkflowScene({ width, height, appearance }: FragmentSceneP
 
 const WHITE_LABEL_STORY: EditorStory = {
   project: GROUP_NAME,
-  logoUrl,
+  logoUrl: northwindLogoUrl(THEME),
   user: 'Lena Vogel',
   menu: {
     folder: 'Germany',
@@ -90,7 +90,7 @@ const WHITE_LABEL_STORY: EditorStory = {
 
 /**
  * The cms of the group, white-labelled: the logo of Northwind in the
- * navigation bar and the interface in the brand colour of the group. The
+ * navigation bar, in the theme of the chapter. The
  * browser window around it (WhiteLabel.astro) shows the address of the
  * group. It is the picture of the fragment "Your brand on the CMS".
  */
@@ -98,12 +98,11 @@ export function WhiteLabelScene({ height }: { height: number }) {
   const page = WHITE_LABEL.landingPage;
   return (
     <EditorScene
-      theme={WHITE_LABEL.brandTheme}
-      appearance={{ theme: WHITE_LABEL.brandTheme }}
+      theme={THEME}
       chrome="app"
       height={height}
       story={WHITE_LABEL_STORY}
-      description={`The record editor of DatoCMS at ${WHITE_LABEL.address}, white-labelled for ${GROUP_NAME}: the logo of Northwind in the navigation bar, and the interface in the green of the brand. A landing page of the German market is open, “${page.title}”.`}
+      description={`The record editor of DatoCMS at ${WHITE_LABEL.address}, white-labelled for ${GROUP_NAME}: the logo of Northwind in the navigation bar. A landing page of the German market is open, “${page.title}”.`}
     >
       <RecordForm title={page.title} icon={LANDING_PAGE_ICON}>
         <RecordForm.Field label="Title" required localized>
