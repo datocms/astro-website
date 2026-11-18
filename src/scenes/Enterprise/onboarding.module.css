@@ -1,39 +1,22 @@
 /*
  * The onboarding plan: one panel, a row for each session, with a line
- * between the rows. The panel is fluid, as the panel of the SLAs
- * (sla.module.css), and it is at the centre of the box.
+ * between the rows. The panel takes all the width of the box, and it is
+ * at the bottom of the box, on the caption.
  */
 .plan {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
   box-sizing: border-box;
   height: 100%;
-  padding: var(--space-sm);
+  /* The room for the ring of the panel: the box of the fragment cuts all that is out of it */
+  padding: 1px;
 }
 
 .panel {
   width: 100%;
-  max-width: 440px;
 }
 
-/*
- * From 650px the box keeps its ratio (4:3). The panel keeps its width, and
- * in a box narrower than 500px the panel becomes smaller by the same ratio,
- * thus all of it stays in the box, at its centre. tan(atan2()) divides two
- * lengths. On phones the box takes the height of the panel.
- */
-@media (min-width: 650px) {
-  .plan {
-    transform: scale(min(1, tan(atan2(100cqi, 500px))));
-    transform-origin: 50% 50%;
-  }
-
-  .panel {
-    flex: none;
-    width: 440px;
-  }
-}
+/* The box of the fragment takes the height of the panel (SceneFragment `height="content"`), thus in a narrow box the panel keeps its type size and its lines wrap. */
 
 .sessions {
   margin: var(--space-xs) 0 0;

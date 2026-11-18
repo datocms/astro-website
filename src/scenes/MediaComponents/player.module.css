@@ -1,22 +1,22 @@
 /*
- * The surface and the font are the ones of the GIF of ../Video/gif.module.css.
- * The player draws the controls of the player of Mux over the frame, in white
- * on a dark shade, as on any video. The box is the container. The rgb()
- * colours are the shades and the white of a player over a video: they
- * belong to the player, not to the theme of this website.
+ * The surface, the font and the place in the box are the ones of the GIF
+ * of ../Video/gif.module.css: no padding, all the width of the box, at
+ * the bottom of the box. The player draws the controls of the player of
+ * Mux over the frame, in white on a dark shade, as on any video. The box
+ * is the container. The rgb() colours and the white are the shades and
+ * the white of a player over a video: they belong to the player, not to
+ * the theme of this website, thus they are the same in the light scheme
+ * and in the dark scheme.
  */
 .player {
-  --pad: var(--space-xl);
-
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   gap: var(--space-md);
   box-sizing: border-box;
   max-width: none;
   height: 100%;
   margin: 0;
-  padding: var(--pad);
   background: var(--surface-inverse);
   color: var(--text-on-inverse-muted);
   font-family: var(--font-mono);
@@ -40,7 +40,8 @@
   overflow: hidden;
   border-radius: var(--radius-md);
   background: var(--surface-inverse-muted);
-  color: var(--text-on-inverse-strong);
+  /* stylelint-disable-next-line datocms/text-roles, scale-unlimited/declaration-strict-value -- The text and the icons of the player are white on the frame of the video in the two schemes, as on any video: they are not text on a ground of this website. */
+  color: white;
   font-family: var(--font-sans);
   --fs: 11px;
   --menu: calc(13 * var(--fs));
@@ -165,11 +166,9 @@
   box-shadow: 0 3px 0 -1.5px white;
 }
 
-/* To 440px: a smaller margin, thus the player keeps its width */
+/* To 440px: the code line is smaller */
 @container (max-width: 440px) {
   .player {
-    --pad: var(--space-md);
-
     font-size: var(--type-2xs);
   }
 }

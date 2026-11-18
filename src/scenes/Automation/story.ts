@@ -11,6 +11,8 @@
 
 export interface Build {
   trigger: string;
+  /** The label of the trigger in a narrow box (to 359px): the long label and the status do not go on one line there. */
+  short: string;
   /** The time of the trigger, after its label. Phones do not show it. */
   time: string;
   pipeline: string;
@@ -25,6 +27,7 @@ export interface Build {
 export const BUILDS: Build[] = [
   {
     trigger: 'Publish changes',
+    short: 'Publish',
     time: '09:14',
     pipeline: 'Vercel',
     log: [
@@ -37,6 +40,7 @@ export const BUILDS: Build[] = [
   },
   {
     trigger: 'Scheduled post',
+    short: 'Scheduled',
     time: '10:00',
     pipeline: 'Netlify',
     log: [
@@ -49,6 +53,7 @@ export const BUILDS: Build[] = [
   },
   {
     trigger: 'Publish changes',
+    short: 'Publish',
     time: '11:32',
     pipeline: 'GitLab',
     log: [
@@ -61,6 +66,7 @@ export const BUILDS: Build[] = [
   },
   {
     trigger: 'Scheduled post',
+    short: 'Scheduled',
     time: '14:30',
     pipeline: 'Your CI',
     log: [

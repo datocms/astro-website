@@ -26,7 +26,8 @@ const dots = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) 
         <div class={styles.slot}>
           <p class:list={[diagram.pill, diagram.swap, styles.trigger]} data-trigger>
             <span class={diagram.symbol} set:html={symbol} />
-            <span data-label>{still.trigger}</span>
+            <span class={styles.long} data-label>{still.trigger}</span>
+            <span class={styles.short} data-short>{still.short}</span>
             <span class={styles.time} data-time>{still.time}</span>
           </p>
         </div>
@@ -152,6 +153,7 @@ const dots = Array.from({ length: 25 }, (_, i) => `--d: ${-(((i * 11 + 7) % 25) 
 
         swap(this.trigger, () => {
           this.set(this.trigger, 'label', build.trigger);
+          this.set(this.trigger, 'short', build.short);
           this.set(this.trigger, 'time', build.time);
         });
         await sleep(MS.swap);

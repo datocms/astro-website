@@ -46,9 +46,18 @@
   }
 }
 
+/*
+ * An item has two rows of the grid: the picture, then the title and the
+ * text. The rows are a subgrid, thus the items of a row of the grid share
+ * the height of the picture and of the text: the titles start on one line,
+ * also when the pictures have different heights. The gap between the two
+ * rows is the margin of the picture, not the gap of the grid.
+ */
 .item {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-row: span 2;
+  grid-template-rows: subgrid;
+  row-gap: 0;
 }
 
 /*
@@ -74,6 +83,11 @@
   .visual:has(> [data-phone-content]) {
     aspect-ratio: auto;
   }
+}
+
+/* A diagram with `height="content"` gives the height of its box at every width. The row of the grid is as high as the highest picture of the row. */
+.visual:has(> [data-content]) {
+  aspect-ratio: auto;
 }
 
 /* Without a picture, the box keeps its size, with the accent colour. Only the top left corner is round, as the box of a picture. */

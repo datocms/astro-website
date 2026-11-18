@@ -9,11 +9,12 @@ import styles from './stream.module.css';
 
 // The picture of the fragment "No spinning wheel.", in the grammar of the
 // diagrams (../diagram/style.module.css). Two players of Restoring Tide
-// Line at the same second: at the left a slow connection, at the right
-// fibre. Above each player, the connection and its signal; on the
+// Line at the same second: fibre at the top left corner of the box, and a
+// slow connection at the bottom right corner, on the corner of the first
+// one. Above each player, the connection and its signal; on the
 // player, the rendition. The picture of each rendition is a real smaller
 // copy of the frame, thus a low rendition is soft as on a real player.
-// The loop: the time of the two players goes on together, and the left
+// The loop: the time of the two players goes on together, and the slow
 // connection changes (CYCLE of ./stream): its name swaps, then the player
 // picks the rendition for it, and its picture changes. The players never
 // stop. The script below drives the loop (in view only; not with reduced
@@ -29,52 +30,50 @@ const played = START / DURATION;
   aria-label={DESCRIPTION}
   data-stream
 >
-  <div class={styles.pair}>
-    <div class={styles.side} data-slow>
-      <p class={styles.connection}>
-        <span class={styles.bars} data-bars={STILL.bars}
-          ><span></span><span></span><span></span><span></span></span
-        >
-        <span class:list={[diagram.swap, styles.name]} data-name>{STILL.label}</span>
-      </p>
-      <div class={styles.player}>
-        {
-          RENDITIONS.map((rendition) => (
-            <img
-              class={styles.picture}
-              src={PICTURES[rendition as keyof typeof PICTURES].src}
-              alt=""
-              data-rendition={rendition}
-              data-on={rendition === STILL.rendition ? '' : undefined}
-            />
-          ))
-        }
-        <span class={styles.badge}
-          ><span class:list={[diagram.swap, styles.value]} data-badge>{STILL.rendition}</span></span
-        >
-      </div>
-      <p class={styles.controls} style={`--played: ${played}`} data-controls>
-        <span class={styles.rail}><span class={styles.played}></span></span>
-        <span class={styles.time} data-time>{clock(START)}</span>
-      </p>
+  <div class:list={[styles.side, styles.back]}>
+    <p class={styles.connection}>
+      <span class={styles.bars} data-bars={FAST.bars}
+        ><span></span><span></span><span></span><span></span></span
+      >
+      <span class={styles.name}>{FAST.label}</span>
+    </p>
+    <div class={styles.player}>
+      <img class={styles.picture} src={frame.src} alt="" data-on />
+      <span class={styles.badge}><span class={styles.value}>{FAST.rendition}</span></span>
     </div>
+    <p class={styles.controls} style={`--played: ${played}`} data-controls>
+      <span class={styles.rail}><span class={styles.played}></span></span>
+      <span class={styles.time} data-time>{clock(START)}</span>
+    </p>
+  </div>
 
-    <div class={styles.side}>
-      <p class={styles.connection}>
-        <span class={styles.bars} data-bars={FAST.bars}
-          ><span></span><span></span><span></span><span></span></span
-        >
-        <span class={styles.name}>{FAST.label}</span>
-      </p>
-      <div class={styles.player}>
-        <img class={styles.picture} src={frame.src} alt="" data-on />
-        <span class={styles.badge}><span class={styles.value}>{FAST.rendition}</span></span>
-      </div>
-      <p class={styles.controls} style={`--played: ${played}`} data-controls>
-        <span class={styles.rail}><span class={styles.played}></span></span>
-        <span class={styles.time} data-time>{clock(START)}</span>
-      </p>
+  <div class:list={[styles.side, styles.front]} data-slow>
+    <p class={styles.connection}>
+      <span class={styles.bars} data-bars={STILL.bars}
+        ><span></span><span></span><span></span><span></span></span
+      >
+      <span class:list={[diagram.swap, styles.name]} data-name>{STILL.label}</span>
+    </p>
+    <div class={styles.player}>
+      {
+        RENDITIONS.map((rendition) => (
+          <img
+            class={styles.picture}
+            src={PICTURES[rendition as keyof typeof PICTURES].src}
+            alt=""
+            data-rendition={rendition}
+            data-on={rendition === STILL.rendition ? '' : undefined}
+          />
+        ))
+      }
+      <span class={styles.badge}
+        ><span class:list={[diagram.swap, styles.value]} data-badge>{STILL.rendition}</span></span
+      >
     </div>
+    <p class={styles.controls} style={`--played: ${played}`} data-controls>
+      <span class={styles.rail}><span class={styles.played}></span></span>
+      <span class={styles.time} data-time>{clock(START)}</span>
+    </p>
   </div>
 </scene-video-stream>
 

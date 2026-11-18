@@ -1,18 +1,21 @@
 /*
  * The layout of the round trip of the fragment "Deploy when editors
  * publish." (Deploys.astro). The parts are the ones of
- * ../diagram/style.module.css. The picture fills the box of the fragment
- * (SceneFragment, preset `fill`) with the inverse surface. A stack at the
- * middle: the bar of DatoCMS, the two legs, the panel of the pipeline.
+ * ../diagram/style.module.css. The picture is in the box of the fragment
+ * (SceneFragment, preset `fill`). A stack as wide as the box, at the
+ * bottom of the box, on the caption: the bar of DatoCMS, the two legs,
+ * the panel of the pipeline.
  */
 .deploys {
-  --pad: var(--space-xl);
+  /* The room for the ring of a panel, 1px: the box of the fragment cuts all that is out of it. The picture has no other margin: it starts at the left edge of the caption */
+  --pad: 1px;
   /* The x of each leg, from the side of the stack: under the trigger at the left, under the status at the right */
   --leg-x: var(--space-2xl);
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* `safe`: in a box that is lower than the stack, the box cuts the log at the bottom, not the bar at the top */
+  justify-content: safe flex-end;
   box-sizing: border-box;
   height: 100%;
   margin: 0;
@@ -73,6 +76,11 @@
 
 .time {
   opacity: 0.6;
+}
+
+/* The short label of the trigger shows only in a narrow box */
+.short {
+  display: none;
 }
 
 .ring {
@@ -217,7 +225,6 @@
 /* A narrow box (a phone): the same stack, with no label on the bar, no time, no tags, shorter legs and the last three lines of the log */
 @container (max-width: 440px) {
   .deploys {
-    --pad: var(--space-sm);
     --leg-x: var(--space-lg);
   }
 
@@ -234,5 +241,16 @@
 
   .log {
     min-height: calc(3 * var(--line) + 2 * var(--space-4xs));
+  }
+}
+
+/* To 359px the long label of the trigger and the status do not go on one line: the trigger shows its short label ("Publish") */
+@container (max-width: 359px) {
+  .long {
+    display: none;
+  }
+
+  .short {
+    display: inline;
   }
 }

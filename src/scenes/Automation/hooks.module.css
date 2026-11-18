@@ -1,9 +1,9 @@
 /*
  * The layout of the webhook of the fragment "Webhooks on any event."
  * (Hooks.astro). The parts are the ones of ../diagram/style.module.css.
- * The picture fills the box of the fragment (SceneFragment, preset
- * `fill`) with the inverse surface, and the diagram is at the middle.
- * The box is the container.
+ * The picture is in the box of the fragment (SceneFragment, preset
+ * `fill`): it takes all the width of the box, and it is at the bottom of
+ * the box, on the caption. The box is the container.
  *
  * Three widths of the box. From 520px: the rows in a column, each with
  * its event type at its right edge, a track from each row to the pill.
@@ -15,11 +15,12 @@
   /* The height of a row of the panel, and the padding of the panel: the tracks start at the middle of each row */
   --row: 26px;
   --panel-pad: var(--space-sm);
-  --pad: var(--space-xl);
+  /* The room for the ring of a panel, 1px: the box of the fragment cuts all that is out of it. The picture has no other margin: it starts at the left edge of the caption */
+  --pad: 1px;
 
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   box-sizing: border-box;
   max-width: none;
   height: 100%;
@@ -175,20 +176,12 @@
   --diagram-ping-scale: 1.1 1.4;
 }
 
-/* To 599px: a smaller margin, thus the tracks keep their width */
-@container (max-width: 599px) {
-  .hooks {
-    --pad: var(--space-lg);
-  }
-}
-
 @container (max-width: 519px) {
   .event {
     display: none;
   }
 
   .hooks {
-    --pad: var(--space-sm);
     --panel-pad: var(--space-xs);
   }
 }

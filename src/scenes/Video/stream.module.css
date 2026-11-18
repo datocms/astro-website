@@ -1,21 +1,28 @@
 /*
  * The layout of the two players of the fragment "No spinning wheel."
  * (Stream.astro). The parts are the ones of ../diagram/style.module.css.
- * The picture fills the box of the fragment (SceneFragment, preset
- * `fill`) with the inverse surface, and the players are at the middle,
- * side by side at every width. The box is the container.
+ * The picture is in the box of the fragment (SceneFragment, preset
+ * `fill`, with the ratio of the box at every width), on the surface of
+ * the page. The box does not show, thus the picture has no padding. The
+ * two players fill the box: fibre is at its top left corner, from the
+ * left edge of the caption, and the slow connection is at its bottom
+ * right corner. Each player is wider than half of the box, thus the
+ * second one is on the bottom right corner of the first one. The box is
+ * the container.
  */
 .stream {
-  --pad: var(--space-xl);
+  /* The width of a player */
+  --player: 58cqi;
+  /* The margin of the surface between the front player and the picture of the back one */
+  --cut: var(--space-xs);
 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  position: relative;
+  /* The root is a custom element: without a display, it is inline and has no height */
+  display: block;
   box-sizing: border-box;
   max-width: none;
   height: 100%;
   margin: 0;
-  padding: var(--pad);
   background: var(--surface-inverse);
   color: var(--text-on-inverse-strong);
   font-family: var(--font-mono);
@@ -24,14 +31,35 @@
   line-height: 1;
 }
 
-.pair {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-md);
+.side {
+  position: absolute;
+  width: var(--player);
 }
 
-.side {
-  min-width: 0;
+.back {
+  top: 0;
+  left: 0;
+}
+
+/*
+ * The front player has the surface of the box around its top left
+ * corner, thus its connection is on the surface, not on the picture of
+ * the back player. Its width is the width of a player and that margin.
+ */
+.front {
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  width: calc(var(--player) + var(--cut));
+  padding: var(--cut) 0 0 var(--cut);
+  border-top-left-radius: var(--radius-md);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse-strong);
+}
+
+/* The controls of the back player stop before the front player: the front player hides no part of them */
+.back .controls {
+  padding-right: calc(2 * var(--player) - 100cqi + var(--cut) + var(--space-2xs));
 }
 
 .connection {
@@ -157,12 +185,8 @@
 
 @container (max-width: 440px) {
   .stream {
-    --pad: var(--space-md);
+    --cut: var(--space-2xs);
 
     font-size: var(--type-2xs);
-  }
-
-  .pair {
-    gap: var(--space-sm);
   }
 }

@@ -1,7 +1,8 @@
 /*
  * The layout of the two diagrams of the security chapter (Backups,
- * Storage): one column at the centre of the box, with a track between the
- * parts. The
+ * Storage): one column, with a track between the parts. The panel takes
+ * all the width of the box, and the column is at the bottom of the box,
+ * on the caption. The
  * grammar (the pill, the track, the pulse, the panel, the ring) is in
  * src/scenes/diagram/style.module.css.
  */
@@ -11,26 +12,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   box-sizing: border-box;
   height: 100%;
-  padding: var(--space-md) var(--space-sm);
-
-  /*
-   * The box of the fragment keeps its ratio (4:3). In a box narrower than
-   * 500px, the diagram becomes smaller by the same ratio, thus all of it
-   * stays in the box, at its centre. tan(atan2()) divides two lengths.
-   */
-  transform: scale(min(1, tan(atan2(100cqi, 500px))));
-  transform-origin: 50% 50%;
+  /* The room for the ring of the panel: the box of the fragment cuts all that is out of it */
+  padding: 1px;
 }
 
-/* On phones the box takes the height of the diagram (SceneFragment `fill`), thus the diagram keeps its size and its rows wrap. */
-@media (max-width: 649px) {
-  .flow {
-    transform: none;
-  }
-}
+/* The box of the fragment takes the height of the diagram (SceneFragment `height="content"`), thus in a narrow box the diagram keeps its size and its rows wrap. */
 
 /* The svg of a track goes 2px under the parts at its two ends. */
 .link {
@@ -44,7 +33,6 @@
 
 .panel {
   width: 100%;
-  max-width: 380px;
   text-align: center;
 }
 

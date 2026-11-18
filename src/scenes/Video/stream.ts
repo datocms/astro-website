@@ -14,10 +14,10 @@ export interface Connection {
   rendition: '270p' | '480p' | '720p' | '1080p';
 }
 
-/** The connection of the right player: it does not change */
+/** The connection of the player at the top left: it does not change */
 export const FAST: Connection = { label: 'Fibre', bars: 4, rendition: '1080p' };
 
-/** The connections of the left player, in this order, again and again. The first is the still. */
+/** The connections of the player at the bottom right, in this order, again and again. The first is the still. */
 export const CYCLE: Connection[] = [
   { label: 'On a train', bars: 1, rendition: '270p' },
   { label: 'Café wi-fi', bars: 2, rendition: '480p' },
@@ -37,4 +37,4 @@ export const DURATION = VIDEO.duration;
 export const clock = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 
-export const DESCRIPTION = `The video “${VIDEO.title}” in two players at the same second, ${clock(START)}, both playing. The left player is on a train: its picture is softer, 270p. The right player is on fiber: its picture is sharp, 1080p. When the left connection gets better, its picture gets sharper; it never stops to load.`;
+export const DESCRIPTION = `The video “${VIDEO.title}” in two players at the same second, ${clock(START)}, both playing. The first player is on fiber: its picture is sharp, 1080p. The second player, on the corner of the first one, is on a train: its picture is softer, 270p. When the connection of the second player gets better, its picture gets sharper; it never stops to load.`;
