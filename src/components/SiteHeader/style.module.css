@@ -28,7 +28,8 @@
   --header-offset: 0px;
 }
 
-:global(html[data-motion='on']):has(.root) {
+/* No transition before data-ready: see the script. */
+:global(html[data-motion='on']):has(.root[data-ready]) {
   --header-slide: top 200ms cubic-bezier(0.3, 0, 0, 1);
   --header-resize: 200ms cubic-bezier(0.3, 0, 0, 1);
 }
@@ -88,8 +89,13 @@
  * the same transition. When the page goes back to the top, the header grows
  * and the margin shrinks. Nothing paints the margin, thus the strip paints it
  * with the ground of the header. If not, the body shows between the header
- * and the hero. While the page scrolls, the strip has no background: there
- * it is on top of the page content.
+ * and the hero.
+ *
+ * While the page scrolls, there is no strip. A transparent strip makes the
+ * layer of the sticky header taller than the header, and Chrome can show a
+ * white line at the bottom edge of this layer. When the strip comes back,
+ * its height starts from the full margin (@starting-style), thus it shrinks
+ * together with the margin.
  */
 .header::after {
   content: '';
@@ -98,11 +104,18 @@
   top: 100%;
   height: calc(var(--header-height) - var(--header-now));
   transition: height var(--header-resize, 0s);
+  background: inherit;
   pointer-events: none;
 }
 
-.root:not([data-scrolled]) .header::after {
-  background: inherit;
+.root[data-scrolled] .header::after {
+  display: none;
+}
+
+@starting-style {
+  .header::after {
+    height: calc(var(--header-height) - var(--header-height-scrolled));
+  }
 }
 
 /*

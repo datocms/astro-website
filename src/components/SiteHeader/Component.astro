@@ -557,6 +557,16 @@ const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.pro
         this.on(this, 'focusin', () => setHidden(false));
 
         update();
+
+        // After a reload, the browser puts back the scroll position at the
+        // load event. Until then, the header has no transition (data-ready),
+        // thus it does not shrink or slide in front of the visitor.
+        const ready = () =>
+          requestAnimationFrame(() =>
+            requestAnimationFrame(() => this.setAttribute('data-ready', '')),
+          );
+        if (document.readyState === 'complete') ready();
+        else window.addEventListener('load', ready, { once: true });
       }
 
       point(item: HTMLElement | null) {
