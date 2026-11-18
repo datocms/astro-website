@@ -7,7 +7,7 @@
 // repository gives the preview address.
 import { stripStega } from '@datocms/astro';
 import ky from 'ky';
-import { Breadcrumb } from '~/components/Breadcrumb';
+import { Breadcrumb, BreadcrumbLabel } from '~/components/Breadcrumb';
 import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Fact, Facts } from '~/components/Facts';
@@ -63,7 +63,8 @@ const logo = page.technology.logo;
   headerVariant="accent"
 >
   {/* The description can be long, thus it is the intro, not a part of the h1. */}
-  <Hero variant="accent" label={page.seoH1 ?? undefined} headline={page.name}>
+  <Hero variant="accent" headline={page.name}>
+    <BreadcrumbLabel slot="label" trail={[indexes.starters]} />
     <div slot="intro" class={s.intro}>
       <p class={s.description}>{page.cmsDescription}</p>
       <Button href={datoDeployUrl} size="l" attrs={{ target: '_blank' }}>
@@ -78,7 +79,7 @@ const logo = page.technology.logo;
       previewUrl={manifest.livePreviewUrl ?? undefined}
     />
   </Hero>
-  <Breadcrumb trail={[indexes.starters]} current={page.name} actionsWhenStuck>
+  <Breadcrumb trail={[indexes.starters]} current={page.name}>
     <Button slot="actions" href={datoDeployUrl} attrs={{ target: '_blank' }}>
       {detail.start}
     </Button>

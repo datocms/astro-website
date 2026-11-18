@@ -1,29 +1,65 @@
 /*
  * A band of the page ground, full width, with a hairline at the bottom.
- * The hero above it is on the accent (a hard cut), or on the page ground
- * (the Partners area): there the hairline marks the band.
+ * It is fixed at the top of the screen, below the site header while the
+ * header shows. It shows only when the h1 of the page goes out of the
+ * screen (data-shown): it comes down from below the site header. Before
+ * that, the BreadcrumbLabel above the h1 shows the trail.
  *
  * The links are 40px tall, as the other controls. Thus the band is 64px
  * tall, with 12px above and below.
  *
- * The band sticks to the top of the screen, below the site header while
- * the header shows. The other sticky elements of the page (a table of
+ * While the band shows, the other sticky elements of the page (a table of
  * contents, a column of facts) add --sticky-offset to their top, thus they
  * stay below the band.
  */
-:global(html):has(.bar) {
+:global(html):has(.bar[data-shown]) {
   --sticky-offset: calc(var(--header-offset, 0px) + 64px);
 }
 
 .bar {
   /* The root is a custom element: it is inline by default. */
   display: block;
-  position: sticky;
+  position: fixed;
   top: var(--header-offset, 0px);
+  right: 0;
+  left: 0;
   z-index: 3;
-  transition: var(--header-slide);
+  visibility: hidden;
+  translate: 0 -100%;
+  transition:
+    var(--header-slide),
+    translate 240ms cubic-bezier(0.23, 1, 0.32, 1),
+    visibility 0s 240ms;
   background: var(--surface-default);
   box-shadow: inset 0 -1px var(--border-default);
+}
+
+.bar[data-shown] {
+  visibility: visible;
+  translate: 0 0;
+  transition:
+    var(--header-slide),
+    translate 240ms cubic-bezier(0.23, 1, 0.32, 1),
+    visibility 0s;
+}
+
+/* With reduced motion, the band only fades in and out. */
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    opacity: 0;
+    translate: none;
+    transition:
+      opacity 200ms ease-out,
+      visibility 0s 200ms;
+  }
+
+  .bar[data-shown] {
+    opacity: 1;
+    translate: none;
+    transition:
+      opacity 200ms ease-out,
+      visibility 0s;
+  }
 }
 
 .content {
@@ -60,38 +96,32 @@
 
 .item {
   display: flex;
+  flex: none;
   align-items: center;
   min-width: 0;
 }
 
-/*
- * Only the last item that shows gets shorter: the name of the page when
- * the bar sticks, else the last link.
- */
-.item:not(:nth-last-child(-n + 2)) {
-  flex: none;
-}
-
-.bar[data-stuck] .item:nth-last-child(2) {
-  flex: none;
+/* Only the name of the page gets shorter. */
+.current {
+  flex: 0 1 auto;
 }
 
 /*
- * On phones the row has no room for the full trail when the bar sticks.
- * Only the last link and the name of the page show. The name gets shorter
- * first. When the name is at its minimum width, the link gets shorter too.
- * This block comes after the rules above, thus it wins over them.
+ * On phones the row has no room for the full trail. Only the last link
+ * and the name of the page show. The name gets shorter first. When the
+ * name is at its minimum width, the link gets shorter too. This block
+ * comes after the rules above, thus it wins over them.
  */
 @media (max-width: 767px) {
-  .bar[data-stuck] .item:not(:nth-last-child(-n + 2)) {
+  .item:not(:nth-last-child(-n + 2)) {
     display: none;
   }
 
-  .bar[data-stuck] .item:nth-last-child(2) {
+  .item:nth-last-child(2) {
     flex: 0 1 auto;
   }
 
-  .bar[data-stuck] .current {
+  .current {
     flex-shrink: 1000;
     min-width: 5em;
   }
@@ -102,42 +132,6 @@
   content: '/';
   flex: none;
   padding-inline: var(--space-3xs);
-}
-
-/*
- * The name of the page shows only when the bar sticks. The h1 of the hero
- * goes up and out of the screen, and the name comes into the bar: it fades
- * in, comes 8px from the left and gets sharp. The separator comes with it.
- * When the bar stops to stick, the name goes at once.
- */
-.current {
-  display: none;
-}
-
-.bar[data-stuck] .current {
-  display: flex;
-  animation: name-in 320ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-@keyframes name-in {
-  from {
-    opacity: 0;
-    filter: blur(4px);
-    translate: -8px 0;
-  }
-}
-
-/* With reduced motion, the name only fades in. */
-@media (prefers-reduced-motion: reduce) {
-  .bar[data-stuck] .current {
-    animation-name: name-fade-in;
-  }
-
-  @keyframes name-fade-in {
-    from {
-      opacity: 0;
-    }
-  }
 }
 
 .current .link {
@@ -165,27 +159,6 @@
 @media (max-width: 767px) {
   .actions {
     display: none;
-  }
-}
-
-/*
- * Actions that show only when the bar sticks. They come in as the name of
- * the page does, and go at once.
- */
-.actions[data-when-stuck] {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .bar[data-stuck] .actions[data-when-stuck] {
-    display: block;
-    animation: name-in 320ms cubic-bezier(0.23, 1, 0.32, 1);
-  }
-}
-
-@media (min-width: 768px) and (prefers-reduced-motion: reduce) {
-  .bar[data-stuck] .actions[data-when-stuck] {
-    animation-name: name-fade-in;
   }
 }
 

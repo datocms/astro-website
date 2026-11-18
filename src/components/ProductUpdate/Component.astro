@@ -58,6 +58,14 @@ const blockComponents = {
       }
     </div>
     <div class={styles.main}>
+      {
+        /* The slot `label` takes a BreadcrumbLabel: the trail of the page. */
+        Astro.slots.has('label') && (
+          <div class={styles.label}>
+            <slot name="label" />
+          </div>
+        )
+      }
       <h1 class="headline">{entry.title}</h1>
       <Prose>
         <StructuredText

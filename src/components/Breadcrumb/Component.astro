@@ -9,19 +9,11 @@ import styles from './style.module.css';
 interface Props {
   /** The pages above this page, from the top. */
   trail: BreadcrumbItem[];
-  /**
-   * The name of the current page. The bar shows it only when it sticks to
-   * the top of the screen: before that, the h1 of the hero names the page.
-   */
+  /** The name of the current page. */
   current: string;
-  /**
-   * The actions show only when the bar sticks: before that, the hero shows
-   * them, for example the install button of a plugin.
-   */
-  actionsWhenStuck?: boolean;
 }
 
-const { trail, current, actionsWhenStuck = false } = Astro.props;
+const { trail, current } = Astro.props;
 const origin = baseUrl(Astro);
 const pageUrl = new URL(Astro.url.pathname, origin).href;
 const hasActions = Astro.slots.has('actions');
@@ -29,10 +21,12 @@ const hasActions = Astro.slots.has('actions');
 
 {
   /*
-  The band below the hero of a detail page. At the left, the trail of the
-  pages above this page. At the right, the slot "actions" takes the actions
-  on the page, for example MarkdownActions. The band sticks to the top of
-  the screen. When it sticks, the trail ends with the name of the page.
+  The band at the top of the screen on a detail page, below the site
+  header. At the left, the trail of the pages above this page and the name
+  of the page. At the right, the slot "actions" takes the actions on the
+  page, for example MarkdownActions. The band shows only when the h1 of the
+  page goes out of the screen: before that, the BreadcrumbLabel above the
+  h1 shows the trail.
 */
 }
 <breadcrumb-bar class={styles.bar}>
@@ -56,7 +50,7 @@ const hasActions = Astro.slots.has('actions');
     </nav>
     {
       hasActions && (
-        <div class={styles.actions} data-when-stuck={actionsWhenStuck || undefined}>
+        <div class={styles.actions}>
           <slot name="actions" />
         </div>
       )
@@ -101,16 +95,18 @@ const hasActions = Astro.slots.has('actions');
     'breadcrumb-bar',
     class extends WebComponent {
       parsedCallback() {
+        // Every page has an h1. Without it, the band shows when the page scrolls.
+        const heading = document.querySelector('h1');
         let frame = 0;
-        // The bar sticks when its top is at its sticky top (the top of the
-        // screen, or below the site header) and the page has scrolled.
+        // The band shows when the bottom of the h1 goes above the top of the
+        // band (the top of the screen, or the bottom of the site header).
         const update = () => {
           frame = 0;
-          const stickyTop = parseFloat(getComputedStyle(this).top) || 0;
-          this.toggleAttribute(
-            'data-stuck',
-            window.scrollY > 0 && this.getBoundingClientRect().top <= stickyTop + 1,
-          );
+          const top = parseFloat(getComputedStyle(this).top) || 0;
+          const shown = heading
+            ? heading.getBoundingClientRect().bottom <= top
+            : window.scrollY > 0;
+          this.toggleAttribute('data-shown', shown);
         };
         const onScroll = () => {
           if (!frame) frame = requestAnimationFrame(update);

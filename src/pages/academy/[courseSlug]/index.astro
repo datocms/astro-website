@@ -1,6 +1,6 @@
 ---
 import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Breadcrumb } from '~/components/Breadcrumb';
+import { Breadcrumb, BreadcrumbLabel } from '~/components/Breadcrumb';
 import { CourseCell } from '~/components/CourseCell';
 import { Hero } from '~/components/Hero';
 import { Prose } from '~/components/Prose';
@@ -62,7 +62,8 @@ const pageUrl = new URL(Astro.url.pathname, baseUrl(Astro)).href;
       }}
     />
   </Fragment>
-  <Hero variant="accent" label="DatoCMS Academy" headline={course.name}>
+  <Hero variant="accent" headline={course.name}>
+    <BreadcrumbLabel slot="label" trail={[indexes.academy]} />
     <Prose slot="intro">
       <StructuredText {...ensureValidStructuredTextProps({ data: course.introduction })} />
     </Prose>

@@ -8,7 +8,7 @@ import { query } from './_graphql';
 import { assignHeadingAnchors } from '~/lib/academyAnchors';
 import { type StructuredTextDocument } from 'datocms-structured-text-to-plain-text';
 import { ArticleBody } from '~/components/ArticleBody';
-import { Breadcrumb } from '~/components/Breadcrumb';
+import { Breadcrumb, BreadcrumbLabel } from '~/components/Breadcrumb';
 import { CourseOutline } from '~/components/CourseOutline';
 import { Hero } from '~/components/Hero';
 import { Prose } from '~/components/Prose';
@@ -93,7 +93,11 @@ const outline = allChapters.map((nthChapter) => ({
       }}
     />
   </Fragment>
-  <Hero variant="accent" label="DatoCMS Academy" headline={chapter.title}>
+  <Hero variant="accent" headline={chapter.title}>
+    <BreadcrumbLabel
+      slot="label"
+      trail={[indexes.academy, { label: course.name, href: buildUrlForAcademyCourse(course) }]}
+    />
     <Prose slot="intro">
       <StructuredText {...ensureValidStructuredTextProps({ data: course.introduction })} />
     </Prose>

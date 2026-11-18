@@ -18,7 +18,6 @@ export const query = graphql(
         }
         name
         cmsDescription
-        seoH1
         yoastAnalysis
         readme
         _firstPublishedAt

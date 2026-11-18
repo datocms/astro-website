@@ -59,7 +59,14 @@ const nameParts = names.split(gluedPattern);
   contentClass={hasCover ? styles.split : undefined}
 >
   <div class:list={[styles.content, hasCover && styles.splitText]}>
-    {isChat && <p class:list={[styles.label, 'labelMedium']}>Casual chat</p>}
+    {
+      /* The slot `label` takes a BreadcrumbLabel: the trail of the page. */
+      Astro.slots.has('label') && (
+        <div class={styles.label}>
+          <slot name="label" />
+        </div>
+      )
+    }
     <h1 class:list={[styles.title, 'display']}>{title}</h1>
     <div class={styles.byline}>
       <div class={styles.avatars}>

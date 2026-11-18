@@ -30,8 +30,6 @@ interface Props extends HeroData {
   team?: FragmentOf<typeof HeroTeamMemberFragment>[];
   /** The `id` of the team row, for an anchor such as `#the-team`. */
   teamId?: string;
-  /** The label is a link to this URL. */
-  labelHref?: string;
   /** The accessible name of the logos. It does not show. */
   logosLabel?: string;
 }
@@ -49,7 +47,6 @@ const {
   headingLevel = 'h1',
   breakBeforeMuted = false,
   teamId,
-  labelHref,
   logosLabel,
 } = Astro.props;
 
@@ -102,6 +99,8 @@ const background = ({ page: 'default', accent: 'accent' } as const)[variant];
 // A picture next to the text (the slot `visual`): from 1152 the hero has
 // two columns, below 1152 the picture comes after the text.
 const hasVisual = Astro.slots.has('visual');
+// The slot `label` (a BreadcrumbLabel) replaces the text of `label`.
+const hasLabel = Boolean(label) || Astro.slots.has('label');
 ---
 
 <Section
@@ -112,16 +111,12 @@ const hasVisual = Astro.slots.has('visual');
 >
   <TextTag class={styles.text}>
     {
-      label && (
-        <p class:list={[styles.label, 'body']}>
-          {labelHref ? (
-            <a href={labelHref} data-datocms-nomd>
-              {label}
-            </a>
-          ) : (
-            label
-          )}
-        </p>
+      hasLabel && (
+        <div class:list={[styles.label, 'body']}>
+          <slot name="label">
+            <p>{label}</p>
+          </slot>
+        </div>
       )
     }
     <Headline

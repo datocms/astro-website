@@ -4,7 +4,7 @@
 // the projects of the showcase and the plugins that the partner released.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import sortBy from 'lodash-es/sortBy';
-import { Breadcrumb } from '~/components/Breadcrumb';
+import { Breadcrumb, BreadcrumbLabel } from '~/components/Breadcrumb';
 import { Button } from '~/components/Button';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Fact, Facts } from '~/components/Facts';
@@ -92,14 +92,12 @@ const sortedProjects = sortBy(page.projects, (project) =>
     /*
       The hero is a split. The text is in the left half, on the page. The
       right half is the white plate of the logo, cut by the right edge and
-      by the bottom edge of the band, as the frame of a product scene.
+      by the bottom edge of the band, as the frame of a product scene, but with a square corner.
     */
   }
   <Section flushBottom class={s.hero} contentClass={s.heroContent} data-hero>
     <div class={s.heroText}>
-      <p class:list={[s.label, 'body']}>
-        <a href={partner.kickerHref} data-datocms-nomd>{partner.kicker}</a>
-      </p>
+      <BreadcrumbLabel class={s.label} trail={[indexes.partners]} />
       <Headline as="h1" size="headline">{page.name}</Headline>
       <div class:list={[s.intro, 'body']}>
         <StructuredText {...ensureValidStructuredTextProps({ data: page.shortDescription })} />

@@ -16,7 +16,7 @@ import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { ResponsiveImageFragment } from '~/components/ResponsiveImage/graphql';
 import { Section } from '~/components/Section';
 import { TableOfContents } from '~/components/TableOfContents';
-import { Breadcrumb } from '~/components/Breadcrumb';
+import { Breadcrumb, BreadcrumbLabel } from '~/components/Breadcrumb';
 import { indexes } from '~/data/breadcrumbs';
 import { detail } from '~/data/plugins';
 import Layout from '~/layouts/Layout.astro';
@@ -77,6 +77,7 @@ const description = (() => {
 
 <Layout theme="blue" seo={overrideSeo(page.seo, seoOgType('website'))} headerVariant="accent">
   <Hero variant="accent" headline={page.title}>
+    <BreadcrumbLabel slot="label" trail={[indexes.plugins]} />
     <div slot="intro" class={s.intro}>
       <p class={s.description}>{description}</p>
       {
@@ -94,7 +95,7 @@ const description = (() => {
       </set-plugin-install-url>
     </div>
   </Hero>
-  <Breadcrumb trail={[indexes.plugins]} current={page.title} actionsWhenStuck>
+  <Breadcrumb trail={[indexes.plugins]} current={page.title}>
     <set-plugin-install-url slot="actions" data-package-name={page.packageName}>
       <Button href={dashboardUrl()} attrs={{ target: '_blank' }}>
         {detail.install}

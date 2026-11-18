@@ -1,6 +1,6 @@
 ---
 // One entry of the changelog, with its content.
-import { Breadcrumb } from '~/components/Breadcrumb';
+import { Breadcrumb, BreadcrumbLabel } from '~/components/Breadcrumb';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { PrevNext } from '~/components/PrevNext';
 import { ProductUpdate } from '~/components/ProductUpdate';
@@ -37,7 +37,9 @@ const neighbours = {
 
 <Layout theme="green" seo={entry.seo} headerVariant="accent">
   <Breadcrumb trail={[indexes.productUpdates]} current={entry.title} />
-  <ProductUpdate entry={entry} />
+  <ProductUpdate entry={entry}>
+    <BreadcrumbLabel slot="label" trail={[indexes.productUpdates]} />
+  </ProductUpdate>
   <PrevNext
     ariaLabel="Newer and older product update"
     prev={neighbours.newer}

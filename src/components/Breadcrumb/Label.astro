@@ -1,0 +1,36 @@
+---
+import type { BreadcrumbItem } from './types';
+import styles from './label.module.css';
+
+interface Props {
+  /** The pages above this page, from the top. */
+  trail: BreadcrumbItem[];
+  class?: string;
+}
+
+const { trail, class: className } = Astro.props;
+---
+
+{
+  /*
+  The trail of the pages above this page, as the label above the h1 of
+  the hero. Each item is a link. The Breadcrumb bar shows the same trail
+  when the h1 goes out of the screen.
+*/
+}
+<p class:list={[styles.label, 'body', className]} data-datocms-nomd>
+  {
+    trail.map((item, index) => (
+      <>
+        {index > 0 && (
+          <span class={styles.separator} aria-hidden="true">
+            /
+          </span>
+        )}
+        <a class={styles.link} href={item.href}>
+          {item.label}
+        </a>
+      </>
+    ))
+  }
+</p>

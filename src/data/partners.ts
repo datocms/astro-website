@@ -56,7 +56,6 @@ export const filterPlaceholder = 'Select…';
 
 export const partner = {
   kicker: 'DatoCMS Agency Partner',
-  kickerHref: '/partner-program',
   description: 'Description',
   visitWebsite: 'Visit website',
   contact: 'Contact',
@@ -72,7 +71,6 @@ export const partner = {
 };
 
 export const project = {
-  kicker: 'Projects showcase',
   madeBy: 'Made by',
   visitProject: 'Visit project',
   projectShots: 'Project shots',

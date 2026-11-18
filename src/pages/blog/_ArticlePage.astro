@@ -3,7 +3,7 @@
 // routes get the record, and this file gives the markup, so they stay the same.
 import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
 import { ArticleBody } from '~/components/ArticleBody';
-import { Breadcrumb } from '~/components/Breadcrumb';
+import { Breadcrumb, BreadcrumbLabel } from '~/components/Breadcrumb';
 import { JsonLd } from '~/components/JsonLd';
 import { MarkdownActions } from '~/components/MarkdownActions';
 import { PostHeader } from '~/components/PostHeader';
@@ -169,7 +169,9 @@ const markdownUrl = new URL(
     />
   </Fragment>
 
-  <PostHeader {...header} cover={cover} />
+  <PostHeader {...header} cover={cover}>
+    <BreadcrumbLabel slot="label" trail={trail} />
+  </PostHeader>
   <Breadcrumb trail={trail} current={article.title}>
     <MarkdownActions slot="actions" markdownUrl={markdownUrl.href} />
   </Breadcrumb>

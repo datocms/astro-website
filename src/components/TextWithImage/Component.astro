@@ -30,7 +30,7 @@ interface Props {
   mediaPadding?: 'default' | 'even';
   /** `accent`: the text half has the accent of the theme as its background. */
   textBackground?: 'default' | 'accent';
-  /** A case-studies-logo above the headline. It fits in 220 × 30. */
+  /** A case-studies-logo below the subline. It fits in 220 × 30. */
   logo?: LogoItem;
   button?: ButtonData;
   /** Use `h1` when the section is the first section of the page. */
@@ -79,10 +79,11 @@ const shownLogo = storyLogo ?? logo;
   >
     <div class:list={[styles.text, headlineStyle === 'two-tone' && styles.twoToneText]}>
       {
-        shownLogo && (
-          <span class={styles.logoBox}>
-            <Logo logo={shownLogo} class={styles.logo} />
-          </span>
+        /* The slot `label` takes a BreadcrumbLabel: the trail of the page. */
+        Astro.slots.has('label') && (
+          <div class={styles.trail}>
+            <slot name="label" />
+          </div>
         )
       }
       {label && <p class:list={['label', styles.label]}>{label}</p>}
@@ -103,6 +104,13 @@ const shownLogo = storyLogo ?? logo;
               {story ? <InlineParagraphs data={story.subtitle} /> : <InlineText text={tagline} />}
             </p>
           </div>
+        )
+      }
+      {
+        shownLogo && (
+          <span class={styles.logoBox}>
+            <Logo logo={shownLogo} class={styles.logo} />
+          </span>
         )
       }
       {button && <ButtonGroup buttons={[button]} />}

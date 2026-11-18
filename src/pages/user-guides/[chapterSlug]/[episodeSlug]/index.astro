@@ -1,7 +1,7 @@
 ---
 import { ensureValidStructuredTextProps, stripStega } from '@datocms/astro';
 import { ArticleBody } from '~/components/ArticleBody';
-import { Breadcrumb } from '~/components/Breadcrumb';
+import { Breadcrumb, BreadcrumbLabel } from '~/components/Breadcrumb';
 import { CourseOutline } from '~/components/CourseOutline';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Hero } from '~/components/Hero';
@@ -89,6 +89,10 @@ const outline = chapters
           })
         : undefined,
   }));
+const trail = [
+  indexes.userGuides,
+  { label: currentChapter.title, href: `${indexes.userGuides.href}#${currentChapter.slug}` },
+];
 ---
 
 <Layout theme="orange" seo={episode._seoMetaTags} headerVariant="accent">
@@ -118,6 +122,7 @@ const outline = chapters
   </Fragment>
   <div class={s.episode}>
     <Hero variant="accent" headline={episode.title}>
+      <BreadcrumbLabel slot="label" trail={trail} />
       <p slot="intro">Video · {formatVideoDuration(episode.asset.video.duration)}</p>
     </Hero>
     {
@@ -130,13 +135,7 @@ const outline = chapters
       <span class:list={[s.band, 'surfaceAccent']} aria-hidden="true"></span>
       <VideoPlayer data={episode.asset} />
     </Section>
-    <Breadcrumb
-      trail={[
-        indexes.userGuides,
-        { label: currentChapter.title, href: `${indexes.userGuides.href}#${currentChapter.slug}` },
-      ]}
-      current={episode.title}
-    />
+    <Breadcrumb trail={trail} current={episode.title} />
     <ArticleBody>
       <CourseOutline
         slot="aside"

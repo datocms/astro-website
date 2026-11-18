@@ -3,7 +3,7 @@
 // video or the main image, the explanation, the screenshots (with a lightbox
 // to the large image), the partner, the services and the technologies.
 import { ensureValidStructuredTextProps } from '@datocms/astro';
-import { Breadcrumb } from '~/components/Breadcrumb';
+import { Breadcrumb, BreadcrumbLabel } from '~/components/Breadcrumb';
 import { ButtonGroup } from '~/components/ButtonGroup';
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { Fact, Facts } from '~/components/Facts';
@@ -39,6 +39,7 @@ if (!page) {
 
 const video = page.video ? readFragment(VideoPlayerFragment, page.video).video : null;
 const partnerUrl = buildUrlForPartner(page.partner);
+const trail = [indexes.partners, { label: page.partner.name, href: partnerUrl }];
 const galleries = [
   { title: project.projectShots, shots: page.projectScreenshots },
   { title: project.backendShots, shots: page.datocmsScreenshots },
@@ -55,13 +56,13 @@ const galleries = [
       The hero is a split, as the hero of the partner page. The text is in
       the left half, on the page. The right half is the video of the
       project, else its main image, cut by the right edge of the band, as
-      the frame of a product scene. The video replaces the main image: the
+      the frame of a product scene, but with a square corner. The video replaces the main image: the
       partner chose the video as the media of the project.
     */
   }
   <Section flushBottom class={s.hero} contentClass={s.heroContent} data-hero>
     <div class={s.heroText}>
-      <p class:list={[s.label, 'body']}>{project.kicker}</p>
+      <BreadcrumbLabel class={s.label} trail={trail} />
       <Headline as="h1" size="headline">{page.name}</Headline>
       <div class:list={[s.intro, 'body']}>
         <StructuredText {...ensureValidStructuredTextProps({ data: page.headline })} />
@@ -94,10 +95,7 @@ const galleries = [
       )
     }
   </Section>
-  <Breadcrumb
-    trail={[indexes.partners, { label: page.partner.name, href: partnerUrl }]}
-    current={page.name}
-  />
+  <Breadcrumb trail={trail} current={page.name} />
 
   <Section>
     <div class={s.layout}>
