@@ -70,6 +70,17 @@ export const FEATURE_BLOCKS = [
   { title: 'Hours per client, each week', button: 'Log hours' },
 ] as const;
 
+/**
+ * The three block models of the diagram of the nested blocks, from the
+ * outer one to the inner one: the name of the model in the cms, and the
+ * type of its records in the GraphQL API.
+ */
+export const NESTED_MODELS = {
+  grid: { name: FEATURE_GRID.name, type: 'FeatureGridRecord' },
+  feature: { name: 'Feature', type: 'FeatureRecord' },
+  button: { name: 'Button', type: 'ButtonRecord' },
+} as const;
+
 export const LOGO_WALL_TITLE = 'Agencies that plan with Plover';
 
 export const TESTIMONIAL_QUOTE = 'We stopped double-booking our designers in the first week.';

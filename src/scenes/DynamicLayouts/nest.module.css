@@ -1,101 +1,364 @@
 /*
- * The layout of the exploded view of the fragment "Blocks inside blocks."
+ * The layout of the nested blocks of the fragment "Blocks inside blocks"
  * (Nest.astro). The parts are the ones of ../diagram/style.module.css. The
- * picture fills the box of the fragment (SceneFragment, preset `fill`)
- * with the surface of the sheet. The box is 4:3, as the viewBox of the
- * drawing.
+ * picture fills the box of the fragment (SceneFragment, `fit="fill"`) on
+ * the surface of the page. The box is the container.
  *
- * Each block is a flat plate with the colours of a panel of the grammar.
+ * At the top, the two labels of the views. Under them, the blocks. Each
+ * block has two places, and `data-view` on the root tells which one it
+ * takes. `page`: the Feature grid is a box, its Features are in a row in
+ * it, and a Button is at the bottom of each Feature. `api`: each block is
+ * a row of a tree, as wide as the type of its record, below the row of its
+ * parent and more to the right. The lines of the tree show only in `api`.
+ *
+ * Nest.astro gives each block its numbers: `--depth` (0 for the Feature
+ * grid), `--row-index` (its row in the tree), `--column` (the place of its
+ * Feature in the row of the page), `--chars` (the length of its type) and
+ * `--name-chars` (the length of its name). It gives the root `--widest`,
+ * the right edge of the widest row of the tree.
+ *
+ * A block shows its text two times: in its box on the page (`.content`),
+ * and at the right of its row in the tree (`.value`). The texts of the
+ * tree start in one column.
+ *
+ * The script sets `data-view`, `data-hidden` and `data-faded` on a line,
+ * and `data-instant` on the root while it puts the picture in the still
+ * with no transition.
+ *
+ * Three widths of the box. To 399px: smaller rows and less space, thus the
+ * seven rows of the tree go in the box of a phone and of a tablet, and no
+ * texts of the blocks, because the box has no room for them at the right
+ * of the tree. From 400px: higher rows, and the texts of the blocks. From
+ * 460px: the sizes of the desktop.
  */
 .nest {
-  /* The time of the drop and of the lift of a plate: MOVE in Nest.astro */
-  --nest-move: 0.9s;
+  /* The time of the move of a block between its two places: MOVE in Nest.astro */
+  --nest-move: 1.1s;
+  --pad: var(--space-sm);
+  /* The height of the band of the two labels: the blocks start under it */
+  --head: 44px;
+  --foot: var(--space-xs);
+  --row: 22px;
+  --gap: var(--space-4xs);
+  --indent: var(--space-sm);
+  /* The distance of a line of the tree from the left edge of its block */
+  --stub: var(--space-3xs);
+  --inset: var(--space-3xs);
+  --between: var(--space-3xs);
+  --label-pad: var(--space-3xs);
+  /* The height of a Button on the page */
+  --button: var(--row);
+  /* The width of one letter of the mono font of a label: each letter of Geist Mono is 0.6em wide */
+  --char: calc(var(--type-2xs) * 0.6);
+  --pitch: calc(var(--row) + var(--gap));
+  /* The band of the label of the Feature grid, above its Features */
+  --lead: calc(var(--row) + var(--space-4xs));
+  /* The width of a Feature on the page. It has a percentage of the width of the box: use it only in `left` and `width`. */
+  --feature: calc((100% - 2 * var(--pad) - 2 * var(--inset) - 2 * var(--between)) / 3);
 
   /* The root is a custom element, which is inline by default */
+  position: relative;
   display: block;
   box-sizing: border-box;
   max-width: none;
   height: 100%;
   margin: 0;
+  overflow: hidden;
   background: var(--surface-inverse);
   color: var(--text-on-inverse);
 }
 
-.stage {
-  position: relative;
-  height: 100%;
+/* The box is higher: the rows are higher and more apart. With its text, a Button on the page has two lines: its name and its label. */
+@container (min-width: 400px) {
+  .nest {
+    --head: 52px;
+    --row: 26px;
+    --gap: var(--space-3xs);
+    --button: calc(var(--row) + 18px);
+  }
 }
 
-.drawing {
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+@container (min-width: 460px) {
+  .nest {
+    --pad: var(--space-xl);
+    --head: 60px;
+    --foot: var(--space-lg);
+    --row: 28px;
+    --gap: var(--space-3xs);
+    --indent: var(--space-md);
+    --stub: var(--space-2xs);
+    --inset: var(--space-xs);
+    --between: var(--space-2xs);
+    --label-pad: var(--space-2xs);
+  }
 }
 
-.plate {
-  stroke: var(--border-on-inverse-strong);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
+/* On phones the box of the fragment has no height of its own: the picture gives the height */
+@media (max-width: 649px) {
+  .nest {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
 }
 
-.grid {
-  fill: color-mix(in oklab, var(--diagram-accent) 8%, var(--diagram-panel));
-  stroke: var(--diagram-accent);
-}
-
-/* A tint of the accent on the panel: no transparency, thus the plates under it do not show */
-.feature {
-  fill: color-mix(in oklab, var(--diagram-accent) 22%, var(--diagram-panel));
-}
-
-.button {
-  fill: var(--diagram-accent);
-  stroke: none;
-}
-
-/* The text of a block: the bars of the tiles of the Wall (../Delivery), the title darker */
-.bar {
-  fill: var(--border-on-inverse-strong);
-}
-
-.heading {
-  fill: var(--text-on-inverse-muted);
-}
-
-.buttonText {
-  fill: var(--diagram-panel);
-}
-
-.outline {
-  fill: none;
-  stroke: var(--border-on-inverse-strong);
-  stroke-width: 1;
-  stroke-dasharray: 3 3;
-  vector-effect: non-scaling-stroke;
-}
-
-.lift {
-  translate: 0 calc(-1px * var(--lift));
-  transition: translate var(--nest-move) var(--diagram-ease-in-out);
-}
-
-.lift[data-down] {
-  translate: 0 0;
+.nest[data-instant] {
+  /* While the script resets the picture, each duration is zero. The durations are variables, thus the rule needs no !important. */
+  --nest-move: 0s;
+  --diagram-fade: 0s;
+  --diagram-enter: 0s;
+  --diagram-draw: 0s;
 }
 
 /*
- * The label of a level: on the end of its track, its right edge at the end
- * of the track. The label is also a `.change` of the grammar. The rule of
- * the grammar has no specificity, thus this position wins.
+ * The two labels of the views. The label of the current view has the
+ * strong text colour and a line of the accent under it.
  */
-.label {
+.views {
   position: absolute;
+  top: 0;
+  left: var(--pad);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: var(--head);
   margin: 0;
-  padding: var(--space-4xs) 0;
-  translate: 0 -100%;
 }
 
-.label > * {
+.view {
+  padding-block: var(--space-4xs);
   font-size: var(--type-2xs);
+  color: var(--text-on-inverse-muted);
+  box-shadow: 0 1.5px 0 transparent;
+  transition:
+    color var(--diagram-fade) var(--diagram-ease-out),
+    box-shadow var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.nest[data-view='page'] .view[data-for='page'],
+.nest[data-view='api'] .view[data-for='api'] {
+  color: var(--text-on-inverse-strong);
+  box-shadow: 0 1.5px 0 var(--diagram-accent);
+}
+
+/*
+ * A block. Its place and its size are in `left`, `top`, `width` and
+ * `height`, thus one transition moves it between its two places. Each
+ * colour has no transparency: a block hides the block under it.
+ */
+.node {
+  /* The width of a row of the tree: the type of the record and the padding of its label */
+  --fit: calc(var(--chars) * var(--char) + 2 * var(--label-pad));
+  /* The left edge of the Feature of the block on the page. `--column` is on the block, thus this value is here and not on the root. */
+  --feature-left: calc(
+    var(--pad) + var(--inset) + var(--column) * (var(--feature) + var(--between))
+  );
+
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: var(--radius-md);
+  color: var(--text-on-inverse-strong);
+  transition:
+    left var(--nest-move) var(--diagram-ease-in-out),
+    top var(--nest-move) var(--diagram-ease-in-out),
+    width var(--nest-move) var(--diagram-ease-in-out),
+    height var(--nest-move) var(--diagram-ease-in-out);
+}
+
+.grid {
+  top: var(--head);
+  left: var(--pad);
+  width: calc(100% - 2 * var(--pad));
+  height: calc(100% - var(--head) - var(--foot));
+  background: color-mix(in oklab, var(--diagram-accent) 8%, var(--diagram-panel));
+  box-shadow: 0 0 0 1px var(--diagram-accent);
+}
+
+.feature {
+  top: calc(var(--head) + var(--lead));
+  left: var(--feature-left);
+  width: var(--feature);
+  height: calc(100% - var(--head) - var(--foot) - var(--lead) - var(--inset));
+  background: color-mix(in oklab, var(--diagram-accent) 22%, var(--diagram-panel));
+  box-shadow: 0 0 0 1px var(--border-on-inverse-strong);
+}
+
+.button {
+  top: calc(100% - var(--foot) - 2 * var(--inset) - var(--button));
+  left: calc(var(--feature-left) + var(--inset));
+  width: calc(var(--feature) - 2 * var(--inset));
+  height: var(--button);
+  border-radius: calc(var(--radius-md) - 2px);
+  background: var(--surface-accent);
+  color: var(--text-on-accent);
+}
+
+/*
+ * The tree: the root class and the attribute give these rules more
+ * specificity than the rules of the page view above, on purpose. The view
+ * of the root decides the place of each block.
+ */
+.nest[data-view='api'] .node {
+  top: calc(var(--head) + var(--row-index) * var(--pitch));
+  left: calc(var(--pad) + var(--depth) * var(--indent));
+  width: var(--fit);
+  height: var(--row);
+}
+
+/*
+ * The two texts of a block, one on the other: its name in the cms (page
+ * view) and the type of its record (API view). The second half of the move
+ * changes one for the other.
+ */
+.name,
+.type {
+  position: absolute;
+  top: 0;
+  left: var(--label-pad);
+  line-height: var(--row);
+  white-space: nowrap;
+  color: inherit;
+  transition: opacity var(--diagram-enter) var(--diagram-ease-out) calc(var(--nest-move) * 0.4);
+}
+
+.name {
+  font-size: var(--type-2xs);
+}
+
+.type,
+.nest[data-view='api'] .name {
+  opacity: 0;
+}
+
+.nest[data-view='api'] .type {
+  opacity: 1;
+}
+
+/*
+ * The text of a block in its box on the page, in the text font. The text
+ * of the Feature grid is after its name, on the same line: a letter of the
+ * name in capitals takes 1.1 letters, with its letter spacing. The text of
+ * a Feature is under its name and takes the width of the box. The text of
+ * a Button is under its name. The text goes at the start of the move to
+ * the tree, before its box becomes small, and comes back at the end of the
+ * move to the page.
+ */
+.content {
+  position: absolute;
+  font-family: var(--font-sans);
+  font-size: var(--type-xs);
+  line-height: 1.3;
+  transition: opacity var(--diagram-enter) var(--diagram-ease-out) calc(var(--nest-move) * 0.7);
+}
+
+.grid .content {
+  top: 0;
+  left: calc(var(--label-pad) + var(--name-chars) * var(--char) * 1.1 + var(--space-2xs));
+  line-height: var(--row);
+  white-space: nowrap;
+  color: var(--text-on-inverse-soft);
+}
+
+.feature .content {
+  top: var(--row);
+  right: var(--label-pad);
+  left: var(--label-pad);
+  color: var(--text-on-inverse-soft);
+}
+
+.button .content {
+  top: calc(var(--row) - 6px);
+  left: var(--label-pad);
+  white-space: nowrap;
+}
+
+.nest[data-view='api'] .content {
+  opacity: 0;
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+/*
+ * The text of a block at the right of its row in the tree, on the surface
+ * of the page. All the texts start in one column, after the widest row:
+ * the `left` is from the left edge of the block, thus it takes off the
+ * depth of the block. The text comes at the end of the move to the tree,
+ * and goes at the start of the move to the page.
+ */
+.value {
+  position: absolute;
+  top: 0;
+  left: calc(var(--widest) + 2 * var(--label-pad) + var(--space-xs) - var(--depth) * var(--indent));
+  font-family: var(--font-sans);
+  font-size: var(--type-xs);
+  line-height: var(--row);
+  white-space: nowrap;
+  color: var(--text-on-inverse-soft);
+  opacity: 0;
+  transition: opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.nest[data-view='api'] .value {
+  opacity: 1;
+  transition: opacity var(--diagram-enter) var(--diagram-ease-out) calc(var(--nest-move) * 0.7);
+}
+
+@container (max-width: 399px) {
+  .content,
+  .value {
+    display: none;
+  }
+}
+
+/*
+ * A line of the tree: a track of the grammar (1.5px, the quiet stroke),
+ * as a box and not as a path of an svg. Its place follows the custom
+ * properties of the layout, which an svg path cannot read. `--depth` is
+ * the depth of the parent. A trunk goes down from the bottom of the parent
+ * (`--row-index`) to the middle of its last child (`--end`). A twig goes
+ * from the trunk to a child (`--row-index`), and starts after the trunk,
+ * thus the two do not overlap. A line draws from its start when
+ * `data-hidden` goes, and fades with `data-faded`.
+ */
+.line {
+  --x: calc(var(--pad) + var(--depth) * var(--indent) + var(--stub));
+  --stroke: 1.5px;
+
+  position: absolute;
+  border-radius: 1px;
+  background: var(--border-on-inverse-strong);
+  transition:
+    scale var(--diagram-draw) var(--diagram-ease-in-out),
+    opacity var(--diagram-fade) var(--diagram-ease-out);
+}
+
+.trunk {
+  top: calc(var(--head) + var(--row-index) * var(--pitch) + var(--row));
+  left: var(--x);
+  width: var(--stroke);
+  height: calc((var(--end) - var(--row-index)) * var(--pitch) - var(--row) / 2 + var(--stroke) / 2);
+  transform-origin: 50% 0;
+}
+
+.twig {
+  top: calc(var(--head) + var(--row-index) * var(--pitch) + var(--row) / 2 - var(--stroke) / 2);
+  left: calc(var(--x) + var(--stroke));
+  width: calc(var(--indent) - var(--stub) - var(--stroke));
+  height: var(--stroke);
+  transform-origin: 0 50%;
+}
+
+.line[data-hidden] {
+  opacity: 0;
+  transition: none;
+}
+
+.trunk[data-hidden] {
+  scale: 1 0;
+}
+
+.twig[data-hidden] {
+  scale: 0 1;
+}
+
+.line[data-faded] {
+  opacity: 0;
 }
