@@ -13,7 +13,7 @@ Read the voice in `BRAND.md` (sections 2, 4, 5 and 7) before you change any text
 - `theme` is the hue of the page (`DESIGN.md`, "Page themes"). A marketing page reads it from the data of its first chapter (`theme={dev.schema.theme}`), not from a literal. The header, the `PageCloser` and the footer take the theme of the page.
 - `headerVariant` is the same value as the `variant` of the `Hero`: `page` on a marketing page, `accent` on a reference page.
 - Do not remove `id="layout-content"` from `<main>`: `/api/seo-analysis` reads the page from it.
-- `PageNav` (bottom left) is for the reviewers, not part of the design. It shows also in production.
+- `PageNav` (bottom left) is a tool for the developers, not part of the design. It shows only in `astro dev`.
 
 ## Components
 
@@ -25,7 +25,7 @@ Read the voice in `BRAND.md` (sections 2, 4, 5 and 7) before you change any text
 - Text faces are in `src/lib/motion/faces.ts`. The copy names a face (`face: 'happy'`), never its glyphs, and only `Face` and the typewriter (`faceStep`) draw it. Add a new face there, and check it in `/dev/face-gallery` (`DESIGN.md`, "The Text Face Rule").
 - Motion: use the helpers in `src/lib/motion/`, CSS before JS. Reduced motion shows the final state, animations play only in view, no layout shift, and the final state is in the DOM without JS. No Lottie, and no video for what CSS can do.
 - `ChatCover` draws the cover of a casual chat from its guests: the portrait is a continuous black and white photograph, never cells. Add the slug of a new chat at the top of `src/data/chatCoverThemes.ts`.
-- The dev tools (`/dev/face-gallery`, `/dev/pxv-gallery`, `/dev/cover-gallery`, `/dev/button-gallery`) are in `src/dev/`, and the integration `dev-tools` in `astro.config.ts` adds their routes. A dev tool must not import a dev dependency: the build has the routes, and the runtime image has no dev dependencies.
+- The dev tools (`/dev/face-gallery`, `/dev/pxv-gallery`, `/dev/cover-gallery`, `/dev/button-gallery`) are in `src/dev/`, and the integration `dev-tools` in `astro.config.ts` adds their routes only in `astro dev`. The build and the deploys do not have them.
 - After a new tarball of the scene kit in `vendor/`, run `npm install` and restart `astro dev`.
 
 ## Styling
