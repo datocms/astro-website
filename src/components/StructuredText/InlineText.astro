@@ -2,6 +2,7 @@
 import { StructuredText as DatoStructuredText } from '@datocms/astro';
 import type { ComponentProps } from 'astro/types';
 import NoParagraph from './NoParagraph.astro';
+import SpanNode from './SpanNode.astro';
 
 type Props = ComponentProps<typeof DatoStructuredText>;
 
@@ -10,5 +11,8 @@ const { nodeOverrides, ...props } = Astro.props;
 
 {/* A Structured Text field of one line: the paragraphs have no <p>. */}
 <span>
-  <DatoStructuredText {...props} nodeOverrides={{ paragraph: NoParagraph, ...nodeOverrides }} />
+  <DatoStructuredText
+    {...props}
+    nodeOverrides={{ paragraph: NoParagraph, span: SpanNode, ...nodeOverrides }}
+  />
 </span>

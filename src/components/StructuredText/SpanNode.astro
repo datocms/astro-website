@@ -1,0 +1,63 @@
+---
+import type { Mark, Span } from 'datocms-structured-text-utils';
+import { PixelEmoji } from '~/components/PixelEmoji';
+import { emojiSegments } from './emojiSegments';
+import styles from './style.module.css';
+
+// A run of text of a Structured Text field. Each emoji that has a pixel
+// drawing shows as the drawing. The character stays in the DOM, hidden: a
+// crawler, a screen reader and the Markdown version of the page read it.
+// Text with the `code` mark keeps its emojis as characters.
+
+interface Props {
+  node: Span;
+  // The type of the overrides is not an export of @datocms/astro.
+  markOverrides?: Partial<Record<Mark, ((props: any) => any) | string>>;
+  /** The text shows without drawings. A parent with the `code` mark sets it. */
+  plain?: boolean;
+}
+
+const { node, markOverrides } = Astro.props;
+const { type, value, marks } = node;
+const plain = Astro.props.plain ?? marks?.includes('code') ?? false;
+
+const [mark, ...otherMarks] = marks ?? [];
+
+/** The elements of the marks that are not the name of an HTML element. */
+const MARK_TAGS: Partial<Record<Mark, string>> = {
+  emphasis: 'em',
+  underline: 'u',
+  strikethrough: 's',
+  highlight: 'mark',
+};
+
+const MarkComponent = mark ? (markOverrides?.[mark] ?? MARK_TAGS[mark] ?? mark) : null;
+
+const lines = value
+  .split('\n')
+  .map((line) => (plain ? [{ type: 'text' as const, value: line }] : emojiSegments(line)));
+---
+
+{
+  MarkComponent ? (
+    <MarkComponent>
+      <Astro.self node={{ type, value, marks: otherMarks }} {markOverrides} {plain} />
+    </MarkComponent>
+  ) : (
+    lines.map((segments, index) => (
+      <>
+        {index > 0 && <br />}
+        {segments.map((segment) =>
+          segment.type === 'emoji' ? (
+            <>
+              <PixelEmoji emoji={segment.drawn} class={styles.emoji} trim />
+              <span class="visuallyHidden">{segment.value}</span>
+            </>
+          ) : (
+            segment.value
+          ),
+        )}
+      </>
+    ))
+  )
+}

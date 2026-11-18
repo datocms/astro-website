@@ -1,5 +1,5 @@
 ---
-import drawings from './drawings.json';
+import { pixelEmojiDrawing } from './drawing';
 import styles from './style.module.css';
 
 // A pixel drawing in place of an emoji of the CMS. An emoji without a drawing
@@ -18,12 +18,7 @@ interface Props {
 
 const { emoji, class: className, animated = false, trim = false } = Astro.props;
 
-// The key has the code points of the emoji, without the variation selector.
-const key = [...emoji]
-  .map((char) => char.codePointAt(0)?.toString(16))
-  .filter((codePoint) => codePoint !== 'fe0f')
-  .join('-');
-const drawing = (drawings as Record<string, string>)[key];
+const drawing = pixelEmojiDrawing(emoji);
 
 // The part of the cells that fade.
 const FADING = 0.45;

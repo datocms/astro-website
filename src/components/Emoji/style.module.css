@@ -1,11 +1,16 @@
 /* @layer blocks */
-/* The emoji sits in the line of text, a little larger than a capital. */
+/*
+ * The emoji sits in the line of text, a little larger than a capital. Its
+ * height is the height of its picture. The offset is a whole number of
+ * pixels: the rows of cells of a pixel drawing stay on the pixels of the
+ * screen.
+ */
 .emoji {
   position: relative;
   display: inline-block;
-  height: 1em;
   margin-inline: 0.06em;
   vertical-align: -0.14em;
+  vertical-align: round(nearest, -0.14em, 1px);
   white-space: nowrap;
 }
 
@@ -28,10 +33,10 @@
   width: auto;
 }
 
-/* A pixel drawing of PixelEmoji, at the size of the line. */
+/* A pixel drawing of PixelEmoji, at the size of the text. PixelEmoji gives it whole cells. */
 .pixel {
   --pixel-emoji-size: 1em;
-  --pixel-emoji-margin-block: 0;
+  --pixel-emoji-margin-block: 0px;
 
   display: block;
 }

@@ -1,16 +1,51 @@
 /* @layer blocks */
 /*
- * The art has 10 by 10 cells. The default size is a multiple of 10, thus each
- * cell covers a whole number of screen pixels.
+ * The art has 10 by 10 cells, and each cell must cover a whole number of
+ * screen pixels: if not, some cells are larger than others.
  * The API: --pixel-emoji-size (the side of the drawing) and
- * --pixel-emoji-margin-block.
+ * --pixel-emoji-margin-block (a length with a unit: 0px, not 0). The size can be relative to the text (1em):
+ * the drawing takes the nearest size that gives whole cells.
  */
 .emoji {
+  /* The step of the size: 10px gives one more CSS pixel to each cell. */
+  --pixel-emoji-step: 10px;
+
   display: inline-block;
   width: var(--pixel-emoji-size, 30px);
   height: var(--pixel-emoji-size, 30px);
   /* The negative margins keep the drawing on the text and the line at its height. */
   margin-block: var(--pixel-emoji-margin-block, -0.2em);
+}
+
+/* With 2 device pixels in a CSS pixel, a cell of 1.5px is 3 whole pixels. */
+@media (resolution >= 2dppx) {
+  .emoji {
+    --pixel-emoji-step: 5px;
+  }
+}
+
+/*
+ * A browser without round() keeps the size of the API. The drawing is never
+ * smaller than one step.
+ */
+@supports (width: round(nearest, 1em, 10px)) {
+  .emoji {
+    --pixel-emoji-side: max(
+      var(--pixel-emoji-step),
+      round(nearest, var(--pixel-emoji-size, 30px), var(--pixel-emoji-step))
+    );
+
+    width: var(--pixel-emoji-side);
+    height: var(--pixel-emoji-side);
+    /*
+     * A drawing that is larger than the size of the API goes up out of its
+     * box by the difference: the line of text keeps its height.
+     */
+    margin-block-start: calc(
+      var(--pixel-emoji-margin-block, -0.2em) +
+        min(0px, var(--pixel-emoji-size, 30px) - var(--pixel-emoji-side))
+    );
+  }
 }
 
 .emoji svg {

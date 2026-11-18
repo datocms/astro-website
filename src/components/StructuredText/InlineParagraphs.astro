@@ -2,6 +2,7 @@
 import { StructuredText as DatoStructuredText } from '@datocms/astro';
 import { isDocument } from 'datocms-structured-text-utils';
 import NoParagraph from './NoParagraph.astro';
+import SpanNode from './SpanNode.astro';
 import { textOnly } from './plainText/document';
 
 interface Props {
@@ -33,7 +34,7 @@ const blocks = textOnly(document?.children ?? []);
           <br />
         </>
       )}
-      <DatoStructuredText data={block} nodeOverrides={{ paragraph: NoParagraph }} />
+      <DatoStructuredText data={block} nodeOverrides={{ paragraph: NoParagraph, span: SpanNode }} />
     </>
   ))
 }
