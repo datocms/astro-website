@@ -39,3 +39,15 @@ export const SCENE_HUE: Record<Theme, number> = {
  * section. The cap quiets it, the same on each theme.
  */
 export const SCENE_CHROMA = 0.08;
+
+/**
+ * The themes where the navigation bar of the cms takes its deepest stop
+ * (the `deepNavbar` of the kit). In the light scheme the bar has the OKLCH
+ * lightness 0.37 at each hue. The inverse surface of green (#1a4731, 0.36)
+ * and of blue (#1a3a47, 0.33) has almost the same lightness: next to it, at
+ * the right of a chapter split, the bar and the ground looked the same. The
+ * deep bar (0.25) is darker than the ground, as on the other themes the
+ * ground is darker than the bar. On the other themes the inverse surface is
+ * dark (0.18 to 0.27): a deep bar comes near it.
+ */
+export const SCENE_DEEP_NAVBAR: ReadonlySet<Theme> = new Set(['green', 'blue']);
