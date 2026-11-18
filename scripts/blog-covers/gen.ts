@@ -633,7 +633,35 @@ async function downloadCover(client: Client, post: Post) {
  * with no changes that are not published is published again. A post with
  * such changes stays as it is: an editor publishes it.
  */
-async function saveCover(client: Client, post: Post, png: Buffer, theme: string) {
+/**
+ * The custom data of the asset of a cover: the subject, the source of the
+ * photo and the licence. An editor reads them in the media area of the CMS.
+ * The record in the file has the same values. Each locale gets them, and
+ * keeps its other metadata.
+ */
+async function writeCustomData(client: Client, uploadId: string, record: CoverRecord) {
+  const { locales } = await client.site.find();
+  const upload = await client.uploads.find(uploadId);
+  const data = {
+    subject: record.subject,
+    source: record.source ?? '',
+    licensed: record.licensed ? 'true' : 'false',
+  };
+  const customData: Record<string, Record<string, string>> = {};
+  for (const locale of locales)
+    customData[locale] = { ...upload.default_field_metadata.custom_data[locale], ...data };
+  await client.uploads.update(uploadId, {
+    default_field_metadata: { ...upload.default_field_metadata, custom_data: customData },
+  });
+}
+
+async function saveCover(
+  client: Client,
+  post: Post,
+  png: Buffer,
+  theme: string,
+  record: CoverRecord,
+) {
   fs.mkdirSync(COVERS, { recursive: true });
   const localPath = path.join(COVERS, `${post.slug}.png`);
   fs.writeFileSync(localPath, png);
@@ -644,6 +672,7 @@ async function saveCover(client: Client, post: Post, png: Buffer, theme: string)
         filename: `cover-${post.slug}.png`,
         tags: ['blog-cover'],
       });
+  await writeCustomData(client, upload.id, record);
   if (post.coverId !== upload.id || post.theme !== theme)
     await client.items.update(post.id, { pixel_cover: { upload_id: upload.id }, theme });
   if (post.published) {
@@ -700,13 +729,15 @@ async function render(
     const before = post ? (await downloadCover(client, post))?.record : undefined;
     const samePhotos =
       before?.layers.map((l) => l.photo).join() === spec.layers.map((l) => l.photo).join();
-    const png = await encodeCover(grid, {
+    const record: CoverRecord = {
       subject: spec.subject,
-      source: spec.source,
+      // The same photo keeps a source that `set` gave.
+      source: spec.source ?? (samePhotos ? before?.source : undefined),
       licensed: samePhotos ? (before?.licensed ?? false) : false,
       layers: spec.layers,
       despeckle: spec.despeckle,
-    });
+    };
+    const png = await encodeCover(grid, record);
     // A try writes the file of the cover, but does not send it. A person can
     // put this file in the field `pixel_cover` of the post in the CMS.
     if (tryOnly || variant || !post) {
@@ -716,7 +747,7 @@ async function render(
       console.log(`  cover file (not sent to the CMS): ${path.relative(ROOT, local)}`);
       continue;
     }
-    console.log(`  CMS: ${await saveCover(client, post, png, theme)}`);
+    console.log(`  CMS: ${await saveCover(client, post, png, theme, record)}`);
   }
   if (failed) process.exitCode = 1;
 }
@@ -793,7 +824,7 @@ async function set(client: Client, slug: string, pairs: string[]) {
   }
   if (!theme) throw new Error(`${slug} has no theme in the CMS: give theme=<theme>`);
   coloursOf(theme);
-  const status = await saveCover(client, post, await encodeCover(grid, record), theme);
+  const status = await saveCover(client, post, await encodeCover(grid, record), theme, record);
   console.log(
     `${slug}: ${JSON.stringify({ ...record, layers: undefined })}\n  theme (the field of the post): ${theme}\n  CMS: ${status}`,
   );

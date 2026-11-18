@@ -4,6 +4,9 @@ Tools for the covers of the blog (drawn by `src/components/PixelCover`). The
 CMS keeps a cover in two fields of a blog post: `pixel_cover` (the file) and
 `theme`. The file is the only copy that we keep: its record (the subject, the
 source of the photo, the licence, the spec) is in a text chunk of the file.
+`render` and `set` also write the subject, the source and the licence in the
+custom data of the asset (`subject`, `source`, `licensed`): an editor reads
+them in the media area of the CMS.
 The rules and the process are in `src/components/PixelCover/AGENTS.md`.
 
 The work files are in `tmp/blog-covers/` (Git ignores it):
