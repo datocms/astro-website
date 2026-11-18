@@ -8,5 +8,13 @@
 export const ORACLE_GLYPHS =
   '!"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĹĺĻļĽľĿŀŁłŃńŅņŇňŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžƏƒƠơƯưǍǎǏǐǑǒǓǔǢǣǦǧǴǵǺǻǼǽǾǿȘșȚțȦȧȲȳȷəʼˆˇ˘˙˚˛˜˝ΔΩμπ฿ḌḍḠḡḤḥḶḷṄṅṖṗṢṣṬṭẀẁẂẃẄẅẊẋẌẍẒẓẞẠạẢảẤấẦầẨẩẪẫẬậẮắẰằẲẳẴẵẶặẸẹẺẻẼẽẾếỀềỂểỄễỆệỈỉỊịỌọỎỏỐốỒồỔổỖỗỘộỚớỜờỞởỠỡỢợỤụỦủỨứỪừỬửỮữỰựỲỳỴỵỶỷỸỹ‐–—―‘’‚“”„†‡•…‰′″‹›‼‽⁂⁄⁑⁰⁴⁵⁶⁷⁸⁹₀₁₂₃₄₅₆₇₈₉₦₨₩₪₫€₮₴₸₺₽₿℅ℓ№℗™Ω⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞⅟ⅠⅡⅢⅣⅤⅥⅦⅧⅨⅩⅬⅭⅮⅯ←↑→↓↖↗↘↙∂∅∆∏∑−∕∙√∞∫≈≠≤≥〈〉①②③④⑤⑥⑦⑧⑨⓪⓿■□▲△▶▷▼▽◀◁◆◇◊○◌●♡♥❶❷❸❹❺❻❼❽❾⬛⬜《》「」『』【】〔〕ﬁﬂ';
 
-/** True when ABC Oracle has the glyph of `ch`. A space is always fine. */
-export const isOracleGlyph = (ch: string) => /\s/.test(ch) || ORACLE_GLYPHS.includes(ch);
+/**
+ * The glyphs that the family ABC Oracle takes from Geist Mono
+ * (src/styles/fonts.css): the arms of the face `dance`. They look the
+ * same on each system, thus the gallery does not mark them.
+ */
+export const ORACLE_FAMILY_EXTRA = '┌┐└┘';
+
+/** True when the family ABC Oracle has the glyph of `ch`. A space is always fine. */
+export const isOracleGlyph = (ch: string) =>
+  /\s/.test(ch) || ORACLE_GLYPHS.includes(ch) || ORACLE_FAMILY_EXTRA.includes(ch);

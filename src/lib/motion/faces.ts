@@ -24,7 +24,9 @@ import type { Frame, Step } from './typewriter';
  * gallery` marks the faces that use one. The glyphs of the font that make
  * good eyes are `• ° ○ ^ - ~ * + x > < ¬ @ 0 ; . ˙ $ ♥ ♡ ■ □`, good
  * mouths are `_ ~ o ▽ v 3 ˘`, and good props after the face are
- * `/ | \ ' , ? ! * z …`.
+ * `/ | \ ' , ? ! * z …`. The arms `┌ ┐ └ ┘` are good too: they are not in
+ * ABC Oracle, but the family takes them from Geist Mono
+ * (src/styles/fonts.css), thus they look the same on each system.
  */
 export interface FaceAnimation {
   /** The final glyphs, as they stay in the copy. */
@@ -116,6 +118,20 @@ export const faces = {
       f('\\[^ᴗ^]/', 350),
       f('_[^ᴗ^]_', 250),
       f('\\[^ᴗ^]/', 400),
+    ],
+  },
+  dance: {
+    face: '┌[^ᴗ^]┘',
+    description:
+      'Dances as an Egyptian: its arms change place, four times. A launch, a party, a release.',
+    frames: [
+      ...draw('ᴗ', ['└', '┐']),
+      f('└[•ᴗ•]┐', 600),
+      f('┌[^ᴗ^]┘', 270),
+      f('└[^ᴗ^]┐', 270),
+      f('┌[^ᴗ^]┘', 270),
+      f('└[^ᴗ^]┐', 270),
+      f('┌[^ᴗ^]┘', 400),
     ],
   },
   wave: {
