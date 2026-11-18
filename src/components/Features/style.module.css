@@ -134,22 +134,28 @@
 .rows {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3xs);
 }
 
 /*
- * The row is a pill: the text has a padding, and the negative margin keeps
- * the text on the edge of the column. The pointer on a row gives the pill
- * a surface (see the end of the file).
+ * A row has no surface, at rest and under the pointer: the arrow and the
+ * description show the open row. A hairline separates two rows: without
+ * it, the description of the open row is between two titles and belongs
+ * to neither. The pointer does not open a row at once. The script opens
+ * the row 150ms after the pointer stops on it: first the visitor reads the
+ * text. 300ms after the pointer stops, the row becomes active: the theme
+ * and the picture change. Thus a pointer that crosses the list does not
+ * move the rows.
  */
 .row {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);
-  margin-inline: calc(var(--space-sm) * -1);
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-lg);
+  padding-block: var(--space-sm);
+}
+
+.row + .row {
+  border-top: 1px solid var(--border-default);
 }
 
 .title {
@@ -395,44 +401,5 @@
 
   .stickyVisual .frame {
     margin-inline: auto;
-  }
-}
-
-/*
- * The pill of the row under the pointer: a faint tint of the colour of the
- * other half (the muted tokens are the colour of the half itself). The
- * pointer does not open the row at once. The script opens the row 150ms
- * after the pointer stops on it: first the visitor reads the text. 450ms
- * after the pointer stops, the row becomes active: the theme and the
- * picture change, and the pill gets the colours of the other half. Thus a
- * pointer that crosses the list does not move the rows.
- */
-@media (hover: hover) {
-  .row:hover {
-    background: var(--surface-accent-faint);
-  }
-
-  .inverted .row:hover {
-    background: var(--surface-inverse-faint);
-  }
-}
-
-@media (min-width: 1152px) and (hover: hover) {
-  .row[data-active] {
-    background: var(--surface-accent);
-    color: var(--text-on-accent);
-  }
-
-  .row[data-active] .description {
-    color: var(--text-on-accent-muted);
-  }
-
-  .inverted .row[data-active] {
-    background: var(--surface-inverse);
-    color: var(--text-on-inverse);
-  }
-
-  .inverted .row[data-active] .description {
-    color: var(--text-on-inverse-muted);
   }
 }

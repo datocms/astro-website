@@ -184,17 +184,22 @@ const visuals = await Promise.all(
 </features-list>
 
 <script>
-  import { prefersReducedMotion } from '~/lib/motion/inView';
+  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
   import { WebComponent } from '~/lib/WebComponent';
 
-  // The active row and the picture change at once.
-  // The colours of the theme go to the new theme in 600ms, in oklab.
+  // The active row and the picture change at once. A hover on a row makes
+  // it active, and with no hover the rows become active in turn.
+  // The colours of the theme go to the new theme in 200ms, in oklab: a
+  // change of all the section in one frame is a flash.
   const DESKTOP = window.matchMedia('(min-width: 1152px)');
-  const FADE_MS = 600;
+  const FADE_MS = 200;
 
   // The theme data (src/styles/tokens.css) that the fade mixes. The fade
   // sets the data on the section, not the roles: each role (also a role
   // that a ground class inside the section sets again) comes from the data.
+  // The list has the data of the two schemes: the dark scheme makes its
+  // grounds and its text from the `--theme-dark-*` data. A token that is
+  // not in the list changes in one frame.
   // The colours mix in oklab: a straight line from one colour to the other.
   // Do not use oklch: it turns around the hue circle, thus the middle of a
   // fade has full chroma (a bright yellow from green to orange).
@@ -210,6 +215,10 @@ const visuals = await Promise.all(
     '--theme-accent-faint',
     '--theme-accent-bright',
     '--theme-pixel-highlight',
+    '--theme-dark-ink',
+    '--theme-dark-inverse',
+    '--theme-dark-band',
+    '--theme-dark-band-ink',
     '--code-background',
     '--code-plain',
     '--code-keyword',
@@ -230,7 +239,9 @@ const visuals = await Promise.all(
     '--theme-alpha-on-inverse-soft',
     '--theme-alpha-on-inverse-muted',
     '--theme-alpha-on-inverse-headline-muted',
+    '--theme-alpha-dark-border',
     '--theme-dark-accent-chroma',
+    '--theme-dark-ground-chroma',
   ];
 
   const TOKENS = [...COLORS, ...NUMBERS];
@@ -282,7 +293,8 @@ const visuals = await Promise.all(
           const next = getComputedStyle(section);
           const to = TOKENS.map((token) => next.getPropertyValue(token).trim());
           TOKENS.forEach((token, i) => {
-            if (from[i] === to[i]) return;
+            // A theme that does not set a token has no value to mix.
+            if (from[i] === to[i] || !from[i] || !to[i]) return;
             section.style.setProperty(
               token,
               COLORS.includes(token)
@@ -320,13 +332,13 @@ const visuals = await Promise.all(
         // ≥1152: only a hover on a row changes the open row and the active
         // row. The pointer on the picture does not change them. When the
         // pointer stays on a row, the row opens after 150ms: first the
-        // visitor reads the text. The row becomes active after 450ms: then
+        // visitor reads the text. The row becomes active after 300ms: then
         // the theme and the scene change. Thus a pointer that only crosses
         // the list does not move the rows or change the scene. When the
         // pointer leaves a row and goes to no other row for 150ms, the
         // active row opens again. The last active row stays active.
         const OPEN_MS = 150;
-        const ACTIVATE_MS = 450;
+        const ACTIVATE_MS = 300;
         let openTimer = 0;
         let activateTimer = 0;
         let closeTimer = 0;
@@ -365,6 +377,72 @@ const visuals = await Promise.all(
         window.addEventListener('scroll', onScroll, {
           passive: true,
           signal: this.#globalListeners.signal,
+        });
+
+        // ≥1152, with a pointer: while the visitor does not use the section,
+        // the next row becomes active each 5s, and the first row follows the
+        // last. The rotation stops while the pointer is in the section (on
+        // the picture also: the scene must not change while the visitor
+        // looks at it), while the focus is in the section, while the section
+        // is not on the middle line of the viewport, and while the tab is
+        // hidden. After a stop, a full interval goes by before the next
+        // change. With reduced motion, there is no rotation.
+        const ROTATE_MS = 5000;
+        const ROTATES = window.matchMedia('(min-width: 1152px) and (hover: hover)');
+        let rotateTimer = 0;
+        let inView = false;
+        let pointerInside = false;
+        let focusInside = false;
+        const rotate = () => {
+          clearTimeout(rotateTimer);
+          if (
+            !ROTATES.matches ||
+            !inView ||
+            pointerInside ||
+            focusInside ||
+            document.hidden ||
+            prefersReducedMotion()
+          ) {
+            return;
+          }
+          rotateTimer = window.setTimeout(() => {
+            // A pointer that did not move after the page load, or a page that
+            // scrolled below it, gives no `pointerenter`.
+            if (!section.matches(':hover')) activate((active + 1) % rows.length);
+            rotate();
+          }, ROTATE_MS);
+        };
+        this.on(section, 'pointerenter', () => {
+          pointerInside = true;
+          rotate();
+        });
+        this.on(section, 'pointerleave', () => {
+          pointerInside = false;
+          rotate();
+        });
+        this.on(section, 'focusin', () => {
+          focusInside = true;
+          rotate();
+        });
+        this.on(section, 'focusout', (event) => {
+          focusInside =
+            event.relatedTarget instanceof Node && section.contains(event.relatedTarget);
+          rotate();
+        });
+        const { signal } = this.#globalListeners;
+        document.addEventListener('visibilitychange', rotate, { signal });
+        ROTATES.addEventListener('change', rotate, { signal });
+        const stopObserver = onVisibilityChange(
+          section,
+          (visible) => {
+            inView = visible;
+            rotate();
+          },
+          { rootMargin: '-50% 0px' },
+        );
+        signal.addEventListener('abort', () => {
+          stopObserver();
+          clearTimeout(rotateTimer);
         });
       }
 
