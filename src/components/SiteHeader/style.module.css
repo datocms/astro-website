@@ -158,6 +158,18 @@
   white-space: nowrap;
 }
 
+/*
+ * The item of the pill is wide: its label has the 16px of a button at each
+ * side. The other items stay narrow, thus the row has room. The script
+ * marks the item (data-wide) and slides the labels to their new places.
+ * Before the script runs, the item of the page is the wide one: the row
+ * does not move when the script starts.
+ */
+.navItem[data-wide],
+.navList:not([data-indicator]) .navItem[aria-current] {
+  padding-inline: var(--space-sm);
+}
+
 .navList:not([data-indicator]) .navItem[aria-current],
 .navList:not([data-indicator]) .navItem[aria-expanded='true'] {
   background: var(--surface-inverse-faint);
@@ -259,15 +271,14 @@
  * shell from one card to the next. The shell is a field of the deep of
  * the page theme, as the footer: it stands apart from a page hero and
  * from an accent hero. The change of surface is the edge: it has no
- * border. The negative offset puts the text of the card under the label
- * of the pill.
+ * border. The text of the card starts under the label of the pill:
+ * --card-x is the left edge of the label, and the offset takes off the
+ * side padding of the open card (--card-inset, from the script).
  */
 .shell {
-  --card-padding-x: var(--space-2xl);
-
   position: absolute;
   top: 100%;
-  left: calc(var(--card-x, 0px) + var(--space-sm) - var(--card-padding-x));
+  left: calc(var(--card-x, 0px) - var(--card-inset, 0px));
   z-index: 1;
   box-sizing: content-box;
   width: var(--card-width, 0);
@@ -284,18 +295,25 @@
 
 /*
  * A card has its own size; the shell shows the active one. The air is
- * one step: 40px around the card and between its sections, 16px under
- * a heading, 12px between the links.
+ * 40px above and below the card and between its sections, 16px under a
+ * heading, 12px between the links. The air at the sides is 60px. A
+ * compact card has 40px on all sides.
  */
 .card {
+  --card-inset: var(--space-2xl);
+
   position: absolute;
   top: 0;
   left: 0;
   display: flex;
   gap: var(--space-2xl);
   width: max-content;
-  padding: var(--space-xl) var(--card-padding-x);
+  padding: var(--space-xl) var(--card-inset);
   visibility: hidden;
+}
+
+.cardCompact {
+  --card-inset: var(--space-xl);
 }
 
 .card[data-active] {
@@ -342,7 +360,7 @@
 /* The promo fills the card to its top, right and bottom edges. */
 .cardPromo {
   margin-block: calc(var(--space-xl) * -1);
-  margin-inline-end: calc(var(--card-padding-x) * -1);
+  margin-inline-end: calc(var(--card-inset) * -1);
 }
 
 /* Mobile nav (<1152). A hairline at its top separates it from the bar. */

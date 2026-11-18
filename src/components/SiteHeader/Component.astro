@@ -47,6 +47,17 @@ nav.forEach((group, i) => {
 });
 
 const cardId = (i: number) => `site-header-card-${i}`;
+
+// In a card with one section, a heading that repeats the label of the item
+// adds no information: the menu does not show it. In a card with more
+// sections, each section keeps its heading: the columns start on one line.
+const sectionCount = (group: NavGroup) =>
+  (group.columns ?? []).reduce((count, column) => count + column.sections.length, 0);
+const showsHeading = (group: NavGroup, heading: string) =>
+  sectionCount(group) > 1 || heading !== group.label;
+
+// A card with one column and no promo is compact: it has less air at its sides.
+const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.promo;
 ---
 
 <site-header class={styles.root}>
@@ -105,14 +116,20 @@ const cardId = (i: number) => `site-header-card-${i}`;
             nav.map(
               (group, i) =>
                 group.columns && (
-                  <div id={cardId(i)} class={styles.card} data-card>
+                  <div
+                    id={cardId(i)}
+                    class:list={[styles.card, isCompact(group) && styles.cardCompact]}
+                    data-card
+                  >
                     {group.columns.map((column) => (
                       <div class={styles.cardColumn}>
                         {column.sections.map((section) => (
                           <div class={styles.cardSection}>
-                            <p class:list={[styles.heading, 'labelMedium']} data-card-row>
-                              {section.heading}
-                            </p>
+                            {showsHeading(group, section.heading) && (
+                              <p class:list={[styles.heading, 'labelMedium']} data-card-row>
+                                {section.heading}
+                              </p>
+                            )}
                             <ul class={styles.cardLinks}>
                               {section.links.map((link) => (
                                 <li data-card-row>
@@ -215,9 +232,11 @@ const cardId = (i: number) => `site-header-card-${i}`;
                       .flatMap((column) => column.sections)
                       .map((section) => (
                         <div class={styles.mobileSection}>
-                          <p class:list={[styles.heading, styles.mobileHeading, 'labelMedium']}>
-                            {section.heading}
-                          </p>
+                          {showsHeading(group, section.heading) && (
+                            <p class:list={[styles.heading, styles.mobileHeading, 'labelMedium']}>
+                              {section.heading}
+                            </p>
+                          )}
                           <ul class={styles.mobileLinks}>
                             {section.links.map((link) => (
                               <li>
@@ -317,6 +336,8 @@ const cardId = (i: number) => `site-header-card-${i}`;
       mobilePanel!: HTMLElement;
       // The close in progress. A new open cancels it.
       closing: Animation | null = null;
+      // The slides of the items after the wide item changed.
+      slides: Animation[] = [];
 
       parsedCallback() {
         this.list = this.$('[data-nav-list]');
@@ -540,6 +561,8 @@ const cardId = (i: number) => `site-header-card-${i}`;
           this.pointed ??
           this.openTrigger ??
           this.items.find((item) => item.hasAttribute('aria-current'));
+        this.setWide(target ?? null);
+        this.placeShell();
         if (!target) {
           this.list.removeAttribute('data-indicator-shown');
           return;
@@ -547,6 +570,47 @@ const cardId = (i: number) => `site-header-card-${i}`;
         this.list.style.setProperty('--indicator-x', `${target.offsetLeft}px`);
         this.list.style.setProperty('--indicator-width', `${target.offsetWidth}px`);
         this.list.setAttribute('data-indicator-shown', '');
+      }
+
+      labelOf(item: HTMLElement) {
+        return item.firstElementChild as HTMLElement;
+      }
+
+      // The item of the pill is wide: it has the side padding of a button.
+      // The layout changes at once, thus the pill and the card read the
+      // final positions. Each label then slides from its old position to
+      // the new one, with the duration and the curve of the pill. Only a
+      // translate moves: no frame changes the layout.
+      setWide(target: HTMLElement | null) {
+        if (this.items.every((item) => item.hasAttribute('data-wide') === (item === target))) {
+          return;
+        }
+        // The positions on screen now, under the slides in progress.
+        const before = this.items.map((item) => this.labelOf(item).getBoundingClientRect().left);
+        for (const slide of this.slides) slide.cancel();
+        this.slides = [];
+        for (const item of this.items) item.toggleAttribute('data-wide', item === target);
+        // Before the first placement there is no slide.
+        const duration = this.list.hasAttribute('data-indicator') ? ms(300) : 0;
+        if (!duration) return;
+        this.items.forEach((item, i) => {
+          const delta = before[i]! - this.labelOf(item).getBoundingClientRect().left;
+          if (!delta) return;
+          this.slides.push(
+            item.animate([{ translate: `${delta}px 0` }, { translate: '0 0' }], {
+              duration,
+              easing: EASE,
+            }),
+          );
+        });
+      }
+
+      // The text of the open card starts under the label of its item.
+      placeShell() {
+        const trigger = this.openTrigger;
+        if (!trigger) return;
+        const x = trigger.offsetLeft + this.labelOf(trigger).offsetLeft;
+        this.shell.style.setProperty('--card-x', `${x}px`);
       }
 
       cardOf(trigger: HTMLButtonElement) {
@@ -599,12 +663,13 @@ const cardId = (i: number) => `site-header-card-${i}`;
         for (const animation of card.getAnimations()) animation.cancel();
         card.setAttribute('data-active', '');
         this.tellPromos(card, 'menu:open');
-        shell.style.setProperty('--card-x', `${trigger.offsetLeft}px`);
+        // The open item is the wide item now, when no other item has the pointer.
+        this.restIndicator();
+        shell.style.setProperty('--card-inset', getComputedStyle(card).paddingLeft);
         shell.style.setProperty('--card-width', `${card.offsetWidth}px`);
         shell.style.setProperty('--card-height', `${card.offsetHeight}px`);
         shell.setAttribute('data-open', '');
         const to = { left: shell.offsetLeft, width: shell.offsetWidth, height: shell.offsetHeight };
-        this.restIndicator();
 
         // The shell already shows this card: a close in progress stopped.
         if (shownCard === card) return;
