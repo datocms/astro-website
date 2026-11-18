@@ -383,10 +383,7 @@ async function decodeCover(png: Buffer, name: string) {
   const { grid, error } = pixelsToGrid(data, info.width, info.height);
   if (!grid) throw new Error(`${name}: ${error}`);
   const text = readText(png, KEYWORD);
-  if (!text) return { grid, record: undefined };
-  // A file from before the key `subject` has the key `animal`.
-  const { animal, ...rest } = JSON.parse(text) as CoverRecord & { animal?: string };
-  return { grid, record: { ...rest, subject: rest.subject ?? animal ?? '' } as CoverRecord };
+  return { grid, record: text ? (JSON.parse(text) as CoverRecord) : undefined };
 }
 
 // ---- Drawing, as src/components/PixelCover draws it (`layout` gives the
