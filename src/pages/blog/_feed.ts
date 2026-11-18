@@ -101,6 +101,8 @@ export function feedBaseUrl(filter: FeedFilter) {
  * is at the address of the index.
  */
 export function parsePageIndex(param: string | undefined) {
+  // The old site numbered its pages from 0, thus /p/0 is the first page too.
+  if (param === '0') return 'redirect';
   if (!param || !/^[1-9]\d*$/.test(param)) return null;
   const page = Number.parseInt(param, 10);
   return page === 1 ? 'redirect' : page;

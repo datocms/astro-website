@@ -8,8 +8,15 @@ const filter: FeedFilter = { kind: 'category', slug: Astro.params.slug! };
 const page = parsePageIndex(Astro.params.pageIndex);
 if (page === 'redirect') return Astro.redirect(feedBaseUrl(filter), 301);
 
-const feed = page ? await loadFeedPage(Astro, page, filter) : null;
+if (!page) {
+  avoidAstroTypeCheckBug(notFoundResponse);
+  return notFoundResponse();
+}
+
+const feed = await loadFeedPage(Astro, page, filter);
 if (!feed) {
+  // A page past the last one goes to the category. A category that does not exist has no first page.
+  if (await loadFeedPage(Astro, 1, filter)) return Astro.redirect(feedBaseUrl(filter), 301);
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
