@@ -72,17 +72,44 @@
 
 /*
  * The mobile menu is a child with the class surfacePage: it keeps the page
- * roles. When the page scrolls more than the header height (data-scrolled),
- * the header has the page ground on all pages: the script removes the class
+ * roles. On a page with an accent hero, the header has the accent ground
+ * while the hero is below all of the header (data-over-hero). When the
+ * bottom of the hero goes above the bottom of the header, the header has
+ * the page ground: the script removes data-over-hero and the class
  * surfaceAccent.
  */
-.root:not([data-scrolled]) .variantAccent {
+.root[data-over-hero] .variantAccent {
   background: var(--surface-accent);
   color: var(--text-on-accent);
 }
 
-/* With data-scrolled, a hairline separates the header from the page. */
-.root[data-scrolled] .header {
+/*
+ * The strip below the header. Its height is the bottom margin of .root, with
+ * the same transition. When the page goes back to the top, the header grows
+ * and the margin shrinks. Nothing paints the margin, thus the strip paints it
+ * with the ground of the header. If not, the body shows between the header
+ * and the hero. While the page scrolls, the strip has no background: there
+ * it is on top of the page content.
+ */
+.header::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
+  height: calc(var(--header-height) - var(--header-now));
+  transition: height var(--header-resize, 0s);
+  pointer-events: none;
+}
+
+.root:not([data-scrolled]) .header::after {
+  background: inherit;
+}
+
+/*
+ * With data-scrolled, a hairline separates the header from the page. Over
+ * the accent hero there is no line: the header runs into the hero.
+ */
+.root[data-scrolled]:not([data-over-hero]) .header {
   box-shadow: inset 0 -1px var(--border-default);
 }
 

@@ -60,7 +60,7 @@ const showsHeading = (group: NavGroup, heading: string) =>
 const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.promo;
 ---
 
-<site-header class={styles.root}>
+<site-header class={styles.root} data-over-hero={variant === 'accent' ? '' : undefined}>
   <header class:list={[styles.header, variantClass]}>
     <div class={styles.bar}>
       <a href="/" class={styles.logo} aria-label="DatoCMS home">
@@ -479,6 +479,9 @@ const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.pro
         const root = document.documentElement;
         const header = this.$('header');
         const accent = header.classList.contains('surfaceAccent');
+        // The accent hero of the page. The header keeps the accent ground
+        // while the hero is below all of the header.
+        const hero = accent ? document.querySelector('#layout-content .surfaceAccent') : null;
         let lastY = window.scrollY;
         let frame = 0;
         let jumping = false;
@@ -501,7 +504,14 @@ const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.pro
           const y = Math.max(0, window.scrollY);
           const scrolled = y > threshold;
           this.toggleAttribute('data-scrolled', scrolled);
-          if (accent) header.classList.toggle('surfaceAccent', !scrolled);
+          if (accent) {
+            const overHero =
+              !scrolled ||
+              (hero !== null &&
+                hero.getBoundingClientRect().bottom > header.getBoundingClientRect().bottom);
+            header.classList.toggle('surfaceAccent', overHero);
+            this.toggleAttribute('data-over-hero', overHero);
+          }
 
           if (!scrolled) {
             setHidden(false);
