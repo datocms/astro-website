@@ -415,7 +415,7 @@ For a new use: make sure that the two blocks touch and that one of them is a par
 
 **The Same Hue At Both Ends Rule.** The header, the hero, the page closer and the footer have the theme of the page. Two inverse surfaces of different hues never touch.
 
-**The Full Bleed Rule.** A coloured surface reaches the edges of the viewport. A coloured box that floats in the column with page margins around it is not part of this system.
+**The Full Bleed Rule.** A coloured surface reaches the edges of the viewport. A coloured box that floats in the column with page margins around it is not part of this system. Inside a modal, the edges are those of the card (see "Modals").
 
 ## Elevation & Depth
 
@@ -440,7 +440,7 @@ No gradients: surfaces are solid, and the edge of a band cuts its content hard. 
 
 Two families of form. Controls are pills: buttons, tabs, category nav items and switches use a full radius. Surfaces are square: bands, cells, halves and plan cards have no radius at all. The product scenes are the one exception: a frame of the product has only its top-left corner rounded (12px; 4px on phones), because the band cuts it on the right and the bottom. A thin hairline in a mix of the accent and the deep follows the cut edges.
 
-Small radii: 4px for tooltips and the windows inside a scene, 8px for inner screens and form notes, 12px for code cards.
+Small radii: 4px for tooltips and the windows inside a scene, 8px for inner screens, form notes and the card of a modal, 12px for code cards.
 
 ## Components
 
@@ -478,6 +478,19 @@ There are few cards. Content sits in bands, cells and halves.
 - **Internal Padding:** the band padding (`--section-padding-y` and `--section-padding-x`).
 - **Hover:** a cell or a row that is one link (a case study, a partner, a post, a product update) fills with the accent, instantly, and its text takes the roles of the accent. Never a tint: a tint next to a hairline is a pastel with an outline. The tints are for cells at rest, for controls (a field, a nav item) and for the docs. A cell with a cover has no fill: the hover is the pixel version of the cover.
 
+### Modals
+
+A modal is a small page, not a box of boxes. The search (`src/components/docs/Search`) is the reference, and the dialog that compares the Free plan and the Professional plan (`src/pages/pricing/_sub/FreeLimitsDialog.astro`) follows it.
+
+- **Card:** below 768, a sheet that fills the screen. From 768, a card in the centre of the viewport, on the page ground (`--surface-default`), with the 8px radius and no shadow. The card is as tall as its content, and not taller than the viewport less 30px at the top and at the bottom: it never has empty space below its content. The page behind it is dimmed with `--scrim-modal`. In the dark scheme, a 1px ring in `--border-default` shows the edge of the card. The radius is the only one: nothing inside the card has a radius, except the controls (pills).
+- **Bands, not boxes:** the Full Bleed Rule applies inside the card. A coloured surface (a note, a warning, a row with a tint, the row under the pointer) goes from side to side of the card. A coloured box with a radius and a margin around it is not permitted. The card cuts the bands at its edges.
+- **Warning band:** a warning in a modal has the signs of a warning callout of the docs: the warning tint (`--surface-status-warning`), the triangle icon (`TriangleAlert`, 20px) and the title (500) in `--text-status-warning`, and the detail in `--text-soft`. The icon is at the inset, in the centre of the first line, and the text is a column at its right.
+- **One inset:** only the text has side padding: 20px on a sheet, 30px on a card. The title, the text of each band and the first and the last cell of a table start and stop on this line. The icon of the close button, not its circle, is on this line too.
+- **Top row:** the title (`.title`) at the left and the close button at the right (a 40px circle, a muted icon of 20px). When a band of colour follows, the row has no line at the bottom: the change of surface separates them. When content on the page ground follows (the results of the search), a hairline separates them.
+- **Scroll:** when the content is taller than the card, the top row and a band directly below it stay, and only the content below them scrolls. The bottom edge of the card ends the last row, with no padding and no line after it.
+- **Tables:** a table in a modal has a row for each record, with a hairline between the rows (values to compare across columns) and the faint tint (`--surface-accent-faint`) on each second row. A value and its note are on one line, the note muted, after a dot ("3 · €39/mo per extra project"). Below 768, the name of the row is on its own line, the values are in two columns below it, and the note is on its own line with no dot.
+- **Motion:** the card comes 10px from above and fades in (160ms, ease-out), and the scrim fades in. With reduced motion, they show at once.
+
 ### Inputs / Fields
 
 - **Style:** no border at rest, Label above the control, padding 30px, square by default.
@@ -492,7 +505,7 @@ There are few cards. Content sits in bands, cells and halves.
   - The header sticks to the top. When the visitor scrolls down past it, it slides up out of view; when the visitor scrolls up by 10px or more, it slides back (200ms, the same curve). It stays while a card or the mobile menu is open, and while the pointer or the focus is in it.
   - After a scroll of more than its height it is 64px tall and on the page ground on all pages, with a hairline at the bottom.
   - While it shows, `--header-offset` is its height (82px or 64px), else 0. Each sticky element adds it to its top (or uses `--sticky-offset`, which contains it), thus it moves down with the header.
-- **Dropdown cards:** a card hangs from the bottom of the header under its item, with a width that comes from its columns (one for Customers and Partners, two for Product and Resources). Philosophy and Pricing are plain links.
+- **Dropdown cards:** a card hangs from the bottom of the header under its item, with a width that comes from its columns (one for Customers and Partners, two for Product and Resources). The text of a card starts under the label of its item. A card with one column and no promo is compact: 40px of air on all sides, and no heading when the heading repeats the label of the item. Philosophy and Pricing are plain links.
   - The card is a field of the deep of the page theme (light text), as the footer, with no border: it stands apart from a page hero and from an accent hero. The tint pill of the open item stays the faint tint.
   - The air is one step: 40px around the card and between its sections, 16px under a heading, 12px between the links. Muted headings, `.title` links, muted descriptions.
   - One shell holds every card: from closed it grows down from the header (260ms) and the rows arrive 20ms apart; from another card it glides to the new place and size (300ms, the same curve) while the two contents cross-fade. With reduced motion, the swaps are instant.

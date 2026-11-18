@@ -2,7 +2,7 @@
 // The dialog that compares the limits of the Free plan and of the
 // Professional plan. A link to "#<id>" opens it. When the address of the
 // page has this hash, the dialog opens on load.
-import { Check, Info, X } from 'lucide';
+import { Check, Info, TriangleAlert, X } from 'lucide';
 import { Icon } from '~/components/Icon';
 import type { FreeLimitsData } from '~/data/pricing';
 import type { FreeLimitRow } from './limits';
@@ -24,13 +24,18 @@ const titleId = `${id}-title`;
         </button>
       </div>
 
-      <div class={styles.body}>
-        <p class:list={[styles.warning, 'body']}>
+      <div class:list={[styles.warning, 'body']}>
+        <span class={styles.warningIcon} data-datocms-nomd>
+          <Icon icon={TriangleAlert} width="20" height="20" />
+        </span>
+        <p>
           <strong class={styles.warningTitle}>{warning}</strong>
           <br />
           {warningDetail}
         </p>
+      </div>
 
+      <div class={styles.body}>
         <table class={styles.table}>
           <thead>
             <tr class="labelMedium">
@@ -87,10 +92,12 @@ const titleId = `${id}-title`;
                           value
                         )}
                         {j === 1 && row.proExtra && (
-                          <>
-                            <br />
-                            <span class={styles.muted}>{row.proExtra}</span>
-                          </>
+                          <span class={styles.muted}>
+                            <span class={styles.dot} aria-hidden="true">
+                              {' · '}
+                            </span>
+                            {row.proExtra}
+                          </span>
                         )}
                       </td>
                     ))}
