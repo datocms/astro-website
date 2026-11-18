@@ -14,7 +14,9 @@
 /*
  * The cells of the benefits. Below 1152 they stack, and the tint
  * alternates. From 1152 they are two halves, and the tint makes a
- * checkerboard, as on /philosophy. Each cell pads itself.
+ * checkerboard, as on /philosophy. The quiet cells have the faint tint,
+ * not the surface of the sections above and below: the grid has an edge.
+ * Each cell pads itself.
  */
 .cells {
   display: grid;
@@ -25,10 +27,10 @@
 }
 
 .cell {
-  --cell-tint: transparent;
+  --cell-tint: var(--surface-accent-faint);
 
   padding: var(--section-padding-y) var(--section-padding-x);
-  /* surface/accent-subtle is transparent. It goes on top of surface/default. */
+  /* The tints are transparent. They go on top of surface/default. */
   background: linear-gradient(var(--cell-tint), var(--cell-tint)), var(--surface-default);
   color: var(--text-primary);
 }
@@ -103,7 +105,7 @@
 
   .cell:nth-child(4n + 1),
   .cell:nth-child(4n + 4) {
-    --cell-tint: transparent;
+    --cell-tint: var(--surface-accent-faint);
   }
 }
 

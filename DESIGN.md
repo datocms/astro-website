@@ -362,7 +362,7 @@ Vertical rhythm comes from the band: `--section-padding-y` is 50 / 60 / 90 / 100
 Recurring structures:
 
 - **The band**: one section, one surface, full bleed.
-- **The split**: two halves of 50%, accent on the left and inverse on the right (chapter headers, versus splits, the compare table). The text of each half starts at the edge of the centred column (`--content-inset-half`). The split stacks below 1152px.
+- **The split**: two halves of 50%, accent on the left and inverse on the right (chapter headers, versus splits, the compare table). The text of each half starts at the edge of the centred column (`--content-inset-half`). The split stacks below 1152px. See "The No Cut-Out Rule".
 - **The grid of cells**: cells of two columns with alternating tints, as on /philosophy and /pricing, each cell padded with the band padding.
 - **The pillar chapter**: a header split, then a scene, then no, two or four feature fragments on the paper surface (`src/data/AGENTS.md`, "The chapter"). A sticky category nav of pills leads through the chapters.
 
@@ -392,9 +392,25 @@ The same six hues serve the areas and the pillars. On a reference page the hue i
 
 **The ground of the hero.** A marketing page has its hero on the page ground: the scene or the typewriter carries it. A reference page has its hero on the accent: the band of colour marks the area. The Partners area is the exception: its heroes are on the page ground, because the logo of a partner keeps its own colours there. On `/partners` the accent marks the area one band lower, in the band with the counts and the map. An article (a post, an entry of the changelog) has the header on the accent, above the header of the article on the page ground. No hero is on the inverse: the footer holds the inverse at the end of the page. The header always takes the ground and the theme of the hero.
 
-**The ground of the closer.** The page closer is on the inverse (the `tonal` palette). The footer, with the "Questions? Ask away [••]" band, is on `--surface-inverse-deep`: the inverse of the same hue, 0.06 darker in OKLCH lightness. Thus the closer and the footer are two deep blocks in one hue, and the end of the closer stays visible. Only the footer and that band use `--surface-inverse-deep` (the lint enforces it). An accent palette (`silhouette`, `onAccent`) is only for a page whose last band above the closer is on the inverse, thus three deep blocks never stack. In the dark scheme the silhouette is the bright accent: a dark subject does not show on the dark band.
+**The ground of the closer.** The page closer is on the inverse (the `tonal` palette). The footer, with the "Questions? Ask away [••]" band, is on `--surface-inverse-deep`: the inverse of the same hue, 0.06 darker in OKLCH lightness. Thus the closer and the footer are two deep blocks in one hue, and the end of the closer stays visible. See "The Second Deep Rule". An accent palette (`silhouette`, `onAccent`) is only for a page whose last band above the closer is on the inverse, thus three deep blocks never stack. In the dark scheme the silhouette is the bright accent: a dark subject does not show on the dark band.
 
 ### Named Rules
+
+**The No Cut-Out Rule.** A half of a split, or a cell of a grid, never has the colour of the block above or below it. With the same colour, the half and the block are one L-shape, and the other half looks cut out of it. Two full bands of the same colour, one after the other, are not this defect. The fix depends on the ground:
+
+- On the inverse: one of the two blocks takes `--surface-inverse-deep` (see "The Second Deep Rule").
+- On the page: the half or the cell takes `--surface-accent-faint` (the Professional plan of /pricing under the hero, the quiet cells of the benefits of /partner-program).
+- On a tint: the band takes a different ground (the importer banner under the compare table is on the inverse, because the tints are the columns of the table).
+
+**The Second Deep Rule.** `--surface-inverse-deep` is the inverse of the same hue, 0.06 darker in OKLCH lightness. It has one job: a deep block that touches a block on `--surface-inverse` and must not join it. It is never a third ground, a darker look for a section, or the ground of a card. The text on it is the text of the inverse (`--text-on-inverse*`, in the same rule). These are all its uses, and the lint refuses a file that is not in `SURFACE_FILES` (`src/lib/tokens/contract.ts`):
+
+- The footer and its "Questions?" band, below the page closer.
+- The contact card, above an inverse band.
+- The field of the Product menu, in the inverse menu.
+- The frame of a diagram in a chapter (`ChapterSplit`), below the inverse half of the header. A product screen is not on it: the split continues behind the screen.
+- The inverse half of a `VersusSplit`, between the hero and the reasons band, and above the page closer.
+
+For a new use: make sure that the two blocks touch and that one of them is a part of a split, add the file to `SURFACE_FILES` with its reason, and add it to this list. Two blocks on the deep inverse never touch.
 
 **The Same Hue At Both Ends Rule.** The header, the hero, the page closer and the footer have the theme of the page. Two inverse surfaces of different hues never touch.
 

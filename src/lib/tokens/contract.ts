@@ -55,10 +55,15 @@ export const INVERSE_SURFACES = ['--surface-inverse-deep'] as const;
 
 /**
  * The surfaces that have one job. Only the listed files may use them.
- * `--surface-inverse-deep` is the footer: the page closer above it stays on
- * `--surface-inverse`, thus the end of the closer is visible. The contact
- * card also uses it: the card is darker than an inverse band below it. The
- * field of the Product menu also uses it: the field is darker than the menu.
+ * `--surface-inverse-deep` is the second deep block: a deep block that
+ * touches a block on `--surface-inverse` and must not join it (DESIGN.md,
+ * "The Second Deep Rule").
+ *   the footer          below the page closer
+ *   the contact card    above an inverse band
+ *   the Product menu    its field, in the inverse menu
+ *   ChapterSplit        the frame of a diagram, below the inverse half of
+ *                       the header
+ *   VersusSplit         its inverse half, above or below an inverse band
  */
 export const SURFACE_FILES: Record<string, string[]> = {
   '--surface-inverse-deep': [
@@ -67,6 +72,8 @@ export const SURFACE_FILES: Record<string, string[]> = {
     'src/components/PageCloser/style.module.css',
     'src/components/ContactCard/style.module.css',
     'src/components/MenuPromo/style.module.css',
+    'src/components/ChapterSplit/style.module.css',
+    'src/components/VersusSplit/style.module.css',
   ],
 };
 
