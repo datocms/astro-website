@@ -21,7 +21,6 @@ interface Props extends HeroData {
    * variant.
    */
   variant?: 'page' | 'accent';
-  alignment?: 'center' | 'left';
   typewriter?: boolean;
   /** Use `h2` when the hero is not the first section of the page. */
   headingLevel?: 'h1' | 'h2';
@@ -39,7 +38,6 @@ interface Props extends HeroData {
 
 const {
   variant = 'page',
-  alignment = 'left',
   label,
   headline,
   subheadline,
@@ -108,7 +106,7 @@ const hasVisual = Astro.slots.has('visual');
 
 <Section
   background={background}
-  class:list={[styles.hero, alignment === 'center' && styles.center]}
+  class={styles.hero}
   contentClass={[styles.content, hasVisual && styles.withVisual].filter(Boolean).join(' ')}
   data-hero
 >
