@@ -216,12 +216,15 @@ const { id, labelId, options } = Astro.props;
           }
         });
 
-        // The label points to the hidden native select. Move the focus to the
-        // combobox instead.
+        // The label points to the hidden native select, and its box covers
+        // all the field (FormField). A click on it opens or closes the menu,
+        // as a click on the combobox does.
         if (label) {
           this.on(label, 'click', (event) => {
             event.preventDefault();
             box.focus();
+            if (isOpen()) close();
+            else open();
           });
         }
 

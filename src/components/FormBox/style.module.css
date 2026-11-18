@@ -16,18 +16,22 @@
   border-bottom: 1px solid var(--text-soft);
 }
 
-.row:first-child {
-  --field-radius: 7px 7px 0 0;
+/*
+ * Only a field in a corner of the box rounds that corner. Below 768px the
+ * fields of a row are in one column.
+ */
+.row:first-child > :first-child {
+  --field-radius-tl: 7px;
+  --field-radius-tr: 7px;
+}
+
+.row:last-child > :last-child {
+  --field-radius-bl: 7px;
+  --field-radius-br: 7px;
 }
 
 .row:last-child {
-  --field-radius: 0 0 7px 7px;
-
   border-bottom: 0;
-}
-
-.row:only-child {
-  --field-radius: 7px;
 }
 
 .row > * + * {
@@ -43,5 +47,25 @@
   .row > * + * {
     border-top: 0;
     border-left: 1px solid var(--text-soft);
+  }
+
+  /*
+   * The fields of a row are side by side: the first field has the left
+   * corners, the last field has the right corners.
+   */
+  .row:first-child > :not(:last-child) {
+    --field-radius-tr: 0;
+  }
+
+  .row:first-child > :last-child {
+    --field-radius-tr: 7px;
+  }
+
+  .row:last-child > :not(:first-child) {
+    --field-radius-bl: 0;
+  }
+
+  .row:last-child > :first-child {
+    --field-radius-bl: 7px;
   }
 }

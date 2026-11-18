@@ -1,8 +1,8 @@
 /* @layer blocks */
 /*
  * The parent draws the grid lines between
- * the fields. The parent can set --field-radius to round the corners of a
- * field in a corner of the form.
+ * the fields. The parent can set --field-radius-tl, -tr, -br and -bl to
+ * round the corners of a field in a corner of the form.
  */
 .field {
   position: relative;
@@ -10,7 +10,8 @@
   flex-direction: column;
   gap: var(--space-2xs);
   padding: var(--space-lg);
-  border-radius: var(--field-radius, 0);
+  border-radius: var(--field-radius-tl, 0) var(--field-radius-tr, 0) var(--field-radius-br, 0)
+    var(--field-radius-bl, 0);
   color: var(--text-primary);
 }
 
@@ -54,17 +55,36 @@
   }
 }
 
+/*
+ * A click on any part of the field goes to the control: the box of the label
+ * covers all the field. The control is on top of it, thus a click on the
+ * control stays on the control. A label that is not a <label> (a group of
+ * controls) does not cover the field.
+ */
 .label {
-  display: flex;
-  gap: var(--space-4xs);
   cursor: pointer;
 }
 
+/* Only a <label> has this class. */
+.cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.field:has(input:is([type='text'], [type='email']), textarea) .label {
+  cursor: text;
+}
+
+/* The asterisk stays next to the last word of a long label. */
 .required {
+  margin-left: var(--space-4xs);
   color: var(--text-muted);
 }
 
 .control {
+  position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   min-width: 0;

@@ -35,7 +35,7 @@ export function FormFieldReactComponent({ htmlFor, label, required, error, child
   return (
     <div className={styles.field}>
       {htmlFor ? (
-        <label className={labelClass} htmlFor={htmlFor}>
+        <label className={classNames(labelClass, styles.cover)} htmlFor={htmlFor}>
           {labelContent}
         </label>
       ) : (
