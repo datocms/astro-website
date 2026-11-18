@@ -18,7 +18,11 @@ interface Props {
 }
 
 const { theme } = Astro.props;
-const appearance = { theme, surface: 'inverse' } as const;
+// Tint 6: the dark screens take the hue of the purple ground. At the
+// default tint 2 they were a neutral grey, which did not go with the
+// ground. A higher tint gives more chroma but not more lightness, thus a
+// border separates each screen from the ground (roles.module.css).
+const appearance = { theme, surface: 'inverse', tint: 6 } as const;
 
 /** The icon on the pill of each role: the agency writes, the legal team clears the claims. */
 const ICONS = { 'Agency Berlin': PenTool, 'Legal team': Scale } as const;
