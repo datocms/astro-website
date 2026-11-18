@@ -639,6 +639,9 @@ async function downloadCover(client: Client, post: Post) {
  * The record in the file has the same values. Each locale gets them, and
  * keeps its other metadata.
  */
+/** The tag of the asset of a cover. */
+const COVER_TAG = 'pixel-cover';
+
 async function writeCustomData(client: Client, uploadId: string, record: CoverRecord) {
   const { locales } = await client.site.find();
   const upload = await client.uploads.find(uploadId);
@@ -651,6 +654,8 @@ async function writeCustomData(client: Client, uploadId: string, record: CoverRe
   for (const locale of locales)
     customData[locale] = { ...upload.default_field_metadata.custom_data[locale], ...data };
   await client.uploads.update(uploadId, {
+    // The tag finds all the covers in the media area.
+    tags: [...new Set([...upload.tags.filter((tag) => tag !== 'blog-cover'), COVER_TAG])],
     default_field_metadata: { ...upload.default_field_metadata, custom_data: customData },
   });
 }
@@ -670,7 +675,7 @@ async function saveCover(
     : await client.uploads.createFromLocalFile({
         localPath,
         filename: `cover-${post.slug}.png`,
-        tags: ['blog-cover'],
+        tags: [COVER_TAG],
       });
   await writeCustomData(client, upload.id, record);
   if (post.coverId !== upload.id || post.theme !== theme)

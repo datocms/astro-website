@@ -5,7 +5,8 @@ CMS keeps a cover in two fields of a blog post: `pixel_cover` (the file) and
 `theme`. The file is the only copy that we keep: its record (the subject, the
 source of the photo, the licence, the spec) is in a text chunk of the file.
 `render` and `set` also write the subject, the source and the licence in the
-custom data of the asset (`subject`, `source`, `licensed`): an editor reads
+custom data of the asset (`subject`, `source`, `licensed`), and give the
+asset the tag `pixel-cover`: an editor reads
 them in the media area of the CMS.
 The rules and the process are in `src/components/PixelCover/AGENTS.md`.
 
