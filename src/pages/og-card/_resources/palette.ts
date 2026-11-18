@@ -28,6 +28,8 @@ export interface OgPalette {
   frameLine: string;
   /** `--text-on-accent-muted`, on the accent: the mid tone of a logo in the picture. */
   inkOnAccentMuted: string;
+  /** `--theme-pixel-highlight`: the light tone of a cover on the ink half. */
+  highlight: string;
 }
 
 export const palettes: Record<Theme, OgPalette> = {
@@ -40,6 +42,7 @@ export const palettes: Record<Theme, OgPalette> = {
     chip: '#e7e5dc',
     frameLine: '#a68e3f',
     inkOnAccentMuted: '#6b5028',
+    highlight: '#f8f2c2',
   },
   orange: {
     paper: '#fffbf5',
@@ -50,6 +53,7 @@ export const palettes: Record<Theme, OgPalette> = {
     chip: '#e8dfd9',
     frameLine: '#af552c',
     inkOnAccentMuted: '#522113',
+    highlight: '#e8d855',
   },
   green: {
     paper: '#f5fff5',
@@ -60,6 +64,7 @@ export const palettes: Record<Theme, OgPalette> = {
     chip: '#dae9dd',
     frameLine: '#67a046',
     inkOnAccentMuted: '#265534',
+    highlight: '#eef0a8',
   },
   purple: {
     paper: '#f6f5ff',
@@ -70,6 +75,7 @@ export const palettes: Record<Theme, OgPalette> = {
     chip: '#dfdcea',
     frameLine: '#6a49ab',
     inkOnAccentMuted: '#2f1650',
+    highlight: '#d1c4ff',
   },
   blue: {
     paper: '#edfeff',
@@ -80,6 +86,7 @@ export const palettes: Record<Theme, OgPalette> = {
     chip: '#d7eaec',
     frameLine: '#3d94af',
     inkOnAccentMuted: '#204b5b',
+    highlight: '#cbf5ee',
   },
   pink: {
     paper: '#fff7f8',
@@ -90,6 +97,7 @@ export const palettes: Record<Theme, OgPalette> = {
     chip: '#ebdfe1',
     frameLine: '#af5866',
     inkOnAccentMuted: '#5d222c',
+    highlight: '#ffd6b3',
   },
   docs: {
     paper: '#ffffff',
@@ -100,5 +108,6 @@ export const palettes: Record<Theme, OgPalette> = {
     chip: '#e8e8e9',
     frameLine: '#6b53a6',
     inkOnAccentMuted: '#262136',
+    highlight: '#d1c4ff',
   },
 };

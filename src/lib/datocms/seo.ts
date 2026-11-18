@@ -2,7 +2,7 @@ import type { TitleMetaLinkTag } from '@datocms/astro';
 import type { AstroGlobal } from 'astro';
 import { truncate, without } from 'lodash-es';
 import { isDefined } from '../isDefined';
-import { ogCardUrl, type OgCardData } from '../ogCardUrl';
+import { ogCardUrl, ogCoverUrl, type OgCardData, type OgCoverData } from '../ogCardUrl';
 
 const pageTitleSuffix = 'DatoCMS';
 
@@ -146,18 +146,33 @@ export function seoTitle(newTitle: string) {
 export const ogCardWidth = 1200;
 export const ogCardHeight = 700;
 
-export function seoGeneratedCard(astroOrRequest: AstroGlobal | Request, data: OgCardData) {
-  const url = ogCardUrl(data, astroOrRequest);
+/**
+ * The size of the OG image of an article: the cover grid of 100 × 58 cells,
+ * with cells of 12 px. A whole number of pixels for each cell keeps the
+ * edges of the cells sharp.
+ */
+export const ogCoverWidth = 1200;
+export const ogCoverHeight = 696;
 
+function seoImage(url: string, width: number, height: number) {
   return [
     seoMeta('og:image', url),
-    seoMeta('og:image:width', ogCardWidth.toString()),
-    seoMeta('og:image:height', ogCardHeight.toString()),
+    seoMeta('og:image:width', width.toString()),
+    seoMeta('og:image:height', height.toString()),
     seoMeta('twitter:image', url),
-    seoMeta('twitter:image:width', ogCardWidth.toString()),
-    seoMeta('twitter:image:height', ogCardHeight.toString()),
+    seoMeta('twitter:image:width', width.toString()),
+    seoMeta('twitter:image:height', height.toString()),
     seoTwitterCard('summary_large_image'),
   ];
+}
+
+export function seoGeneratedCard(astroOrRequest: AstroGlobal | Request, data: OgCardData) {
+  return seoImage(ogCardUrl(data, astroOrRequest), ogCardWidth, ogCardHeight);
+}
+
+/** The OG image of an article is its cover. It replaces the image of the CMS. */
+export function seoCoverCard(astroOrRequest: AstroGlobal | Request, data: OgCoverData) {
+  return seoImage(ogCoverUrl(data, astroOrRequest), ogCoverWidth, ogCoverHeight);
 }
 
 export function seoDescription(rawDescription: string) {

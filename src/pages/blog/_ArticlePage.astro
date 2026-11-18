@@ -6,7 +6,8 @@ import { ArticleBody } from '~/components/ArticleBody';
 import { Breadcrumb, BreadcrumbLabel } from '~/components/Breadcrumb';
 import { JsonLd } from '~/components/JsonLd';
 import { MarkdownActions } from '~/components/MarkdownActions';
-import { PostHeader } from '~/components/PostHeader';
+import { pixelCover, postTheme } from '~/components/PixelCover';
+import { ChatHeaderFragment, PostHeader, PostHeaderFragment } from '~/components/PostHeader';
 import { RelatedPosts } from '~/components/RelatedPosts';
 import { StructuredText } from '~/components/StructuredText';
 import AnchoredHeadingNode from '~/components/StructuredText/AnchoredHeadingNode.astro';
@@ -14,19 +15,20 @@ import { defaultBlockComponents } from '~/components/StructuredText/blocks';
 import { defaultInlineRecordComponents } from '~/components/StructuredText/inlineRecords';
 import { defaultLinkToRecordComponents } from '~/components/StructuredText/linkToRecords';
 import * as blog from '~/data/blog';
-import { blogCover } from '~/data/blogCovers';
-import { chatCoverTheme } from '~/data/chatCoverThemes';
 import { indexes } from '~/data/breadcrumbs';
 import Layout from '~/layouts/Layout.astro';
+import { themeFromSlug } from '~/lib/theme';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import {
   extractFromSeoTags,
   overrideSeo,
   seoCanonical,
+  seoCoverCard,
   seoOgType,
   seoTwitterCard,
 } from '~/lib/datocms/seo';
 import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
+import type { OgCoverData } from '~/lib/ogCardUrl';
 import { canonicalUrl, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { ArticleChatFragment, ArticlePostFragment } from './_article';
 import { loadRelated } from './_related';
@@ -46,11 +48,14 @@ function articleData() {
   switch (record.__typename) {
     case 'BlogPostRecord': {
       const article = readFragment(ArticlePostFragment, record);
+      const cover = pixelCover(readFragment(PostHeaderFragment, article));
       return {
         article,
+        ogCover: cover
+          ? ({ kind: 'post', cover: cover.url, theme: cover.theme } satisfies OgCoverData)
+          : undefined,
         header: { post: article },
-        cover: blogCover(article.slug),
-        theme: blogCover(article.slug)?.theme,
+        theme: postTheme(readFragment(PostHeaderFragment, article)) ?? themeFromSlug(article.slug),
         trail: [
           indexes.blog,
           ...(article.category
@@ -71,11 +76,20 @@ function articleData() {
     }
     case 'CustomerStoryRecord': {
       const article = readFragment(ArticleChatFragment, record);
+      // readFragment gives never for a value with a __typename that the fragment
+      // does not select. The annotation gives the type of the fragment.
+      const chat: FragmentOf<typeof ChatHeaderFragment> = article;
       return {
         article,
+        ogCover: {
+          kind: 'chat',
+          portraits: readFragment(ChatHeaderFragment, chat).people.map(
+            (person) => person.portrait.url,
+          ),
+          theme: themeFromSlug(article.slug),
+        } satisfies OgCoverData,
         header: { chat: article },
-        cover: undefined,
-        theme: chatCoverTheme(article.slug),
+        theme: themeFromSlug(article.slug),
         trail: [indexes.blog, indexes.casualChats],
         authors: article.people.map((person) => person.name),
         jsonLdType: 'Article' as const,
@@ -94,8 +108,8 @@ function articleData() {
 
 const {
   article,
+  ogCover,
   header,
-  cover,
   theme,
   trail,
   authors,
@@ -104,30 +118,28 @@ const {
   relatedCopy,
   structuredText,
 } = articleData();
-// A post with a cover takes the theme of its cover, and a chat takes the theme of its portraits.
-// The other articles are in the green of the blog.
+// A post takes the theme that the CMS gives, and a chat takes the theme of its portraits.
+// A post with no theme in the CMS takes a theme from its slug.
 
 const related = await loadRelated(Astro, article);
 
 const baseUrl = buildBaseUrl(Astro);
-const { description, image } = extractFromSeoTags(article.seo);
+// The OG image of an article is its cover, also when the CMS gives an image.
+const seo = overrideSeo(
+  article.seo,
+  article.canonicalUrl ? seoCanonical(article.canonicalUrl) : undefined,
+  seoOgType('article'),
+  seoTwitterCard('summary_large_image'),
+  ogCover ? seoCoverCard(Astro, ogCover) : undefined,
+);
+const { description, image } = extractFromSeoTags(seo);
 const markdownUrl = new URL(
   Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
   baseUrl,
 );
 ---
 
-<Layout
-  theme={theme ?? 'green'}
-  seo={overrideSeo(
-    article.seo,
-    article.canonicalUrl ? seoCanonical(article.canonicalUrl) : undefined,
-    seoOgType('article'),
-    seoTwitterCard('summary_large_image'),
-  )}
-  seoAnalysis={article.yoastAnalysis}
-  headerVariant="accent"
->
+<Layout theme={theme} seo={seo} seoAnalysis={article.yoastAnalysis} headerVariant="accent">
   <Fragment slot="head">
     {
       article._firstPublishedAt && (
@@ -169,7 +181,7 @@ const markdownUrl = new URL(
     />
   </Fragment>
 
-  <PostHeader {...header} cover={cover}>
+  <PostHeader {...header}>
     <BreadcrumbLabel slot="label" trail={trail} />
   </PostHeader>
   <Breadcrumb trail={trail} current={article.title}>

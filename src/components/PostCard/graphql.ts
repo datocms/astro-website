@@ -1,5 +1,6 @@
 import { BlogPostUrlFragment } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { CustomerStoryUrlFragment } from '~/lib/datocms/gqlUrlBuilder/customerStory';
+import { PixelCoverFragment } from '~/components/PixelCover';
 import { graphql } from '~/lib/datocms/graphql';
 
 /*
@@ -7,8 +8,8 @@ import { graphql } from '~/lib/datocms/graphql';
  * "... on CustomerStoryRecord { title }" when no root field of the query
  * gives a CustomerStoryRecord.
  *
- * Both variants of PostCard read the same fragments. A card has no cover
- * image.
+ * Both variants of PostCard read the same fragments. A featured card shows
+ * the cover of its post (PixelCover) or the portraits of its chat.
  */
 
 export const PostCardFragment = graphql(
@@ -18,6 +19,7 @@ export const PostCardFragment = graphql(
       _firstPublishedAt
       _createdAt
       ...BlogPostUrlFragment
+      ...PixelCoverFragment
       category {
         name
       }
@@ -32,7 +34,7 @@ export const PostCardFragment = graphql(
       }
     }
   `,
-  [BlogPostUrlFragment],
+  [BlogPostUrlFragment, PixelCoverFragment],
 );
 
 /** A casual chat: the model CustomerStory. */

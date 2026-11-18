@@ -24,7 +24,7 @@ Read the voice in `BRAND.md` (sections 2, 4, 5 and 7) before you change any text
 - Inline the SVGs: `import key from '~/svg/illustrations/key.svg?raw'`. The docs use `Svg` (`<Svg name="svg/logos/next-squared" />`), which optimizes the file with SVGO.
 - Text faces are in `src/lib/motion/faces.ts`. The copy names a face (`face: 'happy'`), never its glyphs, and only `Face` and the typewriter (`faceStep`) draw it. Add a new face there, and check it in `/dev/face-gallery` (`DESIGN.md`, "The Text Face Rule").
 - Motion: use the helpers in `src/lib/motion/`, CSS before JS. Reduced motion shows the final state, animations play only in view, no layout shift, and the final state is in the DOM without JS. No Lottie, and no video for what CSS can do.
-- `ChatCover` draws the cover of a casual chat from its guests: the portrait is a continuous black and white photograph, never cells. Add the slug of a new chat at the top of `src/data/chatCoverThemes.ts`.
+- `ChatCover` draws the cover of a casual chat from its guests: the portrait is a continuous black and white photograph, never cells. Its theme comes from the slug of the chat (`themeFromSlug` in `src/lib/theme.ts`).
 - The dev tools (`/dev/face-gallery`, `/dev/pxv-gallery`, `/dev/cover-gallery`, `/dev/button-gallery`) are in `src/dev/`, and the integration `dev-tools` in `astro.config.ts` adds their routes only in `astro dev`. The build and the deploys do not have them.
 - After a new tarball of the scene kit in `vendor/`, run `npm install` and restart `astro dev`.
 
@@ -74,7 +74,7 @@ Each client `<script>` (not `is:inline`) is a custom element that extends `WebCo
 
 The browser must download a file that has the width of the image on the screen, not more. `@datocms/astro` gives a lazy image `sizes="auto"`: Chrome and Firefox then measure the image. Safari has no `auto` and uses the next value of `sizes`. Thus each `sizes` starts with `auto` and continues with a real width for Safari, never with `100vw` alone.
 
-- Show a raster image of the CMS with `ResponsiveImage` (`src/components/ResponsiveImage`) and `ResponsiveImageFragment`. Use a plain `<img src={asset.url}>` only for an SVG, or for a URL with a fixed imgix width at a fixed size on the screen (an avatar: `url(imgixParams: { w: 80, h: 80 })`).
+- Show a raster image of the CMS with `ResponsiveImage` (`src/components/ResponsiveImage`) and `ResponsiveImageFragment`. Use a plain `<img src={asset.url}>` only for an SVG, for a URL with a fixed imgix width at a fixed size on the screen (an avatar: `url(imgixParams: { w: 80, h: 80 })`), or for the cover of a blog post (`PixelCover`: a script reads the pixels of the file, thus the URL asks for a PNG with no loss, at the size of the file).
 - Do not ask for `sizes` in a `responsiveImage` query: not the field, not the `sizes:` argument. A `sizes` from the query wins over `auto`.
 - Set `imgixParams.w` to the largest CSS width at which the layout shows the image. Do not double it for retina screens: the srcset goes from 0.25 to 4 times `w`.
 - Without a `sizes` prop, `ResponsiveImage` gives `auto, (max-width: Wpx) 100vw, Wpx`, with W the width of the query. This is correct when `w` is the largest width on the screen.

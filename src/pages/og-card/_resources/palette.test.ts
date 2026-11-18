@@ -29,6 +29,7 @@ function computePalette(theme: (typeof THEMES)[number]): OgPalette {
     chip: toHex(composite(color('--surface-inverse-faint'), paper)),
     frameLine: toHex(colorMix('oklab', accent, 65, ink, 35)),
     inkOnAccentMuted: toHex(composite(color('--text-on-accent-muted'), accent)),
+    highlight: toHex(color('--theme-pixel-highlight')),
   };
 }
 

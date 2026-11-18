@@ -1,30 +1,44 @@
-// Make and check the covers of the blog (src/assets/blog-covers/). Read
-// src/components/PixelCover/AGENTS.md (the rules and the process) and
-// scripts/blog-covers/README.md (the commands) first.
+// Make and check the covers of the blog. The CMS keeps them: the field
+// `pixel_cover` of a blog post has the file, and the field `theme` has the
+// theme. Read src/components/PixelCover/AGENTS.md (the rules and the
+// process) and scripts/blog-covers/README.md (the commands) first.
 //
-//   npx tsx scripts/blog-covers/gen.ts render <slug>... [--try]
-//   npx tsx scripts/blog-covers/gen.ts list
-//   npx tsx scripts/blog-covers/gen.ts set <slug> <key=value>...
-//   npx tsx scripts/blog-covers/gen.ts recolor <slug>...
-//   npx tsx scripts/blog-covers/gen.ts sheet
+// The script runs with the datocms CLI, which gives it a client of the CMS
+// with the login of the user (`npx datocms login`). covers.sh starts it:
+//
+//   scripts/blog-covers/covers.sh render <slug>... [--try] [--theme=<theme>] [--variant=<name>]
+//   scripts/blog-covers/covers.sh list
+//   scripts/blog-covers/covers.sh set <slug> <key=value>...
+//   scripts/blog-covers/covers.sh sheet
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { Client } from 'datocms/lib/cma-client-node';
 import sharp from 'sharp';
-import { blogCoverThemes } from '../../src/data/blogCoverThemes';
+import {
+  COLS,
+  gridToPixels,
+  layout,
+  paletteOf,
+  palettes,
+  pixelsToGrid,
+  ROWS,
+  SEAM,
+  type Grid,
+  type Rgb,
+  type ThemeColours,
+} from '../../src/lib/pixel-cover/cover';
 import { asciiJson, readText, writeText } from './png';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const COVERS = path.join(ROOT, 'src/assets/blog-covers');
 const WORK = path.join(ROOT, 'tmp/blog-covers');
 const SPECS = path.join(WORK, 'specs');
 const PHOTOS = path.join(WORK, 'photos');
 const PREVIEWS = path.join(WORK, 'preview');
+// The files of the covers: `render` and `set` write them and send them to the CMS.
+const COVERS = path.join(WORK, 'covers');
 
-const COLS = 100;
-const ROWS = 58;
-const SEAM = 50;
 const KEYWORD = 'datocms-cover';
 
 // ---- The spec and the record.
@@ -38,6 +52,14 @@ type Key = {
   erode?: number;
   /** Keep only this part of the photo: [x0, y0, x1, y1], fractions. */
   crop?: [number, number, number, number];
+  /**
+   * Make holes in the subject: an area of ground colour that the subject
+   * closes (the inside of a shackle, of a handle, of a ring) becomes ground.
+   * The value is the smallest area of a hole, a fraction of the photo.
+   * `true` is 0.001. Default: no holes, because a white area of an animal is
+   * not a hole.
+   */
+  holes?: boolean | number;
 };
 
 type Layer = {
@@ -72,94 +94,48 @@ type Spec = {
   despeckle?: boolean;
 };
 
-/** The record in the PNG of a cover. */
+/** The record in the PNG of a cover. The theme is not in it: the CMS has the theme. */
 type CoverRecord = {
   animal: string;
   source?: string;
   /** True when the photo has a licence and the cover uses the licensed file. */
   licensed: boolean;
-  /** The theme of the colours of the file. */
-  theme: string;
   layers: Layer[];
   despeckle?: boolean;
 };
 
 // ---- The colours.
 
-type ThemeColours = { accent: string; ink: string; paper: string; hi: string };
-
 // The colours of each theme, from src/styles/tokens.css (light scheme):
-// `--theme-accent`, `--theme-ink`, the paper of the theme, and a light
-// highlight. Change them here when the tokens change, then run `recolor`.
-const THEMES: Record<string, ThemeColours> = {
-  yellow: { accent: '#e8d855', ink: '#351615', paper: '#fdfff5', hi: '#f8f2c2' },
-  orange: { accent: '#f07a3d', ink: '#42180f', paper: '#fffbf5', hi: '#e8d855' },
-  green: { accent: '#93d44b', ink: '#1a4731', paper: '#f5fff5', hi: '#eef0a8' },
-  purple: { accent: '#9d75f7', ink: '#18032e', paper: '#f6f5ff', hi: '#d1c4ff' },
-  blue: { accent: '#50c9ed', ink: '#1a3a47', paper: '#edfeff', hi: '#cbf5ee' },
-  pink: { accent: '#f28497', ink: '#3f0e16', paper: '#fff7f8', hi: '#ffd6b3' },
-};
+// `--theme-accent`, `--theme-ink`, `--theme-paper` and
+// `--theme-pixel-highlight`. The previews use them. The site reads the
+// tokens: change this table when the tokens change.
+const THEME_HEX: Record<string, { accent: string; ink: string; paper: string; highlight: string }> =
+  {
+    yellow: { accent: '#e8d855', ink: '#351615', paper: '#fdfff5', highlight: '#f8f2c2' },
+    orange: { accent: '#f07a3d', ink: '#42180f', paper: '#fffbf5', highlight: '#e8d855' },
+    green: { accent: '#93d44b', ink: '#1a4731', paper: '#f5fff5', highlight: '#eef0a8' },
+    purple: { accent: '#9d75f7', ink: '#18032e', paper: '#f6f5ff', highlight: '#d1c4ff' },
+    blue: { accent: '#50c9ed', ink: '#1a3a47', paper: '#edfeff', highlight: '#cbf5ee' },
+    pink: { accent: '#f28497', ink: '#3f0e16', paper: '#fff7f8', highlight: '#ffd6b3' },
+  };
 
-const hexToUnit = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
-const hexToRgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-const linear = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
-const gamma = (c: number) => (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055);
+const hexToRgb = (hex: string): Rgb => [
+  parseInt(hex.slice(1, 3), 16),
+  parseInt(hex.slice(3, 5), 16),
+  parseInt(hex.slice(5, 7), 16),
+];
 
-function toOklab(hex: string) {
-  const [r, g, b] = hexToUnit(hex).map(linear) as [number, number, number];
-  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
-  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
-  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
-  return [
-    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
-    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
-    0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
-  ] as const;
-}
-
-function fromOklab([L, a, b]: readonly [number, number, number]) {
-  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
-  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
-  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
-  const rgb = [
-    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
-    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
-    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
-  ];
-  const byte = (c: number) =>
-    Math.round(Math.min(1, Math.max(0, gamma(c))) * 255)
-      .toString(16)
-      .padStart(2, '0');
-  return `#${rgb.map(byte).join('')}`;
-}
-
-/** Mix two colours in OKLab, as CSS `color-mix(in oklab)`. `t` is the part of `b`. */
-function mix(a: string, b: string, t: number) {
-  const A = toOklab(a);
-  const B = toOklab(b);
-  return fromOklab([0, 1, 2].map((i) => A[i]! + (B[i]! - A[i]!) * t) as [number, number, number]);
-}
-
-type Palette = { ground: string; tones: [string, string, string] };
-
-/**
- * The two palettes of a theme. Tone 0 is dark, 1 is the midtone, 2 is the
- * highlight.
- */
-function palettes(theme: string) {
-  const t = THEMES[theme];
-  if (!t) throw new Error(`No colours for the theme "${theme}"`);
+function coloursOf(theme: string): ThemeColours {
+  const hex = THEME_HEX[theme];
+  if (!hex) throw new Error(`No theme "${theme}": use ${Object.keys(THEME_HEX).join(', ')}`);
   return {
-    // The left half, on the accent.
-    accent: { ground: t.accent, tones: [t.ink, mix(t.ink, t.accent, 0.5), t.paper] } as Palette,
-    // The right half, on the ink. The dark tone is a little lighter than the
-    // ground, thus the dark parts of the animal show.
-    inverse: { ground: t.ink, tones: [mix(t.ink, t.accent, 0.3), t.accent, t.hi] } as Palette,
+    accent: hexToRgb(hex.accent),
+    ink: hexToRgb(hex.ink),
+    paper: hexToRgb(hex.paper),
+    highlight: hexToRgb(hex.highlight),
   };
 }
-
-const paletteOf = (pal: ReturnType<typeof palettes>, column: number) =>
-  column < SEAM ? pal.accent : pal.inverse;
 
 // ---- Keying and sampling.
 
@@ -225,6 +201,28 @@ function keyMask({ data, w, h }: Photo, key: Key) {
     if (y < h - 1) push(x, y + 1);
   }
 
+  // `holes`: the areas of ground colour that do not touch the edge.
+  if (key.holes) {
+    const smallest = (key.holes === true ? 0.001 : key.holes) * w * h;
+    const seen = new Uint8Array(w * h);
+    for (let start = 0; start < w * h; start++) {
+      if (!isGround[start] || ground[start] || seen[start]) continue;
+      const area = [start];
+      seen[start] = 1;
+      for (let n = 0; n < area.length; n++) {
+        const i = area[n]!;
+        const x = i % w;
+        const near = [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, i - w, i + w];
+        for (const k of near)
+          if (k >= 0 && k < w * h && isGround[k] && !ground[k] && !seen[k]) {
+            seen[k] = 1;
+            area.push(k);
+          }
+      }
+      if (area.length >= smallest) for (const i of area) ground[i] = 1;
+    }
+  }
+
   // `erode` grows the ground: it removes the light rim of the backdrop.
   for (let e = 0; e < (key.erode ?? 0); e++) {
     const grown = ground.slice();
@@ -267,9 +265,18 @@ function boundingBox(mask: Uint8Array, w: number, h: number) {
 type Cell = { gx: number; gy: number; lum: number; tone: number };
 
 /** Cut one subject into cells, each with the mean luminance of the subject in it. */
+/** The photos that cut their subject at the top or at a side. */
+const photoCuts = new Set<string>();
+
 async function sample(layer: Layer) {
   const photo = await loadPhoto(layer.photo);
   const mask = keyMask(photo, layer.key ?? {});
+  // The subject must not touch the top or a side of the photo: there the
+  // photo cuts it. The bottom of the photo can cut it.
+  let atEdge = 0;
+  for (let x = 0; x < photo.w; x++) atEdge += mask[x]!;
+  for (let y = 0; y < photo.h; y++) atEdge += mask[y * photo.w]! + mask[y * photo.w + photo.w - 1]!;
+  if (atEdge > 3) photoCuts.add(layer.photo);
   const box = boundingBox(mask, photo.w, photo.h);
   const step = (box.y1 - box.y0) / layer.h; // the px of the photo for each cell
   const width = Math.round((box.x1 - box.x0) / step);
@@ -309,9 +316,6 @@ async function sample(layer: Layer) {
   for (const c of cells) c.tone = c.lum < t1 ? 0 : c.lum < t2 ? 1 : 2;
   return cells;
 }
-
-/** The grid: for each cell, -1 (ground) or the tone 0, 1 or 2. */
-type Grid = Int8Array;
 
 async function buildGrid(spec: Spec) {
   const grid: Grid = new Int8Array(COLS * ROWS).fill(-1);
@@ -361,74 +365,44 @@ const NEIGHBOURS = [
   [0, -1],
 ] as const;
 
-// ---- The file of the site: one pixel for each cell.
+// ---- The file of a cover: one pixel for each cell, with only tones.
 
-function cellsOf(grid: Grid, theme: string) {
-  const pal = palettes(theme);
-  const buffer = Buffer.alloc(COLS * ROWS * 3);
-  for (let i = 0; i < COLS * ROWS; i++) {
-    const p = paletteOf(pal, i % COLS);
-    const tone = grid[i]!;
-    buffer.set(hexToRgb(tone < 0 ? p.ground : p.tones[tone]!), i * 3);
-  }
-  return buffer;
-}
-
-/** The grid of a cover file, from its colours and the theme of its colours. */
-async function readGrid(file: string, theme: string) {
-  const pal = palettes(theme);
-  const { data } = await sharp(file).removeAlpha().raw().toBuffer({ resolveWithObject: true });
-  const grid: Grid = new Int8Array(COLS * ROWS).fill(-1);
-  for (let i = 0; i < COLS * ROWS; i++) {
-    const p = paletteOf(pal, i % COLS);
-    const hex = `#${[0, 1, 2].map((k) => data[i * 3 + k]!.toString(16).padStart(2, '0')).join('')}`;
-    if (hex === p.ground) continue;
-    const tone = p.tones.indexOf(hex);
-    if (tone < 0) throw new Error(`${file}: the colour ${hex} is not of the theme "${theme}"`);
-    grid[i] = tone;
-  }
-  return grid;
-}
-
-async function writeCover(slug: string, grid: Grid, record: CoverRecord) {
-  const png = await sharp(cellsOf(grid, record.theme), {
-    raw: { width: COLS, height: ROWS, channels: 3 },
+/** The PNG of a cover, with its record. */
+async function encodeCover(grid: Grid, record: CoverRecord) {
+  const png = await sharp(Buffer.from(gridToPixels(grid)), {
+    raw: { width: COLS, height: ROWS, channels: 4 },
   })
     .png({ compressionLevel: 9, palette: true })
     .toBuffer();
-  fs.writeFileSync(path.join(COVERS, `${slug}.png`), writeText(png, KEYWORD, asciiJson(record)));
+  return writeText(png, KEYWORD, asciiJson(record));
 }
 
-function readRecord(slug: string): CoverRecord | undefined {
-  const file = path.join(COVERS, `${slug}.png`);
-  const text = readText(fs.readFileSync(file), KEYWORD);
-  return text ? (JSON.parse(text) as CoverRecord) : undefined;
+/** The grid and the record of the PNG of a cover. */
+async function decodeCover(png: Buffer, name: string) {
+  const { data, info } = await sharp(png).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { grid, error } = pixelsToGrid(data, info.width, info.height);
+  if (!grid) throw new Error(`${name}: ${error}`);
+  const text = readText(png, KEYWORD);
+  return { grid, record: text ? (JSON.parse(text) as CoverRecord) : undefined };
 }
 
-// ---- Drawing, as src/components/PixelCover draws it: a box of `bw` × `bh`
-// device px, a pitch of whole device px, a gap of 1 device px when the
-// pitch is 6 or more, the grid in the middle of the box. With `flat`, the
-// subject is one colour: the test of the silhouette.
+// ---- Drawing, as src/components/PixelCover draws it (`layout` gives the
+// pitch, the gap and the place of the grid in a box of `bw` × `bh` device
+// px). With `flat`, the subject is one colour: the test of the silhouette.
 
 function draw(grid: Grid, theme: string, bw: number, bh: number, { flat = false } = {}) {
-  const pal = palettes(theme);
-  const pitch = Math.max(1, Math.round(Math.min(bw / COLS, bh / ROWS)));
-  const gap = pitch >= 6 ? 1 : 0;
-  const left = Math.floor((bw - pitch * COLS) / 2);
-  const top = Math.floor((bh - pitch * ROWS) / 2);
-  const seam = left + pitch * SEAM;
+  const pal = palettes(coloursOf(theme));
+  const { pitch, gap, left, top, seam } = layout(bw, bh, grid);
   const buffer = Buffer.alloc(bw * bh * 3);
-  const accent = hexToRgb(pal.accent.ground);
-  const ink = hexToRgb(pal.inverse.ground);
+  const accent = pal.accent.ground;
+  const ink = pal.inverse.ground;
   for (let y = 0; y < bh; y++)
     for (let x = 0; x < bw; x++) buffer.set(x < seam ? accent : ink, (y * bw + x) * 3);
   for (let gy = 0; gy < ROWS; gy++)
     for (let gx = 0; gx < COLS; gx++) {
       const tone = grid[gy * COLS + gx]!;
       const p = paletteOf(pal, gx);
-      const colour = hexToRgb(
-        tone < 0 ? p.ground : flat ? p.tones[gx < SEAM ? 0 : 2] : p.tones[tone]!,
-      );
+      const colour = tone < 0 ? p.ground : flat ? p.tones[gx < SEAM ? 0 : 2] : p.tones[tone]!;
       for (let yy = 0; yy < pitch - gap; yy++)
         for (let xx = 0; xx < pitch - gap; xx++) {
           const X = left + gx * pitch + xx;
@@ -488,7 +462,7 @@ async function writePreview(file: string, grid: Grid, theme: string) {
 
 // ---- The checks. See "Checks" in src/components/PixelCover/AGENTS.md.
 
-function checks(grid: Grid, cut: number, layers: number) {
+function checks(grid: Grid, cut: number, layers: number, photos: string[]) {
   let x0 = COLS;
   let y0 = ROWS;
   let x1 = -1;
@@ -518,6 +492,11 @@ function checks(grid: Grid, cut: number, layers: number) {
   const lines: { ok: boolean; text: string }[] = [];
   const add = (ok: boolean, text: string) => lines.push({ ok, text });
   add(cut === 0, `no subject cell out of the frame at the top or the sides (${cut})`);
+  const cutPhotos = photos.filter((photo) => photoCuts.has(photo));
+  add(
+    cutPhotos.length === 0,
+    `the photo does not cut the subject at the top or at a side${cutPhotos.length ? ` (${cutPhotos.join(', ')}: use a different photo, or key.crop to remove a corner that is not ground)` : ''}`,
+  );
   add(x0 >= 5 && COLS - 1 - x1 >= 5, `margin left/right >= 5 cells (${x0} / ${COLS - 1 - x1})`);
   const bottom = ROWS - 1 - y1;
   add(
@@ -525,6 +504,7 @@ function checks(grid: Grid, cut: number, layers: number) {
     `margin top >= 3, bottom >= 3 or 0 (cut) cells (${y0} / ${bottom})`,
   );
   const bw = x1 - x0 + 1;
+  add(bw >= 32, `subject is not narrow: ${bw} columns wide (>= 32)`);
   const bh = y1 - y0 + 1;
   add(
     bh >= 44 || bw >= 82,
@@ -582,132 +562,255 @@ function checks(grid: Grid, cut: number, layers: number) {
   return lines;
 }
 
-// ---- The commands.
+// ---- The CMS.
 
-function themeOf(slug: string) {
-  const theme = blogCoverThemes[slug];
-  if (!theme) throw new Error(`${slug} has no theme: add it to src/data/blogCoverThemes.ts`);
-  return theme;
+/** A blog post of the CMS: the fields that this script uses. */
+type Post = {
+  id: string;
+  slug: string;
+  theme?: string;
+  /** The ID of the file of the cover. */
+  coverId?: string;
+  category?: string;
+  /** True when the post has no changes that are not published. */
+  published: boolean;
+  /** True when the post was never published, or is not published now. */
+  draft: boolean;
+  date: string;
+};
+
+type Item = Awaited<ReturnType<Client['items']['find']>>;
+
+function toPost(item: Item): Post {
+  const cover = item.pixel_cover as { upload_id: string } | null;
+  return {
+    id: item.id,
+    slug: String(item.slug),
+    theme: (item.theme as string | null) || undefined,
+    coverId: cover?.upload_id,
+    category: (item.category as string | null) ?? undefined,
+    published: item.meta.status === 'published',
+    draft: item.meta.status === 'draft',
+    date: item.meta.first_published_at ?? item.meta.created_at,
+  };
 }
 
-async function render(slugs: string[], { tryOnly }: { tryOnly: boolean }) {
+/** All the blog posts, the newest first. */
+async function allPosts(client: Client) {
+  const posts: Post[] = [];
+  for await (const item of client.items.listPagedIterator({
+    filter: { type: 'blog_post' },
+    version: 'current',
+  }))
+    posts.push(toPost(item as Item));
+  return posts.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+async function findPost(client: Client, slug: string) {
+  const [item] = await client.items.list({
+    filter: { type: 'blog_post', fields: { slug: { eq: slug } } },
+    version: 'current',
+  });
+  if (!item) throw new Error(`The CMS has no blog post with the slug "${slug}"`);
+  return toPost(item as Item);
+}
+
+/** The file of the cover of a post, from the CMS. */
+async function downloadCover(client: Client, post: Post) {
+  if (!post.coverId) return undefined;
+  const upload = await client.uploads.find(post.coverId);
+  const response = await fetch(upload.url);
+  if (!response.ok) throw new Error(`${upload.url}: ${response.status}`);
+  return decodeCover(Buffer.from(await response.arrayBuffer()), post.slug);
+}
+
+/**
+ * Send the file of a cover to the CMS and set the fields of the post. A post
+ * that has a cover keeps its asset: the file of the asset changes. A post
+ * with no changes that are not published is published again. A post with
+ * such changes stays as it is: an editor publishes it.
+ */
+async function saveCover(client: Client, post: Post, png: Buffer, theme: string) {
+  fs.mkdirSync(COVERS, { recursive: true });
+  const localPath = path.join(COVERS, `${post.slug}.png`);
+  fs.writeFileSync(localPath, png);
+  const upload = post.coverId
+    ? await client.uploads.updateFromLocalFile(post.coverId, { localPath })
+    : await client.uploads.createFromLocalFile({
+        localPath,
+        filename: `cover-${post.slug}.png`,
+        tags: ['blog-cover'],
+      });
+  if (post.coverId !== upload.id || post.theme !== theme)
+    await client.items.update(post.id, { pixel_cover: { upload_id: upload.id }, theme });
+  if (post.published) {
+    await client.items.publish(post.id);
+    return 'published';
+  }
+  return post.draft
+    ? 'saved. The post is a draft: the site shows the cover when an editor publishes the post'
+    : 'saved, NOT PUBLISHED: the post has other changes that are not published. An editor publishes it in the CMS';
+}
+
+// ---- The commands.
+
+async function render(
+  client: Client,
+  slugs: string[],
+  { tryOnly, theme: newTheme, variant }: { tryOnly: boolean; theme?: string; variant?: string },
+) {
   fs.mkdirSync(PREVIEWS, { recursive: true });
   let failed = false;
   for (const slug of slugs) {
-    const file = path.join(SPECS, `${slug}.json`);
+    // A variant is a second spec of the same post: <slug>.<variant>.json. It
+    // has its own preview and its own cover file, and it never goes to the CMS.
+    const name = variant ? `${slug}.${variant}` : slug;
+    const file = path.join(SPECS, `${name}.json`);
     if (!fs.existsSync(file)) throw new Error(`No spec ${file}`);
     const spec = JSON.parse(fs.readFileSync(file, 'utf8')) as Spec;
     if (!spec.animal) throw new Error(`${file}: give the animal`);
-    const theme = themeOf(slug);
+    // A try with a theme does not use the CMS: the post can be absent.
+    const post = (tryOnly || variant) && newTheme ? undefined : await findPost(client, slug);
+    const theme = newTheme ?? post?.theme;
+    if (!theme) throw new Error(`${slug} has no theme in the CMS: give --theme=<theme>`);
+    coloursOf(theme);
     const { grid, cut } = await buildGrid(spec);
-    const preview = path.join(PREVIEWS, `${slug}.png`);
+    const preview = path.join(PREVIEWS, `${name}.png`);
     await writePreview(preview, grid, theme);
-    const lines = checks(grid, cut, Math.min(2, spec.layers.length));
+    const lines = checks(
+      grid,
+      cut,
+      Math.min(2, spec.layers.length),
+      spec.layers.map((layer) => layer.photo),
+    );
     const ok = lines.every((l) => l.ok);
     if (!ok) failed = true;
 
     console.log(`\n${slug} (${spec.animal}, ${theme})`);
     for (const l of lines) console.log(`  ${l.ok ? 'ok  ' : 'FAIL'} ${l.text}`);
     console.log(`  preview: ${path.relative(ROOT, preview)}`);
-    if (tryOnly) continue;
     if (!ok) {
-      console.log('  The cover file did not change: a check failed.');
+      if (!tryOnly) console.log('  The cover in the CMS did not change: a check failed.');
       continue;
     }
     // A new photo has no licence. The same photo keeps the licence.
-    const before = fs.existsSync(path.join(COVERS, `${slug}.png`)) ? readRecord(slug) : undefined;
+    const before = post ? (await downloadCover(client, post))?.record : undefined;
     const samePhotos =
       before?.layers.map((l) => l.photo).join() === spec.layers.map((l) => l.photo).join();
-    await writeCover(slug, grid, {
+    const png = await encodeCover(grid, {
       animal: spec.animal,
       source: spec.source,
       licensed: samePhotos ? (before?.licensed ?? false) : false,
-      theme,
       layers: spec.layers,
       despeckle: spec.despeckle,
     });
-    console.log(`  cover: src/assets/blog-covers/${slug}.png`);
+    // A try writes the file of the cover, but does not send it. A person can
+    // put this file in the field `pixel_cover` of the post in the CMS.
+    if (tryOnly || variant || !post) {
+      fs.mkdirSync(COVERS, { recursive: true });
+      const local = path.join(COVERS, `${name}.png`);
+      fs.writeFileSync(local, png);
+      console.log(`  cover file (not sent to the CMS): ${path.relative(ROOT, local)}`);
+      continue;
+    }
+    console.log(`  CMS: ${await saveCover(client, post, png, theme)}`);
   }
   if (failed) process.exitCode = 1;
 }
 
-function slugsOnDisk() {
-  return fs
-    .readdirSync(COVERS)
-    .filter((f) => f.endsWith('.png'))
-    .map((f) => f.slice(0, -4));
+/** The posts with a cover, the newest first, each with its grid and its record. */
+async function covers(client: Client, posts: Post[]) {
+  const list = [];
+  for (const post of posts.filter((p) => p.coverId)) {
+    list.push({ post, ...(await downloadCover(client, post))! });
+  }
+  return list;
 }
 
-function list() {
+async function list(client: Client) {
+  const posts = await allPosts(client);
   const animals = new Map<string, string[]>();
-  for (const slug of slugsOnDisk()) {
-    const record = readRecord(slug);
-    const theme = blogCoverThemes[slug];
+  for (const { post, record } of await covers(client, posts)) {
     const notes: string[] = [];
     if (!record) notes.push('NO RECORD');
-    if (!theme) notes.push('NO THEME in blogCoverThemes.ts');
-    if (record && theme && record.theme !== theme)
-      notes.push(`COLOURS OF ${record.theme}: recolor`);
+    if (!post.theme) notes.push('NO THEME in the CMS: the site does not show the cover');
+    if (!post.published) notes.push('the post has changes that are not published');
     if (record && !record.licensed) notes.push('not licensed');
     if (record && !record.source) notes.push('no source');
     console.log(
-      `${slug}\n  ${record?.animal ?? '?'} · ${theme ?? '?'}${notes.length ? ` · ${notes.join(' · ')}` : ''}${record?.source ? `\n  ${record.source}` : ''}`,
+      `${post.slug}\n  ${record?.animal ?? '?'} · ${post.theme ?? '?'}${notes.length ? ` · ${notes.join(' · ')}` : ''}${record?.source ? `\n  ${record.source}` : ''}`,
     );
     for (const animal of (record?.animal ?? '').split('+').map((a) => a.trim().toLowerCase())) {
-      if (animal) animals.set(animal, [...(animals.get(animal) ?? []), slug]);
+      if (animal) animals.set(animal, [...(animals.get(animal) ?? []), post.slug]);
     }
   }
   for (const [animal, slugs] of animals)
     if (slugs.length > 1) console.log(`\nTWICE: ${animal} (${slugs.join(', ')})`);
-  for (const slug of Object.keys(blogCoverThemes))
-    if (!slugsOnDisk().includes(slug)) console.log(`\nNO FILE: ${slug} has a theme but no cover`);
+
+  // The featured row of a feed is its three newest posts: three different themes.
+  const categories = await client.items.list({ filter: { type: 'blog_post_category' } });
+  const feeds = [
+    { name: 'all posts', posts },
+    ...categories.map((category) => ({
+      name: String(category.name),
+      posts: posts.filter((post) => post.category === category.id),
+    })),
+  ];
+  console.log('\nThe featured rows (the three newest posts of each feed):');
+  for (const feed of feeds) {
+    const three = feed.posts.slice(0, 3);
+    if (three.length === 0) continue;
+    console.log(`  ${feed.name}`);
+    for (const post of three)
+      console.log(
+        `    ${post.theme ?? 'no theme'}${post.coverId ? '' : ' · no cover'}${post.published ? '' : ' · not published'} · ${post.slug}`,
+      );
+    const row = three.filter((post) => post.coverId && post.theme);
+    if (new Set(row.map((post) => post.theme)).size < row.length)
+      console.log(
+        `\nSAME THEME IN A ROW (${feed.name}): ${row.map((post) => `${post.slug} · ${post.theme}`).join(', ')}`,
+      );
+  }
 }
 
-async function set(slug: string, pairs: string[]) {
-  const record = readRecord(slug);
-  if (!record) throw new Error(`${slug} has no record: render it from a spec`);
+async function set(client: Client, slug: string, pairs: string[]) {
+  const post = await findPost(client, slug);
+  const cover = await downloadCover(client, post);
+  if (!cover?.record) throw new Error(`${slug} has no cover with a record: render it from a spec`);
+  const { grid, record } = cover;
+  let theme = post.theme;
   for (const pair of pairs) {
     const [key, ...rest] = pair.split('=');
     const value = rest.join('=');
     if (key === 'animal') record.animal = value;
     else if (key === 'source') record.source = value || undefined;
     else if (key === 'licensed') record.licensed = value === 'true';
-    else throw new Error(`Unknown key "${key}": use animal, source or licensed`);
+    else if (key === 'theme') theme = value;
+    else throw new Error(`Unknown key "${key}": use animal, source, licensed or theme`);
   }
-  const file = path.join(COVERS, `${slug}.png`);
-  fs.writeFileSync(file, writeText(fs.readFileSync(file), KEYWORD, asciiJson(record)));
-  console.log(`${slug}: ${JSON.stringify({ ...record, layers: undefined })}`);
+  if (!theme) throw new Error(`${slug} has no theme in the CMS: give theme=<theme>`);
+  coloursOf(theme);
+  const status = await saveCover(client, post, await encodeCover(grid, record), theme);
+  console.log(
+    `${slug}: ${JSON.stringify({ ...record, layers: undefined, theme })}\n  CMS: ${status}`,
+  );
 }
 
-async function recolor(slugs: string[]) {
-  for (const slug of slugs) {
-    const record = readRecord(slug);
-    if (!record) throw new Error(`${slug} has no record`);
-    const theme = themeOf(slug);
-    const grid = await readGrid(path.join(COVERS, `${slug}.png`), record.theme);
-    await writeCover(slug, grid, { ...record, theme });
-    console.log(`${slug}: ${record.theme} → ${theme}`);
-  }
-}
-
-/** All the covers at feed size on a 2× screen, three in each row, in the order of the themes. */
-async function sheet() {
+/** All the covers at feed size on a 2× screen, three in each row, the newest first. */
+async function sheet(client: Client) {
   const cw = 732;
   const ch = 428;
   const g = 24;
-  const slugs = Object.keys(blogCoverThemes).filter((s) => slugsOnDisk().includes(s));
+  const all = (await covers(client, await allPosts(client))).filter(({ post }) => post.theme);
   const inputs = [];
-  for (const [i, slug] of slugs.entries()) {
-    const record = readRecord(slug);
-    if (!record) continue;
-    const grid = await readGrid(path.join(COVERS, `${slug}.png`), record.theme);
+  for (const [i, { post, grid }] of all.entries()) {
     inputs.push({
-      input: await draw(grid, record.theme, cw, ch).png().toBuffer(),
+      input: await draw(grid, post.theme!, cw, ch).png().toBuffer(),
       left: g + (i % 3) * (cw + g),
       top: g + Math.floor(i / 3) * (ch + g),
     });
   }
-  const rows = Math.ceil(slugs.length / 3);
+  const rows = Math.ceil(all.length / 3);
   const file = path.join(WORK, 'sheet.png');
   fs.mkdirSync(WORK, { recursive: true });
   await sharp({
@@ -724,29 +827,36 @@ async function sheet() {
   console.log(path.relative(ROOT, file));
 }
 
-const [command, ...args] = process.argv.slice(2);
-const flags = args.filter((a) => a.startsWith('--'));
-const words = args.filter((a) => !a.startsWith('--'));
+/**
+ * The datocms CLI calls this function with its client. covers.sh gives the
+ * words of the command in COVERS_ARGS, a JSON list.
+ */
+export default async function (client: Client): Promise<void> {
+  const [command, ...args] = JSON.parse(process.env.COVERS_ARGS ?? '[]') as string[];
+  const flags = args.filter((a) => a.startsWith('--'));
+  const words = args.filter((a) => !a.startsWith('--'));
 
-switch (command) {
-  case 'render':
-    await render(words, { tryOnly: flags.includes('--try') });
-    break;
-  case 'list':
-    list();
-    break;
-  case 'set':
-    await set(words[0]!, words.slice(1));
-    break;
-  case 'recolor':
-    await recolor(words.length ? words : slugsOnDisk());
-    break;
-  case 'sheet':
-    await sheet();
-    break;
-  default:
-    console.log(
-      'Usage: gen.ts render <slug>... [--try] | list | set <slug> key=value... | recolor [<slug>...] | sheet',
-    );
-    process.exitCode = 1;
+  switch (command) {
+    case 'render':
+      await render(client, words, {
+        tryOnly: flags.includes('--try'),
+        theme: flags.find((f) => f.startsWith('--theme='))?.slice('--theme='.length),
+        variant: flags.find((f) => f.startsWith('--variant='))?.slice('--variant='.length),
+      });
+      break;
+    case 'list':
+      await list(client);
+      break;
+    case 'set':
+      await set(client, words[0]!, words.slice(1));
+      break;
+    case 'sheet':
+      await sheet(client);
+      break;
+    default:
+      console.log(
+        'Usage: covers.sh render <slug>... [--try] [--theme=<theme>] [--variant=<name>] | list | set <slug> key=value... | sheet',
+      );
+      process.exitCode = 1;
+  }
 }

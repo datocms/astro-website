@@ -1,3 +1,4 @@
+import { PixelCoverFragment } from '~/components/PixelCover';
 import { graphql } from '~/lib/datocms/graphql';
 
 /*
@@ -6,19 +7,23 @@ import { graphql } from '~/lib/datocms/graphql';
  * gives a CustomerStoryRecord.
  */
 
-export const PostHeaderFragment = graphql(/* GraphQL */ `
-  fragment PostHeaderFragment on BlogPostRecord {
-    title
-    _firstPublishedAt
-    _createdAt
-    author {
-      name
-      avatar {
-        url(imgixParams: { w: 80, h: 80, fit: crop })
+export const PostHeaderFragment = graphql(
+  /* GraphQL */ `
+    fragment PostHeaderFragment on BlogPostRecord {
+      title
+      _firstPublishedAt
+      _createdAt
+      ...PixelCoverFragment
+      author {
+        name
+        avatar {
+          url(imgixParams: { w: 80, h: 80, fit: crop })
+        }
       }
     }
-  }
-`);
+  `,
+  [PixelCoverFragment],
+);
 
 /** A casual chat: the model CustomerStory. */
 export const ChatHeaderFragment = graphql(/* GraphQL */ `

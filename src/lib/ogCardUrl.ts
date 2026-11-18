@@ -34,3 +34,22 @@ export function ogCardUrl(
   );
   return url.toString();
 }
+
+/**
+ * The data of the OG image of an article: its cover, drawn on the server.
+ * A post gives the file of its pixel cover. A chat gives the portraits of
+ * its guests. The URLs are on the asset CDN of DatoCMS.
+ */
+export type OgCoverData =
+  | { kind: 'post'; cover: string; theme: Theme }
+  | { kind: 'chat'; portraits: string[]; theme: Theme };
+
+export function ogCoverUrl(data: OgCoverData, astroOrRequest: AstroGlobal | Request): string {
+  const url = new URL('/og-card/cover.png', baseUrl(astroOrRequest));
+  const clean =
+    data.kind === 'post'
+      ? { ...data, cover: stripStega(data.cover) }
+      : { ...data, portraits: data.portraits.map((portrait) => stripStega(portrait)) };
+  url.searchParams.set('data', Buffer.from(JSON.stringify(clean)).toString('base64'));
+  return url.toString();
+}

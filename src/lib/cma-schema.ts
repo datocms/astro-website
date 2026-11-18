@@ -166,20 +166,26 @@ export type BlogPost = ItemTypeDefinition<
     seo_h1: {
       type: 'string';
     };
+    pixel_cover: {
+      type: 'file';
+    };
     seo_settings: {
       type: 'seo';
     };
-    title: {
+    theme: {
       type: 'string';
-    };
-    slug: {
-      type: 'slug';
     };
     yoast_analysis: {
       type: 'json';
     };
     canonical_url: {
       type: 'string';
+    };
+    title: {
+      type: 'string';
+    };
+    slug: {
+      type: 'slug';
     };
     excerpt: {
       type: 'structured_text';

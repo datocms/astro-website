@@ -1,12 +1,11 @@
 ---
+import { themeFromSlug } from '~/lib/theme';
 import { ChatCover } from '~/components/ChatCover';
-import { PixelCover } from '~/components/PixelCover';
+import { PixelCover, pixelCover } from '~/components/PixelCover';
 import { PlainText } from '~/components/StructuredText';
 import { buildUrlForBlogPost } from '~/lib/datocms/gqlUrlBuilder/blogPost';
 import { buildUrlForCustomerStory } from '~/lib/datocms/gqlUrlBuilder/customerStory';
 import { readFragment } from '~/lib/datocms/graphql';
-import { blogCoverForHref } from '~/data/blogCovers';
-import { chatCoverTheme } from '~/data/chatCoverThemes';
 import { formatLongDate } from '~/lib/format/date';
 import { ChatCardFragment, PostCardFragment } from './graphql';
 import { maxAvatars, shortByline } from './names';
@@ -42,11 +41,13 @@ const people = chat ? chat.people : post!.author;
 const short = shortByline(people.map((person) => person.name));
 const shown = people.slice(0, maxAvatars);
 const isFeatured = variant === 'featured';
-// A featured cell shows the cover of the post when the post has one.
-const cover = isFeatured && post ? blogCoverForHref(href) : undefined;
+// A cell shows the cover of the post when the post has one.
+// TEMPORARY: the dense cells show it too, for the review of the covers. The
+// design shows it only in a featured cell (`isFeatured &&`).
+const showPostCover = post !== undefined && pixelCover(post) !== undefined;
 // A featured chat shows the portraits of its guests in speech bubbles.
 const showChatCover = isFeatured && chat !== undefined;
-const hasCover = Boolean(cover) || showChatCover;
+const hasCover = showPostCover || showChatCover;
 ---
 
 <a
@@ -56,12 +57,12 @@ const hasCover = Boolean(cover) || showChatCover;
     isFeatured ? [styles.featured, hasCover ? styles.withCover : styles[tint]] : styles.dense,
   ]}
 >
-  {cover && <PixelCover cover={cover} class={styles.cover} data-cover />}
+  {showPostCover && <PixelCover post={post!} class={styles.cover} data-cover />}
   {
     showChatCover && (
       <ChatCover
         people={chat!.people}
-        theme={chatCoverTheme(href.split('/').pop() ?? '')}
+        theme={themeFromSlug(href.split('/').pop() ?? '')}
         class={styles.cover}
         data-cover
       />
