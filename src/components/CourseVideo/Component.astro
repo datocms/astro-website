@@ -12,24 +12,29 @@ interface Props {
    * `calc(var(--cells) * 3px)` gives squares of 3px to each video.
    */
   class?: string;
+  /**
+   * `tonal`: for the inverse surface. `onAccent`: for the accent
+   * surface.
+   */
+  palette?: 'tonal' | 'onAccent';
 }
 
-const { slug, class: className } = Astro.props;
+const { slug, class: className, palette = 'tonal' } = Astro.props;
 const { src } = courseVideo(slug);
 const cells = pxvHeader(src).height;
 ---
 
 {
   /*
-  The picture of a course: a pixel video with no frame, always in the
-  palette tonal (also the default video, which has another palette).
-  Put it on the inverse surface: the ground of the palette fills the
-  element.
+  The picture of a course: a pixel video with no frame. The palette of the
+  file does not apply: the palette is tonal on the inverse surface, or
+  onAccent on the accent surface. The ground of the palette fills
+  the element.
 */
 }
 <PixelVideo
   src={src}
-  palette="tonal"
+  palette={palette}
   class:list={[styles.video, className]}
   style={`--cells: ${cells}`}
 />

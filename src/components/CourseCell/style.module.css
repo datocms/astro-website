@@ -5,7 +5,7 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* The video is in the palette tonal: its ground is the inverse surface. */
+/* The ground of the picture: the inverse surface, with the video in the palette tonal. */
 .picture {
   display: grid;
   place-items: center;
@@ -30,6 +30,20 @@
   padding: var(--section-padding-y) var(--section-padding-x);
   background: var(--surface-default);
   color: var(--text-primary);
+}
+
+/*
+ * The grounds `bright`: the picture is on the accent, the text on the
+ * faint tint. Two classes: the rules must win over `.picture` and `.text`
+ * above, in this file.
+ */
+.bright .picture {
+  background: var(--surface-accent);
+  color: var(--text-on-accent);
+}
+
+.bright .text {
+  background: var(--surface-accent-faint);
 }
 
 .intro {
@@ -61,17 +75,20 @@
 
 .list {
   list-style: none;
-  border-bottom: 1px solid var(--border-default);
 }
 
-/* A row is the full link: a number, the title and an arrow. */
+/*
+ * A row is the full link: a number, the title and an arrow. The arrow is
+ * directly after the title: the two read as one link. Space separates two
+ * rows: there are no lines.
+ */
 .chapter {
   display: grid;
-  grid-template-columns: 2.5ch minmax(0, 1fr) auto;
+  grid-template-columns: 2.5ch fit-content(100%) auto;
+  justify-content: start;
   align-items: baseline;
-  gap: var(--space-sm);
-  padding-block: var(--space-sm);
-  border-top: 1px solid var(--border-default);
+  column-gap: var(--space-sm);
+  padding-block: var(--space-2xs);
   color: var(--text-primary);
   text-decoration: none;
 }

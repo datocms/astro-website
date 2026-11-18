@@ -20,10 +20,23 @@ interface Props {
   variant?: 'index' | 'course';
   /** The picture is at the right (from 1152). The index alternates the sides. */
   reverse?: boolean;
+  /**
+   * The grounds of the two cells. `deep`: the picture on the inverse
+   * surface, the text on the page. `bright`: the picture on the accent,
+   * the text on the faint tint of the accent. Use `bright` below a hero on
+   * the page ground: no cell then has the colour of the hero.
+   */
+  ground?: 'deep' | 'bright';
   class?: string;
 }
 
-const { course: courseProp, variant = 'index', reverse = false, class: className } = Astro.props;
+const {
+  course: courseProp,
+  variant = 'index',
+  reverse = false,
+  ground = 'deep',
+  class: className,
+} = Astro.props;
 const course = readFragment(CourseCellFragment, courseProp);
 const { slug } = readFragment(AcademyCourseUrlFragment, course);
 const href = buildUrlForAcademyCourse(course);
@@ -32,15 +45,26 @@ const count = course.chapters.length;
 
 {
   /*
-  A course of the academy: two flat cells, full bleed. One cell is on
-  the inverse surface and holds the pixel video of the course. The other
-  cell is on the page and holds the chapters, as numbered rows.
+  A course of the academy: two flat cells, full bleed. One cell holds the
+  pixel video of the course, on the inverse surface or on the accent. The
+  other cell holds the chapters, as numbered rows.
   Below 1152 the picture cell comes first, then the text.
 */
 }
-<div class:list={[styles.row, reverse && styles.reverse, className]}>
-  <div class:list={[styles.picture, 'surfaceInverse']}>
-    <CourseVideo slug={slug} class={styles.video} />
+<div
+  class:list={[
+    styles.row,
+    reverse && styles.reverse,
+    ground === 'bright' && styles.bright,
+    className,
+  ]}
+>
+  <div class:list={[styles.picture, ground === 'bright' ? 'surfaceAccent' : 'surfaceInverse']}>
+    <CourseVideo
+      slug={slug}
+      class={styles.video}
+      palette={ground === 'bright' ? 'onAccent' : 'tonal'}
+    />
   </div>
   <div class={styles.text}>
     {
