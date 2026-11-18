@@ -577,7 +577,7 @@ const MARCELO_FINAMOR = '79766956';
 
 export const community: CommunityData = {
   headline: 'Community',
-  // :heart: reads "love" (src/components/Emoji).
+  // :heart: is the pixel 💚 and reads "love" (src/components/Emoji).
   muted: 'Ask us anything. We’d :heart: to help you build.',
   paragraph: 'Connect with developers who already run DatoCMS in production.',
   button: {

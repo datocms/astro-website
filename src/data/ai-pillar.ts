@@ -100,9 +100,8 @@ export const mcp: ChapterLayoutData = {
       // Retries" (checked 2026-10-27). Do not use the block limits of a
       // record: they change soon. The single-page Markdown (the Copy page
       // menu, .md on a URL) is a second idea: not here.
-      // :bleep: reads "*" (src/components/Emoji).
       title: 'All our docs, in one file.',
-      text: 'Point your LLM at `/docs/llms-full.txt` for the full docs, always kept up to date, so it doesn’t hallucinate and make sh:bleep:t up.',
+      text: 'Point your LLM at `/docs/llms-full.txt` for the full docs, always up to date. It reads the answer instead of guessing it.',
     },
   ],
 };
@@ -133,8 +132,7 @@ export const skills: ChapterLayoutData = {
 // and skills run in the assistant you already pay for.
 export const opinion: StatementData = {
   label: 'AI will keep changing. Our philosophy won’t.',
-  // The sparkles around "shiny hype-y" are the irony (src/components/Emoji).
-  // The hyphen of hype-y is a no-break hyphen (U+2011): the y stays on the line.
+  // The pixel sparkles around "boring" are the irony (src/components/Emoji).
   text: 'We don’t switch on any AI features for you. You pick what runs and on which model, and a human gets the final say. We’re happy to be the :sparkle:boring:sparkle: part of your AI stack.',
 };
 

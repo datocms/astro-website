@@ -4,13 +4,19 @@ import styles from './style.module.css';
 
 // A pixel drawing in place of an emoji of the CMS. An emoji without a drawing
 // stays text. The drawings decorate: the words around them say everything.
+// With `animated`, some cells fade out and in, each at its own time. The
+// drawing is complete without JS and with reduced motion.
+// With `trim`, the drawing has no empty columns at its two sides: its width
+// is the width of the art. Without it, the drawing is a square.
 
 interface Props {
   emoji: string;
   class?: string;
+  animated?: boolean;
+  trim?: boolean;
 }
 
-const { emoji, class: className } = Astro.props;
+const { emoji, class: className, animated = false, trim = false } = Astro.props;
 
 // The key has the code points of the emoji, without the variation selector.
 const key = [...emoji]
@@ -18,12 +24,67 @@ const key = [...emoji]
   .filter((codePoint) => codePoint !== 'fe0f')
   .join('-');
 const drawing = (drawings as Record<string, string>)[key];
+
+// The part of the cells that fade.
+const FADING = 0.45;
+
+/** A number from 0 to 1 that is always the same for the same cell. */
+function noise(x: number, y: number, seed: number): number {
+  const n = Math.sin(x * 12.9898 + y * 78.233 + seed * 37.719) * 43758.5453;
+  return n - Math.floor(n);
+}
+
+/**
+ * The drawing with each cell that fades as a rect of its own. Each path of
+ * the drawing is one colour, and each subpath is a row of cells
+ * ("M1 1h3v1h-3z"). The cells that stay are one path for each colour.
+ */
+function animate(svg: string): string {
+  let out = '';
+  for (const [, fill, d] of svg.matchAll(/<path fill="([^"]+)" d="([^"]+)"\/>/g)) {
+    let still = '';
+    for (const [, x0, y, w] of d.matchAll(/M(\d+) (\d+)h(\d+)/g)) {
+      for (let x = Number(x0); x < Number(x0) + Number(w); x++) {
+        const r = noise(x, Number(y), 1);
+        if (r < FADING) {
+          // The time of the loop and the start in it change for each cell.
+          const duration = (1.4 + noise(x, Number(y), 2) * 1.2).toFixed(2);
+          const delay = (noise(x, Number(y), 3) * 2.6).toFixed(2);
+          out += `<rect data-fade x="${x}" y="${y}" width="1" height="1" fill="${fill}" style="animation-duration:${duration}s;animation-delay:-${delay}s"/>`;
+        } else {
+          still += `M${x} ${y}h1v1h-1z`;
+        }
+      }
+    }
+    if (still) out = `<path fill="${fill}" d="${still}"/>` + out;
+  }
+  return out;
+}
+
+const body = drawing && animated ? animate(drawing) : drawing;
+
+/** The viewBox: all the 10 by 10 cells, or only the columns with art. */
+function viewBox(svg: string): string {
+  if (!trim) return '0 0 10 10';
+  const runs = [...svg.matchAll(/M(\d+) \d+h(\d+)/g)];
+  const left = Math.min(...runs.map(([, x]) => Number(x)));
+  const right = Math.max(...runs.map(([, x, w]) => Number(x) + Number(w)));
+  return `${left} 0 ${right - left} 10`;
+}
 ---
 
 {
-  drawing ? (
-    <span class:list={[styles.emoji, className]} aria-hidden="true">
-      <svg viewBox="0 0 10 10" shape-rendering="crispEdges" set:html={drawing} />
+  drawing && animated ? (
+    <pixel-emoji
+      class:list={[styles.emoji, className]}
+      data-trim={trim || undefined}
+      aria-hidden="true"
+    >
+      <svg viewBox={viewBox(drawing)} shape-rendering="crispEdges" set:html={body} />
+    </pixel-emoji>
+  ) : drawing ? (
+    <span class:list={[styles.emoji, className]} data-trim={trim || undefined} aria-hidden="true">
+      <svg viewBox={viewBox(drawing)} shape-rendering="crispEdges" set:html={body} />
     </span>
   ) : (
     <span class={className} aria-hidden="true">
@@ -31,3 +92,21 @@ const drawing = (drawings as Record<string, string>)[key];
     </span>
   )
 }
+
+<script>
+  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  // The cells fade only while the drawing is in the viewport.
+  customElements.define(
+    'pixel-emoji',
+    class extends WebComponent {
+      parsedCallback() {
+        if (prefersReducedMotion()) return;
+        onVisibilityChange(this, (visible) => {
+          this.toggleAttribute('data-playing', visible);
+        });
+      }
+    },
+  );
+</script>
