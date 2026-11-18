@@ -1,100 +1,196 @@
-.column {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xl);
-  max-width: 720px;
-  margin-inline: auto;
+.picker {
+  display: block;
 }
 
-.selects {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-}
-
-.topic {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs);
-}
-
-/* The attribute hidden must win over the display of the class. */
-.topic[hidden],
+/* The attribute hidden must win over the display of the classes. */
+.band[hidden],
+.subtopics[hidden],
+.help[hidden],
 .talk[hidden],
-.shortcuts[hidden] {
+.talkIntro[hidden] {
   display: none;
 }
 
-.selectBox {
-  position: relative;
-  border: 1px solid var(--text-soft);
-  border-radius: var(--radius-md);
+/* A band that the script scrolls to stops below the sticky header, with
+   some air (global.css does the same for the headings with an id). */
+.band,
+.subtopics {
+  scroll-margin-top: var(--sticky-offset);
 }
 
-.selectBox:focus-within {
-  border-color: var(--border-strong);
-  box-shadow: 0 0 0 1px var(--border-strong);
+/*
+ * A split of two halves: the title on the left, the options on the right.
+ * The text of the left half starts at the edge of the centred column, and
+ * the options end at its other edge (--content-inset-half). Below 1152 the
+ * halves stack. The vertical padding keeps the page ground above and below
+ * the options: a chosen option on the accent never touches the accent hero,
+ * and a tinted option never touches the tinted band of the help (DESIGN.md,
+ * "The No Cut-Out Rule").
+ */
+.split {
+  display: grid;
+  grid-template-columns: 1fr;
+  padding-block: var(--section-padding-y);
 }
 
-.select {
-  display: block;
-  width: 100%;
-  margin: 0;
-  padding: var(--space-lg);
-  padding-right: calc(var(--space-lg) + var(--space-xl));
-  border: 0;
-  border-radius: inherit;
-  background: transparent;
-  color: var(--text-primary);
-  font-family: inherit;
-  appearance: none;
-  cursor: pointer;
-}
-
-.select:focus,
-.select:focus-visible {
-  outline: none;
-}
-
-.select option {
-  color: initial;
-}
-
-.chevron {
-  position: absolute;
-  top: 50%;
-  right: var(--space-lg);
-  display: flex;
-  color: var(--text-primary);
-  pointer-events: none;
-  transform: translateY(-50%);
-}
-
-.chevron :global(svg) {
-  width: 14px;
-  height: 14px;
-}
-
-.help {
-  padding: var(--space-lg);
-  border-radius: var(--radius-md);
-  background: var(--surface-accent-faint);
-}
-
-.talk {
+.splitText {
   display: flex;
   flex-direction: column;
   gap: var(--space-xl);
+  padding: 0 var(--section-padding-x) var(--space-2xl);
+}
+
+.splitText > h2 {
+  margin: 0;
+}
+
+/* The question of the subtopics follows the options of the topics: their
+   bottom padding gives the gap. */
+.subtopics {
+  padding-top: 0;
+}
+
+@media (min-width: 1152px) {
+  .split {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .splitText {
+    padding-inline-start: var(--content-inset-half);
+    padding-bottom: 0;
+  }
+}
+
+.shortcuts {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+/* A label never breaks in two lines. */
+.shortcut {
+  white-space: nowrap;
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+/* The options: one row each, full bleed, with alternating tints. */
+.cells {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cell {
+  display: block;
+  padding: var(--space-lg) var(--section-padding-x);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+/* The chosen cell paints the accent. Its class surfaceAccent sets the text
+   roles of the accent. */
+.cell[aria-current] {
+  background: var(--surface-accent);
+  color: var(--text-on-accent);
+}
+
+/* The structure is in :where(): the rule has the specificity of the class,
+   thus the hover below wins. */
+.cell:not([aria-current]):where(.cells > :nth-child(even) > *) {
+  background: var(--surface-accent-faint);
+}
+
+@media (min-width: 1152px) {
+  .cell {
+    padding-inline-end: var(--content-inset-half);
+  }
+}
+
+.cellTitle {
+  max-width: 500px;
+}
+
+/*
+ * A cell that is one link fills with the accent, at once (DESIGN.md,
+ * "Cards / Containers"). The rule sets the text roles that the cell uses
+ * (tokens.css, rule 4).
+ */
+@media (hover: hover) {
+  .cells > li > .cell:hover {
+    background: var(--surface-accent);
+    color: var(--text-on-accent);
+    --text-primary: var(--text-on-accent);
+    --text-muted: var(--text-on-accent-muted);
+  }
+}
+
+.cell:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: -4px;
+}
+
+.help {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  /* The text of the help is a reading column, at the left edge of the
+     content column, as the cells above it. */
+  max-width: var(--reading-max);
+}
+
+.help > h2 {
+  margin: 0;
+}
+
+/*
+ * The title of a band takes the focus after a click (tabindex -1), thus the
+ * keyboard continues from there. It is not a control, and it is not in the
+ * tab order: it shows no ring. The scroll shows where the band is.
+ */
+.picker h2[tabindex='-1']:focus {
+  outline: none;
+}
+
+/* The intro and the form, as on /contact: side by side from 1152. */
+.talk {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+@media (min-width: 1152px) {
+  .talk {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3xl);
+  }
 }
 
 .talkIntro {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
+  max-width: 460px;
 }
 
 .talkIntro > * {
   margin: 0;
+}
+
+.talkText {
+  color: var(--text-soft);
+}
+
+.talkForm {
+  flex: 1 1 auto;
+}
+
+@media (min-width: 1152px) {
+  .talkForm {
+    flex: 0 1 580px;
+  }
 }
 
 .errorId:not([hidden]) {
@@ -109,47 +205,4 @@
 .turnstile[data-visible] {
   padding: var(--space-lg);
   border-bottom: 1px solid var(--text-soft);
-}
-
-/* The links before the choice of a topic: one column on a phone, three
-   columns from 768px. */
-.shortcuts {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.shortcuts ul {
-  display: grid;
-  gap: var(--space-sm);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-@media (min-width: 768px) {
-  .shortcuts ul {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.shortcut {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs);
-  height: 100%;
-  padding: var(--space-lg);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  text-decoration: none;
-}
-
-.shortcut:hover {
-  border-color: var(--border-strong);
-  background: var(--surface-accent-faint);
-}
-
-.shortcutText {
-  color: var(--text-muted);
 }

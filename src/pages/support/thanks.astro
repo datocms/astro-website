@@ -1,9 +1,12 @@
 ---
 // The page after a support request. The action forms.submitSupportRequest
-// sends the visitor here.
+// sends the visitor here. The row of people is the support team of
+// ContactCard (contacts.ts), the same people as on the support form.
 import { ArticleBody } from '~/components/ArticleBody';
+import { ContactPeople } from '~/components/ContactPeople';
 import { Hero } from '~/components/Hero';
 import Layout from '~/layouts/Layout.astro';
+import { replyTime } from '~/data/support';
 import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
 
 const seo = overrideSeo([], seoTitle('Thanks for reaching out'));
@@ -17,17 +20,15 @@ const seo = overrideSeo([], seoTitle('Thanks for reaching out'));
     subheadline="We’re on it."
     face="grateful"
   />
-  <ArticleBody tocTitle="On this page">
+  <ArticleBody>
+    <prose-island data-text-width>
+      <ContactPeople departments={['support']} />
+    </prose-island>
+    <p>We have your request, and a copy is on its way to your inbox.</p>
+    <p>Our support team reads it next. {replyTime}</p>
     <p>
-      We have successfully received your request, and <strong
-        >you will shortly receive an automated confirmation via email</strong
-      >.
-    </p>
-    <p>We take great care of our customers. Our support team will be in touch shortly.</p>
-    <p>
-      In the meantime, you can look for answers in the{' '}
-      <a href="/docs">documentation</a>, or in our{' '}
-      <a href="https://community.datocms.com">community forum</a>.
+      While you wait, the <a href="/docs">docs</a> and the{' '}
+      <a href="https://community.datocms.com">community forum</a> may have the answer already.
     </p>
   </ArticleBody>
 </Layout>

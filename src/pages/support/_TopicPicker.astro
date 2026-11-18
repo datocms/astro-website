@@ -1,20 +1,24 @@
 ---
-// The picker of the support page: the selects of the topics, the help text
-// of the chosen topic and, when the topic needs it, a form. The URL holds
-// the choice (?topics=a/b). The first render follows the URL, as the script
-// does after a change.
-import { ChevronDown } from 'lucide';
+// The picker of the support page, in bands: the grid of the topics, the
+// grid of the subtopics, the help text of the chosen topic (on the faint tint)
+// and, when the topic needs it, a form. Each cell is a link (?topics=a/b),
+// thus the page works without JS: the server renders the choice of the URL.
+// The script does the same render after a click, without a new load.
+import { stripStega } from '@datocms/astro';
 import { render as renderAsHtmlString } from 'datocms-structured-text-to-html-string';
 import { ContactForm } from '~/components/ContactForm';
+import { ContactPeople } from '~/components/ContactPeople';
 import { FormField } from '~/components/FormField';
-import { Icon } from '~/components/Icon';
+import { Headline } from '~/components/Headline';
 import { Prose } from '~/components/Prose';
+import { Section } from '~/components/Section';
 import { contact } from '~/data/contact';
-import { errorIdField, picker, shortcuts, supportForm, talk } from '~/data/support';
+import { errorIdField, picker, shortcuts, supportForm } from '~/data/support';
 import type { ResultOf } from '~/lib/datocms/graphql';
 import type { SupportTopicFragment } from './_graphql';
-import { computeView, parseTopicSlugs, type FormMode, type TopicMeta } from './_state';
+import { computeView, hasErrorId, parseTopicSlugs, type FormMode, type TopicMeta } from './_state';
 import s from './_style.module.css';
+import TopicCell from './_TopicCell.astro';
 
 type Topic = ResultOf<typeof SupportTopicFragment>;
 
@@ -32,163 +36,254 @@ const rootsWithChildren = rootTopics.filter((topic) => childrenOf(topic.slug).le
 
 // The contact form shows when the topic is a leaf. With no guides, it shows
 // at once. With guides, the visitor asks for it (a link, or #form).
-function formModeOf(topic: (typeof topics)[number]): FormMode {
+function formModeOf(topic: Topic): FormMode {
   if (topic.children.length > 0) return 'none';
   if (topic.commonQuestions.length === 0) return topic.disableContactForm ? 'none' : 'auto';
   return 'on-request';
 }
 
+// The departments that answer the form of a topic: its own, else the ones
+// of its parent. They give the faces and the intro above the form.
+function departmentsOf(topic: Topic): Topic['departments'] {
+  if (topic.departments.length > 0) return topic.departments;
+  const parent = topic.parent ? bySlug.get(topic.parent.slug) : undefined;
+  return parent ? departmentsOf(parent) : [];
+}
+
+const formTypeOf = (topic: Topic) => (topic.contactFormType === 'support' ? 'support' : 'sales');
+
+interface Intro {
+  key: string;
+  formType: 'support' | 'sales';
+  departments: string[];
+  title: string;
+  text: string;
+}
+
+// The intro of a topic: the title and the text of its first department.
+function introOf(topic: Topic): Intro {
+  const formType = formTypeOf(topic);
+  const departments = departmentsOf(topic);
+  const slugs = departments.map((department) => stripStega(department.slug ?? ''));
+  return {
+    key: `${formType}:${slugs.join(',')}`,
+    formType,
+    departments: slugs,
+    title: departments[0]?.formTitle ?? '',
+    text: departments[0]?.formText ?? '',
+  };
+}
+
+// One intro for each distinct set of departments of the topics with a form.
+const intros = [
+  ...new Map(
+    topics
+      .filter((topic) => formModeOf(topic) !== 'none')
+      .map((topic) => introOf(topic))
+      .map((intro) => [intro.key, intro]),
+  ).values(),
+];
+
 const metas: TopicMeta[] = topics.map((topic) => ({
   slug: topic.slug,
+  title: stripStega(topic.title ?? ''),
+  parentSlug: topic.parent?.slug,
   childSlugs: childrenOf(topic.slug).map((child) => child.slug),
   formMode: formModeOf(topic),
-  formType: topic.contactFormType === 'support' ? 'support' : 'sales',
+  formType: formTypeOf(topic),
   responder: topic.autoResponderType ?? '',
+  intro: introOf(topic).key,
 }));
 
-// The first render follows the URL, as the script does after a change.
-const view = computeView(metas, parseTopicSlugs(Astro.url.search), false);
+// The first render follows the URL, as the script does after a change. A
+// link with an error ID opens the form.
+const withErrorId = hasErrorId(Astro.url.search);
+const view = computeView(metas, parseTopicSlugs(Astro.url.search), withErrorId);
+const currentIntro = metas.find((meta) => meta.slug === view.leafSlug)?.intro;
+const formModeBySlug = new Map(metas.map((meta) => [meta.slug, meta.formMode]));
 const hasHelp = (topic: (typeof topics)[number]) =>
   topic.commonQuestions.length > 0 || Boolean(topic.description);
+const helpSlugs = new Set(topics.filter(hasHelp).map((topic) => topic.slug));
 ---
 
-<topic-picker class={s.column}>
+<topic-picker class={s.picker}>
   <script type="application/json" id="topics-data" set:html={JSON.stringify(metas)} />
 
-  <div class={s.selects}>
-    <div class={s.topic}>
-      <label class="labelMedium" for="topic-0">{picker.topicLabel}</label>
-      <div class={s.selectBox}>
-        <select id="topic-0" class:list={['body', s.select]} autocomplete="off" data-level="0">
-          <option value="empty" disabled selected={!view.rootSlug}>{picker.placeholder}</option>
-          {
-            rootTopics.map((topic) => (
-              <option value={topic.slug} selected={view.rootSlug === topic.slug}>
-                {topic.title}
-              </option>
-            ))
-          }
-        </select>
-        <span class={s.chevron}><Icon icon={ChevronDown} /></span>
-      </div>
-    </div>
-    {
-      rootsWithChildren.map((root) => (
-        <div class={s.topic} data-subtopics={root.slug} hidden={view.subtopicsOf !== root.slug}>
-          <label class="labelMedium" for={`topic-1-${root.slug}`}>
-            {root.subtopicQuestion}
-          </label>
-          <div class={s.selectBox}>
-            <select
-              id={`topic-1-${root.slug}`}
-              class:list={['body', s.select]}
-              autocomplete="off"
-              data-level="1"
-            >
-              <option value="empty" disabled selected={!view.subSlug}>
-                {picker.placeholder}
-              </option>
-              {childrenOf(root.slug).map((topic) => (
-                <option value={topic.slug} selected={view.subSlug === topic.slug}>
-                  {topic.title}
-                </option>
-              ))}
-            </select>
-            <span class={s.chevron}>
-              <Icon icon={ChevronDown} />
-            </span>
-          </div>
-        </div>
-      ))
-    }
-  </div>
+  <p class="visuallyHidden" aria-live="polite" data-status></p>
 
-  <nav
-    class={s.shortcuts}
-    aria-labelledby="support-shortcuts"
-    hidden={Boolean(view.rootSlug)}
-    data-shortcuts
-  >
-    <h2 id="support-shortcuts" class="labelMedium">{shortcuts.title}</h2>
-    <ul>
+  {/* A split: the title on the left, the options on the right. */}
+  <div class={s.split}>
+    <div class={s.splitText}>
+      <Headline as="h2" size="headline">{picker.heading}</Headline>
+      <nav aria-label="Shortcuts">
+        <p class:list={['labelMedium', s.shortcuts]}>
+          {
+            shortcuts.map((part) =>
+              'href' in part ? (
+                <a href={part.href} class={s.shortcut}>
+                  {part.label}
+                </a>
+              ) : (
+                part.text
+              ),
+            )
+          }
+        </p>
+      </nav>
+    </div>
+    <ul class={s.cells}>
       {
-        shortcuts.items.map((item) => (
+        rootTopics.map((topic) => (
           <li>
-            <a href={item.href} class={s.shortcut}>
-              <span class="labelMedium">{item.label}</span>
-              <span class:list={[s.shortcutText, 'caption']}>{item.text}</span>
-            </a>
+            <TopicCell
+              href={`?topics=${topic.slug}`}
+              slug={topic.slug}
+              level={0}
+              current={view.rootSlug === topic.slug}
+              title={topic.title}
+            />
           </li>
         ))
       }
     </ul>
-  </nav>
-
+  </div>
   {
-    topics.filter(hasHelp).map((topic) => (
-      <div class={s.help} data-topic={topic.slug} hidden={view.leafSlug !== topic.slug}>
-        <Prose>
-          {topic.description && <Fragment set:html={renderAsHtmlString(topic.description) ?? ''} />}
-          {topic.commonQuestions.length > 0 && (
-            <>
-              <h3>{picker.guidesTitle}</h3>
-              <p>{picker.guidesText}</p>
-              <ul>
-                {topic.commonQuestions.map((question) => (
-                  <li id={question.url}>
-                    <a href={question.url}>{question.title}</a>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-          {topic.children.length === 0 && !topic.disableContactForm && (
-            <>
-              <h3>{picker.moreTitle}</h3>
-              <ul>
-                <li>
-                  <a href="#form" data-open-form>
-                    {picker.moreLink}
-                  </a>
-                </li>
-              </ul>
-            </>
-          )}
-        </Prose>
+    rootsWithChildren.map((root) => (
+      <div
+        class:list={[s.split, s.subtopics]}
+        data-subtopics={root.slug}
+        hidden={view.subtopicsOf !== root.slug}
+      >
+        <div class={s.splitText}>
+          <h2 class="section" tabindex="-1">
+            {root.subtopicQuestion}
+          </h2>
+        </div>
+        <ul class={s.cells}>
+          {childrenOf(root.slug).map((topic) => (
+            <li>
+              <TopicCell
+                href={`?topics=${root.slug}/${topic.slug}`}
+                slug={topic.slug}
+                level={1}
+                current={view.subSlug === topic.slug}
+                title={topic.title}
+              />
+            </li>
+          ))}
+        </ul>
       </div>
     ))
   }
 
-  <div class={s.talk} id="form" hidden={!view.form} data-form-region>
-    <div class={s.talkIntro}>
-      <h2 class="title">{talk.title}</h2>
-      <p class="labelMedium">{talk.text}</p>
-    </div>
-
-    <div data-form-kind="support" hidden={view.form !== 'support'}>
-      <ContactForm {...supportForm} external idPrefix="support">
-        <input slot="extra" type="hidden" name="issueType" />
-        <div slot="extra" class={s.errorId} data-error-id hidden>
-          <FormField {...errorIdField} id="support-errorId" />
+  <Section
+    background="accent-faint"
+    class={s.band}
+    hidden={!view.leafSlug || !helpSlugs.has(view.leafSlug)}
+    data-help-band
+  >
+    {
+      topics.filter(hasHelp).map((topic) => (
+        <div class={s.help} data-topic={topic.slug} hidden={view.leafSlug !== topic.slug}>
+          <h2 class="headline" tabindex="-1">
+            {topic.title}
+          </h2>
+          <Prose>
+            {topic.description && (
+              <Fragment set:html={renderAsHtmlString(topic.description) ?? ''} />
+            )}
+            {topic.commonQuestions.length > 0 && (
+              <>
+                <h3>{picker.guidesTitle}</h3>
+                <p>{picker.guidesText}</p>
+                <ul>
+                  {topic.commonQuestions.map((question) => (
+                    <li id={question.url}>
+                      <a href={question.url}>{question.title}</a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {/* When the form opens at once, it is already below: no link. */}
+            {formModeBySlug.get(topic.slug) === 'on-request' && (
+              <p>
+                {picker.moreTitle}{' '}
+                <a href="#form" data-open-form>
+                  {picker.moreLink}
+                </a>
+              </p>
+            )}
+          </Prose>
         </div>
-        <div slot="extra" class={s.turnstile} data-turnstile></div>
-      </ContactForm>
+      ))
+    }
+  </Section>
+
+  <Section id="form" class:list={[s.band, s.formRegion]} hidden={!view.form} data-form-region>
+    <div class={s.talk} data-form-kind="support" hidden={view.form !== 'support'}>
+      {
+        /* One intro for each set of departments. The script shows the
+          intro of the chosen topic. */
+      }
+      {
+        intros
+          .filter((intro) => intro.formType === 'support')
+          .map((intro) => (
+            <div class={s.talkIntro} data-intro={intro.key} hidden={intro.key !== currentIntro}>
+              <h2 class="headline" tabindex="-1">
+                {intro.title}
+              </h2>
+              <ContactPeople departments={intro.departments} />
+              {intro.text && <p class:list={['body', s.talkText]}>{intro.text}</p>}
+            </div>
+          ))
+      }
+      <div class={s.talkForm}>
+        <ContactForm {...supportForm} external idPrefix="support">
+          <div slot="start" class={s.errorId} data-error-id hidden={!withErrorId}>
+            <FormField {...errorIdField} id="support-errorId" />
+          </div>
+          <input slot="extra" type="hidden" name="issueType" />
+          <div slot="extra" class={s.turnstile} data-turnstile></div>
+        </ContactForm>
+      </div>
     </div>
 
-    <div data-form-kind="sales" hidden={view.form !== 'sales'}>
-      <ContactForm {...contact.form} external idPrefix="sales">
-        <input slot="extra" type="hidden" name="issueType" value="sales" />
-        <div slot="extra" class={s.turnstile} data-turnstile></div>
-      </ContactForm>
+    <div class={s.talk} data-form-kind="sales" hidden={view.form !== 'sales'}>
+      {
+        /* One intro for each set of departments. The script shows the
+          intro of the chosen topic. */
+      }
+      {
+        intros
+          .filter((intro) => intro.formType === 'sales')
+          .map((intro) => (
+            <div class={s.talkIntro} data-intro={intro.key} hidden={intro.key !== currentIntro}>
+              <h2 class="headline" tabindex="-1">
+                {intro.title}
+              </h2>
+              <ContactPeople departments={intro.departments} />
+              {intro.text && <p class:list={['body', s.talkText]}>{intro.text}</p>}
+            </div>
+          ))
+      }
+      <div class={s.talkForm}>
+        <ContactForm {...contact.form} external idPrefix="sales">
+          <input slot="extra" type="hidden" name="issueType" value="sales" />
+          <div slot="extra" class={s.turnstile} data-turnstile></div>
+        </ContactForm>
+      </div>
     </div>
-  </div>
+  </Section>
 </topic-picker>
 
 <script>
   import { actions } from 'astro:actions';
   import { connectExternalForm, savedAccountEmail } from '~/lib/externalForm';
+  import { picker } from '~/data/support';
   import { WebComponent } from '~/lib/WebComponent';
-  import { computeView, parseTopicSlugs, type TopicMeta } from './_state';
+  import { computeView, hasErrorId, parseTopicSlugs, type TopicMeta } from './_state';
 
   customElements.define(
     'topic-picker',
@@ -196,64 +291,131 @@ const hasHelp = (topic: (typeof topics)[number]) =>
       parsedCallback() {
         const metas: TopicMeta[] = JSON.parse(this.$('#topics-data').textContent ?? '[]');
 
-        // The visitor asked for the form with the link, or with #form.
-        let formRequested = window.location.hash === '#form';
+        // The visitor asked for the form with the link, or with #form. A link
+        // from the dashboard with an error ID also opens the form.
+        let formRequested = window.location.hash === '#form' || hasErrorId(window.location.search);
 
-        const topicSelect = this.$<HTMLSelectElement>('select[data-level="0"]');
+        const cells = this.$$('a[data-topic-link]');
+        const intros = this.$$('[data-intro]');
         const groups = this.$$('[data-subtopics]');
+        const helpBand = this.$('[data-help-band]');
         const helps = this.$$('[data-topic]');
-        const shortcutsNav = this.$('[data-shortcuts]');
         const region = this.$('[data-form-region]');
         const forms = this.$$('[data-form-kind]');
         const support = this.$('[data-form-kind="support"]');
         const issueType = this.$<HTMLInputElement>(
           '[data-form-kind="support"] input[name="issueType"]',
         );
+        const status = this.$('[data-status]');
+        const titleOf = (slug: string | undefined) =>
+          metas.find((meta) => meta.slug === slug)?.title ?? '';
 
-        const render = (scroll = false) => {
-          const view = computeView(metas, parseTopicSlugs(window.location.search), formRequested);
-          topicSelect.value = view.rootSlug ?? 'empty';
-          for (const group of groups) {
-            const visible = group.dataset.subtopics === view.subtopicsOf;
-            group.hidden = !visible;
-            const select = group.querySelector('select');
-            if (visible && select) select.value = view.subSlug ?? 'empty';
+        // After the choice of a topic, a screen reader reads what is now below.
+        const announce = (view: ReturnType<typeof computeView>) => {
+          const hasHelp = helps.some((help) => help.dataset.topic === view.leafSlug);
+          const topic = titleOf(view.leafSlug);
+          if (view.subtopicsOf && !view.subSlug) {
+            status.textContent = picker.status.subtopics(titleOf(view.subtopicsOf));
+          } else if (hasHelp && view.form) {
+            status.textContent = picker.status.helpAndForm(topic);
+          } else if (hasHelp) {
+            status.textContent = picker.status.help(topic);
+          } else if (view.form) {
+            status.textContent = picker.status.form(topic);
+          } else {
+            status.textContent = '';
           }
-          shortcutsNav.hidden = Boolean(view.rootSlug);
-          for (const help of helps) help.hidden = help.dataset.topic !== view.leafSlug;
+        };
+
+        const render = (scroll?: 'next' | 'form') => {
+          const view = computeView(metas, parseTopicSlugs(window.location.search), formRequested);
+          // The chosen cell of each grid is on the accent (TopicCell).
+          for (const cell of cells) {
+            const chosen = cell.dataset.level === '0' ? view.rootSlug : view.subSlug;
+            const current = cell.dataset.topicLink === chosen;
+            cell.toggleAttribute('aria-current', current);
+            if (current) cell.setAttribute('aria-current', 'true');
+            cell.classList.toggle('surfaceAccent', current);
+          }
+          for (const group of groups) group.hidden = group.dataset.subtopics !== view.subtopicsOf;
+          let help: HTMLElement | undefined;
+          for (const block of helps) {
+            block.hidden = block.dataset.topic !== view.leafSlug;
+            if (!block.hidden) help = block;
+          }
+          helpBand.hidden = !help;
           region.hidden = !view.form;
           for (const form of forms) form.hidden = form.dataset.formKind !== view.form;
 
           // The hidden field gives the auto-responder of the topic to the action.
           const leaf = metas.find((meta) => meta.slug === view.leafSlug);
           issueType.value = leaf?.responder ?? '';
+          for (const intro of intros) intro.hidden = intro.dataset.intro !== leaf?.intro;
 
-          if (scroll && view.form) {
-            region.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+          // After a click, the page scrolls to the band that now follows, and
+          // the focus goes to its title, thus the keyboard continues there.
+          // 'next': the subtopics, else the help, else the form. 'form': the
+          // form only (the link "Contact our support team", or #form).
+          if (scroll) {
+            const subtopics =
+              view.subtopicsOf && !view.subSlug ? groups.find((group) => !group.hidden) : undefined;
+            const form = view.form ? this.$(`[data-form-kind="${view.form}"]`) : undefined;
+            const [band, block] =
+              scroll === 'form'
+                ? [region, form]
+                : subtopics
+                  ? [subtopics, subtopics]
+                  : help
+                    ? [helpBand, help]
+                    : [region, form];
+            if (block) {
+              band.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              block
+                .querySelector<HTMLElement>(':not([hidden]) > h2')
+                ?.focus({ preventScroll: true });
+            }
           }
+          return view;
         };
 
-        // A change of a select keeps the other parameters and the hash of the URL.
-        this.on(this, 'change', 'select[data-level]', (_event, select) => {
-          if (!(select instanceof HTMLSelectElement)) return;
+        // A click on a cell changes the URL without a new load. The URL keeps
+        // its other parameters (the fields that a link from the dashboard
+        // fills). A click with a modifier key opens the link as usual.
+        this.on(this, 'click', 'a[data-topic-link]', (event: MouseEvent, cell: HTMLElement) => {
+          if (
+            event.button !== 0 ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey
+          )
+            return;
+          event.preventDefault();
           formRequested = false;
           const url = new URL(window.location.href);
-          const current = parseTopicSlugs(url.search);
-          const slugs =
-            select.dataset.level === '0' ? [select.value] : [current[0] ?? '', select.value];
-          url.searchParams.set('topics', slugs.join('/'));
+          // The href of the cell has the full path of the topic (?topics=a/b).
+          // The other parameters of the URL stay.
+          const href = new URL(cell.getAttribute('href') ?? '', url);
+          url.searchParams.set('topics', href.searchParams.get('topics') ?? '');
+          url.hash = '';
           window.history.pushState({}, '', url);
-          render();
+          announce(render('next'));
         });
 
         this.on(this, 'click', '[data-open-form]', (event) => {
           event.preventDefault();
           formRequested = true;
-          render(true);
+          render('form');
         });
 
         window.addEventListener('popstate', () => render());
-        render(formRequested);
+        // A link to #form after the load also opens the form.
+        window.addEventListener('hashchange', () => {
+          if (window.location.hash !== '#form') return;
+          formRequested = true;
+          render('form');
+        });
+        render(formRequested ? 'form' : undefined);
 
         // Fill the support form from the URL: a link from the dashboard can
         // carry the e-mail, the project, the subject, the text and an error ID.
@@ -269,7 +431,6 @@ const hasHelp = (topic: (typeof topics)[number]) =>
         fill('subject', params.get('subject'));
         fill('body', params.get('body'));
         fill('errorId', params.get('errorId'));
-        if (params.get('errorId')) this.$('[data-error-id]').hidden = false;
 
         for (const form of forms) {
           const kind = form.dataset.formKind;

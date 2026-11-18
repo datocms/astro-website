@@ -3,11 +3,11 @@ import { ButtonGroup } from '~/components/ButtonGroup';
 import { Face } from '~/components/Face';
 import { Headline } from '~/components/Headline';
 import { LogosLine } from '~/components/LogosLine';
-import { stripStega } from '@datocms/astro';
 import { ResponsiveImage } from '~/components/ResponsiveImage';
 import { Section } from '~/components/Section';
 import type { HeroData } from '~/data/home';
 import { HERO_MAX_CHARS, faceFollowsSentence, heroLength } from '~/lib/hero';
+import { shortNames } from '~/lib/shortNames';
 import { readFragment, type FragmentOf } from '~/lib/datocms/graphql';
 import { faceStep, faces } from '~/lib/motion/faces';
 import type { Step } from '~/lib/motion/typewriter';
@@ -59,18 +59,9 @@ const members = (Astro.props.team ?? []).map((member) =>
   readFragment(HeroTeamMemberFragment, member),
 );
 
-// The row shows first names. When two people have the same first name, the
-// name gets the initial of the last name ("Matteo B."). In draft mode, the
-// name ends with the stega of Content Link: the short name keeps it.
-const words = (name: string) => stripStega(name).split(' ');
-const firstName = (name: string) => words(name)[0] ?? name;
-const shortName = (name: string) => {
-  const first = firstName(name);
-  const initial = words(name).at(-1)?.[0];
-  const isShared = members.filter((other) => firstName(other.name) === first).length > 1;
-  const stega = name.slice(stripStega(name).length);
-  return (isShared && initial ? `${first} ${initial}.` : first) + stega;
-};
+// The row shows first names, with an initial when a first name repeats.
+const short = shortNames(members.map((member) => member.name));
+const shortName = (name: string) => short[members.findIndex((member) => member.name === name)];
 
 // Times are from the start of the page.
 // Without a subheadline, the script ends after the headline.

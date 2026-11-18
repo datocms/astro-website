@@ -18,8 +18,10 @@ import styles from './style.module.css';
  * posts to the same page, which then shows the success state.
  *
  * With `external`, the page sends the data: see
- * ./types.ts. The slot `extra` goes at the end of
- * the box, before the submit row: hidden inputs, an anti-bot widget.
+ * ./types.ts. The slot `start` goes at the start of the box, before the
+ * first row: a field that the page fills, for example an error ID. The slot
+ * `extra` goes at the end of the box, before the submit row: hidden inputs,
+ * an anti-bot widget.
  */
 type Props = ContactFormData & {
   /** Show the success state (the page sets it after a POST without JS). */
@@ -72,6 +74,7 @@ const needsScript = external && noscriptMessage !== undefined;
     data-form
   >
     <FormBox>
+      <slot name="start" />
       {
         rows.map((row) => (
           <FormRow>

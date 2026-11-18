@@ -9,7 +9,7 @@ import type { HeroData } from '~/data/home';
  */
 
 export const seo = {
-  title: 'Support page',
+  title: 'Support',
 };
 
 export const hero: HeroData = {
@@ -20,38 +20,41 @@ export const hero: HeroData = {
 };
 
 export const picker = {
-  topicLabel: 'Topic:',
-  placeholder: 'Please select a topic…',
+  /** The heading of the grid of topics. */
+  heading: 'Pick a topic.',
   guidesTitle: 'Popular guides and tutorials',
-  guidesText:
-    'Please take a look at these resources, as they’re probably the fastest way to solve your issue.',
-  moreTitle: 'Didn’t find what you’re looking for?',
+  guidesText: 'The fastest answer is often in these guides.',
+  moreTitle: 'Didn’t find it?',
   moreLink: 'Contact our support team',
+  /**
+   * The text that a screen reader reads after the choice of a topic. The
+   * text is not visible: the visitor sees the change.
+   */
+  status: {
+    helpAndForm: (topic: string) => `The help for ${topic} and the form are below.`,
+    help: (topic: string) => `The help for ${topic} is below.`,
+    form: (topic: string) => `The form for ${topic} is below.`,
+    subtopics: (topic: string) => `Choose the kind of ${topic} below.`,
+  },
 };
 
-// The links below the select before the visitor chooses a topic. They
-// answer the usual questions without a request.
-export const shortcuts = {
-  title: 'Or look here first',
-  items: [
-    { label: 'Docs', text: 'Guides, tutorials and the API reference.', href: '/docs' },
-    {
-      label: 'Community forum',
-      text: 'Ask other developers and search old answers.',
-      href: 'https://community.datocms.com',
-    },
-    {
-      label: 'Status page',
-      text: 'Is it us? See the state of each service.',
-      href: 'https://status.datocms.com',
-    },
-  ],
-};
+// The usual reply time of the support team. The page after the form
+// (/support/thanks) shows it. The text above the support form is in the
+// CMS (the Support department) and gives the same time.
+export const replyTime = 'Expect a reply in less than 10 hours.';
 
-export const talk = {
-  title: 'Talk with us.',
-  text: 'Our experts are available to answer any of your questions. We’re available in a number of ways, any time that you need us.',
-};
+// One sentence below the heading of the topics, with three links. They
+// answer the usual questions without a request. The parts are text and
+// links, in the order of the sentence.
+export const shortcuts: ({ text: string } | { label: string; href: string })[] = [
+  { text: 'Or go straight to the ' },
+  { label: 'docs', href: '/docs' },
+  { text: ', the ' },
+  { label: 'Community forum', href: 'https://community.datocms.com' },
+  { text: ', or the ' },
+  { label: 'status page', href: 'https://status.datocms.com' },
+  { text: '.' },
+];
 
 const legal = {
   before: 'By submitting you agree to our ',

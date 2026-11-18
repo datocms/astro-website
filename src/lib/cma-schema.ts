@@ -552,6 +552,29 @@ export const Demo = {
   REF: { type: 'item_type', id: '810890' },
 } as const;
 
+export type Department = ItemTypeDefinition<
+  EnvironmentSettings,
+  'aXonkM6xSUGiBSBh33ybvA',
+  {
+    name: {
+      type: 'string';
+    };
+    slug: {
+      type: 'slug';
+    };
+    form_title: {
+      type: 'string';
+    };
+    form_text: {
+      type: 'string';
+    };
+  }
+>;
+export const Department = {
+  ID: 'aXonkM6xSUGiBSBh33ybvA',
+  REF: { type: 'item_type', id: 'aXonkM6xSUGiBSBh33ybvA' },
+} as const;
+
 export type DeployButtonForm = ItemTypeDefinition<
   EnvironmentSettings,
   '810885',
@@ -2812,6 +2835,9 @@ export type SupportTopic = ItemTypeDefinition<
     slug: {
       type: 'slug';
     };
+    departments: {
+      type: 'links';
+    };
     position: {
       type: 'integer';
     };
@@ -2884,6 +2910,9 @@ export type TeamMember = ItemTypeDefinition<
     };
     role: {
       type: 'string';
+    };
+    departments: {
+      type: 'links';
     };
     position: {
       type: 'integer';
@@ -3455,6 +3484,7 @@ export type AnyModel =
   | Customer
   | CustomerStoriesIndex
   | CustomerStory
+  | Department
   | DocGroup
   | DocPage
   | DocsPage

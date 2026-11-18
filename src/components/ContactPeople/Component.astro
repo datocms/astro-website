@@ -1,0 +1,38 @@
+---
+import { Avatar } from '~/components/Avatar';
+import { fetchDepartments } from '~/components/ContactCard';
+import styles from './style.module.css';
+
+interface Props {
+  /** The slugs of the departments that answer the form (Department records). */
+  departments: string[];
+  class?: string;
+}
+
+/*
+ * The people who answer a form: their photos, their names and the team.
+ * The people are the team members of the departments, as in ContactCard,
+ * but this row is always visible. When no person has a photo, the row
+ * shows nothing. The names are next to the photos, thus the photos are
+ * aria-hidden. The Markdown version of the page does not show the row: the
+ * text near it names the team.
+ */
+const { departments, class: className } = Astro.props;
+const person = await fetchDepartments(Astro, departments);
+---
+
+{
+  person && (
+    <div class:list={[styles.people, className]} data-datocms-nomd>
+      <span class={styles.faces} aria-hidden="true">
+        {person.people.map((p) => (
+          <Avatar name={p.name} src={p.portrait} size={48} tint />
+        ))}
+      </span>
+      <span class={styles.who}>
+        <span class="labelMedium">{person.names}</span>
+        <span class:list={[styles.role, 'label']}>{person.role}</span>
+      </span>
+    </div>
+  )
+}

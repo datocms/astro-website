@@ -27,6 +27,11 @@ export const SupportTopicFragment = graphql(/* GraphQL */ `
     children {
       slug
     }
+    departments {
+      slug
+      formTitle
+      formText
+    }
   }
 `);
 

@@ -1,0 +1,32 @@
+---
+// A cell of a grid of topics: a link to the topic (?topics=a/b). The chosen
+// cell is on the accent (surfaceAccent) and has aria-current. The script of
+// TopicPicker changes the two after a click.
+import s from './_style.module.css';
+
+interface Props {
+  href: string;
+  slug: string;
+  /** 0: a topic of the first grid. 1: a subtopic. */
+  level: 0 | 1;
+  current: boolean;
+  title: string | null;
+}
+
+const { href, slug, level, current, title } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={[s.cell, current && 'surfaceAccent']}
+  aria-current={current ? 'true' : undefined}
+  data-topic-link={slug}
+  data-level={level}
+>
+  <span class:list={[s.cellTitle, level === 0 ? 'title' : 'titleSmall']}>
+    {/* The Markdown version keeps only the title in the link. */}
+    <span data-datocms-link-text>{title}</span><span aria-hidden="true" data-datocms-nomd
+      >&nbsp;→</span
+    >
+  </span>
+</a>
