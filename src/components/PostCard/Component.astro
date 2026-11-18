@@ -41,10 +41,8 @@ const people = chat ? chat.people : post!.author;
 const short = shortByline(people.map((person) => person.name));
 const shown = people.slice(0, maxAvatars);
 const isFeatured = variant === 'featured';
-// A cell shows the cover of the post when the post has one.
-// TEMPORARY: the dense cells show it too, for the review of the covers. The
-// design shows it only in a featured cell (`isFeatured &&`).
-const showPostCover = post !== undefined && pixelCover(post) !== undefined;
+// A featured cell shows the cover of the post when the post has one.
+const showPostCover = isFeatured && post !== undefined && pixelCover(post) !== undefined;
 // A featured chat shows the portraits of its guests in speech bubbles.
 const showChatCover = isFeatured && chat !== undefined;
 const hasCover = showPostCover || showChatCover;
