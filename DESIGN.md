@@ -331,7 +331,7 @@ The sizes in the frontmatter are the 1320px values. Each role has a class in `sr
 - **Picture label** (Geist Mono 500, 1.4): text inside drawn pictures only. The `.pictureLabel` class.
 - **Tabular**: a treatment, not a role. `.tabular` goes on a role: prices, counts, dates, stats.
 
-**Dark grounds.** On `.surfaceInverse` and in the dark scheme, body, long body and caption get +0.05 line height and +0.01em tracking, and mono text on the page is 500 (`--type-leading-dark`, `--type-tracking-dark` and `--type-mono-weight` in `tokens.css`).
+**Dark grounds.** On `.surfaceInverse` and in the dark scheme, body, long body and caption get +0.01em tracking (the line height stays the same, thus the text has the same height on all the grounds), and mono text on the page is 500 (`--type-tracking-dark` and `--type-mono-weight` in `tokens.css`).
 
 **Floors.** Outside a picture, no text is under 13px on phones and 14px on desktop. Inside a picture, 11px and 12px.
 
