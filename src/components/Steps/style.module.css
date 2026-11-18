@@ -1,8 +1,10 @@
 /*
- * The headline, then the steps in a row of columns, with a hairline
- * between them. Below 1152 the steps stack, with a hairline between
- * two rows. There is no tint: a tinted cell between two plain cells
- * looks like a card.
+ * The headline, then three steps as a staircase of colour: three cells
+ * from side to side of the page, and the tint goes up with the steps. The
+ * first cell has the faint tint, the second the half tint, the last is
+ * the accent band. Space and colour separate the steps: there are no
+ * lines. Below 1152 the cells stack, and the tint goes up from top to
+ * bottom. The component is for three steps.
  */
 .head {
   padding-bottom: var(--space-2xl);
@@ -13,33 +15,60 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid var(--border-default);
   counter-reset: step;
 }
 
 .step {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-  padding-block: var(--space-xl);
+  padding: var(--section-padding-y) var(--section-padding-x);
+  background: var(--surface-accent-faint);
   counter-increment: step;
 }
 
-.step + .step {
-  border-top: 1px solid var(--border-default);
+.step:nth-child(2) {
+  background: var(--surface-accent-subtle);
 }
 
+/*
+ * The last cell is the accent band. The position gives the ground, thus
+ * the cell cannot take a ground class: it uses the band tokens. Its text
+ * has the full ink of the band.
+ */
+.step:last-child {
+  background: var(--surface-accent-band);
+  color: var(--text-on-accent-band);
+  --text-primary: var(--text-on-accent-band);
+  --text-headline-muted: var(--text-on-accent-band-headline-muted);
+}
+
+/*
+ * The number has the size of a stat and the quiet tone of a headline: it
+ * is the first thing that the eye reads in a cell, and the title is the
+ * second.
+ */
 .step::before {
   content: counter(step, decimal-leading-zero);
-  margin-bottom: var(--space-3xs);
-  font-size: var(--type-xl);
+  margin-bottom: var(--space-xl);
+  font-size: var(--type-4xl);
+  font-weight: 500;
   line-height: 1;
-  color: var(--text-muted);
+  letter-spacing: -0.05em;
+  color: var(--text-headline-muted);
+}
+
+.title {
+  color: var(--text-primary);
 }
 
 .body {
+  margin-top: var(--space-sm);
   max-width: var(--reading-max);
   color: var(--text-soft);
+}
+
+.step:last-child .body {
+  color: var(--text-on-accent-band);
 }
 
 .body :where(p + p) {
@@ -54,29 +83,67 @@
 }
 
 /*
- * From 1152: one column for each step. The outer columns start and end
- * at the edge of the content column. The air between two texts is the
- * same everywhere (--space-2xl), thus the three texts have the same width.
+ * From 1152: three cells in a row. The grid has five columns: a free
+ * column at each side, and three text columns that fill the centred
+ * content column. The first cell covers the free column at the left and
+ * the first text column, the last cell the last text column and the free
+ * column at the right. Each cell is a subgrid, thus its text is in its
+ * text column: the text of the first cell starts at the edge of the
+ * content column, and the text of the last cell ends there. --step-gap is
+ * the space between a text and the edge of the colour of the next cell.
+ * The text columns are not equal: the middle column has the gap on its two
+ * sides, thus the three texts have the same width.
  */
 @media (min-width: 1152px) {
   .list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    --step-gap: var(--space-xl);
+    --step-text: calc((var(--content-max) - 4 * var(--step-gap)) / 3);
+
+    grid-template-columns:
+      minmax(var(--section-padding-x), 1fr)
+      minmax(0, calc(var(--step-text) + var(--step-gap)))
+      minmax(0, calc(var(--step-text) + 2 * var(--step-gap)))
+      minmax(0, calc(var(--step-text) + var(--step-gap)))
+      minmax(var(--section-padding-x), 1fr);
   }
 
   .step {
-    padding: var(--space-xl) calc(var(--space-2xl) / 2) 0;
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-auto-rows: max-content;
+    padding-inline: 0;
   }
 
-  .step + .step {
-    border-top: 0;
-    border-left: 1px solid var(--border-default);
+  .step > *,
+  .step::before {
+    grid-column: 1;
   }
 
   .step:first-child {
-    padding-inline: 0 var(--space-2xl);
+    grid-column: 1 / 3;
+  }
+
+  .step:first-child > *,
+  .step:first-child::before {
+    grid-column: 2;
+    padding-inline-end: var(--step-gap);
+  }
+
+  .step:nth-child(2) {
+    grid-column: 3;
+  }
+
+  .step:nth-child(2) > *,
+  .step:nth-child(2)::before {
+    padding-inline: var(--step-gap);
   }
 
   .step:last-child {
-    padding-inline: var(--space-2xl) 0;
+    grid-column: 4 / 6;
+  }
+
+  .step:last-child > *,
+  .step:last-child::before {
+    padding-inline-start: var(--step-gap);
   }
 }

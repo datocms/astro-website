@@ -100,19 +100,18 @@ export const plans: CtaBannerData = {
 
 export const steps = {
   title: 'Getting started is easy.',
-  muted: 'Join the partner program and get listed as a DatoCMS partner.',
   items: [
     {
       title: 'Submit the form',
-      text: 'Fill in the form below to share some details, and tell us a bit about who you are and what you’re working on.',
+      text: 'Share some details and tell us who you are.',
     },
     {
       title: 'Complete the enrollment',
-      text: 'While you can already enjoy the benefits, activate a paid plan and fill out your public partner profile for us to get you listed.',
+      text: 'Activate a paid plan and fill out your partner profile.',
     },
     {
       title: 'It’s official',
-      text: 'Use the support of our partnership to grow your business. We’ll reach out about co-marketing opportunities.',
+      text: 'We’ll reach out about co-marketing opportunities.',
     },
   ],
 };

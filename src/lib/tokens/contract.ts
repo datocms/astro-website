@@ -179,6 +179,7 @@ export const HEADLINE_MUTED_FILES = [
   'src/components/PricingPlans/style.module.css',
   'src/components/Statement/style.module.css',
   'src/components/ChallengeSolution/style.module.css',
+  'src/components/Steps/style.module.css',
 ];
 
 /** The code card: its text roles on `--code-background`. */
