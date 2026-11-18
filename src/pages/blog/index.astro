@@ -4,7 +4,8 @@ import FeedPage from './_FeedPage.astro';
 import { loadFeedPage } from './_feed';
 
 const feed = await loadFeedPage(Astro, 1, { kind: 'all' });
-if (!feed) {
+// Page 1 is never 'past-end': when it has no cards, the feed has none.
+if (!feed || feed === 'past-end') {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }

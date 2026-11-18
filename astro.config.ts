@@ -567,7 +567,6 @@ export default defineConfig({
     '/marketplace/starters/middleman-portfolio': '/starters',
     '/docs/site-search/excluding-text': '/docs/site-search',
     '/docs/plugin-sdk/field-extension': '/docs/plugin-sdk/field-extensions',
-    '/product-updates/p/1': '/product-updates',
     '/docs/guides/localizing-images': '/docs/general-concepts/media-area#localization',
     '/docs/content-delivery-api/modular-content': '/docs/content-modelling/modular-content',
     '/docs/static-generators/other-ssg/modular-content': '/docs',

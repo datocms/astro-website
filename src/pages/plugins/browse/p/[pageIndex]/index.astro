@@ -17,6 +17,7 @@ import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import type { FragmentOf } from '~/lib/datocms/graphql';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { readPageIndex, redirectToFirstPage } from '~/lib/pageIndex';
 import SearchBox from '../../../_SearchBox.astro';
 import ViewAll from '../../../_ViewAll.astro';
 import { officialAuthorsQuery, perPage, popularQuery, query } from './_graphql';
@@ -26,12 +27,9 @@ export interface Props {
   pageIndex?: number;
 }
 
-if (Astro.params.pageIndex === '1') {
-  avoidAstroTypeCheckBug(notFoundResponse);
-  return notFoundResponse();
-}
-
-const pageIndex = Astro.props.pageIndex || Number.parseInt(Astro.params.pageIndex!) || 1;
+// /plugins/browse renders this page with pageIndex 1.
+const pageIndex = Astro.props.pageIndex ?? readPageIndex(Astro, '/plugins/browse');
+if (pageIndex instanceof Response) return pageIndex;
 const officialOnly = Astro.url.searchParams.get('official') === 'true';
 const sort = Astro.url.searchParams.get('sort');
 const searchText = Astro.url.searchParams.get('s');
@@ -84,6 +82,12 @@ if (!pluginsPage) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
+
+// A page past the last one goes to page 1, with the same search and filters.
+// A list with no plugins has only page 1: it shows the message and the
+// popular plugins.
+const totalPages = Math.max(1, Math.ceil(totalEntries / perPage));
+if (pageIndex > totalPages) return redirectToFirstPage(Astro, '/plugins/browse');
 
 // A search that finds no plugin shows the most popular plugins below the message.
 const popular = plugins.length === 0 ? (await executeQuery(Astro, popularQuery)).popular : [];
@@ -171,7 +175,7 @@ const trail =
       }
       <Pagination
         current={pageIndex}
-        total={Math.ceil(totalEntries / perPage)}
+        total={totalPages}
         baseUrl="/plugins/browse"
         search={Astro.url.search}
       />

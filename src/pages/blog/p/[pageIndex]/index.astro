@@ -1,18 +1,19 @@
 ---
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { readPageIndex, redirectToFirstPage } from '~/lib/pageIndex';
 import FeedPage from '../../_FeedPage.astro';
-import { loadFeedPage, parsePageIndex } from '../../_feed';
+import { loadFeedPage } from '../../_feed';
 
-const page = parsePageIndex(Astro.params.pageIndex);
-if (page === 'redirect') return Astro.redirect('/blog', 301);
+const page = readPageIndex(Astro, '/blog');
+if (page instanceof Response) return page;
 
-if (!page) {
+const feed = await loadFeedPage(Astro, page, { kind: 'all' });
+// A page past the last one goes to the index.
+if (feed === 'past-end') return redirectToFirstPage(Astro, '/blog');
+if (!feed) {
   avoidAstroTypeCheckBug(notFoundResponse);
   return notFoundResponse();
 }
-
-const feed = await loadFeedPage(Astro, page, { kind: 'all' });
-if (!feed) return Astro.redirect('/blog', 301);
 ---
 
 <FeedPage feed={feed} />

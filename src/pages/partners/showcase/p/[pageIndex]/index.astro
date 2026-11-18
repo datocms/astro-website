@@ -14,6 +14,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcaseProject';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { readPageIndex, redirectToFirstPage } from '~/lib/pageIndex';
 import { countersToOptions } from '~/pages/partners/_facets';
 import Card from '../../../_Card.astro';
 import { countersForDropdown } from './_facets';
@@ -24,15 +25,9 @@ export interface Props {
   pageIndex?: number;
 }
 
-if (Astro.params.pageIndex === '1') {
-  avoidAstroTypeCheckBug(notFoundResponse);
-  return notFoundResponse();
-}
-
-const rawPageIndex =
-  Astro.props.pageIndex ||
-  (Astro.params.pageIndex ? Number.parseInt(Astro.params.pageIndex, 10) : 1) ||
-  1;
+// /partners/showcase renders this page with pageIndex 1.
+const pageIndex = Astro.props.pageIndex ?? readPageIndex(Astro, '/partners/showcase');
+if (pageIndex instanceof Response) return pageIndex;
 
 const technologyFilter = Astro.url.searchParams.get('technology');
 const areaOfExpertiseFilter = Astro.url.searchParams.get('areaOfExpertise');
@@ -76,7 +71,9 @@ const filteredProjects = projectsWithoutStega.filter((project) => {
 
 const totalEntries = filteredProjects.length;
 const totalPages = Math.max(1, Math.ceil(totalEntries / perPage));
-const pageIndex = Math.min(Math.max(rawPageIndex, 1), totalPages);
+
+// A page past the last one goes to page 1, with the same filters.
+if (pageIndex > totalPages) return redirectToFirstPage(Astro, '/partners/showcase');
 
 const start = (pageIndex - 1) * perPage;
 const pageProjects = filteredProjects.slice(start, start + perPage);

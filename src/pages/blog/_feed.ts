@@ -96,18 +96,6 @@ export function feedBaseUrl(filter: FeedFilter) {
   return '/blog';
 }
 
-/**
- * Read the page number of an index page. `/p/1` is not a page: page 1
- * is at the address of the index.
- */
-export function parsePageIndex(param: string | undefined) {
-  // The old site numbered its pages from 0, thus /p/0 is the first page too.
-  if (param === '0') return 'redirect';
-  if (!param || !/^[1-9]\d*$/.test(param)) return null;
-  const page = Number.parseInt(param, 10);
-  return page === 1 ? 'redirect' : page;
-}
-
 /** The cards in the featured row of a page: only page 1 of each index has one. */
 function featuredOn(page: number) {
   return page === 1 ? blog.featuredCount : 0;
@@ -134,8 +122,9 @@ export function totalPages(count: number) {
  * The cards of one page of the index: the posts and the casual chats (the
  * model CustomerStory), the newest first. A category shows only its posts,
  * without the casual chats. A query cannot sort two models together: this
- * function gets all the cards, sorts them and takes one page. It gives null
- * when the page or the category does not exist.
+ * function gets all the cards, sorts them and takes one page. It gives
+ * 'past-end' when the feed has cards but this page has none. It gives null
+ * when the category does not exist or the feed has no cards.
  */
 export async function loadFeedPage(Astro: AstroGlobal, page: number, filter: FeedFilter) {
   const {
@@ -166,7 +155,7 @@ export async function loadFeedPage(Astro: AstroGlobal, page: number, filter: Fee
 
   const [start, end] = pageRange(page);
   const all = feed.slice(start, end).map(({ date: _, ...card }) => card as PostCardItem);
-  if (all.length === 0) return null;
+  if (all.length === 0) return feed.length > 0 ? ('past-end' as const) : null;
   const featuredOnPage = featuredOn(page);
   const featured = all.slice(0, featuredOnPage);
   const cards = all.slice(featuredOnPage);
@@ -202,7 +191,7 @@ export async function loadFeedPage(Astro: AstroGlobal, page: number, filter: Fee
   };
 }
 
-export type FeedPage = NonNullable<Awaited<ReturnType<typeof loadFeedPage>>>;
+export type FeedPage = Exclude<Awaited<ReturnType<typeof loadFeedPage>>, null | 'past-end'>;
 
 const countsQuery = graphql(/* GraphQL */ `
   query BlogFeedCounts {
