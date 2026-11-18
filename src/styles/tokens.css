@@ -144,6 +144,17 @@
   --surface-raised: var(--color-white);
 }
 
+/*
+ * The alphas of the quiet text on the band of the dark scheme (see the dark
+ * scheme). The ink of the band has 5.6:1, thus the alphas are high. The
+ * themes inherit them; the docs set their own.
+ */
+:root {
+  --theme-alpha-on-band-soft: 96%;
+  --theme-alpha-on-band-muted: 95%;
+  --theme-alpha-on-band-headline-muted: 66%;
+}
+
 /* The brightest cells of the pixel pictures: pure white in each theme and scheme */
 :root {
   --surface-pixel-white: var(--color-white);
@@ -175,11 +186,32 @@
  *                              page (inverse-faint for the muted text), the
  *                              accent, the inverse.
  *   dark-accent-chroma         the chroma of the accent at OKLCH lightness
- *                              0.36 that stays in sRGB, for the dark tints
- *   dark-ground-chroma         the chroma of the dark grounds (the page, the
- *                              band, the inverse, the footer): the value at
- *                              which the tint of the theme shows as much as
- *                              on the other themes. See the dark scheme
+ *                              0.36 that stays in sRGB. The muted tint of
+ *                              the dark scheme is at L 0.3 and uses 80% of it
+ *   dark-ground-chroma         the chroma of the dark page and of the code
+ *                              card on it: the value at which the tint of
+ *                              the theme shows as much as on the other
+ *                              themes. See the dark scheme
+ *   dark-ink                   the vivid ink of the dark scheme: the accent
+ *                              (the purple gives the bright accent: its
+ *                              accent is the darkest of the six)
+ *   dark-inverse               the inverse of the dark scheme: the deep of
+ *                              the light scheme (the purple gives a lighter
+ *                              one: its deep is near the dark page)
+ *   dark-band, dark-band-ink   the accent band of the dark scheme and the
+ *                              text on it. The band is the hue of the
+ *                              accent at OKLCH lightness 0.42 (0.44 green,
+ *                              0.45 blue, 0.47 pink), with 95% of the most
+ *                              chroma that sRGB gives there (100% green,
+ *                              72% pink: a rose, not a crimson). The ink is
+ *                              the hue of the accent at the lowest lightness
+ *                              that gives 5.6:1 on the band. The yellow
+ *                              gives the accent and the deep: its band
+ *                              stays bright
+ *   alpha-on-band-*            the alphas of the quiet text on the band.
+ *                              :root sets them and the themes inherit them
+ *   Each theme sets dark-ink, dark-inverse, dark-band and dark-band-ink: a
+ *   theme that does not set one gets the value of the purple from :root.
  *   alpha-dark-border          the alpha of the ink in the hairline of the
  *                              dark page
  *   alpha-on-accent-button-soft the alpha of the ink in the fill of a soft
@@ -233,6 +265,10 @@
   --theme-dark-accent-chroma: 0.075;
   --theme-dark-ground-chroma: 0.025;
   --theme-alpha-dark-border: 18%;
+  --theme-dark-ink: var(--theme-accent);
+  --theme-dark-inverse: #351615;
+  --theme-dark-band: var(--color-yellow-light-5);
+  --theme-dark-band-ink: #351615;
 }
 
 /* The code card of the yellow theme. A docs callout of the same hue gives it to its code. */
@@ -271,6 +307,10 @@
   --theme-dark-accent-chroma: 0.102;
   --theme-dark-ground-chroma: 0.021;
   --theme-alpha-dark-border: 18%;
+  --theme-dark-ink: var(--theme-accent);
+  --theme-dark-inverse: #42180f;
+  --theme-dark-band: #7d3408;
+  --theme-dark-band-ink: #fbc3a9;
   --code-background: #2b1712;
   --code-plain: #f4e4dd;
   --code-keyword: #ffb897;
@@ -304,6 +344,10 @@
   --theme-dark-accent-chroma: 0.098;
   --theme-dark-ground-chroma: 0.029;
   --theme-alpha-dark-border: 18%;
+  --theme-dark-ink: var(--theme-accent);
+  --theme-dark-inverse: #1a4731;
+  --theme-dark-band: #395f00;
+  --theme-dark-band-ink: #b0f26b;
 }
 
 /* The code card of the green theme. A docs callout of the same hue gives it to its code. */
@@ -344,6 +388,10 @@
   --theme-dark-accent-chroma: 0.198;
   --theme-dark-ground-chroma: 0.028;
   --theme-alpha-dark-border: 18%;
+  --theme-dark-ink: var(--theme-accent-bright);
+  --theme-dark-band: #5c11b4;
+  --theme-dark-band-ink: #ccbffa;
+  --theme-dark-inverse: #27123f;
   --theme-alpha-on-accent-button-soft: 10%;
 }
 
@@ -386,6 +434,10 @@
   --theme-dark-accent-chroma: 0.066;
   --theme-dark-ground-chroma: 0.019;
   --theme-alpha-dark-border: 18%;
+  --theme-dark-ink: var(--theme-accent);
+  --theme-dark-inverse: #1a3a47;
+  --theme-dark-band: #0d5f74;
+  --theme-dark-band-ink: #b9ebfc;
 }
 
 /* The code card of the blue theme. A docs callout of the same hue gives it to its code. */
@@ -432,6 +484,10 @@
   --theme-dark-accent-chroma: 0.144;
   --theme-dark-ground-chroma: 0.024;
   --theme-alpha-dark-border: 18%;
+  --theme-dark-ink: var(--theme-accent);
+  --theme-dark-inverse: #3f0e16;
+  --theme-dark-band: #973249;
+  --theme-dark-band-ink: #fcd9dd;
 }
 
 /* The code card of the pink theme. A docs callout of the same hue gives it to its code. */
@@ -487,6 +543,21 @@
   --theme-dark-accent-chroma: 0.198;
   --theme-dark-ground-chroma: 0.004;
   --theme-alpha-dark-border: 12%;
+  /*
+   * The dark scheme of the docs is neutral: the grounds are near black with
+   * the chroma of the theme, the text is the paper with a fifth of the
+   * accent, and the band has the bright accent as text.
+   */
+  --theme-dark-ink: color-mix(in oklab, var(--theme-accent) 20%, var(--theme-paper));
+  --theme-dark-ink-bright: var(--theme-accent-bright);
+  --theme-dark-inverse: oklch(from var(--theme-accent) 0.15 var(--theme-dark-ground-chroma) h);
+  --theme-dark-inverse-deep: oklch(from var(--theme-accent) 0.13 var(--theme-dark-ground-chroma) h);
+  --theme-dark-band: oklch(from var(--theme-accent) 0.19 var(--theme-dark-ground-chroma) h);
+  --theme-dark-band-ink: var(--theme-accent-bright);
+  --theme-dark-button-hover: var(--theme-accent);
+  --theme-alpha-on-band-soft: 92%;
+  --theme-alpha-on-band-muted: 92%;
+  --theme-alpha-on-band-headline-muted: 68%;
   --theme-alpha-on-accent-button-soft: 8%;
   /*
    * The callouts. Each kind has its hue, not the hue of the theme: info is
@@ -779,50 +850,64 @@
 
 /*
  * The dark scheme. The layout sets data-color-scheme="dark" on <html> (see
- * src/lib/colorScheme.ts). The look of the site is its contrasts: a near
- * white page, the bright accent and the deep inverse. The dark scheme has
- * one family of dark grounds, all in the hue of the accent with a little of
- * its chroma, and puts the colour in the ink: a bright colour on a large
- * surface is heavy on a dark screen, on the text it is not. The block
- * changes these tokens, with the colours of the theme:
- *   default surface   the page, OKLCH L 0.17, the chroma of the theme
- *                     (--theme-dark-ground-chroma)
- *   accent band       L 0.19: a little lighter than the page. surfaceAccent
- *                     and the band tokens use it; its text is the bright
- *                     accent, the same text as the inverse
- *   code              L 0.21: lighter than the page and the band, thus
- *                     the code card shows on the page. A card that is
- *                     darker than the page does not show: on the neutral
- *                     docs page, L 0.15 and L 0.17 look the same
- *   inverse           L 0.15, a little darker than the page; the footer
- *                     (inverse-deep) is L 0.13. All the grounds of a theme
- *                     have one chroma: near black the eye reads a chroma as
- *                     a colour (brown) or as no colour (grey), thus two
- *                     chromas do not read as one hue. The chroma is a value
- *                     per theme, 0.019 (blue) to 0.029 (green): at these
- *                     lightnesses the same OKLCH chroma is a clear teal on
- *                     the blue and almost a grey on the green and the purple,
- *                     thus each theme has the chroma at which its grounds
- *                     show the same amount of tint. The docs page is almost
- *                     neutral (0.004), as its paper is white in light. Each
- *                     value stays in sRGB at L 0.13; the blue is the
- *                     narrowest hue
- *   text              the paper with a fifth of the accent, with the
- *                     alphas of the page text roles
- *   borders           the hairline is the text of the page at the alpha of
- *                     the theme (--theme-alpha-dark-border, 18%; the docs
- *                     12%, a quieter line on their neutral page): a tint
- *                     of the ink, as in the light scheme. An alpha of the
- *                     accent is a muddy line (an olive for the yellow)
+ * src/lib/colorScheme.ts). The look of the site is its blocks of colour: the
+ * paper, the bright accent and the deep inverse. The dark scheme keeps the
+ * blocks and the two hues of each theme, and changes the lightness: the
+ * paper goes dark, the accent band goes deep, and the bright accent stays
+ * in the text and in the small shapes. A colour is heavy on a dark screen
+ * because of its luminance, and it is dull because of a low chroma: the
+ * grounds have a low luminance and keep their chroma.
+ *   default surface   the page, OKLCH L 0.17, in the hue of the accent,
+ *                     with the chroma of the theme
+ *                     (--theme-dark-ground-chroma): the rest between the
+ *                     blocks, as the paper in the light scheme
+ *   inverse           the deep of the theme, the same colour as in the
+ *                     light scheme. A theme whose deep is near the page
+ *                     gives a lighter one (--theme-dark-inverse: the
+ *                     purple). The footer (inverse-deep) is 0.06 darker, as
+ *                     in the light scheme
+ *   accent band       the accent, darkened (--theme-dark-band): the hue of
+ *                     the accent at L 0.42 to 0.47, with almost all the
+ *                     chroma that sRGB gives there. It is not the hue of
+ *                     the deep: the theme keeps its two hues (the moss band
+ *                     next to the forest deep of the green theme).
+ *                     surfaceAccent and the band tokens use it. The yellow
+ *                     has no dark tone (a dark yellow is an olive): its
+ *                     band stays bright, with the deep as text
+ *   text on the band  the accent, lighter (--theme-dark-band-ink): the hue
+ *                     of the accent at the lightness that gives 5.6:1 or
+ *                     more on the band. The quiet roles are alphas of it
+ *                     (--theme-alpha-on-band-*)
+ *   vivid ink         the accent (--theme-dark-ink, when a theme gives a
+ *                     different one). The text on the inverse, as in the
+ *                     light scheme, with the same alphas. On the page: the
+ *                     primary text (headings, labels), the quiet run of a
+ *                     headline and the strong border
+ *   running text      the soft and the muted text of the page are the paper
+ *                     with a fifth of the accent: a paragraph in the accent
+ *                     is hard to read
+ *   code              L 0.21 with the chroma of the page: lighter than the
+ *                     page, thus the code card shows on it, and darker than
+ *                     the band and the inverse
+ *   borders           the hairline is the paper ink of the page at the
+ *                     alpha of the theme (--theme-alpha-dark-border, 18%;
+ *                     the docs 12%, a quieter line on their neutral page).
+ *                     An alpha of the accent is a muddy line (an olive for
+ *                     the yellow)
  *   accent tints      muted, subtle and faint are dark tints of the accent
- *                     (muted: the accent at OKLCH lightness 0.36, the chroma
- *                     at most the edge of sRGB, thus the hue does not move)
+ *                     (muted: the accent at OKLCH lightness 0.3, dark enough
+ *                     for the vivid ink on it; the chroma is at most the
+ *                     edge of sRGB, thus the hue does not move)
  *   inverse-faint     a light tint, because a dark tint does not show on
  *                     the dark surface
- *   accent text       the bright accent (--theme-accent-bright), and the
+ *   accent text       a link or an icon in the hue of the accent: the
+ *                     bright accent (--theme-accent-bright), and the
  *                     signals as they are
  * The bright accent (--surface-accent outside surfaceAccent) stays for the
- * small shapes: a pill or a button on the page keeps the accent and its ink.
+ * small shapes: a pill, a button or a hovered row keeps the accent and its
+ * ink. A small shape that needs the ground class takes surfaceAccentBright.
+ * The docs give their own data: their dark scheme is neutral (see the docs
+ * theme).
  */
 :root[data-color-scheme='dark'] {
   color-scheme: dark;
@@ -837,44 +922,64 @@
 :root[data-color-scheme='dark'] .surfacePage,
 :root[data-color-scheme='dark'] .surfaceAccent,
 :root[data-color-scheme='dark'] .surfaceInverse {
-  /* The grounds of the dark scheme: one family in the hue of the accent. */
   --_page-dark: oklch(from var(--theme-accent) 0.17 var(--theme-dark-ground-chroma) h);
   --surface-default: var(--_page-dark);
-  --surface-inverse: oklch(from var(--theme-accent) 0.15 var(--theme-dark-ground-chroma) h);
-  --surface-inverse-deep: oklch(from var(--theme-accent) 0.13 var(--theme-dark-ground-chroma) h);
+  --surface-inverse: var(--theme-dark-inverse);
+  --surface-inverse-deep: var(
+    --theme-dark-inverse-deep,
+    oklch(from var(--surface-inverse) calc(l - 0.06) c h)
+  );
   --code-background: oklch(from var(--theme-accent) 0.21 var(--theme-dark-ground-chroma) h);
-  --surface-accent-band: oklch(from var(--theme-accent) 0.19 var(--theme-dark-ground-chroma) h);
-  /*
-   * The text on the band is the bright accent, with the alphas of the
-   * inverse for the quiet roles. The text on the inverse is the text of
-   * the page (see --text-on-page): the menus, the footer and the windows
-   * show text to read, not a colour.
-   */
-  --text-on-accent-band: var(--theme-accent-bright);
-  --text-on-inverse: var(--text-on-page);
+  --surface-accent-band: var(--theme-dark-band);
+  --text-on-accent-band: var(--theme-dark-band-ink);
   --text-on-accent-band-soft: color-mix(
     in srgb,
-    var(--theme-accent-bright) var(--theme-alpha-on-inverse-soft),
+    var(--theme-dark-band-ink) var(--theme-alpha-on-band-soft),
     transparent
   );
   --text-on-accent-band-muted: color-mix(
     in srgb,
-    var(--theme-accent-bright) var(--theme-alpha-on-inverse-muted),
+    var(--theme-dark-band-ink) var(--theme-alpha-on-band-muted),
     transparent
   );
   --text-on-accent-band-headline-muted: color-mix(
     in srgb,
-    var(--theme-accent-bright) var(--theme-alpha-on-inverse-headline-muted),
+    var(--theme-dark-band-ink) var(--theme-alpha-on-band-headline-muted),
     transparent
   );
-  --text-on-inverse-soft: var(--text-on-page-soft);
-  --text-on-inverse-muted: var(--text-on-page-muted);
-  --text-on-inverse-headline-muted: var(--text-on-page-headline-muted);
-  --border-on-accent-band-strong: var(--theme-accent);
+  --border-on-accent-band-strong: var(--theme-dark-band-ink);
+  /*
+   * The line along the edge of a picture on the accent band: the ink of the
+   * band at 20% in the band, a quiet line. The light scheme does not set
+   * it: each component has its own mix.
+   */
+  --border-accent-edge: color-mix(
+    in oklab,
+    var(--theme-dark-band-ink) 20%,
+    var(--surface-accent-band)
+  );
+  /* The vivid ink: the accent. The text on the inverse, as in the light scheme. */
+  --_ink-dark: var(--theme-dark-ink);
+  --text-on-inverse: var(--_ink-dark);
+  --text-on-inverse-soft: color-mix(
+    in srgb,
+    var(--_ink-dark) var(--theme-alpha-on-inverse-soft),
+    transparent
+  );
+  --text-on-inverse-muted: color-mix(
+    in srgb,
+    var(--_ink-dark) var(--theme-alpha-on-inverse-muted),
+    transparent
+  );
+  --text-on-inverse-headline-muted: color-mix(
+    in srgb,
+    var(--_ink-dark) var(--theme-alpha-on-inverse-headline-muted),
+    transparent
+  );
   --surface-inverse-faint: var(--_ground-surface-inverse-faint, var(--theme-accent-faint));
   --surface-accent-muted: var(
     --_ground-surface-accent-muted,
-    oklch(from var(--theme-accent) 0.36 min(c, var(--theme-dark-accent-chroma)) h)
+    oklch(from var(--theme-accent) 0.3 min(c, calc(var(--theme-dark-accent-chroma) * 0.8)) h)
   );
   --surface-accent-subtle: var(
     --_ground-surface-accent-subtle,
@@ -882,17 +987,17 @@
   );
   --surface-accent-faint: var(--_ground-surface-accent-faint, var(--theme-accent-faint));
   /*
-   * The text of the page: the paper with a fifth of the accent, thus the
-   * page keeps a little of the colour of its theme. A pure paper is a white
-   * with no theme next to the band, whose text is the accent.
+   * The text of the page. The primary text is the vivid ink. The running
+   * text (soft, muted) is the paper with a fifth of the accent: it keeps a
+   * little of the colour of its theme, and a paragraph stays easy to read.
    */
   --_page-ink-dark: color-mix(in oklab, var(--theme-accent) 20%, var(--theme-paper));
-  --text-on-page: var(--_page-ink-dark);
+  --text-on-page: var(--_ink-dark);
   --text-on-page-soft: color-mix(in srgb, var(--_page-ink-dark) 80%, transparent);
   --text-on-page-muted: color-mix(in srgb, var(--_page-ink-dark) 70%, transparent);
   --text-on-page-headline-muted: color-mix(
     in srgb,
-    var(--_page-ink-dark) var(--theme-alpha-page-headline-muted),
+    var(--_ink-dark) var(--theme-alpha-on-inverse-headline-muted),
     transparent
   );
   --border-on-page: color-mix(
@@ -900,7 +1005,7 @@
     var(--_page-ink-dark) var(--theme-alpha-dark-border),
     transparent
   );
-  --border-on-page-strong: var(--theme-paper);
+  --border-on-page-strong: var(--_ink-dark);
   --text-accent: var(--_ground-text-accent, var(--theme-accent-bright));
   /* The signals, a little paler: the dark accent tints are not black */
   --text-positive: var(
@@ -916,6 +1021,16 @@
     --_ground-text-status-warning,
     var(--theme-status-warning-text, color-mix(in oklab, var(--theme-accent), var(--theme-paper)))
   );
+  /*
+   * The solid button on the page is the vivid ink, the same fill as the
+   * accent. Thus its hover is the paper with the deep as text, as the hover
+   * of the button on the inverse in the light scheme.
+   */
+  --surface-button-hover: var(
+    --_ground-surface-button-hover,
+    var(--theme-dark-button-hover, var(--theme-paper))
+  );
+  --text-button-hover: var(--_ground-text-button-hover, var(--theme-ink));
 }
 
 /*
@@ -1006,14 +1121,14 @@
 }
 
 /*
- * In the dark scheme the accent ground is the band: a dark ground in the
- * hue of the accent, and the text is the bright accent (see the band
- * tokens). A card on the band is the dark page, and the tints are quiet
- * alphas of the accent and of the paper: the muted text, an alpha of the
- * accent, must reach 4.5:1 on them. The signals are a little paler, as on
- * the inverse. The solid button is the accent with its
- * ink; on hover it is the page with the accent. The soft button is a tint
- * of the accent.
+ * In the dark scheme the accent ground is the band: the accent, darkened,
+ * and the text is the ink of the band (see the band tokens). A card on the
+ * band is the dark page, and the tints are quiet alphas of the accent and
+ * of the paper: the muted text must reach 4.5:1 on them. The band is itself
+ * a colour: accent-hued text and the signals are the ink of the band, as on
+ * the accent of the light scheme. The solid button is the bright accent
+ * with its ink; on hover it is the page with the accent. The soft button is
+ * a tint of the accent.
  */
 :root[data-color-scheme='dark'] .surfaceAccent {
   --surface-accent: var(--surface-accent-band);
@@ -1024,7 +1139,7 @@
   /* A callout on the band takes the faint paper tint, as the other themes. */
   --surface-status-info: var(--surface-inverse-faint);
   /*
-   * The globe of /partners: the band is dark, thus the sea, the land and a
+   * The globe of /partners: the band is deep, thus the sea, the land and a
    * country with partners are the bright accent, more and more.
    */
   --surface-pixel-globe-sea: color-mix(in oklab, var(--theme-accent) 14%, var(--surface-accent));
@@ -1033,28 +1148,92 @@
   /* The globe footage of the home: the ocean as the sea, the land as the land. */
   --surface-pixel-globe-ocean: var(--surface-pixel-globe-sea);
   --surface-pixel-globe-continent: var(--surface-pixel-globe-land);
-  /* The silhouette of the closer: a bright subject on the dark band. */
+  /* The silhouette of the closer: a bright subject on the deep band. */
   --surface-pixel-silhouette: var(--theme-accent);
   /* The canonical roles change: the contextual roles take them. */
   --text-on-accent: var(--text-on-accent-band);
   --text-on-accent-soft: var(--text-on-accent-band-soft);
   --text-on-accent-muted: var(--text-on-accent-band-muted);
   --text-on-accent-headline-muted: var(--text-on-accent-band-headline-muted);
-  --border-on-accent: color-mix(in srgb, var(--theme-accent) 25%, transparent);
-  --border-on-accent-strong: var(--theme-accent);
+  --border-on-accent: color-mix(in srgb, var(--theme-dark-band-ink) 22%, transparent);
+  --border-on-accent-strong: var(--text-on-accent-band);
   --_ground-text-accent: var(--text-on-accent);
-  --_ground-text-positive: color-mix(in oklab, var(--surface-positive) 75%, var(--theme-paper));
-  --_ground-text-negative: color-mix(in oklab, var(--surface-negative) 75%, var(--theme-paper));
-  --_ground-text-status-warning: var(--text-on-inverse-strong);
+  --_ground-text-positive: var(--text-on-accent);
+  --_ground-text-negative: var(--text-on-accent);
+  --_ground-text-status-warning: var(--text-on-accent);
   --_ground-surface-button: var(--theme-accent);
   --_ground-text-button: var(--theme-ink);
   --_ground-surface-button-hover: var(--surface-default);
   --_ground-text-button-hover: var(--theme-accent);
-  --_ground-surface-button-soft: color-mix(in srgb, var(--theme-accent) 15%, transparent);
+  --_ground-surface-button-soft: color-mix(in srgb, var(--theme-accent) 10%, transparent);
   --type-leading-dark: 0.05;
   --type-tracking-dark: 0.01em;
   --type-mono-weight: 500;
   color-scheme: dark;
+}
+
+/*
+ * The bright accent ground of the dark scheme: the accent of the light
+ * scheme, with the deep as text. It is a light island on the dark page: a
+ * card on it is the paper, and each role has its value of the light scheme.
+ * Two users:
+ *   the yellow theme      its accent ground stays bright (a dark yellow is
+ *                         an olive). A yellow element does not contain a
+ *                         band of a different theme: the selector would
+ *                         also match that band
+ *   surfaceAccentBright   add it next to surfaceAccent on a small shape (a
+ *                         strip of a card, a badge). A small bright shape
+ *                         is a point of colour, not a band. Do not use it
+ *                         on a section or on a half of a split
+ */
+:root[data-color-scheme='dark'] [data-theme='yellow'].surfaceAccent,
+:root[data-color-scheme='dark'] [data-theme='yellow'] .surfaceAccent,
+:root[data-color-scheme='dark'] .surfaceAccent.surfaceAccentBright {
+  --surface-accent: var(--theme-accent);
+  --surface-default: var(--theme-paper);
+  --_ground-surface-inverse-faint: var(--theme-ink-faint);
+  --_ground-surface-accent-muted: var(--theme-accent-muted);
+  --_ground-surface-accent-subtle: var(--theme-accent-subtle);
+  --_ground-surface-accent-faint: var(--theme-accent-faint);
+  --surface-pixel-globe-sea: color-mix(in oklab, var(--surface-inverse) 16%, var(--surface-accent));
+  --surface-pixel-globe-land: color-mix(
+    in oklab,
+    var(--surface-inverse) 28%,
+    var(--surface-accent)
+  );
+  --surface-pixel-globe-country: var(--surface-inverse);
+  --surface-pixel-globe-ocean: var(--surface-inverse);
+  --surface-pixel-globe-continent: var(--surface-accent);
+  --surface-pixel-silhouette: var(--surface-inverse);
+  --text-on-accent: var(--theme-ink);
+  --text-on-accent-soft: color-mix(in srgb, var(--theme-ink) 92%, transparent);
+  --text-on-accent-muted: color-mix(
+    in srgb,
+    var(--theme-ink) var(--theme-alpha-on-accent-muted),
+    transparent
+  );
+  --text-on-accent-headline-muted: color-mix(
+    in srgb,
+    var(--theme-ink) var(--theme-alpha-on-accent-headline-muted),
+    transparent
+  );
+  --border-on-accent: var(--theme-ink-faint);
+  --border-on-accent-strong: var(--theme-ink);
+  /* The deep pill with the accent as text. The hover is the paper with the deep as text. */
+  --_ground-surface-button: var(--surface-inverse);
+  --_ground-text-button: var(--theme-accent);
+  --_ground-surface-button-hover: var(--theme-paper);
+  --_ground-text-button-hover: var(--theme-ink);
+  --_ground-surface-button-soft: color-mix(
+    in srgb,
+    var(--theme-ink) var(--theme-alpha-on-accent-button-soft),
+    transparent
+  );
+  /* The text is dark: the type has the light values. */
+  --type-leading-dark: 0;
+  --type-tracking-dark: 0em;
+  --type-mono-weight: 400;
+  color-scheme: light;
 }
 
 /*
@@ -1090,11 +1269,13 @@
 
 /*
  * surfaceMenu: add it next to surfaceInverse on the menus of the header.
- * The text is the paper with a fifth of the accent, thus a menu has the
- * same ink in the two schemes. In the dark scheme this is the text of the
- * page, and the rule for surfaceInverse gives it.
+ * The text is the paper with a fifth of the accent, in the two schemes: a
+ * menu shows text to read, not a colour. The second selector wins over the
+ * rule of the dark scheme, which gives the accent to the text on the
+ * inverse.
  */
-.surfaceMenu {
+.surfaceMenu,
+:root[data-color-scheme='dark'] .surfaceMenu {
   --_menu-ink: color-mix(in oklab, var(--theme-accent) 20%, var(--theme-paper));
   --text-on-inverse: var(--_menu-ink);
   --text-on-inverse-soft: color-mix(in srgb, var(--_menu-ink) 80%, transparent);
@@ -1103,15 +1284,30 @@
 
 /*
  * surfaceInverseBright: add it next to surfaceInverse. In the dark scheme,
- * the text on this inverse is the bright accent, not the text of the page.
- * Use it only for the band of the page closer, the status badge and the
- * legal bar of the footer. The light scheme does not change.
+ * the text on this inverse is the vivid ink of the page closer
+ * (--theme-dark-ink-bright), when the theme gives one: the docs, whose text
+ * on the inverse is the text of the page. The other themes have the accent
+ * on each inverse. Use it only for the band of the page closer, the status
+ * badge and the legal bar of the footer. The light scheme does not change.
  */
 :root[data-color-scheme='dark'] .surfaceInverseBright {
-  --text-on-inverse: var(--theme-accent-bright);
-  --text-on-inverse-soft: var(--text-on-accent-band-soft);
-  --text-on-inverse-muted: var(--text-on-accent-band-muted);
-  --text-on-inverse-headline-muted: var(--text-on-accent-band-headline-muted);
+  --_ink-bright-dark: var(--theme-dark-ink-bright, var(--_ink-dark));
+  --text-on-inverse: var(--_ink-bright-dark);
+  --text-on-inverse-soft: color-mix(
+    in srgb,
+    var(--_ink-bright-dark) var(--theme-alpha-on-inverse-soft),
+    transparent
+  );
+  --text-on-inverse-muted: color-mix(
+    in srgb,
+    var(--_ink-bright-dark) var(--theme-alpha-on-inverse-muted),
+    transparent
+  );
+  --text-on-inverse-headline-muted: color-mix(
+    in srgb,
+    var(--_ink-bright-dark) var(--theme-alpha-on-inverse-headline-muted),
+    transparent
+  );
 }
 
 /*
