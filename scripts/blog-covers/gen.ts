@@ -56,7 +56,7 @@ type Key = {
    * Make holes in the subject: an area of ground colour that the subject
    * closes (the inside of a shackle, of a handle, of a ring) becomes ground.
    * The value is the smallest area of a hole, a fraction of the photo.
-   * `true` is 0.001. Default: no holes, because a white area of an animal is
+   * `true` is 0.001. Default: no holes, because a white area of a subject is
    * not a hole.
    */
   holes?: boolean | number;
@@ -85,8 +85,8 @@ type Layer = {
 /** The file tmp/blog-covers/specs/<slug>.json. */
 type Spec = {
   slug: string;
-  /** The animal, in plain words: "beagle", "red fox + hedgehog". */
-  animal: string;
+  /** The subject, in plain words: "beagle", "claw hammer + key". */
+  subject: string;
   /** The page of the photo on Envato (the item, not the search). */
   source?: string;
   layers: Layer[];
@@ -96,7 +96,7 @@ type Spec = {
 
 /** The record in the PNG of a cover. The theme is not in it: the CMS has the theme. */
 type CoverRecord = {
-  animal: string;
+  subject: string;
   source?: string;
   /** True when the photo has a licence and the cover uses the licensed file. */
   licensed: boolean;
@@ -383,7 +383,10 @@ async function decodeCover(png: Buffer, name: string) {
   const { grid, error } = pixelsToGrid(data, info.width, info.height);
   if (!grid) throw new Error(`${name}: ${error}`);
   const text = readText(png, KEYWORD);
-  return { grid, record: text ? (JSON.parse(text) as CoverRecord) : undefined };
+  if (!text) return { grid, record: undefined };
+  // A file from before the key `subject` has the key `animal`.
+  const { animal, ...rest } = JSON.parse(text) as CoverRecord & { animal?: string };
+  return { grid, record: { ...rest, subject: rest.subject ?? animal ?? '' } as CoverRecord };
 }
 
 // ---- Drawing, as src/components/PixelCover draws it (`layout` gives the
@@ -668,7 +671,7 @@ async function render(
     const file = path.join(SPECS, `${name}.json`);
     if (!fs.existsSync(file)) throw new Error(`No spec ${file}`);
     const spec = JSON.parse(fs.readFileSync(file, 'utf8')) as Spec;
-    if (!spec.animal) throw new Error(`${file}: give the animal`);
+    if (!spec.subject) throw new Error(`${file}: give the subject`);
     // A try with a theme does not use the CMS: the post can be absent.
     const post = (tryOnly || variant) && newTheme ? undefined : await findPost(client, slug);
     const theme = newTheme ?? post?.theme;
@@ -686,7 +689,7 @@ async function render(
     const ok = lines.every((l) => l.ok);
     if (!ok) failed = true;
 
-    console.log(`\n${slug} (${spec.animal}, ${theme})`);
+    console.log(`\n${slug} (${spec.subject}, ${theme})`);
     for (const l of lines) console.log(`  ${l.ok ? 'ok  ' : 'FAIL'} ${l.text}`);
     console.log(`  preview: ${path.relative(ROOT, preview)}`);
     if (!ok) {
@@ -698,7 +701,7 @@ async function render(
     const samePhotos =
       before?.layers.map((l) => l.photo).join() === spec.layers.map((l) => l.photo).join();
     const png = await encodeCover(grid, {
-      animal: spec.animal,
+      subject: spec.subject,
       source: spec.source,
       licensed: samePhotos ? (before?.licensed ?? false) : false,
       layers: spec.layers,
@@ -729,7 +732,7 @@ async function covers(client: Client, posts: Post[]) {
 
 async function list(client: Client) {
   const posts = await allPosts(client);
-  const animals = new Map<string, string[]>();
+  const subjects = new Map<string, string[]>();
   for (const { post, record } of await covers(client, posts)) {
     const notes: string[] = [];
     if (!record) notes.push('NO RECORD');
@@ -738,14 +741,14 @@ async function list(client: Client) {
     if (record && !record.licensed) notes.push('not licensed');
     if (record && !record.source) notes.push('no source');
     console.log(
-      `${post.slug}\n  ${record?.animal ?? '?'} · ${post.theme ?? '?'}${notes.length ? ` · ${notes.join(' · ')}` : ''}${record?.source ? `\n  ${record.source}` : ''}`,
+      `${post.slug}\n  ${record?.subject ?? '?'} · ${post.theme ?? '?'}${notes.length ? ` · ${notes.join(' · ')}` : ''}${record?.source ? `\n  ${record.source}` : ''}`,
     );
-    for (const animal of (record?.animal ?? '').split('+').map((a) => a.trim().toLowerCase())) {
-      if (animal) animals.set(animal, [...(animals.get(animal) ?? []), post.slug]);
+    for (const subject of (record?.subject ?? '').split('+').map((a) => a.trim().toLowerCase())) {
+      if (subject) subjects.set(subject, [...(subjects.get(subject) ?? []), post.slug]);
     }
   }
-  for (const [animal, slugs] of animals)
-    if (slugs.length > 1) console.log(`\nTWICE: ${animal} (${slugs.join(', ')})`);
+  for (const [subject, slugs] of subjects)
+    if (slugs.length > 1) console.log(`\nTWICE: ${subject} (${slugs.join(', ')})`);
 
   // The featured row of a feed is its three newest posts: three different themes.
   const categories = await client.items.list({ filter: { type: 'blog_post_category' } });
@@ -782,17 +785,17 @@ async function set(client: Client, slug: string, pairs: string[]) {
   for (const pair of pairs) {
     const [key, ...rest] = pair.split('=');
     const value = rest.join('=');
-    if (key === 'animal') record.animal = value;
+    if (key === 'subject') record.subject = value;
     else if (key === 'source') record.source = value || undefined;
     else if (key === 'licensed') record.licensed = value === 'true';
     else if (key === 'theme') theme = value;
-    else throw new Error(`Unknown key "${key}": use animal, source, licensed or theme`);
+    else throw new Error(`Unknown key "${key}": use subject, source, licensed or theme`);
   }
   if (!theme) throw new Error(`${slug} has no theme in the CMS: give theme=<theme>`);
   coloursOf(theme);
   const status = await saveCover(client, post, await encodeCover(grid, record), theme);
   console.log(
-    `${slug}: ${JSON.stringify({ ...record, layers: undefined, theme })}\n  CMS: ${status}`,
+    `${slug}: ${JSON.stringify({ ...record, layers: undefined })}\n  theme (the field of the post): ${theme}\n  CMS: ${status}`,
   );
 }
 

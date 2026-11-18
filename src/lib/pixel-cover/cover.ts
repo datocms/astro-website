@@ -138,7 +138,7 @@ export function palettes({ accent, ink, paper, highlight }: ThemeColours) {
     // The left half, on the accent.
     accent: { ground: accent, tones: [ink, mix(ink, accent, 0.5), paper] } as Palette,
     // The right half, on the ink. The dark tone is a little lighter than the
-    // ground, thus the dark parts of the animal show.
+    // ground, thus the dark parts of the subject show.
     inverse: { ground: ink, tones: [mix(ink, accent, 0.3), accent, highlight] } as Palette,
   };
 }

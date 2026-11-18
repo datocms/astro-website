@@ -1,6 +1,6 @@
 # Blog covers
 
-Each blog post with a cover gets one real subject (an animal, an object, a tool or a plant), cut out of a stock photo and drawn as a grid of square cells. The cover is the split of the site: the accent of the theme on the left half, the ink on the right half. The animal crosses the seam in the middle, and its colours change where it crosses.
+Each blog post with a cover gets one real subject (an animal, an object, a tool or a plant), cut out of a stock photo and drawn as a grid of square cells. The cover is the split of the site: the accent of the theme on the left half, the ink on the right half. The subject crosses the seam in the middle, and its colours change where it crosses.
 
 - The CMS keeps the covers, in two fields of a blog post. `pixel_cover` is the file: a PNG of 100 × 58 px, one pixel for each cell. `theme` is the theme of the post: the colours of the cover and of the page. The site shows a cover only when the post has the two fields.
 - The file has no colours of a theme. A cell is transparent (the ground) or has one of three tones: black, grey, white. The theme gives the colours when the cover is drawn, thus a change of `theme` in the CMS changes the cover at once. The file is the only copy that we keep (see "The record").
@@ -13,7 +13,7 @@ Each blog post with a cover gets one real subject (an animal, an object, a tool 
 
 - **The feed card** (the featured row of /blog and of each category): 366 × 214 CSS px. **One cell is approximately 3.7 CSS px.** This size decides. On a 1× screen the cell is 4 px, and the box cuts up to 4 columns at the left and at the right and 2 rows at the top and the bottom.
 - **The post header**: the right half of the header, approximately 712 CSS px wide (one cell is approximately 7 px).
-- **Very small**: approximately 20 px high, in a list or in a link preview. The animal must still be a clear shape.
+- **Very small**: approximately 20 px high, in a list or in a link preview. The subject must still be a clear shape.
 
 Judge each cover at feed size first. A cover that works only in the post header does not work.
 
@@ -21,20 +21,20 @@ Judge each cover at feed size first. A cover that works only in the post header 
 
 ### 1. One clear subject
 
-- **The subject is one real thing from a photo: an animal, an object, a tool or a plant.** The rules below say "the animal". They are the same for an object, a tool or a plant: one thing, a name that everybody knows, an outline of its own, few areas of tone.
+- **The subject is one real thing from a photo: an animal, an object, a tool or a plant.** The rules are the same for an animal, an object, a tool or a plant: one thing, a name that everybody knows, an outline of its own, few areas of tone.
 - **An object, a tool or a plant that everybody knows**: a key, a padlock, a compass, an anchor, a watering can, a lantern, a cactus, a sunflower. Its outline names it. A box, a ball or a device with a screen has no outline of its own. The object has no text, no brand and no screen. Thin parts disappear here too: strings, wires, chains, thin stems, the teeth of a comb.
-- **One animal.** A comparison can have two (one on each half), never more. No groups, no rows of copies, no stacks. (Rejected: four stag beetles in a tower for "bugs in a trenchcoat": too much for cells of 4 px.)
-- **An animal that everybody knows.** A reader anywhere must name it at once: dog, pig, elephant, parrot, snail, crow. Not a species that only a birdwatcher knows. (Rejected: a kookaburra, "the laughing bird", for an April Fools' post: "what animal on earth is this?". The joke must work when the reader does not know the species.)
-- **The silhouette names the animal.** Look at the silhouette in the preview (the subject in one colour). If you cannot name the animal from the outline in one second, reject it. (Rejected: a hedgehog that became a lump, "a bush or something".)
-- **A large, simple outline.** Side view. Pick an animal with a shape that is its own: the beak, the ears, the tail, the wings, the legs at full length. Parts thinner than 2 cells disappear or become loose bits: antennae, whiskers, the thin legs of insects, spines, the tips of feathers. An animal that you know only by such parts is a bad pick. (Rejected: an octopus that became a round lump, and one that became a "thumbs up".)
-- **Few large areas of tone.** A busy texture (spotted fur, patterned feathers, scales, spines) becomes noise. Prefer an animal with 2 or 3 large areas: a dark back and a light belly, a white face, a dark wing.
-- **No props.** Only the animal: no branch, perch, grass, food, shadow or ground. Remove them with `key.crop`, or pick a different photo.
+- **One subject.** A comparison can have two (one on each half), never more. No groups, no rows of copies, no stacks. (Rejected: four stag beetles in a tower for "bugs in a trenchcoat": too much for cells of 4 px.)
+- **A subject that everybody knows.** A reader anywhere must name it at once: dog, pig, elephant, parrot, snail, crow. Not a species that only a birdwatcher knows. (Rejected: a kookaburra, "the laughing bird", for an April Fools' post: "what animal on earth is this?". The joke must work when the reader does not know the species.)
+- **The silhouette names the subject.** Look at the silhouette in the preview (the subject in one colour). If you cannot name the subject from the outline in one second, reject it. (Rejected: a hedgehog that became a lump, "a bush or something".)
+- **A large, simple outline.** Side view. Pick a subject with a shape that is its own: the beak, the ears, the tail, the wings, the legs at full length. Parts thinner than 2 cells disappear or become loose bits: antennae, whiskers, the thin legs of insects, spines, the tips of feathers. A subject that you know only by such parts is a bad pick. (Rejected: an octopus that became a round lump, and one that became a "thumbs up".)
+- **Few large areas of tone.** A busy texture (spotted fur, patterned feathers, scales, spines) becomes noise. Prefer a subject with 2 or 3 large areas: a dark back and a light belly, a white face, a dark wing.
+- **No props.** Only the subject: no branch, perch, grass, food, shadow or ground. Remove them with `key.crop`, or pick a different photo.
 - **The holes of the subject are holes.** The space inside a ring, a handle, a shackle, the bow of a key, or between a rope and the thing that it goes around, is ground. Without `key.holes` (see "The spec") the script fills such a space, and the outline is wrong. Look at the silhouette in the preview: each opening of the subject must be open. (Rejected: an anchor with a filled ring and a filled space between its rope and its shank, a key with a filled bow that read as a lollipop, a closed padlock that read as a tombstone.)
 - **A subject that reads as a different thing is rejected**, also when all the checks say `ok`. From the first review of objects: a lighthouse (a stick), a tortoise (a dome), a quill (a feather or a leaf), a side view of a drill (an hourglass), a dress form (the torso of a person: no human figures, also no dummies), a mailbox with letters (a muddle inside). A flat object of one material with no parts (a puzzle piece) reads, but looks like an icon: prefer a subject with parts and tones.
-- **Rejected in the second review**: a boxing glove ("impossible to guess what it is"), a kitchen funnel (weak: a bowl or a lamp), a stapler (the mouth of a fish), a typewriter from the front (a shopping bag) and at an angle (a pistol), a mortar and pestle (a thumbs up). A closed machine from the front or at an angle is a box: only a side view with a clear profile can work. Also rejected in the third round: an armchair from the side (an animal on four legs), a penguin that leans forward (a seal), a horseshoe magnet (an arch), a grocer's dial scale (a trophy), a giraffe (narrow, and the spots are noise), a cheetah (the spots are noise), a honey bee (a bug), a starfish (an icon).
+- **Rejected in the second review**: a boxing glove ("impossible to guess what it is"), a kitchen funnel (weak: a bowl or a lamp), a stapler (the mouth of a fish), a typewriter from the front (a shopping bag) and at an angle (a pistol), a mortar and pestle (a thumbs up). A closed machine from the front or at an angle is a box: only a side view with a clear profile can work. Also rejected in the third round: an armchair from the side (a subject on four legs), a penguin that leans forward (a seal), a horseshoe magnet (an arch), a grocer's dial scale (a trophy), a giraffe (narrow, and the spots are noise), a cheetah (the spots are noise), a honey bee (a bug), a starfish (an icon).
 - **A new cover must be stronger than the cover that it replaces.** (Rejected: a fawn that looks back, weaker than the elephant of the post.)
 - **A flat view: from the side or from the front, with no perspective.** A photo from above at an angle shows the top and the base of an object as ovals. Such a subject has no flat base: it cannot stand on the bottom edge (see rule 2).
-- **The part that names the subject shows**: the tail of a fox (without it, a wolf or a jackal), the two humps of a camel, the ears of a donkey. An idea that needs the face or a small gesture (an animal that looks back) does not show in cells.
+- **The part that names the subject shows**: the tail of a fox (without it, a wolf or a jackal), the two humps of a camel, the ears of a donkey. An idea that needs the face or a small gesture (a subject that looks back) does not show in cells.
 - **Not narrow.** A subject less than 32 columns wide looks small next to the others, also when it is high: a check fails. For a tall, thin subject, use the closer framing (rule 3) or a different subject. (Rejected: a dress form 22 columns wide.)
 - **Matte before glossy.** The shine of polished metal, vinyl, paint or a polished nut becomes white bands and blobs, and `split` cannot remove it. Prefer a photo with soft light and a matte surface.
 - **Not a white subject on the white ground.** The white parts that touch the ground go with it: the neck of a white goose becomes a line, a white scooter loses its body. Take a darker one of the same kind. A higher `key.light` helps only for small white parts.
@@ -44,12 +44,12 @@ Judge each cover at feed size first. A cover that works only in the post header 
 - **A line 1 cell wide** (a chain, a handle, a spoke, the cage of a fan) is correct for one or two parts that name the subject. A subject made mostly of such lines is rejected. (Rejected: a folding chair, a racing bicycle, a balance scale whose chains are dots.)
 - **A real thing, in a real photo.** Not a toy, a figurine or a 3D render: the surface is glossy and the proportions are different. When Envato has no photo of the subject on a white ground (an orca), take a different subject.
 - **A long thin tail** (a mouse, a lizard) gives width but no mass: the subject cannot be large and cross the seam correctly. Do not shorten the tail with `crop`. Take a pose with the tail near the body, or a different subject.
-- **A pair does not touch.** Keep at least 4 empty cells between two animals. If not, they read as one shape.
+- **A pair does not touch.** Keep at least 4 empty cells between two subjects. If not, they read as one shape.
 
 ### 2. No cut, except at the bottom
 
 - **The top, the left and the right cut nothing.** The head, the tail, the beak and the ears are in the frame. (Rejected: a macaw cut at the top.)
-- **The bottom edge can cut the animal.** The animal can stand on the bottom edge, or go out of the frame at the bottom: the legs, the lower body, or a bust (the head and the shoulders) that comes up from the bottom edge. Then the animal can be larger. Make the cut clear: the bottom edge goes through the body or the legs with many cells, not only through the tips of the toes or of the tail (that looks like a mistake).
+- **The bottom edge can cut the subject.** The subject can stand on the bottom edge, or go out of the frame at the bottom: the legs, the lower body, or a bust (the head and the shoulders) that comes up from the bottom edge. Then the subject can be larger. Make the cut clear: the bottom edge goes through the body or the legs with many cells, not only through the tips of the toes or of the tail (that looks like a mistake).
 - **The bottom: a margin, or the ground. Not between the two.** Decide for each subject:
   - **A margin**: 3 empty rows or more below the subject. The subject is in the air, as a bird in flight or a key.
   - **The ground is only for a flat view.** A subject in perspective (a watering can seen a little from above) has an oval base: on the bottom edge it looks cut, not put down. Give it a margin. (Rejected: a watering can at an angle, locked to the bottom.)
@@ -60,26 +60,26 @@ Judge each cover at feed size first. A cover that works only in the post header 
   - In a pair, each subject decides for itself: a hammer on the ground and a key with a margin are correct.
 - **The safe area**: at least 5 empty columns at the left and at the right, and at least 3 empty rows at the top.
 - **Never cut the subject with `crop`** at the top or at a side (a tail, an ear, a horn). No check sees this cut. `crop` removes a prop (a branch, a base, the floor) or a second subject. A `crop` line through the subject is correct only where it falls on the bottom edge of the cover.
-- **In the photo too.** A photo that cuts the head or the tail at the top or at the sides gives a cut animal. A photo cut at the bottom is good when the cut goes on the bottom edge of the cover.
+- **In the photo too.** A photo that cuts the head or the tail at the top or at the sides gives a cut subject. A photo cut at the bottom is good when the cut goes on the bottom edge of the cover.
 
 ### 3. Large: fill the frame
 
-- All the covers have the same scale: the animal fills the frame up to the safe area in its limiting dimension. A tall animal is 44 to 52 rows high (or it goes to the bottom edge). A long animal is 82 to 90 columns wide. (Rejected: a pigeon of 49 × 43 cells, smaller than the other animals of its row.)
-- Make `h` as large as the margins allow. Then look at the row in `/dev/cover-gallery`: no animal can look smaller than the others.
-- **A closer framing is a possible option**, as an alternative to the whole animal. A large head and body read well when the cover is very small. To get closer, let the animal cross the bottom edge (a bust, or the body cut at the legs). Keep the head and the parts that name the animal (the trunk, the comb, the beak, the ears, the shell) in the frame at the top and at the sides. Pick the framing that reads best.
+- All the covers have the same scale: the subject fills the frame up to the safe area in its limiting dimension. A tall subject is 44 to 52 rows high (or it goes to the bottom edge). A long subject is 82 to 90 columns wide. (Rejected: a pigeon of 49 × 43 cells, smaller than the other animals of its row.)
+- Make `h` as large as the margins allow. Then look at the row in `/dev/cover-gallery`: no subject can look smaller than the others.
+- **A closer framing is a possible option**, as an alternative to the whole subject. A large head and body read well when the cover is very small. To get closer, let the subject cross the bottom edge (a bust, or the body cut at the legs). Keep the head and the parts that name the subject (the trunk, the comb, the beak, the ears, the shell) in the frame at the top and at the sides. Pick the framing that reads best.
 
 ### 4. Across the seam
 
-- The animal crosses the seam (column 50). Between 20% and 80% of its cells are on the accent. The head is on the accent (left) when possible: the animal looks to the left (`flip` turns the photo).
-- A symmetric animal (a butterfly from above) has its axis on the seam (`cx: 50`).
-- A pair: one animal on each half, face to face, not touching. In a pair no subject crosses the seam: this is correct.
+- The subject crosses the seam (column 50). Between 20% and 80% of its cells are on the accent. The head is on the accent (left) when possible: the subject looks to the left (`flip` turns the photo).
+- A symmetric subject (a butterfly from above) has its axis on the seam (`cx: 50`).
+- A pair: one subject on each half, face to face, not touching. In a pair no subject crosses the seam: this is correct.
 - When these rules disagree, the cover that reads better wins: say in your report which rule you did not follow. A thin central part (the post of a signpost, the pole of a scale) is never on the seam: move it into one half with `cx`.
 - A subject that leans has its mass away from its centre: `cx` is the centre of its box, not of its mass. Move `cx` until the crossing check passes.
 - An object has no head. Put its darkest part on the accent, because a dark part disappears on the ink (the black handle of a moka pot). Put the seam through the main mass of the subject, not along its edge: if not, the cover looks like two pieces (a spout on one half, a body on the other).
 
 ### 5. The idea
 
-- Pick the subject for **what it does**, not for what it looks like. For an object or a tool, this is its use: a compass (to find the way), a padlock (records that stay locked), a sieve (a filter), a watering can (content that grows). For a plant, how it grows or lives. Say in one line what the post makes the reader do, then find the animal that does it: a hound that follows a trail (agents that read your site), a magpie that collects shiny things (shopping agents), a carrier pigeon (a remote connection), a chameleon (personalization), a butterfly (major changes: a metamorphosis), a crowing rooster (an April Fools' launch).
+- Pick the subject for **what it does**, not for what it looks like. For an object or a tool, this is its use: a compass (to find the way), a padlock (records that stay locked), a sieve (a filter), a watering can (content that grows). For a plant, how it grows or lives. Say in one line what the post makes the reader do, then find the subject that does it: a hound that follows a trail (agents that read your site), a magpie that collects shiny things (shopping agents), a carrier pigeon (a remote connection), a chameleon (personalization), a butterfly (major changes: a metamorphosis), a crowing rooster (an April Fools' launch).
 - A title with a joke can take the joke, but only when the rules above stay true.
 - Read the post first: `curl -s https://www.datocms.com/blog/<slug>.md` for a published post, or the same path on your dev server for a draft.
 - **A post about an event or a mood** (a birthday, a retreat) has no action. Then take an object of the occasion or of the culture (a moka pot for the meals of the team in Italy).
@@ -92,15 +92,15 @@ Judge each cover at feed size first. A cover that works only in the post header 
 
 ### 6. Tones and contrast
 
-- Three tones for each animal, from the quantiles of the luminance (`split`, default `[0.4, 0.8]`).
-- On the ink half, the dark tone is near the ground. A dark animal disappears there: move `split` down (for example `[0.15, 0.65]`) and look at the right half of the preview.
+- Three tones for each subject, from the quantiles of the luminance (`split`, default `[0.4, 0.8]`).
+- On the ink half, the dark tone is near the ground. A dark subject disappears there: move `split` down (for example `[0.15, 0.65]`) and look at the right half of the preview.
 - `despeckle` (on by default) removes lone cells. Do not turn it off.
 
 ## The process
 
 A request for a cover gives the slug of a blog post. The post must be in the CMS: a draft is sufficient. Do all the steps, and stop only for step 7.
 
-1. **Read the post** and choose the idea and the animal (rules 1 and 5). Run `covers.sh list` to see the animals in use.
+1. **Read the post** and choose the idea and the subject (rules 1 and 5). Run `covers.sh list` to see the subjects in use.
 2. **Find photos** on Envato (see "The photos"). Save 6 to 12 previews and look at all of them: `montage -label '%t' $(ls tmp/blog-covers/candidates/<prefix>-<subject>-*.jpg | sort -V) -tile 4x -geometry 300x300+4+4 <out>.png` makes one sheet. Take a photo by the name on its label, not by its place on the sheet: without `sort -V`, 10 comes before 2. Some subjects have fewer than 6 photos on a white ground: then use what there is, or change the subject. Delete the variants that you rejected when you finish, but for one alternative that the owner can want to see. If a search gives fewer than 6 results, change the words. Copy the photo that you use into `tmp/blog-covers/photos/`.
 3. **Write the spec**: `tmp/blog-covers/specs/<slug>.json` (see "The spec"). Choose the theme, if the post has none (see "The theme").
 4. **Try it**: `covers.sh render <slug> --try --theme=<theme>` writes the preview and, when all the checks say `ok`, the cover file `tmp/blog-covers/covers/<slug>.png`. It changes nothing in the CMS. To compare a second photo and keep the first, write a variant: the spec `specs/<slug>.<name>.json`, rendered with `--variant=<name>`, has its own preview `preview/<slug>.<name>.png` and never goes to the CMS. Correct the spec until all the checks say `ok`, then look at the preview (see "The checks"). Try at least 2 photos.
@@ -117,20 +117,20 @@ Keep `tmp/blog-covers/` (Git ignores it): the photos, the specs and the previews
 ```json
 {
   "slug": "headless-cms-personalization",
-  "animal": "chameleon",
+  "subject": "chameleon",
   "source": "https://app.envato.com/search/photos/<id>",
   "layers": [{ "photo": "chameleon-5.jpg", "h": 30, "cx": 49, "y": 16, "flip": true }]
 }
 ```
 
-- `animal`: the subject in plain words (`beagle`, `brass compass`). A pair: `red fox + hedgehog`.
+- `subject`: the subject in plain words (`beagle`, `brass compass`). A pair: `red fox + hedgehog`.
 - `source`: the page of the photo on Envato, as the script of "The photos" gives it: `https://app.envato.com/search/photos/<id>`. Not the URL of a search (`/search?term=…`). A pair has two pages: join them with `+`.
-- A layer is one animal from one photo in `tmp/blog-covers/photos/`:
+- A layer is one subject from one photo in `tmp/blog-covers/photos/`:
   - `h`: the height in cells of the subject that stays after `key` (not of the photo). The width comes from the photo. The result can be 1 row less. For a closer framing that the bottom edge cuts, give an `h` larger than 58 (for example 80): the rows below the frame go. Do not use `crop` for this.
   - `x` (the left column) or `cx` (the centre column), and `y` (the top row). The frame is 100 × 58. The seam is column 50. A lower `cx` moves the subject to the left, onto the accent, with or without `flip`.
   - `flip`: mirror the photo (to look to the left).
   - `key`: how the white ground goes. `light` (222) and `chroma` (30): a pixel is ground when it is lighter than `light`, has less chroma than `chroma`, and touches the edge of the photo through ground. `erode` (0): remove N px of light rim. `crop: [x0, y0, x1, y1]` (fractions of the photo): keep only this part. `holes: true`: an area of ground colour that the subject closes (the inside of a shackle, of a handle, of a ring) becomes ground. Use it for an object with an opening. Without it the opening fills, and the silhouette is a lump. Do not use it for a subject with white areas of its own. A number is the smallest area of a hole, as a fraction of the photo (`true` is 0.001).
-  - `coverage` (0.5): the part of a cell that must be animal. A lower value (0.35) keeps a thin part that names the subject (the beak of a hummingbird).
+  - `coverage` (0.5): the part of a cell that must be subject. A lower value (0.35) keeps a thin part that names the subject (the beak of a hummingbird).
   - `key` for a light or shiny subject: the default removes white plastic, bright steel and the highlights of metal when they touch the ground. Raise `light` (245 to 248) and lower `chroma` (10). For a grey corner or a vignette in the photo, which becomes a second blob: lower `light` (200) or remove the corner with `crop`.
   - `crop` uses the coordinates of the photo before `flip`.
   - `holes` and a white area on the same subject (the handle and the dial of a clock): `holes` removes a white area only when it is one piece without marks. Look at the preview. For the spokes of a wheel, use a small number (`0.0002`).
@@ -147,16 +147,16 @@ Keep `tmp/blog-covers/` (Git ignores it): the photos, the specs and the previews
 - the size: 44 rows high or more, or 82 columns wide or more, and never less than 32 columns wide;
 - the crossing: 20% to 80% on the accent;
 - the noise: 30% of the cells or fewer have 0 or 1 neighbour of their tone;
-- the main parts: the animal (or the two animals) is 90% of the cells or more;
+- the main parts: the subject (or the two subjects) is 90% of the cells or more;
 - the loose bits: 4 small loose parts or fewer.
 
 The checks are necessary, not sufficient. A subject that passes all of them can read as a different thing (see rule 1): the look at the preview decides.
 
 Then look at the preview (`tmp/blog-covers/preview/<slug>.png`):
 
-- **top left**: the feed card on a 2× screen. Can you name the animal at once? Look at the bottom edge too: the subject has a clear margin, or it is on the edge with no band below it.
+- **top left**: the feed card on a 2× screen. Can you name the subject at once? Look at the bottom edge too: the subject has a clear margin, or it is on the edge with no band below it.
 - **top right**: the feed card on a 1× screen (shown at 2×).
-- **bottom left**: the silhouette. Can you name the animal from the outline?
+- **bottom left**: the silhouette. Can you name the subject from the outline?
 - **bottom right**: the post header.
 - **the strip at the bottom**: the cover at 20 px high (shown at 4×). It must be a clear shape.
 
@@ -170,7 +170,7 @@ The site reads the colours of a theme from the tokens (`--theme-accent`, `--them
 
 ## The record
 
-The PNG keeps its record in a text chunk (`datocms-cover`): the animal, the source, the licence and the layers of the spec. The CMS keeps the file as it is, with the chunk. `covers.sh list` shows the record, `covers.sh set` changes it. The spec and the photo are not in the repository: to change a cover, write the spec again from the record and get the photo again from `source`. Do not make a cover file with a different tool: a file with a pixel that is not a tone does not show.
+The PNG keeps its record in a text chunk (`datocms-cover`): the subject, the source, the licence and the layers of the spec. The CMS keeps the file as it is, with the chunk. `covers.sh list` shows the record, `covers.sh set` changes it. The spec and the photo are not in the repository: to change a cover, write the spec again from the record and get the photo again from `source`. Do not make a cover file with a different tool: a file with a pixel that is not a tone does not show.
 
 ## The photos: Envato in the owner's Chrome
 
@@ -192,7 +192,7 @@ The photos come from the previews of Envato (app.envato.com), in the Chrome of t
     const blob = await (await fetch(img.currentSrc || img.src)).blob();
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `<your-prefix>-<animal>-${n}.jpg`;
+    a.download = `<your-prefix>-<subject>-${n}.jpg`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -200,9 +200,9 @@ The photos come from the previews of Envato (app.envato.com), in the Chrome of t
   }
   pages.join('\n');
   ```
-- The files go to `~/Downloads/`, where the owner keeps files too. Move only your files, by the full pattern `<your-prefix>-<animal>-*.jpg`, never by a short prefix: `mkdir -p tmp/blog-covers/candidates && mv ~/Downloads/<your-prefix>-<animal>-*.jpg tmp/blog-covers/candidates/`.
+- The files go to `~/Downloads/`, where the owner keeps files too. Move only your files, by the full pattern `<your-prefix>-<subject>-*.jpg`, never by a short prefix: `mkdir -p tmp/blog-covers/candidates && mv ~/Downloads/<your-prefix>-<subject>-*.jpg tmp/blog-covers/candidates/`.
 - Do not change the `w` parameter of an image URL: the signature breaks (403).
 - Look at what you saved before you use it: the first images of a page are sometimes not related.
 - Do not push a Download or License button, do not use "Generate" (the AI credits are few and belong to the owner), and do not change the settings of the account. Previews only. The licence is a decision of the owner (step 7 of the process).
 
-Search words that work: `<animal> isolated white`, `<animal> side view isolated`, `<animal> white background`.
+Search words that work: `<subject> isolated white`, `<subject> side view isolated`, `<subject> white background`.

@@ -2,7 +2,7 @@
 
 Tools for the covers of the blog (drawn by `src/components/PixelCover`). The
 CMS keeps a cover in two fields of a blog post: `pixel_cover` (the file) and
-`theme`. The file is the only copy that we keep: its record (the animal, the
+`theme`. The file is the only copy that we keep: its record (the subject, the
 source of the photo, the licence, the spec) is in a text chunk of the file.
 The rules and the process are in `src/components/PixelCover/AGENTS.md`.
 
@@ -46,13 +46,13 @@ covers render <slug>... [--try] [--theme=<theme>] [--variant=<name>]
 # specs/<slug>.<name>.json gives preview/<slug>.<name>.png and
 # covers/<slug>.<name>.png. A variant never goes to the CMS.
 
-# All the covers: the animal, the theme, the licence, the source. It marks an
-# animal in use two times and a cover with no theme. At the end: the featured
+# All the covers: the subject, the theme, the licence, the source. It marks an
+# subject in use two times and a cover with no theme. At the end: the featured
 # row of each feed (its three newest posts) with the theme of each post, and a
 # mark on a row that has the same theme two times.
 covers list
 
-# Change the record of a cover or the theme of its post: animal=<words>,
+# Change the record of a cover or the theme of its post: subject=<words>,
 # source=<url> (empty removes it), licensed=true|false, theme=<theme>. The
 # cells do not change.
 covers set <slug> licensed=true
