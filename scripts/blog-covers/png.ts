@@ -1,5 +1,5 @@
 // Read and write one text chunk (tEXt) of a PNG file. A cover keeps its
-// record (the animal, the photo, the spec) in the chunk `datocms-cover`.
+// record (the subject, the photo, the spec) in the chunk `datocms-cover`.
 
 const SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
