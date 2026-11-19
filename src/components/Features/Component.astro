@@ -187,8 +187,9 @@ const visuals = await Promise.all(
   import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
   import { WebComponent } from '~/lib/WebComponent';
 
-  // The active row and the picture change at once. A hover on a row makes
-  // it active, and with no hover the rows become active in turn.
+  // The active row and the picture change at once. A pointer that stops or
+  // moves slowly on a row makes it active, and with no pointer the rows
+  // become active in turn.
   // The colours of the theme go to the new theme in 200ms, in oklab: a
   // change of all the section in one frame is a flash.
   const DESKTOP = window.matchMedia('(min-width: 1152px)');
@@ -327,34 +328,61 @@ const visuals = await Promise.all(
           setTheme(rows[index]!.dataset.rowTheme);
         };
 
-        // ≥1152: only a hover on a row changes the open row and the active
-        // row. The pointer on the picture does not change them. When the
-        // pointer stays on a row, the row opens after 150ms: first the
-        // visitor reads the text. The row becomes active after 300ms: then
-        // the theme and the scene change. Thus a pointer that only crosses
-        // the list does not move the rows or change the scene. When the
-        // pointer leaves a row and goes to no other row for 150ms, the
-        // active row opens again. The last active row stays active.
-        const OPEN_MS = 150;
-        const ACTIVATE_MS = 300;
-        let openTimer = 0;
-        let activateTimer = 0;
-        let closeTimer = 0;
-        const clearTimers = () => {
-          clearTimeout(openTimer);
-          clearTimeout(activateTimer);
-          clearTimeout(closeTimer);
-        };
+        // ≥1152: only a pointer on a row changes the active row. The pointer
+        // on the picture does not change it, and the last active row stays
+        // active. The speed of the pointer shows the intent of the visitor:
+        // - A slow pointer on a row makes the row active at once: the
+        //   visitor looks at the row.
+        // - A fast pointer changes nothing: it only crosses the list. If it
+        //   stops on a row for 60ms, the row becomes active.
+        // - A page that scrolls below a pointer that does not move changes
+        //   nothing: the coordinates of the pointer stay the same.
+        // The speed is the distance from an anchor that is 16ms old or more:
+        // the time between two events is too short for a good measurement.
+        // An anchor that is more than 100ms old is from before a stop, thus
+        // it gives no speed.
+        const SLOW_PX_PER_MS = 0.5;
+        const SAMPLE_MS = 16;
+        const STALE_MS = 100;
+        const REST_MS = 60;
+        let restTimer = 0;
+        let previous: { x: number; y: number } | undefined;
+        let anchor: { x: number; y: number; time: number } | undefined;
+        this.on(section, 'pointermove', (event) => {
+          if (!DESKTOP.matches || event.pointerType === 'touch') return;
+          const { clientX: x, clientY: y, timeStamp: time } = event;
+          const moved = previous !== undefined && (previous.x !== x || previous.y !== y);
+          previous = { x, y };
+          // The first event in the section can come from a scroll: it starts
+          // the measurement only.
+          if (!moved) return;
+          clearTimeout(restTimer);
+          const elapsed = anchor ? time - anchor.time : Infinity;
+          let slow = false;
+          if (!anchor || elapsed > STALE_MS) {
+            anchor = { x, y, time };
+          } else if (elapsed >= SAMPLE_MS) {
+            slow = Math.hypot(x - anchor.x, y - anchor.y) / elapsed < SLOW_PX_PER_MS;
+            anchor = { x, y, time };
+          }
+          const row =
+            event.target instanceof Element
+              ? event.target.closest<HTMLElement>('[data-features-row]')
+              : null;
+          const index = row ? rows.indexOf(row) : -1;
+          if (index < 0) return;
+          if (slow) activate(index);
+          else restTimer = window.setTimeout(() => activate(index), REST_MS);
+        });
+        this.on(section, 'pointerleave', () => {
+          clearTimeout(restTimer);
+          previous = undefined;
+          anchor = undefined;
+        });
+        // A touch or a click on a row is a clear intent.
         rows.forEach((row, i) => {
-          this.on(row, 'pointerenter', () => {
-            if (!DESKTOP.matches) return;
-            clearTimers();
-            openTimer = window.setTimeout(() => open(i), OPEN_MS);
-            activateTimer = window.setTimeout(() => activate(i), ACTIVATE_MS);
-          });
-          this.on(row, 'pointerleave', () => {
-            clearTimers();
-            closeTimer = window.setTimeout(() => open(active), OPEN_MS);
+          this.on(row, 'pointerdown', () => {
+            if (DESKTOP.matches) activate(i);
           });
         });
 
@@ -441,6 +469,7 @@ const visuals = await Promise.all(
         signal.addEventListener('abort', () => {
           stopObserver();
           clearTimeout(rotateTimer);
+          clearTimeout(restTimer);
         });
       }
 
