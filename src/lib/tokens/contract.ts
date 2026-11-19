@@ -153,12 +153,13 @@ export const STATUS_PAIRS: [surface: string, text: string][] = [
 /**
  * The button: each state is a fill with its text. The ground under the
  * button fills the slots, thus the pairs sit on the three grounds. The
- * soft hover is the solid hover.
+ * soft hover is the colour that contrasts most with the ground.
  */
 export const BUTTON_PAIRS: [surface: string, text: string][] = [
   ['--surface-button', '--text-button'],
   ['--surface-button-hover', '--text-button-hover'],
   ['--surface-button-soft', '--text-button-soft'],
+  ['--surface-button-soft-hover', '--text-button-soft-hover'],
   ['--surface-button-accent', '--text-button-accent'],
   ['--surface-button-accent-hover', '--text-button-accent-hover'],
 ];
