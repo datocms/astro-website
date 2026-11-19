@@ -130,9 +130,10 @@ export const onAccent: Style = {
   highStroke: ACCENT,
 };
 
-// The same as On accent in the light scheme. In the dark scheme the accent
-// surface is deep, thus a deep square does not show on it: the squares of
-// the subject take the bright accent (--surface-pixel-silhouette). Use it
+// The same as On accent on the accent of a colour theme, in the two
+// schemes. In the dark scheme of the docs the accent surface is dark, thus
+// a deep square does not show on it: the squares of the subject take the
+// bright accent (--surface-pixel-silhouette). Use it
 // for a subject on an element with the class surfaceAccent. The strokes
 // have the colour of the ground, thus each square stands apart.
 export const onAccentField: Style = {

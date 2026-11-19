@@ -264,11 +264,14 @@ function evaluate(value: string, lookup: Lookup): Rgba | string {
   const nodes = valueParser(substituted).nodes.filter(
     (n) => n.type !== 'space' && n.type !== 'comment',
   );
+  // A value that is only a var() of text is that text: an alpha that takes
+  // the value of a different alpha (`--a: var(--b)`).
+  const alias = /^var\(--[\w-]+\)$/.test(value.trim()) && substituted !== value;
   if (nodes.length !== 1) return value;
   try {
     return evaluateNode(nodes[0]!, lookup);
   } catch (error) {
-    if (error instanceof NotAColor) return value;
+    if (error instanceof NotAColor) return alias ? substituted.trim() : value;
     throw error;
   }
 }
