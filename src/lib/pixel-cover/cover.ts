@@ -18,8 +18,8 @@ export const ROWS = 58;
 /** The first column of the right half. */
 export const SEAM = 50;
 
-/** The smallest pitch, in device pixels, that has a gap between the cells. */
-const MIN_PITCH_WITH_GAP = 6;
+/** The part of the pitch that is the gap between the cells. */
+const GAP_PART = 0.15;
 
 export type Rgb = readonly [number, number, number];
 
@@ -155,12 +155,15 @@ export const paletteOf = (pal: Palettes, column: number) =>
 const SIDE_MARGIN = 5;
 
 /**
- * Where the grid is in a box of `width` × `height` device pixels.
+ * Where the grid is in a box of `width` × `height` device pixels. `ratio` is
+ * the device pixels in one CSS pixel.
  *
  * The pitch is a whole number of device pixels: all the cells have the same
  * size. The nearest whole number can make the grid a little larger than the
  * box. Then the box cuts the edges of the grid, which are ground. The gap is
- * one device pixel. A small cell has no gap: on it, the gaps make a screen.
+ * a part of the pitch (`GAP_PART`), and at most one CSS pixel. It is not a
+ * whole number of device pixels: on a small cell, the canvas blends the gap
+ * into a soft line. Thus a small cover with many cells does not become a screen.
  *
  * The seam of the grid is in the middle of the box. In a box of the shape of
  * the grid, or wider, all the grid shows. In a box that is higher than the
@@ -173,12 +176,12 @@ const SIDE_MARGIN = 5;
  * ground and the box is higher than the grid, the grid is at the bottom of
  * the box: the subject stands on the bottom edge of the box.
  */
-export function layout(width: number, height: number, grid?: Grid) {
+export function layout(width: number, height: number, grid?: Grid, ratio = 1) {
   let fit = Math.min(width / COLS, height / ROWS);
   const half = grid ? halfWidth(grid) : 0;
   if (half > 0) fit = Math.min(height / ROWS, Math.max(fit, width / (2 * half)));
   const pitch = Math.max(1, Math.round(fit));
-  const gap = pitch >= MIN_PITCH_WITH_GAP ? 1 : 0;
+  const gap = Math.min(pitch * GAP_PART, ratio);
   const left = Math.floor(width / 2) - pitch * SEAM;
   const spare = height - pitch * ROWS;
   const top = grid && isGrounded(grid) && spare > 0 ? spare : Math.floor(spare / 2);
@@ -221,7 +224,7 @@ const css = ([r, g, b]: Rgb) => `rgb(${r} ${g} ${b})`;
 
 /**
  * Draw a cover on a canvas of `width` × `height` device pixels: the two
- * grounds, then the cells.
+ * grounds, then the cells. `ratio` is the device pixels in one CSS pixel.
  */
 export function drawCover(
   context: Context,
@@ -229,9 +232,10 @@ export function drawCover(
   colours: ThemeColours,
   width: number,
   height: number,
+  ratio = 1,
 ) {
   const pal = palettes(colours);
-  const { pitch, gap, left, top, seam } = layout(width, height, grid);
+  const { pitch, gap, left, top, seam } = layout(width, height, grid, ratio);
   context.fillStyle = css(pal.accent.ground);
   context.fillRect(0, 0, seam, height);
   context.fillStyle = css(pal.inverse.ground);
