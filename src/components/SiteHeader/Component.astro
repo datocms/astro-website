@@ -576,13 +576,15 @@ const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.pro
 
       // The pill goes to the pointed item, else to the open item, else to
       // the item of the page. With none of them, it fades out where it is.
-      restIndicator() {
+      // The shell of the open card slides to its new place, unless
+      // slideShell is false.
+      restIndicator(slideShell = true) {
         const target =
           this.pointed ??
           this.openTrigger ??
           this.items.find((item) => item.hasAttribute('aria-current'));
         this.setWide(target ?? null);
-        this.placeShell();
+        this.placeShell(slideShell);
         if (!target) {
           this.list.removeAttribute('data-indicator-shown');
           return;
@@ -626,11 +628,24 @@ const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.pro
       }
 
       // The text of the open card starts under the label of its item.
-      placeShell() {
+      // When the wide item changes, the label of the open item moves. The
+      // shell then slides with it, with the duration and the curve of the
+      // labels: it does not jump. The slide adds to the left of the shell,
+      // thus offsetLeft gives the position on screen, and a slide in
+      // progress continues under a new one.
+      placeShell(slide = true) {
         const trigger = this.openTrigger;
         if (!trigger) return;
         const x = trigger.offsetLeft + this.labelOf(trigger).offsetLeft;
+        const old = parseFloat(this.shell.style.getPropertyValue('--card-x'));
         this.shell.style.setProperty('--card-x', `${x}px`);
+        const duration = ms(300);
+        if (!slide || !duration || Number.isNaN(old) || old === x) return;
+        this.shell.animate([{ left: `${old - x}px` }, { left: '0px' }], {
+          duration,
+          easing: EASE,
+          composite: 'add',
+        });
       }
 
       cardOf(trigger: HTMLButtonElement) {
@@ -683,8 +698,10 @@ const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.pro
         for (const animation of card.getAnimations()) animation.cancel();
         card.setAttribute('data-active', '');
         this.tellPromos(card, 'menu:open');
-        // The open item is the wide item now, when no other item has the pointer.
-        this.restIndicator();
+        // The open item is the wide item now, when no other item has the
+        // pointer. The shell goes to its place at once: the target shape
+        // is measured from the plain layout.
+        this.restIndicator(false);
         shell.style.setProperty('--card-inset', getComputedStyle(card).paddingLeft);
         shell.style.setProperty('--card-width', `${card.offsetWidth}px`);
         shell.style.setProperty('--card-height', `${card.offsetHeight}px`);
