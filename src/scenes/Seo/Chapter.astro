@@ -6,7 +6,8 @@ import { FeatureFragments } from '~/components/FeatureFragments';
 import { SceneFragment } from '~/components/SceneFragment';
 import { SceneFrame } from '~/components/SceneFrame';
 import * as copy from '~/data/seo';
-import { SeoPreviewsScene, SeoScene } from './Seo';
+import PreviewStack from './PreviewStack.astro';
+import { SeoScene } from './Seo';
 
 const theme = 'purple';
 ---
@@ -40,10 +41,10 @@ const theme = 'purple';
 </ChapterSplit>
 <FeatureFragments {...copy.fragments} theme={theme} columns={2}>
   {
-    /* The stack of cards, the two behind peeking out above the front one. The stack is larger than the box: the box cuts the cards at its right edge and at its bottom edge. The zoom is 1.1 in a box of 500px, and a narrower box shows the same part of the stack. On phones the zoom is 1.3 (0.9 in a box of 350px), thus more of the front card shows. The cards draw their own edges, thus the fragment has no border. */
+    /* The stack of cards, the two behind peeking out above the front one. The stack has the size of the part that the box shows: each card ends in the box with its border and its round corners, and cuts the field in it at the right and the bottom. The zoom is 1.1 in a box of 500px, and a narrower box shows the same part of the stack. On phones the zoom is 1.3 (0.9 in a box of 350px), thus more of the front card shows. The cards draw their own edges, thus the fragment has no border. */
   }
   <SceneFragment slot="visual-0" fit="scale" border={false} zoom={1.1} phoneZoom={1.3}>
-    <SeoPreviewsScene appearance={{ theme }} width={555} height={480} />
+    <PreviewStack appearance={{ theme }} />
   </SceneFragment>
   <SceneFragment slot="visual-1" fit="crop">
     <CodeSnippetPreview tabs={[copy.query, copy.response]} fill />

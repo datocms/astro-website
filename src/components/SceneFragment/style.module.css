@@ -3,8 +3,9 @@
  * The fragment fills the box of the FeatureFragments item with the tinted
  * surface: the accent colour, a little darker, thus the outline of the box
  * shows. The box is the container of the window. Each picture starts at
- * the top left corner of the box, with no margin, and the box cuts it at
- * the right and the bottom.
+ * the top left corner of the box, with no margin. The window of the
+ * picture is in the box, with its four edges and its four round corners,
+ * and it cuts the picture at the right and the bottom.
  */
 .fragment {
   position: absolute;
@@ -17,8 +18,8 @@
     --fragment-surface,
     color-mix(in oklab, var(--surface-accent) 65%, var(--surface-inverse))
   );
-  /* --fragment-corner: a parent can make round the top corner on the side of the picture. */
-  border-radius: var(--fragment-corner, 0) 0 0 0;
+  /* --fragment-corner: a parent can make round the four corners of the box. */
+  border-radius: var(--fragment-corner, 0);
 
   /*
    * The zoom of the breakpoint: `zoom`, and `phoneZoom` on phones (see the
@@ -48,10 +49,9 @@
 }
 
 /*
- * The clip cuts the picture at the edges of the box. It has square
- * corners, no line, no shadow and no fade: the cut is a hard edge. The
- * corner where the picture starts keeps the round corner that the picture
- * draws itself.
+ * The clip cuts what goes out of the box. It has no line, no shadow and
+ * no fade. The window in it (`scale`) or the clip itself (`crop`) draws
+ * the round corners.
  */
 .clip {
   position: absolute;
@@ -67,14 +67,30 @@
 }
 
 /*
+ * `scale`: the box is a container of its two sizes, thus a picture can
+ * measure the part of itself that the box shows. In the px of the
+ * picture, before the scale of `.screen`:
+ * - --fragment-visible-width: --fragment-reference divided by the zoom.
+ * - --fragment-visible-height: that width times the ratio of the box.
+ * A picture that draws its own edges (`border={false}`) takes these
+ * sizes, thus its edges and its corners are in the box.
+ */
+.scale {
+  container-type: size;
+  --fragment-visible-width: calc(var(--fragment-reference) / var(--fragment-current-zoom));
+  --fragment-visible-height: calc(var(--fragment-visible-width) * tan(atan2(100cqb, 100cqi)));
+}
+
+/*
  * `scale`: the window has a border and round corners. The picture in it
  * has no border, no corners and the zoom 1 of the kit: the window cuts it,
  * and the top left corner of the picture is at the top left corner of the
  * window. A box of --fragment-reference shows the picture at
  * --fragment-current-zoom; a box of another width scales it by its width
  * divided by --fragment-reference (tan(atan2()) divides two lengths). The
- * window goes past the right and the bottom edges of the box, thus the box
- * cuts it there.
+ * window fills the box, with its four edges and its four round corners:
+ * it cuts the picture at the right and the bottom, also in the middle of
+ * a word.
  */
 .window {
   --product-scenes-border: none;
@@ -82,16 +98,36 @@
   --product-scenes-zoom: 1;
 
   position: absolute;
-  inset: 0 -2px -2px 0;
+  inset: 0;
   overflow: hidden;
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
 }
 
 /*
+ * `border="inverse"`: the window has the border colour of a window on the
+ * inverse surface (AppWindow), and the corners of the other fragments.
+ * The window is not in the scale of `.screen`, thus its border is sharp at
+ * each edge of the box. The border is translucent: the window has the inverse surface under it,
+ * as the AppWindow, thus the border has the same colour as on an
+ * AppWindow. The screen keeps the border and the corners of the kit, as
+ * with `border={false}`.
+ */
+.inverseBorder .window {
+  --product-scenes-border: initial;
+  --product-scenes-radius: initial;
+
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+  border-color: var(--border-on-inverse-strong);
+}
+
+/*
  * `border={false}`: the picture draws its own edges, thus the window has no
  * border and no corners, and the screen keeps the border and the corners
- * of the kit (`initial` makes the kit use its defaults).
+ * of the kit (`initial` makes the kit use its defaults). The picture takes
+ * --fragment-visible-width and --fragment-visible-height, thus its edges
+ * are in the box, and it cuts its content inside them.
  */
 .noBorder .window {
   --product-scenes-border: initial;
@@ -109,16 +145,10 @@
 }
 
 /*
- * `align="end"`: the box cuts the window at the left. The top right corner
- * of the picture is at the top right corner of the window.
+ * `align="end"`: the window cuts the picture at the left and the bottom.
+ * The top right corner of the picture is at the top right corner of the
+ * window.
  */
-.end {
-  border-radius: 0 var(--fragment-corner, 0) 0 0;
-}
-
-.end .window {
-  inset: 0 0 -2px -2px;
-}
 
 .end .screen {
   position: absolute;
@@ -128,18 +158,19 @@
   transform-origin: 100% 0;
 }
 
-/* `crop`: the snippet has the corners of the window of `scale`, and no border: on the dark snippet the border does not show */
+/*
+ * `crop`: the picture keeps its size and the width of the box. The clip
+ * has the border and the four corners of the window of `scale`, thus it
+ * cuts the picture at the bottom inside a round corner. The snippet has
+ * the same corners.
+ */
 .crop {
   --code-snippet-radius: var(--radius-sm);
 }
 
-/*
- * `crop`: the picture keeps its size, and goes 2px past the right edge of
- * the box at every width of the box, thus the box cuts it at the right as
- * at the bottom.
- */
-.crop .surface {
-  width: calc(100% + 2px);
+.crop .clip {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
 }
 
 /*

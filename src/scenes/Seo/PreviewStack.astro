@@ -1,0 +1,50 @@
+---
+import type { SceneAppearance } from '../Scene';
+import { SeoPreviewCardScene } from './Seo';
+import { EVENT, STACK_CARDS } from './story';
+import styles from './previewStack.module.css';
+
+// The picture of the fragment "But what will it look like?": the SEO field
+// of the event three times, in a stack of cards. Each card shows the link
+// to the event in another place: a message of Slack, a post of LinkedIn, a
+// post of X. The two cards behind peek out above the front one. In a loop
+// (STEPS), the front card leaves and the next one comes forward, with the
+// motion of the stack of cards of linear.app. The stack has each card
+// twice: a card that leaves goes to the back unseen, while its copy comes
+// in behind the others. The markup is the last step: the first card at the
+// front.
+//
+// The stack has the size of the part of the picture that the box of the
+// SceneFragment shows (--fragment-visible-width, --fragment-visible-height),
+// thus each card ends in the box, with its border and its round corners,
+// and cuts the field in it at the right and the bottom.
+
+type Props = { appearance?: SceneAppearance };
+
+const { appearance } = Astro.props;
+
+const CARDS = [...STACK_CARDS, ...STACK_CARDS];
+// Each card is at the front for 5 seconds.
+const STEPS = CARDS.map((_, index) => `card-${index}:5000`).join(' ');
+---
+
+<div
+  class={styles.stack}
+  role="img"
+  aria-label={`The SEO field of DatoCMS three times, in a stack of cards: each card previews the link to the event “${EVENT.title}” in another place, with its title, description and image. In turn: a message of Slack, a post of LinkedIn, a post of X.`}
+  data-scene-steps={STEPS}
+>
+  {
+    CARDS.map((preview, index) => (
+      <div
+        class:list={[styles.card, 'surfacePage']}
+        style={`--stack-index: ${index}`}
+        aria-hidden="true"
+      >
+        <div class={styles.screen}>
+          <SeoPreviewCardScene preview={preview} appearance={appearance} />
+        </div>
+      </div>
+    ))
+  }
+</div>

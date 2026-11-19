@@ -1,0 +1,96 @@
+/*
+ * The stack of PreviewStack.astro: six cards, one on top of the other.
+ * Each card has a slot from its index and the step: -1 is the card that
+ * leaves (larger, blurred, gone), 0 the front card, 1 and 2 the cards that
+ * peek out above it, 3 and 4 the cards hidden at the back. At each step
+ * every card moves one slot forward. Without `data-step` (no JS, reduced
+ * motion) the step is 5: the first card is at the front.
+ */
+.stack {
+  --stack-step: 5;
+  --stack-ease: cubic-bezier(0.645, 0.045, 0.355, 1);
+
+  position: relative;
+  width: var(--fragment-visible-width);
+  height: var(--fragment-visible-height);
+}
+
+.stack[data-step='card-0'] {
+  --stack-step: 0;
+}
+
+.stack[data-step='card-1'] {
+  --stack-step: 1;
+}
+
+.stack[data-step='card-2'] {
+  --stack-step: 2;
+}
+
+.stack[data-step='card-3'] {
+  --stack-step: 3;
+}
+
+.stack[data-step='card-4'] {
+  --stack-step: 4;
+}
+
+.stack[data-step='card-5'] {
+  --stack-step: 5;
+}
+
+/*
+ * A card is the edge of the SEO field: it cuts the field at its border,
+ * with the corners of the field in the cms (4px, --radius-sm). The border
+ * is on top of the field, thus it also draws the side where the card cuts
+ * the field. There is no shadow: the cards behind are lighter. The card
+ * has the ground `surfacePage` (PreviewStack.astro), as the field follows
+ * the scheme of the page: in the dark scheme the empty cards behind are
+ * dark too, also on the accent ground of the box.
+ */
+.card {
+  /* The position in the stack from 0 to 5, then the slot: 5 is -1 */
+  --stack-position: mod(calc(var(--stack-index) - var(--stack-step) + 5), 6);
+  --stack-slot: calc(var(--stack-position) - 6 * clamp(0, var(--stack-position) - 4, 1));
+  /* 1 for the card that leaves, else 0 */
+  --stack-leaving: clamp(0, -1 * var(--stack-slot), 1);
+  /* The slot, from -1 to 2: the hidden cards stay behind the last one */
+  --stack-depth: clamp(-1, var(--stack-slot), 2);
+
+  position: absolute;
+  inset: 32px 0 0;
+  z-index: calc(10 - var(--stack-slot));
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--surface-default);
+  color: var(--text-on-page);
+  opacity: calc(
+    (1 - 0.3 * clamp(0, var(--stack-slot), 2)) * (1 - clamp(0, var(--stack-slot) - 2, 1)) *
+      (1 - var(--stack-leaving))
+  );
+  filter: blur(calc(2px * var(--stack-leaving)));
+  /* The cards are tall: from the top edge, the cards behind peek out by 16px each */
+  transform: translateY(calc(-16px * var(--stack-depth))) scale(calc(1 - 0.05 * var(--stack-depth)));
+  transform-origin: 50% 0;
+  transition:
+    transform 0.7s var(--stack-ease),
+    filter 0.7s var(--stack-ease),
+    opacity 0.7s var(--stack-ease);
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border: 1px solid var(--border-default);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Only the front card shows its field: the cards behind are empty. */
+.screen {
+  width: max-content;
+  opacity: calc(1 - clamp(0, var(--stack-slot), 1) - var(--stack-leaving));
+  transition: opacity 0.7s var(--stack-ease);
+}

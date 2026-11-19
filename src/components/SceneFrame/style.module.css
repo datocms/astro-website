@@ -26,10 +26,10 @@
 }
 
 /*
- * The frame has no surface and no outline. Only the top corner on the
- * side of the screen is round (--frame-corner): the top left, or the top
- * right for `detailEnd`. Where the frame cuts the screen, the corners are
- * square: the cut is a hard edge.
+ * The frame has no surface and no outline. The two top corners are round
+ * (--frame-corner), also where the frame cuts the screen at the side. At
+ * the bottom, where the frame cuts the screen, the corners are square:
+ * the cut is a hard edge.
  * On phones the frame is 70% of the page width high, or less. The height
  * is a limit, not a size: a screen shorter than the limit gives a shorter
  * frame, thus the frame never shows empty space below the screen.
@@ -42,7 +42,7 @@
   max-height: min(var(--scene-frame-height), var(--scene-frame-phone-height));
   overflow: hidden;
   --frame-corner: var(--radius-lg);
-  border-radius: var(--frame-corner) 0 0 0;
+  border-radius: var(--frame-corner) var(--frame-corner) 0 0;
 }
 
 /*
@@ -59,8 +59,8 @@
 }
 
 /*
- * On phones the screen starts at a corner of the frame, with no margin,
- * thus the round corner of the frame cuts the screen. A small radius cuts
+ * On phones the screen starts at the corners of the frame, with no margin,
+ * thus the round corners of the frame cut the screen. A small radius cuts
  * less of the interface, for example the button at the top right.
  */
 @media (max-width: 649px) {
@@ -85,14 +85,15 @@
  * `window`
  *
  *   desktop                      phone
- *   ╭────────────────────┐       ╭──────────┐
+ *   ╭────────────────────╮       ╭──────────╮
  *   │ screen             ┊       │ screen   ┊
  *   │                    ┊       │          ┊
  *   └────────────────────┘       └──────────┘
  *
  * The frame has no margin and no surface: the screen starts at the top
  * left corner. The frame cuts the screen at the right (┊) with a hard
- * edge and a square corner. From 650px the box is --scene-frame-cut-end (`cutEnd`,
+ * edge, under a round top corner, and at the bottom with square corners.
+ * From 650px the box is --scene-frame-cut-end (`cutEnd`,
  * default 2 × --space-3xl) wider than the frame: the frame cuts the info
  * aside. On phones the box is 615/330 of the frame (615px at 390px, where
  * the frame is 330px), thus the kit gives a screen of 1025px the zoom 0.6:
@@ -125,20 +126,19 @@
  * `detailEnd`
  *
  *   desktop                      phone
- *   ┌─────────────────╮──╮       ┌──────────╮
+ *   ╭─────────────────╮──╮       ╭──────────╮
  *   ┊  screen, larger │  │       ┊  screen  │
  *   ┊                 │  │       ┊          │
  *   └─────────────────┴──┘       └──────────┘
  *
  * The screen is 1100px wide, at the zoom of the frame: above 1, the frame
  * shows the info aside as a detail, cut at the left too (┊), with a hard
- * edge and a square corner. Smaller
+ * edge under a round top corner. Smaller
  * pages make the zoom smaller (× 0.8, × 0.6 on phones), thus a phone still
  * shows all the aside.
  */
 .detailEnd .frame {
   align-items: flex-end;
-  border-radius: 0 var(--frame-corner) 0 0;
 }
 
 .detailEnd .stage {
@@ -189,7 +189,7 @@
  * `fill`
  *
  *   desktop                      phone
- *   ╭────────────────────╮       ┌──────────┐
+ *   ╭────────────────────╮       ╭──────────╮
  *   │ screen             │       │──────────│
  *   │                    │       │ screen   │
  *   │                    │       │          │
@@ -200,16 +200,10 @@
  * fills the frame, with no margin. On phones the screen starts at the top corners
  * of the frame, and the kit zooms it down to the width of the box.
  * The frame makes the round corners, not the content: a screen, a card of
- * code or a box get the same corners. From 650px the two top corners are
- * round. The content has square corners, thus a content that is shorter
- * than the frame has square corners at the bottom.
+ * code or a box get the same corners. The two top corners are round. The
+ * content has square corners, thus a content that is shorter than the
+ * frame has square corners at the bottom.
  */
 .fill .stage {
   --product-scenes-radius: 0;
-}
-
-@media (min-width: 650px) {
-  .fill .frame {
-    border-radius: var(--frame-corner) var(--frame-corner) 0 0;
-  }
 }

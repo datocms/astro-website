@@ -1,10 +1,8 @@
 import {
-  PREVIEW_STACK_SEQUENCE,
   RecordForm,
   SEO_EDIT_SEQUENCE,
   SeoDialog,
   type SeoInputPage,
-  SeoPreviewStack,
 } from '@datocms/product-scenes';
 import { EditorScene, type EditorSceneOptions, type EditorStory } from '../editor';
 import { type FragmentSceneProps, Scene } from '../Scene';
@@ -85,22 +83,23 @@ export function SeoScene(options: EditorSceneOptions) {
   );
 }
 
+/** The props of a card of the stack of previews (PreviewStack.astro) */
+type SeoPreviewCardSceneProps = {
+  /** The preview that the field of the card shows */
+  preview: (typeof STACK_CARDS)[number];
+  appearance?: FragmentSceneProps['appearance'];
+};
+
 /**
- * The SEO field of the event three times, in a stack of cards: the link
- * card of the event on Slack, LinkedIn and X. Each card comes to the front
- * in turn (PREVIEW_STACK_SEQUENCE).
+ * The SEO field of the event with one preview: a card of the stack of
+ * PreviewStack.astro. The screen has a fixed size, larger than the card,
+ * thus the card cuts it at the right and the bottom. The stack has the
+ * description: the screen of a card is hidden from assistive technology.
  */
-export function SeoPreviewsScene({ width, height, appearance }: FragmentSceneProps) {
+export function SeoPreviewCardScene({ preview, appearance }: SeoPreviewCardSceneProps) {
   return (
-    <Scene
-      theme="purple"
-      appearance={appearance}
-      description={`The SEO field of DatoCMS three times, in a stack of cards: each card previews the link to the event “${EVENT.title}” in another place, with its title, description and image. In turn: a message of Slack, a post of LinkedIn, a post of X.`}
-      sequence={PREVIEW_STACK_SEQUENCE}
-      width={width}
-      height={height}
-    >
-      <SeoPreviewStack previews={[...PREVIEWS]} cards={[...STACK_CARDS]} page={PAGE} />
+    <Scene theme="purple" appearance={appearance} description="" width={555} height={448}>
+      <RecordForm.SeoInput previews={[...PREVIEWS]} current={preview} page={PAGE} />
     </Scene>
   );
 }

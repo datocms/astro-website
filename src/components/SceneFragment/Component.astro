@@ -12,9 +12,9 @@ interface Common {
  * `scale`: the box scales the picture by the zoom and by its width divided
  * by 500px, thus each box shows the same part of the picture, and the text
  * follows the width of the box. The picture is in a window with a border
- * and round corners, from its top left corner, at the top left corner of
- * the box, with no margin and no surface. The box cuts the window at the
- * right and the bottom.
+ * and four round corners, from its top left corner. The window fills the
+ * box, with no margin and no surface, and cuts the picture at the right
+ * and the bottom.
  */
 interface Scale extends Common {
   fit: 'scale';
@@ -37,26 +37,29 @@ interface Scale extends Common {
   phoneZoom?: number;
   /**
    * The corner of the picture that the window shows. `start`: the window
-   * shows the picture from its top left corner, and the box cuts it at the
-   * right. `end`: the window shows the picture from its top right corner,
-   * and the box cuts it at the left.
+   * shows the picture from its top left corner, and cuts it at the right.
+   * `end`: the window shows the picture from its top right corner, and
+   * cuts it at the left.
    * @default 'start'
    */
   align?: 'start' | 'end';
   /**
-   * The border and the round corners of the window. `false`: the picture
-   * draws its own edges (a stack of cards, a card in HTML).
+   * The border and the round corners of the window (--radius-sm). `true`:
+   * the border of a field (--border-default). `inverse`: the border of a
+   * window on the inverse surface (AppWindow: --border-on-inverse-strong),
+   * for a picture in a browser window without its own border. `false`: the picture draws its own edges (a stack of cards).
+   * It takes --fragment-visible-width and --fragment-visible-height, thus
+   * its edges are in the box, and it cuts its content inside them.
    * @default true
    */
-  border?: boolean;
+  border?: boolean | 'inverse';
 }
 
 /**
  * `crop`: the picture keeps its size at each width (a CodeSnippetPreview
  * with `fill`), at the top left corner of the box, with no margin and no
- * surface. It goes 2px past the right edge of the box, thus the box cuts
- * it at the right and the bottom, and a narrower box cuts more of it. The
- * snippet has the corners of the window of `scale`.
+ * surface. It has the width of the box, and the box cuts it at the bottom
+ * inside the border and the four round corners of the window of `scale`.
  */
 interface Crop extends Common {
   fit: 'crop';
@@ -107,7 +110,8 @@ interface Fill extends Common {
 
 /*
  * The fragment fills the 4:3 box of a FeatureFragments item with the
- * tinted surface, and the box cuts the picture at its edges.
+ * tinted surface. The window of the picture is in the box, with its four
+ * edges.
  */
 type Props = Scale | Crop | Fill;
 
@@ -133,6 +137,7 @@ const vars = [
     styles[fit],
     align === 'end' && styles.end,
     fit === 'scale' && !border && styles.noBorder,
+    fit === 'scale' && border === 'inverse' && styles.inverseBorder,
     fit === 'fill' && 'surfacePage',
   ]}
   style={vars || undefined}
@@ -162,7 +167,7 @@ const vars = [
       zoom,
       phoneZoom,
       align,
-      border: fit === 'scale' && !border ? false : undefined,
+      border: fit === 'scale' && border !== true ? border : undefined,
       height,
       phoneHeight,
     }}
