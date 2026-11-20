@@ -1,6 +1,6 @@
 /*
- * The section takes the theme of the active feature. The image and the
- * text change at once, the colours fade (the script).
+ * The section takes the theme of the active feature. The image, the text
+ * and the theme change at once, and the grounds fade (the script).
  * The list half is on surface/inverse, the visual half on surface/accent.
  */
 
@@ -14,10 +14,21 @@
   transition: none;
 }
 
-/* The sticky parts move with the site header (tokens.css, --header-slide). */
-.features .visualHalf,
-.features .stage {
-  transition: var(--header-slide);
+/*
+ * The fade of the ground (the script). The layer is below the content of
+ * its half: the content is a positioned box after it. At rest, it does
+ * not show.
+ */
+.fade {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stage,
+.list {
+  position: relative;
 }
 
 .split {
@@ -113,6 +124,7 @@
 }
 
 .listHalf {
+  position: relative;
   display: flex;
   justify-content: flex-end;
   padding: var(--section-padding-y) var(--section-padding-x);
@@ -140,11 +152,8 @@
  * A row has no surface, at rest and under the pointer: the arrow and the
  * description show the open row. A hairline separates two rows: without
  * it, the description of the open row is between two titles and belongs
- * to neither. The pointer does not open a row at once. The script opens
- * the row 150ms after the pointer stops on it: first the visitor reads the
- * text. 300ms after the pointer stops, the row becomes active: the theme
- * and the picture change. Thus a pointer that crosses the list does not
- * move the rows.
+ * to neither. A pointer on a row makes the row active at once: the theme
+ * and the picture change (the script).
  */
 .row {
   position: relative;
@@ -317,7 +326,7 @@
   }
 
   .visualHalf {
-    position: static;
+    position: relative;
     display: flex;
     align-items: center;
     padding-inline: var(--section-padding-x) var(--content-inset-half);

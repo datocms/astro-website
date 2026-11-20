@@ -86,6 +86,7 @@ const visuals = await Promise.all(
       ]}
       data-features-visual
     >
+      <span class={styles.fade} aria-hidden="true" data-features-fade></span>
       <div class={styles.stage}>
         <div
           class:list={[
@@ -142,6 +143,7 @@ const visuals = await Promise.all(
       class:list={[styles.listHalf, inverted ? 'surfaceAccent' : 'surfaceInverse']}
       data-theme={listTheme}
     >
+      <span class={styles.fade} aria-hidden="true" data-features-fade></span>
       <div class={styles.list}>
         {
           title && (
@@ -187,77 +189,15 @@ const visuals = await Promise.all(
   import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
   import { WebComponent } from '~/lib/WebComponent';
 
-  // The active row and the picture change at once. A pointer that stops or
-  // moves slowly on a row makes it active, and with no pointer the rows
-  // become active in turn.
-  // The colours of the theme go to the new theme in 200ms, in oklab: a
-  // change of all the section in one frame is a flash.
+  // A pointer on a row makes it active, and with no pointer the rows become
+  // active in turn. The theme, the text and the picture change in one frame.
+  // Only the grounds of the two halves fade: a change of these large areas in
+  // one frame is a flash. Each half has a layer below its content. The layer
+  // gets the old ground colour, and its opacity goes from 1 to 0 on the GPU.
+  // Do not fade the theme colours on the main thread or with a view
+  // transition: the fade then drops frames.
   const DESKTOP = window.matchMedia('(min-width: 1152px)');
   const FADE_MS = 200;
-
-  // The theme data (src/styles/tokens.css) that the fade mixes. The fade
-  // sets the data on the section, not the roles: each role (also a role
-  // that a ground class inside the section sets again) comes from the data.
-  // The list has the data of the two schemes: the dark scheme makes its
-  // grounds and its text from the `--theme-dark-*` data. A token that is
-  // not in the list changes in one frame.
-  // The colours mix in oklab: a straight line from one colour to the other.
-  // Do not use oklch: it turns around the hue circle, thus the middle of a
-  // fade has full chroma (a bright yellow from green to orange).
-  const COLORS = [
-    '--theme-paper',
-    '--theme-ink',
-    '--theme-ink-muted',
-    '--theme-ink-subtle',
-    '--theme-ink-faint',
-    '--theme-accent',
-    '--theme-accent-muted',
-    '--theme-accent-subtle',
-    '--theme-accent-faint',
-    '--theme-accent-bright',
-    '--theme-pixel-highlight',
-    '--theme-dark-ink',
-    '--theme-dark-inverse',
-    '--code-background',
-    '--code-plain',
-    '--code-keyword',
-    '--code-string',
-    '--code-constant',
-    '--code-function',
-    '--code-punctuation',
-    '--code-comment',
-    '--code-line-number',
-  ];
-
-  // The numbers and the percentages mix in a straight line.
-  const NUMBERS = [
-    '--theme-alpha-page-muted',
-    '--theme-alpha-page-headline-muted',
-    '--theme-alpha-on-accent-muted',
-    '--theme-alpha-on-accent-headline-muted',
-    '--theme-alpha-on-inverse-soft',
-    '--theme-alpha-on-inverse-muted',
-    '--theme-alpha-on-inverse-headline-muted',
-    '--theme-alpha-dark-border',
-    '--theme-dark-accent-chroma',
-    '--theme-dark-ground-chroma',
-  ];
-
-  const TOKENS = [...COLORS, ...NUMBERS];
-
-  // A custom property that is not registered does not transition. Thus
-  // animate one registered number from 0 to 1, and mix each token in oklab
-  // with that number.
-  try {
-    CSS.registerProperty({
-      name: '--features-mix',
-      syntax: '<number>',
-      inherits: true,
-      initialValue: '0',
-    });
-  } catch {
-    // The property is registered already (a second script run).
-  }
 
   customElements.define(
     'features-list',
@@ -272,112 +212,66 @@ const visuals = await Promise.all(
         const images = [...section.querySelectorAll<HTMLElement>('[data-features-image]')];
         const panes = [...section.querySelectorAll<HTMLElement>('[data-features-pane]')];
         const visual = this.$('[data-features-visual]');
+        const fades = this.$$('[data-features-fade]');
         let active = 0;
-        let fade: Animation | undefined;
-
-        const clearTokens = () => TOKENS.forEach((token) => section.style.removeProperty(token));
-
-        // Set the new theme. Each token starts at its current value (also a
-        // value in the middle of a fade) and goes to the value of the new theme.
-        const setTheme = (theme: string | undefined) => {
-          if (prefersReducedMotion()) {
-            section.dataset.theme = theme;
-            return;
-          }
-          const current = getComputedStyle(section);
-          const from = TOKENS.map((token) => current.getPropertyValue(token).trim());
-          fade?.cancel();
-          clearTokens();
-          section.dataset.theme = theme;
-          const next = getComputedStyle(section);
-          const to = TOKENS.map((token) => next.getPropertyValue(token).trim());
-          TOKENS.forEach((token, i) => {
-            // A theme that does not set a token has no value to mix.
-            if (from[i] === to[i] || !from[i] || !to[i]) return;
-            section.style.setProperty(
-              token,
-              COLORS.includes(token)
-                ? `color-mix(in oklab, ${from[i]}, ${to[i]} calc(var(--features-mix) * 100%))`
-                : `calc(${from[i]} + (${to[i]} - ${from[i]}) * var(--features-mix))`,
-            );
-          });
-          fade = section.animate(
-            { '--features-mix': [0, 1] },
-            { duration: FADE_MS, easing: 'ease-out' },
-          );
-          fade.onfinish = () => {
-            clearTokens();
-            fade = undefined;
-          };
-        };
 
         // The open row shows its arrow and its description.
         const open = (index: number) =>
           rows.forEach((row, i) => row.toggleAttribute('data-open', i === index));
 
-        // The active row has the theme and the picture. It is also open.
-        const activate = (index: number) => {
-          open(index);
-          if (index === active || !rows[index]) return;
-          active = index;
-          rows.forEach((row, i) => row.toggleAttribute('data-active', i === index));
-          images.forEach((img, i) => img.toggleAttribute('data-active', i === index));
+        // Show the active row, its picture and its theme. The active row is
+        // also open.
+        const render = () => {
+          open(active);
+          rows.forEach((row, i) => row.toggleAttribute('data-active', i === active));
+          images.forEach((img, i) => img.toggleAttribute('data-active', i === active));
           panes.forEach((pane) =>
-            pane.toggleAttribute('data-active', pane.dataset.featuresPane === String(index)),
+            pane.toggleAttribute('data-active', pane.dataset.featuresPane === String(active)),
           );
-          setTheme(rows[index]!.dataset.rowTheme);
+          section.dataset.theme = rows[active]!.dataset.rowTheme;
         };
 
-        // ≥1152: only a pointer on a row changes the active row. The pointer
-        // on the picture does not change it, and the last active row stays
-        // active. The speed of the pointer shows the intent of the visitor:
-        // - A slow pointer on a row makes the row active at once: the
-        //   visitor looks at the row.
-        // - A fast pointer changes nothing: it only crosses the list. If it
-        //   stops on a row for 60ms, the row becomes active.
-        // - A page that scrolls below a pointer that does not move changes
-        //   nothing: the coordinates of the pointer stay the same.
-        // The speed is the distance from an anchor that is 16ms old or more:
-        // the time between two events is too short for a good measurement.
-        // An anchor that is more than 100ms old is from before a stop, thus
-        // it gives no speed.
-        const SLOW_PX_PER_MS = 0.5;
-        const SAMPLE_MS = 16;
-        const STALE_MS = 100;
-        const REST_MS = 60;
-        let restTimer = 0;
+        // While a fade runs, a new row changes the page at once, and the same
+        // fade continues to the ground of the newest row.
+        const activate = (index: number) => {
+          if (!rows[index]) return;
+          if (index === active) return open(index);
+          active = index;
+          const fade =
+            !prefersReducedMotion() && fades.every((layer) => !layer.getAnimations().length);
+          if (!fade) return render();
+          const grounds = fades.map(
+            (layer) => getComputedStyle(layer.parentElement!).backgroundColor,
+          );
+          render();
+          fades.forEach((layer, i) => {
+            layer.style.backgroundColor = grounds[i]!;
+            layer.animate({ opacity: [1, 0] }, { duration: FADE_MS, easing: 'ease-out' });
+          });
+        };
+
+        // ≥1152: only a pointer on a row changes the active row. A pointer that
+        // moves onto a row makes it active at once. The pointer on the picture
+        // does not change it, and the last active row stays active. A page that
+        // scrolls below a pointer that does not move changes nothing: the
+        // coordinates of the pointer stay the same.
         let previous: { x: number; y: number } | undefined;
-        let anchor: { x: number; y: number; time: number } | undefined;
         this.on(section, 'pointermove', (event) => {
           if (!DESKTOP.matches || event.pointerType === 'touch') return;
-          const { clientX: x, clientY: y, timeStamp: time } = event;
+          const { clientX: x, clientY: y } = event;
           const moved = previous !== undefined && (previous.x !== x || previous.y !== y);
           previous = { x, y };
-          // The first event in the section can come from a scroll: it starts
-          // the measurement only.
+          // The first event in the section can come from a scroll.
           if (!moved) return;
-          clearTimeout(restTimer);
-          const elapsed = anchor ? time - anchor.time : Infinity;
-          let slow = false;
-          if (!anchor || elapsed > STALE_MS) {
-            anchor = { x, y, time };
-          } else if (elapsed >= SAMPLE_MS) {
-            slow = Math.hypot(x - anchor.x, y - anchor.y) / elapsed < SLOW_PX_PER_MS;
-            anchor = { x, y, time };
-          }
           const row =
             event.target instanceof Element
               ? event.target.closest<HTMLElement>('[data-features-row]')
               : null;
           const index = row ? rows.indexOf(row) : -1;
-          if (index < 0) return;
-          if (slow) activate(index);
-          else restTimer = window.setTimeout(() => activate(index), REST_MS);
+          if (index >= 0) activate(index);
         });
         this.on(section, 'pointerleave', () => {
-          clearTimeout(restTimer);
           previous = undefined;
-          anchor = undefined;
         });
         // A touch or a click on a row is a clear intent.
         rows.forEach((row, i) => {
@@ -469,7 +363,6 @@ const visuals = await Promise.all(
         signal.addEventListener('abort', () => {
           stopObserver();
           clearTimeout(rotateTimer);
-          clearTimeout(restTimer);
         });
       }
 
