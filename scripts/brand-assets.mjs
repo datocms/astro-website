@@ -135,12 +135,13 @@ const files = {
 /*
  * The favicon: the app icon for a browser tab. A tab does not cut the
  * picture, thus the square has its own round corners. A tab shows the
- * picture at 16px, thus the D is larger than in the app icon: 11px tall at
+ * picture at 16px, thus the D is larger than in the app icon: 10px tall at
  * 16px. A larger D hides the purple, and the picture then looks dark.
- * With this shift the left edge of the D is on a full pixel at 16px and
- * at 32px, thus the edge is sharp.
+ * The D has no shift: with its box in the centre, its left edge is at
+ * 3.03px at 16px and its top edge at 3px, thus the edges are sharp. A
+ * shift to the right puts the left edge between two pixels at 16px.
  */
-const favicon = badge({ size: 0.6875, shift: 0.0425, side: 64, radius: 0.22 });
+const favicon = badge({ size: 0.625, shift: 0, side: 64, radius: 0.22 });
 
 /*
  * The README buttons: the dark symbol and a label on a pill of purple, the
