@@ -152,18 +152,18 @@ export class PixelVideoElement extends Base {
     this.#canvas.setAttribute('aria-hidden', 'true');
     this.append(this.#canvas);
     this.#applySettings();
-    try {
-      this.#renderer = createRenderer(this.#canvas, () => this.#draw, this.#requestFrame);
-      this.#renderer.setFrame(this.#cellsAt(), this.#frames?.width ?? 0, this.#frames?.height ?? 0);
-    } catch (error) {
-      console.warn(`[pixel-video] ${error instanceof Error ? error.message : error}`);
-    }
     document.addEventListener('visibilitychange', this.#requestFrame);
     document.documentElement.addEventListener('colorschemechange', this.#onSchemeChange);
     observe(this, {
+      // The renderer starts when the element comes near the viewport, not
+      // when it connects. It reads the colours with getComputedStyle: in
+      // connectedCallback, the page is still in the parser, thus the browser
+      // must calculate all the styles of the page before the first paint.
+      // The WebGL context also waits: a browser has approximately 16.
       near: (e) => {
         if (!e.isIntersecting || this.#near) return;
         this.#near = true;
+        this.#startRenderer();
         this.#load();
       },
       visible: (e) => {
@@ -194,8 +194,22 @@ export class PixelVideoElement extends Base {
     else this.#requestFrame();
   }
 
+  #startRenderer() {
+    if (this.#renderer || !this.#canvas) return;
+    this.refreshColors();
+    try {
+      this.#renderer = createRenderer(this.#canvas, () => this.#draw, this.#requestFrame);
+      this.#renderer.setFrame(this.#cellsAt(), this.#frames?.width ?? 0, this.#frames?.height ?? 0);
+    } catch (error) {
+      console.warn(`[pixel-video] ${error instanceof Error ? error.message : error}`);
+    }
+    this.#requestFrame();
+  }
+
   // The tokens change with the colour scheme: read the colours again.
-  #onSchemeChange = () => this.refreshColors();
+  #onSchemeChange = () => {
+    if (this.#renderer) this.refreshColors();
+  };
 
   /** Read the `var()` colours again from the CSS of the page. */
   refreshColors() {
@@ -223,7 +237,8 @@ export class PixelVideoElement extends Base {
       ...(palette ? { palette } : {}),
     });
     this.style.setProperty('--pixel-video-focus', String(this.#settings.focus));
-    this.refreshColors();
+    // Before the renderer starts, there are no colours to read
+    if (this.#renderer) this.refreshColors();
   }
 
   #load() {

@@ -11,7 +11,7 @@ import s from './style.module.css';
 </docs-pixel-field>
 
 <script>
-  import { onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
+  import { onEnterViewport, onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
   import { resolveColor } from '~/lib/pixel-video/color';
   import { createRenderer, type DrawSettings, type Renderer } from '~/lib/pixel-video/renderer';
   import { findPalette } from '~/lib/pixel-video/styles';
@@ -45,6 +45,15 @@ import s from './style.module.css';
       parsedCallback() {
         this.#canvas = this.$<HTMLCanvasElement>('canvas');
         this.#still = prefersReducedMotion();
+        // The field starts in the first callback of the observer, after the
+        // first layout of the page. In parsedCallback the page is still in
+        // the parser: getComputedStyle (the colours) and clientWidth (the
+        // size) make the browser calculate the styles and the layout of all
+        // the page before the first paint.
+        this.eventListenerRemovers.push(onEnterViewport(this, () => this.#begin()));
+      }
+
+      #begin() {
         this.#readColors();
         try {
           this.#renderer = createRenderer(
