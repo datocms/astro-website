@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash-es';
 import { LRUCache } from 'lru-cache';
-import { invalidateFastlySurrogateKeys } from './fastly';
+import { purgeCacheTags } from './purgeCache';
 import { augmentResponseHeadersWithSurrogateKeys, type Context } from './surrogateKeys';
 
 export const cache = new LRUCache({
@@ -40,7 +40,7 @@ export function dataSource<T>(
 
     if (toInvalidate) {
       cache.delete(surrogateKey);
-      await invalidateFastlySurrogateKeys([surrogateKey]);
+      await purgeCacheTags([surrogateKey]);
 
       if (result) {
         cache.set(surrogateKey, result);

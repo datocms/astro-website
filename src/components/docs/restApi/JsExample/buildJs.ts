@@ -1,5 +1,5 @@
 import { camelCase } from 'lodash-es';
-import * as prettier from 'prettier';
+import * as prettier from '~/lib/prettier';
 import { invariant } from '~/lib/invariant';
 import exampleValueForSchema from '../exampleValueForSchema';
 import type { RestApiEndpointJsClient } from '../fetchRestApiEndpointJsClient';

@@ -1,4 +1,4 @@
-import * as prettier from 'prettier';
+import * as prettier from '~/lib/prettier';
 import type { Language } from './LanguagePicker/utils';
 import type { JSONSchema } from './types';
 

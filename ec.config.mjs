@@ -51,6 +51,9 @@ const tokenRolesPlugin = definePlugin({
 export default defineEcConfig({
   themes: ['catppuccin-latte', 'catppuccin-frappe'],
   plugins: [pluginLineNumbers(), tokenRolesPlugin],
+  // The WASM engine of regular expressions (Oniguruma) does not load in
+  // Cloudflare Workers. The JavaScript engine needs no WebAssembly.
+  shiki: { engine: 'javascript' },
   styleOverrides: {
     codeFontSize: '1em',
     codeFontFamily: 'var(--font-mono)',

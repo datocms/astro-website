@@ -1,4 +1,5 @@
-import node from '@astrojs/node';
+import cloudflare from '@astrojs/cloudflare';
+import { cacheCloudflare } from '@astrojs/cloudflare/cache';
 import react from '@astrojs/react';
 import expressiveCode from 'astro-expressive-code';
 import { defineConfig, envField } from 'astro/config';
@@ -423,9 +424,10 @@ export default defineConfig({
       sourcemap: 'hidden',
     },
   },
-  adapter: node({
-    mode: 'standalone',
-  }),
+  adapter: cloudflare(),
+  cache: {
+    provider: cacheCloudflare(),
+  },
   security: {
     checkOrigin: false,
   },

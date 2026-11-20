@@ -20,6 +20,43 @@ export const rollbar: MiddlewareHandler = async ({ request, params }, next) => {
   }
 };
 
+const ONE_YEAR = 60 * 60 * 24 * 365;
+
+/*
+ * The bridge from the headers of the origin to the cache of Astro.
+ *
+ * `executeQuery` and the data sources write the tags of a response in the
+ * header `datocms-cache-tags` (`~/lib/surrogateKeys`). This step gives them
+ * to `cache.set()`, and the cache provider of the adapter writes the headers
+ * of the host (`Cache-Tag` on Cloudflare).
+ *
+ * Astro writes the cache headers when the middleware returns. A page streams,
+ * thus a query in a layout or in a component runs after that moment and its
+ * tags are lost. Reading the body first makes all the queries run.
+ */
+export const cacheTags: MiddlewareHandler = async (context, next) => {
+  let response = await next();
+
+  if ((response.headers.get('content-type') || '').includes('text/html')) {
+    response = new Response(await response.arrayBuffer(), response);
+  }
+
+  const tags = response.headers.get('datocms-cache-tags');
+  response.headers.delete('surrogate-key');
+  response.headers.delete('surrogate-control');
+
+  if (isDraftModeEnabled(context.request) || response.status >= 500) {
+    context.cache.set(false);
+    return response;
+  }
+
+  if (tags) {
+    context.cache.set({ maxAge: ONE_YEAR, swr: 60, tags: tags.split(' ') });
+  }
+
+  return response;
+};
+
 const wellKnownFiles: Record<string, { body: string; contentType: string }> = {
   '/.well-known/api-catalog': { body: apiCatalog, contentType: 'application/linkset+json' },
   '/.well-known/mcp.json': { body: mcpServerCard, contentType: 'application/json' },
@@ -127,25 +164,18 @@ export const markdownProxy: MiddlewareHandler = async (context, next) => {
   // Handles both /page.html.md and /index.html.md patterns
   if (pathname.endsWith('.md')) {
     try {
-      // Remove the .md extension to get the original HTML URL
+      // Remove the .md extension to get the path of the HTML page
       const htmlPathPlusSearch = pathname.slice(0, -3) + context.url.search;
-
-      // Build the HTML URL with the same origin and search params
       const htmlUrl = new URL(htmlPathPlusSearch, baseUrl(context.request));
-      htmlUrl.search = context.url.search;
 
-      // Fetch the HTML version
-      const htmlResponse = await fetch(htmlUrl);
+      // Render the HTML page in this same request, with no fetch. A Worker
+      // that fetches its own hostname does not reach itself.
+      const htmlResponse = await next(htmlPathPlusSearch);
 
-      if (!htmlResponse.ok) {
-        return next();
-      }
-
-      // Check if the response is HTML - only convert HTML to markdown
+      // Only an HTML page has a Markdown version
       const contentType = htmlResponse.headers.get('content-type') || '';
-      if (!contentType.includes('text/html')) {
-        // Not HTML, skip markdown conversion
-        return next();
+      if (!htmlResponse.ok || !contentType.includes('text/html')) {
+        return htmlResponse.ok ? new Response('Not found', { status: 404 }) : htmlResponse;
       }
 
       // Get the HTML content
@@ -254,6 +284,7 @@ export const propagateToken: MiddlewareHandler = async (context, next) => {
 
 export const onRequest = sequence(
   rollbar,
+  cacheTags,
   wellKnown,
   markdownProxy,
   security,
