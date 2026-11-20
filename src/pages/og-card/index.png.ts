@@ -282,14 +282,20 @@ export const GET: APIRoute = async ({ request, url }) => {
     // satori reads static TTF and OTF files only, thus the card uses the two
     // static instances of ABC Oracle in the font bucket, not the variable font.
     // The files come from the bucket, not from `/fonts/` of the site: a
-    // Worker that fetches its own hostname does not reach itself.
-    const loadFont = (file: string) =>
-      fetch(`${UI_FONTS_BASE_URL}/${file}`).then((res) => {
-        if (!res.ok) {
-          throw new Error(`Could not load ${file} for the OG card: HTTP ${res.status}`);
-        }
-        return res.arrayBuffer();
-      });
+    // Worker that fetches its own hostname does not reach itself. The bucket
+    // is a Worker on workers.dev, and a Worker reaches it only through the
+    // service binding `UI_FONTS`. In local dev the binding can be absent or
+    // fail, thus the URL is the fallback.
+    const loadFont = async (file: string) => {
+      const fontUrl = `${UI_FONTS_BASE_URL}/${file}`;
+      const { env } = await import('cloudflare:workers');
+      let res = await env.UI_FONTS?.fetch(fontUrl).catch(() => undefined);
+      if (!res?.ok) res = await fetch(fontUrl);
+      if (!res.ok) {
+        throw new Error(`Could not load ${file} for the OG card: HTTP ${res.status}`);
+      }
+      return res.arrayBuffer();
+    };
 
     const rawData = url.searchParams.get('data');
 

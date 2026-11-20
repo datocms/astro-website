@@ -4,7 +4,7 @@ import react from '@astrojs/react';
 import expressiveCode from 'astro-expressive-code';
 import { defineConfig, envField } from 'astro/config';
 import { readdirSync, readFileSync } from 'fs';
-import { writeFile } from 'fs/promises';
+import { rm, writeFile } from 'fs/promises';
 import type { Plugin } from 'vite';
 import { cssLayerArea } from './css-scope.mjs';
 import { readHeader } from './src/lib/pixel-video/format';
@@ -285,6 +285,19 @@ export default defineConfig({
     react(),
     expressiveCode(),
     {
+      // The Cloudflare adapter writes the redirects of the config into
+      // `_redirects`. Cloudflare refuses that file: a rule with `*` or `:` makes
+      // all the rules after it dynamic, and the limit is 100 dynamic rules.
+      // The adapter also writes wrong targets for the `[...rest]` redirects.
+      // Thus we remove the file, and the Worker answers each redirect.
+      name: 'no-underscore-redirects',
+      hooks: {
+        'astro:build:done': async ({ dir }) => {
+          await rm(new URL('_redirects', dir), { force: true });
+        },
+      },
+    },
+    {
       name: 'rollbar',
       hooks: {
         'astro:config:setup': async ({ injectScript }) => {
@@ -508,7 +521,6 @@ export default defineConfig({
     '/legal/security': '/security',
     '/legal/privacy': '/legal/privacy-policy',
     '/pricing/compare': '/pricing',
-    '/partners/harvey-cameron/showcase/jacuzzi ': '/partners',
     '/use-cases': '/case-studies',
     '/lp/migcs': '/features',
     '/lp/migcs/thanks': '/features',

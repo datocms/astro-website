@@ -19,4 +19,7 @@ declare module 'cloudflare:workers' {
   export const cache: {
     purge(options: { tags?: string[]; purgeEverything?: boolean }): Promise<unknown>;
   };
+  export const env: {
+    UI_FONTS?: { fetch(input: string): Promise<Response> };
+  };
 }

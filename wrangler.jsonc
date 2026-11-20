@@ -5,5 +5,8 @@
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "binding": "ASSETS", "directory": "./dist/client" },
   "cache": { "enabled": true },
+  // The OG card reads its fonts from this Worker. A Worker cannot fetch an
+  // other Worker on workers.dev by its URL: the request gives a 404.
+  "services": [{ "binding": "UI_FONTS", "service": "datocms-ui-fonts" }],
   "observability": { "enabled": true },
 }
