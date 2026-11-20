@@ -422,10 +422,16 @@ export default defineConfig({
       sourcemap: 'hidden',
     },
   },
-  adapter: cloudflare(),
-  cache: {
-    provider: cacheCloudflare(),
-  },
+  // The tests (Vitest) need the Vite config of Astro, not the Worker: with the
+  // adapter, Vitest starts workerd and the tests do not run.
+  ...(process.env.VITEST
+    ? {}
+    : {
+        adapter: cloudflare(),
+        cache: {
+          provider: cacheCloudflare(),
+        },
+      }),
   security: {
     checkOrigin: false,
   },
