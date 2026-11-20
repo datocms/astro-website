@@ -17,6 +17,26 @@
   margin: 0;
   background: var(--surface-inverse);
   color: var(--text-on-inverse);
+  /* The globe (the palette globeDim): on the inverse surface it is quiet, the land shows clearly and the sea a little */
+  --ping-globe-sea: color-mix(in oklab, var(--surface-inverse) 92%, var(--text-on-inverse));
+  --ping-globe-land: color-mix(in oklab, var(--surface-inverse) 78%, var(--text-on-inverse));
+}
+
+/* On the page surface, the land is the accent and the sea a tint of it: the globe pulls the eye to the number */
+:global([data-diagram-surface='page']) .ping {
+  --ping-globe-sea: var(--surface-accent-subtle);
+  --ping-globe-land: var(--surface-accent);
+}
+
+/*
+ * The dark scheme: no token fits. The tints of the accent are see-through
+ * in the dark scheme, and the canvas shows a see-through colour on white.
+ * Thus the sea and the land are opaque mixes of the accent into the dark
+ * surface, and the light number stays clear on the land.
+ */
+:global(:root[data-color-scheme='dark']) :global([data-diagram-surface='page']) .ping {
+  --ping-globe-sea: color-mix(in oklab, var(--surface-default) 92%, var(--surface-accent));
+  --ping-globe-land: color-mix(in oklab, var(--surface-default) 68%, var(--surface-accent));
 }
 
 /*

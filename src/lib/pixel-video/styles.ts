@@ -211,14 +211,16 @@ export const globe: Style = {
   highStroke: 'var(--surface-default)',
 };
 
-// The globe footage, quiet, on the inverse surface: the land shows
-// clearly, the sea a little. This is the globe behind the Ping diagram.
+// The globe footage behind the Ping diagram. The diagram gives the colours
+// of the sea and of the land (--ping-globe-sea, --ping-globe-land in
+// src/scenes/Graphql/style.module.css): quiet on the inverse surface, the
+// accent on the page surface. Outside the diagram, only the surface shows.
 export const globeDim: Style = {
   bgFill: INVERSE,
   bgStroke: INVERSE,
-  midFill: 'color-mix(in oklab, var(--surface-inverse) 92%, var(--text-on-inverse))',
+  midFill: 'var(--ping-globe-sea)',
   midStroke: INVERSE,
-  highFill: 'color-mix(in oklab, var(--surface-inverse) 78%, var(--text-on-inverse))',
+  highFill: 'var(--ping-globe-land)',
   highStroke: INVERSE,
 };
 
