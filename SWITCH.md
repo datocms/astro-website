@@ -25,7 +25,7 @@ Two Workers come from the same code and the same `wrangler.jsonc`:
 
 ## Workers Builds
 
-Connect each Worker to the repository in the dashboard: Workers & Pages → the Worker → Settings → Build → Connect. Use the repository `datocms/astro-website`.
+Both Workers are connected to the repository `datocms/astro-website` (Workers & Pages → the Worker → Settings → Build), with these settings:
 
 | Setting                   | `astro-website`                | `astro-website-draft`                     |
 | ------------------------- | ------------------------------ | ----------------------------------------- |
