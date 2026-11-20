@@ -16,6 +16,7 @@ import { picturesFor } from '~/lib/pictures';
 import { JsonLd } from '~/components/JsonLd';
 import { iconDataUri } from '~/lib/iconDataUri';
 import { NavigationProgress } from '~/components/NavigationProgress';
+import { SkipLink } from '~/components/SkipLink';
 
 /*
  * The head of every page: SEO, favicon, canonical URL, RSS links, cookie
@@ -36,9 +37,14 @@ type Props = {
   theme?: Theme;
   /** The dense values of the type ladder, as `data-density` of <body>. */
   density?: 'dense';
+  /**
+   * The id of the <main> of the layout. The skip link goes to it. The
+   * element must have tabindex="-1": the next Tab then starts in it.
+   */
+  skipTarget: string;
 };
 
-const { seo, ogCard, theme = 'purple', density } = Astro.props;
+const { seo, ogCard, theme = 'purple', density, skipTarget } = Astro.props;
 
 // The order of the cascade layers (see src/styles/global.css). The statement
 // is the first child of <head>, before all other CSS.
@@ -117,6 +123,7 @@ const pageMeta = extractFromSeoTags(stripStega(finalSeo));
     <slot name="head" />
   </head>
   <body data-theme={theme} data-density={density}>
+    <SkipLink target={skipTarget} />
     <NavigationProgress />
     <slot />
     {draftModeEnabled && <ContentLink />}

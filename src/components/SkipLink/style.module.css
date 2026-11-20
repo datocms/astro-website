@@ -1,0 +1,35 @@
+/*
+ * Outside the focus, the link has no size and does not show. A screen
+ * reader still reads it. On focus, it shows as a pill on top of the
+ * header of the site and of the bar of the docs.
+ */
+.root {
+  position: fixed;
+  top: var(--space-3xs);
+  left: var(--space-3xs);
+  z-index: 100;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding-inline: var(--space-sm);
+  border-radius: var(--radius-full);
+  background: var(--surface-inverse);
+  color: var(--text-on-inverse);
+  text-decoration: none;
+
+  &:not(:focus) {
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* The ring is the colour of the page, outside the pill. */
+  &:focus-visible {
+    outline: 2px solid var(--text-on-page);
+    outline-offset: 2px;
+  }
+}

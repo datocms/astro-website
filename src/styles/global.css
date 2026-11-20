@@ -142,6 +142,23 @@
   }
 
   /*
+   * The skip link (src/components/SkipLink) moves the focus to the <main>
+   * of the layout. The main area is not a control, thus it shows no ring.
+   */
+  main[tabindex='-1']:focus {
+    outline: none;
+  }
+
+  /*
+   * The main area stops below the bands that stick to the top of the
+   * screen. At the top of the page, the skip link then does not scroll.
+   * The docs set --anchor-offset.
+   */
+  main[tabindex='-1'] {
+    scroll-margin-top: var(--anchor-offset, var(--sticky-offset));
+  }
+
+  /*
    * On a page of src/layouts/Layout.astro, the footer is at the bottom of
    * the window when the content is short. The main element takes the free
    * height. The docs layout has no #layout-content, thus this rule does
