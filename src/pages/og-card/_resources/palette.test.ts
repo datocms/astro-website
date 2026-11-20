@@ -6,7 +6,7 @@
  */
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { colorMix, composite, toHex } from '~/lib/tokens/color';
+import { composite, toHex } from '~/lib/tokens/color';
 import { pagePath, THEMES, TokenSheet } from '~/lib/tokens/resolve';
 import { type OgPalette, palettes } from './palette';
 
@@ -27,8 +27,9 @@ function computePalette(theme: (typeof THEMES)[number]): OgPalette {
     muted: toHex(composite(color('--text-on-page-muted'), paper)),
     headlineMuted: toHex(composite(color('--text-on-page-headline-muted'), paper)),
     chip: toHex(composite(color('--surface-inverse-faint'), paper)),
-    frameLine: toHex(colorMix('oklab', accent, 65, ink, 35)),
-    inkOnAccentMuted: toHex(composite(color('--text-on-accent-muted'), accent)),
+    onAccent: toHex(composite(color('--text-on-accent'), accent)),
+    plate: toHex(color('--surface-raised')),
+    border: toHex(composite(color('--border-on-page'), paper)),
     highlight: toHex(color('--theme-pixel-highlight')),
   };
 }

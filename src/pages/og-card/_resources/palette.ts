@@ -14,7 +14,7 @@ import type { Theme } from '~/lib/theme';
 export interface OgPalette {
   /** `--surface-default`: the ground of the card. */
   paper: string;
-  /** `--text-on-page`: the text, the wordmark, the figure of the picture. */
+  /** `--text-on-page`: the text and the wordmark. */
   ink: string;
   /** `--surface-accent`: the ground of the picture. */
   accent: string;
@@ -24,10 +24,12 @@ export interface OgPalette {
   headlineMuted: string;
   /** `--surface-inverse-faint`, on the paper: the fill of a chip. */
   chip: string;
-  /** The line of a scene frame: `color-mix(in oklab, accent 65%, ink)`. The grid of the picture. */
-  frameLine: string;
-  /** `--text-on-accent-muted`, on the accent: the mid tone of a logo in the picture. */
-  inkOnAccentMuted: string;
+  /** `--text-on-accent`, on the accent: the symbol in the picture. */
+  onAccent: string;
+  /** `--surface-raised`: the white plate of the logo of a partner. */
+  plate: string;
+  /** `--border-default` of the page, on the paper: the line between the paper and the plate. */
+  border: string;
   /** `--theme-pixel-highlight`: the light tone of a cover on the ink half. */
   highlight: string;
 }
@@ -40,8 +42,9 @@ export const palettes: Record<Theme, OgPalette> = {
     muted: '#796561',
     headlineMuted: '#8f7f7a',
     chip: '#e7e5dc',
-    frameLine: '#a68e3f',
-    inkOnAccentMuted: '#6b5028',
+    onAccent: '#351615',
+    plate: '#ffffff',
+    border: '#e7e5dc',
     highlight: '#f8f2c2',
   },
   orange: {
@@ -51,8 +54,9 @@ export const palettes: Record<Theme, OgPalette> = {
     muted: '#7e6159',
     headlineMuted: '#8e736b',
     chip: '#e8dfd9',
-    frameLine: '#af552c',
-    inkOnAccentMuted: '#522113',
+    onAccent: '#42180f',
+    plate: '#ffffff',
+    border: '#e8dfd9',
     highlight: '#e8d855',
   },
   green: {
@@ -62,8 +66,9 @@ export const palettes: Record<Theme, OgPalette> = {
     muted: '#486e5a',
     headlineMuted: '#648674',
     chip: '#dae9dd',
-    frameLine: '#67a046',
-    inkOnAccentMuted: '#265534',
+    onAccent: '#1a4731',
+    plate: '#ffffff',
+    border: '#dae9dd',
     highlight: '#eef0a8',
   },
   purple: {
@@ -73,8 +78,9 @@ export const palettes: Record<Theme, OgPalette> = {
     muted: '#6f6180',
     headlineMuted: '#7e728e',
     chip: '#dfdcea',
-    frameLine: '#6a49ab',
-    inkOnAccentMuted: '#2f1650',
+    onAccent: '#18032e',
+    plate: '#ffffff',
+    border: '#dfdcea',
     highlight: '#d1c4ff',
   },
   blue: {
@@ -84,8 +90,9 @@ export const palettes: Record<Theme, OgPalette> = {
     muted: '#516d77',
     headlineMuted: '#668189',
     chip: '#d7eaec',
-    frameLine: '#3d94af',
-    inkOnAccentMuted: '#204b5b',
+    onAccent: '#1a3a47',
+    plate: '#ffffff',
+    border: '#d7eaec',
     highlight: '#cbf5ee',
   },
   pink: {
@@ -95,8 +102,9 @@ export const palettes: Record<Theme, OgPalette> = {
     muted: '#826065',
     headlineMuted: '#927277',
     chip: '#ebdfe1',
-    frameLine: '#af5866',
-    inkOnAccentMuted: '#5d222c',
+    onAccent: '#3f0e16',
+    plate: '#ffffff',
+    border: '#ebdfe1',
     highlight: '#ffd6b3',
   },
   docs: {
@@ -106,8 +114,9 @@ export const palettes: Record<Theme, OgPalette> = {
     muted: '#6c6c72',
     headlineMuted: '#818186',
     chip: '#e8e8e9',
-    frameLine: '#6b53a6',
-    inkOnAccentMuted: '#262136',
+    onAccent: '#1a1923',
+    plate: '#ffffff',
+    border: '#e8e8e9',
     highlight: '#d1c4ff',
   },
 };

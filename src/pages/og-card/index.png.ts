@@ -10,8 +10,8 @@ import { toArrayBuffer } from '~/lib/toArrayBuffer';
 import { handleUnexpectedError, invalidRequestResponse } from '~/pages/api/_utils';
 import { UI_FONTS_BASE_URL } from 'astro:env/server';
 import { type OgPalette, palettes } from './_resources/palette';
-import { pixelPicture } from './_resources/pixelPicture';
-import { dataUri, svgToPng } from './_resources/raster';
+import { picture } from './_resources/picture';
+import { pngSize, svgToPng } from './_resources/raster';
 
 /*
  * The OG card: the page of the site, at the scale of a social feed.
@@ -22,8 +22,8 @@ import { dataUri, svgToPng } from './_resources/raster';
  * excerpt in the quiet run (DESIGN.md, "The Two-Tone Rule"). When the two
  * go over the length of a hero headline, the excerpt is the intro below the
  * title instead (DESIGN.md, "The Hero Length Rule"). The chips of the page
- * are at the bottom. The picture (`pixelPicture.ts`) is the right half of
- * a split, on the full height of the card.
+ * are at the bottom. The picture (`picture.ts`) is the right half of a
+ * split, on the full height of the card.
  *
  * The sizes are the sizes of the site at 1320px, times 2: a card is seen at
  * approximately 500px of width in a feed.
@@ -35,7 +35,8 @@ const COLUMN = PICTURE.x - PADDING * 2;
 const HEADLINE_MAX = 120;
 const TITLE_MAX = 80;
 const INTRO_SIZE = 28;
-const INTRO_LEADING = 1.3;
+// `bodyLong`: the intro can have three lines.
+const INTRO_LEADING = 1.5;
 const INTRO_GAP = 24;
 /** The height for the headline and the intro: from under the top row to above the chips, with a gap. */
 const BOX_HEIGHT = ogCardHeight - PADDING * 2 - 32 - 56 - 44 - 40;
@@ -90,7 +91,7 @@ function words(text: string, color: string, size: number): string {
     .filter(Boolean)
     .map(
       (word) =>
-        `<div style="${css({ display: 'flex', color, marginRight: `${size * 0.22}px` })}">${word}</div>`,
+        `<div style="${css({ display: 'flex', color, marginRight: `${size * 0.22}px` })}">${escape(word)}</div>`,
     )
     .join('');
 }
@@ -113,18 +114,49 @@ function chipRow(pills: string[], size: number): string[] {
 }
 
 /**
- * The text of the card, ready for the markup. ABC Oracle has no emoji and
- * satori has no fallback font, thus a pictograph goes out: it is decoration
- * in a title or an excerpt. The spaces collapse to one.
+ * The text of the card. ABC Oracle has no emoji and satori has no fallback
+ * font, thus a pictograph goes out: it is decoration in a title or an
+ * excerpt. The spaces collapse to one.
  */
 function clean(text: string): string {
   return text
     .replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, '')
     .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .trim();
+}
+
+/**
+ * A text in the markup. The escape stops a `<` of the text from opening a
+ * tag. satori-html does not decode the entities, thus `decode` gives the
+ * characters back after the parse.
+ */
+function escape(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+type Node = { props?: { children?: unknown } };
+
+function decode<T>(node: T): T {
+  const children = (node as Node).props?.children;
+  if (typeof children === 'string') {
+    (node as Node).props!.children = children
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&');
+  } else if (Array.isArray(children)) {
+    children.forEach(decode);
+  } else if (children && typeof children === 'object') {
+    decode(children);
+  }
+  return node;
+}
+
+/**
+ * The kicker next to the wordmark. A kicker that starts with the name says
+ * it two times ("DatoCMS DatoCMS Agency Partner"), thus the name goes.
+ */
+function kickerOf(text: string): string {
+  return text.replace(/^DatoCMS\s+/i, '');
 }
 
 /** A title ends with a stop, thus the quiet run reads as the aside. */
@@ -132,10 +164,10 @@ function sentence(title: string): string {
   return /[.!?:…]$/.test(title) ? title : `${title}.`;
 }
 
-function markup(data: OgCardData, palette: OgPalette) {
+function markup(data: OgCardData, palette: OgPalette, withWordmark: boolean) {
   const title = data.title ? truncate(clean(data.title), { length: TITLE_MAX, omission: '…' }) : '';
   const excerpt = data.excerpt ? clean(data.excerpt) : '';
-  const kicker = data.kicker ? clean(data.kicker) : '';
+  const kicker = data.kicker ? kickerOf(clean(data.kicker)) : '';
   const pills = (data.pills ?? []).map(clean).filter(Boolean);
 
   // The excerpt is the quiet run of the headline when the two fit a hero
@@ -160,59 +192,66 @@ function markup(data: OgCardData, palette: OgPalette) {
     .replace(/currentColor/g, palette.ink)
     .replace('<svg ', '<svg height="32" width="211" ');
 
-  return html(/* HTML */ `
-    <div
-      style="${css({
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        height: '100%',
-        padding: `${PADDING}px`,
-        background: palette.paper,
-        color: palette.ink,
-        fontFamily: 'ABC Oracle',
-      })}"
-    >
-      <div
-        style="${css({
-          display: 'flex',
-          alignItems: 'center',
-          gap: '24px',
-          minHeight: '32px',
-          width: `${COLUMN}px`,
-        })}"
-      >
-        ${wordmark}
-        ${
-          kicker
-            ? `<div
-                style="${css({
-                  display: 'flex',
-                  fontSize: '22px',
-                  lineHeight: 1.15,
-                  letterSpacing: '-0.01em',
-                  color: palette.muted,
-                  marginTop: '2px',
-                  flexShrink: 1,
-                })}"
-              >
-                ${kicker}
-              </div>`
-            : ''
-        }
-      </div>
+  return decode(
+    html(/* HTML */ `
       <div
         style="${css({
           display: 'flex',
           flexDirection: 'column',
-          flexGrow: 1,
-          width: `${COLUMN}px`,
-          marginTop: '56px',
+          width: '100%',
+          height: '100%',
+          padding: `${PADDING}px`,
+          background: palette.paper,
+          color: palette.ink,
+          fontFamily: 'ABC Oracle',
         })}"
       >
-        ${
-          headline
-            ? `<div
+        <div
+          style="${css({
+            display: 'flex',
+            alignItems: 'center',
+            gap: '24px',
+            minHeight: '32px',
+            width: `${COLUMN}px`,
+          })}"
+        >
+          ${withWordmark ? wordmark : ''}
+          ${
+            kicker
+              ? `<div
+                style="${css({
+                  display: 'flex',
+                  fontSize: '22px',
+                  // One line, cut with an ellipsis. The cut box needs the
+                  // height of the descenders: a line height of 1 cuts them.
+                  lineHeight: 1.3,
+                  letterSpacing: '-0.01em',
+                  color: palette.muted,
+                  marginTop: '2px',
+                  flexShrink: 1,
+                  minWidth: 0,
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                })}"
+              >
+                ${escape(kicker)}
+              </div>`
+              : ''
+          }
+        </div>
+        <div
+          style="${css({
+            display: 'flex',
+            flexDirection: 'column',
+            flexGrow: 1,
+            width: `${COLUMN}px`,
+            marginTop: '56px',
+          })}"
+        >
+          ${
+            headline
+              ? `<div
                 style="${css({
                   display: 'flex',
                   flexWrap: 'wrap',
@@ -226,11 +265,11 @@ function markup(data: OgCardData, palette: OgPalette) {
                 ${words(headline, palette.ink, size)}
                 ${inHeadline ? words(excerpt, palette.headlineMuted, size) : ''}
               </div>`
-            : ''
-        }
-        ${
-          intro
-            ? `<div
+              : ''
+          }
+          ${
+            intro
+              ? `<div
                 style="${css({
                   display: 'flex',
                   fontSize: `${INTRO_SIZE}px`,
@@ -240,14 +279,14 @@ function markup(data: OgCardData, palette: OgPalette) {
                   marginTop: `${INTRO_GAP}px`,
                 })}"
               >
-                ${intro}
+                ${escape(intro)}
               </div>`
-            : ''
-        }
-      </div>
-      ${
-        chips.length > 0
-          ? `<div style="${css({ display: 'flex', gap: '10px', width: `${COLUMN}px` })}">
+              : ''
+          }
+        </div>
+        ${
+          chips.length > 0
+            ? `<div style="${css({ display: 'flex', gap: '10px', width: `${COLUMN}px` })}">
               ${chips
                 .map(
                   (text) => `<div
@@ -266,15 +305,16 @@ function markup(data: OgCardData, palette: OgPalette) {
                       whiteSpace: 'nowrap',
                     })}"
                   >
-                    ${text}
+                    ${escape(text)}
                   </div>`,
                 )
                 .join('')}
             </div>`
-          : ''
-      }
-    </div>
-  `);
+            : ''
+        }
+      </div>
+    `),
+  );
 }
 
 export const GET: APIRoute = async ({ request, url }) => {
@@ -312,12 +352,17 @@ export const GET: APIRoute = async ({ request, url }) => {
 
     const palette = palettes[data.theme ?? 'purple'] ?? palettes.purple;
 
-    // A logo that does not load gives the symbol: the card never fails for it.
+    // A logo that does not load, or that is not a PNG, gives the card of
+    // DatoCMS: the card never fails for it.
     const loadLogo = async (): Promise<Uint8Array | null> => {
       if (!data.logoPngUrl) return null;
       try {
         const res = await fetch(data.logoPngUrl);
-        return res.ok ? new Uint8Array(await res.arrayBuffer()) : null;
+        if (!res.ok) return null;
+        const file = new Uint8Array(await res.arrayBuffer());
+        // A file that is not a PNG gives an error here.
+        pngSize(file);
+        return file;
       } catch {
         return null;
       }
@@ -333,16 +378,19 @@ export const GET: APIRoute = async ({ request, url }) => {
       { name: 'ABC Oracle', data: oracleRegular, style: 'normal' as const, weight: 400 as const },
       { name: 'ABC Oracle', data: oracleMedium, style: 'normal' as const, weight: 500 as const },
     ];
-    const picture = { width: ogCardWidth - PICTURE.x, height: ogCardHeight, palette };
+    const size = { width: ogCardWidth - PICTURE.x, height: ogCardHeight, palette };
 
     const [svg, pictureSvg] = await Promise.all([
-      satori(markup(data, palette) as any, { width: ogCardWidth, height: ogCardHeight, fonts }),
-      // A logo that is not a PNG gives the symbol too.
-      pixelPicture({ ...picture, logo }).catch(() => pixelPicture(picture)),
+      satori(markup(data, palette, Boolean(logo)) as any, {
+        width: ogCardWidth,
+        height: ogCardHeight,
+        fonts,
+      }),
+      picture({ ...size, logo }),
     ]);
 
-    // The picture goes on the card as an image of the SVG of the card.
-    const image = `<image href="${dataUri(new TextEncoder().encode(pictureSvg), true)}" x="${PICTURE.x}" y="0" width="${picture.width}" height="${picture.height}"/>`;
+    // The picture goes inline in the SVG of the card (see `picture.ts`).
+    const image = pictureSvg.replace('<svg ', `<svg x="${PICTURE.x}" y="0" `);
     const png = await svgToPng(svg.replace(/<\/svg>\s*$/, `${image}</svg>`));
 
     return new Response(toArrayBuffer(png), {

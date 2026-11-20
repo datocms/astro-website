@@ -80,7 +80,11 @@ const sortedProjects = sortBy(page.projects, (project) =>
       kicker: partner.kicker,
       title: page.name,
       excerpt: description,
-      pills: [`${page.projects.length} showcased projects`],
+      // No chip for a partner with no projects in the showcase.
+      pills:
+        page.projects.length > 0
+          ? [`${page.projects.length} showcased project${page.projects.length === 1 ? '' : 's'}`]
+          : [],
       logoPngUrl: page.logo.pngUrl,
       theme: 'pink',
     }),
