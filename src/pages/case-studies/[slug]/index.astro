@@ -20,6 +20,7 @@ import { baseUrl } from '~/lib/draftMode';
 import { canonicalUrl, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import { caseStudyCard } from '~/lib/ogCards';
 
 const variables = { slug: Astro.params.slug! };
 const { page, latest } = await executeQuery(Astro, query, { variables });
@@ -34,7 +35,7 @@ const headline = stripStega(structuredTextToPlainText(page.title) || page.name);
 const others = latest.filter((story) => story.id !== page.id).slice(0, 3);
 ---
 
-<Layout theme="orange" seo={page.seo}>
+<Layout ogCard={caseStudyCard(page)} theme="orange" seo={page.seo}>
   <Fragment slot="head">
     <meta name="datocms-md-title" content={page.name} />
     <JsonLd

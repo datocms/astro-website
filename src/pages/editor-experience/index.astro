@@ -20,6 +20,7 @@ import StructuredContentChapter from '~/scenes/StructuredContent/Chapter.astro';
 import VisualEditingChapter from '~/scenes/VisualEditing/Chapter.astro';
 import WorkflowsChapter from '~/scenes/Workflows/Chapter.astro';
 import { query } from './_graphql';
+import { heroCard } from '~/lib/ogCards';
 
 const { review } = await executeQuery(Astro, query);
 
@@ -35,7 +36,11 @@ const seo = overrideSeo([], seoTitle(ee.seo.title), seoDescription(ee.seo.descri
   the accent surface.
 */
 }
-<Layout theme={visualEditing.theme} seo={seo}>
+<Layout
+  ogCard={heroCard(ee.hero, visualEditing.theme, 'editor')}
+  theme={visualEditing.theme}
+  seo={seo}
+>
   <Hero {...ee.hero} typewriter />
   {/* The chapters of the pillar. Sticky; no theme, as the hero: it takes the theme of the page. */}
   <CategoryNav {...ee.chapterNav} />

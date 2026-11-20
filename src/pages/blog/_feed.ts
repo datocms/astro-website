@@ -4,7 +4,9 @@ import * as blog from '~/data/blog';
 import { TagFragment } from '~/lib/datocms/commonFragments';
 import { executeQuery, executeQueryOutsideAstro } from '~/lib/datocms/executeQuery';
 import { graphql, type ResultOf } from '~/lib/datocms/graphql';
-import { overrideSeo, seoDescription, seoGeneratedCard, seoTitle } from '~/lib/datocms/seo';
+import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
+import { heroCard } from '~/lib/ogCards';
+import type { OgCardData } from '~/lib/ogCardUrl';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
 /** The SEO texts of the index of the casual chats. */
@@ -166,15 +168,21 @@ export async function loadFeedPage(Astro: AstroGlobal, page: number, filter: Fee
           customerStoriesIndex?.seo ?? [],
           seoTitle(chatsIndex.title),
           seoDescription(chatsIndex.description),
-          seoGeneratedCard(Astro, {
-            title: chatsIndex.title,
-            excerpt: chatsIndex.description,
-            theme: 'green',
-          }),
         )
       : filter.kind === 'category'
         ? category!.seo
         : blogPage?.seo;
+
+  // The card of the index: the chats, a category, or the blog.
+  const ogCard: OgCardData =
+    filter.kind === 'chats'
+      ? heroCard(
+          { label: 'Blog', headline: chatsIndex.title, intro: chatsIndex.description },
+          'green',
+        )
+      : filter.kind === 'category'
+        ? heroCard({ label: 'Blog', headline: category!.name }, 'green')
+        : heroCard(blog.hero, 'green');
 
   return {
     featured,
@@ -185,6 +193,7 @@ export async function loadFeedPage(Astro: AstroGlobal, page: number, filter: Fee
     category,
     filters: filterLinks(categories, filter),
     seo: seo ?? [],
+    ogCard,
     // The page gives these to DraftModeQueryListener.
     postsVariables: filter.kind === 'chats' ? undefined : postsVariables,
     hasChats: filter.kind !== 'category',

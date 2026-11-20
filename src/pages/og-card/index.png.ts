@@ -8,10 +8,11 @@ import { toArrayBuffer } from '~/lib/toArrayBuffer';
 import { handleUnexpectedError, invalidRequestResponse } from '~/pages/api/_utils';
 import { UI_FONTS_BASE_URL } from 'astro:env/server';
 import { pixelProof, portraitsHalf } from './_resources/article';
-import { half, label } from './_resources/half';
+import { teamRow } from './_resources/team';
+import { half, label, playButton } from './_resources/half';
 import { type OgPalette, palettes } from './_resources/palette';
 import { picture } from './_resources/picture';
-import { pngSize, svgToPng } from './_resources/raster';
+import { dataUri, jpegSize, pngSize, svgToPng } from './_resources/raster';
 import {
   ADVANCE,
   CHIP as CHIP_SIZE,
@@ -195,9 +196,13 @@ function headline(
   }: { column: number; height: number; ladder: number[]; minQuiet: number },
 ) {
   if (title && excerpt) {
+    // An excerpt that starts in lower case continues the sentence of the
+    // title ("Projects from" + "our partners."), as the muted run of a hero:
+    // then the title gets no full stop.
+    const lead = /^\p{Ll}/u.test(excerpt) ? title : sentence(title);
     for (const quiet of quietRuns(excerpt)) {
       const result = fit(
-        [...wordsOf(sentence(title), false), ...wordsOf(quiet, true)],
+        [...wordsOf(lead, false), ...wordsOf(quiet, true)],
         column,
         height,
         ladder,
@@ -397,7 +402,207 @@ function markup(data: OgCardData, palette: OgPalette, layout: Layout, proof = ''
   );
 }
 
-export const GET: APIRoute = async ({ request, url }) => {
+/**
+ * The card of a plugin with a cover, and of a video with a frame: the
+ * picture on the split, as large as the box at the right permits, with a
+ * margin to the edges of the card. The box is 3:2, as a cover: a picture of
+ * a different shape is smaller, at the right of the box, and the card
+ * never cuts it.
+ */
+const COVER = {
+  margin: 40,
+  box: { width: 825, height: 550 },
+  radius: 16,
+  side: 48,
+  // The largest size of the symbol and the kicker at the top of the column.
+  mark: 60,
+  play: 128,
+};
+
+/**
+ * The size of the symbol and the kicker: the largest that fits the width
+ * of the column, up to `COVER.mark`. The symbol is square, and 16 px apart.
+ */
+function markSize(kicker: string, column: number): number {
+  const fit = (column - 16) / (1 + units(kicker) * ADVANCE * 1.1);
+  return Math.min(COVER.mark, Math.floor(fit));
+}
+
+/**
+ * A card with the picture on the split: the accent at the left, the
+ * inverse at the right, and the seam at the middle of the picture. The
+ * column at the left has the symbol with the kicker at the top, and
+ * `bottom` at the bottom. `overlay` is on the picture.
+ */
+function framedMarkup(
+  data: OgCardData,
+  palette: OgPalette,
+  image: Uint8Array,
+  parts: {
+    bottom: (column: number) => string;
+    overlay?: (width: number, height: number) => string;
+  },
+) {
+  const file = jpegSize(image);
+  const scale = Math.min(COVER.box.width / file.width, COVER.box.height / file.height);
+  const width = Math.round(file.width * scale);
+  const height = Math.round(file.height * scale);
+  const strip = ogCardWidth - COVER.margin - COVER.box.width;
+  const seam = Math.round(ogCardWidth - COVER.margin - width / 2);
+  const column = strip - COVER.side - COVER.margin;
+  const kicker = data.kicker ? kickerOf(clean(data.kicker)) : '';
+  const mark = markSize(kicker, column);
+  return decode(
+    html(/* HTML */ `
+      <div
+        style="${css({
+          display: 'flex',
+          width: '100%',
+          height: '100%',
+          background: palette.accent,
+          color: palette.onAccent,
+          fontFamily: 'ABC Oracle',
+          position: 'relative',
+        })}"
+      >
+        <div
+          style="${css({
+            display: 'flex',
+            position: 'absolute',
+            left: `${seam}px`,
+            top: '0px',
+            width: `${ogCardWidth - seam}px`,
+            height: `${ogCardHeight}px`,
+            background: palette.inverse,
+          })}"
+        ></div>
+        <div
+          style="${css({
+            display: 'flex',
+            flexDirection: 'column',
+            width: `${strip}px`,
+            height: '100%',
+            padding: `${SAFE.top}px ${COVER.margin}px ${SAFE.bottom}px ${COVER.side}px`,
+          })}"
+        >
+          <div style="${css({ display: 'flex', flexGrow: 1, alignItems: 'flex-start' })}">
+            <div style="${css({ display: 'flex', alignItems: 'center', gap: '16px' })}">
+              ${symbol(palette.onAccent, mark)}
+              ${kicker ? `<div style="${css({ ...label(mark, palette.onAccent), fontWeight: 500, lineHeight: 1, letterSpacing: '-0.04em', whiteSpace: 'nowrap' })}">${escape(kicker)}</div>` : ''}
+            </div>
+          </div>
+          ${parts.bottom(column)}
+        </div>
+        <div
+          style="${css({
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            width: `${COVER.box.width}px`,
+            height: '100%',
+          })}"
+        >
+          <div
+            style="${css({ display: 'flex', position: 'relative', width: `${width}px`, height: `${height}px` })}"
+          >
+            <img
+              src="${dataUri(image)}"
+              style="${css({ width: `${width}px`, height: `${height}px`, borderRadius: `${COVER.radius}px` })}"
+            />
+            ${parts.overlay?.(width, height) ?? ''}
+          </div>
+        </div>
+      </div>
+    `),
+  );
+}
+
+/**
+ * The card of a plugin with a cover. The cover shows the name of the
+ * plugin, thus the card does not repeat the title. At the bottom of the
+ * column: `Official` (else the version), and the installs (else the author).
+ */
+function coverMarkup(
+  data: OgCardData,
+  picture: Extract<OgPicture, { kind: 'cover' }>,
+  palette: OgPalette,
+  image: Uint8Array,
+) {
+  const chips = (data.pills ?? []).map(clean).filter(Boolean).slice(0, 1);
+  // The chips: `Official`, else the version. An official plugin has no
+  // version on the card: one chip is enough.
+  const facts = chips.length > 0 ? chips : picture.version ? [clean(picture.version)] : [];
+  return framedMarkup(data, palette, image, {
+    bottom: (column) => {
+      const fact = picture.stat
+        ? `<div style="${css({ display: 'flex', fontSize: '80px', lineHeight: 1, letterSpacing: '-0.05em', fontWeight: 500 })}">${escape(picture.stat.value)}</div>
+          <div style="${css({ ...label(30, palette.accentMuted), marginTop: '12px' })}">${escape(picture.stat.label)}</div>`
+        : picture.author
+          ? `<div style="${css({ ...label(30, palette.onAccent), fontWeight: 500, width: `${column}px`, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' })}">${escape(clean(picture.author))}</div>`
+          : '';
+      return `${
+        facts.length > 0
+          ? `<div style="${css({ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '12px', marginBottom: '32px' })}">
+            ${facts.map((text) => chip(text, palette.accentBorder)).join('')}
+          </div>`
+          : ''
+      }<div style="${css({ display: 'flex', flexDirection: 'column' })}">${fact}</div>`;
+    },
+  });
+}
+
+/**
+ * The card of a video with a frame. The frame has the play button at its
+ * centre and the length as a chip at its bottom left, as a player. At the
+ * bottom of the column: the title, then the series.
+ */
+function videoMarkup(
+  data: OgCardData,
+  picture: Extract<OgPicture, { kind: 'video' }>,
+  palette: OgPalette,
+  image: Uint8Array,
+) {
+  const title = data.title ? clean(data.title) : '';
+  return framedMarkup(data, palette, image, {
+    bottom: (column) => {
+      // The title takes the largest step whose lines fit the column, in
+      // three lines at most.
+      const { size, lines } = fit(wordsOf(title, false), column, 44 * 3, [44, 40, 36, 32]);
+      return `<div style="${css({ display: 'flex', flexDirection: 'column', width: `${column}px`, fontSize: `${size}px`, lineHeight: 1, letterSpacing: '-0.04em', fontWeight: 500 })}">${lines
+        .map(
+          (line) =>
+            `<div style="${css({ display: 'flex' })}">${escape(line.map((word) => word.text).join(' '))}</div>`,
+        )
+        .join('')}</div>
+      ${picture.series ? `<div style="${css({ ...label(28, palette.accentMuted), lineHeight: 1.2, marginTop: '16px', width: `${column}px` })}">${escape(clean(picture.series))}</div>` : ''}`;
+    },
+    overlay: (width, height) =>
+      `${playButton(palette, COVER.play, { position: 'absolute', left: `${(width - COVER.play) / 2}px`, top: `${(height - COVER.play) / 2}px` })}
+      ${
+        picture.duration
+          ? `<div style="${css({
+              display: 'flex',
+              position: 'absolute',
+              // At the left: the presenter is at the bottom right of the frame.
+              left: '20px',
+              bottom: '20px',
+              padding: '8px 16px',
+              borderRadius: '9999px',
+              background: palette.inverse,
+              color: palette.onInverseStrong,
+              fontSize: '30px',
+              lineHeight: 1,
+              letterSpacing: '-0.01em',
+            })}">${escape(picture.duration)}</div>`
+          : ''
+      }`,
+  });
+}
+
+/** A card stays in the caches for one year. */
+const ONE_YEAR = 60 * 60 * 24 * 365;
+
+export const GET: APIRoute = async ({ request, url, cache }) => {
   try {
     // satori reads static TTF and OTF files only, thus the card uses the two
     // static instances of ABC Oracle in the font bucket, not the variable font.
@@ -473,11 +678,13 @@ export const GET: APIRoute = async ({ request, url }) => {
       }
     };
 
-    // The portraits of the guests of a chat. A portrait that does not load
-    // gives the card with no proof: the card never fails for it.
+    // The portraits of the guests of a chat, or the photos of a team. A
+    // photo that does not load gives the card with no proof: the card never
+    // fails for it.
     const loadPortraits = async (): Promise<Uint8Array[] | null> => {
       const picture = data.picture;
-      if (picture?.kind !== 'portraits' || picture.imageUrls.length === 0) return null;
+      if (picture?.kind !== 'portraits' && picture?.kind !== 'team') return null;
+      if (picture.imageUrls.length === 0) return null;
       try {
         return await Promise.all(
           picture.imageUrls.slice(0, 3).map(async (imageUrl) => {
@@ -514,6 +721,7 @@ export const GET: APIRoute = async ({ request, url }) => {
       proofKind === 'product' ||
       proofKind === 'contents' ||
       proofKind === 'portraits' ||
+      proofKind === 'team' ||
       (data.picture?.kind === 'window' && data.picture.half)
         ? ogCardWidth / 2
         : SPLIT_X;
@@ -533,12 +741,29 @@ export const GET: APIRoute = async ({ request, url }) => {
     if (data.picture?.kind === 'portraits') {
       image = portraits ? await portraitsHalf(portraits, palette, halfSize) : null;
     }
+    if (data.picture?.kind === 'team') {
+      image = portraits ? await teamRow(portraits, palette) : null;
+    }
     // A proof that needs a file that does not load gives the card with no proof.
     const needsImage = (picture: NonNullable<OgCardData['picture']>) =>
-      ('imageUrl' in picture && Boolean(picture.imageUrl)) || picture.kind === 'portraits';
+      ('imageUrl' in picture && Boolean(picture.imageUrl)) ||
+      picture.kind === 'portraits' ||
+      picture.kind === 'team';
 
     let svg: string;
-    if (logo) {
+    // A cover of a plugin and a frame of a video go on the split. A file
+    // that is not a JPEG gives the card with the half.
+    const framed = (() => {
+      if (!image) return null;
+      try {
+        if (data.picture?.kind === 'cover') return coverMarkup(data, data.picture, palette, image);
+        if (data.picture?.kind === 'video') return videoMarkup(data, data.picture, palette, image);
+      } catch {}
+      return null;
+    })();
+    if (framed) {
+      svg = await render(framed);
+    } else if (logo) {
       // The logo has the proof half. A number of the page goes under the title.
       const stat = data.picture?.kind === 'stat' ? data.picture : undefined;
       const [card, logoHalf] = await Promise.all([
@@ -570,9 +795,23 @@ export const GET: APIRoute = async ({ request, url }) => {
     }
 
     const png = await svgToPng(svg);
+    // The URL holds all the data of the card: the same URL always gives the
+    // same card, and a change to the record gives a new URL. Thus the card
+    // stays in the cache of the Worker with no tags, and no purge removes
+    // it. A deploy starts the cache of the Worker again (the version tag),
+    // and `OG_CARD_VERSION` of `~/lib/ogCardUrl` gives a new URL to the
+    // caches outside the Worker. An error is not in the cache.
+    cache.set({ maxAge: ONE_YEAR });
     return new Response(toArrayBuffer(png), {
       status: 200,
-      headers: { 'Content-Type': 'image/png' },
+      headers: {
+        'Content-Type': 'image/png',
+        // In local dev, the browser does not keep the card: a change to the
+        // design shows at the next load, with no new version.
+        'Cache-Control': import.meta.env.DEV
+          ? 'no-store'
+          : `public, max-age=${ONE_YEAR}, immutable`,
+      },
     });
   } catch (error) {
     return handleUnexpectedError(request, error);

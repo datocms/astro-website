@@ -28,6 +28,7 @@ import { query } from './_graphql';
 import { LogoPlate } from '~/components/LogoPlate';
 import ProjectFrame from './_ProjectFrame/Component.astro';
 import s from './_style.module.css';
+import { showcaseCard } from '~/lib/ogCards';
 
 const variables = { projectSlug: Astro.params.projectSlug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -47,6 +48,7 @@ const galleries = [
 ---
 
 <Layout
+  ogCard={showcaseCard(page)}
   theme="pink"
   seo={overrideSeo(page._seoMetaTags, seoOgType('website'))}
   headerVariant="page"

@@ -18,6 +18,8 @@ export const OgCardFragment = graphql(/* GraphQL */ `
     title
     video {
       video {
+        # The frame at the poster time of the upload.
+        thumbnailUrl
         duration
       }
     }
@@ -48,6 +50,7 @@ export const query = graphql(
   /* GraphQL */ `
     query UserGuidesItemQuery($episodeSlug: String!) {
       episode: userGuidesEpisode(filter: { slug: { eq: $episodeSlug } }) {
+        ...UserGuideOgCardFragment
         id
         _firstPublishedAt
         _seoMetaTags {
@@ -135,6 +138,7 @@ export const query = graphql(
     }
   `,
   [
+    OgCardFragment,
     TagFragment,
     VideoPlayerFragment,
     InternalVideoFragment,

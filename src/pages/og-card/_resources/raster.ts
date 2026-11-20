@@ -34,6 +34,23 @@ export function pngSize(png: Uint8Array): { width: number; height: number } {
   return { width: view.getUint32(16), height: view.getUint32(20) };
 }
 
+/** The size of a JPEG, from its first frame header (SOF). */
+export function jpegSize(jpeg: Uint8Array): { width: number; height: number } {
+  if (jpeg[0] !== 0xff || jpeg[1] !== 0xd8) throw new Error('The picture is not a JPEG');
+  const view = new DataView(jpeg.buffer, jpeg.byteOffset, jpeg.byteLength);
+  let at = 2;
+  while (at + 9 < jpeg.length) {
+    if (jpeg[at] !== 0xff) throw new Error('The JPEG has no frame header');
+    const marker = jpeg[at + 1]!;
+    // SOF0 to SOF15, but not DHT (C4), JPG (C8) and DAC (CC).
+    if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
+      return { width: view.getUint16(at + 7), height: view.getUint16(at + 5) };
+    }
+    at += 2 + view.getUint16(at + 2);
+  }
+  throw new Error('The JPEG has no frame header');
+}
+
 /** The data URI of a picture. The type comes from the first bytes of the file. */
 export function dataUri(file: Uint8Array, svg = false): string {
   let type = 'image/png';

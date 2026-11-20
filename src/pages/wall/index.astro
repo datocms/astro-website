@@ -18,6 +18,7 @@ import { softwareId } from '~/lib/jsonLd';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { query } from './_graphql';
+import { heroCard } from '~/lib/ogCards';
 
 const { allReviews, allPartnerTestimonials, reviewsMeta, partnerTestimonialsMeta } =
   await executeQuery(Astro, query);
@@ -66,7 +67,12 @@ const reviews = items.map((item): Review => {
 const seo = overrideSeo([], seoTitle(wall.seo.title), seoDescription(wall.seo.description));
 ---
 
-<Layout theme="pink" seo={seo} headerVariant="accent">
+<Layout
+  ogCard={heroCard(wall.hero, 'pink', 'editor')}
+  theme="pink"
+  seo={seo}
+  headerVariant="accent"
+>
   <Fragment slot="head">
     <JsonLd data={{ '@context': 'https://schema.org', '@graph': reviews }} />
   </Fragment>

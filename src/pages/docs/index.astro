@@ -12,6 +12,7 @@ import { HomeSidebar } from '~/components/docs/HomeSidebar';
 import { Sections } from './_sub/Sections';
 import { HomeBanner } from './_sub/HomeBanner';
 import { Quickstart } from './_sub/Quickstart';
+import { heroCard } from '~/lib/ogCards';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -21,7 +22,11 @@ if (!page) {
 }
 ---
 
-<BaseLayout seo={page._seoMetaTags} hideFooter>
+<BaseLayout
+  ogCard={heroCard({ headline: 'DatoCMS Developer Docs' }, 'docs')}
+  seo={page._seoMetaTags}
+  hideFooter
+>
   <Fragment slot="sidebar">
     <HomeSidebar />
   </Fragment>

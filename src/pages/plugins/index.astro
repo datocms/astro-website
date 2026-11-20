@@ -14,6 +14,7 @@ import SearchBox from './_SearchBox.astro';
 import Group from './_Group.astro';
 import { officialPluginsQuery, query } from './_graphql';
 import s from './_style.module.css';
+import { heroCard } from '~/lib/ogCards';
 
 const { page, collections, meta, popular, latest, officialAuthors } = await executeQuery(
   Astro,
@@ -35,7 +36,7 @@ const { official, officialMeta } = await executeQuery(Astro, officialPluginsQuer
 });
 ---
 
-<Layout theme="blue" seo={page.seo} headerVariant="accent">
+<Layout ogCard={heroCard(hero, 'blue')} theme="blue" seo={page.seo} headerVariant="accent">
   <Hero variant="accent" {...hero}>
     <Fragment slot="intro">
       <p>{hero.intro}</p>

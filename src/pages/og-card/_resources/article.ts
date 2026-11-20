@@ -120,6 +120,9 @@ export async function pixelProof(
   return { left, png: await rgbToPng(pixels, width, height) };
 }
 
+/** The part of the width of the proof of a chat that is the inverse. */
+const INVERSE_PART = 0.6;
+
 /**
  * The bubbles in the half, for a number of guests, and the side of a cell
  * in px. A smaller bubble has smaller cells: then the stepped corners and
@@ -150,7 +153,9 @@ function halfBubbles(count: number): { cell: number; bubbles: Bubble[] } {
 }
 
 /**
- * The portraits of the guests of a chat in speech bubbles, on the inverse.
+ * The portraits of the guests of a chat in speech bubbles, on the split:
+ * the accent at the left of the proof, the inverse at the right
+ * (`INVERSE_PART`), as the pixel cover of a post and the cover of a plugin.
  * A portrait is in black and white, as the CSS of `ChatCover` gives it:
  * `grayscale(1) contrast(1.05)`. The filter of the SVG does the same. A chat
  * with more than three guests shows the first three.
@@ -179,7 +184,8 @@ export async function portraitsHalf(
 <feFuncB type="linear" slope="1.05" intercept="-0.025"/>
 </feComponentTransfer>
 </filter>
-<rect width="100%" height="100%" fill="${palette.inverse}"/>
+<rect width="100%" height="100%" fill="${palette.accent}"/>
+<rect x="${(size.width / cell) * (1 - INVERSE_PART)}" width="${(size.width / cell) * INVERSE_PART}" height="100%" fill="${palette.inverse}"/>
 ${shapes}
 </svg>`;
   return svgToPng(svg);

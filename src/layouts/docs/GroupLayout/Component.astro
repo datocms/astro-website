@@ -1,6 +1,7 @@
 ---
 import { ChevronLeft } from 'lucide';
 import type { TitleMetaLinkTag } from '@datocms/astro';
+import type { OgCardData } from '~/lib/ogCardUrl';
 import { readFragment, type FragmentOf } from 'gql.tada';
 import {
   Sidebar,
@@ -21,6 +22,8 @@ type Props = {
   contentWrapperComponent?: (props: any) => any;
   group: FragmentOf<typeof GroupLayoutFragment>;
   seo: TitleMetaLinkTag[];
+  /** The OG card of the page (BaseLayout of the site). */
+  ogCard: OgCardData;
   additionalSidebarItems?: (SidebarEntry | SidebarGroup)[];
   lastUpdatedAt?: string;
 };
@@ -29,6 +32,7 @@ const {
   contentWrapperComponent,
   group: maskedGroup,
   seo,
+  ogCard,
   additionalSidebarItems = [],
   lastUpdatedAt,
 } = Astro.props;
@@ -42,6 +46,7 @@ const showDocsNav = group.pagesOrSections.length <= 1 && additionalSidebarItems.
 
 <BaseLayout
   seo={seo}
+  ogCard={ogCard}
   contentWrapperComponent={contentWrapperComponent}
   lastUpdatedAt={lastUpdatedAt}
 >

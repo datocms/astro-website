@@ -19,6 +19,7 @@ import { baseUrl } from '~/lib/draftMode';
 import { canonicalUrl, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import { compareCard } from '~/lib/ogCards';
 
 const variables = { slug: Astro.params.slug! };
 const { page, alternatives } = await executeQuery(Astro, query, { variables });
@@ -31,7 +32,7 @@ if (!page) {
 const { product } = page;
 ---
 
-<Layout theme="blue" seo={page._seoMetaTags}>
+<Layout ogCard={compareCard(page, compare.hero.headline)} theme="blue" seo={page._seoMetaTags}>
   <Fragment slot="head">
     <meta name="datocms-md-title" content={`When to choose DatoCMS over ${page.product}?`} />
     <JsonLd

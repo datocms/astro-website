@@ -22,6 +22,7 @@ import GovernanceChapter from '~/scenes/Enterprise/GovernanceChapter.astro';
 import SupportChapter from '~/scenes/Enterprise/SupportChapter.astro';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { heroCard } from '~/lib/ogCards';
 
 const { page, review } = await executeQuery(Astro, query);
 
@@ -33,7 +34,12 @@ if (!page) {
 const { subtitle, ...hero } = enterprise.hero;
 ---
 
-<Layout theme={enterprise.security.theme} seo={page.seo} seoAnalysis={page.yoastAnalysis}>
+<Layout
+  ogCard={heroCard(hero, enterprise.security.theme)}
+  theme={enterprise.security.theme}
+  seo={page.seo}
+  seoAnalysis={page.yoastAnalysis}
+>
   <Hero {...hero} label={page.seoH1 ?? undefined} typewriter>
     <p slot="intro"><InlineText text={subtitle} /></p>
   </Hero>

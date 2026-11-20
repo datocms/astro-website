@@ -38,6 +38,7 @@ export const query = graphql(
   /* GraphQL */ `
     query SuccessStoryPage($slug: String!) {
       page: successStory(filter: { slug: { eq: $slug } }) {
+        ...CaseStudyOgCardFragment
         id
         seo: _seoMetaTags {
           ...TagFragment
@@ -64,6 +65,7 @@ export const query = graphql(
     }
   `,
   [
+    OgCardFragment,
     TagFragment,
     StatsNumberFragment,
     TextWithImageStoryFragment,

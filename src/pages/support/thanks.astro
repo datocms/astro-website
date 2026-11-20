@@ -8,11 +8,19 @@ import { Hero } from '~/components/Hero';
 import Layout from '~/layouts/Layout.astro';
 import { replyTime } from '~/data/support';
 import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { teamCard } from '~/lib/ogCards';
 
 const seo = overrideSeo([], seoTitle('Thanks for reaching out'));
+// The people of the team who answer the page are on its OG card.
+const ogCard = await teamCard(
+  Astro,
+  { label: 'Support', headline: 'Thanks for reaching out.', subheadline: 'We’re on it.' },
+  'purple',
+  ['support'],
+);
 ---
 
-<Layout theme="purple" seo={seo} headerVariant="accent">
+<Layout ogCard={ogCard} theme="purple" seo={seo} headerVariant="accent">
   <Hero
     variant="accent"
     label="Support"

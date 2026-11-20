@@ -31,6 +31,7 @@ import { query } from './_graphql';
 import { prepareReadme } from '~/lib/readme';
 import Readme from './_Readme.astro';
 import s from './_style.module.css';
+import { pluginCard } from '~/lib/ogCards';
 
 const variables = {
   slug: Astro.params.rest!,
@@ -75,7 +76,12 @@ const description = (() => {
 })();
 ---
 
-<Layout theme="blue" seo={overrideSeo(page.seo, seoOgType('website'))} headerVariant="accent">
+<Layout
+  ogCard={pluginCard(page)}
+  theme="blue"
+  seo={overrideSeo(page.seo, seoOgType('website'))}
+  headerVariant="accent"
+>
   <Hero variant="accent" headline={page.title}>
     <BreadcrumbLabel slot="label" trail={[indexes.plugins]} />
     <div slot="intro" class={s.intro}>

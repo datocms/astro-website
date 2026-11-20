@@ -17,6 +17,7 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import { query } from './_graphql';
 import StarterCard from './_StarterCard.astro';
 import s from './_style.module.css';
+import { heroCard } from '~/lib/ogCards';
 
 const { starters } = await executeQuery(Astro, query);
 
@@ -31,7 +32,7 @@ const kits = starters.filter((starter) => starter.starterType === 'tech_starter'
 const seo = overrideSeo([], seoTitle(startersSeo.title));
 ---
 
-<Layout theme="blue" seo={seo} headerVariant="accent">
+<Layout ogCard={heroCard(hero, 'blue')} theme="blue" seo={seo} headerVariant="accent">
   <Hero variant="accent" {...hero} />
 
   <Section>

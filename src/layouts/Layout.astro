@@ -14,6 +14,7 @@ import { SiteSearch } from '~/components/SiteSearch';
 import { footerColumns, legal, mainNavigation } from '~/data/navigation';
 import BaseLayout from '~/layouts/BaseLayout/Component.astro';
 import { isDraftModeEnabled } from '~/lib/draftMode';
+import type { OgCardData } from '~/lib/ogCardUrl';
 import type { Theme } from '~/lib/theme';
 import '@datocms/product-scenes/product-scenes.css';
 import '../styles/global.css';
@@ -26,6 +27,12 @@ interface Props {
    * (~/lib/datocms/seo).
    */
   seo: TitleMetaLinkTag[];
+  /**
+   * The OG card of the page (`/og-card/index.png`): each page has one. The
+   * functions of `~/lib/ogCards` make it from the record of the page. The
+   * card replaces the image of the SEO tags of the CMS.
+   */
+  ogCard: OgCardData;
   /**
    * The theme of the page: the hue of its area (a reference page) or of
    * its first chapter (a marketing page). The header, the page closer and
@@ -48,7 +55,15 @@ interface Props {
   seoAnalysis?: unknown;
 }
 
-const { seo, theme, headerVariant = 'page', headerCta, footer = true, seoAnalysis } = Astro.props;
+const {
+  seo,
+  ogCard,
+  theme,
+  headerVariant = 'page',
+  headerCta,
+  footer = true,
+  seoAnalysis,
+} = Astro.props;
 
 // The endpoint of the SEO/Readability plugin of the CMS
 // (src/pages/api/seo-analysis) reads the content of <main id="layout-content">:
@@ -58,7 +73,7 @@ const { seo, theme, headerVariant = 'page', headerCta, footer = true, seoAnalysi
 const showSeoAnalysis = seoAnalysis !== undefined && isDraftModeEnabled(Astro);
 ---
 
-<BaseLayout seo={seo} theme={theme}>
+<BaseLayout seo={seo} ogCard={ogCard} theme={theme}>
   <Fragment slot="head">
     {/* A page can add tags to the head, such as JSON-LD. */}
     <slot name="head" />

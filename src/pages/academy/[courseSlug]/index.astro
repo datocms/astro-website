@@ -17,6 +17,7 @@ import { baseUrl } from '~/lib/draftMode';
 import { courseId, publisherRef, webPageRef } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import { heroCard } from '~/lib/ogCards';
 
 const variables = { courseSlug: Astro.params.courseSlug! };
 
@@ -30,7 +31,12 @@ if (!course) {
 const pageUrl = new URL(Astro.url.pathname, baseUrl(Astro)).href;
 ---
 
-<Layout theme="orange" seo={course.seo} headerVariant="accent">
+<Layout
+  ogCard={{ ...heroCard({ label: 'Academy', headline: course.name }, 'orange'), wordmark: true }}
+  theme="orange"
+  seo={course.seo}
+  headerVariant="accent"
+>
   <Fragment slot="head">
     <JsonLd
       data={{

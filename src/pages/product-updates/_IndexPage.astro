@@ -7,6 +7,7 @@ import * as productUpdates from '~/data/product-updates';
 import Layout from '~/layouts/Layout.astro';
 import type { ResultOf, VariablesOf } from '~/lib/datocms/graphql';
 import { pageQuery } from './p/[pageIndex]/_graphql';
+import { heroCard } from '~/lib/ogCards';
 
 interface Props {
   page: number;
@@ -18,7 +19,12 @@ const { page, data, variables } = Astro.props;
 const totalPages = Math.ceil(data.meta.count / productUpdates.perPage);
 ---
 
-<Layout theme="green" seo={data.changelog?.seo ?? []} headerVariant="accent">
+<Layout
+  ogCard={heroCard(productUpdates.hero, 'green')}
+  theme="green"
+  seo={data.changelog?.seo ?? []}
+  headerVariant="accent"
+>
   <Hero {...productUpdates.hero} variant="accent" breakBeforeMuted />
   <ProductUpdateList
     entries={data.entries}

@@ -3,6 +3,7 @@ import { NotFoundSection } from '~/components/NotFoundSection';
 import { PageCloser } from '~/components/PageCloser';
 import Layout from '~/layouts/Layout.astro';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
+import { heroCard } from '~/lib/ogCards';
 
 // The node adapter renders this page for each route that does not match.
 // Set the status also when a request goes to "/404" directly.
@@ -15,7 +16,14 @@ const seo = overrideSeo(
 );
 ---
 
-<Layout seo={seo} theme="yellow">
+<Layout
+  ogCard={heroCard(
+    { headline: 'Page not found', subheadline: 'The page you requested could not be found.' },
+    'yellow',
+  )}
+  seo={seo}
+  theme="yellow"
+>
   <NotFoundSection />
   <PageCloser video="/videos/person-confused.pxv" />
 </Layout>

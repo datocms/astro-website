@@ -13,6 +13,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { buildUrlForSuccessStory } from '~/lib/datocms/gqlUrlBuilder/successStory';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import { heroCard } from '~/lib/ogCards';
 
 const { page, stories, testimonial } = await executeQuery(Astro, query);
 
@@ -27,7 +28,7 @@ const topStories = others.slice(0, 4);
 const moreStories = others.slice(4);
 ---
 
-<Layout theme="orange" seo={page.seo} headerVariant="page">
+<Layout ogCard={heroCard(cs.hero, 'orange')} theme="orange" seo={page.seo} headerVariant="page">
   <Hero {...cs.hero} variant="page" typewriter />
   <TextWithImage
     story={highlight}

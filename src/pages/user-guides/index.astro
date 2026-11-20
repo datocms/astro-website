@@ -8,6 +8,7 @@ import { readFragment } from '~/lib/datocms/graphql';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import Chapter from './_Chapter.astro';
 import { ChapterFragment, query } from './_graphql';
+import { heroCard } from '~/lib/ogCards';
 
 const { page, chapters } = await executeQuery(Astro, query);
 
@@ -17,7 +18,12 @@ if (!page) {
 }
 ---
 
-<Layout theme="orange" seo={page._seoMetaTags} headerVariant="accent">
+<Layout
+  ogCard={heroCard({ headline: 'User Guides' }, 'orange')}
+  theme="orange"
+  seo={page._seoMetaTags}
+  headerVariant="accent"
+>
   <Hero
     variant="accent"
     headline="User Guides"

@@ -7,11 +7,19 @@ import { contact, thanksSeo } from '~/data/contact';
 import Layout from '~/layouts/Layout.astro';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { GOOGLE_ADS_CONVERSIONS } from '~/lib/googleAds';
+import { teamCard } from '~/lib/ogCards';
 
 const seo = overrideSeo([], seoTitle(thanksSeo.title), seoDescription(thanksSeo.description));
+// The people of the team who answer the page are on its OG card.
+const ogCard = await teamCard(
+  Astro,
+  { headline: thanksSeo.title, subheadline: thanksSeo.description },
+  'purple',
+  ['sales'],
+);
 ---
 
-<Layout theme="purple" seo={seo} headerVariant="accent">
+<Layout ogCard={ogCard} theme="purple" seo={seo} headerVariant="accent">
   <script is:inline define:vars={{ GADS_CONVERSION: GOOGLE_ADS_CONVERSIONS.contactSubmit }}>
     window.dataLayer = window.dataLayer || [];
     function gtag() {

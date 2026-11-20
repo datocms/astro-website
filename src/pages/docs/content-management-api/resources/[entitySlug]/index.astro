@@ -18,13 +18,7 @@ import {
   isValidLanguage,
 } from '~/components/docs/restApi/LanguagePicker/utils';
 import { Heading } from '~/components/docs/Heading';
-import {
-  overrideSeo,
-  seoDescription,
-  seoGeneratedCard,
-  seoPageTitle,
-  seoShareTitle,
-} from '~/lib/datocms/seo';
+import { overrideSeo, seoDescription, seoPageTitle, seoShareTitle } from '~/lib/datocms/seo';
 import { markdownToPlainText } from '~/components/docs/Markdown/utils';
 
 const sidebarItems = await buildCmaSidebarItems(Astro, Astro.params.entitySlug!);
@@ -56,18 +50,18 @@ const plainDescription = resource.description
 ---
 
 <GroupLayout
+  ogCard={{
+    kicker: `DatoCMS Docs: Content Management API`,
+    title: resource.title!,
+    excerpt: plainDescription,
+    theme: 'docs',
+  }}
   group={group}
   seo={overrideSeo(
     [],
     seoPageTitle(resource.title!, 'Content Management API'),
     seoShareTitle(`Content Management API: ${resource.title}`),
     plainDescription ? seoDescription(plainDescription) : undefined,
-    seoGeneratedCard(Astro, {
-      kicker: `DatoCMS Docs: Content Management API`,
-      title: resource.title!,
-      excerpt: plainDescription,
-      theme: 'docs',
-    }),
   )}
   additionalSidebarItems={sidebarItems}
   contentWrapperComponent={LanguagePicker}

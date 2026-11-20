@@ -1,6 +1,7 @@
 ---
 import { ChevronDown, Gauge, Headset, Menu, X } from 'lucide';
 import type { TitleMetaLinkTag } from '@datocms/astro';
+import type { OgCardData } from '~/lib/ogCardUrl';
 // The layers, the tokens, the fonts and the base of the site.
 import '../../../styles/global.css';
 // The rules of the docs that cannot sit in a CSS module (see the file).
@@ -20,17 +21,19 @@ import SchemeScript from '~/components/SchemeScript/Component.astro';
 
 type Props = {
   seo: TitleMetaLinkTag[];
+  /** The OG card of the page (BaseLayout of the site). */
+  ogCard: OgCardData;
   contentWrapperComponent?: (props: any) => any;
   lastUpdatedAt?: string;
   hideFooter?: boolean;
 };
 
-const { seo, contentWrapperComponent, lastUpdatedAt, hideFooter } = Astro.props;
+const { seo, ogCard, contentWrapperComponent, lastUpdatedAt, hideFooter } = Astro.props;
 const ContentWrapper = contentWrapperComponent || 'div';
 const hasPageBar = Astro.slots.has('pagebar');
 ---
 
-<BaseLayout seo={seo} theme="docs" density="dense">
+<BaseLayout seo={seo} ogCard={ogCard} theme="docs" density="dense">
   <Fragment slot="head">
     <slot name="head" />
     <link

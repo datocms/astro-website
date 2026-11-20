@@ -30,13 +30,7 @@ import { currentLanguage, isValidLanguage } from '~/components/docs/restApi/Lang
 import { Heading } from '~/components/docs/Heading';
 import { analyzeResponse } from '~/components/docs/restApi/EndpointResponse/utils';
 import { markdownToPlainText } from '~/components/docs/Markdown/utils';
-import {
-  overrideSeo,
-  seoDescription,
-  seoGeneratedCard,
-  seoPageTitle,
-  seoShareTitle,
-} from '~/lib/datocms/seo';
+import { overrideSeo, seoDescription, seoPageTitle, seoShareTitle } from '~/lib/datocms/seo';
 import DashboardExperimentalAPIWarning from '../../../components/_DashboardExperimentalAPIWarning.astro';
 
 const sidebarItems = await buildDashboardSidebarItems(Astro, Astro.params.entitySlug!);
@@ -96,18 +90,18 @@ const propsForExamples = { entity, endpoint, jsClient, api: 'dashboard-api' as c
 ---
 
 <GroupLayout
+  ogCard={{
+    kicker: `Dashboard API: ${entity.title}`,
+    title: endpoint.title,
+    excerpt: plainDescription,
+    theme: 'docs',
+  }}
   group={group}
   seo={overrideSeo(
     [],
     seoPageTitle(endpoint.title, entity.title!, 'Dashboard API'),
     seoShareTitle(`${entity.title}: ${endpoint.title}`),
     plainDescription ? seoDescription(plainDescription) : undefined,
-    seoGeneratedCard(Astro, {
-      kicker: `Dashboard API: ${entity.title}`,
-      title: endpoint.title,
-      excerpt: plainDescription,
-      theme: 'docs',
-    }),
   )}
   additionalSidebarItems={sidebarItems}
   contentWrapperComponent={LanguagePicker}

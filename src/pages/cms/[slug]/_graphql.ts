@@ -25,6 +25,8 @@ export const query = graphql(
   /* GraphQL */ `
     query CmsFramework($integrations: [String], $reviewId: ItemId) {
       integrations: allIntegrations(filter: { slug: { in: $integrations } }) {
+        slug
+        ...FrameworkOgCardFragment
         showcaseProjects: _allReferencingShowcaseProjects(orderBy: _createdAt_DESC, first: 12) {
           id
           _createdAt
@@ -46,7 +48,7 @@ export const query = graphql(
       }
     }
   `,
-  [ResponsiveImageFragment, QuoteReviewFragment, ShowcaseProjectUrlFragment],
+  [OgCardFragment, ResponsiveImageFragment, QuoteReviewFragment, ShowcaseProjectUrlFragment],
 );
 
 /** The slugs of the framework pages, in the order of the footer. */

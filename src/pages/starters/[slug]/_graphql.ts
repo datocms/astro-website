@@ -29,6 +29,7 @@ export const query = graphql(
   /* GraphQL */ `
     query StarterQuery($slug: String!) {
       page: templateDemo(filter: { code: { eq: $slug } }) {
+        ...StarterOgCardFragment
         seo: _seoMetaTags {
           ...TagFragment
         }
@@ -61,7 +62,7 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment],
+  [OgCardFragment, TagFragment, ResponsiveImageFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

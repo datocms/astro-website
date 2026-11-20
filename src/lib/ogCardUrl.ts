@@ -34,7 +34,8 @@ export type OgCardData = {
 /**
  * The proof half of the card, from the content of the page:
  * - `window`: a screenshot in an app window, cut by the edges of the card.
- * - `video`: a video: the play button and its length.
+ * - `video`: a video: a frame of it with the play button and its length,
+ *   else the play button and its length on the inverse.
  * - `product`: a window of the product, as the home Features show it
  *   ("Meet the product"), in the theme of the card. For a page with a hero.
  * - `cover`: the cover of a plugin, at the top of the half, with a
@@ -47,6 +48,8 @@ export type OgCardData = {
  * - `contents`: the table of contents of a docs page, as a numbered list.
  * - `pixel`: the pixel cover of a blog post (its file of 100 × 58 cells).
  * - `portraits`: the portraits of the guests of a casual chat, in speech bubbles.
+ * - `team`: the people of the team who answer the page: a row of round
+ *   photos, their names and their team.
  */
 /** The screens of the product that a card can show (`og-card/_resources/scenes/`). */
 export type OgProductScene = 'editor' | 'schema' | 'media';
@@ -58,7 +61,14 @@ export type OgPicture =
       /** The window has half of the card: the screenshot is the subject of the page. */
       half?: boolean;
     }
-  | { kind: 'video'; duration?: string }
+  | {
+      kind: 'video';
+      duration?: string;
+      /** A frame of the video (a JPEG). With it, the card shows the frame on the split. */
+      imageUrl?: string;
+      /** The series of the video: the card shows it under the title, next to the frame. */
+      series?: string;
+    }
   | { kind: 'product'; scene: OgProductScene }
   | {
       kind: 'cover';
@@ -73,13 +83,22 @@ export type OgPicture =
   | { kind: 'versus'; other: string }
   | { kind: 'contents'; entries: string[] }
   | { kind: 'pixel'; imageUrl: string }
-  | { kind: 'portraits'; imageUrls: string[] };
+  | { kind: 'portraits'; imageUrls: string[] }
+  | { kind: 'team'; imageUrls: string[]; names: string; role: string };
+
+/**
+ * The version of the design of the cards. The URL of a card carries it.
+ * Increase it after a change to the design: then each page gives a new URL,
+ * and the social sites, which keep a card for its URL, fetch the new card.
+ */
+const OG_CARD_VERSION = 2;
 
 export function ogCardUrl(
   { kicker, title, pills, excerpt, logoPngUrl, techLogoUrl, theme, picture, wordmark }: OgCardData,
   astroOrRequest: AstroGlobal | Request,
 ): string {
   const url = new URL('/og-card/index.png', baseUrl(astroOrRequest));
+  url.searchParams.set('v', String(OG_CARD_VERSION));
   url.searchParams.set(
     'data',
     Buffer.from(

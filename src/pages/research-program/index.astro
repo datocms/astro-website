@@ -17,6 +17,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import Faq from './_Faq.astro';
 import { query } from './_graphql';
+import { teamCard } from '~/lib/ogCards';
 
 const { page } = await executeQuery(Astro, query);
 
@@ -48,9 +49,11 @@ const jsonLd: WithContext<FAQPage> | null =
         })),
       }
     : null;
+// The people of the team who answer the page are on its OG card.
+const ogCard = await teamCard(Astro, hero, 'purple', ['research']);
 ---
 
-<Layout theme="purple" seo={page.seo} headerVariant="accent">
+<Layout ogCard={ogCard} theme="purple" seo={page.seo} headerVariant="accent">
   {jsonLd && <JsonLd slot="head" data={jsonLd} />}
 
   <Hero variant="accent" {...hero} buttons={[{ label: page.heroCtaLabel, href: page.ctaUrl }]} />

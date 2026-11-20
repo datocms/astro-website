@@ -24,6 +24,7 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 // bottom. The pointer on a row changes the theme and the screen.
 import FeaturesWindow from '~/scenes/HomeFeatures/Window.astro';
 import { query } from './_graphql';
+import { heroCard } from '~/lib/ogCards';
 
 const { page, productUpdates, successStories, partners } = await executeQuery(Astro, query);
 
@@ -33,7 +34,12 @@ if (!page) {
 }
 ---
 
-<Layout theme={home.homeHero.theme} seo={page.seo} seoAnalysis={page.yoastAnalysis}>
+<Layout
+  ogCard={heroCard(home.homeHero, home.homeHero.theme, 'editor')}
+  theme={home.homeHero.theme}
+  seo={page.seo}
+  seoAnalysis={page.yoastAnalysis}
+>
   <HomeHero {...home.homeHero} />
   <UserExperience {...home.userExperience} />
   <ContentSource {...home.contentSource} theme="orange" background="default" />

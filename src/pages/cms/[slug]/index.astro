@@ -33,6 +33,7 @@ import Lab from '~/scenes/Images/Lab.astro';
 import Stream from '~/scenes/RealTime/Stream.astro';
 import { VisualEditingScene } from '~/scenes/VisualEditing/VisualEditing';
 import { query } from './_graphql';
+import { frameworkCard } from '~/lib/ogCards';
 
 const fw = [astro, nextjs, nuxt, sveltekit].find((p) => p.slug === Astro.params.slug);
 
@@ -58,6 +59,16 @@ const projects = [
   .slice(0, 12);
 
 const seo = overrideSeo([], seoTitle(fw.seo.title), seoDescription(fw.seo.description));
+// The logo of the card is the logo of the first integration record.
+const ogCard = frameworkCard(
+  integrations.find((integration) => integration.slug === fw.integrations[0]),
+  {
+    seoTitle: fw.seo.title,
+    headline: fw.hero.headline,
+    subheadline: fw.hero.subheadline,
+    theme: fw.fetch.theme,
+  },
+);
 ---
 
 {
@@ -71,7 +82,7 @@ const seo = overrideSeo([], seoTitle(fw.seo.title), seoDescription(fw.seo.descri
   (a framework without one).
 */
 }
-<Layout theme={fw.fetch.theme} seo={seo}>
+<Layout ogCard={ogCard} theme={fw.fetch.theme} seo={seo}>
   <Hero {...fw.hero} typewriter />
   <CategoryNav {...fw.chapterNav} />
 

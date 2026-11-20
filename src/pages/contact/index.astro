@@ -8,11 +8,19 @@ import { contact, seo as contactSeo } from '~/data/contact';
 import Layout from '~/layouts/Layout.astro';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import s from './_style.module.css';
+import { teamCard } from '~/lib/ogCards';
 
 const seo = overrideSeo([], seoTitle(contactSeo.title), seoDescription(contactSeo.description));
+// The people of the team who answer the page are on its OG card.
+const ogCard = await teamCard(
+  Astro,
+  { label: contact.label, headline: contact.headline, subheadline: contact.muted },
+  'purple',
+  ['sales'],
+);
 ---
 
-<Layout theme="purple" seo={seo} headerVariant="accent">
+<Layout ogCard={ogCard} theme="purple" seo={seo} headerVariant="accent">
   <sales-form class={s.salesForm}>
     <ContactSection {...contact} external>
       <Fragment slot="extra">

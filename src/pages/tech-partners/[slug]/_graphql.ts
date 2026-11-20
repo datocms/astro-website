@@ -27,6 +27,7 @@ export const query = graphql(
   /* GraphQL */ `
     query PostQuery($slug: String!) {
       page: techPartner(filter: { slug: { eq: $slug } }) {
+        ...TechPartnerOgCardFragment
         seo: _seoMetaTags {
           ...TagFragment
         }
@@ -98,7 +99,7 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ...defaultLinkToRecordFragments, ...defaultInlineRecordFragments],
+  [OgCardFragment, TagFragment, ...defaultLinkToRecordFragments, ...defaultInlineRecordFragments],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

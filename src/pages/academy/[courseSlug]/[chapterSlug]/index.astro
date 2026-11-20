@@ -30,6 +30,7 @@ import { JsonLd } from '~/components/JsonLd';
 import { canonicalUrl, courseId, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { extractFromSeoTags } from '~/lib/datocms/seo';
 import { baseUrl } from '~/lib/draftMode';
+import { academyCard } from '~/lib/ogCards';
 
 const variables = { courseSlug: Astro.params.courseSlug!, chapterSlug: Astro.params.chapterSlug! };
 
@@ -70,7 +71,7 @@ const outline = allChapters.map((nthChapter) => ({
 }));
 ---
 
-<Layout theme="orange" seo={chapter.seo} headerVariant="accent">
+<Layout ogCard={academyCard(chapter)} theme="orange" seo={chapter.seo} headerVariant="accent">
   <Fragment slot="head">
     <JsonLd
       data={{

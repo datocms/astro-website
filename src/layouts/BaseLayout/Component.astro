@@ -2,11 +2,13 @@
 import { Check, Link } from 'lucide';
 import { ContentLink, Seo, stripStega, type TitleMetaLinkTag } from '@datocms/astro';
 import { baseUrl, isDraftModeEnabled } from '~/lib/draftMode';
+import type { OgCardData } from '~/lib/ogCardUrl';
 import type { Theme } from '~/lib/theme';
 import {
   extractFromSeoTags,
   pipeSeo,
   replaceSeoPageTitleSuffix,
+  seoGeneratedCard,
   seoCanonicalIfMissing,
 } from '~/lib/datocms/seo';
 import { organizationNode, webPageNode, websiteNode } from '~/lib/jsonLd';
@@ -24,13 +26,19 @@ import { NavigationProgress } from '~/components/NavigationProgress';
  */
 type Props = {
   seo: TitleMetaLinkTag[];
+  /**
+   * The OG card of the page (`/og-card/index.png`): each page has one. The
+   * functions of `~/lib/ogCards` make it from the record of the page. The
+   * card replaces the image of the SEO tags of the CMS.
+   */
+  ogCard: OgCardData;
   /** The `data-theme` of <body>. */
   theme?: Theme;
   /** The dense values of the type ladder, as `data-density` of <body>. */
   density?: 'dense';
 };
 
-const { seo, theme = 'purple', density } = Astro.props;
+const { seo, ogCard, theme = 'purple', density } = Astro.props;
 
 // The order of the cascade layers (see src/styles/global.css). The statement
 // is the first child of <head>, before all other CSS.
@@ -63,6 +71,7 @@ const canonicalHref = new URL(Astro.url.pathname, baseUrl(Astro)).href;
 
 const finalSeo = pipeSeo(
   seo,
+  seoGeneratedCard(Astro, ogCard),
   suffix ? replaceSeoPageTitleSuffix(suffix) : undefined,
   seoCanonicalIfMissing(canonicalHref),
 );

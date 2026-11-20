@@ -18,8 +18,8 @@ export const OgCardFragment = graphql(/* GraphQL */ `
       official
     }
     coverImage {
-      # A cover that is not 3:2 keeps its top left corner, as a screenshot.
-      url(imgixParams: { w: 960, h: 640, fit: crop, crop: [top, left], fm: jpg })
+      # The full cover, never cut: the card fits it in its box.
+      url(imgixParams: { w: 1200, h: 800, fit: max, fm: jpg })
     }
   }
 `);
@@ -28,6 +28,7 @@ export const query = graphql(
   /* GraphQL */ `
     query pluginQuery($slug: String!) {
       page: plugin(filter: { packageName: { eq: $slug } }) {
+        ...PluginOgCardFragment
         seo: _seoMetaTags {
           ...TagFragment
         }
@@ -75,7 +76,7 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ResponsiveImageFragment],
+  [OgCardFragment, TagFragment, ResponsiveImageFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

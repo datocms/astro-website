@@ -4,8 +4,28 @@ import { page as astroPage } from '~/data/cms-astro';
 import { page as nextjsPage } from '~/data/cms-nextjs';
 import { page as nuxtPage } from '~/data/cms-nuxt';
 import { page as sveltekitPage } from '~/data/cms-sveltekit';
+import * as ai from '~/data/ai-pillar';
+import * as blog from '~/data/blog';
+import * as brand from '~/data/brand';
+import * as caseStudies from '~/data/case-studies';
+import * as contact from '~/data/contact';
+import * as dev from '~/data/developers-pillar';
+import * as ee from '~/data/editor-experience';
+import * as enterprise from '~/data/enterprise';
+import * as features from '~/data/features';
 import * as home from '~/data/home';
+import * as media from '~/data/media';
+import * as partnerProgram from '~/data/partner-program';
 import * as partners from '~/data/partners';
+import * as philosophy from '~/data/philosophy';
+import * as plugins from '~/data/plugins';
+import * as pricing from '~/data/pricing';
+import * as productUpdates from '~/data/product-updates';
+import * as researchProgram from '~/data/research-program';
+import * as slack from '~/data/slack';
+import * as starters from '~/data/starters';
+import * as support from '~/data/support';
+import * as visualEditing from '~/data/visual-editing-chapter';
 import * as wall from '~/data/wall-of-love';
 import Layout from '~/layouts/Layout.astro';
 import * as docPage from '~/layouts/docs/PageLayout/_graphql';
@@ -20,6 +40,8 @@ import {
   compareCard,
   docsCard,
   frameworkCard,
+  heroCard,
+  teamCard,
   partnerCard,
   pluginCard,
   postCard,
@@ -186,24 +208,78 @@ const plugin = (record: (typeof data.popularPlugins)[number]): Card => ({
 
 const groups: Group[] = [
   {
-    name: 'Pages with a hero',
+    // The cards of `heroCard`, as the pages make them. A pillar shows its
+    // screen of the product.
+    name: 'Marketing pages',
+    cards: [
+      { path: '/', data: heroCard(home.homeHero, home.homeHero.theme, 'editor') },
+      { path: '/developers', data: heroCard(dev.hero, dev.schema.theme, 'schema') },
+      {
+        path: '/editor-experience',
+        data: heroCard(ee.hero, visualEditing.theme, 'editor'),
+      },
+      { path: '/media', data: heroCard(media.hero, media.library.theme, 'media') },
+      { path: '/ai', data: heroCard(ai.hero, ai.mcp.theme) },
+      {
+        path: '/enterprise-headless-cms',
+        data: heroCard(enterprise.hero, enterprise.security.theme),
+      },
+      // The page takes the theme of its first category in the CMS.
+      { path: '/features', data: heroCard(features.hero, 'blue') },
+      { path: '/pricing', data: heroCard(pricing.hero, 'purple') },
+      { path: '/philosophy', data: heroCard(philosophy.hero, 'green') },
+      { path: '/wall', data: heroCard(wall.hero, 'pink', 'editor') },
+      { path: '/brand', data: heroCard(brand.hero, 'purple') },
+    ],
+  },
+  {
+    name: 'Index pages',
+    cards: [
+      { path: '/blog', data: heroCard(blog.hero, 'green') },
+      { path: '/case-studies', data: heroCard(caseStudies.hero, 'orange') },
+      { path: '/plugins', data: heroCard(plugins.hero, 'blue') },
+      { path: '/starters', data: heroCard(starters.hero, 'blue') },
+      { path: '/partners', data: heroCard(partners.index.hero, 'pink') },
+      { path: '/partners/showcase', data: heroCard(partners.showcase.hero, 'pink') },
+      { path: '/tech-partners', data: heroCard(partners.techIndex.hero, 'pink') },
+      { path: '/product-updates', data: heroCard(productUpdates.hero, 'green') },
+    ],
+  },
+  {
+    // The photos of the people of the team who answer each page.
+    name: 'Pages of a team',
     cards: [
       {
-        path: '/',
-        data: {
-          title: home.hero.headline,
-          theme: home.homeTheme,
-          picture: { kind: 'product', scene: 'editor' },
-        },
+        path: '/contact',
+        data: await teamCard(
+          Astro,
+          {
+            label: contact.contact.label,
+            headline: contact.contact.headline,
+            subheadline: contact.contact.muted,
+          },
+          'purple',
+          ['sales'],
+        ),
+      },
+      { path: '/support', data: await teamCard(Astro, support.hero, 'purple', ['support']) },
+      {
+        path: '/partner-program',
+        data: await teamCard(Astro, partnerProgram.hero, 'purple', ['partners']),
       },
       {
-        path: '/wall',
-        data: {
-          title: wall.hero.headline,
-          excerpt: wall.hero.subheadline,
-          theme: 'pink',
-          picture: { kind: 'product', scene: 'editor' },
-        },
+        path: '/research-program',
+        data: await teamCard(Astro, researchProgram.hero, 'purple', ['research']),
+      },
+      {
+        path: '/slack',
+        data: await teamCard(
+          Astro,
+          slack.hero,
+          'purple',
+          ['support', 'sales', 'research'],
+          'The DatoCMS team',
+        ),
       },
     ],
   },
@@ -327,7 +403,13 @@ const cardSrc = (card: Card) => {
 const seo = overrideSeo([], seoTitle('OG gallery'));
 ---
 
-<Layout seo={seo} theme="purple" headerVariant={false} footer={false}>
+<Layout
+  ogCard={{ title: 'OG gallery', theme: 'purple' }}
+  seo={seo}
+  theme="purple"
+  headerVariant={false}
+  footer={false}
+>
   {
     groups.map((group) => (
       <section class="section">

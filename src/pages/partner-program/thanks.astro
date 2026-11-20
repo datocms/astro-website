@@ -8,11 +8,19 @@ import { thanksLogos } from '~/data/thanks';
 import Layout from '~/layouts/Layout.astro';
 import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
 import { GOOGLE_ADS_CONVERSIONS } from '~/lib/googleAds';
+import { teamCard } from '~/lib/ogCards';
 
 const seo = overrideSeo([], seoTitle('Thanks for reaching out'));
+// The people of the team who answer the page are on its OG card.
+const ogCard = await teamCard(
+  Astro,
+  { label: 'Partner program', headline: 'Thanks for reaching out.' },
+  'purple',
+  ['partners'],
+);
 ---
 
-<Layout theme="purple" seo={seo} headerVariant="accent">
+<Layout ogCard={ogCard} theme="purple" seo={seo} headerVariant="accent">
   <script is:inline define:vars={{ GADS_CONVERSION: GOOGLE_ADS_CONVERSIONS.partnerSubmit }}>
     window.dataLayer = window.dataLayer || [];
     function gtag() {

@@ -29,6 +29,7 @@ export const query = graphql(
   /* GraphQL */ `
     query AcademyChapter($courseSlug: String!, $chapterSlug: String!) {
       chapter: academyChapter(filter: { slug: { eq: $chapterSlug } }) {
+        ...AcademyChapterOgCardFragment
         id
         _firstPublishedAt
         _publishedAt
@@ -114,6 +115,7 @@ export const query = graphql(
     }
   `,
   [
+    OgCardFragment,
     TagFragment,
     ImageFragment,
     InternalVideoFragment,

@@ -20,6 +20,7 @@ import PluginsChapter from '~/scenes/Plugins/Chapter.astro';
 import RealTimeChapter from '~/scenes/RealTime/Chapter.astro';
 import SchemaChapter from '~/scenes/SchemaBuilder/Chapter.astro';
 import { query } from './_graphql';
+import { heroCard } from '~/lib/ogCards';
 
 const { review } = await executeQuery(Astro, query);
 
@@ -36,7 +37,7 @@ const seo = overrideSeo([], seoTitle(dev.seo.title), seoDescription(dev.seo.desc
   the opinion on the accent surface.
 */
 }
-<Layout theme={dev.schema.theme} seo={seo}>
+<Layout ogCard={heroCard(dev.hero, dev.schema.theme, 'schema')} theme={dev.schema.theme} seo={seo}>
   <Hero {...dev.hero} typewriter />
   {/* The chapters of the pillar. Sticky; no theme, as the hero: it takes the theme of the page. */}
   <CategoryNav {...dev.chapterNav} />

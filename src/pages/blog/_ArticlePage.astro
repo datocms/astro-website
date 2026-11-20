@@ -23,12 +23,11 @@ import {
   extractFromSeoTags,
   overrideSeo,
   seoCanonical,
-  seoGeneratedCard,
   seoOgType,
   seoTwitterCard,
 } from '~/lib/datocms/seo';
 import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
-import type { OgCardData } from '~/lib/ogCardUrl';
+import { type OgCardData, ogCardUrl } from '~/lib/ogCardUrl';
 import { canonicalUrl, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { ArticleChatFragment, ArticlePostFragment } from './_article';
 import { loadRelated } from './_related';
@@ -111,22 +110,28 @@ const {
 const related = await loadRelated(Astro, article);
 
 const baseUrl = buildBaseUrl(Astro);
-// The OG image of an article is its card, also when the CMS gives an image.
 const seo = overrideSeo(
   article.seo,
   article.canonicalUrl ? seoCanonical(article.canonicalUrl) : undefined,
   seoOgType('article'),
   seoTwitterCard('summary_large_image'),
-  seoGeneratedCard(Astro, ogCard),
 );
-const { description, image } = extractFromSeoTags(seo);
+const { description } = extractFromSeoTags(seo);
+// The image of the article is its OG card, as in the head (Layout).
+const image = ogCardUrl(ogCard, Astro);
 const markdownUrl = new URL(
   Astro.url.pathname.endsWith('.md') ? Astro.url.pathname : `${Astro.url.pathname}.md`,
   baseUrl,
 );
 ---
 
-<Layout theme={theme} seo={seo} seoAnalysis={article.yoastAnalysis} headerVariant="accent">
+<Layout
+  theme={theme}
+  seo={seo}
+  ogCard={ogCard}
+  seoAnalysis={article.yoastAnalysis}
+  headerVariant="accent"
+>
   <Fragment slot="head">
     {
       article._firstPublishedAt && (

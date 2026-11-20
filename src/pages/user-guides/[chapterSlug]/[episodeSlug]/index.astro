@@ -25,6 +25,7 @@ import { canonicalUrl, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { EpisodeFragment, query } from './_graphql';
 import s from './_style.module.css';
+import { userGuideCard } from '~/lib/ogCards';
 
 const { chapterSlug, episodeSlug } = Astro.params;
 
@@ -95,7 +96,12 @@ const trail = [
 ];
 ---
 
-<Layout theme="orange" seo={episode._seoMetaTags} headerVariant="accent">
+<Layout
+  ogCard={userGuideCard(episode, currentChapter.title)}
+  theme="orange"
+  seo={episode._seoMetaTags}
+  headerVariant="accent"
+>
   <Fragment slot="head">
     <JsonLd
       data={{

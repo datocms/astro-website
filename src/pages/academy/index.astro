@@ -8,6 +8,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { heroCard } from '~/lib/ogCards';
 
 const { courses, page } = await executeQuery(Astro, query);
 
@@ -19,7 +20,15 @@ if (!page || courses.length === 0) {
 const listed = courses.filter((course) => course.chapters.length > 0);
 ---
 
-<Layout theme="orange" seo={page.seo} headerVariant="page">
+<Layout
+  ogCard={{
+    ...heroCard({ label: 'Academy', headline: 'DatoCMS Academy' }, 'orange'),
+    wordmark: true,
+  }}
+  theme="orange"
+  seo={page.seo}
+  headerVariant="page"
+>
   <Hero
     variant="page"
     headline="DatoCMS Academy"

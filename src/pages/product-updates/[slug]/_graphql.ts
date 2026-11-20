@@ -24,6 +24,7 @@ export const query = graphql(
   /* GraphQL */ `
     query ProductUpdate($slug: String!) {
       entry: changelogEntry(filter: { slug: { eq: $slug } }) {
+        ...ProductUpdateOgCardFragment
         _firstPublishedAt
         title
         seo: _seoMetaTags {
@@ -33,7 +34,7 @@ export const query = graphql(
       }
     }
   `,
-  [TagFragment, ProductUpdateFragment],
+  [OgCardFragment, TagFragment, ProductUpdateFragment],
 );
 
 /**

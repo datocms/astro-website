@@ -20,7 +20,6 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import {
   overrideSeo,
   seoDescription,
-  seoGeneratedCard,
   seoOgType,
   seoPageTitle,
   seoShareTitle,
@@ -28,6 +27,7 @@ import {
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { techPartnerCard } from '~/lib/ogCards';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -42,19 +42,13 @@ const description = toPlainText(page.shortDescription);
 ---
 
 <Layout
+  ogCard={techPartnerCard(page, techPartner.kicker)}
   theme="pink"
   seo={overrideSeo(
     page.seo,
     seoPageTitle(page.name, techPartner.seoSuffix),
     seoShareTitle(`DatoCMS Ecosystem Partner: ${page.name}`),
     description ? seoDescription(description) : null,
-    seoGeneratedCard(Astro, {
-      kicker: techPartner.kicker,
-      title: page.name,
-      excerpt: description,
-      logoPngUrl: page.logo.pngUrl,
-      theme: 'pink',
-    }),
     seoOgType('website'),
   )}
   headerVariant="page"

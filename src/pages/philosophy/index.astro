@@ -12,6 +12,7 @@ import Layout from '~/layouts/Layout.astro';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import { heroCard } from '~/lib/ogCards';
 
 const { page, members, review } = await executeQuery(Astro, query);
 
@@ -26,7 +27,12 @@ if (!page) {
   The quote goes between principles 04 and 05.
 */
 }
-<Layout theme="green" seo={page._seoMetaTags} headerVariant="accent">
+<Layout
+  ogCard={heroCard(philosophy.hero, 'green')}
+  theme="green"
+  seo={page._seoMetaTags}
+  headerVariant="accent"
+>
   <Hero {...philosophy.hero} team={members} variant="accent" typewriter teamId="the-team" />
   <Principles principles={philosophy.principles.principles.slice(0, 4)} />
   <Quote quote={review} variant="split" hand="ok-reach" theme="yellow" />

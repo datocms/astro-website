@@ -11,6 +11,7 @@ import { executeQuery } from '~/lib/datocms/executeQuery';
 import { buildUrlForChangelogEntry } from '~/lib/datocms/gqlUrlBuilder/changelogEntry';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { neighboursQuery, query } from './_graphql';
+import { productUpdateCard } from '~/lib/ogCards';
 
 const variables = { slug: Astro.params.slug! };
 const { entry } = await executeQuery(Astro, query, { variables });
@@ -35,7 +36,7 @@ const neighbours = {
 };
 ---
 
-<Layout theme="green" seo={entry.seo} headerVariant="accent">
+<Layout ogCard={productUpdateCard(entry)} theme="green" seo={entry.seo} headerVariant="accent">
   <Breadcrumb trail={[indexes.productUpdates]} current={entry.title} />
   <ProductUpdate entry={entry}>
     <BreadcrumbLabel slot="label" trail={[indexes.productUpdates]} />

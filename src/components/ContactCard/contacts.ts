@@ -9,6 +9,8 @@ export interface ContactPerson {
   name: string;
   role: string;
   portrait: string;
+  /** The photo of the OG card: 400 px, a JPEG. */
+  photo: string;
 }
 
 export interface Contact {
@@ -59,7 +61,16 @@ export async function fetchDepartments(
   const people = records
     .filter((r) => r.departments.some((department) => slugs.includes(department.slug ?? '')))
     .flatMap((r) =>
-      r.avatar?.url ? [{ name: r.name ?? '', role: r.role ?? '', portrait: r.avatar.url }] : [],
+      r.avatar?.url
+        ? [
+            {
+              name: r.name ?? '',
+              role: r.role ?? '',
+              portrait: r.avatar.url,
+              photo: r.ogPhoto?.url ?? r.avatar.url,
+            },
+          ]
+        : [],
     )
     .sort((a, b) => stripStega(a.name).localeCompare(stripStega(b.name)));
   if (people.length === 0) return null;

@@ -9,6 +9,7 @@ import Layout from '~/layouts/Layout.astro';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
 import { prepareIubendaHtml } from '~/lib/iubenda';
 import styles from './_iubenda.module.css';
+import { heroCard } from '~/lib/ogCards';
 
 const seo = overrideSeo(
   [],
@@ -18,7 +19,12 @@ const seo = overrideSeo(
 const { html, items } = prepareIubendaHtml(privacy.content);
 ---
 
-<Layout theme="purple" seo={seo} headerVariant="accent">
+<Layout
+  ogCard={heroCard({ label: 'Legal', headline: 'Privacy policy' }, 'purple')}
+  theme="purple"
+  seo={seo}
+  headerVariant="accent"
+>
   <Hero variant="accent" label="Legal" headline="Privacy policy" />
   <ArticleBody items={tableOfContentsItems(items)} tocTitle="In this policy">
     <div class={styles.policy}>

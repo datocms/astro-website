@@ -25,6 +25,7 @@ export const query = graphql(
   /* GraphQL */ `
     query Compare($slug: String!) {
       page: productComparison(filter: { slug: { eq: $slug } }) {
+        ...CompareOgCardFragment
         _firstPublishedAt
         _publishedAt
         _seoMetaTags {
@@ -64,6 +65,7 @@ export const query = graphql(
     }
   `,
   [
+    OgCardFragment,
     TagFragment,
     ReasonColumnsReasonFragment,
     QuoteReviewFragment,

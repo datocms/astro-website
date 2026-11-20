@@ -17,6 +17,7 @@ import MediaComponentsChapter from '~/scenes/MediaComponents/Chapter.astro';
 import MediaLibraryChapter from '~/scenes/MediaLibrary/Chapter.astro';
 import VideoChapter from '~/scenes/Video/Chapter.astro';
 import { query } from './_graphql';
+import { heroCard } from '~/lib/ogCards';
 
 const { review } = await executeQuery(Astro, query);
 
@@ -32,7 +33,11 @@ const seo = overrideSeo([], seoTitle(media.seo.title), seoDescription(media.seo.
   on the accent surface.
 */
 }
-<Layout theme={media.library.theme} seo={seo}>
+<Layout
+  ogCard={heroCard(media.hero, media.library.theme, 'media')}
+  theme={media.library.theme}
+  seo={seo}
+>
   <Hero {...media.hero} typewriter />
   {/* The chapters of the pillar. Sticky; no theme, as the hero: it takes the theme of the page. */}
   <CategoryNav {...media.chapterNav} />

@@ -33,6 +33,7 @@ export const query = graphql(
   /* GraphQL */ `
     query ShowcaseQuery($projectSlug: String!) {
       page: showcaseProject(filter: { slug: { eq: $projectSlug } }) {
+        ...ShowcaseOgCardFragment
         _seoMetaTags {
           ...TagFragment
         }
@@ -148,6 +149,7 @@ export const query = graphql(
     }
   `,
   [
+    OgCardFragment,
     TagFragment,
     ResponsiveImageFragment,
     PartnerUrlFragment,

@@ -7,11 +7,20 @@ import { Section } from '~/components/Section';
 import { thanksLogos } from '~/data/thanks';
 import Layout from '~/layouts/Layout.astro';
 import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { teamCard } from '~/lib/ogCards';
 
 const seo = overrideSeo([], seoTitle('Welcome to the Slack community'));
+// The people of the team who answer the page are on its OG card.
+const ogCard = await teamCard(
+  Astro,
+  { label: 'Slack community', headline: 'Welcome on board.' },
+  'purple',
+  ['support', 'sales', 'research'],
+  'The DatoCMS team',
+);
 ---
 
-<Layout theme="purple" seo={seo} headerVariant="accent">
+<Layout ogCard={ogCard} theme="purple" seo={seo} headerVariant="accent">
   <Hero variant="accent" label="Slack community" headline="Welcome on board." />
   <ArticleBody tocTitle="On this page">
     <p>Thanks for your interest in joining our Slack channel.</p>

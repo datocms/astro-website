@@ -1,3 +1,4 @@
+import { stripStega } from '@datocms/astro';
 import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import { buildGroupsFromHeadings } from '~/components/docs/ContentPlusToc/utils';
 import { pixelCover, postTheme } from '~/components/PixelCover';
@@ -16,7 +17,10 @@ import * as productUpdatePage from '~/pages/product-updates/[slug]/_graphql';
 import * as starterPage from '~/pages/starters/[slug]/_graphql';
 import * as techPartnerPage from '~/pages/tech-partners/[slug]/_graphql';
 import * as userGuidePage from '~/pages/user-guides/[chapterSlug]/[episodeSlug]/_graphql';
-import type { OgCardData } from './ogCardUrl';
+import type { AstroGlobal } from 'astro';
+import { fetchDepartments } from '~/components/ContactCard';
+import { joinWithAnd, shortNames } from './shortNames';
+import type { OgCardData, OgProductScene } from './ogCardUrl';
 import { type Theme, themeFromSlug } from './theme';
 
 /*
@@ -153,7 +157,7 @@ export function partnerCard(
   kicker: string,
 ): OgCardData {
   const partner = readFragment(partnerPage.OgCardFragment, fragment);
-  return partnerData(kicker, partner, partner.projects.count);
+  return partnerData(kicker, partner, partner.showcaseMeta.count);
 }
 
 /** The card of a technology partner: it has no projects in the showcase. */
@@ -212,12 +216,20 @@ export function userGuideCard(
   chapter: string,
 ): OgCardData {
   const episode = readFragment(userGuidePage.OgCardFragment, fragment);
-  const seconds = episode.video.video.duration;
+  const { duration: seconds, thumbnailUrl } = episode.video.video;
+  // The frame at the width of the box of the card.
+  const frame = new URL(thumbnailUrl);
+  frame.searchParams.set('width', '1200');
   return {
-    kicker: `User guides: ${chapter}`,
+    kicker: 'User guides',
     title: episode.title,
     theme: 'orange',
-    picture: { kind: 'video', duration: seconds ? duration(seconds) : undefined },
+    picture: {
+      kind: 'video',
+      duration: seconds ? duration(seconds) : undefined,
+      imageUrl: frame.toString(),
+      series: chapter,
+    },
   };
 }
 
@@ -293,5 +305,65 @@ export function chatCard(fragment: FragmentOf<typeof chatPage.OgCardFragment>): 
     title: chat.title,
     theme: themeFromSlug(chat.slug),
     picture: { kind: 'portraits', imageUrls: chat.people.map((person) => person.portrait.url) },
+  };
+}
+
+/**
+ * The card of a page with a hero and no record of its own (a marketing
+ * page, an index): the copy of the hero. The label is the kicker, the
+ * subheadline (else the intro) is the muted run after the title. The proof
+ * is a screen of the product in the theme of the page: the screen of its
+ * pillar, else the editor.
+ */
+export function heroCard(
+  hero: {
+    label?: string | null;
+    headline: string;
+    subheadline?: string | null;
+    intro?: string | null;
+  },
+  theme: Theme,
+  scene: OgProductScene = 'editor',
+): OgCardData {
+  return {
+    kicker: hero.label ?? undefined,
+    title: hero.headline,
+    excerpt: hero.subheadline ?? hero.intro ?? undefined,
+    theme,
+    picture: { kind: 'product', scene },
+  };
+}
+
+/**
+ * The card of a page that a team answers (contact, support, the programs):
+ * the claim of the hero, and as the proof the photos of the people of the
+ * departments (their slugs), their names and their team, as the row of
+ * `ContactPeople`. The card shows the first three people, and `role`
+ * replaces the name of the team. With no photos, the card is `heroCard`.
+ */
+export async function teamCard(
+  Astro: AstroGlobal,
+  hero: Parameters<typeof heroCard>[0],
+  theme: Theme,
+  departments: string[],
+  role?: string,
+): Promise<OgCardData> {
+  const card = heroCard(hero, theme);
+  const contact = await fetchDepartments(Astro, departments);
+  if (!contact) return card;
+  const people = contact.people.slice(0, 3);
+  // The URL of the card carries the text: no stega of Content Link.
+  const names =
+    people.length === 1
+      ? stripStega(people[0]!.name)
+      : joinWithAnd(shortNames(people.map((person) => stripStega(person.name))));
+  return {
+    ...card,
+    picture: {
+      kind: 'team',
+      imageUrls: people.map((person) => person.photo),
+      names,
+      role: stripStega(role ?? (people.length === 1 ? contact.role : contact.team)),
+    },
   };
 }

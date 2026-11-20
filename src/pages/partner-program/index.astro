@@ -30,6 +30,7 @@ import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse
 import Benefits from './_Benefits.astro';
 import { query } from './_graphql';
 import s from './_style.module.css';
+import { teamCard } from '~/lib/ogCards';
 
 const { partnerTestimonials, page } = await executeQuery(Astro, query);
 
@@ -46,9 +47,11 @@ const partnerLogos: LogoItem[] = page.highlightedPartners.map((partner) => ({
   width: partner.logo.width ?? 0,
   height: partner.logo.height ?? 0,
 }));
+// The people of the team who answer the page are on its OG card.
+const ogCard = await teamCard(Astro, hero, 'purple', ['partners']);
 ---
 
-<Layout theme="purple" seo={seo} headerVariant="accent">
+<Layout ogCard={ogCard} theme="purple" seo={seo} headerVariant="accent">
   <Hero
     variant="accent"
     label={hero.label}

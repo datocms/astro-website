@@ -28,6 +28,7 @@ import { query } from './_graphql';
 import HeroShots from './_HeroShots.astro';
 import s from './_style.module.css';
 import { normalizeManifest, type RawManifest } from './_utils';
+import { starterCard } from '~/lib/ogCards';
 
 const variables = { slug: Astro.params.slug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -57,6 +58,7 @@ const logo = page.technology.logo;
 ---
 
 <Layout
+  ogCard={starterCard(page)}
   theme="blue"
   seo={overrideSeo(page.seo, seoOgType('website'))}
   seoAnalysis={page.yoastAnalysis}

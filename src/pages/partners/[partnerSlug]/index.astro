@@ -27,7 +27,6 @@ import { buildUrlForShowcaseProject } from '~/lib/datocms/gqlUrlBuilder/showcase
 import {
   overrideSeo,
   seoDescription,
-  seoGeneratedCard,
   seoOgType,
   seoPageTitle,
   seoShareTitle,
@@ -38,6 +37,7 @@ import Card from '../_Card.astro';
 import { LogoPlate } from '~/components/LogoPlate';
 import { extraQuery, query } from './_graphql';
 import s from './_style.module.css';
+import { partnerCard } from '~/lib/ogCards';
 
 const variables = { partnerSlug: Astro.params.partnerSlug! };
 const { page } = await executeQuery(Astro, query, { variables });
@@ -70,24 +70,13 @@ const sortedProjects = sortBy(page.projects, (project) =>
 ---
 
 <Layout
+  ogCard={partnerCard(page, partner.kicker)}
   theme="pink"
   seo={overrideSeo(
     page._seoMetaTags,
     seoPageTitle(page.name, 'DatoCMS Partners'),
     seoShareTitle(`DatoCMS Partner: ${page.name}`),
     description ? seoDescription(description) : null,
-    seoGeneratedCard(Astro, {
-      kicker: partner.kicker,
-      title: page.name,
-      excerpt: description,
-      // No chip for a partner with no projects in the showcase.
-      pills:
-        page.projects.length > 0
-          ? [`${page.projects.length} showcased project${page.projects.length === 1 ? '' : 's'}`]
-          : [],
-      logoPngUrl: page.logo.pngUrl,
-      theme: 'pink',
-    }),
     seoOgType('website'),
   )}
   headerVariant="page"

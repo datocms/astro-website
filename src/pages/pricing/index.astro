@@ -26,6 +26,7 @@ import { fetchPerOwnerPricingPlans } from '~/lib/pricing/perOwnerPricingPlans';
 import { query } from './_graphql';
 import FreeLimitsDialog from './_sub/FreeLimitsDialog.astro';
 import { freeLimitRows, limitCategories } from './_sub/limits';
+import { heroCard } from '~/lib/ogCards';
 
 const { page, faqs, planFeatureGroups, hints } = await executeQuery(Astro, query);
 
@@ -66,7 +67,12 @@ const jsonLd: WithContext<FAQPage> | null =
     : null;
 ---
 
-<Layout theme="purple" seo={page.seo} headerVariant="page">
+<Layout
+  ogCard={heroCard(pricing.hero, 'purple')}
+  theme="purple"
+  seo={page.seo}
+  headerVariant="page"
+>
   {jsonLd && <JsonLd slot="head" data={jsonLd} />}
   <meta slot="head" name="datocms-md-title" content="DatoCMS Pricing" />
 

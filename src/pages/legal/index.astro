@@ -4,6 +4,7 @@ import { ArticleBody } from '~/components/ArticleBody';
 import { Hero } from '~/components/Hero';
 import Layout from '~/layouts/Layout.astro';
 import { overrideSeo, seoDescription, seoTitle } from '~/lib/datocms/seo';
+import { heroCard } from '~/lib/ogCards';
 
 const seo = overrideSeo(
   [],
@@ -14,7 +15,12 @@ const seo = overrideSeo(
 );
 ---
 
-<Layout theme="purple" seo={seo} headerVariant="accent">
+<Layout
+  ogCard={heroCard({ label: 'Legal', headline: 'Policies' }, 'purple')}
+  theme="purple"
+  seo={seo}
+  headerVariant="accent"
+>
   <Hero variant="accent" label="Legal" headline="Policies" />
   <ArticleBody tocTitle="On this page">
     <p class="lead">The following pages cover our security and policies:</p>

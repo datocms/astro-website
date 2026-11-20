@@ -19,6 +19,7 @@ import { baseUrl } from '~/lib/draftMode';
 import { canonicalUrl, publisherRef, softwareId, webPageRef } from '~/lib/jsonLd';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
 import { query } from './_graphql';
+import { heroCard } from '~/lib/ogCards';
 
 type Page = NonNullable<ResultOf<typeof query>['page']>;
 type GroupField = Exclude<keyof Page, '_seoMetaTags'>;
@@ -99,7 +100,11 @@ const jsonLd: WithContext<SoftwareApplication> = {
 };
 ---
 
-<Layout theme={categories[0]?.theme ?? 'purple'} seo={page._seoMetaTags}>
+<Layout
+  ogCard={heroCard(features.hero, categories[0]?.theme ?? 'purple')}
+  theme={categories[0]?.theme ?? 'purple'}
+  seo={page._seoMetaTags}
+>
   <JsonLd slot="head" data={jsonLd} />
   <Fragment slot="head">
     <meta name="datocms-md-title" content="DatoCMS features" />

@@ -3,6 +3,7 @@ import type { OgPicture } from '~/lib/ogCardUrl';
 import type { Theme } from '~/lib/theme';
 import type { OgPalette } from './palette';
 import { dataUri } from './raster';
+import { teamRowSize } from './team';
 import { ADVANCE, chip, escape, units } from './text';
 
 /*
@@ -106,7 +107,7 @@ function windowFrame(o: HalfOptions, image: string) {
 }
 
 /** The play button: a disc of the accent, with the triangle in the text of the accent. */
-function playButton(palette: OgPalette, size: number, position: Record<string, string>) {
+export function playButton(palette: OgPalette, size: number, position: Record<string, string>) {
   const play = `<svg width="${size}" height="${size}" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><circle cx="60" cy="60" r="60" fill="${palette.accent}"/><path d="M48 38 L86 60 L48 82 Z" fill="${palette.onAccent}"/></svg>`;
   return `<img src="data:image/svg+xml;base64,${Buffer.from(play).toString('base64')}" style="${css({ width: `${size}px`, height: `${size}px`, ...position })}" />`;
 }
@@ -347,6 +348,18 @@ export function half(o: HalfOptions): string {
           : '',
         { padding: '0px' },
       );
+    case 'team': {
+      const row = teamRowSize(picture.imageUrls.length);
+      // The photos (a PNG of `team.ts`), then the names and the team, at
+      // the bottom of the safe box. The ring of the first photo is outside
+      // the side of the safe box.
+      return ground(
+        `${image ? `<img src="${image}" style="${css({ width: `${row.width}px`, height: `${row.height}px`, marginLeft: '-8px', alignSelf: 'flex-start' })}" />` : ''}
+        <div style="${css({ ...label(40, palette.onInverseStrong), fontWeight: 500, marginTop: '40px' })}">${escape(picture.names)}</div>
+        <div style="${css({ ...label(32, palette.onInverseMuted), marginTop: '8px' })}">${escape(picture.role)}</div>`,
+        { justifyContent: 'flex-end' },
+      );
+    }
     case 'contents':
       return ground(contents(o, picture.entries), { justifyContent: 'flex-end' });
     case 'versus':

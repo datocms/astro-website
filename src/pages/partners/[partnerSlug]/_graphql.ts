@@ -22,7 +22,7 @@ export const OgCardFragment = graphql(/* GraphQL */ `
     logo {
       pngUrl: url(imgixParams: { fm: png, w: 720, h: 320, fit: max })
     }
-    projects: _allReferencingShowcaseProjectsMeta {
+    showcaseMeta: _allReferencingShowcaseProjectsMeta {
       count
     }
   }
@@ -32,6 +32,7 @@ export const query = graphql(
   /* GraphQL */ `
     query PartnerQuery($partnerSlug: String!) {
       page: partner(filter: { slug: { eq: $partnerSlug } }) {
+        ...PartnerOgCardFragment
         _seoMetaTags {
           ...TagFragment
         }
@@ -168,6 +169,7 @@ export const query = graphql(
     }
   `,
   [
+    OgCardFragment,
     TagFragment,
     ResponsiveImageFragment,
     ShowcaseProjectUrlFragment,
