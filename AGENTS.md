@@ -158,6 +158,7 @@ The attributes that control the conversion:
 
 - `data-datocms-md-root` marks the content of a page: on `<main>` in `Layout`, on the article in `ContentPlusToc` and on the docs home. Each page has exactly one. Without it, the conversion gives an error.
 - `data-datocms-nomd` removes an element. Use it for what has no meaning as text: faces, forms, duplicated links, calls to action.
+- `aria-hidden="true"` removes an element too: a space replaces it. Thus a picture of the product (the kit hides each screen outside `astro dev`) and a separator such as `·` are not in the Markdown.
 - `data-datocms-as-tag="dt"` converts an element as a different tag. Use it for a layout that is not good Markdown (`ComparisonTable`).
 - `data-datocms-link-text` on a part of a large link keeps only that part in the link.
 - `data-datocms-subline` moves the muted run of a headline out of the heading.

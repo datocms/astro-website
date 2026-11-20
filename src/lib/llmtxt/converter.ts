@@ -400,6 +400,16 @@ function cleanContent(content: HTMLElement): void {
   flattenListsOfHeadings(content);
 
   normalizeWhitespace(content);
+
+  // A screen reader does not read an aria-hidden element, thus it is not
+  // content of the page: the pictures of the product, the decorations, the
+  // copies for motion. A space replaces it, because a separator (" · ") can
+  // be aria-hidden, and the words on its two sides must not join. This step
+  // comes after normalizeWhitespace, which removes a text node of only
+  // spaces at the start of an element.
+  content.querySelectorAll('[aria-hidden="true"]').forEach((element) => {
+    element.replaceWith(content.ownerDocument.createTextNode(' '));
+  });
 }
 
 /**
