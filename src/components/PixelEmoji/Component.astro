@@ -36,7 +36,8 @@ function noise(x: number, y: number, seed: number): number {
  */
 function animate(svg: string): string {
   let out = '';
-  for (const [, fill, d] of svg.matchAll(/<path fill="([^"]+)" d="([^"]+)"\/>/g)) {
+  // Both groups always match, thus the defaults are only for the types.
+  for (const [, fill = '', d = ''] of svg.matchAll(/<path fill="([^"]+)" d="([^"]+)"\/>/g)) {
     let still = '';
     for (const [, x0, y, w] of d.matchAll(/M(\d+) (\d+)h(\d+)/g)) {
       for (let x = Number(x0); x < Number(x0) + Number(w); x++) {
