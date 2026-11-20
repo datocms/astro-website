@@ -29,7 +29,7 @@ export const PostCardFragment = graphql(
       author {
         name
         avatar {
-          url(imgixParams: { w: 60, h: 60, fit: crop })
+          url(imgixParams: { w: 40, h: 40, fit: crop, auto: format })
         }
       }
     }
@@ -51,7 +51,7 @@ export const ChatCardFragment = graphql(
       people {
         name
         avatar {
-          url(imgixParams: { w: 60, h: 60, fit: crop })
+          url(imgixParams: { w: 40, h: 40, fit: crop, auto: format })
         }
         portrait: avatar {
           url(imgixParams: { w: 640, h: 640, fit: crop })
