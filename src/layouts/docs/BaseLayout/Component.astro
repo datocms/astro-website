@@ -33,7 +33,7 @@ const ContentWrapper = contentWrapperComponent || 'div';
 const hasPageBar = Astro.slots.has('pagebar');
 ---
 
-<BaseLayout seo={seo} ogCard={ogCard} theme="docs" density="dense">
+<BaseLayout seo={seo} ogCard={ogCard} theme="docs" density="dense" skipTarget="docs-content">
   <Fragment slot="head">
     <slot name="head" />
     <link
@@ -114,7 +114,7 @@ const hasPageBar = Astro.slots.has('pagebar');
           </span>
         </div>
         <ContentWrapper>
-          <div class={s.container}>
+          <main id="docs-content" tabindex="-1" class={s.container}>
             <slot />
             <div class:list={[s.pageEnd, hideFooter && s.pageEndBare]}>
               {
@@ -147,7 +147,7 @@ const hasPageBar = Astro.slots.has('pagebar');
                 )
               }
             </div>
-          </div>
+          </main>
         </ContentWrapper>
       </div>
     </div>
@@ -163,10 +163,7 @@ const hasPageBar = Astro.slots.has('pagebar');
   </style>
 
   <script>
-    import { followSystemColorScheme } from '~/lib/colorScheme';
     import { WebComponent } from '~/lib/WebComponent';
-
-    followSystemColorScheme();
 
     window.customElements.define(
       'docs-sidebar-drawer',

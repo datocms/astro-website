@@ -73,7 +73,7 @@ const {
 const showSeoAnalysis = seoAnalysis !== undefined && isDraftModeEnabled(Astro);
 ---
 
-<BaseLayout seo={seo} ogCard={ogCard} theme={theme}>
+<BaseLayout seo={seo} ogCard={ogCard} theme={theme} skipTarget="layout-content">
   <Fragment slot="head">
     {/* A page can add tags to the head, such as JSON-LD. */}
     <slot name="head" />
@@ -102,7 +102,7 @@ const showSeoAnalysis = seoAnalysis !== undefined && isDraftModeEnabled(Astro);
       )
     }
   </slot>
-  <main id="layout-content" data-datocms-md-root>
+  <main id="layout-content" tabindex="-1" data-datocms-md-root>
     <slot />
   </main>
   <slot name="footer">
@@ -118,9 +118,4 @@ const showSeoAnalysis = seoAnalysis !== undefined && isDraftModeEnabled(Astro);
   <SiteSearch />
   {showSeoAnalysis && <SeoAnalysisPanel analysis={seoAnalysis} />}
   {import.meta.env.DEV && <PageNav />}
-  <script>
-    import { followSystemColorScheme } from '~/lib/colorScheme';
-
-    followSystemColorScheme();
-  </script>
 </BaseLayout>

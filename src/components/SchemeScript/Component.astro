@@ -1,21 +1,20 @@
 ---
 /*
  * Inline script for the head. It sets the color scheme before the first
- * paint: the choice of the visitor, else the scheme of the system. The
- * keys and the attribute names come from src/lib/colorScheme.ts.
+ * paint: the choice of the visitor, else light. The key and the attribute
+ * names come from src/lib/colorScheme.ts.
  */
-import { STORAGE_KEY, SYSTEM_DARK } from '~/lib/colorScheme';
+import { STORAGE_KEY } from '~/lib/colorScheme';
 ---
 
-<script is:inline define:vars={{ STORAGE_KEY, SYSTEM_DARK }}>
+<script is:inline define:vars={{ STORAGE_KEY }}>
   (function () {
     var root = document.documentElement;
     var scheme = null;
     try {
       scheme = localStorage.getItem(STORAGE_KEY);
     } catch (e) {}
-    if (scheme !== 'light' && scheme !== 'dark')
-      scheme = matchMedia(SYSTEM_DARK).matches ? 'dark' : 'light';
+    if (scheme !== 'dark') scheme = 'light';
     root.dataset.colorScheme = scheme;
     root.dataset.productScenesScheme = scheme;
   })();

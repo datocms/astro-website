@@ -147,7 +147,6 @@ export class PartnersGlobeElement extends WebComponent {
       this.#readColors();
       this.#draw();
     };
-    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', refresh);
     this.on(document.documentElement, 'colorschemechange', refresh);
 
     new ResizeObserver(() => this.#resize()).observe(this.#stage);
