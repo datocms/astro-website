@@ -1,6 +1,6 @@
 # astro-website
 
-Astro standalone Node server, deployed via `cubo` to Kubernetes on AWS. Three environments: `production`, `staging1`, `staging2`.
+Astro on Cloudflare Workers: two Workers from the same code, the public site and the drafts ("Deployment" below).
 
 ## The layout
 
@@ -167,63 +167,55 @@ To check a change, compare the `.md` of the page with `https://www.datocms.com/<
 
 ## Environment variables
 
-Three distinct mechanisms — pick the right one by asking: **when is the value needed, and is it secret?**
+Ask: is the value secret?
 
-### 1. Build-time public — `cubo.json5` `build.args` + Dockerfile `ARG`
+### A public value: `cloudflare.build.env`
 
-Use for values that need to be baked into the build (client-side bundles, server modules that read `astro:env/client`). The value is committed in cleartext in `cubo.json5` per environment.
+A value that is not secret goes in the bundle at build time (the client scripts, `astro:env/client`). Do the three steps:
 
-Wiring (all four steps are required):
-
-1. **`astro.config.ts`** — declare with `context: 'client', access: 'public'`:
+1. **`astro.config.ts`**: declare it with `context: 'client', access: 'public'`:
    ```ts
    MY_VAR: envField.string({ context: 'client', access: 'public' }),
    ```
-2. **`Dockerfile`** — `ARG MY_VAR` in the base stage, `ENV MY_VAR=$MY_VAR` in the build stage before `RUN npm run build`.
-3. **`cubo.json5`** — add `MY_VAR: 'literal-value'` under `build.args` in each environment where it should be set.
-4. **`.env.example`** — add `MY_VAR=` for local dev discoverability.
+2. **`cloudflare.build.env`**: add `MY_VAR=value`. The file is committed: the value is public.
+3. **`.env.example`**: add `MY_VAR=` for local dev.
 
-Examples in repo: `PUBLIC_HOSTNAME`, `RECAPTCHA_KEY`, `KNOWLEDGE_BASE_URL`, `LINKEDIN_PARTNER_ID`.
+`context: 'client'` does not mean "only in the browser": the server reads the value too, and the build puts it in the code. Examples: `PUBLIC_HOSTNAME`, `TURNSTILE_SITE_KEY`, `KNOWLEDGE_BASE_URL`, `LINKEDIN_PARTNER_ID`.
 
-### 2. Build-time secret — `cubo.json5` `envVarSecrets` + Dockerfile `--mount=type=secret`
+A value that is not secret and that the server reads at request time, and that is different on the two Workers, goes in `vars` of `wrangler.jsonc` (`DEPLOYMENT_DESTINATION`, `DRAFT_MODE_HOSTNAME`). Set it in the top level and in `env.draft`.
 
-Use for secrets needed during `docker build` (e.g. fetching a schema). Cubo passes these via BuildKit secret mounts so they never land in image layers.
+### A secret: `wrangler secret`
 
-Wiring:
-
-1. **`Dockerfile`** — consume with `RUN --mount=type=secret,id=MY_SECRET,env=MY_SECRET ...`.
-2. **`cubo.json5`** — list the name in `envVarSecrets` (an array of strings, not values).
-3. The actual value comes from the build host's environment / CI secret store.
-
-Example in repo: `DATOCMS_API_TOKEN` (used by the `gql.tada` step).
-
-### 3. Runtime secret — `cubo config:set`, nothing in `cubo.json5`
-
-Use for secrets read at request time by the running app (server actions, API routes, anything imported from `astro:env/server`). Values are stored in AWS Secrets Manager and injected into the pod at startup. They are **not** declared in `cubo.json5` and **not** in the Dockerfile.
-
-Wiring:
-
-1. **`astro.config.ts`** — declare with `context: 'server', access: 'secret'`.
-2. **Set the value:**
+1. **`astro.config.ts`**: declare it with `context: 'server', access: 'secret'`.
+2. **Set the value on both Workers**:
    ```
-   cubo config:set MY_SECRET=value --env production
+   npx wrangler secret put MY_SECRET --name astro-website
+   npx wrangler secret put MY_SECRET --name astro-website-draft
    ```
-   This writes to AWS Secrets Manager and triggers a rolling restart (override with `--strategy recreate`).
-3. **`.env.example`** — add `MY_SECRET=` for local dev.
+   The value is active at once, with no deploy.
+3. **`.env.example`**: add `MY_SECRET=` for local dev.
 
-Examples in repo: `DATOCMS_API_TOKEN` (also build-time, see above), `ROLLBAR_TOKEN`, `PIPEDRIVE_TOKEN`, `MAILERLITE_TOKEN`, `RECAPTCHA_SECRET_KEY`, `LINKEDIN_ACCESS_TOKEN`, etc.
+The build needs no secret. Examples: `DATOCMS_API_TOKEN`, `ROLLBAR_TOKEN`, `PIPEDRIVE_TOKEN`, `MAILERLITE_TOKEN`, `TURNSTILE_SECRET_KEY`, `LINKEDIN_ACCESS_TOKEN`.
 
-## Common pitfalls
-
-- **`cubo config:set` cannot set build-time vars.** Values are injected at pod startup, after `docker build` has already baked client bundles. If a var needs to appear in client JS or `astro:env/client`, it must go through mechanism 1.
-- **`envVarSecrets` is not for runtime secrets.** It only declares build-time secret mounts. Listing a var there without a corresponding `--mount=type=secret` in the Dockerfile does nothing.
-- **Production-only vars:** declare them `optional: true` in `astro.config.ts` and guard their use in code, so staging/dev don't crash when the value is absent. Only populate them in the `production` block of `cubo.json5` / via `config:set --env production`.
-- **`context: 'client'` does not mean "client-only".** It means "can be read from both client and server, baked at build time". `context: 'server'` is the runtime-only one.
+A value that only production has: declare it `optional: true` in `astro.config.ts` and check it in the code, so that the other hosts and local dev do not crash.
 
 ## Deployment
 
-- Edit `cubo.json5` for declarative changes (build args, secret declarations, resources, scaling, cron jobs). Commit and deploy via the normal pipeline.
-- Use `cubo config:set` for ad-hoc runtime secret rotation; no code change needed.
+Two Workers come from the same code and the same `wrangler.jsonc`:
+
+- `astro-website`: the public site, in the cache of the Worker, with the cron of the data sources.
+- `astro-website-draft` (`env.draft`): the drafts, with basic auth, never in the cache.
+
+They are two Workers because the cache of a Worker does not separate its hostnames. Draft mode comes from the host of the request (`src/lib/draftMode.ts`). The hosts and the procedure of the release are in `SWITCH.md`.
+
+Workers Builds deploys both Workers on each push to the branch of the site. To deploy by hand:
+
+```
+npm run build:cloudflare && npx wrangler deploy
+CLOUDFLARE_ENV=draft npm run build:cloudflare && npx wrangler deploy
+```
+
+A deploy gives a new version id, and the pages in the cache have a tag with the id: after a deploy, each page is a MISS one time.
 
 ## Migrations (`migrations/`)
 

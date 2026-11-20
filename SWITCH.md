@@ -98,7 +98,7 @@ Use Worker routes, not custom domains. A custom domain makes a new certificate, 
 
 Remove the two `/*` routes: in the dashboard (Worker → Settings → Domains & Routes), or deploy the config of before. `www` and `www-draft` then go again to Fastly and the ELB, through the proxied records. Then set the records to _DNS only_ if you want the traffic of before exactly.
 
-Keep Fastly and the Kubernetes deployment running for at least one week after the switch, so that a rollback stays possible.
+Keep Fastly and the Kubernetes deployment running for at least one week after the switch, so that a rollback stays possible. They do not need the files of this branch: the deployment that runs stays. This branch has no `Dockerfile`, `cubo.json5` or deploy workflows. To deploy Kubernetes again, use a commit of `main` from before the merge.
 
 ## After the switch
 
@@ -114,7 +114,8 @@ When the Workers have served the site for a week with no problem:
   - Optional: make the `/*` routes custom domains, so that the DNS records do not point to Fastly and the ELB any more.
 - **Fastly**: deactivate the service of `www.datocms.com`.
 - **AWS and cubo**: stop the cubo app (production, staging1, staging2) and the ELB.
-- **This repository**: delete `Dockerfile`, `cubo.json5` and the workflows `automatic-deploy.yml`, `manual-deploy.yml` and `reusable-deploy.yml`. Rewrite the parts of `AGENTS.md` about cubo, Kubernetes and the environment variables (a public value goes in `cloudflare.build.env`, a secret goes in `wrangler secret`), and the part of `README.md` about Fastly. Delete this file.
+- **GitHub**: delete the branches `production`, `staging1` and `staging2`, and the repository secrets of the cubo deploy.
+- **This repository**: delete this file.
 
 ## Known issues
 

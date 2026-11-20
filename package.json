@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "prepare": "[ -z \"${INSIDE_DOCKER}\" ] && npx simple-git-hooks || true",
+    "prepare": "npx simple-git-hooks || true",
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
@@ -15,13 +15,10 @@
     "generate-pixel-emoji": "node scripts/generate-pixel-emoji.mjs",
     "generate-schema": "dotenv -e .env.development -c -- bash -c 'gql.tada generate schema https://graphql.datocms.com --header \"X-Exclude-Invalid: true\" --header \"Authorization: $DATOCMS_API_TOKEN\" ${DATOCMS_ENVIRONMENT:+--header \"X-Environment: $DATOCMS_ENVIRONMENT\"} && gql.tada generate-output'",
     "generate-cma-schema": "dotenv -e .env.development -c -- bash -c 'npx datocms schema:generate src/lib/cma-schema.ts ${DATOCMS_ENVIRONMENT:+--environment $DATOCMS_ENVIRONMENT}'",
-    "invalidate-data-sources": "curl -i -X POST \"https://$DRAFT_MODE_HOSTNAME/api/data-sources-invalidate?token=$SECRET_API_TOKEN\"",
     "lint": "npx prettier --check .",
     "lint:css": "node scripts/lint-css.mjs",
     "format": "npx prettier . --write",
     "test": "vitest",
-    "serve": "dotenv -e .env.production -c -- bash -c 'node ./dist/server/entry.mjs'",
-    "start-prod": "npm run astro build && npm run serve",
     "vendor-scenes": "node scripts/vendor-scenes.mjs",
     "pictures": "node scripts/pictures.mjs",
     "brand-assets": "node scripts/brand-assets.mjs"
@@ -106,7 +103,6 @@
   },
   "devDependencies": {
     "@astrojs/ts-plugin": "^1.10.12",
-    "@datocms/cubo": "0.3.2",
     "@types/country-list": "^2.1.4",
     "@types/lodash-es": "^4.17.12",
     "@types/react": "^19.3.0",

@@ -262,7 +262,7 @@ export const contentNegotiation: MiddlewareHandler = async (context, next) => {
     return response;
   }
 
-  // Tell Fastly to cache separate versions per Accept value
+  // The cache keeps a different version for each value of Accept
   response.headers.append('vary', 'Accept');
 
   if (!wantsMarkdown) {
