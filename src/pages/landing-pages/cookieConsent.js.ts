@@ -40,11 +40,24 @@ const cookieConsentScript = `
     document.getElementsByTagName('head')[0].appendChild(script);
   }
 
-  function onReady(cb) {
+  // The tracking scripts wait for the load of the page: they do not take
+  // the network from the content.
+  function onLoad(cb) {
     if (document.readyState === 'complete') {
       cb();
     } else {
       window.addEventListener('load', cb);
+    }
+  }
+
+  // The banner waits only for the DOM. If it waits for the load (the images
+  // and the fonts), it is the last large element that paints, thus the
+  // Largest Contentful Paint of a first visit is late.
+  function onDomReady(cb) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', cb);
+    } else {
+      cb();
     }
   }
 
@@ -269,19 +282,19 @@ const cookieConsentScript = `
     document.cookie = name + '=' + value + '; expires=' + expiration + '; path=/;' + cookieDomain() + ' samesite=none; secure';
   };
 
-  onReady(() => {
-    // 'true' after Accept, 'false' after Reject. Each choice stays for a year.
-    const choice = getCookie(cookieName);
+  // 'true' after Accept, 'false' after Reject. Each choice stays for a year.
+  const choice = getCookie(cookieName);
 
-    if (choice === 'true') {
-      addScripts();
-      return;
-    }
+  if (choice === 'true') {
+    onLoad(addScripts);
+    return;
+  }
 
-    if (choice === 'false') {
-      return;
-    }
+  if (choice === 'false') {
+    return;
+  }
 
+  onDomReady(() => {
     const container = document.createElement('div');
     container.innerHTML = html;
     document.body.appendChild(container);
