@@ -12,7 +12,8 @@ import styles from './nest.module.css';
 // and of a Feature, the label of a Button): in its box on the page, and at
 // the right of its row in the tree. The script below drives the loop (in
 // view only; not with reduced motion): the boxes go to the rows of the tree,
-// the lines of the tree draw, and then the rows go back to the boxes. Without
+// the lines of the tree draw, and then the rows go back to the boxes. The
+// label at the top names the view, and changes with the move. Without
 // it the picture is the still, the boxes.
 
 type Level = keyof typeof NESTED_MODELS;
@@ -83,9 +84,14 @@ const DESCRIPTION = `Blocks inside blocks, in two views. On the page: the ${NEST
   data-view="page"
   data-steps={STEPS}
 >
+  {/* One label names the current view. The script swaps its text when the blocks move. */}
   <p class={styles.views}>
-    <span class:list={[diagram.panelLabel, styles.view]} data-for="page">On the page</span>
-    <span class:list={[diagram.panelLabel, styles.view]} data-for="api">From the API</span>
+    <span
+      class:list={[diagram.panelLabel, diagram.swap, styles.view]}
+      data-label
+      data-page="On the page"
+      data-api="From the API">On the page</span
+    >
   </p>
 
   {
@@ -118,12 +124,21 @@ const DESCRIPTION = `Blocks inside blocks, in two views. On the page: the ${NEST
 </scene-dynamic-layouts-nest>
 
 <script>
-  import { DIAGRAM_MS, reflow, sleep, startDiagramLoop, type Live } from '~/lib/motion/diagramLoop';
+  import {
+    DIAGRAM_MS,
+    reflow,
+    sleep,
+    startDiagramLoop,
+    swap,
+    type Live,
+  } from '~/lib/motion/diagramLoop';
   import { WebComponent } from '~/lib/WebComponent';
 
   /** The time of the move of a block between its two places: --nest-move in nest.module.css */
   const MOVE = 1100;
   const LOOK = DIAGRAM_MS.hold * 2;
+  /** The first wait of a session: the picture is half in view, and the first move starts soon */
+  const FIRST_LOOK = 600;
 
   customElements.define(
     'scene-dynamic-layouts-nest',
@@ -132,14 +147,25 @@ const DESCRIPTION = `Blocks inside blocks, in two views. On the page: the ${NEST
         const root = this as HTMLElement;
         const steps = Number(root.dataset.steps);
         const lines = this.$$<HTMLElement>('[data-line]');
+        const label = this.$<HTMLElement>('[data-label]');
+        const labelOf = (view: 'page' | 'api') => label.dataset[view] ?? '';
+
+        /** The blocks go to `view`, and the label swaps to its name */
+        function show(view: 'page' | 'api') {
+          root.dataset.view = view;
+          swap(label, () => (label.textContent = labelOf(view)));
+        }
         const linesOf = (step: number) =>
           lines.filter((line) => Number(line.dataset.line) === step);
 
+        let first = true;
+
         async function play(live: Live): Promise<void> {
-          await sleep(LOOK);
+          await sleep(first ? FIRST_LOOK : LOOK);
+          first = false;
           if (!live()) return;
 
-          root.dataset.view = 'api';
+          show('api');
           await sleep(MOVE);
 
           for (let step = 0; step < steps; step++) {
@@ -157,16 +183,20 @@ const DESCRIPTION = `Blocks inside blocks, in two views. On the page: the ${NEST
             delete line.dataset.faded;
           }
 
-          root.dataset.view = 'page';
+          show('page');
           await sleep(MOVE);
         }
 
         startDiagramLoop(root, play, {
+          // The loop starts when half of the picture is in view, not at its first pixel
+          threshold: 0.5,
           // Each session starts from the still, with no transition: the
           // boxes, and no lines
           start: () => {
+            first = true;
             root.dataset.instant = '';
             root.dataset.view = 'page';
+            label.textContent = labelOf('page');
             for (const line of lines) {
               line.dataset.hidden = '';
               delete line.dataset.faded;

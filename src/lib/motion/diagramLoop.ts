@@ -106,6 +106,11 @@ export interface DiagramLoopOptions {
    * Use it to clean up a session that stopped in the middle of an event.
    */
   start?: (live: Live) => Promise<void> | void;
+  /**
+   * The part of `root` that must be in view before a session starts, from
+   * 0 (one pixel) to 1 (all of it). The default is 0.
+   */
+  threshold?: number;
 }
 
 /**
@@ -119,22 +124,26 @@ export interface DiagramLoopOptions {
 export function startDiagramLoop(
   root: HTMLElement,
   event: (live: Live) => Promise<void>,
-  { start }: DiagramLoopOptions = {},
+  { start, threshold = 0 }: DiagramLoopOptions = {},
 ): void {
   if (prefersReducedMotion()) return;
   let session = 0;
 
-  onVisibilityChange(root, (visible) => {
-    const current = ++session;
-    if (!visible) {
-      delete root.dataset.playing;
-      return;
-    }
-    root.dataset.playing = '';
-    const live: Live = () => current === session;
-    void (async () => {
-      await start?.(live);
-      while (live()) await event(live);
-    })();
-  });
+  onVisibilityChange(
+    root,
+    (visible) => {
+      const current = ++session;
+      if (!visible) {
+        delete root.dataset.playing;
+        return;
+      }
+      root.dataset.playing = '';
+      const live: Live = () => current === session;
+      void (async () => {
+        await start?.(live);
+        while (live()) await event(live);
+      })();
+    },
+    { threshold },
+  );
 }

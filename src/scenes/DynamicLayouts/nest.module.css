@@ -4,7 +4,7 @@
  * picture fills the box of the fragment (SceneFragment, `fit="fill"`) on
  * the surface of the page. The box is the container.
  *
- * At the top, the two labels of the views. Under them, the blocks. Each
+ * At the top, the label of the current view. Under it, the blocks. Each
  * block has two places, and `data-view` on the root tells which one it
  * takes. `page`: the Feature grid is a box, its Features are in a row in
  * it, and a Button is at the bottom of each Feature. `api`: each block is
@@ -109,8 +109,10 @@
 }
 
 /*
- * The two labels of the views. The label of the current view has the
- * strong text colour and a line of the accent under it.
+ * The label of the current view. It is a caption, not a control: one
+ * label, with no line under it. When the view changes, the old name goes
+ * up and fades, and the new name comes in from below (`.swap` of the
+ * grammar, `swap` of diagramLoop.ts).
  */
 .views {
   position: absolute;
@@ -124,19 +126,13 @@
 }
 
 .view {
+  /* One line: the old name goes up by its height, thus the two names do not overlap */
+  --diagram-swap-y: -1lh;
+
   padding-block: var(--space-4xs);
   font-size: var(--type-2xs);
+  white-space: nowrap;
   color: var(--text-on-inverse-muted);
-  box-shadow: 0 1.5px 0 transparent;
-  transition:
-    color var(--diagram-fade) var(--diagram-ease-out),
-    box-shadow var(--diagram-fade) var(--diagram-ease-out);
-}
-
-.nest[data-view='page'] .view[data-for='page'],
-.nest[data-view='api'] .view[data-for='api'] {
-  color: var(--text-on-inverse-strong);
-  box-shadow: 0 1.5px 0 var(--diagram-accent);
 }
 
 /*
