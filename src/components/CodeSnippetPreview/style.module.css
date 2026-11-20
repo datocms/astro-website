@@ -95,9 +95,85 @@
   cursor: pointer;
 }
 
+/*
+ * The fill of the next tab, below its label. It is empty when the tabs do
+ * not rotate.
+ */
+.tab {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.tab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  /*
+   * The ground of a soft button on an inverse ground (tokens.css): the ink
+   * of --surface-inverse-subtle does not show on the dark code ground.
+   */
+  background: var(--border-on-inverse);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
 .tab[aria-selected='true'] {
   background: var(--surface-accent);
   color: var(--text-on-accent);
+}
+
+/*
+ * A tab that does not show has a hairline at rest: it reads as a button
+ * before the pointer is on it. The inset shadow does not change the size
+ * of the tab.
+ */
+.tab[aria-selected='false'] {
+  box-shadow: inset 0 0 0 1px var(--border-on-inverse-strong);
+}
+
+/*
+ * The rotation of the tabs (the script sets data-rotating). The fill of
+ * the next tab grows in --rotate-duration, and at its end the script shows
+ * that tab. Thus the fill is the clock: data-paused stops the two. The
+ * selected tab then takes its ground in a short fade.
+ */
+@keyframes fill {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.snippet[data-rotating] .tab {
+  transition:
+    background-color 250ms ease-out,
+    color 250ms ease-out;
+}
+
+.snippet[data-rotating] [data-next]::before {
+  animation: fill var(--rotate-duration) linear forwards;
+}
+
+.snippet[data-paused] [data-next]::before {
+  animation-play-state: paused;
+}
+
+/*
+ * A panel that comes after a change of tab fades in and moves up 4px. The
+ * panel at load has no animation: the code is there at once.
+ */
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .panel[data-enter] {
+    animation: enter 300ms ease-out;
+  }
 }
 
 /*
@@ -300,8 +376,15 @@
   align-self: stretch;
 }
 
+/*
+ * The label of a code that is not a tab: a column, or the only tab. It has
+ * the shape of a selected tab, but it is not a button.
+ */
 .label {
+  flex: none;
   margin: 0;
+  padding: var(--space-4xs) var(--space-2xs);
+  border-radius: var(--radius-full);
   background: var(--surface-accent);
   color: var(--text-on-accent);
 }
@@ -315,7 +398,7 @@
 
 @media (hover: hover) {
   .tab[aria-selected='false']:hover {
-    background: var(--surface-inverse-subtle);
+    background: var(--border-on-inverse);
   }
 }
 

@@ -18,6 +18,8 @@ interface Props {
 }
 
 const { tabs, active = 0, fill = false, columns = false } = Astro.props;
+// One code has a label, not a tab.
+const single = tabs.length === 1;
 const id = `code-${Math.random().toString(36).slice(2, 8)}`;
 
 /** A part of a line: tokens, or the tokens that a note points to. */
@@ -94,7 +96,7 @@ const notes = tabs.map((tab) =>
     >
       {tabs.map((tab, i) => (
         <div class={styles.column}>
-          <p class:list={[styles.tab, styles.label, 'labelMedium']}>{tab.label}</p>
+          <p class:list={[styles.label, 'labelMedium']}>{tab.label}</p>
           <pre class={styles.pre} tabindex="0"><code class={styles.code}>{rows[i]!.map((row) => (
             <span class:list={[styles.line, row.dim && styles.dim]}><span class={styles.number} aria-hidden="true" /><span>{row.parts.map((part) => part.tokens.map((token) =>
               token.color && !row.dim ? <span style={`color: ${token.color}`}>{token.text}</span> : token.text
@@ -105,6 +107,12 @@ const notes = tabs.map((tab) =>
     </div>
   ) : (
     <code-snippet-preview class:list={[styles.snippet, fill && styles.fill]}>
+      {/* One code: its label, with no tab to click. */}
+      {single ? (
+        <div class={styles.tabs}>
+          <p class:list={[styles.label, 'labelMedium']}>{tabs[0]!.label}</p>
+        </div>
+      ) : (
       <div class={styles.tabs} role="tablist">
         {tabs.map((tab, i) => (
           <button
@@ -120,12 +128,14 @@ const notes = tabs.map((tab) =>
           </button>
         ))}
       </div>
+      )}
       <div class={styles.panels}>
         {tabs.map((_, i) => (
           <div
-            role="tabpanel"
+            role={single ? undefined : 'tabpanel'}
             id={`${id}-panel-${i}`}
-            aria-labelledby={`${id}-tab-${i}`}
+            aria-labelledby={single ? undefined : `${id}-tab-${i}`}
+            data-panel
             hidden={i !== active}
             class={styles.panel}
           >
@@ -160,12 +170,14 @@ const notes = tabs.map((tab) =>
 }
 
 <script>
-  import { onEnterViewport, prefersReducedMotion } from '~/lib/motion/inView';
+  import { onEnterViewport, onVisibilityChange, prefersReducedMotion } from '~/lib/motion/inView';
   import { WebComponent } from '~/lib/WebComponent';
 
   // From 1152px the comment lines of the notes leave the code. Each note
   // goes next to the code, at the nearest place with no code under it.
   const wide = window.matchMedia('(min-width: 1152px)');
+  // The time that each tab shows when the tabs rotate.
+  const ROTATE_MS = 5000;
   // The space from a note to the code, and to the next note.
   const GAP = 12;
   // The widths that a note can have, from the widest. A parent with more
@@ -356,7 +368,7 @@ const notes = tabs.map((tab) =>
 
     parsedCallback() {
       const tabs = this.$$<HTMLButtonElement>('[role="tab"]');
-      const panels = this.$$('[role="tabpanel"]');
+      const panels = this.$$('[data-panel]');
 
       // A hidden panel keeps its layout, thus all the panels get their notes.
       const layout = () => {
@@ -388,15 +400,88 @@ const notes = tabs.map((tab) =>
           const on = tab === next;
           tab.setAttribute('aria-selected', String(on));
           tab.tabIndex = on ? 0 : -1;
-          this.$(`#${tab.getAttribute('aria-controls')}`).hidden = !on;
+          const panel = this.$(`#${tab.getAttribute('aria-controls')}`);
+          panel.hidden = !on;
+          panel.removeAttribute('data-enter');
+          if (on) {
+            void panel.offsetWidth;
+            panel.setAttribute('data-enter', '');
+          }
         }
         if (!prefersReducedMotion()) show();
       };
+
+      // The tabs rotate one time while the card is in view, and then stop on
+      // the first tab. The fill of the next tab (CSS) is the clock: at its
+      // end, that tab shows. The pointer on the card pauses the rotation.
+      // The first action of the user on the card stops it. With reduced
+      // motion, the tabs do not rotate.
+      let rotating = tabs.length > 1 && !prefersReducedMotion();
+      let steps = 0;
+      let visible = false;
+      let hovered = false;
+      const current = () => tabs.findIndex((tab) => tab.getAttribute('aria-selected') === 'true');
+      const markNext = () => {
+        const next = tabs[(current() + 1) % tabs.length];
+        for (const tab of tabs) tab.toggleAttribute('data-next', rotating && tab === next);
+      };
+      const updatePause = () => this.toggleAttribute('data-paused', !visible || hovered);
+      let stopVisibility = () => {};
+      const stop = () => {
+        if (!rotating) return;
+        rotating = false;
+        this.removeAttribute('data-rotating');
+        markNext();
+        stopVisibility();
+      };
+      if (rotating) {
+        this.style.setProperty('--rotate-duration', `${ROTATE_MS}ms`);
+        this.setAttribute('data-rotating', '');
+        updatePause();
+        markNext();
+        stopVisibility = onVisibilityChange(
+          this.$('[role="tablist"]'),
+          (inView) => {
+            visible = inView;
+            updatePause();
+          },
+          // The tabs, not the card: a tall card can be in view with its
+          // tabs above the window. The tabs must be all in view, above the
+          // bottom fifth of the window.
+          { threshold: 1, rootMargin: '0px 0px -20% 0px' },
+        );
+        this.on(this, 'pointerenter', (event) => {
+          hovered = event.pointerType === 'mouse';
+          updatePause();
+        });
+        this.on(this, 'pointerleave', () => {
+          hovered = false;
+          updatePause();
+        });
+        this.on(this, 'pointerdown', stop);
+        this.on(this, 'focusin', stop);
+        for (const pre of this.$$('pre')) this.on(pre, 'scroll', stop);
+        tabs.forEach((tab) =>
+          this.on(tab, 'animationend', (event) => {
+            if (!rotating || !tab.hasAttribute('data-next')) return;
+            if (event.target !== tab) return;
+            select(tab);
+            steps += 1;
+            if (steps >= tabs.length) stop();
+            else markNext();
+          }),
+        );
+      }
+
       tabs.forEach((tab, i) => {
-        this.on(tab, 'click', () => select(tab));
+        this.on(tab, 'click', () => {
+          stop();
+          select(tab);
+        });
         this.on(tab, 'keydown', (event) => {
           const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
           if (!step) return;
+          stop();
           const next = tabs[(i + step + tabs.length) % tabs.length]!;
           select(next);
           next.focus();
