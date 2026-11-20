@@ -166,7 +166,9 @@ export const basicAuth: MiddlewareHandler = (context, next) => {
   if (
     routesWithNoAuth.includes(context.url.pathname) ||
     prefixesWithNoAuth.some((prefix) => context.url.pathname.startsWith(prefix)) ||
-    DEPLOYMENT_DESTINATION === 'development' ||
+    // The dev server runs with the vars of wrangler.jsonc, thus
+    // DEPLOYMENT_DESTINATION is not `development` there.
+    import.meta.env.DEV ||
     !isDraftModeEnabled(context.request)
   ) {
     return next();

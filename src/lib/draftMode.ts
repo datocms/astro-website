@@ -11,8 +11,9 @@ export function isDraftModeEnabled(requestOrAstro: Request | AstroGlobal) {
 }
 
 export function baseUrl(requestOrAstro: Request | AstroGlobal) {
-  // A dev server can use any port.
-  if (DRAFT_MODE_HOSTNAME === 'localhost') {
+  // A dev server can use any port. It runs with the vars of wrangler.jsonc,
+  // thus DRAFT_MODE_HOSTNAME is not `localhost` there.
+  if (import.meta.env.DEV || DRAFT_MODE_HOSTNAME === 'localhost') {
     const request = 'headers' in requestOrAstro ? requestOrAstro : requestOrAstro.request;
     return new URL(request.url).origin;
   }
