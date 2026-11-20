@@ -291,13 +291,15 @@ export default defineConfig({
     },
     {
       // The tools of the developers. They are not in src/pages/, thus they
-      // have no route by default. Add their routes only in `astro dev`: the
-      // build and the deploys do not have them. An injected route has the
-      // origin "external", thus the integration "routes" ignores it.
+      // have no route by default. Add their routes in `astro dev` and in the
+      // build of the draft Worker (`CLOUDFLARE_ENV=draft`), which has basic
+      // auth. The build of the public Worker does not have them. An injected
+      // route has the origin "external", thus the integration "routes"
+      // ignores it.
       name: 'dev-tools',
       hooks: {
         'astro:config:setup': ({ command, injectRoute }) => {
-          if (command !== 'dev') return;
+          if (command !== 'dev' && process.env.CLOUDFLARE_ENV !== 'draft') return;
           injectRoute({
             pattern: '/dev/pxv-gallery',
             entrypoint: './src/dev/pxv-gallery.astro',
