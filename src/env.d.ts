@@ -19,7 +19,13 @@ declare module 'cloudflare:workers' {
   export const cache: {
     purge(options: { tags?: string[]; purgeEverything?: boolean }): Promise<unknown>;
   };
+  export function waitUntil(promise: Promise<unknown>): void;
   export const env: {
     UI_FONTS?: { fetch(input: string): Promise<Response> };
+    CF_VERSION_METADATA?: { id: string };
+    DATA_SOURCES?: {
+      get<T>(key: string, type: 'json'): Promise<T | null>;
+      put(key: string, value: string): Promise<void>;
+    };
   };
 }

@@ -1,12 +1,19 @@
 {
   "name": "datocms-website",
-  "main": "@astrojs/cloudflare/entrypoints/server",
+  "main": "./src/worker.ts",
   "compatibility_date": "2026-11-01",
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "binding": "ASSETS", "directory": "./dist/client" },
   "cache": { "enabled": true },
+  // The hashes of the data sources (`src/lib/dataSource.ts`). Wrangler makes
+  // the namespace on the first deploy.
+  "kv_namespaces": [{ "binding": "DATA_SOURCES" }],
+  // Every 10 minutes: purge the pages of the data sources that changed.
+  "triggers": { "crons": ["*/10 * * * *"] },
   // The OG card reads its fonts from this Worker. A Worker cannot fetch an
   // other Worker on workers.dev by its URL: the request gives a 404.
   "services": [{ "binding": "UI_FONTS", "service": "datocms-ui-fonts" }],
+  // The id of the version goes to Rollbar as `code_version`.
+  "version_metadata": { "binding": "CF_VERSION_METADATA" },
   "observability": { "enabled": true },
 }

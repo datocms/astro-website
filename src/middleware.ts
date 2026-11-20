@@ -41,7 +41,10 @@ export const cacheTags: MiddlewareHandler = async (context, next) => {
     response = new Response(await response.arrayBuffer(), response);
   }
 
+  // The tags go to the cache, not to the visitor: on a large page the header
+  // is more than 10 KB.
   const tags = response.headers.get('datocms-cache-tags');
+  response.headers.delete('datocms-cache-tags');
   response.headers.delete('surrogate-key');
   response.headers.delete('surrogate-control');
 

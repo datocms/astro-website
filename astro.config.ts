@@ -298,27 +298,6 @@ export default defineConfig({
       },
     },
     {
-      name: 'rollbar',
-      hooks: {
-        'astro:config:setup': async ({ injectScript }) => {
-          injectScript(
-            'page-ssr',
-            `
-              import Rollbar from 'rollbar';
-              import { DEPLOYMENT_DESTINATION, ROLLBAR_TOKEN } from 'astro:env/server';
-
-              new Rollbar({
-                accessToken: ROLLBAR_TOKEN,
-                captureUncaught: true,
-                captureUnhandledRejections: true,
-                environment: DEPLOYMENT_DESTINATION,
-              });
-            `,
-          );
-        },
-      },
-    },
-    {
       // The tools of the developers. They are not in src/pages/, thus they
       // have no route by default. Add their routes only in `astro dev`: the
       // build and the deploys do not have them. An injected route has the
