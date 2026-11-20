@@ -123,8 +123,8 @@ const SCENES = import.meta.glob<string>('./scenes/*.jpg', {
   import: 'default',
   eager: true,
 });
-/** The size of a file of `scenes/`: a window of 1100 × 900 CSS px, at 760px. */
-const SCENE_SIZE = { width: 760, height: 622 };
+/** The size of a file of `scenes/`: a window of 1100 × 900 CSS px, at 1049px. The edges of the card cut a large part: the card shows less of the screen, at a larger size. */
+const SCENE_SIZE = { width: 1049, height: 858 };
 
 /** The window of the product, cut by the edges of the card at the right and at the bottom. */
 function productWindow(o: HalfOptions, file: string) {

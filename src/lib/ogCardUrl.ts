@@ -91,7 +91,7 @@ export type OgPicture =
  * Increase it after a change to the design: then each page gives a new URL,
  * and the social sites, which keep a card for its URL, fetch the new card.
  */
-const OG_CARD_VERSION = 2;
+const OG_CARD_VERSION = 3;
 
 export function ogCardUrl(
   { kicker, title, pills, excerpt, logoPngUrl, techLogoUrl, theme, picture, wordmark }: OgCardData,

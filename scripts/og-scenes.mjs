@@ -2,7 +2,7 @@
 // Make the product windows of the OG card (src/pages/og-card/_resources/scenes/):
 // one file for each scene and theme, `<scene>-<theme>.jpg`. The script takes a
 // screenshot of the page /dev/og-scenes with agent-browser, then makes the
-// file 760px wide with ImageMagick.
+// file 1049px wide with ImageMagick.
 //
 // Start `astro dev` first, then give its URL:
 //
@@ -45,7 +45,7 @@ for (const scene of SCENES) {
     browser('eval', clean);
     browser('screenshot', raw);
     const file = join(OUT, `${scene}-${theme}.jpg`);
-    execFileSync('magick', [raw, '-resize', '760x', '-quality', '82', file]);
+    execFileSync('magick', [raw, '-resize', '1049x', '-quality', '82', file]);
     console.log(file);
   }
 }
