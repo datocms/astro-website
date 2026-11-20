@@ -36,7 +36,7 @@ Connect each Worker to the repository in the dashboard: Workers & Pages → the 
 | Build variables           | `NODE_VERSION=22`              | `NODE_VERSION=22`, `CLOUDFLARE_ENV=draft` |
 | Builds for other branches | off                            | off                                       |
 
-- The branch: `ccr-e5063e06-x9ciu5` now, then the redesign branch after the merge, then `main` at the release. Change it in both Workers.
+- The branch: `redesign` now, then `main` at the release. Change it in both Workers.
 - The build needs no secret.
 - Wrangler deploys the config that the build writes (`dist/server/wrangler.json`). A Worker refuses a build whose config has a different `name`. Thus the draft Worker needs `CLOUDFLARE_ENV=draft`.
 
