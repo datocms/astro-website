@@ -80,7 +80,12 @@ export const GET: APIRoute = async ({ url, request }) => {
     const pageUrl = new URL(websitePath, `https://${DRAFT_MODE_HOSTNAME}/`);
     pageUrl.searchParams.set('token', SECRET_API_TOKEN);
 
-    const pageRequest = await fetch(pageUrl);
+    // A Worker cannot fetch a hostname of its zone that a Worker serves. The
+    // service binding DRAFT_SITE reaches the Worker of the draft host.
+    const { env } = await import('cloudflare:workers');
+    const pageRequest = await (env.DRAFT_SITE
+      ? env.DRAFT_SITE.fetch(pageUrl.toString())
+      : fetch(pageUrl));
 
     if (!pageRequest.ok) {
       return invalidRequestResponse(`Invalid status for ${websitePath}: ${pageRequest.status}`);

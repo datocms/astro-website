@@ -1,19 +1,67 @@
 {
-  "name": "datocms-website",
+  // Two Workers from the same code: `astro-website` (the public site, in the
+  // cache) and `astro-website-draft` (the drafts, `env.draft`). They are two
+  // Workers because the cache of a Worker does not separate its hostnames:
+  // with one Worker, the draft host gives the public page from the cache.
+  // `CLOUDFLARE_ENV=draft` at build time selects the draft Worker.
+  "name": "astro-website",
   "main": "./src/worker.ts",
   "compatibility_date": "2026-11-01",
-  "compatibility_flags": ["nodejs_compat"],
+  // global_fetch_strictly_public: graphql.datocms.com and the other APIs are
+  // in the zone of the Worker. Without the flag, a fetch to them skips the
+  // rules and the Workers of the zone and goes to their origin, which gives
+  // errors ("No query string was present").
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "binding": "ASSETS", "directory": "./dist/client" },
   "cache": { "enabled": true },
+  "workers_dev": false,
+  "preview_urls": false,
+  // SWITCH.md: at the release, this host becomes www.datocms.com.
+  "routes": [{ "pattern": "www-next.datocms.com", "custom_domain": true }],
+  // The values that are not secret. The secrets are secrets of the Worker
+  // (`wrangler secret bulk`).
+  "vars": {
+    "DEPLOYMENT_DESTINATION": "next",
+    "DRAFT_MODE_HOSTNAME": "www-draft-next.datocms.com",
+  },
   // The hashes of the data sources (`src/lib/dataSource.ts`). Wrangler makes
   // the namespace on the first deploy.
   "kv_namespaces": [{ "binding": "DATA_SOURCES" }],
-  // Every 10 minutes: purge the pages of the data sources that changed.
+  // Every 10 minutes: purge the pages of the data sources that changed. Only
+  // the public Worker runs it: a purge is for the whole zone.
   "triggers": { "crons": ["*/10 * * * *"] },
-  // The OG card reads its fonts from this Worker. A Worker cannot fetch an
-  // other Worker on workers.dev by its URL: the request gives a 404.
-  "services": [{ "binding": "UI_FONTS", "service": "datocms-ui-fonts" }],
+  "services": [
+    // The OG card reads its fonts from this Worker. A Worker cannot fetch an
+    // other Worker on workers.dev by its URL: the request gives a 404.
+    { "binding": "UI_FONTS", "service": "datocms-ui-fonts" },
+    // The SEO analysis fetches a page of the draft host. A Worker cannot fetch
+    // a hostname of its zone that a Worker serves: the binding reaches it.
+    { "binding": "DRAFT_SITE", "service": "astro-website-draft" },
+  ],
   // The id of the version goes to Rollbar as `code_version`.
   "version_metadata": { "binding": "CF_VERSION_METADATA" },
   "observability": { "enabled": true },
+
+  "env": {
+    "draft": {
+      "name": "astro-website-draft",
+      // The drafts never go in the cache.
+      "cache": { "enabled": false },
+      "workers_dev": false,
+      "preview_urls": false,
+      // SWITCH.md: at the release, this host becomes www-draft.datocms.com.
+      "routes": [{ "pattern": "www-draft-next.datocms.com", "custom_domain": true }],
+      "vars": {
+        "DEPLOYMENT_DESTINATION": "next",
+        "DRAFT_MODE_HOSTNAME": "www-draft-next.datocms.com",
+      },
+      "kv_namespaces": [{ "binding": "DATA_SOURCES" }],
+      "triggers": { "crons": [] },
+      "services": [
+        { "binding": "UI_FONTS", "service": "datocms-ui-fonts" },
+        { "binding": "DRAFT_SITE", "service": "astro-website-draft" },
+      ],
+      "version_metadata": { "binding": "CF_VERSION_METADATA" },
+    },
+  },
 }

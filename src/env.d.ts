@@ -22,6 +22,7 @@ declare module 'cloudflare:workers' {
   export function waitUntil(promise: Promise<unknown>): void;
   export const env: {
     UI_FONTS?: { fetch(input: string): Promise<Response> };
+    DRAFT_SITE?: { fetch(input: string): Promise<Response> };
     CF_VERSION_METADATA?: { id: string };
     DATA_SOURCES?: {
       get<T>(key: string, type: 'json'): Promise<T | null>;

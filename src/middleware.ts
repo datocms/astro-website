@@ -22,6 +22,11 @@ export const rollbar: MiddlewareHandler = async ({ request, params }, next) => {
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
+const SHORT_MAX_AGE = 5 * 60;
+
+// 16 KB, less a margin for the path tag and the version tag.
+const MAX_CACHE_TAG_LENGTH = 15_000;
+
 /*
  * The bridge from the headers of the origin to the cache of Astro.
  *
@@ -54,10 +59,41 @@ export const cacheTags: MiddlewareHandler = async (context, next) => {
   }
 
   if (tags) {
-    context.cache.set({ maxAge: ONE_YEAR, swr: 60, tags: tags.split(' ') });
+    const tagList = tags.split(' ');
+
+    // Cloudflare reads at most 16 KB of `Cache-Tag`, and drops the tags after
+    // that limit: a purge of a lost tag does not reach the page. Thus a page
+    // with too many tags stays in the cache for a short time only. The margin
+    // is for the tags that the provider adds (the path and the version).
+    if (tagList.join(',').length > MAX_CACHE_TAG_LENGTH) {
+      console.warn(
+        `${context.url.pathname} has ${tagList.length} cache tags, more than Cloudflare reads: cached for ${SHORT_MAX_AGE} s`,
+      );
+      context.cache.set({ maxAge: SHORT_MAX_AGE, swr: 60 });
+    } else {
+      context.cache.set({ maxAge: ONE_YEAR, swr: 60, tags: tagList });
+    }
   }
 
   return response;
+};
+
+/*
+ * Only the production site goes in the search engines. The other hosts (the
+ * next site before its release, the draft hosts) have the same pages and
+ * canonical URLs to themselves.
+ */
+export const noindex: MiddlewareHandler = async (context, next) => {
+  const response = await next();
+
+  if (DEPLOYMENT_DESTINATION === 'production' && !isDraftModeEnabled(context.request)) {
+    return response;
+  }
+
+  // A copy: the headers of a redirect response are immutable.
+  const indexless = new Response(response.body, response);
+  indexless.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  return indexless;
 };
 
 const wellKnownFiles: Record<string, { body: string; contentType: string }> = {
@@ -287,6 +323,7 @@ export const propagateToken: MiddlewareHandler = async (context, next) => {
 
 export const onRequest = sequence(
   rollbar,
+  noindex,
   cacheTags,
   wellKnown,
   markdownProxy,
