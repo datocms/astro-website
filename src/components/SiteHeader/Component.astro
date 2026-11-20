@@ -73,7 +73,7 @@ const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.pro
           {
             /* The tint pill. It slides to the item under the cursor, the open item or the item of the page. */
           }
-          <li class={styles.indicator} aria-hidden="true"></li>
+          <li class={styles.indicator} aria-hidden="true" data-indicator-pill></li>
           {
             nav.map((group, i) =>
               group.columns ? (
@@ -330,6 +330,7 @@ const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.pro
       // The item under the cursor or with the focus. The pill rests elsewhere only when there is none.
       pointed: HTMLElement | null = null;
       list!: HTMLElement;
+      indicator!: HTMLElement;
       shell!: HTMLElement;
       items!: HTMLElement[];
       mobileTrigger!: HTMLButtonElement;
@@ -341,6 +342,7 @@ const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.pro
 
       parsedCallback() {
         this.list = this.$('[data-nav-list]');
+        this.indicator = this.$('[data-indicator-pill]');
         this.shell = this.$('[data-card-shell]');
         this.items = this.$$('[data-nav-item]');
         this.mobileTrigger = this.$<HTMLButtonElement>('[data-mobile-trigger]');
@@ -591,6 +593,11 @@ const isCompact = (group: NavGroup) => group.columns?.length === 1 && !group.pro
         }
         this.list.style.setProperty('--indicator-x', `${target.offsetLeft}px`);
         this.list.style.setProperty('--indicator-width', `${target.offsetWidth}px`);
+        if (!this.list.hasAttribute('data-indicator-shown')) {
+          // The hidden pill has no slide. Read its style now: it jumps to
+          // the item before it shows, thus it only fades in.
+          getComputedStyle(this.indicator).translate;
+        }
         this.list.setAttribute('data-indicator-shown', '');
       }
 

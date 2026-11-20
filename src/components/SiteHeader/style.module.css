@@ -229,11 +229,21 @@
   pointer-events: none;
 }
 
-.navList[data-indicator][data-indicator-shown] .indicator {
+.navList[data-indicator-shown] .indicator {
   opacity: 1;
 }
 
-:global(html[data-motion='on']) [data-indicator] .indicator {
+/*
+ * The pill always fades. It slides only from a shown item to the next. When
+ * it is hidden, the script puts it on the new item first, thus it fades in
+ * there and does not travel from its old place. The motion check is in
+ * :where(), thus the rule of the shown pill wins by its one more attribute.
+ */
+:global(:where(html[data-motion='on'])) [data-indicator] .indicator {
+  transition: opacity 150ms ease-out;
+}
+
+:global(:where(html[data-motion='on'])) [data-indicator][data-indicator-shown] .indicator {
   transition:
     translate 300ms cubic-bezier(0.3, 0, 0, 1),
     width 300ms cubic-bezier(0.3, 0, 0, 1),
