@@ -106,7 +106,7 @@ export interface IntegrityEvent {
 /** The events of the loop, in this order. Event `i` takes the table from stage `i` to stage `i + 1`. */
 export const EVENTS: IntegrityEvent[] = [
   { label: 'New field added: `slug`', column: 'slug', opens: true },
-  { label: 'Record deleted: `News`', column: 'tags' },
+  { label: 'Tag deleted: `News`', column: 'tags' },
   { label: 'Field becomes required: `tags`', column: 'tags', validate: true },
 ];
 
