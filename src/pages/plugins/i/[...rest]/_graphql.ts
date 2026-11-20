@@ -6,6 +6,24 @@ import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
+/** The fields of the OG card of the page (`~/lib/ogCards`). */
+export const OgCardFragment = graphql(/* GraphQL */ `
+  fragment PluginOgCardFragment on PluginRecord {
+    title
+    description
+    installs
+    version
+    author {
+      name
+      official
+    }
+    coverImage {
+      # A cover that is not 3:2 keeps its top left corner, as a screenshot.
+      url(imgixParams: { w: 960, h: 640, fit: crop, crop: [top, left], fm: jpg })
+    }
+  }
+`);
+
 export const query = graphql(
   /* GraphQL */ `
     query pluginQuery($slug: String!) {

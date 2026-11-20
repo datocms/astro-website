@@ -8,6 +8,7 @@ import { InternalVideo } from '~/components/StructuredText/blocks/InternalVideo'
 import { CloneButtonForm } from '~/components/docs/blocks/CloneButtonForm';
 import { Demo } from '~/components/StructuredText/blocks/Demo';
 import { overrideSeo, seoGeneratedCard, prependToSeoPageTitleIfMissing } from '~/lib/datocms/seo';
+import { docsCard } from '~/lib/ogCards';
 import { JsonLd } from '~/components/JsonLd';
 import { baseUrl } from '~/lib/draftMode';
 import { canonicalUrl, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
@@ -68,13 +69,13 @@ const tocGroups = [
   seo={overrideSeo(
     page._seoMetaTags,
     prependToSeoPageTitleIfMissing(group.pagesOrSections.length > 1 ? `${group.name}: ` : ''),
-    seoGeneratedCard(Astro, {
-      kicker: group ? `Documentation: ${group.name}` : 'DatoCMS Docs',
-      title: page.title,
-      pills: tocGroups.flatMap((group) => group.entries).map((entry) => entry.label),
-      excerpt: page.seo?.description,
-      theme: 'docs',
-    }),
+    seoGeneratedCard(
+      Astro,
+      docsCard(page, {
+        group: group?.name,
+        headings: tocGroups.flatMap((group) => group.entries).map((entry) => entry.label),
+      }),
+    ),
   )}
   additionalSidebarItems={additionalSidebarItems}
   lastUpdatedAt={page._publishedAt}

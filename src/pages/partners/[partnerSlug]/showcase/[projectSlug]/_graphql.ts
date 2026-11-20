@@ -13,6 +13,22 @@ import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
+/** The fields of the OG card of the page (`~/lib/ogCards`). */
+export const OgCardFragment = graphql(/* GraphQL */ `
+  fragment ShowcaseOgCardFragment on ShowcaseProjectRecord {
+    name
+    headline {
+      value
+    }
+    partner {
+      name
+    }
+    mainImage {
+      url(imgixParams: { w: 960, h: 777, fit: crop, crop: [top, left], fm: jpg })
+    }
+  }
+`);
+
 export const query = graphql(
   /* GraphQL */ `
     query ShowcaseQuery($projectSlug: String!) {

@@ -6,6 +6,15 @@ import { ShowcaseProjectUrlFragment } from '~/lib/datocms/gqlUrlBuilder/showcase
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
+/** The fields of the OG card of the page (`~/lib/ogCards`). */
+export const OgCardFragment = graphql(/* GraphQL */ `
+  fragment FrameworkOgCardFragment on IntegrationRecord {
+    logo {
+      pngUrl: url(imgixParams: { fm: png, w: 720, h: 320, fit: max })
+    }
+  }
+`);
+
 /*
  * The CMS content of a framework page: the projects of the carousel (the
  * showcase projects that reference the integration records of the

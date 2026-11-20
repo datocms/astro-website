@@ -10,6 +10,11 @@ export type OgCardData = {
   pills?: string[] | null;
   excerpt?: string | null;
   logoPngUrl?: string | null;
+  /**
+   * The logo of a technology of the page (an SVG, as `logo.url` of an
+   * integration): it takes the place of the chips, in the colour of the title.
+   */
+  techLogoUrl?: string | null;
   /** The theme of the page: the hue of its area (DESIGN.md, "Page themes"). */
   theme?: Theme | null;
   /**
@@ -21,7 +26,7 @@ export type OgCardData = {
   /**
    * The bottom row shows the full wordmark next to the kicker, not the
    * symbol: for a page whose kicker does not say that it is of DatoCMS
-   * (a plugin, a lesson of the academy).
+   * (a plugin, a starter, a lesson of the academy).
    */
   wordmark?: boolean | null;
 };
@@ -39,12 +44,20 @@ export type OgCardData = {
  * - `stat`: one real number of the page, with its label.
  * - `date`: the date of the entry.
  * - `versus`: the DatoCMS wordmark against the name of the other product.
+ * - `contents`: the table of contents of a docs page, as a numbered list.
+ * - `pixel`: the pixel cover of a blog post (its file of 100 × 58 cells).
+ * - `portraits`: the portraits of the guests of a casual chat, in speech bubbles.
  */
 /** The screens of the product that a card can show (`og-card/_resources/scenes/`). */
 export type OgProductScene = 'editor' | 'schema' | 'media';
 
 export type OgPicture =
-  | { kind: 'window'; imageUrl: string }
+  | {
+      kind: 'window';
+      imageUrl: string;
+      /** The window has half of the card: the screenshot is the subject of the page. */
+      half?: boolean;
+    }
   | { kind: 'video'; duration?: string }
   | { kind: 'product'; scene: OgProductScene }
   | {
@@ -57,10 +70,13 @@ export type OgPicture =
     }
   | { kind: 'stat'; value: string; label: string }
   | { kind: 'date'; iso: string }
-  | { kind: 'versus'; other: string };
+  | { kind: 'versus'; other: string }
+  | { kind: 'contents'; entries: string[] }
+  | { kind: 'pixel'; imageUrl: string }
+  | { kind: 'portraits'; imageUrls: string[] };
 
 export function ogCardUrl(
-  { kicker, title, pills, excerpt, logoPngUrl, theme, picture, wordmark }: OgCardData,
+  { kicker, title, pills, excerpt, logoPngUrl, techLogoUrl, theme, picture, wordmark }: OgCardData,
   astroOrRequest: AstroGlobal | Request,
 ): string {
   const url = new URL('/og-card/index.png', baseUrl(astroOrRequest));
@@ -72,6 +88,7 @@ export function ogCardUrl(
         title: title ? stripStega(title) : undefined,
         pills: pills ? pills.map((p) => stripStega(p)) : undefined,
         logoPngUrl: logoPngUrl ? stripStega(logoPngUrl) : undefined,
+        techLogoUrl: techLogoUrl ? stripStega(techLogoUrl) : undefined,
         excerpt: excerpt ? truncate(stripStega(excerpt), { length: 300 }) : undefined,
         theme: theme ?? undefined,
         // The strings of a picture come from the CMS too (a number, a name).
@@ -82,24 +99,5 @@ export function ogCardUrl(
       }),
     ).toString('base64'),
   );
-  return url.toString();
-}
-
-/**
- * The data of the OG image of an article: its cover, drawn on the server.
- * A post gives the file of its pixel cover. A chat gives the portraits of
- * its guests. The URLs are on the asset CDN of DatoCMS.
- */
-export type OgCoverData =
-  | { kind: 'post'; cover: string; theme: Theme }
-  | { kind: 'chat'; portraits: string[]; theme: Theme };
-
-export function ogCoverUrl(data: OgCoverData, astroOrRequest: AstroGlobal | Request): string {
-  const url = new URL('/og-card/cover.png', baseUrl(astroOrRequest));
-  const clean =
-    data.kind === 'post'
-      ? { ...data, cover: stripStega(data.cover) }
-      : { ...data, portraits: data.portraits.map((portrait) => stripStega(portrait)) };
-  url.searchParams.set('data', Buffer.from(JSON.stringify(clean)).toString('base64'));
   return url.toString();
 }

@@ -3,7 +3,7 @@ import type { OgPicture } from '~/lib/ogCardUrl';
 import type { Theme } from '~/lib/theme';
 import type { OgPalette } from './palette';
 import { dataUri } from './raster';
-import { chip, escape, wordmark } from './text';
+import { ADVANCE, chip, escape, units } from './text';
 
 /*
  * The proof half of the card: the right half of the split, on the inverse
@@ -139,6 +139,130 @@ function productWindow(o: HalfOptions, file: string) {
   })}"><img src="${file}" style="${css({ width: `${SCENE_SIZE.width}px`, height: `${SCENE_SIZE.height}px` })}" /></div>`;
 }
 
+/** The size of the day on the calendar page: larger than the visible sheet, so the edge of the card cuts it. */
+const DAY_SIZE = 400;
+
+/**
+ * The date of an entry as a page of a wall calendar: a sheet of paper with
+ * the month and the year on a band of the accent, then the day with two
+ * digits. The sheet has the shape of a window: a round corner at the top
+ * left, and the edges of the card cut it at the right and at the bottom.
+ * The day is larger than the sheet: the edge of the card cuts its second
+ * digit, as it cuts a window.
+ */
+function calendarPage(o: HalfOptions, date: Date): string {
+  const { palette } = o;
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const pad = 36;
+  return `<div style="${css({
+    position: 'absolute',
+    left: `${o.inset.side}px`,
+    top: `${o.inset.top}px`,
+    width: '640px',
+    height: `${o.height}px`,
+    display: 'flex',
+    flexDirection: 'column',
+    background: palette.plate,
+    color: palette.ink,
+    borderTopLeftRadius: `${RADIUS}px`,
+    overflow: 'hidden',
+  })}">
+    <div style="${css({
+      display: 'flex',
+      alignItems: 'center',
+      gap: '14px',
+      height: '96px',
+      padding: `0 ${pad}px`,
+      background: palette.accent,
+      color: palette.onAccent,
+      fontSize: '40px',
+      fontWeight: 500,
+      letterSpacing: '-0.02em',
+    })}">${MONTHS[date.getUTCMonth()]}<span style="${css({ color: palette.accentMuted, fontWeight: 400 })}">${date.getUTCFullYear()}</span></div>
+    <div style="${css({ ...numeral(DAY_SIZE), marginTop: '48px', paddingLeft: `${pad - 12}px`, whiteSpace: 'nowrap' })}">${day}</div>
+  </div>`;
+}
+
+/** The lines of a table of contents that the card shows. */
+const CONTENTS_LINES = 5;
+
+/**
+ * The table of contents of a docs page: the headings of the page, numbered,
+ * one on each line, with a hairline between the lines. A heading that is
+ * too long ends with an ellipsis. With more headings than lines, the last
+ * line says how many more headings the page has.
+ */
+function contents(o: HalfOptions, entries: string[]): string {
+  const { palette } = o;
+  const shown = entries.length > CONTENTS_LINES ? entries.slice(0, CONTENTS_LINES - 1) : entries;
+  const more = entries.length - shown.length;
+  const line = (index: string, text: string, color: string, first: boolean) =>
+    `<div style="${css({
+      display: 'flex',
+      alignItems: 'baseline',
+      gap: '24px',
+      padding: '20px 0',
+      borderTop: first ? 'none' : `2px solid ${palette.inverseBorder}`,
+    })}">
+      <div style="${css({ ...label(26, palette.onInverseMuted), width: '40px', flexShrink: 0 })}">${index}</div>
+      <div style="${css({ ...label(30, color), fontWeight: 500, flexShrink: 1, minWidth: 0, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' })}">${escape(text)}</div>
+    </div>`;
+  return [
+    ...shown.map((entry, i) =>
+      line(String(i + 1).padStart(2, '0'), entry, palette.onInverseStrong, i === 0),
+    ),
+    // The count of the other headings is in the column of the text, with no number.
+    ...(more > 0 ? [line('', `+ ${more} more`, palette.onInverseMuted, false)] : []),
+  ].join('');
+}
+
+/** The sizes of the names of a versus, the largest first. */
+const VERSUS_SIZES = [104, 92, 80, 72, 64, 56, 48];
+
+/**
+ * A versus: DatoCMS and the other product, the same type at the same size,
+ * one above the other, with a large "vs" between them. Neither name is a
+ * logo: the two products are equals. The size is the largest step at which
+ * the longest word fits the width of the half, and the lines of the three
+ * parts fit its height.
+ */
+function versus(o: HalfOptions, other: string): string {
+  const column = o.width - o.inset.side * 2;
+  const height = o.height - o.inset.top - o.inset.bottom;
+  const words = ['DatoCMS', ...other.split(/\s+/)];
+  const longest = Math.max(...words.map(units));
+  const lineCount = (size: number) => {
+    const perLine = column / (size * ADVANCE);
+    let lines = 1;
+    let used = 0;
+    for (const word of other.split(/\s+/)) {
+      const add = (used > 0 ? units(' ') : 0) + units(word);
+      if (used > 0 && used + add > perLine) {
+        lines++;
+        used = units(word);
+      } else used += add;
+    }
+    return lines;
+  };
+  const size =
+    VERSUS_SIZES.find(
+      (step) => longest * step * ADVANCE <= column && (2 + lineCount(step)) * step * 1.05 <= height,
+    ) ?? VERSUS_SIZES[VERSUS_SIZES.length - 1]!;
+  const name = (text: string, color: string) =>
+    `<div style="${css({
+      display: 'flex',
+      flexWrap: 'wrap',
+      fontSize: `${size}px`,
+      lineHeight: 1,
+      letterSpacing: '-0.04em',
+      fontWeight: 500,
+      color,
+    })}">${escape(text)}</div>`;
+  return `${name('DatoCMS', o.palette.onInverseStrong)}
+    ${name('vs', o.palette.onInverseMuted)}
+    ${name(other, o.palette.onInverseStrong)}`;
+}
+
 /** The markup of the half, for satori. */
 export function half(o: HalfOptions): string {
   const { picture, palette, width, height, inset } = o;
@@ -212,20 +336,20 @@ export function half(o: HalfOptions): string {
         <div style="${css({ ...label(32, palette.onInverseMuted), marginTop: '24px' })}">${escape(picture.label)}</div>`,
         { justifyContent: 'flex-end' },
       );
-    case 'date': {
-      const date = new Date(picture.iso);
+    case 'date':
+      return ground(calendarPage(o, new Date(picture.iso)));
+    case 'pixel':
+    case 'portraits':
+      // The half is a PNG of its full size (`article.ts`).
       return ground(
-        `<div style="${css({ ...numeral(240) })}">${date.getUTCDate()}</div>
-        <div style="${css({ ...label(36, palette.onInverseMuted), marginTop: '32px' })}">${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}</div>`,
-        { justifyContent: 'flex-end' },
+        image
+          ? `<img src="${image}" style="${css({ width: `${width}px`, height: `${height}px` })}" />`
+          : '',
+        { padding: '0px' },
       );
-    }
+    case 'contents':
+      return ground(contents(o, picture.entries), { justifyContent: 'flex-end' });
     case 'versus':
-      return ground(
-        `${wordmark(palette.onInverseStrong, { width: width - inset.side * 2 })}
-        <div style="${css({ ...label(28, palette.onInverseMuted), margin: '28px 0' })}">vs</div>
-        <div style="${css({ display: 'flex', fontSize: '84px', lineHeight: 1, letterSpacing: '-0.04em', fontWeight: 500 })}">${escape(picture.other)}</div>`,
-        { justifyContent: 'center' },
-      );
+      return ground(versus(o, picture.other), { justifyContent: 'center' });
   }
 }

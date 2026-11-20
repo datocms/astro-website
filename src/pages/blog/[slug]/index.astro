@@ -3,6 +3,7 @@
 import { DraftModeQueryListener } from '~/components/DraftModeQueryListener';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { avoidAstroTypeCheckBug, notFoundResponse } from '~/lib/notFoundResponse';
+import { postCard } from '~/lib/ogCards';
 import ArticlePage from '../_ArticlePage.astro';
 import { query } from './_graphql';
 
@@ -15,6 +16,6 @@ if (!post) {
 }
 ---
 
-<ArticlePage record={post}>
+<ArticlePage record={post} ogCard={postCard(post)}>
   <DraftModeQueryListener query={query} variables={variables} />
 </ArticlePage>

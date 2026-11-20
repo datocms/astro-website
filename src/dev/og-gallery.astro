@@ -1,10 +1,14 @@
 ---
-import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
 import * as compare from '~/data/compare';
+import { page as astroPage } from '~/data/cms-astro';
+import { page as nextjsPage } from '~/data/cms-nextjs';
+import { page as nuxtPage } from '~/data/cms-nuxt';
+import { page as sveltekitPage } from '~/data/cms-sveltekit';
 import * as home from '~/data/home';
 import * as partners from '~/data/partners';
 import * as wall from '~/data/wall-of-love';
 import Layout from '~/layouts/Layout.astro';
+import * as docPage from '~/layouts/docs/PageLayout/_graphql';
 import { executeQuery } from '~/lib/datocms/executeQuery';
 import { graphql } from '~/lib/datocms/graphql';
 import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
@@ -12,162 +16,172 @@ import { type OgCardData, ogCardUrl } from '~/lib/ogCardUrl';
 import {
   academyCard,
   caseStudyCard,
+  chatCard,
   compareCard,
+  docsCard,
+  frameworkCard,
   partnerCard,
   pluginCard,
+  postCard,
   productUpdateCard,
   showcaseCard,
   starterCard,
+  techPartnerCard,
   userGuideCard,
 } from '~/lib/ogCards';
+import * as academyChapterPage from '~/pages/academy/[courseSlug]/[chapterSlug]/_graphql';
+import * as chatPage from '~/pages/blog/casual-chats/[slug]/_graphql';
+import * as postPage from '~/pages/blog/[slug]/_graphql';
+import * as caseStudyPage from '~/pages/case-studies/[slug]/_graphql';
+import * as frameworkPage from '~/pages/cms/[slug]/_graphql';
+import * as comparePage from '~/pages/compare/[slug]/_graphql';
+import * as partnerPage from '~/pages/partners/[partnerSlug]/_graphql';
+import * as showcasePage from '~/pages/partners/[partnerSlug]/showcase/[projectSlug]/_graphql';
+import * as pluginPage from '~/pages/plugins/i/[...rest]/_graphql';
+import * as productUpdatePage from '~/pages/product-updates/[slug]/_graphql';
+import * as starterPage from '~/pages/starters/[slug]/_graphql';
+import * as techPartnerPage from '~/pages/tech-partners/[slug]/_graphql';
+import * as userGuidePage from '~/pages/user-guides/[chapterSlug]/[episodeSlug]/_graphql';
 
-// Show the OG cards of the site (`/og-card/index.png`), as a social feed
-// shows them: for each kind of page, the cards of a few records of the CMS.
-// The cards come from the functions of `~/lib/ogCards`, which the pages use.
-//
-// The OG images of the blog are the covers of the posts: `/dev/cover-gallery`
-// shows them.
+// Show the OG images of the site, as a social feed shows them: for each kind
+// of page, the images of a few records of the CMS. The query spreads the
+// fragment of each kind of page (in the `_graphql.ts` of the page), and the
+// functions of `~/lib/ogCards` make the data of the image, as the pages do.
+// The query asks only for the fields of the paths of the pages.
 //
 // This page is not in src/pages/. The integration "dev-tools" in
 // astro.config.ts adds its route.
 
-const query = graphql(/* GraphQL */ `
-  query OgGallery {
-    popularPlugins: allPlugins(first: 4, orderBy: installs_DESC) {
-      ...OgGalleryPlugin
-    }
-    newPlugins: allPlugins(first: 4, orderBy: releasedAt_DESC) {
-      ...OgGalleryPlugin
-    }
-    starters: allTemplateDemos(first: 4, orderBy: position_ASC) {
-      code
-      name
-      technology {
-        name
-      }
-      screenshot {
-        url(imgixParams: { w: 900, h: 600, fit: crop, crop: top, fm: jpg })
-      }
-    }
-    caseStudies: allSuccessStories(first: 4, orderBy: position_ASC) {
-      slug
-      name
-      title {
-        value
-      }
-      logo {
-        pngUrl: url(imgixParams: { fm: png, w: 720, h: 320, fit: max })
-      }
-      numbers {
-        number
-        label
-      }
-    }
-    showcase: allShowcaseProjects(first: 4, orderBy: _createdAt_DESC) {
-      slug
-      name
-      headline {
-        value
-      }
-      partner {
+const query = graphql(
+  /* GraphQL */ `
+    query OgGallery($frameworks: [String]) {
+      frameworks: allIntegrations(filter: { slug: { in: $frameworks } }) {
         slug
-        name
+        ...FrameworkOgCardFragment
       }
-      mainImage {
-        url(imgixParams: { w: 900, h: 600, fit: crop, crop: top, fm: jpg })
-      }
-    }
-    partners: allPartners(first: 3, orderBy: _createdAt_DESC) {
-      slug
-      name
-      shortDescription {
-        value
-      }
-      logo {
-        pngUrl: url(imgixParams: { fm: png, w: 720, h: 320, fit: max })
-      }
-      projects: _allReferencingShowcaseProjectsMeta {
-        count
-      }
-    }
-    techPartners: allTechPartners(first: 3, orderBy: _createdAt_DESC) {
-      slug
-      name
-      shortDescription {
-        value
-      }
-      logo {
-        pngUrl: url(imgixParams: { fm: png, w: 720, h: 320, fit: max })
-      }
-    }
-    productUpdates: allChangelogEntries(first: 4, orderBy: _firstPublishedAt_DESC) {
-      slug
-      title
-      _firstPublishedAt
-      categories {
-        name
-      }
-    }
-    comparisons: allProductComparisons(first: 3) {
-      slug
-      product
-    }
-    academy: allAcademyCourses(first: 3, orderBy: position_ASC) {
-      slug
-      name
-      chapters {
+      posts: allBlogPosts(
+        first: 4
+        orderBy: _firstPublishedAt_DESC
+        filter: { pixelCover: { exists: true } }
+      ) {
         slug
-        title
+        ...PostOgCardFragment
       }
-    }
-    userGuides: allUserGuidesChapters(first: 3, orderBy: position_ASC) {
-      slug
-      title
-      videos {
+      chats: allCustomerStories(first: 60, orderBy: _firstPublishedAt_DESC) {
         slug
-        title
-        video {
-          video {
-            duration
+        people {
+          id
+        }
+        ...ChatOgCardFragment
+      }
+      docs: allDocGroups(first: 6, filter: { parent: { exists: true } }) {
+        name
+        slug
+        pages {
+          __typename
+          ... on DocGroupPageRecord {
+            page {
+              slug
+              ...DocPageOgCardFragment
+            }
           }
         }
       }
+      popularPlugins: allPlugins(first: 4, orderBy: installs_DESC) {
+        packageName
+        ...PluginOgCardFragment
+      }
+      newPlugins: allPlugins(first: 4, orderBy: releasedAt_DESC) {
+        packageName
+        ...PluginOgCardFragment
+      }
+      starters: allTemplateDemos(first: 6, orderBy: position_ASC) {
+        code
+        ...StarterOgCardFragment
+      }
+      caseStudies: allSuccessStories(first: 4, orderBy: position_ASC) {
+        slug
+        ...CaseStudyOgCardFragment
+      }
+      showcase: allShowcaseProjects(first: 4, orderBy: _createdAt_DESC) {
+        slug
+        partner {
+          slug
+        }
+        ...ShowcaseOgCardFragment
+      }
+      partners: allPartners(first: 3, orderBy: _createdAt_DESC) {
+        slug
+        ...PartnerOgCardFragment
+      }
+      techPartners: allTechPartners(first: 3, orderBy: _createdAt_DESC) {
+        slug
+        ...TechPartnerOgCardFragment
+      }
+      productUpdates: allChangelogEntries(first: 4, orderBy: _firstPublishedAt_DESC) {
+        slug
+        ...ProductUpdateOgCardFragment
+      }
+      comparisons: allProductComparisons(first: 3) {
+        slug
+        ...CompareOgCardFragment
+      }
+      academy: allAcademyCourses(first: 3, orderBy: position_ASC) {
+        slug
+        name
+        chapters {
+          slug
+          ...AcademyChapterOgCardFragment
+        }
+      }
+      userGuides: allUserGuidesChapters(first: 3, orderBy: position_ASC) {
+        slug
+        title
+        videos {
+          slug
+          ...UserGuideOgCardFragment
+        }
+      }
     }
-  }
+  `,
+  [
+    academyChapterPage.OgCardFragment,
+    caseStudyPage.OgCardFragment,
+    chatPage.OgCardFragment,
+    comparePage.OgCardFragment,
+    docPage.OgCardFragment,
+    frameworkPage.OgCardFragment,
+    partnerPage.OgCardFragment,
+    postPage.OgCardFragment,
+    pluginPage.OgCardFragment,
+    productUpdatePage.OgCardFragment,
+    showcasePage.OgCardFragment,
+    starterPage.OgCardFragment,
+    techPartnerPage.OgCardFragment,
+    userGuidePage.OgCardFragment,
+  ],
+);
 
-  fragment OgGalleryPlugin on PluginRecord {
-    packageName
-    title
-    description
-    installs
-    version
-    author {
-      name
-      official
-    }
-    coverImage {
-      url(imgixParams: { w: 960, h: 640, fit: crop, fm: jpg })
-    }
-  }
-`);
+// The framework pages (/cms/<slug>): the logo is the logo of the first
+// integration record of the framework.
+const FRAMEWORKS = [nextjsPage, nuxtPage, sveltekitPage, astroPage];
 
-const data = await executeQuery(Astro, query);
-const plain = (field: { value: unknown } | null | undefined) =>
-  field ? (toPlainText(field.value as Parameters<typeof toPlainText>[0]) ?? '') : '';
+const data = await executeQuery(Astro, query, {
+  variables: { frameworks: FRAMEWORKS.map((page) => page.integrations[0]!) },
+});
+
+// The casual chats: two with one guest, and the chats with two guests or more.
+const chats = [
+  ...data.chats.filter((chat) => chat.people.length === 1).slice(0, 2),
+  ...data.chats.filter((chat) => chat.people.length > 1).slice(0, 4),
+];
 
 type Card = { path: string; data: OgCardData };
 type Group = { name: string; cards: Card[] };
 
 const plugin = (record: (typeof data.popularPlugins)[number]): Card => ({
   path: `/plugins/i/${record.packageName}`,
-  data: pluginCard({
-    title: record.title,
-    description: record.description,
-    coverUrl: record.coverImage?.url,
-    installs: record.installs,
-    version: record.version,
-    author: record.author,
-  }),
+  data: pluginCard(record),
 });
 
 const groups: Group[] = [
@@ -199,35 +213,21 @@ const groups: Group[] = [
     name: 'Starters',
     cards: data.starters.map((starter) => ({
       path: `/starters/${starter.code}`,
-      data: starterCard({
-        name: starter.name,
-        technology: starter.technology?.name,
-        screenshotUrl: starter.screenshot.url,
-      }),
+      data: starterCard(starter),
     })),
   },
   {
     name: 'Case studies',
     cards: data.caseStudies.map((story) => ({
       path: `/case-studies/${story.slug}`,
-      data: caseStudyCard({
-        name: story.name,
-        title: plain(story.title),
-        logoPngUrl: story.logo.pngUrl,
-        number: story.numbers[0],
-      }),
+      data: caseStudyCard(story),
     })),
   },
   {
     name: 'Showcase projects',
     cards: data.showcase.map((project) => ({
       path: `/partners/${project.partner.slug}/showcase/${project.slug}`,
-      data: showcaseCard({
-        name: project.name,
-        headline: plain(project.headline),
-        partner: project.partner.name,
-        imageUrl: project.mainImage.url,
-      }),
+      data: showcaseCard(project),
     })),
   },
   {
@@ -235,22 +235,11 @@ const groups: Group[] = [
     cards: [
       ...data.partners.map((record) => ({
         path: `/partners/${record.slug}`,
-        data: partnerCard({
-          kicker: partners.partner.kicker,
-          name: record.name,
-          description: plain(record.shortDescription),
-          logoPngUrl: record.logo.pngUrl,
-          projects: record.projects.count,
-        }),
+        data: partnerCard(record, partners.partner.kicker),
       })),
       ...data.techPartners.map((record) => ({
         path: `/tech-partners/${record.slug}`,
-        data: partnerCard({
-          kicker: partners.techPartner.kicker,
-          name: record.name,
-          description: plain(record.shortDescription),
-          logoPngUrl: record.logo.pngUrl,
-        }),
+        data: techPartnerCard(record, partners.techPartner.kicker),
       })),
     ],
   },
@@ -258,18 +247,14 @@ const groups: Group[] = [
     name: 'Product updates',
     cards: data.productUpdates.map((entry) => ({
       path: `/product-updates/${entry.slug}`,
-      data: productUpdateCard({
-        title: entry.title,
-        categories: entry.categories.map((category) => category.name),
-        publishedAt: entry._firstPublishedAt!,
-      }),
+      data: productUpdateCard(entry),
     })),
   },
   {
     name: 'Compare',
     cards: data.comparisons.map((comparison) => ({
       path: `/compare/${comparison.slug}`,
-      data: compareCard({ headline: compare.hero.headline, product: comparison.product }),
+      data: compareCard(comparison, compare.hero.headline),
     })),
   },
   {
@@ -277,20 +262,56 @@ const groups: Group[] = [
     cards: data.academy.flatMap((course) =>
       course.chapters.slice(0, 1).map((chapter) => ({
         path: `/academy/${course.slug}/${chapter.slug}`,
-        data: academyCard({ title: chapter.title, course: course.name }),
+        data: academyCard(chapter),
       })),
     ),
+  },
+  {
+    name: 'Blog: posts',
+    cards: data.posts.map((post) => ({ path: `/blog/${post.slug}`, data: postCard(post) })),
+  },
+  {
+    name: 'Blog: casual chats',
+    cards: chats.map((chat) => ({
+      path: `/blog/casual-chats/${chat.slug}`,
+      data: chatCard(chat),
+    })),
+  },
+  {
+    name: 'Framework pages',
+    cards: FRAMEWORKS.map((page) => ({
+      path: `/cms/${page.slug}`,
+      data: frameworkCard(
+        data.frameworks.find((record) => record.slug === page.integrations[0]),
+        {
+          seoTitle: page.seo.title,
+          headline: page.hero.headline,
+          subheadline: page.hero.subheadline,
+          theme: page.fetch.theme,
+        },
+      ),
+    })),
+  },
+  {
+    name: 'Docs',
+    cards: data.docs.flatMap((group) => {
+      const first = group.pages.find((entry) => entry.__typename === 'DocGroupPageRecord');
+      if (!first || !('page' in first)) return [];
+      const { page } = first;
+      return [
+        {
+          path: `/docs/${group.slug}${page.slug === 'index' ? '' : `/${page.slug}`}`,
+          data: docsCard(page, { group: group.name }),
+        },
+      ];
+    }),
   },
   {
     name: 'User guides',
     cards: data.userGuides.flatMap((chapter) =>
       chapter.videos.slice(0, 1).map((episode) => ({
         path: `/user-guides/${chapter.slug}/${episode.slug}`,
-        data: userGuideCard({
-          title: episode.title,
-          chapter: chapter.title,
-          duration: episode.video.video.duration,
-        }),
+        data: userGuideCard(episode, chapter.title),
       })),
     ),
   },
@@ -298,8 +319,8 @@ const groups: Group[] = [
 
 // The URL of a card is on the public hostname of the site. The gallery asks
 // this server for it: the cards then show the code of the working tree.
-const cardSrc = (card: OgCardData) => {
-  const url = new URL(ogCardUrl(card, Astro));
+const cardSrc = (card: Card) => {
+  const url = new URL(ogCardUrl(card.data, Astro));
   return `${Astro.url.origin}${url.pathname}${url.search}`;
 };
 
@@ -317,7 +338,7 @@ const seo = overrideSeo([], seoTitle('OG gallery'));
               <a href={card.path}>
                 <img
                   class="card"
-                  src={cardSrc(card.data)}
+                  src={cardSrc(card)}
                   width="1200"
                   height="630"
                   loading="lazy"

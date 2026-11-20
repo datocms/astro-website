@@ -57,3 +57,24 @@ export function chip(text: string, border: string): string {
     whiteSpace: 'nowrap',
   })}">${escape(text)}</div>`;
 }
+
+/** The mean advance of a character of ABC Oracle Medium with the tracking of the title, in em. */
+export const ADVANCE = 0.5;
+
+/**
+ * The width of a text in mean characters (`ADVANCE`). A capital and a digit
+ * are wider than the mean, a space and a mark are narrower: a title in
+ * capitals ("JSON") takes more space than its count of characters.
+ */
+export function units(text: string): number {
+  let em = 0;
+  for (const char of text) {
+    if (/[A-Z]/.test(char)) em += char === 'I' ? 0.3 : char === 'M' || char === 'W' ? 0.82 : 0.66;
+    else if (/[0-9]/.test(char)) em += 0.56;
+    else if (/[a-z]/.test(char))
+      em += char === 'i' || char === 'l' ? 0.24 : char === 'm' || char === 'w' ? 0.76 : 0.5;
+    else if (/[\s.,:;'’!|]/.test(char)) em += 0.26;
+    else em += 0.55;
+  }
+  return em / ADVANCE;
+}

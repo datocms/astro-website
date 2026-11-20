@@ -1,16 +1,44 @@
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import { buildGroupsFromHeadings } from '~/components/docs/ContentPlusToc/utils';
+import { pixelCover, postTheme } from '~/components/PixelCover';
+import { type FragmentOf, readFragment } from '~/lib/datocms/graphql';
+import * as docPage from '~/layouts/docs/PageLayout/_graphql';
+import * as academyChapterPage from '~/pages/academy/[courseSlug]/[chapterSlug]/_graphql';
+import * as chatPage from '~/pages/blog/casual-chats/[slug]/_graphql';
+import * as postPage from '~/pages/blog/[slug]/_graphql';
+import * as caseStudyPage from '~/pages/case-studies/[slug]/_graphql';
+import * as frameworkPage from '~/pages/cms/[slug]/_graphql';
+import * as comparePage from '~/pages/compare/[slug]/_graphql';
+import * as partnerPage from '~/pages/partners/[partnerSlug]/_graphql';
+import * as showcasePage from '~/pages/partners/[partnerSlug]/showcase/[projectSlug]/_graphql';
+import * as pluginPage from '~/pages/plugins/i/[...rest]/_graphql';
+import * as productUpdatePage from '~/pages/product-updates/[slug]/_graphql';
+import * as starterPage from '~/pages/starters/[slug]/_graphql';
+import * as techPartnerPage from '~/pages/tech-partners/[slug]/_graphql';
+import * as userGuidePage from '~/pages/user-guides/[chapterSlug]/[episodeSlug]/_graphql';
 import type { OgCardData } from './ogCardUrl';
+import { type Theme, themeFromSlug } from './theme';
 
 /*
- * The data of the OG card of each kind of page (`/og-card/index.png`). A
- * page gives the fields of its record, and the function gives the card. The
- * page `/dev/og-gallery` shows the cards of the records of the CMS with the
- * same functions.
+ * The data of the OG card (`/og-card/index.png`) of each kind of page. Each
+ * function takes the fragment of its record. The fragment is in the
+ * `_graphql.ts` of the page, next to its query, with the same name in each
+ * file: `OgCardFragment`, as the query is `query`. The query of the page and the query of
+ * `/dev/og-gallery` spread it. The name of the fragment in GraphQL is
+ * different in each file (`PluginOgCardFragment`): the gallery spreads all
+ * of them in one query, and GraphQL refuses two fragments with one name. The
+ * fragments ask imgix for the files that the card needs:
+ * - a logo: a PNG of up to 720 × 320;
+ * - a screenshot in a window: 960 × 777, the shape of the window (640 × 518
+ *   on the card). imgix keeps its top left corner: the edge of the card cuts
+ *   it at the right.
+ * - the cover of a plugin: 960 × 640 (3:2), with its top left corner;
+ * - the pixel cover of a post: the file (100 × 58), as a PNG;
+ * - a portrait of a guest of a chat: 640 × 640.
  *
- * The URLs of the images come from the query of the page, with these imgix
- * parameters:
- * - a logo: `{ fm: png, w: 720, h: 320, fit: max }`;
- * - a screenshot in a window: `{ w: 900, h: 600, fit: crop, crop: top, fm: jpg }`;
- * - the cover of a plugin: `{ w: 960, h: 640, fit: crop, fm: jpg }`.
+ * Some text of a card is not in the record: the name of the parent (the
+ * chapter of a user guide, the group of a docs page), or the copy of
+ * `src/data`. The page gives it as an argument.
  */
 
 /** A plugin shows its installs from this number. A smaller number does not help the plugin. */
@@ -24,14 +52,18 @@ function duration(seconds: number): string {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
-export function pluginCard(plugin: {
-  title: string;
-  description?: string | null;
-  coverUrl?: string | null;
-  installs: number;
-  version: string;
-  author: { name: string; official: boolean };
-}): OgCardData {
+/** The headings of a Structured Text document: its table of contents. */
+const headingsOf = (value: unknown) =>
+  buildGroupsFromHeadings(value)
+    .flatMap((toc) => toc.entries)
+    .map((entry) => entry.label);
+
+/** The plain text of a Structured Text field. */
+const plain = (field: { value: unknown } | null | undefined) =>
+  field ? (toPlainText(field.value as Parameters<typeof toPlainText>[0]) ?? '') : '';
+
+export function pluginCard(fragment: FragmentOf<typeof pluginPage.OgCardFragment>): OgCardData {
+  const plugin = readFragment(pluginPage.OgCardFragment, fragment);
   const author = `by ${plugin.author.name}`;
   const version = `v${plugin.version}`;
   const installs = plugin.installs >= MIN_INSTALLS;
@@ -41,12 +73,12 @@ export function pluginCard(plugin: {
     excerpt: plugin.description,
     theme: 'blue',
     wordmark: true,
-    ...(plugin.coverUrl
+    ...(plugin.coverImage
       ? {
           pills: plugin.author.official ? ['Official'] : [],
           picture: {
             kind: 'cover',
-            imageUrl: plugin.coverUrl,
+            imageUrl: plugin.coverImage.url,
             stat: installs ? { value: number(plugin.installs), label: 'installs' } : undefined,
             author,
             version,
@@ -59,119 +91,207 @@ export function pluginCard(plugin: {
   };
 }
 
-export function starterCard(starter: {
-  name: string;
-  technology?: string | null;
-  screenshotUrl: string;
-}): OgCardData {
+export function starterCard(fragment: FragmentOf<typeof starterPage.OgCardFragment>): OgCardData {
+  const starter = readFragment(starterPage.OgCardFragment, fragment);
   return {
     kicker: 'Starter',
     title: starter.name,
-    pills: starter.technology ? [starter.technology] : [],
+    pills: starter.technology ? [starter.technology.name] : [],
+    // The logo of the framework (an SVG) takes the place of the chip of its name.
+    techLogoUrl: starter.technology?.logo.url,
     theme: 'blue',
-    picture: { kind: 'window', imageUrl: starter.screenshotUrl },
+    wordmark: true,
+    picture: { kind: 'window', imageUrl: starter.screenshot.url },
   };
 }
 
-export function caseStudyCard(story: {
-  name: string;
-  title: string;
-  logoPngUrl: string;
-  /** The first number of the story, with its label. */
-  number?: { number: string; label?: string | null } | null;
-}): OgCardData {
+export function caseStudyCard(
+  fragment: FragmentOf<typeof caseStudyPage.OgCardFragment>,
+): OgCardData {
+  const story = readFragment(caseStudyPage.OgCardFragment, fragment);
+  // The proof is the first number of the story.
+  const first = story.numbers[0];
   return {
     kicker: `Case study: ${story.name}`,
-    title: story.title,
-    logoPngUrl: story.logoPngUrl,
+    title: plain(story.title),
+    logoPngUrl: story.logo.pngUrl,
     theme: 'orange',
-    picture: story.number
-      ? { kind: 'stat', value: story.number.number, label: story.number.label ?? '' }
-      : null,
+    picture: first ? { kind: 'stat', value: first.number, label: first.label ?? '' } : null,
   };
 }
 
-export function showcaseCard(project: {
-  name: string;
-  headline: string;
-  partner: string;
-  imageUrl: string;
-}): OgCardData {
+export function showcaseCard(fragment: FragmentOf<typeof showcasePage.OgCardFragment>): OgCardData {
+  const project = readFragment(showcasePage.OgCardFragment, fragment);
   return {
-    kicker: `Showcase: ${project.partner}`,
+    kicker: `Showcase: ${project.partner.name}`,
     title: project.name,
-    excerpt: project.headline,
+    excerpt: plain(project.headline),
     theme: 'pink',
-    picture: { kind: 'window', imageUrl: project.imageUrl },
+    picture: { kind: 'window', imageUrl: project.mainImage.url, half: true },
   };
 }
 
-export function partnerCard(partner: {
-  kicker: string;
-  name: string;
-  description: string;
-  logoPngUrl: string;
-  /** The number of projects in the showcase: a technology partner has none. */
-  projects?: number;
-}): OgCardData {
-  const projects = partner.projects ?? 0;
+function partnerData(
+  kicker: string,
+  partner: { name: string; shortDescription: { value: unknown }; logo: { pngUrl: string } },
+  projects: number,
+): OgCardData {
   return {
-    kicker: partner.kicker,
+    kicker,
     title: partner.name,
-    excerpt: partner.description,
+    excerpt: plain(partner.shortDescription),
     // No chip for a partner with no projects in the showcase.
     pills: projects > 0 ? [`${projects} showcased project${projects === 1 ? '' : 's'}`] : [],
-    logoPngUrl: partner.logoPngUrl,
+    logoPngUrl: partner.logo.pngUrl,
     theme: 'pink',
   };
 }
 
-export function productUpdateCard(entry: {
-  title: string;
-  categories: string[];
-  publishedAt: string;
-}): OgCardData {
+/** The card of a partner. The kicker is the copy of `src/data/partners`. */
+export function partnerCard(
+  fragment: FragmentOf<typeof partnerPage.OgCardFragment>,
+  kicker: string,
+): OgCardData {
+  const partner = readFragment(partnerPage.OgCardFragment, fragment);
+  return partnerData(kicker, partner, partner.projects.count);
+}
+
+/** The card of a technology partner: it has no projects in the showcase. */
+export function techPartnerCard(
+  fragment: FragmentOf<typeof techPartnerPage.OgCardFragment>,
+  kicker: string,
+): OgCardData {
+  return partnerData(kicker, readFragment(techPartnerPage.OgCardFragment, fragment), 0);
+}
+
+export function productUpdateCard(
+  fragment: FragmentOf<typeof productUpdatePage.OgCardFragment>,
+): OgCardData {
+  const entry = readFragment(productUpdatePage.OgCardFragment, fragment);
   return {
     kicker: 'Product update',
     title: entry.title,
-    pills: entry.categories,
+    pills: entry.categories.map((category) => category.name),
     theme: 'green',
-    picture: { kind: 'date', iso: entry.publishedAt },
+    picture: entry._firstPublishedAt ? { kind: 'date', iso: entry._firstPublishedAt } : null,
   };
 }
 
-export function compareCard(comparison: { headline: string; product: string }): OgCardData {
+/** The card of a comparison. The headline is the copy of `src/data/compare`. */
+export function compareCard(
+  fragment: FragmentOf<typeof comparePage.OgCardFragment>,
+  headline: string,
+): OgCardData {
+  const comparison = readFragment(comparePage.OgCardFragment, fragment);
   return {
     kicker: 'Compare',
-    title: comparison.headline,
-    excerpt: `Here’s what you should know when comparing it to ${comparison.product}.`,
+    title: headline,
     theme: 'blue',
     picture: { kind: 'versus', other: comparison.product },
   };
 }
 
-export function academyCard(chapter: { title: string; course: string }): OgCardData {
+export function academyCard(
+  fragment: FragmentOf<typeof academyChapterPage.OgCardFragment>,
+): OgCardData {
+  const chapter = readFragment(academyChapterPage.OgCardFragment, fragment);
+  const headings = headingsOf(chapter.content.value);
   return {
-    kicker: `Academy: ${chapter.course}`,
+    // Next to the wordmark: "DatoCMS Academy". The course name does not fit the row.
+    kicker: 'Academy',
     title: chapter.title,
     theme: 'orange',
     wordmark: true,
+    // The proof is the table of contents of the lesson, as on a docs page.
+    picture: headings.length > 0 ? { kind: 'contents', entries: headings } : null,
   };
 }
 
-export function userGuideCard(episode: {
-  title: string;
-  chapter: string;
-  /** The length of the video, in seconds. */
-  duration?: number | null;
-}): OgCardData {
+export function userGuideCard(
+  fragment: FragmentOf<typeof userGuidePage.OgCardFragment>,
+  chapter: string,
+): OgCardData {
+  const episode = readFragment(userGuidePage.OgCardFragment, fragment);
+  const seconds = episode.video.video.duration;
   return {
-    kicker: `User guides: ${episode.chapter}`,
+    kicker: `User guides: ${chapter}`,
     title: episode.title,
     theme: 'orange',
-    picture: {
-      kind: 'video',
-      duration: episode.duration ? duration(episode.duration) : undefined,
-    },
+    picture: { kind: 'video', duration: seconds ? duration(seconds) : undefined },
+  };
+}
+
+/**
+ * The card of a docs page. The proof half is the table of contents of the
+ * page: its headings, or the `headings` of a page with more entries in its
+ * table of contents.
+ */
+export function docsCard(
+  fragment: FragmentOf<typeof docPage.OgCardFragment>,
+  options: { group?: string | null; headings?: string[] } = {},
+): OgCardData {
+  const page = readFragment(docPage.OgCardFragment, fragment);
+  const headings = options.headings ?? headingsOf(page.content.value);
+  return {
+    // The theme of the docs says that the page is of the docs: the kicker is
+    // the name of the group.
+    kicker: options.group ?? 'Docs',
+    title: page.title,
+    excerpt: page.seo?.description,
+    theme: 'docs',
+    // The proof is the table of contents. A page with no headings has the
+    // full width for its title.
+    picture: headings.length > 0 ? { kind: 'contents', entries: headings } : null,
+  };
+}
+
+/**
+ * The card of a framework page (`/cms/<slug>`): the copy is in `src/data`,
+ * the logo is the logo of the integration record of the framework.
+ */
+export function frameworkCard(
+  fragment: FragmentOf<typeof frameworkPage.OgCardFragment> | undefined,
+  page: {
+    /** The title of the page, as "Headless CMS for Next.js". */
+    seoTitle: string;
+    headline: string;
+    subheadline?: string | null;
+    theme: Theme;
+  },
+): OgCardData {
+  const integration = fragment ? readFragment(frameworkPage.OgCardFragment, fragment) : undefined;
+  return {
+    kicker: page.seoTitle,
+    title: page.headline,
+    excerpt: page.subheadline,
+    logoPngUrl: integration?.logo.pngUrl,
+    theme: page.theme,
+  };
+}
+
+/**
+ * The card of a blog post: the title, the category as the kicker, and the
+ * subject of its pixel cover on the inverse. The theme is the theme of the
+ * cover, else the theme from the slug, as on the page.
+ */
+export function postCard(fragment: FragmentOf<typeof postPage.OgCardFragment>): OgCardData {
+  const post = readFragment(postPage.OgCardFragment, fragment);
+  const cover = pixelCover(post);
+  return {
+    kicker: post.category?.name ?? 'Blog',
+    title: post.title,
+    theme: postTheme(post) ?? themeFromSlug(post.slug),
+    picture: cover ? { kind: 'pixel', imageUrl: cover.url } : null,
+  };
+}
+
+/** The card of a casual chat: the title, and the portraits of its guests on the inverse. */
+export function chatCard(fragment: FragmentOf<typeof chatPage.OgCardFragment>): OgCardData {
+  const chat = readFragment(chatPage.OgCardFragment, fragment);
+  return {
+    kicker: 'Casual chat',
+    title: chat.title,
+    theme: themeFromSlug(chat.slug),
+    picture: { kind: 'portraits', imageUrls: chat.people.map((person) => person.portrait.url) },
   };
 }

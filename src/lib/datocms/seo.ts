@@ -2,7 +2,7 @@ import type { TitleMetaLinkTag } from '@datocms/astro';
 import type { AstroGlobal } from 'astro';
 import { truncate, without } from 'lodash-es';
 import { isDefined } from '../isDefined';
-import { ogCardUrl, ogCoverUrl, type OgCardData, type OgCoverData } from '../ogCardUrl';
+import { ogCardUrl, type OgCardData } from '../ogCardUrl';
 
 const pageTitleSuffix = 'DatoCMS';
 
@@ -151,14 +151,6 @@ export function seoTitle(newTitle: string) {
 export const ogCardWidth = 1200;
 export const ogCardHeight = 630;
 
-/**
- * The size of the OG image of an article: the cover grid of 100 × 58 cells,
- * with cells of 12 px. A whole number of pixels for each cell keeps the
- * edges of the cells sharp.
- */
-export const ogCoverWidth = 1200;
-export const ogCoverHeight = 696;
-
 function seoImage(url: string, width: number, height: number) {
   return [
     seoMeta('og:image', url),
@@ -173,11 +165,6 @@ function seoImage(url: string, width: number, height: number) {
 
 export function seoGeneratedCard(astroOrRequest: AstroGlobal | Request, data: OgCardData) {
   return seoImage(ogCardUrl(data, astroOrRequest), ogCardWidth, ogCardHeight);
-}
-
-/** The OG image of an article is its cover. It replaces the image of the CMS. */
-export function seoCoverCard(astroOrRequest: AstroGlobal | Request, data: OgCoverData) {
-  return seoImage(ogCoverUrl(data, astroOrRequest), ogCoverWidth, ogCoverHeight);
 }
 
 export function seoDescription(rawDescription: string) {

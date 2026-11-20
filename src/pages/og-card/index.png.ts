@@ -7,11 +7,20 @@ import type { OgCardData, OgPicture } from '~/lib/ogCardUrl';
 import { toArrayBuffer } from '~/lib/toArrayBuffer';
 import { handleUnexpectedError, invalidRequestResponse } from '~/pages/api/_utils';
 import { UI_FONTS_BASE_URL } from 'astro:env/server';
+import { pixelProof, portraitsHalf } from './_resources/article';
 import { half, label } from './_resources/half';
 import { type OgPalette, palettes } from './_resources/palette';
 import { picture } from './_resources/picture';
 import { pngSize, svgToPng } from './_resources/raster';
-import { CHIP as CHIP_SIZE, chip, escape, symbol, wordmark } from './_resources/text';
+import {
+  ADVANCE,
+  CHIP as CHIP_SIZE,
+  chip,
+  escape,
+  symbol,
+  units,
+  wordmark,
+} from './_resources/text';
 
 /*
  * The OG card: a split of the site at the scale of a social feed
@@ -30,7 +39,7 @@ const SAFE = { top: 72, bottom: 72, side: 64 };
 /** The left edge of the proof half. */
 const SPLIT_X = 720;
 /** The wordmark alone, and the symbol next to the kicker. */
-const WORDMARK_HEIGHT = 46;
+const WORDMARK_HEIGHT = 42;
 const SYMBOL_HEIGHT = 52;
 const KICKER_SIZE = 36;
 /** The height of the bottom row: the line of the kicker. */
@@ -40,30 +49,10 @@ const CHIP = { ...CHIP_SIZE, max: 2 };
 const STAT = { size: 96, label: 30, gap: 16 };
 /** The steps of the title, by the width of its column. */
 const LADDER = { split: [104, 92, 80, 72, 64], full: [150, 132, 116, 104, 92, 80] };
-/** The mean advance of a character of ABC Oracle Medium with the tracking of the title, in em. */
-const ADVANCE = 0.5;
 /** The smallest size of a title with a quiet run: below it, the title is alone. */
 const MIN_QUIET = { split: 64, full: 92 };
 
 type Word = { text: string; quiet: boolean };
-
-/**
- * The width of a text in mean characters (`ADVANCE`). A capital and a digit
- * are wider than the mean, a space and a mark are narrower: a title in
- * capitals ("JSON") takes more space than its count of characters.
- */
-function units(text: string): number {
-  let em = 0;
-  for (const char of text) {
-    if (/[A-Z]/.test(char)) em += char === 'I' ? 0.3 : char === 'M' || char === 'W' ? 0.82 : 0.66;
-    else if (/[0-9]/.test(char)) em += 0.56;
-    else if (/[a-z]/.test(char))
-      em += char === 'i' || char === 'l' ? 0.24 : char === 'm' || char === 'w' ? 0.76 : 0.5;
-    else if (/[\s.,:;'’!|]/.test(char)) em += 0.26;
-    else em += 0.55;
-  }
-  return em / ADVANCE;
-}
 
 /** The lines of the words at a width in mean characters, the first line that is full first. */
 const SPACE = units(' ');
@@ -104,12 +93,21 @@ function balance(words: Word[], perLine: number): Word[][] {
  */
 function fit(words: Word[], column: number, height: number, ladder: number[]) {
   const longest = Math.max(...words.map((word) => units(word.text)));
+  let fallback: { size: number; lines: Word[][]; whole: true } | undefined;
   for (const size of ladder) {
     const perLine = Math.floor(column / (size * ADVANCE));
     if (longest > perLine) continue;
     const lines = balance(words, perLine);
-    if (lines.length * size <= height) return { size, lines, whole: true };
+    if (lines.length * size > height) continue;
+    // A short word alone on a line ("of", "API") breaks the reading of a
+    // title of three words or more: the next step can put it with a
+    // neighbour. If no step can, the largest step that fits is the result.
+    const lonely =
+      words.length > 2 && lines.some((line) => line.length === 1 && line[0]!.text.length < 4);
+    if (!lonely) return { size, lines, whole: true as const };
+    fallback ??= { size, lines, whole: true as const };
   }
+  if (fallback) return fallback;
   const size = ladder[ladder.length - 1]!;
   const perLine = Math.floor(column / (size * ADVANCE));
   const lines = wrap(words, perLine).slice(0, Math.max(1, Math.floor(height / size)));
@@ -211,6 +209,50 @@ function headline(
   return words.length ? fit(words, column, height, ladder) : { size: 0, lines: [], whole: true };
 }
 
+/** The box of the logo of a technology: its height, and its largest width. */
+const TECH_LOGO = { height: 56, maxWidth: 280 };
+
+/**
+ * The logo of a technology in one colour, the colour of the title, as a
+ * mask on the site (`LogoItem`): each paint of the SVG takes the colour,
+ * and a white paint goes.
+ * The result is an <img> at the height of `TECH_LOGO`, or undefined for a
+ * file with no size.
+ */
+function techLogo(svg: string, color: string): string | undefined {
+  const root = svg.match(/<svg\b[^>]*>/)?.[0];
+  if (!root) return undefined;
+  const viewBox = root
+    .match(/viewBox="([^"]+)"/)?.[1]
+    ?.split(/[\s,]+/)
+    .map(Number);
+  const width = viewBox?.[2] ?? Number.parseFloat(root.match(/\swidth="([\d.]+)/)?.[1] ?? '');
+  const height = viewBox?.[3] ?? Number.parseFloat(root.match(/\sheight="([\d.]+)/)?.[1] ?? '');
+  if (!width || !height) return undefined;
+  // A white paint is a cut in the mark (the S of Svelte): it stays empty.
+  const paint = (value: string) =>
+    value === 'none' || /^(#fff(fff)?|white)$/i.test(value) ? 'none' : color;
+  const body = svg
+    .replace(/<\?xml[^>]*>/, '')
+    .replace(/(fill|stroke)="([^"]*)"/g, (_, attribute, value) => `${attribute}="${paint(value)}"`)
+    .replace(
+      /(fill|stroke):\s*([^;"]+)/g,
+      (_, property, value) => `${property}:${paint(value.trim())}`,
+    )
+    // The paths with no fill take the fill of the root.
+    .replace(/<svg\b([^>]*)>/, (_, attributes: string) => {
+      const rest = attributes.replace(/\sfill="[^"]*"/, '');
+      return `<svg${rest} fill="${color}"${viewBox ? '' : ` viewBox="0 0 ${width} ${height}"`}>`;
+    });
+  const scale = Math.min(TECH_LOGO.height / height, TECH_LOGO.maxWidth / width);
+  return `<img src="data:image/svg+xml;base64,${Buffer.from(body).toString('base64')}" style="${css(
+    {
+      width: `${Math.round(width * scale)}px`,
+      height: `${Math.round(height * scale)}px`,
+    },
+  )}" />`;
+}
+
 interface Layout {
   /** The width of the claim: the left half, or the full card. */
   width: number;
@@ -218,6 +260,8 @@ interface Layout {
   withWordmark: boolean;
   /** A number of the page under the title, when the logo has the proof half. */
   stat?: Extract<OgPicture, { kind: 'stat' }>;
+  /** The logo of a technology (`techLogoUrl`), as an <img>: it takes the place of the chips. */
+  techLogo?: string;
 }
 
 function markup(data: OgCardData, palette: OgPalette, layout: Layout, proof = '') {
@@ -226,13 +270,18 @@ function markup(data: OgCardData, palette: OgPalette, layout: Layout, proof = ''
   const title = data.title ? clean(data.title) : '';
   const excerpt = data.excerpt ? clean(data.excerpt) : '';
   const kicker = data.kicker ? kickerOf(clean(data.kicker)) : '';
-  const chips = layout.stat ? [] : (data.pills ?? []).map(clean).filter(Boolean).slice(0, CHIP.max);
+  const chips =
+    layout.stat || layout.techLogo
+      ? []
+      : (data.pills ?? []).map(clean).filter(Boolean).slice(0, CHIP.max);
 
   const below = layout.stat
     ? STAT.size + STAT.gap + Math.round(STAT.label * 1.3) + BOTTOM_GAP
-    : chips.length > 0
-      ? CHIP.height + BOTTOM_GAP
-      : 0;
+    : layout.techLogo
+      ? TECH_LOGO.height + BOTTOM_GAP
+      : chips.length > 0
+        ? CHIP.height + BOTTOM_GAP
+        : 0;
   const titleHeight = ogCardHeight - SAFE.top - SAFE.bottom - BOTTOM_ROW - BOTTOM_GAP - below;
   const { size, lines } = headline(title, excerpt, {
     column,
@@ -296,6 +345,11 @@ function markup(data: OgCardData, palette: OgPalette, layout: Layout, proof = ''
                 <div style="${css({ display: 'flex', fontSize: `${STAT.size}px`, lineHeight: 1, letterSpacing: '-0.05em', fontWeight: 500 })}">${escape(layout.stat.value)}</div>
                 <div style="${css({ ...label(STAT.label, palette.accentMuted), marginTop: `${STAT.gap}px` })}">${escape(layout.stat.label)}</div>
               </div>`
+              : ''
+          }
+          ${
+            layout.techLogo
+              ? `<div style="${css({ display: 'flex', marginBottom: `${BOTTOM_GAP}px` })}">${layout.techLogo}</div>`
               : ''
           }
           ${
@@ -407,11 +461,43 @@ export const GET: APIRoute = async ({ request, url }) => {
       }
     };
 
-    const [oracleRegular, oracleMedium, logo, image] = await Promise.all([
+    // The logo of a technology (an SVG). A logo that does not load gives
+    // the chips: the card never fails for it.
+    const loadTechLogo = async (): Promise<string | undefined> => {
+      if (!data.techLogoUrl) return undefined;
+      try {
+        const res = await fetch(data.techLogoUrl);
+        return res.ok ? techLogo(await res.text(), palette.onAccent) : undefined;
+      } catch {
+        return undefined;
+      }
+    };
+
+    // The portraits of the guests of a chat. A portrait that does not load
+    // gives the card with no proof: the card never fails for it.
+    const loadPortraits = async (): Promise<Uint8Array[] | null> => {
+      const picture = data.picture;
+      if (picture?.kind !== 'portraits' || picture.imageUrls.length === 0) return null;
+      try {
+        return await Promise.all(
+          picture.imageUrls.slice(0, 3).map(async (imageUrl) => {
+            const res = await fetch(imageUrl);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return new Uint8Array(await res.arrayBuffer());
+          }),
+        );
+      } catch {
+        return null;
+      }
+    };
+
+    const [oracleRegular, oracleMedium, logo, loaded, tech, portraits] = await Promise.all([
       loadFont('ABCOracle-Regular.otf'),
       loadFont('ABCOracle-Medium.otf'),
       loadLogo(),
       loadImage(),
+      loadTechLogo(),
+      loadPortraits(),
     ]);
 
     const fonts = [
@@ -421,16 +507,42 @@ export const GET: APIRoute = async ({ request, url }) => {
     const render = (markup: unknown) =>
       satori(markup as any, { width: ogCardWidth, height: ogCardHeight, fonts });
     const proofKind = data.picture?.kind;
-    // A cover and a product window have half of the card: they are pictures, not details.
-    const splitX = proofKind === 'cover' || proofKind === 'product' ? ogCardWidth / 2 : SPLIT_X;
+    // A cover, a product window, the window of a showcase project and a table
+    // of contents have half of the card: they are the subject of the page.
+    let splitX =
+      proofKind === 'cover' ||
+      proofKind === 'product' ||
+      proofKind === 'contents' ||
+      proofKind === 'portraits' ||
+      (data.picture?.kind === 'window' && data.picture.half)
+        ? ogCardWidth / 2
+        : SPLIT_X;
+    // The proof of an article is a PNG that the card draws from the files.
+    // The subject of a pixel cover gives the left edge of its proof.
+    let image = loaded;
+    if (data.picture?.kind === 'pixel') {
+      const proof = loaded
+        ? await pixelProof(loaded, palette, { width: ogCardWidth, height: ogCardHeight }).catch(
+            () => null,
+          )
+        : null;
+      image = proof?.png ?? null;
+      if (proof) splitX = proof.left;
+    }
     const halfSize = { width: ogCardWidth - splitX, height: ogCardHeight };
+    if (data.picture?.kind === 'portraits') {
+      image = portraits ? await portraitsHalf(portraits, palette, halfSize) : null;
+    }
+    // A proof that needs a file that does not load gives the card with no proof.
+    const needsImage = (picture: NonNullable<OgCardData['picture']>) =>
+      ('imageUrl' in picture && Boolean(picture.imageUrl)) || picture.kind === 'portraits';
 
     let svg: string;
     if (logo) {
       // The logo has the proof half. A number of the page goes under the title.
       const stat = data.picture?.kind === 'stat' ? data.picture : undefined;
       const [card, logoHalf] = await Promise.all([
-        render(markup(data, palette, { width: SPLIT_X, withWordmark: true, stat })),
+        render(markup(data, palette, { width: SPLIT_X, withWordmark: true, stat, techLogo: tech })),
         picture({ ...halfSize, palette, logo }),
       ]);
       // The half goes inline in the SVG of the card (see `picture.ts`).
@@ -438,7 +550,7 @@ export const GET: APIRoute = async ({ request, url }) => {
         /<\/svg>\s*$/,
         `${logoHalf.replace('<svg ', `<svg x="${SPLIT_X}" y="0" `)}</svg>`,
       );
-    } else if (data.picture && (!('imageUrl' in data.picture) || !data.picture.imageUrl || image)) {
+    } else if (data.picture && (!needsImage(data.picture) || image)) {
       const proof = `<div style="${css({
         position: 'absolute',
         left: `${splitX}px`,
@@ -447,13 +559,14 @@ export const GET: APIRoute = async ({ request, url }) => {
         height: `${halfSize.height}px`,
         display: 'flex',
       })}">${half({ theme: data.theme ?? 'purple', picture: data.picture, palette, image, inset: SAFE, ...halfSize })}</div>`;
-      // The versus half shows the wordmark: the bottom row does not repeat it.
       svg = await render(
-        markup(data, palette, { width: splitX, withWordmark: proofKind !== 'versus' }, proof),
+        markup(data, palette, { width: splitX, withWordmark: true, techLogo: tech }, proof),
       );
     } else {
       // No proof, or an image that does not load: the title has the full width.
-      svg = await render(markup(data, palette, { width: ogCardWidth, withWordmark: true }));
+      svg = await render(
+        markup(data, palette, { width: ogCardWidth, withWordmark: true, techLogo: tech }),
+      );
     }
 
     const png = await svgToPng(svg);

@@ -14,6 +14,13 @@ import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
+/** The fields of the OG card of the page (`~/lib/ogCards`). */
+export const OgCardFragment = graphql(/* GraphQL */ `
+  fragment CompareOgCardFragment on ProductComparisonRecord {
+    product
+  }
+`);
+
 export const query = graphql(
   /* GraphQL */ `
     query Compare($slug: String!) {

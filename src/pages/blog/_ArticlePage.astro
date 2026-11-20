@@ -6,8 +6,8 @@ import { ArticleBody } from '~/components/ArticleBody';
 import { Breadcrumb, BreadcrumbLabel } from '~/components/Breadcrumb';
 import { JsonLd } from '~/components/JsonLd';
 import { MarkdownActions } from '~/components/MarkdownActions';
-import { pixelCover, postTheme } from '~/components/PixelCover';
-import { ChatHeaderFragment, PostHeader, PostHeaderFragment } from '~/components/PostHeader';
+import { postTheme } from '~/components/PixelCover';
+import { PostHeader, PostHeaderFragment } from '~/components/PostHeader';
 import { RelatedPosts } from '~/components/RelatedPosts';
 import { StructuredText } from '~/components/StructuredText';
 import AnchoredHeadingNode from '~/components/StructuredText/AnchoredHeadingNode.astro';
@@ -23,12 +23,12 @@ import {
   extractFromSeoTags,
   overrideSeo,
   seoCanonical,
-  seoCoverCard,
+  seoGeneratedCard,
   seoOgType,
   seoTwitterCard,
 } from '~/lib/datocms/seo';
 import { baseUrl as buildBaseUrl } from '~/lib/draftMode';
-import type { OgCoverData } from '~/lib/ogCardUrl';
+import type { OgCardData } from '~/lib/ogCardUrl';
 import { canonicalUrl, mainEntityRefs, publisherRef } from '~/lib/jsonLd';
 import { ArticleChatFragment, ArticlePostFragment } from './_article';
 import { loadRelated } from './_related';
@@ -37,9 +37,11 @@ interface Props {
   record:
     | (FragmentOf<typeof ArticlePostFragment> & { __typename: 'BlogPostRecord' })
     | (FragmentOf<typeof ArticleChatFragment> & { __typename: 'CustomerStoryRecord' });
+  /** The OG card of the article (`postCard` or `chatCard` of `~/lib/ogCards`). */
+  ogCard: OgCardData;
 }
 
-const { record } = Astro.props;
+const { record, ogCard } = Astro.props;
 
 // The parts that are different for a post and for a chat. Each branch calls
 // ensureValidStructuredTextProps with its own content type: TypeScript cannot
@@ -48,12 +50,8 @@ function articleData() {
   switch (record.__typename) {
     case 'BlogPostRecord': {
       const article = readFragment(ArticlePostFragment, record);
-      const cover = pixelCover(readFragment(PostHeaderFragment, article));
       return {
         article,
-        ogCover: cover
-          ? ({ kind: 'post', cover: cover.url, theme: cover.theme } satisfies OgCoverData)
-          : undefined,
         header: { post: article },
         theme: postTheme(readFragment(PostHeaderFragment, article)) ?? themeFromSlug(article.slug),
         trail: [
@@ -76,18 +74,8 @@ function articleData() {
     }
     case 'CustomerStoryRecord': {
       const article = readFragment(ArticleChatFragment, record);
-      // readFragment gives never for a value with a __typename that the fragment
-      // does not select. The annotation gives the type of the fragment.
-      const chat: FragmentOf<typeof ChatHeaderFragment> = article;
       return {
         article,
-        ogCover: {
-          kind: 'chat',
-          portraits: readFragment(ChatHeaderFragment, chat).people.map(
-            (person) => person.portrait.url,
-          ),
-          theme: themeFromSlug(article.slug),
-        } satisfies OgCoverData,
         header: { chat: article },
         theme: themeFromSlug(article.slug),
         trail: [indexes.blog, indexes.casualChats],
@@ -108,7 +96,6 @@ function articleData() {
 
 const {
   article,
-  ogCover,
   header,
   theme,
   trail,
@@ -124,13 +111,13 @@ const {
 const related = await loadRelated(Astro, article);
 
 const baseUrl = buildBaseUrl(Astro);
-// The OG image of an article is its cover, also when the CMS gives an image.
+// The OG image of an article is its card, also when the CMS gives an image.
 const seo = overrideSeo(
   article.seo,
   article.canonicalUrl ? seoCanonical(article.canonicalUrl) : undefined,
   seoOgType('article'),
   seoTwitterCard('summary_large_image'),
-  ogCover ? seoCoverCard(Astro, ogCover) : undefined,
+  seoGeneratedCard(Astro, ogCard),
 );
 const { description, image } = extractFromSeoTags(seo);
 const markdownUrl = new URL(

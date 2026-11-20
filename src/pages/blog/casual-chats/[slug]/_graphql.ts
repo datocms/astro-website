@@ -8,16 +8,30 @@ import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
+/** The fields of the OG card of the page (`~/lib/ogCards`). */
+export const OgCardFragment = graphql(/* GraphQL */ `
+  fragment ChatOgCardFragment on CustomerStoryRecord {
+    title
+    slug
+    people {
+      portrait: avatar {
+        url(imgixParams: { w: 640, h: 640, fit: crop })
+      }
+    }
+  }
+`);
+
 export const query = graphql(
   /* GraphQL */ `
     query ChatQuery($slug: String!) {
       chat: customerStory(filter: { slug: { eq: $slug } }) {
         __typename
         ...ArticleChatFragment
+        ...ChatOgCardFragment
       }
     }
   `,
-  [ArticleChatFragment],
+  [ArticleChatFragment, OgCardFragment],
 );
 
 export const buildSitemapUrls: BuildSitemapUrlsFn = async (executeQueryOptions) => {

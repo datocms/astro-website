@@ -19,10 +19,24 @@ import { TagFragment } from '~/lib/datocms/commonFragments';
 import { graphql } from '~/lib/datocms/graphql';
 import { GroupLayoutFragment } from '../GroupLayout/_graphql';
 
+/** The fields of the OG card of the page (`~/lib/ogCards`). */
+export const OgCardFragment = graphql(/* GraphQL */ `
+  fragment DocPageOgCardFragment on DocPageRecord {
+    title
+    seo {
+      description
+    }
+    content {
+      value
+    }
+  }
+`);
+
 export const PageLayoutFragment = graphql(
   /* GraphQL */ `
     fragment PageLayoutFragment on DocPageRecord {
       id
+      ...DocPageOgCardFragment
       title
       _publishedAt
       _seoMetaTags {
@@ -110,6 +124,7 @@ export const PageLayoutFragment = graphql(
     }
   `,
   [
+    OgCardFragment,
     TagFragment,
     ResponsiveImageFragment,
     ImageFragment,

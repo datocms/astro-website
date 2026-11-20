@@ -12,6 +12,22 @@ import { PluginCardFragment } from '~/components/PluginCard';
 import { QuotePartnerTestimonialFragment } from '~/components/Quote';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
+/** The fields of the OG card of the page (`~/lib/ogCards`). */
+export const OgCardFragment = graphql(/* GraphQL */ `
+  fragment PartnerOgCardFragment on PartnerRecord {
+    name
+    shortDescription {
+      value
+    }
+    logo {
+      pngUrl: url(imgixParams: { fm: png, w: 720, h: 320, fit: max })
+    }
+    projects: _allReferencingShowcaseProjectsMeta {
+      count
+    }
+  }
+`);
+
 export const query = graphql(
   /* GraphQL */ `
     query PartnerQuery($partnerSlug: String!) {

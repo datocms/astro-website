@@ -13,6 +13,23 @@ import { graphql } from '~/lib/datocms/graphql';
 import type { ParamsToRecordIdFn } from '~/pages/api/normalize-structured-text/_utils/pathnameToRecordId';
 import type { BuildSitemapUrlsFn } from '~/pages/sitemap.xml';
 
+/** The fields of the OG card of the page (`~/lib/ogCards`). */
+export const OgCardFragment = graphql(/* GraphQL */ `
+  fragment CaseStudyOgCardFragment on SuccessStoryRecord {
+    name
+    title {
+      value
+    }
+    logo {
+      pngUrl: url(imgixParams: { fm: png, w: 720, h: 320, fit: max })
+    }
+    numbers {
+      number
+      label
+    }
+  }
+`);
+
 /*
  * The page gets the four latest stories: one of them can be the story of
  * the page, and the page shows three others.
