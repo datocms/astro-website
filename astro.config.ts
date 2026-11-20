@@ -383,6 +383,20 @@ export default defineConfig({
   // This project does not use static markdown, only remote. See our <Markdown /> component
   markdown: {},
   vite: {
+    // In `astro dev` the server code runs in workerd, and Vite bundles its
+    // dependencies before the first request. The scan does not find these
+    // three: without this list, Vite bundles them when a page first needs
+    // them and loads the program again. After that, a page with a React
+    // scene gets two copies of React and gives a 500 error.
+    ssr: {
+      optimizeDeps: {
+        include: [
+          'astro-expressive-code/components',
+          'datocms-structured-text-to-html-string',
+          'remove-markdown',
+        ],
+      },
+    },
     plugins: [
       cssLayers(),
       pxvHeaders(),
