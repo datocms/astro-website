@@ -27,10 +27,10 @@ import {
   SIDEBAR_OTHER_FOLDERS,
   USER_NAME,
 } from './story';
-import coverImage from './cover.jpg';
-import galleryImage1 from './gallery-1.jpg';
-import galleryImage2 from './gallery-2.jpg';
-import galleryImage3 from './gallery-3.jpg';
+import coverImage from './cover-900w.webp';
+import galleryImage1 from './gallery-1-240w.webp';
+import galleryImage2 from './gallery-2-240w.webp';
+import galleryImage3 from './gallery-3-240w.webp';
 
 // The scenes of the feature page "Structured content": the guide "Three
 // days in Lisbon on foot" in the record editor, and fragments of its Body

@@ -1,14 +1,14 @@
 import { RecordForm } from '@datocms/product-scenes';
 import { EditorScene, type EditorSceneOptions, type EditorStory } from '../editor';
 import { type FragmentSceneProps, Scene } from '../Scene';
-import camels from './camels.jpg';
-import camp from './camp.jpg';
-import cover from './cover.jpg';
-import dunes from './dunes.jpg';
-import rock from './rock.jpg';
-import stars from './stars.jpg';
-import tea from './tea.jpg';
-import trailer from './trailer.jpg';
+import camels from './camels-320w.webp';
+import camp from './camp-320w.webp';
+import cover from './cover-640w.webp';
+import dunes from './dunes-320w.webp';
+import rock from './rock-320w.webp';
+import stars from './stars-320w.webp';
+import tea from './tea-320w.webp';
+import trailer from './trailer-1040w.webp';
 import {
   COVER,
   GALLERY,

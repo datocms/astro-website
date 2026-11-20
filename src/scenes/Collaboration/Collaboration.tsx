@@ -18,9 +18,9 @@ import {
   SAVED_SENTENCE,
   VIEWER,
 } from './story';
-import inesImage from './ines.jpg';
+import inesImage from './ines-80w.webp';
 import styles from './style.module.css';
-import tomImage from './tom.jpg';
+import tomImage from './tom-80w.webp';
 
 // The scenes of the chapter "Collaboration and versions": the recipe
 // "Lemon risotto with peas" of Simmer, open on two screens at the same

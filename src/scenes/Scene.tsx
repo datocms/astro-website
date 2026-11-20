@@ -62,6 +62,9 @@ export function Scene({ theme, appearance = {}, ...stage }: SceneProps) {
   return (
     <Stage
       inspectable={import.meta.env.DEV}
+      // Most scenes are below the fold: the browser loads their photos only
+      // near the viewport. A scene at the top of a page sets 'eager'.
+      imageLoading="lazy"
       hue={SCENE_HUE[sceneTheme]}
       deepNavbar={SCENE_DEEP_NAVBAR.has(sceneTheme)}
       scheme={sceneScheme(appearance)}

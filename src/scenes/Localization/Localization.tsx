@@ -1,7 +1,7 @@
 import { RecordForm, RolePermissions, SelectivePublishing } from '@datocms/product-scenes';
 import { EditorScene, type EditorSceneOptions, type EditorStory } from '../editor';
 import { type FragmentSceneProps, Scene } from '../Scene';
-import productImage from './product.jpg';
+import productImage from './product-720w.webp';
 import {
   ACTIVE_LOCALE,
   LOCALES,

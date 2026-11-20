@@ -6,7 +6,7 @@ import {
 } from '@datocms/product-scenes';
 import { EditorScene, type EditorSceneOptions, type EditorStory } from '../editor';
 import { type FragmentSceneProps, Scene } from '../Scene';
-import heroImage from './hero.jpg';
+import heroImage from './hero-900w.webp';
 // The preview image of the Feature grid model, from its settings in the
 // schema: the block as it shows on the website, three features in a row.
 // The SVG has the colours of the dark version of the website in a query

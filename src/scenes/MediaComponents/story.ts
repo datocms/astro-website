@@ -1,11 +1,11 @@
-import binnacle from './binnacle.jpg';
-import chart from './chart.jpg';
-import coast from './coast.jpg';
-import cover from './cover.jpg';
-import lens from './lens.jpg';
-import night from './night.jpg';
-import original from './original.jpg';
-import stairs from './stairs.jpg';
+import binnacle from './binnacle-400w.webp';
+import chart from './chart-400w.webp';
+import coast from './coast-400w.webp';
+import cover from './cover-1200w.webp';
+import lens from './lens-400w.webp';
+import night from './night-400w.webp';
+import original from './original-720w.webp';
+import stairs from './stairs-400w.webp';
 
 /*
  * The fake data of the frame of the chapter "Image and video components"

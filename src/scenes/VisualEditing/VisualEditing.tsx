@@ -10,10 +10,10 @@ import {
   type WebPreviewTargetProps,
 } from '@datocms/product-scenes';
 import type { ReactNode } from 'react';
-import dawnImage from './dawn.jpg';
-import coverImage from './cover.jpg';
-import coastImage from './coast.jpg';
-import portraitImage from './portrait.jpg';
+import dawnImage from './dawn-1200w.webp';
+import coverImage from './cover-1200w.webp';
+import coastImage from './coast-1200w.webp';
+import portraitImage from './portrait-1200w.webp';
 // The favicon of Field Notes (SVG): an F on the night blue of the cover. The
 // site uses it as its logo.
 import logo from './logo.svg';

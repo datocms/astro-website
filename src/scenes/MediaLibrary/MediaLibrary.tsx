@@ -6,14 +6,14 @@ import {
   RecordEditorLayout,
 } from '@datocms/product-scenes';
 import { type SceneAppearance, type FragmentSceneProps, Scene } from '../Scene';
-import catalogueCover from './catalogue-cover.jpg';
-import clayVessel from './clay-vessel.jpg';
-import embroideryHoop from './embroidery-hoop.jpg';
-import indigoVats from './indigo-vats.jpg';
-import linenBolts from './linen-bolts.jpg';
-import loomRoom from './loom-room.jpg';
-import madderDye from './madder-dye.jpg';
-import openingNight from './opening-night.jpg';
+import catalogueCover from './catalogue-cover-320w.webp';
+import clayVessel from './clay-vessel-1200w.webp';
+import embroideryHoop from './embroidery-hoop-480w.webp';
+import indigoVats from './indigo-vats-480w.webp';
+import linenBolts from './linen-bolts-480w.webp';
+import loomRoom from './loom-room-480w.webp';
+import madderDye from './madder-dye-320w.webp';
+import openingNight from './opening-night-480w.webp';
 import {
   ASSET,
   ASSETS,
@@ -27,10 +27,10 @@ import {
   SOURCES,
   USER_NAME,
 } from './story';
-import textileGallery from './textile-gallery.jpg';
-import threadSpools from './thread-spools.jpg';
-import tideLine from './tide-line.jpg';
-import weaverHands from './weaver-hands.jpg';
+import textileGallery from './textile-gallery-480w.webp';
+import threadSpools from './thread-spools-480w.webp';
+import tideLine from './tide-line-320w.webp';
+import weaverHands from './weaver-hands-480w.webp';
 
 // The scenes of the chapter "Media Area" of /media: the Media Area of
 // Saltmarsh Museum, and its asset "Vessel with dry grasses". Read the scene

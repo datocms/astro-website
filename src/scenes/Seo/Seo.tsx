@@ -7,7 +7,7 @@ import {
 import { EditorScene, type EditorSceneOptions, type EditorStory } from '../editor';
 import { type FragmentSceneProps, Scene } from '../Scene';
 import favicon from './favicon.svg';
-import shareImage from './share.jpg';
+import shareImage from './share-1200w.webp';
 import {
   EVENT,
   EVENT_ICON,

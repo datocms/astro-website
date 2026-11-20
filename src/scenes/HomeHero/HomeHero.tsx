@@ -8,7 +8,7 @@ import {
   StructuredTextInput,
 } from '@datocms/product-scenes';
 import { Scene, type SceneAppearance } from '../Scene';
-import cover from './cover.jpg';
+import cover from './cover-640w.webp';
 
 const folder = (id: string, name: string): ContentSidebarItem => ({
   kind: 'folder',
@@ -111,6 +111,8 @@ export function HomeHeroScene({
       description="The record editor of DatoCMS: the menu of the models, a blog post with its structured text content, and the panel with the record info."
       height={height}
       width={width}
+      // The scene is at the top of the home page: its cover is near the LCP
+      imageLoading="eager"
     >
       <RecordEditorLayout
         navigationBar={

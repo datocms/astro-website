@@ -4,10 +4,10 @@ import { type FragmentSceneProps, type SceneAppearance, Scene } from '../Scene';
 import { AUDIO_TRACK, COLLECTION, TRACKS, VIDEO } from './story';
 // The frame of the thumbnail, at 1:30: hands that sew a fabric with a
 // needle (16:9, a photo from Unsplash: scripts/unsplash-photos.mjs)
-import frame from './restoring-tide-line.jpg';
+import frame from './restoring-tide-line-1200w.webp';
 // The frame of the player, at 2:40: the same hands smooth the linen and
 // pull the thread (edited from the frame at 1:30, see `edited` in PHOTOS)
-import laterFrame from './restoring-tide-line-later.jpg';
+import laterFrame from './restoring-tide-line-later-1200w.webp';
 
 // The scenes of the chapter "Video API" of /media: the page of the video
 // Restoring Tide Line, with the player, the marker of the thumbnail and
