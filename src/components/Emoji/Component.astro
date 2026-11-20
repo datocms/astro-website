@@ -17,7 +17,10 @@ const logo = name in logos ? logos[name as keyof typeof logos] : undefined;
 const pixel = name in pixelEmojis ? pixelEmojis[name as keyof typeof pixelEmojis] : undefined;
 ---
 
-<span class:list={[styles.emoji, styles[name], logo && styles.logo]} data-emoji={name}>
+<span
+  class:list={[styles.emoji, styles[name], logo && styles.logo, pixel && styles.drawing]}
+  data-emoji={name}
+>
   {logo && <span class={styles.mark} aria-hidden="true" set:html={logo} />}
   {pixel && <PixelEmoji emoji={pixel} class={styles.pixel} animated trim />}{
     text && <span class="visuallyHidden">{text}</span>
