@@ -143,8 +143,13 @@ export function seoTitle(newTitle: string) {
   return [seoPageTitle(newTitle), ...seoShareTitle(newTitle)];
 }
 
+/**
+ * The size of the generated card: 1.91:1, the ratio of the feeds of
+ * LinkedIn, Facebook and Slack. X crops it to 2:1: the card keeps its text
+ * inside that crop.
+ */
 export const ogCardWidth = 1200;
-export const ogCardHeight = 700;
+export const ogCardHeight = 630;
 
 /**
  * The size of the OG image of an article: the cover grid of 100 × 58 cells,

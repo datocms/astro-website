@@ -1,0 +1,362 @@
+---
+import { render as toPlainText } from 'datocms-structured-text-to-plain-text';
+import * as compare from '~/data/compare';
+import * as home from '~/data/home';
+import * as partners from '~/data/partners';
+import * as wall from '~/data/wall-of-love';
+import Layout from '~/layouts/Layout.astro';
+import { executeQuery } from '~/lib/datocms/executeQuery';
+import { graphql } from '~/lib/datocms/graphql';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { type OgCardData, ogCardUrl } from '~/lib/ogCardUrl';
+import {
+  academyCard,
+  caseStudyCard,
+  compareCard,
+  partnerCard,
+  pluginCard,
+  productUpdateCard,
+  showcaseCard,
+  starterCard,
+  userGuideCard,
+} from '~/lib/ogCards';
+
+// Show the OG cards of the site (`/og-card/index.png`), as a social feed
+// shows them: for each kind of page, the cards of a few records of the CMS.
+// The cards come from the functions of `~/lib/ogCards`, which the pages use.
+//
+// The OG images of the blog are the covers of the posts: `/dev/cover-gallery`
+// shows them.
+//
+// This page is not in src/pages/. The integration "dev-tools" in
+// astro.config.ts adds its route.
+
+const query = graphql(/* GraphQL */ `
+  query OgGallery {
+    popularPlugins: allPlugins(first: 4, orderBy: installs_DESC) {
+      ...OgGalleryPlugin
+    }
+    newPlugins: allPlugins(first: 4, orderBy: releasedAt_DESC) {
+      ...OgGalleryPlugin
+    }
+    starters: allTemplateDemos(first: 4, orderBy: position_ASC) {
+      code
+      name
+      technology {
+        name
+      }
+      screenshot {
+        url(imgixParams: { w: 900, h: 600, fit: crop, crop: top, fm: jpg })
+      }
+    }
+    caseStudies: allSuccessStories(first: 4, orderBy: position_ASC) {
+      slug
+      name
+      title {
+        value
+      }
+      logo {
+        pngUrl: url(imgixParams: { fm: png, w: 720, h: 320, fit: max })
+      }
+      numbers {
+        number
+        label
+      }
+    }
+    showcase: allShowcaseProjects(first: 4, orderBy: _createdAt_DESC) {
+      slug
+      name
+      headline {
+        value
+      }
+      partner {
+        slug
+        name
+      }
+      mainImage {
+        url(imgixParams: { w: 900, h: 600, fit: crop, crop: top, fm: jpg })
+      }
+    }
+    partners: allPartners(first: 3, orderBy: _createdAt_DESC) {
+      slug
+      name
+      shortDescription {
+        value
+      }
+      logo {
+        pngUrl: url(imgixParams: { fm: png, w: 720, h: 320, fit: max })
+      }
+      projects: _allReferencingShowcaseProjectsMeta {
+        count
+      }
+    }
+    techPartners: allTechPartners(first: 3, orderBy: _createdAt_DESC) {
+      slug
+      name
+      shortDescription {
+        value
+      }
+      logo {
+        pngUrl: url(imgixParams: { fm: png, w: 720, h: 320, fit: max })
+      }
+    }
+    productUpdates: allChangelogEntries(first: 4, orderBy: _firstPublishedAt_DESC) {
+      slug
+      title
+      _firstPublishedAt
+      categories {
+        name
+      }
+    }
+    comparisons: allProductComparisons(first: 3) {
+      slug
+      product
+    }
+    academy: allAcademyCourses(first: 3, orderBy: position_ASC) {
+      slug
+      name
+      chapters {
+        slug
+        title
+      }
+    }
+    userGuides: allUserGuidesChapters(first: 3, orderBy: position_ASC) {
+      slug
+      title
+      videos {
+        slug
+        title
+        video {
+          video {
+            duration
+          }
+        }
+      }
+    }
+  }
+
+  fragment OgGalleryPlugin on PluginRecord {
+    packageName
+    title
+    description
+    installs
+    version
+    author {
+      name
+      official
+    }
+    coverImage {
+      url(imgixParams: { w: 960, h: 640, fit: crop, fm: jpg })
+    }
+  }
+`);
+
+const data = await executeQuery(Astro, query);
+const plain = (field: { value: unknown } | null | undefined) =>
+  field ? (toPlainText(field.value as Parameters<typeof toPlainText>[0]) ?? '') : '';
+
+type Card = { path: string; data: OgCardData };
+type Group = { name: string; cards: Card[] };
+
+const plugin = (record: (typeof data.popularPlugins)[number]): Card => ({
+  path: `/plugins/i/${record.packageName}`,
+  data: pluginCard({
+    title: record.title,
+    description: record.description,
+    coverUrl: record.coverImage?.url,
+    installs: record.installs,
+    version: record.version,
+    author: record.author,
+  }),
+});
+
+const groups: Group[] = [
+  {
+    name: 'Pages with a hero',
+    cards: [
+      {
+        path: '/',
+        data: {
+          title: home.hero.headline,
+          theme: home.homeTheme,
+          picture: { kind: 'product', scene: 'editor' },
+        },
+      },
+      {
+        path: '/wall',
+        data: {
+          title: wall.hero.headline,
+          excerpt: wall.hero.subheadline,
+          theme: 'pink',
+          picture: { kind: 'product', scene: 'editor' },
+        },
+      },
+    ],
+  },
+  { name: 'Plugins: the most popular', cards: data.popularPlugins.map(plugin) },
+  { name: 'Plugins: the newest', cards: data.newPlugins.map(plugin) },
+  {
+    name: 'Starters',
+    cards: data.starters.map((starter) => ({
+      path: `/starters/${starter.code}`,
+      data: starterCard({
+        name: starter.name,
+        technology: starter.technology?.name,
+        screenshotUrl: starter.screenshot.url,
+      }),
+    })),
+  },
+  {
+    name: 'Case studies',
+    cards: data.caseStudies.map((story) => ({
+      path: `/case-studies/${story.slug}`,
+      data: caseStudyCard({
+        name: story.name,
+        title: plain(story.title),
+        logoPngUrl: story.logo.pngUrl,
+        number: story.numbers[0],
+      }),
+    })),
+  },
+  {
+    name: 'Showcase projects',
+    cards: data.showcase.map((project) => ({
+      path: `/partners/${project.partner.slug}/showcase/${project.slug}`,
+      data: showcaseCard({
+        name: project.name,
+        headline: plain(project.headline),
+        partner: project.partner.name,
+        imageUrl: project.mainImage.url,
+      }),
+    })),
+  },
+  {
+    name: 'Partners',
+    cards: [
+      ...data.partners.map((record) => ({
+        path: `/partners/${record.slug}`,
+        data: partnerCard({
+          kicker: partners.partner.kicker,
+          name: record.name,
+          description: plain(record.shortDescription),
+          logoPngUrl: record.logo.pngUrl,
+          projects: record.projects.count,
+        }),
+      })),
+      ...data.techPartners.map((record) => ({
+        path: `/tech-partners/${record.slug}`,
+        data: partnerCard({
+          kicker: partners.techPartner.kicker,
+          name: record.name,
+          description: plain(record.shortDescription),
+          logoPngUrl: record.logo.pngUrl,
+        }),
+      })),
+    ],
+  },
+  {
+    name: 'Product updates',
+    cards: data.productUpdates.map((entry) => ({
+      path: `/product-updates/${entry.slug}`,
+      data: productUpdateCard({
+        title: entry.title,
+        categories: entry.categories.map((category) => category.name),
+        publishedAt: entry._firstPublishedAt!,
+      }),
+    })),
+  },
+  {
+    name: 'Compare',
+    cards: data.comparisons.map((comparison) => ({
+      path: `/compare/${comparison.slug}`,
+      data: compareCard({ headline: compare.hero.headline, product: comparison.product }),
+    })),
+  },
+  {
+    name: 'Academy',
+    cards: data.academy.flatMap((course) =>
+      course.chapters.slice(0, 1).map((chapter) => ({
+        path: `/academy/${course.slug}/${chapter.slug}`,
+        data: academyCard({ title: chapter.title, course: course.name }),
+      })),
+    ),
+  },
+  {
+    name: 'User guides',
+    cards: data.userGuides.flatMap((chapter) =>
+      chapter.videos.slice(0, 1).map((episode) => ({
+        path: `/user-guides/${chapter.slug}/${episode.slug}`,
+        data: userGuideCard({
+          title: episode.title,
+          chapter: chapter.title,
+          duration: episode.video.video.duration,
+        }),
+      })),
+    ),
+  },
+];
+
+// The URL of a card is on the public hostname of the site. The gallery asks
+// this server for it: the cards then show the code of the working tree.
+const cardSrc = (card: OgCardData) => {
+  const url = new URL(ogCardUrl(card, Astro));
+  return `${Astro.url.origin}${url.pathname}${url.search}`;
+};
+
+const seo = overrideSeo([], seoTitle('OG gallery'));
+---
+
+<Layout seo={seo} theme="purple" headerVariant={false} footer={false}>
+  {
+    groups.map((group) => (
+      <section class="section">
+        <h2 class="label">{group.name}</h2>
+        <ul class="grid">
+          {group.cards.map((card) => (
+            <li>
+              <a href={card.path}>
+                <img
+                  class="card"
+                  src={cardSrc(card.data)}
+                  width="1200"
+                  height="630"
+                  loading="lazy"
+                  alt=""
+                />
+              </a>
+              <p class="caption label">{card.path}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</Layout>
+
+<style>
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  /* The size of a card in a feed: 500 px wide. */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 500px);
+    gap: var(--space-xl) var(--space-lg);
+    list-style: none;
+  }
+
+  .card {
+    display: block;
+    width: 500px;
+    height: auto;
+  }
+
+  .caption {
+    margin-top: var(--space-2xs);
+    color: var(--text-muted);
+  }
+</style>

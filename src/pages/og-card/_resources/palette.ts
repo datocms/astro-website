@@ -32,6 +32,20 @@ export interface OgPalette {
   border: string;
   /** `--theme-pixel-highlight`: the light tone of a cover on the ink half. */
   highlight: string;
+  /** `--text-on-accent-muted`, on the accent: the kicker of the card. */
+  accentMuted: string;
+  /** `--text-on-accent-headline-muted`, on the accent: the quiet run of the headline. */
+  accentHeadlineMuted: string;
+  /** `--border-on-accent-strong`, on the accent: the outline of a chip. */
+  accentBorder: string;
+  /** `--surface-inverse`: the ground of the proof half. */
+  inverse: string;
+  /** `--text-on-inverse-strong`, on the inverse: the large text of the proof. */
+  onInverseStrong: string;
+  /** `--text-on-inverse-muted`, on the inverse: the label of the proof. */
+  onInverseMuted: string;
+  /** `--border-on-inverse-strong`, on the inverse: the edge of a window. */
+  inverseBorder: string;
 }
 
 export const palettes: Record<Theme, OgPalette> = {
@@ -46,6 +60,13 @@ export const palettes: Record<Theme, OgPalette> = {
     plate: '#ffffff',
     border: '#e7e5dc',
     highlight: '#f8f2c2',
+    accentMuted: '#6b5028',
+    accentHeadlineMuted: '#866d32',
+    accentBorder: '#351615',
+    inverse: '#351615',
+    onInverseStrong: '#fdfff5',
+    onInverseMuted: '#b29e42',
+    inverseBorder: '#8f7735',
   },
   orange: {
     paper: '#fffbf5',
@@ -58,6 +79,13 @@ export const palettes: Record<Theme, OgPalette> = {
     plate: '#ffffff',
     border: '#e8dfd9',
     highlight: '#e8d855',
+    accentMuted: '#522113',
+    accentHeadlineMuted: '#78361d',
+    accentBorder: '#42180f',
+    inverse: '#42180f',
+    onInverseStrong: '#fffbf5',
+    onInverseMuted: '#df7038',
+    inverseBorder: '#994926',
   },
   green: {
     paper: '#f5fff5',
@@ -70,6 +98,13 @@ export const palettes: Record<Theme, OgPalette> = {
     plate: '#ffffff',
     border: '#dae9dd',
     highlight: '#eef0a8',
+    accentMuted: '#265534',
+    accentHeadlineMuted: '#3e7139',
+    accentBorder: '#1a4731',
+    inverse: '#1a4731',
+    onInverseStrong: '#f5fff5',
+    onInverseMuted: '#82c047',
+    inverseBorder: '#578e3e',
   },
   purple: {
     paper: '#f6f5ff',
@@ -82,6 +117,13 @@ export const palettes: Record<Theme, OgPalette> = {
     plate: '#ffffff',
     border: '#dfdcea',
     highlight: '#d1c4ff',
+    accentMuted: '#2f1650',
+    accentHeadlineMuted: '#4c2f7c',
+    accentBorder: '#18032e',
+    inverse: '#18032e',
+    onInverseStrong: '#f6f5ff',
+    onInverseMuted: '#8c66dd',
+    inverseBorder: '#5b3c93',
   },
   blue: {
     paper: '#edfeff',
@@ -94,6 +136,13 @@ export const palettes: Record<Theme, OgPalette> = {
     plate: '#ffffff',
     border: '#d7eaec',
     highlight: '#cbf5ee',
+    accentMuted: '#204b5b',
+    accentHeadlineMuted: '#2b687c',
+    accentBorder: '#1a3a47',
+    inverse: '#1a3a47',
+    onInverseStrong: '#edfeff',
+    onInverseMuted: '#47b2d2',
+    inverseBorder: '#35829a',
   },
   pink: {
     paper: '#fff7f8',
@@ -106,6 +155,13 @@ export const palettes: Record<Theme, OgPalette> = {
     plate: '#ffffff',
     border: '#ebdfe1',
     highlight: '#ffd6b3',
+    accentMuted: '#5d222c',
+    accentHeadlineMuted: '#7f3844',
+    accentBorder: '#3f0e16',
+    inverse: '#3f0e16',
+    onInverseStrong: '#fff7f8',
+    onInverseMuted: '#d06e7e',
+    inverseBorder: '#994957',
   },
   docs: {
     paper: '#ffffff',
@@ -118,5 +174,12 @@ export const palettes: Record<Theme, OgPalette> = {
     plate: '#ffffff',
     border: '#e8e8e9',
     highlight: '#d1c4ff',
+    accentMuted: '#262136',
+    accentHeadlineMuted: '#453769',
+    accentBorder: '#1a1923',
+    inverse: '#1a1923',
+    onInverseStrong: '#ffffff',
+    onInverseMuted: '#936ee6',
+    inverseBorder: '#5c478d',
   },
 };

@@ -1,25 +1,19 @@
-import wordmarkSvg from '~/assets/logo/wordmark.svg?raw';
 import type { OgPalette } from './palette';
 import { dataUri, pngSize, pngToPixels, trimBox, type Pixels } from './raster';
 
 /*
- * The picture of the OG card: the right half of the split, on the full
- * height of the card. A mark is always drawn as it is: the DatoCMS wordmark
- * as a vector, the logo of a partner as its own file. Never as cells.
- *
- * - With the logo of a partner, the half is a white plate, as the hero of a
- *   partner page (`LogoPlate`). The logo keeps its own colours, at the
- *   centre. A hairline separates the plate from the paper.
- * - Without a logo, the half is a band of the accent, with the DatoCMS
- *   wordmark in the text colour of the accent. The top row of the card
- *   then has no wordmark: the name is in the band.
+ * The logo half of the card: the logo of a customer or a partner on a
+ * white half, on the full height of the card, as the hero of a partner
+ * page (`LogoPlate`). A mark is always drawn as it is: the logo keeps its
+ * own colours, at the centre. The half touches the accent half with a
+ * hard cut.
  */
 export interface PictureOptions {
   width: number;
   height: number;
   palette: OgPalette;
-  /** A PNG of the logo of a partner. Without it, the picture shows the wordmark. */
-  logo?: Uint8Array | null;
+  /** A PNG of the logo. */
+  logo: Uint8Array;
 }
 
 /**
@@ -29,9 +23,6 @@ export interface PictureOptions {
  */
 const LOGO_AREA = 300 * 120;
 const LOGO_MAX = { w: 336, h: 200 };
-
-/** The space between the wordmark and the left and right edges of the band. */
-const WORDMARK_INSET = 56;
 
 /**
  * The border of a logo file that the picture removes: see-through pixels,
@@ -46,8 +37,16 @@ function cropOf(pixels: Pixels) {
   return clear || white ? trimBox(pixels, 20) : undefined;
 }
 
-/** The logo at the centre of the half, at the size that its shape gives. */
-async function logo(png: Uint8Array, width: number, height: number): Promise<string> {
+/**
+ * The half, as an SVG. The card puts it inline: resvg does not draw a
+ * picture inside an image, thus the half must not be an image.
+ */
+export async function picture({
+  width,
+  height,
+  palette,
+  logo: png,
+}: PictureOptions): Promise<string> {
   const size = pngSize(png);
   const crop = cropOf(await pngToPixels(png)) ?? { left: 0, top: 0, ...size };
   const ratio = crop.width / crop.height;
@@ -58,44 +57,8 @@ async function logo(png: Uint8Array, width: number, height: number): Promise<str
   h = Math.round(h * scale);
   const x = Math.round((width - w) / 2);
   const y = Math.round((height - h) / 2);
-  return `<svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="${crop.left} ${crop.top} ${crop.width} ${crop.height}" preserveAspectRatio="xMidYMid meet"><image href="${dataUri(png)}" width="${size.width}" height="${size.height}"/></svg>`;
-}
-
-/** The wordmark at the centre of the band, in one colour, as wide as the insets permit. */
-function wordmark(color: string, width: number, height: number): string {
-  const w = width - WORDMARK_INSET * 2;
-  // The ratio of the view box of the wordmark.
-  const [, , vw, vh] = wordmarkSvg
-    .match(/viewBox="([^"]+)"/)![1]!
-    .split(/\s+/)
-    .map(Number);
-  const h = Math.round((w * vh!) / vw!);
-  return wordmarkSvg
-    .replace(/currentColor/g, color)
-    .replace(
-      '<svg ',
-      `<svg x="${WORDMARK_INSET}" y="${Math.round((height - h) / 2)}" width="${w}" height="${h}" `,
-    );
-}
-
-/**
- * The picture, as an SVG. The card puts it inline: resvg does not draw a
- * picture inside an image, thus the picture must not be an image.
- */
-export async function picture({
-  width,
-  height,
-  palette,
-  logo: png,
-}: PictureOptions): Promise<string> {
-  const body = png
-    ? `<rect width="${width}" height="${height}" fill="${palette.plate}"/>
-  <rect width="1" height="${height}" fill="${palette.border}"/>
-  ${await logo(png, width, height)}`
-    : `<rect width="${width}" height="${height}" fill="${palette.accent}"/>
-  ${wordmark(palette.onAccent, width, height)}`;
-
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-  ${body}
+  <rect width="${width}" height="${height}" fill="${palette.plate}"/>
+  <svg x="${x}" y="${y}" width="${w}" height="${h}" viewBox="${crop.left} ${crop.top} ${crop.width} ${crop.height}" preserveAspectRatio="xMidYMid meet"><image href="${dataUri(png)}" width="${size.width}" height="${size.height}"/></svg>
 </svg>`;
 }

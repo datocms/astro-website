@@ -20,6 +20,7 @@ function computePalette(theme: (typeof THEMES)[number]): OgPalette {
   const paper = color('--surface-default');
   const ink = color('--text-on-page');
   const accent = color('--surface-accent');
+  const inverse = color('--surface-inverse');
   return {
     paper: toHex(paper),
     ink: toHex(ink),
@@ -31,6 +32,13 @@ function computePalette(theme: (typeof THEMES)[number]): OgPalette {
     plate: toHex(color('--surface-raised')),
     border: toHex(composite(color('--border-on-page'), paper)),
     highlight: toHex(color('--theme-pixel-highlight')),
+    accentMuted: toHex(composite(color('--text-on-accent-muted'), accent)),
+    accentHeadlineMuted: toHex(composite(color('--text-on-accent-headline-muted'), accent)),
+    accentBorder: toHex(composite(color('--border-on-accent-strong'), accent)),
+    inverse: toHex(inverse),
+    onInverseStrong: toHex(composite(color('--text-on-inverse-strong'), inverse)),
+    onInverseMuted: toHex(composite(color('--text-on-inverse-muted'), inverse)),
+    inverseBorder: toHex(composite(color('--border-on-inverse-strong'), inverse)),
   };
 }
 

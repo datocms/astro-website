@@ -1,0 +1,52 @@
+---
+import { AppWindow } from '~/components/AppWindow';
+import Layout from '~/layouts/Layout.astro';
+import { overrideSeo, seoTitle } from '~/lib/datocms/seo';
+import { THEMES, type Theme } from '~/lib/theme';
+import { HomeHeroScene } from '~/scenes/HomeHero/HomeHero';
+import { MediaLibraryScene } from '~/scenes/MediaLibrary/MediaLibrary';
+import { SchemaBuilderScene } from '~/scenes/SchemaBuilder/SchemaBuilder';
+
+// The product window of the OG card of a page with a hero
+// (`src/pages/og-card/_resources/scenes/`). The page shows one window, at
+// the top left of the viewport, at the size of the file: the script
+// `scripts/og-scenes.mjs` takes a screenshot of it.
+//
+// - `scene`: `editor` (the record editor), `schema` (the Schema builder),
+//   `media` (the Media Area), as in the home Features.
+// - `theme`: the theme of the card.
+//
+// This page is not in src/pages/. The integration "dev-tools" in
+// astro.config.ts adds its route.
+
+const scene = Astro.url.searchParams.get('scene') ?? 'editor';
+const param = Astro.url.searchParams.get('theme') as Theme | null;
+const theme: Theme = param && (THEMES as readonly string[]).includes(param) ? param : 'purple';
+const appearance = {
+  theme,
+  surface: (Astro.url.searchParams.get('surface') ?? 'default') as 'default' | 'inverse',
+};
+---
+
+<Layout seo={overrideSeo([], seoTitle('OG scenes'))} theme={theme}>
+  <div
+    id="og-scene"
+    style="position: fixed; inset: 0 auto auto 0; z-index: 1000; width: 1100px; height: 900px; display: flex;"
+  >
+    <AppWindow aria-hidden="true" style="flex: 1; display: flex; flex-direction: column;">
+      <div style="flex: 1; min-height: 0; overflow: hidden;">
+        {scene === 'editor' && <HomeHeroScene appearance={appearance} height={1100} />}
+        {
+          scene === 'schema' && (
+            <SchemaBuilderScene appearance={appearance} settings={false} height={1100} />
+          )
+        }
+        {
+          scene === 'media' && (
+            <MediaLibraryScene appearance={appearance} detail={false} height={1100} />
+          )
+        }
+      </div>
+    </AppWindow>
+  </div>
+</Layout>

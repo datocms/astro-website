@@ -311,6 +311,14 @@ export default defineConfig({
             entrypoint: './src/dev/cover-gallery.astro',
           });
           injectRoute({
+            pattern: '/dev/og-gallery',
+            entrypoint: './src/dev/og-gallery.astro',
+          });
+          injectRoute({
+            pattern: '/dev/og-scenes',
+            entrypoint: './src/dev/og-scenes.astro',
+          });
+          injectRoute({
             pattern: '/dev/button-gallery',
             entrypoint: './src/dev/button-gallery.astro',
           });

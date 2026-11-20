@@ -25,7 +25,7 @@ Read the voice in `BRAND.md` (sections 2, 4, 5 and 7) before you change any text
 - Text faces are in `src/lib/motion/faces.ts`. The copy names a face (`face: 'happy'`), never its glyphs, and only `Face` and the typewriter (`faceStep`) draw it. Add a new face there, and check it in `/dev/face-gallery` (`DESIGN.md`, "The Text Face Rule").
 - Motion: use the helpers in `src/lib/motion/`, CSS before JS. Reduced motion shows the final state, animations play only in view, no layout shift, and the final state is in the DOM without JS. No Lottie, and no video for what CSS can do.
 - `ChatCover` draws the cover of a casual chat from its guests: the portrait is a continuous black and white photograph, never cells. Its theme comes from the slug of the chat (`themeFromSlug` in `src/lib/theme.ts`).
-- The dev tools (`/dev/face-gallery`, `/dev/pxv-gallery`, `/dev/cover-gallery`, `/dev/button-gallery`) are in `src/dev/`, and the integration `dev-tools` in `astro.config.ts` adds their routes only in `astro dev`. The build and the deploys do not have them.
+- The dev tools (`/dev/face-gallery`, `/dev/pxv-gallery`, `/dev/cover-gallery`, `/dev/og-gallery`, `/dev/og-scenes`, `/dev/button-gallery`) are in `src/dev/`, and the integration `dev-tools` in `astro.config.ts` adds their routes only in `astro dev`. The build and the deploys do not have them.
 - After a new tarball of the scene kit in `vendor/`, run `npm install` and restart `astro dev`.
 
 ## Styling
