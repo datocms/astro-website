@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
-import { FASTLY_SERVICE_ID, SECRET_API_TOKEN } from 'astro:env/server';
-import { invalidateFastlySurrogateKeys } from '~/lib/fastly';
+import { SECRET_API_TOKEN } from 'astro:env/server';
+import { purgeCacheTags } from '~/lib/purgeCache';
 import { handleUnexpectedError, invalidRequestResponse, json } from '../_utils';
 
 type CdaCacheTagsInvalidateWebhook = {
@@ -29,9 +29,9 @@ export const POST: APIRoute = async ({ url, request }) => {
     const data = (await request.json()) as CdaCacheTagsInvalidateWebhook;
     const cacheTags = data.entity.attributes.tags;
 
-    const response = await invalidateFastlySurrogateKeys(cacheTags);
+    const response = await purgeCacheTags(cacheTags);
 
-    return json({ cacheTags, response, fastlyServiceId: FASTLY_SERVICE_ID });
+    return json({ cacheTags, response });
   } catch (error) {
     return handleUnexpectedError(request, error);
   }

@@ -1,5 +1,4 @@
 import type { APIRoute } from 'astro';
-import sharp from 'sharp';
 import {
   bubbleLayout,
   bubblePath,
@@ -15,6 +14,7 @@ import type { Theme } from '~/lib/theme';
 import { toArrayBuffer } from '~/lib/toArrayBuffer';
 import { handleUnexpectedError, invalidRequestResponse } from '~/pages/api/_utils';
 import { type OgPalette, palettes } from './_resources/palette';
+import { dataUri, pngToPixels, rgbToPng, svgToPng } from './_resources/raster';
 
 /*
  * The OG image of an article: its cover, with no text. A social feed shows
@@ -29,13 +29,13 @@ import { type OgPalette, palettes } from './_resources/palette';
 /** The endpoint loads files only from the asset CDN of DatoCMS. */
 const ASSET_HOST = 'www.datocms-assets.com';
 
-async function loadAsset(url: string): Promise<Buffer> {
+async function loadAsset(url: string): Promise<Uint8Array> {
   if (new URL(url).hostname !== ASSET_HOST) {
     throw new Error(`The OG cover loads files only from ${ASSET_HOST}`);
   }
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Could not load ${url} for the OG cover: HTTP ${res.status}`);
-  return Buffer.from(await res.arrayBuffer());
+  return new Uint8Array(await res.arrayBuffer());
 }
 
 const hexToRgb = (hex: string): Rgb => [
@@ -57,17 +57,14 @@ function themeColours(palette: OgPalette): ThemeColours {
  * A pixel cover. `drawCover` uses only `fillStyle` and `fillRect`, thus a
  * small context that fills an RGB buffer is sufficient.
  */
-async function postCover(url: string, palette: OgPalette): Promise<Buffer> {
-  const { data, info } = await sharp(await loadAsset(url))
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-  const { grid, error } = pixelsToGrid(data, info.width, info.height);
+async function postCover(url: string, palette: OgPalette): Promise<Uint8Array> {
+  const source = await pngToPixels(await loadAsset(url));
+  const { grid, error } = pixelsToGrid(source.data, source.width, source.height);
   if (!grid) throw new Error(`The OG cover cannot read ${url}: ${error}`);
 
   const width = ogCoverWidth;
   const height = ogCoverHeight;
-  const pixels = Buffer.alloc(width * height * 3);
+  const pixels = new Uint8Array(width * height * 3);
   let fill: Rgb = [0, 0, 0];
   const context = {
     // drawCover gives the colours as `rgb(r g b)`.
@@ -90,46 +87,45 @@ async function postCover(url: string, palette: OgPalette): Promise<Buffer> {
   };
   drawCover(context, grid, themeColours(palette), width, height);
 
-  return sharp(pixels, { raw: { width, height, channels: 3 } })
-    .png()
-    .toBuffer();
+  return rgbToPng(pixels, width, height);
 }
 
 /**
- * A portrait in black and white, as the CSS of `ChatCover` gives it:
- * `grayscale(1) contrast(1.05)`.
+ * A chat cover: the speech bubbles of the guests on the two grounds. A
+ * portrait is in black and white, as the CSS of `ChatCover` gives it:
+ * `grayscale(1) contrast(1.05)`. The filter of the SVG does the same.
  */
-async function portraitDataUri(url: string): Promise<string> {
-  const jpeg = await sharp(await loadAsset(url))
-    .grayscale()
-    .linear(1.05, -0.05 * 128)
-    .jpeg({ quality: 88 })
-    .toBuffer();
-  return `data:image/jpeg;base64,${jpeg.toString('base64')}`;
-}
-
-/** A chat cover: the speech bubbles of the guests on the two grounds. */
-async function chatCover(portraits: string[], palette: OgPalette): Promise<Buffer> {
+async function chatCover(portraits: string[], palette: OgPalette): Promise<Uint8Array> {
   const bubbles = bubbleLayout(portraits.length);
-  const images = await Promise.all(bubbles.map((_, index) => portraitDataUri(portraits[index]!)));
+  const images = await Promise.all(
+    bubbles.map(async (_, index) => dataUri(await loadAsset(portraits[index]!))),
+  );
 
   const shapes = bubbles
     .map((bubble, index) => {
       const photo = photoBox(bubble);
       return `<path d="${bubblePath(bubble)}" fill="${palette.paper}"/>
 <clipPath id="photo-${index}"><path d="${photoPath(bubble)}"/></clipPath>
-<image href="${images[index]}" x="${photo.x}" y="${photo.y}" width="${photo.size}" height="${photo.size}" preserveAspectRatio="xMidYMid slice" clip-path="url(#photo-${index})"/>`;
+<image href="${images[index]}" x="${photo.x}" y="${photo.y}" width="${photo.size}" height="${photo.size}" preserveAspectRatio="xMidYMid slice" clip-path="url(#photo-${index})" filter="url(#portrait)"/>`;
     })
     .join('');
 
   const seam = CHAT_COLUMNS / 2;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${ogCoverWidth}" height="${ogCoverHeight}" viewBox="0 0 ${CHAT_COLUMNS} ${CHAT_ROWS}" shape-rendering="crispEdges">
+<filter id="portrait" color-interpolation-filters="sRGB">
+<feColorMatrix type="saturate" values="0"/>
+<feComponentTransfer>
+<feFuncR type="linear" slope="1.05" intercept="-0.025"/>
+<feFuncG type="linear" slope="1.05" intercept="-0.025"/>
+<feFuncB type="linear" slope="1.05" intercept="-0.025"/>
+</feComponentTransfer>
+</filter>
 <rect width="${seam}" height="${CHAT_ROWS}" fill="${palette.accent}"/>
 <rect x="${seam}" width="${seam}" height="${CHAT_ROWS}" fill="${palette.ink}"/>
 ${shapes}
 </svg>`;
 
-  return sharp(Buffer.from(svg)).png().toBuffer();
+  return svgToPng(svg);
 }
 
 export const GET: APIRoute = async ({ request, url }) => {

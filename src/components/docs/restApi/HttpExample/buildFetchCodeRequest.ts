@@ -1,4 +1,4 @@
-import * as prettier from 'prettier';
+import * as prettier from '~/lib/prettier';
 import type { HttpExampleFetchRequest } from './buildFetchRequest';
 
 export async function buildFetchCodeRequest({

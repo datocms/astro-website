@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { LINKEDIN_PARTNER_ID } from 'astro:env/client';
-import { CONSENT_COOKIE_NAME, hasMarketingConsent } from '~/lib/consent';
+import { CONSENT_COOKIE_NAME, hasMarketingConsent, visitorCountry } from '~/lib/consent';
 import { GOOGLE_ADS_ID } from '~/lib/googleAds';
 
 // Usage:
@@ -315,8 +315,7 @@ const headers = {
 };
 
 export const GET: APIRoute = async ({ cookies, request }) => {
-  // 'client-geo-country' is exposed by Fastly via custom VCL snippet
-  const country = request.headers.get('client-geo-country');
+  const country = visitorCountry(request);
   const consented = hasMarketingConsent(request, cookies);
 
   return new Response(

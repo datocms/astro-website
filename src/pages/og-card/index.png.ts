@@ -1,16 +1,17 @@
 import type { APIRoute } from 'astro';
 import { truncate } from 'lodash-es';
-import satori from 'satori';
+import { satori } from '@cf-wasm/satori';
 import { html } from 'satori-html';
-import sharp from 'sharp';
 import css from 'style-object-to-css-string';
 import wordmarkSvg from '~/assets/logo/wordmark.svg?raw';
 import { ogCardHeight, ogCardWidth } from '~/lib/datocms/seo';
 import type { OgCardData } from '~/lib/ogCardUrl';
 import { toArrayBuffer } from '~/lib/toArrayBuffer';
 import { handleUnexpectedError, invalidRequestResponse } from '~/pages/api/_utils';
+import { UI_FONTS_BASE_URL } from 'astro:env/server';
 import { type OgPalette, palettes } from './_resources/palette';
 import { pixelPicture } from './_resources/pixelPicture';
+import { dataUri, svgToPng } from './_resources/raster';
 
 /*
  * The OG card: the page of the site, at the scale of a social feed.
@@ -280,13 +281,21 @@ export const GET: APIRoute = async ({ request, url }) => {
   try {
     // satori reads static TTF and OTF files only, thus the card uses the two
     // static instances of ABC Oracle in the font bucket, not the variable font.
-    const loadFont = (file: string) =>
-      fetch(new URL(`/fonts/${file}`, url)).then((res) => {
-        if (!res.ok) {
-          throw new Error(`Could not load ${file} for the OG card: HTTP ${res.status}`);
-        }
-        return res.arrayBuffer();
-      });
+    // The files come from the bucket, not from `/fonts/` of the site: a
+    // Worker that fetches its own hostname does not reach itself. The bucket
+    // is a Worker on workers.dev, and a Worker reaches it only through the
+    // service binding `UI_FONTS`. In local dev the binding can be absent or
+    // fail, thus the URL is the fallback.
+    const loadFont = async (file: string) => {
+      const fontUrl = `${UI_FONTS_BASE_URL}/${file}`;
+      const { env } = await import('cloudflare:workers');
+      let res = await env.UI_FONTS?.fetch(fontUrl).catch(() => undefined);
+      if (!res?.ok) res = await fetch(fontUrl);
+      if (!res.ok) {
+        throw new Error(`Could not load ${file} for the OG card: HTTP ${res.status}`);
+      }
+      return res.arrayBuffer();
+    };
 
     const rawData = url.searchParams.get('data');
 
@@ -304,11 +313,11 @@ export const GET: APIRoute = async ({ request, url }) => {
     const palette = palettes[data.theme ?? 'purple'] ?? palettes.purple;
 
     // A logo that does not load gives the symbol: the card never fails for it.
-    const loadLogo = async (): Promise<Buffer | null> => {
+    const loadLogo = async (): Promise<Uint8Array | null> => {
       if (!data.logoPngUrl) return null;
       try {
         const res = await fetch(data.logoPngUrl);
-        return res.ok ? Buffer.from(await res.arrayBuffer()) : null;
+        return res.ok ? new Uint8Array(await res.arrayBuffer()) : null;
       } catch {
         return null;
       }
@@ -320,27 +329,21 @@ export const GET: APIRoute = async ({ request, url }) => {
       loadLogo(),
     ]);
 
-    const [svg, picture] = await Promise.all([
-      satori(markup(data, palette) as any, {
-        width: ogCardWidth,
-        height: ogCardHeight,
-        fonts: [
-          { name: 'ABC Oracle', data: oracleRegular, style: 'normal', weight: 400 },
-          { name: 'ABC Oracle', data: oracleMedium, style: 'normal', weight: 500 },
-        ],
-      }),
-      pixelPicture({
-        width: ogCardWidth - PICTURE.x,
-        height: ogCardHeight,
-        palette,
-        logo,
-      }),
+    const fonts = [
+      { name: 'ABC Oracle', data: oracleRegular, style: 'normal' as const, weight: 400 as const },
+      { name: 'ABC Oracle', data: oracleMedium, style: 'normal' as const, weight: 500 as const },
+    ];
+    const picture = { width: ogCardWidth - PICTURE.x, height: ogCardHeight, palette };
+
+    const [svg, pictureSvg] = await Promise.all([
+      satori(markup(data, palette) as any, { width: ogCardWidth, height: ogCardHeight, fonts }),
+      // A logo that is not a PNG gives the symbol too.
+      pixelPicture({ ...picture, logo }).catch(() => pixelPicture(picture)),
     ]);
 
-    const png = await sharp(Buffer.from(svg))
-      .composite([{ input: picture, left: PICTURE.x, top: 0 }])
-      .png()
-      .toBuffer();
+    // The picture goes on the card as an image of the SVG of the card.
+    const image = `<image href="${dataUri(new TextEncoder().encode(pictureSvg), true)}" x="${PICTURE.x}" y="0" width="${picture.width}" height="${picture.height}"/>`;
+    const png = await svgToPng(svg.replace(/<\/svg>\s*$/, `${image}</svg>`));
 
     return new Response(toArrayBuffer(png), {
       status: 200,

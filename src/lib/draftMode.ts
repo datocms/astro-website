@@ -3,11 +3,11 @@ import { PUBLIC_HOSTNAME } from 'astro:env/client';
 import { DRAFT_MODE_HOSTNAME } from 'astro:env/server';
 
 export function isDraftModeEnabled(requestOrAstro: Request | AstroGlobal) {
-  const headers =
-    'headers' in requestOrAstro ? requestOrAstro.headers : requestOrAstro.request.headers;
+  const request = 'headers' in requestOrAstro ? requestOrAstro : requestOrAstro.request;
 
-  // Header set via custom VCL snippet on Fastly
-  return headers.get('x-original-host') !== PUBLIC_HOSTNAME;
+  // The Worker gets the host that the visitor asked for. Each host that is not
+  // the public host shows the drafts.
+  return new URL(request.url).host !== PUBLIC_HOSTNAME;
 }
 
 export function baseUrl(requestOrAstro: Request | AstroGlobal) {

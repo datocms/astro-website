@@ -1,6 +1,6 @@
-import sharp from 'sharp';
 import symbolSvg from '~/assets/logo/symbol.svg?raw';
 import type { OgPalette } from './palette';
+import { containToPixels, dataUri, pngSize, pngToPixels, trimBox } from './raster';
 
 /**
  * The picture of the OG card: a figure drawn as flat square cells on the
@@ -21,7 +21,7 @@ export interface PixelPictureOptions {
   height: number;
   palette: OgPalette;
   /** A PNG of a logo. Without it, the picture shows the DatoCMS symbol. */
-  logo?: Buffer | null;
+  logo?: Uint8Array | null;
 }
 
 type Tone = 'ground' | 'ink' | 'mid' | 'paper';
@@ -38,22 +38,26 @@ const SUPERSAMPLE = 8;
  * of the source in it.
  */
 async function rasterize(
-  source: Buffer | string,
+  source: Uint8Array | string,
   cols: number,
   rows: number,
   tones: 'one' | 'three',
 ): Promise<Tone[][]> {
-  const input = typeof source === 'string' ? Buffer.from(source) : source;
-  // A logo can have a border of empty pixels, or a white ground: cut both.
-  const trimmed = tones === 'three' ? sharp(input).trim({ threshold: 20 }) : sharp(input);
-  const { data, info } = await trimmed
-    .resize(cols * SUPERSAMPLE, rows * SUPERSAMPLE, {
-      fit: 'contain',
-      background: { r: 0, g: 0, b: 0, alpha: 0 },
-    })
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
+  const width = cols * SUPERSAMPLE;
+  const height = rows * SUPERSAMPLE;
+  let info;
+  if (typeof source === 'string') {
+    // The symbol is an SVG: it has no pixels of its own, thus its size here
+    // is only the ratio of its sides.
+    const uri = dataUri(new TextEncoder().encode(source), true);
+    info = await containToPixels({ uri, width, height }, width, height);
+  } else {
+    // A logo can have a border of empty pixels, or a white ground: cut both.
+    const size = pngSize(source);
+    const box = tones === 'three' ? trimBox(await pngToPixels(source), 20) : undefined;
+    info = await containToPixels({ uri: dataUri(source), ...size }, width, height, box);
+  }
+  const { data } = info;
 
   const gridCols = Math.floor(info.width / SUPERSAMPLE);
   const gridRows = Math.floor(info.height / SUPERSAMPLE);
@@ -85,12 +89,13 @@ async function rasterize(
   return grid;
 }
 
+/** The picture, as an SVG. */
 export async function pixelPicture({
   width,
   height,
   palette,
   logo,
-}: PixelPictureOptions): Promise<Buffer> {
+}: PixelPictureOptions): Promise<string> {
   const cell = logo ? LOGO_CELL : SYMBOL_CELL;
   const cols = Math.ceil(width / cell);
   const rows = Math.ceil(height / cell);
@@ -136,11 +141,9 @@ export async function pixelPicture({
     }
   }
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" shape-rendering="crispEdges">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" shape-rendering="crispEdges">
   <rect width="${width}" height="${height}" fill="${palette.accent}"/>
   <path d="${lines.join('')}" stroke="${palette.frameLine}" stroke-width="1"/>
   ${rects.join('')}
 </svg>`;
-
-  return sharp(Buffer.from(svg)).png().toBuffer();
 }

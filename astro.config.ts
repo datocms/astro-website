@@ -1,9 +1,10 @@
-import node from '@astrojs/node';
+import cloudflare from '@astrojs/cloudflare';
+import { cacheCloudflare } from '@astrojs/cloudflare/cache';
 import react from '@astrojs/react';
 import expressiveCode from 'astro-expressive-code';
 import { defineConfig, envField } from 'astro/config';
 import { readdirSync, readFileSync } from 'fs';
-import { writeFile } from 'fs/promises';
+import { rm, writeFile } from 'fs/promises';
 import type { Plugin } from 'vite';
 import { cssLayerArea } from './css-scope.mjs';
 import { readHeader } from './src/lib/pixel-video/format';
@@ -163,14 +164,6 @@ export default defineConfig({
         context: 'server',
         access: 'secret',
       }),
-      FASTLY_KEY: envField.string({
-        context: 'server',
-        access: 'secret',
-      }),
-      FASTLY_SERVICE_ID: envField.string({
-        context: 'server',
-        access: 'secret',
-      }),
       ROLLBAR_TOKEN: envField.string({
         context: 'server',
         access: 'secret',
@@ -284,23 +277,15 @@ export default defineConfig({
     react(),
     expressiveCode(),
     {
-      name: 'rollbar',
+      // The Cloudflare adapter writes the redirects of the config into
+      // `_redirects`. Cloudflare refuses that file: a rule with `*` or `:` makes
+      // all the rules after it dynamic, and the limit is 100 dynamic rules.
+      // The adapter also writes wrong targets for the `[...rest]` redirects.
+      // Thus we remove the file, and the Worker answers each redirect.
+      name: 'no-underscore-redirects',
       hooks: {
-        'astro:config:setup': async ({ injectScript }) => {
-          injectScript(
-            'page-ssr',
-            `
-              import Rollbar from 'rollbar';
-              import { DEPLOYMENT_DESTINATION, ROLLBAR_TOKEN } from 'astro:env/server';
-
-              new Rollbar({
-                accessToken: ROLLBAR_TOKEN,
-                captureUncaught: true,
-                captureUnhandledRejections: true,
-                environment: DEPLOYMENT_DESTINATION,
-              });
-            `,
-          );
+        'astro:build:done': async ({ dir }) => {
+          await rm(new URL('_redirects', dir), { force: true });
         },
       },
     },
@@ -382,6 +367,20 @@ export default defineConfig({
   // This project does not use static markdown, only remote. See our <Markdown /> component
   markdown: {},
   vite: {
+    // In `astro dev` the server code runs in workerd, and Vite bundles its
+    // dependencies before the first request. The scan does not find these
+    // three: without this list, Vite bundles them when a page first needs
+    // them and loads the program again. After that, a page with a React
+    // scene gets two copies of React and gives a 500 error.
+    ssr: {
+      optimizeDeps: {
+        include: [
+          'astro-expressive-code/components',
+          'datocms-structured-text-to-html-string',
+          'remove-markdown',
+        ],
+      },
+    },
     plugins: [
       cssLayers(),
       pxvHeaders(),
@@ -423,9 +422,16 @@ export default defineConfig({
       sourcemap: 'hidden',
     },
   },
-  adapter: node({
-    mode: 'standalone',
-  }),
+  // The tests (Vitest) need the Vite config of Astro, not the Worker: with the
+  // adapter, Vitest starts workerd and the tests do not run.
+  ...(process.env.VITEST
+    ? {}
+    : {
+        adapter: cloudflare(),
+        cache: {
+          provider: cacheCloudflare(),
+        },
+      }),
   security: {
     checkOrigin: false,
   },
@@ -492,7 +498,6 @@ export default defineConfig({
     '/legal/security': '/security',
     '/legal/privacy': '/legal/privacy-policy',
     '/pricing/compare': '/pricing',
-    '/partners/harvey-cameron/showcase/jacuzzi ': '/partners',
     '/use-cases': '/case-studies',
     '/lp/migcs': '/features',
     '/lp/migcs/thanks': '/features',
