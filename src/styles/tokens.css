@@ -94,6 +94,7 @@
   /* Brand: the accent of the orange theme (Ember) and the deep of the purple theme (Iris Deep). */
   --color-orange-light-5: #f07a3d;
   --color-purple-deep-5: #18032e;
+  --color-orange-deep-5: #1d0d08;
 
   /*
    * Code. The colours of the syntax in CodeSnippetPreview, built in OKLCH
@@ -271,10 +272,10 @@
 
 [data-theme='orange'] {
   --theme-paper: #fffbf5;
-  --theme-ink: #42180f;
-  --theme-ink-muted: #42180fb2;
-  --theme-ink-subtle: #42180f80;
-  --theme-ink-faint: #42180f1f;
+  --theme-ink: var(--color-orange-deep-5);
+  --theme-ink-muted: #1d0d08b2;
+  --theme-ink-subtle: #1d0d0880;
+  --theme-ink-faint: #1d0d081f;
   --theme-accent: var(--color-orange-light-5);
   --theme-accent-muted: #f07a3db2;
   --theme-accent-subtle: #f07a3d80;
@@ -292,8 +293,8 @@
   --theme-dark-ground-chroma: 0.021;
   --theme-alpha-dark-border: 18%;
   --theme-dark-ink: var(--theme-accent);
-  --theme-dark-inverse: #42180f;
-  --code-background: #2b1712;
+  --theme-dark-inverse: #271610;
+  --code-background: #211512;
   --code-plain: #f4e4dd;
   --code-keyword: #ffb897;
   --code-string: var(--color-code-green-soft);
@@ -569,9 +570,9 @@
 /*
  * The band of the dark scheme in the colour themes: the accent of the
  * light scheme, with the alphas of the text on the accent. The docs set
- * their own band, and an element of a colour theme in a page of the docs
- * must not inherit it: with `initial`, the band tokens of the dark scheme
- * use their fallback (the accent and the deep).
+ * their own band and footer, and an element of a colour theme in a page of
+ * the docs must not inherit them: with `initial`, the tokens of the dark
+ * scheme use their fallback (the accent and the deep).
  */
 :root,
 [data-theme='yellow'],
@@ -582,9 +583,21 @@
 [data-theme='pink'] {
   --theme-dark-band: initial;
   --theme-dark-band-ink: initial;
+  --theme-inverse-deep: initial;
+  --theme-dark-inverse-deep: initial;
   --theme-alpha-on-band-soft: 92%;
   --theme-alpha-on-band-muted: var(--theme-alpha-on-accent-muted);
   --theme-alpha-on-band-headline-muted: var(--theme-alpha-on-accent-headline-muted);
+}
+
+/*
+ * The deep of the orange theme is near black (L 0.18): a footer 0.06 darker
+ * is black. Its footer is 0.03 darker, in both schemes. This rule comes
+ * after the rule above, which sets the two hooks to `initial`.
+ */
+[data-theme='orange'] {
+  --theme-inverse-deep: oklch(from var(--theme-ink) calc(l - 0.03) c h);
+  --theme-dark-inverse-deep: oklch(from var(--theme-dark-inverse) calc(l - 0.03) c h);
 }
 
 /*
@@ -635,7 +648,10 @@
   --surface-inverse-subtle: var(--theme-ink-subtle);
   --surface-inverse-faint: var(--_ground-surface-inverse-faint, var(--theme-ink-faint));
   /* The second deep block (the footer): the inverse, a little darker. */
-  --surface-inverse-deep: oklch(from var(--theme-ink) calc(l - 0.06) c h);
+  --surface-inverse-deep: var(
+    --theme-inverse-deep,
+    oklch(from var(--theme-ink) calc(l - 0.06) c h)
+  );
   --surface-accent: var(--theme-accent);
   /*
    * The accent band: the accent as a large area that cannot take

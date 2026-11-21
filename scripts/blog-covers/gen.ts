@@ -113,7 +113,7 @@ type CoverRecord = {
 const THEME_HEX: Record<string, { accent: string; ink: string; paper: string; highlight: string }> =
   {
     yellow: { accent: '#e8d855', ink: '#351615', paper: '#fdfff5', highlight: '#f8f2c2' },
-    orange: { accent: '#f07a3d', ink: '#42180f', paper: '#fffbf5', highlight: '#e8d855' },
+    orange: { accent: '#f07a3d', ink: '#1d0d08', paper: '#fffbf5', highlight: '#e8d855' },
     green: { accent: '#93d44b', ink: '#1a4731', paper: '#f5fff5', highlight: '#eef0a8' },
     purple: { accent: '#9d75f7', ink: '#18032e', paper: '#f6f5ff', highlight: '#d1c4ff' },
     blue: { accent: '#50c9ed', ink: '#1a3a47', paper: '#edfeff', highlight: '#cbf5ee' },

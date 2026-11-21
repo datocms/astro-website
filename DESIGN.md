@@ -5,7 +5,7 @@ colors:
   espresso: '#351615'
   pollen: '#e8d855'
   cream-paper: '#fdfff5'
-  ember-deep: '#42180f'
+  ember-deep: '#1d0d08'
   ember: '#f07a3d'
   ember-paper: '#fffbf5'
   fern-deep: '#1a4731'
@@ -204,7 +204,7 @@ The names here are the design names. In `tokens.css` each theme block gives its 
 | Theme (`data-theme`) | Accent (`--theme-accent`)                 | Deep (`--theme-ink`)                        | Paper (`--theme-paper`)         |
 | -------------------- | ----------------------------------------- | ------------------------------------------- | ------------------------------- |
 | `yellow`             | Pollen `#e8d855` `--color-yellow-light-5` | Espresso `#351615`                          | Cream Paper `#fdfff5`           |
-| `orange`             | Ember `#f07a3d` `--color-orange-light-5`  | Ember Deep `#42180f`                        | Ember Paper `#fffbf5`           |
+| `orange`             | Ember `#f07a3d` `--color-orange-light-5`  | Ember Deep `#1d0d08`                        | Ember Paper `#fffbf5`           |
 | `green`              | Fern `#93d44b`                            | Fern Deep `#1a4731`                         | Fern Paper `#f5fff5`            |
 | `purple`             | Iris `#9d75f7` `--color-purple-light-5`   | Iris Deep `#18032e` `--color-purple-deep-5` | Iris Paper `#f6f5ff`            |
 | `blue`               | Glacier `#50c9ed`                         | Harbour Deep `#1a3a47`                      | Glacier Paper `#edfeff`         |
