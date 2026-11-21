@@ -61,6 +61,11 @@
   gap: var(--space-xs);
 }
 
+/*
+ * The symbol follows the logo rule of BRAND.md: the ink of the theme on a
+ * light ground, the accent on a dark ground. The symbol of the drawer has
+ * the same colours.
+ */
 .logo {
   display: flex;
   align-items: center;
@@ -503,4 +508,14 @@
       var(--docs-article-width) + var(--space-2xl) + var(--docs-toc-width) + 2 * var(--space-lg)
     );
   }
+}
+
+/*
+ * In the dark scheme the symbol is the accent: the logo rule of BRAND.md
+ * gives the accent on a dark ground, and no token of the docs gives the
+ * accent as a logo colour in one scheme only.
+ */
+:global(:root[data-color-scheme='dark']) :is(.logo, .drawerSymbol) {
+  /* stylelint-disable-next-line datocms/text-roles -- A logo is an image, not text. */
+  color: var(--surface-accent);
 }
