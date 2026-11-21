@@ -35,8 +35,14 @@ export const LOCALES = [
 ] as const;
 
 /**
- * The locale that the form shows: Italian, a target. Its fields are empty
- * until the jobs of Italian end.
+ * The locale that the form shows first: English, the source, with its
+ * fields filled. The editor then clicks the tab of Italian.
+ */
+export const SOURCE_LOCALE = 'en';
+
+/**
+ * The locale that the form shows after the click: Italian, a target. Its
+ * fields are empty until the jobs of Italian end.
  */
 export const ACTIVE_LOCALE = 'it';
 
@@ -46,6 +52,13 @@ export const SLUG_PREFIX = 'https://marram.cc/products/';
 
 export const PRODUCT_TITLE = 'Rolltop pannier 20 L';
 
+export const PRODUCT_EN = {
+  name: PRODUCT_TITLE,
+  slug: 'rolltop-pannier-20-l',
+  intro: 'Twenty liters, one roll-top closure, no zip that can fail.',
+  body: 'The shell is welded waterproof fabric, and the hooks fit racks from 8 to 16 mm with no tools. Roll the top three times, close the clip, and the rain stays out.',
+} as const;
+
 export const PRODUCT_IT = {
   name: 'Borsa rolltop 20 L',
   slug: 'borsa-rolltop-20-l',
@@ -54,15 +67,20 @@ export const PRODUCT_IT = {
 } as const;
 
 /**
- * The block of the field Body, open, with its fields in Italian. The job
- * of Body keeps it where it is, between the two paragraphs, and also
- * translates its fields.
+ * The block of the field Body, open. The job of Body keeps it where it
+ * is, between the two paragraphs, and also translates its fields.
  */
 export const SIZING_CHART = {
   name: 'Sizing chart',
   icon: '📏',
-  dimensions: '33 × 17 × 48 cm, 1,1 kg',
-  care: 'Lava a mano con acqua tiepida e lascia asciugare aperta.',
+  en: {
+    dimensions: '33 × 17 × 48 cm, 1.1 kg',
+    care: 'Hand wash in warm water and let it dry open.',
+  },
+  it: {
+    dimensions: '33 × 17 × 48 cm, 1,1 kg',
+    care: 'Lava a mano con acqua tiepida e lascia asciugare aperta.',
+  },
 } as const;
 
 /**
@@ -117,4 +135,4 @@ export const RECORD_INFO = {
   createdBy: 'Demo User',
 } as const;
 
-export const DESCRIPTION = `The record editor of DatoCMS with the product “${PRODUCT_TITLE}”, on the Italian tab. In the aside, the panel AI Translations: from English to Italian, German and French, and the button Translate all fields. After the click, a progress bar and one line with the job in progress: Name, Slug and Body, each to Italian, German and French. The Italian fields fill one by one: “${PRODUCT_IT.name}”, the slug “${PRODUCT_IT.slug}”, and the body in Italian, with the block Sizing chart where it was, its fields also in Italian. At the end the panel says: ${DONE_MESSAGE}`;
+export const DESCRIPTION = `The record editor of DatoCMS with the product “${PRODUCT_TITLE}”, on the English tab, with its fields filled in English. The editor clicks the Italian tab, where the fields are empty. In the aside, the panel AI Translations: from English to Italian, German and French, and the button Translate all fields. After the click, a progress bar and one line with the job in progress: Name, Slug and Body, each to Italian, German and French. The Italian fields fill one by one: “${PRODUCT_IT.name}”, the slug “${PRODUCT_IT.slug}”, and the body in Italian, with the block Sizing chart where it was, its fields also in Italian. At the end the panel says: ${DONE_MESSAGE}`;

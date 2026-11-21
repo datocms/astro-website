@@ -14,6 +14,7 @@ import {
   FILLS_AT,
   JOBS,
   LOCALES,
+  PRODUCT_EN,
   PRODUCT_ICON,
   PRODUCT_IT,
   PRODUCT_TITLE,
@@ -23,13 +24,15 @@ import {
   SIDEBAR_OTHER_FOLDERS,
   SIZING_CHART,
   SLUG_PREFIX,
+  SOURCE_LOCALE,
   TARGET_LOCALES,
   USER_NAME,
 } from './story';
 
 // The frame of the chapter "AI translations" of /ai: the product "Rolltop
-// pannier 20 L" in the record editor, on the Italian tab, and the panel AI
-// Translations of the plugin in the aside. Read the scene rules in the
+// pannier 20 L" in the record editor, first on the English tab, then on
+// the Italian tab, and the panel AI Translations of the plugin in the
+// aside. Read the scene rules in the
 // README of @datocms/product-scenes. All the values are fixed, thus the
 // markup is the same on each render.
 //
@@ -47,18 +50,28 @@ const STORY: EditorStory = {
   record: RECORD_INFO,
 };
 
+/**
+ * A field in the three states of the run: filled in English (`source`)
+ * until the click on the Italian tab, empty in Italian until its job ends
+ * (`at`), then filled in Italian.
+ */
 function Translated({
   at,
+  source,
   empty,
   children,
 }: {
   at: string;
+  source: ReactNode;
   empty: ReactNode;
   children: ReactNode;
 }) {
   return (
     <>
-      <div data-until={at}>{empty}</div>
+      <div data-until="rest">{source}</div>
+      <div data-from="rest" data-until={at}>
+        {empty}
+      </div>
       <div className={styles.filled} data-from={at}>
         {children}
       </div>
@@ -66,10 +79,32 @@ function Translated({
   );
 }
 
+/** The field Body, with the block Sizing chart between its two paragraphs */
+function Body({ locale }: { locale: 'en' | 'it' }) {
+  const product = locale === 'en' ? PRODUCT_EN : PRODUCT_IT;
+  const chart = SIZING_CHART[locale];
+
+  return (
+    <StructuredTextInput>
+      <StructuredTextInput.Paragraph>{product.intro}</StructuredTextInput.Paragraph>
+      <StructuredTextInput.Block name={SIZING_CHART.name} icon={SIZING_CHART.icon}>
+        <RecordForm.Field label="Dimensions" localized>
+          <RecordForm.StringInput value={chart.dimensions} />
+        </RecordForm.Field>
+        <RecordForm.Field label="Care" localized>
+          <RecordForm.StringInput value={chart.care} />
+        </RecordForm.Field>
+      </StructuredTextInput.Block>
+      <StructuredTextInput.Paragraph>{product.body}</StructuredTextInput.Paragraph>
+    </StructuredTextInput>
+  );
+}
+
 /**
- * The record editor with the product on the Italian tab, and the panel AI
- * Translations after the record info. The scene plays its own sequence
- * (AI_TRANSLATIONS_SEQUENCE): the click on "Translate all fields", the
+ * The record editor with the product, and the panel AI Translations after
+ * the record info. The scene plays its own sequence
+ * (AI_TRANSLATIONS_SEQUENCE): the English tab with its fields filled, the
+ * click on the Italian tab, the click on "Translate all fields", the
  * jobs, a few at a time, and the Italian fields that fill when their jobs
  * end. From the first field that fills, the toolbar shows the unsaved
  * changes and the button Save. The still is the end of the run: the
@@ -96,18 +131,23 @@ export function TranslationsScene(options: EditorSceneOptions & { minWidth?: num
       <RecordForm
         title={PRODUCT_TITLE}
         icon={PRODUCT_ICON}
-        locales={{ tabs: [...LOCALES], active: ACTIVE_LOCALE }}
+        locales={{ tabs: [...LOCALES], active: ACTIVE_LOCALE, switchFrom: SOURCE_LOCALE }}
         status={RECORD_INFO.status}
         dirty="after-translations"
       >
         <RecordForm.Field label="Name" required localized>
-          <Translated at={FILLS_AT.name} empty={<RecordForm.StringInput value="" large />}>
+          <Translated
+            at={FILLS_AT.name}
+            source={<RecordForm.StringInput value={PRODUCT_EN.name} large />}
+            empty={<RecordForm.StringInput value="" large />}
+          >
             <RecordForm.StringInput value={PRODUCT_IT.name} large />
           </Translated>
         </RecordForm.Field>
         <RecordForm.Field label="Slug" required localized>
           <Translated
             at={FILLS_AT.slug}
+            source={<RecordForm.SlugInput prefix={SLUG_PREFIX} value={PRODUCT_EN.slug} />}
             empty={<RecordForm.SlugInput prefix={SLUG_PREFIX} value="" />}
           >
             <RecordForm.SlugInput prefix={SLUG_PREFIX} value={PRODUCT_IT.slug} />
@@ -116,24 +156,14 @@ export function TranslationsScene(options: EditorSceneOptions & { minWidth?: num
         <RecordForm.Field label="Body" localized>
           <Translated
             at={FILLS_AT.body}
+            source={<Body locale="en" />}
             empty={
               <StructuredTextInput>
                 <StructuredTextInput.Paragraph>{''}</StructuredTextInput.Paragraph>
               </StructuredTextInput>
             }
           >
-            <StructuredTextInput>
-              <StructuredTextInput.Paragraph>{PRODUCT_IT.intro}</StructuredTextInput.Paragraph>
-              <StructuredTextInput.Block name={SIZING_CHART.name} icon={SIZING_CHART.icon}>
-                <RecordForm.Field label="Dimensions" localized>
-                  <RecordForm.StringInput value={SIZING_CHART.dimensions} />
-                </RecordForm.Field>
-                <RecordForm.Field label="Care" localized>
-                  <RecordForm.StringInput value={SIZING_CHART.care} />
-                </RecordForm.Field>
-              </StructuredTextInput.Block>
-              <StructuredTextInput.Paragraph>{PRODUCT_IT.body}</StructuredTextInput.Paragraph>
-            </StructuredTextInput>
+            <Body locale="it" />
           </Translated>
         </RecordForm.Field>
       </RecordForm>
