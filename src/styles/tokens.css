@@ -482,32 +482,27 @@
 }
 
 /*
- * The docs theme: a white page, the slate ink, the purple accent. The docs
+ * The docs theme: a white page, a neutral ink, the orange accent. The docs
  * are a tool, not a story: the page is white, and the ink is a near black
- * with a small tint of violet (OKLCH L 0.22, C 0.02, hue 290). The accent
- * is the purple of the site (--color-purple-light-5, hue 295): the links
- * take a deep tone of it (--text-accent). DESIGN.md calls the ink Docs Ink.
+ * with no hue (OKLCH L 0.22, C 0). Only the accent has a hue: it is the
+ * orange of the brand (--color-orange-light-5), and the links take a deep
+ * tone of it (--text-accent). DESIGN.md calls the ink Docs Ink.
  * The callouts do not take the hue of the theme: each kind has its own hue
  * (--theme-status-*). The data inherits, thus a ground class inside the
  * docs keeps the callout colours.
  */
 [data-theme='docs'] {
   --theme-paper: var(--color-white);
-  --theme-ink: #1a1923;
-  --theme-ink-muted: #1a1923b2;
-  --theme-ink-subtle: #1a192380;
-  --theme-ink-faint: #1a19231a;
-  --theme-accent: var(--color-purple-light-5);
-  --theme-accent-muted: var(--color-purple-light-3);
-  --theme-accent-subtle: var(--color-purple-light-2);
-  /*
-   * The faint tint is 9% of the accent, not 10% (the faint tint of the
-   * purple theme): the docs ink is lighter than Iris Deep, and the accent
-   * text of a soft button on the inverse needs 4.6:1 on it.
-   */
-  --theme-accent-faint: #9d75f718;
-  --theme-accent-bright: #ab89ff;
-  --theme-pixel-highlight: var(--color-lilac-pale);
+  --theme-ink: #1b1b1b;
+  --theme-ink-muted: #1b1b1bb2;
+  --theme-ink-subtle: #1b1b1b80;
+  --theme-ink-faint: #1b1b1b1a;
+  --theme-accent: var(--color-orange-light-5);
+  --theme-accent-muted: #f07a3db2;
+  --theme-accent-subtle: #f07a3d80;
+  --theme-accent-faint: #f07a3d18;
+  --theme-accent-bright: #ff915c;
+  --theme-pixel-highlight: var(--color-yellow-light-5);
   --theme-alpha-page-muted: 64%;
   --theme-alpha-page-headline-muted: 55%;
   --theme-alpha-on-accent-muted: 91%;
@@ -515,15 +510,25 @@
   --theme-alpha-on-inverse-soft: 92%;
   --theme-alpha-on-inverse-muted: 92%;
   --theme-alpha-on-inverse-headline-muted: 68%;
-  --theme-dark-accent-chroma: 0.198;
-  --theme-dark-ground-chroma: 0.004;
+  --theme-dark-accent-chroma: 0.102;
+  --theme-dark-ground-chroma: 0;
   --theme-alpha-dark-border: 12%;
   /*
    * The dark scheme of the docs is neutral: the grounds are near black with
-   * the chroma of the theme, the text is the paper with a fifth of the
-   * accent, and the band has the bright accent as text.
+   * no hue, the text is a light gray with no hue (also the running text),
+   * and the band has the bright accent as text.
    */
-  --theme-dark-ink: color-mix(in oklab, var(--theme-accent) 20%, var(--theme-paper));
+  --theme-dark-ink: oklch(from var(--theme-paper) 0.94 0 h);
+  --theme-dark-page-ink: var(--theme-dark-ink);
+  /* The faint chip (inline code, a soft button) is a tint of the paper, not of the accent. */
+  --theme-dark-inverse-faint: color-mix(in srgb, var(--theme-paper) 8%, transparent);
+  /*
+   * The accent text of the light scheme: an orange, not a brown. Lightness
+   * 0.575 with the most chroma in sRGB (#c25101) gives 4.67:1 on the page.
+   * It reads only on the page: the docs put no accent text on a tint
+   * (ACCENT_TEXT_ON_PAGE_ONLY in src/lib/tokens/contract.ts).
+   */
+  --theme-text-accent: oklch(from var(--theme-accent) 0.575 0.162 h);
   --theme-dark-ink-bright: var(--theme-accent-bright);
   --theme-dark-inverse: oklch(from var(--theme-accent) 0.15 var(--theme-dark-ground-chroma) h);
   --theme-dark-inverse-deep: oklch(from var(--theme-accent) 0.13 var(--theme-dark-ground-chroma) h);
@@ -555,24 +560,24 @@
   --theme-status-warning-text: #7e4f02;
   --theme-status-danger-surface: #ffefee;
   --theme-status-danger-text: #9a3130;
-  /* The code: the hue of the slate ink (290). The keywords are the purple strong level. */
-  --code-background: #1d1b26;
-  --code-plain: #e7e6f2;
+  /* The code: a neutral card with no hue, as the ink. Only the syntax has colours. */
+  --code-background: #1d1d1d;
+  --code-plain: #e7e7e7;
   --code-keyword: var(--color-code-purple-strong);
   --code-string: var(--color-code-green-soft);
   --code-constant: var(--color-code-orange-pale);
   --code-function: var(--color-code-purple-soft);
-  --code-punctuation: #b0afc0;
-  --code-comment: #918fa4;
-  --code-line-number: #858495;
+  --code-punctuation: #b1b1b1;
+  --code-comment: #929292;
+  --code-line-number: #868686;
 }
 
 /*
  * The band of the dark scheme in the colour themes: the accent of the
  * light scheme, with the alphas of the text on the accent. The docs set
- * their own band and footer, and an element of a colour theme in a page of
- * the docs must not inherit them: with `initial`, the tokens of the dark
- * scheme use their fallback (the accent and the deep).
+ * their own band, running text, faint chip, accent text and footer, and an element of a colour
+ * theme in a page of the docs must not inherit them: with `initial`, the
+ * tokens of the dark scheme use their fallback (the accent and the deep).
  */
 :root,
 [data-theme='yellow'],
@@ -583,6 +588,9 @@
 [data-theme='pink'] {
   --theme-dark-band: initial;
   --theme-dark-band-ink: initial;
+  --theme-dark-page-ink: initial;
+  --theme-dark-inverse-faint: initial;
+  --theme-text-accent: initial;
   --theme-inverse-deep: initial;
   --theme-dark-inverse-deep: initial;
   --theme-alpha-on-band-soft: 92%;
@@ -772,10 +780,14 @@
    * Accent-hued text (a link, an icon) and the signals, as text. The accent
    * surface is a light hue and does not read as text on the page: the text
    * takes a dark tone of the hue (OKLCH lightness 0.43 reads on the
-   * accent-subtle tint too). A signal mixed with the ink is dark enough on
-   * the page and on its tints.
+   * accent-subtle tint too). A theme can give its own tone
+   * (--theme-text-accent). A signal mixed with the ink is dark enough on the
+   * page and on its tints.
    */
-  --text-accent: var(--_ground-text-accent, oklch(from var(--theme-accent) 0.43 min(c, 0.11) h));
+  --text-accent: var(
+    --_ground-text-accent,
+    var(--theme-text-accent, oklch(from var(--theme-accent) 0.43 min(c, 0.11) h))
+  );
   --text-positive: var(
     --_ground-text-positive,
     color-mix(in oklab, var(--surface-positive) 40%, var(--theme-ink))
@@ -995,7 +1007,11 @@
     var(--_ink-dark) var(--theme-alpha-on-inverse-headline-muted),
     transparent
   );
-  --surface-inverse-faint: var(--_ground-surface-inverse-faint, var(--theme-accent-faint));
+  /* The faint chip: a tint of the accent. A theme can give its own (--theme-dark-inverse-faint). */
+  --surface-inverse-faint: var(
+    --_ground-surface-inverse-faint,
+    var(--theme-dark-inverse-faint, var(--theme-accent-faint))
+  );
   --surface-accent-muted: var(
     --_ground-surface-accent-muted,
     oklch(from var(--theme-accent) 0.3 min(c, calc(var(--theme-dark-accent-chroma) * 0.8)) h)
@@ -1009,8 +1025,12 @@
    * The text of the page. The primary text is the vivid ink. The running
    * text (soft, muted) is the paper with a fifth of the accent: it keeps a
    * little of the colour of its theme, and a paragraph stays easy to read.
+   * A theme can give its own running text (--theme-dark-page-ink).
    */
-  --_page-ink-dark: color-mix(in oklab, var(--theme-accent) 20%, var(--theme-paper));
+  --_page-ink-dark: var(
+    --theme-dark-page-ink,
+    color-mix(in oklab, var(--theme-accent) 20%, var(--theme-paper))
+  );
   --text-on-page: var(--_ink-dark);
   --text-on-page-soft: color-mix(in srgb, var(--_page-ink-dark) 80%, transparent);
   --text-on-page-muted: color-mix(in srgb, var(--_page-ink-dark) 70%, transparent);

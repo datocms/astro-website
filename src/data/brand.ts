@@ -118,25 +118,25 @@ export const logo = {
       alt: 'The DatoCMS symbol in white',
     },
     {
-      file: 'datocms-symbol-purple',
-      title: 'Symbol, purple',
+      file: 'datocms-symbol-orange',
+      title: 'Symbol, orange',
       note: 'Our color when the symbol stands alone, on a dark ground.',
       preview: 'dark',
-      alt: 'The DatoCMS symbol in purple',
+      alt: 'The DatoCMS symbol in orange',
     },
     {
       file: 'datocms-avatar',
       title: 'Avatar',
       note: 'For a profile picture that a circle cuts.',
       preview: 'circle',
-      alt: 'The dark DatoCMS symbol in a purple circle',
+      alt: 'The dark DatoCMS symbol in an orange circle',
     },
     {
       file: 'datocms-app-icon',
       title: 'App icon',
       note: 'For a square with round corners.',
       preview: 'rounded',
-      alt: 'The dark DatoCMS symbol in a purple square with round corners',
+      alt: 'The dark DatoCMS symbol in an orange square with round corners',
     },
   ] satisfies BrandAsset[],
 };
@@ -187,11 +187,14 @@ export const rules = {
     items: [
       { id: 'tones', text: 'Draw it in two colors, or fade a part of it.' },
       { id: 'outline', text: 'Add a gradient, a shadow, or an outline.' },
-      { id: 'orange', text: 'Use the old orange logo. It’s retired.' },
+      {
+        id: 'color',
+        text: 'Use the symbol in a color that isn’t ours. Purple, blue, or any other.',
+      },
       { id: 'stretch', text: 'Stretch it, rotate it, or redraw it.' },
       { id: 'busy', text: 'Put it on a photo or a busy picture.' },
       { id: 'own', text: 'Make it part of your own logo or icon.' },
-    ] satisfies DrawnRule<'tones' | 'outline' | 'orange' | 'stretch' | 'busy' | 'own'>[],
+    ] satisfies DrawnRule<'tones' | 'outline' | 'color' | 'stretch' | 'busy' | 'own'>[],
   },
 };
 

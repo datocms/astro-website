@@ -20,7 +20,7 @@ colors:
   plum-deep: '#3f0e16'
   bubblegum: '#f28497'
   bubblegum-paper: '#fff7f8'
-  docs-ink: '#1a1923'
+  docs-ink: '#1b1b1b'
   white: '#ffffff'
   signal-green: '#3f9a4a'
   signal-red: '#f25f5a'
@@ -209,9 +209,9 @@ The names here are the design names. In `tokens.css` each theme block gives its 
 | `purple`             | Iris `#9d75f7` `--color-purple-light-5`   | Iris Deep `#18032e` `--color-purple-deep-5` | Iris Paper `#f6f5ff`            |
 | `blue`               | Glacier `#50c9ed`                         | Harbour Deep `#1a3a47`                      | Glacier Paper `#edfeff`         |
 | `pink`               | Bubblegum `#f28497`                       | Plum Deep `#3f0e16`                         | Bubblegum Paper `#fff7f8`       |
-| `docs`               | Iris `#9d75f7` `--color-purple-light-5`   | Docs Ink `#1a1923`                          | White `#ffffff` `--color-white` |
+| `docs`               | Orange `#f07a3d` `--color-orange-light-5` | Docs Ink `#1b1b1b`                          | White `#ffffff` `--color-white` |
 
-Careful: Docs Ink (`#1a1923`), the ink of the docs theme, is a near black with a tint of violet. It is not Iris Deep (`#18032e`).
+Careful: Docs Ink (`#1b1b1b`), the ink of the docs theme, is a near black with no hue. It is not the deep tone of a theme.
 
 ### Primary
 
@@ -223,10 +223,10 @@ Careful: Docs Ink (`#1a1923`), the ink of the docs theme, is a near black with a
 
 The five other themes have the same three roles. A section picks its theme with `data-theme`; the children inherit.
 
-- **Ember** (ember) on **Ember Deep** (ember-deep) and **Ember Paper** (ember-paper). Orange: Help, the Developers pillar.
+- **Ember** (ember) on **Ember Deep** (ember-deep) and **Ember Paper** (ember-paper). Orange: the home page, Help, Brand.
 - **Fern** (fern) on **Fern Deep** (fern-deep) and **Fern Paper** (fern-paper). Green: News, the Editing pillar.
-- **Iris** (iris) on **Iris Deep** (iris-deep) and **Iris Paper** (iris-paper). Purple, a violet (hue 295) on a dark plum-violet deep (hue 301, a little warmer than the accent): the home page, Company and support, pricing.
-- **Glacier** (glacier) on **Harbour Deep** (harbour-deep) and **Glacier Paper** (glacier-paper). Blue: Ecosystem, Brand, the pages for buyers (enterprise, compare), the AI pillar.
+- **Iris** (iris) on **Iris Deep** (iris-deep) and **Iris Paper** (iris-paper). Purple, a violet (hue 295) on a dark plum-violet deep (hue 301, a little warmer than the accent): Company and support, pricing, the Developers pillar.
+- **Glacier** (glacier) on **Harbour Deep** (harbour-deep) and **Glacier Paper** (glacier-paper). Blue: Ecosystem, the pages for buyers (enterprise, compare), the AI pillar.
 - **Bubblegum** (bubblegum) on **Plum Deep** (plum-deep) and **Bubblegum Paper** (bubblegum-paper). Pink, a rose (hue 10, 36 degrees from Ember) on a wine deep: Partners, the Media pillar.
 
 The theme of each page is in "Page themes" (Layout).
@@ -247,11 +247,11 @@ There is no grey. The neutrals are the deep tone of the theme at alpha: text-sof
 
 The docs are a tool, not a story, thus they have a theme of their own: `docs`. Only the docs layout uses it.
 
-- **The page is white**, and the ink is **Docs Ink** (docs-ink, `#1a1923`): a near black with a small tint of violet (OKLCH L 0.22, C 0.02, hue 289). The tints of the ink are greys with the same small tint.
-- **The accent is Iris**, the purple of the site (#9d75f7, hue 295, near the hue of the ink): the symbol in the sidebar in the dark scheme (in light it is the ink, as BRAND.md asks for the logo on a light ground), the active tab, the focus ring, the hit of a search, the tags. The links and the kickers are a deep tone of it (`--text-accent`, OKLCH L 0.43, C 0.11: #554185). It stays small: the docs have no accent bands.
-- **The hero of the docs home** has a pixel field (`src/components/docs/PixelField`): the renderer of the pixel videos, with live cells from a slow noise, in the `docsField` palette (tints of Iris on the page, a grid of the page colour, a few glints of the pixel highlight). 6px cells, steps of 125ms, the shared lens. The field is empty at the top left (the headline) and dense at the right and at the bottom. One field for the two schemes: the tints mix the accent into the page surface. No gradient, no second effect for the dark scheme.
+- **The page is white**, and the ink is **Docs Ink** (docs-ink, `#1b1b1b`): a near black with no hue (OKLCH L 0.22, C 0). The tints of the ink are greys. In the dark scheme the text is a light grey with no hue (OKLCH L 0.94, C 0), also the running text, the grounds have no hue, and the faint chip (inline code, a soft button) is the paper at 8%, not a tint of the accent.
+- **The accent is the orange of the brand** (#f07a3d): the symbol in the sidebar, the active tab, the focus ring, the hit of a search, the tags. The links and the kickers are a bright tone of it in light (`--text-accent` from `--theme-text-accent`, OKLCH L 0.575, C 0.162, #c25101, 4.67:1 on white), and `--theme-accent-bright` in dark. This tone reads only on the page: no accent text on a tint (`ACCENT_TEXT_ON_PAGE_ONLY`); a chip with accent text has the page surface and a 1px accent border. It stays small: the docs have no accent bands, and only the accent has a hue.
+- **The hero of the docs home** has a pixel field (`src/components/docs/PixelField`): the renderer of the pixel videos, with live cells from a slow noise, in the `docsField` palette (greys with purple: tints of the ink on the page, with 4%, 11% and 20% of purple from the faint step to the strong step, a grid of the page colour; no accent, no glints). 6px cells, steps of 125ms, the shared lens. The field is empty at the top left (the headline) and dense at the right and at the bottom. One field for the two schemes: the tints mix the ink into the page surface. No gradient, no second effect for the dark scheme.
 - **The callouts do not take the hue of the theme.** Each kind has its own hue: info blue, tip violet, positive green, warning amber, danger red. The theme gives them as theme data (`--theme-status-*`); `--surface-status-*` and `--text-status-*` read it. A theme without the data keeps the old rule: info and tip are a tint of the ink, warning is a tint of the accent.
-- **The code card** is a deep slate, with the keywords in violet.
+- **The code card** is a near black with no hue (`#1d1d1d`). Only the syntax has colours.
 
 ### Dark scheme
 
@@ -384,7 +384,7 @@ Each page has one theme: the theme of the layout (a necessary prop). Purple is t
 | Ecosystem           | blue   | `/plugins`, `/starters`                                                                                      |
 | Partners            | pink   | `/partners`, `/tech-partners`                                                                                |
 | Company and support | purple | `/support`, `/slack`, `/security`, `/legal`, `/contact`, `/company`, `/partner-program`, `/research-program` |
-| Brand               | blue   | `/brand`                                                                                                     |
+| Brand               | orange | `/brand`                                                                                                     |
 
 **A marketing page takes the hue of its first chapter**, or of its hero when it has no chapters. The page reads the theme from the data of the first chapter, not from a literal, thus the page and its row in the product list of the home page change together (`src/data/home.ts`).
 
@@ -394,7 +394,7 @@ The same six hues serve the areas and the pillars. On a reference page the hue i
 
 **The ground of the hero.** A marketing page has its hero on the page ground: the scene or the typewriter carries it. A reference page has its hero on the accent: the band of colour marks the area. The Partners area is the exception: its heroes are on the page ground, because the logo of a partner keeps its own colours there. On `/partners` the accent marks the area one band lower, in the band with the counts and the map. An article (a post, an entry of the changelog) has the header on the accent, above the header of the article on the page ground. No hero is on the inverse: the footer holds the inverse at the end of the page. The header always takes the ground and the theme of the hero.
 
-**The ground of the closer.** The page closer is on the inverse (the `tonal` palette). The footer, with the "Questions? Ask away [••]" band, is on `--surface-inverse-deep`: the inverse of the same hue, 0.06 darker in OKLCH lightness. Thus the closer and the footer are two deep blocks in one hue, and the end of the closer stays visible. See "The Second Deep Rule". An accent palette (`silhouette`, `onAccent`) is only for a page whose last band above the closer is on the inverse, thus three deep blocks never stack. In the dark scheme the silhouette is the bright accent: a dark subject does not show on the dark band.
+**The ground of the closer.** The page closer is on the inverse (the `tonal` palette). The footer, with the "Questions? Ask away [••]" band, is on `--surface-inverse-deep`: the inverse of the same hue, 0.06 darker in OKLCH lightness (0.03 in the orange theme: Ember Deep is near black, and 0.06 darker is black). Thus the closer and the footer are two deep blocks in one hue, and the end of the closer stays visible. See "The Second Deep Rule". An accent palette (`silhouette`, `onAccent`) is only for a page whose last band above the closer is on the inverse, thus three deep blocks never stack. In the dark scheme the silhouette is the bright accent: a dark subject does not show on the dark band.
 
 ### Named Rules
 

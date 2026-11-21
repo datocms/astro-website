@@ -49,11 +49,11 @@ function purpleTheme(name) {
   return reference ? token(reference[1]) : value;
 }
 
-// The dark version is the deep tone of the purple theme. The purple is its accent.
+// The dark version is the deep tone of the orange theme. The orange is its accent.
 const COLORS = {
-  dark: token('--color-purple-deep-5'),
+  dark: token('--color-orange-deep-5'),
   white: '#ffffff',
-  purple: token('--color-purple-light-5'),
+  orange: token('--color-orange-light-5'),
 };
 
 /** The view box and the paths of a master file. */
@@ -93,7 +93,7 @@ function plain(logo, fill) {
 }
 
 /*
- * The dark symbol on a full square of purple, for a place that cuts the
+ * The dark symbol on a full square of orange, for a place that cuts the
  * picture.
  *
  * The D has two sharp corners on the left and a round side on the right.
@@ -117,7 +117,7 @@ function badge({ size, shift, side = 1024, radius = 0, hole = 1 }) {
   return {
     width: side,
     height: side,
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${side} ${side}"><rect width="${side}" height="${side}"${radius ? ` rx="${radius * side}"` : ''} fill="${COLORS.purple}"/>${pathTags(withHole(symbol, hole), COLORS.dark, transform)}</svg>\n`,
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${side} ${side}"><rect width="${side}" height="${side}"${radius ? ` rx="${radius * side}"` : ''} fill="${COLORS.orange}"/>${pathTags(withHole(symbol, hole), COLORS.dark, transform)}</svg>\n`,
   };
 }
 
@@ -151,7 +151,7 @@ const files = {
   'datocms-wordmark-white': { ...plain(wordmark, COLORS.white), pngWidth: 2000 },
   'datocms-symbol-dark': { ...plain(symbol, COLORS.dark), pngWidth: 1024 },
   'datocms-symbol-white': { ...plain(symbol, COLORS.white), pngWidth: 1024 },
-  'datocms-symbol-purple': { ...plain(symbol, COLORS.purple), pngWidth: 1024 },
+  'datocms-symbol-orange': { ...plain(symbol, COLORS.orange), pngWidth: 1024 },
   // For a circle: a profile picture.
   'datocms-avatar': { ...badge({ size: 0.5, shift: 0.09 }), pngWidth: 1024 },
   // For a square with round corners: an app icon. The cut is smaller, thus the D is larger.
@@ -162,18 +162,18 @@ const files = {
  * The favicon: the app icon for a browser tab. A tab does not cut the
  * picture, thus the square has its own round corners. A tab shows the
  * picture at 16px, thus the D is larger than in the app icon: 10px tall at
- * 16px. A larger D hides the purple, and the picture then looks dark.
- * At 16px and 32px the strokes of the D are thin: the hole is 15% smaller
- * than in the master file, thus the strokes are thicker. Only the favicon
- * has this hole: the other files show the D at 180px or more.
+ * 16px. A larger D hides the orange, and the picture then looks dark.
  * The D has no shift: with its box in the centre, its left edge is at
  * 3.03px at 16px and its top edge at 3px, thus the edges are sharp. A
  * shift to the right puts the left edge between two pixels at 16px.
+ * At 16px and 32px the strokes of the D are thin: the hole is 15% smaller
+ * than in the master file, thus the strokes are thicker. Only the favicon
+ * has this hole: the other files show the D at 180px or more.
  */
 const favicon = badge({ size: 0.625, shift: 0, side: 64, radius: 0.18, hole: 0.85 });
 
 /*
- * The README buttons: the dark symbol and a label on a pill of purple, the
+ * The README buttons: the dark symbol and a label on a pill of orange, the
  * pair of the fixed marks. People put them in READMEs with an <img>, and
  * an SVG in an <img> cannot load a font. Thus the label is the outlines of
  * ABC Oracle Medium (500). HarfBuzz gives the glyphs and the kerning.
@@ -252,7 +252,7 @@ function readmeButton(text) {
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${h}" viewBox="0 0 ${width} ${h}" role="img" aria-label="${text}">` +
     `<title>${text}</title>` +
-    `<rect width="${width}" height="${h}" rx="${h / 2}" fill="${COLORS.purple}"/>` +
+    `<rect width="${width}" height="${h}" rx="${h / 2}" fill="${COLORS.orange}"/>` +
     pathTags(symbol, COLORS.dark, symbolTransform) +
     `<path fill="${COLORS.dark}" transform="translate(${num(labelX)} ${num(baseline)})" d="${d}"/>` +
     `</svg>\n`
@@ -327,11 +327,11 @@ writeFileSync(
     '',
     'wordmark    The symbol and the name. Use this one first.',
     'symbol      The D alone, where the wordmark does not fit.',
-    'avatar      The dark symbol on purple, for a profile picture that a circle cuts.',
-    'app-icon    The dark symbol on purple, for a square with round corners.',
+    'avatar      The dark symbol on orange, for a profile picture that a circle cuts.',
+    'app-icon    The dark symbol on orange, for a square with round corners.',
     '',
     'dark is for a light ground. white is for a dark ground.',
-    'purple is for the symbol alone, on a dark ground.',
+    'orange is for the symbol alone, on a dark ground.',
     'Do not put the symbol alone in a circle: use the avatar.',
     '',
     'The rules: https://www.datocms.com/brand',

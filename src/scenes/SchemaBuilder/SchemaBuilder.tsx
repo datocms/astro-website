@@ -65,7 +65,7 @@ export function SchemaBuilderScene({
 }) {
   return (
     <Scene
-      theme="orange"
+      theme="purple"
       appearance={appearance}
       description={
         settings

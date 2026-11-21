@@ -14,7 +14,7 @@ import { clientLogos as c } from '~/data/clientLogos';
  * The theme of the home page. The layout, the hero and the first band (the
  * product scene) read it, thus the page starts and ends in this hue.
  */
-export const homeTheme: Theme = 'purple';
+export const homeTheme: Theme = 'orange';
 
 export interface HeroData {
   label?: string;
@@ -334,7 +334,7 @@ export const features: FeaturesData = {
       title: 'For developers',
       href: '/developers',
       description: 'Modular how you like it. Steady how you need it. From the schema to the CDN.',
-      theme: 'orange',
+      theme: 'purple',
     },
     {
       title: 'Media',

@@ -5,6 +5,7 @@
  * it as a matrix.
  */
 import {
+  ACCENT_TEXT_ON_PAGE_ONLY,
   CANONICAL_ROLES,
   CODE_ROLES,
   CONTEXTUAL_ROLES,
@@ -189,6 +190,16 @@ export function audit(sheet: TokenSheet): Audit {
               AA_LARGE_TEXT,
             );
             for (const role of DERIVED_TEXT_ROLES) {
+              // A theme of ACCENT_TEXT_ON_PAGE_ONLY: in light, its accent text is
+              // only on the page surface.
+              if (
+                role === '--text-accent' &&
+                scheme === 'light' &&
+                surface !== '--surface-default' &&
+                ACCENT_TEXT_ON_PAGE_ONLY.includes(theme)
+              ) {
+                continue;
+              }
               pair(theme, scheme, context, box, role, surface, surfaceColor, AA_TEXT);
             }
           }

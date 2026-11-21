@@ -33,6 +33,10 @@ export interface Style {
 
 const INVERSE = 'var(--surface-inverse)';
 const ACCENT = 'var(--surface-accent)';
+const PAGE_INK = 'var(--text-on-page)';
+// A tint of the ink on the page surface, with a part of the purple of the brand.
+const docsTint = (ink: number, purple: number) =>
+  `color-mix(in oklab, var(--color-purple-light-5) ${purple}%, color-mix(in oklab, ${PAGE_INK} ${ink}%, var(--surface-default)))`;
 // Half the inverse surface and half the accent surface.
 const HALF_DARK = `color-mix(in oklab, ${INVERSE} 50%, ${ACCENT})`;
 
@@ -241,23 +245,23 @@ export const partnersGlobe: Style = {
 };
 
 // The field behind the hero of the docs home, drawn live (not from
-// footage) on the page surface. The tints of the accent go up in three
-// steps: faint, muted, strong. The strong step is not the full accent:
-// the field is a quiet texture behind the headline. The grid has the
-// colour of the page, thus each cell is a separate square. A few cells of
-// the accent flash in the pixel highlight (the TOP layer). The tints mix
-// the accent into the page surface, thus they are light on the white page
-// and deep on the ink page: the same palette works in light and in dark.
+// footage) on the page surface. The field is gray with purple, not the
+// accent: it is a quiet texture behind the headline and the search. The
+// tints mix the ink of the page into the page surface in three steps:
+// faint, muted, strong. The purple grows with the ink (4%, 11%, 20%): with
+// all of the purple in the faint step, the step from the page to the
+// field is too large. The grid has the colour of the page, thus each
+// cell is a separate square. No cell flashes: the field has no TOP layer.
+// The tints are light on the white page and deep on the ink page: the same
+// palette works in light and in dark.
 export const docsField: Style = {
-  bgFill: `color-mix(in oklab, ${ACCENT} 10%, var(--surface-default))`,
+  bgFill: docsTint(3, 4),
   bgStroke: 'var(--surface-default)',
-  midFill: `color-mix(in oklab, ${ACCENT} 28%, var(--surface-default))`,
+  midFill: docsTint(9, 11),
   midStroke: 'var(--surface-default)',
-  highFill: `color-mix(in oklab, ${ACCENT} 50%, var(--surface-default))`,
+  highFill: docsTint(18, 20),
   highStroke: 'var(--surface-default)',
   groundFill: 'var(--surface-default)',
-  topFill: 'var(--surface-pixel-highlight)',
-  topStroke: 'var(--surface-default)',
 };
 
 /**

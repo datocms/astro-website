@@ -48,6 +48,15 @@ export const PAGE_STRONG_TINTS = ['--surface-accent-muted'] as const;
 export const PAGE_TINTS_WITHOUT_MUTED = ['--surface-accent-subtle'] as const;
 
 /**
+ * The themes whose accent text reads only on the page surface, in the light
+ * scheme. Their accent text is a bright tone (--theme-text-accent), not the
+ * dark tone that reads on every tint. Do not put accent text on a tint in
+ * these themes: a chip with accent text has the page surface and an accent
+ * border.
+ */
+export const ACCENT_TEXT_ON_PAGE_ONLY: readonly string[] = ['docs'];
+
+/**
  * The other surfaces of the inverse ground. Every text role of the inverse
  * ground must also read on each of them.
  */

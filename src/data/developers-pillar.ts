@@ -73,7 +73,7 @@ export const chapterNav: CategoryNavData = {
 // Chapter 1: the schema builder, the modeling and the validations.
 export const schema: ChapterLayoutData = {
   id: 'schema',
-  theme: 'orange',
+  theme: 'purple',
   chapter: {
     label: 'Schema builder',
     headline: 'Model it.',
@@ -152,7 +152,7 @@ export const graphql: ChapterLayoutData = {
 // Chapter 3: the real-time API.
 export const realTime: ChapterLayoutData = {
   id: 'real-time',
-  theme: 'purple',
+  theme: 'orange',
   chapter: {
     label: 'Real-time Updates API',
     headline: 'The same query,',
@@ -326,7 +326,7 @@ export const seo = {
 
 export const ctaBuild: CtaBannerData = {
   variant: 'light',
-  theme: 'orange',
+  theme: 'purple',
   headline: 'The best way to get to know DatoCMS',
   muted: 'is to build something with it.',
   buttons: [

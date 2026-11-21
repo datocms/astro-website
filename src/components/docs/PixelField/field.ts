@@ -9,7 +9,6 @@ const FAINT = 0;
 const MUTED = 1;
 const ACCENT = 2;
 const EMPTY = 3;
-const GLINT = 4;
 
 // The size of a blob of the noise, in cells.
 const SCALE = 22;
@@ -84,8 +83,6 @@ export function fillField(
       else if (c < 0.3) layer = FAINT;
       else if (c < 0.38) layer = MUTED;
       else layer = ACCENT;
-      // A few cells of the accent flash for one step.
-      if (layer === ACCENT && c > 0.44 && hash(x, y, step) > 0.985) layer = GLINT;
       cells[y * cols + x] = layer;
     }
   }
