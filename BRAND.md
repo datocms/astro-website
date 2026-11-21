@@ -240,21 +240,20 @@ The logo has two forms.
 
 The master files are `src/assets/logo/wordmark.svg` and `src/assets/logo/symbol.svg`, in the astro-website repository. Every other copy comes from these two: `npm run brand-assets` makes the files of `public/brand/`, which the page `/brand` offers. The logo files of the other repositories (`dato_symbol.svg` and `dato_wordmark.svg` in `ui-public` of web, the favicons of the cms, the dashboard, and the API, and the README buttons of the dashboard) are copies: change the masters, run the script, then copy the files again.
 
-| Rule         | Detail                                                                                                                                                                                                      |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| One color    | The logo is always a single flat color.                                                                                                                                                                     |
-| Which color  | On a light ground, the dark ink of the theme. On a dark ground, the accent of the theme or white.                                                                                                           |
-| Fixed marks  | Where the logo stands alone with no page around it (favicon, app icon, social avatar, email), it is the dark violet symbol (Iris Deep) on the Iris purple. The bare purple symbol is for dark grounds only. |
-| Clear space  | Keep a margin of the height of the symbol on every side.                                                                                                                                                    |
-| Minimum size | Wordmark: 20 px high. Symbol: 16 px. Below that, don't use the logo.                                                                                                                                        |
-| Ground       | A flat color with enough contrast. Never a photo, a pattern, or a busy picture.                                                                                                                             |
-| In a circle  | Never the symbol alone. Use the avatar file: it has a margin, and the D is moved to where it looks centered.                                                                                                |
+| Rule         | Detail                                                                                                                                                                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| One color    | The logo is always a single flat color.                                                                                                                                                                      |
+| Which color  | On a light ground, the dark ink of the theme. On a dark ground, the accent of the theme or white.                                                                                                            |
+| Fixed marks  | Where the logo stands alone with no page around it (favicon, app icon, social avatar, email), it is the near-black symbol (Ember Deep) on the Ember orange. The bare orange symbol is for dark grounds only. |
+| Clear space  | Keep a margin of the height of the symbol on every side.                                                                                                                                                     |
+| Minimum size | Wordmark: 20 px high. Symbol: 16 px. Below that, don't use the logo.                                                                                                                                         |
+| Ground       | A flat color with enough contrast. Never a photo, a pattern, or a busy picture.                                                                                                                              |
+| In a circle  | Never the symbol alone. Use the avatar file: it has a margin, and the D is moved to where it looks centered.                                                                                                 |
 
 ### Don't
 
 - ⛔ Don't draw it in two tones, such as a faded "CMS".
 - ⛔ Don't add a gradient, a shadow, an outline, or any effect.
-- ⛔ Don't use the old orange logo. It is retired.
 - ⛔ Don't stretch, rotate, crop, or redraw it. Don't retype the name in a font.
 - ⛔ Don't change the space between the symbol and the name, or stack them.
 - ⛔ Don't put it in a sentence in place of the name.
@@ -273,10 +272,10 @@ The principles only. `DESIGN.md` has the values.
 
 - **A brand of several themes, not of one color.** Six pairs, each with a bright accent, a deep ground, and a pale paper: Pollen on Espresso, Ember, Fern, Iris, Glacier, Bubblegum.
 - **One theme for each page.** The header, the hero, and the footer share it.
-- **Purple (Iris) when there is room for one color only.** See the fixed marks in section 8. The product also defaults to purple.
-- **No gray.** A neutral is the deep color of the theme, made lighter.
+- **Orange (Ember) when there is room for one color only.** See the fixed marks in section 8.
+- **No gray.** A neutral is the deep color of the theme, made lighter. The exception is the tools: the docs and the dashboard are white and near black with neutral grays, the orange only in small accents (links, focus, buttons, the logo on a dark ground), and a field of gray and purple pixels.
 - **Dark text on a bright accent**, never white text on it. Text meets WCAG AA contrast.
-- ⛔ Don't use the old orange as a brand color. ⛔ Don't mix accents of two themes in one section.
+- ⛔ Don't mix accents of two themes in one section.
 
 ### Typography
 
@@ -349,7 +348,7 @@ The badge files need to be drawn. Until then, use the wordmark with the text.
 - `https://dashboard.datocms.com/deploy/button.svg`
 - `https://dashboard.datocms.com/clone/button.svg`
 
-Each button is one file: the dark symbol and the label on the Iris purple, the pair of the fixed marks. It reads on a light and on a dark ground, thus a README needs no second file for dark mode. The forms of [Project templates](https://www.datocms.com/docs/general-concepts/project-starters-and-templates) in the docs make the link and the code for your project.
+Each button is one file: the near-black symbol and the label on the Ember orange, the pair of the fixed marks. It reads on a light and on a dark ground, thus a README needs no second file for dark mode. The forms of [Project templates](https://www.datocms.com/docs/general-concepts/project-starters-and-templates) in the docs make the link and the code for your project.
 
 ### Press
 
