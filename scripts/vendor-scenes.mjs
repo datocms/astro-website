@@ -7,8 +7,9 @@
 // then "local", then the short sha of the kit commit, then "dirty" when the
 // kit has changes that are not committed. Thus package.json tells which
 // kit the website uses. The script deletes the old tarball, writes the new
-// name in package.json and in the lock file, installs it and clears the
-// cache of Vite. Restart `astro dev` after it.
+// name in package.json and in the lock file, installs it, clears the
+// cache of Vite and writes src/scenes/kit-classes.json again. Restart
+// `astro dev` after it.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { cpSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -82,5 +83,9 @@ writeFileSync(lockFile, `${JSON.stringify(lock, null, 2)}\n`);
 
 rmSync(path.join(root, 'node_modules', '.vite'), { recursive: true, force: true });
 run('npm', ['ci', '--no-audit', '--no-fund'], root);
+
+// The CSS of the kit that a page gets comes from kit-classes.json. A new
+// kit can have new classes, thus the script writes the file again.
+run('npm', ['run', 'scene-classes'], root);
 
 console.log(`Vendored ${NAME} ${version} (vendor/${tarball}). Restart astro dev.`);
