@@ -19,9 +19,13 @@
    * wider than the text: they go --docs-bleed (up to 40px, from the docs
    * layout) past each side. The caption of a figure stays in line with
    * the text. A callout and a block with data-text-width (a button, a list
-   * of properties with no frame) stay at the width of the text.
+   * of properties with no frame, a figure of code with short lines) stay at
+   * the width of the text. In a group of tabs that bleeds, each code block
+   * bleeds, thus all the panels have the same width.
    */
-  :is(:scope, :scope > figure) > prose-island:not([data-text-width], :has(> [data-callout-type])),
+  :is(:scope, :scope > figure:not([data-text-width]))
+    > prose-island:not([data-text-width], :has(> [data-callout-type])),
+  :scope > figure[data-text-width]:is(custom-tabs[data-bleed] *) > prose-island,
   :scope > figure > image-zoom > a,
   :scope > figure > in-view-video {
     margin-inline: calc(-1 * var(--docs-bleed, 0px));

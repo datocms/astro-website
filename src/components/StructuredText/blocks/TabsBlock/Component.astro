@@ -1,6 +1,7 @@
 ---
 import { ensureValidStructuredTextProps } from '@datocms/astro';
 import { isCode, isDocument } from 'datocms-structured-text-utils';
+import { codeFitsText } from '~/lib/code/fitsText';
 import { DocCallout } from '~/components/docs/blocks/DocCallout';
 import { Prose } from '~/components/docs/DocsProse';
 import { Tab, Tabs } from '~/components/docs/Tabs';
@@ -20,11 +21,19 @@ interface Props {
 const block = readFragment(TabsBlockFragment, Astro.props.block);
 const tabs = block.tabs.map((tab) => readFragment(TabBlockFragment, tab));
 
-/* The code blocks bleed. When each panel holds only code, the row of the tabs bleeds too. */
-const codeOnly = tabs.every((tab) => {
+/*
+ * When each panel holds only code and a panel has a line that is wider
+ * than the text, the group bleeds: the row of the tabs and each code block,
+ * also the short ones, thus all the panels have the same width. With short
+ * code only, the group stays at the width of the text.
+ */
+const codes = tabs.flatMap((tab) => {
   const value = tab.content?.value;
-  return isDocument(value) && value.document.children.every(isCode);
+  return isDocument(value) ? value.document.children : [undefined];
 });
+const bleed =
+  codes.every((node) => node !== undefined && isCode(node)) &&
+  codes.some((node) => node !== undefined && isCode(node) && !codeFitsText(node.code));
 ---
 
 {
@@ -35,7 +44,7 @@ const codeOnly = tabs.every((tab) => {
 */
 }
 <figure>
-  <Tabs bleed={codeOnly}>
+  <Tabs bleed={bleed}>
     {
       tabs.map((tab) => (
         <Tab title={tab.title} noPadding>

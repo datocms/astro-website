@@ -1,6 +1,7 @@
 ---
 import type { Code as CodeNode } from 'datocms-structured-text-utils';
 import { Code } from '~/components/docs/Code';
+import { codeFitsText } from '~/lib/code/fitsText';
 
 interface Props {
   node: CodeNode;
@@ -9,8 +10,7 @@ interface Props {
 const { node } = Astro.props;
 
 // A short code block fits in the text: it does not go past the sides of the text.
-const longestLine = Math.max(...node.code.split('\n').map((line) => line.length));
-const textWidth = longestLine <= 70;
+const textWidth = codeFitsText(node.code);
 ---
 
 {

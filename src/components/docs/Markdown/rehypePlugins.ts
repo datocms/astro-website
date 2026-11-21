@@ -3,6 +3,7 @@ import { matches, select } from 'hast-util-select';
 import { toString } from 'hast-util-to-string';
 import { h } from 'hastscript';
 import { visit } from 'unist-util-visit';
+import { codeFitsText } from '~/lib/code/fitsText';
 
 // Puts each table in a box that scrolls. A wide table stays in the column.
 export function scrollBoxAroundTables() {
@@ -15,6 +16,8 @@ export function scrollBoxAroundTables() {
   };
 }
 
+// Puts each code block in a figure and an island. A block with short lines
+// stays at the width of the text (data-text-width on the figure).
 export function figureAroundCodeBlocks() {
   return function transformer(tree: Root) {
     visit(tree, 'element', (node, index, parent) => {
@@ -27,7 +30,7 @@ export function figureAroundCodeBlocks() {
         parent.children[index] = {
           type: 'element',
           tagName: 'figure',
-          properties: {},
+          properties: codeFitsText(toString(node)) ? { dataTextWidth: '' } : {},
           children: [
             {
               type: 'element',
