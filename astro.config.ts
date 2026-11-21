@@ -4,10 +4,12 @@ import react from '@astrojs/react';
 import expressiveCode from 'astro-expressive-code';
 import { defineConfig, envField } from 'astro/config';
 import { readdirSync, readFileSync } from 'fs';
+import { fileURLToPath } from 'node:url';
 import { rm, writeFile } from 'fs/promises';
 import type { Plugin } from 'vite';
 import { cssLayerArea } from './css-scope.mjs';
 import { readHeader } from './src/lib/pixel-video/format';
+import { pruneKitCss } from './src/lib/sceneKitCss';
 import {
   featureTargets,
   landingPageTargets,
@@ -76,6 +78,68 @@ function pxvHeaders(): Plugin {
         for (const environment of Object.values(server.environments)) {
           const module = environment.moduleGraph.getModuleById(resolved);
           if (module) environment.moduleGraph.invalidateModule(module);
+        }
+      });
+    },
+  };
+}
+
+/*
+ * The CSS of the scene kit for each page (src/lib/sceneKitCss.ts).
+ *
+ * A page under src/pages/ that shows a scene imports
+ * '@datocms/product-scenes/product-scenes.css'. This plugin gives the
+ * import a query with the path of the page, and the transform keeps only the
+ * rules of the classes that src/scenes/kit-classes.json lists for that page.
+ * Thus each page loads the CSS of its own scenes: about 15 KB gzipped, not
+ * 47 KB. The test src/scenes/kitClasses.test.ts writes the list
+ * (`npm run scene-classes`) and fails when it is old. Outside src/pages/ (the
+ * dev tools of src/dev/) the import gives the whole file.
+ */
+const KIT_CSS = '@datocms/product-scenes/product-scenes.css';
+const KIT_CLASSES = fileURLToPath(new URL('./src/scenes/kit-classes.json', import.meta.url));
+const PAGES_DIR = fileURLToPath(new URL('./src/pages/', import.meta.url));
+const KIT_PAGE_QUERY = 'scene-page';
+
+function sceneKitCss(): Plugin {
+  return {
+    name: 'scene-kit-css',
+    enforce: 'pre',
+    async resolveId(source, importer, options) {
+      if (source !== KIT_CSS || !importer) return null;
+      const importerPath = importer.split('?')[0] ?? importer;
+      if (!importerPath.startsWith(PAGES_DIR)) return null;
+      const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
+      if (!resolved) return null;
+      const page = importerPath.slice(PAGES_DIR.length);
+      return `${resolved.id}?${KIT_PAGE_QUERY}=${encodeURIComponent(page)}`;
+    },
+    transform(code, id) {
+      const [path, query] = id.split('?');
+      if (!path?.endsWith('/product-scenes.css') || !query) return null;
+      const page = new URLSearchParams(query).get(KIT_PAGE_QUERY);
+      if (!page) return null;
+      this.addWatchFile(KIT_CLASSES);
+      const manifest: Record<string, string[]> = JSON.parse(readFileSync(KIT_CLASSES, 'utf8'));
+      const classes = manifest[page];
+      if (!classes) {
+        this.error(
+          `src/pages/${page} imports ${KIT_CSS}, but src/scenes/kit-classes.json has no classes for it. Run \`npm run scene-classes\`.`,
+        );
+      }
+      return { code: pruneKitCss(code, new Set(classes)), map: null };
+    },
+    // In `astro dev`, a new list gives the pages their new CSS.
+    configureServer(server) {
+      server.watcher.add(KIT_CLASSES);
+      server.watcher.on('change', (file) => {
+        if (file !== KIT_CLASSES) return;
+        for (const environment of Object.values(server.environments)) {
+          for (const module of environment.moduleGraph.idToModuleMap.values()) {
+            if (module.id?.includes(`?${KIT_PAGE_QUERY}=`)) {
+              environment.moduleGraph.invalidateModule(module);
+            }
+          }
         }
       });
     },
@@ -392,6 +456,9 @@ export default defineConfig({
       },
     },
     plugins: [
+      // Before cssLayers: it prunes the file of the kit, then cssLayers puts
+      // it in the layer "vendor".
+      sceneKitCss(),
       cssLayers(),
       pxvHeaders(),
       // Stop the build when a client JS chunk that a page loads immediately is

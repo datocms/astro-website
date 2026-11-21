@@ -1,9 +1,4 @@
 import { Stage, type StageProps, type StageScheme } from '@datocms/product-scenes';
-// The CSS of the kit (about 50 KB gzipped) is imported here, not in the
-// layout: Astro adds it only to the pages that render a scene. Every scene
-// renders Scene. The kit is in the layer "vendor" (cssLayers in
-// astro.config.ts), thus the order of the stylesheets does not matter.
-import '@datocms/product-scenes/product-scenes.css';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { THEMES, type Theme } from '~/lib/theme';
 import { SCENE_CHROMA, SCENE_DEEP_NAVBAR, SCENE_HUE } from './theme';

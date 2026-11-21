@@ -6,7 +6,7 @@ Astro on Cloudflare Workers: two Workers from the same code, the public site and
 
 Read the voice in `BRAND.md` (sections 2, 4, 5 and 7) before you change any text that a visitor sees. More rules are next to the code: `src/data/AGENTS.md` (the copy, the pages, the pillars, the chapters), `src/scenes/AGENTS.md` (the pictures of the product), `src/lib/pixel-video/AGENTS.md` (the `.pxv` files) and `src/components/PixelCover/AGENTS.md` (the blog covers).
 
-- **Pages**: `src/layouts/Layout.astro`. It imports `src/styles/global.css`, has no router (a full load), and has the layer statement `@layer reset, tokens, base, vendor, blocks, sections, pages;`.
+- **Pages**: `src/layouts/Layout.astro`. It imports `src/styles/global.css` (a page with a scene imports the CSS of the kit itself: `src/scenes/AGENTS.md`, "The CSS of the kit"), has no router (a full load), and has the layer statement `@layer reset, tokens, base, vendor, blocks, sections, pages;`.
 - **Docs pages** (`src/pages/docs/`): `src/layouts/docs/BaseLayout` is the layout of the docs. It imports `src/styles/global.css`, has the same layer statement, has no router (a full load), and its components are in `src/components/docs/` (tokens from `src/styles/tokens.css`).
 - Both use `src/layouts/BaseLayout` for the head (SEO, favicon, canonical, RSS, cookie consent, analytics, draft mode). BaseLayout imports no global stylesheet and puts the layer statement as the first child of `<head>`. Its props are `theme` (the `data-theme` of `<body>`) and `density` (the `data-density` of `<body>`). No page uses the view transitions router.
 - `Layout` requires `seo`: the `_seoMetaTags` of the CMS record of the page, else `overrideSeo([], seoTitle(title), seoDescription(text))` from `~/lib/datocms/seo`.
