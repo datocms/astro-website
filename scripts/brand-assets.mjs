@@ -106,8 +106,10 @@ function plain(logo, fill) {
  * `size` is the height of the D, in parts of the side of the square.
  * `radius` is the radius of the corners, in parts of the side: with no
  * radius the square is full, and the place that shows it cuts it.
+ * `hole` is the size of the hole of the D, in parts of the hole of the
+ * master file.
  */
-function badge({ size, shift, side = 1024, radius = 0 }) {
+function badge({ size, shift, side = 1024, radius = 0, hole = 1 }) {
   const scale = (size * side) / symbol.height;
   const x = side / 2 - (symbol.width * scale) / 2 + shift * symbol.width * scale;
   const y = side / 2 - (symbol.height * scale) / 2;
@@ -115,8 +117,32 @@ function badge({ size, shift, side = 1024, radius = 0 }) {
   return {
     width: side,
     height: side,
-    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${side} ${side}"><rect width="${side}" height="${side}"${radius ? ` rx="${radius * side}"` : ''} fill="${COLORS.purple}"/>${pathTags(symbol, COLORS.dark, transform)}</svg>\n`,
+    svg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${side} ${side}"><rect width="${side}" height="${side}"${radius ? ` rx="${radius * side}"` : ''} fill="${COLORS.purple}"/>${pathTags(withHole(symbol, hole), COLORS.dark, transform)}</svg>\n`,
   };
+}
+
+/*
+ * The symbol with a hole of a different size. The path of the symbol has
+ * two parts: the outline of the D, then the hole. The hole has only
+ * absolute commands (M, C, Z), thus each pair of numbers is a point. Each
+ * point of the hole moves to or from the centre of the round side of the
+ * D: x is the x of the top of the curve, y is the centre of the height.
+ */
+function withHole(logo, hole) {
+  if (hole === 1) return logo;
+  const cx = 9.94643;
+  const cy = logo.height / 2;
+  const [{ evenodd, d }] = logo.paths;
+  const start = d.indexOf('M', 1);
+  const holePath = d.slice(start);
+  if (/[^MCZ\d\s.,-]/.test(holePath))
+    throw new Error('The hole of the symbol has a command that is not M, C or Z.');
+  let index = 0;
+  const scaled = holePath.replace(/-?\d*\.?\d+/g, (number) => {
+    const centre = index++ % 2 === 0 ? cx : cy;
+    return (centre + (Number(number) - centre) * hole).toFixed(4);
+  });
+  return { ...logo, paths: [{ evenodd, d: d.slice(0, start) + scaled }] };
 }
 
 // The name of each file, its drawing, and the width of its PNG.
@@ -137,11 +163,14 @@ const files = {
  * picture, thus the square has its own round corners. A tab shows the
  * picture at 16px, thus the D is larger than in the app icon: 10px tall at
  * 16px. A larger D hides the purple, and the picture then looks dark.
+ * At 16px and 32px the strokes of the D are thin: the hole is 15% smaller
+ * than in the master file, thus the strokes are thicker. Only the favicon
+ * has this hole: the other files show the D at 180px or more.
  * The D has no shift: with its box in the centre, its left edge is at
  * 3.03px at 16px and its top edge at 3px, thus the edges are sharp. A
  * shift to the right puts the left edge between two pixels at 16px.
  */
-const favicon = badge({ size: 0.625, shift: 0, side: 64, radius: 0.22 });
+const favicon = badge({ size: 0.625, shift: 0, side: 64, radius: 0.18, hole: 0.85 });
 
 /*
  * The README buttons: the dark symbol and a label on a pill of purple, the
