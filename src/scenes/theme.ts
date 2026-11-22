@@ -1,3 +1,4 @@
+import { brandColorOfHue } from '@datocms/product-scenes';
 import type { Theme } from '~/lib/theme';
 
 /**
@@ -31,23 +32,32 @@ export const SCENE_HUE: Record<Theme, number> = {
 };
 
 /**
- * The most chroma of the brand colour of the cms, in OKLCH. The cms makes
- * its signal colours (the Publish button, the focus rings, the selected
- * rows) as vivid as the gamut allows: from 0.11 at the blue hue to 0.24
- * at the purple hue. On the site the scene is a picture, not the focus:
- * at full chroma the Publish button is the most visible thing of a
- * section. The cap quiets it, the same on each theme.
+ * The most chroma of the brand colour of the cms, in OKLCH. In the cms a
+ * brand colour is often vivid: the Publish button, the focus rings and the
+ * selected rows show it. On the site the scene is a picture, not the focus,
+ * and its buttons are not real buttons: the page around the scene has the
+ * vivid colours. The kit caps the chroma of the colour of the hue first,
+ * then takes the nearest colour that passes AA (`brandColorOfHue`), as the
+ * cms asks of a project. The cap is the same on each theme.
  */
 export const SCENE_CHROMA = 0.08;
 
 /**
- * The themes where the navigation bar of the cms takes its deepest stop
- * (the `deepNavbar` of the kit). In the light scheme the bar has the OKLCH
- * lightness 0.37 at each hue. The inverse surface of green (#1a4731, 0.36)
- * and of blue (#1a3a47, 0.33) has almost the same lightness: next to it, at
- * the right of a chapter split, the bar and the ground looked the same. The
- * deep bar (0.25) is darker than the ground, as on the other themes the
- * ground is darker than the bar. On the other themes the inverse surface is
- * dark (0.18 to 0.27): a deep bar comes near it.
+ * The lightness of the navigation bar of the cms in the light scheme, from
+ * 0 to 1, as in the theme of a project (`navbarLightness` of the kit). The
+ * default bar (0.5) has the OKLCH lightness 0.42. The inverse surface of
+ * green (#1a4731, 0.36) and of blue (#1a3a47, 0.33) is near it: next to it,
+ * at the right of a chapter split, the bar and the ground looked the same.
+ * At 0.2 the bar has the lightness 0.24 and is darker than the ground, as
+ * on the other themes the ground is darker than the bar. The dark scheme
+ * keeps the default bar.
  */
-export const SCENE_DEEP_NAVBAR: ReadonlySet<Theme> = new Set(['green', 'blue']);
+export const SCENE_NAVBAR_LIGHTNESS: Partial<Record<Theme, number>> = {
+  green: 0.2,
+  blue: 0.2,
+};
+
+/** The brand colour of the cms in a scene of a theme. */
+export function sceneBrandColor(theme: Theme, chroma = SCENE_CHROMA) {
+  return brandColorOfHue(SCENE_HUE[theme], { maxChroma: chroma });
+}
