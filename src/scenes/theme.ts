@@ -47,7 +47,8 @@ export const SCENE_CHROMA = 0.08;
  * 0 to 1, as in the theme of a project (`navbarLightness` of the kit). The
  * default bar (0.5) has the OKLCH lightness 0.42. The inverse surface of
  * green (#1a4731, 0.36) and of blue (#1a3a47, 0.33) is near it: next to it,
- * at the right of a chapter split, the bar and the ground looked the same.
+ * at the right of a chapter split, a default bar and the ground look the
+ * same.
  * At 0.2 the bar has the lightness 0.24 and is darker than the ground, as
  * on the other themes the ground is darker than the bar. The dark scheme
  * keeps the default bar.

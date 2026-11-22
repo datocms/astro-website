@@ -1,6 +1,5 @@
 import { Stage, type StageProps, type StageScheme } from '@datocms/product-scenes';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { THEMES, type Theme } from '~/lib/theme';
+import type { Theme } from '~/lib/theme';
 import { SCENE_NAVBAR_LIGHTNESS, sceneBrandColor } from './theme';
 
 export type SceneAppearance = {
@@ -19,8 +18,9 @@ export type SceneAppearance = {
   surface?: 'default' | 'inverse';
   /**
    * The strength of the hue on the surfaces of the cms. At 1 the dark
-   * scheme is almost black, thus an inverse surface gets 2. The tint
-   * colours the text too: at 3 the light text is not white.
+   * scheme is almost black, thus an inverse surface gets 2. The text keeps
+   * the chroma of the cms (the tint of the kit fades out on the stops of
+   * the text).
    * @default 2 on `inverse`, else 1
    */
   tint?: number;
@@ -39,7 +39,7 @@ export type FragmentSceneProps = {
   appearance?: SceneAppearance;
 };
 
-export function sceneScheme(appearance: SceneAppearance = {}): StageScheme {
+function sceneScheme(appearance: SceneAppearance = {}): StageScheme {
   return appearance.surface === 'inverse' ? 'dark' : 'page';
 }
 
@@ -79,32 +79,4 @@ export function Scene({ theme, appearance = {}, ...stage }: SceneProps) {
 function navbarLightness(theme: Theme) {
   const light = SCENE_NAVBAR_LIGHTNESS[theme];
   return light === undefined ? undefined : { light };
-}
-
-/**
- * The colour properties of the screen of a scene (the tokens of the theme
- * of the cms and the wash ramp, or the two themes and the two ramps of a
- * scene that follows the page) for each theme, as an inline style. The kit computes them
- * on the server only. Thus a page that changes the theme of a scene in
- * the browser gets them from here.
- */
-export function scenePalettes(
-  appearance: Omit<SceneAppearance, 'theme'> = {},
-): Record<Theme, string> {
-  return Object.fromEntries(
-    THEMES.map((theme) => {
-      const html = renderToStaticMarkup(
-        <Scene theme={theme} appearance={{ ...appearance, theme }} description="" height={1}>
-          <span />
-        </Scene>,
-      );
-      const style = /class="ProductScenesScreen"[^>]*?style="([^"]*)"/.exec(html)?.[1] ?? '';
-      const colours = style
-        .split(';')
-        .filter((rule) =>
-          /^--(color--|wash-|product-scenes-(light|dark)--|product-scenes-wash-)/.test(rule),
-        );
-      return [theme, colours.join(';')];
-    }),
-  ) as Record<Theme, string>;
 }
