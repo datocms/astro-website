@@ -143,20 +143,26 @@ function buildRelationshipTypes(schema: JSONSchema) {
   return returnsAnArray ? [`Array<${formattedTypes.join(' | ')}>`] : formattedTypes;
 }
 
+// The values that a property can have, when the schema gives them as an
+// `enum` or as a `const`.
+function discriminatorValues(schema: JSONSchema | undefined): unknown[] {
+  if (!schema) return [];
+  if (Array.isArray(schema.enum)) return schema.enum;
+  if (schema.const !== undefined) return [schema.const];
+  return [];
+}
+
 function findDiscriminator(variants: JSONSchema[]): string | undefined {
   if (variants.length < 2) return undefined;
 
   const firstProps = variants[0]?.properties || {};
   const candidates = Object.keys(firstProps).filter((name) =>
-    variants.every((v) => {
-      const propSchema = v.properties?.[name];
-      return Array.isArray(propSchema?.enum) && propSchema!.enum!.length > 0;
-    }),
+    variants.every((v) => discriminatorValues(v.properties?.[name]).length > 0),
   );
 
   for (const name of candidates) {
     const enumSets = variants.map(
-      (v) => new Set((v.properties![name]!.enum as unknown[]).map((x) => String(x))),
+      (v) => new Set(discriminatorValues(v.properties![name]).map((x) => String(x))),
     );
 
     let disjoint = true;
@@ -178,8 +184,8 @@ function findDiscriminator(variants: JSONSchema[]): string | undefined {
 }
 
 function buildVariantTitle(discriminator: string, variant: JSONSchema): string {
-  const enumValues = variant.properties?.[discriminator]?.enum as unknown[] | undefined;
-  if (!enumValues || enumValues.length === 0) return 'object format';
+  const enumValues = discriminatorValues(variant.properties?.[discriminator]);
+  if (enumValues.length === 0) return 'object format';
   const formatted = enumValues.map((v) => `"${v}"`).join(' or ');
   return `object format when ${discriminator} is ${formatted}`;
 }
@@ -232,20 +238,52 @@ function buildPropertyMoreInfo(
 
     const itemsSchema = !Array.isArray(schema.items) ? schema.items : undefined;
     const variants = itemsSchema?.oneOf || itemsSchema?.anyOf;
-    if (variants && variants.every((v) => toArray(v.type).includes('object') && v.properties)) {
-      const discriminator = findDiscriminator(variants);
-      return variants.map((variant, idx) => {
-        const title = discriminator
-          ? buildVariantTitle(discriminator, variant)
-          : `object format inside array (variant #${idx + 1})`;
-        return buildMoreInfo(title, variant, language, {
-          considerDeprecatedAndRequiredAsRequired,
-        });
-      });
+    if (variants) {
+      return buildVariantsMoreInfo(
+        variants,
+        'object format inside array',
+        language,
+        considerDeprecatedAndRequiredAsRequired,
+      );
     }
   }
 
+  // An object that is a union of object formats (`oneOf` or `anyOf`).
+  const variants = schema.oneOf || schema.anyOf;
+  if (variants && !schema.properties) {
+    return buildVariantsMoreInfo(
+      variants,
+      'object format',
+      language,
+      considerDeprecatedAndRequiredAsRequired,
+    );
+  }
+
   return undefined;
+}
+
+// Makes one pane for each variant of a union. It returns `undefined` if one
+// of the variants is not an object with properties.
+function buildVariantsMoreInfo(
+  variants: JSONSchema[],
+  fallbackTitle: string,
+  language: Language,
+  considerDeprecatedAndRequiredAsRequired: boolean,
+): MoreInfo[] | undefined {
+  if (!variants.every((v) => toArray(v.type).includes('object') && v.properties)) {
+    return undefined;
+  }
+
+  const discriminator = findDiscriminator(variants);
+
+  return variants.map((variant, idx) => {
+    const title = discriminator
+      ? buildVariantTitle(discriminator, variant)
+      : `${fallbackTitle} (variant #${idx + 1})`;
+    return buildMoreInfo(title, variant, language, {
+      considerDeprecatedAndRequiredAsRequired,
+    });
+  });
 }
 
 function buildJsonSchemaPropertyAnalysis(
