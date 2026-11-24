@@ -23,13 +23,11 @@ type Props = {
   seo: TitleMetaLinkTag[];
   /** The OG card of the page (BaseLayout of the site). */
   ogCard: OgCardData;
-  contentWrapperComponent?: (props: any) => any;
   lastUpdatedAt?: string;
   hideFooter?: boolean;
 };
 
-const { seo, ogCard, contentWrapperComponent, lastUpdatedAt, hideFooter } = Astro.props;
-const ContentWrapper = contentWrapperComponent || 'div';
+const { seo, ogCard, lastUpdatedAt, hideFooter } = Astro.props;
 const hasPageBar = Astro.slots.has('pagebar');
 ---
 
@@ -113,42 +111,39 @@ const hasPageBar = Astro.slots.has('pagebar');
             <SchemeToggle />
           </span>
         </div>
-        <ContentWrapper>
-          <main id="docs-content" tabindex="-1" class={s.container}>
-            <slot />
-            <div class:list={[s.pageEnd, hideFooter && s.pageEndBare]}>
-              {
-                lastUpdatedAt && (
-                  <p class={s.lastUpdate}>
-                    Last updated: <LLMDate date={lastUpdatedAt} />
-                  </p>
-                )
-              }
-              {
-                !hideFooter && (
-                  <div class={s.footer} data-datocms-noindex>
-                    <div class={s.footerCol}>
-                      <div class={s.footerTitle}>Did this doc help you?</div>
-                      <div class={s.footerBody}>
-                        <Feedback />
-                      </div>
-                    </div>
-                    <div class={s.footerCol}>
-                      <div class={s.footerTitle}>Need help?</div>
-                      <div class={s.footerBody}>
-                        Explore our <a href="https://community.datocms.com">forum</a>,{' '}
-                        <a href="/support">contact support</a>, or{' '}
-                        <a href="/enterprise-headless-cms#form"> connect with our sales team </a>.
-                        You can also chat live with other users in our{' '}
-                        <a href="/slack">Slack channel</a>.
-                      </div>
+        <main id="docs-content" tabindex="-1" class={s.container}>
+          <slot />
+          <div class:list={[s.pageEnd, hideFooter && s.pageEndBare]}>
+            {
+              lastUpdatedAt && (
+                <p class={s.lastUpdate}>
+                  Last updated: <LLMDate date={lastUpdatedAt} />
+                </p>
+              )
+            }
+            {
+              !hideFooter && (
+                <div class={s.footer} data-datocms-noindex>
+                  <div class={s.footerCol}>
+                    <div class={s.footerTitle}>Did this doc help you?</div>
+                    <div class={s.footerBody}>
+                      <Feedback />
                     </div>
                   </div>
-                )
-              }
-            </div>
-          </main>
-        </ContentWrapper>
+                  <div class={s.footerCol}>
+                    <div class={s.footerTitle}>Need help?</div>
+                    <div class={s.footerBody}>
+                      Explore our <a href="https://community.datocms.com">forum</a>,{' '}
+                      <a href="/support">contact support</a>, or{' '}
+                      <a href="/enterprise-headless-cms#form"> connect with our sales team </a>. You
+                      can also chat live with other users in our <a href="/slack">Slack channel</a>.
+                    </div>
+                  </div>
+                </div>
+              )
+            }
+          </div>
+        </main>
       </div>
     </div>
   </docs-sidebar-drawer>

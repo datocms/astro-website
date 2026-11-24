@@ -21,8 +21,10 @@ const markdownUrl = new URL(
 
 {
   /*
-  The bar at the top of a docs page: the breadcrumb, and the actions on
-  the page. The docs layout puts it in its header (the slot "pagebar").
+  The bar at the top of a docs page: the breadcrumb, the controls of the
+  page (the slot "controls", for example the LanguagePicker of the API
+  pages), and the actions on the page. The docs layout puts it in its
+  header (the slot "pagebar").
 */
 }
 <div class={s.root} data-datocms-noindex>
@@ -37,5 +39,6 @@ const markdownUrl = new URL(
       }
     </ol>
   </nav>
+  {Astro.slots.has('controls') && <slot name="controls" />}
   {markdown && <MarkdownActions markdownUrl={markdownUrl.href} size="s" class={s.actions} />}
 </div>

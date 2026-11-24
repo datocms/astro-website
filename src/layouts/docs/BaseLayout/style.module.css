@@ -2,7 +2,8 @@
  * The shell of the docs. From 1152 the sidebar is at the left edge of the
  * screen and the main area fills the rest. One header line goes across
  * the two: the logo and the search at the left, the breadcrumb and the
- * actions on the page at the right. Below 1152 the sidebar is a drawer.
+ * actions on the page at the right. Below 1152 the sidebar is a drawer
+ * that comes from the right, the side of the hamburger that opens it.
  */
 .root {
   --docs-header-height: 56px;
@@ -28,16 +29,8 @@
   /* The top of a part that sticks below the header. The header sticks only from 1152. */
   --docs-sticky-top: 0px;
 
-  /* The space above the target of a link: the header and the sticky bar. */
-  --anchor-offset: calc(var(--docs-sticky-top) + var(--docs-toc-offset, 0px) + var(--space-md));
-}
-
-/*
- * A bar that sticks below the header (data-docs-sticky-bar, the picker of
- * the API pages) is 56px high. The table of contents sticks below it.
- */
-.root:has([data-docs-sticky-bar]) {
-  --docs-toc-offset: 56px;
+  /* The space above the target of a link: the header. */
+  --anchor-offset: calc(var(--docs-sticky-top) + var(--space-md));
 }
 
 .sidebarHeader {
@@ -324,7 +317,7 @@
 
   .innerSidebar {
     position: fixed;
-    left: 0;
+    right: 0;
     top: 0;
     height: 100dvh;
     width: 450px;
@@ -333,13 +326,13 @@
     background: var(--surface-default);
     display: flex;
     flex-direction: column;
-    transform: translateX(-100%);
+    transform: translateX(100%);
     visibility: hidden;
     transition:
       transform 350ms cubic-bezier(0.32, 0.72, 0, 1),
       visibility 0ms 350ms;
-    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-    border-right: 1px solid var(--border-default);
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+    border-left: 1px solid var(--border-default);
   }
 
   .root[data-drawer-open] .innerSidebar {

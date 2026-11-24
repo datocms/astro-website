@@ -19,7 +19,6 @@ import s from './_style.module.css';
 import { buildUrlForTemplateDemo } from '~/lib/datocms/gqlUrlBuilder/templateDemo';
 
 type Props = {
-  contentWrapperComponent?: (props: any) => any;
   group: FragmentOf<typeof GroupLayoutFragment>;
   seo: TitleMetaLinkTag[];
   /** The OG card of the page (BaseLayout of the site). */
@@ -28,14 +27,7 @@ type Props = {
   lastUpdatedAt?: string;
 };
 
-const {
-  contentWrapperComponent,
-  group: maskedGroup,
-  seo,
-  ogCard,
-  additionalSidebarItems = [],
-  lastUpdatedAt,
-} = Astro.props;
+const { group: maskedGroup, seo, ogCard, additionalSidebarItems = [], lastUpdatedAt } = Astro.props;
 
 const group = readFragment(GroupLayoutFragment, maskedGroup);
 
@@ -44,12 +36,7 @@ const group = readFragment(GroupLayoutFragment, maskedGroup);
 const showDocsNav = group.pagesOrSections.length <= 1 && additionalSidebarItems.length === 0;
 ---
 
-<BaseLayout
-  seo={seo}
-  ogCard={ogCard}
-  contentWrapperComponent={contentWrapperComponent}
-  lastUpdatedAt={lastUpdatedAt}
->
+<BaseLayout seo={seo} ogCard={ogCard} lastUpdatedAt={lastUpdatedAt}>
   <slot name="head" slot="head" />
   <slot name="pagebar" slot="pagebar" />
 

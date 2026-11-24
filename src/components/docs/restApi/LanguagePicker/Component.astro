@@ -5,14 +5,24 @@ import { addLanguageToUrl, currentLanguage } from './utils';
 const language = currentLanguage(Astro);
 ---
 
-<div class:list={[s.picker, 'label']} data-docs-sticky-bar>
-  <div class:list={[s.pickerLabel, 'capTrim']}>Show examples in:</div>
+{
+  /*
+  The language of the examples, in the bar at the top of an API page
+  (the slot "controls" of PageBar). In a narrow bar the label is hidden,
+  but it stays the name of the group for assistive technology.
+*/
+}
+<div
+  class:list={[s.picker, 'label']}
+  role="group"
+  aria-labelledby="language-picker-label"
+  data-datocms-nomd
+>
+  <span id="language-picker-label" class:list={[s.pickerLabel, 'capTrim']}>Show examples in:</span>
   <a
     href={addLanguageToUrl(Astro, Astro.url, 'javascript')}
     class:list={[s.pickerButton, language === 'javascript' && s.pickerButtonActive]}
-    aria-current={language === 'javascript' ? 'true' : undefined}
-  >
-    JavaScript</a
+    aria-current={language === 'javascript' ? 'true' : undefined}>JavaScript</a
   >
   <a
     href={addLanguageToUrl(Astro, Astro.url, 'http')}
@@ -20,5 +30,3 @@ const language = currentLanguage(Astro);
     aria-current={language === 'http' ? 'true' : undefined}>HTTP</a
   >
 </div>
-
-<slot />

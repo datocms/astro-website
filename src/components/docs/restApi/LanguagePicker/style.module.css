@@ -1,21 +1,32 @@
-/* The global class label gives the type. */
+/* The global class label gives the type. The pills do not shrink: the breadcrumb gives way. */
 .picker {
-  position: sticky;
-  height: 56px;
+  flex: none;
   display: flex;
   align-items: center;
-  background: var(--surface-default);
-  z-index: 2;
-  border-bottom: 1px solid var(--border-default);
-  /* Below the sticky header of the docs layout (--docs-sticky-top). */
-  top: calc(var(--docs-sticky-top, 0px) - 1px);
-  padding-left: var(--space-lg);
+  gap: var(--space-4xs);
   font-family: var(--font-sans);
 }
 
 .pickerLabel {
   color: var(--text-muted);
-  margin-right: var(--space-md);
+  margin-right: var(--space-3xs);
+}
+
+/*
+ * In a narrow bar the label is visually hidden (as .visuallyHidden). The
+ * limit is the width of the bar, not of the viewport: the sidebar and the
+ * drawer change it.
+ */
+@container pagebar (max-width: 960px) {
+  .pickerLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
 
 /*
@@ -27,7 +38,6 @@
   display: inline-flex;
   align-items: center;
   height: 32px;
-  margin-right: var(--space-4xs);
   padding-inline: var(--space-xs);
   color: var(--text-muted);
   text-decoration: none;
