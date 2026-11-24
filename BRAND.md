@@ -273,7 +273,7 @@ The principles only. `DESIGN.md` has the values.
 - **A brand of several themes, not of one color.** Six pairs, each with a bright accent, a deep ground, and a pale paper: Pollen on Espresso, Ember, Fern, Iris, Glacier, Bubblegum.
 - **One theme for each page.** The header, the hero, and the footer share it.
 - **Orange (Ember) when there is room for one color only.** See the fixed marks in section 8.
-- **No gray.** A neutral is the deep color of the theme, made lighter. The exception is the tools: the docs and the dashboard are white and near black with neutral grays, the orange only in small accents (links, focus, buttons, the logo on a dark ground), and a field of gray and purple pixels.
+- **No gray.** A neutral is the deep color of the theme, made lighter. The exception is the tools: the docs and the dashboard are white and near black with neutral grays, the orange only in small accents here and there (the current entry, focus, borders, icons, small decorations, the logo on a dark ground), never as text on white and never a brown, and a field of gray pixels (purple in the dark scheme).
 - **Dark text on a bright accent**, never white text on it. Text meets WCAG AA contrast.
 - ⛔ Don't mix accents of two themes in one section.
 
