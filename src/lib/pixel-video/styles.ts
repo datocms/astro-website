@@ -241,19 +241,19 @@ export const partnersGlobe: Style = {
 };
 
 // The field behind the hero of the docs home, drawn live (not from
-// footage) on the page surface: a quiet texture behind the headline and
+// footage) on its own ground: a quiet texture behind the headline and
 // the search, in three steps (faint, muted, strong). The docs theme gives
-// the tints of the two schemes (--surface-pixel-field-* in tokens.css).
-// The grid has the colour of the page, thus each cell is a separate
+// the ground and the tints of the two schemes (--surface-pixel-field-* in
+// tokens.css). The grid has the colour of the ground, thus each cell is a separate
 // square. No cell flashes: the field has no TOP layer.
 export const docsField: Style = {
   bgFill: 'var(--surface-pixel-field-faint)',
-  bgStroke: 'var(--surface-default)',
+  bgStroke: 'var(--surface-pixel-field-ground)',
   midFill: 'var(--surface-pixel-field-muted)',
-  midStroke: 'var(--surface-default)',
+  midStroke: 'var(--surface-pixel-field-ground)',
   highFill: 'var(--surface-pixel-field-high)',
-  highStroke: 'var(--surface-default)',
-  groundFill: 'var(--surface-default)',
+  highStroke: 'var(--surface-pixel-field-ground)',
+  groundFill: 'var(--surface-pixel-field-ground)',
 };
 
 /**
