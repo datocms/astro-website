@@ -1,5 +1,4 @@
 ---
-import { ActiveLink } from '~/components/docs/ActiveLink';
 import type { TocGroup } from '../types';
 import s from './style.module.css';
 
@@ -10,20 +9,61 @@ interface Props {
 const { groups } = Astro.props;
 ---
 
-<nav class={s.toc} aria-label="In this page">
-  {
-    groups.map((group) => (
-      <div class={s.group}>
-        {group.title && <div class:list={[s.tocTitle, 'monoCaps']}>{group.title}</div>}
-        <div class={s.tocEntries}>
-          {group.entries.map((node) => (
-            <ActiveLink href={node.url} class={s.tocEntry} activeClass={s.tocEntryActive}>
-              {node.badge ? <span class:list={[s.badge, 'monoCaps']}>{node.badge}</span> : ''}{' '}
-              {node.label}
-            </ActiveLink>
-          ))}
+{
+  /*
+  The script finds the heading that the visitor reads, and marks its link
+  with aria-current="location" (spyHeadings, as in TocShell). The box has
+  its own scroll: the script keeps the marked link in view. Without the
+  script, the links work and no link is marked.
+*/
+}
+<docs-toc class={s.toc}>
+  <nav aria-label="In this page">
+    {
+      groups.map((group) => (
+        <div class={s.group}>
+          {group.title && <div class:list={[s.tocTitle, 'monoCaps']}>{group.title}</div>}
+          <div class={s.tocEntries}>
+            {group.entries.map((node) => (
+              <a href={node.url} class={s.tocEntry}>
+                {node.badge ? <span class:list={[s.badge, 'monoCaps']}>{node.badge}</span> : ''}{' '}
+                {node.label}
+              </a>
+            ))}
+          </div>
         </div>
-      </div>
-    ))
-  }
-</nav>
+      ))
+    }
+  </nav>
+</docs-toc>
+
+<script>
+  import { revealInList, spyHeadings } from '~/lib/headingSpy';
+  import { WebComponent } from '~/lib/WebComponent';
+
+  customElements.define(
+    'docs-toc',
+    class extends WebComponent {
+      #globalListeners = new AbortController();
+      #active: HTMLAnchorElement | null = null;
+
+      parsedCallback() {
+        spyHeadings({
+          links: this.$$<HTMLAnchorElement>('a[href^="#"]'),
+          signal: this.#globalListeners.signal,
+          onChange: (next) => {
+            this.#active?.removeAttribute('aria-current');
+            next?.setAttribute('aria-current', 'location');
+            this.#active = next;
+            if (next) revealInList(next, this);
+          },
+        });
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.#globalListeners.abort();
+      }
+    },
+  );
+</script>

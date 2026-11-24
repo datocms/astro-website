@@ -6,6 +6,7 @@
 .toc {
   --toc-top: calc(var(--docs-sticky-top) + var(--docs-toc-offset, 0px));
 
+  display: block;
   position: sticky;
   top: var(--toc-top);
   max-height: calc(100vh - var(--toc-top));
@@ -30,16 +31,20 @@
   margin-bottom: var(--space-2xs);
 }
 
-/* A hairline at the left of the entries. The entry of the page you read marks it. */
+/* A hairline at the left of the entries. The entry that you read marks it. */
 .tocEntries {
   border-left: 1px solid var(--border-default);
 }
 
 .tocEntry {
   display: block;
+  /*
+   * The 2px mark of an entry starts at the left edge of the 1px hairline
+   * and covers it. The padding is 1px less, thus the label does not move.
+   */
   margin-left: -1px;
-  padding: var(--space-4xs) 0 var(--space-4xs) var(--space-xs);
-  border-left: 1px solid transparent;
+  padding: var(--space-4xs) 0 var(--space-4xs) calc(var(--space-xs) - 1px);
+  border-left: 2px solid transparent;
   color: var(--text-muted);
   text-decoration: none;
   font-size: var(--type-s);
@@ -61,9 +66,9 @@
   }
 }
 
-.tocEntryActive,
-.tocEntryActive:hover {
-  border-left-color: var(--text-primary);
+/* The hairline of the entry that you read is the accent. The label stays ink. */
+.tocEntry[aria-current='location'] {
+  border-left-color: var(--surface-accent);
   color: var(--text-primary);
 }
 

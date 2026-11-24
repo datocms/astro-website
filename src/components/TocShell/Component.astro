@@ -64,20 +64,16 @@ const { title, note, class: className } = Astro.props;
 </toc-shell>
 
 <script>
+  import { revealInList, spyHeadings } from '~/lib/headingSpy';
   import { WebComponent } from '~/lib/WebComponent';
 
   // From 1320 the box floats and is always open. Below, it starts closed.
   const wide = window.matchMedia('(min-width: 1320px)');
 
-  // A heading is the one that the visitor reads when its top is above this
-  // part of the viewport height.
-  const READ_LINE = 0.3;
-
   customElements.define(
     'toc-shell',
     class extends WebComponent {
       #globalListeners = new AbortController();
-      #frame = 0;
       #active: HTMLAnchorElement | null = null;
 
       parsedCallback() {
@@ -86,13 +82,6 @@ const { title, note, class: className } = Astro.props;
         const body = this.$('[data-toc-body]');
         const marker = this.$('[data-toc-marker]');
         const signal = this.#globalListeners.signal;
-
-        // The links to a heading of this page, each with its heading.
-        const entries = this.$$<HTMLAnchorElement>('a[href^="#"]').flatMap((link) => {
-          const id = decodeURIComponent(link.hash.slice(1));
-          const heading = document.getElementById(id);
-          return heading ? [{ link, heading }] : [];
-        });
 
         // Before the first heading, the bar shows on the link of the page,
         // if the list has one (the chapter of a course).
@@ -105,46 +94,25 @@ const { title, note, class: className } = Astro.props;
           this.#measure();
         };
 
-        const findActive = () => {
-          const line = window.innerHeight * READ_LINE;
-          const atEnd =
-            window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
-          let found: HTMLAnchorElement | null = null;
-
-          for (const { link, heading } of entries) {
-            const top = heading.getBoundingClientRect().top;
-            if (top <= line || (atEnd && top < window.innerHeight)) found = link;
-          }
-
-          return found ?? pageLink;
-        };
-
-        const update = () => {
-          this.#frame = 0;
-          const next = findActive();
-          if (next === this.#active) return;
-
-          if (this.#active?.getAttribute('aria-current') === 'location') {
-            this.#active.removeAttribute('aria-current');
-          }
-          if (next && next !== pageLink) next.setAttribute('aria-current', 'location');
-          this.#active = next;
-          this.#place(marker);
-          this.#reveal(body);
-        };
-
-        const schedule = () => {
-          if (!this.#frame) this.#frame = requestAnimationFrame(update);
-        };
-
         syncBox();
-        update();
+        spyHeadings({
+          links: this.$$<HTMLAnchorElement>('a[href^="#"]'),
+          fallback: pageLink,
+          signal,
+          onChange: (next) => {
+            if (this.#active?.getAttribute('aria-current') === 'location') {
+              this.#active.removeAttribute('aria-current');
+            }
+            if (next && next !== pageLink) next.setAttribute('aria-current', 'location');
+            this.#active = next;
+            this.#place(marker);
+            if (next) revealInList(next, body);
+          },
+        });
         // The first position of the bar does not animate.
         requestAnimationFrame(() => marker.setAttribute('data-ready', ''));
 
         wide.addEventListener('change', syncBox, { signal });
-        window.addEventListener('scroll', schedule, { passive: true, signal });
-        window.addEventListener('resize', schedule, { passive: true, signal });
         new ResizeObserver(() => {
           this.#measure();
           this.#place(marker);
@@ -183,26 +151,9 @@ const { title, note, class: className } = Astro.props;
         marker.setAttribute('data-visible', '');
       }
 
-      /** When the list scrolls, scroll it so that the marked link is in view. Do not scroll the page. */
-      #reveal(body: HTMLElement) {
-        const link = this.#active;
-        if (!link || body.scrollHeight <= body.clientHeight) return;
-
-        const linkBox = link.getBoundingClientRect();
-        const bodyBox = body.getBoundingClientRect();
-        const margin = linkBox.height * 2;
-
-        if (linkBox.top < bodyBox.top + margin) {
-          body.scrollTop -= bodyBox.top + margin - linkBox.top;
-        } else if (linkBox.bottom > bodyBox.bottom - margin) {
-          body.scrollTop += linkBox.bottom - (bodyBox.bottom - margin);
-        }
-      }
-
       disconnectedCallback() {
         super.disconnectedCallback();
         this.#globalListeners.abort();
-        cancelAnimationFrame(this.#frame);
       }
     },
   );

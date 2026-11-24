@@ -487,8 +487,8 @@
  * The docs theme: a white page, a neutral ink, the orange accent. The docs
  * are a tool, not a story: the page is white, and the ink is a near black
  * with no hue (OKLCH L 0.22, C 0). Only the accent has a hue: it is the
- * orange of the brand (--color-orange-light-5), and the links take a deep
- * tone of it (--text-accent). DESIGN.md calls the ink Docs Ink.
+ * orange of the brand (--color-orange-light-5). In the light scheme no text
+ * is orange (see --theme-text-accent). DESIGN.md calls the ink Docs Ink.
  * The callouts do not take the hue of the theme: each kind has its own hue
  * (--theme-status-*). The data inherits, thus a ground class inside the
  * docs keeps the callout colours.
@@ -525,12 +525,13 @@
   /* The faint chip (inline code, a soft button) is a tint of the paper, not of the accent. */
   --theme-dark-inverse-faint: color-mix(in srgb, var(--theme-paper) 8%, transparent);
   /*
-   * The accent text of the light scheme: an orange, not a brown. Lightness
-   * 0.575 with the most chroma in sRGB (#c25101) gives 4.67:1 on the page.
-   * It reads only on the page: the docs put no accent text on a tint
-   * (ACCENT_TEXT_ON_PAGE_ONLY in src/lib/tokens/contract.ts).
+   * The accent text of the light scheme is the ink. An orange text with
+   * 4.5:1 on the page must be dark (OKLCH lightness 0.58 or less), and a
+   * dark orange is a brown. Thus the docs show the orange only where it is
+   * not text: a border, an icon, a cell of a glyph (--surface-accent). A
+   * link is ink with an underline.
    */
-  --theme-text-accent: oklch(from var(--theme-accent) 0.575 0.162 h);
+  --theme-text-accent: var(--theme-ink);
   --theme-dark-ink-bright: var(--theme-accent-bright);
   --theme-dark-inverse: oklch(from var(--theme-accent) 0.15 var(--theme-dark-ground-chroma) h);
   --theme-dark-inverse-deep: oklch(from var(--theme-accent) 0.13 var(--theme-dark-ground-chroma) h);
